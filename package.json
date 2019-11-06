@@ -1,0 +1,45 @@
+{
+  "name": "empty-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "scripts": {
+    "clean": "rm dist/bundle.js",
+    "build-dev": "webpack -d --mode development",
+    "build-prod": "webpack -p --mode production",
+    "watch": "webpack -d --mode development --watch --info-verbosity verbose",
+    "dev": "webpack-dev-server --color -d --mode development --watch --info-verbosity verbose"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "bigint-node": "^1.0.4",
+    "cryptojslib": "^3.1.2",
+    "fs": "^0.0.1-security",
+    "js-sha1": "^0.6.0",
+    "jsbn": "^1.1.0",
+    "node-cryptojs-aes": "^0.4.0",
+    "rusha": "^0.8.13"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "autoprefixer": "latest",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^3.2.0",
+    "file-loader": "^4.2.0",
+    "net": "^1.0.2",
+    "node-sass": "^4.13.0",
+    "path": "^0.12.7",
+    "postcss-loader": "^3.0.0",
+    "sass-loader": "^8.0.0",
+    "stream": "^0.0.2",
+    "style-loader": "^1.0.0",
+    "url-loader": "^2.2.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0"
+  }
+}
