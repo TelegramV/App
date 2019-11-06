@@ -1,5 +1,5 @@
-import Storage from "./storage"
-import {longFromInts, nextRandomInt} from "./bin_utils"
+import Storage from "../../common/storage"
+import {longFromInts, nextRandomInt} from "../utils/bin"
 
 class MtpTimeManager {
     constructor() {
@@ -38,17 +38,18 @@ class MtpTimeManager {
 
         this.lastMessageID = [0, 0]
         this.timeOffset = newTimeOffset
-        console.log(new Date().getTime(), 'Apply server time', serverTime, localTime, newTimeOffset, changed)
+
+        console.debug('Apply server timeManager', serverTime, localTime, newTimeOffset, changed)
 
         return changed
     }
 }
 
-const mtpTimeManager = new MtpTimeManager()
-
 export function tsNow(seconds) {
     let t = +new Date() + (mtpTimeManager.timeOffset || 0)
     return seconds ? Math.floor(t / 1000) : t
 }
+
+const mtpTimeManager = new MtpTimeManager()
 
 export default mtpTimeManager

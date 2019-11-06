@@ -633,7 +633,7 @@
   "methods": [
     {
       "id": "1615239032",
-      "method": "req_pq",
+      "method": "req_pq_multi",
       "params": [
         {
           "name": "nonce",
