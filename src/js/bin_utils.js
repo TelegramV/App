@@ -8,9 +8,9 @@
 import {BigInteger, SecureRandom} from 'jsbn'
 import Rusha from "rusha"
 
-const CryptoJS = require('node-cryptojs-aes').CryptoJS
+import CryptoJS from "./crypto"
 
-const rusha = new Rusha(1024 * 1024)
+const rusha = new Rusha(1024 * 1024);
 
 export function secureRandom() {
     return new SecureRandom()
@@ -401,7 +401,6 @@ export function aesEncryptSync(bytes, keyBytes, ivBytes) {
 
     // console.log(dT(), 'AES encrypt start', len/*, bytesToHex(keyBytes), bytesToHex(ivBytes)*/)
     bytes = addPadding(bytes)
-
     var encryptedWords = CryptoJS.AES.encrypt(bytesToWords(bytes), bytesToWords(keyBytes), {
         iv: bytesToWords(ivBytes),
         padding: CryptoJS.pad.NoPadding,
@@ -415,7 +414,6 @@ export function aesEncryptSync(bytes, keyBytes, ivBytes) {
 }
 
 export function aesDecryptSync(encryptedBytes, keyBytes, ivBytes) {
-
     console.log('AES decrypt start', encryptedBytes.length)
     const decryptedWords = CryptoJS.AES.decrypt({ciphertext: bytesToWords(encryptedBytes)}, bytesToWords(keyBytes), {
         iv: bytesToWords(ivBytes),

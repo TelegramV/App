@@ -42,7 +42,7 @@ class MtpDcConfigurator {
 
             if (false) {
                 var subdomain = this.sslSubdomains[dcID - 1] + (upload ? "-1" : "")
-                var path = "apiw1"
+                var path = "apiw1_test"
                 chosenServer = "https://" + subdomain + ".web.telegram.org/" + path
                 return chosenServer
             }
@@ -50,7 +50,7 @@ class MtpDcConfigurator {
             for (i = 0; i < this.dcOptions.length; i++) {
                 dcOption = this.dcOptions[i]
                 if (dcOption.id == dcID) {
-                    chosenServer = "http://" + dcOption.host + (dcOption.port != 80 ? ":" + dcOption.port : "") + "/apiw1"
+                    chosenServer = "http://" + dcOption.host + (dcOption.port != 80 ? ":" + dcOption.port : "") + "/apiw1_test"
                     break
                 }
             }
@@ -193,7 +193,7 @@ function mtpSendReqPQ(auth) {
 
     messageSerializer.storeMethod("req_pq_multi", {
         nonce: auth.nonce
-    })
+    });
 
     console.debug("Send req_pq", bytesToHex(auth.nonce))
 
