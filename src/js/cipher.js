@@ -8,7 +8,7 @@
 // Import dependencies
 import {BigInteger} from 'jsbn'
 
-var CryptoJS = require('node-cryptojs-aes').CryptoJS;
+import CryptoJS from "./crypto"
 var utility = require('./util');
 
 // RSA encrypt function, requires:
@@ -65,25 +65,25 @@ export function aesEncrypt(msg, key, iv) {
     var padding = msg.length % 16;
     if (padding > 0) {
         var paddingBuffer = utility.createRandomBuffer(16 - padding);
-        msg = Buffer.concat([msg, paddingBuffer]);
+        msg = Buffer.concat([new Buffer(msg), paddingBuffer]);
     }
     // Convert buffers to wordArrays
     var plainMsg = buffer2WordArray(msg);
     var keyWordArray = buffer2WordArray(key);
     var ivWordArray = buffer2WordArray(iv);
-    if (logger.isDebugEnabled()) {
+    //if (logger.isDebugEnabled()) {
         logger.debug('plainMsg = %s\nkeyWordArray = %s\nivWordArray = %s',
             JSON.stringify(plainMsg), JSON.stringify(keyWordArray), JSON.stringify(ivWordArray));
-    }
+    //}
     // Encrypt plain message
     var encryptedWordArray = CryptoJS.AES.encrypt(plainMsg, keyWordArray, {
         iv: ivWordArray,
         padding: CryptoJS.pad.NoPadding,
         mode: CryptoJS.mode.IGE
     }).ciphertext;
-    if (logger.isDebugEnabled()) {
+    //if (logger.isDebugEnabled()) {
         logger.debug('encryptedWordArray = %s', JSON.stringify(encryptedWordArray));
-    }
+   // }
     // Return the encrypted buffer
     return wordArray2Buffer(encryptedWordArray);
 }

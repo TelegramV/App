@@ -32,7 +32,7 @@ class MtpTimeManager {
 
     applyServerTime(serverTime, localTime) {
         const newTimeOffset = serverTime - Math.floor((localTime || tsNow()) / 1000)
-        const changed = Math.abs(timeOffset - newTimeOffset) > 10
+        const changed = Math.abs(this.timeOffset - newTimeOffset) > 10
 
         Storage.set({server_time_offset: newTimeOffset})
 

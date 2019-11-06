@@ -5,7 +5,7 @@ import {
     aesDecryptSync,
     bigStringInt,
     bytesCmp,
-    bytesFromHex,
+    bytesFromHex, bytesModPow,
     bytesToArrayBuffer,
     bytesToHex,
     rsaEncrypt,
@@ -16,7 +16,7 @@ import {PQFinder} from "./pq-finder"
 import {aesEncrypt} from "./cipher"
 import TimeManager, {tsNow} from "./timeManager"
 
-var BigInteger = require("jsbn");
+var BigInteger = require("jsbn").BigInteger;
 
 class MtpDcConfigurator {
     constructor() {
@@ -42,7 +42,7 @@ class MtpDcConfigurator {
 
             if (false) {
                 var subdomain = this.sslSubdomains[dcID - 1] + (upload ? "-1" : "")
-                var path = "apiw1_test"
+                var path = "apiw_test"
                 chosenServer = "https://" + subdomain + ".web.telegram.org/" + path
                 return chosenServer
             }
@@ -50,7 +50,7 @@ class MtpDcConfigurator {
             for (i = 0; i < this.dcOptions.length; i++) {
                 dcOption = this.dcOptions[i]
                 if (dcOption.id == dcID) {
-                    chosenServer = "http://" + dcOption.host + (dcOption.port != 80 ? ":" + dcOption.port : "") + "/apiw1_test"
+                    chosenServer = "http://" + dcOption.host + (dcOption.port != 80 ? ":" + dcOption.port : "") + "/apiw_test"
                     break
                 }
             }
@@ -191,7 +191,7 @@ function mtpSendPlainRequest(dcID, requestBuffer) {
 function mtpSendReqPQ(auth) {
     const messageSerializer = new TLSerialization({mtproto: true})
 
-    messageSerializer.storeMethod("req_pq_multi", {
+    messageSerializer.storeMethod("req_pq", {
         nonce: auth.nonce
     });
 
@@ -323,9 +323,11 @@ function mtpDecryptServerDhDataAnswer(auth, encryptedAnswer) {
     var hash = answerWithHash.slice(0, 20)
     var answerWithPadding = answerWithHash.slice(20)
     var buffer = bytesToArrayBuffer(answerWithPadding)
+    console.log("mtpDecryptServerDhDataAnswer", bytesToHex(answerWithPadding));
 
     var deserializer = new TLDeserialization(buffer, {mtproto: true})
     var response = deserializer.fetchObject("Server_DH_inner_data")
+    console.log(response);
 
     if (response._ != "server_DH_inner_data") {
         throw new Error("[MT] server_DH_inner_data response invalid: " + constructor)
@@ -418,6 +420,7 @@ function mtpSendSetClientDhParams(auth) {
     }, "Client_DH_Inner_Data")
 
     var dataWithHash = createSHAHash(data.getBuffer()).concat(data.getBytes())
+    console.log("mtpSendSetClientDhParams", dataWithHash, auth);
 
     var encryptedData = aesEncrypt(dataWithHash, auth.tmpAesKey, auth.tmpAesIv)
 
@@ -448,7 +451,8 @@ function mtpSendSetClientDhParams(auth) {
             return false
         }
 
-        CryptoWorker.modPow(auth.gA, auth.b, auth.dhPrime).then(function (authKey) {
+        var authKey = bytesModPow(auth.gA, auth.b, auth.dhPrime);
+        console.log("GOT auth key!", authKey);
             var authKeyHash = sha1BytesSync(authKey),
                 authKeyAux = authKeyHash.slice(0, 8),
                 authKeyID = authKeyHash.slice(-8)
@@ -469,6 +473,7 @@ function mtpSendSetClientDhParams(auth) {
                     auth.authKeyID = authKeyID
                     auth.authKey = authKey
                     auth.serverSalt = serverSalt
+                    console.log("GOT EVERYTHING! ", auth)
 
                     deferred.resolve(auth)
                     break
@@ -495,9 +500,6 @@ function mtpSendSetClientDhParams(auth) {
         }, function (error) {
             deferred.reject(error)
         })
-    }, function (error) {
-        deferred.reject(error)
-    })
 }
 
 mtpSendReqPQ(auth)
