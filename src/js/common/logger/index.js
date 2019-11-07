@@ -56,18 +56,18 @@ export class Logger {
 
     log(text, ...options) {
         if (typeof text === "object") {
-            this.driver.log(this.makeLog("log"), text, options)
+            this.driver.log(this.makeLog("log"), text, ...options)
         } else {
-            this.driver.log(this.makeLog("log", text), options)
+            this.driver.log(this.makeLog("log", text), ...options)
         }
     }
 
     info(text, ...options) {
         if (this.levelIndex >= 1) {
             if (typeof text === "object") {
-                this.driver.info(this.makeLog("info"), text, options)
+                this.driver.info(this.makeLog("info"), text, ...options)
             } else {
-                this.driver.info(this.makeLog("info", text), options)
+                this.driver.info(this.makeLog("info", text), ...options)
             }
         }
     }
@@ -75,9 +75,9 @@ export class Logger {
     warn(text, ...options) {
         if (this.levelIndex >= 2) {
             if (typeof text === "object") {
-                this.driver.warn(this.makeLog("warn"), text, options)
+                this.driver.warn(this.makeLog("warn"), text, ...options)
             } else {
-                this.driver.warn(this.makeLog("warn", text), options)
+                this.driver.warn(this.makeLog("warn", text), ...options)
             }
         }
     }
@@ -85,9 +85,9 @@ export class Logger {
     error(text, ...options) {
         if (this.showErrors || this.levelIndex >= 3) {
             if (typeof text === "object") {
-                this.driver.error(this.makeLog("error"), text, options)
+                this.driver.error(this.makeLog("error"), text, ...options)
             } else {
-                this.driver.error(this.makeLog("error", text), options)
+                this.driver.error(this.makeLog("error", text), ...options)
             }
         }
     }
@@ -95,9 +95,9 @@ export class Logger {
     debug(text, ...options) {
         if (this.levelIndex >= 4) {
             if (typeof text === "object") {
-                this.driver.debug(this.makeLog("debug"), text, options)
+                this.driver.debug(this.makeLog("debug"), text, ...options)
             } else {
-                this.driver.debug(this.makeLog("debug", text), options)
+                this.driver.debug(this.makeLog("debug", text), ...options)
             }
         }
     }

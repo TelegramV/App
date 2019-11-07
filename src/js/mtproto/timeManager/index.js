@@ -9,10 +9,6 @@ class MtpTimeManager {
         this.lastMessageID = [0, 0]
         this.timeOffset = 0
 
-        console.error("FUCK", this)
-    }
-
-    generateMessageID() {
         Storage.get("server_time_offset").then(function (offset) {
             if (offset) {
                 this.timeOffset = offset
@@ -20,6 +16,11 @@ class MtpTimeManager {
 
             Logger.warn("offset = ", offset)
         })
+
+        console.error("FUCK", this)
+    }
+
+    generateMessageID() {
 
         Logger.warn("this.timeOffset = ", this.timeOffset)
 
@@ -40,8 +41,13 @@ class MtpTimeManager {
     }
 
     applyServerTime(serverTime, localTime) {
+        Logger.warn("serverTime = ", serverTime)
+        Logger.warn("localTime = ", localTime)
+
         const newTimeOffset = serverTime - Math.floor((localTime || tsNow()) / 1000)
         const changed = Math.abs(this.timeOffset - newTimeOffset) > 10
+
+        Logger.warn("newTimeOffset = ", newTimeOffset)
 
         Storage.set("server_time_offset", newTimeOffset)
 
