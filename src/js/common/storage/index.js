@@ -1,18 +1,24 @@
-const data = {}
+import {createLogger} from "../logger"
+
+const Logger = createLogger("[Storage]")
 
 class Storage {
     constructor() {
-        this.data = data
+        window.mtprotoStorage = window.mtprotoStorage ? window.mtprotoStorage : {}
+        this.data = window.mtprotoStorage
     }
 
     get(key, defaultValue = null) {
+        Logger.debug(`reading data [${key}] [${defaultValue}]`)
         return new Promise(resolve => {
             const value = this.data[key]
+            Logger.debug(`read data [${key}] = [${value}]`)
             resolve(value !== undefined && value != null ? value : defaultValue)
         })
     }
 
     set(key, value) {
+        Logger.debug(`setting data [${key}] [${value}]`)
         this.data[key] = value
         return value
     }
@@ -22,4 +28,5 @@ class Storage {
     }
 }
 
-export default new Storage()
+const storage = new Storage()
+export default storage

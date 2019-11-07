@@ -1,6 +1,7 @@
 import MTProto from "./mtproto"
 import {createNonce} from "./mtproto/utils/bin"
 
+window.mtprotoStorage = {}
 
 const config = {
     id: 196813,
