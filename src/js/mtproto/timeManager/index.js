@@ -22,7 +22,7 @@ class MtpTimeManager {
 
     generateMessageID() {
 
-        Logger.warn("this.timeOffset = ", this.timeOffset)
+        Logger.warn("generateMessageID this.timeOffset = ", this.timeOffset)
 
         const timeTicks = tsNow()
         const timeSec = Math.floor(timeTicks / 1000) + this.timeOffset
@@ -60,11 +60,11 @@ class MtpTimeManager {
     }
 }
 
+const mtpTimeManager = new MtpTimeManager()
+
 export function tsNow(seconds) {
     let t = +new Date() + (mtpTimeManager.timeOffset || 0)
     return seconds ? Math.floor(t / 1000) : t
 }
-
-const mtpTimeManager = new MtpTimeManager()
 
 export default mtpTimeManager

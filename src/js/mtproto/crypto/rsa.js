@@ -9,8 +9,6 @@ export function rsaEncrypt(publicKey, bytes) {
     const E = new BigInteger(publicKey.exponent, 16)
     const X = new BigInteger(bytes)
     const encryptedBigInt = X.modPowInt(E, N)
-    const encryptedBytes = bytesFromBigInt(encryptedBigInt, 256)
-    // console.log('RSA encrypt finish')
 
-    return encryptedBytes
+    return bytesFromBigInt(encryptedBigInt, 256)
 }

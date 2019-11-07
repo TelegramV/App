@@ -7,11 +7,7 @@ const rusha = new Rusha(1024 * 1024);
 export function sha1HashSync(bytes) {
     const rushaInstance = rusha || new Rusha(1024 * 1024)
 
-    // console.log(dT(), 'SHA-1 hash start', bytes.byteLength || bytes.length)
-    const hashBytes = rushaInstance.rawDigest(bytes).buffer
-    // console.log(dT(), 'SHA-1 hash finish')
-
-    return hashBytes
+    return rushaInstance.rawDigest(bytes).buffer
 }
 
 export function sha1BytesSync(bytes) {
@@ -23,7 +19,5 @@ export function sha256HashSync(bytes) {
     const hashWords = CryptoJS.SHA256(bytesToWords(bytes))
     // console.log(dT(), 'SHA-2 hash finish')
 
-    const hashBytes = bytesFromWords(hashWords)
-
-    return hashBytes
+    return bytesFromWords(hashWords)
 }

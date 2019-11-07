@@ -359,6 +359,8 @@ function sendSetClientDhParams(requestContext) {
 
         Logger.debug("GOT auth key!", authKey);
 
+        Logger.warn("SHIT", requestContext.gA, requestContext.b, requestContext.dhPrime)
+
         const authKeyHash = sha1BytesSync(authKey)
         const authKeyAux = authKeyHash.slice(0, 8)
         const authKeyID = authKeyHash.slice(-8)
@@ -372,7 +374,7 @@ function sendSetClientDhParams(requestContext) {
 
 
                 /**
-                 * FIXME: Looks like this can be fixed by fixing TimeManager or Storage..
+                 * FIXME: ...
                  */
                 if (!bytesCmp(newNonceHash1, response.new_nonce_hash1)) {
                     throw new Error("[MT] Set_client_DH_params_answer new_nonce_hash1 mismatch")
