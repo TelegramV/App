@@ -23,7 +23,7 @@ class DataCenter {
 
             if (this.useSsl) {
                 let subdomain = this.sslSubdomains[dcID - 1] + (upload ? "-1" : "")
-                const path = "apiw_test"
+                const path = "apiw1_test"
                 chosenServer = "https://" + subdomain + ".web.telegram.org/" + path
                 return chosenServer
             }
@@ -31,7 +31,7 @@ class DataCenter {
             for (let i = 0; i < this.dcOptions.length; i++) {
                 dcOption = this.dcOptions[i]
                 if (Number(dcOption.id) === Number(dcID)) {
-                    chosenServer = "http://" + dcOption.host + (Number(dcOption.port) !== 80 ? ":" + dcOption.port : "") + "/apiw_test"
+                    chosenServer = "http://" + dcOption.host + (Number(dcOption.port) !== 80 ? ":" + dcOption.port : "") + "/apiw1_test"
                     break
                 }
             }

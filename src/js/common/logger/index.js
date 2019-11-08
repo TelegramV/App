@@ -31,7 +31,7 @@ export class Logger {
             },
         ]
 
-        this.prefix = options.prefix || ""
+        this.prefix = `[${options.prefix}]` || ""
         this.dateTime = options.dateTimeFormat || true
         this.dateTimeFormat = options.dateTimeFormat || "default"
         this.level = options.level || "debug"

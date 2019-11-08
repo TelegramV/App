@@ -2,9 +2,9 @@ import Storage from "../../common/storage"
 import {longFromInts, nextRandomInt} from "../utils/bin"
 import {createLogger} from "../../common/logger"
 
-const Logger = createLogger("[MtpTimeManager]")
+const Logger = createLogger("MtpTimeManager")
 
-class MtpTimeManager {
+export class MtpTimeManager {
     constructor() {
         this.lastMessageID = [0, 0]
         this.timeOffset = 0

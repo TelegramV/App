@@ -1,6 +1,6 @@
 import {createLogger} from "../logger"
 
-const Logger = createLogger("[Storage]")
+const Logger = createLogger("Storage")
 
 class Storage {
     constructor() {

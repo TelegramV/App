@@ -1,4 +1,7 @@
 import {bigint, bigStringInt, bytesToHex, intToUint} from "../utils/bin"
+import {createLogger} from "../../common/logger";
+
+const Logger = createLogger("TLSerialization")
 
 export class TLSerialization {
     constructor(options = {
@@ -259,7 +262,6 @@ export class TLSerialization {
     }
 
     storeObject(obj, type, field) {
-
         switch (type) {
             case "#":
             case "int":
@@ -304,7 +306,7 @@ export class TLSerialization {
         }
 
         if (!(obj instanceof Object)) {
-            throw new Error("Invalid object for type " + type)
+            throw new Error("Invalid object for type " + type + ": " + obj)
         }
 
         const predicate = obj["_"]
@@ -324,7 +326,7 @@ export class TLSerialization {
         }
 
         if (!constructorData) {
-            throw new Error("No predicate " + predicate + " found")
+            throw new Error("No predicate " + predicate + " found: " + type)
         }
 
         if (String(predicate) === String(type)) {

@@ -86,13 +86,14 @@ export class TLDeserialization {
             this.offset++
         }
 
+        let s = sUTF8;
         try {
-            let s = decodeURIComponent(escape(sUTF8))
+            s = decodeURIComponent(escape(sUTF8))
         } catch (e) {
-            let s = sUTF8
+            s = sUTF8
         }
 
-        console.debug("<<<", s, field + ":string")
+        //console.debug("<<<", s, field + ":string")
 
         return s
     }
@@ -285,7 +286,7 @@ export class TLDeserialization {
                 }
             }
             if (!constructorData) {
-                throw new Error("Constructor not found: " + constructor + " " + this.fetchInt() + " " + this.fetchInt())
+                throw new Error("Constructor not found: " + constructorCmp + " " + this.fetchInt() + " " + this.fetchInt())
             }
         }
 
@@ -334,6 +335,10 @@ export class TLDeserialization {
 
     getOffset() {
         return this.offset
+    }
+
+    getLeftoverArray() {
+        return this.byteView.slice(this.offset, this.byteView.byteLength - 1)
     }
 
     fetchEnd() {
