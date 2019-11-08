@@ -19,9 +19,11 @@ import {TLDeserialization} from "../language/deserialization";
 const Logger = createLogger("Networker")
 
 export class Networker {
-    constructor(auth) {
+    constructor(auth, socket) {
         this.timeManager = new MtpTimeManager()
         this.sentMessages = {}
+        this.socket = socket;
+        this.socket.messageHandler = this.receiveData.bind(this)
 
         auth.authKeyHash = sha1BytesSync(auth.authKey)
         auth.authKeyAux = auth.authKeyHash.slice(0, 8)
@@ -113,16 +115,13 @@ export class Networker {
         request.storeRawBytes(encryptedResult.bytes, 'encrypted_data')
 
         // TODO xhrSendBuffer
-        const requestData = true ? request.getBuffer() : request.getArray();
+        const requestData = new Uint8Array(false ? request.getBuffer() : request.getArray().buffer);
 
         let requestPromise;
         const url = DataCenter.chooseServer(this.auth.dcID);
         const baseError = {code: 406, type: 'NETWORK_BAD_RESPONSE', url: url};
 
-        return axios.post(url, requestData, {
-            responseType: "arraybuffer",
-            transformRequest: null
-        })
+        return this.socket.send(requestData)
     }
 
     getDecryptedMessage(msgKey, encryptedData) {
@@ -240,12 +239,14 @@ export class Networker {
         }
     }
 
+    receiveData(data) {
+        const response = this.parseResponse(data)
+        Logger.log("result:", response)
+    }
+
     sendMessage(message) {
         message.msg_id = this.timeManager.generateMessageID()
-        this.sendEncryptedRequest(message).then(result => {
-            const response = this.parseResponse(result.data)
-            Logger.log("result:", response)
-        })
+        this.sendEncryptedRequest(message)
     }
 
     wrapApiCall(method, params, options) {
