@@ -1,6 +1,6 @@
-# Telegram Bridge
+# Telegram Web
 
-Empty project.
+Next generation Telegram web-client.
 
 ## Building and running on localhost
 
@@ -10,20 +10,14 @@ First install dependencies:
 npm install
 ```
 
+To run development server:
+
+```sh
+npm run dev
+```
+
 To create a production build:
 
 ```sh
 npm run build-prod
-```
-
-To create a development build:
-
-```sh
-npm run build-dev
-```
-
-## Running
-
-```sh
-node dist/bundle.js
 ```

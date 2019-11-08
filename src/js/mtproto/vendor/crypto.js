@@ -211,13 +211,13 @@ var CryptoJS = CryptoJS || (function (Math, undefined) {
 
             // Concat
             if (thisSigBytes % 4) {
-                // Copy one byte at a time
+                // Copy one byte at a timeManager
                 for (var i = 0; i < thatSigBytes; i++) {
                     var thatByte = (thatWords[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
                     thisWords[(thisSigBytes + i) >>> 2] |= thatByte << (24 - ((thisSigBytes + i) % 4) * 8);
                 }
             } else if (thatWords.length > 0xffff) {
-                // Copy one word at a time
+                // Copy one word at a timeManager
                 for (var i = 0; i < thatSigBytes; i += 4) {
                     thisWords[(thisSigBytes + i) >>> 2] = thatWords[i >>> 2];
                 }

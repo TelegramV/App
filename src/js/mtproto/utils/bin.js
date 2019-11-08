@@ -1,19 +1,32 @@
-/*!
- * Webogram v0.7.0 - messaging web application for MTProto
- * https://github.com/zhukov/webogram
- * Copyright (C) 2014 Igor Zhukov <igor.beatle@gmail.com>
- * https://github.com/zhukov/webogram/blob/master/LICENSE
- */
+import {BigInteger, SecureRandom} from "jsbn"
+import CryptoJS from "../vendor/crypto"
+import crypto from "crypto"
 
-import {BigInteger, SecureRandom} from 'jsbn'
-import Rusha from "rusha"
+// Mod Pow
+export function modPow(x, e, m) {
+    var logger = console;
+    var bigX = (typeof x === 'number') ? new BigInteger(x + '', 10) : new BigInteger(x.toString('hex'), 16);
+    var bigE = (typeof e === 'number') ? new BigInteger(e + '', 10) : new BigInteger(e.toString('hex'), 16);
+    var bigM = (typeof m === 'number') ? new BigInteger(m + '', 10) : new BigInteger(m.toString('hex'), 16);
+    var bigResult = bigX.modPow(bigE, bigM);
 
-import CryptoJS from "./crypto"
+    logger.debug('X = %s, E = %s, M = %s, result = %s', bigX, bigE, bigM, bigResult);
 
-const rusha = new Rusha(1024 * 1024);
+    var result = new Buffer(bigResult.toByteArray());
+    if (result.length > 256) {
+        result = result.slice(result.length - 256);
+    }
+    return result;
+}
 
-export function secureRandom() {
-    return new SecureRandom()
+// Create a random Buffer
+export function createRandomBuffer(bytesLength) {
+    return new Buffer(crypto.randomBytes(bytesLength));
+}
+
+// Create a new nonce
+export function createNonce(bytesLength) {
+    return createRandomBuffer(bytesLength);
 }
 
 export function bigint(num) {
@@ -24,45 +37,80 @@ export function bigStringInt(strNum) {
     return new BigInteger(strNum, 10)
 }
 
-export function dHexDump(bytes) {
-    var arr = []
-    for (var i = 0; i < bytes.length; i++) {
-        if (i && !(i % 2)) {
-            if (!(i % 16)) {
-                arr.push('\n')
-            } else if (!(i % 4)) {
-                arr.push('  ')
-            } else {
-                arr.push(' ')
+export function addPadding(bytes, blockSize, zeroes) {
+    blockSize = blockSize || 16
+    const len = bytes.byteLength || bytes.length
+    const needPadding = blockSize - (len % blockSize)
+
+    if (needPadding > 0 && needPadding < blockSize) {
+        const padding = new Array(needPadding)
+
+        if (zeroes) {
+            for (let i = 0; i < needPadding; i++) {
+                padding[i] = 0
             }
+        } else {
+            secureRandom().nextBytes(padding)
         }
-        arr.push((bytes[i] < 16 ? '0' : '') + bytes[i].toString(16))
+
+        if (bytes instanceof ArrayBuffer) {
+            bytes = bufferConcat(bytes, padding)
+        } else {
+            bytes = bytes.concat(padding)
+        }
     }
 
-    console.log(arr.join(''))
+    return bytes
 }
 
-export function bytesToHex(bytes) {
-    bytes = bytes || []
-    var arr = []
-    for (var i = 0; i < bytes.length; i++) {
+export function bytesToWords(bytes) {
+    if (bytes instanceof ArrayBuffer) {
+        bytes = new Uint8Array(bytes)
+    }
+
+    const len = bytes.length
+    const words = []
+
+    for (let i = 0; i < len; i++) {
+        words[i >>> 2] |= bytes[i] << (24 - (i % 4) * 8)
+    }
+
+    return new CryptoJS.lib.WordArray.init(words, len)
+}
+
+export function bytesFromWords(wordArray) {
+    const words = wordArray.words
+    const sigBytes = wordArray.sigBytes
+    const bytes = []
+
+    for (let i = 0; i < sigBytes; i++) {
+        bytes.push((words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff)
+    }
+
+    return bytes
+}
+
+export function bytesToHex(bytes = []) {
+    const arr = []
+
+    for (let i = 0; i < bytes.length; i++) {
         arr.push((bytes[i] < 16 ? '0' : '') + (bytes[i] || 0).toString(16))
     }
+
     return arr.join('')
 }
 
 export function bytesFromHex(hexString) {
-    var len = hexString.length,
-        i
-    var start = 0
-    var bytes = []
+    const len = hexString.length
+    const bytes = []
+    let start = 0
 
     if (hexString.length % 2) {
         bytes.push(parseInt(hexString.charAt(0), 16))
         start++
     }
 
-    for (i = start; i < len; i += 2) {
+    for (let i = start; i < len; i += 2) {
         bytes.push(parseInt(hexString.substr(i, 2), 16))
     }
 
@@ -70,10 +118,10 @@ export function bytesFromHex(hexString) {
 }
 
 export function bytesToBase64(bytes) {
-    var mod3
-    var result = ''
+    let mod3
+    let result = ""
 
-    for (var nLen = bytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
+    for (let nLen = bytes.length, nUint24 = 0, nIdx = 0; nIdx < nLen; nIdx++) {
         mod3 = nIdx % 3
         nUint24 |= bytes[nIdx] << (16 >>> mod3 & 24)
         if (mod3 === 2 || nLen - nIdx === 1) {
@@ -105,20 +153,22 @@ export function uint6ToBase64(nUint6) {
 }
 
 export function base64ToBlob(base64str, mimeType) {
-    var sliceSize = 1024
-    var byteCharacters = atob(base64str)
-    var bytesLength = byteCharacters.length
-    var slicesCount = Math.ceil(bytesLength / sliceSize)
-    var byteArrays = new Array(slicesCount)
+    const sliceSize = 1024
+    const byteCharacters = atob(base64str)
+    const bytesLength = byteCharacters.length
+    const slicesCount = Math.ceil(bytesLength / sliceSize)
+    const byteArrays = new Array(slicesCount)
 
-    for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-        var begin = sliceIndex * sliceSize
-        var end = Math.min(begin + sliceSize, bytesLength)
+    for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+        const begin = sliceIndex * sliceSize
+        const end = Math.min(begin + sliceSize, bytesLength)
 
-        var bytes = new Array(end - begin)
-        for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
+        const bytes = new Array(end - begin)
+
+        for (let offset = begin, i = 0; offset < end; ++i, ++offset) {
             bytes[i] = byteCharacters[offset].charCodeAt(0)
         }
+
         byteArrays[sliceIndex] = new Uint8Array(bytes)
     }
 
@@ -127,23 +177,24 @@ export function base64ToBlob(base64str, mimeType) {
 
 export function dataUrlToBlob(url) {
     // var name = 'b64blob ' + url.length
-    // console.time(name)
-    var urlParts = url.split(',')
-    var base64str = urlParts[1]
-    var mimeType = urlParts[0].split(':')[1].split(';')[0]
-    var blob = base64ToBlob(base64str, mimeType)
+    // console.timeManager(name)
+    const urlParts = url.split(',')
+    const base64str = urlParts[1]
+    const mimeType = urlParts[0].split(':')[1].split(';')[0]
+    const blob = base64ToBlob(base64str, mimeType)
     // console.timeEnd(name)
     return blob
 }
 
 export function blobConstruct(blobParts, mimeType) {
-    var blob
-    var safeMimeType = blobSafeMimeType(mimeType)
+    const safeMimeType = blobSafeMimeType(mimeType)
+    let blob
+
     try {
         blob = new Blob(blobParts, {type: safeMimeType})
     } catch (e) {
-        var bb = new BlobBuilder
-        angular.forEach(blobParts, function (blobPart) {
+        const bb = new BlobBuilder()
+        Array.forEach(blobParts, function (blobPart) {
             bb.append(blobPart)
         })
         blob = bb.getBlob(safeMimeType)
@@ -164,69 +215,45 @@ export function blobSafeMimeType(mimeType) {
         'audio/ogg',
         'audio/mpeg',
         'audio/mp4',
-    ].indexOf(mimeType) == -1) {
+    ].indexOf(mimeType) === -1) {
         return 'application/octet-stream'
     }
     return mimeType
 }
 
 export function bytesCmp(bytes1, bytes2) {
-    var len = bytes1.length
-    if (len != bytes2.length) {
+    const len = bytes1.length
+
+    if (len !== bytes2.length) {
         return false
     }
 
-    for (var i = 0; i < len; i++) {
-        if (bytes1[i] != bytes2[i]) {
+    for (let i = 0; i < len; i++) {
+        if (bytes1[i] !== bytes2[i]) {
             return false
         }
     }
+
     return true
 }
 
 export function bytesXor(bytes1, bytes2) {
-    var len = bytes1.length
-    var bytes = []
+    const len = bytes1.length
+    const bytes = []
 
-    for (var i = 0; i < len; ++i) {
+    for (let i = 0; i < len; ++i) {
         bytes[i] = bytes1[i] ^ bytes2[i]
     }
 
     return bytes
 }
 
-export function bytesToWords(bytes) {
-    if (bytes instanceof ArrayBuffer) {
-        bytes = new Uint8Array(bytes)
-    }
-    var len = bytes.length
-    var words = []
-    var i
-    for (i = 0; i < len; i++) {
-        words[i >>> 2] |= bytes[i] << (24 - (i % 4) * 8)
-    }
-
-    return new CryptoJS.lib.WordArray.init(words, len)
-}
-
-export function bytesFromWords(wordArray) {
-    var words = wordArray.words
-    var sigBytes = wordArray.sigBytes
-    var bytes = []
-
-    for (var i = 0; i < sigBytes; i++) {
-        bytes.push((words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff)
-    }
-
-    return bytes
-}
-
 export function bytesFromBigInt(bigInt, len) {
-    var bytes = bigInt.toByteArray()
+    let bytes = bigInt.toByteArray()
 
     if (len && bytes.length < len) {
-        var padding = []
-        for (var i = 0, needPadding = len - bytes.length; i < needPadding; i++) {
+        const padding = []
+        for (let i = 0, needPadding = len - bytes.length; i < needPadding; i++) {
             padding[i] = 0
         }
         if (bytes instanceof ArrayBuffer) {
@@ -244,7 +271,7 @@ export function bytesFromBigInt(bigInt, len) {
 }
 
 export function bytesFromLeemonBigInt(bigInt, len) {
-    var str = bigInt2str(bigInt, 16)
+    const str = bigInt2str(bigInt, 16)
     return bytesFromHex(str)
 }
 
@@ -258,7 +285,7 @@ export function convertToArrayBuffer(bytes) {
         return bytes
     }
     if (bytes.buffer !== undefined &&
-        bytes.buffer.byteLength == bytes.length * bytes.BYTES_PER_ELEMENT) {
+        bytes.buffer.byteLength === bytes.length * bytes.BYTES_PER_ELEMENT) {
         return bytes.buffer
     }
     return bytesToArrayBuffer(bytes)
@@ -268,6 +295,7 @@ export function convertToUint8Array(bytes) {
     if (bytes.buffer !== undefined) {
         return bytes
     }
+
     return new Uint8Array(bytes)
 }
 
@@ -275,20 +303,24 @@ export function convertToByteArray(bytes) {
     if (Array.isArray(bytes)) {
         return bytes
     }
+
     bytes = convertToUint8Array(bytes)
-    var newBytes = []
-    for (var i = 0, len = bytes.length; i < len; i++) {
+
+    const newBytes = []
+
+    for (let i = 0, len = bytes.length; i < len; i++) {
         newBytes.push(bytes[i])
     }
+
     return newBytes
 }
 
 export function bytesFromArrayBuffer(buffer) {
-    var len = buffer.byteLength
-    var byteView = new Uint8Array(buffer)
-    var bytes = []
+    const len = buffer.byteLength
+    const byteView = new Uint8Array(buffer)
+    const bytes = []
 
-    for (var i = 0; i < len; ++i) {
+    for (let i = 0; i < len; ++i) {
         bytes[i] = byteView[i]
     }
 
@@ -296,9 +328,10 @@ export function bytesFromArrayBuffer(buffer) {
 }
 
 export function bufferConcat(buffer1, buffer2) {
-    var l1 = buffer1.byteLength || buffer1.length
-    var l2 = buffer2.byteLength || buffer2.length
-    var tmp = new Uint8Array(l1 + l2)
+    const l1 = buffer1.byteLength || buffer1.length
+    const l2 = buffer2.byteLength || buffer2.length
+    const tmp = new Uint8Array(l1 + l2)
+
     tmp.set(buffer1 instanceof ArrayBuffer ? new Uint8Array(buffer1) : buffer1, 0)
     tmp.set(buffer2 instanceof ArrayBuffer ? new Uint8Array(buffer2) : buffer2, l1)
 
@@ -306,7 +339,7 @@ export function bufferConcat(buffer1, buffer2) {
 }
 
 export function longToInts(sLong) {
-    var divRem = bigStringInt(sLong).divideAndRemainder(bigint(0x100000000))
+    const divRem = bigStringInt(sLong).divideAndRemainder(bigint(0x100000000))
 
     return [divRem[0].intValue(), divRem[1].intValue()]
 }
@@ -334,102 +367,9 @@ export function uintToInt(val) {
     return val
 }
 
-export function sha1HashSync(bytes) {
-    const rushaInstance = rusha || new Rusha(1024 * 1024)
-
-    // console.log(dT(), 'SHA-1 hash start', bytes.byteLength || bytes.length)
-    const hashBytes = rushaInstance.rawDigest(bytes).buffer
-    // console.log(dT(), 'SHA-1 hash finish')
-
-    return hashBytes
-}
-
-export function sha1BytesSync(bytes) {
-    return bytesFromArrayBuffer(sha1HashSync(bytes))
-}
-
-export function sha256HashSync(bytes) {
-    // console.log(dT(), 'SHA-2 hash start', bytes.byteLength || bytes.length)
-    var hashWords = CryptoJS.SHA256(bytesToWords(bytes))
-    // console.log(dT(), 'SHA-2 hash finish')
-
-    var hashBytes = bytesFromWords(hashWords)
-
-    return hashBytes
-}
-
-export function rsaEncrypt(publicKey, bytes) {
-    bytes = addPadding(bytes, 255)
-
-    // console.log('RSA encrypt start')
-    var N = new BigInteger(publicKey.modulus, 16)
-    var E = new BigInteger(publicKey.exponent, 16)
-    var X = new BigInteger(bytes)
-    var encryptedBigInt = X.modPowInt(E, N),
-        encryptedBytes = bytesFromBigInt(encryptedBigInt, 256)
-    // console.log('RSA encrypt finish')
-
-    return encryptedBytes
-}
-
-export function addPadding(bytes, blockSize, zeroes) {
-    blockSize = blockSize || 16
-    var len = bytes.byteLength || bytes.length
-    var needPadding = blockSize - (len % blockSize)
-    if (needPadding > 0 && needPadding < blockSize) {
-        var padding = new Array(needPadding)
-        if (zeroes) {
-            for (var i = 0; i < needPadding; i++) {
-                padding[i] = 0
-            }
-        } else {
-            secureRandom().nextBytes(padding)
-        }
-
-        if (bytes instanceof ArrayBuffer) {
-            bytes = bufferConcat(bytes, padding)
-        } else {
-            bytes = bytes.concat(padding)
-        }
-    }
-
-    return bytes
-}
-
-export function aesEncryptSync(bytes, keyBytes, ivBytes) {
-    var len = bytes.byteLength || bytes.length
-
-    // console.log(dT(), 'AES encrypt start', len/*, bytesToHex(keyBytes), bytesToHex(ivBytes)*/)
-    bytes = addPadding(bytes)
-    var encryptedWords = CryptoJS.AES.encrypt(bytesToWords(bytes), bytesToWords(keyBytes), {
-        iv: bytesToWords(ivBytes),
-        padding: CryptoJS.pad.NoPadding,
-        mode: CryptoJS.mode.IGE
-    }).ciphertext
-
-    var encryptedBytes = bytesFromWords(encryptedWords)
-    // console.log(dT(), 'AES encrypt finish')
-
-    return encryptedBytes
-}
-
-export function aesDecryptSync(encryptedBytes, keyBytes, ivBytes) {
-    console.log('AES decrypt start', encryptedBytes.length)
-    const decryptedWords = CryptoJS.AES.decrypt({ciphertext: bytesToWords(encryptedBytes)}, bytesToWords(keyBytes), {
-        iv: bytesToWords(ivBytes),
-        padding: CryptoJS.pad.NoPadding,
-        mode: CryptoJS.mode.IGE
-    })
-
-    const bytes = bytesFromWords(decryptedWords)
-    console.log('AES decrypt finish')
-
-    return bytes
-}
-
 export function gzipUncompress(bytes) {
     // console.log('Gzip uncompress start')
-    var result = (new Zlib.Gunzip(bytes)).decompress()
+    const result = (new Zlib.Gunzip(bytes)).decompress()
     // console.log('Gzip uncompress finish')
     return result
 }
@@ -439,8 +379,8 @@ export function nextRandomInt(maxValue) {
 }
 
 export function pqPrimeFactorization(pqBytes) {
-    var what = new BigInteger(pqBytes)
-    var result = false
+    const what = new BigInteger(pqBytes)
+    let result = false
 
     // console.log(dT(), 'PQ start', pqBytes, what.toString(16), what.bitLength())
 
@@ -451,7 +391,7 @@ export function pqPrimeFactorization(pqBytes) {
     }
 
     if (result === false && what.bitLength() <= 64) {
-        // console.time('PQ long')
+        // console.timeManager('PQ long')
         try {
             result = pqPrimeLong(goog.math.Long.fromString(what.toString(16), 16))
         } catch (e) {
@@ -462,7 +402,7 @@ export function pqPrimeFactorization(pqBytes) {
     // console.log(result)
 
     if (result === false) {
-        // console.time('pq BigInt')
+        // console.timeManager('pq BigInt')
         result = pqPrimeBigInteger(what)
         // console.timeEnd('pq BigInt')
     }
@@ -473,19 +413,20 @@ export function pqPrimeFactorization(pqBytes) {
 }
 
 export function pqPrimeBigInteger(what) {
-    var it = 0,
-        g
-    for (var i = 0; i < 3; i++) {
-        var q = (nextRandomInt(128) & 15) + 17
-        var x = bigint(nextRandomInt(1000000000) + 1)
-        var y = x.clone()
-        var lim = 1 << (i + 18)
+    let it = 0
+    let g
 
-        for (var j = 1; j < lim; j++) {
+    for (let i = 0; i < 3; i++) {
+        let q = (nextRandomInt(128) & 15) + 17
+        let x = bigint(nextRandomInt(1000000000) + 1)
+        let y = x.clone()
+        let lim = 1 << (i + 18)
+
+        for (let j = 1; j < lim; j++) {
             ++it
-            var a = x.clone()
-            var b = x.clone()
-            var c = bigint(q)
+            let a = x.clone()
+            let b = x.clone()
+            let c = bigint(q)
 
             while (!b.equals(BigInteger.ZERO)) {
                 if (!b.and(BigInteger.ONE).equals(BigInteger.ZERO)) {
@@ -502,7 +443,7 @@ export function pqPrimeBigInteger(what) {
             }
 
             x = c.clone()
-            var z = x.compareTo(y) < 0 ? y.subtract(x) : x.subtract(y)
+            let z = x.compareTo(y) < 0 ? y.subtract(x) : x.subtract(y)
             g = z.gcd(what)
             if (!g.equals(BigInteger.ONE)) {
                 break
@@ -516,7 +457,7 @@ export function pqPrimeBigInteger(what) {
         }
     }
 
-    var f = what.divide(g), P, Q
+    let f = what.divide(g), P, Q
 
     if (g.compareTo(f) > 0) {
         P = f
@@ -547,19 +488,20 @@ export function gcdLong(a, b) {
 }
 
 export function pqPrimeLong(what) {
-    var it = 0,
-        g
-    for (var i = 0; i < 3; i++) {
-        var q = goog.math.Long.fromInt((nextRandomInt(128) & 15) + 17)
-        var x = goog.math.Long.fromInt(nextRandomInt(1000000000) + 1)
-        var y = x
-        var lim = 1 << (i + 18)
+    let it = 0
+    let g
 
-        for (var j = 1; j < lim; j++) {
+    for (let i = 0; i < 3; i++) {
+        let q = goog.math.Long.fromInt((nextRandomInt(128) & 15) + 17)
+        let x = goog.math.Long.fromInt(nextRandomInt(1000000000) + 1)
+        let y = x
+        let lim = 1 << (i + 18)
+
+        for (let j = 1; j < lim; j++) {
             ++it
-            var a = x
-            var b = x
-            var c = q
+            let a = x
+            let b = x
+            let c = q
 
             while (b.notEquals(goog.math.Long.ZERO)) {
                 if (b.and(goog.math.Long.ONE).notEquals(goog.math.Long.ZERO)) {
@@ -576,7 +518,7 @@ export function pqPrimeLong(what) {
             }
 
             x = c
-            var z = x.compare(y) < 0 ? y.subtract(x) : x.subtract(y)
+            let z = x.compare(y) < 0 ? y.subtract(x) : x.subtract(y)
             g = gcdLong(z, what)
             if (g.notEquals(goog.math.Long.ONE)) {
                 break
@@ -590,7 +532,10 @@ export function pqPrimeLong(what) {
         }
     }
 
-    var f = what.div(g), P, Q
+    const f = what.div(g)
+
+    let P
+    let Q
 
     if (g.compare(f) > 0) {
         P = f
@@ -604,22 +549,22 @@ export function pqPrimeLong(what) {
 }
 
 export function pqPrimeLeemon(what) {
-    var minBits = 64
-    var minLen = Math.ceil(minBits / bpe) + 1
-    var it = 0
-    var i, q
-    var j, lim
-    var g, P
-    var Q
-    var a = new Array(minLen)
-    var b = new Array(minLen)
-    var c = new Array(minLen)
-    var g = new Array(minLen)
-    var z = new Array(minLen)
-    var x = new Array(minLen)
-    var y = new Array(minLen)
+    let minBits = 64
+    let minLen = Math.ceil(minBits / bpe) + 1
+    let it = 0
+    let q
+    let j, lim
+    let P
+    let Q
+    let a = new Array(minLen)
+    let b = new Array(minLen)
+    let c = new Array(minLen)
+    let g = new Array(minLen)
+    let z = new Array(minLen)
+    let x = new Array(minLen)
+    let y = new Array(minLen)
 
-    for (i = 0; i < 3; i++) {
+    for (let i = 0; i < 3; i++) {
         q = (nextRandomInt(128) & 15) + 17
         copyInt_(x, nextRandomInt(1000000000) + 1)
         copy_(y, x)
@@ -657,7 +602,7 @@ export function pqPrimeLeemon(what) {
             if (!equalsInt(g, 1)) {
                 break
             }
-            if ((j & (j - 1)) == 0) {
+            if ((j & (j - 1)) === 0) {
                 copy_(y, x)
             }
         }
@@ -683,10 +628,10 @@ export function pqPrimeLeemon(what) {
 
 export function bytesModPow(x, y, m) {
     try {
-        var xBigInt = new BigInteger(bytesToHex(x), 16)
-        var yBigInt = new BigInteger(bytesToHex(y), 16)
-        var mBigInt = new BigInteger(bytesToHex(m), 16)
-        var resBigInt = xBigInt.modPow(yBigInt, mBigInt)
+        const xBigInt = new BigInteger(bytesToHex(x), 16)
+        const yBigInt = new BigInteger(bytesToHex(y), 16)
+        const mBigInt = new BigInteger(bytesToHex(m), 16)
+        const resBigInt = xBigInt.modPow(yBigInt, mBigInt)
 
         return resBigInt.toByteArray()
     } catch (e) {
@@ -694,4 +639,27 @@ export function bytesModPow(x, y, m) {
     }
 
     return bytesFromBigInt(new BigInteger(x).modPow(new BigInteger(y), new BigInteger(m)), 256)
+}
+
+export function dHexDump(bytes) {
+    const arr = []
+
+    for (let i = 0; i < bytes.length; i++) {
+        if (i && !(i % 2)) {
+            if (!(i % 16)) {
+                arr.push('\n')
+            } else if (!(i % 4)) {
+                arr.push('  ')
+            } else {
+                arr.push(' ')
+            }
+        }
+        arr.push((bytes[i] < 16 ? '0' : '') + bytes[i].toString(16))
+    }
+
+    console.log(arr.join(''))
+}
+
+export function secureRandom() {
+    return new SecureRandom()
 }
