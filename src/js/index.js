@@ -58,7 +58,9 @@ if (!window.localStorage.getItem("authKey")) {
     MTProto.connect(auth).then(l => {
         Logger.warn(auth)
         Logger.log(auth.authKey)
-        window.localStorage.setItem("authKey", bytesToHex(new Uint8Array(auth.authKey)))
+        auth.authKey = new Uint8Array(auth.authKey)
+        auth.serverSalt = new Uint8Array(auth.serverSalt)
+        window.localStorage.setItem("authKey", bytesToHex(auth.authKey))
         window.localStorage.setItem("serverSalt", bytesToHex(auth.serverSalt))
     }).then(start)
 } else {
