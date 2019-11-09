@@ -1,19 +1,23 @@
-import {bytesToArrayBuffer, bytesToHex, gzipUncompress, uintToInt, bigint} from "../utils/bin"
+import {bigint, bytesToArrayBuffer, bytesToHex, gzipUncompress, uintToInt} from "../utils/bin"
+import {createLogger} from "../../common/logger"
+
+const Logger = createLogger("TLDeserialization", {
+    level: "log"
+})
 
 export class TLDeserialization {
     constructor(buffer, options = {
-        schema: require("./schema")
+        schema: require("./schema_combine")
     }) {
         this.offset = 0 // in bytes
         this.override = options.override || {}
 
-        this.schema = options.schema || require("./schema")
+        this.schema = options.schema || require("./schema_combine")
 
         this.buffer = buffer
         this.intView = new Uint32Array(this.buffer)
         this.byteView = new Uint8Array(this.buffer)
 
-        // this.debug = options.debug !== undefined ? options.debug : Config.Modes.debug
         this.mtproto = options.mtproto || false
     }
 
@@ -24,7 +28,7 @@ export class TLDeserialization {
 
         const i = this.intView[this.offset / 4]
 
-        console.debug("<<<", i.toString(16), i, field)
+        Logger.debug("<<<", i.toString(16), i, field)
 
         this.offset += 4
 
@@ -93,7 +97,7 @@ export class TLDeserialization {
             s = sUTF8
         }
 
-        //console.debug("<<<", s, field + ":string")
+        //Logger.debug("<<<", s, field + ":string")
 
         return s
     }
@@ -115,7 +119,7 @@ export class TLDeserialization {
             this.offset++
         }
 
-        console.debug("<<<", bytesToHex(bytes), field + ":bytes")
+        Logger.debug("<<<", bytesToHex(bytes), field + ":bytes")
 
         return bytes
     }
@@ -137,7 +141,7 @@ export class TLDeserialization {
             bytes.push(this.byteView[this.offset++])
         }
 
-        console.debug("<<<", bytesToHex(bytes), field + ":int" + bits)
+        Logger.debug("<<<", bytesToHex(bytes), field + ":int" + bits)
 
         return bytes
     }
@@ -162,7 +166,7 @@ export class TLDeserialization {
             bytes.push(this.byteView[this.offset++])
         }
 
-        console.debug("<<<", bytesToHex(bytes), field)
+        Logger.debug("<<<", bytesToHex(bytes), field)
 
         return bytes
     }

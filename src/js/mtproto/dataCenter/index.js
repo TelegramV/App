@@ -1,16 +1,11 @@
+import CONFIG from "../../configuration"
+
 class DataCenter {
     constructor(options = {}) {
         this.useSsl = options.useSsl
         this.sslSubdomains = ["pluto", "venus", "aurora", "vesta", "flora"]
 
-        this.dcOptions = [
-            {id: 0, host: "149.154.167.40", port: 80},
-            {id: 1, host: "149.154.175.50", port: 80},
-            {id: 2, host: "149.154.167.51", port: 80},
-            {id: 3, host: "149.154.175.100", port: 80},
-            {id: 4, host: "149.154.167.91", port: 80},
-            {id: 5, host: "149.154.171.5", port: 80}
-        ]
+        this.dcOptions = CONFIG.mtproto.dataCenter.list
 
         this.chosenServers = {}
     }
@@ -20,18 +15,18 @@ class DataCenter {
         if (this.chosenServers[dcID] === undefined) {
             let chosenServer = false
             let dcOption
+            const path = CONFIG.mtproto.dataCenter.test ? "apiw1_test" : "apiw1"
 
             if (this.useSsl) {
                 let subdomain = this.sslSubdomains[dcID - 1] + (upload ? "-1" : "")
-                const path = "apiw1_test"
-                chosenServer = "https://" + subdomain + ".web.telegram.org/" + path
+                chosenServer = `https://${subdomain}.web.telegram.org/${path}`
                 return chosenServer
             }
 
             for (let i = 0; i < this.dcOptions.length; i++) {
                 dcOption = this.dcOptions[i]
                 if (Number(dcOption.id) === Number(dcID)) {
-                    chosenServer = "http://" + dcOption.host + (Number(dcOption.port) !== 80 ? ":" + dcOption.port : "") + "/apiw1_test"
+                    chosenServer = `http://${dcOption.host}:${dcOption.port}/${path}`
                     break
                 }
             }

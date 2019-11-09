@@ -2,7 +2,9 @@ import Storage from "../../common/storage"
 import {longFromInts, nextRandomInt} from "../utils/bin"
 import {createLogger} from "../../common/logger"
 
-const Logger = createLogger("MtpTimeManager")
+const Logger = createLogger("MtpTimeManager", {
+    level: "log"
+})
 
 export class MtpTimeManager {
     constructor() {
@@ -13,17 +15,10 @@ export class MtpTimeManager {
             if (offset) {
                 this.timeOffset = offset
             }
-
-            Logger.warn("offset = ", offset)
         })
-
-        console.error("FUCK", this)
     }
 
     generateMessageID() {
-
-        Logger.warn("generateMessageID this.timeOffset = ", this.timeOffset)
-
         const timeTicks = tsNow()
         const timeSec = Math.floor(timeTicks / 1000) + this.timeOffset
         const timeMSec = timeTicks % 1000
@@ -60,11 +55,11 @@ export class MtpTimeManager {
     }
 }
 
-const mtpTimeManager = new MtpTimeManager()
+export const TimeManager = new MtpTimeManager()
 
 export function tsNow(seconds) {
-    let t = +new Date() + (mtpTimeManager.timeOffset || 0)
+    let t = +new Date() + (TimeManager.timeOffset || 0)
     return seconds ? Math.floor(t / 1000) : t
 }
 
-export default mtpTimeManager
+export default TimeManager

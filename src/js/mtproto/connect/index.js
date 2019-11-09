@@ -1,5 +1,5 @@
 import {sendReqPQ} from "./methods"
 
-export default function (auth) {
-    return sendReqPQ(auth)
+export default function (authContext) {
+    return sendReqPQ(authContext)
 }

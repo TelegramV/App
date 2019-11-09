@@ -1,27 +1,35 @@
 import {
     bufferConcat,
     bytesCmp,
-    bytesFromArrayBuffer,
     bytesToArrayBuffer,
     bytesToHex,
     createNonce,
-    nextRandomInt
+    longToBytes,
+    nextRandomInt,
+    uintToInt
 } from "../utils/bin";
 import {sha1BytesSync, sha256HashSync} from "../crypto/sha";
 import {aesDecryptSync, aesEncryptSync} from "../crypto/aes";
 import {TLSerialization} from "../language/serialization";
 import DataCenter from "../dataCenter";
 import axios from "axios";
-import {MtpTimeManager} from "../timeManager";
+import {TimeManager} from "../timeManager";
 import {createLogger} from "../../common/logger";
 import {TLDeserialization} from "../language/deserialization";
+import Storage, {createStorage} from "../../common/storage"
+import {MessageProcessor} from "./messageProcessor"
+
+import CONFIG from "../../configuration"
 
 const Logger = createLogger("Networker")
+const MessagesStorage = createStorage("MessagesStorage")
 
 export class Networker {
     constructor(auth) {
-        this.timeManager = new MtpTimeManager()
-        this.sentMessages = {}
+        this.timeManager = TimeManager
+        this.messageProcessor = new MessageProcessor({
+            networker: this
+        })
 
         auth.authKeyHash = sha1BytesSync(auth.authKey)
         auth.authKeyAux = auth.authKeyHash.slice(0, 8)
@@ -80,10 +88,8 @@ export class Networker {
         }
     }
 
-    sendEncryptedRequest(message) {
-        // console.log(dT(), 'Send encrypted'/*, message*/)
-        // console.trace()
-        this.sentMessages[message.msg_id] = message
+    sendEncryptedRequest(message, options) {
+        this.messageProcessor.sentMessages[message.msg_id] = message
 
         const data = new TLSerialization({startMaxLength: message.body.length + 2048});
 
@@ -115,9 +121,7 @@ export class Networker {
         // TODO xhrSendBuffer
         const requestData = true ? request.getBuffer() : request.getArray();
 
-        let requestPromise;
         const url = DataCenter.chooseServer(this.auth.dcID);
-        const baseError = {code: 406, type: 'NETWORK_BAD_RESPONSE', url: url};
 
         return axios.post(url, requestData, {
             responseType: "arraybuffer",
@@ -144,20 +148,19 @@ export class Networker {
 
         const calcMsgKey = this.getMsgKey(dataWithPadding, false)
         if (!bytesCmp(msgKey, calcMsgKey)) {
-            Logger.warn('[MT] msg_keys', msgKey, bytesFromArrayBuffer(calcMsgKey))
             throw new Error('[MT] server msgKey mismatch')
         }
 
         deserializer = new TLDeserialization(dataWithPadding.buffer, {mtproto: true})
 
-        const salt = deserializer.fetchIntBytes(64, false, 'salt');
+        const salt = deserializer.fetchIntBytes(64, false, 'salt'); // ??
         const sessionID = deserializer.fetchIntBytes(64, false, 'session_id');
         const messageID = deserializer.fetchLong('message_id');
 
         // TODO wtf?
         if (!bytesCmp(sessionID, this.auth.sessionID) &&
             (!self.prevSessionID || !bytesCmp(sessionID, self.prevSessionID))) {
-            Logger.warn('Sessions', sessionID, self.sessionID, self.prevSessionID)
+            // Logger.warn('Sessions', sessionID, self.sessionID, self.prevSessionID)
             throw new Error('[MT] Invalid server session_id: ' + bytesToHex(sessionID))
         }
 
@@ -181,9 +184,12 @@ export class Networker {
         }
 
         const buffer = bytesToArrayBuffer(messageBody);
+
         const self = this
+
         const deserializerOptions = {
             mtproto: true,
+            schema: require("../language/schema_combine"),
             override: {
                 mt_message: function (result, field) {
                     result.msg_id = this.fetchLong(field + '[msg_id]')
@@ -204,32 +210,32 @@ export class Networker {
                         // console.log(dT(), result)
                         this.offset = offset + result.bytes
                     }
-                    // console.log(dT(), 'override message', result)
+                    // console.log('override message', result)
                 },
                 // TODO
                 mt_rpc_result: function (result, field) {
-                    console.log("mt_rpc_result", result, field)
-                    console.log(self.sentMessages)
+                    // console.log("mt_rpc_result", result, field)
+                    // console.log(self.sentMessages)
                     result.req_msg_id = this.fetchLong(field + '[req_msg_id]')
 
-                    const sentMessage = self.sentMessages[result.req_msg_id];
+                    const sentMessage = self.messageProcessor.sentMessages[result.req_msg_id];
                     const type = sentMessage && sentMessage.resultType || 'Object';
 
                     if (result.req_msg_id && !sentMessage) {
                         // console.warn(dT(), 'Result for unknown message', result)
                         return
                     }
-                    console.log(result)
-                    console.log(bytesToHex(this.getLeftoverArray()))
-                    this.schema = require("../language/schema_api") // TODO кастыли убери окда)
+                    // console.log(result)
+                    // console.log(bytesToHex(this.getLeftoverArray()))
                     result.result = this.fetchObject(type, field + '[result]')
-                    this.schema = require("../language/schema")
 
                     // console.log(dT(), 'override rpc_result', sentMessage, type, result)
                 }
             }
         };
+
         deserializer = new TLDeserialization(buffer, deserializerOptions)
+
         const response = deserializer.fetchObject('', 'INPUT');
 
         return {
@@ -240,27 +246,42 @@ export class Networker {
         }
     }
 
-    sendMessage(message) {
+    callApi(message, options) {
         message.msg_id = this.timeManager.generateMessageID()
-        this.sendEncryptedRequest(message).then(result => {
-            const response = this.parseResponse(result.data)
-            Logger.log("result:", response)
+
+        return new Promise(resolve => {
+            this.messageProcessor.listenRpc(message.msg_id, resolve)
+            this.sendMessage(message, options)
         })
     }
 
-    wrapApiCall(method, params, options) {
+    sendMessage(message, options = {}) {
+        if (!message.msg_id) {
+            message.msg_id = this.timeManager.generateMessageID()
+        }
+
+        return this.sendEncryptedRequest(message).then(result => {
+            const response = this.parseResponse(result.data)
+
+            Logger.log("result:", response)
+
+            return this.messageProcessor.process(response.response, response.messageID, response.sessionID)
+        })
+    }
+
+    wrapApiCall(method, params, options = {}) {
         const serializer = new TLSerialization(options);
 
         if (!this.connectionInited) {
             // TODO replace with const values
 
-            serializer.storeInt(0xda9b0d0d, 'invokeWithLayer')
-            serializer.storeInt(105, 'layer')
-            serializer.storeInt(0xc7481da6, 'initConnection')
-            serializer.storeInt(1147988, 'api_id')
+            serializer.storeInt(CONFIG.mtproto.api.invokeWithLayer, 'invokeWithLayer')
+            serializer.storeInt(CONFIG.mtproto.api.layer, 'layer')
+            serializer.storeInt(CONFIG.mtproto.api.initConnection, 'initConnection')
+            serializer.storeInt(CONFIG.mtproto.api.api_id, 'api_id')
             serializer.storeString(navigator.userAgent || 'Unknown UserAgent', 'device_model')
             serializer.storeString(navigator.platform || 'Unknown Platform', 'system_version')
-            serializer.storeString("1.4.8.8", 'app_version')
+            serializer.storeString(CONFIG.mtproto.api.app_version, 'app_version')
             serializer.storeString(navigator.language || 'en', 'system_lang_code')
             serializer.storeString('', 'lang_pack')
             serializer.storeString(navigator.language || 'en', 'lang_code')
@@ -299,4 +320,51 @@ export class Networker {
 
         return seqNo
     }
+
+
+    applyServerSalt(newServerSalt) {
+        var serverSalt = longToBytes(newServerSalt)
+
+        Storage.set('dc' + this.dcID + '_server_salt', bytesToHex(serverSalt))
+
+        this.serverSalt = serverSalt
+        return true
+    }
+
+
+    processError(rawError) {
+        const matches = (rawError.error_message || '').match(/^([A-Z_0-9]+\b)(: (.+))?/) || []
+        rawError.error_code = uintToInt(rawError.error_code)
+
+        return {
+            code: !rawError.error_code || rawError.error_code <= 0 ? 500 : rawError.error_code,
+            type: matches[1] || 'UNKNOWN',
+            description: matches[3] || ('CODE#' + rawError.error_code + ' ' + rawError.error_message),
+            originalError: rawError
+        }
+    }
+
+    ackMessage(msgID) {
+        return this.sendMessage(this.wrapMtpMessage({_: "msgs_ack", msg_ids: [msgID]}))
+    }
+
+    wrapMtpMessage(object) {
+        const serializer = new TLSerialization({mtproto: true})
+        serializer.storeObject(object, "Object")
+
+        const messageID = this.timeManager.generateMessageID()
+        const seqNo = this.generateSeqNo(true)
+
+        const message = {
+            msg_id: messageID,
+            seq_no: seqNo,
+            body: serializer.getBytes()
+        }
+
+        console.log('MT message', object, messageID, seqNo)
+
+        return message
+    }
+
+
 }

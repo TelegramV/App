@@ -1,17 +1,19 @@
 import {bigint, bigStringInt, bytesToHex, intToUint} from "../utils/bin"
 import {createLogger} from "../../common/logger";
 
-const Logger = createLogger("TLSerialization")
+const Logger = createLogger("TLSerialization", {
+    level: "log"
+})
 
 export class TLSerialization {
     constructor(options = {
         startMaxLength: 2048,
-        schema: require("./schema")
+        schema: require("./schema_combine")
     }) {
         this.maxLength = options.startMaxLength || 2048 // 2Kb
         this.offset = 0 // in bytes
 
-        this.schema = options.schema || require("./schema")
+        this.schema = options.schema || require("./schema_combine")
 
         this.createBuffer()
 
@@ -72,7 +74,7 @@ export class TLSerialization {
     }
 
     writeInt(value, field = "") {
-        console.debug(">>>", value.toString(16), value, field)
+        Logger.debug(">>>", value.toString(16), value, field)
 
         this.checkLength(4)
         this.intView[this.offset / 4] = value
@@ -131,7 +133,7 @@ export class TLSerialization {
     }
 
     storeString(s, field = "") {
-        console.debug(">>>", s, field + ":string")
+        Logger.debug(">>>", s, field + ":string")
 
         if (s === undefined) {
             s = ""
@@ -167,7 +169,7 @@ export class TLSerialization {
             bytes = []
         }
 
-        console.debug(">>>", bytesToHex(bytes), field + ":bytes")
+        Logger.debug(">>>", bytesToHex(bytes), field + ":bytes")
 
         const len = bytes.byteLength || bytes.length
         this.checkLength(len + 8)
@@ -200,7 +202,7 @@ export class TLSerialization {
             throw new Error("Invalid bits: " + bits + ", " + len)
         }
 
-        console.debug(">>>", bytesToHex(bytes), field + ":int" + bits)
+        Logger.debug(">>>", bytesToHex(bytes), field + ":int" + bits)
 
         this.checkLength(len)
 
@@ -214,7 +216,7 @@ export class TLSerialization {
         }
         var len = bytes.length
 
-        console.debug(">>>", bytesToHex(bytes), field)
+        Logger.debug(">>>", bytesToHex(bytes), field)
 
         this.checkLength(len)
 
@@ -287,7 +289,7 @@ export class TLSerialization {
         }
 
         if (obj instanceof Array) {
-            console.debug(type)
+            Logger.debug(type)
 
             if (type.substr(0, 6) === "Vector") {
                 this.writeInt(0x1cb5c415, field + "[id]")

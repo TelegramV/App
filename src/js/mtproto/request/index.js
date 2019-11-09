@@ -12,7 +12,6 @@ export function sendPlainRequest(dcID, requestBuffer) {
     const chromeVersion = chromeMatches && parseFloat(chromeMatches[1]) || false
     const xhrSendBuffer = !("ArrayBufferView" in window) && (chromeVersion > 0 && chromeVersion < 30)
 
-
     const requestLength = requestBuffer.byteLength
     const requestArray = new Int32Array(requestBuffer)
 

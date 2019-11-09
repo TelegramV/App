@@ -1,5 +1,7 @@
-const webpack = require('webpack');
-const path = require('path');
+const webpack = require('webpack')
+const path = require('path')
+require("@babel/polyfill")
+
 
 const config = {
     node: {
@@ -11,7 +13,7 @@ const config = {
         port: 8090
     },
     watch: true,
-    entry: './src/js/index.js',
+    entry: ["@babel/polyfill", './src/js/index.js'],
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js'

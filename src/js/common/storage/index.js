@@ -1,9 +1,15 @@
 import {createLogger} from "../logger"
+import {nextRandomInt} from "../../mtproto/utils/bin"
 
-const Logger = createLogger("Storage")
+const Logger = createLogger("Storage", {
+    level: "log"
+})
 
 class Storage {
-    constructor() {
+    constructor(options = {
+        loggerName: "Storage" + nextRandomInt()
+    }) {
+        this.logger = createLogger(options.loggerName || "Storage" + nextRandomInt())
         window.mtprotoStorage = window.mtprotoStorage ? window.mtprotoStorage : {}
         this.data = window.mtprotoStorage
     }
@@ -26,6 +32,12 @@ class Storage {
     exists(key) {
         return data[key] !== undefined && data[key] != null
     }
+}
+
+export function createStorage(name = nextRandomInt()) {
+    return new Storage({
+        loggerName: name
+    })
 }
 
 const storage = new Storage()

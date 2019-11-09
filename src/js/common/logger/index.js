@@ -7,7 +7,7 @@
  */
 
 export class Logger {
-    constructor(options = {}) {
+    constructor(name = "", options = {}) {
         this.levels = [
             {
                 index: 0,
@@ -31,7 +31,7 @@ export class Logger {
             },
         ]
 
-        this.prefix = `[${options.prefix}]` || ""
+        this.prefix = `[${name || options.prefix}]` || ""
         this.dateTime = options.dateTimeFormat || true
         this.dateTimeFormat = options.dateTimeFormat || "default"
         this.level = options.level || "debug"
@@ -103,17 +103,10 @@ export class Logger {
     }
 }
 
-export function createLogger(options = {}) {
-    if (typeof options === "string") {
-        return new Logger({
-            prefix: options,
-            level: "debug",
-            levelIndex: 4
-        })
-    } else {
-        options.level = "debug"
-        return new Logger(options)
-    }
+export function createLogger(name = "", options = {}) {
+    return new Logger(name, Object.assign({
+        level: "debug",
+    }, options))
 }
 
 export default new Logger({

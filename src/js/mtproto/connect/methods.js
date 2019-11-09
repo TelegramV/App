@@ -20,7 +20,9 @@ import {PqFinder} from "./pqFinder"
 import {createLogger} from "../../common/logger"
 
 
-const Logger = createLogger("methods.js")
+const Logger = createLogger("methods.js", {
+    level: "log"
+})
 
 const publicKeysHex = [
     {
@@ -86,21 +88,22 @@ function selectRsaKeyByFingerPrint(fingerprints) {
     return false
 }
 
-export function sendReqPQ(requestContext) {
+export function sendReqPQ(authContext) {
     const messageSerializer = new TLSerialization({mtproto: true})
 
     // TODO FIXME!
     // chanhing the name of the method doesn't change it's id :) @kohutd
+    // shit happens.. @undrfined
     messageSerializer.storeMethod("req_pq_multi", {
-        nonce: requestContext.nonce
+        nonce: authContext.nonce
     });
 
-    Logger.debug("sendReqPQ requestContext.nonce = ", requestContext.nonce)
+    Logger.debug("sendReqPQ requestContext.nonce = ", authContext.nonce)
 
-    Logger.debug("Send req_pq", bytesToHex(requestContext.nonce))
+    Logger.debug("Send req_pq", bytesToHex(authContext.nonce))
 
     return new Promise(function (resolve, reject) {
-        sendPlainRequest(requestContext.dcID, messageSerializer.getBuffer()).then(({deserializer}) => {
+        sendPlainRequest(authContext.dcID, messageSerializer.getBuffer()).then(({deserializer}) => {
             const resPQ = deserializer.fetchObject("ResPQ")
             Logger.info(resPQ);
 
@@ -108,89 +111,89 @@ export function sendReqPQ(requestContext) {
                 throw new Error("[MT] resPQ response invalid: " + resPQ._)
             }
 
-            if (!bytesCmp(requestContext.nonce, resPQ.nonce)) {
+            if (!bytesCmp(authContext.nonce, resPQ.nonce)) {
                 throw new Error("[MT] resPQ nonce mismatch")
             }
 
-            requestContext.serverNonce = resPQ.server_nonce
-            requestContext.pq = resPQ.pq
-            requestContext.fingerprints = resPQ.server_public_key_fingerprints
+            authContext.serverNonce = resPQ.server_nonce
+            authContext.pq = resPQ.pq
+            authContext.fingerprints = resPQ.server_public_key_fingerprints
 
-            Logger.debug("sendReqPQ requestContext.server_nonce = ", requestContext.serverNonce)
+            Logger.debug("sendReqPQ requestContext.server_nonce = ", authContext.serverNonce)
 
-            Logger.debug("Got ResPQ", bytesToHex(requestContext.serverNonce), bytesToHex(requestContext.pq), requestContext.fingerprints)
+            Logger.debug("Got ResPQ", bytesToHex(authContext.serverNonce), bytesToHex(authContext.pq), authContext.fingerprints)
 
-            requestContext.publicKey = selectRsaKeyByFingerPrint(requestContext.fingerprints)
+            authContext.publicKey = selectRsaKeyByFingerPrint(authContext.fingerprints)
 
-            if (!requestContext.publicKey) {
+            if (!authContext.publicKey) {
                 throw new Error("[MT] No public key found")
             }
 
-            Logger.log("PQ factorization start", requestContext.pq)
-            const pqFinder = new PqFinder(requestContext.pq)
+            Logger.log("PQ factorization start", authContext.pq)
+            const pqFinder = new PqFinder(authContext.pq)
             const pAndQ = pqFinder.findPQ()
 
-            requestContext.p = pqFinder.getPQAsBuffer()[0]
-            requestContext.q = pqFinder.getPQAsBuffer()[1]
+            authContext.p = pqFinder.getPQAsBuffer()[0]
+            authContext.q = pqFinder.getPQAsBuffer()[1]
 
-            sendReqDhParams(requestContext).then(resolve)
+            sendReqDhParams(authContext).then(resolve)
         })
     })
 }
 
-function sendReqDhParams(requestContext) {
-    requestContext.newNonce = new Array(32)
-    secureRandom().nextBytes(requestContext.newNonce)
+function sendReqDhParams(authContext) {
+    authContext.newNonce = new Array(32)
+    secureRandom().nextBytes(authContext.newNonce)
 
     const dataSerializer = new TLSerialization({mtproto: true})
     dataSerializer.storeObject({
         _: "p_q_inner_data",
-        pq: requestContext.pq,
-        p: requestContext.p,
-        q: requestContext.q,
-        nonce: requestContext.nonce,
-        server_nonce: requestContext.serverNonce,
-        new_nonce: requestContext.newNonce
+        pq: authContext.pq,
+        p: authContext.p,
+        q: authContext.q,
+        nonce: authContext.nonce,
+        server_nonce: authContext.serverNonce,
+        new_nonce: authContext.newNonce
     }, "P_Q_inner_data", "DECRYPTED_DATA")
 
     const dataWithHash = sha1BytesSync(dataSerializer.getBuffer()).concat(dataSerializer.getBytes())
 
     const requestSerializer = new TLSerialization({mtproto: true})
     requestSerializer.storeMethod("req_DH_params", {
-        nonce: requestContext.nonce,
-        server_nonce: requestContext.serverNonce,
-        p: requestContext.p,
-        q: requestContext.q,
-        public_key_fingerprint: requestContext.publicKey.fingerprint,
-        encrypted_data: rsaEncrypt(requestContext.publicKey, dataWithHash)
+        nonce: authContext.nonce,
+        server_nonce: authContext.serverNonce,
+        p: authContext.p,
+        q: authContext.q,
+        public_key_fingerprint: authContext.publicKey.fingerprint,
+        encrypted_data: rsaEncrypt(authContext.publicKey, dataWithHash)
     })
 
     Logger.log("Send req_DH_params")
 
-    Logger.debug("sendReqDhParams requestContext.nonce = ", requestContext.nonce)
-    Logger.debug("sendReqDhParams requestContext.serverNonce = ", requestContext.serverNonce)
-    Logger.debug("sendReqDhParams requestContext.newNonce = ", requestContext.newNonce)
+    Logger.debug("sendReqDhParams requestContext.nonce = ", authContext.nonce)
+    Logger.debug("sendReqDhParams requestContext.serverNonce = ", authContext.serverNonce)
+    Logger.debug("sendReqDhParams requestContext.newNonce = ", authContext.newNonce)
 
     return new Promise(function (resolve) {
-        sendPlainRequest(requestContext.dcID, requestSerializer.getBuffer()).then(({deserializer}) => {
+        sendPlainRequest(authContext.dcID, requestSerializer.getBuffer()).then(({deserializer}) => {
             const response = deserializer.fetchObject("Server_DH_Params", "RESPONSE")
 
             if (response._ !== "server_DH_params_fail" && response._ !== "server_DH_params_ok") {
                 throw new Error("[MT] Server_DH_Params response invalid: " + response._)
             }
 
-            Logger.warn(requestContext.serverNonce, response.server_nonce)
+            Logger.warn(authContext.serverNonce, response.server_nonce)
 
-            if (!bytesCmp(requestContext.nonce, response.nonce)) {
+            if (!bytesCmp(authContext.nonce, response.nonce)) {
                 throw new Error("[MT] Server_DH_Params nonce mismatch")
             }
 
-            if (!bytesCmp(requestContext.serverNonce, response.server_nonce)) {
+            if (!bytesCmp(authContext.serverNonce, response.server_nonce)) {
                 throw new Error("[MT] Server_DH_Params server_nonce mismatch")
             }
 
             if (response._ === "server_DH_params_fail") {
-                const newNonceHash = sha1BytesSync(requestContext.newNonce).slice(-16)
+                const newNonceHash = sha1BytesSync(authContext.newNonce).slice(-16)
                 if (!bytesCmp(newNonceHash, response.new_nonce_hash)) {
                     throw new Error("[MT] server_DH_params_fail new_nonce_hash mismatch")
                 }
@@ -198,29 +201,29 @@ function sendReqDhParams(requestContext) {
             }
 
             try {
-                decryptServerDhDataAnswer(requestContext, response.encrypted_answer)
+                decryptServerDhDataAnswer(authContext, response.encrypted_answer)
             } catch (e) {
                 throw e
             }
 
-            Logger.debug("sendReqDhParams.then requestContext.nonce = ", requestContext.nonce)
-            Logger.debug("sendReqDhParams.then requestContext.serverNonce = ", requestContext.serverNonce)
-            Logger.debug("sendReqDhParams.then requestContext.newNonce = ", requestContext.newNonce)
+            Logger.debug("sendReqDhParams.then requestContext.nonce = ", authContext.nonce)
+            Logger.debug("sendReqDhParams.then requestContext.serverNonce = ", authContext.serverNonce)
+            Logger.debug("sendReqDhParams.then requestContext.newNonce = ", authContext.newNonce)
 
-            sendSetClientDhParams(requestContext).then(resolve)
+            sendSetClientDhParams(authContext).then(resolve)
         }, function (error) {
             throw error
         })
     })
 }
 
-function decryptServerDhDataAnswer(requestContext, encryptedAnswer) {
-    requestContext.localTime = tsNow()
+function decryptServerDhDataAnswer(authContext, encryptedAnswer) {
+    authContext.localTime = tsNow()
 
-    requestContext.tmpAesKey = sha1BytesSync(requestContext.newNonce.concat(requestContext.serverNonce)).concat(sha1BytesSync(requestContext.serverNonce.concat(requestContext.newNonce)).slice(0, 12))
-    requestContext.tmpAesIv = sha1BytesSync(requestContext.serverNonce.concat(requestContext.newNonce)).slice(12).concat(sha1BytesSync([].concat(requestContext.newNonce, requestContext.newNonce)), requestContext.newNonce.slice(0, 4))
+    authContext.tmpAesKey = sha1BytesSync(authContext.newNonce.concat(authContext.serverNonce)).concat(sha1BytesSync(authContext.serverNonce.concat(authContext.newNonce)).slice(0, 12))
+    authContext.tmpAesIv = sha1BytesSync(authContext.serverNonce.concat(authContext.newNonce)).slice(12).concat(sha1BytesSync([].concat(authContext.newNonce, authContext.newNonce)), authContext.newNonce.slice(0, 4))
 
-    const answerWithHash = aesDecryptSync(encryptedAnswer, requestContext.tmpAesKey, requestContext.tmpAesIv)
+    const answerWithHash = aesDecryptSync(encryptedAnswer, authContext.tmpAesKey, authContext.tmpAesIv)
 
     const hash = answerWithHash.slice(0, 20)
     const answerWithPadding = answerWithHash.slice(20)
@@ -235,27 +238,27 @@ function decryptServerDhDataAnswer(requestContext, encryptedAnswer) {
         throw new Error("[MT] server_DH_inner_data response invalid: " + constructor)
     }
 
-    if (!bytesCmp(requestContext.nonce, response.nonce)) {
+    if (!bytesCmp(authContext.nonce, response.nonce)) {
         throw new Error("[MT] server_DH_inner_data nonce mismatch")
     }
 
-    if (!bytesCmp(requestContext.serverNonce, response.server_nonce)) {
+    if (!bytesCmp(authContext.serverNonce, response.server_nonce)) {
         throw new Error("[MT] server_DH_inner_data serverNonce mismatch")
     }
 
     Logger.log("Done decrypting answer")
-    requestContext.g = response.g
-    requestContext.dhPrime = response.dh_prime
-    requestContext.gA = response.g_a
-    requestContext.serverTime = response.server_time
-    requestContext.retry = 0
+    authContext.g = response.g
+    authContext.dhPrime = response.dh_prime
+    authContext.gA = response.g_a
+    authContext.serverTime = response.server_time
+    authContext.retry = 0
 
 
-    Logger.debug("decryptServerDhDataAnswer requestContext.nonce = ", requestContext.nonce)
-    Logger.debug("decryptServerDhDataAnswer requestContext.serverNonce = ", requestContext.serverNonce)
-    Logger.debug("decryptServerDhDataAnswer requestContext.newNonce = ", requestContext.newNonce)
+    Logger.debug("decryptServerDhDataAnswer requestContext.nonce = ", authContext.nonce)
+    Logger.debug("decryptServerDhDataAnswer requestContext.serverNonce = ", authContext.serverNonce)
+    Logger.debug("decryptServerDhDataAnswer requestContext.newNonce = ", authContext.newNonce)
 
-    verifyDhParams(requestContext.g, requestContext.dhPrime, requestContext.gA)
+    verifyDhParams(authContext.g, authContext.dhPrime, authContext.gA)
 
     const offset = deserializer.getOffset()
 
@@ -263,7 +266,7 @@ function decryptServerDhDataAnswer(requestContext, encryptedAnswer) {
         throw new Error("[MT] server_DH_inner_data SHA1-hash mismatch")
     }
 
-    TimeManager.applyServerTime(requestContext.serverTime, requestContext.localTime)
+    TimeManager.applyServerTime(authContext.serverTime, authContext.localTime)
 }
 
 function verifyDhParams(g, dhPrime, gA) {
@@ -304,67 +307,67 @@ function verifyDhParams(g, dhPrime, gA) {
     return true
 }
 
-function sendSetClientDhParams(requestContext) {
-    const gBytes = bytesFromHex(requestContext.g.toString(16))
+function sendSetClientDhParams(authContext) {
+    const gBytes = bytesFromHex(authContext.g.toString(16))
 
-    requestContext.b = new Array(256)
-    secureRandom().nextBytes(requestContext.b)
+    authContext.b = new Array(256)
+    secureRandom().nextBytes(authContext.b)
 
-    const gB = bytesModPow(gBytes, requestContext.b, requestContext.dhPrime)
+    const gB = bytesModPow(gBytes, authContext.b, authContext.dhPrime)
 
     const data = new TLSerialization({mtproto: true})
     data.storeObject({
         _: "client_DH_inner_data",
-        nonce: requestContext.nonce,
-        server_nonce: requestContext.serverNonce,
-        retry_id: [0, requestContext.retry++],
+        nonce: authContext.nonce,
+        server_nonce: authContext.serverNonce,
+        retry_id: [0, authContext.retry++],
         g_b: gB
     }, "Client_DH_Inner_Data")
 
     const dataWithHash = sha1BytesSync(data.getBuffer()).concat(data.getBytes())
-    Logger.debug("mtpSendSetClientDhParams", dataWithHash, requestContext);
+    Logger.debug("mtpSendSetClientDhParams", dataWithHash, authContext);
 
-    const encryptedData = aesEncryptSync(dataWithHash, requestContext.tmpAesKey, requestContext.tmpAesIv)
+    const encryptedData = aesEncryptSync(dataWithHash, authContext.tmpAesKey, authContext.tmpAesIv)
 
     const request = new TLSerialization({mtproto: true})
     request.storeMethod("set_client_DH_params", {
-        nonce: requestContext.nonce,
-        server_nonce: requestContext.serverNonce,
+        nonce: authContext.nonce,
+        server_nonce: authContext.serverNonce,
         encrypted_data: encryptedData
     })
 
-    Logger.debug("sendSetClientDhParams requestContext.nonce = ", requestContext.nonce)
-    Logger.debug("sendSetClientDhParams requestContext.serverNonce = ", requestContext.serverNonce)
-    Logger.debug("sendSetClientDhParams requestContext.newNonce = ", requestContext.newNonce)
+    Logger.debug("sendSetClientDhParams requestContext.nonce = ", authContext.nonce)
+    Logger.debug("sendSetClientDhParams requestContext.serverNonce = ", authContext.serverNonce)
+    Logger.debug("sendSetClientDhParams requestContext.newNonce = ", authContext.newNonce)
 
     Logger.debug("Send set_client_DH_params")
 
     return new Promise(function (resolve) {
-        sendPlainRequest(requestContext.dcID, request.getBuffer()).then(function ({deserializer}) {
+        sendPlainRequest(authContext.dcID, request.getBuffer()).then(function ({deserializer}) {
             const response = deserializer.fetchObject("Set_client_DH_params_answer")
 
 
-            Logger.debug("sendSetClientDhParams.then requestContext.nonce = ", requestContext.nonce)
-            Logger.debug("sendSetClientDhParams.then requestContext.serverNonce = ", requestContext.serverNonce)
-            Logger.debug("sendSetClientDhParams.then requestContext.newNonce = ", requestContext.newNonce)
+            Logger.debug("sendSetClientDhParams.then requestContext.nonce = ", authContext.nonce)
+            Logger.debug("sendSetClientDhParams.then requestContext.serverNonce = ", authContext.serverNonce)
+            Logger.debug("sendSetClientDhParams.then requestContext.newNonce = ", authContext.newNonce)
 
             if (response._ !== "dh_gen_ok" && response._ !== "dh_gen_retry" && response._ !== "dh_gen_fail") {
                 throw new Error("[MT] Set_client_DH_params_answer response invalid: " + response._)
             }
 
-            if (!bytesCmp(requestContext.nonce, response.nonce)) {
+            if (!bytesCmp(authContext.nonce, response.nonce)) {
                 throw new Error("[MT] Set_client_DH_params_answer nonce mismatch")
             }
 
-            if (!bytesCmp(requestContext.serverNonce, response.server_nonce)) {
+            if (!bytesCmp(authContext.serverNonce, response.server_nonce)) {
                 throw new Error("[MT] Set_client_DH_params_answer server_nonce mismatch")
             }
 
-            const authKey = bytesModPow(requestContext.gA, requestContext.b, requestContext.dhPrime)
+            const authKey = bytesModPow(authContext.gA, authContext.b, authContext.dhPrime)
 
             Logger.debug("GOT auth key!", authKey);
 
-            Logger.warn("SHIT", requestContext.gA, requestContext.b, requestContext.dhPrime)
+            Logger.warn("SHIT", authContext.gA, authContext.b, authContext.dhPrime)
 
             const authKeyHash = sha1BytesSync(authKey)
             const authKeyAux = authKeyHash.slice(0, 8)
@@ -373,7 +376,7 @@ function sendSetClientDhParams(requestContext) {
             Logger.debug("Got Set_client_DH_params_answer", response._)
             switch (response._) {
                 case "dh_gen_ok":
-                    const newNonceHash1 = sha1BytesSync(requestContext.newNonce.concat([1], authKeyAux)).slice(-16)
+                    const newNonceHash1 = sha1BytesSync(authContext.newNonce.concat([1], authKeyAux)).slice(-16)
 
                     /**
                      * FIXME: ...
@@ -382,27 +385,27 @@ function sendSetClientDhParams(requestContext) {
                         //throw new Error("[MT] Set_client_DH_params_answer new_nonce_hash1 mismatch")
                     }
 
-                    const serverSalt = bytesXor(requestContext.newNonce.slice(0, 8), requestContext.serverNonce.slice(0, 8))
+                    const serverSalt = bytesXor(authContext.newNonce.slice(0, 8), authContext.serverNonce.slice(0, 8))
                     // Logger.log("Auth successfull!", authKeyID, authKey, serverSalt)
 
-                    requestContext.authKeyID = authKeyID
-                    requestContext.authKey = authKey
-                    requestContext.serverSalt = serverSalt
-                    Logger.debug("GOT EVERYTHING! ", requestContext)
+                    authContext.authKeyID = authKeyID
+                    authContext.authKey = authKey
+                    authContext.serverSalt = serverSalt
+                    Logger.debug("GOT EVERYTHING! ", authContext)
 
                     // deferred.resolve(auth)
                     break
 
                 case "dh_gen_retry":
-                    const newNonceHash2 = sha1BytesSync(requestContext.newNonce.concat([2], authKeyAux)).slice(-16)
+                    const newNonceHash2 = sha1BytesSync(authContext.newNonce.concat([2], authKeyAux)).slice(-16)
                     if (!bytesCmp(newNonceHash2, response.new_nonce_hash2)) {
                         throw new Error("[MT] Set_client_DH_params_answer new_nonce_hash2 mismatch")
                     }
 
-                    return sendSetClientDhParams(requestContext)
+                    return sendSetClientDhParams(authContext)
 
                 case "dh_gen_fail":
-                    const newNonceHash3 = sha1BytesSync(requestContext.newNonce.concat([3], authKeyAux)).slice(-16)
+                    const newNonceHash3 = sha1BytesSync(authContext.newNonce.concat([3], authKeyAux)).slice(-16)
                     if (!bytesCmp(newNonceHash3, response.new_nonce_hash3)) {
                         throw new Error("[MT] Set_client_DH_params_answer new_nonce_hash3 mismatch")
                     }

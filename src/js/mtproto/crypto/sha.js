@@ -15,9 +15,7 @@ export function sha1BytesSync(bytes) {
 }
 
 export function sha256HashSync(bytes) {
-    // console.log(dT(), 'SHA-2 hash start', bytes.byteLength || bytes.length)
     const hashWords = CryptoJS.SHA256(bytesToWords(bytes))
-    // console.log(dT(), 'SHA-2 hash finish')
 
     return bytesFromWords(hashWords)
 }
