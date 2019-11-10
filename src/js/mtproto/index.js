@@ -1,9 +1,10 @@
 import connect from "./connect"
 import {Networker} from "./network"
-import CONFIG from "../configuration"
+import {AppConfiguration} from "../configuration"
 import {bytesFromHex, bytesToHex} from "./utils/bin"
 import TimeManager from "./timeManager"
 import {createLogger} from "../common/logger"
+import {AppPermanentStorage} from "../common/storage"
 
 class MobileProtocol {
     constructor(options = {}) {
@@ -21,21 +22,21 @@ class MobileProtocol {
     connect(authContext) {
         this.authContext = authContext
 
-        if (!window.localStorage.getItem("authKey")) {
+        if (!AppPermanentStorage.exists("authKey")) {
             return connect(authContext).then(() => {
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
-                window.localStorage.setItem("authKey", bytesToHex(authContext.authKey))
-                window.localStorage.setItem("serverSalt", bytesToHex(authContext.serverSalt))
+                AppPermanentStorage.setItem("authKey", bytesToHex(authContext.authKey))
+                AppPermanentStorage.setItem("serverSalt", bytesToHex(authContext.serverSalt))
 
                 this.networker = new Networker(authContext)
                 this.connected = true
             })
         } else {
             return new Promise(resolve => {
-                authContext.authKey = new Uint8Array(bytesFromHex(window.localStorage.getItem("authKey")))
-                authContext.serverSalt = bytesFromHex(window.localStorage.getItem("serverSalt"))
+                authContext.authKey = new Uint8Array(bytesFromHex(AppPermanentStorage.getItem("authKey")))
+                authContext.serverSalt = bytesFromHex(AppPermanentStorage.getItem("serverSalt"))
 
                 this.networker = new Networker(authContext)
                 this.connected = true
@@ -54,5 +55,5 @@ class MobileProtocol {
 }
 
 export const MTProto = new MobileProtocol({
-    configuration: CONFIG
+    configuration: AppConfiguration
 })

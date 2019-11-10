@@ -1,4 +1,4 @@
-import Storage from "../../common/storage"
+import {AppTemporaryStorage} from "../../common/storage"
 import {longFromInts, nextRandomInt} from "../utils/bin"
 import {createLogger} from "../../common/logger"
 
@@ -11,11 +11,9 @@ export class MtpTimeManager {
         this.lastMessageID = [0, 0]
         this.timeOffset = 0
 
-        Storage.get("server_time_offset").then(function (offset) {
-            if (offset) {
-                this.timeOffset = offset
-            }
-        })
+        if (AppTemporaryStorage.exists("server_time_offset")) {
+            this.timeOffset = AppTemporaryStorage.getItem("server_time_offset")
+        }
     }
 
     generateMessageID() {
@@ -44,7 +42,7 @@ export class MtpTimeManager {
 
         Logger.warn("newTimeOffset = ", newTimeOffset)
 
-        Storage.set("server_time_offset", newTimeOffset)
+        AppTemporaryStorage.setItem("server_time_offset", newTimeOffset)
 
         this.lastMessageID = [0, 0]
         this.timeOffset = newTimeOffset

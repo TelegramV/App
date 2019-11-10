@@ -1,4 +1,4 @@
-export const CONFIG = {
+export const AppConfiguration = {
     mtproto: {
         dataCenter: {
             test: false,
@@ -22,4 +22,4 @@ export const CONFIG = {
     }
 }
 
-export default CONFIG
+export default AppConfiguration

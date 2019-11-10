@@ -1,12 +1,12 @@
 import {MTProto} from "./mtproto"
-import {createNonce, longFromInts, nextRandomInt} from "./mtproto/utils/bin"
+import {createNonce} from "./mtproto/utils/bin"
 import {createLogger} from "./common/logger";
 import {setCode2FAForm, setCodeForm, setPhoneForm, setSignUpForm} from "./ui/login/loginPage"
-import CONFIG from "./configuration"
+import {AppConfiguration} from "./configuration"
+import {AppPermanentStorage} from "./common/storage"
+import {renderDialogsSlice} from "./ui/app/dialogs"
 
-const Logger = createLogger("main")
-
-window.mtprotoStorage = {}
+const Logger = createLogger("Main")
 
 const authContext = {
     dcID: 2,
@@ -15,14 +15,33 @@ const authContext = {
 }
 
 function authorizedStart(authorizationData) {
-    window.localStorage.setItem("authorizationData", JSON.stringify(authorizationData))
-    /*MTProto.invokeMethod("messages.getAllChats", {
-        except_ids: []
-    }).then(response => {
-        console.log(response)
-    }, error => {
-        console.log(error)
-    })*/
+    AppPermanentStorage.setItem("authorizationData", authorizationData)
+    // MTProto.invokeMethod("messages.getAllChats", {
+    //     except_ids: []
+    // }).then(response => {
+    //     console.log(response)
+    //
+    // }, error => {
+    //     console.log(error)
+    // })
+
+    MTProto.invokeMethod("messages.getDialogs", {
+        flags: {},
+        exclude_pinned: false,
+        folder_id: "",
+        offset_date: "",
+        offset_id: "",
+        offset_peer: {
+            _: "inputPeerEmpty"
+        },
+        limit: "",
+        hash: ""
+    }).then(result => {
+        console.log(result)
+
+        renderDialogsSlice(result)
+    })
+
 
     /*MTProto.invokeMethod("contacts.importContacts", {
         contacts: [
@@ -46,16 +65,16 @@ console.log(response)
             }
 
     })*/
-    MTProto.invokeMethod("messages.sendMessage", {
-        flags: 0,
-        pFlags: {},
-        peer: {
-            _: "inputPeerUser",
-            user_id: 196706924
-        },
-        message: "weeb'o gram",
-        random_id: createNonce(8)
-    })
+    // MTProto.invokeMethod("messages.sendMessage", {
+    //     flags: 0,
+    //     pFlags: {},
+    //     peer: {
+    //         _: "inputPeerUser",
+    //         user_id: 196706924
+    //     },
+    //     message: "weeb'o gram",
+    //     random_id: createNonce(8)
+    // })
 }
 
 // TODO implement 2FA https://core.telegram.org/api/srp
@@ -89,12 +108,13 @@ function password() {
 }
 
 function start() {
-    let authorizationData = window.localStorage.getItem("authorizationData")
-    if (authorizationData) {
-        authorizationData = JSON.parse(authorizationData)
+
+    if (AppPermanentStorage.exists("authorizationData")) {
+        const authorizationData = AppPermanentStorage.getItem("authorizationData")
         authorizedStart(authorizationData)
         return;
     }
+
     MTProto.invokeMethod("help.getNearestDc").then(ndc => {
         setPhoneForm()
         // authorizedStart()
@@ -106,8 +126,8 @@ function start() {
                 flags: 0,
                 // +9996601488
                 phone_number: phoneNumber,
-                api_id: CONFIG.mtproto.api.api_id,
-                api_hash: CONFIG.mtproto.api.api_hash,
+                api_id: AppConfiguration.mtproto.api.api_id,
+                api_hash: AppConfiguration.mtproto.api.api_hash,
                 settings: {
                     _: "codeSettings",
                     flags: 0,
@@ -176,7 +196,16 @@ function start() {
             })
         })
     })
-
 }
 
-MTProto.connect(authContext).then(start)
+MTProto.connect(authContext)
+    .then(start)
+    .catch(error => {
+
+        document.getElementById("app").innerHTML = `
+    <h1>Error</h1>
+    ${JSON.stringify(error)}
+    <button onclick="location.reload()">Reload</button>
+    `
+
+    })

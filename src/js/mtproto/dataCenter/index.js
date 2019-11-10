@@ -1,11 +1,11 @@
-import CONFIG from "../../configuration"
+import AppConfiguration from "../../configuration"
 
 class DataCenter {
     constructor(options = {}) {
         this.useSsl = options.useSsl
         this.sslSubdomains = ["pluto", "venus", "aurora", "vesta", "flora"]
 
-        this.dcOptions = CONFIG.mtproto.dataCenter.list
+        this.dcOptions = AppConfiguration.mtproto.dataCenter.list
 
         this.chosenServers = {}
     }
@@ -15,7 +15,7 @@ class DataCenter {
         if (this.chosenServers[dcID] === undefined) {
             let chosenServer = false
             let dcOption
-            const path = CONFIG.mtproto.dataCenter.test ? "apiw_test" : "apiw"
+            const path = AppConfiguration.mtproto.dataCenter.test ? "apiw_test" : "apiw"
 
             if (this.useSsl) {
                 let subdomain = this.sslSubdomains[dcID - 1] + (upload ? "-1" : "")

@@ -16,13 +16,12 @@ import axios from "axios";
 import {TimeManager} from "../timeManager";
 import {createLogger} from "../../common/logger";
 import {TLDeserialization} from "../language/deserialization";
-import Storage, {createStorage} from "../../common/storage"
+import {AppPermanentStorage} from "../../common/storage"
 import {MessageProcessor} from "./messageProcessor"
 
-import CONFIG from "../../configuration"
+import AppConfiguration from "../../configuration"
 
 const Logger = createLogger("Networker")
-const MessagesStorage = createStorage("MessagesStorage")
 
 export class Networker {
     constructor(auth) {
@@ -275,13 +274,13 @@ export class Networker {
         if (!this.connectionInited) {
             // TODO replace with const values
 
-            serializer.storeInt(CONFIG.mtproto.api.invokeWithLayer, 'invokeWithLayer')
-            serializer.storeInt(CONFIG.mtproto.api.layer, 'layer')
-            serializer.storeInt(CONFIG.mtproto.api.initConnection, 'initConnection')
-            serializer.storeInt(CONFIG.mtproto.api.api_id, 'api_id')
+            serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, 'invokeWithLayer')
+            serializer.storeInt(AppConfiguration.mtproto.api.layer, 'layer')
+            serializer.storeInt(AppConfiguration.mtproto.api.initConnection, 'initConnection')
+            serializer.storeInt(AppConfiguration.mtproto.api.api_id, 'api_id')
             serializer.storeString(navigator.userAgent || 'Unknown UserAgent', 'device_model')
             serializer.storeString(navigator.platform || 'Unknown Platform', 'system_version')
-            serializer.storeString(CONFIG.mtproto.api.app_version, 'app_version')
+            serializer.storeString(AppConfiguration.mtproto.api.app_version, 'app_version')
             serializer.storeString(navigator.language || 'en', 'system_lang_code')
             serializer.storeString('', 'lang_pack')
             serializer.storeString(navigator.language || 'en', 'lang_code')
@@ -326,7 +325,7 @@ export class Networker {
     applyServerSalt(newServerSalt) {
         var serverSalt = longToBytes(newServerSalt)
 
-        Storage.set('dc' + this.dcID + '_server_salt', bytesToHex(serverSalt))
+        AppPermanentStorage.setItem(`dc${this.dcID}_server_salt`, bytesToHex(serverSalt))
 
         this.serverSalt = serverSalt
         return true
