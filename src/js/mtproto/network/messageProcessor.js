@@ -12,6 +12,7 @@ export class MessageProcessor {
         this.networker = options.networker
 
         this.rpcResultHandlers = {}
+        this.rpcErrorHandlers = {}
         this.sentMessages = {}
 
         this.logger = createLogger("MessageProcessor")
@@ -26,8 +27,9 @@ export class MessageProcessor {
 
     }
 
-    listenRpc(messageId, handler) {
+    listenRpc(messageId, handler, reject) {
         this.rpcResultHandlers[messageId] = handler
+        this.rpcErrorHandlers[messageId] = reject
     }
 
     process(message, messageID, sessionID) {
@@ -47,7 +49,7 @@ export class MessageProcessor {
     }
 
     processMessage(message, messageID, sessionID) {
-        this.logger.debug("message = ", message)
+        //this.logger.debug("Received message", message)
 
         this.process(message.body, message.msg_id, sessionID)
     }
@@ -64,6 +66,10 @@ export class MessageProcessor {
         if (message.result._ === "rpc_error") {
             const error = this.networker.processError(message.result)
             this.logger.error('Rpc error', error)
+
+            this.rpcErrorHandlers[message.req_msg_id](error)
+
+            delete this.rpcErrorHandlers[message.req_msg_id]
         } else {
             this.logger.debug('Rpc response', message.result)
 

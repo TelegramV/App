@@ -1,7 +1,7 @@
 export const CONFIG = {
     mtproto: {
         dataCenter: {
-            test: true,
+            test: false,
             list: [
                 {id: 0, host: "149.154.167.40", port: 80}, // test server
                 {id: 1, host: "149.154.175.50", port: 80},

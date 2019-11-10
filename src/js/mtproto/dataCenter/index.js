@@ -15,7 +15,7 @@ class DataCenter {
         if (this.chosenServers[dcID] === undefined) {
             let chosenServer = false
             let dcOption
-            const path = CONFIG.mtproto.dataCenter.test ? "apiw1_test" : "apiw1"
+            const path = CONFIG.mtproto.dataCenter.test ? "apiw_test" : "apiw"
 
             if (this.useSsl) {
                 let subdomain = this.sslSubdomains[dcID - 1] + (upload ? "-1" : "")

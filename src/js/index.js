@@ -1,7 +1,7 @@
 import {MTProto} from "./mtproto"
-import {createNonce} from "./mtproto/utils/bin"
+import {createNonce, longFromInts, nextRandomInt} from "./mtproto/utils/bin"
 import {createLogger} from "./common/logger";
-import {setCodeForm, setPhoneForm} from "./ui/login/loginPage"
+import {setCode2FAForm, setCodeForm, setPhoneForm, setSignUpForm} from "./ui/login/loginPage"
 import CONFIG from "./configuration"
 
 const Logger = createLogger("main")
@@ -9,16 +9,95 @@ const Logger = createLogger("main")
 window.mtprotoStorage = {}
 
 const authContext = {
-    dcID: 0,
+    dcID: 2,
     nonce: createNonce(16),
     sessionID: createNonce(8) // TODO check if secure?
 }
 
-function start() {
-    MTProto.invokeMethod("help.getNearestDc").then(ndc => {
-        Logger.debug("nearestDc = ", ndc)
+function authorizedStart(authorizationData) {
+    window.localStorage.setItem("authorizationData", JSON.stringify(authorizationData))
+    /*MTProto.invokeMethod("messages.getAllChats", {
+        except_ids: []
+    }).then(response => {
+        console.log(response)
+    }, error => {
+        console.log(error)
+    })*/
 
+    /*MTProto.invokeMethod("contacts.importContacts", {
+        contacts: [
+            {
+                _: "inputPhoneContact",
+                first_name: "maksim",
+                last_name: "sunduk",
+                phone: "380956031588",
+                client_id: 1234
+            }
+        ]
+    }).then(response => {
+console.log(response)
+    })*/
+    // 340271
+    /*MTProto.invokeMethod("users.getFullUser", {
+        id:
+            {
+                _: "inputUser",
+                user_id: 196706924
+            }
+
+    })*/
+    MTProto.invokeMethod("messages.sendMessage", {
+        flags: 0,
+        pFlags: {},
+        peer: {
+            _: "inputPeerUser",
+            user_id: 196706924
+        },
+        message: "weeb'o gram",
+        random_id: createNonce(8)
+    })
+}
+
+// TODO implement 2FA https://core.telegram.org/api/srp
+// @o.tsenilov
+function password() {
+    MTProto.invokeMethod("account.getPassword", {}).then(response => {
+        if (response._ !== "passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow") {
+            throw new Error("Unknown 2FA algo")
+        }
+        setCode2FAForm()
+
+        const salt1 = response.salt1
+        const salt2 = response.salt2
+        const g = response.g
+        const p = response.p
+
+        document.getElementById("loginSendCode2FAButton").addEventListener("click", event => {
+            const code = document.getElementById("code2FAInput").value
+            MTProto.invokeMethod("auth.checkPassword", {
+                password: {
+                    _: "inputCheckPasswordSRP",
+                    srp_id: srpId,
+                    A: aBytes,
+                    M1: m1Bytes
+                }
+            }).then(response => {
+                authorizedStart(response)
+            })
+        })
+    })
+}
+
+function start() {
+    let authorizationData = window.localStorage.getItem("authorizationData")
+    if (authorizationData) {
+        authorizationData = JSON.parse(authorizationData)
+        authorizedStart(authorizationData)
+        return;
+    }
+    MTProto.invokeMethod("help.getNearestDc").then(ndc => {
         setPhoneForm()
+        // authorizedStart()
 
         document.getElementById("loginSendPhoneButton").addEventListener("click", event => {
             const phoneNumber = document.getElementById("loginPhoneNumberInput").value
@@ -42,21 +121,56 @@ function start() {
             }).then(response => {
                 setCodeForm()
 
-                console.log(response)
+                // console.log(response)
 
                 document.getElementById("loginSendCodeButton").addEventListener("click", event => {
                     const code = document.getElementById("loginCodeInput").value
+                    const phoneCodeHash = response.phone_code_hash
 
                     MTProto.invokeMethod("auth.signIn", {
                         phone_number: phoneNumber,
-                        phone_code_hash: response.phone_code_hash,
+                        phone_code_hash: phoneCodeHash,
                         phone_code: code
                     }).then(response => {
-                        console.log(response)
+                        if (response._ === "auth.authorizationSignUpRequired") {
+                            setSignUpForm()
 
-                        MTProto.invokeMethod("account.getAccountTTL").then(result => {
-                            document.getElementById("app").innerHTML = JSON.stringify(result)
-                        })
+                            document.getElementById("signUpButton").addEventListener("click", event => {
+                                MTProto.invokeMethod("auth.signUp", {
+                                    phone_number: phoneNumber,
+                                    phone_code_hash: phoneCodeHash,
+                                    first_name: document.getElementById("signUpFirstName").value,
+                                    last_name: document.getElementById("signUpLastName").value
+                                }).then(response => {
+                                    if (response._ === "auth.authorization") {
+                                        console.log(this)
+                                        console.log("signup success!")
+                                        authorizedStart(response)
+                                    } else {
+                                        console.log(response)
+                                    }
+                                })
+                            })
+                        } else {
+                            authorizedStart(response)
+                        }
+                        // console.log(response)
+
+                        // MTProto.invokeMethod("account.getAccountTTL").then(result => {
+                        //     document.getElementById("app").innerHTML = JSON.stringify(result)
+                        // })
+                    }, error => {
+                        switch (error.type) {
+                            case "PHONE_CODE_EMPTY":
+                            case "PHONE_CODE_EXPIRED":
+                            case "PHONE_CODE_INVALID":
+                                // Try again!
+                                break
+                            // 2FA
+                            case "SESSION_PASSWORD_NEEDED":
+                                password()
+                                break
+                        }
                     })
                 })
             })

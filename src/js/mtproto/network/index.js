@@ -249,8 +249,8 @@ export class Networker {
     callApi(message, options) {
         message.msg_id = this.timeManager.generateMessageID()
 
-        return new Promise(resolve => {
-            this.messageProcessor.listenRpc(message.msg_id, resolve)
+        return new Promise((resolve, reject) => {
+            this.messageProcessor.listenRpc(message.msg_id, resolve, reject)
             this.sendMessage(message, options)
         })
     }
@@ -263,7 +263,7 @@ export class Networker {
         return this.sendEncryptedRequest(message).then(result => {
             const response = this.parseResponse(result.data)
 
-            Logger.log("result:", response)
+            // Logger.log("result:", response)
 
             return this.messageProcessor.process(response.response, response.messageID, response.sessionID)
         })
@@ -304,7 +304,8 @@ export class Networker {
             isAPI: true
         };
 
-        Logger.debug("Api call", method, params, messageID, seqNo, options)
+        //Logger.debug("Api call", method, params, messageID, seqNo, options)
+        Logger.debug("Api call", method, params)
 
         return message
     }
@@ -361,7 +362,7 @@ export class Networker {
             body: serializer.getBytes()
         }
 
-        console.log('MT message', object, messageID, seqNo)
+        //console.log('MT message', object, messageID, seqNo)
 
         return message
     }
