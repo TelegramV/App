@@ -27,15 +27,17 @@ function authorizedStart(authorizationData) {
     })*/
 
     MTProto.invokeMethod("messages.getDialogs", {
-        flags: {},
-        exclude_pinned: false,
-        folder_id: "",
-        offset_date: "",
-        offset_id: "",
+        flags: 0,
+        pFlags: {
+            exclude_pinned: false,
+            folder_id: false
+        },
+        offset_date: 0,
+        offset_id: 0,
         offset_peer: {
             _: "inputPeerEmpty"
         },
-        limit: "",
+        limit: 20,
         hash: ""
     }).then(result => {
         console.log(result)

@@ -1,4 +1,6 @@
 import {AppPermanentStorage} from "../../common/storage"
+import {MTProto} from "../../mtproto";
+import {bufferConcat, createNonce, intToBytes, longToBytes} from "../../mtproto/utils/bin";
 
 export function renderDialogsSlice(dialogsSlice) {
     const app = document.getElementById("app")
@@ -19,9 +21,24 @@ export function renderDialogsSlice(dialogsSlice) {
         const message = findMessageFromDialog(dialog, dialogsSlice)
         const messageUser = findUserFromMessage(message, dialogsSlice)
         let messageUsername = messageUser ? messageUser.id !== peer.id ? `${getPeerName(messageUser, true)}` : "" : ""
-
+        if(peer.photo) {
+            let a = peer.photo.photo_small
+            MTProto.invokeMethod("upload.getFile", {
+                location: {
+                    _: "inputFileLocation",
+                    volume_id: a.volume_id,
+                    local_id: a.local_id
+                },
+                flags: 0,
+                offset: 0,
+                limit: 1024 * 1024
+            }).then(response => {
+                console.log(response)
+            })
+        }
         chatsHTML += `
             <li>
+            <img id="avatar_${peer.id}" alt="${peerName}">
             <i>${dialogPinned ? "[pinned] " : ""} (${peer._})</i> 
             <b>${peerName}</b> : <i>${messageUsername}</i> ${message.message}
             </li>

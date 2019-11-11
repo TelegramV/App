@@ -89,6 +89,12 @@ export class Networker {
         }
     }
 
+    resendMessage(messageId) {
+        if(!this.messageProcessor.sentMessages[messageId])
+            throw new Error("Message to resend does not exist")
+        this.sendMessage(this.messageProcessor.sentMessages[messageId])
+    }
+
     sendEncryptedRequest(message, options) {
         this.messageProcessor.sentMessages[message.msg_id] = message
 
@@ -274,6 +280,7 @@ export class Networker {
             this.messageProcessor.process(response.response, response.messageID, response.sessionID)
         }, this);
         this.sendEncryptedRequest(message);
+
         /*return this.sendEncryptedRequest(message).then(result => {
             const response = this.parseResponse(result.data)
 

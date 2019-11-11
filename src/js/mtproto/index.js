@@ -19,6 +19,11 @@ class MobileProtocol {
         this.connected = false
     }
 
+    updateServerSalt(newSalt) {
+        this.authContext.serverSalt = newSalt
+        AppPermanentStorage.setItem("serverSalt", bytesToHex(newSalt))
+    }
+
     connect(authContext, processor, proc_context) {
         this.authContext = authContext
 

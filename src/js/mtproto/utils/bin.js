@@ -353,6 +353,12 @@ export function longFromInts(high, low) {
     return bigint(high).shiftLeft(32).add(bigint(low)).toString(10)
 }
 
+export function intToBytes(int) {
+    const arr = new Int8Array(1)
+    arr[0] = int
+    return bytesFromArrayBuffer(arr.buffer)
+}
+
 export function intToUint(val) {
     val = parseInt(val)
     if (val < 0) {

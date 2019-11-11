@@ -1,4 +1,6 @@
 import {createLogger} from "../../common/logger"
+import {MTProto} from "../index";
+import {longToBytes} from "../utils/bin";
 
 /**
  * TODO: We should rewrite this shit!
@@ -23,6 +25,7 @@ export class MessageProcessor {
             "message": (message, messageID, sessionID) => this.processMessage(message, messageID, sessionID),
             "rpc_result": (message, messageID, sessionID) => this.processRpcResult(message, messageID, sessionID),
             "msgs_ack": (message, messageID, sessionID) => this.processMessagesAck(message, messageID, sessionID),
+            "bad_server_salt": (message, messageID, sessionID) => this.processBadServerSalt(message, messageID, sessionID)
         }
 
     }
@@ -58,6 +61,11 @@ export class MessageProcessor {
         for (let i = 0; i < message.msg_ids.length; i++) {
             this.networker.ackMessage(message.msg_ids[i])
         }
+    }
+
+    processBadServerSalt(message, messageID, sessionID) {
+        MTProto.updateServerSalt(longToBytes(message.new_server_salt))
+        this.networker.resendMessage(message.bad_msg_id)
     }
 
     processRpcResult(message, messageID, sessionID) {
