@@ -89,7 +89,7 @@ export function renderDialogsSlice(dialogsSlice) {
                 <td id="dialog_${peer.id}">
                     <img id="avatar_${peer.id}">
                     <i>${dialogPinned ? "[pinned] " : ""} (${peer._})</i> 
-                    <b>${peerName}</b> : <i>${messageUsername}</i> ${message.message}
+                    <b>${peerName}</b> : <i>${messageUsername}</i> ${parseMessageEntities(message.message, message.entities, true)}
                 </td>
             </tr>
             `
