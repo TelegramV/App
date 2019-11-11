@@ -21,6 +21,8 @@ import {MessageProcessor} from "./messageProcessor"
 
 import AppConfiguration from "../../configuration"
 
+import {mt_ws_set_processor, mt_ws_transport} from "./mt_ws_transport"
+
 const Logger = createLogger("Networker")
 
 export class Networker {
@@ -122,10 +124,11 @@ export class Networker {
 
         const url = DataCenter.chooseServer(this.auth.dcID);
 
-        return axios.post(url, requestData, {
+        mt_ws_transport(url, requestData);
+        /*return axios.post(url, requestData, {
             responseType: "arraybuffer",
             transformRequest: null
-        })
+        })*/
     }
 
     getDecryptedMessage(msgKey, encryptedData) {
@@ -259,13 +262,25 @@ export class Networker {
             message.msg_id = this.timeManager.generateMessageID()
         }
 
-        return this.sendEncryptedRequest(message).then(result => {
+        mt_ws_set_processor(function(data_buffer)
+        {
+            if(data_buffer.byteLength <= 4)
+            {
+                //some another protocol violation here
+                console.log(data_buffer);
+                throw new Error("404??");
+            }
+            const response = this.parseResponse(data_buffer);
+            this.messageProcessor.process(response.response, response.messageID, response.sessionID)
+        }, this);
+        this.sendEncryptedRequest(message);
+        /*return this.sendEncryptedRequest(message).then(result => {
             const response = this.parseResponse(result.data)
 
             // Logger.log("result:", response)
 
             return this.messageProcessor.process(response.response, response.messageID, response.sessionID)
-        })
+        })*/
     }
 
     wrapApiCall(method, params, options = {}) {

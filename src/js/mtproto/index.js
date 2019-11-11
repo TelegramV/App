@@ -19,11 +19,12 @@ class MobileProtocol {
         this.connected = false
     }
 
-    connect(authContext) {
+    connect(authContext, processor, proc_context) {
         this.authContext = authContext
 
         if (!AppPermanentStorage.exists("authKey")) {
-            return connect(authContext).then(() => {
+            //return new Promise(resolve => {
+                connect(authContext, function(){//.then(() => {
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
@@ -32,7 +33,12 @@ class MobileProtocol {
 
                 this.networker = new Networker(authContext)
                 this.connected = true
-            })
+
+                processor.call(proc_context);
+                //resolve()
+                }, this)
+            //})
+            //})
         } else {
             return new Promise(resolve => {
                 authContext.authKey = new Uint8Array(bytesFromHex(AppPermanentStorage.getItem("authKey")))
@@ -41,6 +47,7 @@ class MobileProtocol {
                 this.networker = new Networker(authContext)
                 this.connected = true
                 resolve()
+                processor.call(proc_context);
             })
         }
     }

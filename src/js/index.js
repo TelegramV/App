@@ -6,6 +6,7 @@ import {AppConfiguration} from "./configuration"
 import {AppPermanentStorage} from "./common/storage"
 import {renderDialogsSlice} from "./ui/app/dialogs"
 
+
 const Logger = createLogger("Main")
 
 const authContext = {
@@ -15,15 +16,15 @@ const authContext = {
 }
 
 function authorizedStart(authorizationData) {
+    //window.localStorage.setItem("authorizationData", JSON.stringify(authorizationData))
     AppPermanentStorage.setItem("authorizationData", authorizationData)
-    // MTProto.invokeMethod("messages.getAllChats", {
-    //     except_ids: []
-    // }).then(response => {
-    //     console.log(response)
-    //
-    // }, error => {
-    //     console.log(error)
-    // })
+    /*MTProto.invokeMethod("messages.getAllChats", {
+        except_ids: []
+    }).then(response => {
+        console.log(response)
+    }, error => {
+        console.log(error)
+    })*/
 
     MTProto.invokeMethod("messages.getDialogs", {
         flags: {},
@@ -41,7 +42,6 @@ function authorizedStart(authorizationData) {
 
         renderDialogsSlice(result)
     })
-
 
     /*MTProto.invokeMethod("contacts.importContacts", {
         contacts: [
@@ -65,16 +65,16 @@ console.log(response)
             }
 
     })*/
-    // MTProto.invokeMethod("messages.sendMessage", {
-    //     flags: 0,
-    //     pFlags: {},
-    //     peer: {
-    //         _: "inputPeerUser",
-    //         user_id: 196706924
-    //     },
-    //     message: "weeb'o gram",
-    //     random_id: createNonce(8)
-    // })
+    /*MTProto.invokeMethod("messages.sendMessage", {
+        flags: 0,
+        pFlags: {},
+        peer: {
+            _: "inputPeerUser",
+            user_id: 196706924
+        },
+        message: "weeb'o gram",
+        random_id: createNonce(8)
+    })*/
 }
 
 // TODO implement 2FA https://core.telegram.org/api/srp
@@ -108,13 +108,11 @@ function password() {
 }
 
 function start() {
-
     if (AppPermanentStorage.exists("authorizationData")) {
         const authorizationData = AppPermanentStorage.getItem("authorizationData")
         authorizedStart(authorizationData)
         return;
     }
-
     MTProto.invokeMethod("help.getNearestDc").then(ndc => {
         setPhoneForm()
         // authorizedStart()
@@ -196,16 +194,10 @@ function start() {
             })
         })
     })
+
 }
 
-MTProto.connect(authContext)
-    .then(start)
-    .catch(error => {
-
-        document.getElementById("app").innerHTML = `
-    <h1>Error</h1>
-    ${JSON.stringify(error)}
-    <button onclick="location.reload()">Reload</button>
-    `
-
-    })
+MTProto.connect(authContext, function()
+{
+    start();
+}, this)
