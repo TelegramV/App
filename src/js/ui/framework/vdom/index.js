@@ -1,3 +1,17 @@
+/**
+ * Simple Virtual DOM
+ *
+ * @param tagName
+ * @param attrs
+ * @param options
+ * @param events
+ * @param children
+ * @param htmlChild
+ * @returns {any}
+ *
+ * @author kohutd
+ */
+
 export function createElement(tagName, {attrs = {}, options = {}, events = {}, children = [], htmlChild = false} = {}) {
     const vElem = Object.create(null);
 
@@ -20,7 +34,42 @@ export function h(tagName, {attrs = {}, options = {}, events = {}, children = []
     return createElement(tagName, {attrs, options, events, children, htmlChild})
 }
 
+/**
+ * alias for `createElement`
+ */
+export function jsx(tagName, conf, ...children) {
+    let attrs = {}
+    let events = {}
+    let options = {}
+    let htmlChild = false
+
+    if (conf) {
+        for (const [k, v] of Object.entries(conf)) {
+            if (k.startsWith("on")) {
+                events[k.substring(2).toLowerCase()] = v
+            } else if (k === "options") {
+                options = Object.assign(options, v)
+            } else if (k === "htmlChild") {
+                htmlChild = Boolean(v)
+            } else {
+                attrs[k] = v
+            }
+        }
+    }
+
+    return createElement(tagName, {attrs, options, events, children, htmlChild})
+}
+
 export function render(vNode) {
+
+    if (Array.isArray(vNode)) {
+        const $el = document.createElement("div")
+        vNode.forEach(vNodeIn => {
+            $el.appendChild(render(vNodeIn))
+        })
+        return $el
+    }
+
     if (!vNode) return document.createTextNode("")
 
     if (vNode.htmlChild) {
@@ -58,9 +107,10 @@ export function render(vNode) {
     return $el
 }
 
-const VDOM = {
+export const VDOM = {
     createElement,
     h,
+    jsx,
     render,
 }
 

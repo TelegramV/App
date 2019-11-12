@@ -1,117 +1,50 @@
 import {MTProto} from "../../../mtproto"
 import {AppPermanentStorage} from "../../../common/storage"
 import {AppFramework} from "../../framework/framework"
-import VDOM from "../../framework/vdom"
+
+const VDOM = require("../../framework/vdom")
+
 
 function vPhoneNumberFormTemplate(onSendHandler) {
-    return VDOM.h("form", {
-        children: [
-            VDOM.h("label", {
-                attrs: {
-                    for: "phoneNumberInput"
-                },
-                children: "Phone"
-            }),
-            VDOM.h("input", {
-                attrs: {
-                    type: "number",
-                    id: "phoneNumberInput",
-                    autofocus: true,
-                },
-            }),
-            VDOM.h("button", {
-                attrs: {
-                    id: "sendCodeButton",
-                },
-                events: {
-                    click: onSendHandler
-                },
-                children: "Next"
-            }),
-        ]
-    })
+    return (
+        <form>
+            <label htmlFor="phoneNumberInput">Phone</label>
+            <input id="phoneNumberInput" type="number" autoFocus/>
+            <button id="sendCodeButton" onClick={onSendHandler}>Next</button>
+        </form>
+    )
 }
 
 function vPhoneCodeFormTemplate(sentType, onSendHandler) {
-    return VDOM.h("div", {
-        children: [
-            sentType,
-            VDOM.h("br"),
-            VDOM.h("form", {
-                children: [
-                    VDOM.h("label", {
-                        attrs: {
-                            for: "phoneCodeInput"
-                        },
-                        children: "Code"
-                    }),
-                    VDOM.h("input", {
-                        attrs: {
-                            type: "number",
-                            id: "phoneCodeInput",
-                            autofocus: true,
-                        },
-                    }),
-                    VDOM.h("button", {
-                        attrs: {
-                            id: "signInButton",
-                        },
-                        events: {
-                            click: onSendHandler
-                        },
-                        children: "SignIn"
-                    }),
-                ]
-            })
-        ]
-    })
+    return (
+        <div>
+            {sentType}
+            <br/>
+            <form>
+                <label htmlFor="phoneCodeInput">Code</label>
+                <input id="phoneCodeInput" type="number" autoFocus/>
+                <button id="signInButton" onClick={onSendHandler}>SignIn</button>
+            </form>
+        </div>
+    )
 }
 
 function vSignUpFormTemplate(onSendHandler) {
-    return VDOM.h("form", {
-        children: [
-            VDOM.h("label", {
-                attrs: {
-                    for: "signUpFirstName"
-                },
-                children: "First name"
-            }),
-            VDOM.h("input", {
-                attrs: {
-                    type: "text",
-                    id: "signUpFirstName",
-                    autofocus: true,
-                },
-            }),
-            VDOM.h("label", {
-                attrs: {
-                    for: "signUpLastName"
-                },
-                children: "Last name"
-            }),
-            VDOM.h("input", {
-                attrs: {
-                    type: "text",
-                    id: "signUpLastName",
-                    autofocus: true,
-                },
-            }),
+    return (
+        <form>
+            <label htmlFor="signUpFirstName">First name</label>
+            <input id="signUpFirstName" type="text" autoFocus/>
 
-            VDOM.h("button", {
-                attrs: {
-                    id: "signUpButton",
-                },
-                events: {
-                    click: onSendHandler
-                },
-                children: "SignUp"
-            }),
-        ]
-    })
+            <label htmlFor="signUpLastName">Last name</label>
+            <input id="signUpLastName" type="text"/>
+
+            <button id="signUpButton" onClick={onSendHandler}>SignUp</button>
+        </form>
+    )
 }
 
 export class LoginPage extends HTMLElement {
-    constructor() {
+    constructor(opts) {
         super();
 
         if (MTProto.isUserAuthorized()) {

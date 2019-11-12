@@ -2,7 +2,8 @@ import {AppTemporaryStorage} from "../../../../common/storage"
 import {MTProto} from "../../../../mtproto"
 import {dialogPeerMap, TelegramDialogComponent} from "./dialog"
 import {MessageListComponent} from "./messageList"
-import VDOM from "../../../framework/vdom"
+
+const VDOM = require("../../../framework/vdom")
 
 export class DialogListComponent extends HTMLElement {
     constructor() {
@@ -34,18 +35,14 @@ export class DialogListComponent extends HTMLElement {
         }).then(dialogsSlice => {
             AppTemporaryStorage.setItem("dialogsSlice", dialogsSlice)
 
-            this.vNode = VDOM.h("div", {
-                children: dialogsSlice.dialogs.map(dialog => {
-                    return VDOM.h(TelegramDialogComponent, {
-                        options: {
-                            dialogsSlice: dialogsSlice,
-                            dialog: dialog,
-                            dataset: {
-                                peer: `${dialog.peer._}.${dialog.peer[dialogPeerMap[dialog.peer._] + '_id']}`
-                            }
-                        }
-                    })
-                })
+            this.vNode = dialogsSlice.dialogs.map(dialog => {
+                return <TelegramDialogComponent options={{
+                    dialogsSlice: dialogsSlice,
+                    dialog: dialog,
+                    dataset: {
+                        peer: `${dialog.peer._}.${dialog.peer[dialogPeerMap[dialog.peer._] + '_id']}`
+                    }
+                }}/>
             })
 
             const chatblock = document.getElementById("chatBlock")

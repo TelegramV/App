@@ -1,82 +1,55 @@
 import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers"
 import {AppTemporaryStorage} from "../../../../common/storage"
 import {findUserFromMessage, getPeerName} from "./dialog"
-import VDOM from "../../../framework/vdom"
 import {FileAPI} from "../../../../api/fileAPI"
+import {VDOM} from "../../../framework/vdom"
 
 function vMessageWithTextOnlyTemplate(data) {
-    return VDOM.h("div", {
-        events: {
-            click() {
-                console.log("FUCK IT DOES WORK!")
-            }
-        },
-        children: [
-            VDOM.h("span", {
-                children: [
-                    VDOM.h("i", {
-                        children: data.userName
-                    })
-                ]
-            }),
+    return (
+        <div onClick={() => console.log("click", data)}>
+            <span>
+                <i>{data.userName}</i>
+            </span>
 
-            VDOM.h("div", {
-                htmlChild: true,
-                children: data.message
-            }),
-        ]
-    })
+            <div htmlChild="true">
+                {data.message}
+            </div>
+        </div>
+    )
 }
 
 function vMessageWithImageTemplate(data) {
-    return VDOM.h("div", {
-        children: [
-            VDOM.h("span", {
-                children: [
-                    VDOM.h("i", {
-                        children: data.userName
-                    })
-                ]
-            }),
+    return (
+        <div onClick={() => console.log("click", data)}>
+            <span>
+                <i>{data.userName}</i>
+            </span>
 
-            VDOM.h("div", {
-                htmlChild: true,
-                children: data.message
-            }),
+            <div htmlChild="true">
+                {data.message}
+            </div>
 
-            VDOM.h("img", {
-                attrs: {
-                    src: data.imgSrc
-                }
-            }),
-        ]
-    })
+            <img src={data.imgSrc} alt="fuck this"/>
+        </div>
+    )
 }
 
 function vMessageWithFileTemplate(data) {
-    return VDOM.h("div", {
-        children: [
-            VDOM.h("span", {
-                children: [
-                    VDOM.h("i", {
-                        children: data.userName
-                    })
-                ]
-            }),
+    return (
+        <div onClick={() => console.log("click", data)}>
+            <span>
+                <i>{data.userName}</i>
+            </span>
 
-            VDOM.h("div", {
-                htmlChild: true,
-                children: data.message
-            }),
+            <div htmlChild="true">
+                {data.message}
+            </div>
 
-            VDOM.h("a", {
-                attrs: {
-                    href: data.fileURL
-                },
-                children: `Download ${data.fileName}`
-            }),
-        ]
-    })
+            <a href={data.fileURL}>
+                Download {data.fileName}
+            </a>
+        </div>
+    )
 }
 
 export class MessageComponent extends HTMLElement {

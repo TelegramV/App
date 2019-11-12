@@ -1,5 +1,6 @@
 import {AppTemporaryStorage} from "../../../../common/storage"
-import VDOM from "../../../framework/vdom"
+
+const VDOM = require("../../../framework/vdom")
 
 export const dialogPeerMaps = {
     "peerUser": "users",
@@ -14,24 +15,20 @@ export const dialogPeerMap = {
 }
 
 function vNodeTemplate(data) {
-    return VDOM.h("a", {
-        attrs: {
-            href: `/#/?p=${data.peer._}.${data.peer[dialogPeerMap[data.peer._] + "_id"]}`
-        },
-        children: [
-            VDOM.h("i", {
-                children: data.pinned ? "[pinned] " : ""
-            }),
-            VDOM.h("b", {
-                children: data.peerName
-            }),
-            " : ",
-            VDOM.h("i", {
-                children: data.messageUsername
-            }),
-            data.message
-        ]
-    })
+    return (
+        <a href={`/#/?p=${data.peer._}.${data.peer[dialogPeerMap[data.peer._] + "_id"]}`}>
+            <i>
+                {data.pinned ? "[pinned] " : ""}
+            </i>
+            <b>
+                {data.peerName}
+            </b>
+            <i>
+                {data.messageUsername}
+            </i>
+            {data.message}
+        </a>
+    )
 }
 
 export class TelegramDialogComponent extends HTMLElement {

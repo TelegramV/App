@@ -1,6 +1,5 @@
 import {MTProto} from "./mtproto"
 import {createNonce} from "./mtproto/utils/bin"
-import {createLogger} from "./common/logger";
 import {setCode2FAForm} from "./ui/login/loginPage"
 import {AppPermanentStorage} from "./common/storage"
 import {LoginPage} from "./ui/pages/login"
@@ -13,8 +12,7 @@ import "../sass/styles.scss"
 import {MessageListComponent} from "./ui/pages/im/components/messageList"
 import {MessageComponent} from "./ui/pages/im/components/message"
 
-
-const Logger = createLogger("Main")
+const VDOM = require("./ui/framework/vdom")
 
 const authContext = {
     dcID: 2,

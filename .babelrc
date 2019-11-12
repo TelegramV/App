@@ -8,6 +8,12 @@
     ]
   ],
   "plugins": [
-    "@babel/plugin-transform-regenerator"
+    "@babel/plugin-transform-regenerator",
+    [
+      "@babel/plugin-transform-react-jsx",
+      {
+        "pragma": "VDOM.jsx"
+      }
+    ]
   ]
 }

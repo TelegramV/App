@@ -11,18 +11,14 @@ export class IMPage extends HTMLElement {
             AppFramework.Router.push("/login")
         }
 
-        this.vNode = VDOM.h("div", {
-            children: [
-                VDOM.h(DialogListComponent),
-                VDOM.h("div", {
-                    attrs: {
-                        id: "chatBlock",
-                        style: "margin-left:25%;padding:1px 16px;height:1000px;"
-                    },
-                    children: "loading.."
-                })
-            ]
-        })
+        this.vNode = (
+            <div>
+                <DialogListComponent/>
+                <div id="chatBlock" style="margin-left:25%;padding:1px 16px;height:1000px;">
+                    loading...
+                </div>
+            </div>
+        )
     }
 
     connectedCallback() {

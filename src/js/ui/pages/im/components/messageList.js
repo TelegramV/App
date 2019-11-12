@@ -69,21 +69,18 @@ export class MessageListComponent extends HTMLElement {
         }).then(response => {
             AppTemporaryStorage.setItem("messages.messagesSlice", response)
 
-            this.vNode = VDOM.h("div", {
-                children: response.messages.map(message => {
-                    return VDOM.h("div", {
-                        children: [
-                            VDOM.h(MessageComponent, {
-                                options: {
-                                    message,
-                                    messagesSlice: response
-                                }
-                            }),
-                            VDOM.h("br")
-                        ]
-                    })
-                })
+            this.vNode = response.messages.map(message => {
+                return (
+                    <div>
+                        <MessageComponent options={{
+                            message,
+                            messagesSlice: response
+                        }}/>
+                        <br/>
+                    </div>
+                )
             })
+
         })
     }
 
