@@ -35,7 +35,7 @@ export function h(tagName, {attrs = {}, options = {}, events = {}, children = []
 }
 
 /**
- * alias for `createElement`
+ * translator for jsx
  */
 export function jsx(tagName, conf, ...children) {
     let attrs = {}
