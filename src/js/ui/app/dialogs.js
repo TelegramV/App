@@ -79,10 +79,10 @@ export function renderDialogsSlice(dialogsSlice) {
         let messageUsername = messageUser ? messageUser.id !== peer.id ? `${getPeerName(messageUser, true)}` : "" : ""
         if(peer.photo) {
             let a = peer.photo.photo_small
-            FileAPI.getPeerPhoto(a, peer, false).then(response => {
-                const blob = new Blob([response.bytes], { type: 'application/jpeg' });
-                document.querySelector(`#avatar_${peer.id}`).setAttribute("src", URL.createObjectURL(blob))
-            })
+            // FileAPI.getPeerPhoto(a, peer, false).then(response => {
+            //     const blob = new Blob([response.bytes], { type: 'application/jpeg' });
+            //     document.querySelector(`#avatar_${peer.id}`).setAttribute("src", URL.createObjectURL(blob))
+            // })
         }
         chatsHTML += `
             <tr>

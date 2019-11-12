@@ -4,3 +4,31 @@ h1 {
   color: $primary-color;
   background-color: $bg;
 }
+
+.dialogs {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 25%;
+  background-color: #f1f1f1;
+  position: fixed;
+  height: 100%;
+  overflow: auto;
+
+  a {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+
+    &.active {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    &:hover:not(.active) {
+      background-color: #555;
+      color: white;
+    }
+  }
+}

@@ -1,10 +1,17 @@
 import {MTProto} from "./mtproto"
 import {createNonce} from "./mtproto/utils/bin"
 import {createLogger} from "./common/logger";
-import {setCode2FAForm, setCodeForm, setPhoneForm, setSignUpForm} from "./ui/login/loginPage"
-import {AppConfiguration} from "./configuration"
+import {setCode2FAForm} from "./ui/login/loginPage"
 import {AppPermanentStorage} from "./common/storage"
-import {renderDialogsSlice} from "./ui/app/dialogs"
+import {LoginPage} from "./ui/pages/login"
+import {IMPage} from "./ui/pages/im"
+import {TelegramDialogComponent} from "./ui/pages/im/components/dialog"
+import {AppFramework} from "./ui/framework/framework"
+import {DialogListComponent} from "./ui/pages/im/components/dialogList"
+
+import "../sass/styles.scss"
+import {MessageListComponent} from "./ui/pages/im/components/messageList"
+import {MessageComponent} from "./ui/pages/im/components/message"
 
 
 const Logger = createLogger("Main")
@@ -16,34 +23,28 @@ const authContext = {
 }
 
 function authorizedStart(authorizationData) {
-    //window.localStorage.setItem("authorizationData", JSON.stringify(authorizationData))
     AppPermanentStorage.setItem("authorizationData", authorizationData)
-    /*MTProto.invokeMethod("messages.getAllChats", {
-        except_ids: []
-    }).then(response => {
-        console.log(response)
-    }, error => {
-        console.log(error)
-    })*/
 
-    MTProto.invokeMethod("messages.getDialogs", {
-        flags: 0,
-        pFlags: {
-            exclude_pinned: false,
-            folder_id: false
-        },
-        offset_date: 0,
-        offset_id: 0,
-        offset_peer: {
-            _: "inputPeerEmpty"
-        },
-        limit: 20,
-        hash: ""
-    }).then(result => {
-        console.log(result)
+    console.log(authorizationData)
 
-        renderDialogsSlice(result)
-    })
+    // MTProto.invokeMethod("messages.getDialogs", {
+    //     flags: 0,
+    //     pFlags: {
+    //         exclude_pinned: false,
+    //         folder_id: false
+    //     },
+    //     offset_date: 0,
+    //     offset_id: 0,
+    //     offset_peer: {
+    //         _: "inputPeerEmpty"
+    //     },
+    //     limit: 20,
+    //     hash: ""
+    // }).then(result => {
+    //     console.log(result)
+    //
+    //     renderDialogsSlice(result)
+    // })
 
     /*MTProto.invokeMethod("contacts.importContacts", {
         contacts: [
@@ -110,96 +111,38 @@ function password() {
 }
 
 function start() {
-    if (AppPermanentStorage.exists("authorizationData")) {
-        const authorizationData = AppPermanentStorage.getItem("authorizationData")
-        authorizedStart(authorizationData)
+    AppFramework.registerComponent("login-page", LoginPage)
+    AppFramework.registerComponent("im-page", IMPage)
+    AppFramework.registerComponent("dialog-list-component", DialogListComponent)
+    AppFramework.registerComponent("telegram-dialog-component", TelegramDialogComponent)
+    AppFramework.registerComponent("message-list-component", MessageListComponent)
+    AppFramework.registerComponent("message-component", MessageComponent)
+
+    AppFramework.Router.route("login", {
+        render() {
+            return `<login-page></login-page>`
+        }
+    })
+
+    AppFramework.Router.route("/", {
+        render() {
+            return `<im-page></im-page>`
+        }
+    })
+
+    AppFramework.mount("#app")
+
+    if (MTProto.isUserAuthorized()) {
+        authorizedStart(MTProto.getAuthorizedUser())
         return;
     }
+
     MTProto.invokeMethod("help.getNearestDc").then(ndc => {
-        setPhoneForm()
-        // authorizedStart()
-
-        document.getElementById("loginSendPhoneButton").addEventListener("click", event => {
-            const phoneNumber = document.getElementById("loginPhoneNumberInput").value
-
-            MTProto.invokeMethod("auth.sendCode", {
-                flags: 0,
-                // +9996601488
-                phone_number: phoneNumber,
-                api_id: AppConfiguration.mtproto.api.api_id,
-                api_hash: AppConfiguration.mtproto.api.api_hash,
-                settings: {
-                    _: "codeSettings",
-                    flags: 0,
-                    pFlags: {
-                        current_number: false,
-                        allow_app_hash: false,
-                        allow_flashcall: false
-                    }
-                },
-                lang_code: navigator.language || 'en'
-            }).then(response => {
-                setCodeForm()
-
-                // console.log(response)
-
-                document.getElementById("loginSendCodeButton").addEventListener("click", event => {
-                    const code = document.getElementById("loginCodeInput").value
-                    const phoneCodeHash = response.phone_code_hash
-
-                    MTProto.invokeMethod("auth.signIn", {
-                        phone_number: phoneNumber,
-                        phone_code_hash: phoneCodeHash,
-                        phone_code: code
-                    }).then(response => {
-                        if (response._ === "auth.authorizationSignUpRequired") {
-                            setSignUpForm()
-
-                            document.getElementById("signUpButton").addEventListener("click", event => {
-                                MTProto.invokeMethod("auth.signUp", {
-                                    phone_number: phoneNumber,
-                                    phone_code_hash: phoneCodeHash,
-                                    first_name: document.getElementById("signUpFirstName").value,
-                                    last_name: document.getElementById("signUpLastName").value
-                                }).then(response => {
-                                    if (response._ === "auth.authorization") {
-                                        console.log(this)
-                                        console.log("signup success!")
-                                        authorizedStart(response)
-                                    } else {
-                                        console.log(response)
-                                    }
-                                })
-                            })
-                        } else {
-                            authorizedStart(response)
-                        }
-                        // console.log(response)
-
-                        // MTProto.invokeMethod("account.getAccountTTL").then(result => {
-                        //     document.getElementById("app").innerHTML = JSON.stringify(result)
-                        // })
-                    }, error => {
-                        switch (error.type) {
-                            case "PHONE_CODE_EMPTY":
-                            case "PHONE_CODE_EXPIRED":
-                            case "PHONE_CODE_INVALID":
-                                // Try again!
-                                break
-                            // 2FA
-                            case "SESSION_PASSWORD_NEEDED":
-                                password()
-                                break
-                        }
-                    })
-                })
-            })
-        })
+        AppFramework.Router.push("/login")
     })
 
 }
 
-MTProto.connect(authContext, function()
-{
+MTProto.connect(authContext, function () {
     start();
 }, this)

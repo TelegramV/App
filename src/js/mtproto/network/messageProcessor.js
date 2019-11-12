@@ -19,7 +19,6 @@ export class MessageProcessor {
 
         this.logger = createLogger("MessageProcessor")
 
-        // do not ask me why have I wrapped this functions into another functions! Never!
         this.handlers = {
             "msg_container": (message, messageID, sessionID) => this.processMessageContainer(message, messageID, sessionID),
             "message": (message, messageID, sessionID) => this.processMessage(message, messageID, sessionID),

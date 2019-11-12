@@ -36,7 +36,8 @@ export class TemporaryStorage {
             if (typeof defaultValue !== "undefined") {
                 return defaultValue
             } else {
-                throw new Error(`${key} was not found`)
+                // throw new Error(`${key} was not found`)
+                return {}
             }
         }
     }
