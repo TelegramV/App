@@ -1,43 +1,113 @@
 import {MTProto} from "../../../mtproto"
 import {AppPermanentStorage} from "../../../common/storage"
 import {AppFramework} from "../../framework/framework"
+import VDOM from "../../framework/vdom"
 
-function phoneForm() {
-    return `
-        <form>
-            <label for="phoneNumberInput">Phone</label>
-            <input type="number" id="phoneNumberInput" value="9996621488" autofocus>
-            
-            <button id="sendCodeButton">Next</button>
-        </form>
-    `
+function vPhoneNumberFormTemplate(onSendHandler) {
+    return VDOM.h("form", {
+        children: [
+            VDOM.h("label", {
+                attrs: {
+                    for: "phoneNumberInput"
+                },
+                children: "Phone"
+            }),
+            VDOM.h("input", {
+                attrs: {
+                    type: "number",
+                    id: "phoneNumberInput",
+                    autofocus: true,
+                },
+            }),
+            VDOM.h("button", {
+                attrs: {
+                    id: "sendCodeButton",
+                },
+                events: {
+                    click: onSendHandler
+                },
+                children: "Next"
+            }),
+        ]
+    })
 }
 
-function codeForm(sentType = "") {
-    return `
-        ${sentType}
-            
-        <form>
-            <label for="phoneCodeInput">Code</label>
-            <input type="number" id="phoneCodeInput" autofocus>
-            
-            <button id="signInButton">Sign In</button>
-        </form>
-    `
+function vPhoneCodeFormTemplate(sentType, onSendHandler) {
+    return VDOM.h("div", {
+        children: [
+            sentType,
+            VDOM.h("br"),
+            VDOM.h("form", {
+                children: [
+                    VDOM.h("label", {
+                        attrs: {
+                            for: "phoneCodeInput"
+                        },
+                        children: "Code"
+                    }),
+                    VDOM.h("input", {
+                        attrs: {
+                            type: "number",
+                            id: "phoneCodeInput",
+                            autofocus: true,
+                        },
+                    }),
+                    VDOM.h("button", {
+                        attrs: {
+                            id: "signInButton",
+                        },
+                        events: {
+                            click: onSendHandler
+                        },
+                        children: "SignIn"
+                    }),
+                ]
+            })
+        ]
+    })
 }
 
-function signUpForm() {
-    return `
-        <form>
-            <label for="signUpFirstName">First name</label>
-            <input id="signUpFirstName">
-            
-            <label for="signUpLastName">Last name</label>
-            <input id="signUpLastName">
-            
-            <button id="signUpButton">Sign Up</button>
-        </form>
-    `
+function vSignUpFormTemplate(onSendHandler) {
+    return VDOM.h("form", {
+        children: [
+            VDOM.h("label", {
+                attrs: {
+                    for: "signUpFirstName"
+                },
+                children: "First name"
+            }),
+            VDOM.h("input", {
+                attrs: {
+                    type: "text",
+                    id: "signUpFirstName",
+                    autofocus: true,
+                },
+            }),
+            VDOM.h("label", {
+                attrs: {
+                    for: "signUpLastName"
+                },
+                children: "Last name"
+            }),
+            VDOM.h("input", {
+                attrs: {
+                    type: "text",
+                    id: "signUpLastName",
+                    autofocus: true,
+                },
+            }),
+
+            VDOM.h("button", {
+                attrs: {
+                    id: "signUpButton",
+                },
+                events: {
+                    click: onSendHandler
+                },
+                children: "SignUp"
+            }),
+        ]
+    })
 }
 
 export class LoginPage extends HTMLElement {
@@ -47,19 +117,25 @@ export class LoginPage extends HTMLElement {
         if (MTProto.isUserAuthorized()) {
             AppFramework.Router.push("/")
         }
+
+        this.vNode = VDOM.h("div", {
+            children: [
+                "wait.."
+            ]
+        })
     }
 
-    submitPhoneForm(event) {
-        event.preventDefault()
+    initVNode() {
+        this.vNode = vPhoneNumberFormTemplate(event => {
+            event.preventDefault()
 
-        const phoneNumber = document.getElementById("phoneNumberInput").value
-        MTProto.invokeMethod("help.getNearestDc").then(ndc => {
+            const phoneNumber = document.getElementById("phoneNumberInput").value
+
             if (this.isNumberValid(phoneNumber)) {
 
                 MTProto.Auth.sendCode(phoneNumber).then(sentCode => {
-                    this.innerHTML = codeForm(sentCode.type._)
 
-                    document.getElementById("signInButton").addEventListener("click", event => {
+                    this.vNode = vPhoneCodeFormTemplate(sentCode.type._, event => {
                         event.preventDefault()
 
                         const phoneCode = document.getElementById("phoneCodeInput").value
@@ -67,9 +143,8 @@ export class LoginPage extends HTMLElement {
 
                         MTProto.Auth.signIn(phoneNumber, phoneCodeHash, phoneCode).then(authorization => {
                             if (authorization._ === "auth.authorizationSignUpRequired") {
-                                this.innerHTML = signUpForm()
-
-                                document.getElementById("signUpButton").addEventListener("click", event => {
+                                this.vNode = vSignUpFormTemplate(event => {
+                                    event.preventDefault()
 
                                     const firstName = document.getElementById("signUpFirstName").value
                                     const lastName = document.getElementById("signUpLastName").value
@@ -85,15 +160,21 @@ export class LoginPage extends HTMLElement {
                                         }
                                     })
                                 })
+
+                                this.render()
                             } else {
                                 AppPermanentStorage.setItem("authorizationData", authorization)
                                 AppFramework.Router.push("/")
                             }
                         })
                     })
+
+                    this.render()
                 })
             }
         })
+
+        this.render()
     }
 
     isNumberValid(number) {
@@ -101,13 +182,16 @@ export class LoginPage extends HTMLElement {
     }
 
     connectedCallback() {
-        this.innerHTML = this.render()
-
-        const loginSendPhoneButton = document.getElementById("sendCodeButton")
-        loginSendPhoneButton.addEventListener("click", event => this.submitPhoneForm(event))
+        MTProto.invokeMethod("help.getNearestDc").then(ndc => {
+            this.initVNode()
+            this.render()
+        })
     }
 
     render() {
-        return phoneForm()
+        this.innerHTML = ""
+        if (this.vNode) {
+            this.appendChild(VDOM.render(this.vNode))
+        }
     }
 }

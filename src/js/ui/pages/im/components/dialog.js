@@ -1,33 +1,57 @@
 import {AppTemporaryStorage} from "../../../../common/storage"
+import VDOM from "../../../framework/vdom"
 
-const dialogPeerMap = {
+export const dialogPeerMaps = {
+    "peerUser": "users",
+    "peerChannel": "chats",
+    "peerChat": "chats",
+}
+
+export const dialogPeerMap = {
     "peerUser": "user",
     "peerChannel": "channel",
     "peerChat": "chat",
 }
 
-function template(data) {
-    return `
-         <a href="/#/?p=${data.peer._}.${data.peer[dialogPeerMap[data.peer._] + "_id"]}">
-            <i>${data.pinned ? "[pinned] " : ""}</i> 
-            <b>${data.peerName}</b> : <i>${data.messageUsername}</i> ${data.message}
-         </a>
-    `
+function vNodeTemplate(data) {
+    return VDOM.h("a", {
+        attrs: {
+            href: `/#/?p=${data.peer._}.${data.peer[dialogPeerMap[data.peer._] + "_id"]}`
+        },
+        children: [
+            VDOM.h("i", {
+                children: data.pinned ? "[pinned] " : ""
+            }),
+            VDOM.h("b", {
+                children: data.peerName
+            }),
+            " : ",
+            VDOM.h("i", {
+                children: data.messageUsername
+            }),
+            data.message
+        ]
+    })
 }
 
 export class TelegramDialogComponent extends HTMLElement {
-    constructor() {
+    constructor(options = {}) {
         super();
+        this.dialog = options.dialog
+        this.dialogsSlice = options.dialogsSlice || AppTemporaryStorage.getItem("dialogsSlice")
+
+        this.vNode = null
     }
 
     connectedCallback() {
-        this.innerHTML = this.render()
+        this.initVNode().then(() => {
+            this.render()
+        })
     }
 
-    render() {
-        const dialogsSlice = AppTemporaryStorage.getItem("dialogsSlice")
-        const dialogPeer = this.dataset.peer.split("-")
-        const dialog = dialogsSlice.dialogs.find(dialog => dialog.peer._ == dialogPeer[0] && dialog.peer[dialogPeerMap[dialog.peer._] + '_id'] == dialogPeer[1])
+    async initVNode() {
+        const dialogsSlice = this.dialogsSlice
+        const dialog = this.dialog
 
         const dialogPinned = dialog.pFlags.pinned
 
@@ -40,13 +64,20 @@ export class TelegramDialogComponent extends HTMLElement {
 
         const submsg = message.message ? (message.message.length > 64 ? (message.message.substring(0, 64) + "...") : message.message) : ""
 
-        return template({
+        this.vNode = vNodeTemplate({
             pinned: dialogPinned,
             peerName,
             messageUsername,
             message: submsg,
             peer: dialog.peer
         })
+    }
+
+    render() {
+        this.innerHTML = ""
+        if (this.vNode) {
+            this.appendChild(VDOM.render(this.vNode))
+        }
     }
 }
 
@@ -89,18 +120,6 @@ export function getPeerName(peer, usernameFirst = false) {
 }
 
 export function findPeerFromDialog(dialog, dialogsSlice) {
-    const dialogPeerMaps = {
-        "peerUser": "users",
-        "peerChannel": "chats",
-        "peerChat": "chats",
-    }
-
-    const dialogPeerMap = {
-        "peerUser": "user",
-        "peerChannel": "channel",
-        "peerChat": "chat",
-    }
-
     return dialogsSlice[dialogPeerMaps[dialog.peer._]].find(item => {
         return String(item._) === String(dialogPeerMap[dialog.peer._]) && String(dialog.peer[`${item._}_id`]) === String(item.id)
     })

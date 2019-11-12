@@ -1,29 +1,29 @@
 import {FrameworkRouter} from "./router"
+import VDOM from "./vdom"
 
 class Framework {
     constructor(options = {}) {
         this.Router = options.Router || new FrameworkRouter({
             Framework: this
         })
-        this.h = options.h || "<router-view></router-view>"
+        this.h = options.h || VDOM.h("router-view")
     }
 
     mount(selector) {
-        const element = document.querySelector(selector)
-        element.innerHTML = typeof this.h === "function" ? this.h() : this.h
+        const $mountElement = document.querySelector(selector)
+
+        const $node = typeof this.h === "function" ? VDOM.render(this.h()) : VDOM.render(this.h)
+        $mountElement.innerHTML = ""
+        $mountElement.appendChild($node)
 
         if (this.Router) {
             this.Router.run()
         }
     }
 
-    registerComponent(tag, component) {
-        window.customElements.define(tag, component)
+    registerComponent(tag, component, options = {}) {
+        window.customElements.define(tag, component, Object.assign({}, options))
     }
 }
 
-export const AppFramework = new Framework({
-    // h() {
-    //     return `page: <router-view></router-view>`
-    // }
-})
+export const AppFramework = new Framework()

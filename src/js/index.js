@@ -132,15 +132,11 @@ function start() {
 
     AppFramework.mount("#app")
 
-    if (MTProto.isUserAuthorized()) {
-        authorizedStart(MTProto.getAuthorizedUser())
-        return;
-    }
-
-    MTProto.invokeMethod("help.getNearestDc").then(ndc => {
+    if (!MTProto.isUserAuthorized()) {
         AppFramework.Router.push("/login")
-    })
-
+    } else {
+        AppFramework.Router.push("/")
+    }
 }
 
 MTProto.connect(authContext, function () {

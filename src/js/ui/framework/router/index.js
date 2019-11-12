@@ -6,6 +6,7 @@
  * @version undefined
  * @author kohutd
  */
+import VDOM from "../vdom"
 
 class RouterViewHTMLElement extends HTMLElement {
     constructor() {
@@ -39,6 +40,13 @@ export class FrameworkRouter {
         this.beforeRenderHanders.push(handler)
     }
 
+
+    /**
+     * WARNING: for some reason do not pass component as an object of HTMLElement! I have to fix it later.
+     *
+     * @param path
+     * @param component
+     */
     route(path, component) {
         let route = undefined
 
@@ -101,7 +109,12 @@ export class FrameworkRouter {
             throw new Error("<router-view> wasn't found")
         }
 
-        this.routerView.innerHTML = route.component.render()
+        if (route.component.hasOwnProperty("render") && typeof route.component.render === "function") {
+            this.routerView.innerHTML = route.component.render()
+        } else {
+            this.routerView.innerHTML = ""
+            this.routerView.appendChild(VDOM.render(route.component))
+        }
 
         if (route.component.hasOwnProperty("mounted") && typeof route.component.mounted === "function") {
             route.component.mounted()
@@ -136,17 +149,16 @@ export class FrameworkRouter {
             }
         }
 
-        this.beforeRenderHanders.forEach(h => {
-            h({
-                route: foundRoute,
-                queryParams: parseQuery(parsedHash.queryString)
-            })
-        })
-
-        this.activeRoute = {
+        const routeToActivate = {
             route: foundRoute,
             queryParams: parseQuery(parsedHash.queryString)
         }
+
+        this.beforeRenderHanders.forEach(hander => {
+            hander(routeToActivate)
+        })
+
+        this.activeRoute = routeToActivate
 
         this.renderRoute(foundRoute)
     }
@@ -192,7 +204,6 @@ export function parseQuery(queryString) {
     if (!queryString) {
         return queryParams
     }
-
 
     queryString.split("&").map(clbkfn => {
         let temp = clbkfn.split("=")

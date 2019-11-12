@@ -2,36 +2,50 @@ import {AppFramework} from "../../../framework/framework"
 import {MTProto} from "../../../../mtproto"
 import {PeerAPI} from "../../../../api/peerAPI"
 import {AppTemporaryStorage} from "../../../../common/storage"
-import {findPeerFromDialog} from "./dialog"
-
-const dialogPeerMap = {
-    "peerUser": "user",
-    "peerChannel": "channel",
-    "peerChat": "chat",
-}
+import {dialogPeerMap, findPeerFromDialog} from "./dialog"
+import {MessageComponent} from "./message"
+import VDOM from "../../../framework/vdom"
 
 export class MessageListComponent extends HTMLElement {
-    constructor() {
+    constructor(options = {}) {
         super()
-        AppFramework.Router.onQueryChange(queryParams => {
-            this.innerHTML = this.render()
+        this.dialogsSlice = options.dialogsSlice || AppTemporaryStorage.getItem("dialogsSlice")
+        this.vNode = VDOM.h("h3", {
+            children: "loading.."
         })
     }
 
     connectedCallback() {
-        this.innerHTML = this.render()
+        this.initVNode().then(() => {
+            this.render()
 
-
+            AppFramework.Router.onQueryChange(queryParams => {
+                this.initVNode().then(() => {
+                    this.render()
+                })
+            })
+        })
     }
 
-    async renderIfChatSelected() {
-        const dialogsSlice = AppTemporaryStorage.getItem("dialogsSlice")
+    async initVNode() {
+        this.innerHTML = "loading.."
+
+        if (!AppFramework.Router.activeRoute.queryParams.p) {
+            this.vNode = VDOM.h("h1", {
+                children: "Select a chat"
+            })
+            return
+        } else {
+            this.vNode = VDOM.h("h1", {
+                children: "loading.."
+            })
+        }
+
+        const dialogsSlice = this.dialogsSlice
 
         if (!dialogsSlice) return
 
         const dialogPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
-
-        console.error(dialogPeer)
 
         const dp = {
             _: dialogPeer[0],
@@ -42,7 +56,7 @@ export class MessageListComponent extends HTMLElement {
             peer: dp
         }, dialogsSlice)
 
-        MTProto.invokeMethod("messages.getHistory", {
+        return await MTProto.invokeMethod("messages.getHistory", {
             peer: PeerAPI.getInput(peer),
             offset_id: 0,
             offset_date: 0,
@@ -54,24 +68,29 @@ export class MessageListComponent extends HTMLElement {
 
         }).then(response => {
             AppTemporaryStorage.setItem("messages.messagesSlice", response)
-            this.innerHTML = ""
 
-            response.messages.forEach((message, i) => {
-                const messageComponent = document.createElement("message-component")
-                messageComponent.dataset.messageId = message.id
-                this.appendChild(messageComponent)
-                this.appendChild(document.createElement("br"))
+            this.vNode = VDOM.h("div", {
+                children: response.messages.map(message => {
+                    return VDOM.h("div", {
+                        children: [
+                            VDOM.h(MessageComponent, {
+                                options: {
+                                    message,
+                                    messagesSlice: response
+                                }
+                            }),
+                            VDOM.h("br")
+                        ]
+                    })
+                })
             })
         })
     }
 
     render() {
-        if (!AppFramework.Router.activeRoute.queryParams.p) {
-            return "<h1>Select a chat</h1>"
-        } else {
-            this.renderIfChatSelected().then(() => {
-            })
-            return "loading..."
+        this.innerHTML = ""
+        if (this.vNode) {
+            this.appendChild(VDOM.render(this.vNode))
         }
     }
 }
