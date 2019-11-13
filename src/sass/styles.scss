@@ -3,6 +3,7 @@ html {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+
 *, *:before, *:after {
   -webkit-box-sizing: inherit;
   -moz-box-sizing: inherit;
@@ -138,7 +139,7 @@ body {
 
 .checkbox-input input:checked ~ .checkmark {
   background-color: #4EA4F6;
-  background-image: url("./../../dist/icons/check_svg.svg");
+  background-image: url("../../public/images/icons/check_svg.svg");
   background-size: contain;
 }
 
@@ -184,10 +185,12 @@ body {
   align-items: center;
   cursor: pointer;
 }
+
 .country-item:first-child {
   border-top-left-radius: 1em;
   border-top-right-radius: 1em;
 }
+
 .country-item:last-child {
   border-bottom-left-radius: 1em;
   border-bottom-right-radius: 1em;
@@ -225,13 +228,13 @@ body {
 }
 
 .password-input[type=password] {
-  background: transparent url("./../../dist/icons/eye1_svg.svg") no-repeat;
+  background: transparent url("../../public/images/icons/eye1_svg.svg") no-repeat;
   background-position-x: 98%;
   background-position-y: 50%;
 }
 
 .password-input[type=text] {
-  background: transparent url("./../../dist/icons/eye2_svg.svg") no-repeat;
+  background: transparent url("../../public/images/icons/eye2_svg.svg") no-repeat;
   background-position-x: 98%;
   background-position-y: 50%;
 }
@@ -313,13 +316,16 @@ body {
 .floating-label-field {
   z-index: 2;
 }
+
 .floating-label-field:focus {
   outline: 0;
   box-shadow: 0;
 }
+
 .floating-label-field::placeholder {
   color: transparent;
 }
+
 .floating-label-field:not(textarea) {
   max-height: 4em;
 }
@@ -345,7 +351,7 @@ body {
   width: auto;
   margin: 0;
   padding: 0.3em;
-  transition: transform 0.25s, opacity 0.25s, padding 0.25s ease-in-out;
+  transition: transform 0.1s, opacity 0.1s, padding 0.1s ease-in-out;
   transform-origin: 0 0;
   color: #707579;
 }
@@ -480,7 +486,7 @@ body {
   background-color: #4CA8F8;
 }
 
-.create-chat-button:hover~span {
+.create-chat-button:hover ~ span {
   color: #4EA4F6;
 }
 
@@ -507,7 +513,7 @@ body {
   background-color: #eee;
   padding-left: 30px;
 
-  background-image: url("../../dist/icons/search_svg.svg");
+  background-image: url("../../public/images/icons/search_svg.svg");
   background-repeat: no-repeat;
   background-position-x: 2%;
   background-position-y: 50%;
@@ -997,7 +1003,7 @@ body {
   border-left: 2px solid #4EA4F6;
 }
 
-.message-self .blockquote>.title,
+.message-self .blockquote > .title,
 .message-self .message-forwarded-text {
   color: #4EA4F6;
 }
@@ -1008,7 +1014,7 @@ body {
   font-size: 13px;
 }
 
-.blockquote>.title,
+.blockquote > .title,
 .message-forwarded-text {
   color: #2196F3;
   font-size: 12px;
@@ -1027,7 +1033,7 @@ body {
   background-color: #2196F3;
 }
 
-.message-voice-playbutton>img {
+.message-voice-playbutton > img {
   width: 25px;
   height: 25px;
 }
@@ -1046,7 +1052,7 @@ body {
   cursor: pointer;
 }
 
-.message-image>img {
+.message-image > img {
   height: auto;
   width: 100%;
   margin: -5px -10px;
@@ -1055,7 +1061,7 @@ body {
   border-top-right-radius: 10px;
 }
 
-.message-image.cover+.message-meta {
+.message-image.cover + .message-meta {
   margin-top: 0px;
 }
 
@@ -1063,7 +1069,7 @@ body {
   margin-bottom: 0px;
 }
 
-.message-image.cover >img {
+.message-image.cover > img {
   height: auto;
   width: 100%;
   margin: -8px -10px;
@@ -1071,7 +1077,7 @@ body {
   border-radius: 10px;
 }
 
-.message-sticker > img, .message-sticker > tgs-player, .message-roundvideo>video {
+.message-sticker > img, .message-sticker > tgs-player, .message-roundvideo > video {
   max-width: 30vh;
   width: 100%;
 }

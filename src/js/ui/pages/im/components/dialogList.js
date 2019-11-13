@@ -36,7 +36,7 @@ export class DialogListComponent extends HTMLElement {
             AppTemporaryStorage.setItem("dialogsSlice", dialogsSlice)
 
             this.vNode = dialogsSlice.dialogs.map(dialog => {
-                return <TelegramDialogComponent options={{
+                return <TelegramDialogComponent constructor={{
                     dialogsSlice: dialogsSlice,
                     dialog: dialog,
                     dataset: {

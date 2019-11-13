@@ -82,12 +82,12 @@ export class MessageListComponent extends HTMLElement {
                         </div>
                         <div class="im-header-options flex-row">
                             <button class="im-header-subscribe">SUBSCRIBE</button>
-                            <div class="im-header-button"><img class="full-center" src="./icons/mute_svg.svg"/>
+                            <div class="im-header-button"><img class="full-center" src="/images/icons/mute_svg.svg"/>
                             </div>
                             <div class="im-header-button"><img class="full-center"
-                                                                   src="./icons/search_svg.svg"/>
+                                                               src="/images/icons/search_svg.svg"/>
                             </div>
-                            <div class="im-header-button"><img class="full-center" src="./icons/more_svg.svg"/>
+                            <div class="im-header-button"><img class="full-center" src="/images/icons/more_svg.svg"/>
                             </div>
                         </div>
                     </div>
@@ -98,7 +98,7 @@ export class MessageListComponent extends HTMLElement {
                                     response.messages.map(message => {
                                         return (
                                             <div>
-                                                <MessageComponent options={{
+                                                <MessageComponent constructor={{
                                                     message,
                                                     messagesSlice: response
                                                 }}/>

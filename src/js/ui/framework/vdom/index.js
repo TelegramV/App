@@ -1,23 +1,28 @@
-/**
- * Simple Virtual DOM
- *
- * @param tagName
- * @param attrs
- * @param options
- * @param events
- * @param children
- * @param htmlChild
- * @returns {any}
- *
- * @author kohutd
+/*
+    Simple Virtual DOM
+
+    @author kohutd
  */
 
-export function createElement(tagName, {attrs = {}, options = {}, events = {}, children = [], htmlChild = false} = {}) {
+/**
+ * Creates Virtual Node
+ *
+ * @param tagName
+ * @param attrs element attributes
+ * @param constructor used when passed {@link HTMLElement} instance
+ * @param options passed when creating element by using {@code document.createElement(tagName, options)}
+ * @param events
+ * @param children
+ * @param htmlChild if true then text children will be rendered by using innerHTML
+ * @returns {any}
+ */
+export function h(tagName, {attrs = {}, constructor = {}, options = {}, events = {}, children = [], htmlChild = false} = {}) {
     const vElem = Object.create(null);
 
     Object.assign(vElem, {
         tagName,
         attrs,
+        constructor,
         options,
         events,
         children,
@@ -28,27 +33,28 @@ export function createElement(tagName, {attrs = {}, options = {}, events = {}, c
 }
 
 /**
- * alias for `createElement`
+ * translator (kostyl') for jsx
+ *
+ * @param tagName
+ * @param attributes
+ * @param children
+ * @returns {any}
  */
-export function h(tagName, {attrs = {}, options = {}, events = {}, children = [], htmlChild = false} = {}) {
-    return createElement(tagName, {attrs, options, events, children, htmlChild})
-}
-
-/**
- * translator for jsx
- */
-export function jsx(tagName, conf, ...children) {
+export function jsx(tagName, attributes, ...children) {
     let attrs = {}
     let events = {}
     let options = {}
+    let constructor = {}
     let htmlChild = false
 
-    if (conf) {
-        for (const [k, v] of Object.entries(conf)) {
+    if (attributes) {
+        for (const [k, v] of Object.entries(attributes)) {
             if (k.startsWith("on")) {
                 events[k.substring(2).toLowerCase()] = v
             } else if (k === "options") {
                 options = Object.assign(options, v)
+            } else if (k === "constructor") {
+                constructor = Object.assign(options, v)
             } else if (k === "htmlChild") {
                 htmlChild = Boolean(v)
             } else {
@@ -57,9 +63,15 @@ export function jsx(tagName, conf, ...children) {
         }
     }
 
-    return createElement(tagName, {attrs, options, events, children, htmlChild})
+    return h(tagName, {attrs, constructor, options, events, children, htmlChild,})
 }
 
+/**
+ * Renders Virtual DOM Node
+ *
+ * @param vNode
+ * @returns {Text|HTMLElement|any}
+ */
 export function render(vNode) {
 
     if (Array.isArray(vNode)) {
@@ -83,7 +95,7 @@ export function render(vNode) {
     }
     let $el = null
     if (typeof vNode.tagName === "function") {
-        $el = new (vNode.tagName)(vNode.options)
+        $el = new (vNode.tagName)(vNode.constructor)
     } else {
         if (vNode.options && Object.keys(vNode.options) > 0) {
             $el = document.createElement(vNode.tagName, options)
@@ -108,7 +120,6 @@ export function render(vNode) {
 }
 
 export const VDOM = {
-    createElement,
     h,
     jsx,
     render,

@@ -16,7 +16,7 @@ export class IMPage extends HTMLElement {
             <div id="container" class="grid chats-grid">
                 <div class="dialog-container">
                     <div class="dialog-header">
-                        <img class="menu-button" src="./icons/menu_svg.svg"/>
+                        <img class="menu-button" src="/images/icons/menu_svg.svg"/>
                         <div class="search-box">
                             <input class="default-input search-input" type="text" name="search"
                                    placeholder="Search"/></div>
