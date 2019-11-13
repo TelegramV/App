@@ -1,4 +1,5 @@
 import {AppTemporaryStorage} from "../../../../common/storage"
+import {FileAPI} from "../../../../api/fileAPI";
 
 const VDOM = require("../../../framework/vdom")
 
@@ -14,21 +15,42 @@ export const dialogPeerMap = {
     "peerChat": "chat",
 }
 
-function vNodeTemplate(data) {
+function vNodeTemplate(data, openDialog) {
+    const notificationClasses = `dialog-notification${data.muted ? " muted" : ""}`
     return (
-        <a href={`/#/?p=${data.peer._}.${data.peer[dialogPeerMap[data.peer._] + "_id"]}`}>
-            <i>
-                {data.pinned ? "[pinned] " : ""}
-            </i>
-            <b>
-                {data.peerName}
-            </b>
-            <i>
-                {data.messageUsername}
-            </i>
-            {data.message}
-        </a>
+        <div class="dialog-item" onClick={openDialog}>
+            <img class="dialog-photo round-block"
+                 src={data.photo} />
+                <div class="dialog-info">
+                    <div class="dialog-peer">{data.peerName}</div>
+                    <div class="dialog-short-text"><span class="dialog-short-text-sender">{data.messageUsername.length > 0 ? data.messageUsername + ": " : ""}</span>{data.message}
+                    </div>
+                </div>
+                <div class="dialog-meta">
+                    <div class="dialog-time">{data.date}</div>
+                    <br/>
+                    {data.hasNotification || data.pinned ? (
+                        <div class={notificationClasses}>
+                            {data.pinned && !data.hasNotification ? <img class="full-center" src="./icons/pinnedchat_svg.svg"/> : ""}
+                            {data.hasNotification ? <div className="dialog-notification">{data.unread}</div> : ""}
+                        </div>
+                    ) : ""}
+                </div>
+        </div>
     )
+
+    /*<a href={`/#/?p=${data.peer._}.${data.peer[dialogPeerMap[data.peer._] + "_id"]}`}>
+        <i>
+            {data.pinned ? "[pinned] " : ""}
+        </i>
+        <b>
+            {data.peerName}
+        </b>
+        <i>
+            {data.messageUsername}
+        </i>
+        {data.message}
+    </a>*/
 }
 
 export class TelegramDialogComponent extends HTMLElement {
@@ -57,17 +79,43 @@ export class TelegramDialogComponent extends HTMLElement {
 
         const message = findMessageFromDialog(dialog, dialogsSlice)
         const messageUser = findUserFromMessage(message, dialogsSlice)
-        let messageUsername = messageUser ? messageUser.id !== peer.id ? `${getPeerName(messageUser, true)}` : "" : ""
+        let messageUsername = messageUser ? messageUser.id !== peer.id ? `${getPeerName(messageUser, false)}` : "" : ""
 
         const submsg = message.message ? (message.message.length > 64 ? (message.message.substring(0, 64) + "...") : message.message) : ""
+        const date = new Date(message.date * 1000)
 
-        this.vNode = vNodeTemplate({
+        const data =  {
             pinned: dialogPinned,
             peerName,
             messageUsername,
             message: submsg,
-            peer: dialog.peer
-        })
+            peer: dialog.peer,
+            photo: "./icons/admin_3x.png",
+            hasNotification: dialog.unread_count > 0,
+            unread: dialog.unread_mentions_count > 0 ? "@" : dialog.unread_count.toString(),
+            muted: dialog.notify_settings.mute_until,
+            date: date.toLocaleTimeString('en', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            })
+        }
+        const onClick = d => {
+            // TODO ask @kohutd how to open it properly
+            window.location = `/#/?p=${data.peer._}.${data.peer[dialogPeerMap[data.peer._] + "_id"]}`
+        }
+
+        this.vNode = vNodeTemplate(data, onClick)
+
+        if(peer.photo) {
+            let a = peer.photo.photo_small
+            FileAPI.getPeerPhoto(a, peer, false).then(response => {
+                const blob = new Blob([response.bytes], { type: 'application/jpeg' });
+                data.photo = URL.createObjectURL(blob)
+                this.vNode = vNodeTemplate(data, onClick)
+                this.render()
+            })
+        }
     }
 
     render() {

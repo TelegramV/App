@@ -27,7 +27,7 @@ function mt_init_transportation(url)
 
     transportation_socket.onmessage = function(ev)
     {
-        console.log("SOCK_RESPONSE");
+        // console.log("SOCK_RESPONSE");
         var data_buffer = mt_inob_recv(ev);
         high_level_processor.call(high_level_context, data_buffer);
     };

@@ -2,6 +2,7 @@ import {createLogger} from "../../common/logger"
 import {MTProto} from "../index";
 import {longToBytes} from "../utils/bin";
 
+const Logger = createLogger("MessageProcessor")
 /**
  * TODO: We should rewrite this shit!
  */
@@ -24,10 +25,26 @@ export class MessageProcessor {
             "message": (message, messageID, sessionID) => this.processMessage(message, messageID, sessionID),
             "rpc_result": (message, messageID, sessionID) => this.processRpcResult(message, messageID, sessionID),
             "msgs_ack": (message, messageID, sessionID) => this.processMessagesAck(message, messageID, sessionID),
-            "bad_server_salt": (message, messageID, sessionID) => this.processBadServerSalt(message, messageID, sessionID)
+            "bad_server_salt": (message, messageID, sessionID) => this.processBadServerSalt(message, messageID, sessionID),
+            "new_session_created": (message, messageID, sessionID) => this.processNewSessionCreated(message, messageID, sessionID),
+            "updateShort": (message, messageID, sessionID) => this.processUpdateShort(message, messageID, sessionID),
+            "updates": (message, messageID, sessionID) => this.processUpdates(message, messageID, sessionID),
         }
 
     }
+
+    processUpdateShort(message, messageID, sessionID) {
+        Logger.log("Short update", message)
+    }
+
+    processNewSessionCreated(message, messageID, sessionID) {
+
+    }
+
+    processUpdates(message, messageID, sessionID) {
+        Logger.log("update", message)
+    }
+
 
     listenRpc(messageId, handler, reject) {
         this.rpcResultHandlers[messageId] = handler

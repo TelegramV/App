@@ -11,10 +11,6 @@ export class FileAPI {
         }
     }
 
-    static getPhotoMimeType(photo) {
-        return "application/jpeg"
-    }
-
     static getInputPeerPhoto(file, peer, big = false) {
         return {
             _: "inputPeerPhotoFileLocation",
@@ -41,7 +37,7 @@ export class FileAPI {
         return this.getFileLocation(this.getInputPeerPhoto(file, peer, big))
     }
 
-    static getFile(file, thumb_size = "m") {
+    static getFile(file, thumb_size = "") {
         return this.getFileLocation({
             _: this.getInputName(file),
             id: file.id,

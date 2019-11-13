@@ -12,6 +12,7 @@ export const AppConfiguration = {
             ]
         },
         api: {
+            invokeWithoutUpdates: 0xbf9459b7,
             invokeWithLayer: 0xda9b0d0d,
             layer: 105,
             initConnection: 0xc7481da6,

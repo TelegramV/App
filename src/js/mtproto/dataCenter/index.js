@@ -17,21 +17,21 @@ class DataCenter {
             let dcOption
             const path = AppConfiguration.mtproto.dataCenter.test ? "apiws_test" : "apiws"
 
-            //if (this.useSsl) {
+            if (dcID !== 0) {
                 let subdomain = this.sslSubdomains[dcID - 1] + (upload ? "-1" : "")
                 chosenServer = `wss://${subdomain}.web.telegram.org/${path}`
                 return chosenServer
-            //}
+            }
 
-            /*for (let i = 0; i < this.dcOptions.length; i++) {
+            for (let i = 0; i < this.dcOptions.length; i++) {
                 dcOption = this.dcOptions[i]
                 if (Number(dcOption.id) === Number(dcID)) {
-                    chosenServer = `wss://${dcOption.host}:${dcOption.port}/${path}`
+                    chosenServer = `ws://${dcOption.host}:${dcOption.port}/${path}`
                     break
                 }
             }
 
-            this.chosenServers[dcID] = chosenServer;*/
+            this.chosenServers[dcID] = chosenServer;
         }
 
         return this.chosenServers[dcID]

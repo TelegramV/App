@@ -7,9 +7,9 @@ import {MessageComponent} from "./message"
 import VDOM from "../../../framework/vdom"
 
 export class MessageListComponent extends HTMLElement {
-    constructor(options = {}) {
+    constructor() {
         super()
-        this.dialogsSlice = options.dialogsSlice || AppTemporaryStorage.getItem("dialogsSlice")
+        this.dialogsSlice = AppTemporaryStorage.getItem("dialogsSlice")
         this.vNode = VDOM.h("h3", {
             children: "loading.."
         })
@@ -69,17 +69,49 @@ export class MessageListComponent extends HTMLElement {
         }).then(response => {
             AppTemporaryStorage.setItem("messages.messagesSlice", response)
 
-            this.vNode = response.messages.map(message => {
-                return (
-                    <div>
-                        <MessageComponent options={{
-                            message,
-                            messagesSlice: response
-                        }}/>
-                        <br/>
+            this.vNode = (
+                <div class="im flex-column">
+                    <div class="im-header flex-row">
+                        <div class="im-header-info flex-row">
+                            <img class="im-header-photo round-block"
+                                 src="https://static10.tgstat.ru/channels/_0/3b/3bdc7810ebf4c3de0646923f39267695.jpg"/>
+                            <div class="flex-column">
+                                <div class="im-header-name">Saved Messages</div>
+                                <div class="im-header-status">Nothing</div>
+                            </div>
+                        </div>
+                        <div class="im-header-options flex-row">
+                            <button class="im-header-subscribe">SUBSCRIBE</button>
+                            <div class="im-header-button"><img class="full-center" src="./icons/mute_svg.svg"/>
+                            </div>
+                            <div class="im-header-button"><img class="full-center"
+                                                                   src="./icons/search_svg.svg"/>
+                            </div>
+                            <div class="im-header-button"><img class="full-center" src="./icons/more_svg.svg"/>
+                            </div>
+                        </div>
                     </div>
-                )
-            })
+                    <div class="im-background">
+                        <div class="im-container flex-column">
+                            <div class="im-history flex-column-reverse">
+                                {
+                                    response.messages.map(message => {
+                                        return (
+                                            <div>
+                                                <MessageComponent options={{
+                                                    message,
+                                                    messagesSlice: response
+                                                }}/>
+                                                <br/>
+                                            </div>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )
 
         })
     }

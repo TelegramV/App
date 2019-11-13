@@ -32,6 +32,7 @@ export class Networker {
             networker: this
         })
 
+
         auth.authKeyHash = sha1BytesSync(auth.authKey)
         auth.authKeyAux = auth.authKeyHash.slice(0, 8)
         auth.authKeyID = auth.authKeyHash.slice(-8)

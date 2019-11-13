@@ -30,7 +30,7 @@ export class DialogListComponent extends HTMLElement {
             offset_peer: {
                 _: "inputPeerEmpty"
             },
-            limit: "",
+            limit: 20,
             hash: ""
         }).then(dialogsSlice => {
             AppTemporaryStorage.setItem("dialogsSlice", dialogsSlice)
@@ -45,7 +45,7 @@ export class DialogListComponent extends HTMLElement {
                 }}/>
             })
 
-            const chatblock = document.getElementById("chatBlock")
+            const chatblock = document.getElementById("message_list")
             chatblock.innerHTML = ""
             chatblock.appendChild(new MessageListComponent({
                 dialogsSlice: dialogsSlice
