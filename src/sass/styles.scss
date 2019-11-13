@@ -139,7 +139,7 @@ body {
 
 .checkbox-input input:checked ~ .checkmark {
   background-color: #4EA4F6;
-  background-image: url("../../public/images/icons/check_svg.svg");
+  background-image: url("../../public/static/images/icons/check_svg.svg");
   background-size: contain;
 }
 
@@ -228,13 +228,13 @@ body {
 }
 
 .password-input[type=password] {
-  background: transparent url("../../public/images/icons/eye1_svg.svg") no-repeat;
+  background: transparent url("../../public/static/images/icons/eye1_svg.svg") no-repeat;
   background-position-x: 98%;
   background-position-y: 50%;
 }
 
 .password-input[type=text] {
-  background: transparent url("../../public/images/icons/eye2_svg.svg") no-repeat;
+  background: transparent url("../../public/static/images/icons/eye2_svg.svg") no-repeat;
   background-position-x: 98%;
   background-position-y: 50%;
 }
@@ -513,7 +513,7 @@ body {
   background-color: #eee;
   padding-left: 30px;
 
-  background-image: url("../../public/images/icons/search_svg.svg");
+  background-image: url("../../public/static/images/icons/search_svg.svg");
   background-repeat: no-repeat;
   background-position-x: 2%;
   background-position-y: 50%;

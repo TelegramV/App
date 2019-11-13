@@ -7,7 +7,7 @@ const VDOM = require("../../framework/vdom")
 function vLoginPageTemplate(options) {
     return (
         <div class="grid login-grid">
-            <img class="logo" src="/images/icons/logo.svg"/>
+            <img class="logo" src="/static/images/icons/logo.svg"/>
             <div class="login-text-block text-center">
                 <div class="login-text-header">{options.header}</div>
                 <div class="login-text-description">{options.description}</div>
@@ -24,7 +24,7 @@ function vPhoneNumberFormTemplate(onSendHandler) {
                 <div class="relative-block">
                     <div class="relative-block">
                         <input class="default-input country-selector floating-label-field" type="text" id="country"
-                               placeholder="Country" style="background-image: url('/images/icons/down_svg.svg');"/>
+                               placeholder="Country" style="background-image: url('/static/images/icons/down_svg.svg');"/>
                         <label class="floating-label" for="country">Country</label>
                     </div>
                     <div id="country-list" class="country-selector-container flex-column hide-block">

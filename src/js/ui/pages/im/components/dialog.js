@@ -31,7 +31,7 @@ function vNodeTemplate(data, openDialog) {
                     <br/>
                     {data.hasNotification || data.pinned ? (
                         <div class={notificationClasses}>
-                            {data.pinned && !data.hasNotification ? <img class="full-center" src="/images/icons/pinnedchat_svg.svg"/> : ""}
+                            {data.pinned && !data.hasNotification ? <img class="full-center" src="/static/images/icons/pinnedchat_svg.svg"/> : ""}
                             {data.hasNotification ? <div className="dialog-notification">{data.unread}</div> : ""}
                         </div>
                     ) : ""}
