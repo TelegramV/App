@@ -62,25 +62,44 @@ function start() {
     AppFramework.registerComponent("message-list-component", MessageListComponent)
     AppFramework.registerComponent("message-component", MessageComponent)
 
-    AppFramework.Router.route("login", {
+    AppFramework.Router.route("login", "login", {
         render() {
             return `<login-page></login-page>`
         }
     })
 
-    AppFramework.Router.route("/", {
+    AppFramework.Router.route("/","main", {
         render() {
             return `<im-page></im-page>`
         }
     })
 
-    AppFramework.mount("#app")
+    AppFramework.Router.middleware(toRoute => {
+        if (!MTProto.isUserAuthorized()) {
+            if (toRoute.route.name !== "login") {
+                console.log("middleware")
+                return {
+                    next: false,
+                    doNext: () => {
+                        AppFramework.Router.push("/login")
+                    }
+                }
+            }
+        } else {
+            if (toRoute.route.name === "login") {
+                return {
+                    next: false,
+                    doNext: () => {
+                        AppFramework.Router.push("/")
+                    }
+                }
+            }
+        }
 
-    if (!MTProto.isUserAuthorized()) {
-        AppFramework.Router.push("/login")
-    } else {
-        AppFramework.Router.push("/")
-    }
+        return true
+    })
+
+    AppFramework.mount("#app")
 }
 
 MTProto.connect(authContext, function () {

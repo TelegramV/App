@@ -2,6 +2,7 @@ import {BigInteger, SecureRandom} from "jsbn"
 import CryptoJS from "../vendor/crypto"
 import crypto from "crypto"
 import {Zlib} from "../vendor/zlib/gunzip.min"
+// import {str2bigInt} from "BigInt"
 
 // Mod Pow
 export function modPow(x, e, m) {

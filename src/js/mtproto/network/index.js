@@ -7,21 +7,21 @@ import {
     longToBytes,
     nextRandomInt,
     uintToInt
-} from "../utils/bin";
-import {sha1BytesSync, sha256HashSync} from "../crypto/sha";
-import {aesDecryptSync, aesEncryptSync} from "../crypto/aes";
-import {TLSerialization} from "../language/serialization";
-import DataCenter from "../dataCenter";
-import axios from "axios";
-import {TimeManager} from "../timeManager";
-import {createLogger} from "../../common/logger";
-import {TLDeserialization} from "../language/deserialization";
+} from "../utils/bin"
+import {sha1BytesSync, sha256HashSync} from "../crypto/sha"
+import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
+import {TLSerialization} from "../language/serialization"
+import DataCenter from "../dataCenter"
+import {TimeManager} from "../timeManager"
+import {createLogger} from "../../common/logger"
+import {TLDeserialization} from "../language/deserialization"
 import {AppPermanentStorage} from "../../common/storage"
 import {MessageProcessor} from "./messageProcessor"
 
 import AppConfiguration from "../../configuration"
 
 import {mt_ws_set_processor, mt_ws_transport} from "./mt_ws_transport"
+import AppCryptoManager from "../crypto/cryptoManager"
 
 const Logger = createLogger("Networker")
 
@@ -43,19 +43,19 @@ export class Networker {
     }
 
     getMsgKey(dataWithPadding, isOut) {
-        const authKey = this.auth.authKey;
-        const x = isOut ? 0 : 8;
-        const msgKeyLargePlain = bufferConcat(authKey.subarray(88 + x, 88 + x + 32), dataWithPadding);
+        const authKey = this.auth.authKey
+        const x = isOut ? 0 : 8
+        const msgKeyLargePlain = bufferConcat(authKey.subarray(88 + x, 88 + x + 32), dataWithPadding)
         // TODO async hash
-        const msgKeyLarge = sha256HashSync(msgKeyLargePlain);
+        const msgKeyLarge = sha256HashSync(msgKeyLargePlain)
         return new Uint8Array(msgKeyLarge).subarray(8, 24)
     }
 
     getAesKeyIv(msgKey, isOut) {
-        const authKey = this.auth.authKey;
-        const x = isOut ? 0 : 8;
-        const sha2aText = new Uint8Array(52);
-        const sha2bText = new Uint8Array(52);
+        const authKey = this.auth.authKey
+        const x = isOut ? 0 : 8
+        const sha2aText = new Uint8Array(52)
+        const sha2bText = new Uint8Array(52)
 
         sha2aText.set(msgKey, 0)
         sha2aText.set(authKey.subarray(x, x + 36), 16)
@@ -65,8 +65,8 @@ export class Networker {
         sha2bText.set(msgKey, 36)
         const sha2b = new Uint8Array(sha256HashSync(sha2bText))
 
-        const aesKey = new Uint8Array(32);
-        const aesIv = new Uint8Array(32);
+        const aesKey = new Uint8Array(32)
+        const aesIv = new Uint8Array(32)
 
         aesKey.set(sha2a.subarray(0, 8))
         aesKey.set(sha2b.subarray(8, 24), 8)
@@ -82,16 +82,26 @@ export class Networker {
     getEncryptedMessage(dataWithPadding) {
         const msgKey = this.getMsgKey(dataWithPadding, true)
         const keyIv = this.getAesKeyIv(msgKey, true)
-        // TODO async
-        const encryptedBytes = aesEncryptSync(dataWithPadding, keyIv[0], keyIv[1])
-        return {
-            bytes: encryptedBytes,
-            msgKey: msgKey
-        }
+
+        return new Promise(resolve => {
+            const encryptedBytes = aesEncryptSync(dataWithPadding, keyIv[0], keyIv[1])
+
+            resolve({
+                bytes: encryptedBytes,
+                msgKey: msgKey
+            })
+        })
+
+        // return AppCryptoManager.aesEncrypt(dataWithPadding, keyIv[0], keyIv[1]).then(encryptedBytes => {
+        //     return {
+        //         bytes: encryptedBytes,
+        //         msgKey: msgKey
+        //     }
+        // })
     }
 
     resendMessage(messageId) {
-        if(!this.messageProcessor.sentMessages[messageId])
+        if (!this.messageProcessor.sentMessages[messageId])
             throw new Error("Message to resend does not exist")
         this.sendMessage(this.messageProcessor.sentMessages[messageId])
     }
@@ -99,7 +109,7 @@ export class Networker {
     sendEncryptedRequest(message, options) {
         this.messageProcessor.sentMessages[message.msg_id] = message
 
-        const data = new TLSerialization({startMaxLength: message.body.length + 2048});
+        const data = new TLSerialization({startMaxLength: message.body.length + 2048})
 
         data.storeIntBytes(this.auth.serverSalt, 64, 'salt')
         data.storeIntBytes(this.auth.sessionID, 64, 'session_id')
@@ -110,32 +120,28 @@ export class Networker {
         data.storeInt(message.body.length, 'message_data_length')
         data.storeRawBytes(message.body, 'message_data')
 
-        const dataBuffer = data.getBuffer();
+        const dataBuffer = data.getBuffer()
 
-        const paddingLength = (16 - (data.offset % 16)) + 16 * (1 + nextRandomInt(5));
-        const padding = createNonce(paddingLength); // TODO check if secure
+        const paddingLength = (16 - (data.offset % 16)) + 16 * (1 + nextRandomInt(5))
+        const padding = createNonce(paddingLength) // TODO check if secure
 
-        const dataWithPadding = bufferConcat(dataBuffer, padding);
+        const dataWithPadding = bufferConcat(dataBuffer, padding)
         // console.log(dT(), 'Adding padding', dataBuffer, padding, dataWithPadding)
         // console.log(dT(), 'auth_key_id', bytesToHex(self.authKeyID))
 
-        const encryptedResult = this.getEncryptedMessage(dataWithPadding);
-        // console.log(dT(), 'Got encrypted out message'/*, encryptedResult*/)
-        const request = new TLSerialization({startMaxLength: encryptedResult.bytes.byteLength + 256});
-        request.storeIntBytes(this.auth.authKeyID, 64, 'auth_key_id')
-        request.storeIntBytes(encryptedResult.msgKey, 128, 'msg_key')
-        request.storeRawBytes(encryptedResult.bytes, 'encrypted_data')
+        return this.getEncryptedMessage(dataWithPadding).then(encryptedResult => {
+            const request = new TLSerialization({startMaxLength: encryptedResult.bytes.byteLength + 256})
+            request.storeIntBytes(this.auth.authKeyID, 64, 'auth_key_id')
+            request.storeIntBytes(encryptedResult.msgKey, 128, 'msg_key')
+            request.storeRawBytes(encryptedResult.bytes, 'encrypted_data')
 
-        // TODO xhrSendBuffer
-        const requestData = true ? request.getBuffer() : request.getArray();
+            // TODO xhrSendBuffer
+            const requestData = true ? request.getBuffer() : request.getArray()
 
-        const url = DataCenter.chooseServer(this.auth.dcID);
+            const url = DataCenter.chooseServer(this.auth.dcID)
 
-        mt_ws_transport(url, requestData);
-        /*return axios.post(url, requestData, {
-            responseType: "arraybuffer",
-            transformRequest: null
-        })*/
+            mt_ws_transport(url, requestData)
+        })
     }
 
     getDecryptedMessage(msgKey, encryptedData) {
@@ -144,14 +150,14 @@ export class Networker {
     }
 
     parseResponse(responseBuffer) {
-        let deserializer = new TLDeserialization(responseBuffer);
+        let deserializer = new TLDeserialization(responseBuffer)
 
-        const authKeyID = deserializer.fetchIntBytes(64, false, 'auth_key_id');
+        const authKeyID = deserializer.fetchIntBytes(64, false, 'auth_key_id')
         if (!bytesCmp(authKeyID, this.auth.authKeyID)) {
             throw new Error('[MT] Invalid server auth_key_id: ' + bytesToHex(authKeyID))
         }
-        const msgKey = deserializer.fetchIntBytes(128, true, 'msg_key');
-        const encryptedData = deserializer.fetchRawBytes(responseBuffer.byteLength - deserializer.getOffset(), true, 'encrypted_data');
+        const msgKey = deserializer.fetchIntBytes(128, true, 'msg_key')
+        const encryptedData = deserializer.fetchRawBytes(responseBuffer.byteLength - deserializer.getOffset(), true, 'encrypted_data')
 
         const dataWithPadding = new Uint8Array(this.getDecryptedMessage(msgKey, encryptedData))
 
@@ -162,9 +168,9 @@ export class Networker {
 
         deserializer = new TLDeserialization(dataWithPadding.buffer, {mtproto: true})
 
-        const salt = deserializer.fetchIntBytes(64, false, 'salt'); // ??
-        const sessionID = deserializer.fetchIntBytes(64, false, 'session_id');
-        const messageID = deserializer.fetchLong('message_id');
+        const salt = deserializer.fetchIntBytes(64, false, 'salt') // ??
+        const sessionID = deserializer.fetchIntBytes(64, false, 'session_id')
+        const messageID = deserializer.fetchLong('message_id')
 
         // TODO wtf?
         if (!bytesCmp(sessionID, this.auth.sessionID) &&
@@ -173,26 +179,26 @@ export class Networker {
             throw new Error('[MT] Invalid server session_id: ' + bytesToHex(sessionID))
         }
 
-        const seqNo = deserializer.fetchInt('seq_no');
+        const seqNo = deserializer.fetchInt('seq_no')
 
-        const totalLength = dataWithPadding.byteLength;
+        const totalLength = dataWithPadding.byteLength
 
-        const messageBodyLength = deserializer.fetchInt('message_data[length]');
+        const messageBodyLength = deserializer.fetchInt('message_data[length]')
         let offset = deserializer.getOffset()
 
         if ((messageBodyLength % 4) ||
             messageBodyLength > totalLength - offset) {
             throw new Error('[MT] Invalid body length: ' + messageBodyLength)
         }
-        const messageBody = deserializer.fetchRawBytes(messageBodyLength, true, 'message_data');
+        const messageBody = deserializer.fetchRawBytes(messageBodyLength, true, 'message_data')
 
         offset = deserializer.getOffset()
-        const paddingLength = totalLength - offset;
+        const paddingLength = totalLength - offset
         if (paddingLength < 12 || paddingLength > 1024) {
             throw new Error('[MT] Invalid padding length: ' + paddingLength)
         }
 
-        const buffer = bytesToArrayBuffer(messageBody);
+        const buffer = bytesToArrayBuffer(messageBody)
 
         const self = this
 
@@ -205,7 +211,7 @@ export class Networker {
                     result.seqno = this.fetchInt(field + '[seqno]')
                     result.bytes = this.fetchInt(field + '[bytes]')
 
-                    const offset = this.getOffset();
+                    const offset = this.getOffset()
 
                     try {
                         result.body = this.fetchObject('Object', field + '[body]')
@@ -227,8 +233,8 @@ export class Networker {
                     // console.log(self.sentMessages)
                     result.req_msg_id = this.fetchLong(field + '[req_msg_id]')
 
-                    const sentMessage = self.messageProcessor.sentMessages[result.req_msg_id];
-                    const type = sentMessage && sentMessage.resultType || 'Object';
+                    const sentMessage = self.messageProcessor.sentMessages[result.req_msg_id]
+                    const type = sentMessage && sentMessage.resultType || 'Object'
 
                     if (result.req_msg_id && !sentMessage) {
                         // console.warn(dT(), 'Result for unknown message', result)
@@ -241,11 +247,11 @@ export class Networker {
                     // console.log(dT(), 'override rpc_result', sentMessage, type, result)
                 }
             }
-        };
+        }
 
         deserializer = new TLDeserialization(buffer, deserializerOptions)
 
-        const response = deserializer.fetchObject('', 'INPUT');
+        const response = deserializer.fetchObject('', 'INPUT')
 
         return {
             response: response,
@@ -269,18 +275,16 @@ export class Networker {
             message.msg_id = this.timeManager.generateMessageID()
         }
 
-        mt_ws_set_processor(function(data_buffer)
-        {
-            if(data_buffer.byteLength <= 4)
-            {
+        mt_ws_set_processor(function (data_buffer) {
+            if (data_buffer.byteLength <= 4) {
                 //some another protocol violation here
-                console.log(data_buffer);
-                throw new Error("404??");
+                console.log(data_buffer)
+                throw new Error("404??")
             }
-            const response = this.parseResponse(data_buffer);
+            const response = this.parseResponse(data_buffer)
             this.messageProcessor.process(response.response, response.messageID, response.sessionID)
-        }, this);
-        this.sendEncryptedRequest(message);
+        }, this)
+        this.sendEncryptedRequest(message)
 
         /*return this.sendEncryptedRequest(message).then(result => {
             const response = this.parseResponse(result.data)
@@ -292,7 +296,7 @@ export class Networker {
     }
 
     wrapApiCall(method, params, options = {}) {
-        const serializer = new TLSerialization(options);
+        const serializer = new TLSerialization(options)
 
         if (!this.connectionInited) {
             // TODO replace with const values
@@ -317,14 +321,14 @@ export class Networker {
 
         options.resultType = serializer.storeMethod(method, params)
 
-        const messageID = this.timeManager.generateMessageID();
-        const seqNo = this.generateSeqNo();
+        const messageID = this.timeManager.generateMessageID()
+        const seqNo = this.generateSeqNo()
         const message = {
             msg_id: messageID,
             seq_no: seqNo,
             body: serializer.getBytes(true),
             isAPI: true
-        };
+        }
 
         //Logger.debug("Api call", method, params, messageID, seqNo, options)
         Logger.debug("Api call", method, params)
@@ -334,7 +338,7 @@ export class Networker {
 
 
     generateSeqNo(notContentRelated) {
-        let seqNo = this.seqNo * 2;
+        let seqNo = this.seqNo * 2
 
         if (!notContentRelated) {
             seqNo++

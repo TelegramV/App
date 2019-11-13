@@ -1,12 +1,8 @@
-import axios from "axios"
 import TimeManager from "../timeManager"
 import DataCenter from "../dataCenter"
 import {TLSerialization} from "../language/serialization"
 import {TLDeserialization} from "../language/deserialization"
 import {mt_ws_set_processor, mt_ws_transport} from "../network/mt_ws_transport"
-
-delete axios.defaults.headers.post["Content-Type"]
-delete axios.defaults.headers.common["Accept"]
 
 export function sendPlainRequest(dcID, requestBuffer, processor) {
     const chromeMatches = navigator.userAgent.match(/Chrome\/(\d+(\.\d+)?)/)
@@ -36,10 +32,8 @@ export function sendPlainRequest(dcID, requestBuffer, processor) {
 
     const url = DataCenter.chooseServer(dcID)
 
-    mt_ws_set_processor(function(data_buffer)
-    {
-        if(data_buffer.byteLength <= 4)
-        {
+    mt_ws_set_processor(function (data_buffer) {
+        if (data_buffer.byteLength <= 4) {
             //some protocol violation here
             console.log(data_buffer);
             throw new Error("404??");

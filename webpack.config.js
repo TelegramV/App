@@ -3,9 +3,9 @@ const path = require("path")
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const {CleanWebpackPlugin} = require("clean-webpack-plugin")
-const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlWebpackPlugin = require("html-webpack-plugin")
 
-const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CopyWebpackPlugin = require("copy-webpack-plugin")
 
 require("@babel/polyfill")
 
@@ -14,14 +14,14 @@ const config = {
         fs: "empty"
     },
     devServer: {
-        contentBase: path.join(__dirname, 'dist'),
+        contentBase: path.join(__dirname, "dist"),
         compress: true,
         port: 8090
     },
-    entry: ["@babel/polyfill", './src/js/application.js'],
+    entry: ["@babel/polyfill", "./src/js/application.js"],
     output: {
-        path: path.resolve(__dirname, 'dist'),
-        filename: 'bundle.[hash].js'
+        path: path.resolve(__dirname, "dist"),
+        filename: "bundle.[hash].js"
     },
     plugins: [
         new MiniCssExtractPlugin({
@@ -39,6 +39,10 @@ const config = {
     ],
     module: {
         rules: [
+            {
+                test: /\.worker\.js$/,
+                use: {loader: "worker-loader"}
+            },
             {
                 test: /\.js$/,
                 use: "babel-loader",

@@ -95,9 +95,13 @@ export class Logger {
     debug(text, ...options) {
         if (this.levelIndex >= 4) {
             if (typeof text === "object") {
-                this.driver.debug(this.makeLog("debug"), text, ...options)
+                console.groupCollapsed(this.makeLog("debug"), text, ...options)
+                console.trace()
+                console.groupEnd()
             } else {
-                this.driver.debug(this.makeLog("debug", text), ...options)
+                console.groupCollapsed(this.makeLog("debug", text), ...options)
+                console.trace()
+                console.groupEnd()
             }
         }
     }

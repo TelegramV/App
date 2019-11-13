@@ -32,12 +32,12 @@ export class FrameworkRouter {
         this.routerView = document.getElementsByTagName("router-view").item(0) || false
 
         this.activeRoute = {}
-        this.beforeRenderHanders = []
+        this.middlewares = []
         this.queryChangeHandlers = []
     }
 
-    beforeRender(handler) {
-        this.beforeRenderHanders.push(handler)
+    middleware(handler) {
+        this.middlewares.push(handler)
     }
 
 
@@ -47,7 +47,7 @@ export class FrameworkRouter {
      * @param path
      * @param component
      */
-    route(path, component) {
+    route(path, name, component) {
         let route = undefined
 
         if (typeof path === "object") {
@@ -56,7 +56,7 @@ export class FrameworkRouter {
         } else {
             route = {
                 path: path,
-                name: path,
+                name: name,
                 component: component
             }
         }
@@ -154,8 +154,12 @@ export class FrameworkRouter {
             queryParams: parseQuery(parsedHash.queryString)
         }
 
-        this.beforeRenderHanders.forEach(hander => {
-            hander(routeToActivate)
+        this.middlewares.forEach(midleware => {
+            const middlewareResult = midleware(routeToActivate)
+
+            if (middlewareResult != true && middlewareResult.next != true) {
+                return middlewareResult.doNext()
+            }
         })
 
         this.activeRoute = routeToActivate
