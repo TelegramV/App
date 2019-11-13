@@ -34,21 +34,7 @@
             return arg;
         }
 
-        // It's an array; check it is a valid representation of a byte
-        if (Array.isArray(arg)) {
-            if (!checkInts(arg)) {
-                throw new Error('Array contains invalid value: ' + arg);
-            }
-
-            return new Uint8Array(arg);
-        }
-
-        // Something else, but behaves like an array (maybe a Buffer? Arguments?)
-        if (checkInt(arg.length) && checkInts(arg)) {
-            return new Uint8Array(arg);
-        }
-
-        throw new Error('unsupported array-like object');
+        return new Uint8Array(arg);
     }
 
     function createArray(length) {
