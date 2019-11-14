@@ -8,7 +8,12 @@ var transportation_streams = new Map();
 
 var high_level_processor;
 var high_level_context;
+let disconnect_processor;
 
+export function mt_set_disconnect_processor(processor) {
+    if(!disconnect_processor)
+        disconnect_processor = processor
+}
 function mt_init_transportation(url)
 {
     var transportation_socket = new WebSocket(url, "binary");
@@ -44,6 +49,7 @@ function mt_init_transportation(url)
         {
             console.log("CRASHED");
         }
+        disconnect_processor()
         console.log('code: ' + ev.code + ' reason: ' + ev.reason);
     };
     

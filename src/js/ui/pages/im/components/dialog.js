@@ -61,7 +61,8 @@ export class TelegramDialogComponent extends FrameworkComponent {
         const messageUser = findUserFromMessage(message, dialogsSlice)
         let messageUsername = messageUser ? messageUser.id !== peer.id ? `${getPeerName(messageUser, false)}` : "" : ""
 
-        const submsg = message.message ? (message.message.length > 64 ? (message.message.substring(0, 64) + "...") : message.message) : ""
+        // TODO this should be made with css
+        const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
         const date = new Date(message.date * 1000)
 
         this.reactive.data = {
@@ -72,7 +73,7 @@ export class TelegramDialogComponent extends FrameworkComponent {
             peer: dialog.peer,
             photo: "/static/images/icons/admin_3x.png",
             hasNotification: dialog.unread_count > 0,
-            unread: dialog.unread_mentions_count > 0 ? "@" : dialog.unread_count.toString(),
+            unread: dialog.unread_mentions_count > 0 ? "@" : (dialog.unread_count > 0 ? dialog.unread_count.toString() : ""),
             muted: dialog.notify_settings.mute_until,
             date: date.toLocaleTimeString('en', {
                 hour: '2-digit',
@@ -100,29 +101,24 @@ export class TelegramDialogComponent extends FrameworkComponent {
         if (!reactive.data) {
             return <div>...</div>
         }
-
-        const notificationClasses = `dialog-notification${reactive.data.muted ? " muted" : ""}`
+        let data = reactive.data
+        let personClasses = "person rp "
+        if(data.online) personClasses += "online "
+        if(data.unread !== "") personClasses += "unread "
+        if(data.hasNotification) personClasses += "muted "
         return (
-            <div className="dialog-item" onClick={this.openDialog(reactive.data.peer)}>
-                <img className="dialog-photo round-block"
-                     src={reactive.data.photo}/>
-                <div className="dialog-info">
-                    <div className="dialog-peer">{reactive.data.peerName}</div>
-                    <div className="dialog-short-text"><span
-                        className="dialog-short-text-sender">{reactive.data.messageUsername.length > 0 ? reactive.data.messageUsername + ": " : ""}</span>{this.reactive.data.message}
+            <div class={personClasses} onClick={this.openDialog(reactive.data.peer)}>
+                <img class="avatar" src={data.photo} alt="avatar"/>
+                <div class="content">
+                    <div class="top">
+                        <div class="title">{data.peerName}</div>
+                        <div class="status tgico"></div>
+                        <div class="time">{data.date}</div>
                     </div>
-                </div>
-                <div className="dialog-meta">
-                    <div className="dialog-time">{reactive.data.date}</div>
-                    <br/>
-                    {reactive.data.hasNotification || reactive.data.pinned ? (
-                        <div className={notificationClasses}>
-                            {reactive.data.pinned && !reactive.data.hasNotification ?
-                                <img className="full-center" src="/static/images/icons/pinnedchat_svg.svg"/> : ""}
-                            {reactive.data.hasNotification ?
-                                <div className="dialog-notification">{reactive.data.unread}</div> : ""}
-                        </div>
-                    ) : ""}
+                    <div class="bottom">
+                        <div class="message">{data.messageUsername.length > 0 ? data.messageUsername + ": " + data.message : data.message}</div>
+                        <div class="badge tgico">{data.unread}</div>
+                    </div>
                 </div>
             </div>
         )

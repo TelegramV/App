@@ -1,0 +1,68 @@
+input[type="text"],
+input[type="tel"] {
+	caret-color: $blue;
+	background-color: transparent;
+	outline: 0;
+	border: 0;
+	font-family: "Roboto";
+	font-size: 16px;
+	color: #000;
+	box-sizing: border-box;
+	width: 100%;
+	&::placeholder {
+		color: $darkgrey;
+		opacity: 0.8;
+	}
+}
+
+.input-field {
+	position: relative;
+	width: 360px;
+	height: 54px;
+	box-sizing: border-box;
+
+	label {
+		position: absolute;
+		top: 50%;
+		left: 11px;
+		transform: translateY(-50%);
+		cursor: text;
+		user-select: none;
+		transition: anim(all);
+		font-size: 16px;
+		color: $grey;
+		background-color: #fff;
+		padding: 5px;
+	}
+
+	.text {
+		height: 54px;
+	}
+
+	input {
+		height: 100%;
+		padding: 0 15px;
+		border: 1px solid $lightgrey;
+		transition: anim(border-color);
+		border-radius: 10px;
+
+		&:hover {
+			border-color: #000;
+		}
+
+		&:focus {
+			border-width: 2px;
+			border-color: $blue;
+		}
+
+		&:focus + label {
+			top: 0;
+			font-size: 12px;
+			font-weight: 500;
+		}
+
+		&:focus + label {
+			color: $blue;
+		}
+	}
+}

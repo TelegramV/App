@@ -1,0 +1,67 @@
+body {
+	font-family: Roboto, sans-serif;
+	background-color: #fff;
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+a {
+	text-decoration: none;
+}
+
+.app {
+	display: flex;
+	background-color: $lightblue;
+}
+
+.rp {
+	overflow: hidden;
+	position: relative;
+
+	.ripple {
+		position: absolute;
+		background: $light;
+		border-radius: 50%;
+		width: 1px;
+		height: 1px;
+		animation: rippleEffect 0.7s ease;
+		opacity: 0;
+	}
+}
+
+.rp.rps {
+	.ripple {
+		width: 1px;
+		height: 1px;
+		animation: rippleEffectSmall 0.4s ease;
+	}
+}
+
+@keyframes rippleEffect {
+	0% {
+		transform: scale(1);
+		opacity: 1;
+	}
+	30% {
+		opacity: 1;
+	}
+	100% {
+		transform: scale(1000);
+		opacity: 0;
+	}
+}
+
+@keyframes rippleEffectSmall {
+	0% {
+		transform: scale(1);
+		opacity: 1;
+	}
+	30% {
+		opacity: 1;
+	}
+	100% {
+		transform: scale(100);
+		opacity: 0;
+	}
+}

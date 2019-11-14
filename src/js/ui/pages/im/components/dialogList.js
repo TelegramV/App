@@ -2,9 +2,8 @@ import {AppTemporaryStorage} from "../../../../common/storage"
 import {MTProto} from "../../../../mtproto"
 import {FrameworkComponent} from "../../../framework/component"
 import {dialogPeerMap, TelegramDialogComponent} from "./dialog"
-import VDOM from "../../../framework/vdom"
 import {MessageListComponent} from "./messageList"
-
+import VDOM from "../../../framework/vdom";
 
 export class DialogListComponent extends FrameworkComponent {
     constructor(props = {}) {
@@ -15,21 +14,42 @@ export class DialogListComponent extends FrameworkComponent {
 
     h(context) {
         if (!context.reactive.dialogsSlice) {
-            return <h1>Loading..</h1>
+            return <div className="full-size-loader">
+                <progress className="progress-circular big"/>
+            </div>
         }
 
         return (
-            <div>
-                {context.reactive.dialogsSlice.dialogs.map(dialog => {
-                    return <div><TelegramDialogComponent constructor={{
-                        dialogsSlice: context.reactive.dialogsSlice,
-                        dialog: dialog,
-                        dataset: {
-                            peer: `${dialog.peer._}.${dialog.peer[dialogPeerMap[dialog.peer._] + '_id']}`
+            (
+                <div>
+                    <div class="list pinned">
+                        {
+                            context.reactive.pinned.map(dialog => {
+                                return <TelegramDialogComponent constructor={{
+                                    dialogsSlice: context.reactive.dialogsSlice,
+                                    dialog: dialog,
+                                    dataset: {
+                                        peer: `${dialog.peer._}.${dialog.peer[dialogPeerMap[dialog.peer._] + '_id']}`
+                                    }
+                                }}/>
+                            })
                         }
-                    }}/></div>
-                })}
-            </div>
+                    </div>
+                    <div class="list">
+                        {
+                            context.reactive.notPinned.map(dialog => {
+                                return <TelegramDialogComponent constructor={{
+                                    dialogsSlice: context.reactive.dialogsSlice,
+                                    dialog: dialog,
+                                    dataset: {
+                                        peer: `${dialog.peer._}.${dialog.peer[dialogPeerMap[dialog.peer._] + '_id']}`
+                                    }
+                                }}/>
+                            })
+                        }
+                    </div>
+                </div>
+            )
         )
     }
 
@@ -53,6 +73,11 @@ export class DialogListComponent extends FrameworkComponent {
             hash: ""
         }).then(dialogsSlice => {
             AppTemporaryStorage.setItem("dialogsSlice", dialogsSlice)
+            const pinned =  dialogsSlice.dialogs.filter(l => l.pFlags.pinned)
+            const notPinned =  dialogsSlice.dialogs.filter(l => !l.pFlags.pinned)
+
+            this.reactive.pinned = pinned
+            this.reactive.notPinned = notPinned
 
             this.reactive.dialogsSlice = dialogsSlice
 

@@ -5,6 +5,7 @@ import {AppTemporaryStorage} from "../../../../common/storage"
 import {dialogPeerMap, findPeerFromDialog} from "./dialog"
 import {MessageComponent} from "./message"
 import {FrameworkComponent} from "../../../framework/component"
+import {FileAPI} from "../../../../api/fileAPI";
 
 export class MessageListComponent extends FrameworkComponent {
     constructor(props = {}) {
@@ -65,8 +66,18 @@ export class MessageListComponent extends FrameworkComponent {
 
         }).then(messagesSlice => {
             AppTemporaryStorage.setItem("messages.messagesSlice", messagesSlice)
+            this.reactive.peer = peer
             this.reactive.messagesSlice = messagesSlice
             this.reactive.isLoading = false
+            if(peer.photo) {
+                let a = peer.photo.photo_small
+                FileAPI.getPeerPhoto(a, peer, false).then(response => {
+                    const blob = new Blob([response.bytes], { type: 'application/jpeg' });
+                    this.reactive.photo = {
+                       url: URL.createObjectURL(blob)
+                    }
+                })
+            }
         })
     }
 
@@ -76,50 +87,47 @@ export class MessageListComponent extends FrameworkComponent {
         }
 
         if (reactive.isLoading) {
-            return <h1>Loading...</h1>
+            return <div className="full-size-loader height">
+                <progress className="progress-circular big"/>
+            </div>
         }
+        const data = reactive
 
         return (
-            <div data-peer={AppFramework.Router.activeRoute.queryParams.p} className="im flex-column">
-                <div className="im-header flex-row">
-                    <div className="im-header-info flex-row">
-                        <img className="im-header-photo round-block"
-                             src="https://static10.tgstat.ru/channels/_0/3b/3bdc7810ebf4c3de0646923f39267695.jpg"/>
-                        <div className="flex-column">
-                            <div className="im-header-name">Saved Messages</div>
-                            <div className="im-header-status">Nothing</div>
+            <div id="chat" data-peer={AppFramework.Router.activeRoute.queryParams.p}>
+                <div id="topbar">
+                    <div className="chat-info">
+                        <div className="person">
+                            <img src={data.photo.url} className="avatar"></img>
+                            <div className="content">
+                                <div className="top">
+                                    <div className="title">{data.peer.first_name} {data.peer.last_name}</div>
+                                </div>
+                                <div className="bottom">
+                                    <div
+                                        className="info">online</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div className="im-header-options flex-row">
-                        <button className="im-header-subscribe">SUBSCRIBE</button>
-                        <div className="im-header-button"><img className="full-center"
-                                                               src="/static/images/icons/mute_svg.svg"/>
-                        </div>
-                        <div className="im-header-button"><img className="full-center"
-                                                               src="/static/images/icons/search_svg.svg"/>
-                        </div>
-                        <div className="im-header-button"><img className="full-center"
-                                                               src="/static/images/icons/more_svg.svg"/>
-                        </div>
-                    </div>
+                    <div className="pinned-msg"></div>
+                    <div className="btn-icon rp rps tgico-search"></div>
+                    <div className="btn-icon rp rps tgico-more"></div>
                 </div>
-                <div className="im-background">
-                    <div className="im-container flex-column">
-                        <div className="im-history flex-column-reverse">
-                            {
-                                reactive.messagesSlice.messages.map(message => {
-                                    return (
-                                        <div>
-                                            <MessageComponent constructor={{
-                                                message,
-                                                messagesSlice: reactive.messagesSlice
-                                            }}/>
-                                            <br/>
-                                        </div>
-                                    )
-                                })
-                            }
-                        </div>
+                <div id="bubbles">
+                    <div id="bubbles-inner">
+                        {/*<div class="service">*/}
+                        {/*    <div class="service-msg">October 21</div>*/}
+                        {/*</div>*/}
+                        {/*TODO fix that */}
+                        {
+                            reactive.messagesSlice.messages.map(message => {
+                                return <MessageComponent constructor={{
+                                    message,
+                                    messagesSlice: reactive.messagesSlice
+                                }}/>
+                            })
+                        }
                     </div>
                 </div>
             </div>
