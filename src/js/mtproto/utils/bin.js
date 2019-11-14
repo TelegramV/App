@@ -1,8 +1,16 @@
 import {BigInteger, SecureRandom} from "jsbn"
 import CryptoJS from "../vendor/crypto"
-import crypto from "crypto"
 import {Zlib} from "../vendor/zlib/gunzip.min"
 // import {str2bigInt} from "BigInt"
+
+export function getBytes(x, i = 4) {
+    const bytes = []
+    do {
+        bytes[--i] = x & (255)
+        x = x >> 8
+    } while (i)
+    return bytes
+}
 
 // Mod Pow
 export function modPow(x, e, m) {
@@ -21,14 +29,12 @@ export function modPow(x, e, m) {
     return result;
 }
 
-// Create a random Buffer
-export function createRandomBuffer(bytesLength) {
-    return new Buffer(crypto.randomBytes(bytesLength));
-}
-
-// Create a new nonce
 export function createNonce(bytesLength) {
-    return createRandomBuffer(bytesLength);
+    const nonce = []
+    for (let i = 0; i < bytesLength; i++) {
+        nonce.push(nextRandomInt(0xFF))
+    }
+    return nonce
 }
 
 export function bigint(num) {
@@ -100,6 +106,16 @@ export function bytesToHex(bytes = []) {
     }
 
     return arr.join('')
+}
+
+
+
+export function uint8ArrayToHex(arr) {
+    let hex = ''
+    for (let i = 0; i < arr.length; i++) {
+        hex += arr[i].toString(16).padStart(2, '0')
+    }
+    return hex
 }
 
 export function bytesFromHex(hexString) {
@@ -556,84 +572,6 @@ export function pqPrimeLong(what) {
     return [bytesFromHex(P.toString(16)), bytesFromHex(Q.toString(16)), it]
 }
 
-export function pqPrimeLeemon(what) {
-    let minBits = 64
-    let minLen = Math.ceil(minBits / bpe) + 1
-    let it = 0
-    let q
-    let j, lim
-    let P
-    let Q
-    let a = new Array(minLen)
-    let b = new Array(minLen)
-    let c = new Array(minLen)
-    let g = new Array(minLen)
-    let z = new Array(minLen)
-    let x = new Array(minLen)
-    let y = new Array(minLen)
-
-    for (let i = 0; i < 3; i++) {
-        q = (nextRandomInt(128) & 15) + 17
-        copyInt_(x, nextRandomInt(1000000000) + 1)
-        copy_(y, x)
-        lim = 1 << (i + 18)
-
-        for (j = 1; j < lim; j++) {
-            ++it
-            copy_(a, x)
-            copy_(b, x)
-            copyInt_(c, q)
-
-            while (!isZero(b)) {
-                if (b[0] & 1) {
-                    add_(c, a)
-                    if (greater(c, what)) {
-                        sub_(c, what)
-                    }
-                }
-                add_(a, a)
-                if (greater(a, what)) {
-                    sub_(a, what)
-                }
-                rightShift_(b, 1)
-            }
-
-            copy_(x, c)
-            if (greater(x, y)) {
-                copy_(z, x)
-                sub_(z, y)
-            } else {
-                copy_(z, y)
-                sub_(z, x)
-            }
-            eGCD_(z, what, g, a, b)
-            if (!equalsInt(g, 1)) {
-                break
-            }
-            if ((j & (j - 1)) === 0) {
-                copy_(y, x)
-            }
-        }
-        if (greater(g, one)) {
-            break
-        }
-    }
-
-    divide_(what, g, x, y)
-
-    if (greater(g, x)) {
-        P = x
-        Q = g
-    } else {
-        P = g
-        Q = x
-    }
-
-    // console.log(dT(), 'done', bigInt2str(what, 10), bigInt2str(P, 10), bigInt2str(Q, 10))
-
-    return [bytesFromLeemonBigInt(P), bytesFromLeemonBigInt(Q), it]
-}
-
 export function bytesModPow(x, y, m) {
     try {
         const xBigInt = new BigInteger(bytesToHex(x), 16)
@@ -647,25 +585,6 @@ export function bytesModPow(x, y, m) {
     }
 
     return bytesFromBigInt(new BigInteger(x).modPow(new BigInteger(y), new BigInteger(m)), 256)
-}
-
-export function dHexDump(bytes) {
-    const arr = []
-
-    for (let i = 0; i < bytes.length; i++) {
-        if (i && !(i % 2)) {
-            if (!(i % 16)) {
-                arr.push('\n')
-            } else if (!(i % 4)) {
-                arr.push('  ')
-            } else {
-                arr.push(' ')
-            }
-        }
-        arr.push((bytes[i] < 16 ? '0' : '') + bytes[i].toString(16))
-    }
-
-    console.log(arr.join(''))
 }
 
 export function secureRandom() {

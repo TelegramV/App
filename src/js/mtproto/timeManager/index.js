@@ -3,7 +3,7 @@ import {longFromInts, nextRandomInt} from "../utils/bin"
 import {createLogger} from "../../common/logger"
 
 const Logger = createLogger("MtpTimeManager", {
-    level: "log"
+    level: "debug"
 })
 
 export class MtpTimeManager {

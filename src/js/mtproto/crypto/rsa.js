@@ -1,13 +1,14 @@
-import {BigInteger} from "jsbn"
-import {addPadding, bytesFromBigInt} from "../utils/bin"
+import {addPadding} from "../utils/bin"
+import {bigModPow, bytesFromNativeBigInt, bytesToBigInt} from "../utils/nativeBigInt"
 
 export function rsaEncrypt(publicKey, bytes) {
     bytes = addPadding(bytes, 255)
 
-    const N = new BigInteger(publicKey.modulus, 16)
-    const E = new BigInteger(publicKey.exponent, 16)
-    const X = new BigInteger(bytes)
-    const encryptedBigInt = X.modPowInt(E, N)
+    const X = bytesToBigInt(bytes)
+    const E = BigInt(`0x${publicKey.exponent}`)
+    const N = BigInt(`0x${publicKey.modulus}`)
 
-    return bytesFromBigInt(encryptedBigInt, 256)
+    const encryptedBigInt = bigModPow(X, E, N)
+
+    return bytesFromNativeBigInt(encryptedBigInt)
 }

@@ -1,9 +1,10 @@
 import CryptoWorker from "../workers/crypto.worker"
 import {aesDecryptSync, aesEncryptSync} from "./aes"
-import {pqPrimeFactorization} from "../utils/bin"
+import {getBytes, pqPrimeFactorization} from "../utils/bin"
 import {createLogger} from "../../common/logger"
-import {PqFinder} from "../connect/pqFinder"
+// import {PqFinder} from "../connect/pqFinder"
 import {sha1HashSync} from "./sha"
+import {factorizeBigInt, bytesToBigInt} from "../utils/nativeBigInt"
 
 const Logger = createLogger("CryptoManager", {
     level: "warn"
@@ -49,8 +50,8 @@ class CryptoManager {
         })
     }
 
-    aesEncrypt(bytes, keyBytes, ivBytes) {
-        if (this.canWork) {
+    aesEncrypt(bytes, keyBytes, ivBytes, options = {worker: true}) {
+        if (options.worker && this.canWork) {
             return new Promise(resolve => {
                 this.performTask("aesEncrypt", {
                     bytes, keyBytes, ivBytes
@@ -64,8 +65,8 @@ class CryptoManager {
         }
     }
 
-    aesDecrypt(encryptedBytes, keyBytes, ivBytes) {
-        if (this.canWork) {
+    aesDecrypt(encryptedBytes, keyBytes, ivBytes, options = {worker: true}) {
+        if (options.worker && this.canWork) {
             return new Promise(resolve => {
                 this.performTask("aesDecrypt", {
                     encryptedBytes, keyBytes, ivBytes
@@ -79,8 +80,8 @@ class CryptoManager {
         }
     }
 
-    pqPrimeFactorization(bytes) {
-        if (this.canWork) {
+    pqPrimeFactorization(bytes, options = {worker: true}) {
+        if (options.worker && this.canWork) {
             return new Promise(resolve => {
                 this.performTask("pqPrimeFactorization", {
                     bytes
@@ -94,8 +95,8 @@ class CryptoManager {
         }
     }
 
-    findPQ(pq) {
-        if (this.canWork) {
+    findPQ(pq, options = {worker: true}) {
+        if (options.worker && this.canWork) {
             return new Promise(resolve => {
                 this.performTask("findPQ", {
                     pq
@@ -103,19 +104,18 @@ class CryptoManager {
             })
         } else {
             return new Promise(resolve => {
-                const pqFinder = new PqFinder(pq)
-                pqFinder.findPQ()
 
-                const p = pqFinder.getPQAsBuffer()[0]
-                const q = pqFinder.getPQAsBuffer()[1]
+                const pAndq = factorizeBigInt(bytesToBigInt(pq))
+                const p = getBytes(Number(pAndq[0]))
+                const q = getBytes(Number(pAndq[1]))
 
                 resolve({p, q})
             })
         }
     }
 
-    sha1Hash(bytes) {
-        if (this.canWork) {
+    sha1Hash(bytes, options = {worker: true}) {
+        if (options.worker && this.canWork) {
             return new Promise(resolve => {
                 this.performTask("sha1Hash", {
                     bytes

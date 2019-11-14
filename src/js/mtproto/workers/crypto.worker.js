@@ -1,7 +1,7 @@
-import {bytesModPow, pqPrimeFactorization} from "../utils/bin"
+import {bytesModPow, getBytes, pqPrimeFactorization} from "../utils/bin"
 import {sha1HashSync} from "../crypto/sha"
 import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
-import {PqFinder} from "../connect/pqFinder"
+import {bytesToBigInt, factorizeBigInt} from "../utils/nativeBigInt"
 
 self.addEventListener("message", event => {
     const eventData = event.data
@@ -14,11 +14,9 @@ self.addEventListener("message", event => {
 
     switch (task) {
         case "findPQ":
-            const pqFinder = new PqFinder(taskData.pq)
-            pqFinder.findPQ()
-
-            const p = pqFinder.getPQAsBuffer()[0]
-            const q = pqFinder.getPQAsBuffer()[1]
+            const pq = factorizeBigInt(bytesToBigInt(taskData.pq))
+            const p = getBytes(Number(pq[0]), 4)
+            const q = getBytes(Number(pq[1]), 4)
             result = {p, q}
 
             break
@@ -26,7 +24,7 @@ self.addEventListener("message", event => {
             result = pqPrimeFactorization(taskData.bytes)
             break
 
-        case "modPow":
+        case "bigModPow":
             result = bytesModPow(taskData.x, taskData.y, taskData.m)
             break
 

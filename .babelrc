@@ -3,7 +3,10 @@
     [
       "@babel/preset-env",
       {
-        "modules": false
+        "modules": false,
+        "exclude": [
+          "babel-plugin-transform-exponentiation-operator"
+        ]
       }
     ]
   ],
