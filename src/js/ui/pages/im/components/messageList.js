@@ -5,7 +5,43 @@ import {AppTemporaryStorage} from "../../../../common/storage"
 import {dialogPeerMap, findPeerFromDialog} from "./dialog"
 import {MessageComponent} from "./message"
 import VDOM from "../../../framework/vdom"
+import {FileAPI} from "../../../../api/fileAPI";
 
+function vMessagesTemplate(data, messages) {
+    return (
+        <div id="chat">
+            <div id="topbar">
+                <div class="chat-info">
+                    <div class="person">
+                        <img src={data.photo.url} class="avatar"></img>
+                        <div class="content">
+                            <div class="top">
+                                <div class="title">{data.peer.first_name} {data.peer.last_name}</div>
+                            </div>
+                            <div class="bottom">
+                                <div class={"info" + (data.peer.status._ === "userStatusOnline" ? " online" : "")}>{data.peer.status._ === "userStatusOnline" ? "online" : "last seen a long time ago"}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pinned-msg"></div>
+                <div class="btn-icon rp rps tgico-search"></div>
+                <div class="btn-icon rp rps tgico-more"></div>
+            </div>
+            <div id="bubbles">
+                <div id="bubbles-inner">
+                    {/*<div class="service">*/}
+                    {/*    <div class="service-msg">October 21</div>*/}
+                    {/*</div>*/}
+                    {/*TODO fix that */}
+                    {
+                        messages
+                    }
+                </div>
+            </div>
+        </div>
+    )
+}
 export class MessageListComponent extends HTMLElement {
     constructor() {
         super()
@@ -28,7 +64,7 @@ export class MessageListComponent extends HTMLElement {
     }
 
     async initVNode() {
-        this.innerHTML = "loading.."
+        this.innerHTML = `<div class="full-size-loader"><progress class="progress-circular big"/></div>`
 
         if (!AppFramework.Router.activeRoute.queryParams.p) {
             this.vNode = VDOM.h("h1", {
@@ -68,45 +104,33 @@ export class MessageListComponent extends HTMLElement {
 
         }).then(response => {
             AppTemporaryStorage.setItem("messages.messagesSlice", response)
+            console.log(response)
+            console.log(peer)
 
-            this.vNode = (
-                <div id="chat">
-                    <div id="topbar">
-                        <div class="chat-info">
-                            <div class="person">
-                                <div class="avatar"></div>
-                                <div class="content">
-                                    <div class="top">
-                                        <div class="title">Campus Party</div>
-                                    </div>
-                                    <div class="bottom">
-                                        <div class="info">2,500 members, 746 online</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pinned-msg"></div>
-                        <div class="btn-icon rp rps tgico-search"></div>
-                        <div class="btn-icon rp rps tgico-more"></div>
-                    </div>
-                    <div id="bubbles">
-                        <div id="bubbles-inner">
-                            {/*<div class="service">*/}
-                            {/*    <div class="service-msg">October 21</div>*/}
-                            {/*</div>*/}
-                            {/*TODO fix that */}
-                            {
-                                response.messages.map(message => {
-                                    return <MessageComponent constructor={{
-                                                message,
-                                                messagesSlice: response
-                                            }}/>
-                                })
-                            }
-                        </div>
-                    </div>
-                </div>
-            )
+            let messages = response.messages.map(message => {
+                return <MessageComponent constructor={{
+                    message,
+                    messagesSlice: response
+                }}/>
+            })
+            this.vNode = vMessagesTemplate({
+                photo: {},
+                peer: peer
+            }, messages)
+
+            if(peer.photo) {
+                let a = peer.photo.photo_small
+                FileAPI.getPeerPhoto(a, peer, false).then(response => {
+                    const blob = new Blob([response.bytes], { type: 'application/jpeg' });
+                    this.vNode = vMessagesTemplate({
+                        photo: {
+                            url: URL.createObjectURL(blob)
+                        },
+                        peer: peer
+                    }, messages)
+                    this.render()
+                })
+            }
 
         })
     }

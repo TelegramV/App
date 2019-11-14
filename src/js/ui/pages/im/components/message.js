@@ -63,6 +63,25 @@ function vMessageWithStickerTemplate(data) {
     ))
 }
 
+function vMessageWithVoiceAudioTemplate(data) {
+    return vMessageTemplate(data,
+        <div class={vGetClass(data)}>
+            <audio src={data.audio.url}/>
+            {vTimeTemplate(data, true)}
+        </div>
+    )
+}
+
+function vMessageWithAudioTemplate(data) {
+    return vMessageTemplate(
+        <div class={vGetClass(data)}>
+            <audio src={data.url}/>
+            dsfsdf
+            {vTimeTemplate(data, true)}
+        </div>
+    )
+}
+
 
 function vMessageWithRoundVideoTemplate(data) {
     return (
@@ -198,6 +217,16 @@ export class MessageComponent extends HTMLElement {
                             } else if (attribute._ === "documentAttributeSticker") {
                                 data.imgSrc = URL.createObjectURL(blob)
                                 this.vNode = vMessageWithStickerTemplate(data)
+
+                            }else if(attribute._ === "documentAttributeAudio") {
+                                const handler = attribute.pFlags.voice ? vMessageWithVoiceAudioTemplate : vMessageWithAudioTemplate
+                                const waveform = attribute.waveform
+                                data.audio = {
+                                    url: URL.createObjectURL(blob),
+                                    duration: attribute.duration,
+                                    waveform: waveform
+                                }
+                                this.vNode = handler(data)
                             } else {
                                 console.log(attribute)
                                 /*blob = blob.slice(0, blob.size, "octec/stream")

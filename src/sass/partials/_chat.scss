@@ -48,6 +48,10 @@
       .bottom {
         font-size: 14px;
         line-height: 18px;
+
+        .info.online {
+          color: $blueonline;
+        }
       }
     }
   }

@@ -19,7 +19,7 @@ export class DialogListComponent extends HTMLElement {
     }
 
     async initVNode() {
-        this.innerHTML = "loading.."
+        this.innerHTML = `<div class="full-size-loader"><progress class="progress-circular big"/></div>`
 
         return await MTProto.invokeMethod("messages.getDialogs", {
             flags: {},
@@ -34,16 +34,40 @@ export class DialogListComponent extends HTMLElement {
             hash: ""
         }).then(dialogsSlice => {
             AppTemporaryStorage.setItem("dialogsSlice", dialogsSlice)
+            const pinned =  dialogsSlice.dialogs.filter(l => l.pFlags.pinned)
+            const notPinned =  dialogsSlice.dialogs.filter(l => !l.pFlags.pinned)
 
-            this.vNode = dialogsSlice.dialogs.map(dialog => {
-                return <TelegramDialogComponent constructor={{
-                    dialogsSlice: dialogsSlice,
-                    dialog: dialog,
-                    dataset: {
-                        peer: `${dialog.peer._}.${dialog.peer[dialogPeerMap[dialog.peer._] + '_id']}`
-                    }
-                }}/>
-            })
+            this.vNode = (
+                <div>
+                    <div class="list pinned">
+                        {
+                            pinned.map(dialog => {
+                                return <TelegramDialogComponent constructor={{
+                                    dialogsSlice: dialogsSlice,
+                                    dialog: dialog,
+                                    dataset: {
+                                        peer: `${dialog.peer._}.${dialog.peer[dialogPeerMap[dialog.peer._] + '_id']}`
+                                    }
+                                }}/>
+                            })
+                        }
+                    </div>
+                    <div class="list">
+                        {
+                            notPinned.map(dialog => {
+                                return <TelegramDialogComponent constructor={{
+                                    dialogsSlice: dialogsSlice,
+                                    dialog: dialog,
+                                    dataset: {
+                                        peer: `${dialog.peer._}.${dialog.peer[dialogPeerMap[dialog.peer._] + '_id']}`
+                                    }
+                                }}/>
+                            })
+                        }
+                    </div>
+                </div>
+            )
+
 
             const chatblock = document.getElementById("message_list")
             chatblock.innerHTML = ""

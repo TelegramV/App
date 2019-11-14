@@ -23,11 +23,12 @@ export class IMPage extends HTMLElement {
                             </div>
                         </div>
                     </div>
-                    <div class="list pinned">
+                    <div class="connecting" id="connecting_message">
+                        <progress class="progress-circular"/>
+                        <span>Waiting for network...</span>
                     </div>
-                    <div class="list">
-                        <DialogListComponent/>
-                    </div>
+                    <DialogListComponent/>
+
                     {/*// TODO костыли*/}
                 </div>
                 <div id="message_list"/>

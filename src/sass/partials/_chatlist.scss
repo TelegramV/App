@@ -189,3 +189,24 @@
 	// 	}
 	// }
 }
+
+.connecting {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	background-color: $connecting-color;
+	margin: 8px;
+	border-radius: 8px;
+	height: 60px;
+	display: none;
+
+	progress {
+		margin-left: 16px;
+		color: #2E3939;
+	}
+	span {
+		font-weight: 400;
+		margin-left: 16px;
+		line-height: 60px;
+	}
+}

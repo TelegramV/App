@@ -20,7 +20,7 @@ import {MessageProcessor} from "./messageProcessor"
 
 import AppConfiguration from "../../configuration"
 
-import {mt_ws_set_processor, mt_ws_transport} from "./mt_ws_transport"
+import {mt_set_disconnect_processor, mt_ws_set_processor, mt_ws_transport} from "./mt_ws_transport"
 import AppCryptoManager from "../crypto/cryptoManager"
 
 const Logger = createLogger("Networker")
@@ -40,6 +40,8 @@ export class Networker {
         this.auth = auth
         this.seqNo = 0
         this.connectionInited = false
+
+        mt_set_disconnect_processor(this.onDisconnect)
     }
 
     getMsgKey(dataWithPadding, isOut) {
@@ -49,6 +51,13 @@ export class Networker {
         // TODO async hash
         const msgKeyLarge = sha256HashSync(msgKeyLargePlain)
         return new Uint8Array(msgKeyLarge).subarray(8, 24)
+    }
+
+    onDisconnect() {
+        console.log("disconnect")
+        // TODO reconnect
+        // ALSO if there's no internet it doesn't disconnect ws, should ping prob
+        document.querySelector("#connecting_message").style.display = "block";
     }
 
     getAesKeyIv(msgKey, isOut) {
@@ -285,7 +294,6 @@ export class Networker {
             this.messageProcessor.process(response.response, response.messageID, response.sessionID)
         }, this)
         this.sendEncryptedRequest(message)
-
         /*return this.sendEncryptedRequest(message).then(result => {
             const response = this.parseResponse(result.data)
 
