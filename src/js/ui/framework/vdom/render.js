@@ -5,6 +5,10 @@
  * @returns {Text|HTMLElement|any|Node|string}
  */
 export function render(vNode) {
+    if (!vNode) {
+        return document.createTextNode(vNode)
+    }
+
     if (Array.isArray(vNode)) {
         throw new Error("FUCK THIS SHIT")
         // const $el = document.createElement("div")
@@ -14,9 +18,9 @@ export function render(vNode) {
         // return $el
     }
 
-    if (vNode.htmlChild) {
+    if (vNode.attrs && vNode.attrs.hasOwnProperty("dangerouslySetInnerHTML")) {
         const $el = document.createElement(vNode.tagName)
-        $el.innerHTML = vNode.children
+        $el.innerHTML = vNode.attrs["dangerouslySetInnerHTML"]
         return $el
     }
 
@@ -39,7 +43,11 @@ export function render(vNode) {
     }
 
     for (const [k, v] of Object.entries(vNode.attrs)) {
-        $el.setAttribute(k, v)
+        if (Array.isArray(v)) {
+            $el.setAttribute(k, v.join(" "))
+        } else {
+            $el.setAttribute(k, v)
+        }
     }
 
     for (const [kEvent, vEvent] of Object.entries(vNode.events)) {
