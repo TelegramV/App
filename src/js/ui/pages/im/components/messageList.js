@@ -4,43 +4,40 @@ import {PeerAPI} from "../../../../api/peerAPI"
 import {AppTemporaryStorage} from "../../../../common/storage"
 import {dialogPeerMap, findPeerFromDialog} from "./dialog"
 import {MessageComponent} from "./message"
-import VDOM from "../../../framework/vdom"
+import {FrameworkComponent} from "../../../framework/component"
 
-export class MessageListComponent extends HTMLElement {
-    constructor() {
+export class MessageListComponent extends FrameworkComponent {
+    constructor(props = {}) {
         super()
-        this.dialogsSlice = AppTemporaryStorage.getItem("dialogsSlice")
-        this.vNode = VDOM.h("h3", {
-            children: "loading.."
-        })
-    }
+        this.dialogsSlice = props.dialogsSlice || AppTemporaryStorage.getItem("dialogsSlice")
 
-    connectedCallback() {
-        this.initVNode().then(() => {
-            this.render()
+        // kostyl, have to be fixed later
+        this.alwaysForceRender = true
 
-            AppFramework.Router.onQueryChange(queryParams => {
-                this.initVNode().then(() => {
-                    this.render()
-                })
-            })
-        })
-    }
-
-    async initVNode() {
-        this.innerHTML = "loading.."
-
-        if (!AppFramework.Router.activeRoute.queryParams.p) {
-            this.vNode = VDOM.h("h1", {
-                children: "Select a chat"
-            })
-            return
-        } else {
-            this.vNode = VDOM.h("h1", {
-                children: "loading.."
-            })
+        if (AppFramework.Router.activeRoute.queryParams.p) {
+            this.init()
         }
 
+        AppFramework.Router.onQueryChange(queryParams => {
+            if (queryParams.p) {
+                this.init()
+                // this.forceRender()
+            } else {
+                // avoid shit like this!
+                this.render()
+            }
+        })
+    }
+
+    data() {
+        return {
+            messagesSlice: false,
+            isLoading: true
+        }
+    }
+
+    init() {
+        this.reactive.isLoading = true
         const dialogsSlice = this.dialogsSlice
 
         if (!dialogsSlice) return
@@ -56,7 +53,7 @@ export class MessageListComponent extends HTMLElement {
             peer: dp
         }, dialogsSlice)
 
-        return await MTProto.invokeMethod("messages.getHistory", {
+        return MTProto.invokeMethod("messages.getHistory", {
             peer: PeerAPI.getInput(peer),
             offset_id: 0,
             offset_date: 0,
@@ -66,60 +63,66 @@ export class MessageListComponent extends HTMLElement {
             min_id: 0,
             hash: 0
 
-        }).then(response => {
-            AppTemporaryStorage.setItem("messages.messagesSlice", response)
-
-            this.vNode = (
-                <div class="im flex-column">
-                    <div class="im-header flex-row">
-                        <div class="im-header-info flex-row">
-                            <img class="im-header-photo round-block"
-                                 src="https://static10.tgstat.ru/channels/_0/3b/3bdc7810ebf4c3de0646923f39267695.jpg"/>
-                            <div class="flex-column">
-                                <div class="im-header-name">Saved Messages</div>
-                                <div class="im-header-status">Nothing</div>
-                            </div>
-                        </div>
-                        <div class="im-header-options flex-row">
-                            <button class="im-header-subscribe">SUBSCRIBE</button>
-                            <div class="im-header-button"><img class="full-center" src="/static/images/icons/mute_svg.svg"/>
-                            </div>
-                            <div class="im-header-button"><img class="full-center"
-                                                               src="/static/images/icons/search_svg.svg"/>
-                            </div>
-                            <div class="im-header-button"><img class="full-center" src="/static/images/icons/more_svg.svg"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="im-background">
-                        <div class="im-container flex-column">
-                            <div class="im-history flex-column-reverse">
-                                {
-                                    response.messages.map(message => {
-                                        return (
-                                            <div>
-                                                <MessageComponent constructor={{
-                                                    message,
-                                                    messagesSlice: response
-                                                }}/>
-                                                <br/>
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )
-
+        }).then(messagesSlice => {
+            AppTemporaryStorage.setItem("messages.messagesSlice", messagesSlice)
+            this.reactive.messagesSlice = messagesSlice
+            this.reactive.isLoading = false
         })
     }
 
-    render() {
-        this.innerHTML = ""
-        if (this.vNode) {
-            this.appendChild(VDOM.render(this.vNode))
+    h({reactive}) {
+        if (!AppFramework.Router.activeRoute.queryParams.p) {
+            return <h1>Select a chat</h1>
         }
+
+        if (reactive.isLoading) {
+            return <h1>Loading...</h1>
+        }
+
+        return (
+            <div data-peer={AppFramework.Router.activeRoute.queryParams.p} className="im flex-column">
+                <div className="im-header flex-row">
+                    <div className="im-header-info flex-row">
+                        <img className="im-header-photo round-block"
+                             src="https://static10.tgstat.ru/channels/_0/3b/3bdc7810ebf4c3de0646923f39267695.jpg"/>
+                        <div className="flex-column">
+                            <div className="im-header-name">Saved Messages</div>
+                            <div className="im-header-status">Nothing</div>
+                        </div>
+                    </div>
+                    <div className="im-header-options flex-row">
+                        <button className="im-header-subscribe">SUBSCRIBE</button>
+                        <div className="im-header-button"><img className="full-center"
+                                                               src="/static/images/icons/mute_svg.svg"/>
+                        </div>
+                        <div className="im-header-button"><img className="full-center"
+                                                               src="/static/images/icons/search_svg.svg"/>
+                        </div>
+                        <div className="im-header-button"><img className="full-center"
+                                                               src="/static/images/icons/more_svg.svg"/>
+                        </div>
+                    </div>
+                </div>
+                <div className="im-background">
+                    <div className="im-container flex-column">
+                        <div className="im-history flex-column-reverse">
+                            {
+                                reactive.messagesSlice.messages.map(message => {
+                                    return (
+                                        <div>
+                                            <MessageComponent constructor={{
+                                                message,
+                                                messagesSlice: reactive.messagesSlice
+                                            }}/>
+                                            <br/>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
     }
 }

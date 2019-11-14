@@ -2,7 +2,11 @@ import {createLogger} from "../../common/logger"
 import {MTProto} from "../index";
 import {longToBytes} from "../utils/bin";
 
-const Logger = createLogger("MessageProcessor")
+const Logger = createLogger("MessageProcessor", {
+    level: "warn",
+    disableLog: true
+})
+
 /**
  * TODO: We should rewrite this shit!
  */
@@ -17,8 +21,6 @@ export class MessageProcessor {
         this.rpcResultHandlers = {}
         this.rpcErrorHandlers = {}
         this.sentMessages = {}
-
-        this.logger = createLogger("MessageProcessor")
 
         this.handlers = {
             "msg_container": (message, messageID, sessionID) => this.processMessageContainer(message, messageID, sessionID),
@@ -56,7 +58,7 @@ export class MessageProcessor {
         if (this.handlers[message._]) {
             this.handlers[message._](message, messageID, sessionID)
         } else {
-            this.logger.warn('Unexpected message = ', message)
+            Logger.warn('Unexpected message = ', message)
         }
 
     }
@@ -89,13 +91,13 @@ export class MessageProcessor {
 
         if (message.result._ === "rpc_error") {
             const error = this.networker.processError(message.result)
-            this.logger.error('Rpc error', error)
+            Logger.error('Rpc error', error)
 
             this.rpcErrorHandlers[message.req_msg_id](error)
 
             delete this.rpcErrorHandlers[message.req_msg_id]
         } else {
-            this.logger.debug('Rpc response', message.result)
+            Logger.debug('Rpc response', message.result)
 
             this.rpcResultHandlers[message.req_msg_id](message.result)
 

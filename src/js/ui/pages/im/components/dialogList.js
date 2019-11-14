@@ -1,27 +1,46 @@
 import {AppTemporaryStorage} from "../../../../common/storage"
 import {MTProto} from "../../../../mtproto"
+import {FrameworkComponent} from "../../../framework/component"
 import {dialogPeerMap, TelegramDialogComponent} from "./dialog"
+import VDOM from "../../../framework/vdom"
 import {MessageListComponent} from "./messageList"
 
-const VDOM = require("../../../framework/vdom")
 
-export class DialogListComponent extends HTMLElement {
-    constructor() {
+export class DialogListComponent extends FrameworkComponent {
+    constructor(props = {}) {
         super();
-        this.classList.add("dialogs")
-        this.vNode = null
+
+        this.init()
     }
 
-    connectedCallback() {
-        this.initVNode().then(() => {
-            this.render()
-        })
+    h(context) {
+        if (!context.reactive.dialogsSlice) {
+            return <h1>Loading..</h1>
+        }
+
+        return (
+            <div>
+                {context.reactive.dialogsSlice.dialogs.map(dialog => {
+                    return <div><TelegramDialogComponent constructor={{
+                        dialogsSlice: context.reactive.dialogsSlice,
+                        dialog: dialog,
+                        dataset: {
+                            peer: `${dialog.peer._}.${dialog.peer[dialogPeerMap[dialog.peer._] + '_id']}`
+                        }
+                    }}/></div>
+                })}
+            </div>
+        )
     }
 
-    async initVNode() {
-        this.innerHTML = "loading.."
+    data() {
+        return {
+            dialogsSlice: false
+        }
+    }
 
-        return await MTProto.invokeMethod("messages.getDialogs", {
+    init() {
+        return MTProto.invokeMethod("messages.getDialogs", {
             flags: {},
             exclude_pinned: false,
             folder_id: "",
@@ -35,28 +54,13 @@ export class DialogListComponent extends HTMLElement {
         }).then(dialogsSlice => {
             AppTemporaryStorage.setItem("dialogsSlice", dialogsSlice)
 
-            this.vNode = dialogsSlice.dialogs.map(dialog => {
-                return <TelegramDialogComponent constructor={{
-                    dialogsSlice: dialogsSlice,
-                    dialog: dialog,
-                    dataset: {
-                        peer: `${dialog.peer._}.${dialog.peer[dialogPeerMap[dialog.peer._] + '_id']}`
-                    }
-                }}/>
-            })
+            this.reactive.dialogsSlice = dialogsSlice
 
+            // todo: fix this kostyl'
             const chatblock = document.getElementById("message_list")
-            chatblock.innerHTML = ""
-            chatblock.appendChild(new MessageListComponent({
+            chatblock.replaceWith(VDOM.render(<MessageListComponent constructor={{
                 dialogsSlice: dialogsSlice
-            }))
+            }}/>))
         })
-    }
-
-    render() {
-        this.innerHTML = ""
-        if (this.vNode) {
-            this.appendChild(VDOM.render(this.vNode))
-        }
     }
 }

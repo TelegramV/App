@@ -38,6 +38,7 @@ export class Logger {
         this.levelIndex = options.levelIndex || this.levels.find(v => v.name === String(this.level)).index
         this.showErrors = options.showErrors || true
         this.driver = options.driver || console
+        this.disableLog = false
     }
 
     makeLog(level = "log", text) {
@@ -55,10 +56,12 @@ export class Logger {
     }
 
     log(text, ...options) {
-        if (typeof text === "object") {
-            this.driver.log(this.makeLog("log"), text, ...options)
-        } else {
-            this.driver.log(this.makeLog("log", text), ...options)
+        if (!this.disableLog) {
+            if (typeof text === "object") {
+                this.driver.log(this.makeLog("log"), text, ...options)
+            } else {
+                this.driver.log(this.makeLog("log", text), ...options)
+            }
         }
     }
 

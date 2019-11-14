@@ -20,7 +20,7 @@ import AppCryptoManager from "../crypto/cryptoManager"
 
 
 const Logger = createLogger("methods.js", {
-    level: "log"
+    level: "warn"
 })
 
 const publicKeysHex = [

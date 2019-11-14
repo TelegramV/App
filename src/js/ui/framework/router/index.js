@@ -25,6 +25,8 @@ export class FrameworkRouter {
         this.mode = options.mode || "hash"
         this.hash = options.hash || "#/"
 
+        this.$mountElement = options.$mountElement || false
+
         this.mountId = options.mountId || "app"
         this.routes = options.routes || []
 
@@ -45,6 +47,7 @@ export class FrameworkRouter {
      * WARNING: for some reason do not pass component as an object of HTMLElement! I have to fix it later.
      *
      * @param path
+     * @param name
      * @param component
      */
     route(path, name, component) {
@@ -68,7 +71,11 @@ export class FrameworkRouter {
         this.queryChangeHandlers.push(handler)
     }
 
-    run() {
+    run($mountElement) {
+        if ($mountElement) {
+            this.$mountElement = $mountElement
+        }
+
         if (window.location.hash === "") {
             history.replaceState({}, "", this.hash);
         }
@@ -101,19 +108,8 @@ export class FrameworkRouter {
     }
 
     renderRoute(route) {
-        if (!this.routerView) {
-            this.routerView = document.getElementsByTagName("router-view").item(0)
-        }
-
-        if (!this.routerView) {
-            throw new Error("<router-view> wasn't found")
-        }
-
-        if (route.component.hasOwnProperty("render") && typeof route.component.render === "function") {
-            this.routerView.innerHTML = route.component.render()
-        } else {
-            this.routerView.innerHTML = ""
-            this.routerView.appendChild(VDOM.render(route.component))
+        if (route.component.hasOwnProperty("h") && typeof route.component.h === "function") {
+            this.$mountElement = VDOM.mount(VDOM.render(route.component.h()), this.$mountElement)
         }
 
         if (route.component.hasOwnProperty("mounted") && typeof route.component.mounted === "function") {
@@ -122,8 +118,6 @@ export class FrameworkRouter {
     }
 
     findRoute(path) {
-        console.log(path)
-
         return this.routes.find(route => {
             return match(path, route.path)
         })
@@ -140,10 +134,8 @@ export class FrameworkRouter {
         if (!foundRoute) {
             foundRoute = {
                 component: {
-                    render() {
-                        return `
-                            <h1>404</h1>
-                        `
+                    h() {
+                        return <h1>404</h1>
                     }
                 }
             }

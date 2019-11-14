@@ -21,9 +21,10 @@ import {MessageProcessor} from "./messageProcessor"
 import AppConfiguration from "../../configuration"
 
 import {mt_ws_set_processor, mt_ws_transport} from "./mt_ws_transport"
-import AppCryptoManager from "../crypto/cryptoManager"
 
-const Logger = createLogger("Networker")
+const Logger = createLogger("Networker", {
+    level: "warn"
+})
 
 export class Networker {
     constructor(auth) {

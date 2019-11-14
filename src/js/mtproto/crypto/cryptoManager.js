@@ -5,7 +5,9 @@ import {createLogger} from "../../common/logger"
 import {PqFinder} from "../connect/pqFinder"
 import {sha1HashSync} from "./sha"
 
-const Logger = createLogger("CryptoManager")
+const Logger = createLogger("CryptoManager", {
+    level: "warn"
+})
 
 class CryptoManager {
     constructor(props = {}) {

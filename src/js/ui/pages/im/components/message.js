@@ -2,7 +2,7 @@ import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers"
 import {AppTemporaryStorage} from "../../../../common/storage"
 import {findUserFromMessage, getPeerName} from "./dialog"
 import {FileAPI} from "../../../../api/fileAPI"
-import {VDOM} from "../../../framework/vdom"
+import {FrameworkComponent} from "../../../framework/component"
 
 function vMessageWithTextOnlyTemplate(data) {
     const classes = data.out ? "message message-self" : "message"
@@ -103,7 +103,7 @@ function vMessageWithFileTemplate(data) {
     )
 }
 
-export class MessageComponent extends HTMLElement {
+export class MessageComponent extends FrameworkComponent {
     constructor(options = {}) {
         super()
         if (!options.message) {
@@ -111,19 +111,21 @@ export class MessageComponent extends HTMLElement {
         }
         this.message = options.message
         this.messagesSlice = options.messagesSlice || AppTemporaryStorage.getItem("messages.messagesSlice")
-        this.dataset.messageId = options.message.id
+        this.messageId = options.message.id
 
-        this.vNode = null
+        this.init()
     }
 
-    connectedCallback() {
-        this.initVNode().then(() => {
-            this.render()
-        })
+    data() {
+        return {
+            message: {
+                type: "",
+                data: {}
+            }
+        }
     }
 
-    async initVNode() {
-        this.innerHTML = "loading.."
+    init() {
         const message = this.message
         const messageMessage = parseMessageEntities(message.message, message.entities)
 
@@ -132,12 +134,15 @@ export class MessageComponent extends HTMLElement {
 
         if (message.media) {
             if (message.media.photo) {
-                this.vNode = vMessageWithImageTemplate({
-                    userName: userName,
-                    message: messageMessage,
-                    imgSrc: null,
-                    out: message.pFlags.out
-                })
+                this.reactive.message = {
+                    type: "photo",
+                    data: {
+                        userName: userName,
+                        message: messageMessage,
+                        imgSrc: null,
+                        out: message.pFlags.out
+                    }
+                }
 
                 FileAPI.getFile(message.media.photo).then(file => {
                     let imgSrc = null
@@ -145,100 +150,98 @@ export class MessageComponent extends HTMLElement {
                         const blob = new Blob([file.bytes], {type: 'application/jpeg'});
                         imgSrc = URL.createObjectURL(blob)
 
-                        this.vNode = vMessageWithImageTemplate({
-                            userName: userName,
-                            message: messageMessage,
-                            imgSrc: imgSrc,
-                            out: message.pFlags.out
-
-                        })
-
-                        // re-render
-                        this.render()
+                        this.reactive.message.data.imgSrc = imgSrc
                     }
                 })
             } else if (message.media.document) {
-                FileAPI.getFile(message.media.document, "").then(response => {
-                    if (response._ === "upload.file") {
-                        let blob = new Blob([response.bytes], {type: message.media.document.mime_type});
-                        /*this.vNode = vMessageWithFileTemplate({
-                            userName: userName,
-                            message: messageMessage,
-                            fileURL: URL.createObjectURL(blob),
-                            fileName: message.media.document.mime_type,
-                                                out: message.pFlags.out
-
-                        })*/
-                        message.media.document.attributes.forEach(attribute => {
-                            if (attribute._ === "documentAttributeVideo") {
-                                const handler = attribute.pFlags.round_message ? vMessageWithRoundVideoTemplate : vMessageWithVideoTemplate
-                                this.vNode = handler({
-                                    userName: userName,
-                                    message: messageMessage,
-                                    video: {
-                                        width: attribute.w,
-                                        height: attribute.h,
-                                        url: URL.createObjectURL(blob),
-                                        type: message.media.document.mime_type,
-                                        duration: attribute.duration
-                                    },
-                                    out: message.pFlags.out
-
-                                })
-                            } else if (attribute._ === "documentAttributeSticker") {
-                                this.vNode = vMessageWithStickerTemplate({
-                                    userName: userName,
-                                    message: messageMessage,
-                                    imgSrc: URL.createObjectURL(blob),
-                                    out: message.pFlags.out
-
-                                })
-                            } else {
-                                console.log(attribute)
-                                /*blob = blob.slice(0, blob.size, "octec/stream")
-                                this.vNode = vMessageWithFileTemplate({
-                                    userName: userName,
-                                    message: messageMessage,
-                                    fileURL: URL.createObjectURL(blob),
-                                    fileName: message.media.document.mime_type,
-                                                        out: message.pFlags.out
-
-                                })*/
-                            }
-                        })
-                        /*this.vNode = vMessageWithRoundVideoTemplate({
-                            userName: userName,
-                            message: messageMessage,
-                            video: {
-                                width: "200",
-                                height: "200",
-                                url: URL.createObjectURL(blob),
-                                type: message.media.document.mime_type
-                            },
-                                                out: message.pFlags.out
-
-                        })*/
-
-                        // re-render
-                        this.render()
-                    }
-                })
+                // FileAPI.getFile(message.media.document, "").then(response => {
+                //     if (response._ === "upload.file") {
+                //         let blob = new Blob([response.bytes], {type: message.media.document.mime_type});
+                //         /*this.vNode = vMessageWithFileTemplate({
+                //             userName: userName,
+                //             message: messageMessage,
+                //             fileURL: URL.createObjectURL(blob),
+                //             fileName: message.media.document.mime_type,
+                //                                 out: message.pFlags.out
+                //
+                //         })*/
+                //         message.media.document.attributes.forEach(attribute => {
+                //             if (attribute._ === "documentAttributeVideo") {
+                //                 const handler = attribute.pFlags.round_message ? vMessageWithRoundVideoTemplate : vMessageWithVideoTemplate
+                //                 this.vNode = handler({
+                //                     userName: userName,
+                //                     message: messageMessage,
+                //                     video: {
+                //                         width: attribute.w,
+                //                         height: attribute.h,
+                //                         url: URL.createObjectURL(blob),
+                //                         type: message.media.document.mime_type,
+                //                         duration: attribute.duration
+                //                     },
+                //                     out: message.pFlags.out
+                //
+                //                 })
+                //             } else if (attribute._ === "documentAttributeSticker") {
+                //                 this.vNode = vMessageWithStickerTemplate({
+                //                     userName: userName,
+                //                     message: messageMessage,
+                //                     imgSrc: URL.createObjectURL(blob),
+                //                     out: message.pFlags.out
+                //
+                //                 })
+                //             } else {
+                //                 console.log(attribute)
+                //                 /*blob = blob.slice(0, blob.size, "octec/stream")
+                //                 this.vNode = vMessageWithFileTemplate({
+                //                     userName: userName,
+                //                     message: messageMessage,
+                //                     fileURL: URL.createObjectURL(blob),
+                //                     fileName: message.media.document.mime_type,
+                //                                         out: message.pFlags.out
+                //
+                //                 })*/
+                //             }
+                //         })
+                //         /*this.vNode = vMessageWithRoundVideoTemplate({
+                //             userName: userName,
+                //             message: messageMessage,
+                //             video: {
+                //                 width: "200",
+                //                 height: "200",
+                //                 url: URL.createObjectURL(blob),
+                //                 type: message.media.document.mime_type
+                //             },
+                //                                 out: message.pFlags.out
+                //
+                //         })*/
+                //
+                //         // re-render
+                //         this.render()
+                //     }
+                // })
             }
 
         } else {
-            this.vNode = vMessageWithTextOnlyTemplate({
-                userName: userName,
-                message: messageMessage,
-                out: message.pFlags.out
-
-            })
+            this.reactive.message = {
+                type: "text",
+                data: {
+                    userName: userName,
+                    message: messageMessage,
+                    out: message.pFlags.out
+                }
+            }
         }
     }
 
-    render() {
-        this.innerHTML = ""
-        if (this.vNode) {
-            this.appendChild(VDOM.render(this.vNode))
+    h({reactive}) {
+        if (!reactive.message.type) {
+            return "loading.."
+        }
+
+        if (reactive.message.type === "photo") {
+            return vMessageWithImageTemplate(reactive.message.data)
+        } else {
+            return vMessageWithTextOnlyTemplate(reactive.message.data)
         }
     }
 }

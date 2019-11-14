@@ -6,23 +6,20 @@ class Framework {
         this.Router = options.Router || new FrameworkRouter({
             Framework: this
         })
-        this.h = options.h || VDOM.h("router-view")
+        this.h = options.h || (() => <h1>...</h1>)
+        window.VDOM = VDOM
     }
 
     mount(selector) {
         const $mountElement = document.querySelector(selector)
 
-        const $node = typeof this.h === "function" ? VDOM.render(this.h()) : VDOM.render(this.h)
-        $mountElement.innerHTML = ""
-        $mountElement.appendChild($node)
-
         if (this.Router) {
-            this.Router.run()
+            this.Router.run($mountElement)
         }
     }
 
     registerComponent(tag, component, options = {}) {
-        window.customElements.define(tag, component, Object.assign({}, options))
+        // window.customElements.define(tag, component, Object.assign({}, options))
     }
 }
 

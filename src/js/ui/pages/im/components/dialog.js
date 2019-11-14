@@ -1,7 +1,7 @@
 import {AppTemporaryStorage} from "../../../../common/storage"
 import {FileAPI} from "../../../../api/fileAPI";
-
-const VDOM = require("../../../framework/vdom")
+import {FrameworkComponent} from "../../../framework/component"
+import {AppFramework} from "../../../framework/framework"
 
 export const dialogPeerMaps = {
     "peerUser": "users",
@@ -15,60 +15,40 @@ export const dialogPeerMap = {
     "peerChat": "chat",
 }
 
-function vNodeTemplate(data, openDialog) {
-    const notificationClasses = `dialog-notification${data.muted ? " muted" : ""}`
-    return (
-        <div class="dialog-item" onClick={openDialog}>
-            <img class="dialog-photo round-block"
-                 src={data.photo} />
-                <div class="dialog-info">
-                    <div class="dialog-peer">{data.peerName}</div>
-                    <div class="dialog-short-text"><span class="dialog-short-text-sender">{data.messageUsername.length > 0 ? data.messageUsername + ": " : ""}</span>{data.message}
-                    </div>
-                </div>
-                <div class="dialog-meta">
-                    <div class="dialog-time">{data.date}</div>
-                    <br/>
-                    {data.hasNotification || data.pinned ? (
-                        <div class={notificationClasses}>
-                            {data.pinned && !data.hasNotification ? <img class="full-center" src="/static/images/icons/pinnedchat_svg.svg"/> : ""}
-                            {data.hasNotification ? <div className="dialog-notification">{data.unread}</div> : ""}
-                        </div>
-                    ) : ""}
-                </div>
-        </div>
-    )
+export class TelegramDialogComponent extends FrameworkComponent {
+    constructor(props = {}) {
+        super()
+        this.dialog = props.dialog
+        this.dialogsSlice = props.dialogsSlice || AppTemporaryStorage.getItem("dialogsSlice")
 
-    /*<a href={`/#/?p=${data.peer._}.${data.peer[dialogPeerMap[data.peer._] + "_id"]}`}>
-        <i>
-            {data.pinned ? "[pinned] " : ""}
-        </i>
-        <b>
-            {data.peerName}
-        </b>
-        <i>
-            {data.messageUsername}
-        </i>
-        {data.message}
-    </a>*/
-}
-
-export class TelegramDialogComponent extends HTMLElement {
-    constructor(options = {}) {
-        super();
-        this.dialog = options.dialog
-        this.dialogsSlice = options.dialogsSlice || AppTemporaryStorage.getItem("dialogsSlice")
-
-        this.vNode = null
+        this.init()
     }
 
-    connectedCallback() {
-        this.initVNode().then(() => {
-            this.render()
+
+    // yes, kostyl, but idk another way now
+    openDialog(peer) {
+        return () => AppFramework.Router.push("/", {
+            queryParams: {
+                p: `${peer._}.${peer[dialogPeerMap[peer._] + "_id"]}`
+            }
         })
     }
 
-    async initVNode() {
+    // default value to `this.reactive`
+    data() {
+        return {
+            message: {
+                pinned: false,
+                peerName: "undefined",
+                messageUsername: "undefined",
+                message: null,
+                peer: null,
+                photo: ""
+            }
+        }
+    }
+
+    init() {
         const dialogsSlice = this.dialogsSlice
         const dialog = this.dialog
 
@@ -84,13 +64,13 @@ export class TelegramDialogComponent extends HTMLElement {
         const submsg = message.message ? (message.message.length > 64 ? (message.message.substring(0, 64) + "...") : message.message) : ""
         const date = new Date(message.date * 1000)
 
-        const data =  {
+        this.reactive.data = {
             pinned: dialogPinned,
             peerName,
             messageUsername,
             message: submsg,
             peer: dialog.peer,
-            photo: "./icons/admin_3x.png",
+            photo: "/static/images/icons/admin_3x.png",
             hasNotification: dialog.unread_count > 0,
             unread: dialog.unread_mentions_count > 0 ? "@" : dialog.unread_count.toString(),
             muted: dialog.notify_settings.mute_until,
@@ -100,29 +80,52 @@ export class TelegramDialogComponent extends HTMLElement {
                 hour12: false
             })
         }
-        const onClick = d => {
-            // TODO ask @kohutd how to open it properly
-            window.location = `/#/?p=${data.peer._}.${data.peer[dialogPeerMap[data.peer._] + "_id"]}`
-        }
 
-        this.vNode = vNodeTemplate(data, onClick)
-
-        if(peer.photo) {
+        if (peer.photo) {
             let a = peer.photo.photo_small
-            FileAPI.getPeerPhoto(a, peer, false).then(response => {
-                const blob = new Blob([response.bytes], { type: 'application/jpeg' });
-                data.photo = URL.createObjectURL(blob)
-                this.vNode = vNodeTemplate(data, onClick)
-                this.render()
-            })
+            try {
+                FileAPI.getPeerPhoto(a, peer, false).then(response => {
+                    const blob = new Blob([response.bytes], {type: 'application/jpeg'});
+                    this.reactive.data.photo = URL.createObjectURL(blob)
+                }).catch(e => {
+                    //
+                })
+            } catch (e) {
+                //
+            }
         }
     }
 
-    render() {
-        this.innerHTML = ""
-        if (this.vNode) {
-            this.appendChild(VDOM.render(this.vNode))
+    h({reactive}) {
+        if (!reactive.data) {
+            return <div>...</div>
         }
+
+        const notificationClasses = `dialog-notification${reactive.data.muted ? " muted" : ""}`
+        return (
+            <div className="dialog-item" onClick={this.openDialog(reactive.data.peer)}>
+                <img className="dialog-photo round-block"
+                     src={reactive.data.photo}/>
+                <div className="dialog-info">
+                    <div className="dialog-peer">{reactive.data.peerName}</div>
+                    <div className="dialog-short-text"><span
+                        className="dialog-short-text-sender">{reactive.data.messageUsername.length > 0 ? reactive.data.messageUsername + ": " : ""}</span>{this.reactive.data.message}
+                    </div>
+                </div>
+                <div className="dialog-meta">
+                    <div className="dialog-time">{reactive.data.date}</div>
+                    <br/>
+                    {reactive.data.hasNotification || reactive.data.pinned ? (
+                        <div className={notificationClasses}>
+                            {reactive.data.pinned && !reactive.data.hasNotification ?
+                                <img className="full-center" src="/static/images/icons/pinnedchat_svg.svg"/> : ""}
+                            {reactive.data.hasNotification ?
+                                <div className="dialog-notification">{reactive.data.unread}</div> : ""}
+                        </div>
+                    ) : ""}
+                </div>
+            </div>
+        )
     }
 }
 

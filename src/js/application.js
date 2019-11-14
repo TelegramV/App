@@ -4,15 +4,9 @@ import {createNonce} from "./mtproto/utils/bin"
 import {AppPermanentStorage} from "./common/storage"
 import {LoginPage} from "./ui/pages/login"
 import {IMPage} from "./ui/pages/im"
-import {TelegramDialogComponent} from "./ui/pages/im/components/dialog"
 import {AppFramework} from "./ui/framework/framework"
-import {DialogListComponent} from "./ui/pages/im/components/dialogList"
 
 import "../sass/application.scss"
-import {MessageListComponent} from "./ui/pages/im/components/messageList"
-import {MessageComponent} from "./ui/pages/im/components/message"
-
-const VDOM = require("./ui/framework/vdom")
 
 const authContext = {
     dcID: 2,
@@ -55,22 +49,15 @@ function password() {
 }
 
 function start() {
-    AppFramework.registerComponent("login-page", LoginPage)
-    AppFramework.registerComponent("im-page", IMPage)
-    AppFramework.registerComponent("dialog-list-component", DialogListComponent)
-    AppFramework.registerComponent("telegram-dialog-component", TelegramDialogComponent)
-    AppFramework.registerComponent("message-list-component", MessageListComponent)
-    AppFramework.registerComponent("message-component", MessageComponent)
-
-    AppFramework.Router.route("login", "login", {
-        render() {
-            return `<login-page></login-page>`
+    AppFramework.Router.route("/login", "login", {
+        h() {
+            return <LoginPage/>
         }
     })
 
-    AppFramework.Router.route("/","main", {
-        render() {
-            return `<im-page></im-page>`
+    AppFramework.Router.route("/", "main", {
+        h() {
+            return <IMPage/>
         }
     })
 
@@ -103,5 +90,5 @@ function start() {
 }
 
 MTProto.connect(authContext, function () {
-    start();
+    start()
 }, this)
