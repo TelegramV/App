@@ -16,41 +16,26 @@ export const dialogPeerMap = {
 }
 
 function vNodeTemplate(data, openDialog) {
-    const notificationClasses = `dialog-notification${data.muted ? " muted" : ""}`
+    let personClasses = "person rp "
+    if(data.online) personClasses += "online "
+    if(data.unread !== "") personClasses += "unread "
+    if(data.hasNotification) personClasses += "muted "
     return (
-        <div class="dialog-item" onClick={openDialog}>
-            <img class="dialog-photo round-block"
-                 src={data.photo} />
-                <div class="dialog-info">
-                    <div class="dialog-peer">{data.peerName}</div>
-                    <div class="dialog-short-text"><span class="dialog-short-text-sender">{data.messageUsername.length > 0 ? data.messageUsername + ": " : ""}</span>{data.message}
-                    </div>
+        <div class={personClasses} onClick={openDialog}>
+            <img class="avatar" src={data.photo} alt="avatar"/>
+            <div class="content">
+                <div class="top">
+                    <div class="title">{data.peerName}</div>
+                    <div class="status tgico"></div>
+                    <div class="time">{data.date}</div>
                 </div>
-                <div class="dialog-meta">
-                    <div class="dialog-time">{data.date}</div>
-                    <br/>
-                    {data.hasNotification || data.pinned ? (
-                        <div class={notificationClasses}>
-                            {data.pinned && !data.hasNotification ? <img class="full-center" src="/static/images/icons/pinnedchat_svg.svg"/> : ""}
-                            {data.hasNotification ? <div className="dialog-notification">{data.unread}</div> : ""}
-                        </div>
-                    ) : ""}
+                <div class="bottom">
+                    <div class="message">{data.messageUsername.length > 0 ? data.messageUsername + ": " : "."}</div>
+                    <div class="badge tgico">{data.unread}</div>
                 </div>
+            </div>
         </div>
     )
-
-    /*<a href={`/#/?p=${data.peer._}.${data.peer[dialogPeerMap[data.peer._] + "_id"]}`}>
-        <i>
-            {data.pinned ? "[pinned] " : ""}
-        </i>
-        <b>
-            {data.peerName}
-        </b>
-        <i>
-            {data.messageUsername}
-        </i>
-        {data.message}
-    </a>*/
 }
 
 export class TelegramDialogComponent extends HTMLElement {
@@ -92,7 +77,7 @@ export class TelegramDialogComponent extends HTMLElement {
             peer: dialog.peer,
             photo: "./icons/admin_3x.png",
             hasNotification: dialog.unread_count > 0,
-            unread: dialog.unread_mentions_count > 0 ? "@" : dialog.unread_count.toString(),
+            unread: dialog.unread_mentions_count > 0 ? "@" : (dialog.unread_count > 0 ? dialog.unread_count.toString() : ""),
             muted: dialog.notify_settings.mute_until,
             date: date.toLocaleTimeString('en', {
                 hour: '2-digit',

@@ -4,63 +4,73 @@ import {findUserFromMessage, getPeerName} from "./dialog"
 import {FileAPI} from "../../../../api/fileAPI"
 import {VDOM} from "../../../framework/vdom"
 
-function vMessageWithTextOnlyTemplate(data) {
-    const classes = data.out ? "message message-self" : "message"
-    return (
-        <div class={classes}>
-            <span>
-                <i>{data.userName}</i>
-            </span>
+function vTimeTemplate(data, bg = false) {
+    let classes = "inner tgico " + (bg ? "bg" : "")
+    let classes2 = "time " + (bg ? "bg" : "")
 
-            <div htmlChild="true">
-                {data.message}
-            </div>
+    return (
+        <span class={classes2}>
+            <div class={classes}>{data.time}</div>
+        </span>
+    )
+}
+
+function vGetClass(data, transparent = false) {
+    let classes = "bubble"
+    if (data.read) classes += " read"
+    if (transparent) classes += " transparent"
+    return classes
+}
+
+function vMessageTemplate(data, inside) {
+    return (
+        <div class={data.out}>
+            {inside}
         </div>
     )
+}
+
+function vMessageWithTextOnlyTemplate(data) {
+    return vMessageTemplate(data, (
+        <div class={vGetClass(data)}>
+            <div class="message">
+                {data.message}
+                {vTimeTemplate(data)}
+            </div>
+        </div>
+    ))
+
 }
 
 function vMessageWithImageTemplate(data) {
-    const classes = data.out ? "message message-self" : "message"
-    return (
-        <div class={classes}>
-            <span>
-                <i>{data.userName}</i>
-            </span>
-
-            <div htmlChild="true">
+    return vMessageTemplate(data, (
+        <div class={vGetClass(data)}>
+            <img class="attachment" src={data.imgSrc}></img>
+            <div class="message">
                 {data.message}
+                {vTimeTemplate(data)}
             </div>
-
-            <img src={data.imgSrc} alt="fuck this"/>
         </div>
-    )
+    ))
 }
 
 function vMessageWithStickerTemplate(data) {
-    const classes = data.out ? "message with-sticker message-self" : "message with-sticker"
-    return (
-        <div class={classes}>
-            <div className="message-sticker">
-                <img src={data.imgSrc} alt="sticker"/>
-            </div>
-            <div className="message-meta absolute"><span className="message-time">22:59</span>
-            </div>
+    return vMessageTemplate(data, (
+        <div class={vGetClass(data, true)}>
+            <img class="sticker" src={data.imgSrc}></img>
+            {vTimeTemplate(data, true)}
         </div>
-    )
+    ))
 }
 
 
 function vMessageWithRoundVideoTemplate(data) {
-    const classes = data.out ? "message message-self" : "message"
     return (
-        <div class={classes}>
-            <span>
-                <i>{data.userName}</i>
-            </span>
-
+        <div class={vGetClass(data, true)}>
             <video width={data.video.width} height={data.video.height} style="border-radius: 100%;">
                 <source type={data.video.type} src={data.video.url}/>
             </video>
+            {vTimeTemplate(data, true)}
         </div>
     )
 }
@@ -69,9 +79,9 @@ function vMessageWithVideoTemplate(data) {
     const classes = data.out ? "message message-self" : "message"
     return (
         <div class={classes}>
-            <span>
-                <i>{data.userName}</i>
-            </span>
+<span>
+<i>{data.userName}</i>
+</span>
 
             <div htmlChild="true">
                 {data.message}
@@ -88,9 +98,9 @@ function vMessageWithFileTemplate(data) {
     const classes = data.out ? "message message-self" : "message"
     return (
         <div class={classes}>
-            <span>
-                <i>{data.userName}</i>
-            </span>
+<span>
+<i>{data.userName}</i>
+</span>
 
             <div htmlChild="true">
                 {data.message}
@@ -129,31 +139,36 @@ export class MessageComponent extends HTMLElement {
 
         const user = findUserFromMessage(message, this.messagesSlice)
         const userName = getPeerName(user)
+        const time = new Date(message.date * 1000)
+
+
+        const timeString = time.toLocaleTimeString('en', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        })
+        console.log(message)
+
+        const data = {
+            userName: userName,
+            message: messageMessage,
+            out: message.pFlags.out ? "out" : "in",
+            time: timeString
+        }
 
         if (message.media) {
             if (message.media.photo) {
-                this.vNode = vMessageWithImageTemplate({
-                    userName: userName,
-                    message: messageMessage,
-                    imgSrc: null,
-                    out: message.pFlags.out
-                })
+                data.imgSrc = null
+                this.vNode = vMessageWithImageTemplate(data)
 
-                FileAPI.getFile(message.media.photo).then(file => {
-                    let imgSrc = null
+                FileAPI.getFile(message.media.photo, "m").then(file => {
                     if (file._ === "upload.file") {
                         const blob = new Blob([file.bytes], {type: 'application/jpeg'});
-                        imgSrc = URL.createObjectURL(blob)
+                        data.imgSrc = URL.createObjectURL(blob)
 
-                        this.vNode = vMessageWithImageTemplate({
-                            userName: userName,
-                            message: messageMessage,
-                            imgSrc: imgSrc,
-                            out: message.pFlags.out
+                        this.vNode = vMessageWithImageTemplate(data)
 
-                        })
-
-                        // re-render
+// re-render
                         this.render()
                     }
                 })
@@ -162,76 +177,61 @@ export class MessageComponent extends HTMLElement {
                     if (response._ === "upload.file") {
                         let blob = new Blob([response.bytes], {type: message.media.document.mime_type});
                         /*this.vNode = vMessageWithFileTemplate({
-                            userName: userName,
-                            message: messageMessage,
-                            fileURL: URL.createObjectURL(blob),
-                            fileName: message.media.document.mime_type,
-                                                out: message.pFlags.out
+                        userName: userName,
+                        message: messageMessage,
+                        fileURL: URL.createObjectURL(blob),
+                        fileName: message.media.document.mime_type,
+                        out: message.pFlags.out
 
                         })*/
                         message.media.document.attributes.forEach(attribute => {
                             if (attribute._ === "documentAttributeVideo") {
                                 const handler = attribute.pFlags.round_message ? vMessageWithRoundVideoTemplate : vMessageWithVideoTemplate
-                                this.vNode = handler({
-                                    userName: userName,
-                                    message: messageMessage,
-                                    video: {
-                                        width: attribute.w,
-                                        height: attribute.h,
-                                        url: URL.createObjectURL(blob),
-                                        type: message.media.document.mime_type,
-                                        duration: attribute.duration
-                                    },
-                                    out: message.pFlags.out
-
-                                })
+                                data.video = {
+                                    width: attribute.w,
+                                    height: attribute.h,
+                                    url: URL.createObjectURL(blob),
+                                    type: message.media.document.mime_type,
+                                    duration: attribute.duration
+                                }
+                                this.vNode = handler(data)
                             } else if (attribute._ === "documentAttributeSticker") {
-                                this.vNode = vMessageWithStickerTemplate({
-                                    userName: userName,
-                                    message: messageMessage,
-                                    imgSrc: URL.createObjectURL(blob),
-                                    out: message.pFlags.out
-
-                                })
+                                data.imgSrc = URL.createObjectURL(blob)
+                                this.vNode = vMessageWithStickerTemplate(data)
                             } else {
                                 console.log(attribute)
                                 /*blob = blob.slice(0, blob.size, "octec/stream")
                                 this.vNode = vMessageWithFileTemplate({
-                                    userName: userName,
-                                    message: messageMessage,
-                                    fileURL: URL.createObjectURL(blob),
-                                    fileName: message.media.document.mime_type,
-                                                        out: message.pFlags.out
+                                userName: userName,
+                                message: messageMessage,
+                                fileURL: URL.createObjectURL(blob),
+                                fileName: message.media.document.mime_type,
+                                out: message.pFlags.out
 
                                 })*/
                             }
                         })
                         /*this.vNode = vMessageWithRoundVideoTemplate({
-                            userName: userName,
-                            message: messageMessage,
-                            video: {
-                                width: "200",
-                                height: "200",
-                                url: URL.createObjectURL(blob),
-                                type: message.media.document.mime_type
-                            },
-                                                out: message.pFlags.out
+                        userName: userName,
+                        message: messageMessage,
+                        video: {
+                        width: "200",
+                        height: "200",
+                        url: URL.createObjectURL(blob),
+                        type: message.media.document.mime_type
+                        },
+                        out: message.pFlags.out
 
                         })*/
 
-                        // re-render
+// re-render
                         this.render()
                     }
                 })
             }
 
         } else {
-            this.vNode = vMessageWithTextOnlyTemplate({
-                userName: userName,
-                message: messageMessage,
-                out: message.pFlags.out
-
-            })
+            this.vNode = vMessageWithTextOnlyTemplate(data)
         }
     }
 

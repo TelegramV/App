@@ -1,0 +1,329 @@
+#message_list {
+  width: 100%;
+}
+
+#chat {
+  display: flex;
+  // padding: 200px;
+  width: 100%;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  flex-direction: column;
+
+  #topbar {
+    width: 100%;
+    background-color: #fff;
+    padding: 0 9px;
+    box-sizing: border-box;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.07);
+
+    & > * {
+      margin: 0 2px;
+    }
+
+    .chat-info {
+      flex-grow: 1;
+    }
+
+    .content {
+      padding-left: 16px;
+    }
+
+    .person {
+      padding: 8px;
+
+      &:hover {
+        background-color: transparent;
+      }
+
+      .avatar {
+        width: 44px;
+        height: 44px;
+      }
+
+      .bottom {
+        font-size: 14px;
+        line-height: 18px;
+      }
+    }
+  }
+
+  #bubbles {
+    overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    width: 100%;
+
+    #bubbles-inner {
+      max-width: 700px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 1;
+      padding: 9px;
+      margin: 0 auto;
+      box-sizing: border-box;
+
+      & > * {
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 1;
+        padding: 9px;
+
+        & > * > * {
+          display: flex;
+          padding: 5px 0;
+        }
+      }
+
+      //& > * {
+      //	display: flex;
+      //	padding: 5px 0;
+      //}
+    }
+
+    .service {
+      justify-content: center;
+
+      .service-msg {
+        color: #fff;
+        background-color: rgba(#000, 0.22);
+        font-weight: 500;
+        padding: 0 8px;
+        line-height: 24px;
+        font-size: 15px;
+        border-radius: 12px;
+        user-select: none;
+      }
+    }
+
+    .bubble {
+      max-width: 480px;
+      border-radius: 12px;
+      box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.15);
+      position: relative;
+      overflow: hidden;
+
+      .attachment {
+        width: 100%;
+        height: auto;
+        background-size: cover;
+      }
+
+      .sticker {
+        height: 300px;
+        background-size: cover;
+      }
+
+      .box {
+        font-size: 14px;
+        margin: 5px;
+        padding: 5px;
+        margin-bottom: -5px;
+        border-radius: 4px;
+        transition: anim(background-color);
+        user-select: none;
+
+        &:hover {
+          cursor: pointer;
+        }
+
+        &.web {
+          margin-top: -5px;
+          margin-bottom: 5px;
+          max-width: 320px;
+
+          .quote {
+            // box-sizing: border-box;
+          }
+
+          .preview {
+            height: 100px;
+            border-radius: 4px;
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 6px;
+          }
+
+          .title {
+            line-height: 1.4;
+            font-weight: 500;
+          }
+
+          .text {
+            line-height: 1.2;
+          }
+        }
+
+        .quote {
+          padding-left: 8px;
+        }
+
+        .name {
+          font-weight: 500;
+          padding-bottom: 4px;
+        }
+      }
+
+      .message {
+        padding: 9px;
+      }
+
+
+      .time {
+        float: right;
+        display: inline-block;
+        font-size: $time-size;
+        user-select: none;
+        height: 20px;
+
+        .inner {
+          position: absolute;
+          bottom: 0;
+          right: 0;
+
+          &.bg {
+            color: white;
+            background-color: rgba(184, 188, 190, 0.2);
+            border-radius: 40px;
+			  text-align: center;
+          }
+        }
+
+
+		  &.bg {
+			  width: 0 !important;
+		  }
+      }
+    }
+
+    .bubble + .bubble {
+      margin-top: 5px;
+    }
+
+    .in,
+    .out {
+      flex-direction: column;
+    }
+
+    .in {
+      align-items: flex-start;
+
+      a {
+        color: $darkblue;
+      }
+
+      .box:hover {
+        background-color: $light;
+      }
+
+      .quote {
+        border-left: 2px $darkblue solid;
+
+        .name {
+          color: $darkblue;
+        }
+      }
+
+      .time {
+        color: rgba($darkgrey, 0.6);
+        width: 33px;
+
+        .inner {
+          padding: 6px 8px;
+        }
+      }
+
+      .bubble {
+        background-color: #ffffff;
+        border-radius: 6px 12px 12px 6px;
+      }
+
+      .bubble:first-child {
+        border-radius: 12px 12px 12px 6px;
+      }
+
+      .bubble:last-child {
+        border-radius: 6px 12px 12px 0px;
+      }
+
+      .bubble:first-child:last-child {
+        border-radius: 12px 12px 12px 0px;
+      }
+    }
+
+    .out {
+      align-items: flex-end;
+
+      .box:hover {
+        background-color: rgba($green, 0.12);
+      }
+
+      .quote {
+        border-left: 2px $darkgreen solid;
+
+        .name {
+          color: $darkgreen;
+        }
+      }
+
+      .time {
+        color: $darkgreen;
+        width: 48px;
+        display: inline-block;
+
+        .inner {
+          padding: 6px 5px;
+        }
+      }
+
+      .bubble {
+        .time .tgico:after {
+          font-size: 18px;
+          line-height: 12px;
+          vertical-align: top;
+        }
+      }
+
+      .bubble.read {
+        .time .tgico:after {
+          content: $tgico-check-read;
+        }
+      }
+
+      .bubble.sent {
+        .time .tgico:after {
+          content: $tgico-check-sent;
+        }
+      }
+
+      .bubble {
+        background-color: #eeffde;
+        border-radius: 12px 6px 6px 12px;
+      }
+
+      .bubble:first-child {
+        border-radius: 12px 12px 6px 12px;
+      }
+
+      .bubble:last-child {
+        border-radius: 12px 6px 0px 12px;
+      }
+
+      .bubble:first-child:last-child {
+        border-radius: 12px 12px 0px 12px;
+      }
+    }
+  }
+}
+
+
+.transparent {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}

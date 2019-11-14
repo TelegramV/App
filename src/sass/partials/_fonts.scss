@@ -1,0 +1,486 @@
+@font-face {
+  font-family: "#{$tgico-font-family}";
+  src: url("#{$tgico-font-path}/#{$tgico-font-family}.eot?owpifk");
+  src: url("#{$tgico-font-path}/#{$tgico-font-family}.eot?owpifk#iefix")
+      format("embedded-opentype"),
+    url("#{$tgico-font-path}/#{$tgico-font-family}.ttf?owpifk")
+      format("truetype"),
+    url("#{$tgico-font-path}/#{$tgico-font-family}.woff?owpifk") format("woff"),
+    url("#{$tgico-font-path}/#{$tgico-font-family}.svg?owpifk##{$tgico-font-family}")
+      format("svg");
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="tgico-"],
+.tgico:before,
+.tgico:after,
+[class*=" tgico-"] {
+  font-family: "#{$tgico-font-family}" !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  //line-height: 1;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.tgico-check-sent {
+  &:before {
+    content: $tgico-check-sent;
+  }
+}
+.tgico-check-read {
+  &:before {
+    content: $tgico-check-read;
+  }
+}
+.tgico-activesessions {
+  &:before {
+    content: $tgico-activesessions;
+  }
+}
+.tgico-add {
+  &:before {
+    content: $tgico-add;
+  }
+}
+.tgico-addmember {
+  &:before {
+    content: $tgico-addmember;
+  }
+}
+.tgico-adduser {
+  &:before {
+    content: $tgico-adduser;
+  }
+}
+.tgico-admin {
+  &:before {
+    content: $tgico-admin;
+  }
+}
+.tgico-animals {
+  &:before {
+    content: $tgico-animals;
+  }
+}
+.tgico-archive {
+  &:before {
+    content: $tgico-archive;
+  }
+}
+.tgico-attach {
+  &:before {
+    content: $tgico-attach;
+  }
+}
+.tgico-avatar_archivedchats {
+  &:before {
+    content: $tgico-avatar_archivedchats;
+  }
+}
+.tgico-avatar_deletedaccount {
+  &:before {
+    content: $tgico-avatar_deletedaccount;
+  }
+}
+.tgico-avatar_savedmessages {
+  &:before {
+    content: $tgico-avatar_savedmessages;
+  }
+}
+.tgico-back {
+  &:before {
+    content: $tgico-back;
+  }
+}
+.tgico-camera {
+  &:before {
+    content: $tgico-camera;
+  }
+}
+.tgico-cameraadd {
+  &:before {
+    content: $tgico-cameraadd;
+  }
+}
+.tgico-car {
+  &:before {
+    content: $tgico-car;
+  }
+}
+.tgico-channel {
+  &:before {
+    content: $tgico-channel;
+  }
+}
+.tgico-channelviews {
+  &:before {
+    content: $tgico-channelviews;
+  }
+}
+.tgico-chatsplaceholder {
+  &:before {
+    content: $tgico-chatsplaceholder;
+  }
+}
+.tgico-check {
+  &:before {
+    content: $tgico-check;
+  }
+}
+.tgico-checkbox {
+  &:before {
+    content: $tgico-checkbox;
+  }
+}
+.tgico-checkboxblock {
+  &:before {
+    content: $tgico-checkboxblock;
+  }
+}
+.tgico-checkboxempty {
+  &:before {
+    content: $tgico-checkboxempty;
+  }
+}
+.tgico-checkboxon {
+  &:before {
+    content: $tgico-checkboxon;
+  }
+}
+.tgico-close {
+  &:before {
+    content: $tgico-close;
+  }
+}
+.tgico-copy {
+  &:before {
+    content: $tgico-copy;
+  }
+}
+.tgico-data {
+  &:before {
+    content: $tgico-data;
+  }
+}
+.tgico-delete_filled {
+  &:before {
+    content: $tgico-delete_filled;
+  }
+}
+.tgico-delete {
+  &:before {
+    content: $tgico-delete;
+  }
+}
+.tgico-deleteuser {
+  &:before {
+    content: $tgico-deleteuser;
+  }
+}
+.tgico-document {
+  &:before {
+    content: $tgico-document;
+  }
+}
+.tgico-down {
+  &:before {
+    content: $tgico-down;
+  }
+}
+.tgico-download {
+  &:before {
+    content: $tgico-download;
+  }
+}
+.tgico-eats {
+  &:before {
+    content: $tgico-eats;
+  }
+}
+.tgico-edit {
+  &:before {
+    content: $tgico-edit;
+  }
+}
+.tgico-eye1 {
+  &:before {
+    content: $tgico-eye1;
+  }
+}
+.tgico-eye2 {
+  &:before {
+    content: $tgico-eye2;
+  }
+}
+.tgico-flag {
+  &:before {
+    content: $tgico-flag;
+  }
+}
+.tgico-forward {
+  &:before {
+    content: $tgico-forward;
+  }
+}
+.tgico-fullscreen {
+  &:before {
+    content: $tgico-fullscreen;
+  }
+}
+.tgico-group {
+  &:before {
+    content: $tgico-group;
+  }
+}
+.tgico-help {
+  &:before {
+    content: $tgico-help;
+  }
+}
+.tgico-info {
+  &:before {
+    content: $tgico-info;
+  }
+}
+.tgico-lamp {
+  &:before {
+    content: $tgico-lamp;
+  }
+}
+.tgico-language {
+  &:before {
+    content: $tgico-language;
+  }
+}
+.tgico-largepause {
+  &:before {
+    content: $tgico-largepause;
+  }
+}
+.tgico-largeplay {
+  &:before {
+    content: $tgico-largeplay;
+  }
+}
+.tgico-location {
+  &:before {
+    content: $tgico-location;
+  }
+}
+.tgico-lock {
+  &:before {
+    content: $tgico-lock;
+  }
+}
+.tgico-logout {
+  &:before {
+    content: $tgico-logout;
+  }
+}
+.tgico-menu {
+  &:before {
+    content: $tgico-menu;
+  }
+}
+.tgico-message {
+  &:before {
+    content: $tgico-message;
+  }
+}
+.tgico-microphone {
+  &:before {
+    content: $tgico-microphone;
+  }
+}
+.tgico-more {
+  &:before {
+    content: $tgico-more;
+  }
+}
+.tgico-mute {
+  &:before {
+    content: $tgico-mute;
+  }
+}
+.tgico-newchannel {
+  &:before {
+    content: $tgico-newchannel;
+  }
+}
+.tgico-newchat_filled {
+  &:before {
+    content: $tgico-newchat_filled;
+  }
+}
+.tgico-newgroup {
+  &:before {
+    content: $tgico-newgroup;
+  }
+}
+.tgico-newprivate {
+  &:before {
+    content: $tgico-newprivate;
+  }
+}
+.tgico-next {
+  &:before {
+    content: $tgico-next;
+  }
+}
+.tgico-pause {
+  &:before {
+    content: $tgico-pause;
+  }
+}
+.tgico-permissions {
+  &:before {
+    content: $tgico-permissions;
+  }
+}
+.tgico-phone {
+  &:before {
+    content: $tgico-phone;
+  }
+}
+.tgico-photo {
+  &:before {
+    content: $tgico-photo;
+  }
+}
+.tgico-pin {
+  &:before {
+    content: $tgico-pin;
+  }
+}
+.tgico-pinnedchat {
+  &:before {
+    content: $tgico-pinnedchat;
+  }
+}
+.tgico-play {
+  &:before {
+    content: $tgico-play;
+  }
+}
+.tgico-radiooff {
+  &:before {
+    content: $tgico-radiooff;
+  }
+}
+.tgico-radioon {
+  &:before {
+    content: $tgico-radioon;
+  }
+}
+.tgico-recent {
+  &:before {
+    content: $tgico-recent;
+  }
+}
+.tgico-reply {
+  &:before {
+    content: $tgico-reply;
+  }
+}
+.tgico-savedmessages {
+  &:before {
+    content: $tgico-savedmessages;
+  }
+}
+.tgico-search {
+  &:before {
+    content: $tgico-search;
+  }
+}
+.tgico-send {
+  &:before {
+    content: $tgico-send;
+  }
+}
+.tgico-send2 {
+  &:before {
+    content: $tgico-send2;
+  }
+}
+.tgico-sending {
+  &:before {
+    content: $tgico-sending;
+  }
+}
+.tgico-sendingerror {
+  &:before {
+    content: $tgico-sendingerror;
+  }
+}
+.tgico-settings {
+  &:before {
+    content: $tgico-settings;
+  }
+}
+.tgico-smallscreen {
+  &:before {
+    content: $tgico-smallscreen;
+  }
+}
+.tgico-smile {
+  &:before {
+    content: $tgico-smile;
+  }
+}
+.tgico-sport {
+  &:before {
+    content: $tgico-sport;
+  }
+}
+.tgico-stop {
+  &:before {
+    content: $tgico-stop;
+  }
+}
+.tgico-unarchive {
+  &:before {
+    content: $tgico-unarchive;
+  }
+}
+.tgico-unlock {
+  &:before {
+    content: $tgico-unlock;
+  }
+}
+.tgico-unmute {
+  &:before {
+    content: $tgico-unmute;
+  }
+}
+.tgico-unpin {
+  &:before {
+    content: $tgico-unpin;
+  }
+}
+.tgico-unreadg {
+  &:before {
+    content: $tgico-unreadg;
+  }
+}
+.tgico-up {
+  &:before {
+    content: $tgico-up;
+  }
+}
+.tgico-user {
+  &:before {
+    content: $tgico-user;
+  }
+}
+.tgico-username {
+  &:before {
+    content: $tgico-username;
+  }
+}

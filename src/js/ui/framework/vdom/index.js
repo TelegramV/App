@@ -75,7 +75,7 @@ export function jsx(tagName, attributes, ...children) {
 export function render(vNode) {
 
     if (Array.isArray(vNode)) {
-        const $el = document.createElement("div")
+        const $el = document.createElement("array")
         vNode.forEach(vNodeIn => {
             $el.appendChild(render(vNodeIn))
         })

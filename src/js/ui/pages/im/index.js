@@ -13,23 +13,25 @@ export class IMPage extends HTMLElement {
         }
 
         this.vNode = (
-            <div id="container" class="grid chats-grid">
-                <div class="dialog-container">
-                    <div class="dialog-header">
-                        <img class="menu-button" src="/static/images/icons/menu_svg.svg"/>
-                        <div class="search-box">
-                            <input class="default-input search-input" type="text" name="search"
-                                   placeholder="Search"/></div>
-                    </div>
-                    <div class="dialog-list-panel">
-                        <div class="dialog-list">
-                            <DialogListComponent/>
+            <div class="app">
+                <div class="chatlist">
+                    <div class="toolbar">
+                        <div class="btn-icon rp rps tgico-menu"></div>
+                        <div class="search">
+                            <div class="input-search">
+                                <input type="text" placeholder="Search"/><span class="tgico tgico-search"></span>
+                            </div>
                         </div>
                     </div>
-
+                    <div class="list pinned">
+                    </div>
+                    <div class="list">
+                        <DialogListComponent/>
+                    </div>
+                    {/*// TODO костыли*/}
                 </div>
                 <div id="message_list"/>
-                {/*// TODO костыли*/}
+
             </div>
         )
     }

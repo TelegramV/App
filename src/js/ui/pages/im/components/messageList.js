@@ -70,44 +70,39 @@ export class MessageListComponent extends HTMLElement {
             AppTemporaryStorage.setItem("messages.messagesSlice", response)
 
             this.vNode = (
-                <div class="im flex-column">
-                    <div class="im-header flex-row">
-                        <div class="im-header-info flex-row">
-                            <img class="im-header-photo round-block"
-                                 src="https://static10.tgstat.ru/channels/_0/3b/3bdc7810ebf4c3de0646923f39267695.jpg"/>
-                            <div class="flex-column">
-                                <div class="im-header-name">Saved Messages</div>
-                                <div class="im-header-status">Nothing</div>
+                <div id="chat">
+                    <div id="topbar">
+                        <div class="chat-info">
+                            <div class="person">
+                                <div class="avatar"></div>
+                                <div class="content">
+                                    <div class="top">
+                                        <div class="title">Campus Party</div>
+                                    </div>
+                                    <div class="bottom">
+                                        <div class="info">2,500 members, 746 online</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="im-header-options flex-row">
-                            <button class="im-header-subscribe">SUBSCRIBE</button>
-                            <div class="im-header-button"><img class="full-center" src="/static/images/icons/mute_svg.svg"/>
-                            </div>
-                            <div class="im-header-button"><img class="full-center"
-                                                               src="/static/images/icons/search_svg.svg"/>
-                            </div>
-                            <div class="im-header-button"><img class="full-center" src="/static/images/icons/more_svg.svg"/>
-                            </div>
-                        </div>
+                        <div class="pinned-msg"></div>
+                        <div class="btn-icon rp rps tgico-search"></div>
+                        <div class="btn-icon rp rps tgico-more"></div>
                     </div>
-                    <div class="im-background">
-                        <div class="im-container flex-column">
-                            <div class="im-history flex-column-reverse">
-                                {
-                                    response.messages.map(message => {
-                                        return (
-                                            <div>
-                                                <MessageComponent constructor={{
-                                                    message,
-                                                    messagesSlice: response
-                                                }}/>
-                                                <br/>
-                                            </div>
-                                        )
-                                    })
-                                }
-                            </div>
+                    <div id="bubbles">
+                        <div id="bubbles-inner">
+                            {/*<div class="service">*/}
+                            {/*    <div class="service-msg">October 21</div>*/}
+                            {/*</div>*/}
+                            {/*TODO fix that */}
+                            {
+                                response.messages.map(message => {
+                                    return <MessageComponent constructor={{
+                                                message,
+                                                messagesSlice: response
+                                            }}/>
+                                })
+                            }
                         </div>
                     </div>
                 </div>
