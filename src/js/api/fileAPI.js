@@ -1,5 +1,9 @@
 import {MTProto} from "../mtproto";
 import {PeerAPI} from "./peerAPI";
+import {bytesToHex} from "../mtproto/utils/bin";
+
+const cache = {}
+const cachePeerPhotos = {}
 
 export class FileAPI {
     static getInputName(file) {
@@ -34,16 +38,37 @@ export class FileAPI {
     }
 
     static getPeerPhoto(file, peer, big) {
-        return this.getFileLocation(this.getInputPeerPhoto(file, peer, big))
+        return new Promise(resolve => {
+            if (cachePeerPhotos[file.volume_id + "_" + file.local_id]){
+                resolve(cachePeerPhotos[file.volume_id + "_" + file.local_id])
+                return
+            }
+            return this.getFileLocation(this.getInputPeerPhoto(file, peer, big)).then(response => {
+                const blob = new Blob([response.bytes], {type: 'application/jpeg'});
+                return cachePeerPhotos[file.volume_id + "_" + file.local_id] = URL.createObjectURL(blob)
+            }).then(resolve)
+        })
     }
 
     static getFile(file, thumb_size = "") {
-        return this.getFileLocation({
-            _: this.getInputName(file),
-            id: file.id,
-            access_hash: file.access_hash,
-            file_reference: file.file_reference,
-            thumb_size: thumb_size
+        return new Promise(resolve => {
+            const key = bytesToHex(file.file_reference)
+            if (cache[key]){
+                resolve(cache[key])
+                return
+            }
+
+            return this.getFileLocation({
+                _: this.getInputName(file),
+                id: file.id,
+                access_hash: file.access_hash,
+                file_reference: file.file_reference,
+                thumb_size: thumb_size
+            }).then(response => {
+                const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
+                const blob = new Blob([response.bytes], {type: type});
+                return cache[key] = URL.createObjectURL(blob)
+            }).then(resolve)
         })
     }
 }

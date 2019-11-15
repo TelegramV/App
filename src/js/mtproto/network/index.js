@@ -59,7 +59,7 @@ export class Networker {
         console.log("disconnect")
         // TODO reconnect
         // ALSO if there's no internet it doesn't disconnect ws, should ping prob
-        document.querySelector("#connecting_message").style.display = "block";
+        document.querySelector("#connecting_message").style.display = "flex";
     }
 
     getAesKeyIv(msgKey, isOut) {

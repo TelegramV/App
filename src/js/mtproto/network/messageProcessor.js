@@ -36,7 +36,7 @@ export class MessageProcessor {
     }
 
     processUpdateShort(message, messageID, sessionID) {
-        Logger.log("Short update", message)
+        // Logger.log("Short update", message)
     }
 
     processNewSessionCreated(message, messageID, sessionID) {
@@ -44,7 +44,7 @@ export class MessageProcessor {
     }
 
     processUpdates(message, messageID, sessionID) {
-        Logger.log("update", message)
+        // Logger.log("update", message)
     }
 
 

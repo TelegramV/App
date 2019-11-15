@@ -51,7 +51,7 @@ function insertAt(str, position, length, b) {
 
 export function parseMessageEntities(text, messageEntities, noLinks = false) {
     if(!messageEntities)
-        return text
+        return text.replace(/(?:\r\n|\r|\n)/g, "<br/>")
     const handlersText = {
         messageEntityBold: (l, a) => `<b>${a}</b>`,
         messageEntityItalic: (l, a) => `<i>${a}</i>`,
@@ -91,5 +91,5 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
         globalOffset += text.length - before.length
         // console.log("AFTER", text, globalOffset)
     })
-    return text
+    return text.replace(/(?:\r\n|\r|\n)/g, "<br/>")
 }

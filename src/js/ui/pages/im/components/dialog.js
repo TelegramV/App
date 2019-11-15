@@ -2,6 +2,7 @@ import {AppTemporaryStorage} from "../../../../common/storage"
 import {FileAPI} from "../../../../api/fileAPI";
 import {FrameworkComponent} from "../../../framework/component"
 import {AppFramework} from "../../../framework/framework"
+import {getMessagePreviewDialog} from "../../../utils";
 
 export const dialogPeerMaps = {
     "peerUser": "users",
@@ -61,20 +62,25 @@ export class TelegramDialogComponent extends FrameworkComponent {
         const messageUser = findUserFromMessage(message, dialogsSlice)
         let messageUsername = messageUser ? messageUser.id !== peer.id ? `${getPeerName(messageUser, false)}` : "" : ""
 
+
+        const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
         // TODO this should be made with css
-        const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
+        const submsg = message.message
         const date = new Date(message.date * 1000)
 
+        console.log(peer, dialog)
         this.reactive.data = {
             pinned: dialogPinned,
             peerName,
-            messageUsername,
+            messageUsername: messageUsername + msgPrefix,
             message: submsg,
             peer: dialog.peer,
+            verified: peer.pFlags.verified,
+            online: peer.status && peer.status._ === "userStatusOnline",
             photo: "/static/images/icons/admin_3x.png",
             hasNotification: dialog.unread_count > 0,
-            unread: dialog.unread_mentions_count > 0 ? "@" : (dialog.unread_count > 0 ? dialog.unread_count.toString() : ""),
-            muted: dialog.notify_settings.mute_until,
+            unread: dialog.unread_mentions_count > 0 ? "@" : (dialog.unread_count > 0 ? dialog.unread_count.toString() : (dialog.pFlags.unread_mark ? " " : "")),
+            muted: dialog.notify_settings.mute_until > 0,
             date: date.toLocaleTimeString('en', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -85,9 +91,8 @@ export class TelegramDialogComponent extends FrameworkComponent {
         if (peer.photo) {
             let a = peer.photo.photo_small
             try {
-                FileAPI.getPeerPhoto(a, peer, false).then(response => {
-                    const blob = new Blob([response.bytes], {type: 'application/jpeg'});
-                    this.reactive.data.photo = URL.createObjectURL(blob)
+                FileAPI.getPeerPhoto(a, peer, false).then(url => {
+                    this.reactive.data.photo = url
                 }).catch(e => {
                     //
                 })
@@ -108,7 +113,7 @@ export class TelegramDialogComponent extends FrameworkComponent {
         if(data.hasNotification) personClasses += "muted "
         return (
             <div class={personClasses} onClick={this.openDialog(reactive.data.peer)}>
-                <img class="avatar" src={data.photo} alt="avatar"/>
+                <div class="avatar" style={`background-image: url(${data.photo});`}/>
                 <div class="content">
                     <div class="top">
                         <div class="title">{data.peerName}</div>
@@ -116,7 +121,7 @@ export class TelegramDialogComponent extends FrameworkComponent {
                         <div class="time">{data.date}</div>
                     </div>
                     <div class="bottom">
-                        <div class="message">{data.messageUsername.length > 0 ? data.messageUsername + ": " + data.message : data.message}</div>
+                        <div class="message"><span class="sender">{data.messageUsername}</span>{data.message}</div>
                         <div class="badge tgico">{data.unread}</div>
                     </div>
                 </div>
@@ -135,6 +140,16 @@ export function findUserFromMessage(message, dialogsSlice) {
     return dialogsSlice.users.find(user => String(user.id) === String(message.from_id))
 }
 
+export function getPeerType(peer) {
+    switch (peer._) {
+        case "chat":
+            return "chat"
+        case "channel":
+            return "channel"
+        case "user":
+            return "user"
+    }
+}
 export function getPeerName(peer, usernameFirst = false) {
     if (!peer) {
         return ""

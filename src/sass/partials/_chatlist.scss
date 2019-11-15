@@ -64,6 +64,12 @@
 	}
 }
 
+.person.group {
+	.content.top:before {
+		content: $tgico-group;
+	}
+}
+
 .person {
 	border-radius: 10px;
 	background-color: #fff;
@@ -76,7 +82,8 @@
 		width: 54px;
 		height: 54px;
 		border-radius: 50%;
-		background-color: $blue;
+		background-repeat: no-repeat;
+		background-size: contain;
 		position: relative;
 		flex-shrink: 0;
 	}
@@ -143,6 +150,10 @@
 		flex-grow: 1;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+
+		.sender {
+			color: black;
+		}
 	}
 
 	.time {

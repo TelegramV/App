@@ -2,7 +2,7 @@ import {AppFramework} from "../../../framework/framework"
 import {MTProto} from "../../../../mtproto"
 import {PeerAPI} from "../../../../api/peerAPI"
 import {AppTemporaryStorage} from "../../../../common/storage"
-import {dialogPeerMap, findPeerFromDialog} from "./dialog"
+import {dialogPeerMap, findPeerFromDialog, getPeerName} from "./dialog"
 import {MessageComponent} from "./message"
 import {FrameworkComponent} from "../../../framework/component"
 import {FileAPI} from "../../../../api/fileAPI";
@@ -67,14 +67,14 @@ export class MessageListComponent extends FrameworkComponent {
         }).then(messagesSlice => {
             AppTemporaryStorage.setItem("messages.messagesSlice", messagesSlice)
             this.reactive.peer = peer
+            this.reactive.title = getPeerName(peer)
             this.reactive.messagesSlice = messagesSlice
             this.reactive.isLoading = false
             if(peer.photo) {
                 let a = peer.photo.photo_small
-                FileAPI.getPeerPhoto(a, peer, false).then(response => {
-                    const blob = new Blob([response.bytes], { type: 'application/jpeg' });
+                FileAPI.getPeerPhoto(a, peer, false).then(url => {
                     this.reactive.photo = {
-                       url: URL.createObjectURL(blob)
+                       url: url
                     }
                 })
             }
@@ -101,7 +101,7 @@ export class MessageListComponent extends FrameworkComponent {
                             <img src={data.photo.url} className="avatar"></img>
                             <div className="content">
                                 <div className="top">
-                                    <div className="title">{data.peer.first_name} {data.peer.last_name}</div>
+                                    <div className="title">{data.title}</div>
                                 </div>
                                 <div className="bottom">
                                     <div
@@ -116,9 +116,9 @@ export class MessageListComponent extends FrameworkComponent {
                 </div>
                 <div id="bubbles">
                     <div id="bubbles-inner">
-                        {/*<div class="service">*/}
-                        {/*    <div class="service-msg">October 21</div>*/}
-                        {/*</div>*/}
+                        <div class="service">
+                            <div class="service-msg">October 21</div>
+                        </div>
                         {/*TODO fix that */}
                         {
                             reactive.messagesSlice.messages.map(message => {

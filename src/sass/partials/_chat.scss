@@ -111,6 +111,69 @@
         background-size: cover;
       }
 
+      .audio {
+        display: flex;
+        width: 270px;
+        height: 56px;
+        flex-direction: row;
+        align-items: center;
+
+        .play {
+          background-color: $blue;
+          color: white;
+          width: 56px;
+          height: 56px;
+          border-radius: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          &:before {
+            margin-left: 5px;
+            content: $tgico-play;
+            font-size: 2em;
+            font-family: "tgico" !important;
+          }
+        }
+
+        .inside {
+          margin-left: 15px;
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+
+          .bars {
+            height: 27px;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-end;
+
+            .bar {
+              width: 2px;
+              height: 100%;
+              margin-right: 2px;
+              background-color: $blue;
+            }
+          }
+
+          .time {
+            margin-top: 8px;
+            width: 100%;
+          }
+
+          .read {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            background-color: $blue;
+            border-radius: 100%;
+          }
+        }
+
+      }
+
       .box {
         font-size: 14px;
         margin: 5px;
@@ -125,16 +188,22 @@
         }
 
         &.web {
+          display: block;
           margin-top: -5px;
           margin-bottom: 5px;
           max-width: 320px;
+
+          &:link {color: black;}
+          &:visited {color: black;}
+          &:hover {color: black;}
+          &:active {color: black;}
 
           .quote {
             // box-sizing: border-box;
           }
 
           .preview {
-            height: 100px;
+            max-height: 100px;
             border-radius: 4px;
             background-size: cover;
             background-position: center;
@@ -148,6 +217,29 @@
 
           .text {
             line-height: 1.2;
+            overflow: hidden;
+            position: relative;
+            max-height: 6em;
+            text-align: justify;
+            margin-right: -1em;
+            padding-right: 1em;
+
+            &:before {
+              content: '...';
+              position: absolute;
+              right: 0;
+              bottom: 0;
+            }
+
+            &:after {
+              content: '';
+              position: absolute;
+              right: 0;
+              width: 1em;
+              height: 1em;
+              margin-top: 0.2em;
+              //background: white;
+            }
           }
         }
 
@@ -163,6 +255,11 @@
 
       .message {
         padding: 9px;
+
+        .fwd {
+          color: $blueonline;
+          font-weight: 400;
+        }
       }
 
 
@@ -198,6 +295,17 @@
     }
 
     .in,
+    .out {
+      flex-direction: row;
+      align-items: flex-end !important;
+
+      .avatar {
+        height: 34px;
+        border-radius: 100%;
+        margin-right: 5px;
+      }
+    }
+
     .out {
       flex-direction: column;
     }
