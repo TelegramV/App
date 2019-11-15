@@ -64,12 +64,11 @@ function start() {
     AppFramework.Router.middleware(toRoute => {
         if (!MTProto.isUserAuthorized()) {
             if (toRoute.route.name !== "login") {
-                console.log("middleware")
                 return {
                     next: false,
                     doNext: () => {
                         AppFramework.Router.push("/login")
-                    }
+                    },
                 }
             }
         } else {

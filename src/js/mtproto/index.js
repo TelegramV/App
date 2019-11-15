@@ -126,3 +126,5 @@ class MobileProtocol {
 export const MTProto = new MobileProtocol({
     configuration: AppConfiguration
 })
+
+export default MTProto

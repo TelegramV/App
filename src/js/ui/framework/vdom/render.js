@@ -1,8 +1,10 @@
+import VDOM from "./index"
+
 /**
  * Renders Virtual DOM Node
  *
  * @param vNode
- * @returns {Text|HTMLElement|any|Node|string}
+ * @returns {Text|HTMLElement|any|Node|string|[]}
  */
 export function render(vNode) {
     if (!vNode) {
@@ -10,12 +12,7 @@ export function render(vNode) {
     }
 
     if (Array.isArray(vNode)) {
-        throw new Error("FUCK THIS SHIT")
-        // const $el = document.createElement("div")
-        // vNode.forEach(vNodeIn => {
-        //     $el.appendChild(render(vNodeIn))
-        // })
-        // return $el
+        throw new Error("wtf")
     }
 
     if (vNode.attrs && vNode.attrs.hasOwnProperty("dangerouslySetInnerHTML")) {
@@ -31,9 +28,22 @@ export function render(vNode) {
 
     let $el = null
     let isFrameworkObject = false
-    if (typeof vNode.tagName === "function") {
+    if (typeof vNode.tagName === "object") {
         isFrameworkObject = true
-        $el = (new (vNode.tagName)(vNode.constructor)).get$node()
+        const component = vNode.tagName
+
+        let prevRendered = component.h()
+        $el = render(prevRendered)
+        component.mounted()
+        component.render = () => {
+            const rendered = component.h()
+            if (prevRendered !== rendered) {
+                const patch = VDOM.diff(prevRendered, rendered)
+                $el = patch($el)
+                prevRendered = rendered;
+                component.updated()
+            }
+        }
     } else {
         if (vNode.options && Object.keys(vNode.options) > 0) {
             $el = document.createElement(vNode.tagName, options)

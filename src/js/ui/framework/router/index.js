@@ -86,7 +86,7 @@ export class FrameworkRouter {
             // check if hash path changes
             // if doesn't then router will not re-render the component
             // if does then it means that query changes, so we trigger handlers
-            if (this.activeRoute.route.path === parseHash(window.location.hash).path) {
+            if (this.activeRoute && this.activeRoute.route && this.activeRoute.route.path === parseHash(window.location.hash).path) {
                 this.queryChangeHandlers.forEach(h => {
                     const newQueryParams = parseQuery(parseHash(window.location.hash).queryString)
                     this.activeRoute.queryParams = newQueryParams
@@ -146,13 +146,19 @@ export class FrameworkRouter {
             queryParams: parseQuery(parsedHash.queryString)
         }
 
+        let doNext = false
+
         this.middlewares.forEach(midleware => {
             const middlewareResult = midleware(routeToActivate)
 
             if (middlewareResult != true && middlewareResult.next != true) {
-                return middlewareResult.doNext()
+                return doNext = middlewareResult.doNext
             }
         })
+
+        if (doNext) {
+            return doNext()
+        }
 
         this.activeRoute = routeToActivate
 

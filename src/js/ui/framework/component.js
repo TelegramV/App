@@ -9,12 +9,7 @@ import ObservableSlim from "observable-slim"
  */
 export class FrameworkComponent {
     constructor(props = {}) {
-        this.cachedVNode = null
-        this.$node = null
-
-        this.isLockingRender = false
-
-        this.componentId = Math.random()
+        this.componentId = ""
 
         /**
          * Define data only if it is really needed
@@ -25,11 +20,7 @@ export class FrameworkComponent {
             })
         }
 
-        this.render()
-    }
-
-    get$node() {
-        return this.$node
+        this.count = 0
     }
 
     h() {
@@ -49,33 +40,15 @@ export class FrameworkComponent {
         this.render()
     }
 
+    mounted() {
+        //
+    }
+
+    updated() {
+        //
+    }
+
     render() {
-        if (!this.isLockingRender) {
-            this.forceRender()
-        } else {
-            console.warn("rendering was locked")
-        }
-    }
-
-    forceRender() {
-        if (this.isLockingRender) {
-            console.warn("rendering was locked")
-        }
-
-        const vNode = this.h(this)
-        if (this.cachedVNode) {
-            const patch = VDOM.diff(this.cachedVNode, vNode)
-            this.$node = patch(this.$node)
-        } else {
-            this.$node = VDOM.render(vNode)
-        }
-        if (this.$node.dataset) {
-            this.$node.dataset.componentId = this.componentId
-        }
-        this.cachedVNode = vNode
-    }
-
-    mount() {
-        this.$node = VDOM.mount(VDOM.render(this.h(this)), this.$node)
+        throw new Error("this component cannot be rendered")
     }
 }

@@ -1,5 +1,15 @@
 import {FrameworkComponent} from "../../framework/component"
 import {DialogListComponent} from "./components/dialogList"
+import {MessageListComponent} from "./components/messageList"
+import DialogsManager from "../../../api/dialogs/dialogsManager"
+
+function onScrollDialogs(event) {
+    const $element = event.target
+    if ($element.scrollHeight - $element.scrollTop === $element.clientHeight) {
+        DialogsManager.fetchNextPage({})
+    }
+}
+
 
 export class IMPage extends FrameworkComponent {
     constructor(props = {}) {
@@ -9,7 +19,7 @@ export class IMPage extends FrameworkComponent {
     h() {
         return (
             <div className="app">
-                <div className="chatlist">
+                <div className="chatlist" onScroll={onScrollDialogs}>
                     <div className="toolbar">
                         <div className="btn-icon rp rps tgico-menu"></div>
                         <div className="search">
@@ -23,10 +33,9 @@ export class IMPage extends FrameworkComponent {
                         <span>Waiting for network...</span>
                     </div>
                     <DialogListComponent/>
-
-                    {/*// TODO костыли*/}
                 </div>
-                <div id="message_list"/>
+
+                <MessageListComponent/>
 
             </div>
         )

@@ -1,9 +1,7 @@
 import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers"
-import {AppTemporaryStorage} from "../../../../common/storage"
-import {findPeerFromDialog, findUserFromMessage, getPeerName, getPeerType} from "./dialog"
+import {findUserFromMessage, getPeerName} from "./dialog"
 import {FrameworkComponent} from "../../../framework/component"
 import {FileAPI} from "../../../../api/fileAPI";
-import {bytesFromArrayBuffer} from "../../../../mtproto/utils/bin";
 import {formatTimeAudio} from "../../../utils";
 
 function vTimeTemplate(data, bg = false) {
@@ -196,10 +194,7 @@ export class MessageComponent extends FrameworkComponent {
             throw new Error("message is not defined")
         }
         this.message = options.message
-        this.messagesSlice = options.messagesSlice || AppTemporaryStorage.getItem("messages.messagesSlice")
-        this.messageId = options.message.id
-
-        this.init()
+        this.messagesSlice = options.messagesSlice
     }
 
     data() {
@@ -211,7 +206,7 @@ export class MessageComponent extends FrameworkComponent {
         }
     }
 
-    init() {
+    mounted() {
         const message = this.message
 
         const user = findUserFromMessage(message, this.messagesSlice)
@@ -275,7 +270,7 @@ export class MessageComponent extends FrameworkComponent {
                     this.reactive.message.data.imgSrc = file
                 })
             } else if (message.media.webpage) {
-                if(message.media.webpage._ === "webPageEmpty") {
+                if (message.media.webpage._ === "webPageEmpty") {
                     this.reactive.message = {
                         type: "text",
                         data: data
@@ -344,7 +339,7 @@ export class MessageComponent extends FrameworkComponent {
                                 time: formatTimeAudio(attribute.duration)
                             }
                             this.reactive.message.type = attribute.pFlags.voice ? "voice" : "audio"
-                        } else if(attribute._ === "documentAttributeFilename") {
+                        } else if (attribute._ === "documentAttributeFilename") {
                             this.reactive.message.data.documentName = attribute.file_name
                         } else {
                             console.log(attribute)
@@ -378,8 +373,8 @@ export class MessageComponent extends FrameworkComponent {
         }
     }
 
-    h({reactive}) {
-        if (!reactive.message.type) {
+    h() {
+        if (!this.reactive.message.type) {
             return <div>Unsupported message type</div>
         }
 
@@ -396,6 +391,6 @@ export class MessageComponent extends FrameworkComponent {
             service: vServiceMessageTemplate
         }
 
-        return handlers[reactive.message.type](reactive.message.data)
+        return handlers[this.reactive.message.type](this.reactive.message.data)
     }
 }

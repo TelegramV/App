@@ -1,33 +1,16 @@
 import {AppFramework} from "../../../framework/framework"
-import {MTProto} from "../../../../mtproto"
-import {PeerAPI} from "../../../../api/peerAPI"
-import {AppTemporaryStorage} from "../../../../common/storage"
-import {dialogPeerMap, findPeerFromDialog, getPeerName} from "./dialog"
-import {MessageComponent} from "./message"
 import {FrameworkComponent} from "../../../framework/component"
-import {FileAPI} from "../../../../api/fileAPI";
+import {PeerAPI} from "../../../../api/peerAPI"
+import MTProto from "../../../../mtproto"
+import PeersManager from "../../../../api/peers/peersManager"
+import DialogsManager from "../../../../api/dialogs/dialogsManager"
+import {FileAPI} from "../../../../api/fileAPI"
+import {getPeerName} from "../../../../api/dialogs/util"
+import {MessageComponent} from "./message"
 
 export class MessageListComponent extends FrameworkComponent {
     constructor(props = {}) {
         super()
-        this.dialogsSlice = props.dialogsSlice || AppTemporaryStorage.getItem("dialogsSlice")
-
-        // kostyl, have to be fixed later
-        this.alwaysForceRender = true
-
-        if (AppFramework.Router.activeRoute.queryParams.p) {
-            this.init()
-        }
-
-        AppFramework.Router.onQueryChange(queryParams => {
-            if (queryParams.p) {
-                this.init()
-                // this.forceRender()
-            } else {
-                // avoid shit like this!
-                this.render()
-            }
-        })
     }
 
     data() {
@@ -37,75 +20,83 @@ export class MessageListComponent extends FrameworkComponent {
         }
     }
 
-    init() {
+    fetchHistory() {
+
         this.reactive.isLoading = true
-        const dialogsSlice = this.dialogsSlice
 
-        if (!dialogsSlice) return
+        if (!DialogsManager.isFetching()) {
+            const dialogPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
 
-        const dialogPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
+            const peer = PeersManager.find(dialogPeer[0], dialogPeer[1])
 
-        const dp = {
-            _: dialogPeer[0],
+            MTProto.invokeMethod("messages.getHistory", {
+                peer: PeerAPI.getInput(peer),
+                offset_id: 0,
+                offset_date: 0,
+                add_offset: 0,
+                limit: 20,
+                max_id: 0,
+                min_id: 0,
+                hash: 0
+            }).then(messagesSlice => {
+                console.log("ll")
+                this.reactive.peer = peer
+                this.reactive.title = getPeerName(peer)
+                this.reactive.messagesSlice = messagesSlice
+                this.reactive.isLoading = false
+                if (peer.photo) {
+                    let a = peer.photo.photo_small
+                    FileAPI.getPeerPhoto(a, peer, false).then(url => {
+                        this.reactive.photo = {
+                            url: url
+                        }
+                    })
+                }
+            })
+        } else {
+            // fix loading after page reload
         }
-        dp[dialogPeerMap[dp._] + '_id'] = dialogPeer[1]
+    }
 
-        const peer = findPeerFromDialog({
-            peer: dp
-        }, dialogsSlice)
-
-        return MTProto.invokeMethod("messages.getHistory", {
-            peer: PeerAPI.getInput(peer),
-            offset_id: 0,
-            offset_date: 0,
-            add_offset: 0,
-            limit: 20,
-            max_id: 0,
-            min_id: 0,
-            hash: 0
-
-        }).then(messagesSlice => {
-            AppTemporaryStorage.setItem("messages.messagesSlice", messagesSlice)
-            this.reactive.peer = peer
-            this.reactive.title = getPeerName(peer)
-            this.reactive.messagesSlice = messagesSlice
-            this.reactive.isLoading = false
-            if(peer.photo) {
-                let a = peer.photo.photo_small
-                FileAPI.getPeerPhoto(a, peer, false).then(url => {
-                    this.reactive.photo = {
-                       url: url
-                    }
-                })
+    mounted() {
+        console.log("mounted")
+        this.fetchHistory()
+        AppFramework.Router.onQueryChange(queryParams => {
+            if (queryParams.p) {
+                this.fetchHistory()
+            } else {
+                // avoid shit like this!
+                this.render()
             }
         })
     }
 
-    h({reactive}) {
+    h() {
         if (!AppFramework.Router.activeRoute.queryParams.p) {
             return <h1>Select a chat</h1>
         }
 
-        if (reactive.isLoading) {
+        if (this.reactive.isLoading) {
             return <div className="full-size-loader height">
                 <progress className="progress-circular big"/>
             </div>
         }
-        const data = reactive
+        const data = this.reactive
 
         return (
             <div id="chat" data-peer={AppFramework.Router.activeRoute.queryParams.p}>
                 <div id="topbar">
                     <div className="chat-info">
                         <div className="person">
-                            <img src={data.photo.url} className="avatar"></img>
+                            <img src={data.photo.url} className="avatar"/>
                             <div className="content">
                                 <div className="top">
                                     <div className="title">{data.title}</div>
                                 </div>
                                 <div className="bottom">
                                     <div
-                                        className="info">online</div>
+                                        className="info">online
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -119,12 +110,12 @@ export class MessageListComponent extends FrameworkComponent {
                         <div class="service">
                             <div class="service-msg">October 21</div>
                         </div>
-                        {/*TODO fix that */}
+                        TODO fix that
                         {
-                            reactive.messagesSlice.messages.map(message => {
+                            data.messagesSlice.messages.map(message => {
                                 return <MessageComponent constructor={{
                                     message,
-                                    messagesSlice: reactive.messagesSlice
+                                    messagesSlice: data.messagesSlice
                                 }}/>
                             })
                         }

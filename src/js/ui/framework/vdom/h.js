@@ -7,11 +7,18 @@
  * @param options passed when creating element by using {@code document.createElement(tagName, options)}
  * @param events
  * @param children
- * @param htmlChild if true then text children will be rendered by using innerHTML
  * @returns {any}
  */
-export function h(tagName, {attrs = {}, constructor = {}, options = {}, events = {}, children = [], htmlChild = false} = {}) {
+export function h(tagName, {attrs = {}, constructor = {}, options = {}, events = {}, children = []} = {}) {
     const vElem = Object.create(null);
+
+    if (typeof tagName === "function") {
+        tagName = (new (tagName)(constructor))
+    }
+
+    if (tagName === "a" && !attrs.target) {
+        attrs.target = "_blank"
+    }
 
     Object.assign(vElem, {
         tagName,
@@ -20,7 +27,6 @@ export function h(tagName, {attrs = {}, constructor = {}, options = {}, events =
         options,
         events,
         children,
-        htmlChild,
     })
 
     return vElem

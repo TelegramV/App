@@ -87,7 +87,8 @@ export class LoginPage extends FrameworkComponent {
         }
     }
 
-    h({reactive, h}) {
+    h() {
+        const reactive = this.reactive
         if (!reactive.form) {
             return (
                 <div className="grid login-grid">
