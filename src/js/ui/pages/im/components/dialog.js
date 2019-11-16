@@ -77,7 +77,10 @@ export class TelegramDialogComponent extends FrameworkComponent {
             peer: dialog.peer,
             verified: peer.pFlags.verified,
             online: peer.status && peer.status._ === "userStatusOnline",
-            photo: "/static/images/icons/admin_3x.png",
+            photoPlaceholder: {
+                num: Math.abs(peer.id) % 8,
+                text: peerName[0]
+            },
             hasNotification: dialog.unread_count > 0,
             unread: dialog.unread_mentions_count > 0 ? "@" : (dialog.unread_count > 0 ? dialog.unread_count.toString() : (dialog.pFlags.unread_mark ? " " : "")),
             muted: dialog.notify_settings.mute_until > 0,
@@ -113,7 +116,9 @@ export class TelegramDialogComponent extends FrameworkComponent {
         if(data.hasNotification) personClasses += "muted "
         return (
             <div class={personClasses} onClick={this.openDialog(reactive.data.peer)}>
-                <div class="avatar" style={`background-image: url(${data.photo});`}/>
+                <div class={"avatar " + (!data.photo ? `placeholder-${data.photoPlaceholder.num}` : "")} style={`background-image: url(${data.photo});`}>
+                    {!data.photo ? data.photoPlaceholder.text : ""}
+                </div>
                 <div class="content">
                     <div class="top">
                         <div class="title">{data.peerName}</div>

@@ -1,5 +1,234 @@
+body, html {
+	height: 100%;
+}
+
 #login {
 	width: 360px;
 	margin: 0 auto;
-	padding-top: 300px;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+
+	.fading-block {
+		position: absolute;
+		height: 100%;
+		left: 0;
+		opacity: 1;
+		transition: left 0.5s, opacity 0.5s;
+
+		&.fade-out {
+			left: -300%;
+			opacity: 0;
+		}
+
+		&.hidden {
+			left: 300%;
+			opacity: 0;
+		}
+
+		&.fade-in {
+			left: 0;
+			opacity: 1;
+		}
+	}
+
+	.object {
+		display: block;
+		width: 160px;
+		height: 160px;
+		margin: 50px auto 42px auto;
+	}
+
+	.info {
+		text-align: center;
+		margin-bottom: 20px;
+	}
+
+	.info .header {
+		font-weight: bold;
+		font-size: 32px;
+		margin-bottom: 15px;
+	}
+
+	.info .description {
+		color: $darkgrey;
+		font-size: 16px;
+		line-height: 25px;
+		margin-bottom: 25px;
+		padding: 0 60px;
+	}
+
+	#phonePane {
+		width: 100%;
+
+		.input-field {
+			margin-bottom: 22px;
+		}
+
+		.checkbox-input {
+			margin-left: 20px;
+		}
+
+		.dropdown-item {
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+
+			.country-flag {
+				width: 30px;
+				padding: 10px;
+			}
+
+			.country-flag>img {
+				width: 20px;
+				height: 20px;
+			}
+
+			.country-name {
+				width: 100%;
+				padding-left: 10px;
+			}
+
+			.country-code {
+				color: $grey;
+				width: 100px;
+				padding-right: 10px;
+			}
+		}
+
+		.button {
+			display: none;
+			margin-top: 45px;
+		}
+	}
+
+	#codePane {
+		width: 100%;
+
+		.info .description {
+			padding: 0 75px;
+		}
+
+		#monkey {
+			height: auto;
+			margin-bottom: 35px;
+		}
+
+		#editPhone {
+			font-size: 28px;
+		}
+	}
+
+	#passwordPane {
+		.input-field {
+			margin: 30px 0;
+		}
+	}
+
+	#registerPane {
+		width: 100%;
+
+		.picture {
+			border-radius: 50%;
+			background-color: $blue;
+			position: relative;
+
+			cursor: pointer;
+
+			.add-icon {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+
+				color: white;
+				font-size: 48px;
+			}
+		}
+
+		.info .description {
+			margin-bottom: 40px;
+			padding: 0 90px;
+		}
+
+		.input-field {
+			margin-bottom: 22px;
+		}
+	}
+}
+
+#cropper {
+	position: relative;
+
+	.cropper-container {
+		position: relative;
+		width: 350px;
+		height: 350px;
+		margin: 0px auto 50px;
+		z-index: 1;
+
+		.boundary {
+			width: 350px;
+			height: 350px;
+			position: relative;
+			overflow: hidden;
+			margin: auto;
+			z-index: 3;
+			border-radius: 0.2em;
+
+			.image {
+				position: absolute;
+				top: 0;
+				left: 0;
+				z-index: -1;
+				max-width: none;
+				max-height: none;
+			}
+
+			.vignette {
+				position: absolute;
+				margin: auto;
+				width: 310px;
+				height: 310px;
+				border-radius: 50%;
+				top: 0;
+				bottom: 0;
+				right: 0;
+				left: 0;
+				box-shadow: 0 0 2000px 2000px rgba(255, 255, 255, 0.5);
+				z-index: 3;
+			}
+
+			.overlay {
+				z-index: 5;
+				position: absolute;
+				cursor: move;
+				touch-action: none;
+			}
+		}
+	}
+
+	.button {
+		position: absolute;
+		right: 0px;
+		bottom: -60px;
+		width: 55px;
+		height: 55px;
+		border-radius: 50%;
+		background-color: $blue;
+
+		.tgico {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			font-size: 24px;
+		}
+	}
+
+}
+
+#app {
+	height: 100%;
 }

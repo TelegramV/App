@@ -314,7 +314,7 @@ export class Networker {
             serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, 'invokeWithLayer')
             serializer.storeInt(AppConfiguration.mtproto.api.layer, 'layer')
             if(this.auth.exportedAuth) {
-                // serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
+                serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
             }
             serializer.storeInt(AppConfiguration.mtproto.api.initConnection, 'initConnection')
             serializer.storeInt(AppConfiguration.mtproto.api.api_id, 'api_id')

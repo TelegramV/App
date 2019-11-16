@@ -119,7 +119,6 @@ class MobileProtocol {
 
         return new Promise(resolve => {
             sendReqPQ(authContext, e => {
-                console.log("successful pq for ", authContext.dcID)
                 const networker = new Networker(authContext)
 
                 const list = this.fileNetworkers[dcID]
@@ -128,8 +127,6 @@ class MobileProtocol {
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
                 AuthAPI.importAuth(authContext.exportedAuth, dcID).then(response => {
-                    console.log("successful auth for ", authContext.dcID)
-
                     list.forEach(async l => {
                         l.resolve(networker.callApi(networker.wrapApiCall(l.method, l.parameters)))
                     })

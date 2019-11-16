@@ -1,5 +1,8 @@
+$input-height: 54px;
+
 input[type="text"],
-input[type="tel"] {
+input[type="tel"],
+input[type="password"] {
 	caret-color: $blue;
 	background-color: transparent;
 	outline: 0;
@@ -9,6 +12,7 @@ input[type="tel"] {
 	color: #000;
 	box-sizing: border-box;
 	width: 100%;
+
 	&::placeholder {
 		color: $darkgrey;
 		opacity: 0.8;
@@ -18,7 +22,7 @@ input[type="tel"] {
 .input-field {
 	position: relative;
 	width: 360px;
-	height: 54px;
+	height: $input-height;
 	box-sizing: border-box;
 
 	label {
@@ -31,8 +35,8 @@ input[type="tel"] {
 		transition: anim(all);
 		font-size: 16px;
 		color: $grey;
-		background-color: #fff;
 		padding: 5px;
+		border-radius: 1em;
 	}
 
 	.text {
@@ -50,19 +54,201 @@ input[type="tel"] {
 			border-color: #000;
 		}
 
+		&::placeholder {
+			color: transparent;
+		}
+
+		&.invalid {
+			border-color: $red;
+		}
+
 		&:focus {
 			border-width: 2px;
 			border-color: $blue;
 		}
 
-		&:focus + label {
+		&.invalid:focus {
+			border-width: 2px;
+			border-color: $red;
+		}
+
+		&:focus:not(:placeholder-shown)+label {
+			color: $blue;
+		}
+
+		&.invalid:focus:not(:placeholder-shown)+label {
+			color: $red;
+		}
+
+		&:not(:focus):not(:placeholder-shown)+label {
+			color: $darkgrey;
+		}
+
+		&.invalid:not(:focus):not(:placeholder-shown)+label {
+			color: $red;
+		}
+
+		&:not(:placeholder-shown)+label {
+			background-color: #fff;
 			top: 0;
 			font-size: 12px;
 			font-weight: 500;
 		}
+	}
+}
 
-		&:focus + label {
-			color: $blue;
+.checkbox-input {
+	display: block;
+	position: relative;
+	user-select: none;
+
+	padding-top: 3px;
+
+	font-size: 16px;
+
+	input {
+		position: absolute;
+		opacity: 0;
+		cursor: default;
+		height: 0;
+		width: 0;
+
+		&:checked~.checkmark {
+			background-color: $blue;
+			color: white;
+		}
+
+		&:checked~.checkmark:after {
+			display: block;
+		}
+	}
+
+	.checkmark {
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 20px;
+		width: 20px;
+		background-color: $lightgrey;
+		border-radius: 20%;
+		transition: background-color 0.2s ease-in-out;
+		cursor: pointer;
+
+		font-size: 19px;
+		color: transparent;
+		transition: anim(color);
+
+		&:hover {
+			background-color: $darkgrey;
+		}
+
+		&:after {
+			content: "";
+			position: absolute;
+			display: none;
+		}
+	}
+
+	.checkbox-label {
+		margin-left: 50px;
+	}
+}
+
+.password-input.peekable {
+	position: relative;
+
+	input {
+		font: large Verdana, sans-serif;
+		letter-spacing: 1px;
+	}
+
+	&:not(.peekable) .btn-icon {
+		display: none;
+	}
+
+	.btn-icon {
+		position: absolute;
+		font-size: 28px;
+		right: 10px;
+		top: 10%;
+
+		&:before {
+			content: $tgico-eye1;
+		}
+
+		&.peek:before {
+			content: $tgico-eye2;
+		}
+	}
+}
+
+.dropdown-container {
+	position: relative;
+
+	.dropdown {
+		position: relative;
+		cursor: pointer;
+
+		&:after {
+			font-family: "#{$tgico-font-family}" !important;
+			content: $tgico-down;
+			font-size: 30px;
+			position: absolute;
+			right: 10px;
+			top: 25%;
+
+			cursor: pointer;
+		}
+
+		&.down:after {
+			content: $tgico-down;
+		}
+
+		&.up:after {
+			content: $tgico-up;
+		}
+	}
+
+	.dropdown-list {
+		display: flex;
+		flex-direction: column;
+
+		position: absolute;
+		width: 100%;
+		height: 30vh;
+		top: $input-height;
+
+		background-color: white;
+		border-radius: 1em;
+		z-index: 42;
+		box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.2);
+
+		overflow-y: overlay;
+
+		@supports not(overflow-y: overlay) {
+			overflow-y: auto;
+		}
+
+		&.hidden {
+			display: none;
+		}
+
+		.dropdown-item {
+			cursor: pointer;
+
+			&:first-child {
+				border-top-left-radius: 1em;
+				border-top-right-radius: 1em;
+			}
+
+			&:last-child {
+				border-bottom-left-radius: 1em;
+				border-bottom-right-radius: 1em;
+			}
+
+			&:hover {
+				background-color: $lightgrey;
+			}
 		}
 	}
 }

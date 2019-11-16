@@ -37,7 +37,12 @@ function vServiceMessageTemplate(data, inside) {
 function vMessageTemplate(data, inside) {
     return (
         <div class={data.out} data-id={data.id}>
-            {data.out === "in" ? <img class="avatar" src={data.avatar}/> : ""}
+            {data.out === "in" ? (
+                <div className={"avatar " + (!data.photo ? `placeholder-${data.photoPlaceholder.num}` : "")}
+                                      style={`background-image: url(${data.photo});`}>
+                    {!data.photo ? data.photoPlaceholder.text : ""}
+                </div>
+            ): ""}
             {inside}
         </div>
     )
@@ -246,7 +251,7 @@ export class MessageComponent extends FrameworkComponent {
             hour12: false
         })
         const out = message.pFlags.out && type !== "channel" ? "out" : "in"
-        // console.log(message, user)
+        //console.log(message, user)
 
         let data = {
             id: message.id,
@@ -254,8 +259,11 @@ export class MessageComponent extends FrameworkComponent {
             message: messageMessage,
             out: out,
             time: (message.post_author && message.post_author.length > 0 ? message.post_author + ", " : "") + timeString,
-            avatar: "",
-            views: message.views
+            views: message.views,
+            photoPlaceholder: {
+                num: Math.abs(message.from_id) % 8,
+                text: userName[0]
+            },
         }
         if (message.fwd_from) {
             data.fwd = {
@@ -385,7 +393,7 @@ export class MessageComponent extends FrameworkComponent {
         if (user && user.photo) {
             let a = user.photo.photo_small
             FileAPI.getPeerPhoto(a, user.photo.dc_id, user, false).then(url => {
-                this.reactive.message.data.avatar = url
+                this.reactive.message.data.photo = url
             })
         }
     }

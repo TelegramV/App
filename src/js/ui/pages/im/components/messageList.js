@@ -70,15 +70,14 @@ export class MessageListComponent extends FrameworkComponent {
             this.reactive.title = getPeerName(peer)
             this.reactive.messagesSlice = messagesSlice
             this.reactive.isLoading = false
-            this.reactive.photo = {
-
+            this.reactive.photoPlaceholder = {
+                num: Math.abs(peer.id) % 8,
+                text: this.reactive.title[0] // TODO change to proper name
             }
             if(peer.photo) {
                 let a = peer.photo.photo_small
                 FileAPI.getPeerPhoto(a, peer.photo.dc_id, peer, false).then(url => {
-                    this.reactive.photo = {
-                       url: url
-                    }
+                    this.reactive.photo = url
                 })
             }
         })
@@ -101,7 +100,10 @@ export class MessageListComponent extends FrameworkComponent {
                 <div id="topbar">
                     <div className="chat-info">
                         <div className="person">
-                            <img src={data.photo.url} className="avatar"></img>
+                            <div className={"avatar " + (!data.photo ? `placeholder-${data.photoPlaceholder.num}` : "")}
+                                 style={`background-image: url(${data.photo});`}>
+                                {!data.photo ? data.photoPlaceholder.text : ""}
+                            </div>
                             <div className="content">
                                 <div className="top">
                                     <div className="title">{data.title}</div>
