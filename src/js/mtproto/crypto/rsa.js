@@ -1,5 +1,5 @@
-import {BigInteger} from "jsbn"
-import {addPadding, bytesFromBigInt} from "../utils/bin"
+import {addPadding, bytesFromBigInt, bytesToHex} from "../utils/bin"
+import {BigInteger} from "./../vendor/jsbn/jsbn"
 
 export function rsaEncrypt(publicKey, bytes) {
     bytes = addPadding(bytes, 255)

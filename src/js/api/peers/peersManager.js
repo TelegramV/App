@@ -1,5 +1,6 @@
 import {arrayDelete} from "../../common/utils/utils"
 import {FileAPI} from "../fileAPI"
+import {getPeerName} from "../../ui/pages/im/components/dialog"
 
 const $peers = {
     user: {},
@@ -44,8 +45,6 @@ function listenPeerInit(peerName, peerId, listener) {
         listener($peers[peerName][peerId])
     } else {
         $peerInitListeners[peerName][peerId].push(listener)
-
-        console.log($peerInitListeners[peerName][peerId])
     }
 }
 
@@ -59,12 +58,18 @@ function set(peer) {
 
         if (peer.photo) {
             let a = peer.photo.photo_small
-            FileAPI.getPeerPhoto(a, peer, false).then(url => {
+            FileAPI.getPeerPhoto(a, peer.photo.dc_id, peer, false).then(url => {
                 $peers[peer._][peer.id]["photo"] = url
                 resolveListeners({
                     type: "updatePhoto",
                 })
             })
+        }
+
+
+        $peers[peer._][peer.id].photoPlaceholder = {
+            num: Math.abs(peer.id) % 8,
+            text: getPeerName(peer)
         }
 
         if ($peerInitListeners[peer._] && $peerInitListeners[peer._][peer.id]) {

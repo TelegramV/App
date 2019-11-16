@@ -32,6 +32,7 @@ export class TelegramDialogComponent extends FrameworkComponent {
 
     h() {
         const dialog = this.dialog
+
         if (!dialog) {
             return <div>...</div>
         }
@@ -44,8 +45,12 @@ export class TelegramDialogComponent extends FrameworkComponent {
         if (dialog.unreadCount > 0) personClasses += "muted "
 
         return (
-            <div class={personClasses} onClick={this.openDialog(dialog.peer)}>
-                <div class="avatar" style={`background-image: url(${dialog.photo});`}/>
+            // FIXME: replaceWith is really bad kostyl!
+            <div replaceWith={true} class={personClasses} onClick={this.openDialog(dialog.peer)}>
+                <div class={"avatar " + (!dialog.photo ? `placeholder-${dialog.photoPlaceholder.num}` : "")}
+                     style={`background-image: url(${dialog.photo});`}>
+                    {!dialog.photo ? dialog.photoPlaceholder.text : ""}
+                </div>
                 <div class="content">
                     <div class="top">
                         <div class="title">{dialog.title}</div>

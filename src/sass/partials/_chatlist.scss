@@ -9,11 +9,11 @@
 	padding-top: 52px;
 	height: 100vh;
 	overflow-y: scroll;
-	scrollbar-width: 5px;
-	//-ms-overflow-style: none;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
 	&::-webkit-scrollbar {
-		//width: 5px;
-		//height: 100%;
+		width: 0;
+		height: 0;
 	}
 }
 
@@ -86,6 +86,37 @@
 		background-size: contain;
 		position: relative;
 		flex-shrink: 0;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: white;
+		font-size: 1.3em;
+
+		&.placeholder-0 {
+			background-color: #cc90e2;
+		}
+		&.placeholder-1 {
+			background-color: #80d066;
+		}
+		&.placeholder-2 {
+			background-color: #ecd074;
+		}
+		&.placeholder-3 {
+			background-color: #6fb1e4;
+		}
+		&.placeholder-4 {
+			background-color: #e57979;
+		}
+		&.placeholder-5 {
+			background-color: #f98bae;
+		}
+		&.placeholder-6 {
+			background-color: #73cdd0;
+		}
+		&.placeholder-7 {
+			background-color: #fba76f;
+		}
 	}
 
 	.content {

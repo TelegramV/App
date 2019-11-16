@@ -1,4 +1,4 @@
-import {BigInteger, SecureRandom} from "jsbn"
+import {BigInteger, SecureRandom} from "../vendor/jsbn/jsbn"
 import CryptoJS from "../vendor/crypto"
 import crypto from "crypto"
 import {Zlib} from "../vendor/zlib/gunzip.min"
@@ -251,7 +251,7 @@ export function bytesXor(bytes1, bytes2) {
 }
 
 export function bytesFromBigInt(bigInt, len) {
-    let bytes = bigInt.toByteArray()
+    let bytes = new Uint8Array(bigInt.toByteArray())
 
     if (len && bytes.length < len) {
         const padding = []

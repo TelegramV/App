@@ -105,7 +105,7 @@ function fetchDialogs({
                 title: peerName,
                 pinned: pinned,
                 muted: dialog.notify_settings.mute_until,
-                photo: "/static/images/icons/admin_3x.png",
+                photo: false,
                 unreadCount: dialog.unread_count,
                 unreadMark: dialog.pFlags.unreadMark,
                 unreadMentionsCount: dialog.unread_mentions_count,
@@ -123,6 +123,10 @@ function fetchDialogs({
                     _: peer._,
                     id: peer.id,
                     access_hash: peer.access_hash
+                },
+                photoPlaceholder: {
+                    num: Math.abs(message.from_id) % 8,
+                    text: peerName[0]
                 },
                 index: generateDialogIndex(message.date)
             }
@@ -178,8 +182,7 @@ export function fetchNextPage({limit = 20}) {
 function fetchPhoto(peer, props = {}) {
     let photoSmall = peer.photo.photo_small
     try {
-        FileAPI.getPeerPhoto(photoSmall, peer, false).then(url => {
-
+        FileAPI.getPeerPhoto(photoSmall, peer.photo.dc_id, peer, false).then(url => {
             updateSingle(peer, {
                 photo: url
             }, props)

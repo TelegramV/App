@@ -1,4 +1,5 @@
 import {FrameworkComponent} from "../../../framework/component"
+import {MTProto} from "../../../../mtproto";
 
 function vTimeTemplate(data, bg = false) {
     let classes = "inner tgico " + (bg ? "bg" : "")
@@ -7,7 +8,11 @@ function vTimeTemplate(data, bg = false) {
     return (
         <span class={classes2}>
             <div class={classes}>{data.views ?
-                <span>{data.views} <span class="tgico tgico-channelviews"/>    </span> : ""}{data.time}</div>
+                <span>{data.views} <span class="tgico tgico-channelviews"/>    </span> : ""}{data.time.toLocaleTimeString('en', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            })}</div>
         </span>
     )
 }
@@ -28,9 +33,15 @@ function vServiceMessageTemplate(data, inside) {
 }
 
 function vMessageTemplate(data, inside) {
+    const className = data.post ? "channel in" : data.out ? "out" : "in"
     return (
-        <div class={data.out && !data.post ? "out" : "in"} data-id={data.id}>
-            {data.out === "in" ? <img class="avatar" src={data.avatar}/> : ""}
+        <div replaceWith={true} class={className} data-id={data.id}>
+            {className === "in" ? (
+                <div className={"avatar " + (!data.from.photo ? `placeholder-${data.from.photoPlaceholder.num}` : "")}
+                     style={`background-image: url(${data.from.photo});`}>
+                    {!data.from.photo ? data.from.photoPlaceholder.text : ""}
+                </div>
+            ) : ""}
             {inside}
         </div>
     )
@@ -72,9 +83,15 @@ function vMessageWithImageTemplate(data) {
     ))
 }
 
+function test() {
+    MTProto.createFileNetworker(1).then(l => {
+        console.log(l)
+    })
+}
+
 function vMessageWithUrlTemplate(data) {
     return vMessageTemplate(data, (
-        <div className={vGetClass(data)}>
+        <div className={vGetClass(data)} onClick={test}>
             <div className="message">
                 <span dangerouslySetInnerHTML={data.message}/>
                 {vTimeTemplate(data)}
@@ -190,7 +207,6 @@ export class MessageComponent extends FrameworkComponent {
         if (!options.message) {
             throw new Error("message is not defined")
         }
-
         this.message = options.message
     }
 

@@ -66,9 +66,8 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
         messageEntityMention: (l, a) => `<a href="#">${a}</a>`,
         messageEntityHashtag: (l, a) => `<a href="#">${a}</a>`,
         messageEntityBotCommand: (l, a) => `<a href="#">${a}</a>`,
-        messageEntityUrl: (l, a) => `<a target="_blank" href="${a}">${a}</a>`,
+        messageEntityUrl: (l, a) => `<a target="_blank" href="${!a.startsWith("http") ? "https://" + a : a}">${a}</a>`,
         messageEntityEmail: (l, a) => `<a href="mailto:${a}">${a}</a>`,
-
         messageEntityTextUrl: (l, a) => `<a target="_blank" href="${l.url}">${a}</a>`, // TODO can be problems when there's " symbol isnide. should be fixed!
         messageEntityMentionName: (l, a) => `<a>${a}</a>`,
         inputMessageEntityMentionName: (l, a) => `<a>${a}</a>`,
@@ -84,6 +83,7 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
         const handler = handlers[l._]
         if(!handler) return
         const result = handlers[l._](l, text.substr(offset, length))
+
         // console.log(result)
         const before = text
         // console.log(l, "BEFORE", text)

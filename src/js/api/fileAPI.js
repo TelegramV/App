@@ -28,22 +28,22 @@ export class FileAPI {
         }
     }
 
-    static getFileLocation(location) {
+    static getFileLocation(location, dcID = null) {
         return MTProto.invokeMethod("upload.getFile", {
             location: location,
             flags: 0,
             offset: 0,
             limit: 1024 * 1024
-        })
+        }, dcID)
     }
 
-    static getPeerPhoto(file, peer, big) {
+    static getPeerPhoto(file, dcID, peer, big) {
         return new Promise(resolve => {
             if (cachePeerPhotos[file.volume_id + "_" + file.local_id]){
                 resolve(cachePeerPhotos[file.volume_id + "_" + file.local_id])
                 return
             }
-            return this.getFileLocation(this.getInputPeerPhoto(file, peer, big)).then(response => {
+            return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
                 const blob = new Blob([response.bytes], {type: 'application/jpeg'});
                 return cachePeerPhotos[file.volume_id + "_" + file.local_id] = URL.createObjectURL(blob)
             }).then(resolve)
@@ -64,7 +64,7 @@ export class FileAPI {
                 access_hash: file.access_hash,
                 file_reference: file.file_reference,
                 thumb_size: thumb_size
-            }).then(response => {
+            }, file.dc_id).then(response => {
                 const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
                 const blob = new Blob([response.bytes], {type: type});
                 return cache[key] = URL.createObjectURL(blob)

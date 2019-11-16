@@ -2,12 +2,12 @@
   font-family: "#{$tgico-font-family}";
   src: url("#{$tgico-font-path}/#{$tgico-font-family}.eot?owpifk");
   src: url("#{$tgico-font-path}/#{$tgico-font-family}.eot?owpifk#iefix")
-      format("embedded-opentype"),
-    url("#{$tgico-font-path}/#{$tgico-font-family}.ttf?owpifk")
-      format("truetype"),
-    url("#{$tgico-font-path}/#{$tgico-font-family}.woff?owpifk") format("woff"),
-    url("#{$tgico-font-path}/#{$tgico-font-family}.svg?owpifk##{$tgico-font-family}")
-      format("svg");
+  format("embedded-opentype"),
+  url("#{$tgico-font-path}/#{$tgico-font-family}.ttf?owpifk")
+  format("truetype"),
+  url("#{$tgico-font-path}/#{$tgico-font-family}.woff?owpifk") format("woff"),
+  url("#{$tgico-font-path}/#{$tgico-font-family}.svg?owpifk##{$tgico-font-family}")
+  format("svg");
   font-weight: normal;
   font-style: normal;
   font-display: block;

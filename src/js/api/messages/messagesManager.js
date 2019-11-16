@@ -6,6 +6,7 @@ import {AppFramework} from "../../ui/framework/framework"
 import {getPeerName} from "../../ui/pages/im/components/dialog"
 import {parseMessageEntities} from "../../mtproto/utils/htmlHelpers"
 import {FileAPI} from "../fileAPI"
+import {formatTimeAudio} from "../../ui/utils"
 
 window.pushMessage = function () {
     const dialogPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
@@ -26,33 +27,6 @@ window.pushMessage = function () {
     resolveListeners({
         type: "push",
     })
-}
-
-window.$messageS = () => {
-    return $messages
-}
-
-// example message object
-const message = {
-    id: 0,
-    userName: "",
-    message: "text",
-    out: false,
-    post: false,
-    time: new Date(),
-    avatar: "",
-    views: 0,
-    fwd: {
-        from: "Test ",
-        date: ""
-    },
-    reply: {
-        name: "kek",
-        text: "lt"
-    },
-    media: [
-        //
-    ]
 }
 
 const $messages = {
@@ -99,6 +73,14 @@ function fetchMessages(peer, props = {offset_id: 0}) {
             $messages[peer._][peer.id] = []
         }
 
+        messagesSlice.chats.forEach(chat => {
+            PeersManager.set(chat)
+        })
+
+        messagesSlice.users.forEach(user => {
+            PeersManager.set(user)
+        })
+
         messagesSlice.messages.forEach(message => {
             const from = PeersManager.find("user", message.from_id)
             const userName = getPeerName(from)
@@ -114,18 +96,16 @@ function fetchMessages(peer, props = {offset_id: 0}) {
             } else {
                 messageToPush = {
                     type: "text",
-
                     id: message.id,
                     userName: userName,
                     message: parseMessageEntities(message.message, message.entities),
                     out: message.pFlags.out,
                     post: message.pFlags.post,
+                    post_author: message.post_author,
                     time: time,
-                    avatar: "",
                     views: message.views,
-                    media: [
-                        //
-                    ]
+                    peer: peer,
+                    from: from ? from : peer
                 }
 
                 if (message.fwd_from) {
@@ -148,32 +128,23 @@ function fetchMessages(peer, props = {offset_id: 0}) {
             $messages[peer._][peer.id].push(messageToPush)
 
             if (message.media) {
-                fetchMessageMedia(message.id, peer, message.media)
+                fetchMessageMedia(message, peer)
             }
         })
 
-        messagesSlice.chats.forEach(chat => {
-            PeersManager.set(chat)
-        })
-
-        messagesSlice.users.forEach(user => {
-            PeersManager.set(user)
-        })
-
-        resolveListeners({
-            type: "fetch"
-        })
+        if (messagesSlice.messages.length > 0 || props.offset_id === 0) {
+            resolveListeners({
+                type: "fetch"
+            })
+        }
     })
 }
 
-function fetchMessageMedia(messageId, peer, media) {
-    const message = {
-        media
-    }
+function fetchMessageMedia(message, peer) {
 
     if (message.media.photo) {
         FileAPI.getFile(message.media.photo, "m").then(file => {
-            updateSingle(peer._, peer.id, messageId, {
+            updateSingle(peer._, peer.id, message.id, {
                 type: "photo",
                 imgSrc: file
             })
@@ -184,7 +155,7 @@ function fetchMessageMedia(messageId, peer, media) {
         } else {
             const webpage = message.media.webpage
 
-            updateSingle(peer._, peer.id, messageId, {
+            updateSingle(peer._, peer.id, message.id, {
                 type: "url",
                 url: {
                     description: webpage.description,
@@ -195,7 +166,7 @@ function fetchMessageMedia(messageId, peer, media) {
             })
 
             FileAPI.getFile(webpage.photo, "m").then(response => {
-                updateSingle(peer._, peer.id, messageId, {
+                updateSingle(peer._, peer.id, message.id, {
                     type: "url",
                     url: {
                         description: webpage.description,
@@ -207,66 +178,72 @@ function fetchMessageMedia(messageId, peer, media) {
             })
         }
     } else if (message.media.document) {
-        // this.reactive.message = {
-        //     type: "document",
-        //     data: data
-        // }
-        // FileAPI.getFile(message.media.document, "").then(response => {
-        //     const url = response
-        //     message.media.document.attributes.forEach(attribute => {
-        //         if (attribute._ === "documentAttributeVideo") {
-        //             this.reactive.message.data.video = {
-        //                 width: attribute.w,
-        //                 height: attribute.h,
-        //                 url: url,
-        //                 type: message.media.document.mime_type,
-        //                 duration: attribute.duration
-        //             }
-        //             this.reactive.message.type = attribute.pFlags.round_message ? "round" : "video"
-        //         } else if (attribute._ === "documentAttributeSticker") {
-        //             this.reactive.message.data.imgSrc = url
-        //             // console.log(this.reactive.message)
-        //             this.reactive.message.type = "sticker"
-        //
-        //         } else if (attribute._ === "documentAttributeAudio") {
-        //             const wf = []
-        //             const ka = [
-        //                 248, 124, 62, 31, 15, 7, 3, 1
-        //             ]
-        //             const ka2 = [
-        //                 0, 0, 0, 0, 128, 192, 224, 240
-        //             ]
-        //             console.log(attribute.waveform)
-        //             for (let i = 0, k = 0; i < attribute.waveform.length; i++, k = (k + 5) % 8) {
-        //                 let z = attribute.waveform[i]
-        //                 let z2 = attribute.waveform[i + 1]
-        //                 wf.push(z & ka[k])
-        //
-        //             }
-        //             console.log(message)
-        //             this.reactive.message.data.audio = {
-        //                 url: url,
-        //                 waveform: attribute.waveform,
-        //                 read: message.pFlags.media_unread ? "read" : "", // TODO
-        //                 time: formatTimeAudio(attribute.duration)
-        //             }
-        //             this.reactive.message.type = attribute.pFlags.voice ? "voice" : "audio"
-        //         } else if (attribute._ === "documentAttributeFilename") {
-        //             this.reactive.message.data.documentName = attribute.file_name
-        //         } else {
-        //             console.log(attribute)
-        //             /*blob = blob.slice(0, blob.size, "octec/stream")
-        //             this.vNode = vMessageWithFileTemplate({
-        //                 userName: userName,
-        //                 message: messageMessage,
-        //                 fileURL: URL.createObjectURL(blob),
-        //                 fileName: message.media.document.mime_type,
-        //                                     out: message.pFlags.out
-        //
-        //             })*/
-        //         }
-        //     })
-        // })
+        FileAPI.getFile(message.media.document, "").then(response => {
+            const url = response
+            message.media.document.attributes.forEach(attribute => {
+                if (attribute._ === "documentAttributeVideo") {
+                    updateSingle(peer._, peer.id, message.id, {
+                        type: attribute.pFlags.round_message ? "round" : "video",
+                        video: {
+                            width: attribute.w,
+                            height: attribute.h,
+                            url: url,
+                            type: message.media.document.mime_type,
+                            duration: attribute.duration
+                        }
+                    })
+                } else if (attribute._ === "documentAttributeSticker") {
+                    updateSingle(peer._, peer.id, message.id, {
+                        type: "sticker",
+                        imgSrc: url
+                    })
+
+                } else if (attribute._ === "documentAttributeAudio") {
+                    const waveToArray = (form) => {
+                        let buf = "";
+                        const arr = [];
+                        for (let i in form) {
+                            let n = form[i].toString(2);
+                            n = "00000000".substr(n.length) + n;
+                            buf += n;
+                            while (buf.length > 5) {
+                                arr.push(parseInt(buf.substr(0, 5), 2));
+                                buf = buf.substr(5);
+                            }
+                        }
+                        return arr;
+                    }
+
+                    let waveformOld = waveToArray(attribute.waveform)
+                    let waveform = []
+                    for (let i = 0; i < 50; i++) {
+                        waveform.push(1 + waveformOld[Math.floor(i / 50 * waveformOld.length)])
+                    }
+                    updateSingle(peer._, peer.id, message.id, {
+                        type: attribute.pFlags.voice ? "voice" : "audio",
+                        audio: {
+                            url: url,
+                            waveform: waveform,
+                            read: message.pFlags.media_unread ? "read" : "", // TODO
+                            time: formatTimeAudio(attribute.duration)
+                        }
+                    })
+                } else if (attribute._ === "documentAttributeFilename") {
+                    // this.reactive.message.data.documentName = attribute.file_name
+                } else {
+                    console.log(attribute)
+                    /*blob = blob.slice(0, blob.size, "octec/stream")
+                    this.vNode = vMessageWithFileTemplate({
+                        userName: userName,
+                        message: messageMessage,
+                        fileURL: URL.createObjectURL(blob),
+                        fileName: message.media.document.mime_type,
+                                            out: message.pFlags.out
+
+                    })*/
+                }
+            })
+        })
     }
 }
 
@@ -274,8 +251,6 @@ function fetchNextPage(peer) {
     let latest = $messages[peer._][peer.id][$messages[peer._][peer.id].length - 1]
 
     fetchMessages(peer, {offset_id: latest.id})
-
-    console.log($messages)
 }
 
 function resolveListeners(event) {

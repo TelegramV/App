@@ -88,7 +88,11 @@ export class MessageListComponent extends FrameworkComponent {
                 <div id="topbar">
                     <div className="chat-info">
                         <div className="person">
-                            <img src={this.peer.photo} className="avatar"/>
+                            <div
+                                className={"avatar " + (!this.peer.photo ? `placeholder-${this.peer.photoPlaceholder.num}` : "")}
+                                style={`background-image: url(${this.peer.photo});`}>
+                                {!this.peer.photo ? this.peer.photoPlaceholder.text : ""}
+                            </div>
                             <div className="content">
                                 <div className="top">
                                     <div className="title">{getPeerName(this.peer)}</div>
@@ -112,9 +116,9 @@ export class MessageListComponent extends FrameworkComponent {
                         </div>
                         {
                             MessagesManager.allForPeer(this.peer).map(message => {
-                                return <div replaceWith={true}><MessageComponent constructor={{
+                                return <MessageComponent constructor={{
                                     message,
-                                }}/></div>
+                                }}/>
                             })
                         }
                     </div>

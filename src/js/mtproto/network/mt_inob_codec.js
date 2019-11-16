@@ -5,7 +5,7 @@
 import isaac from '../utils/isaac'
 import aesjs from '../utils/aes'
 
-function mt_write_bytes(offset, length, input, buffer)
+export function mt_write_bytes(offset, length, input, buffer)
 {
     for(var i = 0; i < length; ++i)
     {
@@ -13,7 +13,7 @@ function mt_write_bytes(offset, length, input, buffer)
     }
 }
 
-function mt_write_uint32(offset, value, buffer)
+export function mt_write_uint32(offset, value, buffer)
 {
     buffer.setUint32(offset, value, true);
 }
@@ -52,10 +52,10 @@ function mt_get_random_num_unsecure(max) {
     return Math.floor(Math.random() * (max + 1));
 }
 
-var aes_encryptor;
-var aes_decryptor;
-var obfuscation_init = false;
-function mt_init_obfuscation(out_buffer_view)
+var aes_encryptors = {};
+var aes_decryptors = {};
+var obfuscation_init = {};
+function mt_init_obfuscation(out_buffer_view, url)
 {
     var out_buffer_offset = 0;
 
@@ -106,8 +106,8 @@ function mt_init_obfuscation(out_buffer_view)
 
     var obfuscation_buffer_u8arr = new Uint8Array(obfuscation_buffer);
     
-    aes_encryptor = new aesjs.ModeOfOperation.ctr(obf_key_256, new aesjs.Counter(obf_vector_128));
-    var encryptedBytes = aes_encryptor.encrypt(obfuscation_buffer_u8arr);
+    aes_encryptors[url] = new aesjs.ModeOfOperation.ctr(obf_key_256, new aesjs.Counter(obf_vector_128));
+    var encryptedBytes = aes_encryptors[url].encrypt(obfuscation_buffer_u8arr);
 
     for(var i = 56; i < 64; ++i)
     {
@@ -120,25 +120,25 @@ function mt_init_obfuscation(out_buffer_view)
     var deobf_key_256 = new Uint8Array(obfuscation_buffer_reverse.slice(8, 40));
     var deobf_vector_128 = new Uint8Array(obfuscation_buffer_reverse.slice(40, 56));
     
-    aes_decryptor = new aesjs.ModeOfOperation.ctr(deobf_key_256, new aesjs.Counter(deobf_vector_128));
+    aes_decryptors[url] = new aesjs.ModeOfOperation.ctr(deobf_key_256, new aesjs.Counter(deobf_vector_128));
 }
 
-function mt_inob_send_init(socket)
+function mt_inob_send_init(socket, url)
 {
     var obf_buffer = new ArrayBuffer(64);
     var obf_buffer_view = new DataView(obf_buffer);
 
-    mt_init_obfuscation(obf_buffer_view);
+    mt_init_obfuscation(obf_buffer_view, url);
     socket.send(obf_buffer);
 
-    obfuscation_init = true;
+    obfuscation_init[url] = true;
 }
 
-export function mt_inob_send(socket, buffer, buffer_len)
+export function mt_inob_send(socket, buffer, buffer_len, url)
 {
-    if(!obfuscation_init)
+    if(!obfuscation_init[url])
     {
-        mt_inob_send_init(socket);
+        mt_inob_send_init(socket, url);
     }
 
     var out_buffer = new ArrayBuffer(buffer_len + 4);
@@ -148,17 +148,17 @@ export function mt_inob_send(socket, buffer, buffer_len)
     mt_write_uint32(0, buffer_len, out_buffer_view);
     mt_write_bytes(4, buffer_len, new Uint8Array(buffer), out_buffer_view);
 
-    var encrypted_buffer = aes_encryptor.encrypt(new Uint8Array(out_buffer));
+    var encrypted_buffer = aes_encryptors[url].encrypt(new Uint8Array(out_buffer));
     socket.send(encrypted_buffer);
 }
 
-export function mt_inob_recv(ev)
+export function mt_inob_recv(ev, url)
 {
-    if(!obfuscation_init)
+    if(!obfuscation_init[url])
     {
         return null;
     }
 
-    var decrypted_buffer = (aes_decryptor.decrypt(new Uint8Array(ev.data))).buffer;
+    var decrypted_buffer = (aes_decryptors[url].decrypt(new Uint8Array(ev.data))).buffer;
     return (decrypted_buffer.slice(4));
 }
