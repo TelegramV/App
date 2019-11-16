@@ -5,7 +5,7 @@
 import isaac from '../utils/isaac'
 import aesjs from '../utils/aes'
 
-function mt_write_bytes(offset, length, input, buffer)
+export function mt_write_bytes(offset, length, input, buffer)
 {
     for(var i = 0; i < length; ++i)
     {
@@ -13,7 +13,7 @@ function mt_write_bytes(offset, length, input, buffer)
     }
 }
 
-function mt_write_uint32(offset, value, buffer)
+export function mt_write_uint32(offset, value, buffer)
 {
     buffer.setUint32(offset, value, true);
 }
