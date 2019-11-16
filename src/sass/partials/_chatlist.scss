@@ -9,11 +9,11 @@
 	padding-top: 52px;
 	height: 100vh;
 	overflow-y: scroll;
-	scrollbar-width: none;
-	-ms-overflow-style: none;
+	scrollbar-width: 5px;
+	//-ms-overflow-style: none;
 	&::-webkit-scrollbar {
-		width: 0;
-		height: 0;
+		//width: 5px;
+		//height: 100%;
 	}
 }
 

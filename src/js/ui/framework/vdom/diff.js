@@ -18,13 +18,11 @@ const diffEvents = (oldEvents, newEvents) => {
         })
     }
 
-    for (const k in oldEvents) {
-        if (!(k in newEvents)) {
-            patches.push($node => {
-                $node.removeEventListener(k)
-                return $node
-            })
-        }
+    for (const [k, v] of Object.entries(oldEvents)) {
+        patches.push($node => {
+            $node.removeEventListener(k, v)
+            return $node
+        })
     }
 
     return $node => {
@@ -40,7 +38,9 @@ const diffAttrs = (oldAttrs, newAttrs) => {
 
     for (const [k, v] of Object.entries(newAttrs)) {
         patches.push($node => {
-            $node.setAttribute(k, v)
+            if ($node.nodeType !== Node.TEXT_NODE) {
+                $node.setAttribute(k, v)
+            }
             return $node
         })
     }
@@ -48,7 +48,9 @@ const diffAttrs = (oldAttrs, newAttrs) => {
     for (const k in oldAttrs) {
         if (!(k in newAttrs)) {
             patches.push($node => {
-                $node.removeAttribute(k)
+                if ($node.nodeType !== Node.TEXT_NODE) {
+                    $node.removeAttribute(k)
+                }
                 return $node
             })
         }
@@ -97,7 +99,8 @@ export const diff = (oldVTree, newVTree) => {
         }
     }
 
-    if ((typeof oldVTree !== "object" || typeof newVTree !== "object") &&
+    if ((oldVTree instanceof Date || newVTree instanceof Date) ||
+        (typeof oldVTree !== "object" || typeof newVTree !== "object") &&
         (typeof oldVTree !== "function" || typeof newVTree !== "function")) {
 
         if (oldVTree !== newVTree) {
@@ -116,7 +119,7 @@ export const diff = (oldVTree, newVTree) => {
         newVTree = newVTree.tagName.h()
     }
 
-    if (oldVTree.tagName !== newVTree.tagName) {
+    if (oldVTree.tagName !== newVTree.tagName || (newVTree.attrs.hasOwnProperty("replaceWith") && newVTree.attrs.replaceWith)) {
         return $node => {
             const $newNode = render(newVTree)
             $node.replaceWith($newNode)

@@ -1,5 +1,17 @@
-const $peers = []
+import {arrayDelete} from "../../common/utils/utils"
+import {FileAPI} from "../fileAPI"
+
+const $peers = {
+    user: {},
+    chat: {},
+    channel: {}
+}
 const $listeners = []
+const $peerInitListeners = {
+    user: {},
+    chat: {},
+    channel: {}
+}
 
 function resolveListeners(event) {
     if (event) {
@@ -17,24 +29,70 @@ function listenUpdates(listener) {
     }
 }
 
-function push(peer) {
-    $peers.push(peer)
-    resolveListeners({
-        type: "push",
-    })
+function listenPeerInit(peerName, peerId, listener) {
+    if (!$peerInitListeners[peerName]) {
+        $peerInitListeners[peerName] = {}
+    }
+
+    peerId = Number(peerId)
+
+    if (!$peerInitListeners[peerName][peerId]) {
+        $peerInitListeners[peerName][peerId] = []
+    }
+
+    if ($peers[peerName][peerId]) {
+        listener($peers[peerName][peerId])
+    } else {
+        $peerInitListeners[peerName][peerId].push(listener)
+
+        console.log($peerInitListeners[peerName][peerId])
+    }
+}
+
+function set(peer) {
+    if (peer._) {
+        if (!$peers[peer._]) {
+            $peers[peer._] = {}
+        }
+
+        $peers[peer._][peer.id] = peer
+
+        if (peer.photo) {
+            let a = peer.photo.photo_small
+            FileAPI.getPeerPhoto(a, peer, false).then(url => {
+                $peers[peer._][peer.id]["photo"] = url
+                resolveListeners({
+                    type: "updatePhoto",
+                })
+            })
+        }
+
+        if ($peerInitListeners[peer._] && $peerInitListeners[peer._][peer.id]) {
+            $peerInitListeners[peer._][peer.id].forEach(listener => {
+                listener(peer)
+                arrayDelete($peerInitListeners[peer._][peer.id], listener)
+            })
+        }
+
+        resolveListeners({
+            type: "set",
+        })
+    }
 }
 
 function find(name, id) {
-    return $peers.find(peer => peer._ === name && peer.id === Number(id))
+    if (!$peers[name]) {
+        return null
+    }
+
+    return $peers[name][id]
 }
 
 function updateSingle(name, id, data, props = {}) {
-    const peerIndex = $peers.findIndex(peer => peer._ === name && peer.id === id)
-
-    if (peerIndex >= 0) {
+    if (find(name, id)) {
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
-                $peers[peerIndex][key] = data[key]
+                $peers[name][id][key] = data[key]
             }
         }
 
@@ -52,7 +110,8 @@ function getPeers() {
 
 export const PeersManager = {
     listenUpdates,
-    push,
+    listenPeerInit,
+    set,
     getPeers,
     find
 }

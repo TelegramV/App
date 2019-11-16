@@ -1,4 +1,5 @@
 import VDOM from "./index"
+import {FrameworkComponent} from "../component"
 
 /**
  * Renders Virtual DOM Node
@@ -7,7 +8,7 @@ import VDOM from "./index"
  * @returns {Text|HTMLElement|any|Node|string|[]}
  */
 export function render(vNode) {
-    if (!vNode) {
+    if (!vNode || typeof vNode === "undefined") {
         return document.createTextNode(vNode)
     }
 
@@ -22,13 +23,14 @@ export function render(vNode) {
     }
 
 
-    if (typeof vNode !== "object" && typeof vNode !== "function") {
+    // todo: make this smarter: ignore all objects but FrameworkComponent instances
+    if (vNode instanceof Date || typeof vNode !== "object" && typeof vNode !== "function") {
         return document.createTextNode(vNode)
     }
 
     let $el = null
     let isFrameworkObject = false
-    if (typeof vNode.tagName === "object") {
+    if (vNode.tagName instanceof FrameworkComponent) {
         isFrameworkObject = true
         const component = vNode.tagName
 

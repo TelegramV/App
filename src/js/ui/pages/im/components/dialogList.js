@@ -5,6 +5,7 @@ import DialogsManager from "../../../../api/dialogs/dialogsManager"
 export class DialogListComponent extends FrameworkComponent {
     constructor(props = {}) {
         super();
+        this.activationFuctions = []
         DialogsManager.fetchDialogs({})
     }
 
@@ -23,7 +24,8 @@ export class DialogListComponent extends FrameworkComponent {
                     {
                         dialogs.pinnedDialogs.map(dialog => {
                             return <TelegramDialogComponent constructor={{
-                                dialog: dialog
+                                dialog: dialog,
+                                activationFunctions: this.activationFunctions
                             }}/>
                         })
                     }
@@ -42,9 +44,12 @@ export class DialogListComponent extends FrameworkComponent {
     }
 
     mounted() {
-        console.log("mounted")
         DialogsManager.listenUpdates(event => {
             this.render()
         })
+    }
+
+    updated() {
+        // console.log("updated")
     }
 }

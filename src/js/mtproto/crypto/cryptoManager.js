@@ -11,7 +11,7 @@ const Logger = createLogger("CryptoManager", {
 
 class CryptoManager {
     constructor(props = {}) {
-        this.canWork = window.Worker || false
+        this.canWork = false
         if (this.canWork) {
             this.cryptoWorker = new CryptoWorker()
             this.cryptoWorker.addEventListener("message", event => {

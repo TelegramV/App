@@ -27,6 +27,9 @@ export class TelegramDialogComponent extends FrameworkComponent {
         })
     }
 
+    mounted() {
+    }
+
     h() {
         const dialog = this.dialog
         if (!dialog) {
@@ -47,7 +50,11 @@ export class TelegramDialogComponent extends FrameworkComponent {
                     <div class="top">
                         <div class="title">{dialog.title}</div>
                         <div class="status tgico"></div>
-                        <div class="time">{dialog.date}</div>
+                        <div class="time">{dialog.date.toLocaleTimeString('en', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        })}</div>
                     </div>
                     <div class="bottom">
                         <div class="message"><span

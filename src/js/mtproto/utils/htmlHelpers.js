@@ -66,10 +66,10 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
         messageEntityMention: (l, a) => `<a href="#">${a}</a>`,
         messageEntityHashtag: (l, a) => `<a href="#">${a}</a>`,
         messageEntityBotCommand: (l, a) => `<a href="#">${a}</a>`,
-        messageEntityUrl: (l, a) => `<a href="${a}">${a}</a>`,
+        messageEntityUrl: (l, a) => `<a target="_blank" href="${a}">${a}</a>`,
         messageEntityEmail: (l, a) => `<a href="mailto:${a}">${a}</a>`,
 
-        messageEntityTextUrl: (l, a) => `<a href="${l.url}">${a}</a>`, // TODO can be problems when there's " symbol isnide. should be fixed!
+        messageEntityTextUrl: (l, a) => `<a target="_blank" href="${l.url}">${a}</a>`, // TODO can be problems when there's " symbol isnide. should be fixed!
         messageEntityMentionName: (l, a) => `<a>${a}</a>`,
         inputMessageEntityMentionName: (l, a) => `<a>${a}</a>`,
         messageEntityPhone: (l, a) => `<a href="tel:${a}">${a}</a>`,

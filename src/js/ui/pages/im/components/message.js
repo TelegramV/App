@@ -1,8 +1,4 @@
-import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers"
-import {findUserFromMessage, getPeerName} from "./dialog"
 import {FrameworkComponent} from "../../../framework/component"
-import {FileAPI} from "../../../../api/fileAPI";
-import {formatTimeAudio} from "../../../utils";
 
 function vTimeTemplate(data, bg = false) {
     let classes = "inner tgico " + (bg ? "bg" : "")
@@ -33,7 +29,7 @@ function vServiceMessageTemplate(data, inside) {
 
 function vMessageTemplate(data, inside) {
     return (
-        <div class={data.out} data-id={data.id}>
+        <div class={data.out && !data.post ? "out" : "in"} data-id={data.id}>
             {data.out === "in" ? <img class="avatar" src={data.avatar}/> : ""}
             {inside}
         </div>
@@ -175,7 +171,7 @@ function vMessageWithFileTemplate(data) {
 <i>{data.userName}</i>
 </span>
 
-            <div htmlChild="true">
+            <div>
                 <span dangerouslySetInnerHTML={data.message}/>
 
             </div>
@@ -190,191 +186,16 @@ function vMessageWithFileTemplate(data) {
 export class MessageComponent extends FrameworkComponent {
     constructor(options = {}) {
         super()
+
         if (!options.message) {
             throw new Error("message is not defined")
         }
+
         this.message = options.message
-        this.messagesSlice = options.messagesSlice
-    }
-
-    data() {
-        return {
-            message: {
-                type: "",
-                data: {}
-            }
-        }
-    }
-
-    mounted() {
-        const message = this.message
-
-        const user = findUserFromMessage(message, this.messagesSlice)
-        const userName = getPeerName(user)
-        const type = "chat" // TODO getPeerType(user)
-        const time = new Date(message.date * 1000)
-
-        if (message._ === "messageService") {
-            console.log(message)
-            let data = {
-                id: message.id,
-                message: message.action._ // TODO parse this properly
-            }
-            this.reactive.message = {
-                type: "service",
-                data: data
-            }
-            return
-        }
-        const messageMessage = parseMessageEntities(message.message, message.entities)
-
-        const timeString = time.toLocaleTimeString('en', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        })
-        const out = message.pFlags.out && type !== "channel" ? "out" : "in"
-        console.log(message, user)
-
-        let data = {
-            id: message.id,
-            userName: userName,
-            message: messageMessage,
-            out: out,
-            time: (message.post_author && message.post_author.length > 0 ? message.post_author + ", " : "") + timeString,
-            avatar: "",
-            views: message.views
-        }
-        if (message.fwd_from) {
-            data.fwd = {
-                from: "Test " + message.fwd_from.from_id,
-                date: message.fwd_from.date
-
-            }
-        }
-        if (message.reply_to_msg_id) {
-
-            data.reply = {
-                name: "kek",
-                text: "lt"
-            }
-        }
-        if (message.media) {
-            if (message.media.photo) {
-                this.reactive.message = {
-                    type: "photo",
-                    data: data
-                }
-
-                FileAPI.getFile(message.media.photo, "m").then(file => {
-                    this.reactive.message.data.imgSrc = file
-                })
-            } else if (message.media.webpage) {
-                if (message.media.webpage._ === "webPageEmpty") {
-                    this.reactive.message = {
-                        type: "text",
-                        data: data
-                    }
-                } else {
-                    this.reactive.message = {
-                        type: "url",
-                        data: data
-                    }
-                    const webpage = message.media.webpage
-                    console.log(webpage)
-                    this.reactive.message.data.url = {
-                        description: webpage.description,
-                        url: webpage.url,
-                        title: webpage.title,
-                        siteName: webpage.site_name
-                    }
-                    console.log("webpage photo download ", webpage.photo)
-                    FileAPI.getFile(webpage.photo, "m").then(response => {
-                        console.log("webpage photo " + response)
-                        this.reactive.message.data.url.photo = response
-                    })
-                }
-            } else if (message.media.document) {
-                this.reactive.message = {
-                    type: "document",
-                    data: data
-                }
-                FileAPI.getFile(message.media.document, "").then(response => {
-                    const url = response
-                    message.media.document.attributes.forEach(attribute => {
-                        if (attribute._ === "documentAttributeVideo") {
-                            this.reactive.message.data.video = {
-                                width: attribute.w,
-                                height: attribute.h,
-                                url: url,
-                                type: message.media.document.mime_type,
-                                duration: attribute.duration
-                            }
-                            this.reactive.message.type = attribute.pFlags.round_message ? "round" : "video"
-                        } else if (attribute._ === "documentAttributeSticker") {
-                            this.reactive.message.data.imgSrc = url
-                            // console.log(this.reactive.message)
-                            this.reactive.message.type = "sticker"
-
-                        } else if (attribute._ === "documentAttributeAudio") {
-                            const wf = []
-                            const ka = [
-                                248, 124, 62, 31, 15, 7, 3, 1
-                            ]
-                            const ka2 = [
-                                0, 0, 0, 0, 128, 192, 224, 240
-                            ]
-                            console.log(attribute.waveform)
-                            for (let i = 0, k = 0; i < attribute.waveform.length; i++, k = (k + 5) % 8) {
-                                let z = attribute.waveform[i]
-                                let z2 = attribute.waveform[i + 1]
-                                wf.push(z & ka[k])
-
-                            }
-                            console.log(message)
-                            this.reactive.message.data.audio = {
-                                url: url,
-                                waveform: attribute.waveform,
-                                read: message.pFlags.media_unread ? "read" : "", // TODO
-                                time: formatTimeAudio(attribute.duration)
-                            }
-                            this.reactive.message.type = attribute.pFlags.voice ? "voice" : "audio"
-                        } else if (attribute._ === "documentAttributeFilename") {
-                            this.reactive.message.data.documentName = attribute.file_name
-                        } else {
-                            console.log(attribute)
-                            /*blob = blob.slice(0, blob.size, "octec/stream")
-                            this.vNode = vMessageWithFileTemplate({
-                                userName: userName,
-                                message: messageMessage,
-                                fileURL: URL.createObjectURL(blob),
-                                fileName: message.media.document.mime_type,
-                                                    out: message.pFlags.out
-
-                            })*/
-                        }
-                    })
-                })
-            }
-
-        } else {
-            this.reactive.message = {
-                type: "text",
-                data: data
-            }
-        }
-
-
-        if (user && user.photo) {
-            let a = user.photo.photo_small
-            FileAPI.getPeerPhoto(a, user, false).then(url => {
-                this.reactive.message.data.avatar = url
-            })
-        }
     }
 
     h() {
-        if (!this.reactive.message.type) {
+        if (!this.message.type) {
             return <div>Unsupported message type</div>
         }
 
@@ -391,6 +212,6 @@ export class MessageComponent extends FrameworkComponent {
             service: vServiceMessageTemplate
         }
 
-        return handlers[this.reactive.message.type](this.reactive.message.data)
+        return handlers[this.message.type](this.message)
     }
 }

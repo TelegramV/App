@@ -1,7 +1,8 @@
 import {h} from "./h"
 
 const jsxAttributesMap = {
-    className: "class"
+    className: "class",
+    htmlFor: "for"
 }
 
 function flatArray(array) {
@@ -33,7 +34,6 @@ export function jsx(tagName, attributes, ...children) {
     let events = {}
     let options = {}
     let constructor = {}
-    let htmlChild = false
 
     children = children.flat(Infinity)
 
@@ -45,8 +45,6 @@ export function jsx(tagName, attributes, ...children) {
                 options = Object.assign(options, v)
             } else if (k === "constructor") {
                 constructor = Object.assign(options, v)
-            } else if (k === "htmlChild") {
-                htmlChild = Boolean(v)
             } else {
                 if (jsxAttributesMap.hasOwnProperty(k)) {
                     attrs[jsxAttributesMap[k]] = v
@@ -57,7 +55,7 @@ export function jsx(tagName, attributes, ...children) {
         }
     }
 
-    return h(tagName, {attrs, constructor, options, events, children, htmlChild,})
+    return h(tagName, {attrs, constructor, options, events, children})
 }
 
 export default jsx

@@ -12,6 +12,8 @@ self.addEventListener("message", event => {
 
     let result = null
 
+    console.log("work some thins")
+
     switch (task) {
         case "findPQ":
             const pqFinder = new PqFinder(taskData.pq)

@@ -13,30 +13,6 @@ import {generateDialogIndex, getMessageLocalID} from "./messageIdManager"
 import {getMessagePreviewDialog} from "../../ui/utils"
 import PeersManager from "../peers/peersManager"
 
-/**
- * dialog template
- */
-const sampleDialog = {
-    title: "",
-    pinned: false,
-    muted: false,
-    photo: "",
-    unreadCount: 0,
-    unreadMentionsCount: 0,
-    message: {
-        sender: "",
-        text: "",
-        self: false,
-        date: new Date(),
-        id: ""
-    },
-    date: new Date(),
-    peer: {
-        _: "user",
-        id: ""
-    }
-}
-
 window.pushDialog = function () {
     let newd = $dialogs[nextRandomInt($dialogs.length)]
     newd.date = new Date()
@@ -67,9 +43,16 @@ let __is_fetched = false
 let __is_empty = false
 
 function fetchDialogs({
-                          limit = 20, flags = {}, exclude_pinned = false, folder_id = "", offset_date = "", offset_id = "", offset_peer = {
-        _: "inputPeerEmpty"
-    }, hash = ""
+                          limit = 20,
+                          flags = {},
+                          exclude_pinned = false,
+                          folder_id = "",
+                          offset_date = "",
+                          offset_id = "",
+                          offset_peer = {
+                              _: "inputPeerEmpty"
+                          },
+                          hash = ""
                       }) {
 
     __is_latest_sorted = false
@@ -82,7 +65,7 @@ function fetchDialogs({
     }
 
 
-    MTProto.invokeMethod("messages.getDialogs", {
+    return MTProto.invokeMethod("messages.getDialogs", {
         flags: flags,
         exclude_pinned: exclude_pinned,
         folder_id: folder_id,
@@ -135,14 +118,11 @@ function fetchDialogs({
                     date: message.date,
                     id: message.id,
                 },
-                date: date.toLocaleTimeString('en', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                }),
+                date: date,
                 peer: {
                     _: peer._,
-                    id: peer.id
+                    id: peer.id,
+                    access_hash: peer.access_hash
                 },
                 index: generateDialogIndex(message.date)
             }
@@ -157,7 +137,7 @@ function fetchDialogs({
                 $dialogs.push(data)
             }
 
-            PeersManager.push(peer)
+            PeersManager.set(peer)
 
             if (peer.photo) {
                 fetchPhoto(peer, {
@@ -189,7 +169,7 @@ export function fetchNextPage({limit = 20}) {
 
     const data = {
         limit: limit,
-        offset_peer: offsetPeer,
+        offset_peer: offsetPeer
     }
 
     return fetchDialogs(data)
@@ -203,8 +183,6 @@ function fetchPhoto(peer, props = {}) {
             updateSingle(peer, {
                 photo: url
             }, props)
-
-            // console.log(URL.createObjectURL(blob))
         }).catch(e => {
 
         })

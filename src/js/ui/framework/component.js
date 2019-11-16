@@ -9,8 +9,6 @@ import ObservableSlim from "observable-slim"
  */
 export class FrameworkComponent {
     constructor(props = {}) {
-        this.componentId = ""
-
         /**
          * Define data only if it is really needed
          */
@@ -48,7 +46,9 @@ export class FrameworkComponent {
         //
     }
 
+    /** render functions defines in {@link VDOM.render} */
     render() {
-        throw new Error("this component cannot be rendered")
+        console.warn("this component cannot be rendered")
+        // throw new Error("this component cannot be rendered")
     }
 }

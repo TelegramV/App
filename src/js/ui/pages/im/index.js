@@ -10,7 +10,6 @@ function onScrollDialogs(event) {
     }
 }
 
-
 export class IMPage extends FrameworkComponent {
     constructor(props = {}) {
         super()

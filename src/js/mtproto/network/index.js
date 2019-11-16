@@ -227,7 +227,7 @@ export class Networker {
                     try {
                         result.body = this.fetchObject('Object', field + '[body]')
                     } catch (e) {
-                        //console.error(dT(), 'parse error', e.message, e.stack)
+                        console.error('parse error', e.message, e.stack)
                         result.body = {_: 'parse_error', error: e}
                     }
                     // TODO wtf кастыли кокие-то
