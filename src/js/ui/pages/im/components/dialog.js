@@ -68,7 +68,7 @@ export class TelegramDialogComponent extends FrameworkComponent {
         const submsg = message.message
         const date = new Date(message.date * 1000)
 
-        console.log(peer, dialog)
+        // console.log(peer, dialog)
         this.reactive.data = {
             pinned: dialogPinned,
             peerName,
@@ -91,7 +91,7 @@ export class TelegramDialogComponent extends FrameworkComponent {
         if (peer.photo) {
             let a = peer.photo.photo_small
             try {
-                FileAPI.getPeerPhoto(a, peer, false).then(url => {
+                FileAPI.getPeerPhoto(a, peer.photo.dc_id, peer, false).then(url => {
                     this.reactive.data.photo = url
                 }).catch(e => {
                     //

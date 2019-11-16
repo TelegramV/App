@@ -70,9 +70,12 @@ export class MessageListComponent extends FrameworkComponent {
             this.reactive.title = getPeerName(peer)
             this.reactive.messagesSlice = messagesSlice
             this.reactive.isLoading = false
+            this.reactive.photo = {
+
+            }
             if(peer.photo) {
                 let a = peer.photo.photo_small
-                FileAPI.getPeerPhoto(a, peer, false).then(url => {
+                FileAPI.getPeerPhoto(a, peer.photo.dc_id, peer, false).then(url => {
                     this.reactive.photo = {
                        url: url
                     }

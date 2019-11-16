@@ -69,7 +69,7 @@ export class DialogListComponent extends FrameworkComponent {
             offset_peer: {
                 _: "inputPeerEmpty"
             },
-            limit: 20,
+            limit: 30,
             hash: ""
         }).then(dialogsSlice => {
             AppTemporaryStorage.setItem("dialogsSlice", dialogsSlice)

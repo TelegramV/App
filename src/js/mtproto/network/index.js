@@ -43,7 +43,7 @@ export class Networker {
         this.seqNo = 0
         this.connectionInited = false
 
-        mt_set_disconnect_processor(this.onDisconnect)
+        mt_set_disconnect_processor(this.onDisconnect, DataCenter.chooseServer(this.auth.dcID))
     }
 
     getMsgKey(dataWithPadding, isOut) {
@@ -147,7 +147,7 @@ export class Networker {
             request.storeRawBytes(encryptedResult.bytes, 'encrypted_data')
 
             // TODO xhrSendBuffer
-            const requestData = true ? request.getBuffer() : request.getArray()
+            const requestData = request.getBuffer()
 
             const url = DataCenter.chooseServer(this.auth.dcID)
 
@@ -165,7 +165,7 @@ export class Networker {
 
         const authKeyID = deserializer.fetchIntBytes(64, false, 'auth_key_id')
         if (!bytesCmp(authKeyID, this.auth.authKeyID)) {
-            throw new Error('[MT] Invalid server auth_key_id: ' + bytesToHex(authKeyID))
+            throw new Error('[MT] Invalid server auth_key_id: ' + bytesToHex(authKeyID) + ", dcid " + this.auth.dcID)
         }
         const msgKey = deserializer.fetchIntBytes(128, true, 'msg_key')
         const encryptedData = deserializer.fetchRawBytes(responseBuffer.byteLength - deserializer.getOffset(), true, 'encrypted_data')
@@ -289,12 +289,12 @@ export class Networker {
         mt_ws_set_processor(function (data_buffer) {
             if (data_buffer.byteLength <= 4) {
                 //some another protocol violation here
-                console.log(data_buffer)
+                console.log(this.auth.dcID)
                 throw new Error("404??")
             }
             const response = this.parseResponse(data_buffer)
             this.messageProcessor.process(response.response, response.messageID, response.sessionID)
-        }, this)
+        }, this, DataCenter.chooseServer(this.auth.dcID))
         this.sendEncryptedRequest(message)
         /*return this.sendEncryptedRequest(message).then(result => {
             const response = this.parseResponse(result.data)
@@ -313,6 +313,9 @@ export class Networker {
 
             serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, 'invokeWithLayer')
             serializer.storeInt(AppConfiguration.mtproto.api.layer, 'layer')
+            if(this.auth.exportedAuth) {
+                // serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
+            }
             serializer.storeInt(AppConfiguration.mtproto.api.initConnection, 'initConnection')
             serializer.storeInt(AppConfiguration.mtproto.api.api_id, 'api_id')
             serializer.storeString(navigator.userAgent || 'Unknown UserAgent', 'device_model')

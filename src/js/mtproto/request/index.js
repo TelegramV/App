@@ -44,7 +44,7 @@ export function sendPlainRequest(dcID, requestBuffer, processor) {
         const msg_len = deserializer.fetchInt("msg_len")
 
         processor(deserializer);
-    }, this);
+    }, this, url);
     mt_ws_transport(url, requestData);
     /*return axios.post(url, requestData, {
         responseType: "arraybuffer",

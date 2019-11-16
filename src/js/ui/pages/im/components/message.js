@@ -5,6 +5,7 @@ import {FrameworkComponent} from "../../../framework/component"
 import {FileAPI} from "../../../../api/fileAPI";
 import {bytesFromArrayBuffer} from "../../../../mtproto/utils/bin";
 import {formatTimeAudio} from "../../../utils";
+import {MTProto} from "../../../../mtproto";
 
 function vTimeTemplate(data, bg = false) {
     let classes = "inner tgico " + (bg ? "bg" : "")
@@ -78,9 +79,15 @@ function vMessageWithImageTemplate(data) {
     ))
 }
 
+function test() {
+    MTProto.createFileNetworker(1).then(l => {
+        console.log(l)
+    })
+}
+
 function vMessageWithUrlTemplate(data) {
     return vMessageTemplate(data, (
-        <div className={vGetClass(data)}>
+        <div className={vGetClass(data)} onClick={test}>
             <div className="message">
                 <span dangerouslySetInnerHTML={data.message}/>
                 {vTimeTemplate(data)}
@@ -220,7 +227,7 @@ export class MessageComponent extends FrameworkComponent {
         const time = new Date(message.date * 1000)
 
         if (message._ === "messageService") {
-            console.log(message)
+            // console.log(message)
             let data = {
                 id: message.id,
                 message: message.action._ // TODO parse this properly
@@ -239,7 +246,7 @@ export class MessageComponent extends FrameworkComponent {
             hour12: false
         })
         const out = message.pFlags.out && type !== "channel" ? "out" : "in"
-        console.log(message, user)
+        // console.log(message, user)
 
         let data = {
             id: message.id,
@@ -322,27 +329,32 @@ export class MessageComponent extends FrameworkComponent {
                             this.reactive.message.type = "sticker"
 
                         } else if (attribute._ === "documentAttributeAudio") {
-                            const wf = []
-                            const ka = [
-                                248, 124, 62, 31, 15, 7, 3, 1
-                            ]
-                            const ka2 = [
-                                0, 0, 0, 0, 128, 192, 224, 240
-                            ]
-                            console.log(attribute.waveform)
-                            for (let i = 0, k = 0; i < attribute.waveform.length; i++, k = (k + 5) % 8) {
-                                let z = attribute.waveform[i]
-                                let z2 = attribute.waveform[i + 1]
-                                wf.push(z & ka[k])
-
+                            function waveToArray(form) {
+                                let buf = "";
+                                const arr = [];
+                                for (let i in form) {
+                                    let n = form[i].toString(2);
+                                    n = "00000000".substr(n.length) + n;
+                                    buf += n;
+                                    while (buf.length > 5) {
+                                        arr.push(parseInt(buf.substr(0, 5), 2));
+                                        buf = buf.substr(5);
+                                    }
+                                }
+                                return arr;
                             }
-                            console.log(message)
+                            let waveformOld = waveToArray(attribute.waveform)
+                            let waveform = []
+                            for(let i = 0; i < 50; i++) {
+                                waveform.push(1 + waveformOld[Math.floor(i / 50 * waveformOld.length)])
+                            }
                             this.reactive.message.data.audio = {
                                 url: url,
-                                waveform: attribute.waveform,
+                                waveform: waveform,
                                 read: message.pFlags.media_unread ? "read" : "", // TODO
                                 time: formatTimeAudio(attribute.duration)
                             }
+                        console.log(attribute.waveform)
                             this.reactive.message.type = attribute.pFlags.voice ? "voice" : "audio"
                         } else if(attribute._ === "documentAttributeFilename") {
                             this.reactive.message.data.documentName = attribute.file_name
@@ -372,7 +384,7 @@ export class MessageComponent extends FrameworkComponent {
 
         if (user && user.photo) {
             let a = user.photo.photo_small
-            FileAPI.getPeerPhoto(a, user, false).then(url => {
+            FileAPI.getPeerPhoto(a, user.photo.dc_id, user, false).then(url => {
                 this.reactive.message.data.avatar = url
             })
         }

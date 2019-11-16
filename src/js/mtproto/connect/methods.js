@@ -1,19 +1,20 @@
 import {TLSerialization} from "../language/serialization"
 import {
+    bigint,
     bigStringInt,
-    bytesCmp,
+    bytesCmp, bytesFromArrayBuffer,
     bytesFromHex,
     bytesModPow,
     bytesToArrayBuffer,
     bytesToHex,
-    bytesXor,
+    bytesXor, longFromInts,
     secureRandom
 } from "../utils/bin"
 import {sendPlainRequest} from "../request"
 import {rsaEncrypt} from "../crypto/rsa"
 import {sha1BytesSync} from "../crypto/sha"
 import {TLDeserialization} from "../language/deserialization"
-import {BigInteger} from "jsbn"
+import {BigInteger} from "../vendor/jsbn/jsbn"
 import TimeManager, {tsNow} from "../timeManager"
 import {createLogger} from "../../common/logger"
 import AppCryptoManager from "../crypto/cryptoManager"
@@ -103,7 +104,6 @@ export function sendReqPQ(authContext, processor, proc_context) {
 
     sendPlainRequest(authContext.dcID, messageSerializer.getBuffer(), function (deserializer) {
         const resPQ = deserializer.fetchObject("ResPQ")
-        Logger.info(resPQ);
 
         if (resPQ._ !== "resPQ") {
             throw new Error("[MT] resPQ response invalid: " + resPQ._)
@@ -133,6 +133,8 @@ export function sendReqPQ(authContext, processor, proc_context) {
 
             authContext.p = result.p
             authContext.q = result.q
+
+
 
             sendReqDhParams(authContext, function () {
                 processor.call(proc_context);
@@ -224,7 +226,7 @@ function decryptServerDhDataAnswer(authContext, encryptedAnswer) {
         const hash = answerWithHash.slice(0, 20)
         const answerWithPadding = answerWithHash.slice(20)
         const buffer = bytesToArrayBuffer(answerWithPadding)
-        Logger.log("mtpDecryptServerDhDataAnswer", bytesToHex(answerWithPadding));
+        // Logger.log("mtpDecryptServerDhDataAnswer", bytesToHex(answerWithPadding));
 
         const deserializer = new TLDeserialization(buffer, {mtproto: true})
         const response = deserializer.fetchObject("Server_DH_inner_data")
@@ -365,7 +367,7 @@ function sendSetClientDhParams(authContext, processor, proc_context) {
 
             Logger.debug("GOT auth key!", authKey);
 
-            Logger.warn("SHIT", authContext.gA, authContext.b, authContext.dhPrime)
+            Logger.debug("SHIT", authContext.gA, authContext.b, authContext.dhPrime)
 
             const authKeyHash = sha1BytesSync(authKey)
             const authKeyAux = authKeyHash.slice(0, 8)
