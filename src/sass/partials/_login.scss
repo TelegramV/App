@@ -80,6 +80,8 @@ html, body, #app {
 		text-transform: uppercase;
 		opacity: 1;
 		border: 0;
+		outline: 0;
+		cursor: pointer;
 
 		&:not([disabled]):hover {
 			background-color: $bluehover;
@@ -113,6 +115,7 @@ html, body, #app {
 
 		#countryList {
 			margin-top: 8px;
+			max-height: 30vh;
 		}
 
 		.dropdown-item {
@@ -120,10 +123,14 @@ html, body, #app {
 			flex-direction: row;
 			justify-content: space-between;
 			align-items: center;
+			height: 50px;
 
 			.country-flag {
-				width: 30px;
 				padding: 10px;
+
+				.emoji-sizer {
+					font-size: 24px;
+				}
 			}
 
 			.country-flag>img {
