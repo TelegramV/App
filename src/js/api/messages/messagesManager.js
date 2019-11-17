@@ -143,12 +143,18 @@ function fetchMessages(peer, props = {offset_id: 0}) {
 function fetchMessageMedia(message, peer) {
 
     if (message.media.photo) {
-        FileAPI.getFile(message.media.photo, "m").then(file => {
+        console.log(message.media)
+        updateSingle(peer._, peer.id, message.id, {
+            type: "photo",
+            imgSrc: FileAPI.getThumbnail(message.media.photo),
+            imgSize: [message.media.photo.sizes[1].w, message.media.photo.sizes[1].h]
+        })
+        /*FileAPI.getFile(message.media.photo, "m").then(file => {
             updateSingle(peer._, peer.id, message.id, {
                 type: "photo",
                 imgSrc: file
             })
-        })
+        })*/
     } else if (message.media.webpage) {
         if (message.media.webpage._ === "webPageEmpty") {
             //

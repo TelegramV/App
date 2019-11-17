@@ -75,7 +75,9 @@ function vMessageWithImageTemplate(data) {
     let haveMsg = data.message && data.message.length > 0;
     return vMessageTemplate(data, (
         <div class={vGetClass(data)}>
-            <img class="attachment" src={data.imgSrc}></img>
+            <div style="overflow: hidden;">
+                <img class="attachment" src={data.imgSrc} style={`width: ${data.imgSize[0]}px; height: ${data.imgSize[1]}px; filter: blur(10px); margin: -20px -20px -20px -20px;`}></img>
+            </div>
             {haveMsg ? (<div class="message">
                 <span dangerouslySetInnerHTML={data.message}/>
                 {vTimeTemplate(data)}
