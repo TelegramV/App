@@ -109,6 +109,9 @@ function handlePasswordSend() {
         const srp_id = response.srp_id
         const srp_B = response.srp_B
 
+        console.log(response);
+        console.log(password);
+
         const srp_ret = mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, password);
 
         MTProto.invokeMethod("auth.checkPassword", {

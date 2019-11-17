@@ -7,7 +7,7 @@ export function rsaEncrypt(publicKey, bytes) {
     const N = new BigInteger(publicKey.modulus, 16)
     const E = new BigInteger(publicKey.exponent, 16)
     const X = new BigInteger(bytes)
-    const encryptedBigInt = X.modPowInt(E, N)
+    const encryptedBigInt = X.modPow(E, N)
 
     return bytesFromBigInt(encryptedBigInt, 256)
 }

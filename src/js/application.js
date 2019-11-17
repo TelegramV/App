@@ -69,6 +69,12 @@ function password() {
 }
 
 function start() {
+    /*for(let i = 1; i <= 4; i++) {
+        MTProto.invokeMethod("help.getConfig", {}, i).then(l => {
+            console.log("dc", i, l)
+        })
+    }
+    return;*/
     // password();
     /*AppFramework.Router.route("/login", "login", {
         h() {
