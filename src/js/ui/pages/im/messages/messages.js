@@ -9,6 +9,7 @@ import DialogsManager from "../../../../api/dialogs/dialogsManager"
 
 let $messagesElement = document.createElement("div")
 let peer = null
+let $sticky = []
 
 function get$bubbles() {
     return $messagesElement.querySelector("#bubbles-inner")
@@ -17,10 +18,28 @@ function get$bubbles() {
 function onScrollMessages(peer) {
     return event => {
         const $element = event.target
-        if ($element.scrollHeight - $element.scrollTop === $element.clientHeight) {
+        if ($element.scrollTop < 20) {
             MessagesManager.fetchNextPage(peer)
         }
+        //
+        // if ($element.scrollHeight - $element.scrollTop === $element.clientHeight) {
+        //     MessagesManager.fetchNextPage(peer)
+        // }
     }
+}
+
+
+function createStickyDate(message) {
+    const date = new Date(message.time)
+
+    return VDOM.render(
+        <div className="service date">
+            <div className="service-msg">{date.toLocaleDateString("en", {
+                month: "long",
+                day: "2-digit"
+            })}</div>
+        </div>
+    )
 }
 
 function render(peer) {
@@ -52,9 +71,6 @@ function render(peer) {
             </div>
             <div id="bubbles" onScroll={onScrollMessages(peer)}>
                 <div id="bubbles-inner">
-                    <div className="service">
-                        <div className="service-msg">October 21</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -65,13 +81,52 @@ function rerender(peer) {
     $messagesElement = VDOM.mount(render(peer), $messagesElement)
 }
 
+function isOtherDay(date1, date2) {
+    return date1.getFullYear() !== date2.getFullYear() || date1.getMonth() !== date2.getMonth() || date1.getDay() !== date2.getDay()
+}
+
+let $latestSticky = null
 function appendMessages(messages) {
     const $bubblesInner = get$bubbles()
 
     if ($bubblesInner) {
+        const $bubbles = document.getElementById("bubbles")
+
+        if($latestSticky && !isOtherDay(messages[0].time, $latestSticky.date)) {
+            $latestSticky.elem.parentElement.removeChild($latestSticky.elem)
+        }
+        let latest = null
+        let final = null
+
+        let k = $bubblesInner.clientHeight
+
         messages.forEach(message => {
+            if (latest && isOtherDay(message.time, latest.time)) {
+                let s = createStickyDate(latest)
+                if (s) $bubblesInner.appendChild(s)
+                final = latest.time
+                latest = null
+            }
+            if(!latest) latest = message
+
             $bubblesInner.appendChild(UICreateMessage(message))
         })
+
+        if (latest) {
+            let s = createStickyDate(latest)
+            if (s) $bubblesInner.appendChild(s)
+            final = latest.time
+            latest = null
+        }
+
+        const all = document.querySelectorAll(".date.service")
+        $latestSticky = {
+            elem: all[all.length - 1],
+            date: final
+        }
+        $bubbles.scrollTop += $bubblesInner.clientHeight - k
+
+
     }
 }
 
@@ -79,9 +134,22 @@ function prependMessages(messages) {
     const $bubblesInner = get$bubbles()
 
     if ($bubblesInner) {
+        const $bubbles = document.getElementById("bubbles")
+
+        // if($latestSticky && !isOtherDay(messages[messages.length - 1].time, $latestSticky.date)) {
+        //     $latestSticky.elem.parentElement.removeChild($latestSticky.elem)
+        // }
+        let reset = false
+        if($bubblesInner.clientHeight - ($bubbles.scrollTop + $bubbles.clientHeight) < 50) {
+            reset = true
+        }
         messages.forEach(message => {
+            // todo sticky date
             $bubblesInner.prepend(UICreateMessage(message))
         })
+        if(reset) {
+            $bubbles.scrollTop = $bubblesInner.clientHeight
+        }
     }
 }
 
