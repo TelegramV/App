@@ -88,14 +88,19 @@ class MobileProtocol {
     connect(authContext, processor, proc_context) {
         this.authContext = authContext
 
-        if (!AppPermanentStorage.exists("authKey")) {
+        // TODO remove, only for dev
+        if(AppPermanentStorage.exists("authKey")) {
+            AppPermanentStorage.setItem("authKey2", AppPermanentStorage.getItem("authKey"))
+            AppPermanentStorage.setItem("serverSalt2", AppPermanentStorage.getItem("serverSalt"))
+        }
+        if (!AppPermanentStorage.exists("authKey" + this.authContext.dcID)) {
             //return new Promise(resolve => {
             connect(authContext, function () {//.then(() => {
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
-                AppPermanentStorage.setItem("authKey", bytesToHex(authContext.authKey))
-                AppPermanentStorage.setItem("serverSalt", bytesToHex(authContext.serverSalt))
+                AppPermanentStorage.setItem("authKey" + this.authContext.dcID, bytesToHex(authContext.authKey))
+                AppPermanentStorage.setItem("serverSalt" + this.authContext.dcID, bytesToHex(authContext.serverSalt))
 
                 this.networker = new Networker(authContext)
                 this.MessageProcessor = this.networker.messageProcessor
@@ -109,8 +114,8 @@ class MobileProtocol {
             //})
             //})
         } else {
-            authContext.authKey = new Uint8Array(bytesFromHex(AppPermanentStorage.getItem("authKey")))
-            authContext.serverSalt = bytesFromHex(AppPermanentStorage.getItem("serverSalt"))
+            authContext.authKey = new Uint8Array(bytesFromHex(AppPermanentStorage.getItem("authKey" + this.authContext.dcID)))
+            authContext.serverSalt = bytesFromHex(AppPermanentStorage.getItem("serverSalt" + this.authContext.dcID))
 
             this.networker = new Networker(authContext)
             this.MessageProcessor = this.networker.messageProcessor
@@ -123,11 +128,28 @@ class MobileProtocol {
     }
 
     async createFileNetworker(dcID) {
+        if(AppPermanentStorage.exists("authKey" + dcID)) {
+            const networker = new Networker({
+                dcID: dcID,
+                nonce: createNonce(16),
+                sessionID: createNonce(8), // TODO check if secure?
+                updates: false,
+                authKey: new Uint8Array(bytesFromHex(AppPermanentStorage.getItem("authKey" + dcID))),
+                serverSalt: new Uint8Array(bytesFromHex(AppPermanentStorage.getItem("serverSalt" + dcID)))
+            })
+            const list = this.fileNetworkers[dcID]
+            this.fileNetworkers[dcID] = networker
+            list.forEach(l => {
+                l.resolve(networker.callApi(networker.wrapApiCall(l.method, l.parameters)))
+            })
+            return networker
+        }
         const authContext = {
             dcID: dcID,
             nonce: createNonce(16),
             sessionID: createNonce(8), // TODO check if secure?
-            exportedAuth: await AuthAPI.exportAuth(dcID)
+            exportedAuth: await AuthAPI.exportAuth(dcID),
+            updates: false
         }
 
         return new Promise(resolve => {
@@ -143,6 +165,11 @@ class MobileProtocol {
                     list.forEach(async l => {
                         l.resolve(networker.callApi(networker.wrapApiCall(l.method, l.parameters)))
                     })
+                    authContext.authKey = new Uint8Array(authContext.authKey)
+                    authContext.serverSalt = new Uint8Array(authContext.serverSalt)
+
+                    AppPermanentStorage.setItem("authKey" + authContext.dcID, bytesToHex(authContext.authKey))
+                    AppPermanentStorage.setItem("serverSalt" + authContext.dcID, bytesToHex(authContext.serverSalt))
 
                     resolve(networker)
                 })
@@ -165,10 +192,9 @@ class MobileProtocol {
             if (!networker) {
                 this.fileNetworkers[dcID] = []
                 return new Promise(resolve => {
-                    this.createFileNetworker(dcID).then(networker => {
-                        resolve(networker.callApi(networker.wrapApiCall(method, parameters)))
+                    return this.createFileNetworker(dcID).then(networker => {
+                        networker.callApi(networker.wrapApiCall(method, parameters)).then(resolve)
                     })
-
                 })
             }
 

@@ -39,6 +39,8 @@ export class Networker {
         auth.authKeyAux = auth.authKeyHash.slice(0, 8)
         auth.authKeyID = auth.authKeyHash.slice(-8)
 
+        this.updates = auth.updates
+
         this.auth = auth
         this.seqNo = 0
         this.connectionInited = false
@@ -313,7 +315,7 @@ export class Networker {
 
             serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, 'invokeWithLayer')
             serializer.storeInt(AppConfiguration.mtproto.api.layer, 'layer')
-            if(this.auth.exportedAuth) {
+            if(!this.updates) {
                 serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
             }
             serializer.storeInt(AppConfiguration.mtproto.api.initConnection, 'initConnection')

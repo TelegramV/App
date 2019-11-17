@@ -132,12 +132,14 @@ function fetchMessages(peer, props = {offset_id: 0}) {
 
             messagesToPush.push(messageToPush)
 
+            $messages[peer._][peer.id].push(messageToPush)
+
             if (message.media) {
                 fetchMessageMedia(message, peer)
             }
         })
 
-        $messages[peer._][peer.id].push(...messagesToPush)
+        //$messages[peer._][peer.id].push(...messagesToPush)
 
         if (messagesSlice.messages.length > 0 || props.offset_id === 0) {
             resolveListeners({
@@ -152,12 +154,24 @@ function fetchMessages(peer, props = {offset_id: 0}) {
 function fetchMessageMedia(message, peer) {
 
     if (message.media.photo) {
-        FileAPI.getFile(message.media.photo, "m").then(file => {
+        try {
             updateSingle(peer, message.id, {
                 type: "photo",
-                imgSrc: file
+                imgSrc: FileAPI.getThumbnail(message.media.photo),
+                imgSize: [message.media.photo.sizes[1].w, message.media.photo.sizes[1].h],
+                thumbnail: true
             })
-        })
+        } catch {
+            
+        } finally {
+            FileAPI.getFile(message.media.photo, "m").then(file => {
+                updateSingle(peer, message.id, {
+                    type: "photo",
+                    imgSrc: file,
+                    thumbnail: false
+                })
+            })
+        }
     } else if (message.media.webpage) {
         if (message.media.webpage._ === "webPageEmpty") {
             //
