@@ -65,6 +65,8 @@ function fetchMessages(peer, props = {offset_id: 0}) {
         _: peer._,
         id: peer.id
     }
+    console.log("fetching")
+
     return MTProto.invokeMethod("messages.getHistory", {
         peer: PeerAPI.getInput(peer),
         offset_id: props.offset_id,
@@ -80,6 +82,7 @@ function fetchMessages(peer, props = {offset_id: 0}) {
             _: 0,
             id: 0
         }
+        console.log("fethed")
 
         if (!$messages[peer._]) {
             $messages[peer._] = {}
@@ -165,14 +168,12 @@ function fetchMessages(peer, props = {offset_id: 0}) {
 
             messagesToPush.push(messageToPush)
 
-            $messages[peer._][peer.id].push(messageToPush)
-
             if (message.media) {
                 fetchMessageMedia(message, peer)
             }
         })
 
-        //$messages[peer._][peer.id].push(...messagesToPush)
+        $messages[peer._][peer.id].push(...messagesToPush)
 
         if (messagesSlice.messages.length > 0 || props.offset_id === 0) {
             resolveListeners({
@@ -221,18 +222,19 @@ function fetchMessageMedia(message, peer) {
         FileAPI.getFile(message.media.document, "").then(response => {
             const url = response
             message.media.document.attributes.forEach(attribute => {
-                if (attribute._ === "documentAttributeVideo") {
-                    updateSingle(peer, message.id, {
-                        type: attribute.pFlags.round_message ? "round" : "video",
-                        video: {
-                            width: attribute.w,
-                            height: attribute.h,
-                            url: url,
-                            type: message.media.document.mime_type,
-                            duration: attribute.duration
-                        }
-                    })
-                } else if (attribute._ === "documentAttributeSticker") {
+                // if (attribute._ === "documentAttributeVideo") {
+                //     updateSingle(peer, message.id, {
+                //         type: attribute.pFlags.round_message ? "round" : "video",
+                //         video: {
+                //             width: attribute.w,
+                //             height: attribute.h,
+                //             url: url,
+                //             type: message.media.document.mime_type,
+                //             duration: attribute.duration
+                //         }
+                //     })
+                // } else
+                    if (attribute._ === "documentAttributeSticker") {
                     updateSingle(peer, message.id, {
                         type: "sticker",
                         imgSrc: url
@@ -281,6 +283,8 @@ function fetchMessageMedia(message, peer) {
 
 function fetchNextPage(peer) {
     let latest = $messages[peer._][peer.id][$messages[peer._][peer.id].length - 1]
+
+    console.log(peer, latest)
 
     return fetchMessages(peer, {offset_id: latest.id})
 }
