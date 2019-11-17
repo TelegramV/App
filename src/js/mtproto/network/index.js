@@ -21,7 +21,6 @@ import {MessageProcessor} from "./messageProcessor"
 import AppConfiguration from "../../configuration"
 
 import {mt_set_disconnect_processor, mt_ws_set_processor, mt_ws_transport} from "./mt_ws_transport"
-import AppCryptoManager from "../crypto/cryptoManager"
 
 const Logger = createLogger("Networker", {
     level: "warn"
@@ -219,27 +218,29 @@ export class Networker {
             mtproto: true,
             schema: require("../language/schema_combine"),
             override: {
-                mt_message: function (result, field) {
-                    result.msg_id = this.fetchLong(field + '[msg_id]')
-                    result.seqno = this.fetchInt(field + '[seqno]')
-                    result.bytes = this.fetchInt(field + '[bytes]')
+                // fuck what is the point?
 
-                    const offset = this.getOffset()
-
-                    try {
-                        result.body = this.fetchObject('Object', field + '[body]')
-                    } catch (e) {
-                        console.error('parse error', e.message, e.stack)
-                        result.body = {_: 'parse_error', error: e}
-                    }
-                    // TODO wtf кастыли кокие-то
-                    if (this.offset != offset + result.bytes) {
-                        // console.warn(dT(), 'set offset', this.offset, offset, result.bytes)
-                        // console.log(dT(), result)
-                        this.offset = offset + result.bytes
-                    }
-                    // console.log('override message', result)
-                },
+                // mt_message: function (result, field) {
+                //     result.msg_id = this.fetchLong(field + '[msg_id]')
+                //     result.seqno = this.fetchInt(field + '[seqno]')
+                //     result.bytes = this.fetchInt(field + '[bytes]')
+                //
+                //     const offset = this.getOffset()
+                //
+                //     try {
+                //         result.body = this.fetchObject('Object', field + '[body]')
+                //     } catch (e) {
+                //         console.error('parse error', e.message, e.stack)
+                //         throw e
+                //     }
+                //     // TODO wtf кастыли кокие-то
+                //     if (this.offset != offset + result.bytes) {
+                //         // console.warn(dT(), 'set offset', this.offset, offset, result.bytes)
+                //         // console.log(dT(), result)
+                //         this.offset = offset + result.bytes
+                //     }
+                //     // console.log('override message', result)
+                // },
                 // TODO
                 mt_rpc_result: function (result, field) {
                     // console.log("mt_rpc_result", result, field)
@@ -264,7 +265,14 @@ export class Networker {
 
         deserializer = new TLDeserialization(buffer, deserializerOptions)
 
-        const response = deserializer.fetchObject('', 'INPUT')
+        let response = {}
+
+        try {
+            response = deserializer.fetchObject('', 'INPUT')
+        } catch (e) {
+            console.log("?/")
+            throw e
+        }
 
         return {
             response: response,

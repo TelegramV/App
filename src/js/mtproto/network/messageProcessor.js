@@ -26,6 +26,7 @@ export class MessageProcessor {
         this.updateShortListeners = []
         this.updateShortMessagesListeners = []
         this.updateNewMessagesListeners = []
+        this.updateNewChannelMessagesListeners = []
 
         this.handlers = {
             "msg_container": this.processMessageContainer.bind(this),
@@ -37,6 +38,7 @@ export class MessageProcessor {
             "updateShort": this.processUpdateShort.bind(this),
             "updateShortMessage": this.processUpdateShortMessage.bind(this),
             "updateNewMessage": this.processUpdateNewMessage.bind(this),
+            "updateNewChannelMessage": this.processUpdateNewChannelMessage.bind(this),
             "updates": this.processUpdates.bind(this),
         }
     }
@@ -54,8 +56,15 @@ export class MessageProcessor {
     }
 
     processUpdateNewMessage(message, messageID, sessionID) {
-        console.log(message)
+        // console.log(message)
         this.updateNewMessagesListeners.forEach(listener => listener(message))
+        // Logger.log("Short update", message)
+    }
+
+
+    processUpdateNewChannelMessage(message, messageID, sessionID) {
+        console.log(message)
+        this.updateNewChannelMessagesListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
 
@@ -72,7 +81,7 @@ export class MessageProcessor {
             if (this.handlers[update._]) {
                 this.handlers[update._](update)
             } else {
-                console.warn("unexprected update")
+                console.warn("unexprected update", update)
             }
         })
     }
@@ -86,7 +95,11 @@ export class MessageProcessor {
     }
 
     listenUpdateNewMessage(listener) {
-        this.updateShortMessagesListeners.push(listener)
+        this.updateNewMessagesListeners.push(listener)
+    }
+
+    listenUpdateNewChannelMessage(listener) {
+        this.updateNewChannelMessagesListeners.push(listener)
     }
 
     listenRpc(messageId, handler, reject) {

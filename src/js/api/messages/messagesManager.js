@@ -318,51 +318,110 @@ function initDataIfNeeded(peer) {
     }
 }
 
-function pushTop(message, short = false) {
-    if (short) {
-        initDataIfNeeded({_: "user", id: message.user_id})
-    } else {
-        initDataIfNeeded(message.peer) // mb have to be fixed
-    }
+function pushTopNew(message) {
+    console.log(message)
+    const from = PeersManager.find("user", message.from_id)
 
-    let from = null
-    if (short) {
-        from = PeersManager.find("user", message.user_id)
-    } else {
-        from = PeersManager.find("user", message.from_id)
-    }
+    initDataIfNeeded(from)
 
     const userName = getPeerName(from)
     const time = new Date(message.date * 1000)
 
-    let messageToPush = {
-        type: "text",
-        id: message.id,
-        userName: userName,
-        message: parseMessageEntities(message.message, message.entities),
-        out: message.pFlags.out,
-        post: false,
-        post_author: "",
-        time: time,
-        views: 0,
-        peer: from,
-        from: from
-    }
-
-    console.log(messageToPush)
-
-    if (message.fwd_from) {
-        messageToPush.fwd = {
-            from: "Test " + message.fwd_from.from_id,
-            date: message.fwd_from.date
-
+    let messageToPush = {}
+    if (message._ === "messageService") {
+        messageToPush = {
+            type: "service",
+            id: message.id,
+            message: message.action._ // TODO parse this properly
         }
+    } else {
+        messageToPush = {
+            type: "text",
+            id: message.id,
+            userName: userName,
+            message: parseMessageEntities(message.message, message.entities),
+            out: message.pFlags.out,
+            post: message.pFlags.post,
+            post_author: message.post_author,
+            time: time,
+            views: message.views,
+            peer: from,
+            from: from
+        }
+
+        if (message.fwd_from) {
+            messageToPush.fwd = {
+                from: "Test " + message.fwd_from.from_id,
+                date: message.fwd_from.date
+
+            }
+        }
+
+        if (message.reply_to_msg_id) {
+            messageToPush.reply = {
+                name: "kek",
+                text: "lt"
+            }
+        }
+
     }
 
-    if (message.reply_to_msg_id) {
-        messageToPush.reply = {
-            name: "kek",
-            text: "lt"
+    $messages[from._][from.id].unshift(0)
+    $messages[from._][from.id][0] = messageToPush
+
+    resolveListeners({
+        type: "pushTop",
+        message: messageToPush,
+        peer: from
+    })
+
+    if (message.media) {
+        fetchMessageMedia(message, from)
+    }
+}
+
+function pushTopShort(message) {
+    initDataIfNeeded({_: "user", id: message.user_id})
+
+    let from = PeersManager.find("user", message.user_id)
+
+    const userName = getPeerName(from)
+    const time = new Date(message.date * 1000)
+    let messageToPush = {}
+    if (message._ === "messageService") {
+        messageToPush = {
+            type: "service",
+            id: message.id,
+            message: message.action._ // TODO parse this properly
+        }
+    } else {
+        messageToPush = {
+            type: "text",
+            id: message.id,
+            userName: userName,
+            message: parseMessageEntities(message.message, message.entities),
+            out: message.pFlags.out,
+            post: false,
+            post_author: "",
+            time: time,
+            views: 0,
+            peer: from,
+            from: from
+        }
+
+        if (message.fwd_from) {
+            messageToPush.fwd = {
+                from: "Test " + message.fwd_from.from_id,
+                date: message.fwd_from.date
+
+            }
+        }
+
+        if (message.reply_to_msg_id) {
+            messageToPush.reply = {
+                name: "kek",
+                text: "lt"
+            }
         }
     }
 
@@ -445,10 +504,14 @@ function existForPeer(peer) {
 
 function init() {
     MTProto.MessageProcessor.listenUpdateShortMessage(update => {
-        pushTop(update, true)
+        pushTopShort(update)
     })
     MTProto.MessageProcessor.listenUpdateNewMessage(update => {
-        pushTop(update, false)
+        pushTopNew(update.message)
+    })
+    MTProto.MessageProcessor.listenUpdateNewChannelMessage(update => {
+        console.log("??")
+        pushTopNew(update.message)
     })
 }
 
