@@ -18,7 +18,8 @@
     "bigint-node": "^1.0.4",
     "goog": "^0.2.1",
     "observable-slim": "^0.1.5",
-    "rusha": "^0.8.13"
+    "rusha": "^0.8.13",
+    "emoji-js": "^3.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",
