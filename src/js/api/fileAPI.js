@@ -1,6 +1,6 @@
 import {MTProto} from "../mtproto";
 import {PeerAPI} from "./peerAPI";
-import {bufferConcat, bytesFromHex, bytesToHex} from "../mtproto/utils/bin";
+import {bufferConcat, bytesFromHex, bytesToHex, createNonce, nextRandomInt} from "../mtproto/utils/bin";
 
 const cache = {}
 const cachePeerPhotos = {}
@@ -26,6 +26,26 @@ export class FileAPI {
             },
             flags: 0
         }
+    }
+
+    static saveFilePart(id, bytes) {
+        return MTProto.invokeMethod("upload.saveFilePart", {
+            file_id: id,
+            file_part: 0,
+            bytes
+        })
+    }
+    static uploadProfilePhoto(name, bytes) {
+        const id = [nextRandomInt(0xffffffff), nextRandomInt(0xffffffff)]
+
+        return this.saveFilePart(id, bytes).then(MTProto.invokeMethod("photos.uploadProfilePhoto", {
+            file: {
+                _: "inputFile",
+                id,
+                parts: 1,
+                name: name
+            }
+        }))
     }
 
     static getFileLocation(location, dcID = null) {
