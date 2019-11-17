@@ -9,6 +9,8 @@ import mt_srp_check_password from "../../../mtproto/crypto/mt_srp/mt_srp";
 import {FileAPI} from "../../../api/fileAPI";
 
 const Croppie = require("croppie")
+const Emoji = require("emoji-js");
+let emoji = new Emoji();
 
 let $countryInput = null
 let $list = null
@@ -106,6 +108,9 @@ function handlePasswordSend() {
         const p = response.current_algo.p
         const srp_id = response.srp_id
         const srp_B = response.srp_B
+
+        console.log(response);
+        console.log(password);
 
         const srp_ret = mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, password);
 
@@ -280,9 +285,9 @@ function generateFullDropdown() {
         elem.dataset.flag = country[2].toLowerCase();
 
         let name = elem.dataset.name;
+        let flag = emoji.replace_colons(":flag-"+elem.dataset.flag+":");
 
-
-        elem.innerHTML = "<div class=\"country-flag\"><img src=\"/static/images/flags/" + country[2].toLowerCase() + ".svg\"></div>\
+        elem.innerHTML = "<div class=\"country-flag\">"+flag+"</div>\
                         <div class=\"country-name\">" + name + "</div>\
                         <div class=\"country-code\">" + country[0] + "</div>"
 
@@ -297,7 +302,7 @@ function fillDropdown(str) {
     for (let i = 0; i < $list.childNodes.length; i++) {
         let elem = $list.childNodes[i]
         let name = elem.dataset.name
-        if (name.toLowerCase().startsWith(str.toLowerCase()) || str.length === 0) {
+        if ( str.length === 0 || name.toLowerCase().startsWith(str.toLowerCase())) {
             elem.style.display = "flex"
         } else {
             elem.style.display = "none"
