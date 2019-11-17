@@ -2,13 +2,12 @@ import {MTProto} from "./mtproto"
 import {createNonce} from "./mtproto/utils/bin"
 //import {setCode2FAForm} from "./ui/login/loginPage"
 import {AppPermanentStorage} from "./common/storage"
-import {LoginPage} from "./ui/pages/login"
-import {IMPage} from "./ui/pages/im"
-import {AppFramework} from "./ui/framework/framework"
-import * as sjcl from "./mtproto/crypto/mt_srp/sjcl"
 import mt_srp_check_password from "./mtproto/crypto/mt_srp/mt_srp"
 
 import "../sass/application.scss"
+import {ImPage} from "./ui/pages/im/impage"
+import {LoginPage} from "./ui/pages/login/nextlogin"
+import {AppFramework} from "./ui/framework/framework"
 
 const authContext = {
     dcID: 2,
@@ -40,7 +39,7 @@ function password() {
 
         const srp_ret = mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, "password");
         //TODO: засунуть куда-то эту хуйню
-        
+
         MTProto.invokeMethod("auth.checkPassword", {
             password: {
                 _: "inputCheckPasswordSRP",
@@ -69,16 +68,22 @@ function password() {
 }
 
 function start() {
-    //password();
+    // password();
     AppFramework.Router.route("/login", "login", {
         h() {
-            return <LoginPage/>
+            return document.createElement("div")
+        }
+    })
+    AppFramework.Router.route("/login-x", "loginx", {
+        h() {
+            return LoginPage()
         }
     })
 
     AppFramework.Router.route("/", "main", {
         h() {
-            return <IMPage/>
+            console.log("ll")
+            return ImPage()
         }
     })
 

@@ -8,20 +8,8 @@
  */
 import VDOM from "../vdom"
 
-class RouterViewHTMLElement extends HTMLElement {
-    constructor() {
-        super();
-    }
-}
-
 export class FrameworkRouter {
     constructor(options = {}) {
-        if (!options.Framework) {
-            throw new Error("Framework is not defined")
-        }
-
-        this.Framework = options.Framework
-
         this.mode = options.mode || "hash"
         this.hash = options.hash || "#/"
 
@@ -29,9 +17,6 @@ export class FrameworkRouter {
 
         this.mountId = options.mountId || "app"
         this.routes = options.routes || []
-
-        this.Framework.registerComponent("router-view", RouterViewHTMLElement)
-        this.routerView = document.getElementsByTagName("router-view").item(0) || false
 
         this.activeRoute = {}
         this.middlewares = []
@@ -41,7 +26,6 @@ export class FrameworkRouter {
     middleware(handler) {
         this.middlewares.push(handler)
     }
-
 
     /**
      * WARNING: for some reason do not pass component as an object of HTMLElement! I have to fix it later.
@@ -109,7 +93,7 @@ export class FrameworkRouter {
 
     renderRoute(route) {
         if (route.component.hasOwnProperty("h") && typeof route.component.h === "function") {
-            this.$mountElement = VDOM.mount(VDOM.render(route.component.h()), this.$mountElement)
+            this.$mountElement = VDOM.mount(route.component.h(), this.$mountElement)
         }
 
         if (route.component.hasOwnProperty("mounted") && typeof route.component.mounted === "function") {
@@ -135,7 +119,7 @@ export class FrameworkRouter {
             foundRoute = {
                 component: {
                     h() {
-                        return <h1>404</h1>
+                        return VDOM.render(<h1>404</h1>)
                     }
                 }
             }

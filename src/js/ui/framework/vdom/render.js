@@ -5,11 +5,23 @@ import {FrameworkComponent} from "../component"
  * Renders Virtual DOM Node
  *
  * @param vNode
- * @returns {Text|HTMLElement|any|Node|string|[]}
+ * @returns {Text|HTMLElement}
  */
 export function render(vNode) {
     if (!vNode || typeof vNode === "undefined") {
         return document.createTextNode(vNode)
+    }
+
+    if (typeof vNode === "object" && !vNode.tagName) {
+        return document.createTextNode(JSON.stringify(vNode))
+    }
+
+    if (typeof vNode.tagName === "object") {
+        throw new Error("not allowed now!")
+
+        if (!(vNode.tagName instanceof FrameworkComponent)) {
+            return document.createTextNode(JSON.stringify(vNode))
+        }
     }
 
     if (Array.isArray(vNode)) {
@@ -23,8 +35,7 @@ export function render(vNode) {
     }
 
 
-    // todo: make this smarter: ignore all objects but FrameworkComponent instances
-    if (vNode instanceof Date || typeof vNode !== "object" && typeof vNode !== "function") {
+    if (typeof vNode !== "object" && typeof vNode !== "function") {
         return document.createTextNode(vNode)
     }
 

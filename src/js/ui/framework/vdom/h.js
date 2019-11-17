@@ -19,6 +19,8 @@ export function h(tagName, {attrs = {}, constructor = {}, options = {}, events =
     if (tagName === "a" && !attrs.target) {
         attrs.target = "_blank"
     }
+    // console.warn(tagName)
+
 
     Object.assign(vElem, {
         tagName,

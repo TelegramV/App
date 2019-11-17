@@ -3,10 +3,9 @@ import {PeerAPI} from "../peerAPI"
 import PeersManager from "../peers/peersManager"
 import {nextRandomInt} from "../../mtproto/utils/bin"
 import {AppFramework} from "../../ui/framework/framework"
-import {getPeerName} from "../../ui/pages/im/components/dialog"
 import {parseMessageEntities} from "../../mtproto/utils/htmlHelpers"
 import {FileAPI} from "../fileAPI"
-import {formatTimeAudio} from "../../ui/utils"
+import {getPeerName} from "../dialogs/util"
 
 window.pushMessage = function () {
     const dialogPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
@@ -27,6 +26,10 @@ window.pushMessage = function () {
     resolveListeners({
         type: "push",
     })
+}
+
+window.$messageee = () => {
+    return $messages
 }
 
 const $messages = {
@@ -81,6 +84,8 @@ function fetchMessages(peer, props = {offset_id: 0}) {
             PeersManager.set(user)
         })
 
+        const messagesToPush = []
+
         messagesSlice.messages.forEach(message => {
             const from = PeersManager.find("user", message.from_id)
             const userName = getPeerName(from)
@@ -125,6 +130,8 @@ function fetchMessages(peer, props = {offset_id: 0}) {
 
             }
 
+            messagesToPush.push(messageToPush)
+
             $messages[peer._][peer.id].push(messageToPush)
 
             if (message.media) {
@@ -132,9 +139,13 @@ function fetchMessages(peer, props = {offset_id: 0}) {
             }
         })
 
+        //$messages[peer._][peer.id].push(...messagesToPush)
+
         if (messagesSlice.messages.length > 0 || props.offset_id === 0) {
             resolveListeners({
-                type: "fetch"
+                type: "updateMany",
+                peer: peer,
+                messages: messagesToPush
             })
         }
     })
@@ -143,25 +154,26 @@ function fetchMessages(peer, props = {offset_id: 0}) {
 function fetchMessageMedia(message, peer) {
 
     if (message.media.photo) {
-        console.log(message.media)
-        updateSingle(peer._, peer.id, message.id, {
+        updateSingle(peer, message.id, {
             type: "photo",
             imgSrc: FileAPI.getThumbnail(message.media.photo),
-            imgSize: [message.media.photo.sizes[1].w, message.media.photo.sizes[1].h]
+            imgSize: [message.media.photo.sizes[1].w, message.media.photo.sizes[1].h],
+            thumbnail: true
         })
-        /*FileAPI.getFile(message.media.photo, "m").then(file => {
-            updateSingle(peer._, peer.id, message.id, {
+        FileAPI.getFile(message.media.photo, "m").then(file => {
+            updateSingle(peer, message.id, {
                 type: "photo",
-                imgSrc: file
+                imgSrc: file,
+                thumbnail: false
             })
-        })*/
+        })
     } else if (message.media.webpage) {
         if (message.media.webpage._ === "webPageEmpty") {
             //
         } else {
             const webpage = message.media.webpage
 
-            updateSingle(peer._, peer.id, message.id, {
+            updateSingle(peer, message.id, {
                 type: "url",
                 url: {
                     description: webpage.description,
@@ -172,7 +184,7 @@ function fetchMessageMedia(message, peer) {
             })
 
             FileAPI.getFile(webpage.photo, "m").then(response => {
-                updateSingle(peer._, peer.id, message.id, {
+                updateSingle(peer, message.id, {
                     type: "url",
                     url: {
                         description: webpage.description,
@@ -184,72 +196,72 @@ function fetchMessageMedia(message, peer) {
             })
         }
     } else if (message.media.document) {
-        FileAPI.getFile(message.media.document, "").then(response => {
-            const url = response
-            message.media.document.attributes.forEach(attribute => {
-                if (attribute._ === "documentAttributeVideo") {
-                    updateSingle(peer._, peer.id, message.id, {
-                        type: attribute.pFlags.round_message ? "round" : "video",
-                        video: {
-                            width: attribute.w,
-                            height: attribute.h,
-                            url: url,
-                            type: message.media.document.mime_type,
-                            duration: attribute.duration
-                        }
-                    })
-                } else if (attribute._ === "documentAttributeSticker") {
-                    updateSingle(peer._, peer.id, message.id, {
-                        type: "sticker",
-                        imgSrc: url
-                    })
-
-                } else if (attribute._ === "documentAttributeAudio") {
-                    const waveToArray = (form) => {
-                        let buf = "";
-                        const arr = [];
-                        for (let i in form) {
-                            let n = form[i].toString(2);
-                            n = "00000000".substr(n.length) + n;
-                            buf += n;
-                            while (buf.length > 5) {
-                                arr.push(parseInt(buf.substr(0, 5), 2));
-                                buf = buf.substr(5);
-                            }
-                        }
-                        return arr;
-                    }
-
-                    let waveformOld = waveToArray(attribute.waveform)
-                    let waveform = []
-                    for (let i = 0; i < 50; i++) {
-                        waveform.push(1 + waveformOld[Math.floor(i / 50 * waveformOld.length)])
-                    }
-                    updateSingle(peer._, peer.id, message.id, {
-                        type: attribute.pFlags.voice ? "voice" : "audio",
-                        audio: {
-                            url: url,
-                            waveform: waveform,
-                            read: message.pFlags.media_unread ? "read" : "", // TODO
-                            time: formatTimeAudio(attribute.duration)
-                        }
-                    })
-                } else if (attribute._ === "documentAttributeFilename") {
-                    // this.reactive.message.data.documentName = attribute.file_name
-                } else {
-                    console.log(attribute)
-                    /*blob = blob.slice(0, blob.size, "octec/stream")
-                    this.vNode = vMessageWithFileTemplate({
-                        userName: userName,
-                        message: messageMessage,
-                        fileURL: URL.createObjectURL(blob),
-                        fileName: message.media.document.mime_type,
-                                            out: message.pFlags.out
-
-                    })*/
-                }
-            })
-        })
+        // FileAPI.getFile(message.media.document, "").then(response => {
+        //     const url = response
+        //     message.media.document.attributes.forEach(attribute => {
+        //         if (attribute._ === "documentAttributeVideo") {
+        //             updateSingle(peer, message.id, {
+        //                 type: attribute.pFlags.round_message ? "round" : "video",
+        //                 video: {
+        //                     width: attribute.w,
+        //                     height: attribute.h,
+        //                     url: url,
+        //                     type: message.media.document.mime_type,
+        //                     duration: attribute.duration
+        //                 }
+        //             })
+        //         } else if (attribute._ === "documentAttributeSticker") {
+        //             updateSingle(peer, message.id, {
+        //                 type: "sticker",
+        //                 imgSrc: url
+        //             })
+        //
+        //         } else if (attribute._ === "documentAttributeAudio") {
+        //             const waveToArray = (form) => {
+        //                 let buf = "";
+        //                 const arr = [];
+        //                 for (let i in form) {
+        //                     let n = form[i].toString(2);
+        //                     n = "00000000".substr(n.length) + n;
+        //                     buf += n;
+        //                     while (buf.length > 5) {
+        //                         arr.push(parseInt(buf.substr(0, 5), 2));
+        //                         buf = buf.substr(5);
+        //                     }
+        //                 }
+        //                 return arr;
+        //             }
+        //
+        //             let waveformOld = waveToArray(attribute.waveform)
+        //             let waveform = []
+        //             for (let i = 0; i < 50; i++) {
+        //                 waveform.push(1 + waveformOld[Math.floor(i / 50 * waveformOld.length)])
+        //             }
+        //             updateSingle(peer, message.id, {
+        //                 type: attribute.pFlags.voice ? "voice" : "audio",
+        //                 audio: {
+        //                     url: url,
+        //                     waveform: waveform,
+        //                     read: message.pFlags.media_unread ? "read" : "", // TODO
+        //                     time: formatTimeAudio(attribute.duration)
+        //                 }
+        //             })
+        //         } else if (attribute._ === "documentAttributeFilename") {
+        //             // this.reactive.message.data.documentName = attribute.file_name
+        //         } else {
+        //             console.log(attribute)
+        //             /*blob = blob.slice(0, blob.size, "octec/stream")
+        //             this.vNode = vMessageWithFileTemplate({
+        //                 userName: userName,
+        //                 message: messageMessage,
+        //                 fileURL: URL.createObjectURL(blob),
+        //                 fileName: message.media.document.mime_type,
+        //                                     out: message.pFlags.out
+        //
+        //             })*/
+        //         }
+        //     })
+        // })
     }
 }
 
@@ -307,6 +319,7 @@ function allForPeer(peer) {
         return []
     }
 
+
     return $messages[peer._][peer.id] ? $messages[peer._][peer.id] : []
 }
 
@@ -318,8 +331,8 @@ function isFetchingFor(peer) {
     return __fetching_for._ == peer._ && __fetching_for.id == peer.id
 }
 
-function updateSingle(peerName, peerId, messageId, data, props = {}) {
-    const message = find({_: peerName, id: Number(peerId)}, messageId)
+function updateSingle(peer, messageId, data, props = {}) {
+    const message = find(peer, messageId)
     if (message) {
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
@@ -329,11 +342,11 @@ function updateSingle(peerName, peerId, messageId, data, props = {}) {
 
         resolveListeners({
             type: "updateSingle",
-            peerName,
-            peerId
+            peer: peer,
+            message: message
         })
     } else {
-        console.warn("message wasn't found", peerName, peerId)
+        console.warn("message wasn't found", peer, messageId)
     }
 }
 
