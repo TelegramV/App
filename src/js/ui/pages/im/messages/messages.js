@@ -18,13 +18,10 @@ function get$bubbles() {
 function onScrollMessages(peer) {
     return event => {
         const $element = event.target
-        if ($element.scrollTop < 20) {
+
+        if ($element.scrollTop === 0) {
             MessagesManager.fetchNextPage(peer)
         }
-        //
-        // if ($element.scrollHeight - $element.scrollTop === $element.clientHeight) {
-        //     MessagesManager.fetchNextPage(peer)
-        // }
     }
 }
 
@@ -86,13 +83,14 @@ function isOtherDay(date1, date2) {
 }
 
 let $latestSticky = null
+
 function appendMessages(messages) {
     const $bubblesInner = get$bubbles()
 
     if ($bubblesInner) {
         const $bubbles = document.getElementById("bubbles")
 
-        if($latestSticky && !isOtherDay(messages[0].time, $latestSticky.date)) {
+        if ($latestSticky && !isOtherDay(messages[0].time, $latestSticky.date)) {
             $latestSticky.elem.parentElement.removeChild($latestSticky.elem)
         }
         let latest = null
@@ -107,7 +105,7 @@ function appendMessages(messages) {
                 final = latest.time
                 latest = null
             }
-            if(!latest) latest = message
+            if (!latest) latest = message
 
             $bubblesInner.appendChild(UICreateMessage(message))
         })
@@ -140,14 +138,14 @@ function prependMessages(messages) {
         //     $latestSticky.elem.parentElement.removeChild($latestSticky.elem)
         // }
         let reset = false
-        if($bubblesInner.clientHeight - ($bubbles.scrollTop + $bubbles.clientHeight) < 50) {
+        if ($bubblesInner.clientHeight - ($bubbles.scrollTop + $bubbles.clientHeight) < 50) {
             reset = true
         }
         messages.forEach(message => {
             // todo sticky date
             $bubblesInner.prepend(UICreateMessage(message))
         })
-        if(reset) {
+        if (reset) {
             $bubbles.scrollTop = $bubblesInner.clientHeight
         }
     }

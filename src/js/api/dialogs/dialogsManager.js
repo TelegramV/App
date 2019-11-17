@@ -298,7 +298,32 @@ function init() {
 
         const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
 
-        updateSingle({_: "user", id: message.user_id} , {
+        updateSingle({_: "user", id: message.user_id}, {
+            message: {
+                sender: messageUsername + msgPrefix,
+                text: submsg,
+                self: messageSelf,
+                date: date,
+                id: message.id,
+            }
+        })
+    })
+
+    MTProto.MessageProcessor.listenUpdateNewMessage(update => {
+        console.log("UPDATE", update)
+
+        const messageUser = PeersManager.find("user", update.message.user_id)
+        let messageUsername = `${getPeerName(messageUser, false)}`
+        let messageSelf = messageUser ? messageUser.id === update.message.user_id : false
+
+        const message = update.message
+
+        const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
+        const date = new Date(message.date * 1000)
+
+        const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
+
+        updateSingle({_: "user", id: message.user_id}, {
             message: {
                 sender: messageUsername + msgPrefix,
                 text: submsg,

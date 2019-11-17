@@ -45,12 +45,12 @@ export class MessageProcessor {
 
     processUpdateShort(message, messageID, sessionID) {
         console.log(message)
-        this.updateShortListeners.forEach(listener => listener(message.update))
+        this.updateShortListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
 
     processUpdateShortMessage(message, messageID, sessionID) {
-        console.log(message)
+        console.log("short", message)
         this.updateShortMessagesListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }

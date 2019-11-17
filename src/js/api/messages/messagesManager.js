@@ -5,7 +5,7 @@ import {nextRandomInt} from "../../mtproto/utils/bin"
 import {AppFramework} from "../../ui/framework/framework"
 import {parseMessageEntities} from "../../mtproto/utils/htmlHelpers"
 import {FileAPI} from "../fileAPI"
-import {getPeerName} from "../dialogs/util"
+import {dialogPeerMap, getPeerName} from "../dialogs/util"
 
 window.pushMessage = function () {
     const dialogPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
@@ -319,8 +319,12 @@ function initDataIfNeeded(peer) {
 }
 
 function pushTopNew(message) {
-    console.log(message)
-    const from = PeersManager.find("user", message.from_id)
+    console.log("pushtotop", message)
+    let peer = null
+    if (dialogPeerMap[message.to_id._] === "chat" || dialogPeerMap[message.to_id._] === "channel") {
+        peer = PeersManager.find(dialogPeerMap[message.to_id._], message.to_id[dialogPeerMap[message.to_id._] + "_id"])
+    }
+    let from = PeersManager.find("user", message.from_id)
 
     initDataIfNeeded(from)
 
@@ -345,7 +349,7 @@ function pushTopNew(message) {
             post_author: message.post_author,
             time: time,
             views: message.views,
-            peer: from,
+            peer: peer,
             from: from
         }
 
