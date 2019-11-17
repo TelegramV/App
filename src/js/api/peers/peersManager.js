@@ -57,23 +57,39 @@ function set(peer) {
             $peers[peer._] = {}
         }
 
-        $peers[peer._][peer.id] = peer
+        peer.photoPlaceholder = {
+            num: Math.abs(peer.id) % 8,
+            text: getPeerName(peer)[0]
+        }
 
         if (peer.photo) {
             let a = peer.photo.photo_small
-            FileAPI.getPeerPhoto(a, peer.photo.dc_id, peer, false).then(url => {
+            let dcid = peer.photo.dc_id
+
+            const pfstorage = find(peer._, peer.id)
+
+            if (pfstorage && pfstorage.photo) {
+                peer.photo = pfstorage.photo
+            } else {
+                peer.photo = false
+            }
+
+            FileAPI.getPeerPhoto(a, dcid, peer, false).then(url => {
                 $peers[peer._][peer.id]["photo"] = url
                 resolveListeners({
                     type: "updatePhoto",
+                    peer: peer
+                })
+            }).catch(() => {
+                $peers[peer._][peer.id]["photo"] = false
+                resolveListeners({
+                    type: "updatePhoto",
+                    peer: peer
                 })
             })
         }
 
-
-        $peers[peer._][peer.id].photoPlaceholder = {
-            num: Math.abs(peer.id) % 8,
-            text: getPeerName(peer)[0]
-        }
+        $peers[peer._][peer.id] = peer
 
         if ($peerInitListeners[peer._] && $peerInitListeners[peer._][peer.id]) {
             $peerInitListeners[peer._][peer.id].forEach(listener => {
@@ -81,6 +97,7 @@ function set(peer) {
                 arrayDelete($peerInitListeners[peer._][peer.id], listener)
             })
         }
+
 
         resolveListeners({
             type: "set",

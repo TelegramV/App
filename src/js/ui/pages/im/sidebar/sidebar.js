@@ -1,6 +1,7 @@
 import DialogsManager from "../../../../api/dialogs/dialogsManager"
 import VDOM from "../../../framework/vdom"
 import {UICreateDialog} from "./dialog"
+import PeersManager from "../../../../api/peers/peersManager"
 
 const $sidebar = VDOM.render(
     <div className="chatlist" onScroll={onScrollDialogs}>
@@ -19,7 +20,7 @@ const $sidebar = VDOM.render(
             <span>Waiting for network...</span>
         </div>
 
-        <div>
+        <div id="dialogsWrapper">
             <div id="dialogsPinned" className="list pinned"/>
             <div id="dialogs" className="list"/>
         </div>
@@ -29,6 +30,7 @@ const $sidebar = VDOM.render(
 const __rendered_pinned = new Set()
 const __rendered = new Set()
 
+const $dialogsWrapper = $sidebar.querySelector("#dialogsWrapper")
 const $dialogsPinned = $sidebar.querySelector("#dialogsPinned")
 const $dialogs = $sidebar.querySelector("#dialogs")
 
@@ -42,13 +44,33 @@ function handleDialogUpdates(event) {
             renderDialog(dialog, false)
         })
     } else if (event.type === "updateSingle") {
-        console.log("Sing", event)
         renderDialog(event.dialog, event.dialog.pinned)
+    }
+}
+
+function handlePeerUpdates(event) {
+    if (event.type === "updatePhoto") {
+        const $dialogAvatar = $dialogsWrapper.querySelector(`[data-peer="${event.peer._}.${event.peer.id}"]>.avatar`)
+
+        if ($dialogAvatar) {
+            if (event.peer.photo) {
+                $dialogAvatar.setAttribute("class", "avatar")
+                $dialogAvatar.style = `background-image: url(${event.peer.photo})`
+                $dialogAvatar.innerHTML = ""
+            } else {
+                $dialogAvatar.setAttribute("class", "avatar " + `placeholder-${event.peer.photoPlaceholder.num}`)
+                $dialogAvatar.innerHTML = event.peer.photoPlaceholder.text[0]
+            }
+        } else {
+            console.warn("dialogAvatar is not on the page")
+        }
     }
 }
 
 function renderDialog(dialog, pinned = false) {
     const __ = `${dialog.peer._}.${dialog.peer.id}`
+
+    const peer = PeersManager.find(dialog.peer._, dialog.peer.id)
 
     if (pinned) {
         if (__rendered_pinned.has(__)) {
@@ -59,13 +81,13 @@ function renderDialog(dialog, pinned = false) {
                     $dialogsPinned.prepend($dialog)
                 }
                 // fix this later!!
-                $dialog.replaceWith(UICreateDialog(dialog))
+                $dialog.replaceWith(UICreateDialog(dialog, peer))
             } else {
                 console.warn("dialog is not on the page")
             }
         } else {
             __rendered_pinned.add(__)
-            $dialogsPinned.appendChild(UICreateDialog(dialog))
+            $dialogsPinned.appendChild(UICreateDialog(dialog, peer))
         }
     } else {
         if (__rendered.has(__)) {
@@ -76,13 +98,13 @@ function renderDialog(dialog, pinned = false) {
                     $dialogs.prepend($dialog)
                 }
                 // fix this later!!
-                $dialog.replaceWith(UICreateDialog(dialog))
+                $dialog.replaceWith(UICreateDialog(dialog, peer))
             } else {
                 console.warn("dialog is not on the page")
             }
         } else {
             __rendered.add(__)
-            $dialogs.appendChild(UICreateDialog(dialog))
+            $dialogs.appendChild(UICreateDialog(dialog, peer))
         }
     }
 }
@@ -96,6 +118,7 @@ function onScrollDialogs(event) {
 
 export function UICreateDialogsSidebar() {
     DialogsManager.listenUpdates(handleDialogUpdates)
+    PeersManager.listenUpdates(handlePeerUpdates)
 
     return $sidebar
 }

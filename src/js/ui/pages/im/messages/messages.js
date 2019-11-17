@@ -291,29 +291,70 @@ function handleDialogUpdates(event) {
     }
 }
 
-function updateHeader({title, online, photo}) {
-    console.log(photo)
-
+function updateHeader({title = false, online = false, photo = false}) {
     const $messagesTitle = $messagesElement.querySelector("#messages-title")
     const $messagesOnline = $messagesElement.querySelector("#messages-online")
     const $messagesPhoto = $messagesElement.querySelector("#messages-photo")
 
-    $messagesTitle.innerHTML = title
-    $messagesOnline.innerHTML = online
+    if (title) $messagesTitle.innerHTML = title
+    if (online) $messagesOnline.innerHTML = online
 
-    if (photo.url) {
-        $messagesPhoto.setAttribute("class", "avatar")
-        $messagesPhoto.style = `background-image: url(${photo.url})`
-        $messagesPhoto.innerHTML = ""
-    } else {
-        $messagesPhoto.setAttribute("class", "avatar" + `placeholder-${photo.placeholder.num}`)
-        $messagesPhoto.innerHTML = photo.placeholder.text[0]
+    if (photo) {
+        if (photo.url) {
+            $messagesPhoto.setAttribute("class", "avatar")
+            $messagesPhoto.style = `background-image: url(${photo.url})`
+            $messagesPhoto.innerHTML = ""
+        } else {
+            $messagesPhoto.setAttribute("class", "avatar " + `placeholder-${photo.placeholder.num}`)
+            $messagesPhoto.innerHTML = photo.placeholder.text[0]
+        }
+    }
+}
+
+function updateMessageAvatar(peer) {
+    const $messagesAvatars = $messagesElement.querySelectorAll(`#bubbles-inner>[data-peer="${peer._}.${peer.id}"]>.avatar`)
+
+    if ($messagesAvatars) {
+        $messagesAvatars.forEach($avatar => {
+            if (peer.photo) {
+                $avatar.setAttribute("class", "avatar")
+                $avatar.style = `background-image: url(${peer.photo})`
+                $avatar.innerHTML = ""
+            } else {
+                $avatar.setAttribute("class", "avatar " + `placeholder-${peer.photoPlaceholder.num}`)
+                $avatar.innerHTML = peer.photoPlaceholder.text[0]
+            }
+        })
+    }
+}
+
+function handlePeerUpdates(event) {
+    if (event.type === "updatePhoto") {
+        updateMessageAvatar(event.peer)
+
+        if (peer.photo) {
+            updateHeader({
+                photo: {
+                    url: peer.photo
+                }
+            })
+        } else {
+            updateHeader({
+                photo: {
+                    placeholder: {
+                        num: peer.photoPlaceholder.num,
+                        text: peer.photoPlaceholder.text,
+                    }
+                }
+            })
+        }
     }
 }
 
 export function UICreateMessages() {
     MessagesManager.listenUpdates(handleMessageUpdates)
     DialogsManager.listenUpdates(handleDialogUpdates)
+    PeersManager.listenUpdates(handlePeerUpdates)
 
     AppFramework.Router.onQueryChange(queryParams => {
         if (queryParams.p) {

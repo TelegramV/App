@@ -123,10 +123,6 @@ function fetchDialogs({
                     id: peer.id,
                     access_hash: peer.access_hash
                 },
-                photoPlaceholder: {
-                    num: Math.abs(peer.id) % 8,
-                    text: peerName[0]
-                },
                 index: generateDialogIndex(message.date)
             }
 
@@ -141,12 +137,6 @@ function fetchDialogs({
             }
 
             PeersManager.set(peer)
-
-            if (peer.photo) {
-                fetchPhoto(peer, {
-                    pinned: pinned
-                })
-            }
         }
 
         $pinnedDialogs.push(...pinnedDialogsToPush)

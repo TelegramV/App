@@ -1,6 +1,7 @@
 import {createLogger} from "../../common/logger"
 import {MTProto} from "../index";
 import {longToBytes} from "../utils/bin";
+import PeersManager from "../../api/peers/peersManager"
 
 const Logger = createLogger("MessageProcessor", {
     level: "warn",
@@ -22,9 +23,10 @@ export class MessageProcessor {
         this.rpcErrorHandlers = {}
         this.sentMessages = {}
 
-        this.updatesListeners = []
         this.updateShortListeners = []
         this.updateShortMessagesListeners = []
+        this.updateNewMessagesListeners = []
+        this.updateNewChannelMessagesListeners = []
 
         this.handlers = {
             "msg_container": this.processMessageContainer.bind(this),
@@ -35,18 +37,34 @@ export class MessageProcessor {
             "new_session_created": this.processNewSessionCreated.bind(this),
             "updateShort": this.processUpdateShort.bind(this),
             "updateShortMessage": this.processUpdateShortMessage.bind(this),
+            "updateNewMessage": this.processUpdateNewMessage.bind(this),
+            "updateNewChannelMessage": this.processUpdateNewChannelMessage.bind(this),
             "updates": this.processUpdates.bind(this),
         }
-
     }
 
     processUpdateShort(message, messageID, sessionID) {
+        console.log(message)
         this.updateShortListeners.forEach(listener => listener(message.update))
         // Logger.log("Short update", message)
     }
 
     processUpdateShortMessage(message, messageID, sessionID) {
+        console.log(message)
         this.updateShortMessagesListeners.forEach(listener => listener(message))
+        // Logger.log("Short update", message)
+    }
+
+    processUpdateNewMessage(message, messageID, sessionID) {
+        // console.log(message)
+        this.updateNewMessagesListeners.forEach(listener => listener(message))
+        // Logger.log("Short update", message)
+    }
+
+
+    processUpdateNewChannelMessage(message, messageID, sessionID) {
+        console.log(message)
+        this.updateNewChannelMessagesListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
 
@@ -55,8 +73,17 @@ export class MessageProcessor {
     }
 
     processUpdates(message, messageID, sessionID) {
-        this.updatesListeners.forEach(listener => listener(message))
-        // Logger.log("update", message)
+        console.log(message)
+        message.users.forEach(user => PeersManager.set(user))
+        message.chats.forEach(user => PeersManager.set(user))
+
+        message.updates.forEach(update => {
+            if (this.handlers[update._]) {
+                this.handlers[update._](update)
+            } else {
+                console.warn("unexprected update", update)
+            }
+        })
     }
 
     listenUpdateShort(listener) {
@@ -65,6 +92,14 @@ export class MessageProcessor {
 
     listenUpdateShortMessage(listener) {
         this.updateShortMessagesListeners.push(listener)
+    }
+
+    listenUpdateNewMessage(listener) {
+        this.updateNewMessagesListeners.push(listener)
+    }
+
+    listenUpdateNewChannelMessage(listener) {
+        this.updateNewChannelMessagesListeners.push(listener)
     }
 
     listenRpc(messageId, handler, reject) {
