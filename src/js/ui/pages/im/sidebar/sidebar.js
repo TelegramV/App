@@ -81,7 +81,6 @@ function renderDialog(dialog, pinned = false) {
                 console.warn("dialog is not on the page")
             }
         } else {
-            console.log("here")
             __rendered.add(__)
             $dialogs.appendChild(UICreateDialog(dialog))
         }

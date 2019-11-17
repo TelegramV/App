@@ -121,7 +121,7 @@ function fetchDialogs({
                     access_hash: peer.access_hash
                 },
                 photoPlaceholder: {
-                    num: Math.abs(message.from_id) % 8,
+                    num: Math.abs(peer.id) % 8,
                     text: peerName[0]
                 },
                 index: generateDialogIndex(message.date)

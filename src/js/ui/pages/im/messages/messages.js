@@ -195,6 +195,8 @@ function handleDialogUpdates(event) {
                 if (peerByManager) {
                     peer = peerByManager
 
+                    console.log(peerByManager)
+
                     if (peerByManager.photo) {
                         updateHeader({
                             title: dialog.title,
@@ -222,6 +224,8 @@ function handleDialogUpdates(event) {
 }
 
 function updateHeader({title, online, photo}) {
+    console.log(photo)
+
     const $messagesTitle = $messagesElement.querySelector("#messages-title")
     const $messagesOnline = $messagesElement.querySelector("#messages-online")
     const $messagesPhoto = $messagesElement.querySelector("#messages-photo")

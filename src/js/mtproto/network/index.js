@@ -315,9 +315,9 @@ export class Networker {
 
             serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, 'invokeWithLayer')
             serializer.storeInt(AppConfiguration.mtproto.api.layer, 'layer')
-            if(!this.updates) {
-                serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
-            }
+            // if(!this.updates) {
+            //     serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
+            // }
             serializer.storeInt(AppConfiguration.mtproto.api.initConnection, 'initConnection')
             serializer.storeInt(AppConfiguration.mtproto.api.api_id, 'api_id')
             serializer.storeString(navigator.userAgent || 'Unknown UserAgent', 'device_model')

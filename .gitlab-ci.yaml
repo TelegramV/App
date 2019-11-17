@@ -1,0 +1,18 @@
+image: alphine:latest
+
+before_script:
+  - npm install
+
+pages:
+  stage: deploy
+  image: node:latest
+  script:
+    - npm run build-prod
+    - mkdir public
+    - mv dist/* public
+    - cp public/index.html public/404.html
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
