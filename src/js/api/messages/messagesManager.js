@@ -259,7 +259,7 @@ function fetchMessageMedia(message, peer) {
 function fetchNextPage(peer) {
     let latest = $messages[peer._][peer.id][$messages[peer._][peer.id].length - 1]
 
-    fetchMessages(peer, {offset_id: latest.id})
+    return fetchMessages(peer, {offset_id: latest.id})
 }
 
 function resolveListeners(event) {
@@ -290,6 +290,76 @@ function push(message) {
 
         $messages[message.peer._][message.peer.id].push(message)
     }
+}
+
+function initDataIfNeeded(peer) {
+    if (peer._) {
+        if (!$messages[peer._]) {
+            $messages[peer._] = {}
+        }
+
+        if (!$messages[peer._][peer.id]) {
+            $messages[peer._][peer.id] = []
+        }
+    }
+}
+
+function pushTop(message, short = false) {
+    if (short) {
+        initDataIfNeeded({_: "user", id: message.user_id})
+    } else {
+        initDataIfNeeded(message.peer) // mb have to be fixed
+    }
+
+    let from = null
+    if (short) {
+        from = PeersManager.find("user", message.user_id)
+    } else {
+        from = PeersManager.find("user", message.from_id)
+    }
+
+    const userName = getPeerName(from)
+    const time = new Date(message.date * 1000)
+
+    let messageToPush = {
+        type: "text",
+        id: message.id,
+        userName: userName,
+        message: parseMessageEntities(message.message, message.entities),
+        out: message.pFlags.out,
+        post: false,
+        post_author: "",
+        time: time,
+        views: 0,
+        peer: from,
+        from: from
+    }
+
+    console.log(messageToPush)
+
+    if (message.fwd_from) {
+        messageToPush.fwd = {
+            from: "Test " + message.fwd_from.from_id,
+            date: message.fwd_from.date
+
+        }
+    }
+
+    if (message.reply_to_msg_id) {
+        messageToPush.reply = {
+            name: "kek",
+            text: "lt"
+        }
+    }
+
+    $messages[from._][from.id].unshift(0)
+    $messages[from._][from.id][0] = messageToPush
+
+    resolveListeners({
+        type: "pushTop",
+        message: messageToPush,
+        peer: from
+    })
 }
 
 // todo implement
@@ -349,6 +419,11 @@ function existForPeer(peer) {
     return $messages[peer._][peer.id] ? $messages[peer._][peer.id].length > 0 : false
 }
 
+function init() {
+    MTProto.MessageProcessor.listenUpdateShortMessage(update => {
+        pushTop(update, true)
+    })
+}
 
 export const MessagesManager = {
     fetchNextPage,
@@ -358,7 +433,8 @@ export const MessagesManager = {
     fetchMessages,
     isFetchingFor,
     isFetching,
-    existForPeer
+    existForPeer,
+    init,
 }
 
 export default MessagesManager

@@ -112,10 +112,9 @@ function fetchDialogs({
                     sender: messageUsername + msgPrefix,
                     text: submsg,
                     self: messageSelf,
-                    date: message.date,
+                    date: date,
                     id: message.id,
                 },
-                date: date,
                 peer: {
                     _: peer._,
                     id: peer.id,
@@ -296,6 +295,31 @@ function isEmpty() {
     return __is_empty
 }
 
+function init() {
+    MTProto.MessageProcessor.listenUpdateShortMessage(update => {
+        const messageUser = PeersManager.find("user", update.user_id)
+        let messageUsername = `${getPeerName(messageUser, false)}`
+        let messageSelf = messageUser ? messageUser.id === update.user_id : false
+
+        const message = update
+
+        const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
+        const date = new Date(message.date * 1000)
+
+        const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
+
+        updateSingle({_: "user", id: message.user_id} , {
+            message: {
+                sender: messageUsername + msgPrefix,
+                text: submsg,
+                self: messageSelf,
+                date: date,
+                id: message.id,
+            }
+        })
+    })
+}
+
 const DialogsManager = {
     fetchDialogs,
     getDialogs,
@@ -304,7 +328,8 @@ const DialogsManager = {
     isFetching,
     isFetched,
     fetchNextPage,
-    isEmpty
+    isEmpty,
+    init
 }
 
 export default DialogsManager

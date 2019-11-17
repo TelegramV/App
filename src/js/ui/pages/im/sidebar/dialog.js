@@ -18,7 +18,9 @@ export function UICreateDialog(dialog) {
     if (dialog.unreadCount > 0) personClasses.push("muted")
 
     return VDOM.render(
-        <div data-peer={`${dialog.peer._}.${dialog.peer.id}`} className={personClasses}
+        <div data-peer={`${dialog.peer._}.${dialog.peer.id}`}
+             data-message-id={dialog.message.id}
+             className={personClasses}
              onClick={openDialog(dialog.peer)}>
             <div className={"avatar " + (!dialog.photo ? `placeholder-${dialog.photoPlaceholder.num}` : "")}
                  style={`background-image: url(${dialog.photo});`}>
@@ -28,7 +30,7 @@ export function UICreateDialog(dialog) {
                 <div className="top">
                     <div className="title">{dialog.title}</div>
                     <div className="status tgico"/>
-                    <div className="time">{dialog.date.toLocaleTimeString('en', {
+                    <div className="time">{new Date(dialog.message.date).toLocaleTimeString('en', {
                         hour: '2-digit',
                         minute: '2-digit',
                         hour12: false

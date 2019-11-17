@@ -137,12 +137,13 @@ function init() {
     }
 
     MTProto.MessageProcessor.listenUpdateShort(update => {
-        switch (update._) {
-            case "updateUserStatus":
-                const status = message.status
-                console.log(update)
-                break
-        }
+        // console.log(update)
+        // switch (update._) {
+        //     case "updateUserStatus":
+        //         const status = message.status
+        //         console.log(update)
+        //         break
+        // }
     })
 }
 

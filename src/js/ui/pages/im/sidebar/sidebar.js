@@ -42,18 +42,22 @@ function handleDialogUpdates(event) {
             renderDialog(dialog, false)
         })
     } else if (event.type === "updateSingle") {
+        console.log("Sing", event)
         renderDialog(event.dialog, event.dialog.pinned)
     }
 }
 
 function renderDialog(dialog, pinned = false) {
-    const __ = `${dialog.peer._}.${dialog.peer.id}.${dialog.message.id}`
+    const __ = `${dialog.peer._}.${dialog.peer.id}`
 
     if (pinned) {
         if (__rendered_pinned.has(__)) {
             const $dialog = $dialogsPinned.querySelector(`[data-peer="${dialog.peer._}.${dialog.peer.id}"]`)
 
             if ($dialog) {
+                if (Number($dialog.dataset.messageId) < dialog.message.id) {
+                    $dialogsPinned.prepend($dialog)
+                }
                 // fix this later!!
                 $dialog.replaceWith(UICreateDialog(dialog))
             } else {
@@ -68,12 +72,16 @@ function renderDialog(dialog, pinned = false) {
             const $dialog = $dialogs.querySelector(`[data-peer="${dialog.peer._}.${dialog.peer.id}"]`)
 
             if ($dialog) {
+                if (Number($dialog.dataset.messageId) < dialog.message.id) {
+                    $dialogs.prepend($dialog)
+                }
                 // fix this later!!
                 $dialog.replaceWith(UICreateDialog(dialog))
             } else {
                 console.warn("dialog is not on the page")
             }
         } else {
+            console.log("here")
             __rendered.add(__)
             $dialogs.appendChild(UICreateDialog(dialog))
         }

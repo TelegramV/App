@@ -22,7 +22,9 @@ export class MessageProcessor {
         this.rpcErrorHandlers = {}
         this.sentMessages = {}
 
+        this.updatesListeners = []
         this.updateShortListeners = []
+        this.updateShortMessagesListeners = []
 
         this.handlers = {
             "msg_container": this.processMessageContainer.bind(this),
@@ -32,6 +34,7 @@ export class MessageProcessor {
             "bad_server_salt": this.processBadServerSalt.bind(this),
             "new_session_created": this.processNewSessionCreated.bind(this),
             "updateShort": this.processUpdateShort.bind(this),
+            "updateShortMessage": this.processUpdateShortMessage.bind(this),
             "updates": this.processUpdates.bind(this),
         }
 
@@ -42,19 +45,26 @@ export class MessageProcessor {
         // Logger.log("Short update", message)
     }
 
+    processUpdateShortMessage(message, messageID, sessionID) {
+        this.updateShortMessagesListeners.forEach(listener => listener(message))
+        // Logger.log("Short update", message)
+    }
+
     processNewSessionCreated(message, messageID, sessionID) {
 
     }
 
     processUpdates(message, messageID, sessionID) {
-        message.updates.forEach(update => {
-
-        })
+        this.updatesListeners.forEach(listener => listener(message))
         // Logger.log("update", message)
     }
 
     listenUpdateShort(listener) {
         this.updateShortListeners.push(listener)
+    }
+
+    listenUpdateShortMessage(listener) {
+        this.updateShortMessagesListeners.push(listener)
     }
 
     listenRpc(messageId, handler, reject) {

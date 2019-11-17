@@ -10,6 +10,10 @@ import DialogsManager from "../../../../api/dialogs/dialogsManager"
 let $messagesElement = document.createElement("div")
 let peer = null
 
+function get$bubbles() {
+    return $messagesElement.querySelector("#bubbles-inner")
+}
+
 function onScrollMessages(peer) {
     return event => {
         const $element = event.target
@@ -62,13 +66,36 @@ function rerender(peer) {
 }
 
 function appendMessages(messages) {
-    const $bubblesInner = $messagesElement.querySelector("#bubbles-inner")
+    const $bubblesInner = get$bubbles()
 
     if ($bubblesInner) {
         messages.forEach(message => {
             $bubblesInner.appendChild(UICreateMessage(message))
         })
     }
+}
+
+function prependMessages(messages) {
+    const $bubblesInner = get$bubbles()
+
+    if ($bubblesInner) {
+        messages.forEach(message => {
+            $bubblesInner.prepend(UICreateMessage(message))
+        })
+    }
+}
+
+function fetchNextPage(peer) {
+    const $bubblesInner = get$bubbles()
+    $bubblesInner.appendChild(VDOM.render(
+        <div id="messagesLoadingNextPage" className="full-size-loader height">
+            <progress className="progress-circular big"/>
+        </div>
+    ))
+
+    MessagesManager.fetchNextPage(peer).then(() => {
+        $bubblesInner.querySelector("#messagesLoadingNextPage").remove()
+    })
 }
 
 function refetchMessages() {
@@ -87,7 +114,11 @@ function refetchMessages() {
         } else {
             if (MessagesManager.existForPeer(peer)) {
                 rerender(peer)
-                appendMessages(MessagesManager.allForPeer(peer))
+                const all = MessagesManager.allForPeer(peer)
+                appendMessages(all)
+                if (all.length < 20) {
+                    fetchNextPage(peer)
+                }
             } else {
                 if (peer._ === queryPeer._ && peer.id === queryPeer.id) {
                     rerender(peer)
@@ -109,15 +140,22 @@ function handleMessageUpdates(event) {
             switch (event.type) {
                 case "updateMany":
                     handleManyUpdate(event)
-                    console.log(event)
+                    // console.log(event)
                     break
                 case "updateSingle":
                     handleSingleUpdate(event)
-                    console.log(event)
+                    // console.log(event)
+                    break
+                case "pushTop":
+                    handlePushTop(event)
                     break
             }
         }
     }
+}
+
+function handlePushTop(event) {
+    prependMessages([event.message])
 }
 
 function handleSingleUpdate(event) {
@@ -171,7 +209,7 @@ function handleDialogUpdates(event) {
                             photo: {
                                 placeholder: {
                                     num: peerByManager.photoPlaceholder.num,
-                                    text: peerByManager.photoPlaceholder.title,
+                                    text: peerByManager.photoPlaceholder.text,
                                 }
                             },
                             online: peerByManager.online ? "online" : "offline"

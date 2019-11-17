@@ -8,6 +8,8 @@ import {AppPermanentStorage} from "../common/storage"
 import {AuthAPI} from "../api/auth";
 import {sendReqPQ} from "./connect/methods";
 import PeersManager from "../api/peers/peersManager"
+import MessagesManager from "../api/messages/messagesManager"
+import DialogsManager from "../api/dialogs/dialogsManager"
 
 class MobileProtocolAPIAuth {
     constructor(options = {}) {
@@ -56,7 +58,9 @@ class MobileProtocolAPIAuth {
 }
 
 function initManagers() {
+    DialogsManager.init()
     PeersManager.init()
+    MessagesManager.init()
 }
 
 class MobileProtocol {
