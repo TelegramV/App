@@ -51,6 +51,31 @@ export class FileAPI {
         })
     }
 
+    static getMaxSize(file) {
+        return file.sizes[file.sizes.length - 1]
+    }
+
+    static photoThumnail(file, resolve) {
+        const max = FileAPI.getMaxSize(file)
+        try {
+            resolve({
+                src: FileAPI.getThumbnail(file),
+                size: [max.w, max.h],
+                thumbnail: true
+            })
+        } catch {
+
+        } finally {
+            FileAPI.getFile(file, max.type).then(file => {
+                resolve({
+                    src: file,
+                    size: [max.w, max.h],
+                    thumbnail: false
+                })
+            })
+        }
+    }
+
     static getFile(file, thumb_size = "") {
         return new Promise(resolve => {
             const key = bytesToHex(file.file_reference)

@@ -97,6 +97,7 @@ function fetchDialogs({
             const date = new Date(message.date * 1000)
 
             const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
+            console.log(dialog, peer, message)
 
             const data = {
                 title: peerName,
@@ -108,6 +109,8 @@ function fetchDialogs({
                 unreadMentionsCount: dialog.unread_mentions_count,
                 verified: peer.pFlags.verified,
                 online: peer.status && peer.status._ === "userStatusOnline",
+                read: message.id <= dialog.read_inbox_max_id,
+                out: message.pFlags.out,
                 message: {
                     sender: messageUsername + msgPrefix,
                     text: submsg,

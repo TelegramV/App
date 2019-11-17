@@ -15,7 +15,12 @@ export function UICreateDialog(dialog) {
     let personClasses = ["person", "rp"]
     if (dialog.online) personClasses.push("online")
     if (unread !== "") personClasses.push("unread")
-    if (dialog.unreadCount > 0) personClasses.push("muted")
+    if (dialog.muted) personClasses.push("muted")
+    if(dialog.out) {
+        personClasses.push("sent")
+
+        if (dialog.read) personClasses.push("read")
+    }
 
     return VDOM.render(
         <div data-peer={`${dialog.peer._}.${dialog.peer.id}`}
@@ -38,7 +43,7 @@ export function UICreateDialog(dialog) {
                 </div>
                 <div className="bottom">
                     <div className="message"><span
-                        className="sender">{dialog.message.self ? "" : `${dialog.message.sender ? dialog.message.sender + ": " : ""}`}</span>{dialog.message.text}
+                        className="sender">{dialog.message.sender}</span>{dialog.message.text}
                     </div>
                     <div className="badge tgico">{unread}</div>
                 </div>

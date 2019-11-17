@@ -5,7 +5,7 @@ import {nextRandomInt} from "../../mtproto/utils/bin"
 import {AppFramework} from "../../ui/framework/framework"
 import {parseMessageEntities} from "../../mtproto/utils/htmlHelpers"
 import {FileAPI} from "../fileAPI"
-import {getPeerName} from "../dialogs/util"
+import {findUserFromMessage, getPeerName} from "../dialogs/util"
 
 window.pushMessage = function () {
     const dialogPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
@@ -46,6 +46,16 @@ let __fetching_for = {
     id: 0
 }
 
+function getMessages(messages, o = "inputMessageID") {
+    return MTProto.invokeMethod("messages.getMessages", {
+        id: [
+            {
+                _: o,
+                id: messages
+            }
+        ]
+    })
+}
 function fetchMessages(peer, props = {offset_id: 0}) {
     __is_fetching = true
     __fetching_for = {
@@ -110,7 +120,7 @@ function fetchMessages(peer, props = {offset_id: 0}) {
                     time: time,
                     views: message.views,
                     peer: peer,
-                    from: from ? from : peer
+                    from: from ? from : peer,
                 }
 
                 if (message.fwd_from) {
@@ -122,10 +132,29 @@ function fetchMessages(peer, props = {offset_id: 0}) {
                 }
 
                 if (message.reply_to_msg_id) {
-                    messageToPush.reply = {
-                        name: "kek",
-                        text: "lt"
+                    let replyTo = $messages[peer._][peer.id][message.reply_to_msg_id]
+
+                    //if(!replyTo) {
+                    {
+                        console.log(message.reply_to_msg_id)
+                        getMessages(message.reply_to_msg_id, "inputMessageID").then(l => {
+                            l.messages.forEach(q => {
+                                if(q.from_id !== message.from_id && q.to_id.user_id !== message.to_id.used_id)
+                                    return
+                                const user = findUserFromMessage(q, l)
+                                updateSingle(peer, message.id, {
+                                    reply: {
+                                        name: getPeerName(user),
+                                        text: q.message
+                                    }
+                                })
+                            })
+                        })
                     }
+                    /*messageToPush.reply = {
+                        name: PeersManager.find(),
+                        text: replyTo.message
+                    }*/
                 }
 
             }
@@ -151,51 +180,36 @@ function fetchMessages(peer, props = {offset_id: 0}) {
     })
 }
 
-function fetchMessageMedia(message, peer) {
 
+
+function fetchMessageMedia(message, peer) {
     if (message.media.photo) {
-        try {
+        FileAPI.photoThumnail(message.media.photo, data => {
             updateSingle(peer, message.id, {
                 type: "photo",
-                imgSrc: FileAPI.getThumbnail(message.media.photo),
-                imgSize: [message.media.photo.sizes[1].w, message.media.photo.sizes[1].h],
-                thumbnail: true
+                imgSrc: data.src,
+                imgSize: data.size,
+                thumbnail: data.thumbnail
             })
-        } catch {
-
-        } finally {
-            FileAPI.getFile(message.media.photo, "m").then(file => {
-                updateSingle(peer, message.id, {
-                    type: "photo",
-                    imgSrc: file,
-                    thumbnail: false
-                })
-            })
-        }
+        })
     } else if (message.media.webpage) {
         if (message.media.webpage._ === "webPageEmpty") {
             //
         } else {
             const webpage = message.media.webpage
 
-            updateSingle(peer, message.id, {
-                type: "url",
-                url: {
-                    description: webpage.description,
-                    url: webpage.url,
-                    title: webpage.title,
-                    siteName: webpage.site_name
-                }
-            })
-
-            FileAPI.getFile(webpage.photo, "m").then(response => {
+            if(webpage.photo)
+            FileAPI.photoThumnail(webpage.photo, data => {
                 updateSingle(peer, message.id, {
                     type: "url",
                     url: {
                         description: webpage.description,
                         url: webpage.response,
                         title: webpage.title,
-                        siteName: webpage.site_name
+                        siteName: webpage.site_name,
+                        photo: data.src,
+                        size: data.size,
+                        thumbnail: data.thumbnail // TODO blur this
                     }
                 })
             })
@@ -348,8 +362,6 @@ function pushTop(message, short = false) {
         peer: from,
         from: from
     }
-
-    console.log(messageToPush)
 
     if (message.fwd_from) {
         messageToPush.fwd = {

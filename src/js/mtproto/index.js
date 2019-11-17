@@ -10,6 +10,7 @@ import {sendReqPQ} from "./connect/methods";
 import PeersManager from "../api/peers/peersManager"
 import MessagesManager from "../api/messages/messagesManager"
 import DialogsManager from "../api/dialogs/dialogsManager"
+import {attach} from "../api/notifications";
 
 class MobileProtocolAPIAuth {
     constructor(options = {}) {
@@ -120,6 +121,7 @@ class MobileProtocol {
             this.networker = new Networker(authContext)
             this.MessageProcessor = this.networker.messageProcessor
             this.connected = true
+            attach()
 
             initManagers()
             // resolve()
