@@ -8,6 +8,7 @@ pages:
   image: node:latest
   script:
     - npm run build-prod
+    - mv public old
     - mkdir public
     - mv dist/* public
     - cp public/index.html public/404.html
