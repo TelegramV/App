@@ -69,7 +69,7 @@ function set(peer) {
 
         $peers[peer._][peer.id].photoPlaceholder = {
             num: Math.abs(peer.id) % 8,
-            text: getPeerName(peer)
+            text: getPeerName(peer)[0]
         }
 
         if ($peerInitListeners[peer._] && $peerInitListeners[peer._][peer.id]) {

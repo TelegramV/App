@@ -1,5 +1,5 @@
-import {FrameworkComponent} from "../../../framework/component"
-import {MTProto} from "../../../../mtproto";
+import {MTProto} from "../../../../mtproto"
+import VDOM from "../../../framework/vdom"
 
 function vTimeTemplate(data, bg = false) {
     let classes = "inner tgico " + (bg ? "bg" : "")
@@ -8,7 +8,8 @@ function vTimeTemplate(data, bg = false) {
     return (
         <span class={classes2}>
             <div class={classes}>{data.views ?
-                <span>{data.views} <span class="tgico tgico-channelviews"/>    </span> : ""}{data.time.toLocaleTimeString('en', {
+                <span>{data.views} <span
+                    class="tgico tgico-channelviews"/>    </span> : ""}{data.time.toLocaleTimeString('en', {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false
@@ -35,7 +36,7 @@ function vServiceMessageTemplate(data, inside) {
 function vMessageTemplate(data, inside) {
     const className = data.post ? "channel in" : data.out ? "out" : "in"
     return (
-        <div replaceWith={true} class={className} data-id={data.id}>
+        <div class={className} data-id={data.id}>
             {className === "in" ? (
                 <div className={"avatar " + (!data.from.photo ? `placeholder-${data.from.photoPlaceholder.num}` : "")}
                      style={`background-image: url(${data.from.photo});`}>
@@ -200,34 +201,23 @@ function vMessageWithFileTemplate(data) {
     )
 }
 
-export class MessageComponent extends FrameworkComponent {
-    constructor(options = {}) {
-        super()
-
-        if (!options.message) {
-            throw new Error("message is not defined")
-        }
-        this.message = options.message
+export function UICreateMessage(message) {
+    if (!message.type) {
+        return <div>Unsupported message type</div>
     }
 
-    h() {
-        if (!this.message.type) {
-            return <div>Unsupported message type</div>
-        }
-
-        const handlers = {
-            photo: vMessageWithImageTemplate,
-            text: vMessageWithTextOnlyTemplate,
-            round: vMessageWithRoundVideoTemplate,
-            video: vMessageWithVideoTemplate,
-            audio: vMessageWithAudioTemplate,
-            voice: vMessageWithVoiceAudioTemplate,
-            sticker: vMessageWithStickerTemplate,
-            document: vMessageWithTextOnlyTemplate,
-            url: vMessageWithUrlTemplate,
-            service: vServiceMessageTemplate
-        }
-
-        return handlers[this.message.type](this.message)
+    const handlers = {
+        photo: vMessageWithImageTemplate,
+        text: vMessageWithTextOnlyTemplate,
+        round: vMessageWithRoundVideoTemplate,
+        video: vMessageWithVideoTemplate,
+        audio: vMessageWithAudioTemplate,
+        voice: vMessageWithVoiceAudioTemplate,
+        sticker: vMessageWithStickerTemplate,
+        document: vMessageWithTextOnlyTemplate,
+        url: vMessageWithUrlTemplate,
+        service: vServiceMessageTemplate
     }
+
+    return VDOM.render(handlers[message.type](message))
 }

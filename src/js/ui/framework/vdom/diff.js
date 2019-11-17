@@ -99,9 +99,17 @@ export const diff = (oldVTree, newVTree) => {
         }
     }
 
-    if ((oldVTree instanceof Date || newVTree instanceof Date) ||
-        (typeof oldVTree !== "object" || typeof newVTree !== "object") &&
-        (typeof oldVTree !== "function" || typeof newVTree !== "function")) {
+    if (typeof newVTree === "object" && !newVTree.tagName) {
+        return $node => {
+            const $newNode = render(newVTree)
+            $node.replaceWith($newNode)
+            return $newNode
+        }
+    }
+
+    if (typeof oldVTree === "string" || typeof oldVTree === "number" || typeof newVTree === "string" || typeof newVTree === "number") {
+
+        console.log(oldVTree, newVTree)
 
         if (oldVTree !== newVTree) {
             return $node => {

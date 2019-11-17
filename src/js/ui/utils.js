@@ -1,3 +1,13 @@
+import VDOM from "./framework/vdom"
+
+export const vLoadingNode = (
+    <div className="full-size-loader height">
+        <progress className="progress-circular big"/>
+    </div>
+)
+
+export const $loadingNode = VDOM.render(vLoadingNode)
+
 // If there's no message it it should display "Photo" or smth
 export function getMediaPreviewName(message) {
     switch (message.media._) {

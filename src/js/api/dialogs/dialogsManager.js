@@ -82,6 +82,9 @@ function fetchDialogs({
             return
         }
 
+        const pinnedDialogsToPush = []
+        const dialogsToPush = []
+
         for (let dialog of dialogsSlice.dialogs) {
             const pinned = dialog.pFlags.hasOwnProperty("pinned") ? dialog.pFlags.pinned : false
 
@@ -136,9 +139,9 @@ function fetchDialogs({
             }
 
             if (pinned) {
-                $pinnedDialogs.push(data)
+                pinnedDialogsToPush.push(data)
             } else {
-                $dialogs.push(data)
+                dialogsToPush.push(data)
             }
 
             PeersManager.set(peer)
@@ -150,16 +153,16 @@ function fetchDialogs({
             }
         }
 
+        $pinnedDialogs.push(...pinnedDialogsToPush)
+        $dialogs.push(...dialogsToPush)
+
         __is_fetching = false
         __is_fetched = true
 
         resolveListeners({
-            type: "fetch",
-            props: {
-                fetched: __is_fetched,
-                empty: __is_empty,
-                sorted: __is_latest_sorted
-            }
+            type: "updateMany",
+            dialogs: dialogsToPush,
+            pinnedDialogs: pinnedDialogsToPush,
         })
     })
 
@@ -202,6 +205,7 @@ function updateSingle(peer, data, props = {}) {
         dialogs = $dialogs
     }
 
+
     const dialogIndex = dialogs.findIndex(dialog => dialog.peer._ === peer._ && dialog.peer.id === peer.id)
 
     if (dialogIndex >= 0) {
@@ -213,11 +217,7 @@ function updateSingle(peer, data, props = {}) {
 
         resolveListeners({
             type: "updateSingle",
-            props: {
-                fetched: __is_fetched,
-                empty: __is_empty,
-                sorted: __is_latest_sorted
-            }
+            dialog: dialogs[dialogIndex]
         })
     } else {
         console.warn("dialog wasn't found", peer)
@@ -265,9 +265,9 @@ function resolveListeners(event) {
     if (event) {
         $listeners.forEach(listener => {
             listener.listener(event)
-            if (listener.listenOnce) {
-                unlistenUpdates(listener)
-            }
+            // if (listener.listenOnce) {
+            //     unlistenUpdates(listener)
+            // }
         })
     } else {
         console.warn("invalid event", event)
