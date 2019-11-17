@@ -68,6 +68,7 @@ export function hasClass(target, className) {
 }
 
 export const countries = [
+    ["+999", "Test Country", "UA"],
     ["+93", "Afghanistan", "AF"],
     ["+358 18", "Åland Islands", "AX"],
     ["+355", "Albania", "AL"],

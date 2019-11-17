@@ -6,6 +6,9 @@ import {AppPermanentStorage} from "../../../common/storage"
 import {AppFramework} from "../../framework/framework"
 import {TGSPlayer} from "./../../vendor/tgs_player"
 import mt_srp_check_password from "../../../mtproto/crypto/mt_srp/mt_srp";
+import {FileAPI} from "../../../api/fileAPI";
+
+const Croppie = require("croppie")
 
 let $countryInput = null
 let $list = null
@@ -16,6 +19,9 @@ let $codeInput = null
 let $passwordInput = null
 let $peekBtn = null
 let $passwordNext = null
+let cropperEl
+let cropper;
+let pictureBlob;
 
 let Monkey = null
 
@@ -29,17 +35,27 @@ function isCodeValid(code) {
     return /^\d{5}$/.test(code)
 }
 
+function resetNextButton(button, text = "NEXT") {
+    button.querySelector("span").innerHTML = text
+    document.querySelector("progress").style.display = "none"
+    button.dataset.loading = "0"
+}
+
 function handlePhoneSend() {
     return event => {
         event.preventDefault()
+        if (document.getElementById("next").disabled || document.getElementById("next").dataset.loading === "1") return
 
         const phoneNumber = $phoneInput.value
-        document.querySelector("#next progress").style.display = "block"
         document.querySelector("#next span").innerHTML = "PLEASE WAIT..."
+        document.querySelector("#next progress").style.display = "block"
+        document.getElementById("next").dataset.loading = "1"
 
         if (isNumberValid(phoneNumber)) {
 
             MTProto.Auth.sendCode(phoneNumber).then(sentCode => {
+                resetNextButton(document.getElementById("next"))
+
                 fadeOut(document.getElementById("phonePane"));
                 fadeIn(document.getElementById("codePane"));
 
@@ -52,7 +68,22 @@ function handlePhoneSend() {
                 phone.prepend(text);
                 _formData.phoneNumber = phoneNumber
                 _formData.sentCode = sentCode
+            }, error => {
+                const messages = {
+                    PHONE_NUMBER_INVALID: "Invalid phone number",
+                    PHONE_NUMBER_BANNED: "Phone number is banned",
+                    PHONE_NUMBER_FLOOD: "Too many attempts"
+                }
+                const msg = messages[error.type] || "Error occured"
+                $phoneInput.classList.add("invalid");
+                $phoneInput.nextElementSibling.innerHTML = msg;
+                resetNextButton(document.getElementById("next"))
             })
+        } else {
+
+            $phoneInput.classList.add("invalid");
+            $phoneInput.nextElementSibling.innerHTML = "Invalid phone number";
+            resetNextButton(document.getElementById("next"))
         }
     }
 }
@@ -60,10 +91,13 @@ function handlePhoneSend() {
 function handlePasswordSend() {
     return event => {
         event.preventDefault()
+        if ($passwordNext.disabled || $passwordNext.dataset.loading === "1") return
 
         const password = $passwordInput.value
-        document.querySelector("#passwordNext progress").style.display = "block"
         document.querySelector("#passwordNext span").innerHTML = "PLEASE WAIT..."
+        document.querySelector("#passwordNext progress").style.display = "block"
+
+        document.getElementById("passwordNext").dataset.loading = "1"
 
         const response = _formData.passwordData
         const salt1 = response.current_algo.salt1
@@ -83,6 +117,7 @@ function handlePasswordSend() {
                 M1: srp_ret.M1
             }
         }).then(response => {
+            resetNextButton($passwordNext)
             console.log(response);
 
             AppPermanentStorage.setItem("authorizationData", response)
@@ -90,6 +125,7 @@ function handlePasswordSend() {
             //authorizedStart(response)
         }, reject => {
             console.log(reject)
+            resetNextButton($passwordNext)
         })
     }
 }
@@ -114,11 +150,8 @@ function handleSignIn(code) {
             AppFramework.Router.push("/")
             return
         }
-
-        $codeInput.classList.add("invalid");
-        $codeInput.nextElementSibling.innerHTML = "Invalid Code";
     }, reject => {
-        if(reject.type === "SESSION_PASSWORD_NEEDED") {
+        if (reject.type === "SESSION_PASSWORD_NEEDED") {
             MTProto.invokeMethod("account.getPassword", {}).then(response => {
                 /*if (response._ !== "passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow") {
                     throw new Error("Unknown 2FA algo")
@@ -137,21 +170,50 @@ function handleSignIn(code) {
     })
 }
 
-function handleSignUp(event) {
-    event.preventDefault()
+function handleSignUp() {
+    return event => {
+        event.preventDefault()
 
-    const firstName = document.getElementById("signUpFirstName").value
-    const lastName = document.getElementById("signUpLastName").value
+        document.querySelector("#start span").innerHTML = "PLEASE WAIT..."
+        document.querySelector("#start progress").style.display = "block"
+        document.getElementById("start").dataset.loading = "1"
 
-    MTProto.Auth.signUp(_formData.phoneNumber, _formData.phoneCodeHash, firstName, lastName).then(authorization => {
-        if (authorization._ === "auth.authorization") {
-            console.log("signup success!")
-            AppPermanentStorage.setItem("authorizationData", authorization)
-            AppFramework.Router.push("/")
-        } else {
-            console.log(authorization)
-        }
-    })
+        const firstName = document.getElementById("name").value
+        const lastName = document.getElementById("lastName").value
+
+        MTProto.Auth.signUp(_formData.phoneNumber, _formData.phoneCodeHash, firstName, lastName).then(async authorization => {
+            if (authorization._ === "auth.authorization") {
+                console.log("signup success!")
+                if(pictureBlob) {
+                    console.log(pictureBlob)
+                    FileAPI.uploadProfilePhoto("avatar.jpg", pictureBlob).then(l => {
+                        AppPermanentStorage.setItem("authorizationData", authorization)
+                        AppFramework.Router.push("/")
+                    }, error => {
+                        console.log(error)
+                    });
+                } else {
+                    AppPermanentStorage.setItem("authorizationData", authorization)
+                    AppFramework.Router.push("/")
+                }
+            } else {
+                console.log(authorization)
+            }
+        }, error => {
+            let msg = "Something went terribly wrong"
+            if(error.type === "FIRSTNAME_INVALID") {
+                msg = "Invalid first name"
+                document.getElementById("name").classList.add("invalid");
+                document.getElementById("name").nextElementSibling.innerHTML = msg;
+            } else if(error.type === "LASTNAME_INVALID") {
+                msg = "Invalid last name"
+                document.getElementById("lastName").classList.add("invalid");
+                document.getElementById("lastName").nextElementSibling.innerHTML = msg;
+            }
+            console.log(error)
+            resetNextButton(document.getElementById("start"), "START MESSAGING")
+        })
+    }
 }
 
 function toggleList() {
@@ -167,12 +229,20 @@ function hideList() {
     $list.classList.add("hidden");
     $parent.classList.add("down");
     $parent.classList.remove("up");
+
+    $openDropdown.classList.add("tgico-down");
+    $openDropdown.classList.remove("tgico-up");
+
 }
 
 function showList() {
     $list.classList.remove("hidden");
     $parent.classList.remove("down");
     $parent.classList.add("up");
+
+
+    $openDropdown.classList.remove("tgico-down");
+    $openDropdown.classList.add("tgico-up");
 }
 
 function fadeBack(elem) {
@@ -188,6 +258,15 @@ function fadeOut(elem) {
 function fadeIn(elem) {
     elem.classList.remove("hidden");
     elem.classList.add("fade-in");
+}
+
+function successfulAuth() {
+    if (!document.getElementById("keepLogger").checked) {
+
+        window.addEventListener("beforeunload", function (e) {
+            AppPermanentStorage.clear() // tODO move this to proper place
+        }, false);
+    }
 }
 
 function generateFullDropdown() {
@@ -210,6 +289,7 @@ function generateFullDropdown() {
         $list.appendChild(elem);
     }
 }
+
 function fillDropdown(str) {
     // while ($list.firstChild) {
     //     $list.removeChild($list.firstChild);
@@ -258,9 +338,14 @@ function formatPhoneNumber() {
     $phoneInput.value = newValue.trim();
 
     if ($phoneInput.value.length > code.length) { //we have number
-        document.getElementById("next").style.display = "flex";
+        document.getElementById("next").disabled = false
     } else {
-        document.getElementById("next").style.display = "none";
+        document.getElementById("next").disabled = true
+    }
+
+    if ($phoneInput.classList.contains("invalid")) {
+        $phoneInput.classList.remove("invalid");
+        $phoneInput.nextElementSibling.innerHTML = "Phone Number";
     }
 }
 
@@ -281,7 +366,7 @@ function setInputFilter(textbox, inputFilter) {
 }
 
 function initPhoneInput() {
-    ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function (event) {
+    ["input"].forEach(function (event) {
         $phoneInput.addEventListener(event, function () {
             formatPhoneNumber();
         });
@@ -290,12 +375,16 @@ function initPhoneInput() {
 
 
 function initDropdown() {
+
+    setInputFilter($countryInput, function (value) {
+        return /^[a-z]*$/i.test(value);
+    });
+
     fillDropdown($countryInput.value);
     $countryInput.addEventListener("focus", showList);
     $countryInput.addEventListener("input", showList);
-    console.log($openDropdown)
     $openDropdown.onclick = l => {
-        alert("test")
+        toggleList()
     }
     //countryInput.addEventListener("blur", hideList); //conflict with arrow click
     // $countryInput.parentElement.getElementsByClassName("arrow")[0].addEventListener("click", toggleList);
@@ -307,24 +396,24 @@ function initDropdown() {
         });
     });
 
-    setInputFilter($countryInput, function (value) {
-        return /^[a-z]*$/i.test(value);
-    });
 }
+
+let prevValue = ""
 
 function initCodeInput() {
     $codeInput.addEventListener("focus", Monkey.smoothTrack.bind(Monkey));
     $codeInput.addEventListener("input", Monkey.checkTrack.bind(Monkey)); //input calls blur when window changes, but not focus
     $codeInput.addEventListener("blur", Monkey.smoothIdle.bind(Monkey));
 
-    ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function (event) {
+    ["input"].forEach(function (event) {
         $codeInput.addEventListener(event, function () {
             let value = $codeInput.value;
             if (value.length > 5) { //limit length
                 $codeInput.value = value.substring(0, 5);
                 value = $codeInput.value;
             }
-            if (value.length === 5) {
+            if (value.length === 5 && value !== prevValue) {
+                prevValue = value
                 handleSignIn(value)
             } else if ($codeInput.classList.contains("invalid")) {
                 $codeInput.classList.remove("invalid");
@@ -334,6 +423,83 @@ function initCodeInput() {
     });
 }
 
+
+function askForFile(accept, callback) {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = accept;
+
+    input.onchange = e => {
+        var file = e.target.files[0];
+
+        var reader = new FileReader();
+        reader.readAsDataURL(file);
+
+        reader.onload = readerEvent => {
+            var content = readerEvent.target.result;
+            callback(content);
+        }
+
+    }
+    input.click();
+}
+
+
+function initCropper(image) {
+    cropper = new Croppie(cropperEl, {
+        enableExif: true,
+        showZoomer: false,
+        viewport: {
+            width: 310,
+            height: 310,
+            type: 'circle'
+        },
+        boundary: {
+            width: 350,
+            height: 350
+        }
+    });
+
+    document.getElementById("photoDone").addEventListener("click", function () {
+        cropper.result({
+            type: 'base64'
+        }).then(function (base) {
+            const bytes = Uint8Array.from(atob(base.split(",")[1]), c => c.charCodeAt(0))
+            console.log(bytes, base)
+            pictureBlob = bytes;
+            let blob = new Blob([bytes], {type: "image/png"});
+            console.log(blob)
+            var url = URL.createObjectURL(blob);
+            var picture = document.getElementById("picture");
+            picture.style.backgroundImage = 'url("' + url + '")';
+            picture.querySelector(".tint").classList.remove("hidden");
+
+            hideModal();
+        });
+    });
+}
+
+
+function initModals() {
+    Array.from(document.querySelectorAll(".modal")).forEach(function (element) {
+        element.addEventListener("click", function (e) {
+            if (e.target == e.currentTarget) {
+                hideModal();
+            }
+        });
+        element.querySelector(".close-button").addEventListener("click", hideModal);
+    });
+}
+
+function showModal(modal) {
+    modal.classList.remove("hidden");
+}
+
+function hideModal() {
+    Array.from(document.querySelectorAll(".modal:not(.hidden)")).forEach(function (element) {
+        element.classList.add("hidden");
+    });
+}
 
 function load() {
     $countryInput = document.getElementById("cc")
@@ -346,6 +512,28 @@ function load() {
     $peekBtn = document.getElementById("peekButton")
     $passwordNext = document.getElementById("passwordNext")
     $passwordNext.style.display = "flex"
+    cropperEl = document.getElementById("cropper")
+
+    document.getElementById("start").addEventListener("click", handleSignUp())
+
+
+    document.addEventListener("click", e => {
+        hideList()
+    })
+    $openDropdown.addEventListener("click", e => {
+        e.stopPropagation()
+    })
+    $countryInput.addEventListener("click", e => {
+        e.stopPropagation()
+    })
+
+
+    document.getElementById("editPhone").addEventListener("click", e => {
+        fadeOut(document.getElementById("codePane"));
+        fadeIn(document.getElementById("phonePane"));
+        $codeInput.value = ""
+    })
+
 
     setInputFilter($phoneInput, function (value) {
         return /^\+[\d ]*$/.test(value)
@@ -364,6 +552,18 @@ function load() {
     initDropdown()
     initPhoneInput()
     initCodeInput()
+    initCropper()
+    initModals()
+
+    document.getElementById("picture").addEventListener("click", function () {
+        askForFile("image/*", function (file) {
+            cropper.bind({
+                url: file
+            });
+            console.log(cropper)
+            showModal(document.getElementById("cropperModal"));
+        });
+    });
 
     $passwordNext.addEventListener("click", handlePasswordSend())
 
@@ -373,83 +573,100 @@ function load() {
 
 export function LoginPage() {
     return VDOM.render(
-        <div id="login">
-            <div id="phonePane" className="fading-block">
-                <img className="object" src="/static/images/logo.svg" alt="" onLoad={load}/>
-                {/*TODO remove onload above*/}
-                <div className="info">
-                    <div className="header">Sign in to Telegram</div>
-                    <div className="description">Please confirm your country and enter your phone number</div>
-                </div>
-                <div className="dropdown-container" id="countryDropdown">
-                    <div className="input-field dropdown down">
-                        <input type="text" id="cc" autoComplete="off" placeholder="Cоuntry"/>
-                        <label htmlFor="cc" required>Country</label>
-                        <i className="arrow btn-icon rp rps tgico" id="openDropdown"/>
-                    </div>
-                    <div id="countryList" className="dropdown-list hidden"/>
-                </div>
-                <div className="input-field">
-                    <input type="tel" id="phone" autoComplete="off" placeholder="Phone Number"/>
-                    <label htmlFor="phone" required>Phone Number</label>
-                </div>
-                <div className="checkbox-input">
-                    <label><input type="checkbox" name="keep_logger"/><span className="checkmark">
-                        <div className="tgico tgico-check"/>
-                    </span></label><span className="checkbox-label">Keep me signed in</span>
-                </div>
-                <div id="next" className="button rp"><span
-                    className="button-text">NEXT</span>
-                    <progress className="progress-circular white"/>
-                </div>
-            </div>
-            <div id="codePane" className="fading-block hidden">
-                <tgs-player id="monkey" className="object"/>
-                <div id="subCodePane" className="fading-block">
+        <div>
+            <div id="login">
+                <div id="phonePane" className="fading-block">
+                    <img className="object" src="/static/images/logo.svg" alt="" onLoad={load}/>
+                    {/*TODO remove onload above*/}
                     <div className="info">
-                        <div id="phonePreview" className="header"><i id="editPhone"
-                                                                     className="btn-icon rp rps tgico tgico-edit"/>
+                        <div className="header">Sign in to Telegram</div>
+                        <div className="description">Please confirm your country and enter your phone number</div>
+                    </div>
+                    <div className="dropdown-container" id="countryDropdown">
+                        <div className="input-field dropdown down">
+                            <input type="text" id="cc" autoComplete="off" placeholder="Cоuntry"/>
+                            <label for="cc" required>Country</label>
+                            <i className="arrow btn-icon rp rps tgico tgico-down" id="openDropdown"/>
                         </div>
-                        <div className="description">We have sent you an SMS with the code.</div>
+                        <div id="countryList" className="dropdown-list hidden"/>
                     </div>
                     <div className="input-field">
-                        <input type="text" id="code" placeholder="Code" autoComplete="off"/>
-                        <label htmlFor="code" required>Code</label>
+                        <input type="tel" id="phone" autoComplete="off" placeholder="Phone Number"/>
+                        <label for="phone" required>Phone Number</label>
                     </div>
-                </div>
-                <div id="passwordPane" className="fading-block hidden">
-                    <div className="info">
-                        <div className="header">Enter a Password</div>
-                        <div className="description">Your account is protected with an additional password.</div>
+                    <div className="checkbox-input">
+                        <label><input type="checkbox" name="keep_logger" id="keepLogger"/><span className="checkmark">
+                        <div className="tgico tgico-check"/>
+                    </span></label><span className="checkbox-label">Keep me signed in</span>
                     </div>
-                    <div className="input-field password-input peekable">
-                        <i id="peekButton" className="btn-icon rp rps tgico"/>
-                        <input type="password" id="password" placeholder="Password"/>
-                        <label htmlFor="password" required>Password</label>
-                    </div>
-                    <div id="passwordNext" className="button rp"><span
+                    <button id="next" className="btn rp" disabled="disabled"><span
                         className="button-text">NEXT</span>
                         <progress className="progress-circular white"/>
+                    </button>
+                </div>
+                <div id="codePane" className="fading-block hidden">
+                    <tgs-player id="monkey" className="object"/>
+                    <div id="subCodePane" className="fading-block">
+                        <div className="info">
+                            <div id="phonePreview" className="header"><i id="editPhone"
+                                                                         className="btn-icon rp rps tgico tgico-edit"/>
+                            </div>
+                            <div className="description">We have sent you an SMS with the code.</div>
+                        </div>
+                        <div className="input-field">
+                            <input type="text" id="code" placeholder="Code" autoComplete="off"/>
+                            <label for="code" required>Code</label>
+                        </div>
+                    </div>
+                    <div id="passwordPane" className="fading-block hidden">
+                        <div className="info">
+                            <div className="header">Enter a Password</div>
+                            <div className="description">Your account is protected with an additional password.</div>
+                        </div>
+                        <div className="input-field password-input peekable">
+                            <i id="peekButton" className="btn-icon rp rps tgico"/>
+                            <input type="password" id="password" placeholder="Password"/>
+                            <label for="password" required>Password</label>
+                        </div>
+                        <div id="passwordNext" className="btn rp"><span
+                            className="button-text">NEXT</span>
+                            <progress className="progress-circular white"/>
+                        </div>
                     </div>
                 </div>
+                <div id="registerPane" className="fading-block hidden">
+                    <div id="picture" className="object picture">
+                        <div className="tint hidden"/>
+                        <i className="add-icon tgico tgico-cameraadd"/></div>
+                    <div className="info">
+                        <div className="header">Your name</div>
+                        <div className="description">Enter your name and add a profile picture</div>
+                    </div>
+                    <div className="input-field">
+                        <input type="text" id="name" placeholder="Name" autoComplete="off"/>
+                        <label for="name" required>Name</label>
+                    </div>
+                    <div className="input-field">
+                        <input type="text" id="lastName" placeholder="Last Name (Optional)" autoComplete="off"/>
+                        <label for="lastName" required>Last Name (Optional)</label>
+                    </div>
+                    <div id="start" className="btn rp"><span className="button-text">START MESSAGING</span><progress className="progress-circular white"/></div>
+                </div>
             </div>
-            <div id="registerPane" className="fading-block hidden">
-                <div id="picture" className="object picture">
-                    <div className="tint hidden"/>
-                    <i className="add-icon tgico tgico-cameraadd"/></div>
-                <div className="info">
-                    <div className="header">Your name</div>
-                    <div className="description">Enter your name and add a profile picture</div>
+            <div id="cropperModal" className="modal hidden">
+                <div className="dialog">
+                    <div className="content">
+                        <div className="header">
+                            <i className="btn-icon rp rps tgico tgico-close close-button"></i>
+                            <div className="title">Drag to Reposition</div>
+                        </div>
+                        <div className="body">
+                            <div id="cropper">
+                            </div>
+                            <div id="photoDone" className="done-button rp"><i className="tgico tgico-check"></i></div>
+                        </div>
+                    </div>
                 </div>
-                <div className="input-field">
-                    <input type="text" id="name" placeholder="Name" autoComplete="off"/>
-                    <label htmlFor="name" required>Name</label>
-                </div>
-                <div className="input-field">
-                    <input type="text" id="lastName" placeholder="Last Name (Optional)" autoComplete="off"/>
-                    <label htmlFor="lastName" required>Last Name (Optional)</label>
-                </div>
-                <div id="start" className="button rp"><span className="button-text">START MESSAGING</span></div>
             </div>
         </div>
     )
