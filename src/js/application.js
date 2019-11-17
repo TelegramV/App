@@ -11,7 +11,7 @@ import {AppFramework} from "./ui/framework/framework"
 import {attach} from "./api/notifications";
 
 const authContext = {
-    dcID: 0,
+    dcID: 2,
     nonce: createNonce(16),
     sessionID: createNonce(8) // TODO check if secure?
 }
