@@ -39,16 +39,15 @@ export function getMediaPreviewName(message) {
 }
 
 export function getMessagePreviewDialog(message, showSender) {
-    if(message._ === "messageService")
-    {
+    if (message._ === "messageService") {
         return "Service message" // TODO parse service messages
     }
     let text = ""
-    if(message.media) {
+    if (message.media) {
         const p = getMediaPreviewName(message)
-        if(p.length > 0)
+        if (p.length > 0)
             text = (showSender ? ": " : "") + p + (message.message.length > 0 ? ", " : "")
-    } else if(message.message.length > 0 && showSender) {
+    } else if (message.message.length > 0 && showSender) {
         text += ": "
     }
     return text
@@ -62,6 +61,10 @@ export function formatTimeAudio(seconds) {
         second: '2-digit',
         hour12: false
     })
+}
+
+export function hasClass(target, className) {
+    return new RegExp('(\\s|^)' + className + '(\\s|$)').test(target.className);
 }
 
 export const countries = [

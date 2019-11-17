@@ -1,4 +1,4 @@
-body, html {
+html, body, #app {
 	height: 100%;
 }
 
@@ -100,6 +100,29 @@ body, html {
 		.button {
 			display: none;
 			margin-top: 45px;
+			background-color: $blue;
+			width: 100%;
+			height: 54px;
+			border-radius: 12px;
+			color: white;
+			justify-content: center;
+			align-items: center;
+			transition: anim(background-color);
+			user-select: none;
+
+			&:hover {
+				background-color: $bluehover;
+			}
+
+			span {
+				height: fit-content;
+			}
+
+			progress {
+				display: none;
+				position: absolute;
+				right: 16px;
+			}
 		}
 	}
 
@@ -227,8 +250,4 @@ body, html {
 		}
 	}
 
-}
-
-#app {
-	height: 100%;
 }

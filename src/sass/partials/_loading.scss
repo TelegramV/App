@@ -13,6 +13,10 @@
   font-size: 8px;
   overflow: hidden;
 
+  &.white {
+    color: white
+  }
+
   &.big {
     width: 64px;
     height: 64px;

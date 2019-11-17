@@ -73,13 +73,14 @@ function vMessageWithTextOnlyTemplate(data) {
 }
 
 function vMessageWithImageTemplate(data) {
+    let haveMsg = data.message && data.message.length > 0;
     return vMessageTemplate(data, (
         <div class={vGetClass(data)}>
             <img class="attachment" src={data.imgSrc}></img>
-            <div class="message">
+            {haveMsg ? (<div class="message">
                 <span dangerouslySetInnerHTML={data.message}/>
                 {vTimeTemplate(data)}
-            </div>
+            </div>): ""}
         </div>
     ))
 }
