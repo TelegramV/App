@@ -58,6 +58,34 @@ html, body, #app {
 		padding: 0 60px;
 	}
 
+	.button {
+		display: none;
+		margin-top: 45px;
+		background-color: $blue;
+		width: 100%;
+		height: 54px;
+		border-radius: 12px;
+		color: white;
+		justify-content: center;
+		align-items: center;
+		transition: anim(background-color);
+		user-select: none;
+
+		&:hover {
+			background-color: $bluehover;
+		}
+
+		span {
+			height: fit-content;
+		}
+
+		progress {
+			display: none;
+			position: absolute;
+			right: 16px;
+		}
+	}
+
 	#phonePane {
 		width: 100%;
 
@@ -67,6 +95,10 @@ html, body, #app {
 
 		.checkbox-input {
 			margin-left: 20px;
+		}
+
+		#countryList {
+			margin-top: 8px;
 		}
 
 		.dropdown-item {
@@ -97,33 +129,7 @@ html, body, #app {
 			}
 		}
 
-		.button {
-			display: none;
-			margin-top: 45px;
-			background-color: $blue;
-			width: 100%;
-			height: 54px;
-			border-radius: 12px;
-			color: white;
-			justify-content: center;
-			align-items: center;
-			transition: anim(background-color);
-			user-select: none;
 
-			&:hover {
-				background-color: $bluehover;
-			}
-
-			span {
-				height: fit-content;
-			}
-
-			progress {
-				display: none;
-				position: absolute;
-				right: 16px;
-			}
-		}
 	}
 
 	#codePane {

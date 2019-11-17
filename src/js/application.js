@@ -69,12 +69,12 @@ function password() {
 
 function start() {
     // password();
-    AppFramework.Router.route("/login", "login", {
+    /*AppFramework.Router.route("/login", "login", {
         h() {
             return document.createElement("div")
         }
-    })
-    AppFramework.Router.route("/login-x", "loginx", {
+    })*/
+    AppFramework.Router.route("/login", "login", {
         h() {
             return LoginPage()
         }

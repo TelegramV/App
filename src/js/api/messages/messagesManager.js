@@ -162,7 +162,7 @@ function fetchMessageMedia(message, peer) {
                 thumbnail: true
             })
         } catch {
-            
+
         } finally {
             FileAPI.getFile(message.media.photo, "m").then(file => {
                 updateSingle(peer, message.id, {
