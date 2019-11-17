@@ -113,15 +113,22 @@ function find(name, id) {
     return $peers[name][id]
 }
 
+
+function findObj(peer) {
+    return find(peer._, peer.id)
+}
+
 function updateOnline(peer, online, props = {}) {
     if (find(peer._, peer.id)) {
-        $peers[name][id][key].online = online
+        $peers[peer._][peer.id].status = online
 
         resolveListeners({
             type: "updateOnline",
+            peer: peer,
+            status: online
         })
     } else {
-        console.warn("peer wasn't found", name, id)
+        console.warn("peer wasn't found", name)
     }
 }
 
@@ -153,14 +160,10 @@ function init() {
         return
     }
 
-    MTProto.MessageProcessor.listenUpdateShort(update => {
-        // console.log(update)
-        // switch (update._) {
-        //     case "updateUserStatus":
-        //         const status = message.status
-        //         console.log(update)
-        //         break
-        // }
+    MTProto.MessageProcessor.listenUpdateShort(({update}) => {
+        if (update._ === "updateUserStatus") {
+            updateOnline({_: "user", id: update.user_id}, update.status)
+        }
     })
 }
 
@@ -170,6 +173,7 @@ export const PeersManager = {
     set,
     getPeers,
     find,
+    findObj,
     init
 }
 

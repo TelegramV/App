@@ -27,6 +27,7 @@ export class MessageProcessor {
         this.updateShortMessagesListeners = []
         this.updateNewMessagesListeners = []
         this.updateNewChannelMessagesListeners = []
+        this.updateShortChatMessagesListeners = []
 
         this.handlers = {
             "msg_container": this.processMessageContainer.bind(this),
@@ -37,6 +38,7 @@ export class MessageProcessor {
             "new_session_created": this.processNewSessionCreated.bind(this),
             "updateShort": this.processUpdateShort.bind(this),
             "updateShortMessage": this.processUpdateShortMessage.bind(this),
+            "updateShortChatMessage": this.processUpdateShortChatMessage.bind(this),
             "updateNewMessage": this.processUpdateNewMessage.bind(this),
             "updateNewChannelMessage": this.processUpdateNewChannelMessage.bind(this),
             "updates": this.processUpdates.bind(this),
@@ -52,6 +54,12 @@ export class MessageProcessor {
     processUpdateShortMessage(message, messageID, sessionID) {
         console.log("short", message)
         this.updateShortMessagesListeners.forEach(listener => listener(message))
+        // Logger.log("Short update", message)
+    }
+
+    processUpdateShortChatMessage(message, messageID, sessionID) {
+        console.log("short", message)
+        this.updateShortChatMessagesListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
 
@@ -92,6 +100,10 @@ export class MessageProcessor {
 
     listenUpdateShortMessage(listener) {
         this.updateShortMessagesListeners.push(listener)
+    }
+
+    listenUpdateShortChatMessage(listener) {
+        this.updateShortChatMessagesListeners.push(listener)
     }
 
     listenUpdateNewMessage(listener) {

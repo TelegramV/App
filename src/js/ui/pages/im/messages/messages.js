@@ -39,6 +39,18 @@ function createStickyDate(message) {
     )
 }
 
+function formatDate(date) {
+    return date.toLocaleTimeString('en', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+    })
+}
+
+function formatOnline(status) {
+    return status.was_online ? "was online " + formatDate(new Date(peer.status.was_online * 1000)) : "online"
+}
+
 function render(peer) {
     return VDOM.render(
         <div id="chat" data-peer={AppFramework.Router.activeRoute.queryParams.p}>
@@ -57,7 +69,9 @@ function render(peer) {
                                 </div>
                             </div>
                             <div className="bottom">
-                                <div id="messages-online" className="info">{peer.online ? "online" : "offline"}</div>
+                                <div id="messages-online" className="info">
+                                    {peer._ === "user" ? formatOnline(peer.status) : ""}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -79,6 +93,8 @@ function rerender(peer) {
 }
 
 function isOtherDay(date1, date2) {
+    if (!date1 || !date2) return false
+
     return date1.getFullYear() !== date2.getFullYear() || date1.getMonth() !== date2.getMonth() || date1.getDay() !== date2.getDay()
 }
 
@@ -91,7 +107,9 @@ function appendMessages(messages) {
         const $bubbles = document.getElementById("bubbles")
 
         if ($latestSticky && !isOtherDay(messages[0].time, $latestSticky.date)) {
-            $latestSticky.elem.parentElement.removeChild($latestSticky.elem)
+            if ($latestSticky.elem.parentElement) {
+                $latestSticky.elem.parentElement.removeChild($latestSticky.elem)
+            }
         }
         let latest = null
         let final = null
@@ -158,6 +176,8 @@ function fetchNextPage(peer) {
             <progress className="progress-circular big"/>
         </div>
     ))
+
+    console.log(peer)
 
     MessagesManager.fetchNextPage(peer).then(() => {
         $bubblesInner.querySelector("#messagesLoadingNextPage").remove()
@@ -261,8 +281,6 @@ function handleDialogUpdates(event) {
                 if (peerByManager) {
                     peer = peerByManager
 
-                    console.log(peerByManager)
-
                     if (peerByManager.photo) {
                         updateHeader({
                             title: dialog.title,
@@ -344,6 +362,13 @@ function handlePeerUpdates(event) {
                         text: peer.photoPlaceholder.text,
                     }
                 }
+            })
+        }
+    } else if (event.type === "updateOnline") {
+        if (parseHashQuery()._ === "user" && parseHashQuery().id === event.status.user_id) {
+            console.log("upd status", event.status)
+            updateHeader({
+                online: formatDate(event.status)
             })
         }
     }

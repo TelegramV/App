@@ -1,6 +1,13 @@
 import {MTProto} from "../../mtproto"
 import {nextRandomInt} from "../../mtproto/utils/bin"
-import {findMessageFromDialog, findPeerFromDialog, findUserFromMessage, getInputPeerFromPeer, getPeerName} from "./util"
+import {
+    findMessageFromDialog,
+    findPeerFromDialog,
+    findUserFromMessage,
+    getInputPeerFromPeer,
+    getPeerName,
+    getPeerTemplateFromToId
+} from "./util"
 import TimeManager from "../../mtproto/timeManager"
 import {generateDialogIndex, getMessageLocalID} from "./messageIdManager"
 import {getMessagePreviewDialog} from "../../ui/utils"
@@ -108,6 +115,8 @@ function fetchDialogs({
                 unreadMentionsCount: dialog.unread_mentions_count,
                 verified: peer.pFlags.verified,
                 online: peer.status && peer.status._ === "userStatusOnline",
+                read: message.id <= dialog.read_inbox_max_id,
+                out: message.pFlags.out,
                 message: {
                     sender: messageUsername + msgPrefix,
                     text: submsg,
@@ -180,6 +189,52 @@ function fetchPhoto(peer, props = {}) {
     }
 }
 
+function createDialogFromMessage(message) {
+    const pinned = dialog.pFlags.hasOwnProperty("pinned") ? dialog.pFlags.pinned : false
+
+    const peer = PeersManager.findObj(message.peer)
+    let peerName = getPeerName(peer)
+
+    const messageUser = message.from
+    let messageUsername = `${getPeerName(messageUser, false)}`
+    let messageSelf = messageUser ? messageUser.id === peer.id : false
+
+    $offsetDate = message.date
+
+    // TODO this should be made with css
+    const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
+    const date = new Date(message.date * 1000)
+
+    const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
+
+    const data = {
+        title: peerName,
+        pinned: pinned,
+        // muted: dialog.notify_settings.mute_until,
+        photo: false,
+        unreadCount: dialog.unread_count,
+        unreadMark: dialog.pFlags.unreadMark,
+        unreadMentionsCount: dialog.unread_mentions_count,
+        verified: peer.pFlags.verified,
+        online: peer.status && peer.status._ === "userStatusOnline",
+        read: message.id <= dialog.read_inbox_max_id,
+        out: message.pFlags.out,
+        message: {
+            sender: messageUsername + msgPrefix,
+            text: submsg,
+            self: messageSelf,
+            date: date,
+            id: message.id,
+        },
+        peer: {
+            _: peer._,
+            id: peer.id,
+            access_hash: peer.access_hash
+        },
+        index: generateDialogIndex(message.date)
+    }
+}
+
 function updateSingle(peer, data, props = {}) {
     let dialogs = []
     if (props.pinned) {
@@ -187,7 +242,6 @@ function updateSingle(peer, data, props = {}) {
     } else {
         dialogs = $dialogs
     }
-
 
     const dialogIndex = dialogs.findIndex(dialog => dialog.peer._ === peer._ && dialog.peer.id === peer.id)
 
@@ -205,6 +259,76 @@ function updateSingle(peer, data, props = {}) {
     } else {
         console.warn("dialog wasn't found", peer)
     }
+}
+
+function refetchDialog(peer) {
+    console.warn("trying to reload dialog", peer)
+    return MTProto.invokeMethod("messages.getPeerDialogs", {
+        peers: [
+            {
+                _: "inputDialogPeer",
+                peer: getInputPeerFromPeer(peer._, peer.id, peer.access_hash)
+            }
+        ]
+    }).then(peerDialogs => {
+        console.log(peerDialogs)
+        for (let dialog of peerDialogs.dialogs) {
+            const pinned = dialog.pFlags.hasOwnProperty("pinned") ? dialog.pFlags.pinned : false
+
+            const peer = findPeerFromDialog(dialog, peerDialogs)
+            let peerName = getPeerName(peer)
+
+            const message = findMessageFromDialog(dialog, peerDialogs)
+            const messageUser = findUserFromMessage(message, peerDialogs)
+            let messageUsername = `${getPeerName(messageUser, false)}`
+            let messageSelf = messageUser ? messageUser.id === peer.id : false
+
+            $offsetDate = message.date
+
+            // TODO this should be made with css
+            const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
+            const date = new Date(message.date * 1000)
+
+            const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
+
+            const data = {
+                title: peerName,
+                pinned: pinned,
+                muted: dialog.notify_settings.mute_until,
+                photo: false,
+                unreadCount: dialog.unread_count,
+                unreadMark: dialog.pFlags.unreadMark,
+                unreadMentionsCount: dialog.unread_mentions_count,
+                verified: peer.pFlags.verified,
+                online: peer.status && peer.status._ === "userStatusOnline",
+                read: message.id <= dialog.read_inbox_max_id,
+                out: message.pFlags.out,
+                message: {
+                    sender: messageUsername + msgPrefix,
+                    text: submsg,
+                    self: messageSelf,
+                    date: date,
+                    id: message.id,
+                },
+                peer: {
+                    _: peer._,
+                    id: peer.id,
+                    access_hash: peer.access_hash
+                },
+                index: generateDialogIndex(message.date)
+            }
+
+            if ($offsetDate && !dialog.pFlags.pinned && (!$dialogsOffsetDate || $offsetDate < $dialogsOffsetDate)) {
+                $dialogsOffsetDate = $offsetDate
+            }
+
+            updateSingle(peer, data, {
+                pinned: data.pinned
+            })
+
+            PeersManager.set(peer)
+        }
+    })
 }
 
 function getDialogs() {
@@ -308,22 +432,19 @@ function init() {
             }
         })
     })
-
-    MTProto.MessageProcessor.listenUpdateNewMessage(update => {
-        console.log("UPDATE", update)
-
-        const messageUser = PeersManager.find("user", update.message.user_id)
+    MTProto.MessageProcessor.listenUpdateShortChatMessage(update => {
+        const messageUser = PeersManager.find("chat", update.chat_id)
         let messageUsername = `${getPeerName(messageUser, false)}`
-        let messageSelf = messageUser ? messageUser.id === update.message.user_id : false
+        let messageSelf = messageUser ? messageUser.id === update.user_id : false
 
-        const message = update.message
+        const message = update
 
         const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
         const date = new Date(message.date * 1000)
 
         const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
 
-        updateSingle({_: "user", id: message.user_id}, {
+        updateSingle({_: "chat", id: message.chat_id}, {
             message: {
                 sender: messageUsername + msgPrefix,
                 text: submsg,
@@ -333,6 +454,66 @@ function init() {
             }
         })
     })
+
+    MTProto.MessageProcessor.listenUpdateNewMessage(update => {
+        const diatpl = getPeerTemplateFromToId(update.message.to_id)
+        let dialogIdToUpdate = update.message.from_id
+
+        const messageUser = PeersManager.find("user", update.message.from_id)
+        let messageUsername = `${getPeerName(messageUser, false)}`
+        let messageSelf = messageUser ? messageUser.id === update.message.from_id : false
+
+        const message = update.message
+
+        if (message.pFlags.out) {
+            dialogIdToUpdate = diatpl
+        }
+
+        const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
+        const date = new Date(message.date * 1000)
+
+        const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
+
+        updateSingle({_: "user", id: dialogIdToUpdate.id}, {
+            message: {
+                sender: messageUsername + msgPrefix,
+                text: submsg,
+                self: messageSelf,
+                date: date,
+                id: message.id,
+            }
+        })
+    })
+
+    MTProto.MessageProcessor.listenUpdateNewChannelMessage((update => {
+        const message = update.message
+
+        let dialogToUpdate = null
+        if (message.to_id) {
+            dialogToUpdate = PeersManager.findObj(getPeerTemplateFromToId(update.message.to_id))
+        } else {
+            dialogToUpdate = PeersManager.find("user", message.from_id)
+        }
+
+        const messageUser = PeersManager.find("user", update.message.from_id)
+        let messageUsername = `${getPeerName(messageUser, false)}`
+        let messageSelf = messageUser ? messageUser.id === update.message.from_id : false
+
+        const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
+        const date = new Date(message.date * 1000)
+
+        const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
+
+        updateSingle(dialogToUpdate, {
+            message: {
+                sender: messageUsername + msgPrefix,
+                text: submsg,
+                self: messageSelf,
+                date: date,
+                id: message.id,
+            }
+        })
+    }))
 }
 
 const DialogsManager = {
@@ -344,7 +525,8 @@ const DialogsManager = {
     isFetched,
     fetchNextPage,
     isEmpty,
-    init
+    init,
+    refetchDialog
 }
 
 export default DialogsManager

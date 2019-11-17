@@ -64,6 +64,16 @@ function handlePeerUpdates(event) {
         } else {
             console.warn("dialogAvatar is not on the page")
         }
+    } else if (event.type === "updateOnline") {
+        const $dialog = $dialogsWrapper.querySelector(`[data-peer="${event.peer._}.${event.peer.id}"]`)
+
+        if ($dialog) {
+            if (event.status.was_online) {
+                $dialog.classList.remove("online")
+            } else {
+                $dialog.classList.remove("online")
+            }
+        }
     }
 }
 

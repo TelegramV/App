@@ -414,7 +414,7 @@
                 border-radius: 6px 12px 12px 6px;
             }
 
-            .bubble:not(.grouped) {
+            /*.bubble:not(.grouped) {
             	&:before {
                     content: "";
                     position: absolute;
@@ -439,7 +439,7 @@
                     border-bottom-right-radius: 10px 15px;
                     border-right: 1px solid rgba(0, 0, 0, 0.1);
                 }
-            }
+            }*/
 
             .bubble:first-child {
                 border-radius: 12px 12px 12px 6px;
@@ -504,7 +504,7 @@
                 border-radius: 12px 6px 6px 12px;
             }
 
-            .bubble:not(.grouped) {
+            /*.bubble:not(.grouped) {
             	&:before {
                 	content: "";
                     position: absolute;
@@ -529,7 +529,7 @@
                     border-bottom-left-radius: 10px 15px;
                     border-left: 1px solid rgba(0, 0, 0, 0.05);
                 }
-            }
+            }*/
 
             .bubble:first-child {
                 border-radius: 12px 12px 6px 12px;

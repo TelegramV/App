@@ -8,6 +8,7 @@ import "../sass/application.scss"
 import {ImPage} from "./ui/pages/im/impage"
 import {LoginPage} from "./ui/pages/login/nextlogin"
 import {AppFramework} from "./ui/framework/framework"
+import {attach} from "./api/notifications";
 
 const authContext = {
     dcID: 2,
@@ -117,3 +118,4 @@ function start() {
 MTProto.connect(authContext, function () {
     start()
 }, this)
+

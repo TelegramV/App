@@ -10,7 +10,14 @@ export const dialogPeerMap = {
     "peerChat": "chat",
 }
 
-export function getInputPeerFromPeer(peerName, peerId) {
+export function getPeerTemplateFromToId(todi) {
+    return {
+        _: dialogPeerMap[todi._],
+        id: todi[dialogPeerMap[todi._] + "_id"]
+    }
+}
+
+export function getInputPeerFromPeer(peerName, peerId, accessHash = "") {
     switch (peerName) {
         case "chat":
             return {
@@ -21,13 +28,13 @@ export function getInputPeerFromPeer(peerName, peerId) {
             return {
                 _: "inputPeerUser",
                 user_id: peerId,
-                access_hash: ""
+                access_hash: accessHash ? accessHash : ""
             }
         case "channel":
             return {
                 _: "inputPeerChannel",
                 channel_id: peerId,
-                access_hash: ""
+                access_hash: accessHash ? accessHash : ""
             }
         default:
             console.warn("unexpected peerName")

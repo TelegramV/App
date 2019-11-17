@@ -10,6 +10,7 @@ import {sendReqPQ} from "./connect/methods";
 import PeersManager from "../api/peers/peersManager"
 import MessagesManager from "../api/messages/messagesManager"
 import DialogsManager from "../api/dialogs/dialogsManager"
+import {attach} from "../api/notifications";
 
 class MobileProtocolAPIAuth {
     constructor(options = {}) {
@@ -78,6 +79,8 @@ class MobileProtocol {
         this.Auth = new MobileProtocolAPIAuth({
             MTProto: this
         })
+
+        this.user = null
     }
 
     updateServerSalt(newSalt) {
@@ -89,7 +92,7 @@ class MobileProtocol {
         this.authContext = authContext
 
         // TODO remove, only for dev
-        if(AppPermanentStorage.exists("authKey")) {
+        if (AppPermanentStorage.exists("authKey")) {
             AppPermanentStorage.setItem("authKey2", AppPermanentStorage.getItem("authKey"))
             AppPermanentStorage.setItem("serverSalt2", AppPermanentStorage.getItem("serverSalt"))
         }
@@ -120,6 +123,7 @@ class MobileProtocol {
             this.networker = new Networker(authContext)
             this.MessageProcessor = this.networker.messageProcessor
             this.connected = true
+            attach()
 
             initManagers()
             // resolve()
@@ -128,7 +132,7 @@ class MobileProtocol {
     }
 
     async createFileNetworker(dcID) {
-        if(AppPermanentStorage.exists("authKey" + dcID)) {
+        if (AppPermanentStorage.exists("authKey" + dcID)) {
             const networker = new Networker({
                 dcID: dcID,
                 nonce: createNonce(16),
@@ -208,8 +212,12 @@ class MobileProtocol {
         return AppPermanentStorage.exists("authorizationData")
     }
 
-    getAuthorizedUser() {
-        return AppPermanentStorage.getItem("authorizationData")
+    getAuthorizedUser(storage = false) {
+        if (storage) {
+            return AppPermanentStorage.getItem("authorizationData")
+        } else {
+            return this.user ? this.user : this.user = AppPermanentStorage.getItem("authorizationData")
+        }
     }
 }
 

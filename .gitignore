@@ -5,6 +5,8 @@ node_modules/
 *.log
 package-lock.json
 
+dist
+
 # OS generated files
 .DS_Store
 .DS_Store?
