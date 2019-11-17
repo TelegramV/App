@@ -3,14 +3,14 @@ import VDOM from "../../framework/vdom"
 import DialogsManager from "../../../api/dialogs/dialogsManager"
 import {UICreateMessages} from "./messages/messages"
 
-const $imElement = VDOM.render(
+const $imPageElement = VDOM.render(
     <div className="app"/>
 )
 
-export default () => {
-    $imElement.appendChild(UICreateDialogsSidebar())
-    $imElement.appendChild(UICreateMessages())
+export function ImPage() {
+    $imPageElement.appendChild(UICreateDialogsSidebar())
+    $imPageElement.appendChild(UICreateMessages())
 
     DialogsManager.fetchDialogs({})
-    return $imElement
+    return $imPageElement
 }

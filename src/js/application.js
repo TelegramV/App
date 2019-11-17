@@ -5,9 +5,9 @@ import {AppPermanentStorage} from "./common/storage"
 import mt_srp_check_password from "./mtproto/crypto/mt_srp/mt_srp"
 
 import "../sass/application.scss"
-import {LoginPage} from "./ui/pages/login"
+import {ImPage} from "./ui/pages/im/impage"
+import {LoginPage} from "./ui/pages/login/nextlogin"
 import {AppFramework} from "./ui/framework/framework"
-import $imElement from "./ui/pages/im/impage"
 
 const authContext = {
     dcID: 2,
@@ -71,14 +71,19 @@ function start() {
     // password();
     AppFramework.Router.route("/login", "login", {
         h() {
-            return <LoginPage/>
+            return document.createElement("div")
+        }
+    })
+    AppFramework.Router.route("/login-x", "loginx", {
+        h() {
+            return LoginPage()
         }
     })
 
     AppFramework.Router.route("/", "main", {
         h() {
             console.log("ll")
-            return $imElement()
+            return ImPage()
         }
     })
 

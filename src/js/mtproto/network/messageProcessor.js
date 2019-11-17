@@ -22,20 +22,23 @@ export class MessageProcessor {
         this.rpcErrorHandlers = {}
         this.sentMessages = {}
 
+        this.updateShortListeners = []
+
         this.handlers = {
-            "msg_container": (message, messageID, sessionID) => this.processMessageContainer(message, messageID, sessionID),
-            "message": (message, messageID, sessionID) => this.processMessage(message, messageID, sessionID),
-            "rpc_result": (message, messageID, sessionID) => this.processRpcResult(message, messageID, sessionID),
-            "msgs_ack": (message, messageID, sessionID) => this.processMessagesAck(message, messageID, sessionID),
-            "bad_server_salt": (message, messageID, sessionID) => this.processBadServerSalt(message, messageID, sessionID),
-            "new_session_created": (message, messageID, sessionID) => this.processNewSessionCreated(message, messageID, sessionID),
-            "updateShort": (message, messageID, sessionID) => this.processUpdateShort(message, messageID, sessionID),
-            "updates": (message, messageID, sessionID) => this.processUpdates(message, messageID, sessionID),
+            "msg_container": this.processMessageContainer.bind(this),
+            "message": this.processMessage.bind(this),
+            "rpc_result": this.processRpcResult.bind(this),
+            "msgs_ack": this.processMessagesAck.bind(this),
+            "bad_server_salt": this.processBadServerSalt.bind(this),
+            "new_session_created": this.processNewSessionCreated.bind(this),
+            "updateShort": this.processUpdateShort.bind(this),
+            "updates": this.processUpdates.bind(this),
         }
 
     }
 
     processUpdateShort(message, messageID, sessionID) {
+        this.updateShortListeners.forEach(listener => listener(message.update))
         // Logger.log("Short update", message)
     }
 
@@ -44,9 +47,15 @@ export class MessageProcessor {
     }
 
     processUpdates(message, messageID, sessionID) {
+        message.updates.forEach(update => {
+
+        })
         // Logger.log("update", message)
     }
 
+    listenUpdateShort(listener) {
+        this.updateShortListeners.push(listener)
+    }
 
     listenRpc(messageId, handler, reject) {
         this.rpcResultHandlers[messageId] = handler

@@ -1,17 +1,11 @@
 import {MTProto} from "../../mtproto"
-import {
-    findMessageFromDialog,
-    findPeerFromDialog,
-    findUserFromMessage,
-    getPeerName
-} from "../../ui/pages/im/components/dialog"
-import {FileAPI} from "../fileAPI"
 import {nextRandomInt} from "../../mtproto/utils/bin"
-import {getInputPeerFromPeer} from "./util"
+import {findMessageFromDialog, findPeerFromDialog, findUserFromMessage, getInputPeerFromPeer, getPeerName} from "./util"
 import TimeManager from "../../mtproto/timeManager"
 import {generateDialogIndex, getMessageLocalID} from "./messageIdManager"
 import {getMessagePreviewDialog} from "../../ui/utils"
 import PeersManager from "../peers/peersManager"
+import {FileAPI} from "../fileAPI"
 
 window.pushDialog = function () {
     let newd = $dialogs[nextRandomInt($dialogs.length)]

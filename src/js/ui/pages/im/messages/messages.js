@@ -148,7 +148,6 @@ function parseHashQuery() {
 
 function handleDialogUpdates(event) {
     if (event.type === "updateSingle") {
-
         if (AppFramework.Router.activeRoute.queryParams.p) {
             const queryPeer = parseHashQuery()
             const dialog = event.dialog

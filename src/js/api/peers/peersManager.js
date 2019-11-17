@@ -1,6 +1,7 @@
 import {arrayDelete} from "../../common/utils/utils"
 import {FileAPI} from "../fileAPI"
-import {getPeerName} from "../../ui/pages/im/components/dialog"
+import {getPeerName} from "../dialogs/util"
+import {MTProto} from "../../mtproto"
 
 const $peers = {
     user: {},
@@ -13,6 +14,8 @@ const $peerInitListeners = {
     chat: {},
     channel: {}
 }
+
+let __inited = false
 
 function resolveListeners(event) {
     if (event) {
@@ -93,6 +96,18 @@ function find(name, id) {
     return $peers[name][id]
 }
 
+function updateOnline(peer, online, props = {}) {
+    if (find(peer._, peer.id)) {
+        $peers[name][id][key].online = online
+
+        resolveListeners({
+            type: "updateOnline",
+        })
+    } else {
+        console.warn("peer wasn't found", name, id)
+    }
+}
+
 function updateSingle(name, id, data, props = {}) {
     if (find(name, id)) {
         for (const key in data) {
@@ -113,12 +128,31 @@ function getPeers() {
     return $peers
 }
 
+function init() {
+    if (!__inited) {
+        __inited = true
+    } else {
+        console.warn("PeersManager already inited")
+        return
+    }
+
+    MTProto.MessageProcessor.listenUpdateShort(update => {
+        switch (update._) {
+            case "updateUserStatus":
+                const status = message.status
+                console.log(update)
+                break
+        }
+    })
+}
+
 export const PeersManager = {
     listenUpdates,
     listenPeerInit,
     set,
     getPeers,
-    find
+    find,
+    init
 }
 
 export default PeersManager

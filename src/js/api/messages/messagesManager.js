@@ -3,10 +3,9 @@ import {PeerAPI} from "../peerAPI"
 import PeersManager from "../peers/peersManager"
 import {nextRandomInt} from "../../mtproto/utils/bin"
 import {AppFramework} from "../../ui/framework/framework"
-import {getPeerName} from "../../ui/pages/im/components/dialog"
 import {parseMessageEntities} from "../../mtproto/utils/htmlHelpers"
 import {FileAPI} from "../fileAPI"
-import {formatTimeAudio} from "../../ui/utils"
+import {getPeerName} from "../dialogs/util"
 
 window.pushMessage = function () {
     const dialogPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")

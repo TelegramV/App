@@ -7,6 +7,7 @@ import {createLogger} from "../common/logger"
 import {AppPermanentStorage} from "../common/storage"
 import {AuthAPI} from "../api/auth";
 import {sendReqPQ} from "./connect/methods";
+import PeersManager from "../api/peers/peersManager"
 
 class MobileProtocolAPIAuth {
     constructor(options = {}) {
@@ -54,6 +55,10 @@ class MobileProtocolAPIAuth {
     }
 }
 
+function initManagers() {
+    PeersManager.init()
+}
+
 class MobileProtocol {
     constructor(options = {}) {
         this.authContext = options.authContext || {}
@@ -89,7 +94,10 @@ class MobileProtocol {
                 AppPermanentStorage.setItem("serverSalt", bytesToHex(authContext.serverSalt))
 
                 this.networker = new Networker(authContext)
+                this.MessageProcessor = this.networker.messageProcessor
                 this.connected = true
+
+                initManagers()
 
                 processor.call(proc_context);
                 //resolve()
@@ -101,7 +109,10 @@ class MobileProtocol {
             authContext.serverSalt = bytesFromHex(AppPermanentStorage.getItem("serverSalt"))
 
             this.networker = new Networker(authContext)
+            this.MessageProcessor = this.networker.messageProcessor
             this.connected = true
+
+            initManagers()
             // resolve()
             processor.call(proc_context);
         }
@@ -140,14 +151,14 @@ class MobileProtocol {
             throw new Error("Looks like you have not connected yet..")
         }
 
-        if(dcID !== null && dcID !== this.authContext.dcID) {
+        if (dcID !== null && dcID !== this.authContext.dcID) {
             let networker = this.fileNetworkers[dcID]
-            if(Array.isArray(networker)) {
+            if (Array.isArray(networker)) {
                 return new Promise(resolve => {
                     networker.push({method, parameters, resolve})
                 })
             }
-            if(!networker) {
+            if (!networker) {
                 this.fileNetworkers[dcID] = []
                 return new Promise(resolve => {
                     this.createFileNetworker(dcID).then(networker => {
