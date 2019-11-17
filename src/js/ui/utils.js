@@ -6,6 +6,28 @@ export const vLoadingNode = (
     </div>
 )
 
+export function addRipple() {
+    let rippleElements = document.getElementsByClassName("rp");
+
+    for (let i = 0; i < rippleElements.length; i++) {
+        rippleElements[i].onmousedown = function(e) {
+            let rect = this.getBoundingClientRect();
+
+            let X = e.clientX - rect.left;
+            let Y = e.clientY - rect.top;
+            let rippleDiv = document.createElement("div");
+            rippleDiv.classList.add("ripple");
+            rippleDiv.setAttribute("style", "top:" + Y + "px; left:" + X + "px;");
+            this.appendChild(rippleDiv);
+            setTimeout(function() {
+                rippleDiv.parentElement.removeChild(rippleDiv);
+            }, 900);
+        };
+    }
+}
+
+setInterval(addRipple, 5000);
+
 export const $loadingNode = VDOM.render(vLoadingNode)
 
 // If there's no message it it should display "Photo" or smth
@@ -68,7 +90,6 @@ export function hasClass(target, className) {
 }
 
 export const countries = [
-    ["+999", "Test Country", "UA"],
     ["+93", "Afghanistan", "AF"],
     ["+358 18", "Åland Islands", "AX"],
     ["+355", "Albania", "AL"],
@@ -281,7 +302,6 @@ export const countries = [
     ["+252", "Somalia", "SO"],
     ["+27", "South Africa", "ZA"],
     ["+500", "South Georgia & South Sandwich Islands", "GS"],
-    ["+995 34", "South Ossetia", "SOS"],
     ["+211", "South Sudan", "SS"],
     ["+34", "Spain", "ES", "es", "ca"],
     ["+94", "Sri Lanka", "LK"],
@@ -308,7 +328,7 @@ export const countries = [
     ["+256", "Uganda", "UG"],
     ["+380", "Ukraine", "UA"],
     ["+971", "United Arab Emirates", "AE"],
-    ["+44", "United Kingdom", "UK"],
+    ["+44", "United Kingdom", "GB"],
     ["+1", "United States", "US", "en"],
     ["+598", "Uruguay", "UY"],
     ["+1 340", "U.S. Virgin Islands", "VI"],
@@ -320,6 +340,6 @@ export const countries = [
     ["+681", "Wallis & Futuna", "WF"],
     ["+967", "Yemen", "YE"],
     ["+260", "Zambia", "ZM"],
-    ["+255", "Zanzibar", "ZB"],
+    ["+255", "Zanzibar", "TZ"],
     ["+263", "Zimbabwe", "ZW"]
 ];
