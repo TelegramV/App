@@ -300,7 +300,7 @@ function updateHeader({title = false, online = false, photo = false}) {
     if (title) $messagesTitle.innerHTML = title
     if (online) $messagesOnline.innerHTML = online
 
-    if (photo) {
+    if (photo && $messagesPhoto) {
         if (photo.url) {
             $messagesPhoto.setAttribute("class", "avatar")
             $messagesPhoto.style = `background-image: url(${photo.url})`
@@ -330,6 +330,7 @@ function updateMessageAvatar(peer) {
 }
 
 function handlePeerUpdates(event) {
+    const peer = event.peer;
     if (event.type === "updatePhoto") {
         updateMessageAvatar(event.peer)
 
