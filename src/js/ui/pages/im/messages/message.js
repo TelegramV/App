@@ -36,7 +36,7 @@ function vServiceMessageTemplate(data, inside) {
 function vMessageTemplate(data, inside) {
     const className = data.post ? "channel in" : data.out ? "out" : "in"
     return (
-        <div class={className} data-id={data.id}>
+        <div class={className} data-id={data.id} data-peer={`${data.from._}.${data.from.id}`}>
             {className === "in" ? (
                 <div className={"avatar " + (!data.from.photo ? `placeholder-${data.from.photoPlaceholder.num}` : "")}
                      style={`background-image: url(${data.from.photo});`}>

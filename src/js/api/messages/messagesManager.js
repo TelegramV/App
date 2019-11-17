@@ -394,8 +394,18 @@ function allForPeer(peer) {
         return []
     }
 
+    if (!$messages[peer._][peer.id]) {
+        $messages[peer._][peer.id] = []
+        return []
+    }
 
-    return $messages[peer._][peer.id] ? $messages[peer._][peer.id] : []
+    const len = $messages[peer._][peer.id].length
+
+    if (len > 100) {
+        $messages[peer._][peer.id] = $messages[peer._][peer.id].slice(0, 100)
+    }
+
+    return $messages[peer._][peer.id]
 }
 
 function isFetching() {
@@ -436,6 +446,9 @@ function existForPeer(peer) {
 function init() {
     MTProto.MessageProcessor.listenUpdateShortMessage(update => {
         pushTop(update, true)
+    })
+    MTProto.MessageProcessor.listenUpdateNewMessage(update => {
+        pushTop(update, false)
     })
 }
 

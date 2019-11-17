@@ -9,7 +9,7 @@ function openDialog(peer) {
     })
 }
 
-export function UICreateDialog(dialog) {
+export function UICreateDialog(dialog, peer) {
     const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.unreadCount > 0 ? dialog.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
     let personClasses = ["person", "rp"]
@@ -22,9 +22,9 @@ export function UICreateDialog(dialog) {
              data-message-id={dialog.message.id}
              className={personClasses}
              onClick={openDialog(dialog.peer)}>
-            <div className={"avatar " + (!dialog.photo ? `placeholder-${dialog.photoPlaceholder.num}` : "")}
-                 style={`background-image: url(${dialog.photo});`}>
-                {!dialog.photo ? dialog.photoPlaceholder.text : ""}
+            <div className={"avatar " + (!peer.photo ? `placeholder-${peer.photoPlaceholder.num}` : "")}
+                 style={`background-image: url(${peer.photo});`}>
+                {!peer.photo ? peer.photoPlaceholder.text : ""}
             </div>
             <div className="content">
                 <div className="top">
