@@ -4,9 +4,12 @@ import {countries, hasClass} from "../../utils"
 import {MTProto} from "../../../mtproto"
 import {AppPermanentStorage} from "../../../common/storage"
 import {AppFramework} from "../../framework/framework"
+import {TGSPlayer} from "./../../vendor/tgs_player"
+import mt_srp_check_password from "../../../mtproto/crypto/mt_srp/mt_srp";
 
 let $countryInput = null
 let $list = null
+let $openDropdown = null
 let $parent = null
 let $phoneInput = null
 let $codeInput = null
@@ -47,35 +50,89 @@ function handlePhoneSend() {
                 let text = document.createElement("span");
                 text.textContent = $phoneInput.value;
                 phone.prepend(text);
-                /*this.formData.phoneNumber = phoneNumber
-                this.formData.sentCode = sentCode
-                this.form = "code"
-                this.render()*/
+                _formData.phoneNumber = phoneNumber
+                _formData.sentCode = sentCode
             })
         }
     }
 }
 
-function handleSignIn(event) {
-    if (!/[0-9]*/.test(event.target.value)) {
+function handlePasswordSend() {
+    return event => {
         event.preventDefault()
-        return
+
+        const password = $passwordInput.value
+        document.querySelector("#passwordNext progress").style.display = "block"
+        document.querySelector("#passwordNext span").innerHTML = "PLEASE WAIT..."
+
+        const response = _formData.passwordData
+        const salt1 = response.current_algo.salt1
+        const salt2 = response.current_algo.salt2
+        const g = response.current_algo.g
+        const p = response.current_algo.p
+        const srp_id = response.srp_id
+        const srp_B = response.srp_B
+
+        const srp_ret = mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, password);
+
+        MTProto.invokeMethod("auth.checkPassword", {
+            password: {
+                _: "inputCheckPasswordSRP",
+                srp_id: srp_ret.srp_id,
+                A: srp_ret.A,
+                M1: srp_ret.M1
+            }
+        }).then(response => {
+            console.log(response);
+
+            AppPermanentStorage.setItem("authorizationData", response)
+            AppFramework.Router.push("/")
+            //authorizedStart(response)
+        }, reject => {
+            console.log(reject)
+        })
     }
+}
 
-    if (!isCodeValid(event.target.value)) return;
+function handleSignIn(code) {
+    if (!isCodeValid(code)) return;
 
-    const phoneCode = document.getElementById("code").value
+    const phoneCode = code
     const phoneCodeHash = _formData.sentCode.phone_code_hash
 
     _formData.phoneCode = phoneCode
     _formData.phoneCodeHash = phoneCodeHash
 
-    MTProto.Auth.signIn(_formData.formData.phoneNumber, phoneCodeHash, phoneCode).then(authorization => {
+    MTProto.Auth.signIn(_formData.phoneNumber, phoneCodeHash, phoneCode).then(authorization => {
         if (authorization._ === "auth.authorizationSignUpRequired") {
             // show sign up
+            fadeOut(document.getElementById("codePane"));
+            fadeIn(document.getElementById("registerPane"));
+            return
         } else {
             AppPermanentStorage.setItem("authorizationData", authorization)
             AppFramework.Router.push("/")
+            return
+        }
+
+        $codeInput.classList.add("invalid");
+        $codeInput.nextElementSibling.innerHTML = "Invalid Code";
+    }, reject => {
+        if(reject.type === "SESSION_PASSWORD_NEEDED") {
+            MTProto.invokeMethod("account.getPassword", {}).then(response => {
+                /*if (response._ !== "passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow") {
+                    throw new Error("Unknown 2FA algo")
+                }*/
+                //console.log(response)
+                //setCode2FAForm()
+
+                fadeOut(document.getElementById("subCodePane"));
+                fadeIn(document.getElementById("passwordPane"));
+                _formData.passwordData = response
+            })
+        } else {
+            $codeInput.classList.add("invalid");
+            $codeInput.nextElementSibling.innerHTML = "Invalid Code";
         }
     })
 }
@@ -133,10 +190,7 @@ function fadeIn(elem) {
     elem.classList.add("fade-in");
 }
 
-function fillDropdown(str) {
-    while ($list.firstChild) {
-        $list.removeChild($list.firstChild);
-    }
+function generateFullDropdown() {
     for (let n in countries) {
         let elem = document.createElement("div");
         elem.classList.add("dropdown-item");
@@ -148,15 +202,25 @@ function fillDropdown(str) {
 
         let name = elem.dataset.name;
 
-        if (str && str.length > 0 && name.toLowerCase().startsWith(str.toLowerCase())) {
-            name = '<span class="highlight">' + name.substring(0, str.length) + '</span>' + name.substring(str.length);
-        }
+
         elem.innerHTML = "<div class=\"country-flag\"><img src=\"/static/images/flags/" + country[2].toLowerCase() + ".svg\"></div>\
                         <div class=\"country-name\">" + name + "</div>\
                         <div class=\"country-code\">" + country[0] + "</div>"
 
-        if (!str || name !== elem.dataset.name) {
-            $list.appendChild(elem);
+        $list.appendChild(elem);
+    }
+}
+function fillDropdown(str) {
+    // while ($list.firstChild) {
+    //     $list.removeChild($list.firstChild);
+    // }
+    for (let i = 0; i < $list.childNodes.length; i++) {
+        let elem = $list.childNodes[i]
+        let name = elem.dataset.name
+        if (name.toLowerCase().startsWith(str.toLowerCase()) || str.length === 0) {
+            elem.style.display = "flex"
+        } else {
+            elem.style.display = "none"
         }
     }
 
@@ -229,10 +293,15 @@ function initDropdown() {
     fillDropdown($countryInput.value);
     $countryInput.addEventListener("focus", showList);
     $countryInput.addEventListener("input", showList);
+    console.log($openDropdown)
+    $openDropdown.onclick = l => {
+        alert("test")
+    }
     //countryInput.addEventListener("blur", hideList); //conflict with arrow click
-    $countryInput.parentElement.getElementsByClassName("arrow")[0].addEventListener("click", toggleList);
+    // $countryInput.parentElement.getElementsByClassName("arrow")[0].addEventListener("click", toggleList);
 
-    ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function (event) {
+    const k = ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"]
+    k.forEach(function (event) {
         $countryInput.addEventListener(event, function () {
             fillDropdown($countryInput.value);
         });
@@ -256,12 +325,7 @@ function initCodeInput() {
                 value = $codeInput.value;
             }
             if (value.length === 5) {
-                if ( /*check*/ true) {
-                    codeEntered();
-                } else {
-                    $codeInput.classList.add("invalid");
-                    $codeInput.nextElementSibling.innerHTML = "Invalid Code";
-                }
+                handleSignIn(value)
             } else if ($codeInput.classList.contains("invalid")) {
                 $codeInput.classList.remove("invalid");
                 $codeInput.nextElementSibling.innerHTML = "Code";
@@ -272,15 +336,16 @@ function initCodeInput() {
 
 
 function load() {
-    console.log("ll")
     $countryInput = document.getElementById("cc")
     $list = document.getElementById("countryList")
+    $openDropdown = document.getElementById("openDropdown")
     $parent = $countryInput.parentElement
     $phoneInput = document.getElementById("phone")
     $codeInput = document.getElementById("code")
     $passwordInput = document.getElementById("password")
     $peekBtn = document.getElementById("peekButton")
     $passwordNext = document.getElementById("passwordNext")
+    $passwordNext.style.display = "flex"
 
     setInputFilter($phoneInput, function (value) {
         return /^\+[\d ]*$/.test(value)
@@ -290,6 +355,8 @@ function load() {
     Monkey.reset()
     Monkey.stop()
 
+    generateFullDropdown()
+
     setInputFilter($codeInput, value => {
         return /^\d*$/.test(value)
     })
@@ -298,6 +365,8 @@ function load() {
     initPhoneInput()
     initCodeInput()
 
+    $passwordNext.addEventListener("click", handlePasswordSend())
+
     document.getElementById("next").onclick = handlePhoneSend()
 
 }
@@ -305,8 +374,8 @@ function load() {
 export function LoginPage() {
     return VDOM.render(
         <div id="login">
-            <div id="phonePane" className="fading-block" onClick={load}>
-                <img className="object" src="/static/images/logo.svg" alt=""/>
+            <div id="phonePane" className="fading-block">
+                <img className="object" src="/static/images/logo.svg" alt="" onLoad={load}/>
                 {/*TODO remove onload above*/}
                 <div className="info">
                     <div className="header">Sign in to Telegram</div>
@@ -316,7 +385,7 @@ export function LoginPage() {
                     <div className="input-field dropdown down">
                         <input type="text" id="cc" autoComplete="off" placeholder="Cоuntry"/>
                         <label htmlFor="cc" required>Country</label>
-                        <i className="arrow btn-icon rp rps tgico"/>
+                        <i className="arrow btn-icon rp rps tgico" id="openDropdown"/>
                     </div>
                     <div id="countryList" className="dropdown-list hidden"/>
                 </div>
@@ -358,7 +427,10 @@ export function LoginPage() {
                         <input type="password" id="password" placeholder="Password"/>
                         <label htmlFor="password" required>Password</label>
                     </div>
-                    <div id="passwordNext" className="button rp"><span className="button-text">NEXT</span></div>
+                    <div id="passwordNext" className="button rp"><span
+                        className="button-text">NEXT</span>
+                        <progress className="progress-circular white"/>
+                    </div>
                 </div>
             </div>
             <div id="registerPane" className="fading-block hidden">
