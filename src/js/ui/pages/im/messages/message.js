@@ -50,13 +50,14 @@ function vMessageTemplate(data, inside) {
 
 // TODO add to every message type
 function vForwardedTemplate(data) {
-    return data.fwd ? <div class="fwd">Forwarded from {data.fwd.from}</div> : ""
+    return data.fwd ? <div class="fwd">Forwarded from {data.fwd.from}</div> : "";
 }
 
 function vMessageWithTextOnlyTemplate(data) {
+    const username = data.userName && !data.post && !data.out;
     return vMessageTemplate(data, (
         <div class={vGetClass(data)}>
-            {data.userName ? <div className="username">{data.userName}</div> : ""}
+            {username ? <div className="username">{data.userName}</div> : ""}
 
             {data.reply ? (<div className="box rp">
                 <div className="quote">
@@ -64,7 +65,7 @@ function vMessageWithTextOnlyTemplate(data) {
                     <div className="text">{data.reply.text}</div>
                 </div>
             </div>) : ""}
-            <div class={`message ${data.userName ? "nopad" : ""}`}>
+            <div class={`message ${username ? "nopad" : ""}`}>
 
                 {vForwardedTemplate(data)}
                 <span dangerouslySetInnerHTML={data.message}/>
