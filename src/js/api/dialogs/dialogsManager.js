@@ -99,8 +99,7 @@ function fetchDialogs({
 
             $offsetDate = message.date
 
-            // TODO this should be made with css
-            const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
+            const submsg = message.message;
             const date = new Date(message.date * 1000)
 
             const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)

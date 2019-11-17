@@ -13,6 +13,7 @@ a {
 .app {
     display: flex;
     background-color: $lightblue;
+    overflow: hidden;
 }
 
 .rp {
