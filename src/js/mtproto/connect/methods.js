@@ -135,7 +135,7 @@ export function sendReqPQ(authContext, processor, proc_context) {
             authContext.q = result.q
 
 
-
+            console.log("END FACTORIZATION");
             sendReqDhParams(authContext, function () {
                 processor.call(proc_context);
             }, this)

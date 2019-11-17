@@ -3,7 +3,7 @@
 //https://github.com/OTsenilov
 
 import {mt_write_uint32, mt_write_bytes} from "./../../network/mt_inob_codec"
-import {BigInteger} from "jsbn"
+import {BigInteger} from "../../vendor/jsbn/jsbn"
 import * as sjcl from "./sjcl"
 
 function H(data)
