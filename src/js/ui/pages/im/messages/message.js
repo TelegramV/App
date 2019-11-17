@@ -56,13 +56,16 @@ function vForwardedTemplate(data) {
 function vMessageWithTextOnlyTemplate(data) {
     return vMessageTemplate(data, (
         <div class={vGetClass(data)}>
+            {data.userName ? <div className="username">{data.userName}</div> : ""}
+
             {data.reply ? (<div className="box rp">
                 <div className="quote">
                     <div className="name">{data.reply.name}</div>
                     <div className="text">{data.reply.text}</div>
                 </div>
             </div>) : ""}
-            <div class="message">
+            <div class={`message ${data.userName ? "nopad" : ""}`}>
+
                 {vForwardedTemplate(data)}
                 <span dangerouslySetInnerHTML={data.message}/>
                 {vTimeTemplate(data)}

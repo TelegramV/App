@@ -56,6 +56,75 @@ function getMessages(messages, o = "inputMessageID") {
         ]
     })
 }
+
+function createMessage(message, peer) {
+    const from = PeersManager.find("user", message.from_id)
+    const userName = getPeerName(from)
+    const time = new Date(message.date * 1000)
+
+    let messageToPush = {}
+    if (message._ === "messageService") {
+        messageToPush = {
+            type: "service",
+            id: message.id,
+            message: message.action._ // TODO parse this properly
+        }
+    } else {
+        messageToPush = {
+            type: "text",
+            id: message.id,
+            message: parseMessageEntities(message.message, message.entities),
+            out: message.pFlags.out,
+            post: message.pFlags.post,
+            post_author: message.post_author,
+            time: time,
+            views: message.views,
+            peer: peer,
+            from: from ? from : peer
+        }
+        console.log(peer)
+        if(peer._ === "chat" || peer._ === "channel")
+            messageToPush.userName = userName
+
+
+        if (message.fwd_from) {
+            messageToPush.fwd = {
+                from: "Test " + message.fwd_from.from_id,
+                date: message.fwd_from.date
+
+            }
+        }
+
+        if (message.reply_to_msg_id) {
+            let replyTo = $messages[peer._][peer.id][message.reply_to_msg_id]
+
+            //if(!replyTo) {
+            {
+                console.log(message.reply_to_msg_id)
+                getMessages(message.reply_to_msg_id, "inputMessageID").then(l => {
+                    l.messages.forEach(q => {
+                        if(q.from_id !== message.from_id && q.to_id.user_id !== message.to_id.used_id)
+                            return
+                        const user = findUserFromMessage(q, l)
+                        updateSingle(peer, message.id, {
+                            reply: {
+                                name: getPeerName(user),
+                                text: q.message
+                            }
+                        })
+                    })
+                })
+            }
+            /*messageToPush.reply = {
+                name: PeersManager.find(),
+                text: replyTo.message
+            }*/
+        }
+    }
+
+    return messageToPush
+}
+
 function fetchMessages(peer, props = {offset_id: 0}) {
     __is_fetching = true
     __fetching_for = {
@@ -97,67 +166,9 @@ function fetchMessages(peer, props = {offset_id: 0}) {
         const messagesToPush = []
 
         messagesSlice.messages.forEach(message => {
-            const from = PeersManager.find("user", message.from_id)
-            const userName = getPeerName(from)
-            const time = new Date(message.date * 1000)
 
-            let messageToPush = {}
-            if (message._ === "messageService") {
-                messageToPush = {
-                    type: "service",
-                    id: message.id,
-                    message: message.action._ // TODO parse this properly
-                }
-            } else {
-                messageToPush = {
-                    type: "text",
-                    id: message.id,
-                    userName: userName,
-                    message: parseMessageEntities(message.message, message.entities),
-                    out: message.pFlags.out,
-                    post: message.pFlags.post,
-                    post_author: message.post_author,
-                    time: time,
-                    views: message.views,
-                    peer: peer,
-                    from: from ? from : peer
-                }
 
-                if (message.fwd_from) {
-                    messageToPush.fwd = {
-                        from: "Test " + message.fwd_from.from_id,
-                        date: message.fwd_from.date
-
-                    }
-                }
-
-                if (message.reply_to_msg_id) {
-                    let replyTo = $messages[peer._][peer.id][message.reply_to_msg_id]
-
-                    //if(!replyTo) {
-                    {
-                        console.log(message.reply_to_msg_id)
-                        getMessages(message.reply_to_msg_id, "inputMessageID").then(l => {
-                            l.messages.forEach(q => {
-                                if(q.from_id !== message.from_id && q.to_id.user_id !== message.to_id.used_id)
-                                    return
-                                const user = findUserFromMessage(q, l)
-                                updateSingle(peer, message.id, {
-                                    reply: {
-                                        name: getPeerName(user),
-                                        text: q.message
-                                    }
-                                })
-                            })
-                        })
-                    }
-                    /*messageToPush.reply = {
-                        name: PeersManager.find(),
-                        text: replyTo.message
-                    }*/
-                }
-
-            }
+            const messageToPush = createMessage(message, peer)
 
             messagesToPush.push(messageToPush)
 
@@ -215,72 +226,72 @@ function fetchMessageMedia(message, peer) {
             })
         }
     } else if (message.media.document) {
-        // FileAPI.getFile(message.media.document, "").then(response => {
-        //     const url = response
-        //     message.media.document.attributes.forEach(attribute => {
-        //         if (attribute._ === "documentAttributeVideo") {
-        //             updateSingle(peer, message.id, {
-        //                 type: attribute.pFlags.round_message ? "round" : "video",
-        //                 video: {
-        //                     width: attribute.w,
-        //                     height: attribute.h,
-        //                     url: url,
-        //                     type: message.media.document.mime_type,
-        //                     duration: attribute.duration
-        //                 }
-        //             })
-        //         } else if (attribute._ === "documentAttributeSticker") {
-        //             updateSingle(peer, message.id, {
-        //                 type: "sticker",
-        //                 imgSrc: url
-        //             })
-        //
-        //         } else if (attribute._ === "documentAttributeAudio") {
-        //             const waveToArray = (form) => {
-        //                 let buf = "";
-        //                 const arr = [];
-        //                 for (let i in form) {
-        //                     let n = form[i].toString(2);
-        //                     n = "00000000".substr(n.length) + n;
-        //                     buf += n;
-        //                     while (buf.length > 5) {
-        //                         arr.push(parseInt(buf.substr(0, 5), 2));
-        //                         buf = buf.substr(5);
-        //                     }
-        //                 }
-        //                 return arr;
-        //             }
-        //
-        //             let waveformOld = waveToArray(attribute.waveform)
-        //             let waveform = []
-        //             for (let i = 0; i < 50; i++) {
-        //                 waveform.push(1 + waveformOld[Math.floor(i / 50 * waveformOld.length)])
-        //             }
-        //             updateSingle(peer, message.id, {
-        //                 type: attribute.pFlags.voice ? "voice" : "audio",
-        //                 audio: {
-        //                     url: url,
-        //                     waveform: waveform,
-        //                     read: message.pFlags.media_unread ? "read" : "", // TODO
-        //                     time: formatTimeAudio(attribute.duration)
-        //                 }
-        //             })
-        //         } else if (attribute._ === "documentAttributeFilename") {
-        //             // this.reactive.message.data.documentName = attribute.file_name
-        //         } else {
-        //             console.log(attribute)
-        //             /*blob = blob.slice(0, blob.size, "octec/stream")
-        //             this.vNode = vMessageWithFileTemplate({
-        //                 userName: userName,
-        //                 message: messageMessage,
-        //                 fileURL: URL.createObjectURL(blob),
-        //                 fileName: message.media.document.mime_type,
-        //                                     out: message.pFlags.out
-        //
-        //             })*/
-        //         }
-        //     })
-        // })
+        FileAPI.getFile(message.media.document, "").then(response => {
+            const url = response
+            message.media.document.attributes.forEach(attribute => {
+                if (attribute._ === "documentAttributeVideo") {
+                    updateSingle(peer, message.id, {
+                        type: attribute.pFlags.round_message ? "round" : "video",
+                        video: {
+                            width: attribute.w,
+                            height: attribute.h,
+                            url: url,
+                            type: message.media.document.mime_type,
+                            duration: attribute.duration
+                        }
+                    })
+                } else if (attribute._ === "documentAttributeSticker") {
+                    updateSingle(peer, message.id, {
+                        type: "sticker",
+                        imgSrc: url
+                    })
+
+                } else if (attribute._ === "documentAttributeAudio") {
+                    const waveToArray = (form) => {
+                        let buf = "";
+                        const arr = [];
+                        for (let i in form) {
+                            let n = form[i].toString(2);
+                            n = "00000000".substr(n.length) + n;
+                            buf += n;
+                            while (buf.length > 5) {
+                                arr.push(parseInt(buf.substr(0, 5), 2));
+                                buf = buf.substr(5);
+                            }
+                        }
+                        return arr;
+                    }
+
+                    let waveformOld = waveToArray(attribute.waveform)
+                    let waveform = []
+                    for (let i = 0; i < 50; i++) {
+                        waveform.push(1 + waveformOld[Math.floor(i / 50 * waveformOld.length)])
+                    }
+                    updateSingle(peer, message.id, {
+                        type: attribute.pFlags.voice ? "voice" : "audio",
+                        audio: {
+                            url: url,
+                            waveform: waveform,
+                            read: message.pFlags.media_unread ? "read" : "", // TODO
+                            time: formatTimeAudio(attribute.duration)
+                        }
+                    })
+                } else if (attribute._ === "documentAttributeFilename") {
+                    // this.reactive.message.data.documentName = attribute.file_name
+                } else {
+                    console.log(attribute)
+                    /*blob = blob.slice(0, blob.size, "octec/stream")
+                    this.vNode = vMessageWithFileTemplate({
+                        userName: userName,
+                        message: messageMessage,
+                        fileURL: URL.createObjectURL(blob),
+                        fileName: message.media.document.mime_type,
+                                            out: message.pFlags.out
+
+                    })*/
+                }
+            })
+        })
     }
 }
 
@@ -341,44 +352,7 @@ function pushTopNew(message) {
     const userName = getPeerName(from)
     const time = new Date(message.date * 1000)
 
-    let messageToPush = {}
-    if (message._ === "messageService") {
-        messageToPush = {
-            type: "service",
-            id: message.id,
-            message: message.action._ // TODO parse this properly
-        }
-    } else {
-        messageToPush = {
-            type: "text",
-            id: message.id,
-            userName: userName,
-            message: parseMessageEntities(message.message, message.entities),
-            out: message.pFlags.out,
-            post: message.pFlags.post,
-            post_author: message.post_author,
-            time: time,
-            views: message.views,
-            peer: from,
-            from: from
-        }
-
-        if (message.fwd_from) {
-            messageToPush.fwd = {
-                from: "Test " + message.fwd_from.from_id,
-                date: message.fwd_from.date
-
-            }
-        }
-
-        if (message.reply_to_msg_id) {
-            messageToPush.reply = {
-                name: "kek",
-                text: "lt"
-            }
-        }
-
-    }
+    let messageToPush = createMessage(message, from)
 
     $messages[from._][from.id].unshift(0)
     $messages[from._][from.id][0] = messageToPush

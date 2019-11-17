@@ -278,13 +278,23 @@
                 }
             }
 
-            .message {
-                padding: 9px;
 
-                .fwd {
-                    color: $blueonline;
-                    font-weight: 400;
+            .username, .fwd {
+                color: $blueonline;
+                font-weight: 400;
+                padding: 9px;
+                padding-bottom: 0px;
+            }
+
+            .message {
+                word-wrap: break-word;
+                padding: 9px;
+                // TODO hack
+                &.nopad {
+                    padding-top: 2px;
                 }
+                line-height: 1.2;
+
             }
 
 
