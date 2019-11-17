@@ -21,6 +21,7 @@ function onScrollMessages(peer) {
         if ($element.scrollTop < 20) {
             MessagesManager.fetchNextPage(peer)
         }
+
         //
         // if ($element.scrollHeight - $element.scrollTop === $element.clientHeight) {
         //     MessagesManager.fetchNextPage(peer)

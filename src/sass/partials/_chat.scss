@@ -167,11 +167,9 @@
             &.date {
                 z-index: 100;
                 top: 10px;
-                position: sticky;
+                //position: sticky; //TODO fix stacking
                 transition: anim(opacity);
                 opacity: 1;
-
-                .service-msg {}
 
                 &.hidden {
                     opacity: 0;
@@ -558,7 +556,7 @@
 
             .time {
                 color: $darkgreen;
-                width: 48px;
+                min-width: 36px;
                 display: inline-block;
 
                 .inner {

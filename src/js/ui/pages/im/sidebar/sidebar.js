@@ -4,7 +4,7 @@ import {UICreateDialog} from "./dialog"
 import PeersManager from "../../../../api/peers/peersManager"
 
 const $sidebar = VDOM.render(
-    <div className="chatlist" onScroll={onScrollDialogs}>
+    <div className="chatlist">
         <div className="toolbar">
             <div className="btn-icon rp rps tgico-menu"/>
             <div className="search">
@@ -20,7 +20,7 @@ const $sidebar = VDOM.render(
             <span>Waiting for network...</span>
         </div>
 
-        <div id="dialogsWrapper">
+        <div id="dialogsWrapper" onScroll={onScrollDialogs}>
             <div id="dialogsPinned" className="list pinned"/>
             <div id="dialogs" className="list"/>
         </div>
