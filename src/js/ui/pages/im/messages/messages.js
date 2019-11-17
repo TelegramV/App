@@ -356,19 +356,37 @@ export function UICreateMessages() {
     DialogsManager.listenUpdates(handleDialogUpdates)
     PeersManager.listenUpdates(handlePeerUpdates)
 
+    let noChatSelected = (<div id="noChat">
+                <div class="placeholder tgico tgico-chatsplaceholder"></div>
+                <div class="text"><p>Open Chat</p> <p>or create a new one</p></div>
+                <div class="buttons">
+                    <div class="button-wrapper">
+                        <div class="button rp"><i class="tgico tgico-newprivate"></i></div>
+                        <p>Private</p>
+                    </div>
+                    <div class="button-wrapper">
+                        <div class="button rp"><i class="tgico tgico-newgroup"></i></div>
+                        <p>Group</p>
+                    </div><div class="button-wrapper">
+                        <div class="button rp"><i class="tgico tgico-newchannel"></i></div>
+                        <p>Channel</p>
+                    </div>
+                </div>
+            </div>);
+
     AppFramework.Router.onQueryChange(queryParams => {
         if (queryParams.p) {
             refetchMessages()
         } else {
             $messagesElement.replaceWith(VDOM.render(
-                <h1>Select a chat</h1>
+                noChatSelected
             ))
         }
     })
 
     if (!AppFramework.Router.activeRoute.queryParams.p) {
         return $messagesElement = VDOM.render(
-            <h1>Select a chat</h1>
+            noChatSelected
         )
     }
 

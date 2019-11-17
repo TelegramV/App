@@ -2,6 +2,80 @@
     width: 100%;
 }
 
+#noChat {
+    align-self: center;
+    margin: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .placeholder {
+        font-size: 150px;
+        color: lighten($darkgrey, 20%);
+        margin-bottom: 25px;
+    }
+
+    .text {
+        text-align: center;
+        width: 300px;
+        font-size: 24px;
+        color: $darkgrey;
+        font-weight: bold;
+        margin-bottom: 40px;
+
+        p {
+        	margin-top: 5px;
+        }
+    }
+
+    .buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .button-wrapper {
+        margin: 0 30px;
+        text-align: center;
+        p {
+        	margin-top: 10px;
+        	color: $darkgrey;
+        }
+    }
+
+    .button {
+        width: 70px;
+        height: 70px;
+        background-color: white;
+        border-radius: 50%;
+        cursor: pointer;
+
+        position: relative;
+
+        .tgico {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateY(-50%) translateX(-50%);
+            color: $darkgrey;
+            font-size: 30px;
+        }
+
+        &:hover {
+        	background-color: $blue;
+
+        	.tgico {
+        		color: white;
+        	}
+
+        	& ~ p {
+        		color: $blue;
+        	}
+        }
+    }
+}
+
 #chat {
     display: flex;
     // padding: 200px;
@@ -62,13 +136,13 @@
         overflow-y: hidden;
 
         &:hover {
-        	overflow-y: overlay;
+            overflow-y: overlay;
         }
 
         @supports not(overflow-y: overlay) {
-        	&:hover {
-        		overflow-y: auto;
-        	}
+            &:hover {
+                overflow-y: auto;
+            }
         }
 
         #bubbles-inner {
@@ -97,8 +171,7 @@
                 transition: anim(opacity);
                 opacity: 1;
 
-                .service-msg {
-                }
+                .service-msg {}
 
                 &.hidden {
                     opacity: 0;
@@ -134,8 +207,8 @@
             }
 
             .attachment:only-child {
-            	border-radius: 12px;
-            	margin-bottom: -3px;
+                border-radius: 12px;
+                margin-bottom: -3px;
             }
 
             .sticker {
@@ -279,7 +352,8 @@
             }
 
 
-            .username, .fwd {
+            .username,
+            .fwd {
                 color: $blueonline;
                 font-weight: 400;
                 padding: 9px;
@@ -289,10 +363,12 @@
             .message {
                 word-wrap: break-word;
                 padding: 9px;
+
                 // TODO hack
                 &.nopad {
                     padding-top: 2px;
                 }
+
                 line-height: 1.2;
 
             }
@@ -336,8 +412,9 @@
 
             a {
                 color: $darkblue;
+
                 &:hover {
-                	text-decoration: underline;
+                    text-decoration: underline;
                 }
             }
 
@@ -424,8 +501,8 @@
                 border-radius: 6px 12px 12px 6px;
             }
 
-            /*.bubble:not(.grouped) {
-            	&:before {
+            .bubble:not(.grouped) {
+                &:before {
                     content: "";
                     position: absolute;
                     z-index: -2;
@@ -449,7 +526,7 @@
                     border-bottom-right-radius: 10px 15px;
                     border-right: 1px solid rgba(0, 0, 0, 0.1);
                 }
-            }*/
+            }
 
             .bubble:first-child {
                 border-radius: 12px 12px 12px 6px;
@@ -514,9 +591,9 @@
                 border-radius: 12px 6px 6px 12px;
             }
 
-            /*.bubble:not(.grouped) {
-            	&:before {
-                	content: "";
+            .bubble:not(.grouped) {
+                &:before {
+                    content: "";
                     position: absolute;
                     z-index: -2;
                     bottom: -1px;
@@ -528,7 +605,7 @@
                 }
 
                 &:after {
-                	content: "";
+                    content: "";
                     position: absolute;
                     z-index: -1;
                     bottom: 0;
@@ -539,7 +616,7 @@
                     border-bottom-left-radius: 10px 15px;
                     border-left: 1px solid rgba(0, 0, 0, 0.05);
                 }
-            }*/
+            }
 
             .bubble:first-child {
                 border-radius: 12px 12px 6px 12px;
