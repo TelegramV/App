@@ -300,7 +300,9 @@ export class Networker {
             if (data_buffer.byteLength <= 4) {
                 //some another protocol violation here
                 console.log(this.auth.dcID)
+                AppPermanentStorage.clear()
                 throw new Error("404??")
+
             }
             const response = this.parseResponse(data_buffer)
             this.messageProcessor.process(response.response, response.messageID, response.sessionID)
