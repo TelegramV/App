@@ -581,7 +581,7 @@ export function LoginPage() {
         <div>
             <div id="login">
                 <div id="phonePane" className="fading-block">
-                    <img className="object" src="/static/images/logo.svg" alt="" onLoad={load}/>
+                    <img className="object" src="./static/images/logo.svg" alt="" onLoad={load}/>
                     {/*TODO remove onload above*/}
                     <div className="info">
                         <div className="header">Sign in to Telegram</div>
