@@ -639,9 +639,12 @@ export function bytesModPow(x, y, m) {
         const xBigInt = new BigInteger(bytesToHex(x), 16)
         const yBigInt = new BigInteger(bytesToHex(y), 16)
         const mBigInt = new BigInteger(bytesToHex(m), 16)
-        const resBigInt = xBigInt.modPow(yBigInt, mBigInt)
+        let resBigInt = xBigInt.modPow(yBigInt, mBigInt).toByteArray()
+        if(resBigInt.length > 256) {
+            resBigInt = resBigInt.splice(resBigInt.length - 256)
+        }
 
-        return resBigInt.toByteArray()
+        return resBigInt
     } catch (e) {
         console.error('mod pow error', e)
     }

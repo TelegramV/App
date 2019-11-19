@@ -20,7 +20,7 @@ import AppCryptoManager from "../crypto/cryptoManager"
 
 
 const Logger = createLogger("methods.js", {
-    level: "warn"
+    level: "debug"
 })
 
 const publicKeysHex = [
@@ -369,6 +369,8 @@ function sendSetClientDhParams(networker, processor, proc_context) {
                 switch (response._) {
                     case "dh_gen_ok":
                         const newNonceHash1 = sha1BytesSync(authContext.newNonce.concat([1], authKeyAux)).slice(-16)
+
+                        Logger.debug(bytesToHex(authKey))
 
                         /**
                          * FIXME: ...
