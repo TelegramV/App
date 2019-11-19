@@ -2,7 +2,7 @@ const webpack = require("webpack")
 const path = require("path")
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const {CleanWebpackPlugin} = require("clean-webpack-plugin")
+const { CleanWebpackPlugin } = require("clean-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 const CopyWebpackPlugin = require("copy-webpack-plugin")
@@ -23,25 +23,23 @@ const config = {
         path: path.resolve(__dirname, "dist"),
         filename: "bundle.[hash].js"
     },
+
     plugins: [
         new MiniCssExtractPlugin({
             filename: "bundle.[hash].css",
             chunkFilename: "./src/sass/application.scss",
             ignoreOrder: false,
         }),
-        new HtmlWebpackPlugin({template: "./src/index.html"}),
+        new HtmlWebpackPlugin({ template: "./src/index.html" }),
         new CleanWebpackPlugin(),
-        new CopyWebpackPlugin([
-            {
-                from: "public"
-            }
-        ])
+        new CopyWebpackPlugin([{
+            from: "public"
+        }])
     ],
     module: {
-        rules: [
-            {
+        rules: [{
                 test: /\.worker\.js$/,
-                use: {loader: "worker-loader"}
+                use: { loader: "worker-loader" }
             },
             {
                 test: /\.js$/,

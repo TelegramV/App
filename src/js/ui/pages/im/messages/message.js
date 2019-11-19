@@ -2,12 +2,11 @@ import {MTProto} from "../../../../mtproto"
 import VDOM from "../../../framework/vdom"
 
 function vTimeTemplate(data, bg = false) {
-    let classes = "inner tgico " + (bg ? "bg" : "")
-    let classes2 = "time " + (bg ? "bg" : "")
+    let classes = "time" + (bg ? " bg" : "")
 
     return (
-        <span class={classes2}>
-            <div class={classes}>{data.views ?
+        <span class={classes}>
+            <div class="inner tgico">{data.views ?
                 <span>{data.views} <span
                     class="tgico tgico-channelviews"/>    </span> : ""}{data.time.toLocaleTimeString('en', {
                 hour: '2-digit',

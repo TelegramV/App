@@ -25,7 +25,7 @@
         margin-bottom: 40px;
 
         p {
-        	margin-top: 5px;
+            margin-top: 5px;
         }
     }
 
@@ -38,9 +38,10 @@
     .button-wrapper {
         margin: 0 30px;
         text-align: center;
+
         p {
-        	margin-top: 10px;
-        	color: $darkgrey;
+            margin-top: 10px;
+            color: $darkgrey;
         }
     }
 
@@ -63,15 +64,15 @@
         }
 
         &:hover {
-        	background-color: $blue;
+            background-color: $blue;
 
-        	.tgico {
-        		color: white;
-        	}
+            .tgico {
+                color: white;
+            }
 
-        	& ~ p {
-        		color: $blue;
-        	}
+            &~p {
+                color: $blue;
+            }
         }
     }
 }
@@ -384,18 +385,20 @@
                     position: absolute;
                     bottom: 0;
                     right: 0;
-
-                    &.bg {
-                        color: white;
-                        background-color: rgba(184, 188, 190, 0.2);
-                        border-radius: 40px;
-                        text-align: center;
-                    }
                 }
 
-
                 &.bg {
-                    width: 0 !important;
+                    position: absolute;
+                    bottom: 10px;
+                    right: 10px;
+
+                    .inner {
+                        color: white;
+                        background-color: rgba(0, 0, 0, 0.3);
+                        border-radius: 40px;
+                        text-align: center;
+                        padding: 4px 6px;
+                    }
                 }
             }
         }
@@ -407,11 +410,16 @@
         .in,
         .out {
             flex-direction: row;
-            align-items: flex-end !important;
+            align-items: flex-end;
+
+            .bubble.transparent {
+                background-color: transparent;
+                box-shadow: none;
+                border-radius: 0 !important;
+            }
 
             a {
                 color: $darkblue;
-
                 &:hover {
                     text-decoration: underline;
                 }
@@ -429,6 +437,7 @@
                 z-index: 1;
                 color: white;
                 font-size: 1em;
+                cursor: pointer;
 
                 background-repeat: no-repeat;
                 background-size: contain;
@@ -500,7 +509,7 @@
                 border-radius: 6px 12px 12px 6px;
             }
 
-            .bubble:not(.grouped) {
+            .bubble:not(.grouped):not(.transparent) {
                 &:before {
                     content: "";
                     position: absolute;
@@ -590,7 +599,7 @@
                 border-radius: 12px 6px 6px 12px;
             }
 
-            .bubble:not(.grouped) {
+            .bubble:not(.grouped):not(.transparent) {
                 &:before {
                     content: "";
                     position: absolute;
@@ -630,11 +639,4 @@
             }
         }
     }
-}
-
-
-.transparent {
-    background-color: transparent !important;
-    box-shadow: none !important;
-    border-radius: 0 !important;
 }
