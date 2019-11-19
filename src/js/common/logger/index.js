@@ -46,7 +46,12 @@ export class Logger {
         output += ` [${level.toUpperCase()}]`
 
         if (this.dateTime) {
-            const datetime = new Date().getTime()
+            const datetime = new Date().toLocaleTimeString("en", {
+                hour12: false,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit"
+            })
             output += ` [${datetime}]`
         }
 

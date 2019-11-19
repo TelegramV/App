@@ -20,67 +20,15 @@ function authorizedStart(authorizationData) {
     AppPermanentStorage.setItem("authorizationData", authorizationData)
 }
 
-// TODO implement 2FA https://core.telegram.org/api/srp
-// @o.tsenilov
-function password() {
-    console.log("start_2fa");
-    MTProto.invokeMethod("account.getPassword", {}).then(response => {
-        /*if (response._ !== "passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow") {
-            throw new Error("Unknown 2FA algo")
-        }*/
-        //console.log(response)
-        //setCode2FAForm()
-        const salt1 = response.current_algo.salt1
-        const salt2 = response.current_algo.salt2
-        const g = response.current_algo.g
-        const p = response.current_algo.p
-        console.log(salt1);
-        const srp_id = response.srp_id
-        const srp_B = response.srp_B
-
-        const srp_ret = mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, "password");
-        //TODO: засунуть куда-то эту хуйню
-
-        MTProto.invokeMethod("auth.checkPassword", {
-            password: {
-                _: "inputCheckPasswordSRP",
-                srp_id: srp_ret.srp_id,
-                A: srp_ret.A,
-                M1: srp_ret.M1
-            }
-        }).then(response => {
-            console.log(response);
-            //authorizedStart(response)
-        })
-        /*document.getElementById("loginSendCode2FAButton").addEventListener("click", event => {
-            const code = document.getElementById("code2FAInput").value
-            MTProto.invokeMethod("auth.checkPassword", {
-                password: {
-                    _: "inputCheckPasswordSRP",
-                    srp_id: srpId,
-                    A: aBytes,
-                    M1: m1Bytes
-                }
-            }).then(response => {
-                authorizedStart(response)
-            })
-        })*/
-    })
-}
 
 function start() {
-    /*for(let i = 1; i <= 4; i++) {
-        MTProto.invokeMethod("help.getConfig", {}, i).then(l => {
-            console.log("dc", i, l)
-        })
-    }
-    return;*/
-    // password();
-    /*AppFramework.Router.route("/login", "login", {
-        h() {
-            return document.createElement("div")
+    MTProto.invokeMethod("help.getNearestDc", {}).then(response => {
+        if(response.this_dc !== response.nearest_dc) {
+            MTProto.changeDefaultDC(response.nearest_dc)
+            // TODO country response.contry
         }
-    })*/
+    })
+
     AppFramework.Router.route("/login", "login", {
         h() {
             return LoginPage()
@@ -89,7 +37,6 @@ function start() {
 
     AppFramework.Router.route("/", "main", {
         h() {
-            console.log("ll")
             return ImPage()
         }
     })
@@ -121,7 +68,4 @@ function start() {
     AppFramework.mount("#app")
 }
 
-MTProto.connect(authContext, function () {
-    start()
-}, this)
-
+MTProto.connect(authContext).then(start)

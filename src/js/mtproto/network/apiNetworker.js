@@ -11,28 +11,25 @@ import {
 import {sha1BytesSync, sha256HashSync} from "../crypto/sha"
 import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
 import {TLSerialization} from "../language/serialization"
-import DataCenter from "../dataCenter"
-import {TimeManager} from "../timeManager"
 import {createLogger} from "../../common/logger"
 import {TLDeserialization} from "../language/deserialization"
 import {AppPermanentStorage} from "../../common/storage"
 import {MessageProcessor} from "./messageProcessor"
 
 import AppConfiguration from "../../configuration"
+import {Networker} from "./networker";
+import AppCryptoManager from "../crypto/cryptoManager";
 
-import {mt_set_disconnect_processor, mt_ws_set_processor, mt_ws_transport} from "./mt_ws_transport"
-
-const Logger = createLogger("Networker", {
+const Logger = createLogger("ApiNetworker", {
     level: "warn"
 })
 
-export class Networker {
+export class ApiNetworker extends Networker {
     constructor(auth) {
-        this.timeManager = TimeManager
+        super(auth)
         this.messageProcessor = new MessageProcessor({
             networker: this
         })
-
 
         auth.authKeyHash = sha1BytesSync(auth.authKey)
         auth.authKeyAux = auth.authKeyHash.slice(0, 8)
@@ -40,136 +37,19 @@ export class Networker {
 
         this.updates = auth.updates
 
-        this.auth = auth
         this.seqNo = 0
         this.connectionInited = false
-
-        mt_set_disconnect_processor(this.onDisconnect, DataCenter.chooseServer(this.auth.dcID))
     }
 
-    getMsgKey(dataWithPadding, isOut) {
-        const authKey = this.auth.authKey
-        const x = isOut ? 0 : 8
-        const msgKeyLargePlain = bufferConcat(authKey.subarray(88 + x, 88 + x + 32), dataWithPadding)
-        // TODO async hash
-        const msgKeyLarge = sha256HashSync(msgKeyLargePlain)
-        return new Uint8Array(msgKeyLarge).subarray(8, 24)
-    }
-
-    onDisconnect() {
-        console.log("disconnect")
-        // TODO reconnect
-        // ALSO if there's no internet it doesn't disconnect ws, should ping prob
-        document.querySelector("#connecting_message").style.display = "flex";
-    }
-
-    getAesKeyIv(msgKey, isOut) {
-        const authKey = this.auth.authKey
-        const x = isOut ? 0 : 8
-        const sha2aText = new Uint8Array(52)
-        const sha2bText = new Uint8Array(52)
-
-        sha2aText.set(msgKey, 0)
-        sha2aText.set(authKey.subarray(x, x + 36), 16)
-        const sha2a = new Uint8Array(sha256HashSync(sha2aText))
-
-        sha2bText.set(authKey.subarray(40 + x, 40 + x + 36), 0)
-        sha2bText.set(msgKey, 36)
-        const sha2b = new Uint8Array(sha256HashSync(sha2bText))
-
-        const aesKey = new Uint8Array(32)
-        const aesIv = new Uint8Array(32)
-
-        aesKey.set(sha2a.subarray(0, 8))
-        aesKey.set(sha2b.subarray(8, 24), 8)
-        aesKey.set(sha2a.subarray(24, 32), 24)
-
-        aesIv.set(sha2b.subarray(0, 8))
-        aesIv.set(sha2a.subarray(8, 24), 8)
-        aesIv.set(sha2b.subarray(24, 32), 24)
-
-        return [aesKey, aesIv]
-    }
-
-    getEncryptedMessage(dataWithPadding) {
-        const msgKey = this.getMsgKey(dataWithPadding, true)
-        const keyIv = this.getAesKeyIv(msgKey, true)
-
-        return new Promise(resolve => {
-            const encryptedBytes = aesEncryptSync(dataWithPadding, keyIv[0], keyIv[1])
-
-            resolve({
-                bytes: encryptedBytes,
-                msgKey: msgKey
-            })
-        })
-
-        // return AppCryptoManager.aesEncrypt(dataWithPadding, keyIv[0], keyIv[1]).then(encryptedBytes => {
-        //     return {
-        //         bytes: encryptedBytes,
-        //         msgKey: msgKey
-        //     }
-        // })
-    }
-
-    resendMessage(messageId) {
-        if (!this.messageProcessor.sentMessages[messageId])
-            throw new Error("Message to resend does not exist")
-        this.sendMessage(this.messageProcessor.sentMessages[messageId])
-    }
-
-    sendEncryptedRequest(message, options) {
-        this.messageProcessor.sentMessages[message.msg_id] = message
-
-        const data = new TLSerialization({startMaxLength: message.body.length + 2048})
-
-        data.storeIntBytes(this.auth.serverSalt, 64, 'salt')
-        data.storeIntBytes(this.auth.sessionID, 64, 'session_id')
-
-        data.storeLong(message.msg_id, 'message_id')
-        data.storeInt(message.seq_no, 'seq_no')
-
-        data.storeInt(message.body.length, 'message_data_length')
-        data.storeRawBytes(message.body, 'message_data')
-
-        const dataBuffer = data.getBuffer()
-
-        const paddingLength = (16 - (data.offset % 16)) + 16 * (1 + nextRandomInt(5))
-        const padding = createNonce(paddingLength) // TODO check if secure
-
-        const dataWithPadding = bufferConcat(dataBuffer, padding)
-        // console.log(dT(), 'Adding padding', dataBuffer, padding, dataWithPadding)
-        // console.log(dT(), 'auth_key_id', bytesToHex(self.authKeyID))
-
-        return this.getEncryptedMessage(dataWithPadding).then(encryptedResult => {
-            const request = new TLSerialization({startMaxLength: encryptedResult.bytes.byteLength + 256})
-            request.storeIntBytes(this.auth.authKeyID, 64, 'auth_key_id')
-            request.storeIntBytes(encryptedResult.msgKey, 128, 'msg_key')
-            request.storeRawBytes(encryptedResult.bytes, 'encrypted_data')
-
-            // TODO xhrSendBuffer
-            const requestData = request.getBuffer()
-
-            const url = DataCenter.chooseServer(this.auth.dcID)
-
-            mt_ws_transport(url, requestData)
-        })
-    }
-
-    getDecryptedMessage(msgKey, encryptedData) {
-        const keyIv = this.getAesKeyIv(msgKey, false)
-        return new Uint8Array(aesDecryptSync(encryptedData, keyIv[0], keyIv[1]))
-    }
-
-    parseResponse(responseBuffer) {
-        let deserializer = new TLDeserialization(responseBuffer)
+    processResponse(data) {
+        let deserializer = new TLDeserialization(data)
 
         const authKeyID = deserializer.fetchIntBytes(64, false, 'auth_key_id')
         if (!bytesCmp(authKeyID, this.auth.authKeyID)) {
             throw new Error('[MT] Invalid server auth_key_id: ' + bytesToHex(authKeyID) + ", dcid " + this.auth.dcID)
         }
         const msgKey = deserializer.fetchIntBytes(128, true, 'msg_key')
-        const encryptedData = deserializer.fetchRawBytes(responseBuffer.byteLength - deserializer.getOffset(), true, 'encrypted_data')
+        const encryptedData = deserializer.fetchRawBytes(data.byteLength - deserializer.getOffset(), true, 'encrypted_data')
 
         const dataWithPadding = new Uint8Array(this.getDecryptedMessage(msgKey, encryptedData))
 
@@ -216,6 +96,7 @@ export class Networker {
 
         const deserializerOptions = {
             mtproto: true,
+            // TODO binary schema
             schema: require("../language/schema_combine"),
             override: {
                 // fuck what is the point?
@@ -274,48 +155,114 @@ export class Networker {
             throw e
         }
 
-        return {
-            response: response,
-            messageID: messageID,
-            sessionID: sessionID,
-            seqNo: seqNo
-        }
+        this.messageProcessor.process(response, messageID, sessionID)
     }
 
-    callApi(message, options) {
-        message.msg_id = this.timeManager.generateMessageID()
+    getMsgKey(dataWithPadding, isOut) {
+        const authKey = this.auth.authKey
+        const x = isOut ? 0 : 8
+        const msgKeyLargePlain = bufferConcat(authKey.subarray(88 + x, 88 + x + 32), dataWithPadding)
+        // TODO async hash
+        const msgKeyLarge = sha256HashSync(msgKeyLargePlain)
+        return new Uint8Array(msgKeyLarge).subarray(8, 24)
+    }
 
-        return new Promise((resolve, reject) => {
-            this.messageProcessor.listenRpc(message.msg_id, resolve, reject)
-            this.sendMessage(message, options)
+    onDisconnect() {
+        console.log("disconnect")
+        // TODO reconnect
+        // ALSO if there's no internet it doesn't disconnect ws, should ping prob
+        document.querySelector("#connecting_message").style.display = "flex";
+    }
+
+    getAesKeyIv(msgKey, isOut) {
+        const authKey = this.auth.authKey
+        const x = isOut ? 0 : 8
+        const sha2aText = new Uint8Array(52)
+        const sha2bText = new Uint8Array(52)
+
+        sha2aText.set(msgKey, 0)
+        sha2aText.set(authKey.subarray(x, x + 36), 16)
+        const sha2a = new Uint8Array(sha256HashSync(sha2aText))
+
+        sha2bText.set(authKey.subarray(40 + x, 40 + x + 36), 0)
+        sha2bText.set(msgKey, 36)
+        const sha2b = new Uint8Array(sha256HashSync(sha2bText))
+
+        const aesKey = new Uint8Array(32)
+        const aesIv = new Uint8Array(32)
+
+        aesKey.set(sha2a.subarray(0, 8))
+        aesKey.set(sha2b.subarray(8, 24), 8)
+        aesKey.set(sha2a.subarray(24, 32), 24)
+
+        aesIv.set(sha2b.subarray(0, 8))
+        aesIv.set(sha2a.subarray(8, 24), 8)
+        aesIv.set(sha2b.subarray(24, 32), 24)
+
+        return [aesKey, aesIv]
+    }
+
+    getEncryptedMessage(dataWithPadding) {
+        const msgKey = this.getMsgKey(dataWithPadding, true)
+        const keyIv = this.getAesKeyIv(msgKey, true)
+
+        return AppCryptoManager.aesEncrypt(dataWithPadding, keyIv[0], keyIv[1]).then(encryptedBytes => {
+            return {
+                bytes: encryptedBytes,
+                msgKey: msgKey
+            }
         })
     }
 
-    sendMessage(message, options = {}) {
-        if (!message.msg_id) {
-            message.msg_id = this.timeManager.generateMessageID()
-        }
-
-        mt_ws_set_processor(function (data_buffer) {
-            if (data_buffer.byteLength <= 4) {
-                //some another protocol violation here
-                console.log(this.auth.dcID)
-                throw new Error("404??")
-            }
-            const response = this.parseResponse(data_buffer)
-            this.messageProcessor.process(response.response, response.messageID, response.sessionID)
-        }, this, DataCenter.chooseServer(this.auth.dcID))
-        this.sendEncryptedRequest(message)
-        /*return this.sendEncryptedRequest(message).then(result => {
-            const response = this.parseResponse(result.data)
-
-            // Logger.log("result:", response)
-
-            return this.messageProcessor.process(response.response, response.messageID, response.sessionID)
-        })*/
+    resendMessage(messageId) {
+        if (!this.messageProcessor.sentMessages[messageId])
+            throw new Error("Message to resend does not exist")
+        this.sendMessage(this.messageProcessor.sentMessages[messageId])
     }
 
-    wrapApiCall(method, params, options = {}) {
+    addHeader(message) {
+        const data = new TLSerialization({startMaxLength: message.body.length + 2048})
+
+        data.storeIntBytes(this.auth.serverSalt, 64, 'salt')
+        data.storeIntBytes(this.auth.sessionID, 64, 'session_id')
+
+        data.storeLong(message.msg_id, 'message_id')
+        data.storeInt(message.seq_no, 'seq_no')
+
+        data.storeInt(message.body.length, 'message_data_length')
+        data.storeRawBytes(message.body, 'message_data')
+
+        const dataBuffer = data.getBuffer()
+
+        const paddingLength = (16 - (data.offset % 16)) + 16 * (1 + nextRandomInt(5))
+        const padding = createNonce(paddingLength) // TODO check if secure
+
+        // console.log(dT(), 'Adding padding', dataBuffer, padding, dataWithPadding)
+        // console.log(dT(), 'auth_key_id', bytesToHex(self.authKeyID))
+        return bufferConcat(dataBuffer, padding)
+    }
+
+    sendMessage(message) {
+        this.messageProcessor.sentMessages[message.msg_id] = message
+
+        const dataWithPadding = this.addHeader(message)
+
+        return this.getEncryptedMessage(dataWithPadding).then(encryptedResult => {
+            const request = new TLSerialization({startMaxLength: encryptedResult.bytes.byteLength + 256})
+            request.storeIntBytes(this.auth.authKeyID, 64, 'auth_key_id')
+            request.storeIntBytes(encryptedResult.msgKey, 128, 'msg_key')
+            request.storeRawBytes(encryptedResult.bytes, 'encrypted_data')
+
+            super.sendMessage(request.getBuffer())
+        })
+    }
+
+    getDecryptedMessage(msgKey, encryptedData) {
+        const keyIv = this.getAesKeyIv(msgKey, false)
+        return new Uint8Array(aesDecryptSync(encryptedData, keyIv[0], keyIv[1]))
+    }
+
+    invokeMethod(method, params, options = {}) {
         const serializer = new TLSerialization(options)
 
         if (!this.connectionInited) {
@@ -356,7 +303,10 @@ export class Networker {
         //Logger.debug("Api call", method, params, messageID, seqNo, options)
         Logger.debug("Api call", method, params)
 
-        return message
+        return new Promise((resolve, reject) => {
+            this.messageProcessor.listenRpc(message.msg_id, resolve, reject)
+            this.sendMessage(message, options)
+        })
     }
 
 
@@ -405,15 +355,13 @@ export class Networker {
         const messageID = this.timeManager.generateMessageID()
         const seqNo = this.generateSeqNo(true)
 
-        const message = {
+        //console.log('MT message', object, messageID, seqNo)
+
+        return {
             msg_id: messageID,
             seq_no: seqNo,
             body: serializer.getBytes()
         }
-
-        //console.log('MT message', object, messageID, seqNo)
-
-        return message
     }
 
 

@@ -7,6 +7,7 @@ import {AppFramework} from "../../framework/framework"
 import {TGSPlayer} from "./../../vendor/tgs_player"
 import mt_srp_check_password from "../../../mtproto/crypto/mt_srp/mt_srp";
 import {FileAPI} from "../../../api/fileAPI";
+import AppCryptoManager from "../../../mtproto/crypto/cryptoManager";
 
 const Croppie = require("croppie")
 const Emoji = require("emoji-js");
@@ -91,7 +92,7 @@ function handlePhoneSend() {
 }
 
 function handlePasswordSend() {
-    return event => {
+    return async event => {
         event.preventDefault()
         if ($passwordNext.disabled || $passwordNext.dataset.loading === "1") return
 
@@ -109,10 +110,7 @@ function handlePasswordSend() {
         const srp_id = response.srp_id
         const srp_B = response.srp_B
 
-        console.log(response);
-        console.log(password);
-
-        const srp_ret = mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, password);
+        const srp_ret = await AppCryptoManager.mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, password);
 
         MTProto.invokeMethod("auth.checkPassword", {
             password: {
@@ -672,6 +670,9 @@ export function LoginPage() {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div style="position: absolute; bottom: 0; right: 0;">
+                <button onClick={l => {AppPermanentStorage.clear() + window.location.reload()}}>clear auth</button>
             </div>
         </div>
     )

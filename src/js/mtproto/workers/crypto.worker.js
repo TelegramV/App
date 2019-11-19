@@ -2,6 +2,7 @@ import {bytesModPow, pqPrimeFactorization} from "../utils/bin"
 import {sha1HashSync} from "../crypto/sha"
 import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
 import {PqFinder} from "../connect/pqFinder"
+import mt_srp_check_password from "../crypto/mt_srp/mt_srp";
 
 self.addEventListener("message", event => {
     const eventData = event.data
@@ -35,12 +36,15 @@ self.addEventListener("message", event => {
             break
 
         case "aesEncrypt":
-            console.log(taskData.ivBytes)
             result = aesEncryptSync(taskData.bytes, taskData.keyBytes, taskData.ivBytes)
             break
 
         case "aesDecrypt":
             result = aesDecryptSync(taskData.encryptedBytes, taskData.keyBytes, taskData.ivBytes)
+            break
+
+        case "mt_srp_check_password":
+            result = mt_srp_check_password(taskData.g, taskData.p, taskData.salt1, taskData.salt2, taskData.srp_id, taskData.srp_B, taskData.password)
             break
 
         default:

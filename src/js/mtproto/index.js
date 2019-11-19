@@ -1,5 +1,4 @@
-import connect from "./connect"
-import {Networker} from "./network"
+import {ApiNetworker, Networker} from "./network/apiNetworker"
 import {AppConfiguration} from "../configuration"
 import {bytesFromHex, bytesToHex, createNonce} from "./utils/bin"
 import TimeManager from "./timeManager"
@@ -11,6 +10,7 @@ import PeersManager from "../api/peers/peersManager"
 import MessagesManager from "../api/messages/messagesManager"
 import DialogsManager from "../api/dialogs/dialogsManager"
 import {attach} from "../api/notifications";
+import {MTProtoNetworker} from "./network/mtprotoNetworker";
 
 class MobileProtocolAPIAuth {
     constructor(options = {}) {
@@ -86,46 +86,40 @@ class MobileProtocol {
         AppPermanentStorage.setItem("serverSalt", bytesToHex(newSalt))
     }
 
-    connect(authContext, processor, proc_context) {
+    createApiNetworker(authContext) {
+        this.networker = new ApiNetworker(authContext)
+        this.MessageProcessor = this.networker.messageProcessor
+        this.connected = true
+
+        attach()
+    }
+
+    connect(authContext) {
         this.authContext = authContext
 
-        // TODO remove, only for dev
-        if(AppPermanentStorage.exists("authKey")) {
-            AppPermanentStorage.setItem("authKey2", AppPermanentStorage.getItem("authKey"))
-            AppPermanentStorage.setItem("serverSalt2", AppPermanentStorage.getItem("serverSalt"))
-        }
         if (!AppPermanentStorage.exists("authKey" + this.authContext.dcID)) {
-            //return new Promise(resolve => {
-            connect(authContext, function () {//.then(() => {
+            const mtprotoNetworker = new MTProtoNetworker(authContext)
+
+            return sendReqPQ(mtprotoNetworker).then(_ => {
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
                 AppPermanentStorage.setItem("authKey" + this.authContext.dcID, bytesToHex(authContext.authKey))
                 AppPermanentStorage.setItem("serverSalt" + this.authContext.dcID, bytesToHex(authContext.serverSalt))
 
-                this.networker = new Networker(authContext)
-                this.MessageProcessor = this.networker.messageProcessor
-                this.connected = true
+                this.createApiNetworker(authContext)
 
                 initManagers()
-
-                processor.call(proc_context);
-                //resolve()
-            }, this)
-            //})
-            //})
+            })
         } else {
             authContext.authKey = new Uint8Array(bytesFromHex(AppPermanentStorage.getItem("authKey" + this.authContext.dcID)))
             authContext.serverSalt = bytesFromHex(AppPermanentStorage.getItem("serverSalt" + this.authContext.dcID))
 
-            this.networker = new Networker(authContext)
-            this.MessageProcessor = this.networker.messageProcessor
-            this.connected = true
-            attach()
+            this.createApiNetworker(authContext)
 
             initManagers()
-            // resolve()
-            processor.call(proc_context);
+
+            return Promise.resolve()
         }
     }
 
@@ -142,7 +136,7 @@ class MobileProtocol {
             const list = this.fileNetworkers[dcID]
             this.fileNetworkers[dcID] = networker
             list.forEach(l => {
-                l.resolve(networker.callApi(networker.wrapApiCall(l.method, l.parameters)))
+                l.resolve(networker.invokeMethod(l.method, l.parameters))
             })
             return networker
         }
@@ -165,7 +159,7 @@ class MobileProtocol {
 
                 AuthAPI.importAuth(authContext.exportedAuth, dcID).then(response => {
                     list.forEach(async l => {
-                        l.resolve(networker.callApi(networker.wrapApiCall(l.method, l.parameters)))
+                        l.resolve(networker.invokeMethod(l.method, l.parameters))
                     })
                     authContext.authKey = new Uint8Array(authContext.authKey)
                     authContext.serverSalt = new Uint8Array(authContext.serverSalt)
@@ -195,15 +189,15 @@ class MobileProtocol {
                 this.fileNetworkers[dcID] = []
                 return new Promise(resolve => {
                     return this.createFileNetworker(dcID).then(networker => {
-                        networker.callApi(networker.wrapApiCall(method, parameters)).then(resolve)
+                        networker.invokeMethod(method, parameters).then(resolve)
                     })
                 })
             }
 
-            return networker.callApi(networker.wrapApiCall(method, parameters))
+            return networker.invokeMethod(method, parameters)
         }
 
-        return this.networker.callApi(this.networker.wrapApiCall(method, parameters))
+        return this.networker.invokeMethod(method, parameters)
     }
 
     isUserAuthorized() {
@@ -212,6 +206,10 @@ class MobileProtocol {
 
     getAuthorizedUser() {
         return AppPermanentStorage.getItem("authorizationData")
+    }
+
+    changeDefaultDC(dcID) {
+
     }
 }
 

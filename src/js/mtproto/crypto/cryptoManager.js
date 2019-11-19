@@ -4,6 +4,7 @@ import {pqPrimeFactorization} from "../utils/bin"
 import {createLogger} from "../../common/logger"
 import {PqFinder} from "../connect/pqFinder"
 import {sha1HashSync} from "./sha"
+import mt_srp_check_password from "./mt_srp/mt_srp";
 
 const Logger = createLogger("CryptoManager", {
     level: "warn"
@@ -57,10 +58,22 @@ class CryptoManager {
                 }, resolve)
             })
         } else {
+            const enc = aesEncryptSync(bytes, keyBytes, ivBytes)
+            return Promise.resolve(enc)
+
+        }
+    }
+
+    mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, password) {
+        if (this.canWork) {
             return new Promise(resolve => {
-                const enc = aesEncryptSync(bytes, keyBytes, ivBytes)
-                resolve(enc)
+                this.performTask("mt_srp_check_password", {
+                    g, p, salt1, salt2, srp_id, srp_B, password
+                }, resolve)
             })
+        } else {
+            const enc = mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, password)
+            return Promise.resolve(enc)
         }
     }
 
@@ -72,10 +85,8 @@ class CryptoManager {
                 }, resolve)
             })
         } else {
-            return new Promise(resolve => {
-                const enc = aesDecryptSync(encryptedBytes, keyBytes, ivBytes)
-                resolve(enc)
-            })
+            const enc = aesDecryptSync(encryptedBytes, keyBytes, ivBytes)
+            return Promise.resolve(enc)
         }
     }
 
@@ -87,10 +98,8 @@ class CryptoManager {
                 }, resolve)
             })
         } else {
-            return new Promise(resolve => {
-                const enc = pqPrimeFactorization(bytes)
-                resolve(enc)
-            })
+            const enc = pqPrimeFactorization(bytes)
+            return Promise.resolve(enc)
         }
     }
 
@@ -102,15 +111,13 @@ class CryptoManager {
                 }, resolve)
             })
         } else {
-            return new Promise(resolve => {
-                const pqFinder = new PqFinder(pq)
-                pqFinder.findPQ()
+            const pqFinder = new PqFinder(pq)
+            pqFinder.findPQ()
 
-                const p = pqFinder.getPQAsBuffer()[0]
-                const q = pqFinder.getPQAsBuffer()[1]
+            const p = pqFinder.getPQAsBuffer()[0]
+            const q = pqFinder.getPQAsBuffer()[1]
 
-                resolve({p, q})
-            })
+            return Promise.resolve({p, q})
         }
     }
 
@@ -122,10 +129,8 @@ class CryptoManager {
                 }, resolve)
             })
         } else {
-            return new Promise(resolve => {
-                const enc = sha1HashSync(bytes)
-                resolve(enc)
-            })
+            const enc = sha1HashSync(bytes)
+            return Promise.resolve(enc)
         }
     }
 }
