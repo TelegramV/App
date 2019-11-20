@@ -86,14 +86,14 @@ function vMessageWithImageTemplate(data) {
         <div class={vGetClass(data)}>
             {data.thumbnail ?
                 <div>
-                    <div css-position="absolute" css-z-index="1000" className="full-size-loader">
-                        <progress className="progress-circular"/>
-                    </div>
                     <img class="attachment attachment-thumb"
                          src={data.imgSrc}
                          css-width={Number(data.imgSize[0]) > 460 ? "460px" : `${data.imgSize[0]}px`}/>
                 </div> :
-                <img className="attachment" src={data.imgSrc}/>
+
+                <div>
+                    <img className="attachment" src={data.imgSrc}/>
+                </div>
             }
             {haveMsg ? (<div class="message">
                 <span dangerouslySetInnerHTML={data.message}/>
