@@ -1,6 +1,6 @@
 import {AppFramework} from "../../../framework/framework"
 import VDOM from "../../../framework/vdom"
-import {vLoadingNode} from "../../../utils"
+import {create$loadingNode, vLoadingNode} from "../../../utils"
 import PeersManager from "../../../../api/peers/peersManager"
 import MessagesManager from "../../../../api/messages/messagesManager"
 import {getPeerName} from "../../../../api/dialogs/util"
@@ -8,7 +8,7 @@ import {UICreateMessage} from "./message"
 import DialogsManager from "../../../../api/dialogs/dialogsManager"
 
 let $messagesElement = document.createElement("div")
-let peer = null
+let _page_peer = null
 let $sticky = []
 
 function get$bubbles() {
@@ -18,14 +18,10 @@ function get$bubbles() {
 function onScrollMessages(peer) {
     return event => {
         const $element = event.target
-        if ($element.scrollTop < 20) {
+
+        if ($element.scrollTop === 0) {
             MessagesManager.fetchNextPage(peer)
         }
-
-        //
-        // if ($element.scrollHeight - $element.scrollTop === $element.clientHeight) {
-        //     MessagesManager.fetchNextPage(peer)
-        // }
     }
 }
 
@@ -171,28 +167,31 @@ function fetchNextPage(peer) {
 function refetchMessages() {
     if (AppFramework.Router.activeRoute.queryParams.p) {
         const queryPeer = parseHashQuery()
-        peer = PeersManager.find(queryPeer._, queryPeer.id)
+        _page_peer = PeersManager.find(queryPeer._, queryPeer.id)
 
-        if (!peer) {
+        $messagesElement = VDOM.mount(create$loadingNode(), $messagesElement)
+
+        if (!_page_peer) {
+
             PeersManager.listenPeerInit(queryPeer._, queryPeer.id, upcomePeer => {
-                peer = upcomePeer
+                _page_peer = upcomePeer
                 if (upcomePeer._ === queryPeer._ && upcomePeer.id === queryPeer.id) {
-                    rerender(peer)
+                    rerender(_page_peer)
                     MessagesManager.fetchMessages(upcomePeer)
                 }
             })
         } else {
-            if (MessagesManager.existForPeer(peer)) {
-                rerender(peer)
-                const all = MessagesManager.allForPeer(peer)
+            if (MessagesManager.existForPeer(_page_peer)) {
+                rerender(_page_peer)
+                const all = MessagesManager.allForPeer(_page_peer)
                 appendMessages(all)
                 if (all.length < 20) {
-                    fetchNextPage(peer)
+                    fetchNextPage(_page_peer)
                 }
             } else {
-                if (peer._ === queryPeer._ && peer.id === queryPeer.id) {
-                    rerender(peer)
-                    MessagesManager.fetchMessages(peer)
+                if (_page_peer._ === queryPeer._ && _page_peer.id === queryPeer.id) {
+                    rerender(_page_peer)
+                    MessagesManager.fetchMessages(_page_peer)
                 }
             }
         }
@@ -263,7 +262,7 @@ function handleDialogUpdates(event) {
             if (dialog.peer._ === queryPeer._ && dialog.peer.id === queryPeer.id) {
                 const peerByManager = PeersManager.find(dialog.peer._, dialog.peer.id)
                 if (peerByManager) {
-                    peer = peerByManager
+                    _page_peer = peerByManager
 
                     console.log(peerByManager)
 
@@ -334,7 +333,7 @@ function handlePeerUpdates(event) {
     if (event.type === "updatePhoto") {
         updateMessageAvatar(event.peer)
 
-        if (event.peer.id === peer.id) {
+        if (event.peer.id === _page_peer.id) {
             if (event.peer.photo) {
                 updateHeader({
                     photo: {
@@ -360,39 +359,37 @@ export function UICreateMessages() {
     DialogsManager.listenUpdates(handleDialogUpdates)
     PeersManager.listenUpdates(handlePeerUpdates)
 
-    let noChatSelected = (<div id="noChat">
-        <div class="placeholder tgico tgico-chatsplaceholder"></div>
-        <div class="text"><p>Open Chat</p> <p>or create a new one</p></div>
-        <div class="buttons">
-            <div class="button-wrapper">
-                <div class="button rp"><i class="tgico tgico-newprivate"></i></div>
-                <p>Private</p>
-            </div>
-            <div class="button-wrapper">
-                <div class="button rp"><i class="tgico tgico-newgroup"></i></div>
-                <p>Group</p>
-            </div>
-            <div class="button-wrapper">
-                <div class="button rp"><i class="tgico tgico-newchannel"></i></div>
-                <p>Channel</p>
+    let $noChatSelected = VDOM.render(
+        <div id="noChat">
+            <div className="placeholder tgico tgico-chatsplaceholder"/>
+            <div className="text"><p>Open Chat</p> <p>or create a new one</p></div>
+            <div className="buttons">
+                <div className="button-wrapper">
+                    <div className="button rp"><i class="tgico tgico-newprivate"/></div>
+                    <p>Private</p>
+                </div>
+                <div className="button-wrapper">
+                    <div className="button rp"><i class="tgico tgico-newgroup"/></div>
+                    <p>Group</p>
+                </div>
+                <div className="button-wrapper">
+                    <div className="button rp"><i class="tgico tgico-newchannel"/></div>
+                    <p>Channel</p>
+                </div>
             </div>
         </div>
-    </div>);
+    );
 
     AppFramework.Router.onQueryChange(queryParams => {
         if (queryParams.p) {
             refetchMessages()
         } else {
-            $messagesElement.replaceWith(VDOM.render(
-                noChatSelected
-            ))
+            $messagesElement = VDOM.mount($noChatSelected, $messagesElement)
         }
     })
 
     if (!AppFramework.Router.activeRoute.queryParams.p) {
-        return $messagesElement = VDOM.render(
-            noChatSelected
-        )
+        return $messagesElement = $noChatSelected
     }
 
     refetchMessages()

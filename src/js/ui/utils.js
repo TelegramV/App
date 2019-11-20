@@ -28,7 +28,7 @@ export function addRipple() {
 
 setInterval(addRipple, 5000);
 
-export const $loadingNode = VDOM.render(vLoadingNode)
+export const create$loadingNode = () => VDOM.render(vLoadingNode)
 
 // If there's no message it it should display "Photo" or smth
 export function getMediaPreviewName(message) {
