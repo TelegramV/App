@@ -3,6 +3,7 @@ import {vdom_jsx} from "./jsx"
 import {vdom_render} from "./render"
 import {vdom_diff} from "./diff"
 import {vdom_mount} from "./mount"
+import vdom_diffReal from "./diffReal"
 
 /**
  Simple Virtual DOM
@@ -14,6 +15,7 @@ export const VDOM = {
     jsx: vdom_jsx,
     render: vdom_render,
     diff: vdom_diff,
+    diffReal: vdom_diffReal,
     mount: vdom_mount,
 }
 

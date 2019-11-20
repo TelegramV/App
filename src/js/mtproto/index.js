@@ -126,7 +126,8 @@ class MobileProtocol {
 
     async createFileNetworker(dcID) {
         if (AppPermanentStorage.exists("authKey" + dcID)) {
-            const networker = new Networker({
+            // i changed it to MTProtoNetworker cause Networker does not have `invokeMethod` function @undrfined
+            const networker = new MTProtoNetworker({
                 dcID: dcID,
                 nonce: createNonce(16),
                 sessionID: createNonce(8), // TODO check if secure?

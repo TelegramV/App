@@ -83,8 +83,8 @@ function createMessage(message, peer) {
             peer: peer,
             from: from ? from : peer
         }
-        console.log(peer)
-        if(peer._ === "chat" || peer._ === "channel")
+        // console.log(peer)
+        if (peer._ === "chat" || peer._ === "channel")
             messageToPush.userName = userName
 
 
@@ -101,10 +101,10 @@ function createMessage(message, peer) {
 
             //if(!replyTo) {
             {
-                console.log(message.reply_to_msg_id)
+                // console.log(message.reply_to_msg_id)
                 getMessages(message.reply_to_msg_id, "inputMessageID").then(l => {
                     l.messages.forEach(q => {
-                        if(q.from_id !== message.from_id && q.to_id.user_id !== message.to_id.used_id)
+                        if (q.from_id !== message.from_id && q.to_id.user_id !== message.to_id.used_id)
                             return
                         const user = findUserFromMessage(q, l)
                         updateSingle(peer, message.id, {
@@ -193,7 +193,6 @@ function fetchMessages(peer, props = {offset_id: 0}) {
 }
 
 
-
 function fetchMessageMedia(message, peer) {
     if (message.media.photo) {
         FileAPI.photoThumnail(message.media.photo, data => {
@@ -210,21 +209,21 @@ function fetchMessageMedia(message, peer) {
         } else {
             const webpage = message.media.webpage
 
-            if(webpage.photo)
-            FileAPI.photoThumnail(webpage.photo, data => {
-                updateSingle(peer, message.id, {
-                    type: "url",
-                    url: {
-                        description: webpage.description,
-                        url: webpage.response,
-                        title: webpage.title,
-                        siteName: webpage.site_name,
-                        photo: data.src,
-                        size: data.size,
-                        thumbnail: data.thumbnail // TODO blur this
-                    }
+            if (webpage.photo)
+                FileAPI.photoThumnail(webpage.photo, data => {
+                    updateSingle(peer, message.id, {
+                        type: "url",
+                        url: {
+                            description: webpage.description,
+                            url: webpage.response,
+                            title: webpage.title,
+                            siteName: webpage.site_name,
+                            photo: data.src,
+                            size: data.size,
+                            thumbnail: data.thumbnail // TODO blur this
+                        }
+                    })
                 })
-            })
         }
     } else if (message.media.document) {
         FileAPI.getFile(message.media.document, "").then(response => {
@@ -399,9 +398,9 @@ function pushTopShort(message) {
         }
 
         if (message.fwd_from) {
-        messageToPush.fwd = {
-            from: "Test " + message.fwd_from.from_id,
-            date: message.fwd_from.date
+            messageToPush.fwd = {
+                from: "Test " + message.fwd_from.from_id,
+                date: message.fwd_from.date
 
             }
         }
@@ -449,8 +448,8 @@ function allForPeer(peer) {
 
     const len = $messages[peer._][peer.id].length
 
-    if (len > 100) {
-        $messages[peer._][peer.id] = $messages[peer._][peer.id].slice(0, 100)
+    if (len > 50) {
+        $messages[peer._][peer.id] = $messages[peer._][peer.id].slice(0, 50)
     }
 
     return $messages[peer._][peer.id]

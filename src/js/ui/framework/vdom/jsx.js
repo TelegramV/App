@@ -25,6 +25,17 @@ export function vdom_jsx(tagName, attributes, ...children) {
         for (const [k, v] of Object.entries(attributes)) {
             if (k.startsWith("on")) {
                 events[k.substring(2).toLowerCase()] = v
+            } else if (k.startsWith("css-")) {
+                const styleKey = k.substring(4)
+
+                if (attrs.style) {
+                    attrs.style += `;${styleKey}: ${v};`
+                } else if (attributes.style) {
+                    attrs.style = `${attributes.style};${styleKey}: ${v};`
+                    delete attributes["style"]
+                } else {
+                    attrs.style = `${styleKey}: ${v};`
+                }
             } else if (k === "options") {
                 options = Object.assign(options, v)
             } else if (k === "constructor") {

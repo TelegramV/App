@@ -79,6 +79,9 @@ function rerender(peer) {
 }
 
 function isOtherDay(date1, date2) {
+    // fixme
+    if (!date1 || !date2) return false
+
     return date1.getFullYear() !== date2.getFullYear() || date1.getMonth() !== date2.getMonth() || date1.getDay() !== date2.getDay()
 }
 
@@ -107,7 +110,7 @@ function appendMessages(messages) {
             }
             if (!latest) latest = message
 
-            $bubblesInner.appendChild(UICreateMessage(message))
+            $bubblesInner.appendChild(VDOM.render(UICreateMessage(message)))
         })
 
         if (latest) {
@@ -143,7 +146,7 @@ function prependMessages(messages) {
         }
         messages.forEach(message => {
             // todo sticky date
-            $bubblesInner.prepend(UICreateMessage(message))
+            $bubblesInner.prepend(VDOM.render(UICreateMessage(message)))
         })
         if (reset) {
             $bubbles.scrollTop = $bubblesInner.clientHeight
@@ -152,6 +155,7 @@ function prependMessages(messages) {
 }
 
 function fetchNextPage(peer) {
+    console.log("fetching new messages pages")
     const $bubblesInner = get$bubbles()
     $bubblesInner.appendChild(VDOM.render(
         <div id="messagesLoadingNextPage" className="full-size-loader height">
@@ -180,6 +184,7 @@ function refetchMessages() {
                     MessagesManager.fetchMessages(upcomePeer)
                 }
             })
+
         } else {
             if (MessagesManager.existForPeer(_page_peer)) {
                 rerender(_page_peer)
@@ -233,7 +238,13 @@ function handleSingleUpdate(event) {
     const $message = $messagesElement.querySelector(`#bubbles-inner>[data-id="${message.id}"]`)
 
     if ($message) {
-        $message.replaceWith(UICreateMessage(message))
+        // $message.replaceWith(VDOM.render(UICreateMessage(message)))
+
+        // WARNING!!!
+        // If message renders not as expected, try to uncomment code above and do comment below
+
+        const patchMessage = VDOM.diffReal($message, UICreateMessage(message))
+        patchMessage($message)
     }
 }
 
