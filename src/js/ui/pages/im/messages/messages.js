@@ -87,13 +87,14 @@ function isOtherDay(date1, date2) {
 }
 
 let $latestSticky = null
+
 function appendMessages(messages) {
     const $bubblesInner = get$bubbles()
 
     if ($bubblesInner) {
         const $bubbles = document.getElementById("bubbles")
 
-        if($latestSticky && !isOtherDay(messages[0].time, $latestSticky.date)) {
+        if ($latestSticky && !isOtherDay(messages[0].time, $latestSticky.date)) {
             $latestSticky.elem.parentElement.removeChild($latestSticky.elem)
         }
         let latest = null
@@ -108,7 +109,7 @@ function appendMessages(messages) {
                 final = latest.time
                 latest = null
             }
-            if(!latest) latest = message
+            if (!latest) latest = message
 
             $bubblesInner.appendChild(UICreateMessage(message))
         })
@@ -141,14 +142,14 @@ function prependMessages(messages) {
         //     $latestSticky.elem.parentElement.removeChild($latestSticky.elem)
         // }
         let reset = false
-        if($bubblesInner.clientHeight - ($bubbles.scrollTop + $bubbles.clientHeight) < 50) {
+        if ($bubblesInner.clientHeight - ($bubbles.scrollTop + $bubbles.clientHeight) < 50) {
             reset = true
         }
         messages.forEach(message => {
             // todo sticky date
             $bubblesInner.prepend(UICreateMessage(message))
         })
-        if(reset) {
+        if (reset) {
             $bubbles.scrollTop = $bubblesInner.clientHeight
         }
     }
@@ -330,25 +331,26 @@ function updateMessageAvatar(peer) {
 }
 
 function handlePeerUpdates(event) {
-    const peer = event.peer;
     if (event.type === "updatePhoto") {
         updateMessageAvatar(event.peer)
 
-        if (peer.photo) {
-            updateHeader({
-                photo: {
-                    url: peer.photo
-                }
-            })
-        } else {
-            updateHeader({
-                photo: {
-                    placeholder: {
-                        num: peer.photoPlaceholder.num,
-                        text: peer.photoPlaceholder.text,
+        if (event.peer.id === peer.id) {
+            if (event.peer.photo) {
+                updateHeader({
+                    photo: {
+                        url: event.peer.photo
                     }
-                }
-            })
+                })
+            } else {
+                updateHeader({
+                    photo: {
+                        placeholder: {
+                            num: event.peer.photoPlaceholder.num,
+                            text: event.peer.photoPlaceholder.text,
+                        }
+                    }
+                })
+            }
         }
     }
 }
@@ -359,22 +361,23 @@ export function UICreateMessages() {
     PeersManager.listenUpdates(handlePeerUpdates)
 
     let noChatSelected = (<div id="noChat">
-                <div class="placeholder tgico tgico-chatsplaceholder"></div>
-                <div class="text"><p>Open Chat</p> <p>or create a new one</p></div>
-                <div class="buttons">
-                    <div class="button-wrapper">
-                        <div class="button rp"><i class="tgico tgico-newprivate"></i></div>
-                        <p>Private</p>
-                    </div>
-                    <div class="button-wrapper">
-                        <div class="button rp"><i class="tgico tgico-newgroup"></i></div>
-                        <p>Group</p>
-                    </div><div class="button-wrapper">
-                        <div class="button rp"><i class="tgico tgico-newchannel"></i></div>
-                        <p>Channel</p>
-                    </div>
-                </div>
-            </div>);
+        <div class="placeholder tgico tgico-chatsplaceholder"></div>
+        <div class="text"><p>Open Chat</p> <p>or create a new one</p></div>
+        <div class="buttons">
+            <div class="button-wrapper">
+                <div class="button rp"><i class="tgico tgico-newprivate"></i></div>
+                <p>Private</p>
+            </div>
+            <div class="button-wrapper">
+                <div class="button rp"><i class="tgico tgico-newgroup"></i></div>
+                <p>Group</p>
+            </div>
+            <div class="button-wrapper">
+                <div class="button rp"><i class="tgico tgico-newchannel"></i></div>
+                <p>Channel</p>
+            </div>
+        </div>
+    </div>);
 
     AppFramework.Router.onQueryChange(queryParams => {
         if (queryParams.p) {
