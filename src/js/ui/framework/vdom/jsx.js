@@ -18,6 +18,7 @@ export function vdom_jsx(tagName, attributes, ...children) {
     let events = {}
     let options = {}
     let constructor = {}
+    let dangerouslySetInnerHTML = false
 
     children = children.flat(Infinity)
 
@@ -38,6 +39,9 @@ export function vdom_jsx(tagName, attributes, ...children) {
                 }
             } else if (k === "options") {
                 options = Object.assign(options, v)
+            } else if (k === "dangerouslySetInnerHTML") {
+                dangerouslySetInnerHTML = v
+                attrs[k] = v
             } else if (k === "constructor") {
                 constructor = Object.assign(options, v)
             } else {
@@ -50,7 +54,7 @@ export function vdom_jsx(tagName, attributes, ...children) {
         }
     }
 
-    return VDOM.h(tagName, {attrs, constructor, options, events, children})
+    return VDOM.h(tagName, {attrs, constructor, options, events, children, dangerouslySetInnerHTML})
 }
 
 export default vdom_jsx

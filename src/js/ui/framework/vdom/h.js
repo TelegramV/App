@@ -7,9 +7,10 @@
  * @param options passed when creating element by using {@code document.createElement(tagName, options)}
  * @param events
  * @param children
+ * @param dangerouslySetInnerHTML
  * @returns {any}
  */
-export function vdom_h(tagName, {attrs = {}, constructor = {}, options = {}, events = {}, children = []} = {}) {
+export function vdom_h(tagName, {attrs = {}, constructor = {}, options = {}, events = {}, children = [], dangerouslySetInnerHTML = false} = {}) {
     const vElem = Object.create(null);
 
     if (typeof tagName === "function") {
@@ -21,7 +22,6 @@ export function vdom_h(tagName, {attrs = {}, constructor = {}, options = {}, eve
     }
     // console.warn(tagName)
 
-
     Object.assign(vElem, {
         tagName,
         attrs,
@@ -29,6 +29,7 @@ export function vdom_h(tagName, {attrs = {}, constructor = {}, options = {}, eve
         options,
         events,
         children,
+        dangerouslySetInnerHTML
     })
 
     return vElem

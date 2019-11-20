@@ -33,7 +33,7 @@ export function vdom_render(vNode) {
     }
 
     // check if innerHTML should be set
-    if (vNode.attrs && vNode.attrs.hasOwnProperty("dangerouslySetInnerHTML")) {
+    if (vNode.dangerouslySetInnerHTML !== false) {
 
         if (Array.isArray(vNode.children)) {
             if (vNode.children.length > 0) {
@@ -45,8 +45,7 @@ export function vdom_render(vNode) {
             throw new Error("Element with `dangerouslySetInnerHTML` should not have children.")
         }
 
-        $el.innerHTML = vNode.attrs["dangerouslySetInnerHTML"]
-        delete vNode.attrs["dangerouslySetInnerHTML"]
+        $el.innerHTML = vNode.dangerouslySetInnerHTML
     }
 
     // setting attributes

@@ -1,7 +1,7 @@
 import {MTProto} from "../../../../mtproto"
-import VDOM from "../../../framework/vdom"
 import Voice from "../../../voice"
 import EmojiConverter from "emoji-js"
+import {vLoadingNode} from "../../../utils"
 
 const emoji = new EmojiConverter();
 
@@ -85,9 +85,14 @@ function vMessageWithImageTemplate(data) {
     return vMessageTemplate(data, (
         <div class={vGetClass(data)}>
             {data.thumbnail ?
-                <img class="attachment attachment-thumb"
-                     src={data.imgSrc}
-                     css-width={Number(data.imgSize[0]) > 460 ? "460px" : `${data.imgSize[0]}px`}/> :
+                <div>
+                    <div css-position="absolute" css-z-index="1000" className="full-size-loader">
+                        <progress className="progress-circular"/>
+                    </div>
+                    <img class="attachment attachment-thumb"
+                         src={data.imgSrc}
+                         css-width={Number(data.imgSize[0]) > 460 ? "460px" : `${data.imgSize[0]}px`}/>
+                </div> :
                 <img className="attachment" src={data.imgSrc}/>
             }
             {haveMsg ? (<div class="message">

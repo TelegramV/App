@@ -107,6 +107,22 @@ function diffChildren(oldVChildren, newVChildren) {
 
 /**
  *
+ * @param {HTMLElement|Node|Text}$oldTree
+ * @param dangerouslySetInnerHTML
+ */
+function diffDangerouslySetInnerHTML($oldTree, dangerouslySetInnerHTML) {
+    if ($oldTree.getAttribute("dangerouslySetInnerHTML") === dangerouslySetInnerHTML) {
+        return $node => $node
+    } else {
+        return $node => {
+            $node.innerHTML = dangerouslySetInnerHTML
+            return $node
+        }
+    }
+}
+
+/**
+ *
  * @param {HTMLElement|Node|Text} $oldTree
  * @param newVTree
  * @returns {(function(*): undefined)|(function(*): (Text|HTMLElement))|(function(*=): *)|(function(*): *)}
@@ -126,6 +142,8 @@ export function vdom_diffReal($oldTree, newVTree) {
             return $newNode
         }
     }
+
+    console.log($oldTree, $oldTree.nodeType, newVTree)
 
     if ($oldTree.nodeType === Node.TEXT_NODE) {
         if ($oldTree.wholeText !== newVTree) {
@@ -149,7 +167,14 @@ export function vdom_diffReal($oldTree, newVTree) {
 
     const patchAttrs = diffAttrs($oldTree.attributes, newVTree.attrs)
     const patchEvents = diffEvents(newVTree.events)
-    const patchChildren = diffChildren($oldTree.childNodes, newVTree.children)
+
+    let patchChildren = null
+    if (newVTree.dangerouslySetInnerHTML !== false) {
+        console.warn($oldTree.childNodes, newVTree)
+        patchChildren = diffDangerouslySetInnerHTML($oldTree, newVTree.dangerouslySetInnerHTML)
+    } else {
+        patchChildren = diffChildren($oldTree.childNodes, newVTree.children)
+    }
 
     return $node => {
         patchAttrs($node)
