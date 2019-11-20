@@ -50,6 +50,26 @@ export default class Voice {
         return this.element;
     }
 
+    asJSX() {
+        return (<div class="audio">
+            <div class="play"></div>
+            <div class="audio-wrapper">
+                <svg style={"width:"+this.width+"px; transform: scale(1,-1)"}>
+                    <defs>
+                        <mask id="bars">
+                            {this._generateBars()}
+                        </mask>
+                    </defs>
+                    <rect x="0" y="0" width={this.width+"px"} height="100%" fill="grey" mask="url(#bars)"/>
+                    <rect x="0" y="0" width={this.width+"px"} height="100%" fill="green" mask="url(#bars)"/>
+                </svg>
+                <div class="timer">
+                {this._timeToFormat(this.audio.duration)}
+                </div>
+            </div>
+        </div>);
+    }
+
     _audioTimeUpdate() {
         this.setPercent(this.audio.currentTime / this.audio.duration);
         this.timer.textContent = this._timeToFormat(this.audio.currentTime);
@@ -136,13 +156,14 @@ export default class Voice {
     _generateBars() {
         let x = this.barMargin;
         let width = this.barWidth;
+        let elemArr = [];
         for (let i = 0; i < this.heights.length; i++) {
             let value = this.heights[i];
             let rect = this._newBar(x, width, this._heightToPercent(value));
-            this.mask.appendChild(rect);
-
+            elemArr.push(rect);
             x += width + this.barMargin;
         }
+        return elemArr;
     }
 
     _setAttr(elem, attr, value) {
@@ -150,14 +171,7 @@ export default class Voice {
     }
 
     _newBar(x, width, height) {
-        let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        this._setAttr(rect, "x", x + "px");
-        this._setAttr(rect, "rx", this.barWidth + "px");
-        this._setAttr(rect, "ry", this.barWidth + "px");
-        this._setAttr(rect, "width", width + "px");
-        this._setAttr(rect, "height", height);
-        this._setAttr(rect, "fill", "white");
-        return rect;
+        return <rect x={x+"px"} rx={this.barWidth+"px"} ry={this.barWidth+"px"} width={width+"px"} height={height} fill="white"/>
     }
 
     _newRect(x, y, width, height) {

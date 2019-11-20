@@ -1,4 +1,4 @@
-import {MTProto} from "../../../../mtproto"
+import { MTProto } from "../../../../mtproto"
 import VDOM from "../../../framework/vdom"
 import Voice from "../../../voice"
 import EmojiConverter from "emoji-js"
@@ -58,7 +58,8 @@ function vForwardedTemplate(data) {
 
 function vMessageWithTextOnlyTemplate(data) {
     const username = data.userName && !data.post && !data.out;
-    const msg = data.message? emoji.replace_unified(data.message) : "";
+    const msg = data.message ? emoji.replace_unified(data.message) : "";
+
     return vMessageTemplate(data, (
         <div class={vGetClass(data)}>
             {username ? <div className="username">{data.userName}</div> : ""}
@@ -164,7 +165,7 @@ function vMessageWithVoiceAudioTemplate(data) {
         <div class={vGetClass(data)}>
             <div className="message">
                 {vForwardedTemplate(data)}
-                <div class="audio" dangerouslySetInnerHTML={voice.getElement().innerHTML} />
+                {voice.asJSX()}
                 {vTimeTemplate(data)}
             </div>
         </div>
