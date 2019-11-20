@@ -1,7 +1,6 @@
 import {MTProto} from "../../../../mtproto"
 import Voice from "../../../voice"
 import EmojiConverter from "emoji-js"
-import {vLoadingNode} from "../../../utils"
 
 const emoji = new EmojiConverter();
 
@@ -59,6 +58,7 @@ function vForwardedTemplate(data) {
 function vMessageWithTextOnlyTemplate(data) {
     const username = data.userName && !data.post && !data.out;
     const msg = data.message ? emoji.replace_unified(data.message) : "";
+
     return vMessageTemplate(data, (
         <div class={vGetClass(data)}>
             {username ? <div className="username">{data.userName}</div> : ""}
@@ -167,7 +167,7 @@ function vMessageWithVoiceAudioTemplate(data) {
         <div class={vGetClass(data)}>
             <div className="message">
                 {vForwardedTemplate(data)}
-                <div class="audio" dangerouslySetInnerHTML={voice.getElement().innerHTML}/>
+                {voice.asJSX()}
                 {vTimeTemplate(data)}
             </div>
         </div>
@@ -250,3 +250,4 @@ export function UICreateMessage(message) {
 
     return handlers[message.type](message)
 }
+
