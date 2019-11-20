@@ -232,12 +232,26 @@
                     align-items: center;
                     justify-content: center;
                     flex-shrink: 0;
+                    cursor: pointer;
 
                     &:before {
                         margin-left: 5px;
                         content: $tgico-play;
                         font-size: 2em;
                         font-family: "tgico" !important;
+                    }
+                }
+
+                .voice-wrapper {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    height: 100%;
+                    svg {
+                        height: 50%;
+                        rect {
+                            transition: width 0.1s linear;
+                        }
                     }
                 }
 
@@ -420,6 +434,7 @@
 
             a {
                 color: $darkblue;
+
                 &:hover {
                     text-decoration: underline;
                 }
@@ -481,7 +496,7 @@
         }
 
         .in {
-            align-items: flex-start;
+            //align-items: flex-start;
 
             .box:hover {
                 background-color: $light;

@@ -6,6 +6,7 @@ import {AppFramework} from "../../ui/framework/framework"
 import {parseMessageEntities} from "../../mtproto/utils/htmlHelpers"
 import {FileAPI} from "../fileAPI"
 import {findUserFromMessage, getPeerName} from "../dialogs/util"
+import {formatTimeAudio} from "../../ui/utils"
 
 window.pushMessage = function () {
     const dialogPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")

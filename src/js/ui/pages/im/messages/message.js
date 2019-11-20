@@ -1,5 +1,6 @@
 import {MTProto} from "../../../../mtproto"
 import VDOM from "../../../framework/vdom"
+import Voice from "../../../voice"
 
 function vTimeTemplate(data, bg = false) {
     let classes = "time" + (bg ? " bg" : "")
@@ -132,7 +133,7 @@ function vMessageWithStickerTemplate(data) {
 }
 
 function vMessageWithVoiceAudioTemplate(data) {
-    return vMessageTemplate(data,
+    /*return vMessageTemplate(data,
         <div class={vGetClass(data)}>
             <div className="message">
                 {vForwardedTemplate(data)}
@@ -151,6 +152,16 @@ function vMessageWithVoiceAudioTemplate(data) {
                     {vTimeTemplate(data)}
                 </div>
                 <audio src={data.audio.url}/>
+            </div>
+        </div>
+    )*/
+    const voice = new Voice(new Audio(data.audio.url), data.audio.waveform);
+    return vMessageTemplate(data,
+        <div class={vGetClass(data)}>
+            <div className="message">
+                {vForwardedTemplate(data)}
+                <div class="audio" dangerouslySetInnerHTML={voice.getElement().innerHTML} />
+                {vTimeTemplate(data)}
             </div>
         </div>
     )
