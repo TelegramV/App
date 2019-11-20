@@ -8,21 +8,23 @@ function zip(xs, ys) {
     return zipped
 }
 
-function diffEvents(oldEvents, newEvents) {
+// todo: fix this thing
+function diffEvents(newEvents) {
     const patches = []
+
+    for (const [k, v] of Object.entries(newEvents)) {
+        patches.push($node => {
+            $node.removeEventListener(k, v)
+            return $node
+        })
+    }
 
     for (const [k, v] of Object.entries(newEvents)) {
         patches.push($node => {
             $node.addEventListener(k, v)
             return $node
         })
-    }
 
-    for (const [k, v] of Object.entries(oldEvents)) {
-        patches.push($node => {
-            $node.removeEventListener(k, v)
-            return $node
-        })
     }
 
     return $node => {
@@ -33,6 +35,12 @@ function diffEvents(oldEvents, newEvents) {
     }
 }
 
+/**
+ *
+ * @param {NamedNodeMap} oldAttrs
+ * @param {object} newAttrs
+ * @returns {function(*=): *}
+ */
 function diffAttrs(oldAttrs, newAttrs) {
     const patches = []
 
@@ -64,10 +72,16 @@ function diffAttrs(oldAttrs, newAttrs) {
     }
 }
 
+/**
+ *
+ * @param {NodeListOf<ChildNode>} oldVChildren
+ * @param newVChildren
+ * @returns {function(*=): *}
+ */
 function diffChildren(oldVChildren, newVChildren) {
     const childPatches = []
     oldVChildren.forEach((oldVChild, i) => {
-        childPatches.push(vdom_diff(oldVChild, newVChildren[i]))
+        childPatches.push(vdom_diffReal(oldVChild, newVChildren[i]))
     })
 
     const additionalPatches = []
@@ -91,7 +105,13 @@ function diffChildren(oldVChildren, newVChildren) {
     }
 }
 
-export function vdom_diff(oldVTree, newVTree) {
+/**
+ *
+ * @param {HTMLElement|Node|Text} $oldTree
+ * @param newVTree
+ * @returns {(function(*): undefined)|(function(*): (Text|HTMLElement))|(function(*=): *)|(function(*): *)}
+ */
+export function vdom_diffReal($oldTree, newVTree) {
     if (newVTree === undefined) {
         return $node => {
             $node.remove()
@@ -107,11 +127,8 @@ export function vdom_diff(oldVTree, newVTree) {
         }
     }
 
-    if (typeof oldVTree === "string" || typeof oldVTree === "number" || typeof newVTree === "string" || typeof newVTree === "number") {
-
-        console.log(oldVTree, newVTree)
-
-        if (oldVTree !== newVTree) {
+    if ($oldTree.nodeType === Node.TEXT_NODE) {
+        if ($oldTree.wholeText !== newVTree) {
             return $node => {
                 const $newNode = VDOM.render(newVTree)
                 $node.replaceWith($newNode)
@@ -122,12 +139,7 @@ export function vdom_diff(oldVTree, newVTree) {
         }
     }
 
-    if (typeof oldVTree.tagName === "object" && typeof newVTree.tagName === "object") {
-        oldVTree = oldVTree.tagName.h()
-        newVTree = newVTree.tagName.h()
-    }
-
-    if (oldVTree.tagName !== newVTree.tagName || (newVTree.attrs.hasOwnProperty("replaceWith") && newVTree.attrs.replaceWith)) {
+    if ($oldTree.tagName.toLowerCase() !== newVTree.tagName) {
         return $node => {
             const $newNode = VDOM.render(newVTree)
             $node.replaceWith($newNode)
@@ -135,9 +147,9 @@ export function vdom_diff(oldVTree, newVTree) {
         }
     }
 
-    const patchAttrs = diffAttrs(oldVTree.attrs, newVTree.attrs)
-    const patchEvents = diffEvents(oldVTree.events, newVTree.events)
-    const patchChildren = diffChildren(oldVTree.children, newVTree.children)
+    const patchAttrs = diffAttrs($oldTree.attributes, newVTree.attrs)
+    const patchEvents = diffEvents(newVTree.events)
+    const patchChildren = diffChildren($oldTree.childNodes, newVTree.children)
 
     return $node => {
         patchAttrs($node)
@@ -147,4 +159,4 @@ export function vdom_diff(oldVTree, newVTree) {
     }
 }
 
-export default vdom_diff
+export default vdom_diffReal

@@ -110,7 +110,7 @@ function appendMessages(messages) {
             }
             if (!latest) latest = message
 
-            $bubblesInner.appendChild(UICreateMessage(message))
+            $bubblesInner.appendChild(VDOM.render(UICreateMessage(message)))
         })
 
         if (latest) {
@@ -146,7 +146,7 @@ function prependMessages(messages) {
         }
         messages.forEach(message => {
             // todo sticky date
-            $bubblesInner.prepend(UICreateMessage(message))
+            $bubblesInner.prepend(VDOM.render(UICreateMessage(message)))
         })
         if (reset) {
             $bubbles.scrollTop = $bubblesInner.clientHeight
@@ -238,7 +238,13 @@ function handleSingleUpdate(event) {
     const $message = $messagesElement.querySelector(`#bubbles-inner>[data-id="${message.id}"]`)
 
     if ($message) {
-        $message.replaceWith(UICreateMessage(message))
+        // $message.replaceWith(VDOM.render(UICreateMessage(message)))
+
+        // WARNING!!!
+        // If message renders not as expected, try to uncomment code above and do comment below
+
+        const patchMessage = VDOM.diffReal($message, UICreateMessage(message))
+        patchMessage($message)
     }
 }
 

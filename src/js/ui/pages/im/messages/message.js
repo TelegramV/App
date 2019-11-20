@@ -243,5 +243,5 @@ export function UICreateMessage(message) {
         service: vServiceMessageTemplate
     }
 
-    return VDOM.render(handlers[message.type](message))
+    return handlers[message.type](message)
 }
