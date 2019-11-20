@@ -77,6 +77,7 @@ export class FileAPI {
 
     static photoThumnail(file, resolve) {
         const max = FileAPI.getMaxSize(file)
+
         try {
             resolve({
                 src: FileAPI.getThumbnail(file),
@@ -86,13 +87,15 @@ export class FileAPI {
         } catch {
 
         } finally {
-            FileAPI.getFile(file, max.type).then(file => {
-                resolve({
-                    src: file,
-                    size: [max.w, max.h],
-                    thumbnail: false
+            setTimeout(() => {
+                FileAPI.getFile(file, max.type).then(file => {
+                    resolve({
+                        src: file,
+                        size: [max.w, max.h],
+                        thumbnail: false
+                    })
                 })
-            })
+            }, 2000)
         }
     }
 

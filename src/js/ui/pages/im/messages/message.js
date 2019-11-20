@@ -58,7 +58,7 @@ function vForwardedTemplate(data) {
 
 function vMessageWithTextOnlyTemplate(data) {
     const username = data.userName && !data.post && !data.out;
-    const msg = data.message? emoji.replace_unified(data.message) : "";
+    const msg = data.message ? emoji.replace_unified(data.message) : "";
     return vMessageTemplate(data, (
         <div class={vGetClass(data)}>
             {username ? <div className="username">{data.userName}</div> : ""}
@@ -85,17 +85,15 @@ function vMessageWithImageTemplate(data) {
     return vMessageTemplate(data, (
         <div class={vGetClass(data)}>
             {data.thumbnail ?
-                <div style="overflow: hidden;">
-                    <img class="attachment" src={data.imgSrc}
-                         style={`width: ${data.imgSize[0]}px; height: ${data.imgSize[1]}px; filter: blur(10px); margin: -20px -20px -20px -20px;`}></img>
-                </div>
-                :
-                <img className="attachment" src={data.imgSrc}></img>
+                <img class="attachment attachment-thumb"
+                     src={data.imgSrc}
+                     css-width={Number(data.imgSize[0]) > 460 ? "460px" : `${data.imgSize[0]}px`}/> :
+                <img className="attachment" src={data.imgSrc}/>
             }
             {haveMsg ? (<div class="message">
                 <span dangerouslySetInnerHTML={data.message}/>
                 {vTimeTemplate(data)}
-            </div>): ""}
+            </div>) : ""}
         </div>
     ))
 }
@@ -164,7 +162,7 @@ function vMessageWithVoiceAudioTemplate(data) {
         <div class={vGetClass(data)}>
             <div className="message">
                 {vForwardedTemplate(data)}
-                <div class="audio" dangerouslySetInnerHTML={voice.getElement().innerHTML} />
+                <div class="audio" dangerouslySetInnerHTML={voice.getElement().innerHTML}/>
                 {vTimeTemplate(data)}
             </div>
         </div>

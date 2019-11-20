@@ -205,6 +205,11 @@
                 border-top-right-radius: 12px;
             }
 
+            .attachment-thumb {
+                filter: blur(10px);
+                padding: 10px;
+            }
+
             .attachment:only-child {
                 border-radius: 12px;
                 margin-bottom: -3px;

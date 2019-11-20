@@ -79,6 +79,9 @@ function rerender(peer) {
 }
 
 function isOtherDay(date1, date2) {
+    // fixme
+    if (!date1 || !date2) return false
+
     return date1.getFullYear() !== date2.getFullYear() || date1.getMonth() !== date2.getMonth() || date1.getDay() !== date2.getDay()
 }
 
@@ -152,6 +155,7 @@ function prependMessages(messages) {
 }
 
 function fetchNextPage(peer) {
+    console.log("fetching new messages pages")
     const $bubblesInner = get$bubbles()
     $bubblesInner.appendChild(VDOM.render(
         <div id="messagesLoadingNextPage" className="full-size-loader height">
@@ -180,6 +184,7 @@ function refetchMessages() {
                     MessagesManager.fetchMessages(upcomePeer)
                 }
             })
+
         } else {
             if (MessagesManager.existForPeer(_page_peer)) {
                 rerender(_page_peer)
