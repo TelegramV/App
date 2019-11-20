@@ -1,7 +1,5 @@
 import {createLogger} from "../../common/logger";
 import {TimeManager} from "../timeManager";
-import {MessageProcessor} from "./messageProcessor";
-import {sha1BytesSync} from "../crypto/sha";
 import {mt_set_disconnect_processor, mt_ws_set_processor, mt_ws_transport} from "./mt_ws_transport";
 import DataCenter from "../dataCenter";
 

@@ -1,8 +1,8 @@
-import {h} from "./h"
-import {jsx} from "./jsx"
-import {render} from "./render"
-import {diff} from "./diff"
-import {mount} from "./mount"
+import {vdom_h} from "./h"
+import {vdom_jsx} from "./jsx"
+import {vdom_render} from "./render"
+import {vdom_diff} from "./diff"
+import {vdom_mount} from "./mount"
 
 /**
  Simple Virtual DOM
@@ -10,11 +10,11 @@ import {mount} from "./mount"
  @author kohutd & tutorials from the net
  */
 export const VDOM = {
-    h,
-    jsx,
-    render,
-    diff,
-    mount,
+    h: vdom_h,
+    jsx: vdom_jsx,
+    render: vdom_render,
+    diff: vdom_diff,
+    mount: vdom_mount,
 }
 
 export default VDOM

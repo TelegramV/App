@@ -1,70 +1,55 @@
-import VDOM from "./index"
-import {FrameworkComponent} from "../component"
-
 /**
  * Renders Virtual DOM Node
  *
  * @param vNode
  * @returns {Text|HTMLElement}
  */
-export function render(vNode) {
+export function vdom_render(vNode) {
     if (!vNode || typeof vNode === "undefined") {
         return document.createTextNode(vNode)
     }
 
+    // means that the object is not a virtual node, so we just convert it to json
     if (typeof vNode === "object" && !vNode.tagName) {
         return document.createTextNode(JSON.stringify(vNode))
     }
 
-    if (typeof vNode.tagName === "object") {
-        throw new Error("not allowed now!")
-
-        if (!(vNode.tagName instanceof FrameworkComponent)) {
-            return document.createTextNode(JSON.stringify(vNode))
-        }
-    }
-
-    if (Array.isArray(vNode)) {
-        throw new Error("wtf")
-    }
-
-    if (vNode.attrs && vNode.attrs.hasOwnProperty("dangerouslySetInnerHTML")) {
-        const $el = document.createElement(vNode.tagName)
-        $el.innerHTML = vNode.attrs["dangerouslySetInnerHTML"]
-        return $el
-    }
-
-
+    // means that the vNode is either string or number or something else but not virtual node
     if (typeof vNode !== "object" && typeof vNode !== "function") {
         return document.createTextNode(vNode)
     }
 
-    let $el = null
-    let isFrameworkObject = false
-    if (vNode.tagName instanceof FrameworkComponent) {
-        isFrameworkObject = true
-        const component = vNode.tagName
-
-        let prevRendered = component.h()
-        $el = render(prevRendered)
-        component.mounted()
-        component.render = () => {
-            const rendered = component.h()
-            if (prevRendered !== rendered) {
-                const patch = VDOM.diff(prevRendered, rendered)
-                $el = patch($el)
-                prevRendered = rendered;
-                component.updated()
-            }
-        }
-    } else {
-        if (vNode.options && Object.keys(vNode.options) > 0) {
-            $el = document.createElement(vNode.tagName, options)
-        } else {
-            $el = document.createElement(vNode.tagName)
-        }
+    // should be removed in future
+    if (Array.isArray(vNode)) {
+        throw new Error("wtf")
     }
 
+    let $el = null
+
+    if (vNode.options && Object.keys(vNode.options) > 0) {
+        $el = document.createElement(vNode.tagName, options)
+    } else {
+        $el = document.createElement(vNode.tagName)
+    }
+
+    // check if innerHTML should be set
+    if (vNode.attrs && vNode.attrs.hasOwnProperty("dangerouslySetInnerHTML")) {
+
+        if (Array.isArray(vNode.children)) {
+            if (vNode.children.length > 0) {
+                console.error(vNode)
+                throw new Error("Element with `dangerouslySetInnerHTML` should not have children.")
+            }
+        } else if (vNode.children) {
+            console.error(vNode)
+            throw new Error("Element with `dangerouslySetInnerHTML` should not have children.")
+        }
+
+        $el.innerHTML = vNode.attrs["dangerouslySetInnerHTML"]
+        delete vNode.attrs["dangerouslySetInnerHTML"]
+    }
+
+    // setting attributes
     for (const [k, v] of Object.entries(vNode.attrs)) {
         if (Array.isArray(v)) {
             $el.setAttribute(k, v.join(" "))
@@ -73,19 +58,17 @@ export function render(vNode) {
         }
     }
 
+    // adding events
     for (const [kEvent, vEvent] of Object.entries(vNode.events)) {
         $el.addEventListener(kEvent, vEvent)
     }
 
-    if (isFrameworkObject && vNode.children.length > 0) {
-        throw new Error("delete children")
-    }
-
+    // append children
     for (const child of vNode.children) {
-        $el.appendChild(render(child))
+        $el.appendChild(vdom_render(child))
     }
 
     return $el
 }
 
-export default render
+export default vdom_render

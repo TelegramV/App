@@ -9,7 +9,7 @@
  * @param children
  * @returns {any}
  */
-export function h(tagName, {attrs = {}, constructor = {}, options = {}, events = {}, children = []} = {}) {
+export function vdom_h(tagName, {attrs = {}, constructor = {}, options = {}, events = {}, children = []} = {}) {
     const vElem = Object.create(null);
 
     if (typeof tagName === "function") {
@@ -34,4 +34,4 @@ export function h(tagName, {attrs = {}, constructor = {}, options = {}, events =
     return vElem
 }
 
-export default h
+export default vdom_h

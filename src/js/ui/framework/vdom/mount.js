@@ -1,6 +1,6 @@
-export function mount($node, $target) {
+export function vdom_mount($node, $target) {
     $target.replaceWith($node);
     return $node;
 }
 
-export default mount
+export default vdom_mount

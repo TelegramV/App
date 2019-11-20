@@ -1,6 +1,6 @@
-import render from "./render"
+import VDOM from "./index"
 
-const zip = (xs, ys) => {
+function zip(xs, ys) {
     const zipped = []
     for (let i = 0; i < Math.min(xs.length, ys.length); i++) {
         zipped.push([xs[i], ys[i]])
@@ -8,7 +8,7 @@ const zip = (xs, ys) => {
     return zipped
 }
 
-const diffEvents = (oldEvents, newEvents) => {
+function diffEvents(oldEvents, newEvents) {
     const patches = []
 
     for (const [k, v] of Object.entries(newEvents)) {
@@ -33,7 +33,7 @@ const diffEvents = (oldEvents, newEvents) => {
     }
 }
 
-const diffAttrs = (oldAttrs, newAttrs) => {
+function diffAttrs(oldAttrs, newAttrs) {
     const patches = []
 
     for (const [k, v] of Object.entries(newAttrs)) {
@@ -64,7 +64,7 @@ const diffAttrs = (oldAttrs, newAttrs) => {
     }
 }
 
-const diffChildren = (oldVChildren, newVChildren) => {
+function diffChildren(oldVChildren, newVChildren) {
     const childPatches = []
     oldVChildren.forEach((oldVChild, i) => {
         childPatches.push(diff(oldVChild, newVChildren[i]))
@@ -73,7 +73,7 @@ const diffChildren = (oldVChildren, newVChildren) => {
     const additionalPatches = []
     for (const additionalVChild of newVChildren.slice(oldVChildren.length)) {
         additionalPatches.push($node => {
-            $node.appendChild(render(additionalVChild))
+            $node.appendChild(VDOM.render(additionalVChild))
             return $node
         })
     }
@@ -91,7 +91,7 @@ const diffChildren = (oldVChildren, newVChildren) => {
     }
 }
 
-export const diff = (oldVTree, newVTree) => {
+export function vdom_diff(oldVTree, newVTree) {
     if (newVTree === undefined) {
         return $node => {
             $node.remove()
@@ -101,7 +101,7 @@ export const diff = (oldVTree, newVTree) => {
 
     if (typeof newVTree === "object" && !newVTree.tagName) {
         return $node => {
-            const $newNode = render(newVTree)
+            const $newNode = VDOM.render(newVTree)
             $node.replaceWith($newNode)
             return $newNode
         }
@@ -113,7 +113,7 @@ export const diff = (oldVTree, newVTree) => {
 
         if (oldVTree !== newVTree) {
             return $node => {
-                const $newNode = render(newVTree)
+                const $newNode = VDOM.render(newVTree)
                 $node.replaceWith($newNode)
                 return $newNode
             }
@@ -129,7 +129,7 @@ export const diff = (oldVTree, newVTree) => {
 
     if (oldVTree.tagName !== newVTree.tagName || (newVTree.attrs.hasOwnProperty("replaceWith") && newVTree.attrs.replaceWith)) {
         return $node => {
-            const $newNode = render(newVTree)
+            const $newNode = VDOM.render(newVTree)
             $node.replaceWith($newNode)
             return $newNode
         }
@@ -147,4 +147,4 @@ export const diff = (oldVTree, newVTree) => {
     }
 }
 
-export default diff
+export default vdom_diff

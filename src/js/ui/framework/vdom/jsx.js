@@ -1,24 +1,8 @@
-import {h} from "./h"
+import VDOM from "./index"
 
 const jsxAttributesMap = {
     className: "class",
     htmlFor: "for"
-}
-
-function flatArray(array) {
-    if (!Array.isArray(array)) {
-        return [array]
-    }
-
-    const res = []
-    for (let i = 0; i < array.length; i++) {
-        if (Array.isArray(array[i])) {
-            res.concat(flatArray(array[i]))
-        } else {
-            res.push(array[i])
-        }
-    }
-    return res
 }
 
 /**
@@ -29,7 +13,7 @@ function flatArray(array) {
  * @param children
  * @returns {any}
  */
-export function jsx(tagName, attributes, ...children) {
+export function vdom_jsx(tagName, attributes, ...children) {
     let attrs = {}
     let events = {}
     let options = {}
@@ -55,7 +39,7 @@ export function jsx(tagName, attributes, ...children) {
         }
     }
 
-    return h(tagName, {attrs, constructor, options, events, children})
+    return VDOM.h(tagName, {attrs, constructor, options, events, children})
 }
 
-export default jsx
+export default vdom_jsx

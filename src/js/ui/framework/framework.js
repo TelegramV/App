@@ -1,7 +1,7 @@
 import {FrameworkRouter} from "./router"
-import VDOM from "./vdom"
+import {VDOM} from "./vdom"
 
-window.VDOM = VDOM
+window["VDOM"] = VDOM
 
 const Router = new FrameworkRouter()
 
@@ -10,6 +10,8 @@ function mount(selector) {
 
     if (Router) {
         Router.run($mountElement)
+    } else {
+        throw new Error("Router is not defined!")
     }
 }
 

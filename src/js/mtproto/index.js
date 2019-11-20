@@ -1,4 +1,4 @@
-import {ApiNetworker, Networker} from "./network/apiNetworker"
+import {ApiNetworker} from "./network/apiNetworker"
 import {AppConfiguration} from "../configuration"
 import {bytesFromHex, bytesToHex, createNonce} from "./utils/bin"
 import TimeManager from "./timeManager"
@@ -11,6 +11,7 @@ import MessagesManager from "../api/messages/messagesManager"
 import DialogsManager from "../api/dialogs/dialogsManager"
 import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
+import {Networker} from "./network/networker"
 
 class MobileProtocolAPIAuth {
     constructor(options = {}) {
@@ -124,7 +125,7 @@ class MobileProtocol {
     }
 
     async createFileNetworker(dcID) {
-        if(AppPermanentStorage.exists("authKey" + dcID)) {
+        if (AppPermanentStorage.exists("authKey" + dcID)) {
             const networker = new Networker({
                 dcID: dcID,
                 nonce: createNonce(16),

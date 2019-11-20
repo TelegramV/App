@@ -132,10 +132,10 @@ export class FrameworkRouter {
 
         let doNext = false
 
-        this.middlewares.forEach(midleware => {
-            const middlewareResult = midleware(routeToActivate)
+        this.middlewares.forEach(middleware => {
+            const middlewareResult = middleware(routeToActivate)
 
-            if (middlewareResult != true && middlewareResult.next != true) {
+            if (middlewareResult !== true && middlewareResult.next !== true) {
                 return doNext = middlewareResult.doNext
             }
         })
