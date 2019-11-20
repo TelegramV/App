@@ -378,9 +378,8 @@
                 word-wrap: break-word;
                 padding: 9px;
 
-                // TODO hack
-                &.nopad {
-                    padding-top: 2px;
+                .emoji-sizer {
+                    font-size: 1.25em;
                 }
 
                 line-height: 1.2;

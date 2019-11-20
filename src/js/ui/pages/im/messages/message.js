@@ -1,6 +1,9 @@
 import {MTProto} from "../../../../mtproto"
 import VDOM from "../../../framework/vdom"
 import Voice from "../../../voice"
+import EmojiConverter from "emoji-js"
+
+const emoji = new EmojiConverter();
 
 function vTimeTemplate(data, bg = false) {
     let classes = "time" + (bg ? " bg" : "")
@@ -55,6 +58,7 @@ function vForwardedTemplate(data) {
 
 function vMessageWithTextOnlyTemplate(data) {
     const username = data.userName && !data.post && !data.out;
+    const msg = data.message? emoji.replace_unified(data.message) : "";
     return vMessageTemplate(data, (
         <div class={vGetClass(data)}>
             {username ? <div className="username">{data.userName}</div> : ""}
@@ -68,7 +72,7 @@ function vMessageWithTextOnlyTemplate(data) {
             <div class={`message ${username ? "nopad" : ""}`}>
 
                 {vForwardedTemplate(data)}
-                <span dangerouslySetInnerHTML={data.message}/>
+                <span dangerouslySetInnerHTML={msg}/>
                 {vTimeTemplate(data)}
             </div>
         </div>
