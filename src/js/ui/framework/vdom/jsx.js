@@ -5,6 +5,14 @@ const jsxAttributesMap = {
     htmlFor: "for"
 }
 
+function removeEmpties(array) {
+    for (let i = 0; i < array.length; i++) {
+        if (array[i] === "") {
+            delete array[i]
+        }
+    }
+}
+
 /**
  * translator (kostyl') for jsx
  *
@@ -20,6 +28,7 @@ export function vdom_jsx(tagName, attributes, ...children) {
     let constructor = {}
     let dangerouslySetInnerHTML = false
 
+    // removeEmpties(children)
     children = children.flat(Infinity)
 
     if (attributes) {

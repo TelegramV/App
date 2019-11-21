@@ -20,7 +20,6 @@ function patchEvents($node, newEvents) {
 }
 
 /**
- *
  * @param $node
  * @param {NamedNodeMap} oldAttrs
  * @param {object} newAttrs
@@ -52,11 +51,10 @@ function patchAttrs($node, oldAttrs, newAttrs) {
  * @param $parent
  * @param {NodeListOf<ChildNode>} $children
  * @param newVChildren
- * @returns {function(*=): *}
  */
 function patchChildren($parent, $children, newVChildren) {
-    $children.forEach((oldVChild, i) => {
-        vdom_patchReal(oldVChild, newVChildren[i])
+    $children.forEach(($oldChild, i) => {
+        vdom_patchReal($oldChild, newVChildren[i])
     })
 
     for (const additionalVChild of newVChildren.slice($children.length)) {
@@ -79,15 +77,15 @@ function patchDangerouslySetInnerHTML($node, dangerouslySetInnerHTML) {
 }
 
 /**
+ * FIXME: fix bug in message voice template!!!
+ *
  * @param {HTMLElement|Node|Text} $node
  * @param newVTree
  */
 export function vdom_patchReal($node, newVTree) {
     if (newVTree === undefined) {
-        return $node => {
-            $node.remove()
-            return undefined
-        }
+        $node.remove()
+        return undefined
     }
 
     if (typeof newVTree === "object" && !newVTree.tagName) {
@@ -106,6 +104,16 @@ export function vdom_patchReal($node, newVTree) {
         }
     }
 
+    // named components check
+    // if names are different then replace all tree
+    if ($node.hasAttribute("data-component") || newVTree.attrs.hasOwnProperty("data-component")) {
+        if ($node.getAttribute("data-component") !== newVTree.attrs["data-component"]) {
+            const $newNode = VDOM.render(newVTree)
+            $node.replaceWith($newNode)
+            return $newNode
+        }
+    }
+
     // if tagNames are different then we replace all tree
     if ($node.tagName.toLowerCase() !== newVTree.tagName) {
         const $newNode = VDOM.render(newVTree)
@@ -117,7 +125,6 @@ export function vdom_patchReal($node, newVTree) {
     patchEvents($node, newVTree.events)
 
     if (newVTree.dangerouslySetInnerHTML !== false) {
-        console.warn($node.childNodes, newVTree)
         patchDangerouslySetInnerHTML($node, newVTree.dangerouslySetInnerHTML)
     } else {
         patchChildren($node, $node.childNodes, newVTree.children)

@@ -1,10 +1,15 @@
+const _XML_NAMESPACES = {
+    svg: "http://www.w3.org/2000/svg"
+}
+
 /**
  * Renders Virtual DOM Node
  *
  * @param vNode
+ * @param xmlns
  * @returns {Text|HTMLElement}
  */
-export function vdom_render(vNode) {
+export function vdom_render(vNode, xmlns = null) {
     if (!vNode || typeof vNode === "undefined") {
         return document.createTextNode(vNode)
     }
@@ -29,7 +34,17 @@ export function vdom_render(vNode) {
     if (vNode.options && Object.keys(vNode.options) > 0) {
         $node = document.createElement(vNode.tagName, options)
     } else {
-        $node = document.createElement(vNode.tagName)
+        if (vNode.attrs.xmlns) {
+            xmlns = vNode.attrs.xmlns
+            $node = document.createElementNS(xmlns, vNode.tagName)
+        } else if (_XML_NAMESPACES.hasOwnProperty(vNode.tagName)) {
+            xmlns = _XML_NAMESPACES[vNode.tagName]
+            $node = document.createElementNS(xmlns, vNode.tagName)
+        } else if (xmlns) {
+            $node = document.createElementNS(xmlns, vNode.tagName)
+        } else {
+            $node = document.createElement(vNode.tagName)
+        }
     }
 
     // check if innerHTML should be set
@@ -64,7 +79,7 @@ export function vdom_render(vNode) {
 
     // append children
     for (const child of vNode.children) {
-        $node.appendChild(vdom_render(child))
+        $node.appendChild(vdom_render(child, xmlns))
     }
 
     return $node
