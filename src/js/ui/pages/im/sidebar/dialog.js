@@ -1,41 +1,47 @@
 import {AppFramework} from "../../../framework/framework"
 import VDOM from "../../../framework/vdom"
+import {UserDialog} from "../../../../dataObjects/userDialog";
+import {Dialog} from "../../../../dataObjects/dialog";
 
-function openDialog(peer) {
+function openDialog(dialog) {
     return () => AppFramework.Router.push("/", {
         queryParams: {
-            p: `${peer._}.${peer.id}`
+            p: dialog instanceof Dialog ? `${dialog.type}.${dialog.id}` : dialog
         }
     })
 }
 
-export function UICreateDialog(dialog, peer) {
+export function UICreateDialog(dialog) {
+    console.log("UICreateDialog")
     const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.unreadCount > 0 ? dialog.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
     let personClasses = ["person", "rp"]
-    if (dialog.online) personClasses.push("online")
+    if (dialog instanceof UserDialog && dialog.onlineStatus.online) personClasses.push("online")
     if (unread !== "") personClasses.push("unread")
     if (dialog.muted) personClasses.push("muted")
-    if(dialog.out) {
+    if(dialog.lastMessage.isOut) {
         personClasses.push("sent")
 
-        if (dialog.read) personClasses.push("read")
+        if (dialog.lastMessage.isRead) personClasses.push("read")
     }
 
+    let hasAvatar = dialog.hasAvatar && dialog._avatar !== undefined
+    console.log(dialog, hasAvatar)
+
     return VDOM.render(
-        <div data-peer={`${dialog.peer._}.${dialog.peer.id}`}
-             data-message-id={dialog.message.id}
+        <div data-peer={`${dialog.type}.${dialog.id}`}
+             data-message-id={dialog.lastMessage.id}
              className={personClasses}
-             onClick={openDialog(dialog.peer)}>
-            <div className={"avatar " + (!peer.photo ? `placeholder-${peer.photoPlaceholder.num}` : "")}
-                 style={`background-image: url(${peer.photo});`}>
-                {!peer.photo ? peer.photoPlaceholder.text : ""}
+             onClick={openDialog(dialog)}>
+            <div className={"avatar " + (!hasAvatar ? `placeholder-${dialog.avatarLetter.num}` : "")}
+                 style={`background-image: url(${dialog._avatar});`}>
+                {!hasAvatar ? dialog.avatarLetter.text : ""}
             </div>
             <div className="content">
                 <div className="top">
-                    <div className="title">{dialog.title}</div>
+                    <div className="title">{dialog.peerName}</div>
                     <div className="status tgico"/>
-                    <div className="time">{new Date(dialog.message.date).toLocaleTimeString('en', {
+                    <div className="time">{dialog.lastMessage.getDate('en', {
                         hour: '2-digit',
                         minute: '2-digit',
                         hour12: false
@@ -43,7 +49,7 @@ export function UICreateDialog(dialog, peer) {
                 </div>
                 <div className="bottom">
                     <div className="message"><span
-                        className="sender">{dialog.message.sender}</span>{dialog.message.text}
+                        className="sender">{dialog.lastMessage.prefix}</span>{dialog.lastMessage.text}
                     </div>
                     <div className="badge tgico">{unread}</div>
                 </div>

@@ -68,43 +68,41 @@ function handlePeerUpdates(event) {
 }
 
 function renderDialog(dialog, pinned = false) {
-    const __ = `${dialog.peer._}.${dialog.peer.id}`
-
-    const peer = PeersManager.find(dialog.peer._, dialog.peer.id)
+    const __ = `${dialog.type}.${dialog.id}`
 
     if (pinned) {
         if (__rendered_pinned.has(__)) {
-            const $dialog = $dialogsPinned.querySelector(`[data-peer="${dialog.peer._}.${dialog.peer.id}"]`)
+            const $dialog = $dialogsPinned.querySelector(`[data-peer="${__}"]`)
 
             if ($dialog) {
-                if (Number($dialog.dataset.messageId) < dialog.message.id) {
+                if (Number($dialog.dataset.messageId) < dialog.lastMessage.id) {
                     $dialogsPinned.prepend($dialog)
                 }
                 // fix this later!!
-                $dialog.replaceWith(UICreateDialog(dialog, peer))
+                $dialog.replaceWith(UICreateDialog(dialog))
             } else {
                 console.warn("dialog is not on the page")
             }
         } else {
             __rendered_pinned.add(__)
-            $dialogsPinned.appendChild(UICreateDialog(dialog, peer))
+            $dialogsPinned.appendChild(UICreateDialog(dialog))
         }
     } else {
         if (__rendered.has(__)) {
-            const $dialog = $dialogs.querySelector(`[data-peer="${dialog.peer._}.${dialog.peer.id}"]`)
+            const $dialog = $dialogs.querySelector(`[data-peer="${__}"]`)
 
             if ($dialog) {
-                if (Number($dialog.dataset.messageId) < dialog.message.id) {
+                if (Number($dialog.dataset.messageId) < dialog.lastMessage.id) {
                     $dialogs.prepend($dialog)
                 }
                 // fix this later!!
-                $dialog.replaceWith(UICreateDialog(dialog, peer))
+                $dialog.replaceWith(UICreateDialog(dialog))
             } else {
                 console.warn("dialog is not on the page")
             }
         } else {
             __rendered.add(__)
-            $dialogs.appendChild(UICreateDialog(dialog, peer))
+            $dialogs.appendChild(UICreateDialog(dialog))
         }
     }
 }

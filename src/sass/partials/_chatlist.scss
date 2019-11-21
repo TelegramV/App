@@ -101,6 +101,7 @@
         justify-content: center;
         color: white;
         font-size: 1.3em;
+        transition: anim(background-image);
 
         &.placeholder-0 {
             background-color: #cc90e2;

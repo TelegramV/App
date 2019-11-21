@@ -6,6 +6,11 @@ import {generateDialogIndex, getMessageLocalID} from "./messageIdManager"
 import {getMessagePreviewDialog} from "../../ui/utils"
 import PeersManager from "../peers/peersManager"
 import {FileAPI} from "../fileAPI"
+import {BotDialog} from "../../dataObjects/botDialog";
+import {UserDialog} from "../../dataObjects/userDialog";
+import {SupergroupDialog} from "../../dataObjects/supergroupDialog";
+import {ChannelDialog} from "../../dataObjects/channelDialog";
+import {GroupDialog} from "../../dataObjects/groupDialog";
 
 window.pushDialog = function () {
     let newd = $dialogs[nextRandomInt($dialogs.length)]
@@ -76,17 +81,37 @@ function fetchDialogs({
             return
         }
 
-        const pinnedDialogsToPush = []
-        const dialogsToPush = []
+        const dialogs = dialogsSlice.dialogs.map(dialog => {
+            const keys = {
+                peerUser: "user_id",
+                peerChannel: "channel_id",
+                peerChat: "chat_id"
+            }
+            const key = keys[dialog.peer._]
+            const peer = (dialog.peer._ === "peerUser" ? dialogsSlice.users : dialogsSlice.chats).find(l => l.id === dialog.peer[key])
+            const lastMessage = dialogsSlice.messages.find(l => l.id === dialog.top_message)
+            let type
+            if(dialog.peer._ === "peerUser") {
+                if(peer.pFlags.bot) {
+                    type = BotDialog
+                } else {
+                    type = UserDialog
+                }
+            } else if(dialog.peer._ === "peerChannel") {
+                if(peer.pFlags.megagroup) {
+                    type = SupergroupDialog
+                } else {
+                    type = ChannelDialog
+                }
+            } else if(dialog.peer._ === "peerChat") {
+                type = GroupDialog
+            }
 
-        for (let dialog of dialogsSlice.dialogs) {
-            const pinned = dialog.pFlags.hasOwnProperty("pinned") ? dialog.pFlags.pinned : false
+            return new (type)(dialog, peer, lastMessage)
+        })
 
-            const peer = findPeerFromDialog(dialog, dialogsSlice)
-            let peerName = getPeerName(peer)
-
-            const message = findMessageFromDialog(dialog, dialogsSlice)
-            const messageUser = findUserFromMessage(message, dialogsSlice)
+        console.log(dialogs)
+        /*dialogs.forEach(dialog => {
             let messageUsername = `${getPeerName(messageUser, false)}`
             let messageSelf = messageUser ? messageUser.id === peer.id : false
 
@@ -136,7 +161,9 @@ function fetchDialogs({
             }
 
             PeersManager.set(peer)
-        }
+        })*/
+        const dialogsToPush = dialogs.filter(l => !l.pinned)
+        const pinnedDialogsToPush = dialogs.filter(l => l.pinned)
 
         $pinnedDialogs.push(...pinnedDialogsToPush)
         $dialogs.push(...dialogsToPush)
@@ -149,6 +176,18 @@ function fetchDialogs({
             dialogs: dialogsToPush,
             pinnedDialogs: pinnedDialogsToPush,
         })
+
+
+        dialogs.forEach(l => {
+            l.getAvatar().then(_ => {
+                console.log("got avatar", l)
+                resolveListeners({
+                    type: "updateSingle",
+                    dialog: l
+                })
+            })
+        })
+
     })
 
 }
@@ -165,21 +204,6 @@ export function fetchNextPage({limit = 20}) {
     }
 
     return fetchDialogs(data)
-}
-
-function fetchPhoto(peer, props = {}) {
-    let photoSmall = peer.photo.photo_small
-    try {
-        FileAPI.getPeerPhoto(photoSmall, peer.photo.dc_id, peer, false).then(url => {
-            updateSingle(peer, {
-                photo: url
-            }, props)
-        }).catch(e => {
-
-        })
-    } catch (e) {
-        console.log(e)
-    }
 }
 
 function updateSingle(peer, data, props = {}) {
