@@ -80,11 +80,13 @@ function vMessageWithTextOnlyTemplate(data) {
     </Message>
 }
 
+
 const MessageMediaImage = ({src, size, alt = "", isThumb}) => {
+    let width = isThumb ? Number(size[0]) >= 460 ? "460px" : `${size[0]}px` : Number(size[0]) >= 480 ? "480px" : `${size[0]}px`
     return (
         <div>
             <img className={["attachment", isThumb ? "attachment-thumb" : ""]}
-                 css-width={Number(size[0]) >= 460 ? "460px" : `${size[0]}px`}
+                 css-width={width}
                  src={src}
                  alt={alt}/>
         </div>

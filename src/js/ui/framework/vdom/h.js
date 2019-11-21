@@ -2,6 +2,9 @@
  * Creates Virtual Node
  *
  * Components:
+ *
+ * A component is simply a function that passes attributes as parameters and returns virtual node.
+ *
  * - simple component:
  *   {@code
  *      const Component = ({someProperty}) => {

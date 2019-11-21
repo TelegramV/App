@@ -1,3 +1,5 @@
+// DEPRECATED
+
 import VDOM from "./index"
 
 function zip(xs, ys) {
