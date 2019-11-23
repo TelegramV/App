@@ -26,6 +26,7 @@ export function UICreateDialog(dialog) {
     }
 
     let hasAvatar = peer.hasAvatar && peer._avatar !== undefined
+    console.log(Object.keys(dialog.messageActions).length)
 
     return (
         <div data-peer={`${dialog.type}.${dialog.id}`}
@@ -46,8 +47,14 @@ export function UICreateDialog(dialog) {
                     })}</div>
                 </div>
                 <div className="bottom">
-                    <div className="message"><span
-                        className="sender">{dialog.lastMessage.prefix}</span>{dialog.lastMessage.text}
+                    <div className="message">
+                        {
+                            Object.keys(dialog.messageActions).length === 0 ?
+                                (<span className="sender">{dialog.lastMessage.prefix}</span>)
+                                :
+                                (<span className="sender">typing...</span>)
+                        }
+                        {Object.keys(dialog.messageActions).length === 0 ? dialog.lastMessage.text : ""}
                     </div>
                     <div className="badge tgico">{unread}</div>
                 </div>

@@ -11,6 +11,7 @@ import {UserPeer} from "../../dataObjects/userPeer";
 import {SupergroupPeer} from "../../dataObjects/supergroupPeer";
 import {GroupPeer} from "../../dataObjects/groupPeer";
 import {ChannelPeer} from "../../dataObjects/channelPeer";
+import {Peer} from "../../dataObjects/peer";
 
 class DialogManager extends Manager {
     constructor() {
@@ -45,24 +46,44 @@ class DialogManager extends Manager {
                     })
                 }
             } else if(update._ === "updateChatUserTyping") {
-                console.log(update)
                 const dialog = this.find("chat", update.chat_id) || this.find("channel", update.chat_id)
 
-                if(!dialog) {
+                if (!dialog) {
                     return; // prob should download the chat
                 }
 
-                const peer = PeersManager.find("user", update.user_id)
-                if(!peer) {
+                let peer = PeersManager.find("user", update.user_id)
+                if (!peer) {
                     await this.updateChatFull(dialog)
-                    console.log("updateChatFull")
+
+                    peer = PeersManager.find("user", update.user_id)
+                    if (!peer) {
+                        return
+                    }
                 }
-                if(dialog && peer) {
-                    console.log(peer.peerName)
-                } else {
-                    console.error("update chat type", dialog, peer, update)
+                if (dialog && peer) {
+                    dialog.addMessageAction(peer, update.action)
+                    this.resolveListeners({
+                        type: "updateSingle",
+                        dialog: dialog
+                    })
                 }
 
+            } else if(update._ === "updateUserTyping") {
+                console.log(update)
+                const dialog = this.find("user", update.user_id)
+
+                if (!dialog) {
+                    return; // prob should download the chat
+                }
+
+                if (dialog) {
+                    dialog.addMessageAction(dialog.peer, update.action)
+                    this.resolveListeners({
+                        type: "updateSingle",
+                        dialog: dialog
+                    })
+                }
             } else {
                 console.log("Short", update)
             }
@@ -183,9 +204,11 @@ class DialogManager extends Manager {
         if(dialog.type === "channel") return this.updateChannelFull(dialog)
 
         return MTProto.invokeMethod( "messages.getFullChat", {
-            chat_id: getInputPeerFromPeer("chat", dialog.id)
+            chat_id: dialog.id
         }).then(l => {
-
+            l.users.forEach(q => {
+                PeersManager.set(getPeerObject(q))
+            })
             if(dialog instanceof GroupPeer) {
                 console.log("GroupPeer", l)
             }
@@ -196,8 +219,9 @@ class DialogManager extends Manager {
         return MTProto.invokeMethod("channels.getFullChannel", {
             channel: getInputPeerFromPeer("channel", dialog.id, dialog.peer.peer.access_hash)
         }).then(l => {
-            console.log(l)
-
+            l.users.forEach(q => {
+                PeersManager.set(getPeerObject(q))
+            })
             if(dialog instanceof ChannelPeer) {
                 console.log("ChannelPeer", l)
             } else if(dialog instanceof SupergroupPeer) {
