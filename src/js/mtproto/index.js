@@ -59,7 +59,7 @@ class MobileProtocolAPIAuth {
 }
 
 function initManagers() {
-    // DialogsManager
+    DialogsManager.init()
     // PeersManager.init()
 }
 

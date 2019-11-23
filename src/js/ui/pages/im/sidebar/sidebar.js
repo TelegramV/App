@@ -45,6 +45,7 @@ function handleDialogUpdates(event) {
         event.dialogs.forEach(dialog => {
             renderDialog(dialog, false)
         })
+
     } else if (event.type === "updateSingle") {
         renderDialog(event.dialog, event.dialog.pinned)
     } else {
@@ -53,7 +54,22 @@ function handleDialogUpdates(event) {
 }
 
 function handlePeerUpdates(event) {
-    {
+    if (event.type === "updatePhoto") {
+        const $dialogAvatar = $dialogsWrapper.querySelector(`[data-peer="${event.peer.type}.${event.peer.id}"]>.avatar`)
+
+        if ($dialogAvatar) {
+            if (event.peer._avatar) {
+                $dialogAvatar.setAttribute("class", "avatar")
+                $dialogAvatar.style = `background-image: url(${event.peer._avatar})`
+                $dialogAvatar.innerHTML = ""
+            } else {
+                $dialogAvatar.setAttribute("class", "avatar " + `placeholder-${event.peer.avatarLetter.num}`)
+                $dialogAvatar.innerHTML = event.peer.avatarLetter.text
+            }
+        } else {
+            console.warn("dialogAvatar is not on the page")
+        }
+    } else {
         Logger.log("PeerUpdates", event)
     }
 }

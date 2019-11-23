@@ -56,12 +56,7 @@ export class PeerManager extends Manager {
                 this.peers[peer.type] = {}
             }
 
-            peer.getAvatar().then(url => {
-                this.resolveListeners({
-                    type: "updatePhoto",
-                    peer: peer
-                })
-            }).catch(l => {
+            peer.getAvatar().catch(l => {
                 this.resolveListeners({
                     type: "updatePhoto",
                     peer: peer

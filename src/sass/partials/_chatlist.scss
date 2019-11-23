@@ -69,7 +69,24 @@
     right: 1px;
     border-radius: 50%;
     border: 2px solid #fff;
-    transition: anim(border);
+    transition: anim(transform);
+    transform: scale(1);
+  }
+}
+
+.person:not(.online) {
+  .avatar:before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background-color: $dotgreen;
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    transform: scale(0);
+    transition: anim(transform);
   }
 }
 

@@ -17,24 +17,24 @@ export class UserPeer extends Peer {
     }
 
     get onlineStatus() {
-        if(this.deleted) {
+        if(this.deleted || !this.peer.status._) {
             return {
                 online: false,
                 status: "a long time ago"
             }
         }
         const now = tsNow(true)
-        Logger.debug("onlineStatus", this.peer)
+        // Logger.debug("onlineStatus", this.peer)
         switch (this.peer.status._) {
             case "userStatusOnline":
-                if(this.peer.status.expires < now)
-                    return {
-                        online: true
-                    }
+                // if(this.peer.status.expires < now)
                 return {
-                    online: false,
-                    status: getLastSeenMessage(this.peer.status.expires, now)
+                    online: true
                 }
+                // return {
+                //     online: false,
+                //     status: getLastSeenMessage(this.peer.status.expires, now)
+                // }
             case "userStatusLastWeek":
                 return {
                     online: false,

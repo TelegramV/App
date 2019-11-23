@@ -270,7 +270,7 @@ export class ApiNetworker extends Networker {
 
             serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, 'invokeWithLayer')
             serializer.storeInt(AppConfiguration.mtproto.api.layer, 'layer')
-            if(!this.updates) {
+            if(this.updates === false) {
                 serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
             }
             serializer.storeInt(AppConfiguration.mtproto.api.initConnection, 'initConnection')

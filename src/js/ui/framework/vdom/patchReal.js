@@ -98,7 +98,6 @@ export function vdom_patchReal($node, newVNode) {
         return $newNode
     }
 
-    console.log($node, newVNode)
     if ($node.nodeType === Node.TEXT_NODE) {
         if ($node.wholeText !== newVNode) {
             const $newNode = VDOM.render(newVNode)

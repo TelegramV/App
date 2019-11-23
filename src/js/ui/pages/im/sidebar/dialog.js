@@ -17,7 +17,10 @@ export function UICreateDialog(dialog) {
     const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.unreadCount > 0 ? dialog.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
     let personClasses = ["person", "rp"]
-    if (peer instanceof UserPeer && peer.onlineStatus.online) personClasses.push("online")
+    if (peer instanceof UserPeer && peer.onlineStatus.online) {
+        console.log("isOnline", peer.onlineStatus.online)
+        personClasses.push("online")
+    }
     if (unread !== "") personClasses.push("unread")
     if (dialog.muted) personClasses.push("muted")
     if(dialog.lastMessage.isOut) {

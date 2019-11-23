@@ -7,6 +7,7 @@ import PeersManager from "../peers/peersManager"
 import {Dialog} from "../../dataObjects/dialog";
 import {getPeerObject} from "../../dataObjects/peerFactory";
 import {Manager} from "../manager";
+import {UserPeer} from "../../dataObjects/userPeer";
 
 class DialogManager extends Manager {
     constructor() {
@@ -19,6 +20,29 @@ class DialogManager extends Manager {
         this.latestDialog = undefined
         this.dialogsOffsetDate = 0 // TODO
         this.offsetDate = 0
+    }
+
+    init() {
+        MTProto.MessageProcessor.listenUpdateShortMessage(update => {
+            // console.log("ShortMessage", update)
+        })
+        MTProto.MessageProcessor.listenUpdateNewChannelMessage(update => {
+            // console.log("NewChannelMessage", update)
+        })
+        MTProto.MessageProcessor.listenUpdateShort(update => {
+            // console.log("Short", update)
+
+            if(update._ === "updateUserStatus") {
+                const dialog = this.find("user", update.user_id)
+                if(dialog && dialog.peer instanceof UserPeer) {
+                    dialog.peer.peer.status = update.status
+                    this.resolveListeners({
+                        type: "updateSingle",
+                        dialog: dialog
+                    })
+                }
+            }
+        })
     }
 
     fetchNextPage({limit = 20}) {
@@ -124,12 +148,7 @@ class DialogManager extends Manager {
 
 
             dialogsToPush.forEach(l => {
-                l.peer.getAvatar().then(_ => {
-                    this.resolveListeners( {
-                        type: "updateSingle",
-                        dialog: l
-                    })
-                })
+                l.peer.getAvatar()
             })
 
         })
@@ -138,32 +157,3 @@ class DialogManager extends Manager {
 }
 
 export default new DialogManager()
-
-
-
-
-
-function init() {
-    /*MTProto.MessageProcessor.listenUpdateShortMessage(update => {
-        const messageUser = PeersManager.find("user", update.user_id)
-        let messageUsername = `${getPeerName(messageUser, false)}`
-        let messageSelf = messageUser ? messageUser.id === update.user_id : false
-
-        const message = update
-
-        const submsg = message.message ? (message.message.length > 16 ? (message.message.substring(0, 16) + "...") : message.message) : ""
-        const date = new Date(message.date * 1000)
-
-        const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
-
-        updateSingle({_: "user", id: message.user_id} , {
-            message: {
-                sender: messageUsername + msgPrefix,
-                text: submsg,
-                self: messageSelf,
-                date: date,
-                id: message.id,
-            }
-        })
-    })*/
-}
