@@ -98,6 +98,14 @@ export function vdom_patchReal($node, newVNode) {
         return $newNode
     }
 
+    if (typeof newVNode !== "object" && typeof newVNode !== "function") {
+        if ($node.nodeType !== Node.TEXT_NODE || $node.wholeText !== newVNode) {
+            const $newNode = VDOM.render(newVNode)
+            $node.replaceWith($newNode)
+            return $newNode
+        }
+    }
+
     if ($node.nodeType === Node.TEXT_NODE) {
         if ($node.wholeText !== newVNode) {
             const $newNode = VDOM.render(newVNode)
