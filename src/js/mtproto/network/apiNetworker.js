@@ -21,7 +21,7 @@ import {Networker} from "./networker";
 import AppCryptoManager from "../crypto/cryptoManager";
 
 const Logger = createLogger("ApiNetworker", {
-    level: "warn"
+    level: "debug"
 })
 
 export class ApiNetworker extends Networker {

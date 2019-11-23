@@ -12,13 +12,11 @@ function openDialog(dialog) {
 }
 
 export function UICreateDialog(dialog) {
-    if(dialog.id == "484725047") console.log("ui create dialog", dialog)
     const peer = dialog.peer
     const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.unreadCount > 0 ? dialog.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
     let personClasses = ["person", "rp"]
     if (peer instanceof UserPeer && peer.onlineStatus.online) {
-        console.log("isOnline", peer.onlineStatus.online)
         personClasses.push("online")
     }
     if (unread !== "") personClasses.push("unread")

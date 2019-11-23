@@ -12,6 +12,12 @@ import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import {Networker} from "./network/networker"
 
+window.id = 202466030
+window.send = (method, params) => {
+    MTProto.invokeMethod(method, params).then(l => {
+        console.log(l)
+    })
+}
 class MobileProtocolAPIAuth {
     constructor(options = {}) {
         if (!options.MTProto) {

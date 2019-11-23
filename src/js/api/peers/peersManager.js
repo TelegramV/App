@@ -1,10 +1,11 @@
 import {arrayDelete} from "../../common/utils/utils"
 import {FileAPI} from "../fileAPI"
-import {getPeerName} from "../dialogs/util"
+import {getInputPeerFromPeer, getPeerName, getPeersInput} from "../dialogs/util"
 import {MTProto} from "../../mtproto"
 import {Peer} from "../../dataObjects/peer";
 import {Manager} from "../manager";
 import {createLogger} from "../../common/logger";
+import {getPeerObject} from "../../dataObjects/peerFactory";
 
 const Logger = createLogger("PeerManager")
 
@@ -24,10 +25,6 @@ export class PeerManager extends Manager {
     }
 
     find(name, id) {
-        if (!this.peers[name]) {
-            return null
-        }
-
         return this.peers[name][id]
     }
 

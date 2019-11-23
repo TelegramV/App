@@ -18,6 +18,7 @@ export class Dialog {
         this._lastMessage = new Message(this, lastMessage) // todo factory?
         // TODO move lastMessage to messages
         this._messages = {}
+        this.messageActions = {}
     }
 
     get dialog() {
@@ -34,6 +35,18 @@ export class Dialog {
 
     get pinned() {
         return this.dialog.pFlags.pinned
+    }
+
+    get messageAction() {
+        return this.messageActions
+    }
+
+    addMessageAction(user, action) {
+        this.messageActions[user] = action
+    }
+
+    removeMessageAction(user) {
+        delete this.messageActions[user]
     }
 
     setPinned(pinned) {

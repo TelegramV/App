@@ -8,6 +8,9 @@ import {Dialog} from "../../dataObjects/dialog";
 import {getPeerObject} from "../../dataObjects/peerFactory";
 import {Manager} from "../manager";
 import {UserPeer} from "../../dataObjects/userPeer";
+import {SupergroupPeer} from "../../dataObjects/supergroupPeer";
+import {GroupPeer} from "../../dataObjects/groupPeer";
+import {ChannelPeer} from "../../dataObjects/channelPeer";
 
 class DialogManager extends Manager {
     constructor() {
@@ -24,23 +27,44 @@ class DialogManager extends Manager {
 
     init() {
         MTProto.MessageProcessor.listenUpdateShortMessage(update => {
-            // console.log("ShortMessage", update)
+            console.log("ShortMessage", update)
         })
         MTProto.MessageProcessor.listenUpdateNewChannelMessage(update => {
             // console.log("NewChannelMessage", update)
         })
-        MTProto.MessageProcessor.listenUpdateShort(update => {
-            // console.log("Short", update)
+        MTProto.MessageProcessor.listenUpdateShort(async update => {
 
             if(update._ === "updateUserStatus") {
                 const dialog = this.find("user", update.user_id)
-                if(dialog && dialog.peer instanceof UserPeer) {
+
+                if (dialog && dialog.peer instanceof UserPeer) {
                     dialog.peer.peer.status = update.status
                     this.resolveListeners({
                         type: "updateSingle",
                         dialog: dialog
                     })
                 }
+            } else if(update._ === "updateChatUserTyping") {
+                console.log(update)
+                const dialog = this.find("chat", update.chat_id) || this.find("channel", update.chat_id)
+
+                if(!dialog) {
+                    return; // prob should download the chat
+                }
+
+                const peer = PeersManager.find("user", update.user_id)
+                if(!peer) {
+                    await this.updateChatFull(dialog)
+                    console.log("updateChatFull")
+                }
+                if(dialog && peer) {
+                    console.log(peer.peerName)
+                } else {
+                    console.error("update chat type", dialog, peer, update)
+                }
+
+            } else {
+                console.log("Short", update)
             }
         })
     }
@@ -153,6 +177,33 @@ class DialogManager extends Manager {
 
         })
 
+    }
+
+    updateChatFull(dialog) {
+        if(dialog.type === "channel") return this.updateChannelFull(dialog)
+
+        return MTProto.invokeMethod( "messages.getFullChat", {
+            chat_id: getInputPeerFromPeer("chat", dialog.id)
+        }).then(l => {
+
+            if(dialog instanceof GroupPeer) {
+                console.log("GroupPeer", l)
+            }
+        })
+    }
+
+    updateChannelFull(dialog) {
+        return MTProto.invokeMethod("channels.getFullChannel", {
+            channel: getInputPeerFromPeer("channel", dialog.id, dialog.peer.peer.access_hash)
+        }).then(l => {
+            console.log(l)
+
+            if(dialog instanceof ChannelPeer) {
+                console.log("ChannelPeer", l)
+            } else if(dialog instanceof SupergroupPeer) {
+                console.log("SupergroupPeer", l)
+            }
+        })
     }
 }
 
