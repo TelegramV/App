@@ -40,9 +40,20 @@
  *      )
  *   }
  *
+ * - named component:
+ *   {@code
+ *      const NamedComponent = {
+ *          name: "named-component",
+ *          h({someProperty}) {
+ *              return <h1>{someProperty}</h1>
+ *          }
+ *      }
+ *
+ *      // ...
+ *   }
+ *
  * @param tagName
  * @param attrs element attributes
- * @param constructor used when passed {@link HTMLElement} instance
  * @param options passed when creating element by using {@code document.createElement(tagName, options)}
  * @param events
  * @param children
@@ -50,22 +61,27 @@
  * @returns {any}
  */
 export function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], dangerouslySetInnerHTML = false} = {}) {
-    const vElem = Object.create(null);
+    const vElem = Object.create(null)
 
     // component
     if (typeof tagName === "function") {
         return tagName(Object.assign(attrs, {slot: children}))
     }
 
+    // named component
+    if (typeof tagName === "object" && tagName.hasOwnProperty("name") && tagName.hasOwnProperty("h")) {
+        const vNode = tagName.h(Object.assign(attrs, {slot: children}))
+        vNode.attrs["data-component"] = tagName.name
+        return vNode
+    }
+
     if (tagName === "a" && !attrs.target) {
         attrs.target = "_blank"
     }
-    // console.warn(tagName)
 
     Object.assign(vElem, {
         tagName,
         attrs,
-        constructor,
         options,
         events,
         children,

@@ -52,19 +52,19 @@ export default class Voice {
 
     asJSX() {
         return (<div class="audio">
-            <div class="play"></div>
+            <div class="play"/>
             <div class="audio-wrapper">
-                <svg style={"width:"+this.width+"px; transform: scale(1,-1)"}>
+                <svg css-width={`${this.width}px`} css-transform="scale(1,-1)">
                     <defs>
                         <mask id="bars">
                             {this._generateBars()}
                         </mask>
                     </defs>
-                    <rect x="0" y="0" width={this.width+"px"} height="100%" fill="grey" mask="url(#bars)"/>
-                    <rect x="0" y="0" width={this.width+"px"} height="100%" fill="green" mask="url(#bars)"/>
+                    <rect x="0" y="0" width={this.width + "px"} height="100%" fill="grey" mask="url(#bars)"/>
+                    <rect x="0" y="0" width={this.width + "px"} height="100%" fill="green" mask="url(#bars)"/>
                 </svg>
                 <div class="timer">
-                {this._timeToFormat(this.audio.duration)}
+                    {this._timeToFormat(this.audio.duration)}
                 </div>
             </div>
         </div>);
@@ -171,7 +171,11 @@ export default class Voice {
     }
 
     _newBar(x, width, height) {
-        return <rect x={x+"px"} rx={this.barWidth+"px"} ry={this.barWidth+"px"} width={width+"px"} height={height} fill="white"/>
+        return <rect x={x + "px"}
+                     rx={this.barWidth + "px"}
+                     ry={this.barWidth + "px"}
+                     width={width + "px"}
+                     height={height} fill="white"/>
     }
 
     _newRect(x, y, width, height) {
