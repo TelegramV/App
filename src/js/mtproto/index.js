@@ -7,7 +7,6 @@ import {AppPermanentStorage} from "../common/storage"
 import {AuthAPI} from "../api/auth";
 import {sendReqPQ} from "./connect/methods";
 import PeersManager from "../api/peers/peersManager"
-import MessagesManager from "../api/messages/messagesManager"
 import DialogsManager from "../api/dialogs/dialogsManager"
 import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
@@ -60,9 +59,8 @@ class MobileProtocolAPIAuth {
 }
 
 function initManagers() {
-    DialogsManager.init()
-    PeersManager.init()
-    MessagesManager.init()
+    // DialogsManager
+    // PeersManager.init()
 }
 
 class MobileProtocol {
@@ -127,7 +125,7 @@ class MobileProtocol {
     async createFileNetworker(dcID) {
         if (AppPermanentStorage.exists("authKey" + dcID)) {
             // i changed it to MTProtoNetworker cause Networker does not have `invokeMethod` function @undrfined
-            const networker = new MTProtoNetworker({
+            const networker = new ApiNetworker({
                 dcID: dcID,
                 nonce: createNonce(16),
                 sessionID: createNonce(8), // TODO check if secure?
@@ -151,8 +149,9 @@ class MobileProtocol {
         }
 
         return new Promise(resolve => {
-            sendReqPQ(authContext, e => {
-                const networker = new Networker(authContext)
+            const mtprotoNetworker = new MTProtoNetworker(authContext)
+            sendReqPQ(mtprotoNetworker).then(response => {
+                const networker = new ApiNetworker(authContext)
 
                 const list = this.fileNetworkers[dcID]
                 this.fileNetworkers[dcID] = networker
@@ -171,7 +170,7 @@ class MobileProtocol {
 
                     resolve(networker)
                 })
-            }, this)
+            })
         })
     }
 

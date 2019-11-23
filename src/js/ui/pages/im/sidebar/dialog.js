@@ -1,22 +1,22 @@
 import {AppFramework} from "../../../framework/framework"
 import VDOM from "../../../framework/vdom"
-import {UserDialog} from "../../../../dataObjects/userDialog";
+import {UserPeer} from "../../../../dataObjects/userPeer";
 import {Dialog} from "../../../../dataObjects/dialog";
 
 function openDialog(dialog) {
     return () => AppFramework.Router.push("/", {
         queryParams: {
-            p: dialog instanceof Dialog ? `${dialog.type}.${dialog.id}` : dialog
+            p: `${dialog.type}.${dialog.id}`
         }
     })
 }
 
 export function UICreateDialog(dialog) {
-    console.log("UICreateDialog")
+    const peer = dialog.peer
     const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.unreadCount > 0 ? dialog.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
     let personClasses = ["person", "rp"]
-    if (dialog instanceof UserDialog && dialog.onlineStatus.online) personClasses.push("online")
+    if (peer instanceof UserPeer && peer.onlineStatus.online) personClasses.push("online")
     if (unread !== "") personClasses.push("unread")
     if (dialog.muted) personClasses.push("muted")
     if(dialog.lastMessage.isOut) {
@@ -26,20 +26,19 @@ export function UICreateDialog(dialog) {
     }
 
     let hasAvatar = dialog.hasAvatar && dialog._avatar !== undefined
-    console.log(dialog, hasAvatar)
 
     return VDOM.render(
         <div data-peer={`${dialog.type}.${dialog.id}`}
              data-message-id={dialog.lastMessage.id}
              className={personClasses}
              onClick={openDialog(dialog)}>
-            <div className={"avatar " + (!hasAvatar ? `placeholder-${dialog.avatarLetter.num}` : "")}
-                 style={`background-image: url(${dialog._avatar});`}>
-                {!hasAvatar ? dialog.avatarLetter.text : ""}
+            <div className={"avatar " + (!hasAvatar ? `placeholder-${peer.avatarLetter.num}` : "")}
+                 style={`background-image: url(${peer._avatar});`}>
+                {!hasAvatar ? peer.avatarLetter.text : ""}
             </div>
             <div className="content">
                 <div className="top">
-                    <div className="title">{dialog.peerName}</div>
+                    <div className="title">{peer.peerName}</div>
                     <div className="status tgico"/>
                     <div className="time">{dialog.lastMessage.getDate('en', {
                         hour: '2-digit',

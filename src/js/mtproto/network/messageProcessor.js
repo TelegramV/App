@@ -44,13 +44,13 @@ export class MessageProcessor {
     }
 
     processUpdateShort(message, messageID, sessionID) {
-        console.log(message)
+        //console.log(message)
         this.updateShortListeners.forEach(listener => listener(message.update))
         // Logger.log("Short update", message)
     }
 
     processUpdateShortMessage(message, messageID, sessionID) {
-        console.log(message)
+        //console.log(message)
         this.updateShortMessagesListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
@@ -63,7 +63,7 @@ export class MessageProcessor {
 
 
     processUpdateNewChannelMessage(message, messageID, sessionID) {
-        console.log(message)
+        //console.log(message)
         this.updateNewChannelMessagesListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
@@ -73,7 +73,7 @@ export class MessageProcessor {
     }
 
     processUpdates(message, messageID, sessionID) {
-        console.log(message)
+        //console.log(message)
         message.users.forEach(user => PeersManager.set(user))
         message.chats.forEach(user => PeersManager.set(user))
 
@@ -81,7 +81,7 @@ export class MessageProcessor {
             if (this.handlers[update._]) {
                 this.handlers[update._](update)
             } else {
-                console.warn("unexprected update", update)
+                // console.warn("unexprected update", update)
             }
         })
     }

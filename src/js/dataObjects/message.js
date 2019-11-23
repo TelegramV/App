@@ -1,9 +1,12 @@
 import {getMessagePreviewDialog} from "../ui/utils";
+import PeersManager from "../api/peers/peersManager";
 
 export class Message {
     constructor(dialog, message) {
         this.dialog = dialog
         this._message = message
+        this.type = "text"
+        this.parseMessage()
     }
 
     get id() {
@@ -14,8 +17,14 @@ export class Message {
         return this._message.message
     }
 
+    get entities() {
+        return this._message.entities
+    }
+
     get from() {
-        return this._message.from_id
+        // TODO there's type of message when channel message is resent to chat
+        // should check it!
+        return PeersManager.find("user", this._message.from_id)
     }
 
     get to() {
@@ -27,7 +36,6 @@ export class Message {
     }
 
     get isRead() {
-        console.log(this.dialog, this.dialog.readOutbox, this.id, "isRead")
         return this.dialog.readOutbox >= this.id
     }
 
@@ -41,5 +49,14 @@ export class Message {
 
     getDate(locale, format) {
         return new Date(this.date * 1000).toLocaleString(locale, format)
+    }
+
+    parseMessage() {
+        const message = this._message
+        console.log(message)
+
+        if(message.media) {
+
+        }
     }
 }

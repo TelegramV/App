@@ -1,6 +1,6 @@
-import {UserDialog} from "./userDialog";
+import {UserPeer} from "./userPeer";
 
-export class BotDialog extends UserDialog {
+export class BotPeer extends UserPeer {
     get onlineStatus() {
         return {
             online: false,

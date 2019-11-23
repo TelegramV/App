@@ -2,32 +2,35 @@ import {AppFramework} from "../../../framework/framework"
 import VDOM from "../../../framework/vdom"
 import {create$loadingNode, vLoadingNode} from "../../../utils"
 import PeersManager from "../../../../api/peers/peersManager"
-import MessagesManager from "../../../../api/messages/messagesManager"
-import {getPeerName} from "../../../../api/dialogs/util"
 import {UICreateMessage} from "./message"
 import DialogsManager from "../../../../api/dialogs/dialogsManager"
+import {UserPeer} from "../../../../dataObjects/userPeer";
+import {ChannelPeer} from "../../../../dataObjects/channelPeer";
+import {GroupPeer} from "../../../../dataObjects/groupPeer";
+import {SupergroupPeer} from "../../../../dataObjects/supergroupPeer";
+import {BotPeer} from "../../../../dataObjects/botPeer";
 
 let $messagesElement = document.createElement("div")
-let _page_peer = null
+let _page_dialog = null
 let $sticky = []
 
 function get$bubbles() {
     return $messagesElement.querySelector("#bubbles-inner")
 }
 
-function onScrollMessages(peer) {
+function onScrollMessages() {
     return event => {
         const $element = event.target
 
         if ($element.scrollTop === 0) {
-            MessagesManager.fetchNextPage(peer)
+            _page_dialog.fetchNextPage()
         }
     }
 }
 
 
 function createStickyDate(message) {
-    const date = new Date(message.time)
+    const date = new Date(message.date)
 
     return VDOM.render(
         <div className="service date">
@@ -39,25 +42,35 @@ function createStickyDate(message) {
     )
 }
 
-function render(peer) {
+function render(dialog) {
+    const peer = dialog.peer
+    let status
+    if(peer instanceof UserPeer)
+        status = peer.onlineStatus.online ? "online" : "last seen " + peer.onlineStatus.status
+    else if(peer instanceof ChannelPeer)
+        status = "0 members"
+    else if(peer instanceof GroupPeer || peer instanceof SupergroupPeer)
+        status = "3 members, 2 online"
+    else if(peer instanceof BotPeer)
+        status = "bot"
     return VDOM.render(
         <div id="chat" data-peer={AppFramework.Router.activeRoute.queryParams.p}>
             <div id="topbar">
                 <div className="chat-info">
                     <div className="person">
                         <div id="messages-photo"
-                             className={"avatar " + (!peer.photo ? `placeholder-${peer.photoPlaceholder.num}` : "")}
-                             style={`background-image: url(${peer.photo});`}>
-                            {!peer.photo ? peer.photoPlaceholder.text[0] : ""}
+                             className={"avatar " + (!peer.hasAvatar ? `placeholder-${peer.avatarLetter.num}` : "")}
+                             style={`background-image: url(${peer._avatar});`}>
+                            {!peer.hasAvatar ? peer.avatarLetter.text[0] : ""}
                         </div>
                         <div className="content">
                             <div className="top">
                                 <div id="messages-title" className="title">
-                                    {getPeerName(peer)}
+                                    {peer.peerName}
                                 </div>
                             </div>
                             <div className="bottom">
-                                <div id="messages-online" className="info">{peer.online ? "online" : "offline"}</div>
+                                <div id="messages-online" className="info">{status}</div>
                             </div>
                         </div>
                     </div>
@@ -66,7 +79,7 @@ function render(peer) {
                 <div className="btn-icon rp rps tgico-search"/>
                 <div className="btn-icon rp rps tgico-more"/>
             </div>
-            <div id="bubbles" onScroll={onScrollMessages(peer)}>
+            <div id="bubbles" onScroll={onScrollMessages()}>
                 <div id="bubbles-inner">
                 </div>
             </div>
@@ -154,7 +167,7 @@ function prependMessages(messages) {
     }
 }
 
-function fetchNextPage(peer) {
+function fetchNextPage(dialog) {
     console.log("fetching new messages pages")
     const $bubblesInner = get$bubbles()
     $bubblesInner.appendChild(VDOM.render(
@@ -163,7 +176,7 @@ function fetchNextPage(peer) {
         </div>
     ))
 
-    MessagesManager.fetchNextPage(peer).then(() => {
+    dialog.fetchNextPage().then(() => {
         $bubblesInner.querySelector("#messagesLoadingNextPage").remove()
     })
 }
@@ -171,11 +184,14 @@ function fetchNextPage(peer) {
 function refetchMessages() {
     if (AppFramework.Router.activeRoute.queryParams.p) {
         const queryPeer = parseHashQuery()
-        _page_peer = PeersManager.find(queryPeer._, queryPeer.id)
+        _page_dialog = DialogsManager.find(queryPeer.type, queryPeer.id)
+        console.log("refetchMessages", _page_dialog)
+        if(!_page_dialog) return
 
         $messagesElement = VDOM.mount(create$loadingNode(), $messagesElement)
 
-        if (!_page_peer) {
+        // TODO fix that
+        /*if (!_page_peer) {
 
             PeersManager.listenPeerInit(queryPeer._, queryPeer.id, upcomePeer => {
                 _page_peer = upcomePeer
@@ -185,19 +201,19 @@ function refetchMessages() {
                 }
             })
 
-        } else {
-            if (MessagesManager.existForPeer(_page_peer)) {
-                rerender(_page_peer)
-                const all = MessagesManager.allForPeer(_page_peer)
+        } else */{
+            if (_page_dialog._messages.length > 1) {
+                rerender(_page_dialog)
+                const all = _page_dialog._messages.slice(0, 50)
                 appendMessages(all)
                 if (all.length < 20) {
-                    fetchNextPage(_page_peer)
+                    fetchNextPage(_page_dialog)
                 }
             } else {
-                if (_page_peer._ === queryPeer._ && _page_peer.id === queryPeer.id) {
-                    rerender(_page_peer)
-                    MessagesManager.fetchMessages(_page_peer)
-                }
+                rerender(_page_dialog)
+
+                _page_dialog.fetchMessages();
+                //MessagesManager.fetchMessages(_page_peer)
             }
         }
     } else {
@@ -207,16 +223,21 @@ function refetchMessages() {
     }
 }
 
+
 function handleMessageUpdates(event) {
+    // TODO change to variable check not router
     if (AppFramework.Router.activeRoute.queryParams.p) {
         const queryPeer = parseHashQuery()
-        if (event.peer._ === queryPeer._ && event.peer.id === queryPeer.id) {
+        if(event.type === "dialogLoaded" && !_page_dialog && event.dialog.id === queryPeer.id && event.dialog.type === queryPeer.type) {
+            refetchMessages()
+        }
+        if (event.dialog && event.dialog.type === queryPeer.type && event.dialog.id === queryPeer.id) {
             switch (event.type) {
-                case "updateMany":
+                case "updateManyMessages":
                     handleManyUpdate(event)
                     // console.log(event)
                     break
-                case "updateSingle":
+                case "updateSingleMessages":
                     handleSingleUpdate(event)
                     // console.log(event)
                     break
@@ -261,9 +282,10 @@ function parseHashQuery() {
         throw Error("invalid peer")
     }
 
-    return {_: queryPeer[0], id: Number(queryPeer[1])}
+    return {type: queryPeer[0], id: Number(queryPeer[1])}
 }
-
+// TODO fix
+/*
 function handleDialogUpdates(event) {
     if (event.type === "updateSingle") {
         if (AppFramework.Router.activeRoute.queryParams.p) {
@@ -301,7 +323,7 @@ function handleDialogUpdates(event) {
             }
         }
     }
-}
+}*/
 
 function updateHeader({title = false, online = false, photo = false}) {
     const $messagesTitle = $messagesElement.querySelector("#messages-title")
@@ -339,7 +361,8 @@ function updateMessageAvatar(peer) {
         })
     }
 }
-
+// TODO fix
+/*
 function handlePeerUpdates(event) {
     if (event.type === "updatePhoto") {
         updateMessageAvatar(event.peer)
@@ -363,12 +386,13 @@ function handlePeerUpdates(event) {
             }
         }
     }
-}
+}*/
 
 export function UICreateMessages() {
-    MessagesManager.listenUpdates(handleMessageUpdates)
-    DialogsManager.listenUpdates(handleDialogUpdates)
-    PeersManager.listenUpdates(handlePeerUpdates)
+    //MessagesManager.listenUpdates(handleMessageUpdates)
+    // TODO return that
+    DialogsManager.listenUpdates(handleMessageUpdates)
+    //PeersManager.listenUpdates(handlePeerUpdates)
 
     let $noChatSelected = VDOM.render(
         <div id="noChat">

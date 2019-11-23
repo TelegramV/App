@@ -1,8 +1,11 @@
-import {Dialog} from "./dialog";
 import {tsNow} from "../mtproto/timeManager";
 import {getLastSeenMessage} from "./utils";
+import {Peer} from "./peer";
+import {createLogger} from "../common/logger";
 
-export class UserDialog extends Dialog {
+const Logger = createLogger("UserPeer")
+
+export class UserPeer extends Peer {
     get peerName() {
         return this.firstName + " " + this.lastName
     }
@@ -15,15 +18,16 @@ export class UserDialog extends Dialog {
 
     get onlineStatus() {
         const now = tsNow(true)
-        switch (this._peer.status._) {
+        Logger.debug("onlineStatus", this.peer)
+        switch (this.peer.status._) {
             case "userStatusOnline":
-                if(this._peer.status.expires < now)
+                if(this.peer.status.expires < now)
                     return {
                         online: true
                     }
                 return {
                     online: false,
-                    status: getLastSeenMessage(this._peer.status.expires, now)
+                    status: getLastSeenMessage(this.peer.status.expires, now)
                 }
             case "userStatusLastWeek":
                 return {
@@ -43,7 +47,7 @@ export class UserDialog extends Dialog {
             case "userStatusOffline":
                 return {
                     online: false,
-                    status: getLastSeenMessage(this._peer.status.was_online, now)
+                    status: getLastSeenMessage(this.peer.status.was_online, now)
                 }
             default:
             case "userStatusEmpty":

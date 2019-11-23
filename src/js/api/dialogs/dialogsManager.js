@@ -1,318 +1,150 @@
 import {MTProto} from "../../mtproto"
 import {nextRandomInt} from "../../mtproto/utils/bin"
-import {findMessageFromDialog, findPeerFromDialog, findUserFromMessage, getInputPeerFromPeer, getPeerName} from "./util"
+import {getInputPeerFromPeer} from "./util"
 import TimeManager from "../../mtproto/timeManager"
-import {generateDialogIndex, getMessageLocalID} from "./messageIdManager"
-import {getMessagePreviewDialog} from "../../ui/utils"
+import {getMessageLocalID} from "./messageIdManager"
 import PeersManager from "../peers/peersManager"
-import {FileAPI} from "../fileAPI"
-import {BotDialog} from "../../dataObjects/botDialog";
-import {UserDialog} from "../../dataObjects/userDialog";
-import {SupergroupDialog} from "../../dataObjects/supergroupDialog";
-import {ChannelDialog} from "../../dataObjects/channelDialog";
-import {GroupDialog} from "../../dataObjects/groupDialog";
+import {Dialog} from "../../dataObjects/dialog";
+import {getPeerObject} from "../../dataObjects/peerFactory";
+import {Manager} from "../manager";
 
-window.pushDialog = function () {
-    let newd = $dialogs[nextRandomInt($dialogs.length)]
-    newd.date = new Date()
-    $dialogs.push(newd)
-
-    resolveListeners({
-        type: "fetch",
-        props: {
-            fetched: __is_fetched,
-            empty: __is_empty,
-            sorted: __is_latest_sorted
+class DialogManager extends Manager {
+    constructor() {
+        super()
+        this.dialogs = {
+            chat: {},
+            channel: {},
+            user: {}
         }
-    })
-}
-
-const $dialogs = []
-const $pinnedDialogs = []
-const $listeners = []
-
-let $offsetDate = 0
-let $offsetID = 0
-let $dialogsOffsetDate = 0
-let $offsetIndex = 0
-
-let __is_latest_sorted = false
-let __is_fetching = true // init with false later
-let __is_fetched = false
-let __is_empty = false
-
-function fetchDialogs({
-                          limit = 20,
-                          flags = {},
-                          exclude_pinned = false,
-                          folder_id = "",
-                          offset_date = "",
-                          offset_id = "",
-                          offset_peer = {
-                              _: "inputPeerEmpty"
-                          },
-                          hash = ""
-                      }) {
-
-    __is_latest_sorted = false
-    __is_fetching = true
-
-    if ($dialogsOffsetDate) {
-        $offsetDate = $dialogsOffsetDate + TimeManager.timeOffset
-        $offsetIndex = $dialogsOffsetDate * 0x10000
-        flags |= 1
+        this.latestDialog = undefined
+        this.dialogsOffsetDate = 0 // TODO
+        this.offsetDate = 0
     }
 
+    fetchNextPage({limit = 20}) {
+        const latestDialog = this.latestDialog
+        const peer = latestDialog.peer
 
-    return MTProto.invokeMethod("messages.getDialogs", {
-        flags: flags,
-        exclude_pinned: exclude_pinned,
-        folder_id: folder_id,
-        offset_date: $offsetDate,
-        offset_id: getMessageLocalID($offsetID),
-        offset_peer: offset_peer,
-        limit: limit,
-        hash: hash
-    }).then(dialogsSlice => {
-        __is_fetched = false
+        const offsetPeer = getInputPeerFromPeer(peer._, peer.id)
 
-        if (Number(dialogsSlice.count) === 0) {
-            __is_empty = true
-            return
+        const data = {
+            limit: limit,
+            offset_peer: offsetPeer
         }
 
-        const dialogs = dialogsSlice.dialogs.map(dialog => {
-            const keys = {
-                peerUser: "user_id",
-                peerChannel: "channel_id",
-                peerChat: "chat_id"
+        return this.fetchDialogs(data)
+    }
+
+    find(type, id) {
+        return this.dialogs[type][id]
+    }
+
+    fetchDialogs({
+                     limit = 20,
+                     flags = {},
+                     exclude_pinned = false,
+                     folder_id = "",
+                     offset_date = "",
+                     offset_id = "",
+                     offset_peer = {
+                         _: "inputPeerEmpty"
+                     },
+                     hash = ""
+                 }) {
+
+        // __is_latest_sorted = false
+        // __is_fetching = true
+
+        if (this.dialogsOffsetDate) {
+            this.offsetDate = this.dialogsOffsetDate + TimeManager.timeOffset
+            flags |= 1
+        }
+
+
+        return MTProto.invokeMethod("messages.getDialogs", {
+            flags: flags,
+            exclude_pinned: exclude_pinned,
+            folder_id: folder_id,
+            offset_date: this.offsetDate,
+            offset_id: offset_id,
+            offset_peer: offset_peer,
+            limit: limit,
+            hash: hash
+        }).then(dialogsSlice => {
+            // __is_fetched = false
+
+            if (Number(dialogsSlice.count) === 0) {
+                // __is_empty = true
+                return
             }
-            const key = keys[dialog.peer._]
-            const peer = (dialog.peer._ === "peerUser" ? dialogsSlice.users : dialogsSlice.chats).find(l => l.id === dialog.peer[key])
-            const lastMessage = dialogsSlice.messages.find(l => l.id === dialog.top_message)
-            let type
-            if(dialog.peer._ === "peerUser") {
-                if(peer.pFlags.bot) {
-                    type = BotDialog
-                } else {
-                    type = UserDialog
+
+            const dialogsToPush = []
+            dialogsSlice.dialogs.map(dialog => {
+                const keys = {
+                    peerUser: "user_id",
+                    peerChannel: "channel_id",
+                    peerChat: "chat_id"
                 }
-            } else if(dialog.peer._ === "peerChannel") {
-                if(peer.pFlags.megagroup) {
-                    type = SupergroupDialog
-                } else {
-                    type = ChannelDialog
+                const key = keys[dialog.peer._]
+                const peer = (dialog.peer._ === "peerUser" ? dialogsSlice.users : dialogsSlice.chats).find(l => l.id === dialog.peer[key])
+                const lastMessage = dialogsSlice.messages.find(l => l.id === dialog.top_message)
+                this.offsetDate = lastMessage.date
+                if (this.offsetDate && !dialog.pFlags.pinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
+                    this.dialogsOffsetDate = this.offsetDate
                 }
-            } else if(dialog.peer._ === "peerChat") {
-                type = GroupDialog
-            }
+                const p = getPeerObject(peer)
+                PeersManager.set(p)
 
-            return new (type)(dialog, peer, lastMessage)
-        })
+                const d = new Dialog(dialog, p, lastMessage)
+                this.dialogs[d.type][d.id] = d
+                dialogsToPush.push(d)
+                this.resolveListeners({
+                    type: "dialogLoaded",
+                    dialog: d
+                }) // TODO remove
+                return d
+            })
 
-        console.log(dialogs)
-        /*dialogs.forEach(dialog => {
-            let messageUsername = `${getPeerName(messageUser, false)}`
-            let messageSelf = messageUser ? messageUser.id === peer.id : false
+            // const dialogsToPush = dialogs.filter(l => !l.pinned)
+            // const pinnedDialogsToPush = dialogs.filter(l => l.pinned)
 
-            $offsetDate = message.date
+            // $pinnedDialogs.push(...pinnedDialogsToPush)
+            // $dialogs.push(...dialogsToPush)
 
-            const submsg = message.message;
-            const date = new Date(message.date * 1000)
+            // __is_fetching = false
+            // __is_fetched = true
 
-            const msgPrefix = getMessagePreviewDialog(message, messageUsername.length > 0)
-            console.log(dialog, peer, message)
+            this.latestDialog = dialogsToPush[dialogsToPush.length - 1]
 
-            const data = {
-                title: peerName,
-                pinned: pinned,
-                muted: dialog.notify_settings.mute_until,
-                photo: false,
-                unreadCount: dialog.unread_count,
-                unreadMark: dialog.pFlags.unreadMark,
-                unreadMentionsCount: dialog.unread_mentions_count,
-                verified: peer.pFlags.verified,
-                online: peer.status && peer.status._ === "userStatusOnline",
-                read: message.id <= dialog.read_inbox_max_id,
-                out: message.pFlags.out,
-                message: {
-                    sender: messageUsername + msgPrefix,
-                    text: submsg,
-                    self: messageSelf,
-                    date: date,
-                    id: message.id,
-                },
-                peer: {
-                    _: peer._,
-                    id: peer.id,
-                    access_hash: peer.access_hash
-                },
-                index: generateDialogIndex(message.date)
-            }
-
-            if ($offsetDate && !dialog.pFlags.pinned && (!$dialogsOffsetDate || $offsetDate < $dialogsOffsetDate)) {
-                $dialogsOffsetDate = $offsetDate
-            }
-
-            if (pinned) {
-                pinnedDialogsToPush.push(data)
-            } else {
-                dialogsToPush.push(data)
-            }
-
-            PeersManager.set(peer)
-        })*/
-        const dialogsToPush = dialogs.filter(l => !l.pinned)
-        const pinnedDialogsToPush = dialogs.filter(l => l.pinned)
-
-        $pinnedDialogs.push(...pinnedDialogsToPush)
-        $dialogs.push(...dialogsToPush)
-
-        __is_fetching = false
-        __is_fetched = true
-
-        resolveListeners({
-            type: "updateMany",
-            dialogs: dialogsToPush,
-            pinnedDialogs: pinnedDialogsToPush,
-        })
+            this.resolveListeners({
+                type: "updateMany",
+                dialogs: dialogsToPush.filter(l => !l.pinned),
+                pinnedDialogs: dialogsToPush.filter(l => l.pinned)
+            })
 
 
-        dialogs.forEach(l => {
-            l.getAvatar().then(_ => {
-                console.log("got avatar", l)
-                resolveListeners({
-                    type: "updateSingle",
-                    dialog: l
+            dialogsToPush.forEach(l => {
+                l.peer.getAvatar().then(_ => {
+                    this.resolveListeners({
+                        type: "updateSingle",
+                        dialog: l
+                    })
                 })
             })
+
         })
 
-    })
-
-}
-
-export function fetchNextPage({limit = 20}) {
-    const latestDialog = $dialogs[$dialogs.length - 1]
-    const peer = latestDialog.peer
-
-    const offsetPeer = getInputPeerFromPeer(peer._, peer.id)
-
-    const data = {
-        limit: limit,
-        offset_peer: offsetPeer
-    }
-
-    return fetchDialogs(data)
-}
-
-function updateSingle(peer, data, props = {}) {
-    let dialogs = []
-    if (props.pinned) {
-        dialogs = $pinnedDialogs
-    } else {
-        dialogs = $dialogs
-    }
-
-
-    const dialogIndex = dialogs.findIndex(dialog => dialog.peer._ === peer._ && dialog.peer.id === peer.id)
-
-    if (dialogIndex >= 0) {
-        for (const key in data) {
-            if (data.hasOwnProperty(key)) {
-                dialogs[dialogIndex][key] = data[key]
-            }
-        }
-
-        resolveListeners({
-            type: "updateSingle",
-            dialog: dialogs[dialogIndex]
-        })
-    } else {
-        console.warn("dialog wasn't found", peer)
     }
 }
 
-function getDialogs() {
-    if (__is_latest_sorted) {
-        return {
-            pinnedDialogs: $pinnedDialogs,
-            dialogs: $dialogs
-        }
-    } else {
-        // sortDialogs()
-        return {
-            pinnedDialogs: $pinnedDialogs,
-            dialogs: $dialogs
-        }
-    }
-}
+export default new DialogManager()
 
-// todo: fix sorting
-function sortDialogs() {
-    $dialogs.sort(function (x, y) {
-        if (x.date > y.date) {
-            return -1
-        }
-        if (x.date < y.date) {
-            return 1
-        }
-        return 0
-    });
-    $pinnedDialogs.sort(function (x, y) {
-        if (x.date > y.date) {
-            return -1
-        }
-        if (x.date < y.date) {
-            return 1
-        }
-        return 0
-    });
-}
 
-function resolveListeners(event) {
-    if (event) {
-        $listeners.forEach(listener => {
-            listener.listener(event)
-            // if (listener.listenOnce) {
-            //     unlistenUpdates(listener)
-            // }
-        })
-    } else {
-        console.warn("invalid event", event)
-    }
-}
 
-function listenOnce(listener) {
-    if (listener && typeof listener === "function") {
-        $listeners.push({listener, listenOnce: true})
-    }
-}
 
-function listenUpdates(listener) {
-    if (listener && typeof listener === "function") {
-        $listeners.push({listener, listenOnce: false})
-    }
-}
-
-function unlistenUpdates(listener) {
-    delete $listeners[listener]
-}
-
-function isFetching() {
-    return __is_fetching
-}
-
-function isFetched() {
-    return __is_fetching
-}
-
-function isEmpty() {
-    return __is_empty
-}
 
 function init() {
-    MTProto.MessageProcessor.listenUpdateShortMessage(update => {
+    /*MTProto.MessageProcessor.listenUpdateShortMessage(update => {
         const messageUser = PeersManager.find("user", update.user_id)
         let messageUsername = `${getPeerName(messageUser, false)}`
         let messageSelf = messageUser ? messageUser.id === update.user_id : false
@@ -333,19 +165,5 @@ function init() {
                 id: message.id,
             }
         })
-    })
+    })*/
 }
-
-const DialogsManager = {
-    fetchDialogs,
-    getDialogs,
-    listenUpdates,
-    listenOnce,
-    isFetching,
-    isFetched,
-    fetchNextPage,
-    isEmpty,
-    init
-}
-
-export default DialogsManager

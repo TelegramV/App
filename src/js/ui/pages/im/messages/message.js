@@ -1,17 +1,18 @@
 import {MTProto} from "../../../../mtproto"
 import Voice from "../../../voice"
 import EmojiConverter from "emoji-js"
+import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers";
 
 const emoji = new EmojiConverter();
 
-function vTimeTemplate(data, bg = false) {
+function vTimeTemplate(message, bg = false) {
     let classes = "time" + (bg ? " bg" : "")
 
     return (
         <span class={classes}>
-            <div class="inner tgico">{data.views ?
-                <span>{data.views} <span
-                    class="tgico tgico-channelviews"/>    </span> : ""}{data.time.toLocaleTimeString('en', {
+            <div class="inner tgico">{message.views ?
+                <span>{message.views} <span
+                    class="tgico tgico-channelviews"/>    </span> : ""}{message.getDate('en', {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false
@@ -35,14 +36,16 @@ function vServiceMessageTemplate(data, inside) {
     )
 }
 
-function vMessageTemplate(data, inside) {
-    const className = data.post ? "channel in" : data.out ? "out" : "in"
+function vMessageTemplate(message, inside) {
+    const className = message.post ? "channel in" : message.out ? "out" : "in"
+    const from = message.from
+    console.log(message)
     return (
-        <div class={className} data-id={data.id} data-peer={`${data.from._}.${data.from.id}`}>
+        <div class={className} data-id={message.id} data-peer={`${from.type}.${from.id}`}>
             {className === "in" ? (
-                <div className={"avatar " + (!data.from.photo ? `placeholder-${data.from.photoPlaceholder.num}` : "")}
-                     style={`background-image: url(${data.from.photo});`}>
-                    {!data.from.photo ? data.from.photoPlaceholder.text : ""}
+                <div className={"avatar " + (!from.hasAvatar ? `placeholder-${from.avatarLetter.num}` : "")}
+                     style={`background-image: url(${from._avatar});`}>
+                    {!from.hasAvatar ? from.avatarLetter.text : ""}
                 </div>
             ) : ""}
             {inside}
@@ -55,25 +58,26 @@ function vForwardedTemplate(data) {
     return data.fwd ? <div class="fwd">Forwarded from {data.fwd.from}</div> : "";
 }
 
-function vMessageWithTextOnlyTemplate(data) {
-    const username = data.userName && !data.post && !data.out;
-    const msg = data.message ? emoji.replace_unified(data.message) : "";
+function vMessageWithTextOnlyTemplate(message) {
+    const username = message.userName && !message.post && !message.out;
+    let msg = parseMessageEntities(message.text, message.entities)
+    msg = msg ? emoji.replace_unified(msg) : "";
 
-    return vMessageTemplate(data, (
-        <div class={vGetClass(data)}>
-            {username ? <div className="username">{data.userName}</div> : ""}
+    return vMessageTemplate(message, (
+        <div class={vGetClass(message)}>
+            {username ? <div className="username">{message.userName}</div> : ""}
 
-            {data.reply ? (<div className="box rp">
+            {message.reply ? (<div className="box rp">
                 <div className="quote">
-                    <div className="name">{data.reply.name}</div>
-                    <div className="text">{data.reply.text}</div>
+                    <div className="name">{message.reply.name}</div>
+                    <div className="text">{message.reply.text}</div>
                 </div>
             </div>) : ""}
             <div class={`message ${username ? "nopad" : ""}`}>
 
-                {vForwardedTemplate(data)}
+                {vForwardedTemplate(message)}
                 <span dangerouslySetInnerHTML={msg}/>
-                {vTimeTemplate(data)}
+                {vTimeTemplate(message)}
             </div>
         </div>
     ))
@@ -103,15 +107,10 @@ function vMessageWithImageTemplate(data) {
     ))
 }
 
-function test() {
-    MTProto.createFileNetworker(1).then(l => {
-        console.log(l)
-    })
-}
 
 function vMessageWithUrlTemplate(data) {
     return vMessageTemplate(data, (
-        <div className={vGetClass(data)} onClick={test}>
+        <div className={vGetClass(data)}>
             <div className="message">
                 <span dangerouslySetInnerHTML={data.message}/>
                 {vTimeTemplate(data)}

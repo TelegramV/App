@@ -34,7 +34,6 @@ export const create$loadingNode = () => VDOM.render(vLoadingNode)
 export function getMediaPreviewName(message) {
     switch (message.media._) {
         case "messageMediaPhoto":
-            console.log("PHOTO")
             return "Photo"
         case "messageMediaGeo":
             return "Location"

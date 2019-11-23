@@ -4,6 +4,10 @@ import MTProto from "../mtproto";
 import {Message} from "./message";
 import {tsNow} from "../mtproto/timeManager";
 import {generateDialogIndex} from "../api/dialogs/messageIdManager";
+import {PeerAPI} from "../api/peerAPI";
+import PeersManager from "../api/peers/peersManager";
+import DialogsManager from "../api/dialogs/dialogsManager";
+import {getPeerObject} from "./peerFactory";
 
 const Logger = createLogger(Dialog)
 
@@ -12,50 +16,54 @@ export class Dialog {
         this._dialog = dialog
         this._peer = peer
         this._lastMessage = new Message(this, lastMessage) // todo factory?
-        this._avatar = undefined
+        // TODO move lastMessage to messages
+        this._messages = {}
     }
 
     get dialog() {
         return this._dialog
     }
+
     get peer() {
         return this._peer
     }
+
     get id() {
         return this.peer.id
-    }
-    get username() {
-        return this._peer.username || null
     }
 
     get pinned() {
         return this.dialog.pFlags.pinned
     }
+
     setPinned(pinned) {
         return MTProto.invokeMethod("messages.toggleDialogPin", {
             peer: {
                 _: "inputDialogPeer"
             },
             pinned
-        }).then(l => { this.dialog.pFlags.pinned = l })
+        }).then(l => {
+            this.dialog.pFlags.pinned = l
+        })
     }
 
-    get verified() {
-        return this.dialog.pFlags.verified === true
-    }
 
     get notifySettings() {
         return this.dialog.notify_settings
     }
+
     get muted() {
         return this.notifySettings.mute_until >= tsNow(true)
     }
+
     get unreadCount() {
         return this._dialog.unread_count
     }
+
     get unreadMark() {
         return this._dialog.pFlags.unreadMark
     }
+
     get unreadMentionsCount() {
         return this._dialog.unread_mentions_count
     }
@@ -77,35 +85,67 @@ export class Dialog {
         return generateDialogIndex(this.lastMessage.date)
     }
 
-    get peerName() {
-        return this.peer.title
+    get type() {
+        return this.peer.type
     }
 
-    get hasAvatar() {
-        return this.peer.photo._ !== "chatPhotoEmpty"
+    handleUpdate(update) {
+
     }
 
-    get avatarLetter() {
-        return {
-            num: Math.abs(this.id) % 8,
-            text: this.peerName[0]
-        }
+    fetchNextPage() {
+        let oldest = this._messages[Object.keys(this._messages)[0]]
+
+        return this.fetchMessages({offset_id: oldest.id})
     }
 
-    getAvatar(big = false) {
-        if(this._avatar) return Promise.resolve(this._avatar)
-        if(!this.hasAvatar) return Promise.resolve(null)
+    fetchMessages(props = {offset_id: 0}) {
+        return MTProto.invokeMethod("messages.getHistory", {
+            peer: PeerAPI.getInput(this.peer.peer),
+            offset_id: props.offset_id,
+            offset_date: 0,
+            add_offset: 0,
+            limit: 20,
+            max_id: 0,
+            min_id: 0,
+            hash: 0
+        }).then(messagesSlice => {
+            // __is_fetching = true
+            // __fetching_for = {
+            //     _: 0,
+            //     id: 0
+            // }
+            messagesSlice.chats.forEach(chat => {
+                PeersManager.set(getPeerObject(chat))
+            })
 
-        // TODO cache
-        return FileAPI.getPeerPhoto(big ? this.peer.photo.photo_big : this.peer.photo.photo_small, this.peer.photo.dc_id, this.peer, big).then(url => {
-            return this._avatar = url
-        }).catch(e => {
-            Logger.error("Exception while loading avatar:", e)
+            messagesSlice.users.forEach(user => {
+                PeersManager.set(getPeerObject(user))
+            })
+
+            const messagesToPush = []
+
+            messagesSlice.messages.forEach(message => {
+                const messageToPush = new Message(this, message)
+
+                messagesToPush.push(messageToPush)
+
+                this._messages[messageToPush.id] = messageToPush
+
+                /*if (message.media) {
+                    fetchMessageMedia(message, peer)
+                }*/
+            })
+
+            //$messages[peer._][peer.id].push(...messagesToPush)
+
+            if (messagesSlice.messages.length > 0 || props.offset_id === 0) {
+                DialogsManager.resolveListeners({
+                    type: "updateManyMessages",
+                    dialog: this,
+                    messages: messagesToPush
+                })
+            }
         })
     }
-
-    get type() {
-        return this.constructor.name.toLowerCase().slice(0, -6)
-    }
-
 }
