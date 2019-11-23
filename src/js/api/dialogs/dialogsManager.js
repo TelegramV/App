@@ -123,8 +123,13 @@ class DialogManager extends Manager {
             })
 
 
-            dialogsToPush.forEach(async l => {
-                await l.peer.getAvatar()
+            dialogsToPush.forEach(l => {
+                l.peer.getAvatar().then(_ => {
+                    this.resolveListeners( {
+                        type: "updateSingle",
+                        dialog: l
+                    })
+                })
             })
 
         })

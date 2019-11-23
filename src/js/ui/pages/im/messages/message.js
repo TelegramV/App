@@ -36,10 +36,10 @@ function vServiceMessageTemplate(data, inside) {
     )
 }
 
-function vMessageTemplate(message, inside) {
+
+const Message = ({message, slot}) => {
     const className = message.post ? "channel in" : message.out ? "out" : "in"
     const from = message.from
-    console.log(message)
     return (
         <div class={className} data-id={message.id} data-peer={`${from.type}.${from.id}`}>
             {className === "in" ? (
@@ -48,7 +48,7 @@ function vMessageTemplate(message, inside) {
                     {!from.hasAvatar ? from.avatarLetter.text : ""}
                 </div>
             ) : ""}
-            {inside}
+            {slot}
         </div>
     )
 }
@@ -63,9 +63,9 @@ function vMessageWithTextOnlyTemplate(message) {
     let msg = parseMessageEntities(message.text, message.entities)
     msg = msg ? emoji.replace_unified(msg) : "";
 
-    return vMessageTemplate(message, (
-        <div class={vGetClass(message)}>
-            {username ? <div className="username">{message.userName}</div> : ""}
+    return <Message message={message}>
+        <div className={vGetClass(data)}>
+            {username ? <div className="username">{data.userName}</div> : ""}
 
             {message.reply ? (<div className="box rp">
                 <div className="quote">
@@ -73,69 +73,78 @@ function vMessageWithTextOnlyTemplate(message) {
                     <div className="text">{message.reply.text}</div>
                 </div>
             </div>) : ""}
-            <div class={`message ${username ? "nopad" : ""}`}>
+            <div className={`message ${username ? "nopad" : ""}`}>
 
                 {vForwardedTemplate(message)}
                 <span dangerouslySetInnerHTML={msg}/>
                 {vTimeTemplate(message)}
             </div>
         </div>
-    ))
+    </Message>
+}
 
+
+const MessageMediaImage = ({src, size, alt = "", isThumb}) => {
+    let width = isThumb ? Number(size[0]) >= 460 ? "460px" : `${size[0]}px` : Number(size[0]) >= 480 ? "480px" : `${size[0]}px`
+    return (
+        <div>
+            <img className={["attachment", isThumb ? "attachment-thumb" : ""]}
+                 css-width={width}
+                 src={src}
+                 alt={alt}/>
+        </div>
+    )
 }
 
 function vMessageWithImageTemplate(data) {
     let haveMsg = data.message && data.message.length > 0;
-    return vMessageTemplate(data, (
-        <div class={vGetClass(data)}>
-            {data.thumbnail ?
-                <div>
-                    <div css-position="absolute" css-z-index="1000" className="full-size-loader">
-                        <progress className="progress-circular"/>
-                    </div>
-                    <img class="attachment attachment-thumb"
-                         src={data.imgSrc}
-                         css-width={Number(data.imgSize[0]) > 460 ? "460px" : `${data.imgSize[0]}px`}/>
-                </div> :
-                <img className="attachment" src={data.imgSrc}/>
-            }
-            {haveMsg ? (<div class="message">
-                <span dangerouslySetInnerHTML={data.message}/>
-                {vTimeTemplate(data)}
-            </div>) : ""}
-        </div>
-    ))
+    return (
+        <Message data={data}>
+            <div class={vGetClass(data)}>
+                <MessageMediaImage src={data.imgSrc} size={data.imgSize} isThumb={!!data.thumbnail}/>
+
+                {haveMsg ? (<div class="message">
+                    <span dangerouslySetInnerHTML={data.message}/>
+                    {vTimeTemplate(data)}
+                </div>) : ""}
+            </div>
+        </Message>
+    )
 }
 
 
 function vMessageWithUrlTemplate(data) {
-    return vMessageTemplate(data, (
-        <div className={vGetClass(data)}>
-            <div className="message">
-                <span dangerouslySetInnerHTML={data.message}/>
-                {vTimeTemplate(data)}
-            </div>
-
-            <a href={data.url.url} className="box web rp">
-                <div className="quote">
-                    <div className="preview"
-                         style={`background-image: url(${data.url.photo})`}></div>
-                    <div className="name">{data.url.siteName}</div>
-                    <div className="title">{data.url.title}</div>
-                    <div className="text">{data.url.description}</div>
+    return (
+        <Message data={data}>
+            <div className={vGetClass(data)} onClick={test}>
+                <div className="message">
+                    <span dangerouslySetInnerHTML={data.message}/>
+                    {vTimeTemplate(data)}
                 </div>
-            </a>
-        </div>
-    ))
+
+                <a href={data.url.url} className="box web rp">
+                    <div className="quote">
+                        <div className="preview"
+                             css-background-image="url(${data.url.photo})"/>
+                        <div className="name">{data.url.siteName}</div>
+                        <div className="title">{data.url.title}</div>
+                        <div className="text">{data.url.description}</div>
+                    </div>
+                </a>
+            </div>
+        </Message>
+    )
 }
 
 function vMessageWithStickerTemplate(data) {
-    return vMessageTemplate(data, (
-        <div class={vGetClass(data, true)}>
-            <img class="sticker" src={data.imgSrc}></img>
-            {vTimeTemplate(data, true)}
-        </div>
-    ))
+    return (
+        <Message data={data}>
+            <div class={vGetClass(data, true)}>
+                <img class="sticker" src={data.imgSrc}/>
+                {vTimeTemplate(data, true)}
+            </div>
+        </Message>
+    )
 }
 
 function vMessageWithVoiceAudioTemplate(data) {
@@ -162,24 +171,27 @@ function vMessageWithVoiceAudioTemplate(data) {
         </div>
     )*/
     const voice = new Voice(new Audio(data.audio.url), data.audio.waveform);
-    return vMessageTemplate(data,
-        <div class={vGetClass(data)}>
-            <div className="message">
-                {vForwardedTemplate(data)}
-                {voice.asJSX()}
-                {vTimeTemplate(data)}
+    return (
+        <Message data={data}>
+            <div class={vGetClass(data)}>
+                <div className="message">
+                    {vForwardedTemplate(data)}
+                    {voice.asJSX()}
+                    {vTimeTemplate(data)}
+                </div>
             </div>
-        </div>
+        </Message>
     )
 }
 
 function vMessageWithAudioTemplate(data) {
-    return vMessageTemplate(
-        <div class={vGetClass(data)}>
-            <audio src={data.url}/>
-            dsfsdf
-            {vTimeTemplate(data, true)}
-        </div>
+    return (
+        <Message data={data}>
+            <div class={vGetClass(data)}>
+                <audio src={data.url}/>
+                {vTimeTemplate(data, true)}
+            </div>
+        </Message>
     )
 }
 

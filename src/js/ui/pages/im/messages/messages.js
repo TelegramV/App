@@ -262,10 +262,9 @@ function handleSingleUpdate(event) {
         // $message.replaceWith(VDOM.render(UICreateMessage(message)))
 
         // WARNING!!!
-        // If message renders not as expected, try to uncomment code above and do comment below
+        // If message renders not as expected, then try to uncomment code above and do comment below
 
-        const patchMessage = VDOM.diffReal($message, UICreateMessage(message))
-        patchMessage($message)
+        VDOM.patchReal($message, UICreateMessage(message))
     }
 }
 

@@ -17,6 +17,12 @@ export class UserPeer extends Peer {
     }
 
     get onlineStatus() {
+        if(this.deleted) {
+            return {
+                online: false,
+                status: "a long time ago"
+            }
+        }
         const now = tsNow(true)
         Logger.debug("onlineStatus", this.peer)
         switch (this.peer.status._) {

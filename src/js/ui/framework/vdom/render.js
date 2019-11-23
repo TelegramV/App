@@ -24,12 +24,12 @@ export function vdom_render(vNode) {
         throw new Error("wtf")
     }
 
-    let $el = null
+    let $node = null
 
     if (vNode.options && Object.keys(vNode.options) > 0) {
-        $el = document.createElement(vNode.tagName, options)
+        $node = document.createElement(vNode.tagName, options)
     } else {
-        $el = document.createElement(vNode.tagName)
+        $node = document.createElement(vNode.tagName)
     }
 
     // check if innerHTML should be set
@@ -45,29 +45,29 @@ export function vdom_render(vNode) {
             throw new Error("Element with `dangerouslySetInnerHTML` should not have children.")
         }
 
-        $el.innerHTML = vNode.dangerouslySetInnerHTML
+        $node.innerHTML = vNode.dangerouslySetInnerHTML
     }
 
     // setting attributes
     for (const [k, v] of Object.entries(vNode.attrs)) {
         if (Array.isArray(v)) {
-            $el.setAttribute(k, v.join(" "))
+            $node.setAttribute(k, v.join(" "))
         } else {
-            $el.setAttribute(k, v)
+            $node.setAttribute(k, v)
         }
     }
 
     // adding events
     for (const [kEvent, vEvent] of Object.entries(vNode.events)) {
-        $el.addEventListener(kEvent, vEvent)
+        $node.addEventListener(kEvent, vEvent)
     }
 
     // append children
     for (const child of vNode.children) {
-        $el.appendChild(vdom_render(child))
+        $node.appendChild(vdom_render(child))
     }
 
-    return $el
+    return $node
 }
 
 export default vdom_render
