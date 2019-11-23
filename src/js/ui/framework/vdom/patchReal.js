@@ -80,24 +80,28 @@ function patchDangerouslySetInnerHTML($node, dangerouslySetInnerHTML) {
  * FIXME: fix bug in message voice template!!!
  *
  * @param {HTMLElement|Node|Text} $node
- * @param newVTree
+ * @param newVNode
  */
-export function vdom_patchReal($node, newVTree) {
-    if (newVTree === undefined) {
+export function vdom_patchReal($node, newVNode) {
+    if (newVNode instanceof Node) {
+        throw new Error("newVNode is an element of the real DOM and should be of virtual!")
+    }
+
+    if (newVNode === undefined) {
         $node.remove()
         return undefined
     }
 
-    if (typeof newVTree === "object" && !newVTree.tagName) {
-        const $newNode = VDOM.render(newVTree)
+    if (typeof newVNode === "object" && !newVNode.tagName) {
+        const $newNode = VDOM.render(newVNode)
         $node.replaceWith($newNode)
         return $newNode
     }
 
-    console.log($node, newVTree)
+    console.log($node, newVNode)
     if ($node.nodeType === Node.TEXT_NODE) {
-        if ($node.wholeText !== newVTree) {
-            const $newNode = VDOM.render(newVTree)
+        if ($node.wholeText !== newVNode) {
+            const $newNode = VDOM.render(newVNode)
             $node.replaceWith($newNode)
             return $newNode
         } else {
@@ -107,28 +111,28 @@ export function vdom_patchReal($node, newVTree) {
 
     // named components check
     // if names are different then replace all tree
-    if ($node.hasAttribute("data-component") || newVTree.attrs.hasOwnProperty("data-component")) {
-        if ($node.getAttribute("data-component") !== newVTree.attrs["data-component"]) {
-            const $newNode = VDOM.render(newVTree)
+    if ($node.hasAttribute("data-component") || newVNode.attrs.hasOwnProperty("data-component")) {
+        if ($node.getAttribute("data-component") !== newVNode.attrs["data-component"]) {
+            const $newNode = VDOM.render(newVNode)
             $node.replaceWith($newNode)
             return $newNode
         }
     }
 
     // if tagNames are different then we replace all tree
-    if ($node.tagName.toLowerCase() !== newVTree.tagName) {
-        const $newNode = VDOM.render(newVTree)
+    if ($node.tagName.toLowerCase() !== newVNode.tagName) {
+        const $newNode = VDOM.render(newVNode)
         $node.replaceWith($newNode)
         return $newNode
     }
 
-    patchAttrs($node, $node.attributes, newVTree.attrs)
-    patchEvents($node, newVTree.events)
+    patchAttrs($node, $node.attributes, newVNode.attrs)
+    patchEvents($node, newVNode.events)
 
-    if (newVTree.dangerouslySetInnerHTML !== false) {
-        patchDangerouslySetInnerHTML($node, newVTree.dangerouslySetInnerHTML)
+    if (newVNode.dangerouslySetInnerHTML !== false) {
+        patchDangerouslySetInnerHTML($node, newVNode.dangerouslySetInnerHTML)
     } else {
-        patchChildren($node, $node.childNodes, newVTree.children)
+        patchChildren($node, $node.childNodes, newVNode.children)
     }
 
     return $node

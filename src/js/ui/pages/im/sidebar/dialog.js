@@ -28,7 +28,7 @@ export function UICreateDialog(dialog) {
 
     let hasAvatar = dialog.hasAvatar && dialog._avatar !== undefined
 
-    return VDOM.render(
+    return (
         <div data-peer={`${dialog.type}.${dialog.id}`}
              data-message-id={dialog.lastMessage.id}
              className={personClasses}

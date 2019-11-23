@@ -76,7 +76,7 @@ function renderDialog(dialog, pinned = false) {
             }
         } else {
             __rendered_pinned.add(__)
-            $dialogsPinned.appendChild(UICreateDialog(dialog))
+            $dialogsPinned.appendChild(VDOM.render(UICreateDialog(dialog)))
         }
     } else {
         if (__rendered.has(__)) {
@@ -87,13 +87,14 @@ function renderDialog(dialog, pinned = false) {
                     $dialogs.prepend($dialog)
                 }
                 // fix this later!!
+                // $dialog.replaceWith(VDOM.render(UICreateDialog(dialog)))
                 VDOM.patchReal($dialog, UICreateDialog(dialog))
             } else {
                 console.warn("dialog is not on the page")
             }
         } else {
             __rendered.add(__)
-            $dialogs.appendChild(UICreateDialog(dialog))
+            $dialogs.appendChild(VDOM.render(UICreateDialog(dialog)))
         }
     }
 }
