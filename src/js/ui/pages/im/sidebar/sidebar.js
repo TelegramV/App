@@ -2,7 +2,9 @@ import DialogsManager from "../../../../api/dialogs/dialogsManager"
 import VDOM from "../../../framework/vdom"
 import {UICreateDialog} from "./dialog"
 import PeersManager from "../../../../api/peers/peersManager"
+import {createLogger} from "../../../../common/logger";
 
+const Logger = createLogger("Sidebar")
 const $sidebar = VDOM.render(
     <div className="chatlist">
         <div className="toolbar">
@@ -44,26 +46,31 @@ function handleDialogUpdates(event) {
             renderDialog(dialog, false)
         })
     } else if (event.type === "updateSingle") {
+        Logger.error("updateSingle was called!", event)
         renderDialog(event.dialog, event.dialog.pinned)
+    } else {
+        Logger.log("DialogUpdates", event)
     }
 }
 
 function handlePeerUpdates(event) {
     if (event.type === "updatePhoto") {
-        const $dialogAvatar = $dialogsWrapper.querySelector(`[data-peer="${event.peer._}.${event.peer.id}"]>.avatar`)
+        const $dialogAvatar = $dialogsWrapper.querySelector(`[data-peer="${event.peer.type}.${event.peer.id}"]>.avatar`)
 
         if ($dialogAvatar) {
-            if (event.peer.photo) {
+            if (event.peer._avatar) {
                 $dialogAvatar.setAttribute("class", "avatar")
-                $dialogAvatar.style = `background-image: url(${event.peer.photo})`
+                $dialogAvatar.style = `background-image: url(${event.peer._avatar})`
                 $dialogAvatar.innerHTML = ""
             } else {
-                $dialogAvatar.setAttribute("class", "avatar " + `placeholder-${event.peer.photoPlaceholder.num}`)
-                $dialogAvatar.innerHTML = event.peer.photoPlaceholder.text[0]
+                $dialogAvatar.setAttribute("class", "avatar " + `placeholder-${event.peer.avatarLetter.num}`)
+                $dialogAvatar.innerHTML = event.peer.avatarLetter.text
             }
         } else {
             console.warn("dialogAvatar is not on the page")
         }
+    } else {
+        Logger.log("PeerUpdates", event)
     }
 }
 

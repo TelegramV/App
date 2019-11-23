@@ -9,7 +9,7 @@ const $imPageElement = VDOM.render(
 
 export function ImPage() {
     $imPageElement.appendChild(UICreateDialogsSidebar())
-    $imPageElement.appendChild(UICreateMessages())
+    // $imPageElement.appendChild(UICreateMessages())
 
     DialogsManager.fetchDialogs({})
     return $imPageElement

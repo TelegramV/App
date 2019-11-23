@@ -53,7 +53,6 @@ export class Message {
 
     parseMessage() {
         const message = this._message
-        console.log(message)
 
         if(message.media) {
 

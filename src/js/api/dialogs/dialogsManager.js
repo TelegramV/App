@@ -25,7 +25,7 @@ class DialogManager extends Manager {
         const latestDialog = this.latestDialog
         const peer = latestDialog.peer
 
-        const offsetPeer = getInputPeerFromPeer(peer._, peer.id)
+        const offsetPeer = getInputPeerFromPeer(peer.type, peer.id)
 
         const data = {
             limit: limit,
@@ -98,10 +98,10 @@ class DialogManager extends Manager {
                 const d = new Dialog(dialog, p, lastMessage)
                 this.dialogs[d.type][d.id] = d
                 dialogsToPush.push(d)
-                this.resolveListeners({
-                    type: "dialogLoaded",
-                    dialog: d
-                }) // TODO remove
+                // this.resolveListeners({
+                //     type: "dialogLoaded",
+                //     dialog: d
+                // }) // TODO remove
                 return d
             })
 
@@ -123,13 +123,8 @@ class DialogManager extends Manager {
             })
 
 
-            dialogsToPush.forEach(l => {
-                l.peer.getAvatar().then(_ => {
-                    this.resolveListeners({
-                        type: "updateSingle",
-                        dialog: l
-                    })
-                })
+            dialogsToPush.forEach(async l => {
+                await l.peer.getAvatar()
             })
 
         })

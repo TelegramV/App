@@ -78,9 +78,9 @@ export class PeerManager extends Manager {
             }
 
 
-            this.resolveListeners({
-                type: "set",
-            })
+            // this.resolveListeners({
+            //     type: "set",
+            // })
         }
     }
 }

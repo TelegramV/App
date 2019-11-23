@@ -259,6 +259,10 @@
     cursor: pointer;
   }
 
+  &.selected {
+    background-color: $darkgrey;
+  }
+
   // &.online:hover {
   // 	.avatar:before {
   // 		border: 2px solid mix(opacify($light,1) );

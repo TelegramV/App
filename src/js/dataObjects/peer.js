@@ -1,5 +1,6 @@
 import {FileAPI} from "../api/fileAPI";
 import {createLogger} from "../common/logger";
+import {default as PeersManager} from "../api/peers/peersManager";
 
 const Logger = createLogger("Peer")
 
@@ -46,6 +47,10 @@ export class Peer {
 
         // TODO cache
         return FileAPI.getPeerPhoto(big ? this.peer.photo.photo_big : this.peer.photo.photo_small, this.peer.photo.dc_id, this.peer, big).then(url => {
+            PeersManager.resolveListeners({
+                type: "updatePhoto",
+                peer: this
+            })
             return this._avatar = url
         }).catch(e => {
             Logger.error("Exception while loading avatar:", e)
