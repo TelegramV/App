@@ -1,7 +1,5 @@
 import {AppFramework} from "../../../framework/framework"
-import VDOM from "../../../framework/vdom"
 import {UserPeer} from "../../../../dataObjects/userPeer";
-import {Dialog} from "../../../../dataObjects/dialog";
 
 function openDialog(dialog) {
     return () => AppFramework.Router.push("/", {
@@ -12,7 +10,7 @@ function openDialog(dialog) {
 }
 
 export function UICreateDialog(dialog) {
-    if(dialog.id == "484725047") console.log("ui create dialog", dialog)
+    if (dialog.id == "484725047") console.log("ui create dialog", dialog)
     const peer = dialog.peer
     const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.unreadCount > 0 ? dialog.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
@@ -23,13 +21,13 @@ export function UICreateDialog(dialog) {
     }
     if (unread !== "") personClasses.push("unread")
     if (dialog.muted) personClasses.push("muted")
-    if(dialog.lastMessage.isOut) {
+    if (dialog.lastMessage.isOut) {
         personClasses.push("sent")
 
         if (dialog.lastMessage.isRead) personClasses.push("read")
     }
 
-    let hasAvatar = dialog.hasAvatar && dialog._avatar !== undefined
+    let hasAvatar = peer.hasAvatar && peer._avatar !== undefined
 
     return (
         <div data-peer={`${dialog.type}.${dialog.id}`}
