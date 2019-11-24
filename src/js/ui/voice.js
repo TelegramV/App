@@ -1,28 +1,21 @@
 export default class Voice {
-    constructor(audio, waveform, options = {}) {
+    constructor(audio, waveform, options = {id: Math.random(), mainColor: "green", secondaryColor: "grey"}) {
         this.element = document.createElement("div");
         this.audio = audio;
+        this.options = options;
         this.heights = this._waveToArray(waveform);
 
         this.playing = false;
+        this.bind = false;
 
         this.barWidth = 2;
         this.barMargin = 2;
 
         this.width = this.heights.length * (this.barWidth + this.barMargin) + this.barMargin * 2;
 
-        this._initContainer();
-
-        this._generateBars();
-
         this.enterHandler = this._handleEnter.bind(this);
-        this.svgContainer.addEventListener("mouseenter", this.enterHandler);
-
         this.leaveHandler = this._handleLeave.bind(this);
-        this.svgContainer.addEventListener("mouseleave", this.leaveHandler);
-
         this.moveHandler = this._handleMove.bind(this);
-        this.svgContainer.addEventListener("mousedown", this.moveHandler);
 
         this.audio.addEventListener("timeupdate", this._audioTimeUpdate.bind(this));
         this.audio.addEventListener("ended", this._playButtonClick.bind(this));
@@ -51,20 +44,21 @@ export default class Voice {
     }
 
     asJSX() {
-        return (<div class="audio">
-            <div class="play"/>
+        return (<div class="audio" id={"audio-"+this.options.id}>
+            <div class="play tgico tgico-play" onMouseDown={this._playButtonClick.bind(this)}/>
             <div class="audio-wrapper">
-                <svg css-width={`${this.width}px`} css-transform="scale(1,-1)">
+                <svg css-width={`${this.width}px`} css-transform="scale(1,-1)" onMouseEnter={this.enterHandler} onMouseLeave={this.leaveHandler} onMouseDown={this.moveHandler}>
                     <defs>
                         <mask id="bars">
                             {this._generateBars()}
                         </mask>
                     </defs>
-                    <rect x="0" y="0" width={this.width + "px"} height="100%" fill="grey" mask="url(#bars)"/>
-                    <rect x="0" y="0" width={this.width + "px"} height="100%" fill="green" mask="url(#bars)"/>
+                    <rect x="0" y="0" width={this.width + "px"} height="100%" fill={this.options.secondaryColor} mask="url(#bars)"/>
+                    <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%" fill={this.options.mainColor} mask="url(#bars)"/>
                 </svg>
                 <div class="timer">
-                    {this._timeToFormat(this.audio.duration)}
+                    {this.options.duration ? this.options.duration : this._timeToFormat(this.audio.duration)}
+                    <span class="read"></span>
                 </div>
             </div>
         </div>);
@@ -84,6 +78,7 @@ export default class Voice {
     }
 
     _handleEnter(e) {
+    	if(!this.bind) this._boundElement(document.getElementById("audio-"+this.options.id));
         this.svgContainer.addEventListener("mousemove", this.moveHandler);
     }
 
@@ -101,56 +96,27 @@ export default class Voice {
         }
     }
 
-    _playButtonClick() {
-        this.playButton.removeChild(this.playButton.firstElementChild);
-        let text = document.createElement("span");
+    _playButtonClick(e) {
+    	if(!this.bind) this._boundElement(document.getElementById("audio-"+this.options.id));
+
         if (this.playing) {
             this.pause();
-            text.textContent = "Play";
+            this.playButton.classList.remove("tgico-pause");
+            this.playButton.classList.add("tgico-play");
         } else {
             this.play();
-            text.textContent = "Pause";
+            this.playButton.classList.add("tgico-pause");
+            this.playButton.classList.remove("tgico-play");
         }
-        this.playButton.appendChild(text);
     }
 
-    _initContainer() {
-        this.playButton = document.createElement("div");
-        this.playButton.classList.add("play");
-        let text = document.createElement("span");
-        text.textContent = "Play";
-        this.playButton.appendChild(text);
-        this.element.appendChild(this.playButton);
-        this.playButton.addEventListener("mousedown", this._playButtonClick.bind(this));
+    _boundElement(elem) { //Давид зроби івент
+    	this.timer = elem.querySelector(".timer");
+    	this.progress = elem.querySelector(".progress");
+    	this.svgContainer = elem.querySelector("svg");
+    	this.playButton = elem.querySelector(".play");
 
-        let wrapper = document.createElement("div");
-        wrapper.classList.add("voice-wrapper");
-        this.element.appendChild(wrapper);
-
-        this.svgContainer = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        this.svgContainer.style.width = this.width + "px";
-        this.svgContainer.style.transform = "scale(1,-1)";
-        wrapper.appendChild(this.svgContainer);
-
-        this.timer = document.createElement("div");
-        this.timer.textContent = "0:00";
-        wrapper.appendChild(this.timer);
-
-        let defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-        this.svgContainer.appendChild(defs);
-        this.mask = document.createElementNS('http://www.w3.org/2000/svg', 'mask');
-        this.mask.setAttributeNS(null, "id", "bars");
-        defs.appendChild(this.mask);
-
-        let back = this._newRect(0, 0, this.width + "px", "100%");
-        this._setAttr(back, "fill", "grey");
-        this._setAttr(back, "mask", "url(#bars)")
-        this.svgContainer.appendChild(back);
-
-        this.progress = this._newRect(0, 0, this.width + "px", "100%");
-        this._setAttr(this.progress, "fill", "green");
-        this._setAttr(this.progress, "mask", "url(#bars)")
-        this.svgContainer.appendChild(this.progress);
+    	this.bind = true;
     }
 
     _generateBars() {
@@ -164,6 +130,10 @@ export default class Voice {
             x += width + this.barMargin;
         }
         return elemArr;
+    }
+
+    _heightToPercent(height) {
+        return Math.min(((2 + height) / 33) * 100, 100) + "%";
     }
 
     _setAttr(elem, attr, value) {
@@ -185,10 +155,6 @@ export default class Voice {
         this._setAttr(rect, "width", width);
         this._setAttr(rect, "height", height);
         return rect;
-    }
-
-    _heightToPercent(height) {
-        return Math.min(((2 + height) / 33) * 100, 100) + "%";
     }
 
     _getVpPos(el) {

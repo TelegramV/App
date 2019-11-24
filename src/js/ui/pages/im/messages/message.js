@@ -1,4 +1,4 @@
-import {MTProto} from "../../../../mtproto"
+import { MTProto } from "../../../../mtproto"
 import Voice from "../../../voice"
 import EmojiConverter from "emoji-js"
 
@@ -35,7 +35,7 @@ function vServiceMessageTemplate(data, inside) {
     )
 }
 
-const Message = ({data, slot}) => {
+const Message = ({ data, slot }) => {
     const className = data.post ? "channel in" : data.out ? "out" : "in"
 
     return (
@@ -81,7 +81,7 @@ function vMessageWithTextOnlyTemplate(data) {
 }
 
 
-const MessageMediaImage = ({src, size, alt = "", isThumb}) => {
+const MessageMediaImage = ({ src, size, alt = "", isThumb }) => {
     let width = isThumb ? Number(size[0]) >= 460 ? "460px" : `${size[0]}px` : Number(size[0]) >= 480 ? "480px" : `${size[0]}px`
     return (
         <div>
@@ -150,29 +150,13 @@ function vMessageWithStickerTemplate(data) {
 }
 
 function vMessageWithVoiceAudioTemplate(data) {
-    /*return vMessageTemplate(data,
-        <div class={vGetClass(data)}>
-            <div className="message">
-                {vForwardedTemplate(data)}
-                <div class="audio">
-                    <div class="play"/>
-                    <div class="inside">
-                        <div class="bars">
-                            {
-                                Object.assign([], data.audio.waveform).map(l => {
-                                    return <div className="bar" style={`height: ${l / 31 * 100}%`}/>
-                                })
-                            }
-                        </div>
-                        <span class="time">{data.audio.time} <span class={data.audio.read}/></span>
-                    </div>
-                    {vTimeTemplate(data)}
-                </div>
-                <audio src={data.audio.url}/>
-            </div>
-        </div>
-    )*/
-    const voice = new Voice(new Audio(data.audio.url), data.audio.waveform);
+    let color =  data.out ? "#50af4f" : "#4ea4f6";
+    const voice = new Voice(new Audio(data.audio.url), data.audio.waveform, {
+        id: data.id,
+        duration: data.audio.time,
+        mainColor: color,
+        secondaryColor: "#c4c9cc"
+    });
     return (
         <Message data={data}>
             <div class={vGetClass(data)}>
@@ -263,4 +247,3 @@ export function UICreateMessage(message) {
 
     return handlers[message.type](message)
 }
-
