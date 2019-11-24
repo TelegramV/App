@@ -72,6 +72,9 @@ export class Dialog {
         })
     }
 
+    get draft() {
+        return this._dialog.draft && this._dialog.draft._ !== "draftMessageEmpty" ? this._dialog.draft.message : null
+    }
 
     get notifySettings() {
         return this.dialog.notify_settings

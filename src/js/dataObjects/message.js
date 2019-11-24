@@ -24,7 +24,7 @@ export class Message {
     get from() {
         // TODO there's type of message when channel message is resent to chat
         // should check it!
-        return PeersManager.find("user", this._message.from_id)
+        return !this._message.from_id ? PeersManager.findByPeer(this._message.to_id) : PeersManager.find("user", this._message.from_id)
     }
 
     get to() {
@@ -40,7 +40,14 @@ export class Message {
     }
 
     get prefix() {
-        return getMessagePreviewDialog(this._message, true)
+        const from = this.from
+        if(from) {
+            return from.peerName + getMessagePreviewDialog(this._message, true)
+        } else {
+            console.log(this._message)
+            console.log(PeersManager.peers)
+            return getMessagePreviewDialog(this._message, true)
+        }
     }
 
     get date() {

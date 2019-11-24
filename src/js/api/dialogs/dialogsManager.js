@@ -33,8 +33,23 @@ class DialogManager extends Manager {
         MTProto.MessageProcessor.listenUpdateNewChannelMessage(update => {
             // console.log("NewChannelMessage", update)
         })
+        MTProto.MessageProcessor.listenUpdateDraftMessage(update => {
+            const dialog = this.findByPeer(update.peer)
+            if(dialog) {
+                dialog._dialog.draft = update.draft
+                this.resolveListeners({
+                    type: "updateSingle",
+                    dialog: dialog
+                })
+            }
+        })
+        MTProto.MessageProcessor.listenUpdateReadHistoryOutbox(update => {
+            console.log("outbox", update)
+        })
+        MTProto.MessageProcessor.listenUpdateReadHistoryInbox(update => {
+            console.log("inbox", update)
+        })
         MTProto.MessageProcessor.listenUpdateShort(async update => {
-
             if(update._ === "updateUserStatus") {
                 const dialog = this.find("user", update.user_id)
 
@@ -84,6 +99,20 @@ class DialogManager extends Manager {
                         dialog: dialog
                     })
                 }
+            } else if(update._ === "updateReadChannelOutbox") {
+                const dialog = this.find("channel", update.channel_id)
+
+                if (!dialog) {
+                    return // prob should be fixed
+                }
+
+                dialog._dialog.read_outbox_max_id = update.max_id
+                this.resolveListeners({
+                    type: "updateSingle",
+                    dialog: dialog
+                })
+            } else if(update._ === "updateReadHistoryOutbox") {
+                console.log(update)
             } else {
                 console.log("Short", update)
             }
@@ -106,6 +135,24 @@ class DialogManager extends Manager {
 
     find(type, id) {
         return this.dialogs[type][id]
+    }
+
+    findByPeer(peer) {
+        if(peer instanceof Peer) return this.find(peer.type, peer.id)
+
+        const keys = {
+            peerUser: "user",
+            peerChannel: "channel",
+            peerChat: "chat"
+        }
+        const key = keys[peer._]
+        const keysId = {
+            peerUser: "user_id",
+            peerChannel: "channel_id",
+            peerChat: "chat_id"
+        }
+        const keyId = keysId[peer._]
+        return this.find(key, peer[keyId])
     }
 
     fetchDialogs({
@@ -146,6 +193,13 @@ class DialogManager extends Manager {
                 // __is_empty = true
                 return
             }
+
+            dialogsSlice.users.forEach(l => {
+                PeersManager.set(getPeerObject(l))
+            })
+            dialogsSlice.chats.forEach(l => {
+                PeersManager.set(getPeerObject(l))
+            })
 
             const dialogsToPush = []
             dialogsSlice.dialogs.map(dialog => {

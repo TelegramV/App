@@ -1,4 +1,7 @@
 import VDOM from "./framework/vdom"
+import EmojiConverter from "emoji-js";
+
+export const emoji = new EmojiConverter();
 
 export const vLoadingNode = (
     <div className="full-size-loader height">

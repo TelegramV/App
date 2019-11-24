@@ -113,6 +113,7 @@
     background-size: contain;
     position: relative;
     flex-shrink: 0;
+    text-transform: uppercase;
 
     display: flex;
     align-items: center;
@@ -232,6 +233,10 @@
 
     .sender {
       color: black;
+    }
+
+    .draft {
+      color: red;
     }
   }
 
