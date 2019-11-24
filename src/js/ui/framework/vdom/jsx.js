@@ -1,4 +1,5 @@
 import vdom_h from "./h"
+import vdom_hasAttribute, {vdom_removeAttribute} from "./check/hasAttribute"
 
 const jsxAttributesMap = {
     className: "class",
@@ -8,7 +9,21 @@ const jsxAttributesMap = {
 function removeEmpties(array) {
     for (let i = 0; i < array.length; i++) {
         if (array[i] === "") {
-            delete array[i]
+            array.splice(i, 1)
+        }
+    }
+}
+
+function processChildrenIfs(children) {
+    let prevIf = undefined
+    for (let i = 0; i < children.length; i++) {
+        const vNode = children[i]
+        if (vdom_hasAttribute("if", vNode)) {
+            prevIf = !!vNode.attrs["if"]
+            vNode.renderIf = prevIf
+        } else if (vdom_hasAttribute("else", vNode) && prevIf !== undefined) {
+            vNode.renderIf = !prevIf
+            prevIf = undefined
         }
     }
 }
@@ -32,6 +47,8 @@ function vdom_jsx(tagName, attributes, ...children) {
     // removeEmpties(children)
     children = children.flat(Infinity)
 
+    processChildrenIfs(children)
+
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
             if (k.startsWith("on")) {
@@ -54,8 +71,6 @@ function vdom_jsx(tagName, attributes, ...children) {
                 attrs[k] = v
             } else if (k === "constructor") {
                 constructor = Object.assign(options, v)
-            } else if (k === "if") {
-                renderIf = Boolean(v)
             } else {
                 if (jsxAttributesMap.hasOwnProperty(k)) {
                     attrs[jsxAttributesMap[k]] = v

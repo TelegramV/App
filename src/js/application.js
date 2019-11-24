@@ -69,34 +69,4 @@ function start() {
     AppFramework.mount("#app")
 }
 
-const Conditional = ({ok}) => {
-    return (
-        <div id="conditional">
-            <div if={ok}>
-                ok = {ok}
-            </div>
-            <div if={!ok}>
-                not ok = {ok}
-            </div>
-        </div>
-    )
-}
-
-let ok = false
-
-const toggleCond = () => {
-    ok = !ok
-    console.log(<Conditional ok={ok}/>)
-    VDOM.patchReal(document.getElementById("conditional"), <Conditional ok={ok}/>)
-}
-
-const Btns = (
-    <div>
-        <Conditional ok={ok}/>
-        <button onClick={toggleCond}>toggle</button>
-    </div>
-)
-
-VDOM.mount(Btns, "#app")
-
-// MTProto.connect(authContext).then(start)
+MTProto.connect(authContext).then(start)

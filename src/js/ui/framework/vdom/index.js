@@ -7,6 +7,7 @@ import vdom_isVNode from "./check/isVNode"
 import vdom_isSimpleComponent from "./check/isSimpleComponent"
 import vdom_isNamedComponent from "./check/isNamedComponent"
 import vdom_isComponent from "./check/isComponent"
+import vdom_hasAttribute from "./check/hasAttribute"
 
 /**
  * Simple Virtual DOM.
@@ -26,6 +27,7 @@ export const VDOM = {
     isSimpleComponent: vdom_isSimpleComponent,
     isNamedComponent: vdom_isNamedComponent,
     isComponent: vdom_isComponent,
+    hasAttribute: vdom_hasAttribute
 }
 
 export default VDOM

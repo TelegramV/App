@@ -62,9 +62,20 @@
  */
 import vdom_isNamedComponent from "./check/isNamedComponent"
 import vdom_isSimpleComponent from "./check/isSimpleComponent"
+import vdom_isVNode from "./check/isVNode"
+
+function removeIfs(array) {
+    for (let i = 0; i < array.length; i++) {
+        if (vdom_isVNode(array[i]) && !array[i].renderIf) {
+            array.splice(i, 1)
+        }
+    }
+}
 
 function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], dangerouslySetInnerHTML = false, renderIf = true} = {}) {
     const vElem = Object.create(null)
+
+    removeIfs(children)
 
     // component
     if (vdom_isSimpleComponent(tagName)) {
@@ -78,6 +89,7 @@ function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], 
         vNode.renderIf = renderIf
         return vNode
     }
+
 
     Object.assign(vElem, {
         tagName,

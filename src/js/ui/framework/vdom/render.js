@@ -4,6 +4,10 @@ const _XML_NAMESPACES = {
     svg: "http://www.w3.org/2000/svg"
 }
 
+export function vdom_prepareToRender(vNode) {
+
+}
+
 /**
  * Renders Virtual DOM Node
  *
@@ -86,13 +90,7 @@ function vdom_render(vNode, xmlns = null) {
 
     // append children
     for (const child of vNode.children) {
-        if (vdom_isVNode(child)) {
-            if (child.renderIf) {
-                $node.appendChild(vdom_render(child, xmlns))
-            }
-        } else {
-            $node.appendChild(vdom_render(child, xmlns))
-        }
+        $node.appendChild(vdom_render(child, xmlns))
     }
 
     return $node
