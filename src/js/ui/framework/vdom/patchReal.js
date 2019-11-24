@@ -1,14 +1,8 @@
-import VDOM from "./index"
-
-function zip(xs, ys) {
-    const zipped = []
-    for (let i = 0; i < Math.min(xs.length, ys.length); i++) {
-        zipped.push([xs[i], ys[i]])
-    }
-    return zipped
-}
-
 // todo: fix this thing
+import vdom_render from "./render"
+import vdom_isVNode from "./check/isVNode"
+import vdom_mount from "./mount"
+
 function patchEvents($node, newEvents) {
     for (const [k, v] of Object.entries(newEvents)) {
         $node.removeEventListener(k, v)
@@ -58,7 +52,7 @@ function patchChildren($parent, $children, newVChildren) {
     })
 
     for (const additionalVChild of newVChildren.slice($children.length)) {
-        $parent.appendChild(VDOM.render(additionalVChild))
+        $parent.appendChild(vdom_render(additionalVChild))
     }
 }
 
@@ -82,9 +76,9 @@ function patchDangerouslySetInnerHTML($node, dangerouslySetInnerHTML) {
  * @param {HTMLElement|Node|Text} $node
  * @param newVNode
  */
-export function vdom_patchReal($node, newVNode) {
+function vdom_patchReal($node, newVNode) {
     if (newVNode instanceof Node) {
-        throw new Error("newVNode is an element of the real DOM and should be of virtual!")
+        throw new Error("newVNode is an element of the real DOM and should be of virtual.")
     }
 
     if (newVNode === undefined) {
@@ -92,25 +86,19 @@ export function vdom_patchReal($node, newVNode) {
         return undefined
     }
 
-    if (typeof newVNode === "object" && !newVNode.tagName) {
-        const $newNode = VDOM.render(newVNode)
-        $node.replaceWith($newNode)
-        return $newNode
+    if (typeof newVNode === "object" && !vdom_isVNode(newVNode)) {
+        return vdom_mount(newVNode, $node)
     }
 
     if (typeof newVNode !== "object" && typeof newVNode !== "function") {
         if ($node.nodeType !== Node.TEXT_NODE || $node.wholeText !== newVNode) {
-            const $newNode = VDOM.render(newVNode)
-            $node.replaceWith($newNode)
-            return $newNode
+            return vdom_mount(newVNode, $node)
         }
     }
 
     if ($node.nodeType === Node.TEXT_NODE) {
         if ($node.wholeText !== newVNode) {
-            const $newNode = VDOM.render(newVNode)
-            $node.replaceWith($newNode)
-            return $newNode
+            return vdom_mount(newVNode, $node)
         } else {
             return $node
         }
@@ -118,19 +106,15 @@ export function vdom_patchReal($node, newVNode) {
 
     // named components check
     // if names are different then replace all tree
-    if ($node.hasAttribute("data-component") || newVNode.attrs.hasOwnProperty("data-component")) {
+    if ($node.hasAttribute("data-component") || newVNode.attrs["data-component"] !== undefined) {
         if ($node.getAttribute("data-component") !== newVNode.attrs["data-component"]) {
-            const $newNode = VDOM.render(newVNode)
-            $node.replaceWith($newNode)
-            return $newNode
+            return vdom_mount(newVNode, $node)
         }
     }
 
-    // if tagNames are different then we replace all tree
+    // if tagNames are different then replace all tree
     if ($node.tagName.toLowerCase() !== newVNode.tagName) {
-        const $newNode = VDOM.render(newVNode)
-        $node.replaceWith($newNode)
-        return $newNode
+        return vdom_mount(newVNode, $node)
     }
 
     patchAttrs($node, $node.attributes, newVNode.attrs)

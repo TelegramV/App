@@ -9,6 +9,7 @@ import {ImPage} from "./ui/pages/im/impage"
 import {LoginPage} from "./ui/pages/login/nextlogin"
 import {AppFramework} from "./ui/framework/framework"
 import {attach} from "./api/notifications";
+import VDOM from "./ui/framework/vdom"
 
 const authContext = {
     dcID: 2,
