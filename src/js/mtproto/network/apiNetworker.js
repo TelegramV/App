@@ -19,6 +19,7 @@ import {MessageProcessor} from "./messageProcessor"
 import AppConfiguration from "../../configuration"
 import {Networker} from "./networker";
 import AppCryptoManager from "../crypto/cryptoManager";
+import TimeManager from "../timeManager";
 
 const Logger = createLogger("ApiNetworker", {
     level: "warn"
@@ -39,6 +40,33 @@ export class ApiNetworker extends Networker {
 
         this.seqNo = 0
         this.connectionInited = false
+
+        this.pings = {}
+        setInterval(this.checkConnection.bind(this), 1000)
+    }
+
+    checkConnection() {
+        if(Object.keys(this.pings) > 1) { // Probably disconnected
+            // TODO Show disconnection badge
+        }
+        const serializer = new TLSerialization({mtproto: true});
+        const pingID = [nextRandomInt(0xFFFFFFFF), nextRandomInt(0xFFFFFFFF)];
+
+        serializer.storeMethod('ping', {ping_id: pingID})
+
+        const pingMessage = {
+            msg_id: this.timeManager.generateMessageID(),
+            seq_no: this.generateSeqNo(true),
+            body: serializer.getBytes()
+        };
+
+        this.pings[pingMessage.msg_id] = pingID
+
+        this.messageProcessor.listenPong(pingMessage.msg_id, l => {
+            delete this.pings[pingMessage.msg_id]
+
+        })
+        this.sendMessage(pingMessage)
     }
 
     processResponse(data) {
@@ -156,6 +184,12 @@ export class ApiNetworker extends Networker {
         }
 
         this.messageProcessor.process(response, messageID, sessionID)
+    }
+
+
+    updateServerSalt(newSalt) {
+        this.auth.serverSalt = newSalt
+        AppPermanentStorage.setItem("serverSalt" + this.auth.dcID, bytesToHex(newSalt))
     }
 
     getMsgKey(dataWithPadding, isOut) {
@@ -323,7 +357,7 @@ export class ApiNetworker extends Networker {
 
 
     applyServerSalt(newServerSalt) {
-        var serverSalt = longToBytes(newServerSalt)
+        const serverSalt = longToBytes(newServerSalt);
 
         AppPermanentStorage.setItem(`dc${this.dcID}_server_salt`, bytesToHex(serverSalt))
 

@@ -86,11 +86,6 @@ class MobileProtocol {
         })
     }
 
-    updateServerSalt(newSalt) {
-        this.authContext.serverSalt = newSalt
-        AppPermanentStorage.setItem("serverSalt", bytesToHex(newSalt))
-    }
-
     createApiNetworker(authContext) {
         this.networker = new ApiNetworker(authContext)
         this.MessageProcessor = this.networker.messageProcessor

@@ -19,6 +19,7 @@ export class MessageProcessor {
 
         this.networker = options.networker
 
+        this.pongHandlers = {}
         this.rpcResultHandlers = {}
         this.rpcErrorHandlers = {}
         this.sentMessages = {}
@@ -31,11 +32,13 @@ export class MessageProcessor {
         this.updateReadHistoryOutboxListeners = []
         this.updateEditChannelMessageListeners = []
         this.updateDraftMessageListeners = []
+        this.updateDialogUnreadMarkListeners = []
 
         this.handlers = {
             "msg_container": this.processMessageContainer.bind(this),
             "message": this.processMessage.bind(this),
             "rpc_result": this.processRpcResult.bind(this),
+            "pong": this.processPong.bind(this),
             "msgs_ack": this.processMessagesAck.bind(this),
             "bad_server_salt": this.processBadServerSalt.bind(this),
             "new_session_created": this.processNewSessionCreated.bind(this),
@@ -47,7 +50,8 @@ export class MessageProcessor {
             "updateReadHistoryOutbox": this.processUpdateReadHistoryOutbox.bind(this),
             "updateReadHistoryInbox": this.processUpdateReadHistoryInbox.bind(this),
             "updateEditChannelMessage": this.processUpdateEditChannelMessage.bind(this),
-            "updateDraftMessage": this.processUpdateDraftMessage.bind(this)
+            "updateDraftMessage": this.processUpdateDraftMessage.bind(this),
+            "updateDialogUnreadMark": this.processUpdateDialogUnreadMark.bind(this)
         }
     }
 
@@ -59,6 +63,10 @@ export class MessageProcessor {
 
     processUpdateEditChannelMessage(message, messageID, sessionID) {
         this.updateEditChannelMessageListeners.forEach(listener => listener(message))
+    }
+
+    processUpdateDialogUnreadMark(message, messageID, sessionID) {
+        this.updateDialogUnreadMarkListeners.forEach(listener => listener(message))
     }
 
     processUpdateDraftMessage(message, messageID, sessionID) {
@@ -118,6 +126,10 @@ export class MessageProcessor {
         this.updateReadHistoryOutboxListeners.push(listener)
     }
 
+    listenUpdateDialogUnreadMark(listener) {
+        this.updateDialogUnreadMarkListeners.push(listener)
+    }
+
     listenUpdateReadHistoryInbox(listener) {
         this.updateReadHistoryInboxListeners.push(listener)
     }
@@ -145,6 +157,10 @@ export class MessageProcessor {
 
     listenUpdateNewChannelMessage(listener) {
         this.updateNewChannelMessagesListeners.push(listener)
+    }
+
+    listenPong(messageId, handler) {
+        this.pongHandlers[messageId] = handler
     }
 
     listenRpc(messageId, handler, reject) {
@@ -181,8 +197,15 @@ export class MessageProcessor {
     }
 
     processBadServerSalt(message, messageID, sessionID) {
-        MTProto.updateServerSalt(longToBytes(message.new_server_salt))
+        this.networker.updateServerSalt(longToBytes(message.new_server_salt))
         this.networker.resendMessage(message.bad_msg_id)
+    }
+
+    processPong(message, messageID, sessionID) {
+        const handler = this.pongHandlers[message.msg_id]
+        if(handler) {
+            handler(message)
+        }
     }
 
     processRpcResult(message, messageID, sessionID) {

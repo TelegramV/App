@@ -43,11 +43,37 @@ class DialogManager extends Manager {
                 })
             }
         })
+        MTProto.MessageProcessor.listenUpdateDialogUnreadMark(update => {
+            const dialog = this.findByPeer(update.peer.peer)
+            if(dialog) {
+                dialog._dialog.pFlags.unread_mark = update.pFlags.unread
+                this.resolveListeners({
+                    type: "updateSingle",
+                    dialog: dialog
+                })
+            }
+        })
         MTProto.MessageProcessor.listenUpdateReadHistoryOutbox(update => {
-            console.log("outbox", update)
+            const dialog = this.findByPeer(update.peer)
+            if(dialog) {
+                dialog._dialog.read_outbox_max_id = update.max_id
+                this.resolveListeners({
+                    type: "updateSingle",
+                    dialog: dialog
+                })
+            }
         })
         MTProto.MessageProcessor.listenUpdateReadHistoryInbox(update => {
             console.log("inbox", update)
+            const dialog = this.findByPeer(update.peer)
+            if(dialog) {
+                dialog._dialog.read_inbox_max_id = update.max_id
+                dialog._dialog.unread_count = update.still_unread_count
+                this.resolveListeners({
+                    type: "updateSingle",
+                    dialog: dialog
+                })
+            }
         })
         MTProto.MessageProcessor.listenUpdateShort(async update => {
             if(update._ === "updateUserStatus") {

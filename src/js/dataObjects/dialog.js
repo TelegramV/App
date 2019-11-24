@@ -89,7 +89,7 @@ export class Dialog {
     }
 
     get unreadMark() {
-        return this._dialog.pFlags.unreadMark
+        return this._dialog.pFlags.unread_mark
     }
 
     get unreadMentionsCount() {
