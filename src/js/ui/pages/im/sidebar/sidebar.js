@@ -55,20 +55,7 @@ function handleDialogUpdates(event) {
 
 function handlePeerUpdates(event) {
     if (event.type === "updatePhoto") {
-        const $dialogAvatar = $dialogsWrapper.querySelector(`[data-peer="${event.peer.type}.${event.peer.id}"]>.avatar`)
-
-        if ($dialogAvatar) {
-            if (event.peer._avatar) {
-                $dialogAvatar.setAttribute("class", "avatar")
-                $dialogAvatar.style = `background-image: url(${event.peer._avatar})`
-                $dialogAvatar.innerHTML = ""
-            } else {
-                $dialogAvatar.setAttribute("class", "avatar " + `placeholder-${event.peer.avatarLetter.num}`)
-                $dialogAvatar.innerHTML = event.peer.avatarLetter.text
-            }
-        } else {
-            console.warn("dialogAvatar is not on the page")
-        }
+        renderDialog(DialogsManager.find(event.peer.type, event.peer.id), event.peer.pinned)
     } else {
         Logger.log("PeerUpdates", event)
     }
@@ -85,8 +72,12 @@ function renderDialog(dialog, pinned = false) {
                 if (Number($dialog.dataset.messageId) < dialog.lastMessage.id) {
                     $dialogsPinned.prepend($dialog)
                 }
+
+                console.time("time")
+                console.timeLog("time")
                 // fix this later!!
                 VDOM.patchReal($dialog, UICreateDialog(dialog))
+                console.timeEnd("time")
             } else {
                 console.warn("dialog is not on the page")
             }

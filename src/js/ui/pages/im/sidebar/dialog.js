@@ -32,7 +32,7 @@ export function UICreateDialog(dialog) {
              data-message-id={dialog.lastMessage.id}
              className={personClasses}
              onClick={openDialog(dialog)}>
-            <div className={"avatar " + (!hasAvatar ? `placeholder-${peer.avatarLetter.num}` : "")}>
+            <div css-background-image={hasAvatar ? `url(${peer._avatar})` : ""} className={"avatar " + (!hasAvatar ? `placeholder-${peer.avatarLetter.num}` : "")}>
                 {!hasAvatar ? peer.avatarLetter.text : ""}
             </div>
             <div className="content">

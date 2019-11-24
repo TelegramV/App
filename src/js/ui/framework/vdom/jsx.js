@@ -1,4 +1,4 @@
-import VDOM from "./index"
+import vdom_h from "./h"
 
 const jsxAttributesMap = {
     className: "class",
@@ -21,12 +21,13 @@ function removeEmpties(array) {
  * @param children
  * @returns {any}
  */
-export function vdom_jsx(tagName, attributes, ...children) {
+function vdom_jsx(tagName, attributes, ...children) {
     let attrs = {}
     let events = {}
     let options = {}
     let constructor = {}
     let dangerouslySetInnerHTML = false
+    let renderIf = true
 
     // removeEmpties(children)
     children = children.flat(Infinity)
@@ -53,6 +54,8 @@ export function vdom_jsx(tagName, attributes, ...children) {
                 attrs[k] = v
             } else if (k === "constructor") {
                 constructor = Object.assign(options, v)
+            } else if (k === "if") {
+                renderIf = Boolean(v)
             } else {
                 if (jsxAttributesMap.hasOwnProperty(k)) {
                     attrs[jsxAttributesMap[k]] = v
@@ -63,7 +66,7 @@ export function vdom_jsx(tagName, attributes, ...children) {
         }
     }
 
-    return VDOM.h(tagName, {attrs, constructor, options, events, children, dangerouslySetInnerHTML})
+    return vdom_h(tagName, {attrs, constructor, options, events, children, dangerouslySetInnerHTML, renderIf})
 }
 
 export default vdom_jsx

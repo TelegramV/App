@@ -60,23 +60,23 @@
  * @param dangerouslySetInnerHTML
  * @returns {any}
  */
-export function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], dangerouslySetInnerHTML = false} = {}) {
+import vdom_isNamedComponent from "./check/isNamedComponent"
+import vdom_isSimpleComponent from "./check/isSimpleComponent"
+
+function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], dangerouslySetInnerHTML = false, renderIf = true} = {}) {
     const vElem = Object.create(null)
 
     // component
-    if (typeof tagName === "function") {
+    if (vdom_isSimpleComponent(tagName)) {
         return tagName(Object.assign(attrs, {slot: children}))
     }
 
     // named component
-    if (typeof tagName === "object" && tagName.hasOwnProperty("name") && tagName.hasOwnProperty("h")) {
+    if (vdom_isNamedComponent(tagName)) {
         const vNode = tagName.h(Object.assign(attrs, {slot: children}))
         vNode.attrs["data-component"] = tagName.name
+        vNode.renderIf = renderIf
         return vNode
-    }
-
-    if (tagName === "a" && !attrs.target) {
-        attrs.target = "_blank"
     }
 
     Object.assign(vElem, {
@@ -85,7 +85,8 @@ export function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children
         options,
         events,
         children,
-        dangerouslySetInnerHTML
+        dangerouslySetInnerHTML,
+        renderIf
     })
 
     return vElem

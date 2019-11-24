@@ -9,6 +9,7 @@ import {ImPage} from "./ui/pages/im/impage"
 import {LoginPage} from "./ui/pages/login/nextlogin"
 import {AppFramework} from "./ui/framework/framework"
 import {attach} from "./api/notifications";
+import VDOM from "./ui/framework/vdom"
 
 const authContext = {
     dcID: 2,
@@ -68,4 +69,34 @@ function start() {
     AppFramework.mount("#app")
 }
 
-MTProto.connect(authContext).then(start)
+const Conditional = ({ok}) => {
+    return (
+        <div id="conditional">
+            <div if={ok}>
+                ok = {ok}
+            </div>
+            <div if={!ok}>
+                not ok = {ok}
+            </div>
+        </div>
+    )
+}
+
+let ok = false
+
+const toggleCond = () => {
+    ok = !ok
+    console.log(<Conditional ok={ok}/>)
+    VDOM.patchReal(document.getElementById("conditional"), <Conditional ok={ok}/>)
+}
+
+const Btns = (
+    <div>
+        <Conditional ok={ok}/>
+        <button onClick={toggleCond}>toggle</button>
+    </div>
+)
+
+VDOM.mount(Btns, "#app")
+
+// MTProto.connect(authContext).then(start)

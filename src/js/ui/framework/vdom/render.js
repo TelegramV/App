@@ -1,3 +1,5 @@
+import vdom_isVNode from "./check/isVNode"
+
 const _XML_NAMESPACES = {
     svg: "http://www.w3.org/2000/svg"
 }
@@ -9,13 +11,17 @@ const _XML_NAMESPACES = {
  * @param xmlns
  * @returns {Text|HTMLElement}
  */
-export function vdom_render(vNode, xmlns = null) {
+function vdom_render(vNode, xmlns = null) {
+    if (vNode instanceof Node) {
+        throw new Error("Cannot render real node as virtual..")
+    }
+
     if (!vNode || typeof vNode === "undefined") {
         return document.createTextNode(vNode)
     }
 
     // means that the object is not a virtual node, so we just convert it to json
-    if (typeof vNode === "object" && !vNode.tagName) {
+    if (typeof vNode === "object" && !vdom_isVNode(vNode)) {
         return document.createTextNode(JSON.stringify(vNode))
     }
 
@@ -31,21 +37,22 @@ export function vdom_render(vNode, xmlns = null) {
 
     let $node = null
 
-    if (vNode.options && Object.keys(vNode.options) > 0) {
-        $node = document.createElement(vNode.tagName, options)
+    // if (vNode.options && Object.keys(vNode.options) > 0) {
+    //     $node = document.createElement(vNode.tagName, options)
+    // } else {
+
+    if (vNode.attrs.xmlns) {
+        xmlns = vNode.attrs.xmlns
+        $node = document.createElementNS(xmlns, vNode.tagName)
+    } else if (_XML_NAMESPACES.hasOwnProperty(vNode.tagName)) {
+        xmlns = _XML_NAMESPACES[vNode.tagName]
+        $node = document.createElementNS(xmlns, vNode.tagName)
+    } else if (xmlns) {
+        $node = document.createElementNS(xmlns, vNode.tagName)
     } else {
-        if (vNode.attrs.xmlns) {
-            xmlns = vNode.attrs.xmlns
-            $node = document.createElementNS(xmlns, vNode.tagName)
-        } else if (_XML_NAMESPACES.hasOwnProperty(vNode.tagName)) {
-            xmlns = _XML_NAMESPACES[vNode.tagName]
-            $node = document.createElementNS(xmlns, vNode.tagName)
-        } else if (xmlns) {
-            $node = document.createElementNS(xmlns, vNode.tagName)
-        } else {
-            $node = document.createElement(vNode.tagName)
-        }
+        $node = document.createElement(vNode.tagName)
     }
+    // }
 
     // check if innerHTML should be set
     if (vNode.dangerouslySetInnerHTML !== false) {
@@ -79,7 +86,13 @@ export function vdom_render(vNode, xmlns = null) {
 
     // append children
     for (const child of vNode.children) {
-        $node.appendChild(vdom_render(child, xmlns))
+        if (vdom_isVNode(child)) {
+            if (child.renderIf) {
+                $node.appendChild(vdom_render(child, xmlns))
+            }
+        } else {
+            $node.appendChild(vdom_render(child, xmlns))
+        }
     }
 
     return $node
