@@ -33,7 +33,9 @@ export function UICreateDialog(dialog) {
              className={personClasses}
              onClick={openDialog(dialog)}>
             <div className={"avatar " + (!hasAvatar ? `placeholder-${peer.avatarLetter.num}` : "")}>
-                {!hasAvatar ? peer.avatarLetter.text : ""}
+                <span>{!hasAvatar ? peer.avatarLetter.text : ""}</span>
+
+                <div className="avatar-inner"/>
             </div>
             <div className="content">
                 <div className="top">

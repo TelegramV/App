@@ -58,13 +58,16 @@ function handlePeerUpdates(event) {
         const $dialogAvatar = $dialogsWrapper.querySelector(`[data-peer="${event.peer.type}.${event.peer.id}"]>.avatar`)
 
         if ($dialogAvatar) {
+            const $dialogAvatarInner = $dialogAvatar.querySelector(`.avatar-inner`)
+            // const $dialogAvatarSpan = $dialogAvatar.querySelector(`span`)
+
             if (event.peer._avatar) {
-                $dialogAvatar.setAttribute("class", "avatar")
-                $dialogAvatar.style = `background-image: url(${event.peer._avatar})`
-                $dialogAvatar.innerHTML = ""
+                // $dialogAvatarInner.setAttribute("class", "avatar")
+                $dialogAvatarInner.style = `background-image: url(${event.peer._avatar}); opacity: 1;`
+                // $dialogAvatarSpan.textContent = ""
             } else {
-                $dialogAvatar.setAttribute("class", "avatar " + `placeholder-${event.peer.avatarLetter.num}`)
-                $dialogAvatar.innerHTML = event.peer.avatarLetter.text
+                // $dialogAvatar.setAttribute("class", "avatar " + `placeholder-${event.peer.avatarLetter.num}`)
+                // $dialogAvatarSpan.textContent = event.peer.avatarLetter.text
             }
         } else {
             console.warn("dialogAvatar is not on the page")

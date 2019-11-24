@@ -71,6 +71,7 @@
     border: 2px solid #fff;
     transition: anim(transform);
     transform: scale(1);
+    z-index: 100;
   }
 }
 
@@ -87,6 +88,7 @@
     border: 2px solid #fff;
     transform: scale(0);
     transition: anim(transform);
+    z-index: 100;
   }
 }
 
@@ -121,6 +123,22 @@
     color: white;
     font-size: 1.3em;
     transition: anim(background-image);
+
+    span {
+      position: absolute;
+      z-index: 10;
+    }
+
+    .avatar-inner {
+      z-index: 11;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background-repeat: no-repeat;
+      background-size: contain;
+      transition: anim(opacity);
+      opacity: 0;
+    }
 
 
     &.placeholder-0 {
