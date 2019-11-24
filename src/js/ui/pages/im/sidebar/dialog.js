@@ -46,9 +46,16 @@ export function UICreateDialog(dialog) {
                     })}</div>
                 </div>
                 <div className="bottom">
-                    <div className="message"><span
-                        className="sender">{dialog.lastMessage.prefix}</span>{dialog.lastMessage.text}
-                    </div>
+                    {
+                        dialog.draft !== null ?
+                            (<div className="message"><span className="draft">Draft: </span>{dialog.draft}</div>)
+                            : (
+                                Object.keys(dialog.messageActions).length === 0 ?
+                                    (<div className="message"><span className="sender">{dialog.lastMessage.prefix}</span>{dialog.lastMessage.text}</div>)
+                                    :
+                                    (<div className="message"><span className="sender">typing...</span></div>)
+                            )
+                    }
                     <div className="badge tgico">{unread}</div>
                 </div>
             </div>

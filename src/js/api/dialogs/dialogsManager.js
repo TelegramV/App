@@ -11,6 +11,7 @@ import {UserPeer} from "../../dataObjects/userPeer";
 import {SupergroupPeer} from "../../dataObjects/supergroupPeer";
 import {GroupPeer} from "../../dataObjects/groupPeer";
 import {ChannelPeer} from "../../dataObjects/channelPeer";
+import {Peer} from "../../dataObjects/peer";
 
 class DialogManager extends Manager {
     constructor() {
@@ -32,8 +33,23 @@ class DialogManager extends Manager {
         MTProto.MessageProcessor.listenUpdateNewChannelMessage(update => {
             // console.log("NewChannelMessage", update)
         })
+        MTProto.MessageProcessor.listenUpdateDraftMessage(update => {
+            const dialog = this.findByPeer(update.peer)
+            if(dialog) {
+                dialog._dialog.draft = update.draft
+                this.resolveListeners({
+                    type: "updateSingle",
+                    dialog: dialog
+                })
+            }
+        })
+        MTProto.MessageProcessor.listenUpdateReadHistoryOutbox(update => {
+            console.log("outbox", update)
+        })
+        MTProto.MessageProcessor.listenUpdateReadHistoryInbox(update => {
+            console.log("inbox", update)
+        })
         MTProto.MessageProcessor.listenUpdateShort(async update => {
-
             if(update._ === "updateUserStatus") {
                 const dialog = this.find("user", update.user_id)
 
@@ -45,24 +61,58 @@ class DialogManager extends Manager {
                     })
                 }
             } else if(update._ === "updateChatUserTyping") {
-                console.log(update)
                 const dialog = this.find("chat", update.chat_id) || this.find("channel", update.chat_id)
 
-                if(!dialog) {
+                if (!dialog) {
                     return; // prob should download the chat
                 }
 
-                const peer = PeersManager.find("user", update.user_id)
-                if(!peer) {
+                let peer = PeersManager.find("user", update.user_id)
+                if (!peer) {
                     await this.updateChatFull(dialog)
-                    console.log("updateChatFull")
+
+                    peer = PeersManager.find("user", update.user_id)
+                    if (!peer) {
+                        return
+                    }
                 }
-                if(dialog && peer) {
-                    console.log(peer.peerName)
-                } else {
-                    console.error("update chat type", dialog, peer, update)
+                if (dialog && peer) {
+                    dialog.addMessageAction(peer, update.action)
+                    this.resolveListeners({
+                        type: "updateSingle",
+                        dialog: dialog
+                    })
                 }
 
+            } else if(update._ === "updateUserTyping") {
+                console.log(update)
+                const dialog = this.find("user", update.user_id)
+
+                if (!dialog) {
+                    return; // prob should download the chat
+                }
+
+                if (dialog) {
+                    dialog.addMessageAction(dialog.peer, update.action)
+                    this.resolveListeners({
+                        type: "updateSingle",
+                        dialog: dialog
+                    })
+                }
+            } else if(update._ === "updateReadChannelOutbox") {
+                const dialog = this.find("channel", update.channel_id)
+
+                if (!dialog) {
+                    return // prob should be fixed
+                }
+
+                dialog._dialog.read_outbox_max_id = update.max_id
+                this.resolveListeners({
+                    type: "updateSingle",
+                    dialog: dialog
+                })
+            } else if(update._ === "updateReadHistoryOutbox") {
+                console.log(update)
             } else {
                 console.log("Short", update)
             }
@@ -85,6 +135,24 @@ class DialogManager extends Manager {
 
     find(type, id) {
         return this.dialogs[type][id]
+    }
+
+    findByPeer(peer) {
+        if(peer instanceof Peer) return this.find(peer.type, peer.id)
+
+        const keys = {
+            peerUser: "user",
+            peerChannel: "channel",
+            peerChat: "chat"
+        }
+        const key = keys[peer._]
+        const keysId = {
+            peerUser: "user_id",
+            peerChannel: "channel_id",
+            peerChat: "chat_id"
+        }
+        const keyId = keysId[peer._]
+        return this.find(key, peer[keyId])
     }
 
     fetchDialogs({
@@ -125,6 +193,13 @@ class DialogManager extends Manager {
                 // __is_empty = true
                 return
             }
+
+            dialogsSlice.users.forEach(l => {
+                PeersManager.set(getPeerObject(l))
+            })
+            dialogsSlice.chats.forEach(l => {
+                PeersManager.set(getPeerObject(l))
+            })
 
             const dialogsToPush = []
             dialogsSlice.dialogs.map(dialog => {
@@ -183,9 +258,11 @@ class DialogManager extends Manager {
         if(dialog.type === "channel") return this.updateChannelFull(dialog)
 
         return MTProto.invokeMethod( "messages.getFullChat", {
-            chat_id: getInputPeerFromPeer("chat", dialog.id)
+            chat_id: dialog.id
         }).then(l => {
-
+            l.users.forEach(q => {
+                PeersManager.set(getPeerObject(q))
+            })
             if(dialog instanceof GroupPeer) {
                 console.log("GroupPeer", l)
             }
@@ -196,8 +273,9 @@ class DialogManager extends Manager {
         return MTProto.invokeMethod("channels.getFullChannel", {
             channel: getInputPeerFromPeer("channel", dialog.id, dialog.peer.peer.access_hash)
         }).then(l => {
-            console.log(l)
-
+            l.users.forEach(q => {
+                PeersManager.set(getPeerObject(q))
+            })
             if(dialog instanceof ChannelPeer) {
                 console.log("ChannelPeer", l)
             } else if(dialog instanceof SupergroupPeer) {

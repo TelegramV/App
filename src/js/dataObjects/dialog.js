@@ -42,7 +42,19 @@ export class Dialog {
     }
 
     addMessageAction(user, action) {
-        this.messageActions[user] = action
+        this.messageActions[user] = {
+            action: action,
+            expires: tsNow(true) + 6
+        }
+        setTimeout(l => {
+            if(this.messageActions[user] && tsNow(true) >= this.messageActions[user].expires) {
+                this.removeMessageAction(user)
+                DialogsManager.resolveListeners({
+                    type: "updateSingle",
+                    dialog: this
+                })
+            }
+        }, 6000)
     }
 
     removeMessageAction(user) {
@@ -60,6 +72,9 @@ export class Dialog {
         })
     }
 
+    get draft() {
+        return this._dialog.draft && this._dialog.draft._ !== "draftMessageEmpty" ? this._dialog.draft.message : null
+    }
 
     get notifySettings() {
         return this.dialog.notify_settings

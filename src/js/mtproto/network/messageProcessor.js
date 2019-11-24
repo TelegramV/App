@@ -27,6 +27,10 @@ export class MessageProcessor {
         this.updateShortMessagesListeners = []
         this.updateNewMessagesListeners = []
         this.updateNewChannelMessagesListeners = []
+        this.updateReadHistoryInboxListeners = []
+        this.updateReadHistoryOutboxListeners = []
+        this.updateEditChannelMessageListeners = []
+        this.updateDraftMessageListeners = []
 
         this.handlers = {
             "msg_container": this.processMessageContainer.bind(this),
@@ -40,12 +44,36 @@ export class MessageProcessor {
             "updateNewMessage": this.processUpdateNewMessage.bind(this),
             "updateNewChannelMessage": this.processUpdateNewChannelMessage.bind(this),
             "updates": this.processUpdates.bind(this),
+            "updateReadHistoryOutbox": this.processUpdateReadHistoryOutbox.bind(this),
+            "updateReadHistoryInbox": this.processUpdateReadHistoryInbox.bind(this),
+            "updateEditChannelMessage": this.processUpdateEditChannelMessage.bind(this),
+            "updateDraftMessage": this.processUpdateDraftMessage.bind(this)
         }
     }
 
     processUpdateShort(message, messageID, sessionID) {
         //console.log(message)
         this.updateShortListeners.forEach(listener => listener(message.update))
+        // Logger.log("Short update", message)
+    }
+
+    processUpdateEditChannelMessage(message, messageID, sessionID) {
+        this.updateEditChannelMessageListeners.forEach(listener => listener(message))
+    }
+
+    processUpdateDraftMessage(message, messageID, sessionID) {
+        this.updateDraftMessageListeners.forEach(listener => listener(message))
+    }
+
+    processUpdateReadHistoryInbox(message, messageID, sessionID) {
+        //console.log(message)
+        this.updateReadHistoryInboxListeners.forEach(listener => listener(message))
+        // Logger.log("Short update", message)
+    }
+
+    processUpdateReadHistoryOutbox(message, messageID, sessionID) {
+        //console.log(message)
+        this.updateReadHistoryOutboxListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
 
@@ -81,10 +109,27 @@ export class MessageProcessor {
             if (this.handlers[update._]) {
                 this.handlers[update._](update)
             } else {
-                // console.warn("unexprected update", update)
+                console.warn("unexprected update", update)
             }
         })
     }
+
+    listenUpdateReadHistoryOutbox(listener) {
+        this.updateReadHistoryOutboxListeners.push(listener)
+    }
+
+    listenUpdateReadHistoryInbox(listener) {
+        this.updateReadHistoryInboxListeners.push(listener)
+    }
+
+    listenUpdateDraftMessage(listener) {
+        this.updateDraftMessageListeners.push(listener)
+    }
+
+    listenUpdateEditChannelMessage(listener) {
+        this.updateEditChannelMessageListeners.push(listener)
+    }
+
 
     listenUpdateShort(listener) {
         this.updateShortListeners.push(listener)

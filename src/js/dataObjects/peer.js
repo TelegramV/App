@@ -39,9 +39,10 @@ export class Peer {
     }
 
     get avatarLetter() {
+        const split = this.peerName.split(" ")
         return {
             num: Math.abs(this.id) % 8,
-            text: this.peerName[0]
+            text: split[0].match(/./ug)[0]
         }
     }
 

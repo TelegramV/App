@@ -7,7 +7,7 @@ const Logger = createLogger("UserPeer")
 
 export class UserPeer extends Peer {
     get peerName() {
-        return this.firstName + " " + this.lastName
+        return this.firstName + (this.lastName.length > 0 ? " " + this.lastName : "")
     }
     get firstName() {
         return this.peer.first_name

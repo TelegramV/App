@@ -1,9 +1,8 @@
 import {MTProto} from "../../../../mtproto"
 import Voice from "../../../voice"
-import EmojiConverter from "emoji-js"
 import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers";
+import {emoji} from "../../../utils";
 
-const emoji = new EmojiConverter();
 
 function vTimeTemplate(message, bg = false) {
     let classes = "time" + (bg ? " bg" : "")

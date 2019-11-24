@@ -28,6 +28,24 @@ export class PeerManager extends Manager {
         return this.peers[name][id]
     }
 
+    findByPeer(peer) {
+        if(peer instanceof Peer) return peer
+
+        const keys = {
+            peerUser: "user",
+            peerChannel: "channel",
+            peerChat: "chat"
+        }
+        const key = keys[peer._]
+        const keysId = {
+            peerUser: "user_id",
+            peerChannel: "channel_id",
+            peerChat: "chat_id"
+        }
+        const keyId = keysId[peer._]
+        return this.find(key, peer[keyId])
+    }
+
     listenPeerInit(peerName, peerId, listener) {
         if (!this.peerInitListeners[peerName]) {
             this.peerInitListeners[peerName] = {}
