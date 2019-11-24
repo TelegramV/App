@@ -55,7 +55,10 @@ function handleDialogUpdates(event) {
 
 function handlePeerUpdates(event) {
     if (event.type === "updatePhoto") {
-        renderDialog(DialogsManager.find(event.peer.type, event.peer.id), event.peer.pinned)
+        const dialog = DialogsManager.find(event.peer.type, event.peer.id)
+        if (dialog) {
+            renderDialog(dialog, event.peer.pinned)
+        }
     } else {
         Logger.log("PeerUpdates", event)
     }
@@ -73,11 +76,7 @@ function renderDialog(dialog, pinned = false) {
                     $dialogsPinned.prepend($dialog)
                 }
 
-                console.time("time")
-                console.timeLog("time")
-                // fix this later!!
                 VDOM.patchReal($dialog, UICreateDialog(dialog))
-                console.timeEnd("time")
             } else {
                 console.warn("dialog is not on the page")
             }
