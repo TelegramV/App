@@ -10,6 +10,7 @@ import {LoginPage} from "./ui/pages/login/nextlogin"
 import {AppFramework} from "./ui/framework/framework"
 import {attach} from "./api/notifications";
 import VDOM from "./ui/framework/vdom"
+import {loadSchema} from "./mtproto/language/schema";
 
 const authContext = {
     dcID: 2,
@@ -69,4 +70,4 @@ function start() {
     AppFramework.mount("#app")
 }
 
-MTProto.connect(authContext).then(start)
+loadSchema().then(l => MTProto.connect(authContext).then(start))

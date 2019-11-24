@@ -20,6 +20,7 @@ import AppConfiguration from "../../configuration"
 import {Networker} from "./networker";
 import AppCryptoManager from "../crypto/cryptoManager";
 import TimeManager from "../timeManager";
+import {schema} from "../language/schema";
 
 const Logger = createLogger("ApiNetworker", {
     level: "warn"
@@ -125,7 +126,7 @@ export class ApiNetworker extends Networker {
         const deserializerOptions = {
             mtproto: true,
             // TODO binary schema
-            schema: require("../language/schema_combine"),
+            schema: schema,
             override: {
                 // fuck what is the point?
 
