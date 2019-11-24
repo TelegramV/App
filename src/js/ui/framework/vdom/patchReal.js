@@ -14,18 +14,16 @@ function patchEvents($node, newEvents) {
 }
 
 /**
- * @param $node
- * @param {NamedNodeMap} oldAttrs
+ * @param {Element} $node
  * @param {object} newAttrs
- * @returns {function(*=): *}
  */
-function patchAttrs($node, oldAttrs, newAttrs) {
+function patchAttrs($node, newAttrs) {
+    const oldAttrs = $node.attributes
     for (const [k, v] of Object.entries(newAttrs)) {
         if ($node.nodeType !== Node.TEXT_NODE) {
-            if (Array.isArray(v)) {
-                $node.setAttribute(k, v.join(" "))
-            } else {
-                $node.setAttribute(k, v)
+            const nv = Array.isArray(v) ? v.join(" ") : v
+            if ($node.getAttribute(k) !== nv) {
+                $node.setAttribute(k, nv)
             }
         }
     }
@@ -117,7 +115,7 @@ function vdom_patchReal($node, newVNode) {
         return vdom_mount(newVNode, $node)
     }
 
-    patchAttrs($node, $node.attributes, newVNode.attrs)
+    patchAttrs($node, newVNode.attrs)
     patchEvents($node, newVNode.events)
 
     if (newVNode.dangerouslySetInnerHTML !== false) {
