@@ -6,46 +6,35 @@
  * @author kohutd
  */
 
-export class Logger {
-    constructor(name = "", options = {}) {
-        this.levels = [
-            {
-                index: 0,
-                name: "log",
-            },
-            {
-                index: 1,
-                name: "info",
-            },
-            {
-                index: 2,
-                name: "warn",
-            },
-            {
-                index: 3,
-                name: "error",
-            },
-            {
-                index: 4,
-                name: "debug",
-            },
-        ]
+const _levels = [
+    {
+        index: 0,
+        name: "log",
+    },
+    {
+        index: 1,
+        name: "info",
+    },
+    {
+        index: 2,
+        name: "warn",
+    },
+    {
+        index: 3,
+        name: "error",
+    },
+    {
+        index: 4,
+        name: "debug",
+    },
+]
 
-        this.prefix = `[${name || options.prefix}]` || ""
-        this.dateTime = options.dateTimeFormat || true
-        this.dateTimeFormat = options.dateTimeFormat || "default"
-        this.level = options.level || "debug"
-        this.levelIndex = options.levelIndex || this.levels.find(v => v.name === String(this.level)).index
-        this.showErrors = options.showErrors || true
-        this.driver = options.driver || console
-        this.disableLog = false
-    }
-
-    makeLog(level = "log", text) {
-        let output = `${this.prefix}`
+const createMakeLog = Logger => {
+    return (level = "log", text) => {
+        let output = `${Logger.prefix}`
         output += ` [${level.toUpperCase()}]`
 
-        if (this.dateTime) {
+        if (Logger.dateTime) {
             const datetime = new Date().toLocaleTimeString("en", {
                 hour12: false,
                 hour: "2-digit",
@@ -59,68 +48,95 @@ export class Logger {
 
         return output
     }
+}
 
-    log(text, ...options) {
-        if (!this.disableLog) {
+const createOutLevel = Logger => {
+    return (levelName, text, ...options) => {
+        if (typeof text === "function" && options[0] !== false) {
+            text(this[levelName])
+        } else {
             if (typeof text === "object") {
-                this.driver.log(this.makeLog("log"), text, ...options)
+                Logger.driver[levelName](Logger.makeLog(levelName), text, ...options)
             } else {
-                this.driver.log(this.makeLog("log", text), ...options)
-            }
-        }
-    }
-
-    info(text, ...options) {
-        if (this.levelIndex >= 1) {
-            if (typeof text === "object") {
-                this.driver.info(this.makeLog("info"), text, ...options)
-            } else {
-                this.driver.info(this.makeLog("info", text), ...options)
-            }
-        }
-    }
-
-    warn(text, ...options) {
-        if (this.levelIndex >= 2) {
-            if (typeof text === "object") {
-                this.driver.warn(this.makeLog("warn"), text, ...options)
-            } else {
-                this.driver.warn(this.makeLog("warn", text), ...options)
-            }
-        }
-    }
-
-    error(text, ...options) {
-        if (this.showErrors || this.levelIndex >= 3) {
-            if (typeof text === "object") {
-                this.driver.error(this.makeLog("error"), text, ...options)
-            } else {
-                this.driver.error(this.makeLog("error", text), ...options)
-            }
-        }
-    }
-
-    debug(text, ...options) {
-        if (this.levelIndex >= 4) {
-            if (typeof text === "object") {
-                console.groupCollapsed(this.makeLog("debug"), text, ...options)
-                console.trace()
-                console.groupEnd()
-            } else {
-                console.groupCollapsed(this.makeLog("debug", text), ...options)
-                console.trace()
-                console.groupEnd()
+                Logger.driver[levelName](Logger.makeLog(levelName, text), ...options)
             }
         }
     }
 }
 
-export function createLogger(name = "", options = {}) {
-    return new Logger(name, Object.assign({
-        level: "debug",
-    }, options))
+const createLog = logger => {
+    return (text, ...options) => {
+        if (!logger.disableLog) {
+            logger.outLevel("log", text, ...options)
+        }
+    }
 }
 
-export default new Logger({
-    level: "debug"
-})
+const createInfo = Logger => {
+    return (text, ...options) => {
+        if (Logger.levelIndex >= 1) {
+            Logger.outLevel("info", text, ...options)
+        }
+    }
+}
+
+const createWarn = Logger => {
+    return (text, ...options) => {
+        if (Logger.levelIndex >= 2) {
+            Logger.outLevel("warn", text, ...options)
+        }
+    }
+}
+
+const createError = Logger => {
+    return (text, ...options) => {
+        if (Logger.showErrors || Logger.levelIndex >= 3) {
+            Logger.outLevel("error", text, ...options)
+        }
+    }
+}
+
+const createDebug = Logger => {
+    return (text, ...options) => {
+        if (Logger.levelIndex >= 4) {
+            if (typeof text === "function" && options[0] !== false) {
+                text(Logger.debug)
+            } else {
+                if (typeof text === "object") {
+                    console.groupCollapsed(Logger.makeLog("debug"), text, ...options)
+                    console.trace()
+                    console.groupEnd()
+                } else {
+                    console.groupCollapsed(Logger.makeLog("debug", text), ...options)
+                    console.trace()
+                    console.groupEnd()
+                }
+            }
+        }
+    }
+}
+
+export const createLogger = (name = "", options = {}) => {
+    const Logger = {
+        prefix: `[${name || options.prefix}]` || "",
+        dateTime: options.dateTimeFormat || true,
+        dateTimeFormat: options.dateTimeFormat || "default",
+        level: options.level || "debug",
+        levelIndex: options.levelIndex || _levels.find(v => v.name === String(options.level || "debug")).index,
+        showErrors: options.showErrors || true,
+        driver: options.driver || console,
+        disableLog: options.disableLog || false,
+    }
+
+    Logger.makeLog = createMakeLog(Logger)
+    Logger.outLevel = createOutLevel(Logger)
+    Logger.log = createLog(Logger)
+    Logger.info = createInfo(Logger)
+    Logger.warn = createWarn(Logger)
+    Logger.error = createError(Logger)
+    Logger.debug = createDebug(Logger)
+
+    return Logger
+}
+
+export default createLogger()
