@@ -1,6 +1,8 @@
-# Telegram Web
+# Telegram
 
-Next generation Telegram web-client.
+[![pipeline status](https://gitlab.com/erchive/telegramweb/badges/master/pipeline.svg)](https://gitlab.com/erchive/telegramweb/commits/master)
+
+Next generation Telegram web client.
 
 ## Building and running on localhost
 
