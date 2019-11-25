@@ -1,9 +1,9 @@
-import {nextRandomInt} from "../../mtproto/utils/bin"
 import {TemporaryStorage} from "./temporaryStorage"
 import {PermanentStorage} from "./permanentStorage"
+import Random from "../../mtproto/utils/random"
 
 
-export function createTemporaryStorage(name = nextRandomInt()) {
+export function createTemporaryStorage(name = Random.nextInteger()) {
     return new TemporaryStorage({
         name: name
     })

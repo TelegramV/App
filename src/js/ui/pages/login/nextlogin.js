@@ -4,10 +4,11 @@ import {countries, hasClass} from "../../utils"
 import {MTProto} from "../../../mtproto"
 import {AppPermanentStorage} from "../../../common/storage"
 import {AppFramework} from "../../framework/framework"
-import {TGSPlayer} from "./../../vendor/tgs_player"
-import mt_srp_check_password from "../../../mtproto/crypto/mt_srp/mt_srp";
 import {FileAPI} from "../../../api/fileAPI";
 import AppCryptoManager from "../../../mtproto/crypto/cryptoManager";
+
+// do not use `import` to get this, because DO NOT DO THIS
+require("./../../vendor/tgs_player")
 
 const Croppie = require("croppie")
 const Emoji = require("emoji-js");
@@ -78,7 +79,7 @@ function handlePhoneSend() {
                     PHONE_NUMBER_FLOOD: "Too many attempts",
                     AUTH_RESTART: "Auth restarting"
                 }
-                if(error.type === "AUTH_RESTART") {
+                if (error.type === "AUTH_RESTART") {
                     window.location.reload() // TODO should probably save session state
                 }
                 const msg = messages[error.type] || "Error occured"
@@ -114,7 +115,7 @@ function handlePasswordSend() {
         const srp_id = response.srp_id
         const srp_B = response.srp_B
 
-        const srp_ret = await AppCryptoManager.mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, password);
+        const srp_ret = await AppCryptoManager.srpCheckPassword(g, p, salt1, salt2, srp_id, srp_B, password);
 
         MTProto.invokeMethod("auth.checkPassword", {
             password: {
@@ -134,7 +135,7 @@ function handlePasswordSend() {
             console.log(reject)
             $phoneInput.classList.add("invalid");
 
-            if(reject.type === "INVALID_PASSWORD_HASH") {
+            if (reject.type === "INVALID_PASSWORD_HASH") {
                 $phoneInput.nextElementSibling.innerHTML = "Invalid password";
             } else {
                 $phoneInput.nextElementSibling.innerHTML = reject.type;
@@ -198,7 +199,7 @@ function handleSignUp() {
         MTProto.Auth.signUp(_formData.phoneNumber, _formData.phoneCodeHash, firstName, lastName).then(async authorization => {
             if (authorization._ === "auth.authorization") {
                 console.log("signup success!")
-                if(pictureBlob) {
+                if (pictureBlob) {
                     console.log(pictureBlob)
                     FileAPI.uploadProfilePhoto("avatar.jpg", pictureBlob).then(l => {
                         AppPermanentStorage.setItem("authorizationData", authorization)
@@ -215,11 +216,11 @@ function handleSignUp() {
             }
         }, error => {
             let msg = "Something went terribly wrong"
-            if(error.type === "FIRSTNAME_INVALID") {
+            if (error.type === "FIRSTNAME_INVALID") {
                 msg = "Invalid first name"
                 document.getElementById("name").classList.add("invalid");
                 document.getElementById("name").nextElementSibling.innerHTML = msg;
-            } else if(error.type === "LASTNAME_INVALID") {
+            } else if (error.type === "LASTNAME_INVALID") {
                 msg = "Invalid last name"
                 document.getElementById("lastName").classList.add("invalid");
                 document.getElementById("lastName").nextElementSibling.innerHTML = msg;
@@ -294,9 +295,9 @@ function generateFullDropdown() {
         elem.dataset.flag = country[2].toLowerCase();
 
         let name = elem.dataset.name;
-        let flag = emoji.replace_colons(":flag-"+elem.dataset.flag+":");
+        let flag = emoji.replace_colons(":flag-" + elem.dataset.flag + ":");
 
-        elem.innerHTML = "<div class=\"country-flag\">"+flag+"</div>\
+        elem.innerHTML = "<div class=\"country-flag\">" + flag + "</div>\
                         <div class=\"country-name\">" + name + "</div>\
                         <div class=\"country-code\">" + country[0] + "</div>"
 
@@ -311,7 +312,7 @@ function fillDropdown(str) {
     for (let i = 0; i < $list.childNodes.length; i++) {
         let elem = $list.childNodes[i]
         let name = elem.dataset.name
-        if ( str.length === 0 || name.toLowerCase().startsWith(str.toLowerCase())) {
+        if (str.length === 0 || name.toLowerCase().startsWith(str.toLowerCase())) {
             elem.style.display = "flex"
         } else {
             elem.style.display = "none"
@@ -582,7 +583,6 @@ function load() {
     $passwordNext.addEventListener("click", handlePasswordSend())
 
     document.getElementById("next").onclick = handlePhoneSend()
-
 }
 
 export function LoginPage() {
@@ -664,7 +664,9 @@ export function LoginPage() {
                         <input type="text" id="lastName" placeholder="Last Name (Optional)" autoComplete="off"/>
                         <label for="lastName" required>Last Name (Optional)</label>
                     </div>
-                    <div id="start" className="btn rp"><span className="button-text">START MESSAGING</span><progress className="progress-circular white"/></div>
+                    <div id="start" className="btn rp"><span className="button-text">START MESSAGING</span>
+                        <progress className="progress-circular white"/>
+                    </div>
                 </div>
             </div>
             <div id="cropperModal" className="modal hidden">
@@ -683,7 +685,10 @@ export function LoginPage() {
                 </div>
             </div>
             <div style="position: absolute; bottom: 0; right: 0;">
-                <button onClick={l => {AppPermanentStorage.clear() + window.location.reload()}}>clear auth</button>
+                <button onClick={l => {
+                    AppPermanentStorage.clear() + window.location.reload()
+                }}>clear auth
+                </button>
             </div>
         </div>
     )

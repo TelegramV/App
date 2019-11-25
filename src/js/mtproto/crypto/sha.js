@@ -1,6 +1,7 @@
 import Rusha from "rusha"
 import CryptoJS from "../vendor/crypto"
-import {bytesFromArrayBuffer, bytesFromWords, bytesToWords} from "../utils/bin"
+import {bytesFromWords, bytesToWords} from "../utils/bin"
+import Bytes from "../utils/bytes"
 
 const rusha = new Rusha(1024 * 1024);
 
@@ -11,7 +12,7 @@ export function sha1HashSync(bytes) {
 }
 
 export function sha1BytesSync(bytes) {
-    return bytesFromArrayBuffer(sha1HashSync(bytes))
+    return Bytes.fromArrayBuffer(sha1HashSync(bytes))
 }
 
 export function sha256HashSync(bytes) {

@@ -1,8 +1,9 @@
 import CryptoJS from "../vendor/crypto"
-import {addPadding, bytesFromWords, bytesToWords} from "../utils/bin"
+import {bytesFromWords, bytesToWords} from "../utils/bin"
+import Bytes from "../utils/bytes"
 
 export function aesEncryptSync(bytes, keyBytes, ivBytes) {
-    bytes = addPadding(bytes)
+    bytes = Bytes.addPadding(bytes)
 
     const encryptedWords = CryptoJS.AES.encrypt(bytesToWords(bytes), bytesToWords(keyBytes), {
         iv: bytesToWords(ivBytes),

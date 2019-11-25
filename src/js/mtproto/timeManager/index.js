@@ -1,6 +1,7 @@
 import {AppTemporaryStorage} from "../../common/storage"
-import {longFromInts, nextRandomInt} from "../utils/bin"
+import {longFromInts} from "../utils/bin"
 import {createLogger} from "../../common/logger"
+import Random from "../utils/random"
 
 const Logger = createLogger("MtpTimeManager", {
     level: "log"
@@ -20,7 +21,7 @@ export class MtpTimeManager {
         const timeTicks = tsNow()
         const timeSec = Math.floor(timeTicks / 1000) + this.timeOffset
         const timeMSec = timeTicks % 1000
-        const random = nextRandomInt(0xFFFF)
+        const random = Random.nextInteger(0xFFFF)
 
         let messageID = [timeSec, (timeMSec << 21) | (random << 3) | 4]
 

@@ -1,6 +1,7 @@
-import {bigint, bigStringInt, bytesToHex, intToUint} from "../utils/bin"
+import {bigint, bigStringInt, intToUint} from "../utils/bin"
 import {createLogger} from "../../common/logger";
 import {schema} from "./schema";
+import Bytes from "../utils/bytes"
 
 const Logger = createLogger("TLSerialization", {
     level: "log"
@@ -17,8 +18,6 @@ export class TLSerialization {
         this.schema = options.schema || schema
 
         this.createBuffer()
-
-        this.mtproto = options.mtproto || false
     }
 
     createBuffer() {
@@ -27,6 +26,9 @@ export class TLSerialization {
         this.byteView = new Uint8Array(this.buffer)
     }
 
+    /**
+     * @return {Int32Array}
+     */
     getArray() {
         const resultBuffer = new ArrayBuffer(this.offset)
         const resultArray = new Int32Array(resultBuffer)
@@ -36,10 +38,17 @@ export class TLSerialization {
         return resultArray
     }
 
+    /**
+     * @return {ArrayBufferLike}
+     */
     getBuffer() {
         return this.getArray().buffer
     }
 
+    /**
+     * @param typed
+     * @return {Array|Uint8Array}
+     */
     getBytes(typed) {
         if (typed) {
             const resultBuffer = new ArrayBuffer(this.offset)
@@ -74,22 +83,39 @@ export class TLSerialization {
         new Int32Array(this.buffer).set(previousArray)
     }
 
+    /**
+     * @param {number} value
+     * @param field
+     */
     writeInt(value, field = "") {
-        Logger.debug(">>>", value.toString(16), value, field)
+        Logger.debug(_ => _(">>>", value.toString(16), value, field))
 
         this.checkLength(4)
         this.intView[this.offset / 4] = value
         this.offset += 4
     }
 
+    /**
+     * @param {number} value
+     * @param field
+     */
     storeInt(value, field = "") {
         this.writeInt(value, field + ":int")
     }
 
+    /**
+     * @param {number} value
+     * @param {number} size
+     * @param field
+     */
     storeIntSize(value, size, field = "") {
         this.writeInt(value, field + ":int" + size)
     }
 
+    /**
+     * @param {boolean} value
+     * @param field
+     */
     storeBool(value, field = "") {
         if (value) {
             this.writeInt(0x997275b5, field + ":bool")
@@ -98,11 +124,20 @@ export class TLSerialization {
         }
     }
 
+    /**
+     * @param {number} iHigh
+     * @param {number} iLow
+     * @param field
+     */
     storeLongP(iHigh, iLow, field = "") {
         this.writeInt(iLow, field + ":long[low]")
         this.writeInt(iHigh, field + ":long[high]")
     }
 
+    /**
+     * @param {number|string|Array} sLong
+     * @param field
+     */
     storeLong(sLong, field = "") {
         if (sLong instanceof Array) {
             if (sLong.length === 2) {
@@ -122,6 +157,10 @@ export class TLSerialization {
         this.writeInt(intToUint(divRem[0].intValue()), field + ":long[high]")
     }
 
+    /**
+     * @param {number} f
+     * @param field
+     */
     storeDouble(f, field = "") {
         const buffer = new ArrayBuffer(8)
         const intView = new Int32Array(buffer)
@@ -133,6 +172,10 @@ export class TLSerialization {
         this.writeInt(intView[1], field + ":double[high]")
     }
 
+    /**
+     * @param {string} s
+     * @param field
+     */
     storeString(s, field = "") {
         Logger.debug(">>>", s, field + ":string")
 
@@ -163,6 +206,10 @@ export class TLSerialization {
         }
     }
 
+    /**
+     * @param {Array|ArrayBuffer|Uint8Array|Uint16Array|Uint32Array} bytes
+     * @param field
+     */
     storeBytes(bytes, field = "") {
         if (bytes instanceof ArrayBuffer) {
             bytes = new Uint8Array(bytes)
@@ -170,7 +217,7 @@ export class TLSerialization {
             bytes = []
         }
 
-        Logger.debug(">>>", bytesToHex(bytes), field + ":bytes")
+        Logger.debug(_ => _(">>>", Bytes.asHex(bytes), field + ":bytes"))
 
         const len = bytes.byteLength || bytes.length
         this.checkLength(len + 8)
@@ -192,6 +239,11 @@ export class TLSerialization {
         }
     }
 
+    /**
+     * @param {Array|ArrayBuffer|Uint8Array|Uint16Array|Uint32Array} bytes
+     * @param bits
+     * @param field
+     */
     storeIntBytes(bytes, bits, field = "") {
         if (bytes instanceof ArrayBuffer) {
             bytes = new Uint8Array(bytes)
@@ -203,7 +255,7 @@ export class TLSerialization {
             throw new Error("Invalid bits: " + bits + ", " + len)
         }
 
-        Logger.debug(">>>", bytesToHex(bytes), field + ":int" + bits)
+        Logger.debug(_ => _(">>>", Bytes.asHex(bytes), field + ":int" + bits))
 
         this.checkLength(len)
 
@@ -211,13 +263,17 @@ export class TLSerialization {
         this.offset += len
     }
 
+    /**
+     * @param {Array|ArrayBuffer|Uint8Array|Uint16Array|Uint32Array} bytes
+     * @param field
+     */
     storeRawBytes(bytes, field = "") {
         if (bytes instanceof ArrayBuffer) {
             bytes = new Uint8Array(bytes)
         }
-        var len = bytes.length
+        const len = bytes.length
 
-        Logger.debug(">>>", bytesToHex(bytes), field)
+        Logger.debug(_ => _(">>>", Bytes.asHex(bytes), field))
 
         this.checkLength(len)
 
@@ -225,6 +281,11 @@ export class TLSerialization {
         this.offset += len
     }
 
+    /**
+     * @param methodName
+     * @param params
+     * @return {*}
+     */
     storeMethod(methodName, params) {
         let methodData = false
 
@@ -264,6 +325,12 @@ export class TLSerialization {
         return methodData.type
     }
 
+    /**
+     * @param obj
+     * @param type
+     * @param field
+     * @return {boolean|void|*}
+     */
     storeObject(obj, type, field) {
         switch (type) {
             case "#":
@@ -315,13 +382,12 @@ export class TLSerialization {
         const predicate = obj["_"]
         let isBare = type.charAt(0) === "%"
         let constructorData = false
-        let i = null
 
         if (isBare) {
             type = type.substr(1)
         }
 
-        for (i = 0; i < this.schema.constructors.length; i++) {
+        for (let i = 0; i < this.schema.constructors.length; i++) {
             if (String(this.schema.constructors[i].predicate) === String(predicate)) {
                 constructorData = this.schema.constructors[i]
                 break
@@ -344,7 +410,7 @@ export class TLSerialization {
         let condType
         let fieldBit
         let len = constructorData.params.length
-        for (i = 0; i < len; i++) {
+        for (let i = 0; i < len; i++) {
             param = constructorData.params[i]
             type = param.type
             if (type.indexOf("?") !== -1) {

@@ -1,16 +1,15 @@
 import {ApiNetworker} from "./network/apiNetworker"
 import {AppConfiguration} from "../configuration"
-import {bytesFromHex, bytesToHex, createNonce} from "./utils/bin"
+import {createNonce} from "./utils/bin"
 import TimeManager from "./timeManager"
 import {createLogger} from "../common/logger"
 import {AppPermanentStorage} from "../common/storage"
 import {AuthAPI} from "../api/auth";
 import {sendReqPQ} from "./connect/methods";
-import PeersManager from "../api/peers/peersManager"
 import DialogsManager from "../api/dialogs/dialogsManager"
 import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
-import {Networker} from "./network/networker"
+import Bytes from "./utils/bytes"
 
 window.id = 202466030
 window.send = (method, params) => {
@@ -18,6 +17,7 @@ window.send = (method, params) => {
         console.log(l)
     })
 }
+
 class MobileProtocolAPIAuth {
     constructor(options = {}) {
         if (!options.MTProto) {
@@ -104,16 +104,16 @@ class MobileProtocol {
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
-                AppPermanentStorage.setItem("authKey" + this.authContext.dcID, bytesToHex(authContext.authKey))
-                AppPermanentStorage.setItem("serverSalt" + this.authContext.dcID, bytesToHex(authContext.serverSalt))
+                AppPermanentStorage.setItem("authKey" + this.authContext.dcID, Bytes.asHex(authContext.authKey))
+                AppPermanentStorage.setItem("serverSalt" + this.authContext.dcID, Bytes.asHex(authContext.serverSalt))
 
                 this.createApiNetworker(authContext)
 
                 initManagers()
             })
         } else {
-            authContext.authKey = new Uint8Array(bytesFromHex(AppPermanentStorage.getItem("authKey" + this.authContext.dcID)))
-            authContext.serverSalt = bytesFromHex(AppPermanentStorage.getItem("serverSalt" + this.authContext.dcID))
+            authContext.authKey = new Uint8Array(Bytes.fromHex(AppPermanentStorage.getItem("authKey" + this.authContext.dcID)))
+            authContext.serverSalt = Bytes.fromHex(AppPermanentStorage.getItem("serverSalt" + this.authContext.dcID))
 
             this.createApiNetworker(authContext)
 
@@ -131,8 +131,8 @@ class MobileProtocol {
                 nonce: createNonce(16),
                 sessionID: createNonce(8), // TODO check if secure?
                 updates: false,
-                authKey: new Uint8Array(bytesFromHex(AppPermanentStorage.getItem("authKey" + dcID))),
-                serverSalt: new Uint8Array(bytesFromHex(AppPermanentStorage.getItem("serverSalt" + dcID)))
+                authKey: new Uint8Array(Bytes.fromHex(AppPermanentStorage.getItem("authKey" + dcID))),
+                serverSalt: new Uint8Array(Bytes.fromHex(AppPermanentStorage.getItem("serverSalt" + dcID)))
             })
             const list = this.fileNetworkers[dcID]
             this.fileNetworkers[dcID] = networker
@@ -166,8 +166,8 @@ class MobileProtocol {
                     authContext.authKey = new Uint8Array(authContext.authKey)
                     authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
-                    AppPermanentStorage.setItem("authKey" + authContext.dcID, bytesToHex(authContext.authKey))
-                    AppPermanentStorage.setItem("serverSalt" + authContext.dcID, bytesToHex(authContext.serverSalt))
+                    AppPermanentStorage.setItem("authKey" + authContext.dcID, Bytes.asHex(authContext.authKey))
+                    AppPermanentStorage.setItem("serverSalt" + authContext.dcID, Bytes.asHex(authContext.serverSalt))
 
                     resolve(networker)
                 })

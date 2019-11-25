@@ -1,6 +1,7 @@
-import {bigint, bytesToArrayBuffer, bytesToHex, gzipUncompress, uintToInt} from "../utils/bin"
+import {bigint, gzipUncompress} from "../utils/bin"
 import {createLogger} from "../../common/logger"
 import {schema} from "./schema";
+import Bytes from "../utils/bytes"
 
 const Logger = createLogger("TLDeserialization", {
     level: "log"
@@ -29,7 +30,7 @@ export class TLDeserialization {
 
         const i = this.intView[this.offset / 4]
 
-        Logger.debug("<<<", i.toString(16), i, field)
+        Logger.debug(_ => _("<<<", i.toString(16), i, field))
 
         this.offset += 4
 
@@ -120,7 +121,7 @@ export class TLDeserialization {
             this.offset++
         }
 
-        Logger.debug("<<<", bytesToHex(bytes), field + ":bytes")
+        Logger.debug(_ => _("<<<", Bytes.asHex(bytes), field + ":bytes"))
 
         return bytes
     }
@@ -142,7 +143,7 @@ export class TLDeserialization {
             bytes.push(this.byteView[this.offset++])
         }
 
-        Logger.debug("<<<", bytesToHex(bytes), field + ":int" + bits)
+        Logger.debug(_ => _("<<<", Bytes.asHex(bytes), field + ":int" + bits))
 
         return bytes
     }
@@ -167,7 +168,7 @@ export class TLDeserialization {
             bytes.push(this.byteView[this.offset++])
         }
 
-        Logger.debug("<<<", bytesToHex(bytes), field)
+        Logger.debug(_ => _("<<<", Bytes.asHex(bytes), field))
 
         return bytes
     }
@@ -207,7 +208,7 @@ export class TLDeserialization {
                 if (constructorCmp === 0x3072cfa1) { // Gzip packed
                     const compressed = this.fetchBytes(field + "[packed_string]")
                     const uncompressed = gzipUncompress(compressed)
-                    const buffer = bytesToArrayBuffer(uncompressed)
+                    const buffer = Bytes.asUint8Buffer(uncompressed)
                     const newDeserializer = (new TLDeserialization(buffer))
 
                     return newDeserializer.fetchObject(type, field)
@@ -259,7 +260,7 @@ export class TLDeserialization {
             if (constructorCmp === 0x3072cfa1) { // Gzip packed
                 const compressed = this.fetchBytes(field + "[packed_string]")
                 const uncompressed = gzipUncompress(compressed)
-                const buffer = bytesToArrayBuffer(uncompressed)
+                const buffer = Bytes.asUint8Buffer(uncompressed)
                 const newDeserializer = (new TLDeserialization(buffer))
 
                 return newDeserializer.fetchObject(type, field)
@@ -278,13 +279,12 @@ export class TLDeserialization {
             }
 
             let fallback = false
-            if (!constructorData && this.mtproto) {
+            if (!constructorData) {
                 let schemaFallback = this.schema
                 for (i = 0; i < schemaFallback.constructors.length; i++) {
-                    if (schemaFallback.constructors[i].id == constructorCmp) {
+                    if (this.schema.constructors[i].id == constructorCmp) {
                         constructorData = schemaFallback.constructors[i]
 
-                        delete this.mtproto
                         fallback = true
                         break
                     }

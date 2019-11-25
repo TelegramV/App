@@ -1,6 +1,7 @@
 import {TLSerialization} from "../language/serialization"
-import {bigStringInt, bytesFromHex, bytesToHex} from "../utils/bin"
+import {bigStringInt} from "../utils/bin"
 import {sha1BytesSync} from "../crypto/sha"
+import Bytes from "../utils/bytes"
 
 const keys = [
     {
@@ -33,15 +34,15 @@ function prepare() {
         let keyParsed = keys[i]
 
         let rsaPublicKeySerializer = new TLSerialization()
-        rsaPublicKeySerializer.storeBytes(bytesFromHex(keyParsed.modulus), "n")
-        rsaPublicKeySerializer.storeBytes(bytesFromHex(keyParsed.exponent), "e")
+        rsaPublicKeySerializer.storeBytes(Bytes.fromHex(keyParsed.modulus), "n")
+        rsaPublicKeySerializer.storeBytes(Bytes.fromHex(keyParsed.exponent), "e")
 
         let buffer = rsaPublicKeySerializer.getBuffer()
 
         let fingerprintBytes = sha1BytesSync(buffer).slice(-8)
         fingerprintBytes.reverse()
 
-        parsedKeys[bytesToHex(fingerprintBytes)] = {
+        parsedKeys[Bytes.asHex(fingerprintBytes)] = {
             modulus: keyParsed.modulus,
             exponent: keyParsed.exponent
         }

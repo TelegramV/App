@@ -1,15 +1,6 @@
-import {
-    bufferConcat,
-    bytesCmp,
-    bytesToArrayBuffer,
-    bytesToHex,
-    createNonce,
-    longToBytes,
-    nextRandomInt,
-    uintToInt
-} from "../utils/bin"
+import {bufferConcat, createNonce, longToBytes, uintToInt} from "../utils/bin"
 import {sha1BytesSync, sha256HashSync} from "../crypto/sha"
-import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
+import {aesDecryptSync} from "../crypto/aes"
 import {TLSerialization} from "../language/serialization"
 import {createLogger} from "../../common/logger"
 import {TLDeserialization} from "../language/deserialization"
@@ -19,8 +10,9 @@ import {MessageProcessor} from "./messageProcessor"
 import AppConfiguration from "../../configuration"
 import {Networker} from "./networker";
 import AppCryptoManager from "../crypto/cryptoManager";
-import TimeManager from "../timeManager";
 import {schema} from "../language/schema";
+import Bytes from "../utils/bytes"
+import Random from "../utils/random"
 
 const Logger = createLogger("ApiNetworker", {
     level: "warn"
@@ -47,11 +39,11 @@ export class ApiNetworker extends Networker {
     }
 
     checkConnection() {
-        if(Object.keys(this.pings) > 1) { // Probably disconnected
+        if (Object.keys(this.pings) > 1) { // Probably disconnected
             // TODO Show disconnection badge
         }
-        const serializer = new TLSerialization({mtproto: true});
-        const pingID = [nextRandomInt(0xFFFFFFFF), nextRandomInt(0xFFFFFFFF)];
+        const serializer = new TLSerialization();
+        const pingID = [Random.nextInteger(0xFFFFFFFF), Random.nextInteger(0xFFFFFFFF)];
 
         serializer.storeMethod('ping', {ping_id: pingID})
 
@@ -74,8 +66,8 @@ export class ApiNetworker extends Networker {
         let deserializer = new TLDeserialization(data)
 
         const authKeyID = deserializer.fetchIntBytes(64, false, 'auth_key_id')
-        if (!bytesCmp(authKeyID, this.auth.authKeyID)) {
-            throw new Error('[MT] Invalid server auth_key_id: ' + bytesToHex(authKeyID) + ", dcid " + this.auth.dcID)
+        if (!Bytes.compare(authKeyID, this.auth.authKeyID)) {
+            throw new Error('[MT] Invalid server auth_key_id: ' + Bytes.asHex(authKeyID) + ", dcid " + this.auth.dcID)
         }
         const msgKey = deserializer.fetchIntBytes(128, true, 'msg_key')
         const encryptedData = deserializer.fetchRawBytes(data.byteLength - deserializer.getOffset(), true, 'encrypted_data')
@@ -83,7 +75,7 @@ export class ApiNetworker extends Networker {
         const dataWithPadding = new Uint8Array(this.getDecryptedMessage(msgKey, encryptedData))
 
         const calcMsgKey = this.getMsgKey(dataWithPadding, false)
-        if (!bytesCmp(msgKey, calcMsgKey)) {
+        if (!Bytes.compare(msgKey, calcMsgKey)) {
             throw new Error('[MT] server msgKey mismatch')
         }
 
@@ -94,10 +86,10 @@ export class ApiNetworker extends Networker {
         const messageID = deserializer.fetchLong('message_id')
 
         // TODO wtf?
-        if (!bytesCmp(sessionID, this.auth.sessionID) &&
-            (!self.prevSessionID || !bytesCmp(sessionID, self.prevSessionID))) {
+        if (!Bytes.compare(sessionID, this.auth.sessionID) &&
+            (!self.prevSessionID || !Bytes.compare(sessionID, self.prevSessionID))) {
             // Logger.warn('Sessions', sessionID, self.sessionID, self.prevSessionID)
-            throw new Error('[MT] Invalid server session_id: ' + bytesToHex(sessionID))
+            throw new Error('[MT] Invalid server session_id: ' + Bytes.asHex(sessionID))
         }
 
         const seqNo = deserializer.fetchInt('seq_no')
@@ -119,7 +111,7 @@ export class ApiNetworker extends Networker {
             throw new Error('[MT] Invalid padding length: ' + paddingLength)
         }
 
-        const buffer = bytesToArrayBuffer(messageBody)
+        const buffer = Bytes.asUint8Buffer(messageBody)
 
         const self = this
 
@@ -165,7 +157,7 @@ export class ApiNetworker extends Networker {
                         return
                     }
                     // console.log(result)
-                    // console.log(bytesToHex(this.getLeftoverArray()))
+                    // console.log(Bytes.asHex(this.getLeftoverArray()))
                     result.result = this.fetchObject(type, field + '[result]')
 
                     // console.log(dT(), 'override rpc_result', sentMessage, type, result)
@@ -190,7 +182,7 @@ export class ApiNetworker extends Networker {
 
     updateServerSalt(newSalt) {
         this.auth.serverSalt = newSalt
-        AppPermanentStorage.setItem("serverSalt" + this.auth.dcID, bytesToHex(newSalt))
+        AppPermanentStorage.setItem("serverSalt" + this.auth.dcID, Bytes.asHex(newSalt))
     }
 
     getMsgKey(dataWithPadding, isOut) {
@@ -269,11 +261,11 @@ export class ApiNetworker extends Networker {
 
         const dataBuffer = data.getBuffer()
 
-        const paddingLength = (16 - (data.offset % 16)) + 16 * (1 + nextRandomInt(5))
+        const paddingLength = (16 - (data.offset % 16)) + 16 * (1 + Random.nextInteger(5))
         const padding = createNonce(paddingLength) // TODO check if secure
 
         // console.log(dT(), 'Adding padding', dataBuffer, padding, dataWithPadding)
-        // console.log(dT(), 'auth_key_id', bytesToHex(self.authKeyID))
+        // console.log(dT(), 'auth_key_id', Bytes.asHex(self.authKeyID))
         return bufferConcat(dataBuffer, padding)
     }
 
@@ -305,7 +297,7 @@ export class ApiNetworker extends Networker {
 
             serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, 'invokeWithLayer')
             serializer.storeInt(AppConfiguration.mtproto.api.layer, 'layer')
-            if(this.updates === false) {
+            if (this.updates === false) {
                 serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
             }
             serializer.storeInt(AppConfiguration.mtproto.api.initConnection, 'initConnection')
@@ -360,7 +352,7 @@ export class ApiNetworker extends Networker {
     applyServerSalt(newServerSalt) {
         const serverSalt = longToBytes(newServerSalt);
 
-        AppPermanentStorage.setItem(`dc${this.dcID}_server_salt`, bytesToHex(serverSalt))
+        AppPermanentStorage.setItem(`dc${this.dcID}_server_salt`, Bytes.asHex(serverSalt))
 
         this.serverSalt = serverSalt
         return true

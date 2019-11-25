@@ -2,14 +2,11 @@ import {MTProto} from "./mtproto"
 import {createNonce} from "./mtproto/utils/bin"
 //import {setCode2FAForm} from "./ui/login/loginPage"
 import {AppPermanentStorage} from "./common/storage"
-import mt_srp_check_password from "./mtproto/crypto/mt_srp/mt_srp"
 
 import "../sass/application.scss"
 import {ImPage} from "./ui/pages/im/impage"
 import {LoginPage} from "./ui/pages/login/nextlogin"
 import {AppFramework} from "./ui/framework/framework"
-import {attach} from "./api/notifications";
-import VDOM from "./ui/framework/vdom"
 import {loadSchema} from "./mtproto/language/schema";
 
 const authContext = {
@@ -25,7 +22,7 @@ function authorizedStart(authorizationData) {
 
 function start() {
     MTProto.invokeMethod("help.getNearestDc", {}).then(response => {
-        if(response.this_dc !== response.nearest_dc) {
+        if (response.this_dc !== response.nearest_dc) {
             MTProto.changeDefaultDC(response.nearest_dc)
             // TODO country response.contry
         }
@@ -70,4 +67,4 @@ function start() {
     AppFramework.mount("#app")
 }
 
-loadSchema().then(l => MTProto.connect(authContext).then(start))
+loadSchema().then(() => MTProto.connect(authContext).then(start))

@@ -1,6 +1,7 @@
-import {bytesToBase64} from "../utils/bin";
+import Bytes from "../utils/bytes"
 
 export let schema = null
+
 export function loadSchema() {
     return new Promise(resolve => {
         console.time("schema")
@@ -15,12 +16,12 @@ export function loadSchema() {
                 let byteOffset = 0
                 const dv = new DataView(arrayBuffer)
 
-                function readString() {
+                const readString = () => {
                     const len = dv.getUint8(byteOffset)
                     byteOffset += 1
                     const sa = new Uint8Array(arrayBuffer).subarray(byteOffset, byteOffset + len)
                     byteOffset += len
-                    return atob(bytesToBase64(sa))
+                    return atob(Bytes.asBase64(sa))
                 }
 
                 const k = {

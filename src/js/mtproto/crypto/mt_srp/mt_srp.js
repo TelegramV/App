@@ -32,7 +32,7 @@ var hmacSHA512 = function(key) {
     var hasher = new sjcl.misc.hmac(key, sjcl.hash.sha512);
     this.encrypt = function() {
       return hasher.encrypt.apply(hasher, arguments);
-    };	
+    };
   };
   var pbkdf2Sync_sha512 = function(password, salt, iterations, keylen) {
     var derivedKey = sjcl.misc.pbkdf2(password, salt, iterations, 512, hmacSHA512);
@@ -76,7 +76,7 @@ export default function mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B,
     var v = big_g.modPow(big_x, big_p);
 
     var big_k = new BigInteger(sjcl.codec.hex.fromBits(k), 16);
-    
+
     var k_v = (big_k.multiply(v)).mod(big_p);
 
     var a = sjcl.random.randomWords(64);
@@ -120,7 +120,7 @@ export default function mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B,
     var c4 = sjcl.bitArray.concat(c3, srp_B_bits)
 
     var M1 = H( sjcl.bitArray.concat(c4, k_a) );
-    
+
     var M1_bytes = sjcl.codec.bytes.fromBits(M1);
     var g_a_bytes = sjcl.codec.bytes.fromBits(g_a_bits);
 
