@@ -1,7 +1,7 @@
 import {BigInteger, SecureRandom} from "jsbn"
 import CryptoJS from "../vendor/crypto"
+import {Zlib} from "../vendor/zlib"
 import crypto from "crypto"
-import pako from "pako"
 import Bytes from "./bytes"
 // import {str2bigInt} from "BigInt"
 
@@ -220,7 +220,7 @@ export function uintToInt(val) {
 }
 
 export function gzipUncompress(bytes) {
-    return pako.inflate(bytes)
+    return (new Zlib.Gunzip(bytes)).decompress()
 }
 
 export function dHexDump(bytes) {

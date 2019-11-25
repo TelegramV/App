@@ -2,10 +2,12 @@ const webpack = require("webpack")
 const path = require("path")
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const { CleanWebpackPlugin } = require("clean-webpack-plugin")
+const {CleanWebpackPlugin} = require("clean-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 const CopyWebpackPlugin = require("copy-webpack-plugin")
+
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 require("@babel/polyfill")
 
@@ -30,17 +32,17 @@ const config = {
             chunkFilename: "./src/sass/application.scss",
             ignoreOrder: false,
         }),
-        new HtmlWebpackPlugin({ template: "./src/index.html" }),
+        new HtmlWebpackPlugin({template: "./src/index.html"}),
         new CleanWebpackPlugin(),
         new CopyWebpackPlugin([{
             from: "public"
-        }])
+        }]),
     ],
     module: {
         rules: [{
-                test: /\.worker\.js$/,
-                use: { loader: "worker-loader" }
-            },
+            test: /\.worker\.js$/,
+            use: {loader: "worker-loader"}
+        },
             {
                 test: /\.js$/,
                 use: "babel-loader",
@@ -75,6 +77,11 @@ const config = {
                 },
             },
         ]
+    },
+    optimization: {
+        splitChunks: {
+            chunks: "all"
+        }
     }
 }
 
