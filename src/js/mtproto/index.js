@@ -11,6 +11,7 @@ import UpdatesManager from "../api/updatesManager"
 import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import Bytes from "./utils/bytes"
+import PeersManager from "../api/peers/peersManager"
 
 window.id = 202466030
 window.send = (method, params) => {
