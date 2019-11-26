@@ -209,11 +209,11 @@ class DialogManager extends Manager {
 
     fetchDialogs({
                      limit = 20,
-                     flags = {},
+                     flags = 0,
                      exclude_pinned = false,
-                     folder_id = "",
-                     offset_date = "",
-                     offset_id = "",
+                     folder_id = -1,
+                     offset_date = this.offsetDate,
+                     offset_id = -1,
                      offset_peer = {
                          _: "inputPeerEmpty"
                      },
@@ -228,12 +228,13 @@ class DialogManager extends Manager {
             flags |= 1
         }
 
-
         return MTProto.invokeMethod("messages.getDialogs", {
             flags: flags,
-            exclude_pinned: exclude_pinned,
+            pFlags: {
+                exclude_pinned: exclude_pinned
+            },
             folder_id: folder_id,
-            offset_date: this.offsetDate,
+            offset_date: offset_date,
             offset_id: offset_id,
             offset_peer: offset_peer,
             limit: limit,
