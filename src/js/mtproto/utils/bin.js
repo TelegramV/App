@@ -641,7 +641,10 @@ export function bytesModPow(x, y, m) {
         const mBigInt = new BigInteger(bytesToHex(m), 16)
         let resBigInt = xBigInt.modPow(yBigInt, mBigInt).toByteArray()
         if(resBigInt.length > 256) {
+            console.log("resbigint > 256")
             resBigInt = resBigInt.splice(resBigInt.length - 256)
+        } else if(resBigInt.length < 256) {
+            return resBigInt.unshift(0)
         }
 
         return resBigInt

@@ -1,14 +1,8 @@
-import VDOM from "./index"
-
-function zip(xs, ys) {
-    const zipped = []
-    for (let i = 0; i < Math.min(xs.length, ys.length); i++) {
-        zipped.push([xs[i], ys[i]])
-    }
-    return zipped
-}
-
 // todo: fix this thing
+import vdom_render from "./render"
+import vdom_isVNode from "./check/isVNode"
+import vdom_mount from "./mount"
+
 function patchEvents($node, newEvents) {
     for (const [k, v] of Object.entries(newEvents)) {
         $node.removeEventListener(k, v)
@@ -20,18 +14,16 @@ function patchEvents($node, newEvents) {
 }
 
 /**
- * @param $node
- * @param {NamedNodeMap} oldAttrs
+ * @param {Element} $node
  * @param {object} newAttrs
- * @returns {function(*=): *}
  */
-function patchAttrs($node, oldAttrs, newAttrs) {
+function patchAttrs($node, newAttrs) {
+    const oldAttrs = $node.attributes
     for (const [k, v] of Object.entries(newAttrs)) {
         if ($node.nodeType !== Node.TEXT_NODE) {
-            if (Array.isArray(v)) {
-                $node.setAttribute(k, v.join(" "))
-            } else {
-                $node.setAttribute(k, v)
+            const nv = Array.isArray(v) ? v.join(" ") : v
+            if ($node.getAttribute(k) !== nv) {
+                $node.setAttribute(k, nv)
             }
         }
     }
@@ -58,7 +50,7 @@ function patchChildren($parent, $children, newVChildren) {
     })
 
     for (const additionalVChild of newVChildren.slice($children.length)) {
-        $parent.appendChild(VDOM.render(additionalVChild))
+        $parent.appendChild(vdom_render(additionalVChild))
     }
 }
 
@@ -80,25 +72,31 @@ function patchDangerouslySetInnerHTML($node, dangerouslySetInnerHTML) {
  * FIXME: fix bug in message voice template!!!
  *
  * @param {HTMLElement|Node|Text} $node
- * @param newVTree
+ * @param newVNode
  */
-export function vdom_patchReal($node, newVTree) {
-    if (newVTree === undefined) {
+function vdom_patchReal($node, newVNode) {
+    if (newVNode instanceof Node) {
+        throw new Error("newVNode is an element of the real DOM and should be of virtual.")
+    }
+
+    if (newVNode === undefined) {
         $node.remove()
         return undefined
     }
 
-    if (typeof newVTree === "object" && !newVTree.tagName) {
-        const $newNode = VDOM.render(newVTree)
-        $node.replaceWith($newNode)
-        return $newNode
+    if (typeof newVNode === "object" && !vdom_isVNode(newVNode)) {
+        return vdom_mount(newVNode, $node)
+    }
+
+    if (typeof newVNode !== "object" && typeof newVNode !== "function") {
+        if ($node.nodeType !== Node.TEXT_NODE || $node.wholeText !== newVNode) {
+            return vdom_mount(newVNode, $node)
+        }
     }
 
     if ($node.nodeType === Node.TEXT_NODE) {
-        if ($node.wholeText !== newVTree) {
-            const $newNode = VDOM.render(newVTree)
-            $node.replaceWith($newNode)
-            return $newNode
+        if ($node.wholeText !== newVNode) {
+            return vdom_mount(newVNode, $node)
         } else {
             return $node
         }
@@ -106,28 +104,24 @@ export function vdom_patchReal($node, newVTree) {
 
     // named components check
     // if names are different then replace all tree
-    if ($node.hasAttribute("data-component") || newVTree.attrs.hasOwnProperty("data-component")) {
-        if ($node.getAttribute("data-component") !== newVTree.attrs["data-component"]) {
-            const $newNode = VDOM.render(newVTree)
-            $node.replaceWith($newNode)
-            return $newNode
+    if ($node.hasAttribute("data-component") || newVNode.attrs["data-component"] !== undefined) {
+        if ($node.getAttribute("data-component") !== newVNode.attrs["data-component"]) {
+            return vdom_mount(newVNode, $node)
         }
     }
 
-    // if tagNames are different then we replace all tree
-    if ($node.tagName.toLowerCase() !== newVTree.tagName) {
-        const $newNode = VDOM.render(newVTree)
-        $node.replaceWith($newNode)
-        return $newNode
+    // if tagNames are different then replace all tree
+    if ($node.tagName.toLowerCase() !== newVNode.tagName) {
+        return vdom_mount(newVNode, $node)
     }
 
-    patchAttrs($node, $node.attributes, newVTree.attrs)
-    patchEvents($node, newVTree.events)
+    patchAttrs($node, newVNode.attrs)
+    patchEvents($node, newVNode.events)
 
-    if (newVTree.dangerouslySetInnerHTML !== false) {
-        patchDangerouslySetInnerHTML($node, newVTree.dangerouslySetInnerHTML)
+    if (newVNode.dangerouslySetInnerHTML !== false) {
+        patchDangerouslySetInnerHTML($node, newVNode.dangerouslySetInnerHTML)
     } else {
-        patchChildren($node, $node.childNodes, newVTree.children)
+        patchChildren($node, $node.childNodes, newVNode.children)
     }
 
     return $node

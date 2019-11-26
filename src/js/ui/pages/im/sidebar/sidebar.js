@@ -2,7 +2,9 @@ import DialogsManager from "../../../../api/dialogs/dialogsManager"
 import VDOM from "../../../framework/vdom"
 import {UICreateDialog} from "./dialog"
 import PeersManager from "../../../../api/peers/peersManager"
+import {createLogger} from "../../../../common/logger";
 
+const Logger = createLogger("Sidebar")
 const $sidebar = VDOM.render(
     <div className="chatlist">
         <div className="toolbar">
@@ -43,68 +45,62 @@ function handleDialogUpdates(event) {
         event.dialogs.forEach(dialog => {
             renderDialog(dialog, false)
         })
+
     } else if (event.type === "updateSingle") {
         renderDialog(event.dialog, event.dialog.pinned)
+    } else {
+        Logger.log("DialogUpdates", event)
     }
 }
 
 function handlePeerUpdates(event) {
     if (event.type === "updatePhoto") {
-        const $dialogAvatar = $dialogsWrapper.querySelector(`[data-peer="${event.peer._}.${event.peer.id}"]>.avatar`)
-
-        if ($dialogAvatar) {
-            if (event.peer.photo) {
-                $dialogAvatar.setAttribute("class", "avatar")
-                $dialogAvatar.style = `background-image: url(${event.peer.photo})`
-                $dialogAvatar.innerHTML = ""
-            } else {
-                $dialogAvatar.setAttribute("class", "avatar " + `placeholder-${event.peer.photoPlaceholder.num}`)
-                $dialogAvatar.innerHTML = event.peer.photoPlaceholder.text[0]
-            }
-        } else {
-            console.warn("dialogAvatar is not on the page")
+        const dialog = DialogsManager.find(event.peer.type, event.peer.id)
+        if (dialog) {
+            renderDialog(dialog, dialog.pinned)
         }
+    } else {
+        Logger.log("PeerUpdates", event)
     }
 }
 
 function renderDialog(dialog, pinned = false) {
-    const __ = `${dialog.peer._}.${dialog.peer.id}`
-
-    const peer = PeersManager.find(dialog.peer._, dialog.peer.id)
+    const __ = `${dialog.type}.${dialog.id}`
 
     if (pinned) {
         if (__rendered_pinned.has(__)) {
-            const $dialog = $dialogsPinned.querySelector(`[data-peer="${dialog.peer._}.${dialog.peer.id}"]`)
+            const $dialog = $dialogsPinned.querySelector(`[data-peer="${__}"]`)
 
             if ($dialog) {
-                if (Number($dialog.dataset.messageId) < dialog.message.id) {
+                if (Number($dialog.dataset.messageId) < dialog.lastMessage.id) {
                     $dialogsPinned.prepend($dialog)
                 }
-                // fix this later!!
-                $dialog.replaceWith(UICreateDialog(dialog, peer))
+
+                VDOM.patchReal($dialog, UICreateDialog(dialog))
             } else {
                 console.warn("dialog is not on the page")
             }
         } else {
             __rendered_pinned.add(__)
-            $dialogsPinned.appendChild(UICreateDialog(dialog, peer))
+            $dialogsPinned.appendChild(VDOM.render(UICreateDialog(dialog)))
         }
     } else {
         if (__rendered.has(__)) {
-            const $dialog = $dialogs.querySelector(`[data-peer="${dialog.peer._}.${dialog.peer.id}"]`)
+            const $dialog = $dialogs.querySelector(`[data-peer="${__}"]`)
 
             if ($dialog) {
-                if (Number($dialog.dataset.messageId) < dialog.message.id) {
+                if (Number($dialog.dataset.messageId) < dialog.lastMessage.id) {
                     $dialogs.prepend($dialog)
                 }
                 // fix this later!!
-                $dialog.replaceWith(UICreateDialog(dialog, peer))
+                // $dialog.replaceWith(VDOM.render(UICreateDialog(dialog)))
+                VDOM.patchReal($dialog, UICreateDialog(dialog))
             } else {
                 console.warn("dialog is not on the page")
             }
         } else {
             __rendered.add(__)
-            $dialogs.appendChild(UICreateDialog(dialog, peer))
+            $dialogs.appendChild(VDOM.render(UICreateDialog(dialog)))
         }
     }
 }

@@ -1,4 +1,7 @@
 import VDOM from "./framework/vdom"
+import EmojiConverter from "emoji-js";
+
+export const emoji = new EmojiConverter();
 
 export const vLoadingNode = (
     <div className="full-size-loader height">
@@ -34,7 +37,6 @@ export const create$loadingNode = () => VDOM.render(vLoadingNode)
 export function getMediaPreviewName(message) {
     switch (message.media._) {
         case "messageMediaPhoto":
-            console.log("PHOTO")
             return "Photo"
         case "messageMediaGeo":
             return "Location"

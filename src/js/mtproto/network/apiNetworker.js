@@ -19,6 +19,8 @@ import {MessageProcessor} from "./messageProcessor"
 import AppConfiguration from "../../configuration"
 import {Networker} from "./networker";
 import AppCryptoManager from "../crypto/cryptoManager";
+import TimeManager from "../timeManager";
+import {schema} from "../language/schema";
 
 const Logger = createLogger("ApiNetworker", {
     level: "warn"
@@ -39,6 +41,33 @@ export class ApiNetworker extends Networker {
 
         this.seqNo = 0
         this.connectionInited = false
+
+        this.pings = {}
+        setInterval(this.checkConnection.bind(this), 1000)
+    }
+
+    checkConnection() {
+        if(Object.keys(this.pings) > 1) { // Probably disconnected
+            // TODO Show disconnection badge
+        }
+        const serializer = new TLSerialization({mtproto: true});
+        const pingID = [nextRandomInt(0xFFFFFFFF), nextRandomInt(0xFFFFFFFF)];
+
+        serializer.storeMethod('ping', {ping_id: pingID})
+
+        const pingMessage = {
+            msg_id: this.timeManager.generateMessageID(),
+            seq_no: this.generateSeqNo(true),
+            body: serializer.getBytes()
+        };
+
+        this.pings[pingMessage.msg_id] = pingID
+
+        this.messageProcessor.listenPong(pingMessage.msg_id, l => {
+            delete this.pings[pingMessage.msg_id]
+
+        })
+        this.sendMessage(pingMessage)
     }
 
     processResponse(data) {
@@ -97,7 +126,7 @@ export class ApiNetworker extends Networker {
         const deserializerOptions = {
             mtproto: true,
             // TODO binary schema
-            schema: require("../language/schema_combine"),
+            schema: schema,
             override: {
                 // fuck what is the point?
 
@@ -156,6 +185,12 @@ export class ApiNetworker extends Networker {
         }
 
         this.messageProcessor.process(response, messageID, sessionID)
+    }
+
+
+    updateServerSalt(newSalt) {
+        this.auth.serverSalt = newSalt
+        AppPermanentStorage.setItem("serverSalt" + this.auth.dcID, bytesToHex(newSalt))
     }
 
     getMsgKey(dataWithPadding, isOut) {
@@ -270,9 +305,9 @@ export class ApiNetworker extends Networker {
 
             serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, 'invokeWithLayer')
             serializer.storeInt(AppConfiguration.mtproto.api.layer, 'layer')
-            // if(!this.updates) {
-            //     serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
-            // }
+            if(this.updates === false) {
+                serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
+            }
             serializer.storeInt(AppConfiguration.mtproto.api.initConnection, 'initConnection')
             serializer.storeInt(AppConfiguration.mtproto.api.api_id, 'api_id')
             serializer.storeString(navigator.userAgent || 'Unknown UserAgent', 'device_model')
@@ -299,6 +334,11 @@ export class ApiNetworker extends Networker {
             body: serializer.getBytes(true),
             isAPI: true
         }
+        this.messageProcessor.sentMessagesDebug[messageID] = {
+            _: method,
+            params: params
+        }
+
 
         //Logger.debug("Api call", method, params, messageID, seqNo, options)
         Logger.debug("Api call", method, params)
@@ -323,7 +363,7 @@ export class ApiNetworker extends Networker {
 
 
     applyServerSalt(newServerSalt) {
-        var serverSalt = longToBytes(newServerSalt)
+        const serverSalt = longToBytes(newServerSalt);
 
         AppPermanentStorage.setItem(`dc${this.dcID}_server_salt`, bytesToHex(serverSalt))
 

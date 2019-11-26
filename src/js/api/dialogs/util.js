@@ -1,16 +1,4 @@
-export const dialogPeerMaps = {
-    "peerUser": "users",
-    "peerChannel": "chats",
-    "peerChat": "chats",
-}
-
-export const dialogPeerMap = {
-    "peerUser": "user",
-    "peerChannel": "channel",
-    "peerChat": "chat",
-}
-
-export function getInputPeerFromPeer(peerName, peerId) {
+export function getInputPeerFromPeer(peerName, peerId, accessHash = "") {
     switch (peerName) {
         case "chat":
             return {
@@ -21,13 +9,13 @@ export function getInputPeerFromPeer(peerName, peerId) {
             return {
                 _: "inputPeerUser",
                 user_id: peerId,
-                access_hash: ""
+                access_hash: accessHash
             }
         case "channel":
             return {
                 _: "inputPeerChannel",
                 channel_id: peerId,
-                access_hash: ""
+                access_hash: accessHash
             }
         default:
             console.warn("unexpected peerName")
@@ -37,46 +25,42 @@ export function getInputPeerFromPeer(peerName, peerId) {
     }
 }
 
-export function findMessageFromDialog(dialog, dialogsSlice) {
-    return dialogsSlice.messages.find(msg => {
-        return String(msg.id) === String(dialog.top_message)
-    })
+export function getInputPeerFromMessage(peerName, peerId, message) {
+    switch (peerName) {
+        case "user":
+            return {
+                _: "inputPeerUserFromMessage",
+                user_id: peerId,
+                msg_id: message
+            }
+        case "channel":
+            return {
+                _: "inputPeerChannelFromMessage",
+                channel_id: peerId,
+                msg_id: message
+            }
+        default:
+            console.warn("unexpected peerName")
+            return {
+                _: "inputPeerEmpty"
+            }
+    }
 }
+
+export function getPeersInput(peerName) {
+    switch (peerName) {
+        case "chat":
+            return "messages.getFullChat"
+        case "user":
+            return "users.getFullUser"
+        case "channel":
+            return "channel.getFullChannel"
+        default:
+            return ""
+    }
+}
+
 
 export function findUserFromMessage(message, dialogsSlice) {
     return dialogsSlice.users.find(user => String(user.id) === String(message.from_id))
-}
-
-export function getPeerName(peer, usernameFirst = false) {
-    if (!peer) {
-        return ""
-    }
-
-    if (usernameFirst && peer.username) {
-        return `@${peer.username}`
-    }
-
-    let peerName = ""
-
-    switch (peer._) {
-        case "chat":
-            peerName = peer.title
-            break
-        case "channel":
-            peerName = peer.title
-            break
-        case "user":
-            peerName = peer.first_name
-            if (peer.last_name)
-                peerName += ` ${peer.last_name}`
-            break
-    }
-
-    return peerName
-}
-
-export function findPeerFromDialog(dialog, dialogsSlice) {
-    return dialogsSlice[dialogPeerMaps[dialog.peer._]].find(item => {
-        return String(item._) === String(dialogPeerMap[dialog.peer._]) && String(dialog.peer[`${item._}_id`]) === String(item.id)
-    })
 }

@@ -1,50 +1,63 @@
 import {AppFramework} from "../../../framework/framework"
-import VDOM from "../../../framework/vdom"
+import {UserPeer} from "../../../../dataObjects/userPeer";
 
-function openDialog(peer) {
+function openDialog(dialog) {
     return () => AppFramework.Router.push("/", {
         queryParams: {
-            p: `${peer._}.${peer.id}`
+            p: `${dialog.type}.${dialog.id}`
         }
     })
 }
 
-export function UICreateDialog(dialog, peer) {
+export function UICreateDialog(dialog) {
+    const peer = dialog.peer
     const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.unreadCount > 0 ? dialog.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
     let personClasses = ["person", "rp"]
-    if (dialog.online) personClasses.push("online")
+    if (peer instanceof UserPeer && peer.onlineStatus.online) {
+        personClasses.push("online")
+    }
     if (unread !== "") personClasses.push("unread")
     if (dialog.muted) personClasses.push("muted")
-    if(dialog.out) {
+    if (dialog.lastMessage.isOut) {
         personClasses.push("sent")
 
-        if (dialog.read) personClasses.push("read")
+        if (dialog.lastMessage.isRead) personClasses.push("read")
     }
 
-    return VDOM.render(
-        <div data-peer={`${dialog.peer._}.${dialog.peer.id}`}
-             data-message-id={dialog.message.id}
+    let hasAvatar = peer.hasAvatar && peer._avatar !== undefined
+
+    return (
+        <div data-peer={`${dialog.type}.${dialog.id}`}
+             data-message-id={dialog.lastMessage.id}
              className={personClasses}
-             onClick={openDialog(dialog.peer)}>
-            <div className={"avatar " + (!peer.photo ? `placeholder-${peer.photoPlaceholder.num}` : "")}
-                 style={`background-image: url(${peer.photo});`}>
-                {!peer.photo ? peer.photoPlaceholder.text : ""}
+             onClick={openDialog(dialog)}>
+            <div className={"avatar " + `placeholder-${peer.avatarLetter.num}`}>
+                <span>{peer.avatarLetter.text}</span>
+
+                <div className="avatar-inner" css-background-image={hasAvatar ? `url(${peer._avatar})` : "none"} css-opacity={hasAvatar ? 1 : 0}/>
             </div>
             <div className="content">
                 <div className="top">
-                    <div className="title">{dialog.title}</div>
+                    <div className="title">{peer.peerName}</div>
                     <div className="status tgico"/>
-                    <div className="time">{new Date(dialog.message.date).toLocaleTimeString('en', {
+                    <div className="time">{dialog.lastMessage.getDate('en', {
                         hour: '2-digit',
                         minute: '2-digit',
                         hour12: false
                     })}</div>
                 </div>
                 <div className="bottom">
-                    <div className="message"><span
-                        className="sender">{dialog.message.sender}</span>{dialog.message.text}
-                    </div>
+                    {
+                        dialog.draft !== null ?
+                            (<div className="message"><span className="draft">Draft: </span>{dialog.draft}</div>)
+                            : (
+                                Object.keys(dialog.messageActions).length === 0 ?
+                                    (<div className="message"><span className="sender">{dialog.lastMessage.prefix}</span>{dialog.lastMessage.text}</div>)
+                                    :
+                                    (<div className="message"><span className="sender">typing...</span></div>)
+                            )
+                    }
                     <div className="badge tgico">{unread}</div>
                 </div>
             </div>

@@ -40,7 +40,7 @@ function isCodeValid(code) {
 
 function resetNextButton(button, text = "NEXT") {
     button.querySelector("span").innerHTML = text
-    document.querySelector("progress").style.display = "none"
+    button.querySelector("progress").style.display = "none"
     button.dataset.loading = "0"
 }
 
@@ -75,7 +75,11 @@ function handlePhoneSend() {
                 const messages = {
                     PHONE_NUMBER_INVALID: "Invalid phone number",
                     PHONE_NUMBER_BANNED: "Phone number is banned",
-                    PHONE_NUMBER_FLOOD: "Too many attempts"
+                    PHONE_NUMBER_FLOOD: "Too many attempts",
+                    AUTH_RESTART: "Auth restarting"
+                }
+                if(error.type === "AUTH_RESTART") {
+                    window.location.reload() // TODO should probably save session state
                 }
                 const msg = messages[error.type] || "Error occured"
                 $phoneInput.classList.add("invalid");
@@ -128,6 +132,13 @@ function handlePasswordSend() {
             //authorizedStart(response)
         }, reject => {
             console.log(reject)
+            $phoneInput.classList.add("invalid");
+
+            if(reject.type === "INVALID_PASSWORD_HASH") {
+                $phoneInput.nextElementSibling.innerHTML = "Invalid password";
+            } else {
+                $phoneInput.nextElementSibling.innerHTML = reject.type;
+            }
             resetNextButton($passwordNext)
         })
     }

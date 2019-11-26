@@ -1,4 +1,5 @@
-import VDOM from "./index"
+import vdom_h from "./h"
+import vdom_hasAttribute, {vdom_removeAttribute} from "./check/hasAttribute"
 
 const jsxAttributesMap = {
     className: "class",
@@ -8,7 +9,21 @@ const jsxAttributesMap = {
 function removeEmpties(array) {
     for (let i = 0; i < array.length; i++) {
         if (array[i] === "") {
-            delete array[i]
+            array.splice(i, 1)
+        }
+    }
+}
+
+function processChildrenIfs(children) {
+    let prevIf = undefined
+    for (let i = 0; i < children.length; i++) {
+        const vNode = children[i]
+        if (vdom_hasAttribute("if", vNode)) {
+            prevIf = !!vNode.attrs["if"]
+            vNode.renderIf = prevIf
+        } else if (vdom_hasAttribute("else", vNode) && prevIf !== undefined) {
+            vNode.renderIf = !prevIf
+            prevIf = undefined
         }
     }
 }
@@ -21,15 +36,18 @@ function removeEmpties(array) {
  * @param children
  * @returns {any}
  */
-export function vdom_jsx(tagName, attributes, ...children) {
+function vdom_jsx(tagName, attributes, ...children) {
     let attrs = {}
     let events = {}
     let options = {}
     let constructor = {}
     let dangerouslySetInnerHTML = false
+    let renderIf = true
 
     // removeEmpties(children)
     children = children.flat(Infinity)
+
+    processChildrenIfs(children)
 
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
@@ -63,7 +81,7 @@ export function vdom_jsx(tagName, attributes, ...children) {
         }
     }
 
-    return VDOM.h(tagName, {attrs, constructor, options, events, children, dangerouslySetInnerHTML})
+    return vdom_h(tagName, {attrs, constructor, options, events, children, dangerouslySetInnerHTML, renderIf})
 }
 
 export default vdom_jsx

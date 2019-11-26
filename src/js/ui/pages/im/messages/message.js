@@ -1,17 +1,17 @@
 import { MTProto } from "../../../../mtproto"
 import Voice from "../../../voice"
-import EmojiConverter from "emoji-js"
+import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers";
+import {emoji} from "../../../utils";
 
-const emoji = new EmojiConverter();
 
-function vTimeTemplate(data, bg = false) {
+function vTimeTemplate(message, bg = false) {
     let classes = "time" + (bg ? " bg" : "")
 
     return (
         <span class={classes}>
-            <div class="inner tgico">{data.views ?
-                <span>{data.views} <span
-                    class="tgico tgico-channelviews"/>    </span> : ""}{data.time.toLocaleTimeString('en', {
+            <div class="inner tgico">{message.views ?
+                <span>{message.views} <span
+                    class="tgico tgico-channelviews"/>    </span> : ""}{message.getDate('en', {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false
@@ -35,15 +35,16 @@ function vServiceMessageTemplate(data, inside) {
     )
 }
 
-const Message = ({ data, slot }) => {
-    const className = data.post ? "channel in" : data.out ? "out" : "in"
 
+const Message = ({message, slot}) => {
+    const className = message.post ? "channel in" : message.out ? "out" : "in"
+    const from = message.from
     return (
-        <div class={className} data-id={data.id} data-peer={`${data.from._}.${data.from.id}`}>
+        <div class={className} data-id={message.id} data-peer={`${from.type}.${from.id}`}>
             {className === "in" ? (
-                <div className={"avatar " + (!data.from.photo ? `placeholder-${data.from.photoPlaceholder.num}` : "")}
-                     style={`background-image: url(${data.from.photo});`}>
-                    {!data.from.photo ? data.from.photoPlaceholder.text : ""}
+                <div className={"avatar " + (!from.hasAvatar ? `placeholder-${from.avatarLetter.num}` : "")}
+                     style={`background-image: url(${from._avatar});`}>
+                    {!from.hasAvatar ? from.avatarLetter.text : ""}
                 </div>
             ) : ""}
             {slot}
@@ -56,32 +57,33 @@ function vForwardedTemplate(data) {
     return data.fwd ? <div class="fwd">Forwarded from {data.fwd.from}</div> : "";
 }
 
-function vMessageWithTextOnlyTemplate(data) {
-    const username = data.userName && !data.post && !data.out;
-    const msg = data.message ? emoji.replace_unified(data.message) : "";
+function vMessageWithTextOnlyTemplate(message) {
+    const username = message.userName && !message.post && !message.out;
+    let msg = parseMessageEntities(message.text, message.entities)
+    msg = msg ? emoji.replace_unified(msg) : "";
 
-    return <Message data={data}>
+    return <Message message={message}>
         <div className={vGetClass(data)}>
             {username ? <div className="username">{data.userName}</div> : ""}
 
-            {data.reply ? (<div className="box rp">
+            {message.reply ? (<div className="box rp">
                 <div className="quote">
-                    <div className="name">{data.reply.name}</div>
-                    <div className="text">{data.reply.text}</div>
+                    <div className="name">{message.reply.name}</div>
+                    <div className="text">{message.reply.text}</div>
                 </div>
             </div>) : ""}
             <div className={`message ${username ? "nopad" : ""}`}>
 
-                {vForwardedTemplate(data)}
+                {vForwardedTemplate(message)}
                 <span dangerouslySetInnerHTML={msg}/>
-                {vTimeTemplate(data)}
+                {vTimeTemplate(message)}
             </div>
         </div>
     </Message>
 }
 
 
-const MessageMediaImage = ({ src, size, alt = "", isThumb }) => {
+const MessageMediaImage = ({src, size, alt = "", isThumb}) => {
     let width = isThumb ? Number(size[0]) >= 460 ? "460px" : `${size[0]}px` : Number(size[0]) >= 480 ? "480px" : `${size[0]}px`
     return (
         <div>
@@ -109,11 +111,6 @@ function vMessageWithImageTemplate(data) {
     )
 }
 
-function test() {
-    MTProto.createFileNetworker(1).then(l => {
-        console.log(l)
-    })
-}
 
 function vMessageWithUrlTemplate(data) {
     return (
@@ -150,13 +147,29 @@ function vMessageWithStickerTemplate(data) {
 }
 
 function vMessageWithVoiceAudioTemplate(data) {
-    let color =  data.out ? "#50af4f" : "#4ea4f6";
-    const voice = new Voice(new Audio(data.audio.url), data.audio.waveform, {
-        id: data.id,
-        duration: data.audio.time,
-        mainColor: color,
-        secondaryColor: "#c4c9cc"
-    });
+    /*return vMessageTemplate(data,
+        <div class={vGetClass(data)}>
+            <div className="message">
+                {vForwardedTemplate(data)}
+                <div class="audio">
+                    <div class="play"/>
+                    <div class="inside">
+                        <div class="bars">
+                            {
+                                Object.assign([], data.audio.waveform).map(l => {
+                                    return <div className="bar" style={`height: ${l / 31 * 100}%`}/>
+                                })
+                            }
+                        </div>
+                        <span class="time">{data.audio.time} <span class={data.audio.read}/></span>
+                    </div>
+                    {vTimeTemplate(data)}
+                </div>
+                <audio src={data.audio.url}/>
+            </div>
+        </div>
+    )*/
+    const voice = new Voice(new Audio(data.audio.url), data.audio.waveform);
     return (
         <Message data={data}>
             <div class={vGetClass(data)}>
@@ -247,3 +260,4 @@ export function UICreateMessage(message) {
 
     return handlers[message.type](message)
 }
+

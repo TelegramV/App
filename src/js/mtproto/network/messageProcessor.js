@@ -19,52 +19,59 @@ export class MessageProcessor {
 
         this.networker = options.networker
 
+        this.pongHandlers = {}
         this.rpcResultHandlers = {}
         this.rpcErrorHandlers = {}
         this.sentMessages = {}
+        this.sentMessagesDebug = {}
 
         this.updateShortListeners = []
-        this.updateShortMessagesListeners = []
-        this.updateNewMessagesListeners = []
-        this.updateNewChannelMessagesListeners = []
+        this.updateShortMessageListeners = []
+        this.updateShortSentMessageListeners = []
+        this.updateShortChatMessageListeners = []
+        this.updatesCombinedListeners = []
+        this.updatesListeners = []
 
         this.handlers = {
             "msg_container": this.processMessageContainer.bind(this),
             "message": this.processMessage.bind(this),
             "rpc_result": this.processRpcResult.bind(this),
+            "pong": this.processPong.bind(this),
             "msgs_ack": this.processMessagesAck.bind(this),
             "bad_server_salt": this.processBadServerSalt.bind(this),
             "new_session_created": this.processNewSessionCreated.bind(this),
             "updateShort": this.processUpdateShort.bind(this),
             "updateShortMessage": this.processUpdateShortMessage.bind(this),
-            "updateNewMessage": this.processUpdateNewMessage.bind(this),
-            "updateNewChannelMessage": this.processUpdateNewChannelMessage.bind(this),
+            "updateShortChatMessage": this.processUpdateShortChatMessage.bind(this),
+            "updateShortSentMessage": this.processUpdateShortSentMessage.bind(this),
             "updates": this.processUpdates.bind(this),
+            "updatesCombined": this.processUpdatesCombined.bind(this),
         }
     }
 
     processUpdateShort(message, messageID, sessionID) {
-        console.log(message)
+        //console.log(message)
         this.updateShortListeners.forEach(listener => listener(message.update))
         // Logger.log("Short update", message)
     }
 
+    processUpdatesCombined(message, messageID, sessionID) {
+        this.updatesCombinedListeners.forEach(listener => listener(message))
+    }
+
+    processUpdateShortChatMessage(message, messageID, sessionID) {
+        this.updateShortChatMessageListeners.forEach(listener => listener(message))
+    }
+
     processUpdateShortMessage(message, messageID, sessionID) {
-        console.log(message)
-        this.updateShortMessagesListeners.forEach(listener => listener(message))
+        //console.log(message)
+        this.updateShortMessageListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
 
-    processUpdateNewMessage(message, messageID, sessionID) {
-        // console.log(message)
-        this.updateNewMessagesListeners.forEach(listener => listener(message))
-        // Logger.log("Short update", message)
-    }
-
-
-    processUpdateNewChannelMessage(message, messageID, sessionID) {
-        console.log(message)
-        this.updateNewChannelMessagesListeners.forEach(listener => listener(message))
+    processUpdateShortSentMessage(message, messageID, sessionID) {
+        //console.log(message)
+        this.updateShortSentMessageListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
 
@@ -73,17 +80,34 @@ export class MessageProcessor {
     }
 
     processUpdates(message, messageID, sessionID) {
-        console.log(message)
-        message.users.forEach(user => PeersManager.set(user))
-        message.chats.forEach(user => PeersManager.set(user))
+        //console.log(message)
+        this.updatesListeners.forEach(listener => listener(message))
+        // message.users.forEach(user => PeersManager.set(user))
+        // message.chats.forEach(user => PeersManager.set(user))
+        //
+        // message.updates.forEach(update => {
+        //     if (this.handlers[update._]) {
+        //         this.handlers[update._](update)
+        //     } else {
+        //         console.warn("unexprected update", update)
+        //     }
+        // })
+    }
 
-        message.updates.forEach(update => {
-            if (this.handlers[update._]) {
-                this.handlers[update._](update)
-            } else {
-                console.warn("unexprected update", update)
-            }
-        })
+    listenUpdatesCombined(listener) {
+        this.updatesCombinedListeners.push(listener)
+    }
+
+    listenUpdates(listener) {
+        this.updatesListeners.push(listener)
+    }
+
+    listenUpdateShortChatMessage(listener) {
+        this.updateShortChatMessageListeners.push(listener)
+    }
+
+    listenUpdateShortSentMessage(listener) {
+        this.updateShortSentMessageListeners.push(listener)
     }
 
     listenUpdateShort(listener) {
@@ -91,15 +115,11 @@ export class MessageProcessor {
     }
 
     listenUpdateShortMessage(listener) {
-        this.updateShortMessagesListeners.push(listener)
+        this.updateShortMessageListeners.push(listener)
     }
 
-    listenUpdateNewMessage(listener) {
-        this.updateNewMessagesListeners.push(listener)
-    }
-
-    listenUpdateNewChannelMessage(listener) {
-        this.updateNewChannelMessagesListeners.push(listener)
+    listenPong(messageId, handler) {
+        this.pongHandlers[messageId] = handler
     }
 
     listenRpc(messageId, handler, reject) {
@@ -136,8 +156,15 @@ export class MessageProcessor {
     }
 
     processBadServerSalt(message, messageID, sessionID) {
-        MTProto.updateServerSalt(longToBytes(message.new_server_salt))
+        this.networker.updateServerSalt(longToBytes(message.new_server_salt))
         this.networker.resendMessage(message.bad_msg_id)
+    }
+
+    processPong(message, messageID, sessionID) {
+        const handler = this.pongHandlers[message.msg_id]
+        if(handler) {
+            handler(message)
+        }
     }
 
     processRpcResult(message, messageID, sessionID) {
@@ -145,7 +172,7 @@ export class MessageProcessor {
 
         if (message.result._ === "rpc_error") {
             const error = this.networker.processError(message.result)
-            Logger.error('Rpc error', error)
+            Logger.error('Rpc error', error, ". request: ", this.sentMessagesDebug[message.req_msg_id])
 
             this.rpcErrorHandlers[message.req_msg_id](error)
 

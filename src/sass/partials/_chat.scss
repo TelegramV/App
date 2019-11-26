@@ -469,6 +469,7 @@
 
                 background-repeat: no-repeat;
                 background-size: contain;
+                transition: anim(background-image);
 
                 &.placeholder-0 {
                     background-color: #cc90e2;

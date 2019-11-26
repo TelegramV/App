@@ -1,14 +1,108 @@
 import {arrayDelete} from "../../common/utils/utils"
 import {FileAPI} from "../fileAPI"
-import {getPeerName} from "../dialogs/util"
+import {getInputPeerFromPeer, getPeerName, getPeersInput} from "../dialogs/util"
 import {MTProto} from "../../mtproto"
+import {Peer} from "../../dataObjects/peer";
+import {Manager} from "../manager";
+import {createLogger} from "../../common/logger";
+import {getPeerObject} from "../../dataObjects/peerFactory";
 
-const $peers = {
-    user: {},
-    chat: {},
-    channel: {}
+const Logger = createLogger("PeerManager")
+
+export class PeerManager extends Manager {
+    constructor() {
+        super()
+        this.peers = {
+            user: {},
+            chat: {},
+            channel: {}
+        }
+        this.peerInitListeners = {
+            user: {},
+            chat: {},
+            channel: {}
+        }
+    }
+
+    find(name, id) {
+        return this.peers[name][id]
+    }
+
+    findByPeer(peer) {
+        if(peer instanceof Peer) return peer
+
+        const keys = {
+            peerUser: "user",
+            peerChannel: "channel",
+            peerChat: "chat"
+        }
+        const key = keys[peer._]
+        const keysId = {
+            peerUser: "user_id",
+            peerChannel: "channel_id",
+            peerChat: "chat_id"
+        }
+        const keyId = keysId[peer._]
+        return this.find(key, peer[keyId])
+    }
+
+    listenPeerInit(peerName, peerId, listener) {
+        if (!this.peerInitListeners[peerName]) {
+            this.peerInitListeners[peerName] = {}
+        }
+
+        peerId = Number(peerId)
+
+        if (!this.peerInitListeners[peerName][peerId]) {
+            this.peerInitListeners[peerName][peerId] = []
+        }
+
+        if (this.peers[peerName][peerId]) {
+            listener(this.peers[peerName][peerId])
+        } else {
+            this.peerInitListeners[peerName][peerId].push(listener)
+        }
+    }
+
+
+    set(peer) {
+        if (peer instanceof Peer) {
+            if (!this.peers[peer.type]) {
+                this.peers[peer.type] = {}
+            }
+
+            if(this.peers[peer.type][peer.id]) {
+                return false
+            }
+            this.peers[peer.type][peer.id] = peer
+
+            peer.getAvatar().catch(l => {
+                this.resolveListeners({
+                    type: "updatePhoto",
+                    peer: peer
+                })
+            })
+
+
+            if (this.peerInitListeners[peer.type] && this.peerInitListeners[peer.type][peer.id]) {
+                this.peerInitListeners[peer.type][peer.id].forEach(listener => {
+                    listener(peer)
+                    arrayDelete(this.peerInitListeners[peer.type][peer.id], listener)
+                })
+            }
+            return true
+
+
+            // this.resolveListeners({
+            //     type: "set",
+            // })
+        }
+        throw new Error("Not a peer object!")
+    }
 }
-const $listeners = []
+
+export default new PeerManager()
+/*
 const $peerInitListeners = {
     user: {},
     chat: {},
@@ -16,22 +110,6 @@ const $peerInitListeners = {
 }
 
 let __inited = false
-
-function resolveListeners(event) {
-    if (event) {
-        $listeners.forEach(listener => {
-            listener(event)
-        })
-    } else {
-        console.warn("invalid event", event)
-    }
-}
-
-function listenUpdates(listener) {
-    if (listener && typeof listener === "function") {
-        $listeners.push(listener)
-    }
-}
 
 function listenPeerInit(peerName, peerId, listener) {
     if (!$peerInitListeners[peerName]) {
@@ -44,78 +122,18 @@ function listenPeerInit(peerName, peerId, listener) {
         $peerInitListeners[peerName][peerId] = []
     }
 
-    if ($peers[peerName][peerId]) {
-        listener($peers[peerName][peerId])
+    if (this.peers[peerName][peerId]) {
+        listener(this.peers[peerName][peerId])
     } else {
         $peerInitListeners[peerName][peerId].push(listener)
     }
 }
 
-function set(peer) {
-    if (peer._) {
-        if (!$peers[peer._]) {
-            $peers[peer._] = {}
-        }
 
-        peer.photoPlaceholder = {
-            num: Math.abs(peer.id) % 8,
-            text: getPeerName(peer)[0]
-        }
-
-        if (peer.photo) {
-            let a = peer.photo.photo_small
-            let dcid = peer.photo.dc_id
-
-            const pfstorage = find(peer._, peer.id)
-
-            if (pfstorage && pfstorage.photo) {
-                peer.photo = pfstorage.photo
-            } else {
-                peer.photo = false
-            }
-
-            FileAPI.getPeerPhoto(a, dcid, peer, false).then(url => {
-                $peers[peer._][peer.id]["photo"] = url
-                resolveListeners({
-                    type: "updatePhoto",
-                    peer: peer
-                })
-            }).catch(() => {
-                $peers[peer._][peer.id]["photo"] = false
-                resolveListeners({
-                    type: "updatePhoto",
-                    peer: peer
-                })
-            })
-        }
-
-        $peers[peer._][peer.id] = peer
-
-        if ($peerInitListeners[peer._] && $peerInitListeners[peer._][peer.id]) {
-            $peerInitListeners[peer._][peer.id].forEach(listener => {
-                listener(peer)
-                arrayDelete($peerInitListeners[peer._][peer.id], listener)
-            })
-        }
-
-
-        resolveListeners({
-            type: "set",
-        })
-    }
-}
-
-function find(name, id) {
-    if (!$peers[name]) {
-        return null
-    }
-
-    return $peers[name][id]
-}
 
 function updateOnline(peer, online, props = {}) {
     if (find(peer._, peer.id)) {
-        $peers[name][id][key].online = online
+        this.peers[name][id][key].online = online
 
         resolveListeners({
             type: "updateOnline",
@@ -129,7 +147,7 @@ function updateSingle(name, id, data, props = {}) {
     if (find(name, id)) {
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
-                $peers[name][id][key] = data[key]
+                this.peers[name][id][key] = data[key]
             }
         }
 
@@ -142,7 +160,7 @@ function updateSingle(name, id, data, props = {}) {
 }
 
 function getPeers() {
-    return $peers
+    return this.peers
 }
 
 function init() {
@@ -163,14 +181,4 @@ function init() {
         // }
     })
 }
-
-export const PeersManager = {
-    listenUpdates,
-    listenPeerInit,
-    set,
-    getPeers,
-    find,
-    init
-}
-
-export default PeersManager
+*/

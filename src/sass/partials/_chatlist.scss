@@ -1,285 +1,332 @@
 .chatlist {
-    background-color: #fff;
-    border-right: 1px $lightgrey solid;
-    max-width: 422px;
-    width: 100%;
-    height: 100%;
-    box-sizing: border-box;
-    position: relative;
-    padding-top: 52px;
-    height: 100vh;
+  background-color: #fff;
+  border-right: 1px $lightgrey solid;
+  max-width: 422px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
+  padding-top: 52px;
+  height: 100vh;
 }
 
 #dialogsWrapper {
-	height: 100%;
-    overflow-y: hidden;
+  height: 100%;
+  overflow-y: hidden;
 
+  &:hover {
+    overflow-y: overlay;
+  }
+
+  @supports not(overflow-y: overlay) {
     &:hover {
-        overflow-y: overlay;
+      overflow-y: auto;
     }
-
-    @supports not(overflow-y: overlay) {
-        &:hover {
-            overflow-y: auto;
-        }
-    }
+  }
 }
 
 .list {
-    padding: 8px;
-    padding-left: 8px;
+  padding: 8px;
+  padding-left: 8px;
 
-    * {
-        user-select: none;
-    }
+  * {
+    user-select: none;
+  }
 
-    &.pinned {
-        border-bottom: 1px $lightgrey solid;
+  &.pinned {
+    border-bottom: 1px $lightgrey solid;
 
-        .person {
-            .badge:empty {
-                display: block;
-                background-color: $grey;
-                width: 24px;
-                height: 24px;
-                padding: 0;
-                font-size: 24px;
+    .person {
+      .badge:empty {
+        display: block;
+        background-color: $grey;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        font-size: 24px;
 
-                &:before {
-                    font-family: "#{$tgico-font-family}" !important;
-                    content: $tgico-pinnedchat;
-                }
-            }
+        &:before {
+          font-family: "#{$tgico-font-family}" !important;
+          content: $tgico-pinnedchat;
         }
+      }
     }
+  }
 }
 
-.person+.person {
-    margin-top: 4px;
+.person + .person {
+  margin-top: 4px;
 }
 
 .person.online {
-    .avatar:before {
-        content: "";
-        width: 10px;
-        height: 10px;
-        background-color: $dotgreen;
-        position: absolute;
-        bottom: 1px;
-        right: 1px;
-        border-radius: 50%;
-        border: 2px solid #fff;
-        transition: anim(border);
-    }
+  .avatar:before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background-color: $dotgreen;
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    transition: anim(transform);
+    transform: scale(1);
+    z-index: 100;
+  }
+}
+
+.person:not(.online) {
+  .avatar:before {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background-color: $dotgreen;
+    position: absolute;
+    bottom: 1px;
+    right: 1px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    transform: scale(0);
+    transition: anim(transform);
+    z-index: 100;
+  }
 }
 
 .person.group {
-    .content.top:before {
-        content: $tgico-group;
-    }
+  .content.top:before {
+    content: $tgico-group;
+  }
 }
 
 .person {
-    border-radius: 10px;
-    background-color: #fff;
-    padding: 9px;
-    transition: anim(background-color);
+  border-radius: 10px;
+  background-color: #fff;
+  padding: 9px;
+  transition: anim(background-color);
+
+  display: flex;
+
+  .avatar {
+
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    position: relative;
+    flex-shrink: 0;
+    text-transform: uppercase;
 
     display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.3em;
 
-    .avatar {
-        width: 54px;
-        height: 54px;
-        border-radius: 50%;
-        background-repeat: no-repeat;
-        background-size: contain;
-        position: relative;
-        flex-shrink: 0;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.3em;
-
-        &.placeholder-0 {
-            background-color: #cc90e2;
-        }
-
-        &.placeholder-1 {
-            background-color: #80d066;
-        }
-
-        &.placeholder-2 {
-            background-color: #ecd074;
-        }
-
-        &.placeholder-3 {
-            background-color: #6fb1e4;
-        }
-
-        &.placeholder-4 {
-            background-color: #e57979;
-        }
-
-        &.placeholder-5 {
-            background-color: #f98bae;
-        }
-
-        &.placeholder-6 {
-            background-color: #73cdd0;
-        }
-
-        &.placeholder-7 {
-            background-color: #fba76f;
-        }
+    span {
+      position: absolute;
+      z-index: 10;
     }
 
-    .content {
-        flex-grow: 1;
-        padding-left: 9px;
-        padding-bottom: 2px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-
-        .top,
-        .bottom,
-        .status {
-            line-height: 24px;
-        }
-
-        .bottom {
-            position: relative;
-            display: flex;
-        }
+    .avatar-inner {
+      z-index: 11;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background-repeat: no-repeat;
+      background-size: contain;
+      transition: anim(opacity);
+      opacity: 0;
     }
 
-    .title {
-        font-size: $text-size;
-        font-weight: 500;
-        color: $text;
-        flex-grow: 1;
+
+    &.placeholder-0 {
+      background-color: #cc90e2;
     }
 
-    .badge:empty {
-        display: none;
+    &.placeholder-1 {
+      background-color: #80d066;
     }
 
-    .badge {
-        /*position: absolute;
-		top: 3px;*/
-        flex-shrink: 0;
-        right: 0;
-        background-color: $green;
-        min-width: 24px;
-        height: 24px;
-        text-align: center;
-        border-radius: 12px;
-        font-size: 14px;
-        color: #fff;
-        box-sizing: border-box;
+    &.placeholder-2 {
+      background-color: #ecd074;
     }
 
-    &.unread .badge {
-        font-weight: 700;
-        padding: 0 8px;
+    &.placeholder-3 {
+      background-color: #6fb1e4;
     }
 
-    .status {
-        color: $darkgreen;
-        display: none;
-        font-size: 19px;
-        box-sizing: border-box;
+    &.placeholder-4 {
+      background-color: #e57979;
     }
 
-    .bottom {
-        color: $darkgrey;
+    &.placeholder-5 {
+      background-color: #f98bae;
     }
 
-    .message {
-        font-size: $text-size;
-        font-weight: 400;
-        flex-grow: 1;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-        padding-right: 5px;
-
-        .sender {
-            color: black;
-        }
+    &.placeholder-6 {
+      background-color: #73cdd0;
     }
 
-    .time {
-        font-size: $time-size;
-        color: $darkgrey;
-        padding: 0 3px 0 1px;
+    &.placeholder-7 {
+      background-color: #fba76f;
     }
+  }
+
+
+  .content {
+    flex-grow: 1;
+    padding-left: 9px;
+    padding-bottom: 2px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     .top,
+    .bottom,
+    .status {
+      line-height: 24px;
+    }
+
     .bottom {
-        display: flex;
+      position: relative;
+      display: flex;
+    }
+  }
+
+  .title {
+    font-size: $text-size;
+    font-weight: 500;
+    color: $text;
+    flex-grow: 1;
+  }
+
+  .badge:empty {
+    display: none;
+  }
+
+  .badge {
+    /*position: absolute;
+    top: 3px;*/
+    flex-shrink: 0;
+    right: 0;
+    background-color: $green;
+    min-width: 24px;
+    height: 24px;
+    text-align: center;
+    border-radius: 12px;
+    font-size: 14px;
+    color: #fff;
+    box-sizing: border-box;
+  }
+
+  &.unread .badge {
+    font-weight: 700;
+    padding: 0 8px;
+  }
+
+  .status {
+    color: $darkgreen;
+    display: none;
+    font-size: 19px;
+    box-sizing: border-box;
+  }
+
+  .bottom {
+    color: $darkgrey;
+  }
+
+  .message {
+    font-size: $text-size;
+    font-weight: 400;
+    flex-grow: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding-right: 5px;
+
+    .sender {
+      color: black;
     }
 
-    &.sent,
-    &.read {
-        .status {
-            display: block;
-        }
+    .draft {
+      color: red;
     }
+  }
 
-    &.sent {
-        .status:before {
-            content: $tgico-check-sent;
-        }
+  .time {
+    font-size: $time-size;
+    color: $darkgrey;
+    padding: 0 3px 0 1px;
+  }
+
+  .top,
+  .bottom {
+    display: flex;
+  }
+
+  &.sent,
+  &.read {
+    .status {
+      display: block;
     }
+  }
 
-    &.read {
-        .status:before {
-            content: $tgico-check-read;
-        }
+  &.sent {
+    .status:before {
+      content: $tgico-check-sent;
     }
+  }
 
-    &.muted {
-        .badge {
-            background-color: $grey;
-        }
+  &.read {
+    .status:before {
+      content: $tgico-check-read;
     }
+  }
 
-    &:hover {
-        background-color: $light;
-        cursor: pointer;
+  &.muted {
+    .badge {
+      background-color: $grey;
     }
+  }
 
-    // &.online:hover {
-    // 	.avatar:before {
-    // 		border: 2px solid mix(opacify($light,1) );
-    // 	}
-    // }
+  &:hover {
+    background-color: $light;
+    cursor: pointer;
+  }
+
+  &.selected {
+    background-color: $darkgrey;
+  }
+
+  // &.online:hover {
+  // 	.avatar:before {
+  // 		border: 2px solid mix(opacify($light,1) );
+  // 	}
+  // }
 }
 
 .connecting {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    background-color: $connecting-color;
-    margin: 8px;
-    border-radius: 8px;
-    height: 60px;
-    display: none;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: $connecting-color;
+  margin: 8px;
+  border-radius: 8px;
+  height: 60px;
+  display: none;
 
-    progress {
-        margin-left: 16px;
-        color: #2E3939;
-    }
+  progress {
+    margin-left: 16px;
+    color: #2E3939;
+  }
 
-    span {
-        font-weight: 400;
-        margin-left: 16px;
-        line-height: 60px;
-    }
+  span {
+    font-weight: 400;
+    margin-left: 16px;
+    line-height: 60px;
+  }
 }

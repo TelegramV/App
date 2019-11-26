@@ -1,5 +1,6 @@
 import {bigint, bytesToArrayBuffer, bytesToHex, gzipUncompress, uintToInt} from "../utils/bin"
 import {createLogger} from "../../common/logger"
+import {schema} from "./schema";
 
 const Logger = createLogger("TLDeserialization", {
     level: "log"
@@ -7,12 +8,12 @@ const Logger = createLogger("TLDeserialization", {
 
 export class TLDeserialization {
     constructor(buffer, options = {
-        schema: require("./schema_combine")
+        schema: schema
     }) {
         this.offset = 0 // in bytes
         this.override = options.override || {}
 
-        this.schema = options.schema || require("./schema_combine")
+        this.schema = options.schema || schema
 
         this.buffer = buffer
         this.intView = new Uint32Array(this.buffer)
@@ -201,7 +202,7 @@ export class TLDeserialization {
         if (type.substr(0, 6) === "Vector" || type.substr(0, 6) === "vector") {
             if (type.charAt(0) === "V") {
                 const constructor = this.readInt(field + "[id]")
-                const constructorCmp = uintToInt(constructor)
+                const constructorCmp = constructor
 
                 if (constructorCmp === 0x3072cfa1) { // Gzip packed
                     const compressed = this.fetchBytes(field + "[packed_string]")
@@ -253,7 +254,7 @@ export class TLDeserialization {
             }
         } else {
             const constructor = this.readInt(field + "[id]")
-            const constructorCmp = uintToInt(constructor)
+            const constructorCmp = constructor
 
             if (constructorCmp === 0x3072cfa1) { // Gzip packed
                 const compressed = this.fetchBytes(field + "[packed_string]")

@@ -57,6 +57,7 @@ export class MTProtoNetworker extends Networker {
         const auth_key_id = deserializer.fetchLong("auth_key_id")
         const msg_id = deserializer.fetchLong("msg_id")
         const msg_len = deserializer.fetchInt("msg_len")
+        Logger.debug("Response")
 
         this.handler(deserializer)
     }

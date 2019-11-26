@@ -1,5 +1,6 @@
 import {bigint, bigStringInt, bytesToHex, intToUint} from "../utils/bin"
 import {createLogger} from "../../common/logger";
+import {schema} from "./schema";
 
 const Logger = createLogger("TLSerialization", {
     level: "log"
@@ -8,12 +9,12 @@ const Logger = createLogger("TLSerialization", {
 export class TLSerialization {
     constructor(options = {
         startMaxLength: 2048,
-        schema: require("./schema_combine")
+        schema: schema
     }) {
         this.maxLength = options.startMaxLength || 2048 // 2Kb
         this.offset = 0 // in bytes
 
-        this.schema = options.schema || require("./schema_combine")
+        this.schema = options.schema || schema
 
         this.createBuffer()
 

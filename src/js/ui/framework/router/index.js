@@ -7,6 +7,7 @@
  * @author kohutd
  */
 import VDOM from "../vdom"
+import {vdom_realMount} from "../vdom/mount"
 
 export class FrameworkRouter {
     constructor(options = {}) {
@@ -93,7 +94,7 @@ export class FrameworkRouter {
 
     renderRoute(route) {
         if (route.component.hasOwnProperty("h") && typeof route.component.h === "function") {
-            this.$mountElement = VDOM.mount(route.component.h(), this.$mountElement)
+            this.$mountElement = vdom_realMount(route.component.h(), this.$mountElement)
         }
 
         if (route.component.hasOwnProperty("mounted") && typeof route.component.mounted === "function") {
