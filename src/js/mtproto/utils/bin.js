@@ -241,7 +241,3 @@ export function dHexDump(bytes) {
 
     console.log(arr.join(''))
 }
-
-export function secureRandom() {
-    return new SecureRandom()
-}

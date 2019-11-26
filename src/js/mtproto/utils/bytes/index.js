@@ -1,5 +1,6 @@
 import {BigInteger} from "../../vendor/jsbn/jsbn"
-import {bufferConcat, secureRandom, uint6ToBase64} from "../bin"
+import {bufferConcat, uint6ToBase64} from "../bin"
+import {SecureRandomSingleton} from "../singleton"
 
 /**
  * @param {Array|Uint8Array|Uint16Array|Uint32Array} a
@@ -201,7 +202,7 @@ function addPadding(bytes, blockSize = 16, zeroes = false) {
                 padding[i] = 0
             }
         } else {
-            secureRandom().nextBytes(padding)
+            SecureRandomSingleton.nextBytes(padding)
         }
 
         if (bytes instanceof ArrayBuffer) {

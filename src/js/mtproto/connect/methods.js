@@ -1,5 +1,5 @@
 import {TLSerialization} from "../language/serialization"
-import {bytesToArrayBuffer, secureRandom} from "../utils/bin"
+import {bytesToArrayBuffer} from "../utils/bin"
 import {rsaEncrypt} from "../crypto/rsa"
 import {sha1BytesSync} from "../crypto/sha"
 import {TLDeserialization} from "../language/deserialization"
@@ -9,6 +9,7 @@ import {createLogger} from "../../common/logger"
 import AppCryptoManager from "../crypto/cryptoManager"
 import {rsaKeyByFingerprints} from "./rsaKeys"
 import Bytes from "../utils/bytes"
+import {SecureRandomSingleton} from "../utils/singleton"
 
 
 const Logger = createLogger("methods.js", {
@@ -72,7 +73,7 @@ function sendReqDhParams(networker) {
     const authContext = networker.auth
 
     authContext.newNonce = new Array(32)
-    secureRandom().nextBytes(authContext.newNonce)
+    SecureRandomSingleton.nextBytes(authContext.newNonce)
 
     const dataSerializer = new TLSerialization()
     dataSerializer.storeObject({
@@ -234,7 +235,7 @@ function sendSetClientDhParams(networker, processor, proc_context) {
     const gBytes = Bytes.fromHex(authContext.g.toString(16))
 
     authContext.b = new Array(256)
-    secureRandom().nextBytes(authContext.b)
+    SecureRandomSingleton.nextBytes(authContext.b)
 
     const gB = Bytes.modPow(gBytes, authContext.b, authContext.dhPrime)
 
