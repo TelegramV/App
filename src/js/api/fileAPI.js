@@ -22,7 +22,7 @@ export class FileAPI {
             _: "inputPeerPhotoFileLocation",
             volume_id: file.volume_id,
             local_id: file.local_id,
-            peer: PeerAPI.getInput(peer),
+            peer: peer.inputPeer,
             pFlags: {
                 big: big
             },

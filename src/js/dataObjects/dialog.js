@@ -8,6 +8,7 @@ import {PeerAPI} from "../api/peerAPI";
 import PeersManager from "../api/peers/peersManager";
 import DialogsManager from "../api/dialogs/dialogsManager";
 import {getPeerObject} from "./peerFactory";
+import {UserPeer} from "./userPeer";
 
 const Logger = createLogger(Dialog)
 
@@ -42,23 +43,26 @@ export class Dialog {
     }
 
     addMessageAction(user, action) {
-        this.messageActions[user] = {
+        this.messageActions[user.id] = {
             action: action,
             expires: tsNow(true) + 6
         }
         setTimeout(l => {
-            if(this.messageActions[user] && tsNow(true) >= this.messageActions[user].expires) {
+            if(this.messageActions[user.id] && tsNow(true) >= this.messageActions[user.id].expires) {
                 this.removeMessageAction(user)
-                DialogsManager.resolveListeners({
-                    type: "updateSingle",
-                    dialog: this
-                })
             }
         }, 6000)
     }
 
     removeMessageAction(user) {
-        delete this.messageActions[user]
+        if(this.messageActions[user.id]) {
+            delete this.messageActions[user.id]
+
+            DialogsManager.resolveListeners({
+                type: "updateSingle",
+                dialog: this
+            })
+        }
     }
 
     setPinned(pinned) {
@@ -103,6 +107,14 @@ export class Dialog {
     set lastMessage(lastMessage) {
         // TODO cause update?
         this._lastMessage = lastMessage
+        if(lastMessage.from instanceof UserPeer) {
+            this.removeMessageAction(lastMessage.from)
+        }
+        DialogsManager.resolveListeners({
+            type: "updateSingle",
+            dialog: this
+        })
+
     }
 
     get lastMessage() {
@@ -129,7 +141,7 @@ export class Dialog {
 
     fetchMessages(props = {offset_id: 0}) {
         return MTProto.invokeMethod("messages.getHistory", {
-            peer: PeerAPI.getInput(this.peer.peer),
+            peer: this.peer.inputPeer,
             offset_id: props.offset_id,
             offset_date: 0,
             add_offset: 0,

@@ -7,6 +7,10 @@ export class Manager {
         this.listeners = []
     }
 
+    init() {
+
+    }
+
     resolveListeners(event) {
         if (event) {
             this.listeners.forEach(listener => {

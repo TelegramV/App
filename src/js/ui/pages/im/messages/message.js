@@ -1,4 +1,4 @@
-import {MTProto} from "../../../../mtproto"
+import { MTProto } from "../../../../mtproto"
 import Voice from "../../../voice"
 import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers";
 import {emoji} from "../../../utils";

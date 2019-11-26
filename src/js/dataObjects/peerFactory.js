@@ -9,7 +9,7 @@ import {ChannelForbiddenPeer} from "./channelForbiddenPeer";
 
 const Logger = createLogger("PeerFactory")
 
-export function getPeerObject(peer) {
+export function getPeerObject(peer, messageId = null) {
     let type
     if(peer._ === "user") {
         if(peer.pFlags.bot) {
@@ -30,5 +30,13 @@ export function getPeerObject(peer) {
     } else if(peer._ === "channelForbidden") {
         type = ChannelForbiddenPeer
     }
-    return new (type)(peer)
+    // If there's no pFlags it's probably chat
+    if(peer.pFlags && peer.pFlags.min && !messageId) {
+        // https://core.telegram.org/api/min
+        console.error(peer, messageId)
+        throw new Error("Tried to create min peer without message context")
+    }
+    const p = new (type)(peer)
+    p.contextMessageId = messageId
+    return p
 }

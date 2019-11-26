@@ -1,8 +1,6 @@
 import {MTProto} from "../../mtproto"
-import {nextRandomInt} from "../../mtproto/utils/bin"
 import {getInputPeerFromPeer} from "./util"
 import TimeManager from "../../mtproto/timeManager"
-import {getMessageLocalID} from "./messageIdManager"
 import PeersManager from "../peers/peersManager"
 import {Dialog} from "../../dataObjects/dialog";
 import {getPeerObject} from "../../dataObjects/peerFactory";
@@ -12,6 +10,7 @@ import {SupergroupPeer} from "../../dataObjects/supergroupPeer";
 import {GroupPeer} from "../../dataObjects/groupPeer";
 import {ChannelPeer} from "../../dataObjects/channelPeer";
 import {Peer} from "../../dataObjects/peer";
+import {Message} from "../../dataObjects/message";
 
 class DialogManager extends Manager {
     constructor() {
@@ -27,129 +26,156 @@ class DialogManager extends Manager {
     }
 
     init() {
-        MTProto.MessageProcessor.listenUpdateShortMessage(update => {
-            console.log("ShortMessage", update)
-        })
-        MTProto.MessageProcessor.listenUpdateNewChannelMessage(update => {
-            // console.log("NewChannelMessage", update)
-        })
-        MTProto.MessageProcessor.listenUpdateDraftMessage(update => {
-            const dialog = this.findByPeer(update.peer)
-            if(dialog) {
-                dialog._dialog.draft = update.draft
-                this.resolveListeners({
-                    type: "updateSingle",
-                    dialog: dialog
-                })
-            }
-        })
-        MTProto.MessageProcessor.listenUpdateDialogUnreadMark(update => {
-            const dialog = this.findByPeer(update.peer.peer)
-            if(dialog) {
-                dialog._dialog.pFlags.unread_mark = update.pFlags.unread
-                this.resolveListeners({
-                    type: "updateSingle",
-                    dialog: dialog
-                })
-            }
-        })
-        MTProto.MessageProcessor.listenUpdateReadHistoryOutbox(update => {
-            const dialog = this.findByPeer(update.peer)
-            if(dialog) {
-                dialog._dialog.read_outbox_max_id = update.max_id
-                this.resolveListeners({
-                    type: "updateSingle",
-                    dialog: dialog
-                })
-            }
-        })
-        MTProto.MessageProcessor.listenUpdateReadHistoryInbox(update => {
-            console.log("inbox", update)
-            const dialog = this.findByPeer(update.peer)
-            if(dialog) {
-                dialog._dialog.read_inbox_max_id = update.max_id
-                dialog._dialog.unread_count = update.still_unread_count
-                this.resolveListeners({
-                    type: "updateSingle",
-                    dialog: dialog
-                })
-            }
-        })
-        MTProto.MessageProcessor.listenUpdateShort(async update => {
-            if(update._ === "updateUserStatus") {
-                const dialog = this.find("user", update.user_id)
-
-                if (dialog && dialog.peer instanceof UserPeer) {
-                    dialog.peer.peer.status = update.status
-                    this.resolveListeners({
-                        type: "updateSingle",
-                        dialog: dialog
-                    })
-                }
-            } else if(update._ === "updateChatUserTyping") {
-                const dialog = this.find("chat", update.chat_id) || this.find("channel", update.chat_id)
-
-                if (!dialog) {
-                    return; // prob should download the chat
-                }
-
-                let peer = PeersManager.find("user", update.user_id)
-                if (!peer) {
-                    await this.updateChatFull(dialog)
-
-                    peer = PeersManager.find("user", update.user_id)
-                    if (!peer) {
-                        return
-                    }
-                }
-                if (dialog && peer) {
-                    dialog.addMessageAction(peer, update.action)
-                    this.resolveListeners({
-                        type: "updateSingle",
-                        dialog: dialog
-                    })
-                }
-
-            } else if(update._ === "updateUserTyping") {
-                console.log(update)
-                const dialog = this.find("user", update.user_id)
-
-                if (!dialog) {
-                    return; // prob should download the chat
-                }
-
-                if (dialog) {
-                    dialog.addMessageAction(dialog.peer, update.action)
-                    this.resolveListeners({
-                        type: "updateSingle",
-                        dialog: dialog
-                    })
-                }
-            } else if(update._ === "updateReadChannelOutbox") {
-                const dialog = this.find("channel", update.channel_id)
-
-                if (!dialog) {
-                    return // prob should be fixed
-                }
-
-                dialog._dialog.read_outbox_max_id = update.max_id
-                this.resolveListeners({
-                    type: "updateSingle",
-                    dialog: dialog
-                })
-            } else if(update._ === "updateReadHistoryOutbox") {
-                console.log(update)
-            } else {
-                console.log("Short", update)
-            }
-        })
+        // MTProto.MessageProcessor.listenUpdateShortMessage(update => {
+        //     console.log("ShortMessage", update)
+        // })
+        //
+        // MTProto.MessageProcessor.listenUpdateNewMessage(update => {
+        //     const dialog = this.find("user", update.message.from_id)
+        //     if(!dialog) return
+        //     dialog.lastMessage = new Message(dialog, update.message)
+        // })
+        // MTProto.MessageProcessor.listenUpdateNewChannelMessage(update => {
+        //     console.log(update)
+        //     const dialog = this.find("channel", update.message.to_id.channel_id)
+        //     if(!dialog || !PeersManager.find("user", update.message.from_id)) {
+        //         MTProto.invokeMethod("updates.getDifference", {
+        //             flags: 0,
+        //             pts: 683207,
+        //             qts: "",
+        //             date: update.message.date
+        //         }).then(l => {
+        //             l.users.forEach(q => {
+        //                 PeersManager.set(getPeerObject(q))
+        //             })
+        //             l.chats.forEach(q => {
+        //                 PeersManager.set(getPeerObject(q))
+        //             })
+        //             console.log("resp diff", l)
+        //         }).catch(l => {
+        //             console.log(l)
+        //         })
+        //         return
+        //     }
+        //     dialog.lastMessage = new Message(dialog, update.message)
+        // })
+        // MTProto.MessageProcessor.listenUpdateDraftMessage(update => {
+        //     const dialog = this.findByPeer(update.peer)
+        //     if(dialog) {
+        //         dialog._dialog.draft = update.draft
+        //         this.resolveListeners({
+        //             type: "updateSingle",
+        //             dialog: dialog
+        //         })
+        //     }
+        // })
+        // MTProto.MessageProcessor.listenUpdateDialogUnreadMark(update => {
+        //     const dialog = this.findByPeer(update.peer.peer)
+        //     if(dialog) {
+        //         dialog._dialog.pFlags.unread_mark = update.pFlags.unread
+        //         this.resolveListeners({
+        //             type: "updateSingle",
+        //             dialog: dialog
+        //         })
+        //     }
+        // })
+        // MTProto.MessageProcessor.listenUpdateReadHistoryOutbox(update => {
+        //     const dialog = this.findByPeer(update.peer)
+        //     if(dialog) {
+        //         dialog._dialog.read_outbox_max_id = update.max_id
+        //         this.resolveListeners({
+        //             type: "updateSingle",
+        //             dialog: dialog
+        //         })
+        //     }
+        // })
+        // MTProto.MessageProcessor.listenUpdateReadHistoryInbox(update => {
+        //     // console.log("inbox", update)
+        //     const dialog = this.findByPeer(update.peer)
+        //     if(dialog) {
+        //         dialog._dialog.read_inbox_max_id = update.max_id
+        //         dialog._dialog.unread_count = update.still_unread_count
+        //         this.resolveListeners({
+        //             type: "updateSingle",
+        //             dialog: dialog
+        //         })
+        //     }
+        // })
+        // MTProto.MessageProcessor.listenUpdateShort(async update => {
+        //     if(update._ === "updateUserStatus") {
+        //         const dialog = this.find("user", update.user_id)
+        //
+        //         if (dialog && dialog.peer instanceof UserPeer) {
+        //             dialog.peer.peer.status = update.status
+        //             this.resolveListeners({
+        //                 type: "updateSingle",
+        //                 dialog: dialog
+        //             })
+        //         }
+        //     } else if(update._ === "updateChatUserTyping") {
+        //         const dialog = this.find("chat", update.chat_id) || this.find("channel", update.chat_id)
+        //
+        //         if (!dialog) {
+        //             return; // prob should download the chat
+        //         }
+        //
+        //         let peer = PeersManager.find("user", update.user_id)
+        //         if (!peer) {
+        //             await this.updateChatFull(dialog)
+        //
+        //             peer = PeersManager.find("user", update.user_id)
+        //             if (!peer) {
+        //                 return
+        //             }
+        //         }
+        //         if (dialog && peer) {
+        //             dialog.addMessageAction(peer, update.action)
+        //             this.resolveListeners({
+        //                 type: "updateSingle",
+        //                 dialog: dialog
+        //             })
+        //         }
+        //
+        //     } else if(update._ === "updateUserTyping") {
+        //         // console.log(update)
+        //         const dialog = this.find("user", update.user_id)
+        //
+        //         if (!dialog) {
+        //             return; // prob should download the chat
+        //         }
+        //
+        //         if (dialog) {
+        //             dialog.addMessageAction(dialog.peer, update.action)
+        //             this.resolveListeners({
+        //                 type: "updateSingle",
+        //                 dialog: dialog
+        //             })
+        //         }
+        //     } else if(update._ === "updateReadChannelOutbox") {
+        //         const dialog = this.find("channel", update.channel_id)
+        //
+        //         if (!dialog) {
+        //             return // prob should be fixed
+        //         }
+        //
+        //         dialog._dialog.read_outbox_max_id = update.max_id
+        //         this.resolveListeners({
+        //             type: "updateSingle",
+        //             dialog: dialog
+        //         })
+        //     } else if(update._ === "updateReadHistoryOutbox") {
+        //         console.log("updateReadHistoryOutbox", update)
+        //     } else {
+        //         console.log("Short", update)
+        //     }
+        // })
     }
 
     fetchNextPage({limit = 20}) {
         const latestDialog = this.latestDialog
         const peer = latestDialog.peer
 
-        const offsetPeer = getInputPeerFromPeer(peer.type, peer.id)
+        const offsetPeer = peer.inputPeer
 
         const data = {
             limit: limit,
@@ -270,6 +296,8 @@ class DialogManager extends Manager {
                 dialogs: dialogsToPush.filter(l => !l.pinned),
                 pinnedDialogs: dialogsToPush.filter(l => l.pinned)
             })
+
+            console.log(this.dialogs)
 
 
             dialogsToPush.forEach(l => {

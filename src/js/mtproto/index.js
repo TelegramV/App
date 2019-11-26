@@ -7,6 +7,7 @@ import {AppPermanentStorage} from "../common/storage"
 import {AuthAPI} from "../api/auth";
 import {sendReqPQ} from "./connect/methods";
 import DialogsManager from "../api/dialogs/dialogsManager"
+import UpdatesManager from "../api/updatesManager"
 import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import Bytes from "./utils/bytes"
@@ -66,7 +67,8 @@ class MobileProtocolAPIAuth {
 
 function initManagers() {
     DialogsManager.init()
-    // PeersManager.init()
+    UpdatesManager.init()
+    PeersManager.init()
 }
 
 class MobileProtocol {
