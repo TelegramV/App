@@ -334,6 +334,11 @@ export class ApiNetworker extends Networker {
             body: serializer.getBytes(true),
             isAPI: true
         }
+        this.messageProcessor.sentMessagesDebug[messageID] = {
+            _: method,
+            params: params
+        }
+
 
         //Logger.debug("Api call", method, params, messageID, seqNo, options)
         Logger.debug("Api call", method, params)

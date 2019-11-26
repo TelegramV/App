@@ -71,6 +71,11 @@ export class PeerManager extends Manager {
                 this.peers[peer.type] = {}
             }
 
+            if(this.peers[peer.type][peer.id]) {
+                return false
+            }
+            this.peers[peer.type][peer.id] = peer
+
             peer.getAvatar().catch(l => {
                 this.resolveListeners({
                     type: "updatePhoto",
@@ -78,7 +83,6 @@ export class PeerManager extends Manager {
                 })
             })
 
-            this.peers[peer.type][peer.id] = peer
 
             if (this.peerInitListeners[peer.type] && this.peerInitListeners[peer.type][peer.id]) {
                 this.peerInitListeners[peer.type][peer.id].forEach(listener => {
@@ -86,12 +90,14 @@ export class PeerManager extends Manager {
                     arrayDelete(this.peerInitListeners[peer.type][peer.id], listener)
                 })
             }
+            return true
 
 
             // this.resolveListeners({
             //     type: "set",
             // })
         }
+        throw new Error("Not a peer object!")
     }
 }
 

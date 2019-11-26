@@ -8,6 +8,7 @@ import {AuthAPI} from "../api/auth";
 import {sendReqPQ} from "./connect/methods";
 import PeersManager from "../api/peers/peersManager"
 import DialogsManager from "../api/dialogs/dialogsManager"
+import UpdatesManager from "../api/updatesManager"
 import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import {Networker} from "./network/networker"
@@ -66,7 +67,8 @@ class MobileProtocolAPIAuth {
 
 function initManagers() {
     DialogsManager.init()
-    // PeersManager.init()
+    UpdatesManager.init()
+    PeersManager.init()
 }
 
 class MobileProtocol {

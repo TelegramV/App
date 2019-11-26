@@ -7,6 +7,8 @@ const Logger = createLogger("UserPeer")
 
 export class UserPeer extends Peer {
     get peerName() {
+        if(this.deleted)
+            return "Deleted Account"
         return this.firstName + (this.lastName.length > 0 ? " " + this.lastName : "")
     }
     get firstName() {
@@ -17,7 +19,7 @@ export class UserPeer extends Peer {
     }
 
     get onlineStatus() {
-        if(this.deleted || !this.peer.status._) {
+        if(this.deleted || !this.peer.status) {
             return {
                 online: false,
                 status: "a long time ago"

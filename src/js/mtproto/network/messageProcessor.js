@@ -23,16 +23,14 @@ export class MessageProcessor {
         this.rpcResultHandlers = {}
         this.rpcErrorHandlers = {}
         this.sentMessages = {}
+        this.sentMessagesDebug = {}
 
         this.updateShortListeners = []
-        this.updateShortMessagesListeners = []
-        this.updateNewMessagesListeners = []
-        this.updateNewChannelMessagesListeners = []
-        this.updateReadHistoryInboxListeners = []
-        this.updateReadHistoryOutboxListeners = []
-        this.updateEditChannelMessageListeners = []
-        this.updateDraftMessageListeners = []
-        this.updateDialogUnreadMarkListeners = []
+        this.updateShortMessageListeners = []
+        this.updateShortSentMessageListeners = []
+        this.updateShortChatMessageListeners = []
+        this.updatesCombinedListeners = []
+        this.updatesListeners = []
 
         this.handlers = {
             "msg_container": this.processMessageContainer.bind(this),
@@ -44,14 +42,10 @@ export class MessageProcessor {
             "new_session_created": this.processNewSessionCreated.bind(this),
             "updateShort": this.processUpdateShort.bind(this),
             "updateShortMessage": this.processUpdateShortMessage.bind(this),
-            "updateNewMessage": this.processUpdateNewMessage.bind(this),
-            "updateNewChannelMessage": this.processUpdateNewChannelMessage.bind(this),
+            "updateShortChatMessage": this.processUpdateShortChatMessage.bind(this),
+            "updateShortSentMessage": this.processUpdateShortSentMessage.bind(this),
             "updates": this.processUpdates.bind(this),
-            "updateReadHistoryOutbox": this.processUpdateReadHistoryOutbox.bind(this),
-            "updateReadHistoryInbox": this.processUpdateReadHistoryInbox.bind(this),
-            "updateEditChannelMessage": this.processUpdateEditChannelMessage.bind(this),
-            "updateDraftMessage": this.processUpdateDraftMessage.bind(this),
-            "updateDialogUnreadMark": this.processUpdateDialogUnreadMark.bind(this)
+            "updatesCombined": this.processUpdatesCombined.bind(this),
         }
     }
 
@@ -61,46 +55,23 @@ export class MessageProcessor {
         // Logger.log("Short update", message)
     }
 
-    processUpdateEditChannelMessage(message, messageID, sessionID) {
-        this.updateEditChannelMessageListeners.forEach(listener => listener(message))
+    processUpdatesCombined(message, messageID, sessionID) {
+        this.updatesCombinedListeners.forEach(listener => listener(message))
     }
 
-    processUpdateDialogUnreadMark(message, messageID, sessionID) {
-        this.updateDialogUnreadMarkListeners.forEach(listener => listener(message))
-    }
-
-    processUpdateDraftMessage(message, messageID, sessionID) {
-        this.updateDraftMessageListeners.forEach(listener => listener(message))
-    }
-
-    processUpdateReadHistoryInbox(message, messageID, sessionID) {
-        //console.log(message)
-        this.updateReadHistoryInboxListeners.forEach(listener => listener(message))
-        // Logger.log("Short update", message)
-    }
-
-    processUpdateReadHistoryOutbox(message, messageID, sessionID) {
-        //console.log(message)
-        this.updateReadHistoryOutboxListeners.forEach(listener => listener(message))
-        // Logger.log("Short update", message)
+    processUpdateShortChatMessage(message, messageID, sessionID) {
+        this.updateShortChatMessageListeners.forEach(listener => listener(message))
     }
 
     processUpdateShortMessage(message, messageID, sessionID) {
         //console.log(message)
-        this.updateShortMessagesListeners.forEach(listener => listener(message))
+        this.updateShortMessageListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
 
-    processUpdateNewMessage(message, messageID, sessionID) {
-        // console.log(message)
-        this.updateNewMessagesListeners.forEach(listener => listener(message))
-        // Logger.log("Short update", message)
-    }
-
-
-    processUpdateNewChannelMessage(message, messageID, sessionID) {
+    processUpdateShortSentMessage(message, messageID, sessionID) {
         //console.log(message)
-        this.updateNewChannelMessagesListeners.forEach(listener => listener(message))
+        this.updateShortSentMessageListeners.forEach(listener => listener(message))
         // Logger.log("Short update", message)
     }
 
@@ -110,53 +81,41 @@ export class MessageProcessor {
 
     processUpdates(message, messageID, sessionID) {
         //console.log(message)
-        message.users.forEach(user => PeersManager.set(user))
-        message.chats.forEach(user => PeersManager.set(user))
-
-        message.updates.forEach(update => {
-            if (this.handlers[update._]) {
-                this.handlers[update._](update)
-            } else {
-                console.warn("unexprected update", update)
-            }
-        })
+        this.updatesListeners.forEach(listener => listener(message))
+        // message.users.forEach(user => PeersManager.set(user))
+        // message.chats.forEach(user => PeersManager.set(user))
+        //
+        // message.updates.forEach(update => {
+        //     if (this.handlers[update._]) {
+        //         this.handlers[update._](update)
+        //     } else {
+        //         console.warn("unexprected update", update)
+        //     }
+        // })
     }
 
-    listenUpdateReadHistoryOutbox(listener) {
-        this.updateReadHistoryOutboxListeners.push(listener)
+    listenUpdatesCombined(listener) {
+        this.updatesCombinedListeners.push(listener)
     }
 
-    listenUpdateDialogUnreadMark(listener) {
-        this.updateDialogUnreadMarkListeners.push(listener)
+    listenUpdates(listener) {
+        this.updatesListeners.push(listener)
     }
 
-    listenUpdateReadHistoryInbox(listener) {
-        this.updateReadHistoryInboxListeners.push(listener)
+    listenUpdateShortChatMessage(listener) {
+        this.updateShortChatMessageListeners.push(listener)
     }
 
-    listenUpdateDraftMessage(listener) {
-        this.updateDraftMessageListeners.push(listener)
+    listenUpdateShortSentMessage(listener) {
+        this.updateShortSentMessageListeners.push(listener)
     }
-
-    listenUpdateEditChannelMessage(listener) {
-        this.updateEditChannelMessageListeners.push(listener)
-    }
-
 
     listenUpdateShort(listener) {
         this.updateShortListeners.push(listener)
     }
 
     listenUpdateShortMessage(listener) {
-        this.updateShortMessagesListeners.push(listener)
-    }
-
-    listenUpdateNewMessage(listener) {
-        this.updateNewMessagesListeners.push(listener)
-    }
-
-    listenUpdateNewChannelMessage(listener) {
-        this.updateNewChannelMessagesListeners.push(listener)
+        this.updateShortMessageListeners.push(listener)
     }
 
     listenPong(messageId, handler) {
@@ -213,7 +172,7 @@ export class MessageProcessor {
 
         if (message.result._ === "rpc_error") {
             const error = this.networker.processError(message.result)
-            Logger.error('Rpc error', error)
+            Logger.error('Rpc error', error, ". request: ", this.sentMessagesDebug[message.req_msg_id])
 
             this.rpcErrorHandlers[message.req_msg_id](error)
 
