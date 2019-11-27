@@ -9,6 +9,11 @@ function openDialog(dialog) {
     })
 }
 
+/**
+ * @param {Dialog} dialog
+ * @return {*}
+ * @constructor
+ */
 export function UICreateDialog(dialog) {
     const peer = dialog.peer
     const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.unreadCount > 0 ? dialog.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
@@ -28,7 +33,7 @@ export function UICreateDialog(dialog) {
     let hasAvatar = peer.hasAvatar && peer._avatar !== undefined
 
     return (
-        <div data-peer={`${dialog.type}.${dialog.id}`}
+        <div data-peer-username={dialog.peer} data-peer={`${dialog.type}.${dialog.id}`}
              data-message-id={dialog.lastMessage.id}
              className={personClasses}
              onClick={openDialog(dialog)}>

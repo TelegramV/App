@@ -9,7 +9,7 @@ const Logger = createLogger("PermanentStorage", {
  *
  * TODO: mb we should make all methods async..
  *
- * The `driver` have to implement following methods:
+ * The `driver` must implement following methods:
  * - `getItem(key)`
  * - `setItem(key, value)
  * - `removeItem(key, value)

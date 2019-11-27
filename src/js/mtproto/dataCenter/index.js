@@ -1,41 +1,41 @@
 import AppConfiguration from "../../configuration"
 
-class DataCenter {
-    constructor(options = {}) {
-        this.useSsl = options.useSsl
-        this.sslSubdomains = ["pluto", "venus", "aurora", "vesta", "flora"]
+const names = ["pluto", "venus", "aurora", "vesta", "flora"]
+const dc_list = AppConfiguration.mtproto.dataCenter.list
+const chosen_servers = {}
 
-        this.dcOptions = AppConfiguration.mtproto.dataCenter.list
+/**
+ * @param {number} dcId
+ * @param upload
+ * @return {string|*}
+ */
+function chooseServer(dcId, upload = false) {
+    if (chosen_servers[dcId] === undefined) {
+        let chosenServer = false
+        const path = AppConfiguration.mtproto.dataCenter.test ? "apiws_test" : "apiws"
 
-        this.chosenServers = {}
-    }
-
-
-    chooseServer(dcID, upload) {
-        if (this.chosenServers[dcID] === undefined) {
-            let chosenServer = false
-            let dcOption
-            const path = AppConfiguration.mtproto.dataCenter.test ? "apiws_test" : "apiws"
-
-            if (dcID !== 0) {
-                let subdomain = this.sslSubdomains[dcID - 1] + (upload ? "-1" : "")
-                chosenServer = `wss://${subdomain}.web.telegram.org/${path}`
-                return chosenServer
-            }
-
-            for (let i = 0; i < this.dcOptions.length; i++) {
-                dcOption = this.dcOptions[i]
-                if (Number(dcOption.id) === Number(dcID)) {
-                    chosenServer = `ws://${dcOption.host}:${dcOption.port}/${path}`
-                    break
-                }
-            }
-
-            this.chosenServers[dcID] = chosenServer;
+        if (dcId !== 0) {
+            let subdomain = names[dcId - 1] + (upload ? "-1" : "")
+            chosenServer = `wss://${subdomain}.web.telegram.org/${path}`
+            return chosenServer
         }
 
-        return this.chosenServers[dcID]
+        for (let i = 0; i < dc_list.length; i++) {
+            let dcOption = dc_list[i]
+            if (dcOption.id === dcId) {
+                chosenServer = `ws://${dcOption.host}:${dcOption.port}/${path}`
+                break
+            }
+        }
+
+        chosen_servers[dcId] = chosenServer;
     }
+
+    return chosen_servers[dcId]
 }
 
-export default new DataCenter()
+const DataCenter = {
+    chooseServer
+}
+
+export default DataCenter

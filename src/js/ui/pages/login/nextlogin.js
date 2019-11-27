@@ -4,11 +4,8 @@ import {countries, hasClass} from "../../utils"
 import {MTProto} from "../../../mtproto"
 import {AppPermanentStorage} from "../../../common/storage"
 import {AppFramework} from "../../framework/framework"
-import {FileAPI} from "../../../api/fileAPI";
-import AppCryptoManager from "../../../mtproto/crypto/cryptoManager";
-
-// do not use `import` to get this, because DO NOT DO THIS
-require("./../../vendor/tgs_player")
+import {FileAPI} from "../../../api/fileAPI"
+import AppCryptoManager from "../../../mtproto/crypto/cryptoManager"
 
 const Croppie = require("croppie")
 const Emoji = require("emoji-js");

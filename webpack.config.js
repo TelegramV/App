@@ -7,8 +7,6 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-
 require("@babel/polyfill")
 
 const config = {
@@ -27,6 +25,9 @@ const config = {
     },
 
     plugins: [
+        new CopyWebpackPlugin([{
+            from: "public"
+        }]),
         new MiniCssExtractPlugin({
             filename: "bundle.[hash].css",
             chunkFilename: "./src/sass/application.scss",
@@ -34,15 +35,13 @@ const config = {
         }),
         new HtmlWebpackPlugin({template: "./src/index.html"}),
         new CleanWebpackPlugin(),
-        new CopyWebpackPlugin([{
-            from: "public"
-        }]),
     ],
     module: {
-        rules: [{
-            test: /\.worker\.js$/,
-            use: {loader: "worker-loader"}
-        },
+        rules: [
+            {
+                test: /\.worker\.js$/,
+                use: {loader: "worker-loader"}
+            },
             {
                 test: /\.js$/,
                 use: "babel-loader",

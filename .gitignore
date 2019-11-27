@@ -7,7 +7,7 @@ package-lock.json
 
 dist
 
-yarn.lock
+*.lock
 # OS generated files
 .DS_Store
 .DS_Store?

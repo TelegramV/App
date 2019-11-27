@@ -1,13 +1,6 @@
-import {createLogger} from "../../common/logger";
 import {TimeManager} from "../timeManager";
 import {mt_set_disconnect_processor, mt_ws_set_processor, mt_ws_transport} from "./mt_ws_transport";
 import DataCenter from "../dataCenter";
-import {ApiNetworker} from "./apiNetworker";
-import {AppPermanentStorage, AppTemporaryStorage} from "../../common/storage";
-
-const Logger = createLogger("Networker", {
-    level: "warn"
-})
 
 export class Networker {
     constructor(auth) {

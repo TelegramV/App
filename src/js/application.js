@@ -1,22 +1,19 @@
 import {MTProto} from "./mtproto"
 import {createNonce} from "./mtproto/utils/bin"
-//import {setCode2FAForm} from "./ui/login/loginPage"
-import {AppPermanentStorage} from "./common/storage"
 
 import "../sass/application.scss"
 import {ImPage} from "./ui/pages/im/impage"
 import {LoginPage} from "./ui/pages/login/nextlogin"
 import {AppFramework} from "./ui/framework/framework"
-import {loadSchema} from "./mtproto/language/schema";
+import {loadSchema} from "./mtproto/language/schema"
+
+import "./ui/vendor/tgs_player"
+
 
 const authContext = {
     dcID: 2,
     nonce: createNonce(16),
     sessionID: createNonce(8) // TODO check if secure?
-}
-
-function authorizedStart(authorizationData) {
-    AppPermanentStorage.setItem("authorizationData", authorizationData)
 }
 
 
