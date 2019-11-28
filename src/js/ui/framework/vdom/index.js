@@ -8,6 +8,8 @@ import vdom_isSimpleComponent from "./check/isSimpleComponent"
 import vdom_isNamedComponent from "./check/isNamedComponent"
 import vdom_isComponent from "./check/isComponent"
 import vdom_hasAttribute from "./check/hasAttribute"
+import vdom_appendToReal from "./appendToReal"
+import vdom_prependToReal from "./prependToReal"
 
 /**
  * Simple Virtual DOM.
@@ -21,13 +23,16 @@ export const VDOM = {
     jsx: vdom_jsx,
     render: vdom_render,
     patchReal: vdom_patchReal,
-    mount: vdom_mount,
 
     isVNode: vdom_isVNode,
     isSimpleComponent: vdom_isSimpleComponent,
     isNamedComponent: vdom_isNamedComponent,
     isComponent: vdom_isComponent,
-    hasAttribute: vdom_hasAttribute
+    hasAttribute: vdom_hasAttribute,
+
+    mount: vdom_mount,
+    appendToReal: vdom_appendToReal,
+    prependToReal: vdom_prependToReal,
 }
 
 export default VDOM

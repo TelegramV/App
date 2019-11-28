@@ -107,7 +107,7 @@ export function blobConstruct(blobParts, mimeType) {
     } catch (e) {
         const bb = new BlobBuilder()
         Array.forEach(blobParts, function (blobPart) {
-            bb.append(blobPart)
+            bb.appendToReal(blobPart)
         })
         blob = bb.getBlob(safeMimeType)
     }

@@ -9,6 +9,7 @@ import {ChannelPeer} from "../../../../dataObjects/channelPeer";
 import {GroupPeer} from "../../../../dataObjects/groupPeer";
 import {SupergroupPeer} from "../../../../dataObjects/supergroupPeer";
 import {BotPeer} from "../../../../dataObjects/botPeer";
+import {Pinned} from "../../../pinnedController";
 
 let $messagesElement = document.createElement("div")
 let _page_dialog = null
@@ -75,7 +76,7 @@ function render(dialog) {
                         </div>
                     </div>
                 </div>
-                <div className="pinned-msg"/>
+                <Pinned/>
                 <div className="btn-icon rp rps tgico-search"/>
                 <div className="btn-icon rp rps tgico-more"/>
             </div>

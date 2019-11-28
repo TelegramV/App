@@ -1,11 +1,8 @@
 import vdom_isVNode from "./check/isVNode"
+import vdom_appendToReal from "./appendToReal"
 
 const _XML_NAMESPACES = {
     svg: "http://www.w3.org/2000/svg"
-}
-
-export function vdom_prepareToRender(vNode) {
-
 }
 
 /**
@@ -88,9 +85,13 @@ function vdom_render(vNode, xmlns = null) {
         $node.addEventListener(kEvent, vEvent)
     }
 
-    // append children
+    if (typeof vNode.created === "function") {
+        vNode.created($node)
+    }
+
+    // appending children
     for (const child of vNode.children) {
-        $node.appendChild(vdom_render(child, xmlns))
+        vdom_appendToReal(child, $node, {xmlns})
     }
 
     return $node

@@ -12,9 +12,7 @@ function vdom_isVNode(potentialVNode) {
     return (
         typeof potentialVNode === "object" &&
         potentialVNode.tagName !== undefined &&
-        potentialVNode.children !== undefined &&
-        potentialVNode.attrs !== undefined &&
-        potentialVNode.events !== undefined
+        potentialVNode.__virtual === true
     )
 }
 

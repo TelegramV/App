@@ -1,3 +1,15 @@
+import vdom_isNamedComponent from "./check/isNamedComponent"
+import vdom_isSimpleComponent from "./check/isSimpleComponent"
+import vdom_isVNode from "./check/isVNode"
+
+function removeIfs(array) {
+    for (let i = 0; i < array.length; i++) {
+        if (vdom_isVNode(array[i]) && !array[i].renderIf) {
+            array.splice(i, 1)
+        }
+    }
+}
+
 /**
  * Creates Virtual Node
  *
@@ -58,21 +70,12 @@
  * @param events
  * @param children
  * @param dangerouslySetInnerHTML
+ * @param renderIf
+ * @param mounted callback
+ * @param created
  * @returns {any}
  */
-import vdom_isNamedComponent from "./check/isNamedComponent"
-import vdom_isSimpleComponent from "./check/isSimpleComponent"
-import vdom_isVNode from "./check/isVNode"
-
-function removeIfs(array) {
-    for (let i = 0; i < array.length; i++) {
-        if (vdom_isVNode(array[i]) && !array[i].renderIf) {
-            array.splice(i, 1)
-        }
-    }
-}
-
-function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], dangerouslySetInnerHTML = false, renderIf = true} = {}) {
+function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], dangerouslySetInnerHTML = false, renderIf = true, created = undefined, mounted = undefined} = {}) {
     const vElem = Object.create(null)
 
     removeIfs(children)
@@ -87,18 +90,23 @@ function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], 
         const vNode = tagName.h(Object.assign(attrs, {slot: children}))
         vNode.attrs["data-component"] = tagName.name
         vNode.renderIf = renderIf
+        vNode.created = tagName.created
+        vNode.mounted = tagName.mounted
         return vNode
     }
 
 
     Object.assign(vElem, {
+        __virtual: true,
         tagName,
         attrs,
         options,
         events,
         children,
         dangerouslySetInnerHTML,
-        renderIf
+        renderIf,
+        created,
+        mounted,
     })
 
     return vElem
