@@ -1,7 +1,7 @@
 import {FileAPI} from "../api/fileAPI";
 import {createLogger} from "../common/logger";
 import {default as PeersManager} from "../api/peers/peersManager";
-import {getInputPeerFromMessage, getInputPeerFromPeer} from "../api/dialogs/util";
+import {getInputPeerFromPeer} from "../api/dialogs/util";
 
 const Logger = createLogger("Peer")
 
@@ -9,7 +9,6 @@ export class Peer {
     constructor(peer) {
         this._peer = peer
         this._avatar = undefined
-        this.contextMessageId = 0
     }
 
     get id() {
@@ -40,11 +39,11 @@ export class Peer {
         return this.peer.photo && this.peer.photo._ !== "chatPhotoEmpty"
     }
 
-    get inputPeer() {
-        if(this.peer.pFlags.min) {
-            return getInputPeerFromMessage(this.type, this.id, this.contextMessageId)
-        }
+    get isMin() {
+        return this.peer.pFlags && this.peer.pFlags.min === true
+    }
 
+    get inputPeer() {
         return getInputPeerFromPeer(this.type, this.id, this.peer.access_hash)
     }
 
@@ -61,6 +60,9 @@ export class Peer {
             return Promise.resolve(this._avatar)
         }
         if(!this.hasAvatar) {
+            return Promise.resolve(null)
+        }
+        if(this.isMin) {
             return Promise.resolve(null)
         }
 
