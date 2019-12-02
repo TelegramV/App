@@ -1,13 +1,25 @@
+.d-none {
+  display: none;
+}
+
 .chatlist {
   background-color: #fff;
   border-right: 1px $lightgrey solid;
   max-width: 422px;
   width: 100%;
-  height: 100%;
   box-sizing: border-box;
   position: relative;
   padding-top: 52px;
   height: 100vh;
+
+  &:before {
+    content: " ";
+    position: absolute;
+    right: -5px;
+    width: 5px;
+    height: 100vh;
+    cursor: w-resize;
+  }
 }
 
 #dialogsWrapper {

@@ -87,6 +87,75 @@ function renderDialog(dialog) {
     }
 }
 
+function registerResizer($element) {
+    const MIN_WIDTH = 90
+    const DEFAULT_WIDTH = 422
+
+    let sticked = false
+    let prevPosition = $element.offsetX
+    let isMoving = false
+
+    const $connectingMessageText = $element.querySelector("#connecting_message>span")
+    const $searchElement = $element.querySelector(".search")
+
+    const setmin = () => {
+        sticked = true
+        $element.style.width = `${MIN_WIDTH}px`
+        $searchElement.classList.add("d-none")
+        $connectingMessageText.classList.add("d-none")
+    }
+
+    const setdef = () => {
+        sticked = false
+        $element.style.width = `${DEFAULT_WIDTH}px`
+        $searchElement.classList.remove("d-none")
+        $connectingMessageText.classList.remove("d-none")
+    }
+
+    const resize = event => {
+        const computedSize = parseInt(getComputedStyle($element).width) + event.x - prevPosition
+
+        if (computedSize < 150 && $searchElement) {
+            $searchElement.classList.add("d-none")
+        } else {
+            $searchElement.classList.remove("d-none")
+        }
+
+        if (computedSize <= (MIN_WIDTH + 20) && !sticked) {
+            setmin()
+            prevPosition = event.x
+        } else if (computedSize >= MIN_WIDTH) {
+            sticked = false
+            $element.style.width = `${computedSize}px`
+            prevPosition = event.x
+            $searchElement.classList.remove("d-none")
+            $connectingMessageText.classList.remove("d-none")
+        }
+    }
+
+    $element.addEventListener("mousedown", function (event) {
+        isMoving = true
+        if (event.offsetX > 10 && isMoving) {
+            prevPosition = event.x
+
+            document.addEventListener("mousemove", resize, false)
+        }
+    }, false)
+
+    $element.addEventListener("dblclick", function (event) {
+        const w = parseInt(getComputedStyle($element).width)
+        if (w < DEFAULT_WIDTH) {
+            setdef()
+        } else {
+            setmin()
+        }
+    })
+
+    document.addEventListener("mouseup", function () {
+        document.removeEventListener("mousemove", resize)
+    }, false)
+}
+
 export const DialogListComponent = {
     name: "dialog-list",
     h() {
@@ -121,5 +190,7 @@ export const DialogListComponent = {
 
         DialogsManager.listenUpdates(handleDialogUpdates)
         PeersManager.listenUpdates(handlePeerUpdates)
+
+        registerResizer($element)
     }
 }
