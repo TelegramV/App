@@ -87,11 +87,30 @@ function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], 
 
     // named component
     if (vdom_isNamedComponent(tagName)) {
-        const vNode = tagName.h(Object.assign(attrs, {slot: children}))
+        const vNode = tagName.h.bind(tagName)(Object.assign(attrs, {slot: children}))
+
+        // todo: rewrite this shit
+        tagName.render = (function () {
+            const v = this.h.bind(this)(Object.assign(attrs, {slot: children}))
+            v.attrs["data-component"] = tagName.name
+            this.$el = VDOM.patchReal(this.$el, v)
+            if (this.updated) {
+                this.updated()
+            }
+        }).bind(tagName)
+
+        vNode.component = tagName
         vNode.attrs["data-component"] = tagName.name
         vNode.renderIf = renderIf
-        vNode.created = tagName.created
-        vNode.mounted = tagName.mounted
+        if (tagName.created) {
+            vNode.created = tagName.created.bind(tagName)
+        }
+        if (tagName.mounted) {
+            vNode.mounted = tagName.mounted.bind(tagName)
+        }
+        if (tagName.updated) {
+            vNode.updated = tagName.created.bind(tagName)
+        }
         return vNode
     }
 

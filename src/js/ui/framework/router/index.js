@@ -68,9 +68,9 @@ export class FrameworkRouter {
         this.renderActive()
 
         window.addEventListener("hashchange", () => {
-            // check if hash path changes
-            // if doesn't then router will not re-render the component
-            // if does then it means that query changes, so we trigger handlers
+            // check if hash path was changed
+            // if wasn't then router will not re-render the component
+            // if was then it means that query was changed, so we trigger handlers
             if (this.activeRoute && this.activeRoute.route && this.activeRoute.route.path === parseHash(window.location.hash).path) {
                 this.queryChangeHandlers.forEach(h => {
                     const newQueryParams = parseQuery(parseHash(window.location.hash).queryString)

@@ -2,6 +2,8 @@ import { MTProto } from "../../../../mtproto"
 import Voice from "../../../voice"
 import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers";
 import {emoji} from "../../../utils";
+import Message from "../components/message/messageComponent"
+import TextMessage from "../components/message/textMessageComponent"
 
 
 function vTimeTemplate(message, bg = false) {
@@ -35,51 +37,9 @@ function vServiceMessageTemplate(data, inside) {
     )
 }
 
-
-const Message = ({message, slot}) => {
-    const className = message.post ? "channel in" : message.out ? "out" : "in"
-    const from = message.from
-    return (
-        <div class={className} data-id={message.id} data-peer={`${from.type}.${from.id}`}>
-            {className === "in" ? (
-                <div className={"avatar " + (!from.hasAvatar ? `placeholder-${from.avatarLetter.num}` : "")}
-                     style={`background-image: url(${from._avatar});`}>
-                    {!from.hasAvatar ? from.avatarLetter.text : ""}
-                </div>
-            ) : ""}
-            {slot}
-        </div>
-    )
-}
-
 // TODO add to every message type
 function vForwardedTemplate(data) {
     return data.fwd ? <div class="fwd">Forwarded from {data.fwd.from}</div> : "";
-}
-
-function vMessageWithTextOnlyTemplate(message) {
-    const username = message.userName && !message.post && !message.out;
-    let msg = parseMessageEntities(message.text, message.entities)
-    msg = msg ? emoji.replace_unified(msg) : "";
-
-    return <Message message={message}>
-        <div className={vGetClass(data)}>
-            {username ? <div className="username">{data.userName}</div> : ""}
-
-            {message.reply ? (<div className="box rp">
-                <div className="quote">
-                    <div className="name">{message.reply.name}</div>
-                    <div className="text">{message.reply.text}</div>
-                </div>
-            </div>) : ""}
-            <div className={`message ${username ? "nopad" : ""}`}>
-
-                {vForwardedTemplate(message)}
-                <span dangerouslySetInnerHTML={msg}/>
-                {vTimeTemplate(message)}
-            </div>
-        </div>
-    </Message>
 }
 
 
@@ -169,16 +129,16 @@ function vMessageWithVoiceAudioTemplate(data) {
             </div>
         </div>
     )*/
-    const voice = new Voice(new Audio(data.audio.url), data.audio.waveform);
+    // const voice = new Voice(new Audio(data.audio.url), data.audio.waveform);
     return (
         <Message data={data}>
-            <div class={vGetClass(data)}>
-                <div className="message">
-                    {vForwardedTemplate(data)}
-                    {voice.asJSX()}
-                    {vTimeTemplate(data)}
-                </div>
-            </div>
+            {/*<div class={vGetClass(data)}>*/}
+            {/*    <div className="message">*/}
+            {/*        {vForwardedTemplate(data)}*/}
+            {/*        {voice.asJSX()}*/}
+            {/*        {vTimeTemplate(data)}*/}
+            {/*    </div>*/}
+            {/*</div>*/}
         </Message>
     )
 }
@@ -186,10 +146,10 @@ function vMessageWithVoiceAudioTemplate(data) {
 function vMessageWithAudioTemplate(data) {
     return (
         <Message data={data}>
-            <div class={vGetClass(data)}>
-                <audio src={data.url}/>
-                {vTimeTemplate(data, true)}
-            </div>
+            {/*<div class={vGetClass(data)}>*/}
+            {/*    <audio src={data.url}/>*/}
+            {/*    {vTimeTemplate(data, true)}*/}
+            {/*</div>*/}
         </Message>
     )
 }
@@ -246,18 +206,24 @@ export function UICreateMessage(message) {
     }
 
     const handlers = {
-        photo: vMessageWithImageTemplate,
-        text: vMessageWithTextOnlyTemplate,
-        round: vMessageWithRoundVideoTemplate,
-        video: vMessageWithVideoTemplate,
-        audio: vMessageWithAudioTemplate,
-        voice: vMessageWithVoiceAudioTemplate,
-        sticker: vMessageWithStickerTemplate,
-        document: vMessageWithTextOnlyTemplate,
-        url: vMessageWithUrlTemplate,
-        service: vServiceMessageTemplate
+        // photo: vMessageWithImageTemplate,
+        text: TextMessage,
+        // round: vMessageWithRoundVideoTemplate,
+        // video: vMessageWithVideoTemplate,
+        // audio: vMessageWithAudioTemplate,
+        // voice: vMessageWithVoiceAudioTemplate,
+        // sticker: vMessageWithStickerTemplate,
+        // document: TextMessage,
+        // url: vMessageWithUrlTemplate,
+        // service: vServiceMessageTemplate
     }
 
-    return handlers[message.type](message)
+    const Handler = handlers[message.type]
+
+    if (Handler) {
+        return <Handler message={message}/>
+    } else {
+        return <div>unexpected</div>
+    }
 }
 

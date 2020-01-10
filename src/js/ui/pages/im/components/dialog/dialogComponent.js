@@ -9,10 +9,15 @@ const DATE_FORMAT = {
     hour12: false
 }
 
+/**
+ * @param {Dialog} dialog
+ */
 function handleClick(dialog) {
+    const p = dialog.peer.username ? `@${dialog.peer.username}` : `${dialog.type}.${dialog.id}`
+
     return () => AppFramework.Router.push("/", {
         queryParams: {
-            p: `${dialog.type}.${dialog.id}`
+            p
         }
     })
 }

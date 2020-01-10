@@ -139,4 +139,6 @@ export const createLogger = (name = "", options = {}) => {
     return Logger
 }
 
+global.Logger = createLogger()
+
 export default createLogger()

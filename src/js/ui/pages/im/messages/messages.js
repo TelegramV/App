@@ -1,7 +1,6 @@
 import {AppFramework} from "../../../framework/framework"
 import VDOM from "../../../framework/vdom"
 import {create$loadingNode, vLoadingNode} from "../../../utils"
-import PeersManager from "../../../../api/peers/peersManager"
 import {UICreateMessage} from "./message"
 import DialogsManager from "../../../../api/dialogs/dialogsManager"
 import {UserPeer} from "../../../../dataObjects/userPeer";
@@ -10,6 +9,8 @@ import {GroupPeer} from "../../../../dataObjects/groupPeer";
 import {SupergroupPeer} from "../../../../dataObjects/supergroupPeer";
 import {BotPeer} from "../../../../dataObjects/botPeer";
 import {Pinned} from "../../../pinnedController";
+import {vdom_realMount} from "../../../framework/vdom/mount"
+import PeerManager from "../../../../api/peers/peersManager"
 
 let $messagesElement = document.createElement("div")
 let _page_dialog = null
@@ -46,13 +47,13 @@ function createStickyDate(message) {
 function render(dialog) {
     const peer = dialog.peer
     let status
-    if(peer instanceof UserPeer)
+    if (peer instanceof UserPeer)
         status = peer.onlineStatus.online ? "online" : "last seen " + peer.onlineStatus.status
-    else if(peer instanceof ChannelPeer)
+    else if (peer instanceof ChannelPeer)
         status = "0 members"
-    else if(peer instanceof GroupPeer || peer instanceof SupergroupPeer)
+    else if (peer instanceof GroupPeer || peer instanceof SupergroupPeer)
         status = "3 members, 2 online"
-    else if(peer instanceof BotPeer)
+    else if (peer instanceof BotPeer)
         status = "bot"
     return VDOM.render(
         <div id="chat" data-peer={AppFramework.Router.activeRoute.queryParams.p}>
@@ -89,7 +90,8 @@ function render(dialog) {
 }
 
 function rerender(peer) {
-    $messagesElement = VDOM.mount(render(peer), $messagesElement)
+    // todo: update partially not re-mount
+    $messagesElement = vdom_realMount(render(peer), $messagesElement)
 }
 
 function isOtherDay(date1, date2) {
@@ -124,7 +126,7 @@ function appendMessages(messages) {
             }
             if (!latest) latest = message
 
-            $bubblesInner.appendChild(VDOM.render(UICreateMessage(message)))
+            VDOM.appendToReal(UICreateMessage(message), $bubblesInner)
         })
 
         if (latest) {
@@ -160,7 +162,7 @@ function prependMessages(messages) {
         }
         messages.forEach(message => {
             // todo sticky date
-            $bubblesInner.prepend(VDOM.render(UICreateMessage(message)))
+            VDOM.prependToReal(UICreateMessage(message), $bubblesInner)
         })
         if (reset) {
             $bubbles.scrollTop = $bubblesInner.clientHeight
@@ -184,25 +186,31 @@ function fetchNextPage(dialog) {
 
 function refetchMessages() {
     if (AppFramework.Router.activeRoute.queryParams.p) {
-        const queryPeer = parseHashQuery()
-        _page_dialog = DialogsManager.find(queryPeer.type, queryPeer.id)
-        console.log("refetchMessages", _page_dialog)
-        if(!_page_dialog) return
 
-        $messagesElement = VDOM.mount(create$loadingNode(), $messagesElement)
+        if (AppFramework.Router.activeRoute.queryParams.p.startsWith("@")) {
+            _page_dialog = DialogsManager.findByUsername(AppFramework.Router.activeRoute.queryParams.p.substr(1))
+        } else {
+            const queryPeer = parseHashQuery()
+            _page_dialog = DialogsManager.find(queryPeer.type, queryPeer.id)
+        }
+        console.log("refetchMessages", _page_dialog)
+        // if (!_page_dialog) return
+
+        $messagesElement = vdom_realMount(create$loadingNode(), $messagesElement)
 
         // TODO fix that
-        /*if (!_page_peer) {
+        if (!_page_dialog) {
 
-            PeersManager.listenPeerInit(queryPeer._, queryPeer.id, upcomePeer => {
-                _page_peer = upcomePeer
-                if (upcomePeer._ === queryPeer._ && upcomePeer.id === queryPeer.id) {
-                    rerender(_page_peer)
-                    MessagesManager.fetchMessages(upcomePeer)
-                }
-            })
+            // DialogsManager.listenDialogInit(queryPeer._, queryPeer.id, upcomePeer => {
+            //     _page_peer = upcomePeer
+            //     if (upcomePeer._ === queryPeer._ && upcomePeer.id === queryPeer.id) {
+            //         rerender(_page_peer)
+            //         _page_dialog.fetchMessages()
+            //     }
+            // })
 
-        } else */{
+        } else
+        {
             if (_page_dialog._messages.length > 1) {
                 rerender(_page_dialog)
                 const all = _page_dialog._messages.slice(0, 50)
@@ -213,7 +221,12 @@ function refetchMessages() {
             } else {
                 rerender(_page_dialog)
 
-                _page_dialog.fetchMessages();
+                _page_dialog.fetchMessages().then(() => {
+                    // const $loader = document.querySelector("loader")
+                    // if ($loader) {
+                    //     $loader.remove()
+                    // }
+                })
                 //MessagesManager.fetchMessages(_page_peer)
             }
         }
@@ -228,23 +241,29 @@ function refetchMessages() {
 function handleMessageUpdates(event) {
     // TODO change to variable check not router
     if (AppFramework.Router.activeRoute.queryParams.p) {
-        const queryPeer = parseHashQuery()
-        if(event.type === "dialogLoaded" && !_page_dialog && event.dialog.id === queryPeer.id && event.dialog.type === queryPeer.type) {
-            refetchMessages()
-        }
-        if (event.dialog && event.dialog.type === queryPeer.type && event.dialog.id === queryPeer.id) {
-            switch (event.type) {
-                case "updateManyMessages":
-                    handleManyUpdate(event)
-                    // console.log(event)
-                    break
-                case "updateSingleMessages":
-                    handleSingleUpdate(event)
-                    // console.log(event)
-                    break
-                case "pushTop":
-                    handlePushTop(event)
-                    break
+        if (AppFramework.Router.activeRoute.queryParams.p.startsWith("@")) {
+
+        } else {
+            const queryPeer = parseHashQuery()
+
+            if (event.type === "dialogLoaded" && !_page_dialog && event.dialog.id === queryPeer.id && event.dialog.type === queryPeer.type) {
+                refetchMessages()
+            }
+
+            if (event.dialog && event.dialog.type === queryPeer.type && event.dialog.id === queryPeer.id) {
+                switch (event.type) {
+                    case "updateManyMessages":
+                        handleManyUpdate(event)
+                        // console.log(event)
+                        break
+                    case "updateSingleMessages":
+                        handleSingleUpdate(event)
+                        // console.log(event)
+                        break
+                    case "pushTop":
+                        handlePushTop(event)
+                        break
+                }
             }
         }
     }
@@ -284,6 +303,7 @@ function parseHashQuery() {
 
     return {type: queryPeer[0], id: Number(queryPeer[1])}
 }
+
 // TODO fix
 /*
 function handleDialogUpdates(event) {
@@ -361,6 +381,7 @@ function updateMessageAvatar(peer) {
         })
     }
 }
+
 // TODO fix
 /*
 function handlePeerUpdates(event) {

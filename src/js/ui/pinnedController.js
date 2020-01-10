@@ -2,50 +2,50 @@ let pinned = null;
 let audio = null;
 
 export function pin(msg) {
-    this.pinned = msg;
+    pinned = msg;
 }
 
 export function unpin() {
-    this.pinned = null;
+    pinned = null;
 }
 
-export function pinAudio(audio) {
-    this.audio = audio;
+export function pinAudio(a) {
+    audio = a;
 }
 
 export function unpinAudio() {
-    this.audio = null;
+    audio = null;
     //stop audio?
 }
 
 export function getPinned() {
-    return this.pinned;
+    return pinned;
 }
 
 export function hasAudio() {
-    return !!this.audio;
+    return !!audio;
 }
 
 export function getAudio() {
-    return this.audio;
+    return audio;
 }
 
 export const Pinned = () => {
-    if (this.audio) {
+    if (audio) {
         return <div className="pin active-audio">
-        			<div className="play tgico tgico-play"></div>
+        			<div className="play tgico tgico-play"/>
         			<div className="text-wrapper">
                 		<div className="title">Pinned message</div>
                 		<div className="description">See you tomorrow at 18:00 at the park</div>
                 	</div>
                 </div>
     }
-    if (this.pinned) {
+    if (pinned) {
         return <div className="pin pinned-message">
                 	<div className="title">Pinned message</div>
                 	<div className="description">See you tomorrow at 18:00 at the park</div>
                 </div>
     } else {
-        <div className="pin pinned-message"/>
+        return <div className="pin pinned-message"/>
     }
 }

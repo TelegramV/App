@@ -1,7 +1,7 @@
 import {FrameworkRouter} from "./router"
 import {VDOM} from "./vdom"
 
-window["VDOM"] = VDOM
+global.VDOM = VDOM
 
 const Router = new FrameworkRouter()
 

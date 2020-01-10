@@ -189,6 +189,17 @@ class DialogManager extends Manager {
         return this.dialogs[type][id]
     }
 
+    findByUsername(username) {
+        for (const [k, data] of Object.entries(this.dialogs)) {
+            for (const [id, dialog] of Object.entries(data)) {
+                if (dialog.peer.username === username) {
+                    return dialog
+                }
+            }
+        }
+        return null
+    }
+
     findByPeer(peer) {
         if(peer instanceof Peer) return this.find(peer.type, peer.id)
 

@@ -85,6 +85,10 @@ function vdom_render(vNode, xmlns = null) {
         $node.addEventListener(kEvent, vEvent)
     }
 
+    if (vNode.component) {
+        vNode.component.$el = $node
+    }
+
     if (typeof vNode.created === "function") {
         vNode.created($node)
     }

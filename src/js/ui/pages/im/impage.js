@@ -1,6 +1,8 @@
 import VDOM from "../../framework/vdom"
 import DialogsManager from "../../../api/dialogs/dialogsManager"
 import {DialogListComponent} from "./components/dialog/dialogListComponent"
+import {vdom_realMount} from "../../framework/vdom/mount"
+import {UICreateMessages} from "./messages/messages"
 
 
 const $imPageElement = VDOM.render(
@@ -9,8 +11,7 @@ const $imPageElement = VDOM.render(
 
 export function ImPage() {
     VDOM.appendToReal(<DialogListComponent/>, $imPageElement)
-    // $imPageElement.appendChild(UICreateMessages())
 
-    DialogsManager.fetchDialogs({})
+    $imPageElement.appendChild(UICreateMessages())
     return $imPageElement
 }

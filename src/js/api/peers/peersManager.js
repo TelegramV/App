@@ -51,7 +51,7 @@ export class PeerManager extends Manager {
             this.peerInitListeners[peerName] = {}
         }
 
-        peerId = Number(peerId)
+        peerId = parseInt(peerId)
 
         if (!this.peerInitListeners[peerName][peerId]) {
             this.peerInitListeners[peerName][peerId] = []

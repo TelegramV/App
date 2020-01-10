@@ -12,6 +12,7 @@ function vdom_appendToReal(vNode, $element, {xmlns = null} = {}) {
     if (vdom_isVNode(vNode) && typeof vNode.mounted === "function") {
         vNode.mounted($mountedElement)
     }
+
     return $mountedElement
 }
 

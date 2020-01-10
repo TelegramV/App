@@ -1,7 +1,7 @@
 import DialogsManager from "../../../../../api/dialogs/dialogsManager"
 import PeersManager from "../../../../../api/peers/peersManager"
-import VDOM from "../../../../framework/vdom"
 import {DialogComponent} from "./dialogComponent"
+import {vLoadingNode} from "../../../../utils"
 
 function scrollHandler(event) {
     const $element = event.target
@@ -22,6 +22,11 @@ let $pinnedDialogs = undefined
  * @type {Element|undefined}
  */
 let $generalDialogs = undefined
+
+/**
+ * @type {Element|undefined}
+ */
+let $loader = undefined
 
 function handleDialogUpdates(event) {
     if (event.type === "updateMany") {
@@ -56,7 +61,7 @@ function handlePeerUpdates(event) {
  */
 function renderDialog(dialog) {
     if (!$pinnedDialogs || !$generalDialogs) {
-        throw new Error("$pinnedDialogs or $dialogs wasn't found on the page.")
+        throw new Error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
     }
 
     const __ = `${dialog.type}.${dialog.id}`
@@ -158,6 +163,9 @@ function registerResizer($element) {
 
 export const DialogListComponent = {
     name: "dialog-list",
+    state: {
+        isLoading: true
+    },
     h() {
         return (
             <div className="chatlist">
@@ -177,20 +185,39 @@ export const DialogListComponent = {
                 </div>
 
                 <div id="dialogsWrapper" onScroll={scrollHandler}>
-                    <div id="dialogsPinned" className="list pinned"/>
-                    <div id="dialogs" className="list"/>
+                    <div className="full-size-loader" id="loader">
+                        <progress className="progress-circular big"/>
+                    </div>
+
+                    <div css-display="none" id="dialogsPinned" className="list pinned"/>
+                    <div css-display="none" id="dialogs" className="list"/>
                 </div>
             </div>
         )
     },
 
-    mounted($element) {
-        $pinnedDialogs = $element.querySelector("#dialogsPinned")
-        $generalDialogs = $element.querySelector("#dialogs")
+    created() {
+        //
+    },
+
+    mounted() {
+        $loader = this.$el.querySelector("#loader")
+        $pinnedDialogs = this.$el.querySelector("#dialogsPinned")
+        $generalDialogs = this.$el.querySelector("#dialogs")
+
+        DialogsManager.fetchDialogs({}).then(() => {
+            $loader.style.display = "none"
+            $pinnedDialogs.style.display = ""
+            $generalDialogs.style.display = ""
+        })
 
         DialogsManager.listenUpdates(handleDialogUpdates)
         PeersManager.listenUpdates(handlePeerUpdates)
 
-        registerResizer($element)
+        registerResizer(this.$el)
+    },
+
+    updated() {
+
     }
 }

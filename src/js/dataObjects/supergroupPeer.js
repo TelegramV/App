@@ -1,3 +1,4 @@
+
 import {GroupPeer} from "./groupPeer";
 
 // It should actually extend from channel but who cares

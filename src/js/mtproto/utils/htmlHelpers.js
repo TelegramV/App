@@ -63,7 +63,7 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
     }
 
     const handlersLinks = {
-        messageEntityMention: (l, a) => `<a href="#">${a}</a>`,
+        messageEntityMention: (l, a) => `<a href="/#/?p=${a}">${a}</a>`,
         messageEntityHashtag: (l, a) => `<a href="#">${a}</a>`,
         messageEntityBotCommand: (l, a) => `<a href="#">${a}</a>`,
         messageEntityUrl: (l, a) => `<a target="_blank" href="${!a.startsWith("http") ? "https://" + a : a}">${a}</a>`,

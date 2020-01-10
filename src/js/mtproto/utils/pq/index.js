@@ -7,7 +7,7 @@ function bigint(num) {
 }
 
 /**
- * TODO: rewrite algorithm @ponyruletheworld
+ * TODO: rewrite the algorithm @ponyruletheworld
  *
  * @param {Array|ArrayBuffer|Uint8Array|Uint16Array|Uint32Array} pq
  */
