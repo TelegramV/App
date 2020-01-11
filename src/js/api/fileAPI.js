@@ -1,6 +1,4 @@
 import {MTProto} from "../mtproto";
-import {PeerAPI} from "./peerAPI";
-import {bufferConcat} from "../mtproto/utils/bin";
 import Bytes from "../mtproto/utils/bytes"
 import Random from "../mtproto/utils/random"
 
@@ -129,6 +127,6 @@ export class FileAPI {
         const footer = Bytes.fromHex("ffd9")
         header[164] = stripped[1]
         header[166] = stripped[2]
-        return URL.createObjectURL(new Blob([bufferConcat(bufferConcat(header, stripped.slice(3)), footer)], {type: "application/jpeg"}))
+        return URL.createObjectURL(new Blob([Bytes.concatBuffer(Bytes.concatBuffer(header, stripped.slice(3)), footer)], {type: "application/jpeg"}))
     }
 }

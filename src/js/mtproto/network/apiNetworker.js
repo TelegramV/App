@@ -1,4 +1,4 @@
-import {bufferConcat, createNonce, longToBytes, uintToInt} from "../utils/bin"
+import {createNonce, longToBytes, uintToInt} from "../utils/bin"
 import {sha1BytesSync, sha256HashSync} from "../crypto/sha"
 import {aesDecryptSync} from "../crypto/aes"
 import {TLSerialization} from "../language/serialization"
@@ -188,7 +188,7 @@ export class ApiNetworker extends Networker {
     getMsgKey(dataWithPadding, isOut) {
         const authKey = this.auth.authKey
         const x = isOut ? 0 : 8
-        const msgKeyLargePlain = bufferConcat(authKey.subarray(88 + x, 88 + x + 32), dataWithPadding)
+        const msgKeyLargePlain = Bytes.concatBuffer(authKey.subarray(88 + x, 88 + x + 32), dataWithPadding)
         // TODO async hash
         const msgKeyLarge = sha256HashSync(msgKeyLargePlain)
         return new Uint8Array(msgKeyLarge).subarray(8, 24)
@@ -266,7 +266,7 @@ export class ApiNetworker extends Networker {
 
         // console.log(dT(), 'Adding padding', dataBuffer, padding, dataWithPadding)
         // console.log(dT(), 'auth_key_id', Bytes.asHex(self.authKeyID))
-        return bufferConcat(dataBuffer, padding)
+        return Bytes.concatBuffer(dataBuffer, padding)
     }
 
     sendMessage(message) {

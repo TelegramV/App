@@ -1,5 +1,5 @@
 import {BigInteger} from "../../vendor/jsbn/jsbn"
-import {bufferConcat, uint6ToBase64} from "../bin"
+import {uint6ToBase64} from "../bin"
 import {SecureRandomSingleton} from "../singleton"
 
 /**
@@ -131,7 +131,7 @@ function fromBigInteger(bigInteger, length = undefined) {
             padding[i] = 0
         }
         if (bytes instanceof ArrayBuffer) {
-            bytes = bufferConcat(padding, bytes)
+            bytes = Bytes.concatBuffer(padding, bytes)
         } else {
             bytes = padding.concat(bytes)
         }
@@ -206,13 +206,40 @@ function addPadding(bytes, blockSize = 16, zeroes = false) {
         }
 
         if (bytes instanceof ArrayBuffer) {
-            bytes = bufferConcat(bytes, padding)
+            bytes = Bytes.concatBuffer(bytes, padding)
         } else {
             bytes = bytes.concat(padding)
         }
     }
 
     return bytes
+}
+
+/**
+ *
+ * @param {ArrayLike|ArrayBufferLike} a
+ * @param {ArrayLike|ArrayBufferLike} b
+ * @returns {ArrayLike}
+ */
+function concat(a, b) {
+    const l1 = a.byteLength || a.length
+    const l2 = b.byteLength || b.length
+    const tmp = new Uint8Array(l1 + l2)
+
+    tmp.set(a instanceof ArrayBuffer ? new Uint8Array(a) : a, 0)
+    tmp.set(b instanceof ArrayBuffer ? new Uint8Array(b) : b, l1)
+
+    return tmp
+}
+
+/**
+ *
+ * @param {ArrayLike|ArrayBufferLike} a
+ * @param {ArrayLike|ArrayBufferLike} b
+ * @returns {ArrayBufferLike}
+ */
+function concatBuffer(a, b) {
+    return concat(a, b).buffer
 }
 
 const Bytes = {
@@ -227,6 +254,8 @@ const Bytes = {
     fromBigInteger,
     modPow,
     addPadding,
+    concat,
+    concatBuffer,
 }
 
 export default Bytes
