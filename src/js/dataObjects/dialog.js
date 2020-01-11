@@ -26,6 +26,9 @@ export class Dialog {
         return this._dialog
     }
 
+    /**
+     * @return {Peer}
+     */
     get peer() {
         return this._peer
     }
@@ -35,7 +38,15 @@ export class Dialog {
     }
 
     get pinned() {
-        return this.dialog.pFlags.pinned
+        return this.dialog.pFlags.pinned || false
+    }
+
+    set pinned(pinned) {
+        this.dialog.pFlags.pinned = pinned || false
+        DialogsManager.resolveListeners({
+            type: "updateSingle",
+            dialog: this
+        })
     }
 
     get messageAction() {
@@ -92,6 +103,19 @@ export class Dialog {
         return this._dialog.unread_count
     }
 
+    incrementUnreadCount() {
+        ++this._dialog.unread_count
+
+        DialogsManager.resolveListeners({
+            type: "updateSingle",
+            dialog: this
+        })
+    }
+
+    incrementUnreadCountWithoutUpdate() {
+        return ++this._dialog.unread_count
+    }
+
     get unreadMark() {
         return this._dialog.pFlags.unread_mark
     }
@@ -114,7 +138,6 @@ export class Dialog {
             type: "updateSingle",
             dialog: this
         })
-
     }
 
     get lastMessage() {

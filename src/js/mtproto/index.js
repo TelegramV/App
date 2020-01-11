@@ -214,6 +214,7 @@ class MobileProtocol {
     }
 
     getAuthorizedUser() {
+        // todo: cache AuthorizedUse
         return AppPermanentStorage.getItem("authorizationData")
     }
 

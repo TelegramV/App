@@ -83,13 +83,13 @@ export class PeerManager extends Manager {
                 })
             })
 
-
             if (this.peerInitListeners[peer.type] && this.peerInitListeners[peer.type][peer.id]) {
                 this.peerInitListeners[peer.type][peer.id].forEach(listener => {
                     listener(peer)
                     arrayDelete(this.peerInitListeners[peer.type][peer.id], listener)
                 })
             }
+
             return true
 
 

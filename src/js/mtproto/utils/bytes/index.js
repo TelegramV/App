@@ -1,10 +1,11 @@
 import {BigInteger} from "../../vendor/jsbn/jsbn"
 import {uint6ToBase64} from "../bin"
 import {SecureRandomSingleton} from "../singleton"
+import crypto from "crypto"
 
 /**
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} a
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} b
+ * @param {Array|ArrayLike|ArrayBufferLike} a
+ * @param {Array|ArrayLike|ArrayBufferLike} b
  * @return {boolean}
  */
 function compare(a, b) {
@@ -22,9 +23,9 @@ function compare(a, b) {
 }
 
 /**
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} a
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} b
- * @return {Array}
+ * @param {Array|ArrayLike|ArrayBufferLike} a
+ * @param {Array|ArrayLike|ArrayBufferLike} b
+ * @return {Array|ArrayLike|ArrayBufferLike}
  */
 function xor(a, b) {
     const c = []
@@ -37,16 +38,16 @@ function xor(a, b) {
 }
 
 /**
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} bytes
- * @return {ArrayBufferLike}
+ * @param {Array|ArrayLike|ArrayBufferLike} bytes
+ * @return {Array|ArrayLike|ArrayBufferLike}
  */
 function asUint8Buffer(bytes) {
     return asUint8Array(bytes).buffer
 }
 
 /**
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} bytes
- * @return {Uint8Array|*}
+ * @param {Array|ArrayLike|ArrayBufferLike} bytes
+ * @return {Array|ArrayLike|ArrayBufferLike}
  */
 function asUint8Array(bytes) {
     if (bytes.buffer !== undefined) {
@@ -57,7 +58,7 @@ function asUint8Array(bytes) {
 }
 
 /**
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} bytes
+ * @param {Array|ArrayLike|ArrayBufferLike} bytes
  * @return {string}
  */
 function asBase64(bytes) {
@@ -102,7 +103,7 @@ function fromHex(hex) {
 }
 
 /**
- * @param {ArrayBuffer} buffer
+ * @param {Array|ArrayLike|ArrayBufferLike} buffer
  * @return {Array}
  */
 function fromArrayBuffer(buffer) {
@@ -120,7 +121,7 @@ function fromArrayBuffer(buffer) {
 /**
  * @param {BigInteger} bigInteger
  * @param {number} length
- * @return {Uint8Array}
+ * @return {Array|ArrayLike|ArrayBufferLike}
  */
 function fromBigInteger(bigInteger, length = undefined) {
     let bytes = new Uint8Array(bigInteger.toByteArray())
@@ -145,10 +146,10 @@ function fromBigInteger(bigInteger, length = undefined) {
 }
 
 /**
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} x
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} y
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} m
- * @return {number|Uint8Array}
+ * @param {Array|ArrayLike|ArrayBufferLike} x
+ * @param {Array|ArrayLike|ArrayBufferLike} y
+ * @param {Array|ArrayLike|ArrayBufferLike} m
+ * @return {number|ArrayLike|ArrayBufferLike}
  */
 function modPow(x, y, m) {
     try {
@@ -171,7 +172,7 @@ function modPow(x, y, m) {
 }
 
 /**
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} bytes
+ * @param {Array|ArrayLike|ArrayBufferLike} bytes
  * @return {string}
  */
 function asHex(bytes) {
@@ -217,9 +218,9 @@ function addPadding(bytes, blockSize = 16, zeroes = false) {
 
 /**
  *
- * @param {ArrayLike|ArrayBufferLike} a
- * @param {ArrayLike|ArrayBufferLike} b
- * @returns {ArrayLike}
+ * @param {Array|ArrayLike|ArrayBufferLike} a
+ * @param {Array|ArrayLike|ArrayBufferLike} b
+ * @returns {Uint8Array}
  */
 function concat(a, b) {
     const l1 = a.byteLength || a.length
@@ -234,12 +235,30 @@ function concat(a, b) {
 
 /**
  *
- * @param {ArrayLike|ArrayBufferLike} a
- * @param {ArrayLike|ArrayBufferLike} b
+ * @param {Array|ArrayLike|ArrayBufferLike} a
+ * @param {Array|ArrayLike|ArrayBufferLike} b
  * @returns {ArrayBufferLike}
  */
 function concatBuffer(a, b) {
     return concat(a, b).buffer
+}
+
+/**
+ * @param {number} length
+ * @return {Array}
+ */
+function randomArray(length = 32) {
+    const bytesArray = new Array(length)
+    SecureRandomSingleton.nextBytes(bytesArray)
+    return bytesArray
+}
+
+/**
+ * @param {number} length
+ * @return {ArrayBufferLike|ArrayBuffer|Buffer}
+ */
+function randomBuffer(length = 32) {
+    return crypto.randomBytes(length)
 }
 
 const Bytes = {

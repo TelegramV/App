@@ -305,6 +305,10 @@
     }
   }
 
+  .badge.muted {
+    background-color: $grey;
+  }
+
   &:hover {
     background-color: $light;
     cursor: pointer;

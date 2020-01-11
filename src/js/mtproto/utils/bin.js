@@ -1,4 +1,4 @@
-import {BigInteger, SecureRandom} from "jsbn"
+import {BigInteger} from "jsbn"
 import CryptoJS from "../vendor/crypto"
 import {Zlib} from "../vendor/zlib"
 import crypto from "crypto"
@@ -11,8 +11,7 @@ export function createRandomBuffer(bytesLength) {
 }
 
 // Create a new nonce
-export function
-createNonce(bytesLength) {
+export function createNonce(bytesLength) {
     return createRandomBuffer(bytesLength);
 }
 
