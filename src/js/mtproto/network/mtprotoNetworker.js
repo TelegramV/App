@@ -1,16 +1,13 @@
 import {Networker} from "./networker";
 import {TLSerialization} from "../language/serialization";
-import TimeManager from "../timeManager";
-import DataCenter from "../dataCenter";
-import {mt_ws_set_processor, mt_ws_transport} from "./mt_ws_transport";
 import {TLDeserialization} from "../language/deserialization";
-import AppConfiguration from "../../configuration";
 import {createLogger} from "../../common/logger";
 
 const Logger = createLogger("MTProtoNetworker")
 
 export class MTProtoNetworker extends Networker {
     handler
+
     constructor(authContext) {
         super(authContext)
     }

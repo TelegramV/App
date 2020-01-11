@@ -5,13 +5,13 @@ import TimeManager from "./timeManager"
 import {createLogger} from "../common/logger"
 import {AppPermanentStorage} from "../common/storage"
 import {AuthAPI} from "../api/auth";
-import {sendReqPQ} from "./connect/methods";
 import DialogsManager from "../api/dialogs/dialogsManager"
 import UpdatesManager from "../api/updatesManager"
 import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import Bytes from "./utils/bytes"
 import PeersManager from "../api/peers/peersManager"
+import authKeyCreation from "./connect/authKeyCreation"
 
 window.id = 202466030
 window.send = (method, params) => {
@@ -107,7 +107,7 @@ class MobileProtocol {
         if (!AppPermanentStorage.exists("authKey" + this.authContext.dcID)) {
             const mtprotoNetworker = new MTProtoNetworker(authContext)
 
-            return sendReqPQ(mtprotoNetworker).then(_ => {
+            return authKeyCreation(mtprotoNetworker).then(_ => {
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
@@ -158,7 +158,7 @@ class MobileProtocol {
 
         return new Promise(resolve => {
             const mtprotoNetworker = new MTProtoNetworker(authContext)
-            sendReqPQ(mtprotoNetworker).then(response => {
+            authKeyCreation(mtprotoNetworker).then(response => {
                 const networker = new ApiNetworker(authContext)
 
                 const list = this.fileNetworkers[dcID]

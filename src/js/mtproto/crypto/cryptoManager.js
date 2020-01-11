@@ -127,8 +127,8 @@ function decomposePQ(pq) {
 }
 
 /**
- * @param {Array|Uint8Array|Uint16Array|Uint32Array} bytes
- * @return {Promise<any>}
+ * @param {Array|Uint8Array|Uint16Array|Uint32Array|ArrayBuffer} bytes
+ * @return {Promise<ArrayBuffer|Array>}
  */
 function sha1Hash(bytes) {
     if (_canWork) {

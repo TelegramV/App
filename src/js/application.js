@@ -64,4 +64,6 @@ function start() {
     AppFramework.mount("#app")
 }
 
+// loadSchema().then(() => authKeyCreation())
+
 loadSchema().then(() => MTProto.connect(authContext).then(start))
