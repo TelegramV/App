@@ -24,6 +24,11 @@ export class PeerManager extends Manager {
         }
     }
 
+    /**
+     * @param name
+     * @param id
+     * @return {Peer}
+     */
     find(name, id) {
         return this.peers[name][id]
     }

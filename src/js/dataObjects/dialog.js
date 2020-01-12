@@ -1,10 +1,8 @@
-import {FileAPI} from "../api/fileAPI";
 import {createLogger} from "../common/logger";
 import MTProto from "../mtproto";
 import {Message} from "./message";
 import {tsNow} from "../mtproto/timeManager";
 import {generateDialogIndex} from "../api/dialogs/messageIdManager";
-import {PeerAPI} from "../api/peerAPI";
 import PeersManager from "../api/peers/peersManager";
 import DialogsManager from "../api/dialogs/dialogsManager";
 import {getPeerObject} from "./peerFactory";
@@ -20,6 +18,7 @@ export class Dialog {
         // TODO move lastMessage to messages
         this._messages = {}
         this.messageActions = {}
+        this._unreadMessageIds = new Set()
     }
 
     get dialog() {
@@ -43,6 +42,7 @@ export class Dialog {
 
     set pinned(pinned) {
         this.dialog.pFlags.pinned = pinned || false
+
         DialogsManager.resolveListeners({
             type: "updateSingle",
             dialog: this
@@ -53,20 +53,84 @@ export class Dialog {
         return this.messageActions
     }
 
+    get draft() {
+        return this._dialog.draft && this._dialog.draft._ !== "draftMessageEmpty" ? this._dialog.draft.message : null
+    }
+
+    get notifySettings() {
+        return this.dialog.notify_settings
+    }
+
+    get muted() {
+        return this.notifySettings.mute_until >= tsNow(true)
+    }
+
+    get unreadCount() {
+        return this._dialog.unread_count + this._unreadMessageIds.size
+    }
+
+    get unreadMark() {
+        return this._dialog.pFlags.unread_mark
+    }
+
+    get unreadMentionsCount() {
+        return this._dialog.unread_mentions_count
+    }
+
+    get readOutbox() {
+        return this._dialog.read_outbox_max_id
+    }
+
+    get lastMessage() {
+        return this._lastMessage
+    }
+
+    set lastMessage(lastMessage) {
+        // TODO cause update?
+        this._lastMessage = lastMessage
+
+        if (lastMessage.from instanceof UserPeer) {
+            this.removeMessageAction(lastMessage.from)
+        }
+
+        if (!lastMessage.isOut) {
+            this._unreadMessageIds.add(lastMessage.id)
+        }
+
+        DialogsManager.resolveListeners({
+            type: "updateSingle",
+            dialog: this
+        })
+    }
+
+    get index() {
+        return generateDialogIndex(this.lastMessage.date)
+    }
+
+    get type() {
+        return this.peer.type
+    }
+
+    clearUnreadCount() {
+        this._unreadMessageIds.clear()
+        this._dialog.unread_count = 0
+        this._dialog.unread_mentions_count = 0
+    }
+
     addMessageAction(user, action) {
         this.messageActions[user.id] = {
             action: action,
             expires: tsNow(true) + 6
         }
         setTimeout(l => {
-            if(this.messageActions[user.id] && tsNow(true) >= this.messageActions[user.id].expires) {
+            if (this.messageActions[user.id] && tsNow(true) >= this.messageActions[user.id].expires) {
                 this.removeMessageAction(user)
             }
-        }, 6000)
+        }, 2000)
     }
 
     removeMessageAction(user) {
-        if(this.messageActions[user.id]) {
+        if (this.messageActions[user.id]) {
             delete this.messageActions[user.id]
 
             DialogsManager.resolveListeners({
@@ -87,22 +151,6 @@ export class Dialog {
         })
     }
 
-    get draft() {
-        return this._dialog.draft && this._dialog.draft._ !== "draftMessageEmpty" ? this._dialog.draft.message : null
-    }
-
-    get notifySettings() {
-        return this.dialog.notify_settings
-    }
-
-    get muted() {
-        return this.notifySettings.mute_until >= tsNow(true)
-    }
-
-    get unreadCount() {
-        return this._dialog.unread_count
-    }
-
     incrementUnreadCount() {
         ++this._dialog.unread_count
 
@@ -114,42 +162,6 @@ export class Dialog {
 
     incrementUnreadCountWithoutUpdate() {
         return ++this._dialog.unread_count
-    }
-
-    get unreadMark() {
-        return this._dialog.pFlags.unread_mark
-    }
-
-    get unreadMentionsCount() {
-        return this._dialog.unread_mentions_count
-    }
-
-    get readOutbox() {
-        return this._dialog.read_outbox_max_id
-    }
-
-    set lastMessage(lastMessage) {
-        // TODO cause update?
-        this._lastMessage = lastMessage
-        if(lastMessage.from instanceof UserPeer) {
-            this.removeMessageAction(lastMessage.from)
-        }
-        DialogsManager.resolveListeners({
-            type: "updateSingle",
-            dialog: this
-        })
-    }
-
-    get lastMessage() {
-        return this._lastMessage
-    }
-
-    get index() {
-        return generateDialogIndex(this.lastMessage.date)
-    }
-
-    get type() {
-        return this.peer.type
     }
 
     handleUpdate(update) {

@@ -24,6 +24,32 @@ export function getInputPeerFromPeer(peerName, peerId, accessHash = "") {
             }
     }
 }
+export function getInputFromPeer(peerName, peerId, accessHash = "") {
+    switch (peerName) {
+        case "chat":
+            return {
+                _: "inputChat",
+                chat_id: peerId
+            }
+        case "user":
+            return {
+                _: "inputUser",
+                user_id: peerId,
+                access_hash: accessHash
+            }
+        case "channel":
+            return {
+                _: "inputChannel",
+                channel_id: peerId,
+                access_hash: accessHash
+            }
+        default:
+            console.warn("unexpected peerName")
+            return {
+                _: "inputPeerEmpty"
+            }
+    }
+}
 
 export function getInputPeerFromPeerWithoutAccessHash(peerName, peerId) {
     switch (peerName) {

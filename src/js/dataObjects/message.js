@@ -42,7 +42,10 @@ export class Message {
     }
 
     get to() {
-        return this._message.to_id // TODO get id from peerN object
+        if (this._message.to_id === "peerChannel") {
+            return PeersManager.find("channel", this._message.to_id.channel_id)
+        }
+        return null
     }
 
     get isOut() {
@@ -57,8 +60,8 @@ export class Message {
         const from = this.from
 
         // todo: check if megagroup
-        if (this.to && this.to._ === "peerChannel") {
-            return ""
+        if (this.to) {
+            return this.to.peerName
         }
 
         if (from) {

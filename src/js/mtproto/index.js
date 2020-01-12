@@ -71,8 +71,8 @@ class MobileProtocolAPIAuth {
 }
 
 function initManagers() {
-    DialogsManager.init()
     UpdatesManager.init()
+    DialogsManager.init()
     PeersManager.init()
 }
 
@@ -86,6 +86,8 @@ class MobileProtocol {
         this.logger = options.logger || createLogger("MTProto", {
             level: "debug"
         })
+
+        this.UpdatesManager = UpdatesManager
 
         this.connected = false
         this.Auth = new MobileProtocolAPIAuth({

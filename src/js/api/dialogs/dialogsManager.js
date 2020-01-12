@@ -27,35 +27,25 @@ class DialogManager extends Manager {
 
 
     init() {
-        MTProto.MessageProcessor.listenUpdateShortMessage(async update => {
-            let dialog = undefined
-
-            dialog = await this.findOrFetch("user", update.user_id)
-
+        /**
+         * @param {Dialog} dialog
+         * @param {Object} lastMessage
+         */
+        const updateDialogLastMessage = (dialog, lastMessage) => {
             if (!dialog) return
 
-            if (!update.pFlags.out) {
-                dialog.incrementUnreadCountWithoutUpdate()
-            }
+            dialog.lastMessage = new Message(dialog, lastMessage)
+        }
 
-            dialog.lastMessage = new Message(dialog, update)
+        MTProto.UpdatesManager.listenUpdate("updateShortMessage", async update => {
+            updateDialogLastMessage(await this.findOrFetch("user", update.user_id), update)
         })
 
-        MTProto.MessageProcessor.listenUpdateShortChatMessage(async update => {
-            let dialog = undefined
-
-            dialog = await this.findOrFetch("chat", update.chat_id)
-
-            if (!dialog) return
-
-            if (!update.pFlags.out) {
-                dialog.incrementUnreadCountWithoutUpdate()
-            }
-
-            dialog.lastMessage = new Message(dialog, update)
+        MTProto.UpdatesManager.listenUpdate("updateShortChatMessage", async update => {
+            updateDialogLastMessage(await this.findOrFetch("chat", update.chat_id), update)
         })
 
-        MTProto.MessageProcessor.listenUpdateNewMessage(async update => {
+        MTProto.UpdatesManager.listenUpdate("updateNewMessage", async update => {
             let dialog = undefined
 
             if (update.message.to_id) {
@@ -65,16 +55,18 @@ class DialogManager extends Manager {
                 dialog = await this.findOrFetch("user", update.message.from_id)
             }
 
-            if (!dialog) return
-
-            if (!update.message.pFlags.out) {
-                dialog.incrementUnreadCountWithoutUpdate()
-            }
-
-            dialog.lastMessage = new Message(dialog, update.message)
+            updateDialogLastMessage(dialog, update.message)
         })
 
-        MTProto.MessageProcessor.listenUpdateDialogPinned(async update => {
+        MTProto.UpdatesManager.listenUpdate("updateDeleteChannelMessages", async update => {
+            console.log("deleted", update)
+        })
+
+        MTProto.UpdatesManager.listenUpdate("updateDeleteMessages", async update => {
+            console.log("deleted", update)
+        })
+
+        MTProto.UpdatesManager.listenUpdate("updateDialogPinned", async update => {
             const peerName = getPeerNameFromType(update.peer.peer._)
             const dialog = await this.findOrFetch(peerName, update.peer.peer[`${peerName}_id`])
 
@@ -83,7 +75,7 @@ class DialogManager extends Manager {
             dialog.pinned = update.pFlags.pinned || false
         })
 
-        MTProto.MessageProcessor.listenUpdateNewChannelMessage(async update => {
+        MTProto.UpdatesManager.listenUpdate("updateNewChannelMessage", async update => {
             const dialog = await this.findOrFetch("channel", update.message.to_id.channel_id)
             // if(!dialog || !PeersManager.find("user", update.message.from_id)) {
             //     MTProto.invokeMethod("updates.getDifference", {
@@ -105,17 +97,10 @@ class DialogManager extends Manager {
             //     return
             // }
 
-
-            if (!dialog) return
-
-            if (!update.message.pFlags.out) {
-                dialog.incrementUnreadCountWithoutUpdate()
-            }
-
-            dialog.lastMessage = new Message(dialog, update.message)
+            updateDialogLastMessage(dialog, update.message)
         })
 
-        MTProto.MessageProcessor.listenUpdateDraftMessage(update => {
+        MTProto.UpdatesManager.listenUpdate("updateDraftMessage", update => {
             const dialog = this.findByPeer(update.peer)
             if (dialog) {
                 dialog._dialog.draft = update.draft
@@ -138,14 +123,13 @@ class DialogManager extends Manager {
         //     }
         // })
 
-        MTProto.MessageProcessor.listenUpdateReadHistoryInbox(update => {
-            // console.log("inbox", update)
+        MTProto.UpdatesManager.listenUpdate("updateReadHistoryInbox", update => {
             const dialog = this.findByPeer(update.peer)
             if (dialog) {
                 dialog._dialog.read_inbox_max_id = update.max_id
                 dialog._dialog.unread_count = update.still_unread_count
                 if (dialog._dialog.unread_count === 0) {
-                    dialog._dialog.unread_mentions_count = 0
+                    dialog.clearUnreadCount()
                 }
                 this.resolveListeners({
                     type: "updateSingle",
@@ -154,7 +138,7 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.MessageProcessor.listenUpdateReadHistoryOutbox(update => {
+        MTProto.UpdatesManager.listenUpdate("updateReadHistoryOutbox", update => {
             const dialog = this.findByPeer(update.peer)
             if (dialog) {
                 dialog._dialog.read_outbox_max_id = update.max_id
@@ -165,14 +149,14 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.MessageProcessor.listenUpdateReadChannelInbox(update => {
+        MTProto.UpdatesManager.listenUpdate("updateReadChannelInbox", update => {
             // console.log("inbox", update)
             const dialog = this.find("channel", update.channel_id)
             if (dialog) {
                 dialog._dialog.read_inbox_max_id = update.max_id
                 dialog._dialog.unread_count = update.still_unread_count
                 if (dialog._dialog.unread_count === 0) {
-                    dialog._dialog.unread_mentions_count = 0
+                    dialog.clearUnreadCount()
                 }
                 this.resolveListeners({
                     type: "updateSingle",
@@ -181,7 +165,7 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.MessageProcessor.listenUpdateReadChannelOutbox(update => {
+        MTProto.UpdatesManager.listenUpdate("updateReadChannelOutbox", update => {
             const dialog = this.find("channel", update.channel_id)
             if (dialog) {
                 dialog._dialog.read_outbox_max_id = update.max_id
@@ -192,7 +176,7 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.MessageProcessor.listenUpdateShort(async update => {
+        MTProto.UpdatesManager.listenUpdate("updateShort", async update => {
             if (update._ === "updateUserStatus") {
                 const dialog = this.find("user", update.user_id)
 
