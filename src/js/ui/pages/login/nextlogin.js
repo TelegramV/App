@@ -309,7 +309,7 @@ function fillDropdown(str) {
     for (let i = 0; i < $list.childNodes.length; i++) {
         let elem = $list.childNodes[i]
         let name = elem.dataset.name
-        if (str.length === 0 || name.toLowerCase().startsWith(str.toLowerCase())) {
+        if (!str || str.length === 0 || countryTest(str, name)) {
             elem.style.display = "flex"
         } else {
             elem.style.display = "none"
@@ -325,6 +325,15 @@ function fillDropdown(str) {
             setTimeout(hideList, 1); //idk, it doesn't work without it
         });
     });
+}
+
+function countryTest(input, country) {
+	if(country.toLowerCase().includes(input.toLowerCase())) return true;
+	let split = country.split(/\b(?=[a-z])/ig);
+	if(split.length > 1) {
+		let abbr = split.map(token => token[0]).join("").toLowerCase();
+		if(abbr.includes(input.toLowerCase())) return true;
+	}
 }
 
 function formatPhoneNumber() {

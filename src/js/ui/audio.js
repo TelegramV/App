@@ -7,6 +7,7 @@ const sounds = {
 let activeAudio = [];
 
 export function playSound(sound) {
+    //TODO no notifications setting
     if (!sounds[sound]) throw new Error("No such sound: " + sound)
     let audio = new Audio(sounds[sound]);
     audio.play();

@@ -1,11 +1,11 @@
 .toolbar {
-	padding: 0 14px;
-	margin: 8px 0;
+	padding: 8px 14px;
+	//margin: 8px 0;
 	background-color: #fff;
 	position: absolute;
 	top: 0;
 	left: 0;
-	z-index: 10;
+	z-index: 100;
 	width: 100%;
 	display: flex;
 	box-sizing: border-box;
