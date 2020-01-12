@@ -18,7 +18,7 @@ export function getInputPeerFromPeer(peerName, peerId, accessHash = "") {
                 access_hash: accessHash
             }
         default:
-            console.warn("unexpected peerName")
+            console.warn("unexpected peerName = ", peerName)
             return {
                 _: "inputPeerEmpty"
             }

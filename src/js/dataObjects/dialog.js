@@ -140,6 +140,21 @@ export class Dialog {
         }
     }
 
+    removeUnreadMessages(messages) {
+        messages.forEach(mId => {
+            if (this._unreadMessageIds.has(mId)) {
+                this._unreadMessageIds.delete(mId)
+            } else {
+                this.decrementUnreadCountWithoutUpdate()
+            }
+        })
+
+        DialogsManager.resolveListeners({
+            type: "updateSingle",
+            dialog: this
+        })
+    }
+
     setPinned(pinned) {
         return MTProto.invokeMethod("messages.toggleDialogPin", {
             peer: {
@@ -162,6 +177,10 @@ export class Dialog {
 
     incrementUnreadCountWithoutUpdate() {
         return ++this._dialog.unread_count
+    }
+
+    decrementUnreadCountWithoutUpdate() {
+        return this._dialog.unread_count > 0 ? --this._dialog.unread_count : 0
     }
 
     handleUpdate(update) {

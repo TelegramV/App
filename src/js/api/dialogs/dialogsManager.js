@@ -11,15 +11,21 @@ import {GroupPeer} from "../../dataObjects/groupPeer";
 import {ChannelPeer} from "../../dataObjects/channelPeer";
 import {Peer} from "../../dataObjects/peer";
 import {Message} from "../../dataObjects/message";
+import {PeerAPI} from "../peerAPI"
 
 class DialogManager extends Manager {
     constructor() {
         super()
-        this.dialogs = {
-            chat: {},
-            channel: {},
-            user: {}
-        }
+        this.dialogs = new Map([
+            ["chat", new Map()],
+            ["channel", new Map()],
+            ["user", new Map()],
+        ])
+        // this.dialogs = {
+        //     chat: {},
+        //     channel: {},
+        //     user: {}
+        // }
         this.latestDialog = undefined
         this.dialogsOffsetDate = 0 // TODO
         this.offsetDate = 0
@@ -58,8 +64,14 @@ class DialogManager extends Manager {
             updateDialogLastMessage(dialog, update.message)
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateDeleteChannelMessages", async update => {
-            console.log("deleted", update)
+        MTProto.UpdatesManager.listenUpdate("updateDeleteChannelMessages", update => {
+            const dialog = this.find("channel", update.channel_id)
+
+            if (dialog) {
+                update.messages.forEach(mId => {
+                    dialog._unreadMessageIds.delete(mId)
+                })
+            }
         })
 
         MTProto.UpdatesManager.listenUpdate("updateDeleteMessages", async update => {
@@ -266,7 +278,7 @@ class DialogManager extends Manager {
      * @return {Dialog}
      */
     find(type, id) {
-        return this.dialogs[type][id]
+        return this.dialogs.get(type).get(id)
     }
 
     /**
@@ -275,16 +287,17 @@ class DialogManager extends Manager {
      * @return {Promise<Dialog|null>}
      */
     async findOrFetch(type, id) {
-        let dialog = this.dialogs[type][id]
+        let dialog = this.find(type, id)
 
         if (!dialog) {
             await this.fetchPlainPeerDialogs({_: type, id})
         }
 
-        return this.dialogs[type][id]
+        return this.find(type, id)
     }
 
     findByUsername(username) {
+        return null // todo: fix
         for (const [k, data] of Object.entries(this.dialogs)) {
             for (const [id, dialog] of Object.entries(data)) {
                 if (dialog.peer.username === username) {
@@ -325,51 +338,51 @@ class DialogManager extends Manager {
 
         return MTProto.invokeMethod("messages.getPeerDialogs", {
             peers: [peerData]
-        }).then(dialogsSlice => {
-            if (parseInt(dialogsSlice.count) === 0) {
-                return
-            }
-
-            dialogsSlice.users.forEach(l => {
+        }).then(_dialogsSlice => {
+            _dialogsSlice.users.forEach(l => {
                 PeersManager.set(getPeerObject(l))
             })
-            dialogsSlice.chats.forEach(l => {
+            _dialogsSlice.chats.forEach(l => {
                 PeersManager.set(getPeerObject(l))
             })
 
-            const dialogsToPush = dialogsSlice.dialogs.map(dialog => {
-                const keys = {
-                    peerUser: "user_id",
-                    peerChannel: "channel_id",
-                    peerChat: "chat_id"
-                }
-                const key = keys[dialog.peer._]
-                const peer = (dialog.peer._ === "peerUser" ? dialogsSlice.users : dialogsSlice.chats).find(l => l.id === dialog.peer[key])
-                const lastMessage = dialogsSlice.messages.find(l => l.id === dialog.top_message)
-                this.offsetDate = lastMessage.date
-                if (this.offsetDate && !dialog.pFlags.pinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
-                    this.dialogsOffsetDate = this.offsetDate
-                }
-                const p = getPeerObject(peer)
-                PeersManager.set(p)
-
-                const d = new Dialog(dialog, p, lastMessage)
-                this.dialogs[d.type][d.id] = d
-
-                return d
+            const dialogs = _dialogsSlice.dialogs.map(_dialog => {
+                return this.resolveDialogWithSlice(_dialog, _dialogsSlice)
             })
 
-            if (dialogsToPush[0]) {
+            if (dialogs.length) {
                 this.resolveListeners({
                     type: "updateSingle",
-                    dialog: dialogsToPush[0],
+                    dialog: dialogs[0],
                 })
             }
 
-            dialogsToPush.forEach(l => {
-                l.peer.getAvatar()
+            dialogs.forEach(async dialog => {
+                await dialog.peer.getAvatar()
             })
         })
+    }
+
+    /**
+     * @param {Object} _dialog
+     * @param {Object} _slice
+     * @param config
+     * @return {Dialog|undefined}
+     */
+    resolveDialogWithSlice(_dialog, _slice, config = {}) {
+        const plainPeer = PeerAPI.getPlain(_dialog.peer, false)
+
+        const _peer = (plainPeer._ === "user" ? _slice.users : _slice.chats).find(l => l.id === plainPeer.id)
+        const _lastMessage = _slice.messages.find(l => l.id === _dialog.top_message)
+
+        const peer = getPeerObject(_peer)
+        PeersManager.set(peer)
+
+        const dialog = new Dialog(_dialog, peer, _lastMessage)
+
+        this.set(dialog, config.dispatchEvent || false)
+
+        return dialog
     }
 
     fetchDialogs({
@@ -384,9 +397,6 @@ class DialogManager extends Manager {
                      },
                      hash = ""
                  }) {
-
-        // __is_latest_sorted = false
-        // __is_fetching = true
 
         if (this.dialogsOffsetDate) {
             this.offsetDate = this.dialogsOffsetDate + TimeManager.timeOffset
@@ -404,67 +414,40 @@ class DialogManager extends Manager {
             offset_peer: offset_peer,
             limit: limit,
             hash: hash
-        }).then(dialogsSlice => {
-            // __is_fetched = false
-
-            if (parseInt(dialogsSlice.count) === 0) {
-                // __is_empty = true
+        }).then(_dialogsSlice => {
+            if (parseInt(_dialogsSlice.count) === 0) {
                 return
             }
 
-            dialogsSlice.users.forEach(l => {
+            _dialogsSlice.users.forEach(l => {
                 PeersManager.set(getPeerObject(l))
             })
-            dialogsSlice.chats.forEach(l => {
+            _dialogsSlice.chats.forEach(l => {
                 PeersManager.set(getPeerObject(l))
             })
 
-            const dialogsToPush = []
-            dialogsSlice.dialogs.map(dialog => {
-                const keys = {
-                    peerUser: "user_id",
-                    peerChannel: "channel_id",
-                    peerChat: "chat_id"
-                }
-                const key = keys[dialog.peer._]
-                const peer = (dialog.peer._ === "peerUser" ? dialogsSlice.users : dialogsSlice.chats).find(l => l.id === dialog.peer[key])
-                const lastMessage = dialogsSlice.messages.find(l => l.id === dialog.top_message)
-                this.offsetDate = lastMessage.date
-                if (this.offsetDate && !dialog.pFlags.pinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
+            const dialogs = _dialogsSlice.dialogs.map(_dialog => {
+                const dialog = this.resolveDialogWithSlice(_dialog, _dialogsSlice)
+
+                // todo: rewrite this
+                this.offsetDate = dialog.lastMessage.date
+                if (this.offsetDate && !dialog.pinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
                     this.dialogsOffsetDate = this.offsetDate
                 }
-                const p = getPeerObject(peer)
-                PeersManager.set(p)
 
-                const d = new Dialog(dialog, p, lastMessage)
-                this.dialogs[d.type][d.id] = d
-                dialogsToPush.push(d)
-                // this.resolveListeners({
-                //     type: "dialogLoaded",
-                //     dialog: d
-                // }) // TODO remove
-                return d
+                return dialog
             })
 
-            // const dialogsToPush = dialogs.filter(l => !l.pinned)
-            // const pinnedDialogsToPush = dialogs.filter(l => l.pinned)
-
-            // $pinnedDialogs.push(...pinnedDialogsToPush)
-            // $dialogs.push(...dialogsToPush)
-
-            // __is_fetching = false
-            // __is_fetched = true
-
-            this.latestDialog = dialogsToPush[dialogsToPush.length - 1]
+            this.latestDialog = dialogs[dialogs.length - 1]
 
             this.resolveListeners({
                 type: "updateMany",
-                dialogs: dialogsToPush.filter(l => !l.pinned),
-                pinnedDialogs: dialogsToPush.filter(l => l.pinned)
+                dialogs: dialogs.filter(l => !l.pinned),
+                pinnedDialogs: dialogs.filter(l => l.pinned)
             })
 
-            dialogsToPush.forEach(l => {
-                l.peer.getAvatar()
+            dialogs.forEach(async dialog => {
+                await dialog.peer.getAvatar()
             })
         })
 
@@ -498,6 +481,22 @@ class DialogManager extends Manager {
                 console.log("SupergroupPeer", l)
             }
         })
+    }
+
+    set(dialog, dispatchEvent = true) {
+        if (dialog instanceof Dialog) {
+            this.dialogs.get(dialog.type).set(dialog.id, dialog)
+
+            if (dispatchEvent) {
+                console.log("setting")
+                this.resolveListeners({
+                    type: "updateSingle", // todo: create specific event
+                    dialog
+                })
+            }
+        } else {
+            console.error("invalid dialog passed")
+        }
     }
 }
 

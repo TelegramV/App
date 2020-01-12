@@ -25,47 +25,43 @@ function start() {
         }
     })
 
-    MTProto.invokeMethod("updates.getState", {}).then(State => {
-        MTProto.UpdatesManager.State = State
-
-        AppFramework.Router.route("/login", "login", {
-            h() {
-                return LoginPage()
-            }
-        })
-
-        AppFramework.Router.route("/", "main", {
-            h() {
-                return ImPage()
-            }
-        })
-
-        AppFramework.Router.middleware(toRoute => {
-            if (!MTProto.isUserAuthorized()) {
-                if (toRoute.route.name !== "login") {
-                    return {
-                        next: false,
-                        doNext: () => {
-                            AppFramework.Router.push("/login")
-                        },
-                    }
-                }
-            } else {
-                if (toRoute.route.name === "login") {
-                    return {
-                        next: false,
-                        doNext: () => {
-                            AppFramework.Router.push("/")
-                        }
-                    }
-                }
-            }
-
-            return true
-        })
-
-        AppFramework.mount("#app")
+    AppFramework.Router.route("/login", "login", {
+        h() {
+            return LoginPage()
+        }
     })
+
+    AppFramework.Router.route("/", "main", {
+        h() {
+            return ImPage()
+        }
+    })
+
+    AppFramework.Router.middleware(toRoute => {
+        if (!MTProto.isUserAuthorized()) {
+            if (toRoute.route.name !== "login") {
+                return {
+                    next: false,
+                    doNext: () => {
+                        AppFramework.Router.push("/login")
+                    },
+                }
+            }
+        } else {
+            if (toRoute.route.name === "login") {
+                return {
+                    next: false,
+                    doNext: () => {
+                        AppFramework.Router.push("/")
+                    }
+                }
+            }
+        }
+
+        return true
+    })
+
+    AppFramework.mount("#app")
 }
 
 // loadSchema().then(() => authKeyCreation())
