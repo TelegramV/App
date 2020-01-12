@@ -53,7 +53,7 @@ async function step4_req_DH_params(pAndQ, networker) {
     Logger.debug("step4 authContext = ", authContext)
 
     authContext.newNonce = new Array(32)
-    SecureRandomSingleton.nextBytes(authContext.newNonce) // fuck we need to use this because we need array in new_nonce
+    SecureRandomSingleton.nextBytes(authContext.newNonce) // fuck we have to use this because we need array in new_nonce
 
     const data_serializer = new TLSerialization()
     data_serializer.storeObject({
@@ -182,7 +182,6 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
     return true
 }
 
-// pizdec function
 async function step6_set_client_DH_params(networker, processor, proc_context) {
     const authContext = networker.auth
     Logger.debug("step6 authContext = ", authContext)

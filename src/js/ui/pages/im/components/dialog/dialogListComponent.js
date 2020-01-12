@@ -1,170 +1,30 @@
 import DialogsManager from "../../../../../api/dialogs/dialogsManager"
 import PeersManager from "../../../../../api/peers/peersManager"
 import {DialogComponent} from "./dialogComponent"
-import {vLoadingNode} from "../../../../utils"
-
-function scrollHandler(event) {
-    const $element = event.target
-    if ($element.scrollHeight - $element.scrollTop === $element.clientHeight) {
-        DialogsManager.fetchNextPage({})
-    }
-}
-
-const __rendered_pinned = new Set()
-const __rendered = new Set()
 
 /**
- * @type {Element|undefined}
+ * CRITICAL: Never rerender this component!!!
  */
-let $pinnedDialogs = undefined
-
-/**
- * @type {Element|undefined}
- */
-let $generalDialogs = undefined
-
-/**
- * @type {Element|undefined}
- */
-let $loader = undefined
-
-function handleDialogUpdates(event) {
-    if (event.type === "updateMany") {
-        event.pinnedDialogs.forEach(dialog => {
-            renderDialog(dialog)
-        })
-
-        event.dialogs.forEach(dialog => {
-            renderDialog(dialog)
-        })
-
-    } else if (event.type === "updateSingle") {
-        renderDialog(event.dialog)
-    } else {
-        Logger.log("DialogUpdates", event)
-    }
-}
-
-function handlePeerUpdates(event) {
-    if (event.type === "updatePhoto") {
-        const dialog = DialogsManager.find(event.peer.type, event.peer.id)
-        if (dialog) {
-            renderDialog(dialog)
-        }
-    } else {
-        Logger.log("PeerUpdates", event)
-    }
-}
-
-/**
- * @param {Dialog} dialog
- */
-function renderDialog(dialog) {
-    if (!$pinnedDialogs || !$generalDialogs) {
-        throw new Error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
-    }
-
-    const __ = `${dialog.type}.${dialog.id}`
-    const renderedInPinned = __rendered_pinned.has(__)
-    const renderedInGeneral = __rendered.has(__)
-
-    let $dialogs = undefined
-
-    if (renderedInPinned || dialog.pinned) {
-        $dialogs = $pinnedDialogs
-    } else if (renderedInGeneral) {
-        $dialogs = $generalDialogs
-    } else {
-        __rendered.add(__)
-        $dialogs = $generalDialogs // fixme
-    }
-
-    const $dialog = $dialogs.querySelector(`[data-peer="${__}"]`)
-
-    if ($dialog) {
-        if (parseInt($dialog.dataset.message) < dialog.lastMessage.id) {
-            $dialogs.prepend($dialog)
-        }
-
-        VDOM.patchReal($dialog, <DialogComponent dialog={dialog}/>)
-    } else {
-        VDOM.appendToReal(<DialogComponent dialog={dialog}/>, $dialogs)
-    }
-}
-
-function registerResizer($element) {
-    const MIN_WIDTH = 90
-    const DEFAULT_WIDTH = 422
-
-    let sticked = false
-    let prevPosition = $element.offsetX
-    let isMoving = false
-
-    const $connectingMessageText = $element.querySelector("#connecting_message>span")
-    const $searchElement = $element.querySelector(".search")
-
-    const setmin = () => {
-        sticked = true
-        $element.style.width = `${MIN_WIDTH}px`
-        $searchElement.classList.add("d-none")
-        $connectingMessageText.classList.add("d-none")
-    }
-
-    const setdef = () => {
-        sticked = false
-        $element.style.width = `${DEFAULT_WIDTH}px`
-        $searchElement.classList.remove("d-none")
-        $connectingMessageText.classList.remove("d-none")
-    }
-
-    const resize = event => {
-        const computedSize = parseInt(getComputedStyle($element).width) + event.x - prevPosition
-
-        if (computedSize < 150 && $searchElement) {
-            $searchElement.classList.add("d-none")
-        } else {
-            $searchElement.classList.remove("d-none")
-        }
-
-        if (computedSize <= (MIN_WIDTH + 20) && !sticked) {
-            setmin()
-            prevPosition = event.x
-        } else if (computedSize >= MIN_WIDTH) {
-            sticked = false
-            $element.style.width = `${computedSize}px`
-            prevPosition = event.x
-            $searchElement.classList.remove("d-none")
-            $connectingMessageText.classList.remove("d-none")
-        }
-    }
-
-    $element.addEventListener("mousedown", function (event) {
-        isMoving = true
-        if (event.offsetX > 10 && isMoving) {
-            prevPosition = event.x
-
-            document.addEventListener("mousemove", resize, false)
-        }
-    }, false)
-
-    $element.addEventListener("dblclick", function (event) {
-        const w = parseInt(getComputedStyle($element).width)
-        if (w < DEFAULT_WIDTH) {
-            setdef()
-        } else {
-            setmin()
-        }
-    })
-
-    document.addEventListener("mouseup", function () {
-        document.removeEventListener("mousemove", resize)
-    }, false)
-}
-
 export const DialogListComponent = {
     name: "dialog-list",
     state: {
-        isLoading: true
+        // note: mb this is redundant, but we should be careful with this
+        renderedDialogsIds: {
+            pinned: new Set(),
+            general: new Set(),
+        },
+
+        renderedDialogsElements: new Map([
+            ["chat", new Map()],
+            ["channel", new Map()],
+            ["user", new Map()],
+        ])
+    },
+    elements: {
+        $loader: undefined,
+        $dialogsWrapper: undefined,
+        $pinnedDialogs: undefined,
+        $generalDialogs: undefined,
     },
     h() {
         return (
@@ -184,7 +44,7 @@ export const DialogListComponent = {
                     <span>Waiting for network...</span>
                 </div>
 
-                <div id="dialogsWrapper" onScroll={scrollHandler}>
+                <div id="dialogsWrapper" onScroll={this._scrollHandler}>
                     <div className="full-size-loader" id="loader">
                         <progress className="progress-circular big"/>
                     </div>
@@ -196,28 +56,361 @@ export const DialogListComponent = {
         )
     },
 
-    created() {
-        //
-    },
-
     mounted() {
-        $loader = this.$el.querySelector("#loader")
-        $pinnedDialogs = this.$el.querySelector("#dialogsPinned")
-        $generalDialogs = this.$el.querySelector("#dialogs")
+        this.elements.$loader = this.$el.querySelector("#loader")
+        this.elements.$dialogsWrapper = this.$el.querySelector("#dialogsWrapper")
+        this.elements.$pinnedDialogs = this.elements.$dialogsWrapper.querySelector("#dialogsPinned")
+        this.elements.$generalDialogs = this.elements.$dialogsWrapper.querySelector("#dialogs")
 
         DialogsManager.fetchDialogs({}).then(() => {
-            $loader.style.display = "none"
-            $pinnedDialogs.style.display = ""
-            $generalDialogs.style.display = ""
+            this.elements.$loader.style.display = "none"
+            this.elements.$pinnedDialogs.style.display = ""
+            this.elements.$generalDialogs.style.display = ""
         })
 
-        DialogsManager.listenUpdates(handleDialogUpdates)
-        PeersManager.listenUpdates(handlePeerUpdates)
+        DialogsManager.listenUpdates(this._handleDialogUpdates.bind(this))
+        PeersManager.listenUpdates(this._handlePeerUpdates.bind(this))
 
-        registerResizer(this.$el)
+        this._registerResizer()
     },
 
-    updated() {
+    /**
+     * @param {Dialog} dialog
+     * @param {boolean|string} appendOrPrepend if `false` then it will try to find dialog to insert before
+     * @private
+     */
+    _renderDialog(dialog, appendOrPrepend = false) {
+        if (!this.elements.$pinnedDialogs || !this.elements.$generalDialogs) {
+            throw new Error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
+        }
 
+        const dialogElements = this.state.renderedDialogsElements.get(dialog.type)
+        let $rendered = dialogElements.get(dialog.id) || false
+
+        if ($rendered) {
+            if (String(dialog.pinned) !== $rendered.dataset.pinned) {
+
+                if (dialog.pinned) {
+                    this.elements.$pinnedDialogs.prepend($rendered)
+                } else {
+                    const $foundRendered = this._findRenderedDialogToInsertBefore(dialog, $rendered)
+
+                    if ($foundRendered) {
+                        this.elements.$generalDialogs.insertBefore($rendered, $foundRendered)
+                    }
+                }
+
+            } else if (parseInt($rendered.dataset.date) !== dialog.lastMessage.date) {
+                if (!dialog.pinned) {
+                    const $foundRendered = this._findRenderedDialogToInsertBefore(dialog, $rendered)
+
+                    if ($foundRendered) {
+                        this.elements.$generalDialogs.insertBefore($rendered, $foundRendered)
+                    } else {
+                        $rendered.remove()
+                        dialogElements.delete(dialog.id)
+                    }
+                }
+            }
+
+            this._patchDialog.bind(this)(dialog, $rendered)
+        } else {
+            const newVDialog = <DialogComponent dialog={dialog}/>
+
+            if (appendOrPrepend === "append") {
+                if (dialog.pinned) {
+                    $rendered = VDOM.appendToReal(newVDialog, this.elements.$pinnedDialogs)
+                    dialogElements.set(dialog.id, $rendered)
+                } else {
+                    $rendered = VDOM.appendToReal(newVDialog, this.elements.$generalDialogs)
+                    dialogElements.set(dialog.id, $rendered)
+                }
+            } else if (appendOrPrepend === "prepend") {
+                if (dialog.pinned) {
+                    $rendered = VDOM.prependToReal(newVDialog, this.elements.$pinnedDialogs)
+                    dialogElements.set(dialog.id, $rendered)
+                } else {
+                    $rendered = VDOM.prependToReal(newVDialog, this.elements.$generalDialogs)
+                    dialogElements.set(dialog.id, $rendered)
+                }
+            } else {
+                if (dialog.pinned) {
+                    $rendered = VDOM.prependToReal(newVDialog, this.elements.$pinnedDialogs)
+                    dialogElements.set(dialog.id, $rendered)
+                } else {
+                    const $foundRendered = this._findRenderedDialogToInsertBefore(dialog)
+
+                    if ($foundRendered) {
+                        $rendered = this.elements.$generalDialogs.insertBefore(VDOM.render(newVDialog), $foundRendered)
+                        dialogElements.set(dialog.id, $rendered)
+                    }
+                }
+            }
+        }
+    },
+
+    /**
+     * @param {Dialog} dialog
+     * @param $ignore
+     * @return {ChildNode|Element|Node|undefined}
+     * @private
+     */
+    _findRenderedDialogToInsertBefore(dialog, $ignore = undefined) {
+        const renderedDialogs = [
+            ...this.state.renderedDialogsElements.get("user").values(),
+            ...this.state.renderedDialogsElements.get("chat").values(),
+            ...this.state.renderedDialogsElements.get("channel").values(),
+        ]
+
+        if (renderedDialogs.size === 0) {
+            return undefined
+        }
+
+        let minDiff = 999999999999
+
+        /**
+         * @type {undefined|Element|Node}
+         */
+        let $dialog = undefined
+
+        const lastMessageDate = parseInt(dialog.lastMessage.date)
+
+        renderedDialogs.forEach($rendered => {
+            if ($rendered !== $ignore && $rendered.dataset.pinned !== "true") {
+                const datasetDate = parseInt($rendered.dataset.date)
+                const nextDiff = Math.abs(lastMessageDate - datasetDate)
+
+                if (minDiff > nextDiff) {
+                    minDiff = nextDiff
+                    $dialog = $rendered
+                }
+            }
+        })
+
+        if (parseInt($dialog.dataset.date) > lastMessageDate && $dialog.nextSibling) {
+            return $dialog.nextSibling
+        }
+
+        return $dialog  // fuuuuuuck
+    },
+
+    /**
+     * @param {Dialog} dialog
+     * @param $ignore
+     * @return {ChildNode|Element|Node|undefined}
+     * @private
+     */
+    _findRenderedDialogToInsertBeforeByIndex(dialog, $ignore = undefined) {
+        const renderedDialogs = [
+            ...this.state.renderedDialogsElements.get("user").values(),
+            ...this.state.renderedDialogsElements.get("chat").values(),
+            ...this.state.renderedDialogsElements.get("channel").values(),
+        ]
+
+        if (renderedDialogs.size === 0) {
+            return undefined
+        }
+
+        let minDiff = 999999999999
+
+        /**
+         * @type {undefined|Element|Node}
+         */
+        let $dialog = undefined
+
+        const dialogIndex = parseInt(dialog.index)
+
+        renderedDialogs.forEach($rendered => {
+            if ($rendered !== $ignore && $rendered.dataset.pinned !== "true") {
+                const datasetIndex = parseInt($rendered.dataset.index)
+                const nextDiff = Math.abs(dialogIndex - datasetIndex)
+
+                if (minDiff > nextDiff) {
+                    minDiff = nextDiff
+                    $dialog = $rendered
+                }
+            }
+        })
+
+        if (parseInt($dialog.dataset.index) > dialogIndex && $dialog.nextSibling) {
+            return $dialog.nextSibling
+        }
+
+        return $dialog
+    },
+
+    /**
+     * Handles Dialog updates
+     * @param event
+     * @private
+     */
+    _handleDialogUpdates(event) {
+        switch (event.type) {
+            case "updateMany":
+                event.pinnedDialogs.forEach(dialog => {
+                    this._renderDialog.bind(this)(dialog, "append")
+                })
+
+                event.dialogs.forEach(dialog => {
+                    this._renderDialog.bind(this)(dialog, "append")
+                })
+
+                break
+
+            case "updateSingle":
+                this._renderDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateDraftMessage":
+                this._renderDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateReadHistoryInbox":
+                this._patchDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateReadHistoryOutbox":
+                this._patchDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateReadChannelInbox":
+                this._patchDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateReadChannelOutbox":
+                this._patchDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateUserStatus":
+                this._patchDialog.bind(this)(event.dialog)
+
+                break
+
+        }
+    },
+
+    _patchDialog(dialog, $dialog = undefined) {
+        if (!$dialog) {
+            const dialogElements = this.state.renderedDialogsElements.get(dialog.type)
+            $dialog = dialogElements.get(dialog.id) || false
+
+            if (!$dialog) {
+                return
+            }
+        }
+
+        VDOM.patchReal($dialog, <DialogComponent dialog={dialog}/>)
+    },
+
+    /**
+     * Handles Peer updates
+     * @param event
+     * @private
+     */
+    _handlePeerUpdates(event) {
+        if (event.type === "updatePhoto") {
+            const dialog = DialogsManager.find(event.peer.type, event.peer.id)
+            if (dialog) {
+                this._patchDialog.bind(this)(dialog)
+            }
+        } else {
+            Logger.log("PeerUpdates", event)
+        }
+    },
+
+    /**
+     * Handles dialogs scroll. If at the bottom, then gets next page of dialogs.
+     * @param event
+     * @private
+     */
+    _scrollHandler(event) {
+        const $element = event.target
+
+        if ($element.scrollHeight - $element.scrollTop === $element.clientHeight) {
+            DialogsManager.fetchNextPage({}).then(() => {
+                console.log("fetched next page")
+            })
+        }
+    },
+
+    /**
+     * Makes the sidebar resizeable.
+     * TODO: mb will be better to have this on another file
+     * @private
+     */
+    _registerResizer() {
+        const $element = this.$el
+        const MIN_WIDTH = 90
+        const DEFAULT_WIDTH = 422
+
+        let sticked = false
+        let prevPosition = $element.offsetX
+        let isMoving = false
+
+        const $connectingMessageText = $element.querySelector("#connecting_message>span")
+        const $searchElement = $element.querySelector(".search")
+
+        const setmin = () => {
+            sticked = true
+            $element.style.width = `${MIN_WIDTH}px`
+            $searchElement.classList.add("d-none")
+            $connectingMessageText.classList.add("d-none")
+        }
+
+        const setdef = () => {
+            sticked = false
+            $element.style.width = `${DEFAULT_WIDTH}px`
+            $searchElement.classList.remove("d-none")
+            $connectingMessageText.classList.remove("d-none")
+        }
+
+        const resize = event => {
+            const computedSize = parseInt(getComputedStyle($element).width) + event.x - prevPosition
+
+            if (computedSize < 150 && $searchElement) {
+                $searchElement.classList.add("d-none")
+            } else {
+                $searchElement.classList.remove("d-none")
+            }
+
+            if (computedSize <= (MIN_WIDTH + 20) && !sticked) {
+                setmin()
+                prevPosition = event.x
+            } else if (computedSize >= MIN_WIDTH) {
+                sticked = false
+                $element.style.width = `${computedSize}px`
+                prevPosition = event.x
+                $searchElement.classList.remove("d-none")
+                $connectingMessageText.classList.remove("d-none")
+            }
+        }
+
+        $element.addEventListener("mousedown", function (event) {
+            isMoving = true
+            if (event.offsetX > 10 && isMoving) {
+                prevPosition = event.x
+
+                document.addEventListener("mousemove", resize, false)
+            }
+        }, false)
+
+        $element.addEventListener("dblclick", function (event) {
+            const w = parseInt(getComputedStyle($element).width)
+            if (w < DEFAULT_WIDTH) {
+                setdef()
+            } else {
+                setmin()
+            }
+        })
+
+        document.addEventListener("mouseup", function () {
+            document.removeEventListener("mousemove", resize)
+        }, false)
     }
 }

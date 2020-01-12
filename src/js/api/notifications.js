@@ -9,5 +9,5 @@ export function notify(update) {
 
 export function attach() {
     console.log("test")
-    MTProto.MessageProcessor.listenUpdateShortMessage(notify)
+    // MTProto.MessageProcessor.listenUpdateShortMessage(notify)
 }

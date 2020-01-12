@@ -1,5 +1,5 @@
 import {parseMessageEntities} from "../../../../../mtproto/utils/htmlHelpers"
-import Message from "./messageComponent"
+import MessageComponent from "./messageComponent"
 
 function vGetClass(data, transparent = false) {
     let classes = "bubble"
@@ -28,14 +28,14 @@ function vTimeTemplate(message, bg = false) {
     )
 }
 
-const TextMessage = {
+const TextMessageComponent = {
     name: "text-only-message",
     h({message}) {
         const username = message.userName && !message.post && !message.out;
         let msg = parseMessageEntities(message.text ? message.text : "", message.entities)
         // msg = msg ? emoji.replace_unified(msg) : "";
 
-        return <Message message={message}>
+        return <MessageComponent message={message}>
             <div className={vGetClass(message)}>
                 {username ? <div className="username">{username}</div> : ""}
 
@@ -52,8 +52,8 @@ const TextMessage = {
                     {vTimeTemplate(message)}
                 </div>
             </div>
-        </Message>
+        </MessageComponent>
     }
 }
 
-export default TextMessage
+export default TextMessageComponent

@@ -1,5 +1,6 @@
 import {getMessagePreviewDialog} from "../ui/utils";
 import PeersManager from "../api/peers/peersManager";
+import MTProto from "../mtproto"
 
 export class Message {
     constructor(dialog, message) {
@@ -7,6 +8,11 @@ export class Message {
         this._message = message
         this.type = "text"
         this.parseMessage()
+    }
+
+
+    get isShort() {
+        return this._message._ === "updateShortMessage"
     }
 
     get id() {
@@ -24,15 +30,30 @@ export class Message {
     get from() {
         // TODO there's type of message when channel message is resent to chat
         // should check it!
+
+        if (this.isOut) {
+            // todo: cache AuthorizedUse
+            return PeersManager.find("user", MTProto.getAuthorizedUser().user.id)
+        } else if (this.isShort) {
+            return PeersManager.find("user", this._message.user_id)
+        }
+
         return !this._message.from_id ? PeersManager.findByPeer(this._message.to_id) : PeersManager.find("user", this._message.from_id)
     }
 
     get to() {
-        return this._message.to_id // TODO get id from peerN object
+        if (this._message.to_id === "peerChannel") {
+            return PeersManager.find("channel", this._message.to_id.channel_id)
+        }
+        return null
     }
 
     get isOut() {
-        return this._message.pFlags.out
+        return this._message.pFlags.out || false
+    }
+
+    get isPost() {
+        return this._message.pFlags.post || false
     }
 
     get isRead() {
@@ -41,7 +62,13 @@ export class Message {
 
     get prefix() {
         const from = this.from
-        if(from) {
+
+        // todo: check if megagroup
+        if (this.to) {
+            return this.to.peerName
+        }
+
+        if (from) {
             return from.peerName + getMessagePreviewDialog(this._message, true)
         } else {
             console.log(this._message)
@@ -61,7 +88,7 @@ export class Message {
     parseMessage() {
         const message = this._message
 
-        if(message.media) {
+        if (message.media) {
 
         }
     }

@@ -18,8 +18,11 @@ export function getFullMessageID(msgID, channelID) {
     if (!channelID || msgID <= 0) {
         return msgID
     }
+
     msgID = getMessageLocalID(msgID)
+
     let localStart = channelLocals[channelID]
+
     if (!localStart) {
         localStart = (++channelCurLocal) * fullMsgIDModulus
         channelsByLocals[localStart] = channelID
