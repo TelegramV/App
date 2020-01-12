@@ -160,6 +160,7 @@
             .avatar {
                 width: 44px;
                 height: 44px;
+                flex-shrink: 0;
             }
 
             .bottom {
@@ -498,6 +499,7 @@
             .avatar {
                 height: 34px;
                 width: 34px;
+                flex-shrink: 0;
                 border-radius: 100%;
                 margin-right: 5px;
 
@@ -637,7 +639,7 @@
 
             .time {
                 color: $darkgreen;
-                min-width: 36px;
+                min-width: 47px;
                 display: inline-block;
 
                 .inner {
