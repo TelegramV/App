@@ -23,8 +23,6 @@ function initUIManagers() {
 export function ImPage() {
     VDOM.appendToReal(<DialogListComponent/>, $imPageElement)
     $imPageElement.appendChild(UICreateMessages())
-    
-    VDOM.appendToReal(<MessagesWrapperComponent/>, $imPageElement)
 
     initUIManagers()
     VDOM.appendToReal(<DialogInfoComponent/>, $imPageElement)
