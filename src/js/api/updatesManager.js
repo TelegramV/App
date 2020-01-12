@@ -82,6 +82,8 @@ class UpdateManager extends Manager {
             message.updates.forEach(update => {
                 this.processUpdate(update._, update)
             })
+        } else if (message._ === "updateShort") {
+            this.processUpdate(message.update._, message.update)
         } else {
             if (this.updateListeners.has(message._)) {
                 this.processUpdate(message._, message)
@@ -92,13 +94,15 @@ class UpdateManager extends Manager {
 
     }
 
-    getDifference(onTooLong = undefined) {
+    getDifference(State = {}, onTooLong = undefined) {
         MTProto.invokeMethod("updates.getDifference", {
-            pts: this.State.pts,
-            date: this.State.date,
-            qts: this.State.qts,
+            pts: State.pts || this.State.pts,
+            date: State.date || this.State.date,
+            qts: State.qts || this.State.qts,
             flags: 0
         }).then(_difference => {
+            console.warn("Difference", _difference)
+
             if (onTooLong && _difference._ === "updates.differenceTooLong") {
                 onTooLong(_difference)
             } else {
@@ -150,7 +154,7 @@ class UpdateManager extends Manager {
 
     _checkChannelPts(dialog, _update, onFail) {
         if ((dialog.dialog.pts + _update.pts_count) === _update.pts) {
-            console.log("channel update can be processed", _update)
+            // console.log("channel update can be processed", _update)
 
             this.resolveUpdateListeners(_update)
 
@@ -163,18 +167,20 @@ class UpdateManager extends Manager {
         }
     }
 
-    _checkUserPts(_update, onFail) {
-        if ((this.State.pts + _update.pts_count) === _update.pts) {
-            console.log("update can be processed", _update)
+    _checkUserPts(State = {}, _update, onFail) {
+        const statePts = State.pts || this.State.pts
+
+        if ((statePts + _update.pts_count) === _update.pts) {
+            // console.log("update can be processed", _update)
 
             this.State.pts = _update.pts
 
             this.resolveUpdateListeners(_update)
 
-        } else if ((this.State.pts + _update.pts_count) > _update.pts) {
+        } else if ((statePts + _update.pts_count) > _update.pts) {
             console.log("update already processed")
         } else {
-            console.warn("update cannot be processed", _update, this.State.pts, _update.pts_count, _update.pts)
+            console.warn("update cannot be processed", _update, statePts, _update.pts_count, _update.pts)
             onFail()
         }
     }
@@ -186,14 +192,14 @@ class UpdateManager extends Manager {
             channelId = update.message.to_id.channel_id
         } else if (update._ === "updateEditChannelMessage") {
             channelId = update.message.to_id.channel_id
-        } else if (update._ === "updateDeleteChannelMessage") {
+        } else if (update._ === "updateDeleteChannelMessages") {
             channelId = update.channel_id
         } else {
-            console.warn("ignoring", update)
+            console.log("ignoring")
             return
         }
 
-        const dialog = DialogsManager.find("channel", update.message.to_id.channel_id)
+        const dialog = DialogsManager.find("channel", channelId)
 
         if (dialog) {
             this._checkChannelPts(dialog, update, () => {
@@ -201,6 +207,8 @@ class UpdateManager extends Manager {
             })
         } else {
             console.error("dialog wasn't found!", update)
+
+            DialogsManager.findOrFetch("channel", channelId)
 
             // let peer = undefined
             //
@@ -226,8 +234,8 @@ class UpdateManager extends Manager {
     }
 
     _processUserMessageUpdate(update) {
-        this._checkUserPts(update, () => {
-            this.getDifference()
+        this._checkUserPts({}, update, () => {
+            this.getDifference({})
         })
     }
 
@@ -238,7 +246,7 @@ class UpdateManager extends Manager {
             try {
                 const update = this._channelStack[0]
 
-                if (update._.endsWith("ChannelMessage")) {
+                if (update._.endsWith("ChannelMessage") || update._.endsWith("ChannelMessages")) {
                     this._processChannelMessageUpdate(update)
                 } else if (update._ === "updates.channelDifference") {
                     update.users.forEach(user => PeersManager.set(getPeerObject(user)))
@@ -292,8 +300,8 @@ class UpdateManager extends Manager {
             try {
                 const update = this._userStack[0]
 
-                if (update._.endsWith("Message")) {
-                    console.warn("message update", update)
+                if (update._.endsWith("Message") || update._.endsWith("Messages")) {
+                    // console.warn("message update", update)
                     this._processUserMessageUpdate(update)
                 } else if (update._ === "updates.difference") {
                     update.chats.forEach(chat => PeersManager.set(getPeerObject(chat)))

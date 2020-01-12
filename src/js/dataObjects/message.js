@@ -49,7 +49,11 @@ export class Message {
     }
 
     get isOut() {
-        return this._message.pFlags.out
+        return this._message.pFlags.out || false
+    }
+
+    get isPost() {
+        return this._message.pFlags.post || false
     }
 
     get isRead() {

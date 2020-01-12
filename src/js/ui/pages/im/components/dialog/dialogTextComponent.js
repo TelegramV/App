@@ -40,7 +40,7 @@ const Text = {
  * @constructor
  */
 export const DialogTextComponent = ({dialog}) => {
-    if (dialog.draft !== null) {
+    if (dialog.draft !== null && dialog.draft._ !== "draftMessageEmpty") {
         return (
             <Draft text={dialog.draft}/>
         )

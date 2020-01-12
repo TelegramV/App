@@ -1,9 +1,9 @@
 import VDOM from "../../framework/vdom"
 import DialogsManager from "../../../api/dialogs/dialogsManager"
 import {DialogListComponent} from "./components/dialog/dialogListComponent"
-import {UICreateMessages} from "./messages/messages"
 import UpdatesManager from "../../../api/updatesManager"
 import PeersManager from "../../../api/peers/peersManager"
+import MessagesWrapperComponent from "./components/message/messagesWrapperComponent"
 
 
 const $imPageElement = VDOM.render(
@@ -20,7 +20,7 @@ function initUIManagers() {
 export function ImPage() {
     VDOM.appendToReal(<DialogListComponent/>, $imPageElement)
 
-    $imPageElement.appendChild(UICreateMessages())
+    VDOM.appendToReal(<MessagesWrapperComponent/>, $imPageElement)
 
     initUIManagers()
 

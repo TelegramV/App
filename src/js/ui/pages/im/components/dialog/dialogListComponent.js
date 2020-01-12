@@ -2,106 +2,6 @@ import DialogsManager from "../../../../../api/dialogs/dialogsManager"
 import PeersManager from "../../../../../api/peers/peersManager"
 import {DialogComponent} from "./dialogComponent"
 
-const __rendered_pinned = new Set()
-const __rendered_general = new Set()
-
-const __$dialogElements = {
-    chat: {},
-    user: {},
-    channel: {}
-}
-
-/**
- * @type {Element|undefined}
- */
-let $pinnedDialogs = undefined
-
-/**
- * @type {Element|undefined}
- */
-let $generalDialogs = undefined
-
-/**
- * @param {Dialog} dialog
- * @return {undefined|Element|Node}
- */
-function findBelow$Dialog(dialog) {
-    let diff = 999999999999999 // todo: make this not hardcoded
-    let diff$el = undefined
-    for (const [type, data] of Object.entries(__$dialogElements)) {
-        for (const [id, $dialog] of Object.entries(data)) {
-            const nextDiff = Math.abs(parseInt(dialog.lastMessage.date) - parseInt($dialog.dataset.date))
-            if (nextDiff < diff && $dialog.dataset.pinned !== "true") {
-                diff = nextDiff
-                diff$el = $dialog
-            }
-        }
-    }
-    return diff$el
-}
-
-/**
- * @param {Dialog} dialog
- * @param appendOnly
- */
-function renderDialog(dialog, appendOnly = false) {
-    if (!$pinnedDialogs || !$generalDialogs) {
-        throw new Error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
-    }
-
-    const __ = `${dialog.type}.${dialog.id}`
-    const renderedInPinned = __rendered_pinned.has(__)
-    const renderedInGeneral = __rendered_general.has(__)
-
-    let $dialogs = undefined
-
-    if (renderedInPinned || dialog.pinned) {
-        $dialogs = $pinnedDialogs
-        __rendered_pinned.add(__)
-        __rendered_general.delete(__)
-    } else if (renderedInGeneral) {
-        $dialogs = $generalDialogs
-        __rendered_pinned.delete(__)
-    } else {
-        __rendered_general.add(__)
-        __rendered_pinned.delete(__)
-        $dialogs = $generalDialogs // fixme
-    }
-
-    let $dialog = __$dialogElements[dialog.type][dialog.id]
-
-    if ($dialog) {
-        if ($dialog.dataset.pinned !== String(dialog.pinned)) {
-            if (dialog.pinned) {
-                $dialogs.prepend($dialog)
-            } else {
-                const $below = findBelow$Dialog(dialog)
-
-                if ($below && $below !== $dialog) {
-                    $dialogs.insertBefore($dialog, $below)
-                }
-            }
-        } else if (parseInt($dialog.dataset.date) < dialog.lastMessage.date && !dialog.pinned) {
-            const $below = findBelow$Dialog(dialog)
-
-            if ($below && $below !== $dialog) {
-                $dialogs.insertBefore($dialog, $below)
-            }
-        }
-
-        VDOM.patchReal($dialog, <DialogComponent dialog={dialog}/>)
-    } else {
-        if (!appendOnly) {
-            const $below = findBelow$Dialog(dialog)
-
-            $dialog = VDOM.render(<DialogComponent dialog={dialog}/>)
-            __$dialogElements[dialog.type][dialog.id] = $dialogs.insertBefore($dialog, $below)
-        } else {
-            __$dialogElements[dialog.type][dialog.id] = VDOM.appendToReal(<DialogComponent dialog={dialog}/>, $dialogs)
-        }
-    }
-}
-
 /**
  * CRITICAL: Never rerender this component!!!
  */
@@ -200,12 +100,15 @@ export const DialogListComponent = {
                     }
                 }
 
-            } else if (parseInt($rendered.dataset.date) < dialog.lastMessage.date) {
+            } else if (parseInt($rendered.dataset.date) !== dialog.lastMessage.date) {
                 if (!dialog.pinned) {
                     const $foundRendered = this._findRenderedDialogToInsertBefore(dialog, $rendered)
 
                     if ($foundRendered) {
                         this.elements.$generalDialogs.insertBefore($rendered, $foundRendered)
+                    } else {
+                        $rendered.remove()
+                        dialogElements.delete(dialog.id)
                     }
                 }
             }
@@ -246,6 +149,12 @@ export const DialogListComponent = {
         }
     },
 
+    /**
+     * @param {Dialog} dialog
+     * @param $ignore
+     * @return {ChildNode|Element|Node|undefined}
+     * @private
+     */
     _findRenderedDialogToInsertBefore(dialog, $ignore = undefined) {
         const renderedDialogs = [
             ...this.state.renderedDialogsElements.get("user").values(),
@@ -266,9 +175,6 @@ export const DialogListComponent = {
 
         const lastMessageDate = parseInt(dialog.lastMessage.date)
 
-        let c = 0
-        let cx = 0
-
         renderedDialogs.forEach($rendered => {
             if ($rendered !== $ignore && $rendered.dataset.pinned !== "true") {
                 const datasetDate = parseInt($rendered.dataset.date)
@@ -278,9 +184,7 @@ export const DialogListComponent = {
                     minDiff = nextDiff
                     $dialog = $rendered
                 }
-                cx++
             }
-            c++
         })
 
         if (parseInt($dialog.dataset.date) > lastMessageDate && $dialog.nextSibling) {
@@ -291,23 +195,103 @@ export const DialogListComponent = {
     },
 
     /**
+     * @param {Dialog} dialog
+     * @param $ignore
+     * @return {ChildNode|Element|Node|undefined}
+     * @private
+     */
+    _findRenderedDialogToInsertBeforeByIndex(dialog, $ignore = undefined) {
+        const renderedDialogs = [
+            ...this.state.renderedDialogsElements.get("user").values(),
+            ...this.state.renderedDialogsElements.get("chat").values(),
+            ...this.state.renderedDialogsElements.get("channel").values(),
+        ]
+
+        if (renderedDialogs.size === 0) {
+            return undefined
+        }
+
+        let minDiff = 999999999999
+
+        /**
+         * @type {undefined|Element|Node}
+         */
+        let $dialog = undefined
+
+        const dialogIndex = parseInt(dialog.index)
+
+        renderedDialogs.forEach($rendered => {
+            if ($rendered !== $ignore && $rendered.dataset.pinned !== "true") {
+                const datasetIndex = parseInt($rendered.dataset.index)
+                const nextDiff = Math.abs(dialogIndex - datasetIndex)
+
+                if (minDiff > nextDiff) {
+                    minDiff = nextDiff
+                    $dialog = $rendered
+                }
+            }
+        })
+
+        if (parseInt($dialog.dataset.index) > dialogIndex && $dialog.nextSibling) {
+            return $dialog.nextSibling
+        }
+
+        return $dialog
+    },
+
+    /**
      * Handles Dialog updates
      * @param event
      * @private
      */
     _handleDialogUpdates(event) {
-        if (event.type === "updateMany") {
-            event.pinnedDialogs.forEach(dialog => {
-                this._renderDialog.bind(this)(dialog, "append")
-            })
+        switch (event.type) {
+            case "updateMany":
+                event.pinnedDialogs.forEach(dialog => {
+                    this._renderDialog.bind(this)(dialog, "append")
+                })
 
-            event.dialogs.forEach(dialog => {
-                this._renderDialog.bind(this)(dialog, "append")
-            })
-        } else if (event.type === "updateSingle") {
-            this._renderDialog.bind(this)(event.dialog)
-        } else {
-            Logger.log("DialogUpdates", event)
+                event.dialogs.forEach(dialog => {
+                    this._renderDialog.bind(this)(dialog, "append")
+                })
+
+                break
+
+            case "updateSingle":
+                this._renderDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateDraftMessage":
+                this._renderDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateReadHistoryInbox":
+                this._patchDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateReadHistoryOutbox":
+                this._patchDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateReadChannelInbox":
+                this._patchDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateReadChannelOutbox":
+                this._patchDialog.bind(this)(event.dialog)
+
+                break
+
+            case "updateUserStatus":
+                this._patchDialog.bind(this)(event.dialog)
+
+                break
+
         }
     },
 

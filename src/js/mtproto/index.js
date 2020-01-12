@@ -5,12 +5,10 @@ import TimeManager from "./timeManager"
 import {createLogger} from "../common/logger"
 import {AppPermanentStorage} from "../common/storage"
 import {AuthAPI} from "../api/auth";
-import DialogsManager from "../api/dialogs/dialogsManager"
 import UpdatesManager from "../api/updatesManager"
 import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import Bytes from "./utils/bytes"
-import PeersManager from "../api/peers/peersManager"
 import authKeyCreation from "./connect/authKeyCreation"
 
 window.id = 202466030
@@ -91,6 +89,8 @@ class MobileProtocol {
         this.Auth = new MobileProtocolAPIAuth({
             MTProto: this
         })
+
+        this.authorizedUser = undefined
     }
 
     createApiNetworker(authContext) {
@@ -214,8 +214,10 @@ class MobileProtocol {
     }
 
     getAuthorizedUser() {
-        // todo: cache AuthorizedUse
-        return AppPermanentStorage.getItem("authorizationData")
+        if (!this.authorizedUser) {
+            this.authorizedUser = AppPermanentStorage.getItem("authorizationData")
+        }
+        return this.authorizedUser
     }
 
     changeDefaultDC(dcID) {

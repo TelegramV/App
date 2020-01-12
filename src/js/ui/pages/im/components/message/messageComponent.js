@@ -1,7 +1,13 @@
-const Message = {
+const MessageComponent = {
     name: "message",
+
+    /**
+     * @param {Message} message
+     * @param slot
+     * @return {*}
+     */
     h({message, slot}) {
-        const className = message.post ? "channel in" : message.out ? "out" : "in"
+        const className = message.isPost ? "channel in" : message.isOut ? "out" : "in"
         const from = message.from
 
         let hasAvatar = from.hasAvatar && from._avatar !== undefined
@@ -33,4 +39,4 @@ const Message = {
     }
 }
 
-export default Message
+export default MessageComponent

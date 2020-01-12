@@ -21,11 +21,6 @@ class DialogManager extends Manager {
             ["channel", new Map()],
             ["user", new Map()],
         ])
-        // this.dialogs = {
-        //     chat: {},
-        //     channel: {},
-        //     user: {}
-        // }
         this.latestDialog = undefined
         this.dialogsOffsetDate = 0 // TODO
         this.offsetDate = 0
@@ -54,7 +49,7 @@ class DialogManager extends Manager {
         MTProto.UpdatesManager.listenUpdate("updateNewMessage", async update => {
             let dialog = undefined
 
-            if (update.message.to_id) {
+            if (update.message.pFlags.out && update.message.to_id) {
                 const peerName = getPeerNameFromType(update.message.to_id._)
                 dialog = await this.findOrFetch(peerName, update.message.to_id[`${peerName}_id`])
             } else {
@@ -71,11 +66,27 @@ class DialogManager extends Manager {
                 update.messages.forEach(mId => {
                     dialog._unreadMessageIds.delete(mId)
                 })
+
+                if (update.messages.indexOf(dialog.lastMessage.id) > -1) {
+                    this.fetchPlainPeerDialogs({
+                        _: dialog.peer.type,
+                        id: dialog.peer.id,
+                        access_hash: dialog.peer.peer.access_hash
+                    })
+                }
             }
         })
 
         MTProto.UpdatesManager.listenUpdate("updateDeleteMessages", async update => {
-            console.log("deleted", update)
+            this.dialogs.forEach((data, type) => data.forEach(/** @param {Dialog} dialog */(dialog, id) => {
+                if (update.messages.indexOf(dialog.lastMessage.id) > -1) {
+                    this.fetchPlainPeerDialogs({_: dialog.peer.type, id: dialog.peer.id})
+
+                    update.messages.forEach(mId => {
+                        dialog._unreadMessageIds.delete(mId)
+                    })
+                }
+            }))
         })
 
         MTProto.UpdatesManager.listenUpdate("updateDialogPinned", async update => {
@@ -85,6 +96,11 @@ class DialogManager extends Manager {
             if (!dialog) return
 
             dialog.pinned = update.pFlags.pinned || false
+        })
+
+
+        MTProto.UpdatesManager.listenUpdate("updateChannel", async update => {
+            await this.findOrFetch("channel", update.channel_id)
         })
 
         MTProto.UpdatesManager.listenUpdate("updateNewChannelMessage", async update => {
@@ -118,7 +134,7 @@ class DialogManager extends Manager {
                 dialog._dialog.draft = update.draft
 
                 this.resolveListeners({
-                    type: "updateSingle",
+                    type: "updateDraftMessage",
                     dialog: dialog
                 })
             }
@@ -143,8 +159,9 @@ class DialogManager extends Manager {
                 if (dialog._dialog.unread_count === 0) {
                     dialog.clearUnreadCount()
                 }
+
                 this.resolveListeners({
-                    type: "updateSingle",
+                    type: "updateReadHistoryInbox",
                     dialog: dialog
                 })
             }
@@ -154,8 +171,9 @@ class DialogManager extends Manager {
             const dialog = this.findByPeer(update.peer)
             if (dialog) {
                 dialog._dialog.read_outbox_max_id = update.max_id
+
                 this.resolveListeners({
-                    type: "updateSingle",
+                    type: "updateReadHistoryOutbox",
                     dialog: dialog
                 })
             }
@@ -170,8 +188,9 @@ class DialogManager extends Manager {
                 if (dialog._dialog.unread_count === 0) {
                     dialog.clearUnreadCount()
                 }
+
                 this.resolveListeners({
-                    type: "updateSingle",
+                    type: "updateReadChannelInbox",
                     dialog: dialog
                 })
             }
@@ -181,8 +200,22 @@ class DialogManager extends Manager {
             const dialog = this.find("channel", update.channel_id)
             if (dialog) {
                 dialog._dialog.read_outbox_max_id = update.max_id
+
                 this.resolveListeners({
-                    type: "updateSingle",
+                    type: "updateReadChannelOutbox",
+                    dialog: dialog
+                })
+            }
+        })
+
+        MTProto.UpdatesManager.listenUpdate("updateUserStatus", update => {
+            const dialog = this.find("user", update.user_id)
+
+            if (dialog && dialog.peer instanceof UserPeer) {
+                dialog.peer.peer.status = update.status
+
+                this.resolveListeners({
+                    type: "updateUserStatus",
                     dialog: dialog
                 })
             }
@@ -195,7 +228,7 @@ class DialogManager extends Manager {
                 if (dialog && dialog.peer instanceof UserPeer) {
                     dialog.peer.peer.status = update.status
                     this.resolveListeners({
-                        type: "updateSingle",
+                        type: "updateUserStatus",
                         dialog: dialog
                     })
                 }
@@ -258,7 +291,7 @@ class DialogManager extends Manager {
         })
     }
 
-    fetchNextPage({limit = 20}) {
+    fetchNextPage({limit = 10}) {
         const latestDialog = this.latestDialog
         const peer = latestDialog.peer
 
@@ -333,7 +366,7 @@ class DialogManager extends Manager {
     fetchPlainPeerDialogs(peer) {
         const peerData = {
             _: "inputDialogPeer",
-            peer: getInputPeerFromPeerWithoutAccessHash(peer._, peer.id)
+            peer: !peer.access_hash ? getInputPeerFromPeerWithoutAccessHash(peer._, peer.id) : getInputPeerFromPeer(peer._, peer.id, peer.access_hash)
         }
 
         return MTProto.invokeMethod("messages.getPeerDialogs", {
@@ -350,12 +383,10 @@ class DialogManager extends Manager {
                 return this.resolveDialogWithSlice(_dialog, _dialogsSlice)
             })
 
-            if (dialogs.length) {
-                this.resolveListeners({
-                    type: "updateSingle",
-                    dialog: dialogs[0],
-                })
-            }
+            this.resolveListeners({
+                type: "updateSingle",
+                dialog: dialogs[0],
+            })
 
             dialogs.forEach(async dialog => {
                 await dialog.peer.getAvatar()

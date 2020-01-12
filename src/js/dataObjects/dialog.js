@@ -193,13 +193,13 @@ export class Dialog {
         return this.fetchMessages({offset_id: oldest.id})
     }
 
-    fetchMessages(props = {offset_id: 0}) {
+    fetchMessages(props = {offset_id: 0, limit: 20}) {
         return MTProto.invokeMethod("messages.getHistory", {
             peer: this.peer.inputPeer,
             offset_id: props.offset_id,
             offset_date: 0,
             add_offset: 0,
-            limit: 20,
+            limit: props.limit || 20,
             max_id: 0,
             min_id: 0,
             hash: 0

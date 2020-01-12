@@ -24,6 +24,10 @@ function handleClick(dialog) {
 
 export const DialogComponent = {
     name: "dialog",
+    /**
+     * @param {Dialog} dialog
+     * @return {*}
+     */
     h({dialog}) {
         const peer = dialog.peer
         const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.unreadCount > 0 ? dialog.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
@@ -46,7 +50,8 @@ export const DialogComponent = {
                  data-date={dialog.lastMessage.date}
                  data-pinned={dialog.pinned === undefined ? false : dialog.pinned}
                  className={personClasses}
-                 onClick={handleClick(dialog)}>
+                 onClick={handleClick(dialog)}
+                 data-index={dialog.index}>
 
                 <DialogAvatarComponent dialog={dialog}/>
 
@@ -60,8 +65,10 @@ export const DialogComponent = {
                     <div className="bottom">
                         <DialogTextComponent dialog={dialog}/>
 
-                        <div css-display={dialog.unreadMentionsCount === 0 ? "none" : ""} className="badge tgico">@{dialog.unreadMentionsCount}</div>
-                        <div css-display={dialog.unreadCount === 0 ? "none" : ""} className="badge tgico">{dialog.unreadCount}</div>
+                        <div css-display={dialog.unreadMentionsCount === 0 ? "none" : ""}
+                             className="badge tgico">@{dialog.unreadMentionsCount}</div>
+                        <div css-display={dialog.unreadCount === 0 ? "none" : ""}
+                             className="badge tgico">{dialog.unreadCount}</div>
                         <div css-display={!dialog.unreadMark ? "none" : ""} className="badge tgico">?</div>
                     </div>
                 </div>
