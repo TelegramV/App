@@ -71,9 +71,7 @@ class MobileProtocolAPIAuth {
 }
 
 function initManagers() {
-    UpdatesManager.init()
-    DialogsManager.init()
-    PeersManager.init()
+    // init non-ui managers
 }
 
 class MobileProtocol {
