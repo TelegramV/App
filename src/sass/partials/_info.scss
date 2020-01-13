@@ -1,0 +1,142 @@
+.dialog-info {
+    max-width: 422px;
+    width: 100%;
+    height: 100vh;
+    background-color: white;
+    border-left: 1px $grey solid;
+    overflow: hidden;
+
+    &:hover {
+        overflow-y: overlay;
+    }
+
+    .header {
+    	padding: 0 5px;
+        height: 54px;
+        display: flex;
+        align-items: center;
+
+        .title {
+            width: 100%;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .tgico {
+        	color: $darkgrey;
+        	font-size: 24px;
+        	flex-shrink: 0;
+        }
+
+        .tgico-close {
+            margin-right: 20px;
+            margin-left: 10px;
+        }
+
+        .tgico-more {
+            margin-right: 10px;
+        }
+    }
+
+    .content {
+        .photo-container {
+            height: 120px;
+            width: 100%;
+            position: relative;
+
+            .photo {
+                margin: 0;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translateY(-50%) translateX(-50%);
+                border-radius: 50%;
+                max-width: 120px;
+            }
+        }
+
+        .description {
+            text-align: center;
+            margin-top: 30px;
+            margin-bottom: 20px;
+
+            .name {
+                font-size: 24px;
+                font-weight: bold;
+            }
+
+            .status {
+                margin-top: 10px;
+                color: $blue;
+                font-size: 14px;
+            }
+
+            .subscribers {
+            	margin-top: 10px;
+                color: $darkgrey;
+                font-size: 14px;
+            }
+        }
+
+        .details {
+            align-items: center;
+            margin: 10px 0 20px 0;
+            display: flex;
+
+            .icon {
+                margin-left: 25px;
+                margin-right: 30px;
+                height: 22px;
+                font-size: 24px;
+                color: $darkgrey;
+            }
+
+            .notifications-checkbox {
+                padding-left: 28px;
+                margin-right: 50px;
+            }
+
+            .line {
+                display: flex;
+                flex-direction: column;
+                padding-top: 5px;
+
+                .text {
+                    margin-top: 14px;
+                    font-size: 14px;
+                }
+
+                .label {
+                    color: $darkgrey;
+                    font-size: 12px;
+                    margin-top: 5px;
+                }
+            }
+        }
+
+        .materials {
+            width: 100%;
+            margin-top: 60px;
+
+            .header {
+                width: 100%;
+                height: 24px;
+                display: flex;
+                flex-direction: row;
+                justify-content: space-around;
+                border-bottom: 1px $grey solid;
+            }
+
+            .item {
+            	height: 100%;
+            	font-weight: bold;
+            	color: $darkgrey;
+            }
+
+            .item.selected {
+                border-bottom: 3px $blue solid;
+                color: $blue;
+            }
+        }
+    }
+}
