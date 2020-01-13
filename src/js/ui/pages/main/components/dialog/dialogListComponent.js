@@ -18,7 +18,9 @@ export const DialogListComponent = {
             ["chat", new Map()],
             ["channel", new Map()],
             ["user", new Map()],
-        ])
+        ]),
+
+        isInLoadingMoreScroll: false
     },
     elements: {
         $loader: undefined,
@@ -332,16 +334,20 @@ export const DialogListComponent = {
     _scrollHandler(event) {
         const $element = event.target
 
-        if ($element.scrollHeight - $element.scrollTop === $element.clientHeight) {
+        if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.state.isInLoadingMoreScroll) {
+            this.state.isInLoadingMoreScroll = true
+
+            console.log("fetching next page")
+
             DialogsManager.fetchNextPage({}).then(() => {
-                console.log("fetched next page")
+                this.state.isInLoadingMoreScroll = false
             })
         }
     },
 
     /**
      * Makes the sidebar resizeable.
-     * TODO: mb will be better to have this on another file
+     * TODO: mb will be better to have this in another file
      * @private
      */
     _registerResizer() {

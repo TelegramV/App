@@ -187,12 +187,36 @@ export class Dialog {
 
     }
 
+    fetchInitialMessages() {
+        return this.fetchMessages({}).then(messages => {
+            if (messages.length > 0) {
+                DialogsManager.resolveListeners({
+                    type: "fetchedInitialMessages",
+                    dialog: this,
+                    messages: messages
+                })
+            }
+        })
+    }
+
     fetchNextPage() {
         let oldest = this._messages[Object.keys(this._messages)[0]]
 
-        return this.fetchMessages({offset_id: oldest.id})
+        return this.fetchMessages({offset_id: oldest.id}).then(messages => {
+            if (messages.length > 0) {
+                DialogsManager.resolveListeners({
+                    type: "fetchedMessagesNextPage",
+                    dialog: this,
+                    messages: messages
+                })
+            }
+        })
     }
 
+    /**
+     * @param props
+     * @return {Promise<Array<Message>>}
+     */
     fetchMessages(props = {offset_id: 0, limit: 20}) {
         return MTProto.invokeMethod("messages.getHistory", {
             peer: this.peer.inputPeer,
@@ -204,11 +228,6 @@ export class Dialog {
             min_id: 0,
             hash: 0
         }).then(messagesSlice => {
-            // __is_fetching = true
-            // __fetching_for = {
-            //     _: 0,
-            //     id: 0
-            // }
             messagesSlice.chats.forEach(chat => {
                 PeersManager.set(getPeerObject(chat))
             })
@@ -217,29 +236,13 @@ export class Dialog {
                 PeersManager.set(getPeerObject(user))
             })
 
-            const messagesToPush = []
-
-            messagesSlice.messages.forEach(message => {
+            return messagesSlice.messages.map(message => {
                 const messageToPush = new Message(this, message)
-
-                messagesToPush.push(messageToPush)
 
                 this._messages[messageToPush.id] = messageToPush
 
-                /*if (message.media) {
-                    fetchMessageMedia(message, peer)
-                }*/
+                return messageToPush
             })
-
-            //$messages[peer._][peer.id].push(...messagesToPush)
-
-            if (messagesSlice.messages.length > 0 || props.offset_id === 0) {
-                DialogsManager.resolveListeners({
-                    type: "updateManyMessages",
-                    dialog: this,
-                    messages: messagesToPush
-                })
-            }
         })
     }
 }

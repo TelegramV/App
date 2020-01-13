@@ -2,6 +2,7 @@ import {FileAPI} from "../api/fileAPI";
 import {createLogger} from "../common/logger";
 import {default as PeersManager} from "../api/peers/peersManager";
 import {getInputPeerFromPeer} from "../api/dialogs/util";
+import MTProto from "../mtproto"
 
 const Logger = createLogger("Peer")
 
@@ -9,10 +10,28 @@ export class Peer {
     constructor(peer) {
         this._peer = peer
         this._avatar = undefined
+        this._full = undefined
+
+        /**
+         * @type {Dialog|undefined}
+         * @private
+         */
+        this._dialog = undefined
     }
 
     get id() {
         return this.peer.id
+    }
+
+    /**
+     * @return {Dialog|undefined}
+     */
+    get dialog() {
+        return this._dialog
+    }
+
+    set dialog(dialog) {
+        this._dialog = dialog
     }
 
     get deleted() {
@@ -55,14 +74,23 @@ export class Peer {
         }
     }
 
+    get full() {
+        return this._full
+    }
+
+    get type() {
+        return this.peer._
+        //return this.constructor.name.toLowerCase().slice(0, -4)
+    }
+
     getAvatar(big = false) {
-        if(this._avatar)  {
+        if (this._avatar) {
             return Promise.resolve(this._avatar)
         }
-        if(!this.hasAvatar) {
+        if (!this.hasAvatar) {
             return Promise.resolve(null)
         }
-        if(this.isMin) {
+        if (this.isMin) {
             return Promise.resolve(null)
         }
 
@@ -79,9 +107,48 @@ export class Peer {
         })
     }
 
-    get type() {
-        return this.peer._
-        //return this.constructor.name.toLowerCase().slice(0, -4)
-    }
+    fetchFull() {
+        if (this.type === "channel") {
+            return MTProto.invokeMethod("channels.getFullChannel", {
+                channel: {
+                    _: "inputChannel",
+                    channel_id: this.id,
+                    access_hash: this.peer.access_hash
+                }
+            }).then(channelFull => {
+                this._full = channelFull.full_chat
 
+                PeersManager.resolveListeners({
+                    type: "fullLoaded",
+                    peer: this
+                })
+            })
+        } else if (this.type === "chat") {
+            return MTProto.invokeMethod("messages.getFullChat", {
+                chat_id: this.id
+            }).then(chatFull => {
+                this._full = chatFull.full_chat
+
+                PeersManager.resolveListeners({
+                    type: "fullLoaded",
+                    peer: this
+                })
+            })
+        } else {
+            return MTProto.invokeMethod("users.getFullUser", {
+                id: {
+                    _: "inputUser",
+                    user_id: this.id,
+                    access_hash: this.peer.access_hash
+                }
+            }).then(userFull => {
+                this._full = userFull
+
+                PeersManager.resolveListeners({
+                    type: "fullLoaded",
+                    peer: this
+                })
+            })
+        }
+    }
 }

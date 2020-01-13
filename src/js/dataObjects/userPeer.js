@@ -7,19 +7,23 @@ const Logger = createLogger("UserPeer")
 
 export class UserPeer extends Peer {
     get peerName() {
-        if(this.deleted)
+        if (this.deleted) {
             return "Deleted Account"
+        }
+
         return this.firstName + (this.lastName.length > 0 ? " " + this.lastName : "")
     }
+
     get firstName() {
         return this.peer.first_name
     }
+
     get lastName() {
         return this.peer.last_name || ""
     }
 
     get onlineStatus() {
-        if(this.deleted || !this.peer.status) {
+        if (this.deleted || !this.peer.status) {
             return {
                 online: false,
                 status: "a long time ago"
@@ -33,10 +37,10 @@ export class UserPeer extends Peer {
                 return {
                     online: true
                 }
-                // return {
-                //     online: false,
-                //     status: getLastSeenMessage(this.peer.status.expires, now)
-                // }
+            // return {
+            //     online: false,
+            //     status: getLastSeenMessage(this.peer.status.expires, now)
+            // }
             case "userStatusLastWeek":
                 return {
                     online: false,
@@ -57,12 +61,13 @@ export class UserPeer extends Peer {
                     online: false,
                     status: getLastSeenMessage(this.peer.status.was_online, now)
                 }
-            default:
             case "userStatusEmpty":
                 return {
                     online: false,
                     status: "a long time ago"
                 }
+
+            default:
         }
     }
 }

@@ -9,8 +9,9 @@ import vdom_isVNode from "./check/isVNode"
  */
 function vdom_appendToReal(vNode, $element, {xmlns = null} = {}) {
     const $mountedElement = $element.appendChild(vdom_render(vNode, xmlns))
+
     if (vdom_isVNode(vNode) && typeof vNode.mounted === "function") {
-        vNode.mounted($mountedElement)
+        vNode.mounted()
     }
 
     return $mountedElement

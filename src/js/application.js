@@ -2,12 +2,13 @@ import {MTProto} from "./mtproto"
 import {createNonce} from "./mtproto/utils/bin"
 
 import "../sass/application.scss"
-import {ImPage} from "./ui/pages/im/impage"
+import {MainPage} from "./ui/pages/main/mainPage"
 import {LoginPage} from "./ui/pages/login/nextlogin"
 import {AppFramework} from "./ui/framework/framework"
 import {loadSchema} from "./mtproto/language/schema"
 
 import "./ui/vendor/tgs_player"
+import {EventBus} from "./api/eventBus"
 
 
 const authContext = {
@@ -25,6 +26,8 @@ function start() {
         }
     })
 
+    global.UIEventBus = new EventBus()
+
     AppFramework.Router.route("/login", "login", {
         h() {
             return LoginPage()
@@ -33,7 +36,7 @@ function start() {
 
     AppFramework.Router.route("/", "main", {
         h() {
-            return ImPage()
+            return MainPage()
         }
     })
 

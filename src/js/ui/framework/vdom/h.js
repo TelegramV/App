@@ -87,7 +87,6 @@ function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], 
 
     // named component
     if (vdom_isNamedComponent(tagName)) {
-        const vNode = tagName.h.bind(tagName)(Object.assign(attrs, {slot: children}))
 
         // todo: rewrite this shit
         tagName.render = (function () {
@@ -97,11 +96,20 @@ function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], 
             if (this.updated) {
                 this.updated()
             }
-        }).bind(tagName)
+        })
+
+        for (const [key, value] of Object.entries(tagName)) {
+            if (typeof value === "function") {
+                tagName[key] = value.bind(tagName)
+            }
+        }
+
+        const vNode = tagName.h(Object.assign(attrs, {slot: children}))
 
         vNode.component = tagName
         vNode.attrs["data-component"] = tagName.name
         vNode.renderIf = renderIf
+
         if (tagName.created) {
             vNode.created = tagName.created.bind(tagName)
         }

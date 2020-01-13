@@ -17,7 +17,7 @@ function initUIManagers() {
     PeersManager.init()
 }
 
-export function ImPage() {
+export function MainPage() {
     VDOM.appendToReal(<DialogListComponent/>, $imPageElement)
 
     VDOM.appendToReal(<MessagesWrapperComponent/>, $imPageElement)

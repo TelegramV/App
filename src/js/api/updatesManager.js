@@ -7,7 +7,9 @@ import {getPeerObject} from "../dataObjects/peerFactory";
 import {Message} from "../dataObjects/message";
 import {getInputFromPeer, getInputPeerFromPeer} from "./dialogs/util";
 
-const Logger = createLogger("UpdateManager")
+const Logger = createLogger("UpdateManager", {
+    level: "log"
+})
 
 class UpdateManager extends Manager {
     constructor() {
@@ -23,10 +25,10 @@ class UpdateManager extends Manager {
             "updates.channelDifferenceTooLong",
         ]
 
-        this._channelStack = []
+        this._channelQueue = []
         this._channelStackResolving = false
 
-        this._userStack = []
+        this._userQueue = []
         this._userStackResolving = false
     }
 
@@ -137,7 +139,7 @@ class UpdateManager extends Manager {
     }
 
     pushToChannelStack(_update) {
-        this._channelStack.push(_update)
+        this._channelQueue.push(_update)
 
         if (!this._channelStackResolving) {
             this.resolveChannelStack()
@@ -145,7 +147,7 @@ class UpdateManager extends Manager {
     }
 
     pushToUserStack(_update) {
-        this._userStack.push(_update)
+        this._userQueue.push(_update)
 
         if (!this._userStackResolving) {
             this.resolveUserStack()
@@ -240,11 +242,11 @@ class UpdateManager extends Manager {
     }
 
     resolveChannelStack() {
-        if (this._channelStack.length > 0 && !this._channelStackResolving) {
+        if (this._channelQueue.length > 0 && !this._channelStackResolving) {
             this._channelStackResolving = true
 
             try {
-                const update = this._channelStack[0]
+                const update = this._channelQueue[0]
 
                 if (update._.endsWith("ChannelMessage") || update._.endsWith("ChannelMessages")) {
                     this._processChannelMessageUpdate(update)
@@ -276,7 +278,7 @@ class UpdateManager extends Manager {
                     this.resolveUpdateListeners(update)
                 }
 
-                this._channelStack.shift()
+                this._channelQueue.shift()
 
                 this._channelStackResolving = false
 
@@ -284,7 +286,7 @@ class UpdateManager extends Manager {
             } catch
                 (e) {
                 console.error(e)
-                this._channelStack.shift()
+                this._channelQueue.shift()
 
                 this._channelStackResolving = false
 
@@ -294,11 +296,11 @@ class UpdateManager extends Manager {
     }
 
     resolveUserStack() {
-        if (this._userStack.length > 0 && !this._userStackResolving) {
+        if (this._userQueue.length > 0 && !this._userStackResolving) {
             this._userStackResolving = true
 
             try {
-                const update = this._userStack[0]
+                const update = this._userQueue[0]
 
                 if (update._.endsWith("Message") || update._.endsWith("Messages")) {
                     // console.warn("message update", update)
@@ -350,7 +352,7 @@ class UpdateManager extends Manager {
                     this.resolveUpdateListeners(update)
                 }
 
-                this._userStack.shift()
+                this._userQueue.shift()
 
                 this._userStackResolving = false
 
@@ -358,7 +360,7 @@ class UpdateManager extends Manager {
             } catch
                 (e) {
                 console.error(e)
-                this._userStack.shift()
+                this._userQueue.shift()
 
                 this._userStackResolving = false
 

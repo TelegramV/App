@@ -9,7 +9,7 @@ function vdom_prependToReal(vNode, $element) {
     const $createdElement = vdom_render(vNode)
     $element.prepend($createdElement)
     if (typeof vNode.mounted === "function") {
-        vNode.mounted($createdElement)
+        vNode.mounted()
     }
     return $createdElement
 }

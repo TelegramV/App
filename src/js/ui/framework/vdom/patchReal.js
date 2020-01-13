@@ -105,11 +105,11 @@ function vdom_patchReal($node, newVNode) {
     // todo: uncomment this
     // named components check
     // if names are different then replace all tree
-    // if ($node.hasAttribute("data-component") || newVNode.attrs["data-component"] !== undefined) {
-    //     if ($node.getAttribute("data-component") !== newVNode.attrs["data-component"]) {
-    //         return vdom_mount(newVNode, $node)
-    //     }
-    // }
+    if ($node.hasAttribute("data-component") || newVNode.attrs["data-component"] !== undefined) {
+        if ($node.getAttribute("data-component") !== newVNode.attrs["data-component"]) {
+            return vdom_mount(newVNode, $node)
+        }
+    }
 
     // if tagNames are different then replace all tree
     if ($node.tagName.toLowerCase() !== newVNode.tagName) {

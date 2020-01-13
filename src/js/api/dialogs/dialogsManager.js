@@ -12,15 +12,26 @@ import {ChannelPeer} from "../../dataObjects/channelPeer";
 import {Peer} from "../../dataObjects/peer";
 import {Message} from "../../dataObjects/message";
 import {PeerAPI} from "../peerAPI"
+import {arrayDelete} from "../../common/utils/utils"
 
 class DialogManager extends Manager {
     constructor() {
         super()
+        /**
+         * @type {Map<string, Map<number, Dialog>>}
+         */
         this.dialogs = new Map([
             ["chat", new Map()],
             ["channel", new Map()],
             ["user", new Map()],
         ])
+
+        this.initListeners = new Map([
+            ["chat", new Map()],
+            ["channel", new Map()],
+            ["user", new Map()],
+        ])
+
         this.latestDialog = undefined
         this.dialogsOffsetDate = 0 // TODO
         this.offsetDate = 0
@@ -221,74 +232,74 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateShort", async update => {
-            if (update._ === "updateUserStatus") {
-                const dialog = this.find("user", update.user_id)
-
-                if (dialog && dialog.peer instanceof UserPeer) {
-                    dialog.peer.peer.status = update.status
-                    this.resolveListeners({
-                        type: "updateUserStatus",
-                        dialog: dialog
-                    })
-                }
-            } else if (update._ === "updateChatUserTyping") {
-                const dialog = this.find("chat", update.chat_id) || this.find("channel", update.chat_id)
-
-                if (!dialog) {
-                    return; // prob should download the chat
-                }
-
-                let peer = PeersManager.find("user", update.user_id)
-                if (!peer) {
-                    await this.updateChatFull(dialog)
-
-                    peer = PeersManager.find("user", update.user_id)
-                    if (!peer) {
-                        return
-                    }
-                }
-                if (dialog && peer) {
-                    dialog.addMessageAction(peer, update.action)
-                    this.resolveListeners({
-                        type: "updateSingle",
-                        dialog: dialog
-                    })
-                }
-
-            } else if (update._ === "updateUserTyping") {
-                // console.log(update)
-                const dialog = this.find("user", update.user_id)
-
-                if (!dialog) {
-                    return; // prob should download the chat
-                }
-
-                if (dialog) {
-                    dialog.addMessageAction(dialog.peer, update.action)
-                    this.resolveListeners({
-                        type: "updateSingle",
-                        dialog: dialog
-                    })
-                }
-            } else if (update._ === "updateReadChannelOutbox") {
-                const dialog = this.find("channel", update.channel_id)
-
-                if (!dialog) {
-                    return // prob should be fixed
-                }
-
-                dialog._dialog.read_outbox_max_id = update.max_id
-                this.resolveListeners({
-                    type: "updateSingle",
-                    dialog: dialog
-                })
-            } else if (update._ === "updateReadHistoryOutbox") {
-                console.log("updateReadHistoryOutbox", update)
-            } else {
-                console.log("Short", update)
-            }
-        })
+        // MTProto.UpdatesManager.listenUpdate("updateShort", async update => {
+        //     if (update._ === "updateUserStatus") {
+        //         const dialog = this.find("user", update.user_id)
+        //
+        //         if (dialog && dialog.peer instanceof UserPeer) {
+        //             dialog.peer.peer.status = update.status
+        //             this.resolveListeners({
+        //                 type: "updateUserStatus",
+        //                 dialog: dialog
+        //             })
+        //         }
+        //     } else if (update._ === "updateChatUserTyping") {
+        //         const dialog = this.find("chat", update.chat_id) || this.find("channel", update.chat_id)
+        //
+        //         if (!dialog) {
+        //             return; // prob should download the chat
+        //         }
+        //
+        //         let peer = PeersManager.find("user", update.user_id)
+        //         if (!peer) {
+        //             await this.updateChatFull(dialog)
+        //
+        //             peer = PeersManager.find("user", update.user_id)
+        //             if (!peer) {
+        //                 return
+        //             }
+        //         }
+        //         if (dialog && peer) {
+        //             dialog.addMessageAction(peer, update.action)
+        //             this.resolveListeners({
+        //                 type: "updateSingle",
+        //                 dialog: dialog
+        //             })
+        //         }
+        //
+        //     } else if (update._ === "updateUserTyping") {
+        //         // console.log(update)
+        //         const dialog = this.find("user", update.user_id)
+        //
+        //         if (!dialog) {
+        //             return; // prob should download the chat
+        //         }
+        //
+        //         if (dialog) {
+        //             dialog.addMessageAction(dialog.peer, update.action)
+        //             this.resolveListeners({
+        //                 type: "updateSingle",
+        //                 dialog: dialog
+        //             })
+        //         }
+        //     } else if (update._ === "updateReadChannelOutbox") {
+        //         const dialog = this.find("channel", update.channel_id)
+        //
+        //         if (!dialog) {
+        //             return // prob should be fixed
+        //         }
+        //
+        //         dialog._dialog.read_outbox_max_id = update.max_id
+        //         this.resolveListeners({
+        //             type: "updateSingle",
+        //             dialog: dialog
+        //         })
+        //     } else if (update._ === "updateReadHistoryOutbox") {
+        //         console.log("updateReadHistoryOutbox", update)
+        //     } else {
+        //         console.log("Short", update)
+        //     }
+        // })
     }
 
     fetchNextPage({limit = 10}) {
@@ -308,7 +319,7 @@ class DialogManager extends Manager {
     /**
      * @param type
      * @param id
-     * @return {Dialog}
+     * @return {Dialog|undefined}
      */
     find(type, id) {
         return this.dialogs.get(type).get(id)
@@ -329,15 +340,19 @@ class DialogManager extends Manager {
         return this.find(type, id)
     }
 
+    /**
+     * @param {string} username
+     * @return {null|Dialog}
+     */
     findByUsername(username) {
-        return null // todo: fix
-        for (const [k, data] of Object.entries(this.dialogs)) {
-            for (const [id, dialog] of Object.entries(data)) {
+        for (const [_, data] of this.dialogs.entries()) {
+            for (const [_, dialog] of data.entries()) {
                 if (dialog.peer.username === username) {
                     return dialog
                 }
             }
         }
+
         return null
     }
 
@@ -514,12 +529,30 @@ class DialogManager extends Manager {
         })
     }
 
-    set(dialog, dispatchEvent = true) {
+    listenInit(type, id, callback) {
+        if (!this.initListeners.get(type).has(id)) {
+            this.initListeners.get(type).set(id, [])
+        }
+
+        this.initListeners.get(type).get(id).push(callback)
+    }
+
+    set(dialog, fireUpdateSingle = true) {
         if (dialog instanceof Dialog) {
             this.dialogs.get(dialog.type).set(dialog.id, dialog)
 
-            if (dispatchEvent) {
-                console.log("setting")
+            if (this.initListeners.get(dialog.type).has(dialog.id)) {
+                this.initListeners.get(dialog.type).get(dialog.id).forEach(listener => {
+                    try {
+                        listener(dialog)
+                        arrayDelete(this.initListeners.get(dialog.type).get(dialog.id), listener)
+                    } catch (e) {
+                        arrayDelete(this.initListeners.get(dialog.type).get(dialog.id), listener)
+                    }
+                })
+            }
+
+            if (fireUpdateSingle) {
                 this.resolveListeners({
                     type: "updateSingle", // todo: create specific event
                     dialog

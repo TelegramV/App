@@ -32,7 +32,7 @@ export function getAudio() {
 
 export const Pinned = () => {
     if (audio) {
-        return <div className="pin active-audio">
+        return <div id="messages-wrapper-pinned" className="pin active-audio">
         			<div className="play tgico tgico-play"/>
         			<div className="text-wrapper">
                 		<div className="title">Pinned message</div>
@@ -41,11 +41,11 @@ export const Pinned = () => {
                 </div>
     }
     if (pinned) {
-        return <div className="pin pinned-message">
+        return <div id="messages-wrapper-pinned" className="pin pinned-message">
                 	<div className="title">Pinned message</div>
                 	<div className="description">See you tomorrow at 18:00 at the park</div>
                 </div>
     } else {
-        return <div className="pin pinned-message"/>
+        return <div id="messages-wrapper-pinned" className="pin pinned-message"/>
     }
 }

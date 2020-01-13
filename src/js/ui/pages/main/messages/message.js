@@ -206,7 +206,7 @@ export function UICreateMessage(message) {
     }
 
     const handlers = {
-        // photo: vMessageWithImageTemplate,
+        photo: vMessageWithImageTemplate,
         text: TextMessageComponent,
         // round: vMessageWithRoundVideoTemplate,
         // video: vMessageWithVideoTemplate,

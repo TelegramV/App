@@ -20,7 +20,7 @@ export class Message {
     }
 
     get text() {
-        return this._message.message
+        return this._message.message || ""
     }
 
     get entities() {
@@ -91,5 +91,13 @@ export class Message {
         if (message.media) {
 
         }
+    }
+
+    get rawMessage() {
+        return this._message
+    }
+
+    get media() {
+        return this._message.media
     }
 }
