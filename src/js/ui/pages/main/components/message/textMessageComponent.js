@@ -16,7 +16,7 @@ const TextMessageComponent = {
             classes += " read"
         }
 
-        const username = message.from.username && !message.isPost && !message.isOut
+        const username = message.from.peerName && !message.isPost && !message.isOut
         let text = parseMessageEntities(message.text, message.entities)
 
         if (message.rawMessage.fwd_from) {
@@ -38,7 +38,7 @@ const TextMessageComponent = {
         return (
             <MessageComponent message={message}>
                 <div className={classes}>
-                    {username ? <div className="username">{username}</div> : ""}
+                    {username ? <div className="username">{message.from.peerName}</div> : ""}
 
                     <div className={`message ${username ? "nopad" : ""}`}>
                         <span dangerouslySetInnerHTML={text}/>

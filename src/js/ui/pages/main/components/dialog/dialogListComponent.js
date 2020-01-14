@@ -1,6 +1,9 @@
 import DialogsManager from "../../../../../api/dialogs/dialogsManager"
-import PeersManager from "../../../../../api/peers/peersManager"
 import {DialogComponent} from "./dialogComponent"
+import {AppFramework} from "../../../../framework/framework"
+import DialogsStore from "../../../../../api/store/dialogsStore"
+import {parseHashQuery} from "../message/messagesWrapperComponent"
+import AppEvents from "../../../../../api/eventBus/appEvents"
 
 /**
  * CRITICAL: Never rerender this component!!!
@@ -20,7 +23,9 @@ export const DialogListComponent = {
             ["user", new Map()],
         ]),
 
-        isInLoadingMoreScroll: false
+        isInLoadingMoreScroll: false,
+
+        selectedDialog: undefined,
     },
     elements: {
         $loader: undefined,
@@ -70,8 +75,26 @@ export const DialogListComponent = {
             this.elements.$generalDialogs.style.display = ""
         })
 
-        DialogsManager.listenUpdates(this._handleDialogUpdates.bind(this))
-        PeersManager.listenUpdates(this._handlePeerUpdates.bind(this))
+        AppEvents.Dialogs.listenAny(this._handleDialogUpdates)
+        AppEvents.Peers.listenAny(this._handlePeerUpdates)
+
+
+        AppFramework.Router.onQueryChange(queryParams => {
+            if (queryParams.p) {
+                const previous = this.state.selectedDialog
+
+                if (queryParams.p.startsWith("@")) {
+                    this.state.selectedDialog = DialogsStore.getByUsername(queryParams.p.substring(1))
+                } else {
+                    const queryPeer = parseHashQuery()
+                    this.state.selectedDialog = DialogsStore.get(queryPeer.type, queryPeer.id)
+                }
+
+                this._patchSelectedDialog(previous)
+            } else {
+
+            }
+        })
 
         this._registerResizer()
     },
@@ -90,9 +113,9 @@ export const DialogListComponent = {
         let $rendered = dialogElements.get(dialog.id) || false
 
         if ($rendered) {
-            if (String(dialog.pinned) !== $rendered.dataset.pinned) {
+            if (String(dialog.isPinned) !== $rendered.dataset.pinned) {
 
-                if (dialog.pinned) {
+                if (dialog.isPinned) {
                     this.elements.$pinnedDialogs.prepend($rendered)
                 } else {
                     const $foundRendered = this._findRenderedDialogToInsertBefore(dialog, $rendered)
@@ -102,8 +125,8 @@ export const DialogListComponent = {
                     }
                 }
 
-            } else if (parseInt($rendered.dataset.date) !== dialog.lastMessage.date) {
-                if (!dialog.pinned) {
+            } else if (parseInt($rendered.dataset.date) !== dialog.messages.last.date) {
+                if (!dialog.isPinned) {
                     const $foundRendered = this._findRenderedDialogToInsertBefore(dialog, $rendered)
 
                     if ($foundRendered) {
@@ -120,7 +143,7 @@ export const DialogListComponent = {
             const newVDialog = <DialogComponent dialog={dialog}/>
 
             if (appendOrPrepend === "append") {
-                if (dialog.pinned) {
+                if (dialog.isPinned) {
                     $rendered = VDOM.appendToReal(newVDialog, this.elements.$pinnedDialogs)
                     dialogElements.set(dialog.id, $rendered)
                 } else {
@@ -128,7 +151,7 @@ export const DialogListComponent = {
                     dialogElements.set(dialog.id, $rendered)
                 }
             } else if (appendOrPrepend === "prepend") {
-                if (dialog.pinned) {
+                if (dialog.isPinned) {
                     $rendered = VDOM.prependToReal(newVDialog, this.elements.$pinnedDialogs)
                     dialogElements.set(dialog.id, $rendered)
                 } else {
@@ -136,7 +159,7 @@ export const DialogListComponent = {
                     dialogElements.set(dialog.id, $rendered)
                 }
             } else {
-                if (dialog.pinned) {
+                if (dialog.isPinned) {
                     $rendered = VDOM.prependToReal(newVDialog, this.elements.$pinnedDialogs)
                     dialogElements.set(dialog.id, $rendered)
                 } else {
@@ -175,7 +198,7 @@ export const DialogListComponent = {
          */
         let $dialog = undefined
 
-        const lastMessageDate = parseInt(dialog.lastMessage.date)
+        const lastMessageDate = parseInt(dialog.messages.last.date)
 
         renderedDialogs.forEach($rendered => {
             if ($rendered !== $ignore && $rendered.dataset.pinned !== "true") {
@@ -250,47 +273,57 @@ export const DialogListComponent = {
         switch (event.type) {
             case "updateMany":
                 event.pinnedDialogs.forEach(dialog => {
-                    this._renderDialog.bind(this)(dialog, "append")
+                    this._renderDialog(dialog, "append")
                 })
 
                 event.dialogs.forEach(dialog => {
-                    this._renderDialog.bind(this)(dialog, "append")
+                    this._renderDialog(dialog, "append")
                 })
+
+                break
+
+            case "newMessage":
+                this._renderDialog(event.dialog)
 
                 break
 
             case "updateSingle":
-                this._renderDialog.bind(this)(event.dialog)
+                this._renderDialog(event.dialog)
 
                 break
 
             case "updateDraftMessage":
-                this._renderDialog.bind(this)(event.dialog)
+                this._renderDialog(event.dialog)
 
                 break
 
             case "updateReadHistoryInbox":
-                this._patchDialog.bind(this)(event.dialog)
+                this._patchDialog(event.dialog)
+
+                break
+
+            case "readHistory":
+                this._patchDialog(event.dialog)
 
                 break
 
             case "updateReadHistoryOutbox":
-                this._patchDialog.bind(this)(event.dialog)
+                this._patchDialog(event.dialog)
 
                 break
 
             case "updateReadChannelInbox":
-                this._patchDialog.bind(this)(event.dialog)
+                this._patchDialog(event.dialog)
 
                 break
 
             case "updateReadChannelOutbox":
-                this._patchDialog.bind(this)(event.dialog)
+                this._patchDialog(event.dialog)
 
                 break
 
-            case "updateUserStatus":
-                this._patchDialog.bind(this)(event.dialog)
+            case "updatePinned":
+                this._renderDialog(event.dialog)
 
                 break
 
@@ -307,7 +340,18 @@ export const DialogListComponent = {
             }
         }
 
-        VDOM.patchReal($dialog, <DialogComponent dialog={dialog}/>)
+        VDOM.patchReal($dialog, <DialogComponent dialog={dialog}
+                                                 selected={this.state.selectedDialog && dialog.id === this.state.selectedDialog.id}/>)
+    },
+
+    _patchSelectedDialog(previous = false) {
+        if (this.state.selectedDialog) {
+            if (previous) {
+                this._patchDialog(previous)
+            }
+
+            this._patchDialog(this.state.selectedDialog)
+        }
     },
 
     /**
@@ -316,13 +360,16 @@ export const DialogListComponent = {
      * @private
      */
     _handlePeerUpdates(event) {
+        const dialog = DialogsStore.get(event.peer.type, event.peer.id)
+
         if (event.type === "updatePhoto") {
-            const dialog = DialogsManager.find(event.peer.type, event.peer.id)
             if (dialog) {
-                this._patchDialog.bind(this)(dialog)
+                this._patchDialog(dialog)
             }
-        } else {
-            Logger.log("PeerUpdates", event)
+        } else if (event.type === "updateUserStatus") {
+            if (dialog) {
+                this._patchDialog(dialog)
+            }
         }
     },
 
@@ -377,23 +424,27 @@ export const DialogListComponent = {
         }
 
         const resize = event => {
-            const computedSize = parseInt(getComputedStyle($element).width) + event.x - prevPosition
-
-            if (computedSize < 150 && $searchElement) {
-                $searchElement.classList.add("d-none")
-            } else {
-                $searchElement.classList.remove("d-none")
-            }
-
-            if (computedSize <= (MIN_WIDTH + 20) && !sticked) {
+            if (this.state.renderedDialogsElements.size > 50) {
                 setmin()
-                prevPosition = event.x
-            } else if (computedSize >= MIN_WIDTH) {
-                sticked = false
-                $element.style.width = `${computedSize}px`
-                prevPosition = event.x
-                $searchElement.classList.remove("d-none")
-                $connectingMessageText.classList.remove("d-none")
+            } else {
+                const computedSize = parseInt(getComputedStyle($element).width) + event.x - prevPosition
+
+                if (computedSize < 150 && $searchElement) {
+                    $searchElement.classList.add("d-none")
+                } else {
+                    $searchElement.classList.remove("d-none")
+                }
+
+                if (computedSize <= (MIN_WIDTH + 20) && !sticked) {
+                    setmin()
+                    prevPosition = event.x
+                } else if (computedSize >= MIN_WIDTH) {
+                    sticked = false
+                    $element.style.width = `${computedSize}px`
+                    prevPosition = event.x
+                    $searchElement.classList.remove("d-none")
+                    $connectingMessageText.classList.remove("d-none")
+                }
             }
         }
 

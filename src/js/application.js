@@ -17,7 +17,6 @@ const authContext = {
     sessionID: createNonce(8) // TODO check if secure?
 }
 
-
 function start() {
     MTProto.invokeMethod("help.getNearestDc", {}).then(response => {
         if (response.this_dc !== response.nearest_dc) {
@@ -66,7 +65,5 @@ function start() {
 
     AppFramework.mount("#app")
 }
-
-// loadSchema().then(() => authKeyCreation())
 
 loadSchema().then(() => MTProto.connect(authContext).then(start))

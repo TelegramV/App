@@ -70,7 +70,7 @@ a {
 
 
 ::-webkit-scrollbar {
-    width: 8px;
+    width: 5px;
     border-radius: 5px;
 }
 
@@ -80,14 +80,14 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba($darkgrey, .5);
+    background: rgba($darkgrey, .3);
     border: solid 3px transparent;
     border-radius: 5px;
     min-height: 50px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba($darkgrey, .8)
+    background: rgba($darkgrey, .5);
 }
 
 body {

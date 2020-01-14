@@ -1,28 +1,198 @@
-import {createLogger} from "../common/logger";
 import MTProto from "../mtproto";
 import {Message} from "./message";
 import {tsNow} from "../mtproto/timeManager";
 import {generateDialogIndex} from "../api/dialogs/messageIdManager";
 import PeersManager from "../api/peers/peersManager";
-import DialogsManager from "../api/dialogs/dialogsManager";
-import {getPeerObject} from "./peerFactory";
-import {UserPeer} from "./userPeer";
+import {getInputFromPeer, getInputPeerFromPeer} from "../api/dialogs/util"
+import PeersStore from "../api/store/peersStore"
+import {Peer} from "./peer/peer"
+import {DialogMessages} from "./dialogMessages"
+import AppEvents from "../api/eventBus/appEvents"
+import {DraftMessage} from "./draftMessage"
 
-const Logger = createLogger(Dialog)
+/**
+ * @property {Dialog} dialog
+ */
+class DialogAPI {
 
-export class Dialog {
-    constructor(dialog, peer, lastMessage) {
-        this._dialog = dialog
-        this._peer = peer
-        this._lastMessage = new Message(this, lastMessage) // todo factory?
-        // TODO move lastMessage to messages
-        this._messages = {}
-        this.messageActions = {}
-        this._unreadMessageIds = new Set()
+    /**
+     * @param {Dialog} dialog
+     */
+    constructor(dialog) {
+        this.dialog = dialog
     }
 
-    get dialog() {
-        return this._dialog
+    /**
+     * @param props
+     * @return {Promise<Message[]>}
+     */
+    async getHistory(props = {offset_id: 0, limit: 20}) {
+        const messagesSlice = await MTProto.invokeMethod("messages.getHistory", {
+            peer: this.dialog.peer.inputPeer,
+            offset_id: props.offset_id,
+            offset_date: 0,
+            add_offset: 0,
+            limit: props.limit || 20,
+            max_id: 0,
+            min_id: 0,
+            hash: 0
+        })
+
+        messagesSlice.chats.forEach(chat => {
+            PeersManager.setFromRawAndFire(chat)
+        })
+
+        messagesSlice.users.forEach(user => {
+            PeersManager.setFromRawAndFire(user)
+        })
+
+        return messagesSlice.messages.map(rawMessage => {
+            return new Message(this.dialog, rawMessage)
+        })
+    }
+
+
+    fetchInitialMessages() {
+        return this.getHistory({}).then(messages => {
+            if (messages.length > 0) {
+                this.dialog.messages.appendMany(messages)
+
+                AppEvents.Dialogs.fire("fetchedInitialMessages", {
+                    dialog: this.dialog,
+                    messages: messages
+                })
+            }
+        })
+    }
+
+
+    setPinned(pinned) {
+        return MTProto.invokeMethod("messages.toggleDialogPin", {
+            peer: {
+                _: "inputDialogPeer"
+            },
+            pinned
+        }).then(l => {
+            this.pinned = l
+        })
+    }
+
+    fetchNextPage() {
+        let oldest = this.dialog.messages.oldest
+
+        return this.getHistory({offset_id: oldest.id}).then(messages => {
+            if (messages.length > 0) {
+                this.dialog.messages.appendMany(messages)
+
+                AppEvents.Dialogs.fire("fetchedMessagesNextPage", {
+                    dialog: this.dialog,
+                    messages: messages
+                })
+            }
+        })
+    }
+
+    readAllHistory() {
+        if (this.dialog.type === "channel") {
+            return MTProto.invokeMethod("channels.readHistory", {
+                channel: getInputFromPeer(this.dialog.type, this.dialog.peer.id, this.dialog.peer.peer.access_hash),
+                max_id: this.dialog.messages.last.id
+            }).then(response => {
+                if (response._ === "boolTrue") {
+                    this.dialog.messages.clearUnread()
+                    AppEvents.Dialogs.fire("readHistory", {
+                        dialog: this.dialog
+                    })
+                }
+            })
+        } else {
+            return MTProto.invokeMethod("messages.readHistory", {
+                peer: getInputPeerFromPeer(this.dialog.type, this.dialog.peer.id, this.dialog.peer.peer.access_hash),
+                max_id: this.dialog.messages.last.id
+            }).then(response => {
+                this.dialog.messages.clearUnread()
+                AppEvents.Dialogs.fire("readHistory", {
+                    dialog: this.dialog
+                })
+            })
+        }
+    }
+}
+
+export class Dialog {
+
+    /**
+     * @param {Object} rawDialog
+     * @param {Peer} peer
+     * @param {Message} topMessage
+     */
+    constructor(rawDialog, {
+        peer,
+        topMessage
+    }) {
+        this._rawDialog = rawDialog
+
+        this._pinned = false
+        this._unreadMark = false
+
+        if (peer) {
+            if (peer instanceof Peer) {
+                this._peer = peer
+            } else {
+                throw new Error("invalid peer")
+            }
+        } else {
+            this._peer = undefined // lazy init
+        }
+
+        this._readInboxMaxId = -1
+        this._readOutboxMaxId = -1
+        this._unreadMentionsCount = 0
+        this._pts = 0
+        this._draft = DraftMessage.createEmpty(this)
+        this._folderId = undefined
+
+        if (topMessage) {
+            if (topMessage instanceof Message) {
+                topMessage.dialog = this
+                this._messages = new DialogMessages(this, [topMessage])
+            } else {
+                throw new Error("invalid message")
+            }
+        } else {
+            this._messages = new DialogMessages(this)
+        }
+
+        this._API = new DialogAPI(this)
+
+        this.fillRaw(rawDialog)
+
+        this._activeActions = new Map()
+
+        this.messageActions = {}
+    }
+
+    get API() {
+        return this._API
+    }
+
+    get pts() {
+        return this._pts
+    }
+
+    set pts(pts) {
+        this._pts = pts
+    }
+
+    get raw() {
+        return this._rawDialog
+    }
+
+    /**
+     * @return {DialogMessages}
+     */
+    get messages() {
+        return this._messages
     }
 
     /**
@@ -36,15 +206,14 @@ export class Dialog {
         return this.peer.id
     }
 
-    get pinned() {
-        return this.dialog.pFlags.pinned || false
+    get isPinned() {
+        return this._pinned
     }
 
     set pinned(pinned) {
-        this.dialog.pFlags.pinned = pinned || false
+        this._pinned = pinned || false
 
-        DialogsManager.resolveListeners({
-            type: "updateSingle",
+        AppEvents.Dialogs.fire("updatePinned", {
             dialog: this
         })
     }
@@ -54,68 +223,60 @@ export class Dialog {
     }
 
     get draft() {
-        return this._dialog.draft && this._dialog.draft._ !== "draftMessageEmpty" ? this._dialog.draft.message : null
+        return this._draft
     }
 
     get notifySettings() {
-        return this.dialog.notify_settings
+        return this.raw.notify_settings
     }
 
-    get muted() {
+    get isMuted() {
         return this.notifySettings.mute_until >= tsNow(true)
     }
 
-    get unreadCount() {
-        return this._dialog.unread_count + this._unreadMessageIds.size
-    }
-
     get unreadMark() {
-        return this._dialog.pFlags.unread_mark
+        return this._unreadMark
     }
 
     get unreadMentionsCount() {
-        return this._dialog.unread_mentions_count
+        return this._unreadMentionsCount
     }
 
     get readOutbox() {
-        return this._dialog.read_outbox_max_id
-    }
-
-    get lastMessage() {
-        return this._lastMessage
-    }
-
-    set lastMessage(lastMessage) {
-        // TODO cause update?
-        this._lastMessage = lastMessage
-
-        if (lastMessage.from instanceof UserPeer) {
-            this.removeMessageAction(lastMessage.from)
-        }
-
-        if (!lastMessage.isOut) {
-            this._unreadMessageIds.add(lastMessage.id)
-        }
-
-        DialogsManager.resolveListeners({
-            type: "updateSingle",
-            dialog: this
-        })
+        return this._readOutboxMaxId
     }
 
     get index() {
-        return generateDialogIndex(this.lastMessage.date)
+        return generateDialogIndex(this.messages.last.date)
     }
 
     get type() {
         return this.peer.type
     }
 
-    clearUnreadCount() {
-        this._unreadMessageIds.clear()
-        this._dialog.unread_count = 0
-        this._dialog.unread_mentions_count = 0
+    fillRaw(rawDialog) {
+        this._pinned = rawDialog.pFlags.pinned || false
+        this._unreadMark = rawDialog.pFlags.unread_mark || false
+        if (!this._peer) {
+            this._peer = PeersStore.getFromDialogRawPeer(rawDialog.peer) // handle not found
+        }
+        this._readInboxMaxId = rawDialog.read_inbox_max_id || -1
+        this._readOutboxMaxId = rawDialog.read_outbox_max_id || -1
+        this.messages.unreadCount = rawDialog.unread_count || 0
+        this._unreadMentionsCount = rawDialog.unread_mentions_count || 0
+        this._pts = rawDialog.pts || 0
+        this._draft = new DraftMessage(this, rawDialog.draft)
     }
+
+
+    fillRawAndFire(rawDialog) {
+        this.fillRaw(rawDialog)
+
+        AppEvents.Dialogs.fire("updateSingle", {
+            dialog: this
+        })
+    }
+
 
     addMessageAction(user, action) {
         this.messageActions[user.id] = {
@@ -133,116 +294,9 @@ export class Dialog {
         if (this.messageActions[user.id]) {
             delete this.messageActions[user.id]
 
-            DialogsManager.resolveListeners({
-                type: "updateSingle",
+            AppEvents.Dialogs.fire("updateSingle", {
                 dialog: this
             })
         }
-    }
-
-    removeUnreadMessages(messages) {
-        messages.forEach(mId => {
-            if (this._unreadMessageIds.has(mId)) {
-                this._unreadMessageIds.delete(mId)
-            } else {
-                this.decrementUnreadCountWithoutUpdate()
-            }
-        })
-
-        DialogsManager.resolveListeners({
-            type: "updateSingle",
-            dialog: this
-        })
-    }
-
-    setPinned(pinned) {
-        return MTProto.invokeMethod("messages.toggleDialogPin", {
-            peer: {
-                _: "inputDialogPeer"
-            },
-            pinned
-        }).then(l => {
-            this.dialog.pFlags.pinned = l
-        })
-    }
-
-    incrementUnreadCount() {
-        ++this._dialog.unread_count
-
-        DialogsManager.resolveListeners({
-            type: "updateSingle",
-            dialog: this
-        })
-    }
-
-    incrementUnreadCountWithoutUpdate() {
-        return ++this._dialog.unread_count
-    }
-
-    decrementUnreadCountWithoutUpdate() {
-        return this._dialog.unread_count > 0 ? --this._dialog.unread_count : 0
-    }
-
-    handleUpdate(update) {
-
-    }
-
-    fetchInitialMessages() {
-        return this.fetchMessages({}).then(messages => {
-            if (messages.length > 0) {
-                DialogsManager.resolveListeners({
-                    type: "fetchedInitialMessages",
-                    dialog: this,
-                    messages: messages
-                })
-            }
-        })
-    }
-
-    fetchNextPage() {
-        let oldest = this._messages[Object.keys(this._messages)[0]]
-
-        return this.fetchMessages({offset_id: oldest.id}).then(messages => {
-            if (messages.length > 0) {
-                DialogsManager.resolveListeners({
-                    type: "fetchedMessagesNextPage",
-                    dialog: this,
-                    messages: messages
-                })
-            }
-        })
-    }
-
-    /**
-     * @param props
-     * @return {Promise<Array<Message>>}
-     */
-    fetchMessages(props = {offset_id: 0, limit: 20}) {
-        return MTProto.invokeMethod("messages.getHistory", {
-            peer: this.peer.inputPeer,
-            offset_id: props.offset_id,
-            offset_date: 0,
-            add_offset: 0,
-            limit: props.limit || 20,
-            max_id: 0,
-            min_id: 0,
-            hash: 0
-        }).then(messagesSlice => {
-            messagesSlice.chats.forEach(chat => {
-                PeersManager.set(getPeerObject(chat))
-            })
-
-            messagesSlice.users.forEach(user => {
-                PeersManager.set(getPeerObject(user))
-            })
-
-            return messagesSlice.messages.map(message => {
-                const messageToPush = new Message(this, message)
-
-                this._messages[messageToPush.id] = messageToPush
-
-                return messageToPush
-            })
-        })
     }
 }

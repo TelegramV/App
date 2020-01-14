@@ -29,7 +29,7 @@ export function addRipple() {
     }
 }
 
-setInterval(addRipple, 5000);
+// setInterval(addRipple, 5000);
 
 export const create$loadingNode = () => VDOM.render(vLoadingNode)
 

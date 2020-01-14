@@ -4,15 +4,15 @@ import MessagesWrapperChatInfoComponent from "./messagesWrapperChatInfoComponent
 import {AppFramework} from "../../../../framework/framework"
 import DialogsManager from "../../../../../api/dialogs/dialogsManager"
 import VDOM from "../../../../framework/vdom"
-import PeersManager from "../../../../../api/peers/peersManager"
 import TextMessageComponent from "./textMessageComponent"
-import {MTProto} from "../../../../../mtproto"
 import {Message} from "../../../../../dataObjects/message"
-import {getPeerNameFromType} from "../../../../../api/dialogs/util"
 import {FileAPI} from "../../../../../api/fileAPI"
 import ImageMessageComponent from "./imageMessageComponent"
+import DialogsStore from "../../../../../api/store/dialogsStore"
+import AppEvents from "../../../../../api/eventBus/appEvents"
+import {isElementInViewport} from "../../../../framework/utils"
 
-function parseHashQuery() {
+export function parseHashQuery() {
     const queryPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
 
     if (queryPeer.length < 2) {
@@ -35,8 +35,13 @@ const MessagesWrapperComponent = {
         /**
          * @var {Array<Node|Element>|[]} renderedMessageElements
          */
-        renderedMessageElements: []
+        renderedMessageElements: [],
+
+        isFetchingNextPage: false,
     },
+    /**
+     * @property {Element|Node} elements.*
+     */
     elements: {
         $fullLoader: undefined,
         $messagesLoader: undefined,
@@ -80,31 +85,45 @@ const MessagesWrapperComponent = {
         this.elements.$bubblesInner = this.elements.$bubbles.querySelector("#bubbles-inner")
         this.elements.$messagesLoader = this.$el.querySelector("#messages-wrapper-messages-loader")
 
-        DialogsManager.listenUpdates(event => {
+        AppEvents.Dialogs.listenAny(event => {
             const dialog = event.dialog
+
             if (dialog && this.state.dialog && this.state.dialog.type === dialog.type && this.state.dialog.id === dialog.id) {
                 if (event.type === "fetchedInitialMessages") {
                     this._appendMessages(event.messages)
                 } else if (event.type === "fetchedMessagesNextPage") {
                     this._appendMessages(event.messages)
+                } else if (event.type === "newMessage") {
+                    if (isElementInViewport(this._prependMessages([event.message])[0])) {
+                        this._markAllAsRead()
+                    }
                 } else {
                     this._resolveDialog(event.dialog)
                 }
             }
         })
 
-        PeersManager.listenUpdates(event => {
-            const dialog = event.peer.dialog || DialogsManager.find(event.peer.type, event.peer.id)
+        AppEvents.Peers.listenAny(event => {
+            if (event.type === "updateUserStatus") {
+                if (this.state.dialog && this.state.dialog.type === event.peer.type && this.state.dialog.id === event.peer.id) {
+                    this._patchChatInfo()
+                }
+            } else {
+                const dialog = event.peer.dialog || DialogsManager.find(event.peer.type, event.peer.id)
 
-            if (dialog && this.state.dialog && this.state.dialog.type === dialog.type && this.state.dialog.id === dialog.id) {
-                if (event.type === "updatePhoto") {
-                    this.state.dialog = dialog
-                    this._patchChatInfo()
-                } else if (event.type === "fullLoaded") {
-                    this.state.dialog = dialog
-                    this._patchChatInfo()
-                } else {
-                    Logger.log("PeerUpdates", event)
+                if (dialog && this.state.dialog && this.state.dialog.type === dialog.type && this.state.dialog.id === dialog.id) {
+                    if (event.type === "updatePhoto") {
+                        this.state.dialog = dialog
+                        this._patchChatInfo()
+                    } else if (event.type === "updateSingle") {
+                        this.state.dialog = dialog
+                        this._patchChatInfo()
+                    } else if (event.type === "fullLoaded") {
+                        this.state.dialog = dialog
+                        this._patchChatInfo()
+                    } else {
+                        Logger.log("PeerUpdates", event)
+                    }
                 }
             }
         })
@@ -115,82 +134,22 @@ const MessagesWrapperComponent = {
                 let dialog = undefined
 
                 if (queryParams.p.startsWith("@")) {
-                    dialog = DialogsManager.findByUsername(queryParams.p.substring(1))
+                    dialog = DialogsStore.getByUsername(queryParams.p.substring(1))
                 } else {
                     const queryPeer = parseHashQuery()
                     dialog = DialogsManager.find(queryPeer.type, queryPeer.id)
                 }
 
                 if (dialog) {
-                    this._resolveDialog(dialog)
-                    this._refreshMessages()
+                    if (this._resolveDialog(dialog)) {
+                        this._markAllAsRead()
+                        this._refreshMessages()
+                    }
                 }
 
             } else {
                 // todo: handle no dialog selected
             }
-        })
-
-        MTProto.UpdatesManager.listenUpdate("updateShortMessage", async update => {
-            const peer = PeersManager.find("user", update.user_id)
-
-            if (peer && this.state.dialog && this.state.dialog.peer.type === peer.type && this.state.dialog.peer.id === peer.id) {
-                const message = new Message(this.state.dialog, update)
-
-                this._prependMessages([message])
-            }
-        })
-
-        MTProto.UpdatesManager.listenUpdate("updateShortChatMessage", async update => {
-            const peer = PeersManager.find("chat", update.chat_id)
-
-            if (peer && this.state.dialog && this.state.dialog.peer.type === peer.type && this.state.dialog.peer.id === peer.id) {
-                const message = new Message(this.state.dialog, update)
-
-                this._prependMessages([message])
-            }
-        })
-
-        MTProto.UpdatesManager.listenUpdate("updateNewMessage", update => {
-            let peer = undefined
-
-            if (update.message.pFlags.out && update.message.to_id) {
-                const peerName = getPeerNameFromType(update.message.to_id._)
-                peer = PeersManager.find(peerName, update.message.to_id[`${peerName}_id`])
-            } else {
-                peer = PeersManager.find("user", update.message.from_id)
-            }
-
-            if (peer && this.state.dialog && this.state.dialog.peer.type === peer.type && this.state.dialog.peer.id === peer.id) {
-                const message = new Message(this.state.dialog, update.message)
-
-                this._prependMessages([message])
-            }
-        })
-
-
-        MTProto.UpdatesManager.listenUpdate("updateNewChannelMessage", update => {
-            const peer = PeersManager.find("channel", update.message.to_id.channel_id)
-
-            if (peer && this.state.dialog && this.state.dialog.peer.type === peer.type && this.state.dialog.peer.id === peer.id) {
-                const message = new Message(this.state.dialog, update.message)
-
-                this._prependMessages([message])
-            }
-        })
-
-        MTProto.UpdatesManager.listenUpdate("updateDeleteChannelMessages", update => {
-            // const peer = PeersManager.find("channel", update.channel_id)
-
-            // if (peer && this.state.dialog && this.state.dialog.peer.type === peer.type && this.state.dialog.peer.id === peer.id) {
-            //     if (update.messages.indexOf(dialog.lastMessage.id) > -1) {
-            //         this.fetchPlainPeerDialogs({
-            //             _: dialog.peer.type,
-            //             id: dialog.peer.id,
-            //             access_hash: dialog.peer.peer.access_hash
-            //         })
-            //     }
-            // }
         })
     },
 
@@ -204,15 +163,20 @@ const MessagesWrapperComponent = {
                 if (dialog.peer.username === AppFramework.Router.activeRoute.queryParams.p.substring(1)) {
                     this.state.dialog = dialog
                     this._refreshDialog()
+
+                    return true
                 }
             } else {
                 const queryPeer = parseHashQuery()
                 if (dialog.peer.type === queryPeer.type && dialog.peer.id === queryPeer.id) {
                     this.state.dialog = dialog
                     this._refreshDialog()
+                    return true
                 }
             }
         }
+
+        return false
     },
 
     _clearBubbles() {
@@ -227,9 +191,13 @@ const MessagesWrapperComponent = {
         this._toggleMessagesLoader(false)
         this._clearBubbles()
 
-        this.state.dialog.fetchInitialMessages().then(messages => {
+        this.state.dialog.API.fetchInitialMessages().then(messages => {
             this._toggleMessagesLoader(true)
         })
+    },
+
+    _markAllAsRead() {
+        return this.state.dialog.API.readAllHistory()
     },
 
     __sticky_isOtherDay(date1, date2) {
@@ -301,15 +269,21 @@ const MessagesWrapperComponent = {
             reset = true
         }
 
+        const pushed = []
+
         for (const message of messages) {
             // todo sticky date
             // todo push only new
-            this.state.renderedMessageElements.push(this._renderMessage(message, true))
+            const rendered = this._renderMessage(message, true)
+            this.state.renderedMessageElements.push(rendered)
+            pushed.push(rendered)
         }
 
         if (reset) {
             this.elements.$bubbles.scrollTop = this.elements.$bubblesInner.clientHeight
         }
+
+        return pushed
     },
 
     /**
@@ -327,7 +301,6 @@ const MessagesWrapperComponent = {
                 $message = $mount(<ImageMessageComponent message={message} image={false}/>, this.elements.$bubblesInner)
 
                 FileAPI.photoThumnail(message.media.photo, data => {
-                    console.log("patching", data, $message)
                     VDOM.patchReal($message, <ImageMessageComponent message={message} image={{
                         imgSrc: data.src,
                         imgSize: data.size,
@@ -362,9 +335,22 @@ const MessagesWrapperComponent = {
 
     _onScrollBubbles(event) {
         const $element = event.target
+        /**
+         * @type {Node|Element}
+         */
+        const $bi = this.elements.$bubblesInner
 
-        if ($element.scrollTop === 0) {
-            this.state.dialog.fetchNextPage()
+        if ($element.scrollTop === 0 && !this.state.isFetchingNextPage) {
+            this.state.isFetchingNextPage = true
+            this.state.dialog.API.fetchNextPage().then(() => {
+                this.state.isFetchingNextPage = false
+            })
+        } else if ($bi) {
+            const minel = $bi.childNodes.length > 10 ? 10 : $bi.childNodes.length
+
+            if (isElementInViewport($bi.childNodes[minel])) {
+                this._markAllAsRead()
+            }
         }
     },
 

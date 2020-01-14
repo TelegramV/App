@@ -1,11 +1,11 @@
-import {BotPeer} from "./botPeer";
-import {UserPeer} from "./userPeer";
-import {SupergroupPeer} from "./supergroupPeer";
-import {ChannelPeer} from "./channelPeer";
-import {GroupPeer} from "./groupPeer";
+import {BotPeer} from "./peer/botPeer";
+import {UserPeer} from "./peer/userPeer";
+import {SupergroupPeer} from "./peer/supergroupPeer";
+import {ChannelPeer} from "./peer/channelPeer";
+import {GroupPeer} from "./peer/groupPeer";
 import {createLogger} from "../common/logger";
-import {GroupForbiddenPeer} from "./groupForbiddenPeer";
-import {ChannelForbiddenPeer} from "./channelForbiddenPeer";
+import {GroupForbiddenPeer} from "./peer/groupForbiddenPeer";
+import {ChannelForbiddenPeer} from "./peer/channelForbiddenPeer";
 
 const Logger = createLogger("PeerFactory")
 

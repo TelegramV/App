@@ -101,8 +101,3 @@ export function getPeerNameFromType(peerType) {
             return ""
     }
 }
-
-
-export function findUserFromMessage(message, dialogsSlice) {
-    return dialogsSlice.users.find(user => String(user.id) === String(message.from_id))
-}

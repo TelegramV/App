@@ -1,4 +1,4 @@
-import {UserPeer} from "../../../../../dataObjects/userPeer"
+import {UserPeer} from "../../../../../dataObjects/peer/userPeer"
 import {DialogTextComponent} from "./dialogTextComponent"
 import {AppFramework} from "../../../../framework/framework"
 import {DialogAvatarComponent} from "./dialogAvatarComponent"
@@ -26,29 +26,33 @@ export const DialogComponent = {
     name: "dialog",
     /**
      * @param {Dialog} dialog
+     * @param {boolean} selected
      * @return {*}
      */
-    h({dialog}) {
+    h({dialog, selected}) {
         const peer = dialog.peer
-        const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.unreadCount > 0 ? dialog.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
+        const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.messages.unreadCount > 0 ? dialog.messages.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
         let personClasses = ["person", "rp"]
         if (peer instanceof UserPeer && peer.onlineStatus.online) {
             personClasses.push("online")
         }
+        if (selected) {
+            personClasses.push("active")
+        }
         if (unread !== "") personClasses.push("unread")
-        if (dialog.muted) personClasses.push("muted")
-        if (dialog.lastMessage.isOut) {
+        if (dialog.isMuted) personClasses.push("muted")
+        if (dialog.messages.last.isOut) {
             personClasses.push("sent")
 
-            if (dialog.lastMessage.isRead) personClasses.push("read")
+            if (dialog.messages.last.isRead) personClasses.push("read")
         }
 
         return (
             <div data-peer-username={dialog.peer} data-peer={`${dialog.type}.${dialog.id}`}
-                 data-message-id={dialog.lastMessage.id}
-                 data-date={dialog.lastMessage.date}
-                 data-pinned={dialog.pinned === undefined ? false : dialog.pinned}
+                 data-message-id={dialog.messages.last.id}
+                 data-date={dialog.messages.last.date}
+                 data-pinned={dialog.isPinned === undefined ? false : dialog.isPinned}
                  className={personClasses}
                  onClick={handleClick(dialog)}
                  data-index={dialog.index}>
@@ -59,7 +63,7 @@ export const DialogComponent = {
                     <div className="top">
                         <div className="title">{peer.peerName}</div>
                         <div className="status tgico"/>
-                        <div className="time">{dialog.lastMessage.getDate("en", DATE_FORMAT)}</div>
+                        <div className="time">{dialog.messages.last.getDate("en", DATE_FORMAT)}</div>
                     </div>
 
                     <div className="bottom">
@@ -67,8 +71,8 @@ export const DialogComponent = {
 
                         <div css-display={dialog.unreadMentionsCount === 0 ? "none" : ""}
                              className="badge tgico">@{dialog.unreadMentionsCount}</div>
-                        <div css-display={dialog.unreadCount === 0 ? "none" : ""}
-                             className="badge tgico">{dialog.unreadCount}</div>
+                        <div css-display={dialog.messages.unreadCount === 0 ? "none" : ""}
+                             className="badge tgico">{dialog.messages.unreadCount}</div>
                         <div css-display={!dialog.unreadMark ? "none" : ""} className="badge tgico">?</div>
                     </div>
                 </div>

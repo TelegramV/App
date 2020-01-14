@@ -1,8 +1,12 @@
 import {getMessagePreviewDialog} from "../ui/utils";
-import PeersManager from "../api/peers/peersManager";
 import MTProto from "../mtproto"
+import PeersStore from "../api/store/peersStore"
 
 export class Message {
+    /**
+     * @param {Dialog} dialog
+     * @param message
+     */
     constructor(dialog, message) {
         this.dialog = dialog
         this._message = message
@@ -33,17 +37,17 @@ export class Message {
 
         if (this.isOut) {
             // todo: cache AuthorizedUse
-            return PeersManager.find("user", MTProto.getAuthorizedUser().user.id)
+            return PeersStore.get("user", MTProto.getAuthorizedUser().user.id)
         } else if (this.isShort) {
-            return PeersManager.find("user", this._message.user_id)
+            return PeersStore.get("user", this._message.user_id)
         }
 
-        return !this._message.from_id ? PeersManager.findByPeer(this._message.to_id) : PeersManager.find("user", this._message.from_id)
+        return !this._message.from_id ? PeersStore.getFromDialogRawPeer(this._message.to_id) : PeersStore.get("user", this._message.from_id)
     }
 
     get to() {
         if (this._message.to_id === "peerChannel") {
-            return PeersManager.find("channel", this._message.to_id.channel_id)
+            return PeersStore.get("channel", this._message.to_id.channel_id)
         }
         return null
     }
@@ -71,14 +75,20 @@ export class Message {
         if (from) {
             return from.peerName + getMessagePreviewDialog(this._message, true)
         } else {
-            console.log(this._message)
-            console.log(PeersManager.peers)
             return getMessagePreviewDialog(this._message, true)
         }
     }
 
     get date() {
         return this._message.date
+    }
+
+    get rawMessage() {
+        return this._message
+    }
+
+    get media() {
+        return this._message.media
     }
 
     getDate(locale, format) {
@@ -91,13 +101,5 @@ export class Message {
         if (message.media) {
 
         }
-    }
-
-    get rawMessage() {
-        return this._message
-    }
-
-    get media() {
-        return this._message.media
     }
 }

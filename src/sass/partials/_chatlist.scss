@@ -314,6 +314,14 @@
     cursor: pointer;
   }
 
+  &.active {
+    background-color: $light;
+  }
+
+  .active {
+    background-color: $light;
+  }
+
   &.selected {
     background-color: $darkgrey;
   }

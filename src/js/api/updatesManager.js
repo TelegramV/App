@@ -3,9 +3,10 @@ import MTProto from "../mtproto";
 import {createLogger} from "../common/logger";
 import {default as PeersManager} from "./peers/peersManager";
 import {default as DialogsManager} from "./dialogs/dialogsManager";
-import {getPeerObject} from "../dataObjects/peerFactory";
 import {Message} from "../dataObjects/message";
 import {getInputFromPeer, getInputPeerFromPeer} from "./dialogs/util";
+import PeersStore from "./store/peersStore"
+import DialogsStore from "./store/dialogsStore"
 
 const Logger = createLogger("UpdateManager", {
     level: "log"
@@ -78,8 +79,8 @@ class UpdateManager extends Manager {
     process(message) {
 
         if (message._ === "updates") {
-            message.users.forEach(user => PeersManager.set(getPeerObject(user)))
-            message.chats.forEach(chat => PeersManager.set(getPeerObject(chat)))
+            message.users.forEach(user => PeersManager.setFromRawAndFire(user))
+            message.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
 
             message.updates.forEach(update => {
                 this.processUpdate(update._, update)
@@ -142,7 +143,7 @@ class UpdateManager extends Manager {
         this._channelQueue.push(_update)
 
         if (!this._channelStackResolving) {
-            this.resolveChannelStack()
+            this.resolveChannelQueue()
         }
     }
 
@@ -150,21 +151,27 @@ class UpdateManager extends Manager {
         this._userQueue.push(_update)
 
         if (!this._userStackResolving) {
-            this.resolveUserStack()
+            this.resolveUserQueue()
         }
     }
 
+    /**
+     * @param {Dialog} dialog
+     * @param _update
+     * @param onFail
+     * @private
+     */
     _checkChannelPts(dialog, _update, onFail) {
-        if ((dialog.dialog.pts + _update.pts_count) === _update.pts) {
+        if ((dialog.pts + _update.pts_count) === _update.pts) {
             // console.log("channel update can be processed", _update)
 
             this.resolveUpdateListeners(_update)
 
-            dialog.dialog.pts = _update.pts
-        } else if ((dialog.dialog.pts + _update.pts_count) > _update.pts) {
+            dialog.pts = _update.pts
+        } else if ((dialog.pts + _update.pts_count) > _update.pts) {
             console.log("channel update already processed")
         } else {
-            console.warn("channel update cannot be processed", _update, dialog.dialog.pts, _update.pts_count, _update.pts)
+            console.warn("channel update cannot be processed", _update, dialog.pts, _update.pts_count, _update.pts)
             onFail()
         }
     }
@@ -173,8 +180,6 @@ class UpdateManager extends Manager {
         const statePts = State.pts || this.State.pts
 
         if ((statePts + _update.pts_count) === _update.pts) {
-            // console.log("update can be processed", _update)
-
             this.State.pts = _update.pts
 
             this.resolveUpdateListeners(_update)
@@ -205,7 +210,7 @@ class UpdateManager extends Manager {
 
         if (dialog) {
             this._checkChannelPts(dialog, update, () => {
-                this.getChannelDifference(getInputFromPeer("channel", channelId, dialog.peer.peer.access_hash), dialog.dialog.pts)
+                this.getChannelDifference(getInputFromPeer("channel", channelId, dialog.peer.peer.access_hash), dialog.pts)
             })
         } else {
             console.error("dialog wasn't found!", update)
@@ -241,48 +246,60 @@ class UpdateManager extends Manager {
         })
     }
 
-    resolveChannelStack() {
+    _processChannelDifference(_difference) {
+        console.warn("processing difference", _difference)
+
+        const dialog = DialogsManager.find("channel", _difference.__channel.channel_id)
+
+        if (dialog && dialog.pts > _difference.pts) {
+            console.warn("looks like difference is outdated")
+        }
+
+        if (_difference._ === "updates.channelDifference") {
+            _difference.users.forEach(user => PeersManager.setFromRawAndFire(user))
+            _difference.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
+
+            _difference.new_messages.forEach(message => {
+                this.resolveUpdateListeners({
+                    _: "updateNewChannelMessage",
+                    message
+                })
+            })
+
+            _difference.other_updates.forEach(ou => {
+                this.resolveUpdateListeners(ou)
+            })
+
+            dialog.pts = _difference.pts
+        } else if (_difference._ === "updates.channelDifferenceTooLong") {
+            location.reload()
+        } else if (_difference._ === "updates.channelDifferenceEmpty") {
+            dialog.pts = _difference.pts
+        } else {
+            this.resolveUpdateListeners(_difference)
+        }
+    }
+
+    resolveChannelQueue(next = undefined) {
         if (this._channelQueue.length > 0 && !this._channelStackResolving) {
             this._channelStackResolving = true
 
             try {
-                const update = this._channelQueue[0]
+                const update = next ? next : this._channelQueue[0]
 
                 if (update._.endsWith("ChannelMessage") || update._.endsWith("ChannelMessages")) {
                     this._processChannelMessageUpdate(update)
-                } else if (update._ === "updates.channelDifference") {
-                    update.users.forEach(user => PeersManager.set(getPeerObject(user)))
-                    update.chats.forEach(chat => PeersManager.set(getPeerObject(chat)))
+                } else if (update._.startsWith("updates.channelDifference")) {
 
-                    update.new_messages.forEach(message => {
-                        this.resolveUpdateListeners({
-                            _: "updateNewChannelMessage",
-                            message
-                        })
-                    })
+                    this._processChannelDifference(update)
 
-                    update.other_updates.forEach(ou => {
-                        this.resolveUpdateListeners(ou)
-                    })
-
-                    const dialog = DialogsManager.find("channel", update.__channel.channel_id)
-
-                    dialog.dialog.pts = update.pts
-
-                } else if (update._ === "updates.channelDifferenceTooLong") {
-                    location.reload()
-                } else if (update._ === "updates.channelDifferenceEmpty") {
-                    const dialog = DialogsManager.find("channel", update.__channel.channel_id)
-                    dialog.dialog.pts = update.pts
-                } else {
-                    this.resolveUpdateListeners(update)
                 }
 
                 this._channelQueue.shift()
 
                 this._channelStackResolving = false
 
-                this.resolveChannelStack()
+                this.resolveChannelQueue()
             } catch
                 (e) {
                 console.error(e)
@@ -290,12 +307,12 @@ class UpdateManager extends Manager {
 
                 this._channelStackResolving = false
 
-                this.resolveChannelStack()
+                this.resolveChannelQueue()
             }
         }
     }
 
-    resolveUserStack() {
+    resolveUserQueue() {
         if (this._userQueue.length > 0 && !this._userStackResolving) {
             this._userStackResolving = true
 
@@ -306,8 +323,8 @@ class UpdateManager extends Manager {
                     // console.warn("message update", update)
                     this._processUserMessageUpdate(update)
                 } else if (update._ === "updates.difference") {
-                    update.chats.forEach(chat => PeersManager.set(getPeerObject(chat)))
-                    update.users.forEach(user => PeersManager.set(getPeerObject(user)))
+                    update.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
+                    update.users.forEach(user => PeersManager.setFromRawAndFire(user))
 
                     update.new_messages.forEach(message => {
                         this.resolveUpdateListeners({
@@ -325,8 +342,8 @@ class UpdateManager extends Manager {
                     this.State = update.state
 
                 } else if (update._ === "updates.differenceSlice") {
-                    update.chats.forEach(chat => PeersManager.set(getPeerObject(chat)))
-                    update.users.forEach(user => PeersManager.set(getPeerObject(user)))
+                    update.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
+                    update.users.forEach(user => PeersManager.setFromRawAndFire(user))
 
                     update.new_messages.forEach(message => {
                         this.resolveUpdateListeners({
@@ -356,7 +373,7 @@ class UpdateManager extends Manager {
 
                 this._userStackResolving = false
 
-                this.resolveUserStack()
+                this.resolveUserQueue()
             } catch
                 (e) {
                 console.error(e)
@@ -364,33 +381,33 @@ class UpdateManager extends Manager {
 
                 this._userStackResolving = false
 
-                this.resolveUserStack()
+                this.resolveUserQueue()
             }
         }
     }
 
     getChannel(id) {
-        return PeersManager.find("channel", id)
+        return PeersStore.get("channel", id)
     }
 
     getChannelDialog(id) {
-        return DialogsManager.find("channel", id)
+        return DialogsStore.get("channel", id)
     }
 
     getChat(id) {
-        return PeersManager.find("chat", id)
+        return PeersStore.get("chat", id)
     }
 
     getChatDialog(id) {
-        return DialogsManager.find("chat", id)
+        return DialogsStore.get("chat", id)
     }
 
     getUser(id) {
-        return PeersManager.find("user", id)
+        return PeersStore.get("user", id)
     }
 
     getUserDialog(id) {
-        return DialogsManager.find("user", id)
+        return DialogsStore.get("user", id)
     }
 
     async loadDialog(type, id) {
@@ -458,40 +475,6 @@ class UpdateManager extends Manager {
                 Logger.error("Unknown update", update._, update)
                 break
         }
-    }
-
-    handleShort(update) {
-        this.handleUpdate(update)
-        // this.getDifference()
-    }
-
-    handleShortMessage(update) {
-        this.handleUpdate(update)
-    }
-
-    handleShortChatMessage(update) {
-        this.handleUpdate(update)
-    }
-
-    handleShortSentMessage(update) {
-        this.handleUpdate(update)
-    }
-
-    handleCombined(update) {
-        Logger.debug("Combined", update._)
-    }
-
-    handle(update) {
-        const addedUsers = update.users.filter(l => {
-            PeersManager.set(getPeerObject(l))
-        })
-        const addedChats = update.chats.filter(l => {
-            PeersManager.set(getPeerObject(l))
-        })
-        // Logger.debug(`Update (+${addedUsers.length} users, +${addedChats.length} chats): `, update)
-        update.updates.forEach(l => {
-            this.handleUpdate(l)
-        })
     }
 }
 

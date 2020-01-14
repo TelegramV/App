@@ -40,16 +40,16 @@ const Text = {
  * @constructor
  */
 export const DialogTextComponent = ({dialog}) => {
-    if (dialog.draft !== null && dialog.draft._ !== "draftMessageEmpty") {
+    if (dialog.draft.isPresent) {
         return (
-            <Draft text={dialog.draft}/>
+            <Draft text={dialog.draft.message}/>
         )
     }
 
     if (Object.keys(dialog.messageActions).length === 0) {
         return (
-            <Text user={dialog.lastMessage.prefix}
-                  text={dialog.lastMessage.text}/>
+            <Text user={dialog.messages.last.prefix}
+                  text={dialog.messages.last.text}/>
         )
     }
 

@@ -1,8 +1,8 @@
-import {UserPeer} from "../../../../../dataObjects/userPeer"
-import {ChannelPeer} from "../../../../../dataObjects/channelPeer"
-import {GroupPeer} from "../../../../../dataObjects/groupPeer"
-import {SupergroupPeer} from "../../../../../dataObjects/supergroupPeer"
-import {BotPeer} from "../../../../../dataObjects/botPeer"
+import {UserPeer} from "../../../../../dataObjects/peer/userPeer"
+import {ChannelPeer} from "../../../../../dataObjects/peer/channelPeer"
+import {GroupPeer} from "../../../../../dataObjects/peer/groupPeer"
+import {SupergroupPeer} from "../../../../../dataObjects/peer/supergroupPeer"
+import {BotPeer} from "../../../../../dataObjects/peer/botPeer"
 
 const MessagesWrapperChatInfoComponent = {
     name: "MessagesWrapperChatInfoComponent",
@@ -42,21 +42,21 @@ const MessagesWrapperChatInfoComponent = {
             }
         } else if (peer instanceof ChannelPeer) {
             if (peer.full) {
-                const user = peer.full.participants_count === 1 ? "user" : "users"
+                const user = peer.full.participants_count === 1 ? "member" : "members"
                 status = `${peer.full.participants_count} ${user}`
             } else {
                 status = "loading info..."
             }
         } else if (peer instanceof SupergroupPeer) {
             if (peer.full) {
-                const user = peer.full.participants_count === 1 ? "user" : "users"
+                const user = peer.full.participants_count === 1 ? "member" : "members"
                 status = `${peer.full.participants_count} ${user}, ${peer.full.online_count} online`
             } else {
                 status = "loading info..."
             }
         } else if (peer instanceof GroupPeer) {
             if (peer.full) {
-                const user = peer.peer.participants_count === 1 ? "user" : "users"
+                const user = peer.peer.participants_count === 1 ? "member" : "members"
                 status = `${peer.peer.participants_count} ${user}, ${peer.full.online_count} online`
             } else {
                 status = "loading info..."

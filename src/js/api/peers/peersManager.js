@@ -1,22 +1,15 @@
 import {arrayDelete} from "../../common/utils/utils"
-import {FileAPI} from "../fileAPI"
-import {getInputPeerFromPeer, getPeerName, getPeersInput} from "../dialogs/util"
-import {MTProto} from "../../mtproto"
-import {Peer} from "../../dataObjects/peer";
+import {Peer} from "../../dataObjects/peer/peer";
 import {Manager} from "../manager";
-import {createLogger} from "../../common/logger";
-import {getPeerObject} from "../../dataObjects/peerFactory";
+import PeersStore from "../store/peersStore"
+import AppEvents from "../eventBus/appEvents"
+import {MTProto} from "../../mtproto"
+import {UserPeer} from "../../dataObjects/peer/userPeer"
+import {getPeerObject} from "../../dataObjects/peerFactory"
 
-const Logger = createLogger("PeerManager")
-
-export class PeerManager extends Manager {
+class PeerManager extends Manager {
     constructor() {
         super()
-        this.peers = {
-            user: {},
-            chat: {},
-            channel: {}
-        }
         this.peerInitListeners = {
             user: {},
             chat: {},
@@ -24,31 +17,18 @@ export class PeerManager extends Manager {
         }
     }
 
-    /**
-     * @param name
-     * @param id
-     * @return {Peer}
-     */
-    find(name, id) {
-        return this.peers[name][id]
-    }
+    init() {
+        MTProto.UpdatesManager.listenUpdate("updateUserStatus", update => {
+            const peer = PeersStore.get("user", update.user_id)
 
-    findByPeer(peer) {
-        if(peer instanceof Peer) return peer
+            if (peer && peer instanceof UserPeer) {
+                peer.peer.status = update.status
 
-        const keys = {
-            peerUser: "user",
-            peerChannel: "channel",
-            peerChat: "chat"
-        }
-        const key = keys[peer._]
-        const keysId = {
-            peerUser: "user_id",
-            peerChannel: "channel_id",
-            peerChat: "chat_id"
-        }
-        const keyId = keysId[peer._]
-        return this.find(key, peer[keyId])
+                AppEvents.Peers.fire("updateUserStatus", {
+                    peer
+                })
+            }
+        })
     }
 
     listenPeerInit(peerName, peerId, listener) {
@@ -62,8 +42,8 @@ export class PeerManager extends Manager {
             this.peerInitListeners[peerName][peerId] = []
         }
 
-        if (this.peers[peerName][peerId]) {
-            listener(this.peers[peerName][peerId])
+        if (PeersStore.get(peerName, peerId)) {
+            listener(PeersStore.get(peerName, peerId))
         } else {
             this.peerInitListeners[peerName][peerId].push(listener)
         }
@@ -72,18 +52,14 @@ export class PeerManager extends Manager {
 
     set(peer) {
         if (peer instanceof Peer) {
-            if (!this.peers[peer.type]) {
-                this.peers[peer.type] = {}
-            }
-
-            if(this.peers[peer.type][peer.id]) {
+            if (PeersStore.has(peer.type, peer.id)) {
                 return false
             }
-            this.peers[peer.type][peer.id] = peer
+
+            PeersStore.set(peer)
 
             peer.getAvatar().catch(l => {
-                this.resolveListeners({
-                    type: "updatePhoto",
+                AppEvents.Peers.fire("updatePhoto", {
                     peer: peer
                 })
             })
@@ -104,86 +80,40 @@ export class PeerManager extends Manager {
         }
         throw new Error("Not a peer object!")
     }
-}
 
-export default new PeerManager()
-/*
-const $peerInitListeners = {
-    user: {},
-    chat: {},
-    channel: {}
-}
+    setFromRaw(rawPeer) {
+        let peer = PeersStore.get(rawPeer._, rawPeer.id)
 
-let __inited = false
-
-function listenPeerInit(peerName, peerId, listener) {
-    if (!$peerInitListeners[peerName]) {
-        $peerInitListeners[peerName] = {}
-    }
-
-    peerId = Number(peerId)
-
-    if (!$peerInitListeners[peerName][peerId]) {
-        $peerInitListeners[peerName][peerId] = []
-    }
-
-    if (this.peers[peerName][peerId]) {
-        listener(this.peers[peerName][peerId])
-    } else {
-        $peerInitListeners[peerName][peerId].push(listener)
-    }
-}
-
-
-
-function updateOnline(peer, online, props = {}) {
-    if (find(peer._, peer.id)) {
-        this.peers[name][id][key].online = online
-
-        resolveListeners({
-            type: "updateOnline",
-        })
-    } else {
-        console.warn("peer wasn't found", name, id)
-    }
-}
-
-function updateSingle(name, id, data, props = {}) {
-    if (find(name, id)) {
-        for (const key in data) {
-            if (data.hasOwnProperty(key)) {
-                this.peers[name][id][key] = data[key]
-            }
+        if (peer) {
+            peer.fillRaw(rawPeer)
+            return peer
+        } else {
+            peer = getPeerObject(rawPeer)
+            PeersStore.set(peer)
         }
 
-        resolveListeners({
-            type: "updateSingle",
-        })
-    } else {
-        console.warn("peer wasn't found", name, id)
+        return peer
+    }
+
+    setFromRawAndFire(rawPeer) {
+        let peer = PeersStore.get(rawPeer._, rawPeer.id)
+
+        if (peer) {
+            peer.fillRawAndFire(rawPeer)
+            return peer
+        } else {
+            peer = getPeerObject(rawPeer)
+            PeersStore.set(peer)
+
+            AppEvents.Peers.fire("updateSingle", {
+                peer
+            })
+        }
+
+        return peer
     }
 }
 
-function getPeers() {
-    return this.peers
-}
+const PeersManager = new PeerManager()
 
-function init() {
-    if (!__inited) {
-        __inited = true
-    } else {
-        console.warn("PeersManager already inited")
-        return
-    }
-
-    MTProto.MessageProcessor.listenUpdateShort(update => {
-        // console.log(update)
-        // switch (update._) {
-        //     case "updateUserStatus":
-        //         const status = message.status
-        //         console.log(update)
-        //         break
-        // }
-    })
-}
-*/
+export default PeersManager

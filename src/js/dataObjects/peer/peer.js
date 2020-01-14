@@ -1,22 +1,38 @@
-import {FileAPI} from "../api/fileAPI";
-import {createLogger} from "../common/logger";
-import {default as PeersManager} from "../api/peers/peersManager";
-import {getInputPeerFromPeer} from "../api/dialogs/util";
-import MTProto from "../mtproto"
+import {FileAPI} from "../../api/fileAPI";
+import {createLogger} from "../../common/logger";
+import {getInputPeerFromPeer} from "../../api/dialogs/util";
+import MTProto from "../../mtproto"
+import AppEvents from "../../api/eventBus/appEvents"
+import DialogsStore from "../../api/store/dialogsStore"
 
 const Logger = createLogger("Peer")
 
 export class Peer {
-    constructor(peer) {
-        this._peer = peer
-        this._avatar = undefined
-        this._full = undefined
+    constructor(rawPeer) {
+        this._rawPeer = rawPeer
 
         /**
          * @type {Dialog|undefined}
          * @private
          */
         this._dialog = undefined
+
+        this._type = "chat"
+        this._id = 0
+        this._access_hash = 0
+        this._username = undefined
+        this._photo = undefined
+
+        this.fillRaw(rawPeer)
+
+
+        this._peer = rawPeer
+        this._avatar = undefined
+        this._full = undefined
+    }
+
+    get raw() {
+        return this._rawPeer
     }
 
     get id() {
@@ -27,6 +43,10 @@ export class Peer {
      * @return {Dialog|undefined}
      */
     get dialog() {
+        if (!this._dialog) {
+            this.dialog = DialogsStore.get(this.type, this.id)
+        }
+
         return this._dialog
     }
 
@@ -39,7 +59,7 @@ export class Peer {
     }
 
     get peer() {
-        return this._peer
+        return this._rawPeer
     }
 
     get username() {
@@ -80,7 +100,6 @@ export class Peer {
 
     get type() {
         return this.peer._
-        //return this.constructor.name.toLowerCase().slice(0, -4)
     }
 
     getAvatar(big = false) {
@@ -97,8 +116,7 @@ export class Peer {
         // TODO cache
         return FileAPI.getPeerPhoto(big ? this.peer.photo.photo_big : this.peer.photo.photo_small, this.peer.photo.dc_id, this, big).then(url => {
             this._avatar = url
-            PeersManager.resolveListeners({
-                type: "updatePhoto",
+            AppEvents.Peers.fire("updatePhoto", {
                 peer: this
             })
             return this._avatar
@@ -118,8 +136,7 @@ export class Peer {
             }).then(channelFull => {
                 this._full = channelFull.full_chat
 
-                PeersManager.resolveListeners({
-                    type: "fullLoaded",
+                AppEvents.Peers.fire("fullLoaded", {
                     peer: this
                 })
             })
@@ -129,8 +146,7 @@ export class Peer {
             }).then(chatFull => {
                 this._full = chatFull.full_chat
 
-                PeersManager.resolveListeners({
-                    type: "fullLoaded",
+                AppEvents.Peers.fire("fullLoaded", {
                     peer: this
                 })
             })
@@ -144,11 +160,26 @@ export class Peer {
             }).then(userFull => {
                 this._full = userFull
 
-                PeersManager.resolveListeners({
-                    type: "fullLoaded",
+                AppEvents.Peers.fire("fullLoaded", {
                     peer: this
                 })
             })
         }
+    }
+
+    fillRaw(rawPeer) {
+        this._type = rawPeer._
+        this._id = rawPeer.id
+        this._access_hash = rawPeer.access_hash
+        this._username = rawPeer.username
+        this._photo = undefined
+    }
+
+    fillRawAndFire(rawPeer) {
+        this.fillRaw(rawPeer)
+
+        AppEvents.Peers.fire("updateSingle", {
+            peer: this
+        })
     }
 }

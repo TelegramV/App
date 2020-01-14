@@ -6,20 +6,33 @@ export class EventBus {
         /**
          * @type {Map<string, Array<Function>>}
          */
-        this.listeners = new Map()
+        this._listeners = new Map()
+
+        /**
+         * @type {Array<Function>}
+         */
+        this._listenersAny = []
     }
 
     /**
      * @param {string} type
-     * @param {any} event
+     * @param {*} event
      */
     fire(type, event) {
-        const listeners = this.listeners.get(type)
+        const listeners = this._listeners.get(type)
+        event = {
+            type,
+            ...event
+        }
 
         if (listeners) {
             for (const listener of listeners) {
                 listener(event)
             }
+        }
+
+        for (const listener of this._listenersAny) {
+            listener(event)
         }
     }
 
@@ -28,13 +41,26 @@ export class EventBus {
      * @param {Function} callback
      */
     listen(type, callback) {
-        let listeners = this.listeners.get(type)
+        let listeners = this._listeners.get(type)
 
         if (!listeners) {
-            this.listeners.set(type, [])
-            listeners = this.listeners.get(type)
+            this._listeners.set(type, [])
+            listeners = this._listeners.get(type)
         }
 
         listeners.push(callback)
+    }
+
+    /**
+     * @param {function({
+     *     type: string,
+     *     peer: Peer,
+     *     dialog: Dialog,
+     *     message: Message,
+     *     messages: Message[],
+     * })} callback
+     */
+    listenAny(callback) {
+        this._listenersAny.push(callback)
     }
 }
