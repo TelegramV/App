@@ -1,6 +1,7 @@
 import vdom_isNamedComponent from "./check/isNamedComponent"
 import vdom_isSimpleComponent from "./check/isSimpleComponent"
 import vdom_isVNode from "./check/isVNode"
+import {VNode} from "./vNode"
 
 function removeIfs(array) {
     for (let i = 0; i < array.length; i++) {
@@ -65,76 +66,116 @@ function removeIfs(array) {
  *   }
  *
  * @param tagName
- * @param attrs element attributes
- * @param options passed when creating element by using {@code document.createElement(tagName, options)}
- * @param events
- * @param children
- * @param dangerouslySetInnerHTML
- * @param renderIf
- * @param mounted callback
- * @param created
- * @returns {any}
+ * @param vNode
+ * @returns {VNode}
  */
-function vdom_h(tagName, {attrs = {}, options = {}, events = {}, children = [], dangerouslySetInnerHTML = false, renderIf = true, created = undefined, mounted = undefined} = {}) {
-    const vElem = Object.create(null)
+function vdom_h(tagName, vNode) {
+    const vElem = Object.create(VNode)
 
-    removeIfs(children)
+    removeIfs(vNode.children)
 
     // component
     if (vdom_isSimpleComponent(tagName)) {
-        return tagName(Object.assign(attrs, {slot: children}))
+        return tagName(Object.assign(vNode.attrs, {slot: vNode.children}))
     }
 
     // named component
     if (vdom_isNamedComponent(tagName)) {
+        const component = tagName
 
-        // todo: rewrite this shit
-        tagName.render = (function () {
-            const v = this.h.bind(this)(Object.assign(attrs, {slot: children}))
-            v.attrs["data-component"] = tagName.name
-            this.$el = VDOM.patchReal(this.$el, v)
-            if (this.updated) {
-                this.updated()
+        if (!component.__ || !component.__.inited) {
+            // component creation
+            component.__ = component.__ || {
+                inited: false,
+                mounted: false,
+                destroyed: false,
+                created: false,
+                reactive: {}
             }
-        })
 
-        for (const [key, value] of Object.entries(tagName)) {
-            if (typeof value === "function") {
-                tagName[key] = value.bind(tagName)
-            }
+            component.$el = component.$el || undefined
+            component.vParent = component.vParent || undefined
+            component.state = component.state || {}
+
+            component.props = component.props || {}
+
+            component.h = (component.h || function () {
+                throw new Error("implement pls")
+            }).bind(component)
+
+            component.created = (component.created || function () {
+            }).bind(component)
+
+            component.changed = (component.changed || function (key, value) {
+            }).bind(component)
+
+            component.mounted = (component.mounted || function () {
+            }).bind(component)
+
+            component.destroy = (component.destroy || function () {
+            }).bind(component)
+
+            component.patch = (component.patch || function (vNode) {
+                return vNode
+            }).bind(component)
+
+            component.delete = (component.delete || function () {
+                this.destroy()
+                this.$el.remove()
+            }).bind(component)
+
+            component.__render = (component.__render || function (props) {
+                this.__init()
+
+                this.props = props
+                const vNode = this.h(props)
+
+                vNode.component = this
+                vNode.attrs["data-component"] = this.name
+
+                return vNode
+            }).bind(component)
+
+            component.__patch = (component.__patch || function (props) {
+                this.__init()
+
+                this.$el = VDOM.patchReal(this.$el, this.__render(props))
+            }).bind(component)
+
+            component.__init = (component.__init || function () {
+                if (!this.__.inited) {
+                    for (const [key, value] of Object.entries(this)) {
+                        if (typeof value === "function") {
+                            this[key] = value.bind(this)
+                        }
+                    }
+
+                    for (const [k, v] of Object.entries(this.state)) {
+                        if (v && v.__rc) {
+                            v.component = this
+                            v.key = k
+                            this.state[k] = v.default
+                        }
+                    }
+
+                    this.__.inited = true
+                }
+            }).bind(component)
         }
 
-        const vNode = tagName.h(Object.assign(attrs, {slot: children}))
+        // debugger
 
-        vNode.component = tagName
-        vNode.attrs["data-component"] = tagName.name
-        vNode.renderIf = renderIf
+        component.__init()
 
-        if (tagName.created) {
-            vNode.created = tagName.created.bind(tagName)
-        }
-        if (tagName.mounted) {
-            vNode.mounted = tagName.mounted.bind(tagName)
-        }
-        if (tagName.updated) {
-            vNode.updated = tagName.created.bind(tagName)
-        }
-        return vNode
+        const vComponentNode = component.__render(Object.assign(vNode.attrs, {slot: vNode.children}))
+
+        vComponentNode.renderIf = vNode.renderIf
+
+        return vComponentNode
     }
 
-
-    Object.assign(vElem, {
-        __virtual: true,
-        tagName,
-        attrs,
-        options,
-        events,
-        children,
-        dangerouslySetInnerHTML,
-        renderIf,
-        created,
-        mounted,
-    })
+    Object.assign(vElem, vNode)
+    vElem.tagName = tagName
 
     return vElem
 }

@@ -1,19 +1,13 @@
+import {VNode} from "../vNode"
+
 /**
  * Checks if object is virtual node.
  *
- * @param potentialVNode
+ * @param {VNode} potentialVNode
  * @return {boolean}
  */
 function vdom_isVNode(potentialVNode) {
-    if (potentialVNode instanceof Node) {
-        return false
-    }
-
-    return (
-        typeof potentialVNode === "object" &&
-        potentialVNode.tagName !== undefined &&
-        potentialVNode.__virtual === true
-    )
+    return typeof potentialVNode === "object" && potentialVNode.__virtual
 }
 
 export default vdom_isVNode

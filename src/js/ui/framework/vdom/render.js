@@ -1,9 +1,9 @@
 import vdom_isVNode from "./check/isVNode"
 import vdom_appendToReal from "./appendToReal"
 
-const _XML_NAMESPACES = {
-    svg: "http://www.w3.org/2000/svg"
-}
+const _XML_NAMESPACES = new Map([
+    ["svg", "http://www.w3.org/2000/svg"]
+])
 
 /**
  * Renders Virtual DOM Node
@@ -45,8 +45,8 @@ function vdom_render(vNode, xmlns = null) {
     if (vNode.attrs.xmlns) {
         xmlns = vNode.attrs.xmlns
         $node = document.createElementNS(xmlns, vNode.tagName)
-    } else if (_XML_NAMESPACES.hasOwnProperty(vNode.tagName)) {
-        xmlns = _XML_NAMESPACES[vNode.tagName]
+    } else if (_XML_NAMESPACES.has(vNode.tagName)) {
+        xmlns = _XML_NAMESPACES.get(vNode.tagName)
         $node = document.createElementNS(xmlns, vNode.tagName)
     } else if (xmlns) {
         $node = document.createElementNS(xmlns, vNode.tagName)
@@ -81,16 +81,16 @@ function vdom_render(vNode, xmlns = null) {
     }
 
     // adding events
-    for (const [kEvent, vEvent] of Object.entries(vNode.events)) {
+    for (const [kEvent, vEvent] of vNode.events.entries()) {
         $node.addEventListener(kEvent, vEvent)
     }
 
     if (vNode.component) {
         vNode.component.$el = $node
-    }
 
-    if (typeof vNode.created === "function") {
-        vNode.created($node)
+        if (!vNode.component.__.created) {
+            vNode.component.created($node)
+        }
     }
 
     // appending children

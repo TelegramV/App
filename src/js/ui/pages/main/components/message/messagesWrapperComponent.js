@@ -11,16 +11,9 @@ import ImageMessageComponent from "./imageMessageComponent"
 import DialogsStore from "../../../../../api/store/dialogsStore"
 import AppEvents from "../../../../../api/eventBus/appEvents"
 import {isElementInViewport} from "../../../../framework/utils"
+import {parseHashQuery} from "../../../../reactive/SelectedDialog"
+import BubblesInnerComponent from "./bubblesInnerComponent"
 
-export function parseHashQuery() {
-    const queryPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
-
-    if (queryPeer.length < 2) {
-        throw Error("invalid peer")
-    }
-
-    return {type: queryPeer[0], id: parseInt(queryPeer[1])}
-}
 
 /**
  * CRITICAL: never rerender this component!
@@ -67,10 +60,7 @@ const MessagesWrapperComponent = {
                 <LoaderComponent id="messages-wrapper-messages-loader" full={true} show={true}/>
 
                 <div id="bubbles" onScroll={this._onScrollBubbles.bind(this)}>
-
-                    <div id="bubbles-inner">
-
-                    </div>
+                    <BubblesInnerComponent/>
                 </div>
             </div>
         )

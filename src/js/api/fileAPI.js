@@ -2,55 +2,8 @@ import {MTProto} from "../mtproto";
 import Bytes from "../mtproto/utils/bytes"
 import Random from "../mtproto/utils/random"
 
-let db
-let dbReady = false
-
-let request = indexedDB.open('cachedFiles', 1);
-
-request.onerror = function (e) {
-    console.error('Unable to open database.');
-}
-
-request.onsuccess = function (e) {
-    db = e.target.result
-    console.log('db opened')
-    dbReady = true
-}
-
-request.onupgradeneeded = function (e) {
-    let db = e.target.result
-    db.createObjectStore('files', {key: "id", autoIncrement: false})
-    dbReady = true
-}
-
-const putFileInDb = function (id, bytes) {
-    let trans = db.transaction(['files'], 'readwrite')
-    let addReq = trans.objectStore('files').put(bytes, id);
-
-    addReq.onerror = function (e) {
-        console.log('error storing data');
-        console.error(e);
-    }
-
-    trans.oncomplete = function (e) {
-        console.log('data stored');
-    }
-}
-
-const readFileFromDb = function (id) {
-    return new Promise((resolve, reject) => {
-        if (!dbReady) {
-            return reject("not ready")
-        }
-
-        console.log("reading from db")
-
-        const transaction = db.transaction(["files"], 'readonly')
-        const get = transaction.objectStore("files").get(id)
-        get.onsuccess = resolve
-        get.onerror = reject
-    })
-}
+const cache = {}
+const cachePeerPhotos = {}
 
 export class FileAPI {
     static getInputName(file) {
@@ -107,20 +60,14 @@ export class FileAPI {
 
     static getPeerPhoto(file, dcID, peer, big) {
         return new Promise(resolve => {
-            readFileFromDb(file.volume_id + "_" + file.local_id).then(event => {
-                console.log("read from db", event)
-                const blob = new Blob([event.target.result], {type: 'application/jpeg'});
+            if (cachePeerPhotos[file.volume_id + "_" + file.local_id]) {
+                return cachePeerPhotos[file.volume_id + "_" + file.local_id]
+            }
+            return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
+                const blob = new Blob([response.bytes], {type: 'application/jpeg'})
 
-                resolve(URL.createObjectURL(blob))
-            }).catch(error => {
-                console.error("er", error)
-                return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
-                    putFileInDb(file.volume_id + "_" + file.local_id, response.bytes)
-                    const blob = new Blob([response.bytes], {type: 'application/jpeg'});
-
-                    return URL.createObjectURL(blob)
-                }).then(resolve)
-            })
+                return cachePeerPhotos[file.volume_id + "_" + file.local_id] = URL.createObjectURL(blob)
+            }).then(resolve)
         })
     }
 
@@ -152,29 +99,23 @@ export class FileAPI {
 
     static getFile(file, thumb_size = "") {
         return new Promise(resolve => {
-            readFileFromDb(file.id).then(event => {
-                console.log("read from db", event)
+            const key = Bytes.asHex(file.file_reference)
+            if (cache[key]) {
+                resolve(cache[key])
+                return
+            }
+
+            return this.getFileLocation({
+                _: this.getInputName(file),
+                id: file.id,
+                access_hash: file.access_hash,
+                file_reference: file.file_reference,
+                thumb_size: thumb_size
+            }, file.dc_id).then(response => {
                 const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
-                const blob = new Blob([event.target.result], {type: type})
-                resolve(URL.createObjectURL(blob))
-            }).catch(error => {
-                console.error("read telegram, error ", error)
-
-                const key = Bytes.asHex(file.file_reference)
-
-                return this.getFileLocation({
-                    _: this.getInputName(file),
-                    id: file.id,
-                    access_hash: file.access_hash,
-                    file_reference: file.file_reference,
-                    thumb_size: thumb_size
-                }, file.dc_id).then(response => {
-                    putFileInDb(file.id, response.bytes)
-                    const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
-                    const blob = new Blob([response.bytes], {type: type});
-                    return URL.createObjectURL(blob)
-                }).then(resolve)
-            })
+                const blob = new Blob([response.bytes], {type: type});
+                return cache[key] = URL.createObjectURL(blob)
+            }).then(resolve)
         })
     }
 

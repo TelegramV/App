@@ -18,7 +18,8 @@
   "dependencies": {
     "croppie": "^2.6.4",
     "emoji-js": "^3.4.1",
-    "rusha": "^0.8.13"
+    "rusha": "^0.8.13",
+    "sortablejs": "^1.10.2"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

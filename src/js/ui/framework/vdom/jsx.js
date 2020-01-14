@@ -1,10 +1,10 @@
 import vdom_h from "./h"
-import vdom_hasAttribute, {vdom_removeAttribute} from "./check/hasAttribute"
+import vdom_hasAttribute from "./check/hasAttribute"
 
-const jsxAttributesMap = {
-    className: "class",
-    htmlFor: "for"
-}
+const jsxAttributesMap = new Map([
+    ["className", "class"],
+    ["htmlFor", "for"],
+])
 
 function removeEmpties(array) {
     for (let i = 0; i < array.length; i++) {
@@ -34,13 +34,11 @@ function processChildrenIfs(children) {
  * @param tagName
  * @param attributes
  * @param children
- * @returns {any}
+ * @returns {VNode}
  */
 function vdom_jsx(tagName, attributes, ...children) {
     let attrs = {}
-    let events = {}
-    let options = {}
-    let constructor = {}
+    let events = new Map()
     let dangerouslySetInnerHTML = false
     let renderIf = true
 
@@ -52,7 +50,7 @@ function vdom_jsx(tagName, attributes, ...children) {
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
             if (k.startsWith("on")) {
-                events[k.substring(2).toLowerCase()] = v
+                events.set(k.substring(2).toLowerCase(), v)
             } else if (k.startsWith("css-")) {
                 const styleKey = k.substring(4)
 
@@ -64,16 +62,12 @@ function vdom_jsx(tagName, attributes, ...children) {
                 } else {
                     attrs.style = `${styleKey}: ${v};`
                 }
-            } else if (k === "options") {
-                options = Object.assign(options, v)
             } else if (k === "dangerouslySetInnerHTML") {
                 dangerouslySetInnerHTML = v
                 attrs[k] = v
-            } else if (k === "constructor") {
-                constructor = Object.assign(options, v)
             } else {
-                if (jsxAttributesMap.hasOwnProperty(k)) {
-                    attrs[jsxAttributesMap[k]] = v
+                if (jsxAttributesMap.has(k)) {
+                    attrs[jsxAttributesMap.get(k)] = v
                 } else {
                     attrs[k] = v
                 }
@@ -81,7 +75,7 @@ function vdom_jsx(tagName, attributes, ...children) {
         }
     }
 
-    return vdom_h(tagName, {attrs, constructor, options, events, children, dangerouslySetInnerHTML, renderIf})
+    return vdom_h(tagName, {attrs, events, children, dangerouslySetInnerHTML, renderIf})
 }
 
 export default vdom_jsx

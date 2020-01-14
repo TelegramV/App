@@ -3,10 +3,16 @@ import {ChannelPeer} from "../../../../../dataObjects/peer/channelPeer"
 import {GroupPeer} from "../../../../../dataObjects/peer/groupPeer"
 import {SupergroupPeer} from "../../../../../dataObjects/peer/supergroupPeer"
 import {BotPeer} from "../../../../../dataObjects/peer/botPeer"
+import ReactiveSelectedDialog from "../../../../reactive/SelectedDialog"
 
 const MessagesWrapperChatInfoComponent = {
     name: "MessagesWrapperChatInfoComponent",
-    h({dialog}) {
+    state: {
+        dialog: ReactiveSelectedDialog
+    },
+    h() {
+        const dialog = this.state.dialog
+
         if (!dialog) {
             return (
                 <div id="messages-wrapper-chat-info" className="chat-info">

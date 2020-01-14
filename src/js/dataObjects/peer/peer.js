@@ -116,6 +116,9 @@ export class Peer {
         // TODO cache
         return FileAPI.getPeerPhoto(big ? this.peer.photo.photo_big : this.peer.photo.photo_small, this.peer.photo.dc_id, this, big).then(url => {
             this._avatar = url
+
+            console.log(url)
+
             AppEvents.Peers.fire("updatePhoto", {
                 peer: this
             })

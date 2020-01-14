@@ -2,8 +2,9 @@ import DialogsManager from "../../../../../api/dialogs/dialogsManager"
 import {DialogComponent} from "./dialogComponent"
 import {AppFramework} from "../../../../framework/framework"
 import DialogsStore from "../../../../../api/store/dialogsStore"
-import {parseHashQuery} from "../message/messagesWrapperComponent"
 import AppEvents from "../../../../../api/eventBus/appEvents"
+import {parseHashQuery} from "../../../../reactive/SelectedDialog"
+import Sortable from "sortablejs"
 
 /**
  * CRITICAL: Never rerender this component!!!
@@ -73,6 +74,7 @@ export const DialogListComponent = {
             this.elements.$loader.style.display = "none"
             this.elements.$pinnedDialogs.style.display = ""
             this.elements.$generalDialogs.style.display = ""
+            Sortable.create(this.elements.$pinnedDialogs)
         })
 
         AppEvents.Dialogs.listenAny(this._handleDialogUpdates)

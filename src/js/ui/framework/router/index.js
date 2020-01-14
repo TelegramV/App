@@ -96,10 +96,6 @@ export class FrameworkRouter {
         if (route.component.hasOwnProperty("h") && typeof route.component.h === "function") {
             this.$mountElement = vdom_realMount(route.component.h(), this.$mountElement)
         }
-
-        if (route.component.hasOwnProperty("mounted") && typeof route.component.mounted === "function") {
-            route.component.mounted()
-        }
     }
 
     findRoute(path) {

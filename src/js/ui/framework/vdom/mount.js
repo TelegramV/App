@@ -1,5 +1,4 @@
 import vdom_render from "./render"
-import vdom_isVNode from "./check/isVNode"
 
 /**
  * Mounts virtual node to $real.
@@ -15,6 +14,7 @@ function vdom_mount(vNode, $target) {
 /**
  * @param {Element} $node
  * @param {Element|string} $target
+ * @param {VNode} vNode
  * @return {Element}
  */
 export function vdom_realMount($node, $target, vNode = undefined) {
@@ -24,8 +24,9 @@ export function vdom_realMount($node, $target, vNode = undefined) {
 
     $target.replaceWith($node)
 
-    if (vNode !== undefined && vdom_isVNode(vNode) && typeof vNode.mounted === "function") {
-        vNode.mounted($node)
+    if (vNode && vNode.component && !vNode.component.__.mounted) {
+        vNode.component.$el = $node
+        vNode.component.mounted()
     }
 
     return $node

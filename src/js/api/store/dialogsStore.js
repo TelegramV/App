@@ -64,7 +64,7 @@ class DialogsMapStore extends MappedStore {
 
     /**
      * @param {string} username
-     * @return {Dialog|false}
+     * @return {Dialog|boolean}
      */
     getByUsername(username) {
         return this.find(dialog => dialog.peer.username === username)

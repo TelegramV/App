@@ -1,7 +1,7 @@
 import vdom_isVNode from "./isVNode"
 
 function vdom_hasAttribute(attrName, vNode) {
-    return vdom_isVNode(vNode) && Object.keys(vNode.attrs).indexOf(attrName) > -1
+    return vdom_isVNode(vNode) && attrName in vNode.attrs
 }
 
 export function vdom_attributeIndex(attrName, vNode) {

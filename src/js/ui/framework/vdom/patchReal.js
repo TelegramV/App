@@ -3,22 +3,27 @@ import vdom_render from "./render"
 import vdom_isVNode from "./check/isVNode"
 import vdom_mount from "./mount"
 
+/**
+ * @param {Element|Node} $node
+ * @param newEvents
+ */
 function patchEvents($node, newEvents) {
-    for (const [k, v] of Object.entries(newEvents)) {
+    for (const [k, v] of newEvents.entries()) {
         $node.removeEventListener(k, v)
     }
 
-    for (const [k, v] of Object.entries(newEvents)) {
+    for (const [k, v] of newEvents.entries()) {
         $node.addEventListener(k, v)
     }
 }
 
 /**
  * @param {Element} $node
- * @param {object} newAttrs
+ * @param {Object} newAttrs
  */
 function patchAttrs($node, newAttrs) {
     const oldAttrs = $node.attributes
+
     for (const [k, v] of Object.entries(newAttrs)) {
         if ($node.nodeType !== Node.TEXT_NODE) {
             const nv = Array.isArray(v) ? v.join(" ") : v
@@ -29,7 +34,7 @@ function patchAttrs($node, newAttrs) {
     }
 
     for (const k in oldAttrs) {
-        if (!(k in newAttrs)) {
+        if (!newAttrs.hasOwnProperty(k)) {
             if ($node.nodeType !== Node.TEXT_NODE) {
                 $node.removeAttribute(k)
             }
@@ -88,24 +93,17 @@ function vdom_patchReal($node, newVNode) {
         return vdom_mount(newVNode, $node)
     }
 
-    if (typeof newVNode !== "object" && typeof newVNode !== "function") {
-        if ($node.nodeType !== Node.TEXT_NODE || $node.wholeText !== newVNode) {
-            return vdom_mount(newVNode, $node)
-        }
-    }
-
     if ($node.nodeType === Node.TEXT_NODE) {
-        if ($node.wholeText !== newVNode) {
+        if (typeof newVNode === "object" || typeof newVNode === "function" || String($node.textContent) !== String(newVNode)) {
             return vdom_mount(newVNode, $node)
         } else {
             return $node
         }
     }
 
-    // todo: uncomment this
     // named components check
     // if names are different then replace all tree
-    if ($node.hasAttribute("data-component") || newVNode.attrs["data-component"] !== undefined) {
+    if ($node.hasAttribute("data-component") || newVNode.attrs.hasOwnProperty("data-component")) {
         if ($node.getAttribute("data-component") !== newVNode.attrs["data-component"]) {
             return vdom_mount(newVNode, $node)
         }

@@ -5,10 +5,11 @@ import "../sass/application.scss"
 import {MainPage} from "./ui/pages/main/mainPage"
 import {LoginPage} from "./ui/pages/login/nextlogin"
 import {AppFramework} from "./ui/framework/framework"
-import {loadSchema} from "./mtproto/language/schema"
 
 import "./ui/vendor/tgs_player"
 import {EventBus} from "./api/eventBus"
+import ReactiveCallback from "./ui/framework/reactive/reactiveCallback"
+import {loadSchema} from "./mtproto/language/schema"
 
 
 const authContext = {
@@ -65,5 +66,71 @@ function start() {
 
     AppFramework.mount("#app")
 }
+
+// const selectedDialogListeners = []
+//
+// const SelectedDialog = ReactiveCallback(resolve => {
+//     selectedDialogListeners.push(resolve)
+// })
+
+// AppFramework.Router.route("/", "main", {
+//     h() {
+//         const NestedComponent = {
+//             name: "nested",
+//             state: {
+//                 count: 0
+//             },
+//             props: {},
+//             h() {
+//                 return (
+//                     <h1>
+//                         {this.state.count} | {this.props.get("combo")}
+//                     </h1>
+//                 )
+//             },
+//             mounted() {
+//                 console.log("nested mounted")
+//             },
+//             created() {
+//                 console.log("nested created")
+//             },
+//             updated() {
+//                 console.log("nested updated")
+//             },
+//             destroy() {
+//                 console.log("nested destroy")
+//             },
+//             patchRequest(vNode) {
+//                 console.log("nested patchRequest", vNode)
+//             },
+//         }
+//
+//         const Component = {
+//             name: "component",
+//             state: {
+//                 query: UpdatedQuery
+//             },
+//             h() {
+//                 return (
+//                     <div>
+//                         {AppFramework.Router.activeRoute.queryParams}
+//                         {this.state.query ? this.state.query.q : "q"}
+//
+//                         {this.state.query ? <NestedComponent combo={this.state.query.q}/> : <NestedComponent/>}
+//                     </div>
+//                 )
+//             }
+//         }
+//
+//         return VDOM.render(
+//             <div>
+//                 <Component/>
+//             </div>
+//         )
+//     }
+// })
+
+
+// AppFramework.mount("#app")
 
 loadSchema().then(() => MTProto.connect(authContext).then(start))

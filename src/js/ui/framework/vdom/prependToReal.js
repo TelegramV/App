@@ -8,9 +8,13 @@ import vdom_render from "./render"
 function vdom_prependToReal(vNode, $element) {
     const $createdElement = vdom_render(vNode)
     $element.prepend($createdElement)
-    if (typeof vNode.mounted === "function") {
-        vNode.mounted()
+
+    if (vNode && vNode.component && !vNode.component.__.mounted) {
+        vNode.component.$el = $createdElement
+        vNode.component.mounted()
     }
+
+
     return $createdElement
 }
 

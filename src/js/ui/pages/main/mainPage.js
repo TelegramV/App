@@ -22,7 +22,7 @@ export function MainPage() {
     VDOM.appendToReal(<DialogListComponent/>, $imPageElement)
     VDOM.appendToReal(<MessagesWrapperComponent/>, $imPageElement)
 
-    VDOM.appendToReal(<DialogInfoComponent/>, $imPageElement)
+    // VDOM.appendToReal(<DialogInfoComponent/>, $imPageElement)
 
     initUIManagers()
 
