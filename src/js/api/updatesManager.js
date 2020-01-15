@@ -3,7 +3,7 @@ import MTProto from "../mtproto";
 import {createLogger} from "../common/logger";
 import {default as PeersManager} from "./peers/peersManager";
 import {default as DialogsManager} from "./dialogs/dialogsManager";
-import {Message} from "../dataObjects/message";
+import {Message} from "./dataObjects/message";
 import {getInputFromPeer, getInputPeerFromPeer} from "./dialogs/util";
 import PeersStore from "./store/peersStore"
 import DialogsStore from "./store/dialogsStore"
@@ -66,6 +66,7 @@ class UpdateManager extends Manager {
         } else {
             Logger.warn("unexpected update = ", update._, update)
         }
+
     }
 
     processUpdate(type, update) {
@@ -247,12 +248,12 @@ class UpdateManager extends Manager {
     }
 
     _processChannelDifference(_difference) {
-        console.warn("processing difference", _difference)
+        console.warn("processing channel difference", _difference)
 
         const dialog = DialogsManager.find("channel", _difference.__channel.channel_id)
 
         if (dialog && dialog.pts > _difference.pts) {
-            console.warn("looks like difference is outdated")
+            console.warn("looks like the channel difference is outdated")
         }
 
         if (_difference._ === "updates.channelDifference") {
@@ -288,11 +289,16 @@ class UpdateManager extends Manager {
                 const update = next ? next : this._channelQueue[0]
 
                 if (update._.endsWith("ChannelMessage") || update._.endsWith("ChannelMessages")) {
+
                     this._processChannelMessageUpdate(update)
+
                 } else if (update._.startsWith("updates.channelDifference")) {
 
                     this._processChannelDifference(update)
 
+                } else {
+                    //todo: process other updates and set their pts
+                    console.log("unprocessable update")
                 }
 
                 this._channelQueue.shift()

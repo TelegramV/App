@@ -3,8 +3,8 @@ import {DialogComponent} from "./dialogComponent"
 import {AppFramework} from "../../../../framework/framework"
 import DialogsStore from "../../../../../api/store/dialogsStore"
 import AppEvents from "../../../../../api/eventBus/appEvents"
-import {parseHashQuery} from "../../../../reactive/SelectedDialog"
 import Sortable from "sortablejs"
+import {parseHashQuery} from "../../../../../api/dialogs/selectedDialog"
 
 /**
  * CRITICAL: Never rerender this component!!!

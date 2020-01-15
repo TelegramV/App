@@ -1,5 +1,5 @@
-import {parseMessageEntities} from "../../../../../mtproto/utils/htmlHelpers"
-import MessageComponent from "./messageComponent"
+import {parseMessageEntities} from "../../../../../../mtproto/utils/htmlHelpers"
+import MessageWrapperComponent from "./messageWrapperComponent"
 import MessageTimeComponent from "./messageTimeComponent"
 
 const TextMessageComponent = {
@@ -10,10 +10,9 @@ const TextMessageComponent = {
      * @return {*}
      */
     h({message}) {
-        let classes = "bubble"
-
-        if (message.isRead) {
-            classes += " read"
+        let classes = {
+            "bubble": true,
+            "read": message.isRead
         }
 
         const username = message.from.peerName && !message.isPost && !message.isOut
@@ -21,9 +20,9 @@ const TextMessageComponent = {
 
         if (message.rawMessage.fwd_from) {
             return (
-                <MessageComponent message={message}>
+                <MessageWrapperComponent message={message}>
                     <div className={classes}>
-                        {username ? <div className="username">{username}</div> : ""}
+                        {username ? <div className="username">{message.from.peerName}</div> : ""}
 
                         <div className={`message ${username ? "nopad" : ""}`}>
                             <div className="fwd">Forwarded from {message.rawMessage.fwd_from.from_id}</div>
@@ -31,12 +30,12 @@ const TextMessageComponent = {
                             <MessageTimeComponent message={message}/>
                         </div>
                     </div>
-                </MessageComponent>
+                </MessageWrapperComponent>
             )
         }
 
         return (
-            <MessageComponent message={message}>
+            <MessageWrapperComponent message={message}>
                 <div className={classes}>
                     {username ? <div className="username">{message.from.peerName}</div> : ""}
 
@@ -45,7 +44,7 @@ const TextMessageComponent = {
                         <MessageTimeComponent message={message}/>
                     </div>
                 </div>
-            </MessageComponent>
+            </MessageWrapperComponent>
         )
     }
 }

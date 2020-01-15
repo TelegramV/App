@@ -1,7 +1,7 @@
-import {tsNow} from "../../mtproto/timeManager";
+import {tsNow} from "../../../mtproto/timeManager";
 import {getLastSeenMessage} from "../utils";
 import {Peer} from "./peer";
-import {createLogger} from "../../common/logger";
+import {createLogger} from "../../../common/logger";
 
 const Logger = createLogger("UserPeer")
 

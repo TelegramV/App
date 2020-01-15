@@ -1,4 +1,4 @@
-const MessageComponent = {
+const MessageWrapperComponent = {
     name: "message",
 
     /**
@@ -7,7 +7,12 @@ const MessageComponent = {
      * @return {*}
      */
     h({message, slot}) {
-        const className = message.isPost ? "channel in" : message.isOut ? "out" : "in"
+        const className = {
+            "channel": message.isPost,
+            "out": !message.isPost && message.isOut,
+            "in": message.isPost || !message.isOut,
+        }
+
         const from = message.from
 
         let hasAvatar = from.hasAvatar && from._avatar !== undefined
@@ -27,7 +32,7 @@ const MessageComponent = {
 
         return (
             <div class={className} data-id={message.id} data-peer={`${from.type}.${from.id}`}>
-                {className === "in" ? (
+                {!message.isPost && className.in ? (
                     <div className={classes}
                          css-background-image={cssBackgroundImage}>
                         {letter}
@@ -39,4 +44,4 @@ const MessageComponent = {
     }
 }
 
-export default MessageComponent
+export default MessageWrapperComponent

@@ -1,14 +1,14 @@
-// todo: fix this thing
 import vdom_render from "./render"
 import vdom_isVNode from "./check/isVNode"
 import vdom_mount from "./mount"
 
 /**
  * @param {Element|Node} $node
- * @param newEvents
+ * @param {Map} newEvents
  */
 function patchEvents($node, newEvents) {
     for (const [k, v] of newEvents.entries()) {
+        // todo: fix this thing
         $node.removeEventListener(k, v)
     }
 

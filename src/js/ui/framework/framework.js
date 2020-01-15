@@ -19,3 +19,5 @@ export const AppFramework = {
     Router,
     mount
 }
+
+export default AppFramework

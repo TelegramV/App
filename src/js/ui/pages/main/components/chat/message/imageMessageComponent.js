@@ -1,4 +1,4 @@
-import MessageComponent from "./messageComponent"
+import MessageWrapperComponent from "./messageWrapperComponent"
 import MessageTimeComponent from "./messageTimeComponent"
 
 const MessageMediaImage = ({src, size, alt = "", isThumb}) => {
@@ -30,7 +30,7 @@ const ImageMessageComponent = {
 
         if (image) {
             return (
-                <MessageComponent message={message}>
+                <MessageWrapperComponent message={message}>
                     <div class={classes}>
                         {haveMsg ? (
                             <div class="message">
@@ -40,12 +40,12 @@ const ImageMessageComponent = {
                             </div>
                         ) : ""}
                     </div>
-                </MessageComponent>
+                </MessageWrapperComponent>
             )
         }
 
         return (
-            <MessageComponent message={message}>
+            <MessageWrapperComponent message={message}>
                 <div class={classes}>
                     {haveMsg ? (
                         <div class="message">
@@ -55,7 +55,7 @@ const ImageMessageComponent = {
                         </div>
                     ) : ""}
                 </div>
-            </MessageComponent>
+            </MessageWrapperComponent>
         )
     }
 }

@@ -4,7 +4,7 @@ import {DialogListComponent} from "./components/dialog/dialogListComponent"
 import {DialogInfoComponent} from "./components/dialog/dialogInfoComponent"
 import UpdatesManager from "../../../api/updatesManager"
 import PeersManager from "../../../api/peers/peersManager"
-import MessagesWrapperComponent from "./components/message/messagesWrapperComponent"
+import ChatComponent from "./components/chat/chatComponent"
 
 
 const $imPageElement = VDOM.render(
@@ -20,7 +20,7 @@ function initUIManagers() {
 
 export function MainPage() {
     VDOM.appendToReal(<DialogListComponent/>, $imPageElement)
-    VDOM.appendToReal(<MessagesWrapperComponent/>, $imPageElement)
+    VDOM.appendToReal(<ChatComponent/>, $imPageElement)
 
     // VDOM.appendToReal(<DialogInfoComponent/>, $imPageElement)
 

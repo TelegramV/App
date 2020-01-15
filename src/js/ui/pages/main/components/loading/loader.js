@@ -1,14 +1,17 @@
 const LoaderComponent = {
     name: "loader-component",
     h({big = true, full = false, show = true, id = ""}) {
-        const classes = ["full-size-loader"]
-        const progressClasses = ["progress-circular"]
-        if (big) {
-            progressClasses.push("big")
+
+        const classes = {
+            "full-size-loader": true,
+            "height": !full,
         }
-        if (!full) {
-            classes.push("height")
+
+        const progressClasses = {
+            "progress-circular": true,
+            "big": big
         }
+
         return (
             <div id={id} css-display={!show ? "none" : ""} className={classes}>
                 <progress className={progressClasses}/>

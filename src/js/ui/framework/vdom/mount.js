@@ -8,7 +8,14 @@ import vdom_render from "./render"
  * @return {Element}
  */
 function vdom_mount(vNode, $target) {
-    return vdom_realMount(vdom_render(vNode), $target)
+    const $mounted = vdom_realMount(vdom_render(vNode), $target)
+
+    if (vNode && vNode.component && !vNode.component.__.mounted) {
+        vNode.component.$el = $mounted
+        vNode.component.mounted()
+    }
+
+    return $mounted
 }
 
 /**
@@ -23,11 +30,6 @@ export function vdom_realMount($node, $target, vNode = undefined) {
     }
 
     $target.replaceWith($node)
-
-    if (vNode && vNode.component && !vNode.component.__.mounted) {
-        vNode.component.$el = $node
-        vNode.component.mounted()
-    }
 
     return $node
 }

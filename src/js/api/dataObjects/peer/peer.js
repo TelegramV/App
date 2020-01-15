@@ -1,9 +1,9 @@
-import {FileAPI} from "../../api/fileAPI";
-import {createLogger} from "../../common/logger";
-import {getInputPeerFromPeer} from "../../api/dialogs/util";
-import MTProto from "../../mtproto"
-import AppEvents from "../../api/eventBus/appEvents"
-import DialogsStore from "../../api/store/dialogsStore"
+import {FileAPI} from "../../fileAPI";
+import {createLogger} from "../../../common/logger";
+import {getInputPeerFromPeer} from "../../dialogs/util";
+import MTProto from "../../../mtproto"
+import AppEvents from "../../eventBus/appEvents"
+import DialogsStore from "../../store/dialogsStore"
 
 const Logger = createLogger("Peer")
 
@@ -116,8 +116,6 @@ export class Peer {
         // TODO cache
         return FileAPI.getPeerPhoto(big ? this.peer.photo.photo_big : this.peer.photo.photo_small, this.peer.photo.dc_id, this, big).then(url => {
             this._avatar = url
-
-            console.log(url)
 
             AppEvents.Peers.fire("updatePhoto", {
                 peer: this

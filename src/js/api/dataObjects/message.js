@@ -1,6 +1,6 @@
-import {getMessagePreviewDialog} from "../ui/utils";
-import MTProto from "../mtproto"
-import PeersStore from "../api/store/peersStore"
+import {getMessagePreviewDialog} from "../../ui/utils";
+import MTProto from "../../mtproto"
+import PeersStore from "../store/peersStore"
 
 export class Message {
     /**
@@ -61,7 +61,7 @@ export class Message {
     }
 
     get isRead() {
-        return this.dialog.readOutbox >= this.id
+        return this.dialog.messages.readOutboxMaxId >= this.id
     }
 
     get prefix() {

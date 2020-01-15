@@ -1,37 +1,86 @@
 /**
- * Додаємо реактивності і дано-рушійності в компоненти!!!
- *
- * @see ReactiveSelectedDialog
- * @param {function(function(*))} callback
- * @return {*|{FireOnly: *, PatchOnly: *}}
+ * @param context
+ * @return {function(...[*]=)}
  */
-const ReactiveCallback = callback => {
-    const context = {
-        __rc: true,
-    }
-
-    context.resolve = (value) => {
-        console.log("patchOnly", context)
+const createResolve = context => {
+    return value => {
         if (context.component && context.key) {
             if (context.patchOnly) {
-                context.component.state[context.key] = value
+                context.component.reactive[context.key] = value
                 context.component.__patch()
             } else if (context.fireOnly) {
+                context.component.reactive[context.key] = value
                 context.component.changed(context.key, value)
             } else {
-                context.component.state[context.key] = value
+                context.component.reactive[context.key] = value
                 context.component.changed(context.key, value)
                 context.component.__patch()
             }
         }
     }
+}
 
-    context.default = callback(context.resolve)
+/**
+ * Додаємо реактивності і дано-рушійності в компоненти!!!
+ *
+ * @see AppSelectedDialog.Reactive
+ *
+ * @param {function(function(*))} callback
+ * @return {{Default: *, FireOnly: *, PatchOnly: *}}
+ */
+function ReactiveCallback(callback) {
+    return {
+        /**
+         * Means that both `__patch` and `changed` will be called.
+         *
+         * @return {*}
+         */
+        get Default() {
+            const context = Object.create(null)
+            context.__rc = true
 
-    context.FireOnly = {fireOnly: true, ...context}
-    context.PatchOnly = {patchOnly: true, ...context}
+            context.resolve = createResolve(context)
 
-    return context
+            context.defaultValue = callback(context.resolve)
+
+            return context
+        },
+
+        /**
+         * Means that the only `changed` will be called. No re-rendering.
+         *
+         * @return {*}
+         */
+        get FireOnly() {
+            const context = Object.create(null)
+
+            context.__rc = true
+            context.fireOnly = true
+
+            context.resolve = createResolve(context)
+
+            context.defaultValue = callback(context.resolve)
+
+            return context
+        },
+
+        /**
+         * Means that the only `__patch` will be called.
+         *
+         * @return {*}
+         */
+        get PatchOnly() {
+            const context = Object.create(null)
+            context.__rc = true
+            context.patchOnly = true
+
+            context.resolve = createResolve(context)
+
+            context.defaultValue = callback(context.resolve)
+
+            return context
+        }
+    }
 }
 
 export default ReactiveCallback

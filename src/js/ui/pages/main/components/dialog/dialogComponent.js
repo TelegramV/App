@@ -1,4 +1,4 @@
-import {UserPeer} from "../../../../../dataObjects/peer/userPeer"
+import {UserPeer} from "../../../../../api/dataObjects/peer/userPeer"
 import {DialogTextComponent} from "./dialogTextComponent"
 import {AppFramework} from "../../../../framework/framework"
 import {DialogAvatarComponent} from "./dialogAvatarComponent"
@@ -31,7 +31,7 @@ export const DialogComponent = {
      */
     h({dialog, selected}) {
         const peer = dialog.peer
-        const unread = dialog.unreadMentionsCount > 0 ? "@" : (dialog.messages.unreadCount > 0 ? dialog.messages.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
+        const unread = dialog.messages.unreadMentionsCount > 0 ? "@" : (dialog.messages.unreadCount > 0 ? dialog.messages.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
         let personClasses = ["person", "rp"]
         if (peer instanceof UserPeer && peer.onlineStatus.online) {
@@ -69,8 +69,8 @@ export const DialogComponent = {
                     <div className="bottom">
                         <DialogTextComponent dialog={dialog}/>
 
-                        <div css-display={dialog.unreadMentionsCount === 0 ? "none" : ""}
-                             className="badge tgico">@{dialog.unreadMentionsCount}</div>
+                        <div css-display={dialog.messages.unreadMentionsCount === 0 ? "none" : ""}
+                             className="badge tgico">@{dialog.messages.unreadMentionsCount}</div>
                         <div css-display={dialog.messages.unreadCount === 0 ? "none" : ""}
                              className="badge tgico">{dialog.messages.unreadCount}</div>
                         <div css-display={!dialog.unreadMark ? "none" : ""} className="badge tgico">?</div>

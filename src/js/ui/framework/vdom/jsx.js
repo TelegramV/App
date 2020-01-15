@@ -1,9 +1,27 @@
 import vdom_h from "./h"
-import vdom_hasAttribute from "./check/hasAttribute"
+import VDOM from "./index"
+import vdom_isVNode from "./check/isVNode"
 
 const jsxAttributesMap = new Map([
     ["className", "class"],
     ["htmlFor", "for"],
+])
+
+const classAttrProcessor = value => {
+    if (Array.isArray(value)) {
+        return value.join(" ")
+    } else if (typeof value === "object") {
+        return Object.entries(value)
+            .filter(attr => attr[1])
+            .map(attr => attr[0])
+            .join(" ")
+    } else {
+        return value
+    }
+}
+
+const attrProcessorsMap = new Map([
+    ["class", classAttrProcessor]
 ])
 
 function removeEmpties(array) {
@@ -14,19 +32,19 @@ function removeEmpties(array) {
     }
 }
 
-function processChildrenIfs(children) {
-    let prevIf = undefined
-    for (let i = 0; i < children.length; i++) {
-        const vNode = children[i]
-        if (vdom_hasAttribute("if", vNode)) {
-            prevIf = !!vNode.attrs["if"]
-            vNode.renderIf = prevIf
-        } else if (vdom_hasAttribute("else", vNode) && prevIf !== undefined) {
-            vNode.renderIf = !prevIf
-            prevIf = undefined
-        }
-    }
-}
+// function processChildrenIfs(children) {
+//     let prevIf = undefined
+//     for (let i = 0; i < children.length; i++) {
+//         const vNode = children[i]
+//         if (vdom_hasAttribute("if", vNode)) {
+//             prevIf = !!vNode.attrs["if"]
+//             vNode.renderIf = prevIf
+//         } else if (vdom_hasAttribute("else", vNode) && prevIf !== undefined) {
+//             vNode.renderIf = !prevIf
+//             prevIf = undefined
+//         }
+//     }
+// }
 
 /**
  * translator (kostyl') for jsx
@@ -37,18 +55,25 @@ function processChildrenIfs(children) {
  * @returns {VNode}
  */
 function vdom_jsx(tagName, attributes, ...children) {
+    if (tagName === VDOM.Fragment) {
+        throw new Error("fragments are not implemented")
+    }
+
+    children = children.flat(Infinity)
+
     let attrs = {}
     let events = new Map()
     let dangerouslySetInnerHTML = false
     let renderIf = true
 
     // removeEmpties(children)
-    children = children.flat(Infinity)
 
-    processChildrenIfs(children)
+    // processChildrenIfs(children)
 
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
+            let key = k
+
             if (k.startsWith("on")) {
                 events.set(k.substring(2).toLowerCase(), v)
             } else if (k.startsWith("css-")) {
@@ -67,15 +92,23 @@ function vdom_jsx(tagName, attributes, ...children) {
                 attrs[k] = v
             } else {
                 if (jsxAttributesMap.has(k)) {
-                    attrs[jsxAttributesMap.get(k)] = v
+                    key = jsxAttributesMap.get(k)
+                    attrs[key] = v
                 } else {
                     attrs[k] = v
                 }
             }
+
+            if (attrProcessorsMap.has(key)) {
+                attrs[key] = attrProcessorsMap.get(key)(v)
+            }
         }
     }
 
-    return vdom_h(tagName, {attrs, events, children, dangerouslySetInnerHTML, renderIf})
+    const vNode = Object.create(null)
+    Object.assign(vNode, {attrs, events, children, dangerouslySetInnerHTML, renderIf})
+
+    return vdom_h(tagName, vNode)
 }
 
 export default vdom_jsx

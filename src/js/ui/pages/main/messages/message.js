@@ -2,8 +2,8 @@ import { MTProto } from "../../../../mtproto"
 import Voice from "../../../voice"
 import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers";
 import {emoji} from "../../../utils";
-import MessageComponent from "../components/message/messageComponent"
-import TextMessageComponent from "../components/message/textMessageComponent"
+import MessageWrapperComponent from "../components/chat/message/messageWrapperComponent"
+import TextMessageComponent from "../components/chat/message/textMessageComponent"
 
 
 function vTimeTemplate(message, bg = false) {
@@ -58,7 +58,7 @@ const MessageMediaImage = ({src, size, alt = "", isThumb}) => {
 function vMessageWithImageTemplate(data) {
     let haveMsg = data.message && data.message.length > 0;
     return (
-        <MessageComponent data={data}>
+        <MessageWrapperComponent data={data}>
             <div class={vGetClass(data)}>
                 <MessageMediaImage src={data.imgSrc} size={data.imgSize} isThumb={!!data.thumbnail}/>
 
@@ -67,14 +67,14 @@ function vMessageWithImageTemplate(data) {
                     {vTimeTemplate(data)}
                 </div>) : ""}
             </div>
-        </MessageComponent>
+        </MessageWrapperComponent>
     )
 }
 
 
 function vMessageWithUrlTemplate(data) {
     return (
-        <MessageComponent data={data}>
+        <MessageWrapperComponent data={data}>
             <div className={vGetClass(data)} onClick={test}>
                 <div className="message">
                     <span dangerouslySetInnerHTML={data.message}/>
@@ -91,18 +91,18 @@ function vMessageWithUrlTemplate(data) {
                     </div>
                 </a>
             </div>
-        </MessageComponent>
+        </MessageWrapperComponent>
     )
 }
 
 function vMessageWithStickerTemplate(data) {
     return (
-        <MessageComponent data={data}>
+        <MessageWrapperComponent data={data}>
             <div class={vGetClass(data, true)}>
                 <img class="sticker" src={data.imgSrc}/>
                 {vTimeTemplate(data, true)}
             </div>
-        </MessageComponent>
+        </MessageWrapperComponent>
     )
 }
 
@@ -131,7 +131,7 @@ function vMessageWithVoiceAudioTemplate(data) {
     )*/
     // const voice = new Voice(new Audio(data.audio.url), data.audio.waveform);
     return (
-        <MessageComponent data={data}>
+        <MessageWrapperComponent data={data}>
             {/*<div class={vGetClass(data)}>*/}
             {/*    <div className="message">*/}
             {/*        {vForwardedTemplate(data)}*/}
@@ -139,18 +139,18 @@ function vMessageWithVoiceAudioTemplate(data) {
             {/*        {vTimeTemplate(data)}*/}
             {/*    </div>*/}
             {/*</div>*/}
-        </MessageComponent>
+        </MessageWrapperComponent>
     )
 }
 
 function vMessageWithAudioTemplate(data) {
     return (
-        <MessageComponent data={data}>
+        <MessageWrapperComponent data={data}>
             {/*<div class={vGetClass(data)}>*/}
             {/*    <audio src={data.url}/>*/}
             {/*    {vTimeTemplate(data, true)}*/}
             {/*</div>*/}
-        </MessageComponent>
+        </MessageWrapperComponent>
     )
 }
 

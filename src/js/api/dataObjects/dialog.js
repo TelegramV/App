@@ -1,13 +1,13 @@
-import MTProto from "../mtproto";
+import MTProto from "../../mtproto";
 import {Message} from "./message";
-import {tsNow} from "../mtproto/timeManager";
-import {generateDialogIndex} from "../api/dialogs/messageIdManager";
-import PeersManager from "../api/peers/peersManager";
-import {getInputFromPeer, getInputPeerFromPeer} from "../api/dialogs/util"
-import PeersStore from "../api/store/peersStore"
+import {tsNow} from "../../mtproto/timeManager";
+import {generateDialogIndex} from "../dialogs/messageIdManager";
+import PeersManager from "../peers/peersManager";
+import {getInputFromPeer, getInputPeerFromPeer} from "../dialogs/util"
+import PeersStore from "../store/peersStore"
 import {Peer} from "./peer/peer"
 import {DialogMessages} from "./dialogMessages"
-import AppEvents from "../api/eventBus/appEvents"
+import AppEvents from "../eventBus/appEvents"
 import {DraftMessage} from "./draftMessage"
 
 /**
@@ -145,9 +145,6 @@ export class Dialog {
             this._peer = undefined // lazy init
         }
 
-        this._readInboxMaxId = -1
-        this._readOutboxMaxId = -1
-        this._unreadMentionsCount = 0
         this._pts = 0
         this._draft = DraftMessage.createEmpty(this)
         this._folderId = undefined
@@ -222,52 +219,65 @@ export class Dialog {
         return this.messageActions
     }
 
+    /**
+     * @return {DraftMessage}
+     */
     get draft() {
         return this._draft
     }
 
+    /**
+     * @return {*}
+     */
     get notifySettings() {
         return this.raw.notify_settings
     }
 
+    /**
+     * @return {boolean}
+     */
     get isMuted() {
         return this.notifySettings.mute_until >= tsNow(true)
     }
 
-    get unreadMark() {
-        return this._unreadMark
-    }
-
-    get unreadMentionsCount() {
-        return this._unreadMentionsCount
-    }
-
-    get readOutbox() {
-        return this._readOutboxMaxId
-    }
-
+    /**
+     * @return {number}
+     */
     get index() {
         return generateDialogIndex(this.messages.last.date)
     }
 
+    /**
+     * @return {string}
+     */
     get type() {
         return this.peer.type
+    }
+
+    /**
+     * @return {boolean}
+     */
+    get unreadMark() {
+        return this._unreadMark
     }
 
     fillRaw(rawDialog) {
         this._pinned = rawDialog.pFlags.pinned || false
         this._unreadMark = rawDialog.pFlags.unread_mark || false
+        this._unreadMark = rawDialog.pFlags.unread_mark || false
+
         if (!this._peer) {
             this._peer = PeersStore.getFromDialogRawPeer(rawDialog.peer) // handle not found
         }
-        this._readInboxMaxId = rawDialog.read_inbox_max_id || -1
-        this._readOutboxMaxId = rawDialog.read_outbox_max_id || -1
+
         this.messages.unreadCount = rawDialog.unread_count || 0
-        this._unreadMentionsCount = rawDialog.unread_mentions_count || 0
+        this.messages.readInboxMaxId = rawDialog.read_inbox_max_id || 0
+        this.messages.readOutboxMaxId = rawDialog.read_outbox_max_id || 0
+        this.messages.unreadMentionsCount = rawDialog.unread_mentions_count || 0
+
         this._pts = rawDialog.pts || 0
         this._draft = new DraftMessage(this, rawDialog.draft)
     }
-
 
     fillRawAndFire(rawDialog) {
         this.fillRaw(rawDialog)

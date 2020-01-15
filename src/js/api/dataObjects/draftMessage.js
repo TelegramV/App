@@ -1,4 +1,4 @@
-import AppEvents from "../api/eventBus/appEvents"
+import AppEvents from "../eventBus/appEvents"
 
 export class DraftMessage {
     constructor(dialog, rawDraftMessage) {

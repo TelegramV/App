@@ -3,7 +3,7 @@ import {UserPeer} from "./peer/userPeer";
 import {SupergroupPeer} from "./peer/supergroupPeer";
 import {ChannelPeer} from "./peer/channelPeer";
 import {GroupPeer} from "./peer/groupPeer";
-import {createLogger} from "../common/logger";
+import {createLogger} from "../../common/logger";
 import {GroupForbiddenPeer} from "./peer/groupForbiddenPeer";
 import {ChannelForbiddenPeer} from "./peer/channelForbiddenPeer";
 

@@ -10,13 +10,14 @@ import vdom_isComponent from "./check/isComponent"
 import vdom_hasAttribute from "./check/hasAttribute"
 import vdom_appendToReal from "./appendToReal"
 import vdom_prependToReal from "./prependToReal"
+import vdom_createEmptyNode from "./createEmptyNode"
 
 /**
  * Simple Virtual DOM.
  *
  * - Patches directly virtual node to real $element.
  *
- * @author kohutd & tutorials from the internet
+ * @author kohutd
  */
 export const VDOM = {
     h: vdom_h,
@@ -30,9 +31,13 @@ export const VDOM = {
     isComponent: vdom_isComponent,
     hasAttribute: vdom_hasAttribute,
 
+    createEmptyNode: vdom_createEmptyNode,
+
     mount: vdom_mount,
     appendToReal: vdom_appendToReal,
     prependToReal: vdom_prependToReal,
+
+    Fragment: 69
 }
 
 export default VDOM

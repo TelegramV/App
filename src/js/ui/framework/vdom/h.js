@@ -2,6 +2,8 @@ import vdom_isNamedComponent from "./check/isNamedComponent"
 import vdom_isSimpleComponent from "./check/isSimpleComponent"
 import vdom_isVNode from "./check/isVNode"
 import {VNode} from "./vNode"
+import vdom_createEmptyNode from "./createEmptyNode"
+import VDOM from "./index"
 
 function removeIfs(array) {
     for (let i = 0; i < array.length; i++) {
@@ -13,6 +15,8 @@ function removeIfs(array) {
 
 /**
  * Creates Virtual Node
+ *
+ * WARNING: Virtual Node != Component. Thus, methods with same name can do different job!
  *
  * Components:
  *
@@ -70,9 +74,18 @@ function removeIfs(array) {
  * @returns {VNode}
  */
 function vdom_h(tagName, vNode) {
-    const vElem = Object.create(VNode)
+    // removeIfs(vNode.children) // todo: uncomment this there is a need. but without this rendering is faster
 
-    removeIfs(vNode.children)
+    // for fragments
+    // if (tagName === VDOM.Fragment) {
+    //     console.log(tagName, vNode)
+    //     if (!vNode.parent) {
+    //         throw new Error("fragment without parent cannot be rendered")
+    //     } else {
+    //         vNode.parent.children = []
+    //         vNode.parent.children.push(...vNode.children)
+    //     }
+    // }
 
     // component
     if (vdom_isSimpleComponent(tagName)) {
@@ -84,7 +97,7 @@ function vdom_h(tagName, vNode) {
         const component = tagName
 
         if (!component.__ || !component.__.inited) {
-            // component creation
+            // component meta info. do not ever change this manually!
             component.__ = component.__ || {
                 inited: false,
                 mounted: false,
@@ -93,41 +106,71 @@ function vdom_h(tagName, vNode) {
                 reactive: {}
             }
 
+            // mounted real DOM $node
             component.$el = component.$el || undefined
+
+            // mb deprecated because not implemented yet
             component.vParent = component.vParent || undefined
+
+            // the component state.
             component.state = component.state || {}
 
+            // the reactive component state.
+            component.reactive = component.reactive || {}
+
+            // mb deprecated
             component.props = component.props || {}
 
+            // returns a virtual node
             component.h = (component.h || function () {
                 throw new Error("implement pls")
             }).bind(component)
 
+            // event.
+            // called when the component was rendered by vdom_render
+            // called always before `mounted`
             component.created = (component.created || function () {
             }).bind(component)
 
+            // event.
+            // called when some reactive property from the state was changed
             component.changed = (component.changed || function (key, value) {
             }).bind(component)
 
+            // event.
+            // called when component has mounted to real DOM
             component.mounted = (component.mounted || function () {
             }).bind(component)
 
+            // event.
+            // called when component is destroying.
+            // fixme: not implemented yet
             component.destroy = (component.destroy || function () {
             }).bind(component)
 
+            // event.
+            // called when trying patch the component by `__patch`
+            // passes vNode: a new virtualNode to be patched
+            // returns vNode or false
+            // if returns false then will not be patched
             component.patch = (component.patch || function (vNode) {
                 return vNode
             }).bind(component)
 
+            // remove component from DOM
             component.delete = (component.delete || function () {
                 this.destroy()
                 this.$el.remove()
             }).bind(component)
 
+            // ...
             component.__render = (component.__render || function (props) {
                 this.__init()
 
-                this.props = props
+                if (props) {
+                    Object.assign(this.props, props)
+                }
+
                 const vNode = this.h(props)
 
                 vNode.component = this
@@ -136,12 +179,16 @@ function vdom_h(tagName, vNode) {
                 return vNode
             }).bind(component)
 
+            // ...
             component.__patch = (component.__patch || function (props) {
                 this.__init()
 
-                this.$el = VDOM.patchReal(this.$el, this.__render(props))
+                if (this.patch(this.__render(props))) {
+                    this.$el = VDOM.patchReal(this.$el, this.__render(props))
+                }
             }).bind(component)
 
+            // ...
             component.__init = (component.__init || function () {
                 if (!this.__.inited) {
                     for (const [key, value] of Object.entries(this)) {
@@ -150,11 +197,13 @@ function vdom_h(tagName, vNode) {
                         }
                     }
 
-                    for (const [k, v] of Object.entries(this.state)) {
+                    for (const [k, v] of Object.entries(this.reactive)) {
                         if (v && v.__rc) {
                             v.component = this
                             v.key = k
-                            this.state[k] = v.default
+                            this.reactive[k] = v.defaultValue
+                        } else {
+                            console.error(`not reactive value ${k}`, value)
                         }
                     }
 
@@ -167,15 +216,24 @@ function vdom_h(tagName, vNode) {
 
         component.__init()
 
-        const vComponentNode = component.__render(Object.assign(vNode.attrs, {slot: vNode.children}))
+        const vComponentElem = component.__render(Object.assign(vNode.attrs, {slot: vNode.children}))
 
-        vComponentNode.renderIf = vNode.renderIf
+        vComponentElem.renderIf = vNode.renderIf
 
-        return vComponentNode
+        return vComponentElem
     }
 
+    const vElem = vdom_createEmptyNode()
     Object.assign(vElem, vNode)
     vElem.tagName = tagName
+
+    // for fragments
+    // vElem.children.forEach(vChild => {
+    //     console.log("setting parent", vElem, vChild)
+    //     if (vdom_isVNode(vChild)) {
+    //         vChild.parent = vElem
+    //     }
+    // })
 
     return vElem
 }

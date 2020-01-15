@@ -2,11 +2,11 @@ import {MTProto} from "../../mtproto"
 import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash, getPeerNameFromType} from "./util"
 import TimeManager from "../../mtproto/timeManager"
 import PeersManager from "../peers/peersManager"
-import {Dialog} from "../../dataObjects/dialog";
+import {Dialog} from "../dataObjects/dialog";
 import {Manager} from "../manager";
-import {UserPeer} from "../../dataObjects/peer/userPeer";
-import {Peer} from "../../dataObjects/peer/peer";
-import {Message} from "../../dataObjects/message";
+import {UserPeer} from "../dataObjects/peer/userPeer";
+import {Peer} from "../dataObjects/peer/peer";
+import {Message} from "../dataObjects/message";
 import {PeerAPI} from "../peerAPI"
 import DialogsStore from "../store/dialogsStore"
 import AppEvents from "../eventBus/appEvents"
@@ -38,7 +38,10 @@ class DialogManager extends Manager {
             const message = new Message(dialog, lastMessage)
 
             dialog.messages.appendSingle(message)
-            dialog.messages.addUnread(message.id)
+
+            if (!message.isOut) {
+                dialog.messages.addUnread(message.id)
+            }
 
             if (message.from instanceof UserPeer) {
                 dialog.removeMessageAction(message.from)
@@ -76,7 +79,7 @@ class DialogManager extends Manager {
 
             if (dialog) {
                 update.messages.forEach(mId => {
-                    dialog.messages.deleteUnread(mId)
+                    dialog.messages.deleteSingle(mId)
                 })
 
                 if (update.messages.indexOf(dialog.messages.last.id) > -1) {
@@ -91,12 +94,12 @@ class DialogManager extends Manager {
 
         MTProto.UpdatesManager.listenUpdate("updateDeleteMessages", async update => {
             DialogsStore.data.forEach((data, type) => data.forEach(/** @param {Dialog} dialog */(dialog, id) => {
+                update.messages.forEach(mId => {
+                    dialog.messages.deleteSingle(mId)
+                })
+
                 if (update.messages.indexOf(dialog.messages.last.id) > -1) {
                     this.fetchPlainPeerDialogs({_: dialog.peer.type, id: dialog.peer.id})
-
-                    update.messages.forEach(mId => {
-                        dialog.messages.deleteUnread(mId)
-                    })
                 }
             }))
         })
@@ -163,39 +166,29 @@ class DialogManager extends Manager {
             const dialog = this.findByPeer(update.peer)
             if (dialog) {
                 //todo: fix
-                dialog._dialog.read_inbox_max_id = update.max_id
+                dialog.messages.readInboxMaxId = update.max_id
                 if (update.still_unread_count === 0) {
                     dialog.messages.clearUnread()
                 } else {
                     dialog.messages.unreadCount = update.still_unread_count
                     dialog.messages.clearUnreadIds()
                 }
-
-                AppEvents.Dialogs.fire("updateReadHistoryInbox", {
-                    dialog
-                })
             }
         })
 
         MTProto.UpdatesManager.listenUpdate("updateReadHistoryOutbox", update => {
             const dialog = this.findByPeer(update.peer)
             if (dialog) {
-                //todo: fix
-                dialog._dialog.read_outbox_max_id = update.max_id
-
-                AppEvents.Dialogs.fire("updateReadHistoryOutbox", {
-                    dialog
-                })
+                dialog.messages.readOutboxMaxId = update.max_id
             }
         })
 
         MTProto.UpdatesManager.listenUpdate("updateReadChannelInbox", update => {
-            // console.log("inbox", update)
             const dialog = this.find("channel", update.channel_id)
 
             if (dialog) {
                 //todo: fix
-                dialog.readInboxMaxId = update.max_id
+                dialog.messages.readInboxMaxId = update.max_id
                 if (update.still_unread_count === 0) {
                     dialog.messages.clearUnread()
                 } else {
@@ -212,7 +205,7 @@ class DialogManager extends Manager {
         MTProto.UpdatesManager.listenUpdate("updateReadChannelOutbox", update => {
             const dialog = this.find("channel", update.channel_id)
             if (dialog) {
-                dialog._dialog.read_outbox_max_id = update.max_id
+                dialog.messages.readOutboxMaxId = update.max_id
 
                 AppEvents.Dialogs.fire("updateReadChannelOutbox", {
                     dialog: dialog

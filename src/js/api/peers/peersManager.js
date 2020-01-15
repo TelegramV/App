@@ -1,11 +1,11 @@
 import {arrayDelete} from "../../common/utils/utils"
-import {Peer} from "../../dataObjects/peer/peer";
+import {Peer} from "../dataObjects/peer/peer";
 import {Manager} from "../manager";
 import PeersStore from "../store/peersStore"
 import AppEvents from "../eventBus/appEvents"
 import {MTProto} from "../../mtproto"
-import {UserPeer} from "../../dataObjects/peer/userPeer"
-import {getPeerObject} from "../../dataObjects/peerFactory"
+import {UserPeer} from "../dataObjects/peer/userPeer"
+import {getPeerObject} from "../dataObjects/peerFactory"
 
 class PeerManager extends Manager {
     constructor() {

@@ -1,15 +1,11 @@
-import {MTProto} from "./mtproto"
-import {createNonce} from "./mtproto/utils/bin"
-
 import "../sass/application.scss"
-import {MainPage} from "./ui/pages/main/mainPage"
-import {LoginPage} from "./ui/pages/login/nextlogin"
-import {AppFramework} from "./ui/framework/framework"
 
 import "./ui/vendor/tgs_player"
-import {EventBus} from "./api/eventBus"
-import ReactiveCallback from "./ui/framework/reactive/reactiveCallback"
 import {loadSchema} from "./mtproto/language/schema"
+import AppFramework from "./ui/framework/framework"
+import MTProto from "./mtproto"
+import {MainPage} from "./ui/pages/main/mainPage"
+import {LoginPage} from "./ui/pages/login/nextlogin"
 
 
 const authContext = {
@@ -25,8 +21,6 @@ function start() {
             // TODO country response.contry
         }
     })
-
-    global.UIEventBus = new EventBus()
 
     AppFramework.Router.route("/login", "login", {
         h() {
@@ -131,6 +125,19 @@ function start() {
 // })
 
 
-// AppFramework.mount("#app")
+// global.VDOM = VDOM
+//
+// const Fragment = (
+//     <div>
+//         <>
+//             <dt>{0}</dt>
+//             <dd>{1}</dd>
+//         </>
+//     </div>
+// )
+//
+// console.log(Fragment)
+//
+// VDOM.mount(Fragment, "#app")
 
 loadSchema().then(() => MTProto.connect(authContext).then(start))
