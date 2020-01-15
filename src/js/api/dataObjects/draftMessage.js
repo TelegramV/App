@@ -15,6 +15,10 @@ export class DraftMessage {
         this.fillRaw(rawDraftMessage)
     }
 
+    get raw() {
+        return this._rawDraftMessage
+    }
+
     get dialog() {
         return this._dialog
     }

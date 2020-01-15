@@ -19,7 +19,7 @@ import vdom_createEmptyNode from "./createEmptyNode"
  *
  * @author kohutd
  */
-export const VDOM = {
+const VDOM = {
     h: vdom_h,
     jsx: vdom_jsx,
     render: vdom_render,

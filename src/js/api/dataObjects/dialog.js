@@ -270,10 +270,12 @@ export class Dialog {
             this._peer = PeersStore.getFromDialogRawPeer(rawDialog.peer) // handle not found
         }
 
+        this.messages.startTransaction()
         this.messages.unreadCount = rawDialog.unread_count || 0
         this.messages.readInboxMaxId = rawDialog.read_inbox_max_id || 0
         this.messages.readOutboxMaxId = rawDialog.read_outbox_max_id || 0
         this.messages.unreadMentionsCount = rawDialog.unread_mentions_count || 0
+        this.messages.stopTransaction()
 
         this._pts = rawDialog.pts || 0
         this._draft = new DraftMessage(this, rawDialog.draft)

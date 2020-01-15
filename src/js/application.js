@@ -6,6 +6,7 @@ import AppFramework from "./ui/framework/framework"
 import MTProto from "./mtproto"
 import {MainPage} from "./ui/pages/main/mainPage"
 import {LoginPage} from "./ui/pages/login/nextlogin"
+import AppCache from "./api/cache"
 
 
 const authContext = {
@@ -139,5 +140,7 @@ function start() {
 // console.log(Fragment)
 //
 // VDOM.mount(Fragment, "#app")
+
+AppCache.open()
 
 loadSchema().then(() => MTProto.connect(authContext).then(start))

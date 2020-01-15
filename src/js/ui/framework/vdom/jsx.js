@@ -52,7 +52,7 @@ function removeEmpties(array) {
  * @param tagName
  * @param attributes
  * @param children
- * @returns {VNode}
+ * @returns {*}
  */
 function vdom_jsx(tagName, attributes, ...children) {
     if (tagName === VDOM.Fragment) {

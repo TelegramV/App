@@ -1,6 +1,7 @@
 import {MTProto} from "../mtproto";
 import Bytes from "../mtproto/utils/bytes"
 import Random from "../mtproto/utils/random"
+import AppCache from "./cache"
 
 const cache = {}
 const cachePeerPhotos = {}
@@ -60,13 +61,16 @@ export class FileAPI {
 
     static getPeerPhoto(file, dcID, peer, big) {
         return new Promise(resolve => {
-            if (cachePeerPhotos[file.volume_id + "_" + file.local_id]) {
-                return cachePeerPhotos[file.volume_id + "_" + file.local_id]
-            }
-            return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
-                const blob = new Blob([response.bytes], {type: 'application/jpeg'})
+            return AppCache.get("peerAvatars", file.volume_id + "_" + file.local_id).then(blob => {
+                return URL.createObjectURL(blob)
+            }).catch(error => {
+                return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
+                    const blob = new Blob([response.bytes], {type: 'application/jpeg'})
 
-                return cachePeerPhotos[file.volume_id + "_" + file.local_id] = URL.createObjectURL(blob)
+                    AppCache.put("peerAvatars", file.volume_id + "_" + file.local_id, blob)
+
+                    return URL.createObjectURL(blob)
+                })
             }).then(resolve)
         })
     }
@@ -99,22 +103,24 @@ export class FileAPI {
 
     static getFile(file, thumb_size = "") {
         return new Promise(resolve => {
-            const key = Bytes.asHex(file.file_reference)
-            if (cache[key]) {
-                resolve(cache[key])
-                return
-            }
 
-            return this.getFileLocation({
-                _: this.getInputName(file),
-                id: file.id,
-                access_hash: file.access_hash,
-                file_reference: file.file_reference,
-                thumb_size: thumb_size
-            }, file.dc_id).then(response => {
-                const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
-                const blob = new Blob([response.bytes], {type: type});
-                return cache[key] = URL.createObjectURL(blob)
+            const key = Bytes.asHex(file.file_reference)
+
+            AppCache.get("files", key).then(blob => {
+                return URL.createObjectURL(blob)
+            }).catch(error => {
+                return this.getFileLocation({
+                    _: this.getInputName(file),
+                    id: file.id,
+                    access_hash: file.access_hash,
+                    file_reference: file.file_reference,
+                    thumb_size: thumb_size
+                }, file.dc_id).then(response => {
+                    const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
+                    const blob = new Blob([response.bytes], {type: type})
+                    AppCache.put("files", key, blob)
+                    return URL.createObjectURL(blob)
+                })
             }).then(resolve)
         })
     }

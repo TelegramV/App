@@ -1,9 +1,7 @@
-import {VNode} from "../vNode"
-
 /**
  * Checks if object is virtual node.
  *
- * @param {VNode} potentialVNode
+ * @param potentialVNode
  * @return {boolean}
  */
 function vdom_isVNode(potentialVNode) {

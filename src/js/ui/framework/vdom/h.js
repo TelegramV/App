@@ -1,7 +1,6 @@
 import vdom_isNamedComponent from "./check/isNamedComponent"
 import vdom_isSimpleComponent from "./check/isSimpleComponent"
 import vdom_isVNode from "./check/isVNode"
-import {VNode} from "./vNode"
 import vdom_createEmptyNode from "./createEmptyNode"
 import VDOM from "./index"
 
@@ -71,7 +70,7 @@ function removeIfs(array) {
  *
  * @param tagName
  * @param vNode
- * @returns {VNode}
+ * @returns {*}
  */
 function vdom_h(tagName, vNode) {
     // removeIfs(vNode.children) // todo: uncomment this there is a need. but without this rendering is faster

@@ -1,7 +1,7 @@
 import vdom_render from "./render"
 
 /**
- * @param {VNode} vNode
+ * @param vNode
  * @param {Element} $element
  * @param xmlns
  * @return {Element}

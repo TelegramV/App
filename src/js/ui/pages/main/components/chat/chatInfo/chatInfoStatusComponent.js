@@ -7,9 +7,10 @@ import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 import AppEvents from "../../../../../../api/eventBus/appEvents"
 
 const ChatInfoStatusComponent = {
+
     name: "ChatInfoStatusComponent",
 
-    simpleState: {
+    state: {
         patchEvents: new Set([
             "updateUserStatus",
             "fullLoaded",
@@ -27,7 +28,7 @@ const ChatInfoStatusComponent = {
     mounted() {
         AppEvents.Peers.listenAny(event => {
             if (AppSelectedDialog.check(event.peer.dialog)) {
-                if (this.simpleState.patchEvents.has(event.type)) {
+                if (this.state.patchEvents.has(event.type)) {
                     this.__patch()
                 }
             }

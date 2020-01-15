@@ -21,7 +21,7 @@ function vdom_mount(vNode, $target) {
 /**
  * @param {Element} $node
  * @param {Element|string} $target
- * @param {VNode} vNode
+ * @param vNode
  * @return {Element}
  */
 export function vdom_realMount($node, $target, vNode = undefined) {

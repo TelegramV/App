@@ -1,5 +1,5 @@
 import {FrameworkRouter} from "./router"
-import {VDOM} from "./vdom"
+import VDOM from "./vdom"
 
 global.VDOM = VDOM
 

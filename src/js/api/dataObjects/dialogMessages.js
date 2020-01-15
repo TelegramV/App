@@ -42,6 +42,8 @@ export class DialogMessages {
         this._unreadMentionsCount = unreadMentionsCount
         this._readOutboxMaxId = readOutboxMaxId
         this._readInboxMaxId = readInboxMaxId
+
+        this._fireTransactionStarted = false
     }
 
     /**
@@ -94,9 +96,11 @@ export class DialogMessages {
     set unreadCount(unreadCount) {
         this._unreadCount = unreadCount || this._unreadCount
 
-        AppEvents.Dialogs.fire("updateUnreadCount", {
-            dialog: this._dialog
-        })
+        if (!this._fireTransactionStarted) {
+            AppEvents.Dialogs.fire("updateUnreadCount", {
+                dialog: this._dialog
+            })
+        }
     }
 
     /**
@@ -112,9 +116,11 @@ export class DialogMessages {
     set unreadMentionsCount(unreadMentionsCount) {
         this._unreadMentionsCount = unreadMentionsCount || this._unreadMentionsCount
 
-        AppEvents.Dialogs.fire("updateUnreadMentionsCount", {
-            dialog: this._dialog
-        })
+        if (!this._fireTransactionStarted) {
+            AppEvents.Dialogs.fire("updateUnreadMentionsCount", {
+                dialog: this._dialog
+            })
+        }
     }
 
     /**
@@ -130,9 +136,11 @@ export class DialogMessages {
     set readOutboxMaxId(readOutboxMaxId) {
         this._readOutboxMaxId = readOutboxMaxId || this._readOutboxMaxId
 
-        AppEvents.Dialogs.fire("updateReadOutboxMaxId", {
-            dialog: this._dialog
-        })
+        if (!this._fireTransactionStarted) {
+            AppEvents.Dialogs.fire("updateReadOutboxMaxId", {
+                dialog: this._dialog
+            })
+        }
     }
 
     /**
@@ -148,9 +156,11 @@ export class DialogMessages {
     set readInboxMaxId(readInboxMaxId) {
         this._readInboxMaxId = readInboxMaxId || this._readInboxMaxId
 
-        AppEvents.Dialogs.fire("updateReadInboxMaxId", {
-            dialog: this._dialog
-        })
+        if (!this._fireTransactionStarted) {
+            AppEvents.Dialogs.fire("updateReadInboxMaxId", {
+                dialog: this._dialog
+            })
+        }
     }
 
     /**
@@ -158,6 +168,10 @@ export class DialogMessages {
      */
     get unreadMessagesIds() {
         return this._unreadIds
+    }
+
+    get isTransaction() {
+        return this._fireTransactionStarted
     }
 
     /**
@@ -204,9 +218,11 @@ export class DialogMessages {
             this._prevLastMessage = undefined
         }
 
-        AppEvents.Dialogs.fire("deleteMessage", {
-            messageId
-        })
+        if (!this._fireTransactionStarted) {
+            AppEvents.Dialogs.fire("deleteMessage", {
+                messageId
+            })
+        }
     }
 
     /**
@@ -219,9 +235,11 @@ export class DialogMessages {
             this._unreadCount++
         }
 
-        AppEvents.Dialogs.fire("updateUnread", {
-            dialog: this._dialog
-        })
+        if (!this._fireTransactionStarted) {
+            AppEvents.Dialogs.fire("updateUnread", {
+                dialog: this._dialog
+            })
+        }
     }
 
     /**
@@ -236,18 +254,22 @@ export class DialogMessages {
             }
         }
 
-        AppEvents.Dialogs.fire("updateUnread", {
-            dialog: this._dialog
-        })
+        if (!this._fireTransactionStarted) {
+            AppEvents.Dialogs.fire("updateUnread", {
+                dialog: this._dialog
+            })
+        }
     }
 
     clearUnread() {
         this.clearUnreadIds()
         this._unreadCount = 0
 
-        AppEvents.Dialogs.fire("updateUnread", {
-            dialog: this._dialog
-        })
+        if (!this._fireTransactionStarted) {
+            AppEvents.Dialogs.fire("updateUnread", {
+                dialog: this._dialog
+            })
+        }
     }
 
     clearUnreadIds() {
@@ -269,5 +291,21 @@ export class DialogMessages {
                 return 0
             }
         })
+    }
+
+    startTransaction() {
+        this._fireTransactionStarted = true
+    }
+
+    stopTransaction() {
+        this._fireTransactionStarted = false
+    }
+
+    fireTransaction(eventName = "updateSingle") {
+        AppEvents.Dialogs.fire(eventName, {
+            dialog: this._dialog
+        })
+
+        this._fireTransactionStarted = false
     }
 }
