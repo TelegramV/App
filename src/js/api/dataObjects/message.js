@@ -76,7 +76,7 @@ export class Message {
     get prefix() {
         const from = this.from
         const hideSender = this.to instanceof ChannelPeer || (!this.isOut && this.to instanceof UserPeer)
-        const sender = this.isOut ? "You" : from.peerName
+        const sender = this.isOut ? "You" : from.name
 
         return getMessagePreviewDialog(this._message, sender, !hideSender)
     }
