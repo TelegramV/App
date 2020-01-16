@@ -10,16 +10,11 @@ import {Message} from "../dataObjects/message";
 import {PeerAPI} from "../peerAPI"
 import DialogsStore from "../store/dialogsStore"
 import AppEvents from "../eventBus/appEvents"
+import AppSelectedDialog from "./selectedDialog"
 
 class DialogManager extends Manager {
     constructor() {
         super()
-
-        this.initListeners = new Map([
-            ["chat", new Map()],
-            ["channel", new Map()],
-            ["user", new Map()],
-        ])
 
         this.latestDialog = undefined
         this.dialogsOffsetDate = 0 // TODO
@@ -28,6 +23,12 @@ class DialogManager extends Manager {
 
 
     init() {
+        AppSelectedDialog.listen(_ => {
+            if (AppSelectedDialog.PreviousDialog) {
+                AppSelectedDialog.PreviousDialog.messages.clear()
+            }
+        })
+
         /**
          * @param {Dialog} dialog
          * @param {Object} lastMessage
@@ -78,28 +79,45 @@ class DialogManager extends Manager {
             const dialog = DialogsStore.get("channel", update.channel_id)
 
             if (dialog) {
-                update.messages.forEach(mId => {
+                dialog.messages.startTransaction()
+
+                update.messages.sort().forEach(mId => {
                     dialog.messages.deleteSingle(mId)
                 })
 
-                if (update.messages.indexOf(dialog.messages.last.id) > -1) {
-                    this.fetchPlainPeerDialogs({
-                        _: dialog.peer.type,
-                        id: dialog.peer.id,
-                        access_hash: dialog.peer.peer.access_hash
-                    })
+                if (!dialog.messages.last) {
+                    if (update.messages.indexOf(dialog.messages.last.id) > -1) {
+                        this.fetchPlainPeerDialogs({
+                            _: dialog.peer.type,
+                            id: dialog.peer.id,
+                            access_hash: dialog.peer.peer.access_hash
+                        })
+                    }
+                } else {
+                    dialog.messages.fireTransaction()
                 }
             }
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateDeleteMessages", async update => {
+        MTProto.UpdatesManager.listenUpdate("updateDeleteMessages", update => {
             DialogsStore.data.forEach((data, type) => data.forEach(/** @param {Dialog} dialog */(dialog, id) => {
-                update.messages.forEach(mId => {
-                    dialog.messages.deleteSingle(mId)
-                })
+                if (dialog.type !== "channel") {
+                    dialog.messages.startTransaction()
 
-                if (update.messages.indexOf(dialog.messages.last.id) > -1) {
-                    this.fetchPlainPeerDialogs({_: dialog.peer.type, id: dialog.peer.id})
+                    update.messages.sort().forEach(mId => {
+                        dialog.messages.deleteSingle(mId)
+                    })
+
+                    if (!dialog.messages.last) {
+                        if (update.messages.indexOf(dialog.messages.last.id) > -1) {
+                            this.fetchPlainPeerDialogs({
+                                _: dialog.peer.type,
+                                id: dialog.peer.id
+                            })
+                        }
+                    } else {
+                        dialog.messages.fireTransaction()
+                    }
                 }
             }))
         })
@@ -151,22 +169,12 @@ class DialogManager extends Manager {
             }
         })
 
-        // MTProto.MessageProcessor.listenUpdateDialogUnreadMark(update => {
-        //     const dialog = this.findByPeer(update.peer.peer)
-        //     if(dialog) {
-        //         dialog._dialog.pFlags.unread_mark = update.pFlags.unread
-        //         this.resolveListeners({
-        //             type: "updateSingle",
-        //             dialog: dialog
-        //         })
-        //     }
-        // })
-
         MTProto.UpdatesManager.listenUpdate("updateReadHistoryInbox", update => {
             const dialog = this.findByPeer(update.peer)
+
             if (dialog) {
-                //todo: fix
                 dialog.messages.readInboxMaxId = update.max_id
+
                 if (update.still_unread_count === 0) {
                     dialog.messages.clearUnread()
                 } else {
@@ -187,7 +195,7 @@ class DialogManager extends Manager {
             const dialog = this.find("channel", update.channel_id)
 
             if (dialog) {
-                //todo: fix
+                dialog.messages.startTransaction()
                 dialog.messages.readInboxMaxId = update.max_id
                 if (update.still_unread_count === 0) {
                     dialog.messages.clearUnread()
@@ -195,6 +203,7 @@ class DialogManager extends Manager {
                     dialog.messages.unreadCount = update.still_unread_count
                     dialog.messages.clearUnreadIds()
                 }
+                dialog.messages.stopTransaction()
 
                 AppEvents.Dialogs.fire("updateReadChannelInbox", {
                     dialog
@@ -283,7 +292,7 @@ class DialogManager extends Manager {
         // })
     }
 
-    fetchNextPage({limit = 10}) {
+    fetchNextPage({limit = 40}) {
         const latestDialog = this.latestDialog
         const peer = latestDialog.peer
 

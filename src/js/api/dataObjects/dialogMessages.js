@@ -43,7 +43,7 @@ export class DialogMessages {
         this._readOutboxMaxId = readOutboxMaxId
         this._readInboxMaxId = readInboxMaxId
 
-        this._fireTransactionStarted = false
+        this._fireTransactionCount = 0
     }
 
     /**
@@ -96,7 +96,7 @@ export class DialogMessages {
     set unreadCount(unreadCount) {
         this._unreadCount = unreadCount || this._unreadCount
 
-        if (!this._fireTransactionStarted) {
+        if (!this.isTransaction) {
             AppEvents.Dialogs.fire("updateUnreadCount", {
                 dialog: this._dialog
             })
@@ -116,7 +116,7 @@ export class DialogMessages {
     set unreadMentionsCount(unreadMentionsCount) {
         this._unreadMentionsCount = unreadMentionsCount || this._unreadMentionsCount
 
-        if (!this._fireTransactionStarted) {
+        if (!this.isTransaction) {
             AppEvents.Dialogs.fire("updateUnreadMentionsCount", {
                 dialog: this._dialog
             })
@@ -136,7 +136,7 @@ export class DialogMessages {
     set readOutboxMaxId(readOutboxMaxId) {
         this._readOutboxMaxId = readOutboxMaxId || this._readOutboxMaxId
 
-        if (!this._fireTransactionStarted) {
+        if (!this.isTransaction) {
             AppEvents.Dialogs.fire("updateReadOutboxMaxId", {
                 dialog: this._dialog
             })
@@ -156,7 +156,7 @@ export class DialogMessages {
     set readInboxMaxId(readInboxMaxId) {
         this._readInboxMaxId = readInboxMaxId || this._readInboxMaxId
 
-        if (!this._fireTransactionStarted) {
+        if (!this.isTransaction) {
             AppEvents.Dialogs.fire("updateReadInboxMaxId", {
                 dialog: this._dialog
             })
@@ -171,7 +171,7 @@ export class DialogMessages {
     }
 
     get isTransaction() {
-        return this._fireTransactionStarted
+        return this._fireTransactionCount > 0
     }
 
     /**
@@ -218,7 +218,11 @@ export class DialogMessages {
             this._prevLastMessage = undefined
         }
 
-        if (!this._fireTransactionStarted) {
+        if (messageId === this.this._prevLastMessage.id) {
+            this._lastMessage = undefined
+        }
+
+        if (!this.isTransaction) {
             AppEvents.Dialogs.fire("deleteMessage", {
                 messageId
             })
@@ -235,7 +239,7 @@ export class DialogMessages {
             this._unreadCount++
         }
 
-        if (!this._fireTransactionStarted) {
+        if (!this.isTransaction) {
             AppEvents.Dialogs.fire("updateUnread", {
                 dialog: this._dialog
             })
@@ -254,7 +258,7 @@ export class DialogMessages {
             }
         }
 
-        if (!this._fireTransactionStarted) {
+        if (!this.isTransaction) {
             AppEvents.Dialogs.fire("updateUnread", {
                 dialog: this._dialog
             })
@@ -265,7 +269,7 @@ export class DialogMessages {
         this.clearUnreadIds()
         this._unreadCount = 0
 
-        if (!this._fireTransactionStarted) {
+        if (!this.isTransaction) {
             AppEvents.Dialogs.fire("updateUnread", {
                 dialog: this._dialog
             })
@@ -274,6 +278,10 @@ export class DialogMessages {
 
     clearUnreadIds() {
         this._unreadIds.clear()
+    }
+
+    clear() {
+        this._messages.clear()
     }
 
     /**
@@ -294,11 +302,13 @@ export class DialogMessages {
     }
 
     startTransaction() {
-        this._fireTransactionStarted = true
+        this._fireTransactionCount++
     }
 
     stopTransaction() {
-        this._fireTransactionStarted = false
+        if (this._fireTransactionCount !== 0) {
+            this._fireTransactionCount--
+        }
     }
 
     fireTransaction(eventName = "updateSingle") {
@@ -306,6 +316,6 @@ export class DialogMessages {
             dialog: this._dialog
         })
 
-        this._fireTransactionStarted = false
+        this.stopTransaction()
     }
 }

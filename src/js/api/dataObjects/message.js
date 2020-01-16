@@ -53,7 +53,11 @@ export class Message {
     }
 
     get isOut() {
-        return this._message.pFlags.out || false
+        if (this._message.pFlags.out) {
+            return true
+        }
+
+        return this._message.from_id === parseInt(MTProto.getAuthorizedUser().user.id)
     }
 
     get isPost() {

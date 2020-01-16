@@ -28,7 +28,7 @@ export class PeerAPI {
     /**
      * @param peer
      * @param idNames
-     * @return {{_: string}}
+     * @return {{_: string, id: number}}
      */
     static getPlain(peer, idNames = true) {
         switch (peer._) {

@@ -42,6 +42,14 @@ class UpdateManager extends Manager {
         console.log("State was set = ", State)
     }
 
+    updateHasPts(_update) {
+        return !!_update.pts
+    }
+
+    updateHasPtsWithCount(_update) {
+        return this.updateHasPts(_update) && _update.pts_count !== undefined && _update.pts_count !== null
+    }
+
     init() {
         MTProto.invokeMethod("updates.getState", {}).then(State => {
             this.State = State
@@ -163,33 +171,43 @@ class UpdateManager extends Manager {
      * @private
      */
     _checkChannelPts(dialog, _update, onFail) {
-        if ((dialog.pts + _update.pts_count) === _update.pts) {
-            // console.log("channel update can be processed", _update)
+        if (this.updateHasPtsWithCount(_update)) {
+            if ((dialog.pts + _update.pts_count) === _update.pts) {
+                // console.log("channel update can be processed", _update)
 
-            this.resolveUpdateListeners(_update)
+                this.resolveUpdateListeners(_update)
 
-            dialog.pts = _update.pts
-        } else if ((dialog.pts + _update.pts_count) > _update.pts) {
-            console.log("channel update already processed")
+                dialog.pts = _update.pts
+            } else if ((dialog.pts + _update.pts_count) > _update.pts) {
+                console.log("channel update already processed")
+            } else {
+                console.warn("channel update cannot be processed", _update, dialog.pts, _update.pts_count, _update.pts)
+                onFail()
+            }
         } else {
-            console.warn("channel update cannot be processed", _update, dialog.pts, _update.pts_count, _update.pts)
-            onFail()
+            console.log("channel update has no pts")
+            this.resolveUpdateListeners(_update)
         }
     }
 
     _checkUserPts(State = {}, _update, onFail) {
         const statePts = State.pts || this.State.pts
 
-        if ((statePts + _update.pts_count) === _update.pts) {
-            this.State.pts = _update.pts
+        if (this.updateHasPtsWithCount(_update)) {
+            if ((statePts + _update.pts_count) === _update.pts) {
+                this.State.pts = _update.pts
 
-            this.resolveUpdateListeners(_update)
+                this.resolveUpdateListeners(_update)
 
-        } else if ((statePts + _update.pts_count) > _update.pts) {
-            console.log("update already processed")
+            } else if ((statePts + _update.pts_count) > _update.pts) {
+                console.log("update already processed")
+            } else {
+                console.warn("update cannot be processed", _update, statePts, _update.pts_count, _update.pts)
+                onFail()
+            }
         } else {
-            console.warn("update cannot be processed", _update, statePts, _update.pts_count, _update.pts)
-            onFail()
+            console.log("update has no pts")
+            this.resolveUpdateListeners(_update)
         }
     }
 
@@ -288,7 +306,7 @@ class UpdateManager extends Manager {
             try {
                 const update = next ? next : this._channelQueue[0]
 
-                if (update._.endsWith("ChannelMessage") || update._.endsWith("ChannelMessages")) {
+                if (update._.endsWith("ChannelMessage") || update._.endsWith("ChannelMessages") || update._.endsWith("ChannelPinnedMessages")) {
 
                     this._processChannelMessageUpdate(update)
 
@@ -372,7 +390,9 @@ class UpdateManager extends Manager {
                     this.State.seq = update.seq
                     this.State.date = update.date
                 } else {
+                    // if (this.updateHasPts(update)) {
                     this.resolveUpdateListeners(update)
+                    // }
                 }
 
                 this._userQueue.shift()

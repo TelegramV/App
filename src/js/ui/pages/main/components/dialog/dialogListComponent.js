@@ -4,13 +4,16 @@ import {AppFramework} from "../../../../framework/framework"
 import DialogsStore from "../../../../../api/store/dialogsStore"
 import AppEvents from "../../../../../api/eventBus/appEvents"
 import Sortable from "sortablejs"
-import {parseHashQuery} from "../../../../../api/dialogs/selectedDialog"
+import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 
 /**
  * CRITICAL: Never rerender this component!!!
  */
 export const DialogListComponent = {
     name: "dialog-list",
+    reactive: {
+        selectedDialog: AppSelectedDialog.Reactive.FireOnly
+    },
     state: {
         // note: mb this is redundant, but we should be careful with this
         renderedDialogsIds: {
@@ -26,14 +29,16 @@ export const DialogListComponent = {
 
         isInLoadingMoreScroll: false,
 
-        selectedDialog: undefined,
+        previousSelectedDialog: undefined,
     },
+
     elements: {
         $loader: undefined,
         $dialogsWrapper: undefined,
         $pinnedDialogs: undefined,
         $generalDialogs: undefined,
     },
+
     h() {
         return (
             <div className="chatlist">
@@ -74,6 +79,7 @@ export const DialogListComponent = {
             this.elements.$loader.style.display = "none"
             this.elements.$pinnedDialogs.style.display = ""
             this.elements.$generalDialogs.style.display = ""
+
             Sortable.create(this.elements.$pinnedDialogs)
         })
 
@@ -83,22 +89,18 @@ export const DialogListComponent = {
 
         AppFramework.Router.onQueryChange(queryParams => {
             if (queryParams.p) {
-                const previous = this.state.selectedDialog
-
-                if (queryParams.p.startsWith("@")) {
-                    this.state.selectedDialog = DialogsStore.getByUsername(queryParams.p.substring(1))
-                } else {
-                    const queryPeer = parseHashQuery()
-                    this.state.selectedDialog = DialogsStore.get(queryPeer.type, queryPeer.id)
-                }
-
-                this._patchSelectedDialog(previous)
             } else {
 
             }
         })
 
         this._registerResizer()
+    },
+
+    changed(key, value) {
+        if (key === "selectedDialog") {
+            this._patchSelectedDialog()
+        }
     },
 
     /**
@@ -342,17 +344,16 @@ export const DialogListComponent = {
             }
         }
 
-        VDOM.patchReal($dialog, <DialogComponent dialog={dialog}
-                                                 selected={this.state.selectedDialog && dialog.id === this.state.selectedDialog.id}/>)
+        VDOM.patchReal($dialog, <DialogComponent dialog={dialog}/>)
     },
 
-    _patchSelectedDialog(previous = false) {
-        if (this.state.selectedDialog) {
-            if (previous) {
-                this._patchDialog(previous)
+    _patchSelectedDialog() {
+        if (this.reactive.selectedDialog) {
+            if (AppSelectedDialog.PreviousDialog) {
+                this._patchDialog(AppSelectedDialog.PreviousDialog)
             }
 
-            this._patchDialog(this.state.selectedDialog)
+            this._patchDialog(this.reactive.selectedDialog)
         }
     },
 

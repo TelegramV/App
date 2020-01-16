@@ -19,15 +19,26 @@ class SelectedDialog {
      */
     constructor({dialog = undefined}) {
         this._dialog = dialog
+        this._previousDialog = undefined
+
         this._selectListeners = []
 
         AppFramework.Router.onQueryChange(queryParams => {
+            this._previousDialog = this._dialog
             this._dialog = this.findFromQueryParams(queryParams)
 
             this._selectListeners.forEach(listener => {
                 listener(this._dialog)
             })
         })
+    }
+
+    /**
+     * @return {undefined|Dialog}
+     * @constructor
+     */
+    get PreviousDialog() {
+        return this._previousDialog
     }
 
     /**
@@ -57,11 +68,15 @@ class SelectedDialog {
     get Reactive() {
         return ReactiveCallback(resolve => {
             this.listen(resolve)
+            this._previousDialog = this._dialog
             this._dialog = this.findFromQueryParams(AppFramework.Router.activeRoute.queryParams)
             return this._dialog
         })
     }
 
+    /**
+     * @param {function(dialog: Dialog)} callback
+     */
     listen(callback) {
         this._selectListeners.push(callback)
     }

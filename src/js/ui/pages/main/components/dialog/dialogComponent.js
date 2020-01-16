@@ -2,6 +2,7 @@ import {UserPeer} from "../../../../../api/dataObjects/peer/userPeer"
 import {DialogTextComponent} from "./dialogTextComponent"
 import {AppFramework} from "../../../../framework/framework"
 import {DialogAvatarComponent} from "./dialogAvatarComponent"
+import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 
 const DATE_FORMAT = {
     hour: '2-digit',
@@ -29,7 +30,7 @@ export const DialogComponent = {
      * @param {boolean} selected
      * @return {*}
      */
-    h({dialog, selected}) {
+    h({dialog}) {
         const peer = dialog.peer
         const unread = dialog.messages.unreadMentionsCount > 0 ? "@" : (dialog.messages.unreadCount > 0 ? dialog.messages.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
@@ -37,7 +38,7 @@ export const DialogComponent = {
         if (peer instanceof UserPeer && peer.onlineStatus.online) {
             personClasses.push("online")
         }
-        if (selected) {
+        if (AppSelectedDialog.check(dialog)) {
             personClasses.push("active")
         }
         if (unread !== "") personClasses.push("unread")
