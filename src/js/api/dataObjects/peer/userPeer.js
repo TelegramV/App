@@ -1,12 +1,9 @@
 import {tsNow} from "../../../mtproto/timeManager";
 import {getLastSeenMessage} from "../utils";
 import {Peer} from "./peer";
-import {createLogger} from "../../../common/logger";
-
-const Logger = createLogger("UserPeer")
 
 export class UserPeer extends Peer {
-    get peerName() {
+    get name() {
         if (this.isDeleted) {
             return "Deleted Account"
         }
@@ -15,15 +12,15 @@ export class UserPeer extends Peer {
     }
 
     get firstName() {
-        return this.peer.first_name
+        return this.raw.first_name || ""
     }
 
     get lastName() {
-        return this.peer.last_name || ""
+        return this.raw.last_name || ""
     }
 
     get onlineStatus() {
-        if (this.isDeleted || !this.peer.status) {
+        if (this.isDeleted || !this.raw.status) {
             return {
                 online: false,
                 status: "a long time ago"
@@ -32,7 +29,7 @@ export class UserPeer extends Peer {
 
         const now = tsNow(true)
 
-        switch (this.peer.status._) {
+        switch (this.raw.status._) {
             case "userStatusOnline":
 
                 return {
@@ -57,7 +54,7 @@ export class UserPeer extends Peer {
             case "userStatusOffline":
                 return {
                     online: false,
-                    status: getLastSeenMessage(this.peer.status.was_online, now)
+                    status: getLastSeenMessage(this.raw.status.was_online, now)
                 }
             case "userStatusEmpty":
                 return {

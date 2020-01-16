@@ -1,8 +1,8 @@
 import {MTProto} from "../../mtproto"
-import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash, getPeerNameFromType} from "./util"
+import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash, getPeerTypeFromType} from "./util"
 import TimeManager from "../../mtproto/timeManager"
 import PeersManager from "../peers/peersManager"
-import {Dialog} from "../dataObjects/dialog";
+import {Dialog} from "../dataObjects/dialog/dialog";
 import {Manager} from "../manager";
 import {UserPeer} from "../dataObjects/peer/userPeer";
 import {Peer} from "../dataObjects/peer/peer";
@@ -66,8 +66,8 @@ class DialogManager extends Manager {
             let dialog = undefined
 
             if (update.message.pFlags.out && update.message.to_id) {
-                const peerName = getPeerNameFromType(update.message.to_id._)
-                dialog = await this.findOrFetch(peerName, update.message.to_id[`${peerName}_id`])
+                const peerType = getPeerTypeFromType(update.message.to_id._)
+                dialog = await this.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
             } else {
                 dialog = await this.findOrFetch("user", update.message.from_id)
             }
@@ -90,7 +90,7 @@ class DialogManager extends Manager {
                         this.fetchPlainPeerDialogs({
                             _: dialog.peer.type,
                             id: dialog.peer.id,
-                            access_hash: dialog.peer.peer.access_hash
+                            access_hash: dialog.peer.accessHash
                         })
                     }
                 } else {
@@ -123,8 +123,8 @@ class DialogManager extends Manager {
         })
 
         MTProto.UpdatesManager.listenUpdate("updateDialogPinned", async update => {
-            const peerName = getPeerNameFromType(update.peer.peer._)
-            const dialog = await this.findOrFetch(peerName, update.peer.peer[`${peerName}_id`])
+            const peerType = getPeerTypeFromType(update.peer.peer._)
+            const dialog = await this.findOrFetch(peerType, update.peer.peer[`${peerType}_id`])
 
             if (!dialog) return
 

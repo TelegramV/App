@@ -73,11 +73,11 @@ export class Message {
 
         // todo: check if megagroup
         if (this.to) {
-            return this.to.peerName
+            return this.to.name
         }
 
         if (from) {
-            return from.peerName + getMessagePreviewDialog(this._message, true)
+            return from.name + getMessagePreviewDialog(this._message, true)
         } else {
             return getMessagePreviewDialog(this._message, true)
         }
@@ -87,7 +87,7 @@ export class Message {
         return this._message.date
     }
 
-    get rawMessage() {
+    get raw() {
         return this._message
     }
 

@@ -5,6 +5,7 @@ import ImageMessageComponent from "./message/imageMessageComponent"
 import {FileAPI} from "../../../../../api/fileAPI"
 import TextMessageComponent from "./message/textMessageComponent"
 import {isElementInViewport} from "../../../../framework/utils"
+import AppFramework from "../../../../framework/framework"
 
 /**
  * WARNING: never patch this component! not manually, not from parent!
@@ -12,7 +13,7 @@ import {isElementInViewport} from "../../../../framework/utils"
  * @property {Node[]|Element[]|undefined[]} elements
  * @property {Node|Element} $el
  */
-const BubblesComponent = {
+const BubblesComponent = AppFramework.createComponent({
     name: "BubblesInnerComponent",
 
     reactive: {
@@ -209,6 +210,6 @@ const BubblesComponent = {
             }
         }
     },
-}
+})
 
 export default BubblesComponent

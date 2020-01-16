@@ -1,5 +1,6 @@
 import {FrameworkRouter} from "./router"
 import VDOM from "./vdom"
+import {createComponent} from "./component"
 
 global.VDOM = VDOM
 
@@ -17,7 +18,8 @@ function mount(selector) {
 
 export const AppFramework = {
     Router,
-    mount
+    mount,
+    createComponent
 }
 
 export default AppFramework

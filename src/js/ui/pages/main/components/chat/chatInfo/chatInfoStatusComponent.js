@@ -5,8 +5,9 @@ import {GroupPeer} from "../../../../../../api/dataObjects/peer/groupPeer"
 import {BotPeer} from "../../../../../../api/dataObjects/peer/botPeer"
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 import AppEvents from "../../../../../../api/eventBus/appEvents"
+import AppFramework from "../../../../../framework/framework"
 
-const ChatInfoStatusComponent = {
+const ChatInfoStatusComponent = AppFramework.createComponent({
 
     name: "ChatInfoStatusComponent",
 
@@ -66,8 +67,8 @@ const ChatInfoStatusComponent = {
             }
         } else if (peer instanceof GroupPeer) {
             if (peer.full) {
-                const user = peer.peer.participants_count === 1 ? "member" : "members"
-                status = `${peer.peer.participants_count} ${user}, ${peer.full.online_count} online`
+                const user = peer.raw.participants_count === 1 ? "member" : "members"
+                status = `${peer.raw.participants_count} ${user}, ${peer.full.online_count} online`
             } else {
                 status = "loading info..."
             }
@@ -77,6 +78,6 @@ const ChatInfoStatusComponent = {
 
         return status
     }
-}
+})
 
 export default ChatInfoStatusComponent

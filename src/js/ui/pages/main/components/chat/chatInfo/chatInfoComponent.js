@@ -2,8 +2,9 @@ import ChatInfoStatusComponent from "./chatInfoStatusComponent"
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 import ChatInfoAvatarComponent from "./chatInfoAvatarComponent"
 import ChatInfoNameComponent from "./chatInfoNameComponent"
+import AppFramework from "../../../../../framework/framework"
 
-const ChatInfoComponent = {
+const ChatInfoComponent = AppFramework.createComponent({
     name: "ChatInfoComponent",
     reactive: {
         dialog: AppSelectedDialog.Reactive.Default // reactive property
@@ -26,7 +27,10 @@ const ChatInfoComponent = {
                 </div>
             </div>
         )
+    },
+    changed(key, value) {
+        console.log(key, value)
     }
-}
+})
 
 export default ChatInfoComponent

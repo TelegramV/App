@@ -1,13 +1,13 @@
-import MTProto from "../../mtproto";
-import {Message} from "./message";
-import {tsNow} from "../../mtproto/timeManager";
-import {generateDialogIndex} from "../dialogs/messageIdManager";
-import PeersManager from "../peers/peersManager";
-import {getInputFromPeer, getInputPeerFromPeer} from "../dialogs/util"
-import PeersStore from "../store/peersStore"
-import {Peer} from "./peer/peer"
+import MTProto from "../../../mtproto";
+import {Message} from "../message";
+import {tsNow} from "../../../mtproto/timeManager";
+import {generateDialogIndex} from "../../dialogs/messageIdManager";
+import PeersManager from "../../peers/peersManager";
+import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util"
+import PeersStore from "../../store/peersStore"
+import {Peer} from "../peer/peer"
 import {DialogMessages} from "./dialogMessages"
-import AppEvents from "../eventBus/appEvents"
+import AppEvents from "../../eventBus/appEvents"
 import {DraftMessage} from "./draftMessage"
 
 /**
@@ -95,7 +95,7 @@ class DialogAPI {
     readAllHistory() {
         if (this.dialog.type === "channel") {
             return MTProto.invokeMethod("channels.readHistory", {
-                channel: getInputFromPeer(this.dialog.type, this.dialog.peer.id, this.dialog.peer.peer.access_hash),
+                channel: getInputFromPeer(this.dialog.type, this.dialog.peer.id, this.dialog.peer.accessHash),
                 max_id: this.dialog.messages.last.id
             }).then(response => {
                 if (response._ === "boolTrue") {
@@ -107,7 +107,7 @@ class DialogAPI {
             })
         } else {
             return MTProto.invokeMethod("messages.readHistory", {
-                peer: getInputPeerFromPeer(this.dialog.type, this.dialog.peer.id, this.dialog.peer.peer.access_hash),
+                peer: getInputPeerFromPeer(this.dialog.type, this.dialog.peer.id, this.dialog.peer.accessHash),
                 max_id: this.dialog.messages.last.id
             }).then(response => {
                 this.dialog.messages.clearUnread()
@@ -264,7 +264,6 @@ export class Dialog {
     fillRaw(rawDialog) {
         this._pinned = rawDialog.pFlags.pinned || false
         this._unreadMark = rawDialog.pFlags.unread_mark || false
-        this._unreadMark = rawDialog.pFlags.unread_mark || false
 
         if (!this._peer) {
             this._peer = PeersStore.getFromDialogRawPeer(rawDialog.peer) // handle not found
@@ -278,7 +277,7 @@ export class Dialog {
         this.messages.stopTransaction()
 
         this._pts = rawDialog.pts || 0
-        this._draft = new DraftMessage(this, rawDialog.draft)
+        this._draft.fillRaw(this, rawDialog.draft)
     }
 
     fillRawAndFire(rawDialog) {

@@ -22,7 +22,7 @@ class PeerManager extends Manager {
             const peer = PeersStore.get("user", update.user_id)
 
             if (peer && peer instanceof UserPeer) {
-                peer.peer.status = update.status
+                peer.raw.status = update.status
 
                 AppEvents.Peers.fire("updateUserStatus", {
                     peer

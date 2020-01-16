@@ -1,11 +1,11 @@
 function MessageTimeComponent({message, bg = false}) {
     let classes = "time" + (bg ? " bg" : "")
 
-    if (message.rawMessage.views) {
+    if (message.raw.views) {
         return (
             <span class={classes}>
                     <div class="inner tgico">
-                        <span>{message.rawMessage.views}
+                        <span>{message.raw.views}
                             <span class="tgico tgico-channelviews"/>
                         </span>
                         {message.getDate('en', {

@@ -2,6 +2,10 @@ import AppEvents from "../../eventBus/appEvents"
 import {FileAPI} from "../../fileAPI"
 
 export class PeerPhoto {
+    /**
+     * @param {Peer} peer
+     * @param rawPhoto
+     */
     constructor(peer, rawPhoto) {
         this._peer = peer
         this._rawPhoto = rawPhoto
@@ -24,6 +28,10 @@ export class PeerPhoto {
         this._isFetchingBig = false
 
         this.fillRaw(rawPhoto)
+    }
+
+    get raw() {
+        return this._rawPhoto
     }
 
     /**
@@ -118,6 +126,11 @@ export class PeerPhoto {
 
         } else {
             this._type = this._peer.type === "user" ? "userProfilePhotoEmpty" : "chatPhotoEmpty"
+        }
+
+        this._letter = {
+            num: Math.abs(this._peer.id) % 8,
+            text: this._peer.name.split(" ")[0].match(/./ug)[0]
         }
     }
 

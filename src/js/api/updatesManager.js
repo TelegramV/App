@@ -231,7 +231,7 @@ class UpdateManager extends Manager {
 
         if (dialog) {
             this._checkChannelPts(dialog, update, () => {
-                this.getChannelDifference(getInputFromPeer("channel", channelId, dialog.peer.peer.access_hash), dialog.pts)
+                this.getChannelDifference(getInputFromPeer("channel", channelId, dialog.peer.accessHash), dialog.pts)
             })
         } else {
             console.error("dialog wasn't found!", update)
