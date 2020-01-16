@@ -17,9 +17,9 @@ const ChatInfoAvatarComponent = {
 
         return (
             <div id="messages-photo"
-                 className={"avatar " + (!peer.hasAvatar ? `placeholder-${peer.avatarLetter.num}` : "")}
-                 style={`background-image: url(${peer._avatar});`}>
-                {!peer.hasAvatar ? peer.avatarLetter.text[0] : ""}
+                 className={"avatar " + (peer.photo.isEmpty ? `placeholder-${peer.photo.letter.num}` : "")}
+                 style={`background-image: url(${peer.photo.smallUrl});`}>
+                {peer.photo.isEmpty ? peer.photo.letter.text : ""}
             </div>
         )
     },
@@ -27,7 +27,7 @@ const ChatInfoAvatarComponent = {
     mounted() {
         AppEvents.Peers.listenAny(event => {
             if (AppSelectedDialog.check(event.peer.dialog)) {
-                if (event.type === "updatePhoto") {
+                if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
                     this.__patch()
                 }
             }

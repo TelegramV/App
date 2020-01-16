@@ -1,6 +1,5 @@
 import DialogsManager from "../../../../../api/dialogs/dialogsManager"
 import {DialogComponent} from "./dialogComponent"
-import {AppFramework} from "../../../../framework/framework"
 import DialogsStore from "../../../../../api/store/dialogsStore"
 import AppEvents from "../../../../../api/eventBus/appEvents"
 import Sortable from "sortablejs"
@@ -30,12 +29,17 @@ export const DialogListComponent = {
         isInLoadingMoreScroll: false,
 
         previousSelectedDialog: undefined,
+
+        generalSortable: undefined,
     },
 
     elements: {
         $loader: undefined,
         $dialogsWrapper: undefined,
         $pinnedDialogs: undefined,
+        /**
+         * @type {Element|Node}
+         */
         $generalDialogs: undefined,
     },
 
@@ -81,18 +85,13 @@ export const DialogListComponent = {
             this.elements.$generalDialogs.style.display = ""
 
             Sortable.create(this.elements.$pinnedDialogs)
+            // this.state.generalSortable = new Sortable(this.elements.$generalDialogs, {
+            //     dataIdAttr: "data-date"
+            // })
         })
 
         AppEvents.Dialogs.listenAny(this._handleDialogUpdates)
         AppEvents.Peers.listenAny(this._handlePeerUpdates)
-
-
-        AppFramework.Router.onQueryChange(queryParams => {
-            if (queryParams.p) {
-            } else {
-
-            }
-        })
 
         this._registerResizer()
     },
@@ -224,51 +223,6 @@ export const DialogListComponent = {
     },
 
     /**
-     * @param {Dialog} dialog
-     * @param $ignore
-     * @return {ChildNode|Element|Node|undefined}
-     * @private
-     */
-    _findRenderedDialogToInsertBeforeByIndex(dialog, $ignore = undefined) {
-        const renderedDialogs = [
-            ...this.state.renderedDialogsElements.get("user").values(),
-            ...this.state.renderedDialogsElements.get("chat").values(),
-            ...this.state.renderedDialogsElements.get("channel").values(),
-        ]
-
-        if (renderedDialogs.size === 0) {
-            return undefined
-        }
-
-        let minDiff = 999999999999
-
-        /**
-         * @type {undefined|Element|Node}
-         */
-        let $dialog = undefined
-
-        const dialogIndex = parseInt(dialog.index)
-
-        renderedDialogs.forEach($rendered => {
-            if ($rendered !== $ignore && $rendered.dataset.pinned !== "true") {
-                const datasetIndex = parseInt($rendered.dataset.index)
-                const nextDiff = Math.abs(dialogIndex - datasetIndex)
-
-                if (minDiff > nextDiff) {
-                    minDiff = nextDiff
-                    $dialog = $rendered
-                }
-            }
-        })
-
-        if (parseInt($dialog.dataset.index) > dialogIndex && $dialog.nextSibling) {
-            return $dialog.nextSibling
-        }
-
-        return $dialog
-    },
-
-    /**
      * Handles Dialog updates
      * @param event
      * @private
@@ -365,12 +319,10 @@ export const DialogListComponent = {
     _handlePeerUpdates(event) {
         const dialog = DialogsStore.get(event.peer.type, event.peer.id)
 
-        if (event.type === "updatePhoto") {
-            if (dialog) {
+        if (dialog) {
+            if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
                 this._patchDialog(dialog)
-            }
-        } else if (event.type === "updateUserStatus") {
-            if (dialog) {
+            } else if (event.type === "updateUserStatus") {
                 this._patchDialog(dialog)
             }
         }

@@ -1,6 +1,5 @@
 import vdom_h from "./h"
 import VDOM from "./index"
-import vdom_isVNode from "./check/isVNode"
 
 const jsxAttributesMap = new Map([
     ["className", "class"],
@@ -65,6 +64,7 @@ function vdom_jsx(tagName, attributes, ...children) {
     let events = new Map()
     let dangerouslySetInnerHTML = false
     let renderIf = true
+    // let customStyle = {}
 
     // removeEmpties(children)
 
@@ -78,6 +78,8 @@ function vdom_jsx(tagName, attributes, ...children) {
                 events.set(k.substring(2).toLowerCase(), v)
             } else if (k.startsWith("css-")) {
                 const styleKey = k.substring(4)
+
+                // customStyle[styleKey] = v
 
                 if (attrs.style) {
                     attrs.style += `;${styleKey}: ${v};`

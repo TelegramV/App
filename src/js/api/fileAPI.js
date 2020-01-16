@@ -59,13 +59,20 @@ export class FileAPI {
         }, dcID)
     }
 
+    /**
+     * @param file
+     * @param dcID
+     * @param {Peer} peer
+     * @param big
+     * @return {Promise<string>}
+     */
     static getPeerPhoto(file, dcID, peer, big) {
         return new Promise(resolve => {
             return AppCache.get("peerAvatars", file.volume_id + "_" + file.local_id).then(blob => {
                 return URL.createObjectURL(blob)
             }).catch(error => {
                 return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
-                    const blob = new Blob([response.bytes], {type: 'application/jpeg'})
+                    const blob = new Blob(new Array(response.bytes), {type: 'application/jpeg'})
 
                     AppCache.put("peerAvatars", file.volume_id + "_" + file.local_id, blob)
 

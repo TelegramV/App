@@ -1,7 +1,7 @@
 import CryptoWorker from "../workers/crypto.worker"
 import {aesDecryptSync, aesEncryptSync} from "./aes"
 import {createLogger} from "../../common/logger"
-import {sha1HashSync} from "./sha"
+import {sha1HashSync, sha256HashSync} from "./sha"
 import mt_srp_check_password from "./mt_srp/mt_srp";
 import PQ from "../utils/pq"
 
@@ -143,6 +143,23 @@ function sha1Hash(bytes) {
     }
 }
 
+/**
+ * @param {Array|Uint8Array|Uint16Array|Uint32Array|ArrayBuffer} bytes
+ * @return {Promise<ArrayBuffer|Array>}
+ */
+function sha256Hash(bytes) {
+    if (_canWork) {
+        return new Promise(resolve => {
+            performTask("sha256Hash", {
+                bytes
+            }, resolve)
+        })
+    } else {
+        const enc = sha256HashSync(bytes)
+        return Promise.resolve(enc)
+    }
+}
+
 if (_canWork) {
     _cryptoWorker.addEventListener("message", event => {
         if (event.data.taskId) {
@@ -156,7 +173,8 @@ const AppCryptoManager = {
     aesDecrypt,
     srpCheckPassword,
     decomposePQ,
-    sha1Hash
+    sha1Hash,
+    sha256Hash
 }
 
 export default AppCryptoManager

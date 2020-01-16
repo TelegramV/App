@@ -41,10 +41,11 @@ export class ApiNetworker extends Networker {
         if (Object.keys(this.pings) > 1) { // Probably disconnected
             // TODO Show disconnection badge
         }
+
         const serializer = new TLSerialization();
         const pingID = [Random.nextInteger(0xFFFFFFFF), Random.nextInteger(0xFFFFFFFF)];
 
-        serializer.storeMethod('ping', {ping_id: pingID})
+        serializer.storeMethod("ping", {ping_id: pingID})
 
         const pingMessage = {
             msg_id: this.timeManager.generateMessageID(),
@@ -64,54 +65,54 @@ export class ApiNetworker extends Networker {
     processResponse(data) {
         let deserializer = new TLDeserialization(data)
 
-        const authKeyID = deserializer.fetchIntBytes(64, false, 'auth_key_id')
+        const authKeyID = deserializer.fetchIntBytes(64, false, "auth_key_id")
 
         if (!Bytes.compare(authKeyID, this.auth.authKeyID)) {
-            throw new Error('[MT] Invalid server auth_key_id: ' + Bytes.asHex(authKeyID) + ", dcid " + this.auth.dcID)
+            throw new Error("bad server auth_key_id: " + Bytes.asHex(authKeyID) + ", dc id " + this.auth.dcID)
         }
 
-        const msgKey = deserializer.fetchIntBytes(128, true, 'msg_key')
-        const encryptedData = deserializer.fetchRawBytes(data.byteLength - deserializer.getOffset(), true, 'encrypted_data')
+        const msgKey = deserializer.fetchIntBytes(128, true, "msg_key")
+        const encryptedData = deserializer.fetchRawBytes(data.byteLength - deserializer.getOffset(), true, "encrypted_data")
 
-        this.getDecryptedMessage(msgKey, encryptedData).then(dataWithPadding => {
+        this.getDecryptedMessage(msgKey, encryptedData).then(async dataWithPadding => {
             dataWithPadding = new Uint8Array(dataWithPadding)
 
-            const calcMsgKey = this.getMsgKey(dataWithPadding, false)
+            const calcMsgKey = await this.getMsgKey(dataWithPadding, false)
             if (!Bytes.compare(msgKey, calcMsgKey)) {
-                throw new Error('[MT] server msgKey mismatch')
+                throw new Error("bad server msgKey")
             }
 
             deserializer = new TLDeserialization(dataWithPadding.buffer, {mtproto: true})
 
-            const salt = deserializer.fetchIntBytes(64, false, 'salt') // ??
-            const sessionID = deserializer.fetchIntBytes(64, false, 'session_id')
-            const messageID = deserializer.fetchLong('message_id')
+            const salt = deserializer.fetchIntBytes(64, false, "salt") // ??
+            const sessionID = deserializer.fetchIntBytes(64, false, "session_id")
+            const messageID = deserializer.fetchLong("message_id")
 
             // TODO wtf?
             if (!Bytes.compare(sessionID, this.auth.sessionID) &&
                 (!self.prevSessionID || !Bytes.compare(sessionID, self.prevSessionID))) {
-                // Logger.warn('Sessions', sessionID, self.sessionID, self.prevSessionID)
-                throw new Error('[MT] Invalid server session_id: ' + Bytes.asHex(sessionID))
+                // Logger.warn("Sessions", sessionID, self.sessionID, self.prevSessionID)
+                throw new Error("bad server session_id: " + Bytes.asHex(sessionID))
             }
 
-            const seqNo = deserializer.fetchInt('seq_no')
+            const seqNo = deserializer.fetchInt("seq_no")
 
             const totalLength = dataWithPadding.byteLength
 
-            const messageBodyLength = deserializer.fetchInt('message_data[length]')
+            const messageBodyLength = deserializer.fetchInt("message_data[length]")
             let offset = deserializer.getOffset()
 
             if ((messageBodyLength % 4) ||
                 messageBodyLength > totalLength - offset) {
-                throw new Error('[MT] Invalid body length: ' + messageBodyLength)
+                throw new Error("bad body length: " + messageBodyLength)
             }
 
-            const messageBody = deserializer.fetchRawBytes(messageBodyLength, true, 'message_data')
+            const messageBody = deserializer.fetchRawBytes(messageBodyLength, true, "message_data")
 
             offset = deserializer.getOffset()
             const paddingLength = totalLength - offset
             if (paddingLength < 12 || paddingLength > 1024) {
-                throw new Error('[MT] Invalid padding length: ' + paddingLength)
+                throw new Error("bad padding length: " + paddingLength)
             }
 
             const buffer = Bytes.asUint8Buffer(messageBody)
@@ -124,22 +125,16 @@ export class ApiNetworker extends Networker {
                 schema: schema,
                 override: {
                     mt_rpc_result: function (result, field) {
-                        // console.log("mt_rpc_result", result, field)
-                        // console.log(self.sentMessages)
-                        result.req_msg_id = this.fetchLong(field + '[req_msg_id]')
+                        result.req_msg_id = this.fetchLong(field + "[req_msg_id]")
 
                         const sentMessage = self.messageProcessor.sentMessages[result.req_msg_id]
-                        const type = sentMessage && sentMessage.resultType || 'Object'
+                        const type = sentMessage && sentMessage.resultType || "Object"
 
                         if (result.req_msg_id && !sentMessage) {
-                            // console.warn(dT(), 'Result for unknown message', result)
                             return
                         }
-                        // console.log(result)
-                        // console.log(Bytes.asHex(this.getLeftoverArray()))
-                        result.result = this.fetchObject(type, field + '[result]')
 
-                        // console.log(dT(), 'override rpc_result', sentMessage, type, result)
+                        result.result = this.fetchObject(type, field + "[result]")
                     }
                 }
             }
@@ -149,9 +144,8 @@ export class ApiNetworker extends Networker {
             let response = {}
 
             try {
-                response = deserializer.fetchObject('', 'INPUT')
+                response = deserializer.fetchObject("", "INPUT")
             } catch (e) {
-                console.log("?/")
                 throw e
             }
 
@@ -169,15 +163,16 @@ export class ApiNetworker extends Networker {
         const authKey = this.auth.authKey
         const x = isOut ? 0 : 8
         const msgKeyLargePlain = Bytes.concatBuffer(authKey.subarray(88 + x, 88 + x + 32), dataWithPadding)
-        // TODO async hash
-        const msgKeyLarge = sha256HashSync(msgKeyLargePlain)
-        return new Uint8Array(msgKeyLarge).subarray(8, 24)
+
+        return AppCryptoManager.sha256Hash(msgKeyLargePlain).then(msgKeyLarge => {
+            return new Uint8Array(msgKeyLarge).subarray(8, 24)
+        })
     }
 
     onDisconnect() {
         console.log("disconnect")
         // TODO reconnect
-        // ALSO if there's no internet it doesn't disconnect ws, should ping prob
+        // ALSO if there"s no internet it doesn"t disconnect ws, should ping prob
         document.querySelector("#connecting_message").style.display = "flex";
     }
 
@@ -210,14 +205,15 @@ export class ApiNetworker extends Networker {
     }
 
     getEncryptedMessage(dataWithPadding) {
-        const msgKey = this.getMsgKey(dataWithPadding, true)
-        const keyIv = this.getAesKeyIv(msgKey, true)
+        return this.getMsgKey(dataWithPadding, true).then(msgKey => {
+            const keyIv = this.getAesKeyIv(msgKey, true)
 
-        return AppCryptoManager.aesEncrypt(dataWithPadding, keyIv[0], keyIv[1]).then(encryptedBytes => {
-            return {
-                bytes: encryptedBytes,
-                msgKey: msgKey
-            }
+            return AppCryptoManager.aesEncrypt(dataWithPadding, keyIv[0], keyIv[1]).then(encryptedBytes => {
+                return {
+                    bytes: encryptedBytes,
+                    msgKey: msgKey
+                }
+            })
         })
     }
 
@@ -230,22 +226,22 @@ export class ApiNetworker extends Networker {
     addHeader(message) {
         const data = new TLSerialization({startMaxLength: message.body.length + 2048})
 
-        data.storeIntBytes(this.auth.serverSalt, 64, 'salt')
-        data.storeIntBytes(this.auth.sessionID, 64, 'session_id')
+        data.storeIntBytes(this.auth.serverSalt, 64, "salt")
+        data.storeIntBytes(this.auth.sessionID, 64, "session_id")
 
-        data.storeLong(message.msg_id, 'message_id')
-        data.storeInt(message.seq_no, 'seq_no')
+        data.storeLong(message.msg_id, "message_id")
+        data.storeInt(message.seq_no, "seq_no")
 
-        data.storeInt(message.body.length, 'message_data_length')
-        data.storeRawBytes(message.body, 'message_data')
+        data.storeInt(message.body.length, "message_data_length")
+        data.storeRawBytes(message.body, "message_data")
 
         const dataBuffer = data.getBuffer()
 
         const paddingLength = (16 - (data.offset % 16)) + 16 * (1 + Random.nextInteger(5))
         const padding = createNonce(paddingLength) // TODO check if secure
 
-        // console.log(dT(), 'Adding padding', dataBuffer, padding, dataWithPadding)
-        // console.log(dT(), 'auth_key_id', Bytes.asHex(self.authKeyID))
+        // console.log(dT(), "Adding padding", dataBuffer, padding, dataWithPadding)
+        // console.log(dT(), "auth_key_id", Bytes.asHex(self.authKeyID))
         return Bytes.concatBuffer(dataBuffer, padding)
     }
 
@@ -256,9 +252,9 @@ export class ApiNetworker extends Networker {
 
         return this.getEncryptedMessage(dataWithPadding).then(encryptedResult => {
             const request = new TLSerialization({startMaxLength: encryptedResult.bytes.byteLength + 256})
-            request.storeIntBytes(this.auth.authKeyID, 64, 'auth_key_id')
-            request.storeIntBytes(encryptedResult.msgKey, 128, 'msg_key')
-            request.storeRawBytes(encryptedResult.bytes, 'encrypted_data')
+            request.storeIntBytes(this.auth.authKeyID, 64, "auth_key_id")
+            request.storeIntBytes(encryptedResult.msgKey, 128, "msg_key")
+            request.storeRawBytes(encryptedResult.bytes, "encrypted_data")
 
             super.sendMessage(request.getBuffer())
         })
@@ -275,25 +271,25 @@ export class ApiNetworker extends Networker {
         if (!this.connectionInited) {
             // TODO replace with const values
 
-            serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, 'invokeWithLayer')
-            serializer.storeInt(AppConfiguration.mtproto.api.layer, 'layer')
+            serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, "invokeWithLayer")
+            serializer.storeInt(AppConfiguration.mtproto.api.layer, "layer")
             if (this.updates === false) {
-                serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, 'invokeWithoutUpdates')
+                serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, "invokeWithoutUpdates")
             }
-            serializer.storeInt(AppConfiguration.mtproto.api.initConnection, 'initConnection')
-            serializer.storeInt(AppConfiguration.mtproto.api.api_id, 'api_id')
-            serializer.storeString(navigator.userAgent || 'Unknown UserAgent', 'device_model')
-            serializer.storeString(navigator.platform || 'Unknown Platform', 'system_version')
-            serializer.storeString(AppConfiguration.mtproto.api.app_version, 'app_version')
-            serializer.storeString(navigator.language || 'en', 'system_lang_code')
-            serializer.storeString('', 'lang_pack')
-            serializer.storeString(navigator.language || 'en', 'lang_code')
+            serializer.storeInt(AppConfiguration.mtproto.api.initConnection, "initConnection")
+            serializer.storeInt(AppConfiguration.mtproto.api.api_id, "api_id")
+            serializer.storeString(navigator.userAgent || "Unknown UserAgent", "device_model")
+            serializer.storeString(navigator.platform || "Unknown Platform", "system_version")
+            serializer.storeString(AppConfiguration.mtproto.api.app_version, "app_version")
+            serializer.storeString(navigator.language || "en", "system_lang_code")
+            serializer.storeString("", "lang_pack")
+            serializer.storeString(navigator.language || "en", "lang_code")
             // TODO init connection
         }
 
         // if (options.afterMessageID) {
-        //     serializer.storeInt(0xcb9f372d, 'invokeAfterMsg')
-        //     serializer.storeLong(options.afterMessageID, 'msg_id')
+        //     serializer.storeInt(0xcb9f372d, "invokeAfterMsg")
+        //     serializer.storeLong(options.afterMessageID, "msg_id")
         // }
 
         options.resultType = serializer.storeMethod(method, params)
@@ -345,13 +341,13 @@ export class ApiNetworker extends Networker {
 
 
     processError(rawError) {
-        const matches = (rawError.error_message || '').match(/^([A-Z_0-9]+\b)(: (.+))?/) || []
+        const matches = (rawError.error_message || "").match(/^([A-Z_0-9]+\b)(: (.+))?/) || []
         rawError.error_code = uintToInt(rawError.error_code)
 
         return {
             code: !rawError.error_code || rawError.error_code <= 0 ? 500 : rawError.error_code,
-            type: matches[1] || 'UNKNOWN',
-            description: matches[3] || ('CODE#' + rawError.error_code + ' ' + rawError.error_message),
+            type: matches[1] || "UNKNOWN",
+            description: matches[3] || ("CODE#" + rawError.error_code + " " + rawError.error_message),
             originalError: rawError
         }
     }
@@ -367,7 +363,7 @@ export class ApiNetworker extends Networker {
         const messageID = this.timeManager.generateMessageID()
         const seqNo = this.generateSeqNo(true)
 
-        //console.log('MT message', object, messageID, seqNo)
+        //console.log("MT message", object, messageID, seqNo)
 
         return {
             msg_id: messageID,

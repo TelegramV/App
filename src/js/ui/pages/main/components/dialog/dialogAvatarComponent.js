@@ -4,17 +4,24 @@
  * @constructor
  */
 export const DialogAvatarComponent = ({dialog}) => {
-    let hasAvatar = dialog.peer.hasAvatar && dialog.peer._avatar !== undefined
+    let hasAvatar = !dialog.peer.photo.isEmpty
 
-    const classes = "avatar" + (!hasAvatar ? ` placeholder-${dialog.peer.avatarLetter.num}` : "")
-    const letter = hasAvatar ? "" : dialog.peer.avatarLetter.text
+    const classes = {
+        "avatar": true,
+    }
 
-    const cssBackgroundImage = hasAvatar ? `url(${dialog.peer._avatar})` : "none"
+    classes[`placeholder-${dialog.peer.photo.letter.num}`] = !hasAvatar
+
+    const letter = hasAvatar ? "" : dialog.peer.photo.letter.text
+
+    const cssBackgroundImage = hasAvatar ? `url(${dialog.peer.photo.smallUrl})` : "none"
     const cssOpacity = hasAvatar ? 1 : 0
 
     return (
         <div className={classes}>
             <span>{letter}</span>
+
+            {/*<img class="" src={dialog.peer.photo.smallUrl}/>*/}
 
             <div className="avatar-inner"
                  css-background-image={cssBackgroundImage}

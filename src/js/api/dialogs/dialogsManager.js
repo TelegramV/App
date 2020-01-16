@@ -377,9 +377,9 @@ class DialogManager extends Manager {
                 dialog: dialogs[0],
             })
 
-            dialogs.forEach(async dialog => {
-                await dialog.peer.getAvatar()
-            })
+            // dialogs.forEach(async dialog => {
+            //     await dialog.peer.getAvatar()
+            // })
         })
     }
 
@@ -460,9 +460,9 @@ class DialogManager extends Manager {
                 pinnedDialogs: dialogs.filter(l => l.isPinned)
             })
 
-            dialogs.forEach(async dialog => {
-                await dialog.peer.getAvatar()
-            })
+            // dialogs.forEach(async dialog => {
+            //     await dialog.peer.getAvatar()
+            // })
         })
 
     }

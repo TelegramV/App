@@ -1,9 +1,9 @@
-import {FileAPI} from "../../fileAPI";
 import {createLogger} from "../../../common/logger";
 import {getInputPeerFromPeer} from "../../dialogs/util";
 import MTProto from "../../../mtproto"
 import AppEvents from "../../eventBus/appEvents"
 import DialogsStore from "../../store/dialogsStore"
+import {PeerPhoto} from "./peerPhoto"
 
 const Logger = createLogger("Peer")
 
@@ -21,13 +21,11 @@ export class Peer {
         this._id = 0
         this._access_hash = 0
         this._username = undefined
-        this._photo = undefined
+        this._photo = PeerPhoto.createEmpty(this)
 
         this.fillRaw(rawPeer)
 
-
         this._peer = rawPeer
-        this._avatar = undefined
         this._full = undefined
     }
 
@@ -54,7 +52,7 @@ export class Peer {
         this._dialog = dialog
     }
 
-    get deleted() {
+    get isDeleted() {
         return this.peer.pFlags.deleted
     }
 
@@ -71,7 +69,11 @@ export class Peer {
     }
 
     get peerName() {
-        return this.peer.title
+        return this.peer.title || this.raw.first_name + " " + this.raw.last_name
+    }
+
+    get name() {
+        return this.peer.title || this.raw.first_name + " " + this.raw.last_name
     }
 
     get hasAvatar() {
@@ -86,8 +88,13 @@ export class Peer {
         return getInputPeerFromPeer(this.type, this.id, this.peer.access_hash)
     }
 
+    get photo() {
+        return this._photo
+    }
+
     get avatarLetter() {
         const split = this.peerName.split(" ")
+
         return {
             num: Math.abs(this.id) % 8,
             text: split[0].match(/./ug)[0]
@@ -103,27 +110,29 @@ export class Peer {
     }
 
     getAvatar(big = false) {
-        if (this._avatar) {
-            return Promise.resolve(this._avatar)
-        }
-        if (!this.hasAvatar) {
-            return Promise.resolve(null)
-        }
-        if (this.isMin) {
-            return Promise.resolve(null)
-        }
-
-        // TODO cache
-        return FileAPI.getPeerPhoto(big ? this.peer.photo.photo_big : this.peer.photo.photo_small, this.peer.photo.dc_id, this, big).then(url => {
-            this._avatar = url
-
-            AppEvents.Peers.fire("updatePhoto", {
-                peer: this
-            })
-            return this._avatar
-        }).catch(e => {
-            Logger.error("Exception while loading avatar:", e)
-        })
+        // if (this._avatar) {
+        //     return Promise.resolve(this._avatar)
+        // }
+        // if (!this.hasAvatar) {
+        //     return Promise.resolve(null)
+        // }
+        // if (this.isMin) {
+        //     return Promise.resolve(null)
+        // }
+        //
+        // console.log(this.peer)
+        //
+        // // TODO cache
+        // return FileAPI.getPeerPhoto(big ? this.peer.photo.photo_big : this.peer.photo.photo_small, this.peer.photo.dc_id, this, big).then(url => {
+        //     this._avatar = url
+        //
+        //     AppEvents.Peers.fire("updatePhoto", {
+        //         peer: this
+        //     })
+        //     return this._avatar
+        // }).catch(e => {
+        //     Logger.error("Exception while loading avatar:", e)
+        // })
     }
 
     fetchFull() {
@@ -173,7 +182,12 @@ export class Peer {
         this._id = rawPeer.id
         this._access_hash = rawPeer.access_hash
         this._username = rawPeer.username
-        this._photo = undefined
+
+        if (this.isMin) {
+            this._photo.fillRaw(false)
+        } else {
+            this._photo.fillRaw(rawPeer.photo)
+        }
     }
 
     fillRawAndFire(rawPeer) {

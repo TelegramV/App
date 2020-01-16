@@ -12,6 +12,7 @@ function vdom_mount(vNode, $target) {
 
     if (vNode && vNode.component && !vNode.component.__.mounted) {
         vNode.component.$el = $mounted
+        vNode.component.__.mounted = true
         vNode.component.mounted()
     }
 

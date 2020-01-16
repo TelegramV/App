@@ -11,6 +11,7 @@ function vdom_createEmptyNode() {
     vNode.children = new Array()
     vNode.dangerouslySetInnerHTML = false
     vNode.renderIf = true
+    vNode.customStyle = {}
 
     Object.defineProperty(vNode, "isComponent", {
         get() {

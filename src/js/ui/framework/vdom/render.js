@@ -71,6 +71,10 @@ function vdom_render(vNode, xmlns = null) {
         $node.innerHTML = vNode.dangerouslySetInnerHTML
     }
 
+    // for (const [k, v] of Object.entries(vNode.customStyle)) {
+    //     $node.style[k] = v
+    // }
+
     // setting attributes
     for (const [k, v] of Object.entries(vNode.attrs)) {
         if (Array.isArray(v)) {

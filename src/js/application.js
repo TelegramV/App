@@ -7,6 +7,8 @@ import MTProto from "./mtproto"
 import {MainPage} from "./ui/pages/main/mainPage"
 import {LoginPage} from "./ui/pages/login/nextlogin"
 import AppCache from "./api/cache"
+import AppEvents from "./api/eventBus/appEvents"
+import {DialogComponent} from "./ui/pages/main/components/dialog/dialogComponent"
 
 
 const authContext = {

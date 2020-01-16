@@ -2,6 +2,14 @@ import vdom_render from "./render"
 import vdom_isVNode from "./check/isVNode"
 import vdom_mount from "./mount"
 
+// function patchStyles($node, newStyles) {
+//     for (const [k, v] of Object.entries(newStyles)) {
+//         if ($node.style[k] !== newStyles[k]) {
+//             $node.style[k] = v
+//         }
+//     }
+// }
+
 /**
  * @param {Element|Node} $node
  * @param {Map} newEvents
@@ -114,6 +122,7 @@ function vdom_patchReal($node, newVNode) {
         return vdom_mount(newVNode, $node)
     }
 
+    // patchStyles($node, newVNode.customStyle)
     patchAttrs($node, newVNode.attrs)
     patchEvents($node, newVNode.events)
 

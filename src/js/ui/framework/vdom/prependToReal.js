@@ -11,6 +11,7 @@ function vdom_prependToReal(vNode, $element) {
 
     if (vNode && vNode.component && !vNode.component.__.mounted) {
         vNode.component.$el = $createdElement
+        vNode.component.__.mounted = true
         vNode.component.mounted()
     }
 

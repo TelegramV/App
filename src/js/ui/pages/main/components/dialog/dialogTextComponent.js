@@ -1,37 +1,28 @@
-const Draft = {
-    name: "dialog-text-draft",
-    h({text}) {
-        return (
-            <div className="message">
-                <span className="draft">Draft: </span>
-                {text}
-            </div>
-        )
-    }
+function Draft({text}) {
+    return (
+        <div className="message">
+            <span className="draft">Draft: </span>
+            {text}
+        </div>
+    )
 }
 
-const Action = {
-    name: "dialog-text-action",
-    h({user, action}) {
-        return (
-            <div className="message">
-                <span className="sender">{user}</span>
-                {action}
-            </div>
-        )
-    }
+function Action({user, action}) {
+    return (
+        <div className="message">
+            <span className="sender">{user}</span>
+            {action}
+        </div>
+    )
 }
 
-const Text = {
-    name: "dialog-text-text",
-    h({user, text}) {
-        return (
-            <div className="message">
-                <span className="sender">{user}</span>
-                {text}
-            </div>
-        )
-    }
+function Text({user, text}) {
+    return (
+        <div className="message">
+            <span className="sender">{user}</span>
+            {text}
+        </div>
+    )
 }
 
 /**

@@ -11,45 +11,22 @@ const MessageMediaImage = ({src, size, alt = "", isThumb}) => {
     )
 }
 
-const ImageMessageComponent = {
-    name: "image-only-message",
+function ImageMessageComponent({message, image = false}) {
+    let classes = "bubble"
 
-    /**
-     * @param {Message} message
-     * @param image
-     * @return {*}
-     */
-    h({message, image = false}) {
-        let classes = "bubble"
+    if (message.isRead) {
+        classes += " read"
+    }
 
-        if (message.isRead) {
-            classes += " read"
-        }
+    let haveMsg = message.text.length > 0
 
-        let haveMsg = message.text.length > 0
-
-        if (image) {
-            return (
-                <MessageWrapperComponent message={message}>
-                    <div class={classes}>
-                        {haveMsg ? (
-                            <div class="message">
-                                <MessageMediaImage src={image.imgSrc} size={image.imgSize} isThumb={!!image.thumbnail}/>
-                                <span dangerouslySetInnerHTML={message.text}/>
-                                <MessageTimeComponent message={message}/>
-                            </div>
-                        ) : ""}
-                    </div>
-                </MessageWrapperComponent>
-            )
-        }
-
+    if (image) {
         return (
             <MessageWrapperComponent message={message}>
                 <div class={classes}>
                     {haveMsg ? (
                         <div class="message">
-                            <img src="" class="attachment"/>
+                            <MessageMediaImage src={image.imgSrc} size={image.imgSize} isThumb={!!image.thumbnail}/>
                             <span dangerouslySetInnerHTML={message.text}/>
                             <MessageTimeComponent message={message}/>
                         </div>
@@ -58,6 +35,20 @@ const ImageMessageComponent = {
             </MessageWrapperComponent>
         )
     }
+
+    return (
+        <MessageWrapperComponent message={message}>
+            <div class={classes}>
+                {haveMsg ? (
+                    <div class="message">
+                        <img src="" class="attachment"/>
+                        <span dangerouslySetInnerHTML={message.text}/>
+                        <MessageTimeComponent message={message}/>
+                    </div>
+                ) : ""}
+            </div>
+        </MessageWrapperComponent>
+    )
 }
 
 export default ImageMessageComponent

@@ -218,7 +218,7 @@ export class DialogMessages {
             this._prevLastMessage = undefined
         }
 
-        if (messageId === this.this._prevLastMessage.id) {
+        if (this._prevLastMessage && messageId === this._prevLastMessage.id) {
             this._lastMessage = undefined
         }
 

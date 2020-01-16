@@ -1,16 +1,9 @@
-const MessageTimeComponent = {
-    name: "MessageTimeComponent",
+function MessageTimeComponent({message, bg = false}) {
+    let classes = "time" + (bg ? " bg" : "")
 
-    /**
-     * @param {Message} message
-     * @param bg
-     */
-    h({message, bg = false}) {
-        let classes = "time" + (bg ? " bg" : "")
-
-        if (message.rawMessage.views) {
-            return (
-                <span class={classes}>
+    if (message.rawMessage.views) {
+        return (
+            <span class={classes}>
                     <div class="inner tgico">
                         <span>{message.rawMessage.views}
                             <span class="tgico tgico-channelviews"/>
@@ -22,11 +15,11 @@ const MessageTimeComponent = {
                         })}
                     </div>
                 </span>
-            )
-        }
+        )
+    }
 
-        return (
-            <span class={classes}>
+    return (
+        <span class={classes}>
                 <div class="inner tgico">
                     {message.getDate('en', {
                         hour: '2-digit',
@@ -35,8 +28,7 @@ const MessageTimeComponent = {
                     })}
                 </div>
             </span>
-        )
-    }
+    )
 }
 
 export default MessageTimeComponent

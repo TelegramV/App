@@ -1,4 +1,4 @@
-import {sha1HashSync} from "../crypto/sha"
+import {sha1HashSync, sha256HashSync} from "../crypto/sha"
 import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
 import mt_srp_check_password from "../crypto/mt_srp/mt_srp";
 import Bytes from "../utils/bytes"
@@ -25,6 +25,10 @@ self.addEventListener("message", event => {
 
         case "sha1Hash":
             result = sha1HashSync(taskData.bytes)
+            break
+
+        case "sha256Hash":
+            result = sha256HashSync(taskData.bytes)
             break
 
         case "aesEncrypt":

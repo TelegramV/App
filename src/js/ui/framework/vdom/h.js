@@ -73,7 +73,7 @@ function removeIfs(array) {
  * @returns {*}
  */
 function vdom_h(tagName, vNode) {
-    // removeIfs(vNode.children) // todo: uncomment this there is a need. but without this rendering is faster
+    // removeIfs(vNode.children) // todo: uncomment this if there is a need. but without this rendering is faster
 
     // for fragments
     // if (tagName === VDOM.Fragment) {
@@ -92,6 +92,7 @@ function vdom_h(tagName, vNode) {
     }
 
     // named component
+    // todo fixme create new component!!!
     if (vdom_isNamedComponent(tagName)) {
         const component = tagName
 

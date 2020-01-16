@@ -11,6 +11,7 @@ function vdom_appendToReal(vNode, $element, {xmlns = null} = {}) {
 
     if (vNode && vNode.component && !vNode.component.__.mounted) {
         vNode.component.$el = $mountedElement
+        vNode.component.__.mounted = true
         vNode.component.mounted()
     }
 

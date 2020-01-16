@@ -4,9 +4,7 @@ import {createLogger} from "../common/logger";
 import {default as PeersManager} from "./peers/peersManager";
 import {default as DialogsManager} from "./dialogs/dialogsManager";
 import {Message} from "./dataObjects/message";
-import {getInputFromPeer, getInputPeerFromPeer} from "./dialogs/util";
-import PeersStore from "./store/peersStore"
-import DialogsStore from "./store/dialogsStore"
+import {getInputFromPeer} from "./dialogs/util";
 
 const Logger = createLogger("UpdateManager", {
     level: "log"
@@ -181,6 +179,8 @@ class UpdateManager extends Manager {
             } else if ((dialog.pts + _update.pts_count) > _update.pts) {
                 console.log("channel update already processed")
             } else {
+                this.resolveUpdateListeners(_update)
+                dialog.pts = dialog.pts + _update.pts_count
                 console.warn("channel update cannot be processed", _update, dialog.pts, _update.pts_count, _update.pts)
                 onFail()
             }
@@ -202,6 +202,8 @@ class UpdateManager extends Manager {
             } else if ((statePts + _update.pts_count) > _update.pts) {
                 console.log("update already processed")
             } else {
+                this.resolveUpdateListeners(_update)
+                this.State.pts = statePts + _update.pts
                 console.warn("update cannot be processed", _update, statePts, _update.pts_count, _update.pts)
                 onFail()
             }
@@ -270,32 +272,33 @@ class UpdateManager extends Manager {
 
         const dialog = DialogsManager.find("channel", _difference.__channel.channel_id)
 
-        if (dialog && dialog.pts > _difference.pts) {
+        if (dialog && dialog.pts >= _difference.pts) {
             console.warn("looks like the channel difference is outdated")
-        }
-
-        if (_difference._ === "updates.channelDifference") {
-            _difference.users.forEach(user => PeersManager.setFromRawAndFire(user))
-            _difference.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
-
-            _difference.new_messages.forEach(message => {
-                this.resolveUpdateListeners({
-                    _: "updateNewChannelMessage",
-                    message
-                })
-            })
-
-            _difference.other_updates.forEach(ou => {
-                this.resolveUpdateListeners(ou)
-            })
-
-            dialog.pts = _difference.pts
-        } else if (_difference._ === "updates.channelDifferenceTooLong") {
-            location.reload()
-        } else if (_difference._ === "updates.channelDifferenceEmpty") {
-            dialog.pts = _difference.pts
         } else {
-            this.resolveUpdateListeners(_difference)
+
+            if (_difference._ === "updates.channelDifference") {
+                _difference.users.forEach(user => PeersManager.setFromRawAndFire(user))
+                _difference.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
+
+                _difference.new_messages.forEach(message => {
+                    this.resolveUpdateListeners({
+                        _: "updateNewChannelMessage",
+                        message
+                    })
+                })
+
+                _difference.other_updates.forEach(ou => {
+                    this.resolveUpdateListeners(ou)
+                })
+
+                dialog.pts = _difference.pts
+            } else if (_difference._ === "updates.channelDifferenceTooLong") {
+                location.reload()
+            } else if (_difference._ === "updates.channelDifferenceEmpty") {
+                dialog.pts = _difference.pts
+            } else {
+                this.resolveUpdateListeners(_difference)
+            }
         }
     }
 
@@ -347,42 +350,53 @@ class UpdateManager extends Manager {
                     // console.warn("message update", update)
                     this._processUserMessageUpdate(update)
                 } else if (update._ === "updates.difference") {
-                    update.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
-                    update.users.forEach(user => PeersManager.setFromRawAndFire(user))
 
-                    update.new_messages.forEach(message => {
-                        this.resolveUpdateListeners({
-                            _: "updateNewMessage",
-                            message
+                    if (this.State >= update.pts) {
+                        console.warn("looks like the difference is outdated")
+                    } else {
+
+                        update.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
+                        update.users.forEach(user => PeersManager.setFromRawAndFire(user))
+
+                        update.new_messages.forEach(message => {
+                            this.resolveUpdateListeners({
+                                _: "updateNewMessage",
+                                message
+                            })
                         })
-                    })
 
-                    // todo: handle encrypted messages
+                        // todo: handle encrypted messages
 
-                    update.other_updates.forEach(ou => {
-                        this.resolveUpdateListeners(ou)
-                    })
+                        update.other_updates.forEach(ou => {
+                            this.resolveUpdateListeners(ou)
+                        })
 
-                    this.State = update.state
+                        this.State = update.state
+                    }
 
                 } else if (update._ === "updates.differenceSlice") {
-                    update.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
-                    update.users.forEach(user => PeersManager.setFromRawAndFire(user))
 
-                    update.new_messages.forEach(message => {
-                        this.resolveUpdateListeners({
-                            _: "updateNewMessage",
-                            message
+                    if (this.State >= update.pts) {
+                        console.warn("looks like the difference is outdated")
+                    } else {
+                        update.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
+                        update.users.forEach(user => PeersManager.setFromRawAndFire(user))
+
+                        update.new_messages.forEach(message => {
+                            this.resolveUpdateListeners({
+                                _: "updateNewMessage",
+                                message
+                            })
                         })
-                    })
 
-                    // todo: handle encrypted messages
+                        // todo: handle encrypted messages
 
-                    update.other_updates.forEach(ou => {
-                        this.resolveUpdateListeners(ou)
-                    })
+                        update.other_updates.forEach(ou => {
+                            this.resolveUpdateListeners(ou)
+                        })
 
-                    this.State = update.intermediate_state // todo: handle it
+                        this.State = update.intermediate_state // todo: handle it
+                    }
 
                 } else if (update._ === "updates.differenceTooLong") {
                     location.reload()
@@ -409,97 +423,6 @@ class UpdateManager extends Manager {
 
                 this.resolveUserQueue()
             }
-        }
-    }
-
-    getChannel(id) {
-        return PeersStore.get("channel", id)
-    }
-
-    getChannelDialog(id) {
-        return DialogsStore.get("channel", id)
-    }
-
-    getChat(id) {
-        return PeersStore.get("chat", id)
-    }
-
-    getChatDialog(id) {
-        return DialogsStore.get("chat", id)
-    }
-
-    getUser(id) {
-        return PeersStore.get("user", id)
-    }
-
-    getUserDialog(id) {
-        return DialogsStore.get("user", id)
-    }
-
-    async loadDialog(type, id) {
-        await this.loadDialogPeer(getInputPeerFromPeer(type, id))
-    }
-
-    async loadDialogPeer(peer) {
-        await DialogsManager.fetchDialogs({
-            limit: 1,
-            offset_id: -1,
-            offset_date: -1,
-            offset_peer: peer
-        })
-    }
-
-    async handleUpdate(update) {
-
-        switch (update._) {
-            case "updateUserStatus":
-                break
-            case "updateChatUserTyping":
-                break
-            case "updateMessagePoll":
-                break
-
-            case "updateDeleteChannelMessages":
-                const channel = this.getChannel(update.channel_id)
-                const messages = update.messages
-                break
-
-            case "updateShortMessage": {
-                console.log("SHORT MESSAGE", update)
-                const dialog = this.getUserDialog(update.user_id)
-                if (!dialog) {
-                    Logger.error("No dialog found", update.text, update)
-
-                    await this.loadDialog("user", update.user_id)
-                    return
-                }
-                const message = new Message(dialog, update)
-                break
-            }
-            case "updateEditMessage":
-            case "updateNewMessage":
-            case "updateEditChannelMessage":
-            case "updateNewChannelMessage": {
-                const msg = update.message
-                // console.log("msg", msg)
-                const peer = update._ === "updateNewChannelMessage" || update._ === "updateEditChannelMessage" ?
-                    update.message.to_id : (update.message.from ?
-                        getInputPeerFromPeer("user", update.message.from) :
-                        update.message.to_id)
-                const dialog = DialogsManager.findByPeer(msg.to_id)
-                // console.log(msg.message, dialog ? dialog.peer.peerName : "null",  msg.to_id)
-                if (!dialog) {
-                    Logger.error("No dialog found", msg.text, msg)
-                    await this.loadDialogPeer(peer)
-                    return
-                }
-                const message = new Message(dialog, msg)
-
-                break
-            }
-            default:
-                Logger.error("Unknown update", update._, update)
-                break
         }
     }
 }

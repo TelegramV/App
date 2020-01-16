@@ -12,11 +12,15 @@ const ChatInfoComponent = {
         return (
             <div id="messages-wrapper-chat-info" className="chat-info">
                 <div className="person">
+
                     <ChatInfoAvatarComponent/>
+
                     <div className="content">
+
                         <div className="top">
                             <ChatInfoNameComponent/>
                         </div>
+
                         <ChatInfoStatusComponent/>
                     </div>
                 </div>

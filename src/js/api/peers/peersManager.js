@@ -58,11 +58,11 @@ class PeerManager extends Manager {
 
             PeersStore.set(peer)
 
-            peer.getAvatar().catch(l => {
-                AppEvents.Peers.fire("updatePhoto", {
-                    peer: peer
-                })
-            })
+            // peer.getAvatar().catch(l => {
+            //     AppEvents.Peers.fire("updatePhoto", {
+            //         peer: peer
+            //     })
+            // })
 
             if (this.peerInitListeners[peer.type] && this.peerInitListeners[peer.type][peer.id]) {
                 this.peerInitListeners[peer.type][peer.id].forEach(listener => {

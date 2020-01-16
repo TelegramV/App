@@ -7,7 +7,7 @@ const Logger = createLogger("UserPeer")
 
 export class UserPeer extends Peer {
     get peerName() {
-        if (this.deleted) {
+        if (this.isDeleted) {
             return "Deleted Account"
         }
 
@@ -23,24 +23,22 @@ export class UserPeer extends Peer {
     }
 
     get onlineStatus() {
-        if (this.deleted || !this.peer.status) {
+        if (this.isDeleted || !this.peer.status) {
             return {
                 online: false,
                 status: "a long time ago"
             }
         }
+
         const now = tsNow(true)
-        // Logger.debug("onlineStatus", this.peer)
+
         switch (this.peer.status._) {
             case "userStatusOnline":
-                // if(this.peer.status.expires < now)
+
                 return {
                     online: true
                 }
-            // return {
-            //     online: false,
-            //     status: getLastSeenMessage(this.peer.status.expires, now)
-            // }
+
             case "userStatusLastWeek":
                 return {
                     online: false,
