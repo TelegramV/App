@@ -1,6 +1,5 @@
 import {createNonce, longToBytes, uintToInt} from "../utils/bin"
 import {sha1BytesSync, sha256HashSync} from "../crypto/sha"
-import {aesDecryptSync} from "../crypto/aes"
 import {TLSerialization} from "../language/serialization"
 import {createLogger} from "../../common/logger"
 import {TLDeserialization} from "../language/deserialization"
@@ -66,117 +65,98 @@ export class ApiNetworker extends Networker {
         let deserializer = new TLDeserialization(data)
 
         const authKeyID = deserializer.fetchIntBytes(64, false, 'auth_key_id')
+
         if (!Bytes.compare(authKeyID, this.auth.authKeyID)) {
             throw new Error('[MT] Invalid server auth_key_id: ' + Bytes.asHex(authKeyID) + ", dcid " + this.auth.dcID)
         }
+
         const msgKey = deserializer.fetchIntBytes(128, true, 'msg_key')
         const encryptedData = deserializer.fetchRawBytes(data.byteLength - deserializer.getOffset(), true, 'encrypted_data')
 
-        const dataWithPadding = new Uint8Array(this.getDecryptedMessage(msgKey, encryptedData))
+        this.getDecryptedMessage(msgKey, encryptedData).then(dataWithPadding => {
+            dataWithPadding = new Uint8Array(dataWithPadding)
 
-        const calcMsgKey = this.getMsgKey(dataWithPadding, false)
-        if (!Bytes.compare(msgKey, calcMsgKey)) {
-            throw new Error('[MT] server msgKey mismatch')
-        }
+            const calcMsgKey = this.getMsgKey(dataWithPadding, false)
+            if (!Bytes.compare(msgKey, calcMsgKey)) {
+                throw new Error('[MT] server msgKey mismatch')
+            }
 
-        deserializer = new TLDeserialization(dataWithPadding.buffer, {mtproto: true})
+            deserializer = new TLDeserialization(dataWithPadding.buffer, {mtproto: true})
 
-        const salt = deserializer.fetchIntBytes(64, false, 'salt') // ??
-        const sessionID = deserializer.fetchIntBytes(64, false, 'session_id')
-        const messageID = deserializer.fetchLong('message_id')
+            const salt = deserializer.fetchIntBytes(64, false, 'salt') // ??
+            const sessionID = deserializer.fetchIntBytes(64, false, 'session_id')
+            const messageID = deserializer.fetchLong('message_id')
 
-        // TODO wtf?
-        if (!Bytes.compare(sessionID, this.auth.sessionID) &&
-            (!self.prevSessionID || !Bytes.compare(sessionID, self.prevSessionID))) {
-            // Logger.warn('Sessions', sessionID, self.sessionID, self.prevSessionID)
-            throw new Error('[MT] Invalid server session_id: ' + Bytes.asHex(sessionID))
-        }
+            // TODO wtf?
+            if (!Bytes.compare(sessionID, this.auth.sessionID) &&
+                (!self.prevSessionID || !Bytes.compare(sessionID, self.prevSessionID))) {
+                // Logger.warn('Sessions', sessionID, self.sessionID, self.prevSessionID)
+                throw new Error('[MT] Invalid server session_id: ' + Bytes.asHex(sessionID))
+            }
 
-        const seqNo = deserializer.fetchInt('seq_no')
+            const seqNo = deserializer.fetchInt('seq_no')
 
-        const totalLength = dataWithPadding.byteLength
+            const totalLength = dataWithPadding.byteLength
 
-        const messageBodyLength = deserializer.fetchInt('message_data[length]')
-        let offset = deserializer.getOffset()
+            const messageBodyLength = deserializer.fetchInt('message_data[length]')
+            let offset = deserializer.getOffset()
 
-        if ((messageBodyLength % 4) ||
-            messageBodyLength > totalLength - offset) {
-            throw new Error('[MT] Invalid body length: ' + messageBodyLength)
-        }
-        const messageBody = deserializer.fetchRawBytes(messageBodyLength, true, 'message_data')
+            if ((messageBodyLength % 4) ||
+                messageBodyLength > totalLength - offset) {
+                throw new Error('[MT] Invalid body length: ' + messageBodyLength)
+            }
 
-        offset = deserializer.getOffset()
-        const paddingLength = totalLength - offset
-        if (paddingLength < 12 || paddingLength > 1024) {
-            throw new Error('[MT] Invalid padding length: ' + paddingLength)
-        }
+            const messageBody = deserializer.fetchRawBytes(messageBodyLength, true, 'message_data')
 
-        const buffer = Bytes.asUint8Buffer(messageBody)
+            offset = deserializer.getOffset()
+            const paddingLength = totalLength - offset
+            if (paddingLength < 12 || paddingLength > 1024) {
+                throw new Error('[MT] Invalid padding length: ' + paddingLength)
+            }
 
-        const self = this
+            const buffer = Bytes.asUint8Buffer(messageBody)
 
-        const deserializerOptions = {
-            mtproto: true,
-            // TODO binary schema
-            schema: schema,
-            override: {
-                // fuck what is the point?
+            const self = this
 
-                // mt_message: function (result, field) {
-                //     result.msg_id = this.fetchLong(field + '[msg_id]')
-                //     result.seqno = this.fetchInt(field + '[seqno]')
-                //     result.bytes = this.fetchInt(field + '[bytes]')
-                //
-                //     const offset = this.getOffset()
-                //
-                //     try {
-                //         result.body = this.fetchObject('Object', field + '[body]')
-                //     } catch (e) {
-                //         console.error('parse error', e.message, e.stack)
-                //         throw e
-                //     }
-                //     // TODO wtf кастыли кокие-то
-                //     if (this.offset != offset + result.bytes) {
-                //         // console.warn(dT(), 'set offset', this.offset, offset, result.bytes)
-                //         // console.log(dT(), result)
-                //         this.offset = offset + result.bytes
-                //     }
-                //     // console.log('override message', result)
-                // },
-                // TODO
-                mt_rpc_result: function (result, field) {
-                    // console.log("mt_rpc_result", result, field)
-                    // console.log(self.sentMessages)
-                    result.req_msg_id = this.fetchLong(field + '[req_msg_id]')
+            const deserializerOptions = {
+                mtproto: true,
+                // TODO binary schema
+                schema: schema,
+                override: {
+                    mt_rpc_result: function (result, field) {
+                        // console.log("mt_rpc_result", result, field)
+                        // console.log(self.sentMessages)
+                        result.req_msg_id = this.fetchLong(field + '[req_msg_id]')
 
-                    const sentMessage = self.messageProcessor.sentMessages[result.req_msg_id]
-                    const type = sentMessage && sentMessage.resultType || 'Object'
+                        const sentMessage = self.messageProcessor.sentMessages[result.req_msg_id]
+                        const type = sentMessage && sentMessage.resultType || 'Object'
 
-                    if (result.req_msg_id && !sentMessage) {
-                        // console.warn(dT(), 'Result for unknown message', result)
-                        return
+                        if (result.req_msg_id && !sentMessage) {
+                            // console.warn(dT(), 'Result for unknown message', result)
+                            return
+                        }
+                        // console.log(result)
+                        // console.log(Bytes.asHex(this.getLeftoverArray()))
+                        result.result = this.fetchObject(type, field + '[result]')
+
+                        // console.log(dT(), 'override rpc_result', sentMessage, type, result)
                     }
-                    // console.log(result)
-                    // console.log(Bytes.asHex(this.getLeftoverArray()))
-                    result.result = this.fetchObject(type, field + '[result]')
-
-                    // console.log(dT(), 'override rpc_result', sentMessage, type, result)
                 }
             }
-        }
 
-        deserializer = new TLDeserialization(buffer, deserializerOptions)
+            deserializer = new TLDeserialization(buffer, deserializerOptions)
 
-        let response = {}
+            let response = {}
 
-        try {
-            response = deserializer.fetchObject('', 'INPUT')
-        } catch (e) {
-            console.log("?/")
-            throw e
-        }
+            try {
+                response = deserializer.fetchObject('', 'INPUT')
+            } catch (e) {
+                console.log("?/")
+                throw e
+            }
 
-        this.messageProcessor.process(response, messageID, sessionID)
+            this.messageProcessor.process(response, messageID, sessionID)
+        })
     }
 
 
@@ -284,9 +264,9 @@ export class ApiNetworker extends Networker {
         })
     }
 
-    getDecryptedMessage(msgKey, encryptedData) {
+    async getDecryptedMessage(msgKey, encryptedData) {
         const keyIv = this.getAesKeyIv(msgKey, false)
-        return new Uint8Array(aesDecryptSync(encryptedData, keyIv[0], keyIv[1]))
+        return new Uint8Array(await AppCryptoManager.aesDecrypt(encryptedData, keyIv[0], keyIv[1]))
     }
 
     invokeMethod(method, params, options = {}) {
