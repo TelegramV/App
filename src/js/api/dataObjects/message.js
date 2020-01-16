@@ -85,7 +85,7 @@ export class Message {
         return this._message.date
     }
 
-    get rawMessage() {
+    get raw() {
         return this._message
     }
 

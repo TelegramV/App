@@ -1,8 +1,8 @@
 /**
  * @property {Map<number, Message>} _messages
  */
-import AppSelectedDialog from "../dialogs/selectedDialog"
-import AppEvents from "../eventBus/appEvents"
+import AppSelectedDialog from "../../dialogs/selectedDialog"
+import AppEvents from "../../eventBus/appEvents"
 
 /**
  * @property {Message} _lastMessage

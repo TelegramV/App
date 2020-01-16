@@ -1,7 +1,8 @@
 import AppEvents from "../../../../../../api/eventBus/appEvents"
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
+import AppFramework from "../../../../../framework/framework"
 
-const ChatInfoAvatarComponent = {
+const ChatInfoAvatarComponent = AppFramework.createComponent({
     name: "ChatInfoAvatarComponent",
     h() {
         if (AppSelectedDialog.isNotSelected) {
@@ -33,6 +34,6 @@ const ChatInfoAvatarComponent = {
             }
         })
     },
-}
+})
 
 export default ChatInfoAvatarComponent

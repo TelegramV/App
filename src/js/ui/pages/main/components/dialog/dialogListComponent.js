@@ -4,11 +4,12 @@ import DialogsStore from "../../../../../api/store/dialogsStore"
 import AppEvents from "../../../../../api/eventBus/appEvents"
 import Sortable from "sortablejs"
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
+import AppFramework from "../../../../framework/framework"
 
 /**
  * CRITICAL: Never rerender this component!!!
  */
-export const DialogListComponent = {
+export const DialogListComponent = AppFramework.createComponent({
     name: "dialog-list",
     reactive: {
         selectedDialog: AppSelectedDialog.Reactive.FireOnly
@@ -425,4 +426,4 @@ export const DialogListComponent = {
             document.removeEventListener("mousemove", resize)
         }, false)
     }
-}
+})

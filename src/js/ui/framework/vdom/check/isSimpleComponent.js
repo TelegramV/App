@@ -1,5 +1,5 @@
 /**
- * Checks if object is simple component.
+ * Checks if given object is a simple component.
  *
  * @param potentialSimpleComponent
  * @returns {boolean}

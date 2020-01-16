@@ -55,7 +55,7 @@ export function DialogComponent({dialog}) {
 
             <div className="content">
                 <div className="top">
-                    <div className="title">{peer.peerName}</div>
+                    <div className="title">{peer.name}</div>
                     <div className="status tgico"/>
                     <div className="time">{dialog.messages.last.getDate("en", DATE_FORMAT)}</div>
                 </div>
