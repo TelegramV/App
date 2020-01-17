@@ -5,6 +5,7 @@ const Message = ({ message }) => {
     if (!message.type) {
         return <div>Unsupported message type</div>
     }
+    console.log(message.type);
 
     const handlers = {
         text: TextMessageComponent,
@@ -34,7 +35,7 @@ const TextMessageComponent = ({ message }) => {
         "read": message.isRead
     }
 
-    const username = message.from.name && !message.isPost && !message.isOut
+    const username = message.from.name && !message.isPost && !message.isOut && !isBigMedia(message)
     let text = parseMessageEntities(message.text, message.entities)
 
     return (
@@ -42,10 +43,18 @@ const TextMessageComponent = ({ message }) => {
                 <div className={classes}>
                     {username ? <div className="username">{message.from.name}</div> : ""}
 
-                    <div className={`message ${username ? "nopad" : ""}`}>
-                    	{message.media ? <MessageMediaComponent message={message}/> : ""} {/*Text can be before media (links), there's need to move text position inside it*/}
-                        {!!text ? <span dangerouslySetInnerHTML={text}/> : ""}
-                        <MessageTimeComponent message={message}/>
+                    <div className={`message ${isBigMedia(message)? "no-pad" : ""}`}>
+                        {message.media ? <MessageMediaComponent message={message}/> : ""} {/*Text can be before media (links), there's need to move text position inside it*/}
+                        {
+                            (() => {if(!!text) return (
+                                <div class="text-wrapper">
+                                    <span class="text" dangerouslySetInnerHTML={text}/>
+                                    <MessageTimeComponent message={message}/>
+                                </div>
+                            ); 
+                            return "";
+                            })()
+                        }
                     </div>
                 </div>
             </MessageWrapperComponent>
@@ -68,10 +77,12 @@ const MessageMediaComponent = ({ message }) => {
 const MessageMediaImage = ({ src, size, alt = "", isThumb }) => {
     let width = isThumb ? parseInt(size[0]) >= 460 ? "460px" : `${size[0]}px` : parseInt(size[0]) >= 480 ? "480px" : `${size[0]}px`
     return (
-        <img className={["attachment", isThumb ? "attachment-thumb" : ""]}
+        <div class="media-wrapper">
+            <img className={["attachment", isThumb ? "attachment-thumb" : ""]}
              css-width={width}
              src={src}
              alt={alt}/>
+        </div>
     )
 }
 
@@ -82,7 +93,7 @@ const MessageTimeComponent = ({ message, bg = false }) => {
     if (message.raw.views) {
         views = (
             <span class="views">
-        		{numberFormat(message.raw.views)}
+                {numberFormat(message.raw.views)}
                 <span class="tgico tgico-channelviews"/> 
             </span>
         )
@@ -92,9 +103,9 @@ const MessageTimeComponent = ({ message, bg = false }) => {
 
     return (
         <span class={classes}>
-        		{views}
-        		<div class="inner tgico">
-        			{edited}
+                {views}
+                <div class="inner tgico">
+                    {edited}
                     {message.getDate('en', {
                         hour: '2-digit',
                         minute: '2-digit',
@@ -132,7 +143,13 @@ const MessageWrapperComponent = ({ message, slot }) => {
             {slot}
         </div>
     )
+}
 
+function isBigMedia(message) {
+    if (!message.media) return false;
+    let media = message.media;
+    if (media.photo) return true;
+    return false;
 }
 
 function numberFormat(num) {
