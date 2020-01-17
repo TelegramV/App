@@ -14,9 +14,6 @@ export class Peer {
          */
         this._dialog = undefined
 
-        this._type = undefined
-        this._id = undefined
-        this._username = undefined
         this._photo = PeerPhoto.createEmpty(this)
 
         this._full = undefined
@@ -25,6 +22,7 @@ export class Peer {
     }
 
     /**
+     * @private
      * @return {*}
      */
     get raw() {
@@ -32,10 +30,18 @@ export class Peer {
     }
 
     /**
+     * @private
+     * @param rawPeer
+     */
+    set raw(rawPeer) {
+        this._rawPeer = rawPeer
+    }
+
+    /**
      * @return {number}
      */
     get id() {
-        return this._id || this.raw.id
+        return this.raw.id
     }
 
     /**
@@ -71,7 +77,7 @@ export class Peer {
      * @return {*|string|T|boolean}
      */
     get username() {
-        return this._username || false
+        return this.raw.username
     }
 
     /**
@@ -85,7 +91,7 @@ export class Peer {
      * @return {string}
      */
     get name() {
-        return this.raw.title || this.raw.first_name + " " + this.raw.last_name || " "
+        return this.raw.first_name + (this.raw.last_name ? " " + this.raw.last_name : "")
     }
 
     /**
@@ -125,68 +131,37 @@ export class Peer {
     }
 
     /**
-     * @return {string}
+     * Get the type of peer
+     * @returns {string}
      */
     get type() {
-        return this._type
+        return "user"
     }
 
     /**
      * @return {Promise<*>}
      */
     fetchFull() {
-        if (this.type === "channel") {
-            return MTProto.invokeMethod("channels.getFullChannel", {
-                channel: {
-                    _: "inputChannel",
-                    channel_id: this.id,
-                    access_hash: this.accessHash
-                }
-            }).then(channelFull => {
-                this._full = channelFull.full_chat
+        return MTProto.invokeMethod("users.getFullUser", {
+            id: this.inputPeer
+        }).then(userFull => {
+            this._full = userFull
 
-                AppEvents.Peers.fire("fullLoaded", {
-                    peer: this
-                })
+            AppEvents.Peers.fire("fullLoaded", {
+                peer: this
             })
-        } else if (this.type === "chat") {
-            return MTProto.invokeMethod("messages.getFullChat", {
-                chat_id: this.id
-            }).then(chatFull => {
-                this._full = chatFull.full_chat
-
-                AppEvents.Peers.fire("fullLoaded", {
-                    peer: this
-                })
-            })
-        } else {
-            return MTProto.invokeMethod("users.getFullUser", {
-                id: {
-                    _: "inputUser",
-                    user_id: this.id,
-                    access_hash: this.accessHash
-                }
-            }).then(userFull => {
-                this._full = userFull
-
-                AppEvents.Peers.fire("fullLoaded", {
-                    peer: this
-                })
-            })
-        }
+        })
     }
 
     /**
      * @param rawPeer
      */
     fillRaw(rawPeer) {
-        if (this._type !== undefined && this._id !== undefined && (rawPeer._ !== this.type || rawPeer.id !== this.id)) {
+        if (rawPeer._ !== this.type || rawPeer.id !== this.id) {
             throw new Error("peer data cannot be filled")
         }
 
-        this._type = rawPeer._
-        this._id = rawPeer.id
-        this._username = rawPeer.username
+        this.raw = rawPeer
 
         if (this.isMin) {
             this._photo.fillRaw(false)
