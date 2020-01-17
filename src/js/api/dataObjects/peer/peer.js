@@ -110,6 +110,14 @@ export class Peer {
     }
 
     /**
+     * Sets the new photo
+     * @param photo
+     */
+    set photo(photo) {
+        this._photo = photo
+    }
+
+    /**
      * @return {*|undefined}
      */
     get full() {

@@ -14,6 +14,8 @@ a {
     display: flex;
     background-color: $lightblue;
     overflow: hidden;
+    // Only specific parts should be selectable
+    user-select: none;
 }
 
 .rp {

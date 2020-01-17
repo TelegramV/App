@@ -92,14 +92,15 @@ class DialogAPI {
         })
     }
 
-    readAllHistory() {
+    readHistory(maxId) {
         if (this.dialog.type === "channel") {
             return MTProto.invokeMethod("channels.readHistory", {
                 channel: getInputFromPeer(this.dialog.type, this.dialog.peer.id, this.dialog.peer.accessHash),
-                max_id: this.dialog.messages.last.id
+                max_id: maxId
             }).then(response => {
                 if (response._ === "boolTrue") {
-                    this.dialog.messages.clearUnread()
+                    this.dialog.messages.deleteUnread(maxId)
+                    //this.dialog.messages.clearUnread()
                     AppEvents.Dialogs.fire("readHistory", {
                         dialog: this.dialog
                     })
@@ -108,14 +109,19 @@ class DialogAPI {
         } else {
             return MTProto.invokeMethod("messages.readHistory", {
                 peer: getInputPeerFromPeer(this.dialog.type, this.dialog.peer.id, this.dialog.peer.accessHash),
-                max_id: this.dialog.messages.last.id
+                max_id: maxId
             }).then(response => {
-                this.dialog.messages.clearUnread()
+                this.dialog.messages.deleteUnread(maxId)
+                //this.dialog.messages.clearUnread()
                 AppEvents.Dialogs.fire("readHistory", {
                     dialog: this.dialog
                 })
             })
         }
+    }
+
+    readAllHistory() {
+        this.readHistory(this.dialog.messages.last.id)
     }
 }
 
