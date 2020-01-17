@@ -4,7 +4,7 @@
  * @constructor
  */
 export const DialogAvatarComponent = ({dialog}) => {
-    let hasAvatar = !dialog.peer.photo.isEmpty
+    let hasAvatar = !dialog.peer.photo.isEmpty && !dialog.peer.photo._isFetchingSmall
 
     const classes = {
         "avatar": true,
@@ -21,11 +21,18 @@ export const DialogAvatarComponent = ({dialog}) => {
         <div className={classes}>
             <span>{letter}</span>
 
-            {/*<img class="" src={dialog.peer.photo.smallUrl}/>*/}
+            <div className="avatar-outer" css-opacity={cssOpacity}>
+            {
+                hasAvatar ?
+                    <img className="avatar-inner" src={dialog.peer.photo.smallUrl}/>
+                    :
+                    ""
+            }
+            </div>
 
-            <div className="avatar-inner"
-                 css-background-image={cssBackgroundImage}
-                 css-opacity={cssOpacity}/>
+            {/*<div className="avatar-inner"*/}
+            {/*     css-background-image={cssBackgroundImage}*/}
+            {/*     css-opacity={cssOpacity}/>*/}
         </div>
     )
 }

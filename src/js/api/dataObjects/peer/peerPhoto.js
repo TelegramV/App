@@ -141,9 +141,9 @@ export class PeerPhoto {
         this._isFetchingSmall = true
 
         return FileAPI.getPeerPhoto(this._photoSmall, this._dcId, this._peer, false).then(url => {
-            this.smallUrl = url
-
             this._isFetchingSmall = false
+
+            this.smallUrl = url
         })
     }
 
