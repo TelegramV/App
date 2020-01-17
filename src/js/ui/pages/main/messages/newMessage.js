@@ -34,13 +34,13 @@ const TextMessageComponent = ({ message }) => {
         "read": message.isRead
     }
 
-    const username = message.from.peerName && !message.isPost && !message.isOut
+    const username = message.from.name && !message.isPost && !message.isOut
     let text = parseMessageEntities(message.text, message.entities)
 
     return (
         <MessageWrapperComponent message={message}>
                 <div className={classes}>
-                    {username ? <div className="username">{message.from.peerName}</div> : ""}
+                    {username ? <div className="username">{message.from.name}</div> : ""}
 
                     <div className={`message ${username ? "nopad" : ""}`}>
                     	{message.media ? <MessageMediaComponent message={message}/> : ""} {/*Text can be before media (links), there's need to move text position inside it*/}
@@ -79,16 +79,16 @@ const MessageTimeComponent = ({ message, bg = false }) => {
     let classes = "time" + (bg ? " bg" : "");
 
     let views = "";
-    if (message.rawMessage.views) {
+    if (message.raw.views) {
         views = (
             <span class="views">
-        		{numberFormat(message.rawMessage.views)}
+        		{numberFormat(message.raw.views)}
                 <span class="tgico tgico-channelviews"/> 
             </span>
         )
     }
 
-    let edited = message.rawMessage.edit_date ? (<span class="edited">edited</span>) : "";
+    let edited = message.raw.edit_date ? (<span class="edited">edited</span>) : "";
 
     return (
         <span class={classes}>
@@ -114,24 +114,28 @@ const MessageWrapperComponent = ({ message, slot }) => {
 
     const from = message.from
 
-    let hasAvatar = from.hasAvatar && from._avatar !== undefined
+    let hasAvatar = !from.photo.isEmpty
+    console.log(message);
+    console.log(hasAvatar);
+    console.log(from.photo.smallUrl);
 
-    const classes = "avatar" + (!hasAvatar ? ` placeholder-${from.avatarLetter.num}` : "")
-    const letter = hasAvatar ? "" : from.avatarLetter.text
+    const classes = "avatar" + (!hasAvatar ? ` placeholder-${from.photo.letter.num}` : "")
+    const letter = hasAvatar ? "" : from.photo.letter.text
 
-    const cssBackgroundImage = hasAvatar ? `url(${from._avatar})` : "none"
+    const cssBackgroundImage = hasAvatar ? `url(${from.photo.smallUrl})` : "none"
 
     return (
         <div class={className} data-id={message.id} data-peer={`${from.type}.${from.id}`}>
-                {!message.isPost && className.in ? (
-                    <div className={classes}
-                         css-background-image={cssBackgroundImage}>
-                        {letter}
-                    </div>
-                ) : ""}
-                {slot}
-            </div>
+            {!message.isPost && className.in ? (
+                <div className={classes}
+                     css-background-image={cssBackgroundImage}>
+                    {letter}
+                </div>
+            ) : ""}
+            {slot}
+        </div>
     )
+
 }
 
 function numberFormat(num) {
