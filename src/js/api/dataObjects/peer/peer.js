@@ -14,9 +14,9 @@ export class Peer {
          */
         this._dialog = undefined
 
-        this._type = "chat"
-        this._id = 0
-        this._accessHash = 0
+        this._type = undefined
+        this._id = undefined
+        this._accessHash = undefined
         this._username = undefined
         this._photo = PeerPhoto.createEmpty(this)
 
@@ -33,7 +33,7 @@ export class Peer {
     }
 
     get peer() {
-
+        return this._rawPeer
     }
 
     /**
@@ -62,7 +62,7 @@ export class Peer {
     }
 
     get accessHash() {
-        return this._accessHash
+        return this._accessHash || this.raw.access_hash
     }
 
     /**
@@ -177,6 +177,10 @@ export class Peer {
      * @param rawPeer
      */
     fillRaw(rawPeer) {
+        if (this._type !== undefined && this._id !== undefined && (rawPeer._ !== this.type || rawPeer.id !== this.id)) {
+            throw new Error("peer data cannot be filled")
+        }
+
         this._type = rawPeer._
         this._id = rawPeer.id
         this._accessHash = rawPeer.access_hash
