@@ -115,9 +115,6 @@ const MessageWrapperComponent = ({ message, slot }) => {
     const from = message.from
 
     let hasAvatar = !from.photo.isEmpty
-    console.log(message);
-    console.log(hasAvatar);
-    console.log(from.photo.smallUrl);
 
     const classes = "avatar" + (!hasAvatar ? ` placeholder-${from.photo.letter.num}` : "")
     const letter = hasAvatar ? "" : from.photo.letter.text
