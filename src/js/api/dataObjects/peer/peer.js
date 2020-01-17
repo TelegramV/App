@@ -16,7 +16,6 @@ export class Peer {
 
         this._type = undefined
         this._id = undefined
-        this._accessHash = undefined
         this._username = undefined
         this._photo = PeerPhoto.createEmpty(this)
 
@@ -29,10 +28,6 @@ export class Peer {
      * @return {*}
      */
     get raw() {
-        return this._rawPeer
-    }
-
-    get peer() {
         return this._rawPeer
     }
 
@@ -62,7 +57,7 @@ export class Peer {
     }
 
     get accessHash() {
-        return this._accessHash || this.raw.access_hash
+        return this.raw.access_hash
     }
 
     /**
@@ -183,7 +178,6 @@ export class Peer {
 
         this._type = rawPeer._
         this._id = rawPeer.id
-        this._accessHash = rawPeer.access_hash
         this._username = rawPeer.username
 
         if (this.isMin) {

@@ -48,12 +48,14 @@ export class Message {
     }
 
     get to() {
-        if (this._message.to_id._ === "peerChannel") {
+        if (this._message.to_id && this._message.to_id._ === "peerChannel") {
             return PeersStore.get("channel", this._message.to_id.channel_id)
         }
-        if(this._message.to_id._ === "peerUser") {
+
+        if (this._message.to_id && this._message.to_id._ === "peerUser") {
             return PeersStore.get("user", this._message.to_id.user_id)
         }
+
         return null
     }
 

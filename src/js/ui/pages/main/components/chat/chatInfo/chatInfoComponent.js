@@ -29,7 +29,7 @@ const ChatInfoComponent = AppFramework.createComponent({
         )
     },
     changed(key, value) {
-        console.log(key, value)
+        
     }
 })
 
