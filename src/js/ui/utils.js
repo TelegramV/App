@@ -62,17 +62,18 @@ export function getMediaPreviewName(message) {
     }
 }
 
-export function getMessagePreviewDialog(message, showSender) {
+export function getMessagePreviewDialog(message, peerName, showSender) {
     if (message._ === "messageService") {
         return "Service message" // TODO parse service messages
     }
     let text = ""
     if (message.media) {
         const p = getMediaPreviewName(message)
-        if (p.length > 0)
-            text = (showSender ? ": " : "") + p + (message.message.length > 0 ? ", " : "")
+        if (p.length > 0) {
+            text = (showSender ? peerName + ": " : "") + p + (message.message.length > 0 ? ", " : "")
+        }
     } else if (message.message.length > 0 && showSender) {
-        text += ": "
+        text += peerName + ": "
     }
     return text
 }

@@ -1,6 +1,8 @@
 import {getMessagePreviewDialog} from "../../ui/utils";
 import MTProto from "../../mtproto"
 import PeersStore from "../store/peersStore"
+import {ChannelPeer} from "./peer/channelPeer";
+import {UserPeer} from "./peer/userPeer";
 
 export class Message {
     /**
@@ -46,8 +48,11 @@ export class Message {
     }
 
     get to() {
-        if (this._message.to_id === "peerChannel") {
+        if (this._message.to_id._ === "peerChannel") {
             return PeersStore.get("channel", this._message.to_id.channel_id)
+        }
+        if(this._message.to_id._ === "peerUser") {
+            return PeersStore.get("user", this._message.to_id.user_id)
         }
         return null
     }
@@ -70,17 +75,10 @@ export class Message {
 
     get prefix() {
         const from = this.from
+        const hideSender = this.to instanceof ChannelPeer || (!this.isOut && this.to instanceof UserPeer)
+        const sender = this.isOut ? "You" : from.name
 
-        // todo: check if megagroup
-        if (this.to) {
-            return this.to.name
-        }
-
-        if (from) {
-            return from.name + getMessagePreviewDialog(this._message, true)
-        } else {
-            return getMessagePreviewDialog(this._message, true)
-        }
+        return getMessagePreviewDialog(this._message, sender, !hideSender)
     }
 
     get date() {
