@@ -7,12 +7,12 @@ function MessageWrapperComponent({message, slot}) {
 
     const from = message.from
 
-    let hasAvatar = from.hasAvatar && from._avatar !== undefined
+    let hasAvatar = !from.photo.isEmpty
 
-    const classes = "avatar" + (!hasAvatar ? ` placeholder-${from.avatarLetter.num}` : "")
-    const letter = hasAvatar ? "" : from.avatarLetter.text
+    const classes = "avatar" + (!hasAvatar ? ` placeholder-${from.photo.letter.num}` : "")
+    const letter = hasAvatar ? "" : from.photo.letter.text
 
-    const cssBackgroundImage = hasAvatar ? `url(${from._avatar})` : "none"
+    const cssBackgroundImage = hasAvatar ? `url(${from.photo.smallUrl})` : "none"
     // const cssOpacity = hasAvatar ? 1 : 0
 
     // return (

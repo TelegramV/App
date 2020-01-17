@@ -8,17 +8,17 @@ function TextMessageComponent({message}) {
         "read": message.isRead
     }
 
-    const username = message.from.peerName && !message.isPost && !message.isOut
+    const username = message.from.name && !message.isPost && !message.isOut
     let text = parseMessageEntities(message.text, message.entities)
 
-    if (message.rawMessage.fwd_from) {
+    if (message.raw.fwd_from) {
         return (
             <MessageWrapperComponent message={message}>
                 <div className={classes}>
-                    {username ? <div className="username">{message.from.peerName}</div> : ""}
+                    {username ? <div className="username">{message.from.name}</div> : ""}
 
                     <div className={`message ${username ? "nopad" : ""}`}>
-                        <div className="fwd">Forwarded from {message.rawMessage.fwd_from.from_id}</div>
+                        <div className="fwd">Forwarded from {message.raw.fwd_from.from_id}</div>
                         <span dangerouslySetInnerHTML={text}/>
                         <MessageTimeComponent message={message}/>
                     </div>
@@ -30,7 +30,7 @@ function TextMessageComponent({message}) {
     return (
         <MessageWrapperComponent message={message}>
             <div className={classes}>
-                {username ? <div className="username">{message.from.peerName}</div> : ""}
+                {username ? <div className="username">{message.from.name}</div> : ""}
 
                 <div className={`message ${username ? "nopad" : ""}`}>
                     <span dangerouslySetInnerHTML={text}/>

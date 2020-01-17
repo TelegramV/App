@@ -89,7 +89,7 @@ export function getPeersInput(peerName) {
     }
 }
 
-export function getPeerNameFromType(peerType) {
+export function getPeerTypeFromType(peerType) {
     switch (peerType) {
         case "peerChat":
             return "chat"

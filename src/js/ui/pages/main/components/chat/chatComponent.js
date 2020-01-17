@@ -3,15 +3,16 @@ import LoaderComponent from "../loading/loader"
 import ChatInfoComponent from "./chatInfo/chatInfoComponent"
 import BubblesComponent from "./bubblesComponent"
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
+import AppFramework from "../../../../framework/framework"
 
 
 /**
  * CRITICAL: never rerender this component!
  */
-const ChatComponent = {
+const ChatComponent = AppFramework.createComponent({
     name: "messages-wrapper-component",
     reactive: {
-        dialog: AppSelectedDialog.Reactive.FireOnly
+        // dialog: AppSelectedDialog.Reactive.FireOnly
     },
     state: {
         /**
@@ -60,6 +61,6 @@ const ChatComponent = {
         // this.elements.$bubblesInner = this.elements.$bubbles.querySelector("#bubbles-inner")
         // this.elements.$messagesLoader = this.$el.querySelector("#messages-wrapper-messages-loader")
     },
-}
+})
 
 export default ChatComponent

@@ -1,7 +1,8 @@
 import AppEvents from "../../../../../../api/eventBus/appEvents"
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
+import AppFramework from "../../../../../framework/framework"
 
-const ChatInfoNameComponent = {
+const ChatInfoNameComponent = AppFramework.createComponent({
     name: "ChatInfoAvatarComponent",
     h() {
         if (AppSelectedDialog.isNotSelected) {
@@ -16,7 +17,7 @@ const ChatInfoNameComponent = {
 
         return (
             <div id="messages-title" className="title">
-                {peer.peerName}
+                {peer.name}
             </div>
         )
     },
@@ -30,6 +31,6 @@ const ChatInfoNameComponent = {
             }
         })
     },
-}
+})
 
 export default ChatInfoNameComponent

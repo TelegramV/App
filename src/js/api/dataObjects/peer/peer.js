@@ -1,11 +1,8 @@
-import {createLogger} from "../../../common/logger";
 import {getInputPeerFromPeer} from "../../dialogs/util";
 import MTProto from "../../../mtproto"
 import AppEvents from "../../eventBus/appEvents"
 import DialogsStore from "../../store/dialogsStore"
 import {PeerPhoto} from "./peerPhoto"
-
-const Logger = createLogger("Peer")
 
 export class Peer {
     constructor(rawPeer) {
@@ -17,24 +14,28 @@ export class Peer {
          */
         this._dialog = undefined
 
-        this._type = "chat"
-        this._id = 0
-        this._access_hash = 0
+        this._type = undefined
+        this._id = undefined
         this._username = undefined
         this._photo = PeerPhoto.createEmpty(this)
 
-        this.fillRaw(rawPeer)
-
-        this._peer = rawPeer
         this._full = undefined
+
+        this.fillRaw(rawPeer)
     }
 
+    /**
+     * @return {*}
+     */
     get raw() {
         return this._rawPeer
     }
 
+    /**
+     * @return {number}
+     */
     get id() {
-        return this.peer.id
+        return this._id || this.raw.id
     }
 
     /**
@@ -48,100 +49,90 @@ export class Peer {
         return this._dialog
     }
 
+    /**
+     * @param {Dialog} dialog
+     */
     set dialog(dialog) {
         this._dialog = dialog
     }
 
+    get accessHash() {
+        return this.raw.access_hash
+    }
+
+    /**
+     * @return {boolean}
+     */
     get isDeleted() {
-        return this.peer.pFlags.deleted
+        return this.raw.pFlags.deleted
     }
 
-    get peer() {
-        return this._rawPeer
-    }
-
+    /**
+     * @return {*|string|T|boolean}
+     */
     get username() {
-        return this.peer.username || null
+        return this._username || false
     }
 
+    /**
+     * @return {boolean}
+     */
     get verified() {
-        return this.peer.pFlags.verified === true
+        return this.raw.pFlags.verified === true
     }
 
-    get peerName() {
-        return this.peer.title || this.raw.first_name + " " + this.raw.last_name
-    }
-
+    /**
+     * @return {string}
+     */
     get name() {
-        return this.peer.title || this.raw.first_name + " " + this.raw.last_name
+        return this.raw.title || this.raw.first_name + " " + this.raw.last_name || " "
     }
 
-    get hasAvatar() {
-        return this.peer.photo && this.peer.photo._ !== "chatPhotoEmpty"
-    }
-
+    /**
+     * @return {boolean}
+     */
     get isMin() {
-        return this.peer.pFlags && this.peer.pFlags.min === true
+        return this.raw.pFlags && this.raw.pFlags.min === true
     }
 
+    /**
+     * @return {{_: string, chat_id: *}|{user_id: *, access_hash: string, _: string}|{access_hash: string, channel_id: *, _: string}|{_: string}}
+     */
     get inputPeer() {
-        return getInputPeerFromPeer(this.type, this.id, this.peer.access_hash)
+        return getInputPeerFromPeer(this.type, this.id, this.accessHash)
     }
 
+    /**
+     * @return {PeerPhoto}
+     */
     get photo() {
         return this._photo
     }
 
-    get avatarLetter() {
-        const split = this.peerName.split(" ")
-
-        return {
-            num: Math.abs(this.id) % 8,
-            text: split[0].match(/./ug)[0]
-        }
-    }
-
+    /**
+     * @return {*|undefined}
+     */
     get full() {
         return this._full
     }
 
+    /**
+     * @return {string}
+     */
     get type() {
-        return this.peer._
+        return this._type
     }
 
-    getAvatar(big = false) {
-        // if (this._avatar) {
-        //     return Promise.resolve(this._avatar)
-        // }
-        // if (!this.hasAvatar) {
-        //     return Promise.resolve(null)
-        // }
-        // if (this.isMin) {
-        //     return Promise.resolve(null)
-        // }
-        //
-        // console.log(this.peer)
-        //
-        // // TODO cache
-        // return FileAPI.getPeerPhoto(big ? this.peer.photo.photo_big : this.peer.photo.photo_small, this.peer.photo.dc_id, this, big).then(url => {
-        //     this._avatar = url
-        //
-        //     AppEvents.Peers.fire("updatePhoto", {
-        //         peer: this
-        //     })
-        //     return this._avatar
-        // }).catch(e => {
-        //     Logger.error("Exception while loading avatar:", e)
-        // })
-    }
-
+    /**
+     * @return {Promise<*>}
+     */
     fetchFull() {
         if (this.type === "channel") {
             return MTProto.invokeMethod("channels.getFullChannel", {
                 channel: {
                     _: "inputChannel",
                     channel_id: this.id,
-                    access_hash: this.peer.access_hash
+                    access_hash: this.accessHash
                 }
             }).then(channelFull => {
                 this._full = channelFull.full_chat
@@ -165,7 +156,7 @@ export class Peer {
                 id: {
                     _: "inputUser",
                     user_id: this.id,
-                    access_hash: this.peer.access_hash
+                    access_hash: this.accessHash
                 }
             }).then(userFull => {
                 this._full = userFull
@@ -177,10 +168,16 @@ export class Peer {
         }
     }
 
+    /**
+     * @param rawPeer
+     */
     fillRaw(rawPeer) {
+        if (this._type !== undefined && this._id !== undefined && (rawPeer._ !== this.type || rawPeer.id !== this.id)) {
+            throw new Error("peer data cannot be filled")
+        }
+
         this._type = rawPeer._
         this._id = rawPeer.id
-        this._access_hash = rawPeer.access_hash
         this._username = rawPeer.username
 
         if (this.isMin) {
@@ -190,6 +187,9 @@ export class Peer {
         }
     }
 
+    /**
+     * @param rawPeer
+     */
     fillRawAndFire(rawPeer) {
         this.fillRaw(rawPeer)
 
