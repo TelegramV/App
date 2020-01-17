@@ -1,3 +1,5 @@
+//UNUSED
+//CHECK bubbleComponent.js
 import { MTProto } from "../../../../mtproto"
 import Voice from "../../../voice"
 import {parseMessageEntities} from "../../../../mtproto/utils/htmlHelpers";

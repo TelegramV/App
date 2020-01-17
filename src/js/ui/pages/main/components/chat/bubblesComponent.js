@@ -2,10 +2,13 @@ import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import AppEvents from "../../../../../api/eventBus/appEvents"
 import VDOM from "../../../../framework/vdom"
 import ImageMessageComponent from "./message/imageMessageComponent"
-import {FileAPI} from "../../../../../api/fileAPI"
+import { FileAPI } from "../../../../../api/fileAPI"
 import TextMessageComponent from "./message/textMessageComponent"
-import {isElementInViewport} from "../../../../framework/utils"
+import { isElementInViewport } from "../../../../framework/utils"
 import AppFramework from "../../../../framework/framework"
+
+import Message from "./../../messages/newMessage"
+
 
 /**
  * WARNING: never patch this component! not manually, not from parent!
@@ -93,8 +96,20 @@ const BubblesComponent = AppFramework.createComponent({
     _renderMessage(message, prepend = false) {
         const $mount = prepend ? VDOM.prependToReal : VDOM.appendToReal
         let $message = undefined
-
+        $message = $mount(<Message message={message}/>, this.elements.$bubblesInner); //TODO Давид поправ як має бути
         if (message.media) {
+            if (message.media.photo) {
+                FileAPI.photoThumnail(message.media.photo, data => {
+                    message.media.photo.real = {
+                        src: data.src,
+                        sizes: data.size,
+                        thumbnail: data.thumbnail
+                    }
+                    VDOM.patchReal($message, <Message message={message}/>);
+                })
+            }
+        }
+        /*if (message.media) {
             if (message.media.photo) {
                 $message = $mount(<ImageMessageComponent message={message} image={false}/>, this.elements.$bubblesInner)
 
@@ -111,7 +126,7 @@ const BubblesComponent = AppFramework.createComponent({
             }
         } else {
             $message = $mount(<TextMessageComponent message={message}/>, this.elements.$bubblesInner)
-        }
+        }*/
 
         return $message
     },

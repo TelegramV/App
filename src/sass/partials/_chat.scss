@@ -248,6 +248,10 @@
         background-size: cover;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
+
+        /*Full-size image*/
+        margin-left: -9px;
+        margin-top: -9px;
       }
 
       .attachment-thumb {
@@ -450,15 +454,19 @@
 
       .time {
         float: right;
-        display: inline-block;
+        display: flex;
         font-size: $time-size;
         user-select: none;
         height: 20px;
+        line-height: 20px;
+        margin-top: 5px;
+        margin-right: -10px;
+        margin-left: 5px;
 
         .inner {
-          position: absolute;
-          bottom: 0;
-          right: 0;
+          .edited {
+            margin-right: 5px;
+          }
         }
 
         &.bg {
@@ -574,10 +582,17 @@
 
       .time {
         color: rgba($darkgrey, 0.6);
-        width: 33px;
+
+        .views {
+          display: flex;
+
+          .tgico-channelviews {
+            font-size: 18px;
+          }
+        }
 
         .inner {
-          padding: 6px 8px;
+          padding: 0px 8px;
         }
       }
 
@@ -643,18 +658,17 @@
 
       .time {
         color: $darkgreen;
-        min-width: 47px;
-        display: inline-block;
+        display: flex;
 
         .inner {
-          padding: 6px 5px;
+          padding: 0px 5px;
         }
       }
 
       .bubble {
         .time .tgico:after {
           font-size: 18px;
-          line-height: 12px;
+          line-height: 16px;
           vertical-align: top;
         }
       }
