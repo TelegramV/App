@@ -5,6 +5,11 @@ import {AppPermanentStorage} from "../../../common/storage"
 import {AppFramework} from "../../framework/framework"
 import {FileAPI} from "../../../api/fileAPI"
 import AppCryptoManager from "../../../mtproto/crypto/cryptoManager"
+import {DropdownComponent} from "../main/components/input/dropdownComponent";
+import {InputComponent} from "../main/components/input/inputComponent";
+import {CheckboxComponent} from "../main/components/input/checkboxComponent";
+import {ButtonWithProgressBarComponent} from "../main/components/input/buttonComponent";
+import Component from "../../framework/vrdom/component";
 
 const Croppie = require("croppie")
 const Emoji = require("emoji-js");
@@ -92,94 +97,6 @@ function handlePhoneSend() {
     }
 }
 
-function handlePasswordSend() {
-    return async event => {
-        event.preventDefault()
-        if ($passwordNext.disabled || $passwordNext.dataset.loading === "1") return
-
-        const password = $passwordInput.value
-        document.querySelector("#passwordNext span").innerHTML = "PLEASE WAIT..."
-        document.querySelector("#passwordNext progress").style.display = "block"
-
-        document.getElementById("passwordNext").dataset.loading = "1"
-
-        const response = _formData.passwordData
-        const salt1 = response.current_algo.salt1
-        const salt2 = response.current_algo.salt2
-        const g = response.current_algo.g
-        const p = response.current_algo.p
-        const srp_id = response.srp_id
-        const srp_B = response.srp_B
-
-        const srp_ret = await AppCryptoManager.srpCheckPassword(g, p, salt1, salt2, srp_id, srp_B, password);
-
-        MTProto.invokeMethod("auth.checkPassword", {
-            password: {
-                _: "inputCheckPasswordSRP",
-                srp_id: srp_ret.srp_id,
-                A: srp_ret.A,
-                M1: srp_ret.M1
-            }
-        }).then(response => {
-            resetNextButton($passwordNext)
-            console.log(response);
-
-            AppPermanentStorage.setItem("authorizationData", response)
-            AppFramework.Router.push("/")
-            //authorizedStart(response)
-        }, reject => {
-            console.log(reject)
-            $phoneInput.classList.add("invalid");
-
-            if (reject.type === "INVALID_PASSWORD_HASH") {
-                $phoneInput.nextElementSibling.innerHTML = "Invalid password";
-            } else {
-                $phoneInput.nextElementSibling.innerHTML = reject.type;
-            }
-            resetNextButton($passwordNext)
-        })
-    }
-}
-
-function handleSignIn(code) {
-    if (!isCodeValid(code)) return;
-
-    const phoneCode = code
-    const phoneCodeHash = _formData.sentCode.phone_code_hash
-
-    _formData.phoneCode = phoneCode
-    _formData.phoneCodeHash = phoneCodeHash
-
-    MTProto.Auth.signIn(_formData.phoneNumber, phoneCodeHash, phoneCode).then(authorization => {
-        if (authorization._ === "auth.authorizationSignUpRequired") {
-            // show sign up
-            fadeOut(document.getElementById("codePane"));
-            fadeIn(document.getElementById("registerPane"));
-            return
-        } else {
-            AppPermanentStorage.setItem("authorizationData", authorization)
-            AppFramework.Router.push("/")
-            return
-        }
-    }, reject => {
-        if (reject.type === "SESSION_PASSWORD_NEEDED") {
-            MTProto.invokeMethod("account.getPassword", {}).then(response => {
-                /*if (response._ !== "passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow") {
-                    throw new Error("Unknown 2FA algo")
-                }*/
-                //console.log(response)
-                //setCode2FAForm()
-
-                fadeOut(document.getElementById("subCodePane"));
-                fadeIn(document.getElementById("passwordPane"));
-                _formData.passwordData = response
-            })
-        } else {
-            $codeInput.classList.add("invalid");
-            $codeInput.nextElementSibling.innerHTML = "Invalid Code";
-        }
-    })
-}
 
 function handleSignUp() {
     return event => {
@@ -261,15 +178,6 @@ function fadeBack(elem) {
     elem.classList.add("hidden");
 }
 
-function fadeOut(elem) {
-    elem.classList.remove("fade-in");
-    elem.classList.add("fade-out");
-}
-
-function fadeIn(elem) {
-    elem.classList.remove("hidden");
-    elem.classList.add("fade-in");
-}
 
 function successfulAuth() {
     if (!document.getElementById("keepLogger").checked) {
@@ -281,24 +189,13 @@ function successfulAuth() {
 }
 
 function generateFullDropdown() {
-    for (let n in countries) {
-        let elem = document.createElement("div");
-        elem.classList.add("dropdown-item");
-        let country = countries[n];
-
-        elem.dataset.code = country[0];
-        elem.dataset.name = country[1];
-        elem.dataset.flag = country[2].toLowerCase();
-
-        let name = elem.dataset.name;
-        let flag = emoji.replace_colons(":flag-" + elem.dataset.flag + ":");
-
-        elem.innerHTML = "<div class=\"country-flag\">" + flag + "</div>\
-                        <div class=\"country-name\">" + name + "</div>\
-                        <div class=\"country-code\">" + country[0] + "</div>"
-
-        $list.appendChild(elem);
-    }
+    return countries.map(l => {
+        return {
+            flag: emoji.replace_colons(":flag-" + l[2].toLowerCase() + ":"),
+            name: l[1],
+            code: l[0]
+        }
+    })
 }
 
 function fillDropdown(str) {
@@ -367,30 +264,6 @@ function formatPhoneNumber() {
         $phoneInput.classList.remove("invalid");
         $phoneInput.nextElementSibling.innerHTML = "Phone Number";
     }
-}
-
-function setInputFilter(textbox, inputFilter) {
-    ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function (event) {
-        textbox.oldValue = "";
-        textbox.addEventListener(event, function () {
-            if (inputFilter(this.value)) {
-                this.oldValue = this.value;
-                this.oldSelectionStart = this.selectionStart;
-                this.oldSelectionEnd = this.selectionEnd;
-            } else if (this.hasOwnProperty("oldValue")) {
-                this.value = this.oldValue;
-                this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
-            }
-        });
-    });
-}
-
-function initPhoneInput() {
-    ["input"].forEach(function (event) {
-        $phoneInput.addEventListener(event, function () {
-            formatPhoneNumber();
-        });
-    });
 }
 
 
@@ -522,7 +395,7 @@ function hideModal() {
 }
 
 function load() {
-    $countryInput = document.getElementById("cc")
+    $countryInput = document.getElementById("country")
     $list = document.getElementById("countryList")
     $openDropdown = document.getElementById("openDropdown")
     $parent = $countryInput.parentElement
@@ -563,8 +436,6 @@ function load() {
     Monkey.reset()
     Monkey.stop()
 
-    generateFullDropdown()
-
     setInputFilter($codeInput, value => {
         return /^\d*$/.test(value)
     })
@@ -590,101 +461,481 @@ function load() {
     document.getElementById("next").onclick = handlePhoneSend()
 }
 
+const InfoComponent = ({header, description}) => {
+    return (
+        <div className="info">
+            <div className="header">{header}</div>
+            <div className="description">{description}</div>
+        </div>
+    )
+}
+
+function CountryDropdownItemComponent({flag, name, code}) {
+    return <div className="dropdown-item">
+        <div className="country-flag" dangerouslySetInnerHTML={flag}></div>
+        <div className="country-name">{name}</div>
+        <div className="country-code">{code}</div>
+    </div>
+}
+
+class PaneComponent extends Component {
+    constructor() {
+        super();
+    }
+
+    set isShown(value) {
+        this.state.isShown = value
+        this.__patch()
+    }
+}
+
+class PhoneInputComponent extends PaneComponent {
+    constructor() {
+        super();
+
+        this.state = {
+            country: null,
+            isLoading: false,
+            nextDisabled: true
+        }
+    }
+
+    h() {
+        let classList = ["fading-block"]
+        if (this.state.isShown === true) {
+            classList.push("fade-in");
+        } else if (this.state.isShown === false) {
+            classList.push("fade-out");
+        }
+        return (
+            <div id="phonePane" className={classList.join(" ")}>
+                <img className="object" src="./static/images/logo.svg" alt=""
+                     onClick={this.props.finished}/>
+                <InfoComponent header="Sign in to Telegram"
+                               description="Please confirm your country and enter your phone number"/>
+                <DropdownComponent label="Country" data={generateFullDropdown()}
+                                   template={CountryDropdownItemComponent} selected={this.onDropdownSelect}
+                                   ref="dropdown"/>
+                <InputComponent label="Phone Number" type="tel"
+                                filter={value => /^\+?[\d ]*$/.test(value)} input={this.phoneInput} ref="phone"/>
+                <CheckboxComponent label="Keep me signed in" id="keepLogger" checked/>
+                <ButtonWithProgressBarComponent label="Next" disabled={this.state.nextDisabled}
+                                                click={this.handlePhoneSend} ref="next"/>
+            </div>
+        )
+    }
+
+    handlePhoneSend() {
+        if (this.state.isLoading) return
+        this.state.isLoading = true
+
+        const phone = this.refs.get("phone")
+        const next = this.refs.get("next")
+        const phoneNumber = phone.getValue()
+
+        next.isLoading = true
+        next.label = "Please wait..."
+
+        MTProto.Auth.sendCode(phoneNumber).then(sentCode => {
+            this.props.finished({
+                phone: phoneNumber,
+                sentCode: sentCode
+            })
+
+
+            // fadeOut(document.getElementById("phonePane"));
+            // fadeIn(document.getElementById("codePane"));
+            //
+            // let phone = document.getElementById("phonePreview");
+            // if (phone.firstChild.tagName.toLowerCase() === "span") {
+            //     phone.removeChild(phone.firstChild);
+            // }
+            // let text = document.createElement("span");
+            // text.textContent = $phoneInput.value;
+            // phone.prepend(text);
+            // _formData.phoneNumber = phoneNumber
+            // _formData.sentCode = sentCode
+        }, error => {
+            if (error.type === "AUTH_RESTART") {
+                AppPermanentStorage.clear()
+                handlePhoneSend()
+                return
+            }
+            const msg = {
+                PHONE_NUMBER_INVALID: "Invalid phone number",
+                PHONE_NUMBER_BANNED: "Phone number is banned",
+                PHONE_NUMBER_FLOOD: "Too many attempts",
+                AUTH_RESTART: "Auth restarting"
+            }[error.type] || "Error occured"
+            this.refs.get("phone").error = msg
+        }).finally(l => {
+            this.state.isLoading = false
+            next.isLoading = false
+            next.label = "Next"
+        })
+    }
+
+    phoneInput(ev) {
+        // Add + if entering a number
+        if (!ev.target.value.startsWith("+") && ev.target.value.length > 0) {
+            ev.target.value = "+" + ev.target.value
+        }
+        if (ev.target.value.length > 1) {
+            for (let i in countries) {
+                const country = countries[i]
+                if (ev.target.value.replace(" ", "").startsWith(country[0].replace(" ", ""))) {
+                    this.state.country = i
+                    this.refs.get("dropdown").select(i)
+                    break
+                }
+            }
+        }
+        if (this.state.country) {
+            // length without +380
+            const numberLength = ev.target.value.replace(" ", "").length - countries[this.state.country][0].replace(" ", "").length
+            if (numberLength >= 9) {
+                this.state.nextDisabled = false
+                this.refs.get("next").setDisabled(false)
+                return true
+            }
+        }
+        this.state.nextDisabled = true
+        this.refs.get("next").setDisabled(true)
+        return true
+    }
+
+    onDropdownSelect(value) {
+        const phone = this.refs.get("phone")
+        phone.setValue(value.code)
+    }
+}
+
+class CodeInputComponent extends PaneComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoading: false
+        }
+    }
+
+    h() {
+
+        let classList = ["fading-block"]
+        if (this.state.isShown === true) {
+            classList.push("fade-in");
+        } else if (this.state.isShown === false) {
+            classList.push("fade-out");
+        }
+
+        return <div id="subCodePane" className={classList.join(" ")}>
+
+            <div className="info">
+                <div className="header"><span>{this.state.phone}</span><i className="btn-icon rp rps tgico tgico-edit"
+                                                                          onClick={this.props.cancel}/>
+                </div>
+                <div className="description">We have sent you an SMS with the code.</div>
+            </div>
+            <InputComponent label="Code" type="text" filter={value => /^[\d]{0,5}$/.test(value)} input={this.onInput}
+                            ref="codeInput"/>
+        </div>
+    }
+
+    setData(ev) {
+        this.state.phone = ev.phone
+        this.state.sentCode = ev.sentCode
+        this.__patch()
+    }
+
+    onInput(ev) {
+        if (this.isLoading) return false
+        this.props.monkeyLook(ev.target.value.length)
+        if (ev.target.value.length === 5) {
+            this.handleSignIn(ev.target.value)
+        }
+        return true
+    }
+
+    handleSignIn(phoneCode) {
+        const phoneCodeHash = this.state.sentCode.phone_code_hash
+        this.isLoading = true
+
+        //this.state.phoneCode = phoneCode
+        //this.state.phoneCodeHash = phoneCodeHash
+
+        MTProto.Auth.signIn(this.state.phone, phoneCodeHash, phoneCode).then(authorization => {
+            if (authorization._ === "auth.authorizationSignUpRequired") {
+                // show sign up
+                //fadeOut(document.getElementById("codePane"));
+                //fadeIn(document.getElementById("registerPane"));
+                this.props.signUp()
+                return
+            } else {
+                this.props.finished(authorization)
+                return
+            }
+        }, reject => {
+            if (reject.type === "SESSION_PASSWORD_NEEDED") {
+                MTProto.invokeMethod("account.getPassword", {}).then(response => {
+                    console.log(response)
+                    this.props.password(response)
+                    /*if (response._ !== "passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow") {
+                        throw new Error("Unknown 2FA algo")
+                    }*/
+                    //console.log(response)
+                    //setCode2FAForm()
+
+                    //fadeOut(document.getElementById("subCodePane"));
+                    //fadeIn(document.getElementById("passwordPane"));
+                    //_formData.passwordData = response
+                })
+            } else {
+                this.refs.get("codeInput").error = "Invalid code"
+            }
+        }).finally(l => {
+            this.isLoading = false
+        })
+    }
+}
+
+
+class PasswordInputComponent extends PaneComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoading: false
+        }
+    }
+
+    h() {
+        let classList = ["fading-block"]
+        if (this.state.isShown === true) {
+            classList.push("fade-in");
+        } else if (this.state.isShown === false) {
+            classList.push("fade-out");
+        } else {
+            classList.push("hidden");
+        }
+
+        return <div id="passwordPane" className={classList.join(" ")}>
+            <InfoComponent header="Enter a Password"
+                           description="Your account is protected with an additional password."/>
+
+            <InputComponent label={"Hint: " + (this.state.response ? this.state.response.hint : "")} type="password" hide ref="passwordInput" peekChange={this.onPeekChange}/>
+
+
+            <ButtonWithProgressBarComponent label="Next" click={this.handlePasswordSend} ref="nextPassword"/>
+        </div>
+    }
+
+    onPeekChange(e) {
+        this.props.monkeyPeek(e)
+    }
+
+    setData(ev) {
+        this.props.monkeyClose()
+        this.state.response = ev
+        this.__patch()
+    }
+
+    async handlePasswordSend() {
+        if (this.state.isLoading) return
+        this.state.isLoading = true
+
+        const passwordInput = this.refs.get("passwordInput")
+        const next = this.refs.get("nextPassword")
+        const password = passwordInput.getValue()
+
+        next.isLoading = true
+        next.label = "Please wait..."
+
+        const response = this.state.response
+        const salt1 = response.current_algo.salt1
+        const salt2 = response.current_algo.salt2
+        const g = response.current_algo.g
+        const p = response.current_algo.p
+        const srp_id = response.srp_id
+        const srp_B = response.srp_B
+
+        const srp_ret = await AppCryptoManager.srpCheckPassword(g, p, salt1, salt2, srp_id, srp_B, password);
+
+        MTProto.invokeMethod("auth.checkPassword", {
+            password: {
+                _: "inputCheckPasswordSRP",
+                srp_id: srp_ret.srp_id,
+                A: srp_ret.A,
+                M1: srp_ret.M1
+            }
+        }).then(response => {
+            // resetNextButton($passwordNext)
+            // console.log(response);
+            //
+            this.props.finished(response)
+            //authorizedStart(response)
+        }, reject => {
+            // console.log(reject)
+            // $phoneInput.classList.add("invalid");
+            //
+            if (reject.type === "INVALID_PASSWORD_HASH") {
+                this.refs.get("passwordInput").error = "Invalid password"
+            } else {
+                this.refs.get("passwordInput").error = reject.type
+            }
+
+        }).finally(l => {
+            this.state.isLoading = false
+            next.isLoading = false
+            next.label = "Next"
+        })
+    }
+}
+
+class CodeAndPasswordPaneComponent extends PaneComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            monkey: new MonkeyController()
+        }
+    }
+
+    h() {
+        let classList = ["fading-block"]
+        if (this.state.isShown === true) {
+            classList.push("fade-in");
+        } else if (this.state.isShown === false) {
+            classList.push("fade-out");
+        } else {
+            classList.push("hidden");
+        }
+
+        return <div className={classList.join(" ")}>
+            <tgs-player id="monkey" className="object"/>
+            <CodeInputComponent ref="code" cancel={this.props.cancelCode} finished={this.props.finished}
+                                password={this.onPassword} monkeyLook={this.state.monkey.monkeyLook.bind(this.state.monkey)}/>
+            <PasswordInputComponent ref="password" finished={this.props.finished} monkeyClose={this.state.monkey.close.bind(this.state.monkey)} monkeyPeek={this.monkeyPeek}/>
+        </div>
+    }
+
+    monkeyPeek(e) {
+        if(e) {
+            this.state.monkey.peek()
+       } else {
+            // TODO тут треба unpeek
+            this.state.monkey.peek()
+        }
+    }
+
+    open() {
+        this.state.monkey.init(document.getElementById("monkey"))
+        this.state.monkey.reset()
+        this.state.monkey.stop()
+    }
+
+    onPassword(ev) {
+        this.refs.get("password").setData(ev)
+        this.props.password(ev)
+    }
+}
+
+class RegisterPaneComponent extends PaneComponent {
+
+    h() {
+        let classList = ["fading-block"]
+        if (this.state.isShown === true) {
+            classList.push("fade-in");
+        } else if (this.state.isShown === false) {
+            classList.push("fade-out");
+        } else {
+            classList.push("hidden");
+        }
+
+        return <div id="registerPane" className={classList.join(" ")}>
+            <div id="picture" className="object picture">
+                <div className="tint hidden"/>
+                <i className="add-icon tgico tgico-cameraadd"/></div>
+            <InfoComponent header="Your name" description="Enter your name and add a profile picture"/>
+
+            <div className="input-field">
+                <input type="text" id="name" placeholder="Name" autoComplete="off"/>
+                <label htmlFor="name" required>Name</label>
+            </div>
+            <div className="input-field">
+                <input type="text" id="lastName" placeholder="Last Name (Optional)" autoComplete="off"/>
+                <label htmlFor="lastName" required>Last Name (Optional)</label>
+            </div>
+            <div id="start" className="btn rp"><span className="button-text">START MESSAGING</span>
+                <progress className="progress-circular white"/>
+            </div>
+        </div>
+    }
+}
+
+
+class Login extends Component {
+    constructor(props) {
+        super(props);
+
+    }
+
+    h() {
+        return (
+            <div id="login">
+                <PhoneInputComponent finished={this.handleSendCode} ref="phonePane"/>
+                <CodeAndPasswordPaneComponent ref="codeAndPassword" cancelCode={this.cancelCode}
+                                              password={this.password} finished={this.loginSuccess}/>
+                <RegisterPaneComponent ref="register"/>
+            </div>
+        )
+    }
+
+    loginSuccess(response) {
+        AppPermanentStorage.setItem("authorizationData", response)
+        AppFramework.Router.push("/")
+        console.log("login success!")
+    }
+
+    password() {
+        this.fadeOut(this.refs.get("codeAndPassword").refs.get("code"));
+        this.fadeIn(this.refs.get("codeAndPassword").refs.get("password"));
+    }
+
+    cancelCode() {
+        this.fadeIn(this.refs.get("phonePane"));
+        this.fadeOut(this.refs.get("codeAndPassword"));
+    }
+
+    handleSendCode(ev) {
+        this.refs.get("codeAndPassword").open()
+
+        this.refs.get("codeAndPassword").refs.get("code").setData(ev)
+        this.fadeOut(this.refs.get("phonePane"));
+        this.fadeIn(this.refs.get("codeAndPassword"));
+    }
+
+
+    fadeOut(elem) {
+        elem.isShown = false
+    }
+
+    fadeIn(elem) {
+        elem.isShown = true
+    }
+}
+
 export function LoginPage() {
     return (
         <div>
-            <div id="login">
-                <div id="phonePane" className="fading-block">
-                    <img className="object" src="./static/images/logo.svg" alt="" onLoad={load}/>
-                    {/*TODO remove onload above*/}
-                    <div className="info">
-                        <div className="header">Sign in to Telegram</div>
-                        <div className="description">Please confirm your country and enter your phone number</div>
-                    </div>
-                    <div className="dropdown-container" id="countryDropdown">
-                        <div className="input-field dropdown down">
-                            <input type="text" id="cc" autoComplete="off" placeholder="Cоuntry"/>
-                            <label for="cc" required>Country</label>
-                            <i className="arrow btn-icon rp rps tgico tgico-down" id="openDropdown"/>
-                        </div>
-                        <div id="countryList" className="dropdown-list hidden"/>
-                    </div>
-                    <div className="input-field">
-                        <input type="tel" id="phone" autoComplete="off" placeholder="Phone Number"/>
-                        <label for="phone" required>Phone Number</label>
-                    </div>
-                    <div className="checkbox-input">
-                        <label><input type="checkbox" name="keep_logger" id="keepLogger"/><span className="checkmark">
-                        <div className="tgico tgico-check"/>
-                    </span></label><span className="checkbox-label">Keep me signed in</span>
-                    </div>
-                    <button id="next" className="btn rp" disabled="disabled"><span
-                        className="button-text">NEXT</span>
-                        <progress className="progress-circular white"/>
-                    </button>
-                </div>
-                <div id="codePane" className="fading-block hidden">
-                    <tgs-player id="monkey" className="object"/>
-                    <div id="subCodePane" className="fading-block">
-                        <div className="info">
-                            <div id="phonePreview" className="header"><i id="editPhone"
-                                                                         className="btn-icon rp rps tgico tgico-edit"/>
-                            </div>
-                            <div className="description">We have sent you an SMS with the code.</div>
-                        </div>
-                        <div className="input-field">
-                            <input type="text" id="code" placeholder="Code" autoComplete="off"/>
-                            <label for="code" required>Code</label>
-                        </div>
-                    </div>
-                    <div id="passwordPane" className="fading-block hidden">
-                        <div className="info">
-                            <div className="header">Enter a Password</div>
-                            <div className="description">Your account is protected with an additional password.</div>
-                        </div>
-                        <div className="input-field password-input peekable">
-                            <i id="peekButton" className="btn-icon rp rps tgico"/>
-                            <input type="password" id="password" placeholder="Password"/>
-                            <label for="password" required>Password</label>
-                        </div>
-                        <div id="passwordNext" className="btn rp"><span
-                            className="button-text">NEXT</span>
-                            <progress className="progress-circular white"/>
-                        </div>
-                    </div>
-                </div>
-                <div id="registerPane" className="fading-block hidden">
-                    <div id="picture" className="object picture">
-                        <div className="tint hidden"/>
-                        <i className="add-icon tgico tgico-cameraadd"/></div>
-                    <div className="info">
-                        <div className="header">Your name</div>
-                        <div className="description">Enter your name and add a profile picture</div>
-                    </div>
-                    <div className="input-field">
-                        <input type="text" id="name" placeholder="Name" autoComplete="off"/>
-                        <label for="name" required>Name</label>
-                    </div>
-                    <div className="input-field">
-                        <input type="text" id="lastName" placeholder="Last Name (Optional)" autoComplete="off"/>
-                        <label for="lastName" required>Last Name (Optional)</label>
-                    </div>
-                    <div id="start" className="btn rp"><span className="button-text">START MESSAGING</span>
-                        <progress className="progress-circular white"/>
-                    </div>
-                </div>
-            </div>
+            <Login/>
             <div id="cropperModal" className="modal hidden">
                 <div className="dialog">
                     <div className="content">
                         <div className="header">
-                            <i className="btn-icon rp rps tgico tgico-close close-button"></i>
+                            <i className="btn-icon rp rps tgico tgico-close close-button"/>
                             <div className="title">Drag to Reposition</div>
                         </div>
                         <div className="body">
                             <div id="cropper">
                             </div>
-                            <div id="photoDone" className="done-button rp"><i className="tgico tgico-check"></i></div>
+                            <div id="photoDone" className="done-button rp"><i className="tgico tgico-check"/></div>
                         </div>
                     </div>
                 </div>

@@ -5,18 +5,17 @@ const Message = ({ message }) => {
     if (!message.type) {
         return <div>Unsupported message type</div>
     }
-    console.log(message.type);
 
     const handlers = {
         text: TextMessageComponent,
-        // photo: idk, is it exist?
+        photo: PhotoMessageComponent,
         // round: vMessageWithRoundVideoTemplate,
         // video: vMessageWithVideoTemplate,
         // audio: vMessageWithAudioTemplate,
         // voice: vMessageWithVoiceAudioTemplate,
-        // sticker: vMessageWithStickerTemplate,
+        sticker: StickerMessageComponent,
         // document: TextMessage,
-        // url: vMessageWithUrlTemplate,
+        webpage: WebpageMessageComponent
         // service: vServiceMessageTemplate
     }
 
@@ -25,61 +24,99 @@ const Message = ({ message }) => {
     if (Handler) {
         return <Handler message={message}/>
     } else {
-        return <div>No handler!</div>
+        message._message.message = "NO HANDLER!"
+        return (
+            <TextMessageComponent message={message}/>
+        )
     }
 }
 
-const TextMessageComponent = ({ message }) => {
-    let classes = {
-        "bubble": true,
-        "read": message.isRead
+const IVMessageComponent = ({ message }) => {
+    //one day...
+}
+
+const WebpageMessageComponent = ({ message }) => {
+    let webpage = message.media.webpage;
+    let photoUrl = "";
+    if(webpage.photo && webpage.photo.real) {
+        photoUrl = webpage.photo.real.url;
     }
-
-    const username = message.from.name && !message.isPost && !message.isOut && !isBigMedia(message)
-    let text = parseMessageEntities(message.text, message.entities)
-
     return (
         <MessageWrapperComponent message={message}>
-                <div className={classes}>
-                    {username ? <div className="username">{message.from.name}</div> : ""}
-
-                    <div className={`message ${isBigMedia(message)? "no-pad" : ""}`}>
-                        {message.media ? <MessageMediaComponent message={message}/> : ""} {/*Text can be before media (links), there's need to move text position inside it*/}
-                        {
-                            (() => {if(!!text) return (
-                                <div class="text-wrapper">
-                                    <span class="text" dangerouslySetInnerHTML={text}/>
-                                    <MessageTimeComponent message={message}/>
-                                </div>
-                            ); 
-                            return "";
-                            })()
-                        }
+            <div className="message">
+                <TextWrapperComponent message={message}>
+                <a href={webpage.url} target="_blank" className="box web rp">
+                    <div className="quote">
+                        {photoUrl?<img className="preview" src={photoUrl}/>: ""}
+                        <div className="name">{webpage.site_name}</div>
+                        <div className="title">{webpage.title}</div>
+                        <div className="text">{webpage.description}</div>
                     </div>
-                </div>
-            </MessageWrapperComponent>
+                </a>
+                </TextWrapperComponent>
+            </div>
+        </MessageWrapperComponent>
     )
 }
 
-const MessageMediaComponent = ({ message }) => {
-    if (!message.media) return "";
-
-    if (message.media.photo) {
-        if (message.media.photo.real) { //re-render of image, when it's ready
-            let image = message.media.photo.real;
-            return (<MessageMediaImage src={image.src} size={image.sizes} isThumb={!!image.thumbnail}/>);
-        }
-        return (<MessageMediaImage src="" size={message.media.photo.sizes} isThumb={undefined}/>); //placeholder
-    }
-    return ""; //TODO add more media types
+const StickerMessageComponent = ({ message }) => {
+    console.log(message);
+    let animated = message.media.document.mime_type == "application/x-tgsticker";
+    let src = message.media.document.real ? message.media.document.real.url : "";
+    let sticker = animated ? <tgs-player class="sticker" autoplay loop src={src}/> : <img class="sticker" src={src}/>
+    return (
+        <MessageWrapperComponent message={message} transparent={true}>
+                {sticker}
+                <MessageTimeComponent message={message} bg={true}/>
+        </MessageWrapperComponent>
+    )
 }
 
-const MessageMediaImage = ({ src, size, alt = "", isThumb }) => {
-    let width = isThumb ? parseInt(size[0]) >= 460 ? "460px" : `${size[0]}px` : parseInt(size[0]) >= 480 ? "480px" : `${size[0]}px`
+const PhotoMessageComponent = ({ message }) => {
+    let imageLoaded = message.media.photo.real;
+
+    return (
+        <MessageWrapperComponent message={message}>
+            <div className="message no-pad">
+                {imageLoaded ?
+                    <MessageMediaImage src={imageLoaded.src} isThumb={!!imageLoaded.thumbnail}/>
+                    :
+                    <MessageMediaImage src="" isThumb={undefined}/>
+                }
+                <TextWrapperComponent message={message}/>
+            </div>
+        </MessageWrapperComponent>
+    )
+}
+
+const TextMessageComponent = ({ message }) => {
+    const username = message.from.name && !message.isPost && !message.isOut;
+    return (
+        <MessageWrapperComponent message={message}>
+            {username ? <div className="username">{message.from.name}</div> : ""}
+            <div className="message">
+                <TextWrapperComponent message={message}/>
+            </div>
+        </MessageWrapperComponent>
+    )
+}
+
+const TextWrapperComponent = ({ message, slot}) => {
+    let text = parseMessageEntities(message.text, message.entities);
+    if (!text) return "";
+    return (
+        <div class="text-wrapper">
+            <span class="text" dangerouslySetInnerHTML={text}/>
+            {slot}
+            <MessageTimeComponent message={message}/>
+        </div>
+    )
+}
+
+const MessageMediaImage = ({ src, alt = "", isThumb }) => {
     return (
         <div class="media-wrapper">
             <img className={["attachment", isThumb ? "attachment-thumb" : ""]}
-             css-width={width}
              src={src}
              alt={alt}/>
         </div>
@@ -116,11 +153,18 @@ const MessageTimeComponent = ({ message, bg = false }) => {
     )
 }
 
-const MessageWrapperComponent = ({ message, slot }) => {
+const MessageWrapperComponent = ({ message, transparent = false, slot }) => {
     const className = {
         "channel": message.isPost,
         "out": !message.isPost && message.isOut,
         "in": message.isPost || !message.isOut,
+    }
+
+    let wrapClasses = {
+        "bubble": true,
+        "transparent": transparent,
+        "read": message.isRead,
+        "sent": !message.isRead //TODO more convenient method to do this
     }
 
     const from = message.from
@@ -140,7 +184,9 @@ const MessageWrapperComponent = ({ message, slot }) => {
                     {letter}
                 </div>
             ) : ""}
-            {slot}
+            <div className={wrapClasses}>
+                {slot}
+            </div>
         </div>
     )
 }

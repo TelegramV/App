@@ -38,7 +38,7 @@ html, body, #app {
 		display: block;
 		width: 160px;
 		height: 160px;
-		margin: 50px auto 42px auto;
+		margin: 50px auto 42px 100px;
 	}
 
 	.info {
@@ -83,16 +83,23 @@ html, body, #app {
 		outline: 0;
 		cursor: pointer;
 
-		&:not([disabled]):hover {
+		&:not(.disabled):hover {
 			background-color: $bluehover;
 		}
 
-		&[disabled] {
+		&.disabled {
 			opacity: 0;
+			cursor: auto;
 		}
 
 		span {
 			height: fit-content;
+		}
+
+		&.loading {
+			progress {
+				display: block;
+			}
 		}
 
 		progress {
@@ -111,11 +118,6 @@ html, body, #app {
 
 		.checkbox-input {
 			margin-left: 20px;
-		}
-
-		#countryList {
-			margin-top: 8px;
-			max-height: 30vh;
 		}
 
 		.dropdown-item {

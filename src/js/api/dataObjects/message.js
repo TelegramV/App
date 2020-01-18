@@ -1,8 +1,8 @@
-import {getMessagePreviewDialog} from "../../ui/utils";
+import { getMessagePreviewDialog } from "../../ui/utils";
 import MTProto from "../../mtproto"
 import PeersStore from "../store/peersStore"
-import {ChannelPeer} from "./peer/channelPeer";
-import {UserPeer} from "./peer/userPeer";
+import { ChannelPeer } from "./peer/channelPeer";
+import { UserPeer } from "./peer/userPeer";
 
 export class Message {
     /**
@@ -101,9 +101,65 @@ export class Message {
 
     parseMessage() {
         const message = this._message
-
-        if (message.media) {
-
+        const media = message.media;
+        if (media) {
+            switch (media._) {
+                case "messageMediaPhoto":
+                    this.type = "photo";
+                    break;
+                case "messageMediaGeo":
+                    this.type = "location";
+                    break;
+                case "messageMediaGeoLive":
+                    this.type = "beacon";
+                    break;
+                case "messageMediaGame":
+                    this.type = "game";
+                    break;
+                case "messageMediaPoll":
+                    this.type = "poll";
+                    break;
+                case "messageMediaInvoice":
+                    this.type = "invoice";
+                    break;
+                case "messageMediaWebPage":
+                    this.type = "webpage";
+                    break;
+                case "messageMediaContact":
+                    this.type = "contact";
+                    break;
+                case "messageMediaDocument":
+                    {
+                        this.type = "document";
+                        const attrs = media.document.attributes;
+                        for (let i = 0; i < attrs.length; i++) {
+                            const attr = attrs[i];
+                            if (attr._ == "documentAttributeSticker") {
+                                this.type = "sticker";
+                            }
+                            if (attr._ == "documentAttributeAudio") {
+                                if (attr.pFlags.voice) {
+                                    this.type = "voice"
+                                } else {
+                                    this.type = "audio"
+                                }
+                            }
+                            if (attr._ == "documentAttributeVideo") {
+                                if (attr.pFlags.round_message) {
+                                    this.type = "round";
+                                } else {
+                                    this.type = "video";
+                                }
+                            }
+                        }
+                    }
+                	break;
+                case "messageMediaUnsupported":
+                default:
+                    console.log("unsupported", message.media);
+                    this.type = undefined;
+            }
         }
+        if (message._ == "messageService") this.type = "service";
     }
 }

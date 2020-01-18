@@ -1,7 +1,7 @@
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import AppEvents from "../../../../../api/eventBus/appEvents"
-import {FileAPI} from "../../../../../api/fileAPI"
-import {isElementInViewport} from "../../../../framework/utils"
+import { FileAPI } from "../../../../../api/fileAPI"
+import { isElementInViewport } from "../../../../framework/utils"
 
 import Message from "./../../messages/newMessage"
 import Component from "../../../../framework/vrdom/component"
@@ -102,6 +102,22 @@ class BubblesComponent extends Component {
                     }
                     VRDOM.patch($message, <Message message={message}/>);
                 })
+            }
+            if (message.media.webpage && message.media.webpage.photo) {
+                FileAPI.photoThumnail(message.media.webpage.photo,data => {
+                    message.media.webpage.photo.real = {
+                        url: data.src
+                    }
+                    VRDOM.patch($message, <Message message={message}/>);
+                })
+            }
+            if (message.media.document) {
+                if (message.type = "sticker") {
+                    FileAPI.getFile(message.media.document, "application/x-tgsticker").then(data => {
+                        message.media.document.real = { url: data };
+                        VRDOM.patch($message, <Message message={message}/>);
+                    });
+                }
             }
         }
         /*if (message.media) {

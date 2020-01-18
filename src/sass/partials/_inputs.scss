@@ -37,6 +37,7 @@ input[type="password"] {
 		color: $grey;
 		padding: 5px;
 		border-radius: 1em;
+		pointer-events: none;
 	}
 
 	.text {
@@ -217,6 +218,8 @@ input[type="password"] {
 		box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.2);
 
 		overflow-y: overlay;
+		margin-top: 8px;
+		max-height: 30vh;
 
 		@supports not(overflow-y: overlay) {
 			overflow-y: auto;
@@ -229,6 +232,10 @@ input[type="password"] {
 		.dropdown-item {
 			cursor: pointer;
 			min-height: 20px;
+
+			&.hidden {
+				display: none !important;
+			}
 
 			&:hover {
 				background-color: $lightgrey;
