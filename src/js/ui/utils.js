@@ -1,19 +1,12 @@
-import VDOM from "./framework/vdom"
 import EmojiConverter from "emoji-js";
 
 export const emoji = new EmojiConverter();
-
-export const vLoadingNode = (
-    <div className="full-size-loader height">
-        <progress className="progress-circular big"/>
-    </div>
-)
 
 export function addRipple() {
     let rippleElements = document.getElementsByClassName("rp");
 
     for (let i = 0; i < rippleElements.length; i++) {
-        rippleElements[i].onmousedown = function(e) {
+        rippleElements[i].onmousedown = function (e) {
             let rect = this.getBoundingClientRect();
 
             let X = e.clientX - rect.left;
@@ -22,16 +15,12 @@ export function addRipple() {
             rippleDiv.classList.add("ripple");
             rippleDiv.setAttribute("style", "top:" + Y + "px; left:" + X + "px;");
             this.appendChild(rippleDiv);
-            setTimeout(function() {
+            setTimeout(function () {
                 rippleDiv.parentElement.removeChild(rippleDiv);
             }, 900);
         };
     }
 }
-
-// setInterval(addRipple, 5000);
-
-export const create$loadingNode = () => VDOM.render(vLoadingNode)
 
 // If there's no message it it should display "Photo" or smth
 export function getMediaPreviewName(message) {

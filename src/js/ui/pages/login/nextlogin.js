@@ -1,4 +1,3 @@
-import VDOM from "../../framework/vdom"
 import {MonkeyController} from "./monkey"
 import {countries, hasClass} from "../../utils"
 import {MTProto} from "../../../mtproto"
@@ -328,12 +327,12 @@ function fillDropdown(str) {
 }
 
 function countryTest(input, country) {
-	if(country.toLowerCase().includes(input.toLowerCase())) return true;
-	let split = country.split(/\b(?=[a-z])/ig);
-	if(split.length > 1) {
-		let abbr = split.map(token => token[0]).join("").toLowerCase();
-		if(abbr.includes(input.toLowerCase())) return true;
-	}
+    if (country.toLowerCase().includes(input.toLowerCase())) return true;
+    let split = country.split(/\b(?=[a-z])/ig);
+    if (split.length > 1) {
+        let abbr = split.map(token => token[0]).join("").toLowerCase();
+        if (abbr.includes(input.toLowerCase())) return true;
+    }
 }
 
 function formatPhoneNumber() {

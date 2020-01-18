@@ -1,5 +1,3 @@
-import VDOM from "../../ui/framework/vdom"
-
 function insertAt(str, position, length, b) {
     return [str.slice(0, position), b, str.slice(position + length)].join('')
 }
