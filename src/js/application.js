@@ -9,19 +9,20 @@ import ReactiveCallback from "./ui/framework/reactive/reactiveCallback"
 import Component from "./ui/framework/vrdom/component"
 import AppCache from "./api/cache"
 import {loadSchema} from "./mtproto/language/schema"
+import PeersStore from "./api/store/peersStore"
 
 
 const authContext = {
     dcID: 2,
     nonce: createNonce(16),
-    sessionID: createNonce(8) // TODO check if secure?
+    sessionID: createNonce(8)
 }
 
 function start() {
     MTProto.invokeMethod("help.getNearestDc", {}).then(response => {
         if (response.this_dc !== response.nearest_dc) {
             MTProto.changeDefaultDC(response.nearest_dc)
-            // TODO country response.contry
+            // TODO country response.country
         }
     })
 
@@ -177,6 +178,7 @@ class Parent extends Component {
 // AppFramework.mount("#app")
 
 
+global.Peers = PeersStore
 AppCache.open()
 //
 loadSchema().then(() => MTProto.connect(authContext).then(start))

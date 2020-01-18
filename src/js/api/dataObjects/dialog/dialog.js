@@ -267,6 +267,11 @@ export class Dialog {
         return this._unreadMark
     }
 
+    /**
+     * CRITICAL TODO: handle min if filled non-min!!!!!!!!!!!!!!!!!!
+     *
+     * @param rawDialog
+     */
     fillRaw(rawDialog) {
         this._pinned = rawDialog.pFlags.pinned || false
         this._unreadMark = rawDialog.pFlags.unread_mark || false
@@ -275,6 +280,8 @@ export class Dialog {
             this._peer = PeersStore.getFromDialogRawPeer(rawDialog.peer) // handle not found
         }
 
+        this._pts = rawDialog.pts || 0
+
         this.messages.startTransaction()
         this.messages.unreadCount = rawDialog.unread_count || 0
         this.messages.readInboxMaxId = rawDialog.read_inbox_max_id || 0
@@ -282,7 +289,6 @@ export class Dialog {
         this.messages.unreadMentionsCount = rawDialog.unread_mentions_count || 0
         this.messages.stopTransaction()
 
-        this._pts = rawDialog.pts || 0
         this._draft.fillRaw(this, rawDialog.draft)
     }
 

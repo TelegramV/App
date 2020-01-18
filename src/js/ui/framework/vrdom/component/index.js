@@ -30,22 +30,37 @@ class Component {
         throw new Error("implement pls")
     }
 
+    // created event; normally called once per component
+    // always called before `mounted`
     created() {
     }
 
+    // changed reactive property event
     changed(key, value) {
     }
 
+    // mounted event; normally called once per component
+    // on this stage `this.$el` is accessible; if not, then report bug
+    // always called after `created`
     mounted() {
     }
 
+    // destroy event (not destroyed)
     destroy() {
     }
 
+    // patch request interceptor; return `false` to decline.
     patch(vNode) {
         return vNode
     }
 
+    // patched event
+    patched() {
+        //
+    }
+
+    // deletes component
+    // do not override this if there is no critical reason
     __delete() {
         this.destroy()
         this.__disableReactive()
@@ -53,6 +68,7 @@ class Component {
         this.$el.remove()
     }
 
+    // do not override this if there is no critical reason
     __disableReactive() {
         for (const [resolve, offCallback] of this.__.reactiveOffCallbacks.values()) {
             offCallback(resolve)
@@ -60,6 +76,8 @@ class Component {
     }
 
     /**
+     * do not override this if there is no critical reason
+     *
      * @param props
      * @private
      * @return {VRNode}
@@ -79,6 +97,7 @@ class Component {
         return vNode
     }
 
+    // do not override this if there is no critical reason
     __patch(props) {
         if (this.__.mounted) {
             this.__.patchingSelf = true
@@ -88,6 +107,7 @@ class Component {
 
             if (this.patch(rendered)) {
                 this.$el = VRDOM.patch(this.$el, rendered)
+                this.patched()
             }
 
             this.__.patchingSelf = false
@@ -98,6 +118,7 @@ class Component {
         return this.$el
     }
 
+    // do not override this if there is no critical reason
     __init() {
         if (!this.__.inited) {
             for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(this))) {

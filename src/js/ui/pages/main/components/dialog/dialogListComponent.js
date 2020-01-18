@@ -118,7 +118,7 @@ export class DialogListComponent extends Component {
         let $rendered = dialogElements.get(dialog.id) || false
 
         if ($rendered) {
-            console.warn("already rendered")
+            // console.warn("already rendered")
             if (String(dialog.isPinned) !== $rendered.dataset.pinned) {
 
                 if (dialog.isPinned) {
@@ -146,7 +146,7 @@ export class DialogListComponent extends Component {
 
             this._patchDialog.bind(this)(dialog, $rendered)
         } else {
-            console.log("rendering new")
+            // console.log("rendering new")
             const newVDialog = <DialogComponent dialog={dialog}/>
 
             if (appendOrPrepend === "append") {

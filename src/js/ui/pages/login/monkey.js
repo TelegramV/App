@@ -1,7 +1,6 @@
 
 export class MonkeyController {
-    constructor(player) {
-        this.monkey = player;
+    constructor() {
 
         this.states = {
             close: "/static/monkey/TwoFactorSetupMonkeyClose.tgs",
@@ -20,10 +19,22 @@ export class MonkeyController {
         this.closed = false;
 
         this.frameHandler = this._frameListener.bind(this);
-        this.monkey.addEventListener("frame", this.frameHandler);
 
         this.completionHandler = this._completionListener.bind(this);
+    }
+
+    init(player) {
+        this.monkey = player;
+        this.monkey.addEventListener("frame", this.frameHandler);
         this.monkey.addEventListener("complete", this.completionHandler);
+    }
+
+    monkeyLook(i) {
+        if(i === 0) {
+            this.idle()
+            return
+        }
+        this.track(1 + i)
     }
 
     idle(start) {
@@ -47,6 +58,7 @@ export class MonkeyController {
                 that.monkey.seek(start);
             }
             that.monkey.play();
+            that.monkey.pause();
         });
     }
 
