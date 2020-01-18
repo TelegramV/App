@@ -2,16 +2,16 @@ import { parseMessageEntities } from "../../../../mtproto/utils/htmlHelpers";
 import { FileAPI } from "../../../../api/fileAPI"
 
 const Message = ({ message }) => {
-    if (!message.type) {
+    /*if (!message.type) {
         return <div>Unsupported message type</div>
-    }
+    }*/
 
     const handlers = {
         text: TextMessageComponent,
         photo: PhotoMessageComponent,
-        // round: vMessageWithRoundVideoTemplate,
-        // video: vMessageWithVideoTemplate,
-        // audio: vMessageWithAudioTemplate,
+        round: RoundVideoMessageComponent,
+        video: VideoMessageComponent,
+        audio: AudioMessageComponent,
         // voice: vMessageWithVoiceAudioTemplate,
         sticker: StickerMessageComponent,
         // document: TextMessage,
@@ -29,6 +29,46 @@ const Message = ({ message }) => {
             <TextMessageComponent message={message}/>
         )
     }
+}
+
+const AudioMessageComponent = ({message}) => {
+    let audioSrc = message.media.document.real ? message.media.document.real.url : "";
+    return (
+        <MessageWrapperComponent message={message}>
+            <div class="message">
+                <audio constrols>
+                    <source src={audioSrc} type={message.media.document.mime_type}/>
+                </audio>
+                <TextWrapperComponent message={message}/>
+            </div>
+        </MessageWrapperComponent>
+        )
+}
+
+const VideoMessageComponent = ({message}) => {
+    let videoSrc = message.media.document.real ? message.media.document.real.url : "";
+    return (
+        <MessageWrapperComponent message={message}>
+        <div class="message no-pad">
+                <div class="media-wrapper">
+                    <video controls src={videoSrc} type={message.media.document.mime_type}/>
+                </div>
+                <TextWrapperComponent message={message}/>
+                </div>
+        </MessageWrapperComponent>
+        )
+}
+
+const RoundVideoMessageComponent = ({message}) => {
+    let videoSrc = message.media.document.real ? message.media.document.real.url : "";
+    return (
+        <MessageWrapperComponent message={message} transparent={true}>
+                <div class="round-video-wrapper">
+                    <video controls src={videoSrc} type={message.media.document.mime_type}/>
+                </div>
+                <MessageTimeComponent message={message} bg={true}/>
+        </MessageWrapperComponent>
+        )
 }
 
 const IVMessageComponent = ({ message }) => {
@@ -60,7 +100,6 @@ const WebpageMessageComponent = ({ message }) => {
 }
 
 const StickerMessageComponent = ({ message }) => {
-    console.log(message);
     let animated = message.media.document.mime_type == "application/x-tgsticker";
     let src = message.media.document.real ? message.media.document.real.url : "";
     let sticker = animated ? <tgs-player class="sticker" autoplay loop src={src}/> : <img class="sticker" src={src}/>
@@ -141,7 +180,7 @@ const MessageTimeComponent = ({ message, bg = false }) => {
     return (
         <span class={classes}>
                 {views}
-                <div class="inner tgico">
+                <div class="inner status tgico">
                     {edited}
                     {message.getDate('en', {
                         hour: '2-digit',

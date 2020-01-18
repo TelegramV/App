@@ -136,19 +136,24 @@ export class Message {
                             const attr = attrs[i];
                             if (attr._ == "documentAttributeSticker") {
                                 this.type = "sticker";
+                                break;
                             }
                             if (attr._ == "documentAttributeAudio") {
                                 if (attr.pFlags.voice) {
                                     this.type = "voice"
+                                    break;
                                 } else {
                                     this.type = "audio"
+                                    break;
                                 }
                             }
                             if (attr._ == "documentAttributeVideo") {
                                 if (attr.pFlags.round_message) {
                                     this.type = "round";
+                                    break;
                                 } else {
                                     this.type = "video";
+                                    break;
                                 }
                             }
                         }

@@ -249,6 +249,18 @@
                 max-height: 512px;
             }
 
+            .round-video-wrapper {
+              width: 200px;
+              height: 200px;
+              border-radius: 50%;
+              overflow: hidden;
+
+              video {
+                width: 100%;
+                height: auto;
+              }
+            }
+
             .audio {
                 display: flex;
                 width: 100%;
@@ -503,7 +515,7 @@
                         padding: 4px 6px;
                     }
 
-                    .tgico:after {
+                    .tgico.status:after {
                       line-height: 12px;
                     }
                 }
@@ -692,7 +704,7 @@
             }
 
             .bubble {
-                .time .tgico:after {
+                .time .tgico.status:after {
                     font-size: 18px;
                     line-height: 12px;
                     vertical-align: top;
@@ -700,13 +712,13 @@
             }
 
             .bubble.read {
-                .time .tgico:after {
+                .time .tgico.status:after {
                     content: $tgico-check-read;
                 }
             }
 
             .bubble.sent {
-                .time .tgico:after {
+                .time .tgico.status:after {
                     content: $tgico-check-sent;
                 }
             }
