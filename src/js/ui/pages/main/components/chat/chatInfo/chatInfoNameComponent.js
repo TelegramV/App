@@ -1,9 +1,8 @@
 import AppEvents from "../../../../../../api/eventBus/appEvents"
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
-import AppFramework from "../../../../../framework/framework"
+import Component from "../../../../../framework/vrdom/component"
 
-const ChatInfoNameComponent = AppFramework.createComponent({
-    name: "ChatInfoAvatarComponent",
+class ChatInfoNameComponent extends Component {
     h() {
         if (AppSelectedDialog.isNotSelected) {
             return (
@@ -20,9 +19,15 @@ const ChatInfoNameComponent = AppFramework.createComponent({
                 {peer.name}
             </div>
         )
-    },
+    }
+
+    created() {
+        console.log(`${this.name} created`)
+    }
 
     mounted() {
+        console.log(`${this.name} mounted`)
+
         AppEvents.Peers.listenAny(event => {
             if (AppSelectedDialog.check(event.peer.dialog)) {
                 if (event.type === "updateName") {
@@ -30,7 +35,7 @@ const ChatInfoNameComponent = AppFramework.createComponent({
                 }
             }
         })
-    },
-})
+    }
+}
 
 export default ChatInfoNameComponent

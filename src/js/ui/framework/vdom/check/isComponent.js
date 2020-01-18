@@ -8,6 +8,7 @@ import vdom_isNamedComponent from "./isNamedComponent"
  * @returns {boolean}
  */
 function vdom_isComponent(potentialComponent) {
+    throw new Error("deprecated")
     return (
         vdom_isSimpleComponent(potentialComponent) ||
         vdom_isNamedComponent(potentialComponent)

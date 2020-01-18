@@ -6,6 +6,7 @@ const createResolve = context => {
     return value => {
         if (context.component && context.key) {
             if (context.patchOnly) {
+                console.log("patch only")
                 context.component.reactive[context.key] = value
                 context.component.__patch()
             } else if (context.fireOnly) {
@@ -26,9 +27,17 @@ const createResolve = context => {
  * @see AppSelectedDialog.Reactive
  *
  * @param {function(function(*))} callback
+ * @param {function(function(*))} offCallback
  * @return {{Default: *, FireOnly: *, PatchOnly: *}}
  */
-function ReactiveCallback(callback) {
+function ReactiveCallback(callback, offCallback) {
+    if (typeof callback !== "function") {
+        throw new Error("callback is not a function")
+    }
+    if (typeof offCallback !== "function") {
+        throw new Error("offCallback is not a function")
+    }
+
     return {
         /**
          * Means that both `__patch` and `changed` will be called.
@@ -37,11 +46,13 @@ function ReactiveCallback(callback) {
          */
         get Default() {
             const context = Object.create(null)
+
             context.__rc = true
 
             context.resolve = createResolve(context)
 
             context.defaultValue = callback(context.resolve)
+            context.offCallback = offCallback
 
             return context
         },
@@ -60,6 +71,7 @@ function ReactiveCallback(callback) {
             context.resolve = createResolve(context)
 
             context.defaultValue = callback(context.resolve)
+            context.offCallback = offCallback
 
             return context
         },
@@ -71,12 +83,14 @@ function ReactiveCallback(callback) {
          */
         get PatchOnly() {
             const context = Object.create(null)
+
             context.__rc = true
             context.patchOnly = true
 
             context.resolve = createResolve(context)
 
             context.defaultValue = callback(context.resolve)
+            context.offCallback = offCallback
 
             return context
         }

@@ -1,8 +1,13 @@
 import {FrameworkRouter} from "./router"
-import VDOM from "./vdom"
 import {createComponent} from "./component"
+import VRDOM from "./vrdom"
 
-global.VDOM = VDOM
+global.VRDOM = VRDOM
+
+/**
+ * @type {Map<string, Component>}
+ */
+const mountedComponents = new Map()
 
 const Router = new FrameworkRouter()
 
@@ -18,8 +23,11 @@ function mount(selector) {
 
 export const AppFramework = {
     Router,
+    mountedComponents,
     mount,
     createComponent
 }
+
+global.F = AppFramework
 
 export default AppFramework

@@ -6,15 +6,24 @@
  * @version undefined
  * @author kohutd
  */
-import VDOM from "../vdom"
-import {vdom_realMount} from "../vdom/mount"
+import VRDOM from "../vrdom"
+import {VRNode} from "../vrdom/VRNode"
+import AppFramework from "../framework"
 
 export class FrameworkRouter {
     constructor(options = {}) {
         this.mode = options.mode || "hash"
         this.hash = options.hash || "#/"
 
+        /**
+         * @type {Element|Node|boolean}
+         */
         this.$mountElement = options.$mountElement || false
+
+        /**
+         * @type {Element|Node|boolean}
+         */
+        this.$mountElementInner = undefined
 
         this.mountId = options.mountId || "app"
         this.routes = options.routes || []
@@ -29,24 +38,15 @@ export class FrameworkRouter {
     }
 
     /**
-     * WARNING: for some reason do not pass component as an object of HTMLElement! I have to fix it later.
-     *
      * @param path
      * @param name
-     * @param component
+     * @param page
      */
-    route(path, name, component) {
-        let route = undefined
-
-        if (typeof path === "object") {
-            route = path
-            route.name = route.name || route.path
-        } else {
-            route = {
-                path: path,
-                name: name,
-                component: component
-            }
+    route(path, name, page) {
+        let route = {
+            path: path,
+            name: name,
+            page: page
         }
 
         this.routes.push(route)
@@ -72,15 +72,25 @@ export class FrameworkRouter {
             // if wasn't then router will not re-render the component
             // if was then it means that query was changed, so we trigger handlers
             if (this.activeRoute && this.activeRoute.route && this.activeRoute.route.path === parseHash(window.location.hash).path) {
+                const newQueryParams = parseQuery(parseHash(window.location.hash).queryString)
+
+                // console.log("[router] triggering query change")
+
+                // if (this.diffQueryParams(newQueryParams)) {
                 this.queryChangeHandlers.forEach(h => {
-                    const newQueryParams = parseQuery(parseHash(window.location.hash).queryString)
                     this.activeRoute.queryParams = newQueryParams
                     h(newQueryParams)
                 })
-                return
-            }
+                // }
+            } else {
+                // console.log("[router] triggering replace")
+                // todo: patch tree not delete it
+                AppFramework.mountedComponents.forEach(c => {
+                    c.__delete()
+                })
 
-            this.renderActive()
+                this.renderActive()
+            }
         })
     }
 
@@ -93,9 +103,30 @@ export class FrameworkRouter {
     }
 
     renderRoute(route) {
-        if (route.component.hasOwnProperty("h") && typeof route.component.h === "function") {
-            this.$mountElement = vdom_realMount(route.component.h(), this.$mountElement)
+        if (route.page.hasOwnProperty("h") && typeof route.page.h === "function") {
+            // console.log("[router] rendering new")
+            const vNode = route.page.h()
+
+            if (vNode instanceof VRNode) {
+                VRDOM.patch(this.$mountElement, vNode)
+            } else {
+                throw new Error("page first parent cannot be component for some reason")
+            }
         }
+    }
+
+    diffQueryParams(queryParams) {
+        if (Object.keys(queryParams).length !== Object.keys(this.activeRoute.queryParams).length) {
+            return false
+        }
+
+        for (const [k, v] of Object.entries(queryParams)) {
+            if (this.activeRoute.queryParams[k] !== v) {
+                return false
+            }
+        }
+
+        return true
     }
 
     findRoute(path) {
@@ -114,9 +145,9 @@ export class FrameworkRouter {
 
         if (!foundRoute) {
             foundRoute = {
-                component: {
+                page: {
                     h() {
-                        return VDOM.render(<h1>404</h1>)
+                        return <div><h1>404</h1></div>
                     }
                 }
             }

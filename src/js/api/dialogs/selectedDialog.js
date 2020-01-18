@@ -2,6 +2,7 @@ import ReactiveCallback from "../../ui/framework/reactive/reactiveCallback"
 import {AppFramework} from "../../ui/framework/framework"
 import DialogsStore from "../store/dialogsStore"
 import DialogsManager from "./dialogsManager"
+import {Dialog} from "../dataObjects/dialog/dialog"
 
 export function parseHashQuery() {
     const queryPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
@@ -18,8 +19,8 @@ class SelectedDialog {
      * @param {Dialog} dialog
      */
     constructor({dialog = undefined}) {
-        this._dialog = dialog
         this._previousDialog = undefined
+        this._dialog = dialog
 
         this._selectListeners = []
 
@@ -45,14 +46,14 @@ class SelectedDialog {
      * @return {boolean}
      */
     get isSelected() {
-        return !this.isNotSelected
+        return this.Dialog instanceof Dialog
     }
 
     /**
      * @return {boolean}
      */
     get isNotSelected() {
-        return !this._dialog
+        return !this.isSelected
     }
 
     /**
@@ -71,14 +72,29 @@ class SelectedDialog {
             this._previousDialog = this._dialog
             this._dialog = this.findFromQueryParams(AppFramework.Router.activeRoute.queryParams)
             return this._dialog
+        }, resolve => {
+            this.shutUp(resolve)
         })
     }
 
     /**
-     * @param {function(dialog: Dialog)} callback
+     * @param {function(dialog: Dialog)} resolve
      */
-    listen(callback) {
-        this._selectListeners.push(callback)
+    listen(resolve) {
+        this._selectListeners.push(resolve)
+    }
+
+    /**
+     * @param {function(dialog: Dialog)} resolve
+     */
+    shutUp(resolve) {
+        const index = this._selectListeners.findIndex(value => value === resolve)
+
+        if (index > -1) {
+            this._selectListeners.splice(index, 1)
+        } else {
+            console.error("cannot find resolve")
+        }
     }
 
     /**
@@ -109,7 +125,11 @@ class SelectedDialog {
      * @return {boolean}
      */
     check(dialog) {
-        return this.Dialog === dialog && (this._dialog !== undefined && dialog !== undefined)
+        if (!this._dialog || !dialog) {
+            return false
+        }
+
+        return this.Dialog === dialog && this.Dialog.type === dialog.type && this.Dialog.id === dialog.id
     }
 }
 

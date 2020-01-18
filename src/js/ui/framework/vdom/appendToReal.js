@@ -1,4 +1,6 @@
 import vdom_render from "./render"
+import vdom_isNamedComponent from "./check/isNamedComponent"
+import AppFramework from "../framework"
 
 /**
  * @param vNode
@@ -7,12 +9,18 @@ import vdom_render from "./render"
  * @return {Element}
  */
 function vdom_appendToReal(vNode, $element, {xmlns = null} = {}) {
+    throw new Error("deprecated")
     const $mountedElement = $element.appendChild(vdom_render(vNode, xmlns))
 
-    if (vNode && vNode.component && !vNode.component.__.mounted) {
-        vNode.component.$el = $mountedElement
-        vNode.component.__.mounted = true
-        vNode.component.mounted()
+    if (vdom_isNamedComponent(vNode)) {
+        const component = AppFramework.mountedComponents.get($mountedElement.getAttribute("data-component-id"))
+
+        component.$el = $mountedElement
+
+        if (!component.__.mounted) {
+            component.__.mounted = true
+            component.mounted()
+        }
     }
 
     return $mountedElement

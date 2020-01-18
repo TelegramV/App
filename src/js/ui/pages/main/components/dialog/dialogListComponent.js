@@ -4,45 +4,46 @@ import DialogsStore from "../../../../../api/store/dialogsStore"
 import AppEvents from "../../../../../api/eventBus/appEvents"
 import Sortable from "sortablejs"
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
-import AppFramework from "../../../../framework/framework"
+import Component from "../../../../framework/vrdom/component"
+import VRDOM from "../../../../framework/vrdom"
 
-/**
- * CRITICAL: Never rerender this component!!!
- */
-export const DialogListComponent = AppFramework.createComponent({
-    name: "dialog-list",
-    reactive: {
-        selectedDialog: AppSelectedDialog.Reactive.FireOnly
-    },
-    state: {
-        // note: mb this is redundant, but we should be careful with this
-        renderedDialogsIds: {
-            pinned: new Set(),
-            general: new Set(),
-        },
+export class DialogListComponent extends Component {
+    constructor() {
+        super({
+            reactive: {
+                selectedDialog: AppSelectedDialog.Reactive.FireOnly
+            },
+            state: {
+                // note: mb this is redundant, but we should be careful with this
+                renderedDialogsIds: {
+                    pinned: new Set(),
+                    general: new Set(),
+                },
 
-        renderedDialogsElements: new Map([
-            ["chat", new Map()],
-            ["channel", new Map()],
-            ["user", new Map()],
-        ]),
+                renderedDialogsElements: new Map([
+                    ["chat", new Map()],
+                    ["channel", new Map()],
+                    ["user", new Map()],
+                ]),
 
-        isInLoadingMoreScroll: false,
+                isInLoadingMoreScroll: false,
 
-        previousSelectedDialog: undefined,
+                previousSelectedDialog: undefined,
 
-        generalSortable: undefined,
-    },
+                generalSortable: undefined,
+            }
+        })
 
-    elements: {
-        $loader: undefined,
-        $dialogsWrapper: undefined,
-        $pinnedDialogs: undefined,
-        /**
-         * @type {Element|Node}
-         */
-        $generalDialogs: undefined,
-    },
+        this.elements = {
+            $loader: undefined,
+            $dialogsWrapper: undefined,
+            $pinnedDialogs: undefined,
+            /**
+             * @type {Element|Node}
+             */
+            $generalDialogs: undefined,
+        }
+    }
 
     h() {
         return (
@@ -72,7 +73,7 @@ export const DialogListComponent = AppFramework.createComponent({
                 </div>
             </div>
         )
-    },
+    }
 
     mounted() {
         this.elements.$loader = this.$el.querySelector("#loader")
@@ -95,13 +96,13 @@ export const DialogListComponent = AppFramework.createComponent({
         AppEvents.Peers.listenAny(this._handlePeerUpdates)
 
         this._registerResizer()
-    },
+    }
 
     changed(key, value) {
         if (key === "selectedDialog") {
             this._patchSelectedDialog()
         }
-    },
+    }
 
     /**
      * @param {Dialog} dialog
@@ -117,6 +118,7 @@ export const DialogListComponent = AppFramework.createComponent({
         let $rendered = dialogElements.get(dialog.id) || false
 
         if ($rendered) {
+            console.warn("already rendered")
             if (String(dialog.isPinned) !== $rendered.dataset.pinned) {
 
                 if (dialog.isPinned) {
@@ -144,39 +146,40 @@ export const DialogListComponent = AppFramework.createComponent({
 
             this._patchDialog.bind(this)(dialog, $rendered)
         } else {
+            console.log("rendering new")
             const newVDialog = <DialogComponent dialog={dialog}/>
 
             if (appendOrPrepend === "append") {
                 if (dialog.isPinned) {
-                    $rendered = VDOM.appendToReal(newVDialog, this.elements.$pinnedDialogs)
+                    $rendered = VRDOM.append(newVDialog, this.elements.$pinnedDialogs)
                     dialogElements.set(dialog.id, $rendered)
                 } else {
-                    $rendered = VDOM.appendToReal(newVDialog, this.elements.$generalDialogs)
+                    $rendered = VRDOM.append(newVDialog, this.elements.$generalDialogs)
                     dialogElements.set(dialog.id, $rendered)
                 }
             } else if (appendOrPrepend === "prepend") {
                 if (dialog.isPinned) {
-                    $rendered = VDOM.prependToReal(newVDialog, this.elements.$pinnedDialogs)
+                    $rendered = VRDOM.append(newVDialog, this.elements.$pinnedDialogs)
                     dialogElements.set(dialog.id, $rendered)
                 } else {
-                    $rendered = VDOM.prependToReal(newVDialog, this.elements.$generalDialogs)
+                    $rendered = VRDOM.append(newVDialog, this.elements.$generalDialogs)
                     dialogElements.set(dialog.id, $rendered)
                 }
             } else {
                 if (dialog.isPinned) {
-                    $rendered = VDOM.prependToReal(newVDialog, this.elements.$pinnedDialogs)
+                    $rendered = VRDOM.prepend(newVDialog, this.elements.$pinnedDialogs)
                     dialogElements.set(dialog.id, $rendered)
                 } else {
                     const $foundRendered = this._findRenderedDialogToInsertBefore(dialog)
 
                     if ($foundRendered) {
-                        $rendered = this.elements.$generalDialogs.insertBefore(VDOM.render(newVDialog), $foundRendered)
+                        $rendered = this.elements.$generalDialogs.insertBefore(VRDOM.render(newVDialog), $foundRendered)
                         dialogElements.set(dialog.id, $rendered)
                     }
                 }
             }
         }
-    },
+    }
 
     /**
      * @param {Dialog} dialog
@@ -221,7 +224,7 @@ export const DialogListComponent = AppFramework.createComponent({
         }
 
         return $dialog  // fuuuuuuck
-    },
+    }
 
     /**
      * Handles Dialog updates
@@ -287,7 +290,7 @@ export const DialogListComponent = AppFramework.createComponent({
                 break
 
         }
-    },
+    }
 
     _patchDialog(dialog, $dialog = undefined) {
         if (!$dialog) {
@@ -299,8 +302,8 @@ export const DialogListComponent = AppFramework.createComponent({
             }
         }
 
-        VDOM.patchReal($dialog, <DialogComponent dialog={dialog}/>)
-    },
+        VRDOM.patch($dialog, <DialogComponent dialog={dialog}/>)
+    }
 
     _patchSelectedDialog() {
         if (this.reactive.selectedDialog) {
@@ -310,7 +313,7 @@ export const DialogListComponent = AppFramework.createComponent({
 
             this._patchDialog(this.reactive.selectedDialog)
         }
-    },
+    }
 
     /**
      * Handles Peer updates
@@ -327,7 +330,7 @@ export const DialogListComponent = AppFramework.createComponent({
                 this._patchDialog(dialog)
             }
         }
-    },
+    }
 
     /**
      * Handles dialogs scroll. If at the bottom, then gets next page of dialogs.
@@ -346,7 +349,7 @@ export const DialogListComponent = AppFramework.createComponent({
                 this.state.isInLoadingMoreScroll = false
             })
         }
-    },
+    }
 
     /**
      * Makes the sidebar resizeable.
@@ -426,4 +429,4 @@ export const DialogListComponent = AppFramework.createComponent({
             document.removeEventListener("mousemove", resize)
         }, false)
     }
-})
+}

@@ -592,7 +592,7 @@ function load() {
 }
 
 export function LoginPage() {
-    return VDOM.render(
+    return (
         <div>
             <div id="login">
                 <div id="phonePane" className="fading-block">

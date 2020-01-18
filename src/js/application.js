@@ -1,14 +1,14 @@
 import "../sass/application.scss"
 
 import "./ui/vendor/tgs_player"
-import {loadSchema} from "./mtproto/language/schema"
 import AppFramework from "./ui/framework/framework"
 import MTProto from "./mtproto"
 import {MainPage} from "./ui/pages/main/mainPage"
 import {LoginPage} from "./ui/pages/login/nextlogin"
+import ReactiveCallback from "./ui/framework/reactive/reactiveCallback"
+import Component from "./ui/framework/vrdom/component"
 import AppCache from "./api/cache"
-import AppEvents from "./api/eventBus/appEvents"
-import {DialogComponent} from "./ui/pages/main/components/dialog/dialogComponent"
+import {loadSchema} from "./mtproto/language/schema"
 
 
 const authContext = {
@@ -64,85 +64,119 @@ function start() {
     AppFramework.mount("#app")
 }
 
-// const selectedDialogListeners = []
-//
-// const SelectedDialog = ReactiveCallback(resolve => {
-//     selectedDialogListeners.push(resolve)
-// })
+const _selectListeners = []
+
+AppFramework.Router.onQueryChange(queryParams => {
+    _selectListeners.forEach(listener => {
+        listener(AppFramework.Router.activeRoute.queryParams)
+    })
+})
+
+const ReactiveQuery = ReactiveCallback(resolve => {
+    _selectListeners.push(resolve)
+    return AppFramework.Router.activeRoute.queryParams
+}, resolve => {
+    const index = _selectListeners.findIndex(value => value === resolve)
+
+    if (index > -1) {
+        _selectListeners.splice(index, 1)
+    } else {
+        console.error("cannot find resolve")
+    }
+})
+
+
+const DateComponent = ({date}) => <b>{date}</b>
+
+class Y extends Component {
+    constructor() {
+        super();
+
+        this.state = {
+            count: 0
+        }
+    }
+
+    h() {
+        return (
+            <h1 onClick={this._click}>
+                Component {this.state.count}
+                Query {this.reactive.q}
+                <br/>
+                <DateComponent date={new Date()}/>
+            </h1>
+        )
+    }
+
+    created() {
+        console.log("X created")
+    }
+
+    mounted() {
+        console.log("X mounted")
+    }
+
+    destroy() {
+        console.log("X destroying")
+    }
+
+    _click() {
+        console.log("clicked", this)
+        this.state.count++
+        this.__patch()
+    }
+}
+
+class Parent extends Component {
+    constructor() {
+        super();
+
+        this.reactive = {
+            q: ReactiveQuery.Default
+        }
+    }
+
+    h() {
+        return (
+            <div>
+                <div>1<Y ref="Parent"/><Y/></div>
+                <br/>
+                {this.reactive.q}
+
+                <br/>
+                <br/>
+                <hr/>
+                {this.refs.get("Parent")}
+            </div>
+        )
+    }
+
+    changed(key, value) {
+        console.log("changed", key, value, this)
+    }
+
+    created() {
+        console.log("Parent created")
+    }
+
+    mounted() {
+        console.log("Parent mounted")
+    }
+
+    destroy() {
+        console.log("Parent destroying")
+    }
+}
 
 // AppFramework.Router.route("/", "main", {
 //     h() {
-//         const NestedComponent = {
-//             name: "nested",
-//             state: {
-//                 count: 0
-//             },
-//             props: {},
-//             h() {
-//                 return (
-//                     <h1>
-//                         {this.state.count} | {this.props.get("combo")}
-//                     </h1>
-//                 )
-//             },
-//             mounted() {
-//                 console.log("nested mounted")
-//             },
-//             created() {
-//                 console.log("nested created")
-//             },
-//             updated() {
-//                 console.log("nested updated")
-//             },
-//             destroy() {
-//                 console.log("nested destroy")
-//             },
-//             patchRequest(vNode) {
-//                 console.log("nested patchRequest", vNode)
-//             },
-//         }
-//
-//         const Component = {
-//             name: "component",
-//             state: {
-//                 query: UpdatedQuery
-//             },
-//             h() {
-//                 return (
-//                     <div>
-//                         {AppFramework.Router.activeRoute.queryParams}
-//                         {this.state.query ? this.state.query.q : "q"}
-//
-//                         {this.state.query ? <NestedComponent combo={this.state.query.q}/> : <NestedComponent/>}
-//                     </div>
-//                 )
-//             }
-//         }
-//
-//         return VDOM.render(
-//             <div>
-//                 <Component/>
-//             </div>
-//         )
+//         return <div><Parent/></div>
 //     }
 // })
+//
+// AppFramework.mount("#app")
 
-
-// global.VDOM = VDOM
-//
-// const Fragment = (
-//     <div>
-//         <>
-//             <dt>{0}</dt>
-//             <dd>{1}</dd>
-//         </>
-//     </div>
-// )
-//
-// console.log(Fragment)
-//
-// VDOM.mount(Fragment, "#app")
 
 AppCache.open()
-
+//
 loadSchema().then(() => MTProto.connect(authContext).then(start))

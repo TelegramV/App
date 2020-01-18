@@ -1,8 +1,8 @@
 import vdom_isNamedComponent from "./check/isNamedComponent"
 import vdom_isSimpleComponent from "./check/isSimpleComponent"
 import vdom_isVNode from "./check/isVNode"
-import vdom_createEmptyNode from "./createEmptyNode"
 import AppFramework from "../framework"
+import {VRNode} from "../vrdom/VRNode"
 
 function removeIfs(array) {
     for (let i = 0; i < array.length; i++) {
@@ -70,22 +70,11 @@ function removeIfs(array) {
  *
  * @param tagName
  * @param vNode
- * @returns {*}
+ * @returns {VRNode}
  */
 function vdom_h(tagName, vNode) {
-    // removeIfs(vNode.children) // todo: uncomment this if there is a need. but without this rendering is faster
 
-    // for fragments
-    // if (tagName === VDOM.Fragment) {
-    //     console.log(tagName, vNode)
-    //     if (!vNode.parent) {
-    //         throw new Error("fragment without parent cannot be rendered")
-    //     } else {
-    //         vNode.parent.children = []
-    //         vNode.parent.children.push(...vNode.children)
-    //     }
-    // }
-
+    throw new Error("deprecated")
     // component
     if (vdom_isSimpleComponent(tagName)) {
         return tagName(Object.assign(vNode.attrs, {slot: vNode.children}))
@@ -93,35 +82,20 @@ function vdom_h(tagName, vNode) {
 
     // named component
     // todo fixme create new component!!!
-    if (vdom_isNamedComponent(tagName)) {
-        let component = tagName
-
-        if (!component.__) {
-            component = AppFramework.createComponent(component)
-        }
-
-        component.__init()
-
-        const vComponentElem = component.__render(Object.assign(vNode.attrs, {slot: vNode.children}))
-
-        vComponentElem.renderIf = vNode.renderIf
-
-        return vComponentElem
-    }
-
-    const vElem = vdom_createEmptyNode()
-    Object.assign(vElem, vNode)
-    vElem.tagName = tagName
-
-    // for fragments
-    // vElem.children.forEach(vChild => {
-    //     console.log("setting parent", vElem, vChild)
-    //     if (vdom_isVNode(vChild)) {
-    //         vChild.parent = vElem
+    // if (vdom_isNamedComponent(tagName)) {
+    //     let component = tagName
+    //
+    //     if (!component.__) {
+    //         component = AppFramework.createComponent(component)
     //     }
-    // })
+    //
+    //     Object.assign(component.props, vNode.attrs)
+    //     component.slot = vNode.children
+    //
+    //     return component
+    // }
 
-    return vElem
+    return new VRNode(tagName, vNode)
 }
 
 export default vdom_h

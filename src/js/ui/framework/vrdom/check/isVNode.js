@@ -4,9 +4,10 @@
  * @param potentialVNode
  * @return {boolean}
  */
+import {VRNode} from "../VRNode"
+
 function vdom_isVNode(potentialVNode) {
-    throw new Error("deprecated")
-    return typeof potentialVNode === "object" && potentialVNode.__virtual
+    return typeof potentialVNode instanceof VRNode
 }
 
 export default vdom_isVNode

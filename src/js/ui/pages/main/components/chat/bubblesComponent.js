@@ -1,37 +1,33 @@
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import AppEvents from "../../../../../api/eventBus/appEvents"
-import VDOM from "../../../../framework/vdom"
 import ImageMessageComponent from "./message/imageMessageComponent"
 import {FileAPI} from "../../../../../api/fileAPI"
 import TextMessageComponent from "./message/textMessageComponent"
 import {isElementInViewport} from "../../../../framework/utils"
-import AppFramework from "../../../../framework/framework"
+import Component from "../../../../framework/vrdom/component"
+import VRDOM from "../../../../framework/vrdom"
 
-/**
- * WARNING: never patch this component! not manually, not from parent!
- *
- * @property {Node[]|Element[]|undefined[]} elements
- * @property {Node|Element} $el
- */
-const BubblesComponent = AppFramework.createComponent({
-    name: "BubblesInnerComponent",
+class BubblesComponent extends Component {
+    constructor() {
+        super({
+            reactive: {
+                dialog: AppSelectedDialog.Reactive.FireOnly,
+            },
 
-    reactive: {
-        dialog: AppSelectedDialog.Reactive.FireOnly,
-    },
+            state: {
+                /**
+                 * @var {Array<Node|Element>|[]} renderedMessageElements
+                 */
+                renderedMessageElements: [],
+                isFetchingNextPage: false,
+            }
+        });
 
-    state: {
-        /**
-         * @var {Array<Node|Element>|[]} renderedMessageElements
-         */
-        renderedMessageElements: [],
-        isFetchingNextPage: false,
-    },
-
-    elements: {
-        $bubblesInner: undefined,
-        $loader: undefined,
-    },
+        this.elements = {
+            $bubblesInner: undefined,
+            $loader: undefined,
+        }
+    }
 
     h() {
         return (
@@ -41,7 +37,7 @@ const BubblesComponent = AppFramework.createComponent({
                 </div>
             </div>
         )
-    },
+    }
 
     mounted() {
         this.elements.$bubblesInner = this.$el.querySelector("#bubbles-inner")
@@ -64,7 +60,7 @@ const BubblesComponent = AppFramework.createComponent({
                 }
             }
         })
-    },
+    }
 
     changed(key, value) {
         // check if selected dialog was changed
@@ -80,7 +76,7 @@ const BubblesComponent = AppFramework.createComponent({
                 this._clearBubbles()
             }
         }
-    },
+    }
 
     /**
      * TODO: REWRITE!!!!
@@ -91,7 +87,7 @@ const BubblesComponent = AppFramework.createComponent({
      * @return {Element|Node}
      */
     _renderMessage(message, prepend = false) {
-        const $mount = prepend ? VDOM.prependToReal : VDOM.appendToReal
+        const $mount = prepend ? VRDOM.prepend : VRDOM.append
         let $message = undefined
 
         if (message.media) {
@@ -99,7 +95,7 @@ const BubblesComponent = AppFramework.createComponent({
                 $message = $mount(<ImageMessageComponent message={message} image={false}/>, this.elements.$bubblesInner)
 
                 FileAPI.photoThumnail(message.media.photo, data => {
-                    VDOM.patchReal($message, <ImageMessageComponent message={message} image={{
+                    VRDOM.patch($message, <ImageMessageComponent message={message} image={{
                         imgSrc: data.src,
                         imgSize: data.size,
                         thumbnail: data.thumbnail
@@ -114,7 +110,7 @@ const BubblesComponent = AppFramework.createComponent({
         }
 
         return $message
-    },
+    }
 
     /**
      * todo: rewrite this thing
@@ -130,7 +126,7 @@ const BubblesComponent = AppFramework.createComponent({
         }
 
         this.$el.scrollTop += this.elements.$bubblesInner.clientHeight - k
-    },
+    }
 
     /**
      * @param {Array<Message>} messages
@@ -158,7 +154,7 @@ const BubblesComponent = AppFramework.createComponent({
         }
 
         return pushed
-    },
+    }
 
     _refreshMessages() {
         this._toggleMessagesLoader(false)
@@ -167,7 +163,7 @@ const BubblesComponent = AppFramework.createComponent({
         this.reactive.dialog.API.fetchInitialMessages().then(messages => {
             this._toggleMessagesLoader(true)
         })
-    },
+    }
 
     _clearBubbles() {
         this.state.renderedMessageElements = []
@@ -175,11 +171,11 @@ const BubblesComponent = AppFramework.createComponent({
         while (this.elements.$bubblesInner.firstChild) {
             this.elements.$bubblesInner.firstChild.remove()
         }
-    },
+    }
 
     _markAllAsRead() {
         return this.reactive.dialog.API.readAllHistory()
-    },
+    }
 
     _onScrollBubbles(event) {
         const $element = event.target
@@ -199,7 +195,7 @@ const BubblesComponent = AppFramework.createComponent({
             //     this._markAllAsRead()
             // }
         }
-    },
+    }
 
     _toggleMessagesLoader(hide = true) {
         if (this.elements.$loader) {
@@ -209,7 +205,7 @@ const BubblesComponent = AppFramework.createComponent({
                 this.elements.$loader.style.display = ""
             }
         }
-    },
-})
+    }
+}
 
 export default BubblesComponent

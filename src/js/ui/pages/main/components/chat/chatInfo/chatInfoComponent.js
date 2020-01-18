@@ -1,14 +1,18 @@
 import ChatInfoStatusComponent from "./chatInfoStatusComponent"
-import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 import ChatInfoAvatarComponent from "./chatInfoAvatarComponent"
 import ChatInfoNameComponent from "./chatInfoNameComponent"
-import AppFramework from "../../../../../framework/framework"
+import Component from "../../../../../framework/vrdom/component"
+import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 
-const ChatInfoComponent = AppFramework.createComponent({
-    name: "ChatInfoComponent",
-    reactive: {
-        dialog: AppSelectedDialog.Reactive.Default // reactive property
-    },
+class ChatInfoComponent extends Component {
+    constructor() {
+        super({
+            reactive: {
+                dialog: AppSelectedDialog.Reactive.Default // reactive property
+            }
+        });
+    }
+
     h() {
         return (
             <div id="messages-wrapper-chat-info" className="chat-info">
@@ -27,10 +31,7 @@ const ChatInfoComponent = AppFramework.createComponent({
                 </div>
             </div>
         )
-    },
-    changed(key, value) {
-        
     }
-})
+}
 
 export default ChatInfoComponent

@@ -1,9 +1,8 @@
 import AppEvents from "../../../../../../api/eventBus/appEvents"
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
-import AppFramework from "../../../../../framework/framework"
+import Component from "../../../../../framework/vrdom/component"
 
-const ChatInfoAvatarComponent = AppFramework.createComponent({
-    name: "ChatInfoAvatarComponent",
+class ChatInfoAvatarComponent extends Component {
     h() {
         if (AppSelectedDialog.isNotSelected) {
             return (
@@ -23,17 +22,18 @@ const ChatInfoAvatarComponent = AppFramework.createComponent({
                 {peer.photo.isEmpty ? peer.photo.letter.text : ""}
             </div>
         )
-    },
+    }
 
     mounted() {
         AppEvents.Peers.listenAny(event => {
             if (AppSelectedDialog.check(event.peer.dialog)) {
                 if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
-                    this.__patch()
+                    console.log(event.peer.dialog, AppSelectedDialog.Dialog)
+                    // this.__patch()
                 }
             }
         })
-    },
-})
+    }
+}
 
 export default ChatInfoAvatarComponent

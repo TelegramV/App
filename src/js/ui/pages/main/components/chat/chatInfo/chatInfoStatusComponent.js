@@ -6,17 +6,19 @@ import {BotPeer} from "../../../../../../api/dataObjects/peer/botPeer"
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 import AppEvents from "../../../../../../api/eventBus/appEvents"
 import AppFramework from "../../../../../framework/framework"
+import Component from "../../../../../framework/vrdom/component"
 
-const ChatInfoStatusComponent = AppFramework.createComponent({
-
-    name: "ChatInfoStatusComponent",
-
-    state: {
-        patchEvents: new Set([
-            "updateUserStatus",
-            "fullLoaded",
-        ]),
-    },
+class ChatInfoStatusComponent extends Component {
+    constructor() {
+        super({
+            state: {
+                patchEvents: new Set([
+                    "updateUserStatus",
+                    "fullLoaded",
+                ]),
+            }
+        });
+    }
 
     h() {
         return (
@@ -24,7 +26,7 @@ const ChatInfoStatusComponent = AppFramework.createComponent({
                 <div id="messages-online" className="info">{this.statusLine}</div>
             </div>
         )
-    },
+    }
 
     mounted() {
         AppEvents.Peers.listenAny(event => {
@@ -34,7 +36,7 @@ const ChatInfoStatusComponent = AppFramework.createComponent({
                 }
             }
         })
-    },
+    }
 
     get statusLine() {
         if (AppSelectedDialog.isNotSelected) {
@@ -78,6 +80,6 @@ const ChatInfoStatusComponent = AppFramework.createComponent({
 
         return status
     }
-})
+}
 
 export default ChatInfoStatusComponent

@@ -4,8 +4,7 @@
  * @param potentialNamedComponent
  * @returns {boolean}
  */
-function vdom_isNamedComponent(potentialNamedComponent) {
-    throw new Error("deprecated")
+function bvdom_isComponent(potentialNamedComponent) {
     return (
         typeof potentialNamedComponent === "object" &&
         typeof potentialNamedComponent.name === "string" &&
@@ -14,4 +13,4 @@ function vdom_isNamedComponent(potentialNamedComponent) {
     )
 }
 
-export default vdom_isNamedComponent
+export default bvdom_isComponent

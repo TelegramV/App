@@ -1,6 +1,7 @@
 import vdom_render from "./render"
 import vdom_isVNode from "./check/isVNode"
 import vdom_mount from "./mount"
+import vdom_isNamedComponent from "./check/isNamedComponent"
 
 // function patchStyles($node, newStyles) {
 //     for (const [k, v] of Object.entries(newStyles)) {
@@ -9,6 +10,10 @@ import vdom_mount from "./mount"
 //         }
 //     }
 // }
+
+function patchNamedComponent($node, component) {
+
+}
 
 /**
  * @param {Element|Node} $node
@@ -88,6 +93,7 @@ function patchDangerouslySetInnerHTML($node, dangerouslySetInnerHTML) {
  * @param newVNode
  */
 function vdom_patchReal($node, newVNode) {
+    throw new Error("deprecated")
     if (newVNode instanceof Node) {
         throw new Error("newVNode is an element of the real DOM and should be of virtual.")
     }
@@ -109,10 +115,26 @@ function vdom_patchReal($node, newVNode) {
         }
     }
 
+    if ($node.hasAttribute("data-component")) {
+        if (vdom_isNamedComponent(newVNode)) {
+            if (!newVNode.__.patchingSelf) {
+                return newVNode.__patch()
+            }
+        } else if (newVNode.component) {
+            if (!newVNode.component.__.patchingSelf) {
+                return newVNode.component.__patch()
+            }
+        } else {
+            deleteNamedComponentById($node.dataset["data-component"])
+            return undefined
+        }
+    }
+
     // named components check
     // if names are different then replace all tree
     if ($node.hasAttribute("data-component") || newVNode.attrs.hasOwnProperty("data-component")) {
         if ($node.getAttribute("data-component") !== newVNode.attrs["data-component"]) {
+            console.warn("patch diff components")
             return vdom_mount(newVNode, $node)
         }
     }

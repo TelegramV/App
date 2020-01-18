@@ -1,5 +1,7 @@
 import vdom_isVNode from "./check/isVNode"
 import vdom_appendToReal from "./appendToReal"
+import vdom_isNamedComponent from "./check/isNamedComponent"
+import vdom_renderNamedComponent from "./renderNamedComponent"
 
 const _XML_NAMESPACES = new Map([
     ["svg", "http://www.w3.org/2000/svg"]
@@ -13,6 +15,11 @@ const _XML_NAMESPACES = new Map([
  * @returns {Text|HTMLElement}
  */
 function vdom_render(vNode, xmlns = null) {
+    throw new Error("deprecated")
+    if (vdom_isNamedComponent(vNode)) {
+        return vdom_renderNamedComponent(vNode)
+    }
+
     if (vNode instanceof Node) {
         throw new Error("Cannot render real node as virtual..")
     }
@@ -70,10 +77,6 @@ function vdom_render(vNode, xmlns = null) {
 
         $node.innerHTML = vNode.dangerouslySetInnerHTML
     }
-
-    // for (const [k, v] of Object.entries(vNode.customStyle)) {
-    //     $node.style[k] = v
-    // }
 
     // setting attributes
     for (const [k, v] of Object.entries(vNode.attrs)) {

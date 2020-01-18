@@ -6,6 +6,7 @@ import vdom_render from "./render"
  * @return {Element}
  */
 function vdom_prependToReal(vNode, $element) {
+    throw new Error("deprecated")
     const $createdElement = vdom_render(vNode)
     $element.prepend($createdElement)
 

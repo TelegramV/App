@@ -1,5 +1,5 @@
-import vdom_h from "./h"
-import VDOM from "./index"
+import vrdom_createElement from "./createElement"
+import VRDOM from "./index"
 
 const jsxAttributesMap = new Map([
     ["className", "class"],
@@ -23,34 +23,22 @@ const attrProcessorsMap = new Map([
     ["class", classAttrProcessor]
 ])
 
-function removeEmpties(array) {
-    for (let i = 0; i < array.length; i++) {
-        if (array[i] === "") {
-            array.splice(i, 1)
-        }
-    }
-}
-
 /**
- * translator (kostyl') for jsx
- *
  * @param tagName
  * @param attributes
  * @param children
- * @returns {*}
+ * @return {VRNode}
  */
-function vdom_jsx(tagName, attributes, ...children) {
-    throw new Error("deprecated")
-    if (tagName === VDOM.Fragment) {
+function vrdom_jsx(tagName, attributes, ...children) {
+    if (tagName === VRDOM.Fragment) {
         throw new Error("fragments are not implemented")
     }
 
     children = children.flat(Infinity)
 
-    let attrs = {}
-    let events = new Map()
+    const attrs = {}
+    const events = new Map()
     let dangerouslySetInnerHTML = false
-    let renderIf = true
 
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
@@ -58,6 +46,9 @@ function vdom_jsx(tagName, attributes, ...children) {
 
             if (k.startsWith("on")) {
                 events.set(k.substring(2).toLowerCase(), v)
+            } else if (k === "dangerouslySetInnerHTML") {
+                dangerouslySetInnerHTML = v
+                attrs[k] = v
             } else if (k.startsWith("css-")) {
                 const styleKey = k.substring(4)
 
@@ -69,9 +60,6 @@ function vdom_jsx(tagName, attributes, ...children) {
                 } else {
                     attrs.style = `${styleKey}: ${v};`
                 }
-            } else if (k === "dangerouslySetInnerHTML") {
-                dangerouslySetInnerHTML = v
-                attrs[k] = v
             } else {
                 if (jsxAttributesMap.has(k)) {
                     key = jsxAttributesMap.get(k)
@@ -87,10 +75,13 @@ function vdom_jsx(tagName, attributes, ...children) {
         }
     }
 
-    const vNode = Object.create(null)
-    Object.assign(vNode, {attrs, events, children, dangerouslySetInnerHTML})
+    return vrdom_createElement(tagName, {
+        attrs,
+        events,
+        children,
 
-    return vdom_h(tagName, vNode)
+        dangerouslySetInnerHTML
+    })
 }
 
-export default vdom_jsx
+export default vrdom_jsx
