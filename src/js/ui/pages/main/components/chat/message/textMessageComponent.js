@@ -9,8 +9,7 @@ function TextMessageComponent({message}) {
     }
 
     const username = message.from.name && !message.isPost && !message.isOut
-    // let text = parseMessageEntities(message.text, message.entities)
-    let text = "unparsed"
+    let text = parseMessageEntities(message.text, message.entities)
 
     if (message.raw.fwd_from) {
         return (
