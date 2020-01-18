@@ -1,11 +1,9 @@
-import {arrayDelete} from "../../common/utils/utils"
-import {Peer} from "../dataObjects/peer/peer";
 import {Manager} from "../manager";
 import PeersStore from "../store/peersStore"
 import AppEvents from "../eventBus/appEvents"
 import {MTProto} from "../../mtproto"
 import {UserPeer} from "../dataObjects/peer/userPeer"
-import {getPeerObject} from "../dataObjects/peerFactory"
+import PeerFactory from "../dataObjects/peerFactory"
 import {PeerPhoto} from "../dataObjects/peer/peerPhoto";
 
 class PeerManager extends Manager {
@@ -58,68 +56,33 @@ class PeerManager extends Manager {
         }
     }
 
-
-    set(peer) {
-        if (peer instanceof Peer) {
-            if (PeersStore.has(peer.type, peer.id)) {
-                return false
-            }
-
-            PeersStore.set(peer)
-
-            // peer.getAvatar().catch(l => {
-            //     AppEvents.Peers.fire("updatePhoto", {
-            //         peer: peer
-            //     })
-            // })
-
-            if (this.peerInitListeners[peer.type] && this.peerInitListeners[peer.type][peer.id]) {
-                this.peerInitListeners[peer.type][peer.id].forEach(listener => {
-                    listener(peer)
-                    arrayDelete(this.peerInitListeners[peer.type][peer.id], listener)
-                })
-            }
-
-            return true
-
-
-            // this.resolveListeners({
-            //     type: "set",
-            // })
-        }
-        throw new Error("Not a peer object!")
-    }
-
     setFromRaw(rawPeer) {
-        let peer = PeersStore.get(rawPeer._, rawPeer.id)
-
-        if (peer) {
+        if (PeersStore.has(rawPeer._, rawPeer.id)) {
+            const peer = PeersStore.get(rawPeer._, rawPeer.id)
             peer.fillRaw(rawPeer)
             return peer
         } else {
-            peer = getPeerObject(rawPeer)
+            const peer = PeerFactory.fromRaw(rawPeer)
             PeersStore.set(peer)
+            return peer
         }
-
-        return peer
     }
 
     setFromRawAndFire(rawPeer) {
-        let peer = PeersStore.get(rawPeer._, rawPeer.id)
-
-        if (peer) {
+        if (PeersStore.has(rawPeer._, rawPeer.id)) {
+            const peer = PeersStore.get(rawPeer._, rawPeer.id)
             peer.fillRawAndFire(rawPeer)
             return peer
         } else {
-            peer = getPeerObject(rawPeer)
+            const peer = PeerFactory.fromRaw(rawPeer)
             PeersStore.set(peer)
 
             AppEvents.Peers.fire("updateSingle", {
                 peer
             })
-        }
 
-        return peer
+            return peer
+        }
     }
 }
 

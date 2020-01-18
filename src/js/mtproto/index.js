@@ -5,7 +5,7 @@ import TimeManager from "./timeManager"
 import {createLogger} from "../common/logger"
 import {AppPermanentStorage} from "../common/storage"
 import {AuthAPI} from "../api/auth";
-import UpdatesManager from "../api/updatesManager"
+import UpdatesManager from "../api/updates/updatesManager"
 import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import Bytes from "./utils/bytes"

@@ -9,6 +9,7 @@ import ReactiveCallback from "./ui/framework/reactive/reactiveCallback"
 import Component from "./ui/framework/vrdom/component"
 import AppCache from "./api/cache"
 import {loadSchema} from "./mtproto/language/schema"
+import PeersStore from "./api/store/peersStore"
 
 
 const authContext = {
@@ -177,6 +178,7 @@ class Parent extends Component {
 // AppFramework.mount("#app")
 
 
+global.Peers = PeersStore
 AppCache.open()
 //
 loadSchema().then(() => MTProto.connect(authContext).then(start))

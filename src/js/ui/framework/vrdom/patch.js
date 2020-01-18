@@ -30,13 +30,14 @@ function patchAttrs($node, newAttrs) {
     for (const [k, v] of Object.entries(newAttrs)) {
         if ($node.nodeType !== Node.TEXT_NODE) {
             const nv = Array.isArray(v) ? v.join(" ") : v
+
             if ($node.getAttribute(k) !== nv) {
                 $node.setAttribute(k, nv)
             }
         }
     }
 
-    for (const k in oldAttrs) {
+    for (const k of oldAttrs) {
         if (!newAttrs.hasOwnProperty(k)) {
             if ($node.nodeType !== Node.TEXT_NODE) {
                 $node.removeAttribute(k)

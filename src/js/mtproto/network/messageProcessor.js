@@ -129,13 +129,13 @@ export class MessageProcessor {
 
         if (message.result._ === "rpc_error") {
             const error = this.networker.processError(message.result)
-            Logger.error('Rpc error', error, ". request: ", this.sentMessagesDebug[message.req_msg_id])
+            console.error("error = ", error, " request = ", this.sentMessagesDebug[message.req_msg_id])
 
             this.rpcErrorHandlers[message.req_msg_id](error)
 
             delete this.rpcErrorHandlers[message.req_msg_id]
         } else {
-            Logger.debug('Rpc response', message.result)
+            // console.debug("response", message.result)
 
             this.rpcResultHandlers[message.req_msg_id](message.result)
 

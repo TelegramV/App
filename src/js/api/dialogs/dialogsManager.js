@@ -86,13 +86,11 @@ class DialogManager extends Manager {
                 })
 
                 if (!dialog.messages.last) {
-                    if (update.messages.indexOf(dialog.messages.last.id) > -1) {
-                        this.fetchPlainPeerDialogs({
-                            _: dialog.peer.type,
-                            id: dialog.peer.id,
-                            access_hash: dialog.peer.accessHash
-                        })
-                    }
+                    this.fetchPlainPeerDialogs({
+                        _: dialog.peer.type,
+                        id: dialog.peer.id,
+                        access_hash: dialog.peer.accessHash
+                    })
                 } else {
                     dialog.messages.fireTransaction()
                 }
@@ -109,15 +107,12 @@ class DialogManager extends Manager {
                     })
 
                     if (!dialog.messages.last) {
-                        if (update.messages.indexOf(dialog.messages.last.id) > -1) {
-                            this.fetchPlainPeerDialogs({
-                                _: dialog.peer.type,
-                                id: dialog.peer.id
-                            })
-                        }
-                    } else {
-                        dialog.messages.fireTransaction()
+                        this.fetchPlainPeerDialogs({
+                            _: dialog.peer.type,
+                            id: dialog.peer.id
+                        })
                     }
+                    dialog.messages.fireTransaction()
                 }
             }))
         })
@@ -430,6 +425,7 @@ class DialogManager extends Manager {
             limit: limit,
             hash: hash
         }).then(_dialogsSlice => {
+
             if (parseInt(_dialogsSlice.count) === 0) {
                 return
             }
@@ -459,71 +455,41 @@ class DialogManager extends Manager {
                 dialogs: dialogs.filter(l => !l.isPinned),
                 pinnedDialogs: dialogs.filter(l => l.isPinned)
             })
-
-            // dialogs.forEach(async dialog => {
-            //     await dialog.peer.getAvatar()
-            // })
         })
 
     }
 
-    set(dialog, fireUpdateSingle = true) {
-        if (dialog instanceof Dialog) {
-            DialogsStore.set(dialog)
-
-            // if (this.initListeners.get(dialog.type).has(dialog.id)) {
-            //     this.initListeners.get(dialog.type).get(dialog.id).forEach(listener => {
-            //         try {
-            //             listener(dialog)
-            //             arrayDelete(this.initListeners.get(dialog.type).get(dialog.id), listener)
-            //         } catch (e) {
-            //             arrayDelete(this.initListeners.get(dialog.type).get(dialog.id), listener)
-            //         }
-            //     })
-            // }
-
-            if (fireUpdateSingle) {
-                AppEvents.Dialogs.fire("updateSingle", {
-                    dialog
-                })
-            }
-        } else {
-            console.error("invalid dialog passed")
-        }
-    }
-
     setFromRaw(rawDialog, peer, topMessage) {
         const plainPeer = PeerAPI.getPlain(rawDialog.peer, false)
-        let dialog = DialogsStore.get(plainPeer._, plainPeer.id)
 
-        if (dialog) {
+        if (DialogsStore.has(plainPeer._, plainPeer.id)) {
+            const dialog = DialogsStore.get(plainPeer._, plainPeer.id)
             dialog.fillRaw(rawDialog)
             return dialog
         } else {
-            dialog = new Dialog(rawDialog, {peer, topMessage})
+            const dialog = new Dialog(rawDialog, {peer, topMessage})
             DialogsStore.set(dialog)
+            return dialog
         }
-
-        return dialog
     }
 
     setFromRawAndFire(rawDialog, peer, topMessage) {
         const plainPeer = PeerAPI.getPlain(rawDialog.peer, false)
-        let dialog = DialogsStore.get(plainPeer._, plainPeer.id)
 
-        if (dialog) {
+        if (DialogsStore.has(plainPeer._, plainPeer.id)) {
+            const dialog = DialogsStore.get(plainPeer._, plainPeer.id)
             dialog.fillRawAndFire(rawDialog)
             return dialog
         } else {
-            dialog = new Dialog(rawDialog, {peer, topMessage})
+            const dialog = new Dialog(rawDialog, {peer, topMessage})
             DialogsStore.set(dialog)
 
             AppEvents.Dialogs.fire("updateSingle", {
                 dialog: dialog
             })
-        }
 
-        return dialog
+            return dialog
+        }
     }
 }
 

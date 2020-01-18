@@ -24,7 +24,7 @@ export function vrdom_mount_resolveComponentMounted($mounted) {
                 component.mounted()
             }
         } else {
-            console.error("component was not found. it means that there is a bug in the vrdom")
+            console.error("component was not found. it means that there is a potential bug in the vrdom")
         }
     }
 }

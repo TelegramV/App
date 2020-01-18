@@ -8,11 +8,13 @@ import {vrdom_mount_resolveComponentMounted} from "./mount"
  * @return {Element}
  */
 function vrdom_prepend(vNode, $element, {xmlns = null} = {}) {
-    $element.prepend(vrdom_render(vNode, xmlns))
+    const $node = vrdom_render(vNode, xmlns)
 
-    vrdom_mount_resolveComponentMounted($element)
+    $element.prepend($node)
 
-    return $element
+    vrdom_mount_resolveComponentMounted($node)
+
+    return $node
 }
 
 export default vrdom_prepend

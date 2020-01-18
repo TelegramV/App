@@ -41,7 +41,12 @@ class PeersMapStore extends MappedStore {
      */
     getFromDialogRawPeer(dialogRawPeer) {
         const plain = PeerAPI.getPlain(dialogRawPeer, false)
-        return this.data.get(plain._).get(plain.id) || false
+
+        if (this.data.has(plain._)) {
+            return this.data.get(plain._).get(plain.id)
+        } else {
+            return false
+        }
     }
 
     /**
