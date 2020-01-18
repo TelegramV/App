@@ -1,11 +1,12 @@
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import AppEvents from "../../../../../api/eventBus/appEvents"
-import ImageMessageComponent from "./message/imageMessageComponent"
 import {FileAPI} from "../../../../../api/fileAPI"
-import TextMessageComponent from "./message/textMessageComponent"
 import {isElementInViewport} from "../../../../framework/utils"
+
+import Message from "./../../messages/newMessage"
 import Component from "../../../../framework/vrdom/component"
 import VRDOM from "../../../../framework/vrdom"
+
 
 class BubblesComponent extends Component {
     constructor() {
@@ -20,14 +21,15 @@ class BubblesComponent extends Component {
                  */
                 renderedMessageElements: [],
                 isFetchingNextPage: false,
-            }
-        });
+            },
+        })
 
         this.elements = {
             $bubblesInner: undefined,
             $loader: undefined,
         }
     }
+
 
     h() {
         return (
@@ -89,13 +91,25 @@ class BubblesComponent extends Component {
     _renderMessage(message, prepend = false) {
         const $mount = prepend ? VRDOM.prepend : VRDOM.append
         let $message = undefined
-
+        $message = $mount(<Message message={message}/>, this.elements.$bubblesInner); //TODO Давид поправ як має бути
         if (message.media) {
+            if (message.media.photo) {
+                FileAPI.photoThumnail(message.media.photo, data => {
+                    message.media.photo.real = {
+                        src: data.src,
+                        sizes: data.size,
+                        thumbnail: data.thumbnail
+                    }
+                    VRDOM.patch($message, <Message message={message}/>);
+                })
+            }
+        }
+        /*if (message.media) {
             if (message.media.photo) {
                 $message = $mount(<ImageMessageComponent message={message} image={false}/>, this.elements.$bubblesInner)
 
                 FileAPI.photoThumnail(message.media.photo, data => {
-                    VRDOM.patch($message, <ImageMessageComponent message={message} image={{
+                    VDOM.patchReal($message, <ImageMessageComponent message={message} image={{
                         imgSrc: data.src,
                         imgSize: data.size,
                         thumbnail: data.thumbnail
@@ -107,7 +121,7 @@ class BubblesComponent extends Component {
             }
         } else {
             $message = $mount(<TextMessageComponent message={message}/>, this.elements.$bubblesInner)
-        }
+        }*/
 
         return $message
     }

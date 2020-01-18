@@ -43,7 +43,7 @@ export function DialogComponent({dialog}) {
     }
 
     return (
-        <div data-peer-username={dialog.peer} data-peer={`${dialog.type}.${dialog.id}`}
+        <div data-peer-username={dialog.peer.username} data-peer={`${dialog.type}.${dialog.id}`}
              data-message-id={dialog.messages.last.id}
              data-date={dialog.messages.last.date}
              data-pinned={dialog.isPinned === undefined ? false : dialog.isPinned}
@@ -64,8 +64,8 @@ export function DialogComponent({dialog}) {
                     <DialogTextComponent dialog={dialog}/>
 
                     <div css-display={dialog.messages.unreadMentionsCount === 0 ? "none" : ""}
-                         className="badge tgico">@{dialog.messages.unreadMentionsCount}</div>
-                    <div css-display={dialog.messages.unreadCount === 0 ? "none" : ""}
+                         className="badge tgico">@</div>
+                    <div css-display={dialog.messages.unreadCount === 0 || dialog.messages.unreadMentionsCount > 0 ? "none" : ""}
                          className="badge tgico">{dialog.messages.unreadCount}</div>
                     <div css-display={!dialog.unreadMark ? "none" : ""} className="badge tgico">?</div>
                 </div>

@@ -8,6 +8,8 @@ import vrdom_prepend from "./prependChild"
 
 /**
  * Virtual DOM that operates on Real DOM and does not save previous rendered node.
+ *
+ * @author kohutd
  */
 const VRDOM = {
     createElement: vrdom_createElement,

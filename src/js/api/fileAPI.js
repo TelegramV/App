@@ -3,9 +3,6 @@ import Bytes from "../mtproto/utils/bytes"
 import Random from "../mtproto/utils/random"
 import AppCache from "./cache"
 
-const cache = {}
-const cachePeerPhotos = {}
-
 export class FileAPI {
     static getInputName(file) {
         switch (file._) {
