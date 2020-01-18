@@ -1,5 +1,4 @@
 import {FrameworkRouter} from "./router"
-import {createComponent} from "./component"
 import VRDOM from "./vrdom"
 
 global.VRDOM = VRDOM
@@ -25,7 +24,6 @@ export const AppFramework = {
     Router,
     mountedComponents,
     mount,
-    createComponent
 }
 
 global.F = AppFramework

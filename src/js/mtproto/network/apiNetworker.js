@@ -77,7 +77,7 @@ export class ApiNetworker extends Networker {
         this.getDecryptedMessage(msgKey, encryptedData).then(async dataWithPadding => {
             dataWithPadding = new Uint8Array(dataWithPadding)
 
-            const calcMsgKey = await this.getMsgKey(dataWithPadding, false)
+            const calcMsgKey = this.getMsgKey(dataWithPadding, false)
             if (!Bytes.compare(msgKey, calcMsgKey)) {
                 throw new Error("bad server msgKey")
             }
@@ -164,9 +164,9 @@ export class ApiNetworker extends Networker {
         const x = isOut ? 0 : 8
         const msgKeyLargePlain = Bytes.concatBuffer(authKey.subarray(88 + x, 88 + x + 32), dataWithPadding)
 
-        return AppCryptoManager.sha256Hash(msgKeyLargePlain).then(msgKeyLarge => {
-            return new Uint8Array(msgKeyLarge).subarray(8, 24)
-        })
+        const msgKeyLarge = sha256HashSync(msgKeyLargePlain)
+
+        return new Uint8Array(msgKeyLarge).subarray(8, 24)
     }
 
     onDisconnect() {
@@ -205,15 +205,14 @@ export class ApiNetworker extends Networker {
     }
 
     getEncryptedMessage(dataWithPadding) {
-        return this.getMsgKey(dataWithPadding, true).then(msgKey => {
-            const keyIv = this.getAesKeyIv(msgKey, true)
+        const msgKey = this.getMsgKey(dataWithPadding, true)
+        const keyIv = this.getAesKeyIv(msgKey, true)
 
-            return AppCryptoManager.aesEncrypt(dataWithPadding, keyIv[0], keyIv[1]).then(encryptedBytes => {
-                return {
-                    bytes: encryptedBytes,
-                    msgKey: msgKey
-                }
-            })
+        return AppCryptoManager.aesEncrypt(dataWithPadding, keyIv[0], keyIv[1]).then(encryptedBytes => {
+            return {
+                bytes: encryptedBytes,
+                msgKey: msgKey
+            }
         })
     }
 

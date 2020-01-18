@@ -77,9 +77,9 @@ class UpdateManager extends Manager {
 
     processUpdate(type, update) {
         if (this._channelUpdateTypes.includes(update._)) {
-            this.pushToChannelStack(update)
+            this.pushToChannelQueue(update)
         } else {
-            this.pushToUserStack(update)
+            this.pushToUserQueue(update)
         }
     }
 
@@ -116,7 +116,7 @@ class UpdateManager extends Manager {
             if (onTooLong && _difference._ === "updates.differenceTooLong") {
                 onTooLong(_difference)
             } else {
-                this.pushToUserStack(_difference)
+                this.pushToUserQueue(_difference)
             }
 
             return _difference
@@ -139,14 +139,14 @@ class UpdateManager extends Manager {
             if (onTooLong && _difference._ === "updates.channelDifferenceTooLong") {
                 onTooLong(_difference)
             } else {
-                this.pushToChannelStack(_difference)
+                this.pushToChannelQueue(_difference)
             }
 
             return _difference
         })
     }
 
-    pushToChannelStack(_update) {
+    pushToChannelQueue(_update) {
         this._channelQueue.push(_update)
 
         if (!this._channelStackResolving) {
@@ -154,7 +154,7 @@ class UpdateManager extends Manager {
         }
     }
 
-    pushToUserStack(_update) {
+    pushToUserQueue(_update) {
         this._userQueue.push(_update)
 
         if (!this._userStackResolving) {
