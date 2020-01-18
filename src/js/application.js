@@ -146,7 +146,12 @@ class Parent extends Component {
 
                 <br/>
                 <br/>
+
+                <div>TEXT<i></i></div>
+
                 <hr/>
+
+
                 {this.refs.get("Parent")}
             </div>
         )
@@ -179,6 +184,8 @@ class Parent extends Component {
 
 
 global.Peers = PeersStore
+
 AppCache.open()
-//
+
+
 loadSchema().then(() => MTProto.connect(authContext).then(start))

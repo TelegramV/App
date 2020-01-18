@@ -111,17 +111,16 @@ export class DefaultUpdatesProcessor {
                     self.queueIsProcessing = false
                 },
                 onFail(type) {
+                    self.queueIsProcessing = false
                     self.isWaitingForDifference = true
 
                     self.getDifference().then(rawDifference => {
-                        self.queueIsProcessing = false
                         self.isWaitingForDifference = false
                         self.updatesManager.State.pts = rawDifference.pts
                         self.processDifference(rawDifference)
                     }).catch(e => {
                         console.error("BUG: difference obtaining failed", e)
                         self.isWaitingForDifference = false
-                        self.queueIsProcessing = false
                     })
                 }
             })
@@ -129,6 +128,9 @@ export class DefaultUpdatesProcessor {
     }
 
     processDifference(rawDifference) {
+        console.log("got difference", rawDifference)
+        this.isWaitingForDifference = false
+
         if (rawDifference._ === "updates.difference") {
 
             rawDifference.users.forEach(user => PeersManager.setFromRawAndFire(user))
@@ -158,16 +160,14 @@ export class DefaultUpdatesProcessor {
         } else if (rawDifference._ === "updates.differenceTooLong") {
 
             console.error("difference too long", rawDifference)
+            this.isWaitingForDifference = true
 
             this.getDifference({pts: rawDifference.pts}).then(rawDifference => {
-                self.queueIsProcessing = false
-                self.isWaitingForDifference = false
                 self.updatesManager.State.pts = rawDifference.pts
                 self.processDifference(rawDifference)
             }).catch(e => {
                 console.error("BUG: difference obtaining failed", e)
                 this.isWaitingForDifference = false
-                this.queueIsProcessing = false
                 this.processQueue()
             })
 

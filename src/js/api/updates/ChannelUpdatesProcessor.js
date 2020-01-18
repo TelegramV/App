@@ -149,36 +149,33 @@ export class ChannelUpdatesProcessor {
                     self.queueIsProcessing = false
                 },
                 onFail(type) {
+                    self.queueIsProcessing = false
                     self.isWaitingForDifference = true
 
-                    console.log("waiting for a difference")
+                    console.log("fetching difference")
 
                     let inputPeer = peer.input
 
                     if (!peer.dialog) {
                         console.error("BUG: dialog wan not found, processing next update")
                         self.isWaitingForDifference = false
-                        self.queueIsProcessing = false
                         return
                     }
 
                     if (peer.isMin) {
                         console.error("BUG: peer is min, processing next update")
                         self.isWaitingForDifference = false
-                        self.queueIsProcessing = false
                         peer.dialog.pts = rawUpdate.pts
                         return
                     }
 
                     self.getChannelDifference(inputPeer, peer.dialog.pts, peer).then(rawDifference => {
-                        self.queueIsProcessing = false
                         self.isWaitingForDifference = false
                         peer.dialog.pts = rawDifference.pts
                         self.processDifference(rawDifference)
                     }).catch(e => {
                         console.error("BUG: channel difference obtaining failed", e)
                         self.isWaitingForDifference = false
-                        self.queueIsProcessing = false
                     })
                 }
             })
@@ -187,6 +184,7 @@ export class ChannelUpdatesProcessor {
 
     processDifference(rawDifference) {
         console.log("got channel difference", rawDifference)
+        this.isWaitingForDifference = false
 
         if (rawDifference._ === "updates.channelDifference") {
 
@@ -207,29 +205,23 @@ export class ChannelUpdatesProcessor {
             if (rawDifference.pFlags.final === true) {
                 console.warn("difference is final", rawDifference)
 
-                this.isWaitingForDifference = false
-                this.queueIsProcessing = false
             } else {
                 console.warn("difference is not final", rawDifference)
+                this.isWaitingForDifference = true
 
                 this.getChannelDifference(rawDifference.__channel, rawDifference.pts, rawDifference.peer).then(rawDifference => {
-                    self.queueIsProcessing = false
-                    self.isWaitingForDifference = false
                     rawDifference.peer.dialog.pts = rawDifference.pts
                     self.processDifference(rawDifference)
                 }).catch(e => {
                     console.error("BUG: difference obtaining failed", e)
-                    self.isWaitingForDifference = false
-                    self.queueIsProcessing = false
                 })
             }
         } else if (rawDifference._ === "updates.channelDifferenceTooLong") {
             console.error("difference too long", rawDifference)
+
+
         } else if (rawDifference._ === "updates.channelDifferenceEmpty") {
             console.warn("difference empty")
-
-            this.isWaitingForDifference = false
-            this.queueIsProcessing = false
 
             // dialog.pts = _difference.pts
         } else {
