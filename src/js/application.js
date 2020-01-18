@@ -14,14 +14,14 @@ import {loadSchema} from "./mtproto/language/schema"
 const authContext = {
     dcID: 2,
     nonce: createNonce(16),
-    sessionID: createNonce(8) // TODO check if secure?
+    sessionID: createNonce(8)
 }
 
 function start() {
     MTProto.invokeMethod("help.getNearestDc", {}).then(response => {
         if (response.this_dc !== response.nearest_dc) {
             MTProto.changeDefaultDC(response.nearest_dc)
-            // TODO country response.contry
+            // TODO country response.country
         }
     })
 
