@@ -32,20 +32,22 @@ function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
             console.debug("[default] update already processed")
             onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         } else {
-            console.warn("[default] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
+            // console.warn("[default] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
             onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
         }
-    } else if (hasUpdatePts(rawUpdate)) {
-        if (state.pts === rawUpdate.pts) {
-            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
-        } else if (state.pts > rawUpdate.pts) {
-            console.debug("[default] [no pts_count] update already processed")
-            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
-        } else {
-            console.warn("[default] [no pts_count] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
-            onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
-        }
-    } else {
+    }
+    // else if (hasUpdatePts(rawUpdate)) {
+        // if (state.pts === rawUpdate.pts) {
+        //     onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
+        // } else if (state.pts > rawUpdate.pts) {
+        //     console.debug("[default] [no pts_count] update already processed")
+        //     onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
+        // } else {
+        //     // console.warn("[default] [no pts_count] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
+        //     onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
+        // }
+    // }
+    else {
         console.debug("[default] update has no pts")
         onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
     }
@@ -90,7 +92,7 @@ export class DefaultUpdatesProcessor {
             }
         } else {
             this.queue.push(rawUpdate)
-            console.warn("[default] waiting for diff")
+            // console.warn("[default] waiting for diff")
         }
     }
 
@@ -170,7 +172,7 @@ export class DefaultUpdatesProcessor {
             this.processQueue()
 
         } else if (rawDifference._ === "updates.differenceTooLong") {
-            console.warn("[default] difference too long", rawDifference)
+            // console.warn("[default] difference too long", rawDifference)
 
             this.isWaitingForDifference = true
 
@@ -188,7 +190,7 @@ export class DefaultUpdatesProcessor {
             })
 
         } else if (rawDifference._ === "updates.differenceEmpty") {
-            console.warn("[default] difference empty")
+            // console.warn("[default] difference empty")
 
             this.updatesManager.State.date = rawDifference.date
             this.updatesManager.State.qts = rawDifference.qts

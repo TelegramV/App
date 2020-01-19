@@ -1,0 +1,17 @@
+@keyframes slide-up-message {
+  0% {
+    transform: translateY(1px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up-dialog {
+  0% {
+    transform: translateY(1px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

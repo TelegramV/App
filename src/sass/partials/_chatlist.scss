@@ -1,14 +1,7 @@
+@import "animation";
+
 .d-none {
   display: none;
-}
-
-@keyframes slide-up {
-  0% {
-    transform: translateY(1px);
-  }
-  100% {
-    transform: translateY(0);
-  }
 }
 
 .chatlist {
@@ -120,7 +113,7 @@
 }
 
 .person {
-  animation: slide-up 0.4s ease;
+  animation: slide-up-dialog 0.4s ease;
 
   border-radius: 10px;
   background-color: #fff;

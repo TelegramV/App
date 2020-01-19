@@ -133,25 +133,6 @@ class DialogManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateNewChannelMessage", async update => {
             const dialog = await this.findOrFetch("channel", update.message.to_id.channel_id)
-            // if(!dialog || !PeersManager.find("user", update.message.from_id)) {
-            //     MTProto.invokeMethod("updates.getDifference", {
-            //         flags: 0,
-            //         pts: 683207,
-            //         qts: "",
-            //         date: update.message.date
-            //     }).then(l => {
-            //         l.users.forEach(q => {
-            //             PeersManager.set(getPeerObject(q))
-            //         })
-            //         l.chats.forEach(q => {
-            //             PeersManager.set(getPeerObject(q))
-            //         })
-            //         console.log("resp diff", l)
-            //     }).catch(l => {
-            //         console.log(l)
-            //     })
-            //     return
-            // }
 
             updateDialogLastMessage(dialog, update.message)
         })

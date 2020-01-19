@@ -35,20 +35,22 @@ function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
             console.debug("[channel] update already processed")
             onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         } else {
-            console.warn("[channel] channel update cannot be processed", rawUpdate._, peer.dialog.pts, rawUpdate.pts_count, rawUpdate.pts)
+            // console.warn("[channel] channel update cannot be processed", rawUpdate._, peer.dialog.pts, rawUpdate.pts_count, rawUpdate.pts)
             onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
         }
-    } else if (hasUpdatePts(rawUpdate)) {
-        if (peer.dialog.pts === rawUpdate.pts) {
-            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
-        } else if (peer.dialog.pts > rawUpdate.pts) {
-            console.debug("[channel] [no pts_count] channel update already processed")
-            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
-        } else {
-            console.warn("[channel] [no pts_count] channel update cannot be processed", rawUpdate._, peer.dialog.pts, rawUpdate.pts)
-            onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
-        }
-    } else {
+    }
+    // else if (hasUpdatePts(rawUpdate)) {
+        // if (peer.dialog.pts === rawUpdate.pts) {
+        //     onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
+        // } else if (peer.dialog.pts > rawUpdate.pts) {
+        //     console.debug("[channel] [no pts_count] channel update already processed")
+        //     onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
+        // } else {
+        //     // console.warn("[channel] [no pts_count] channel update cannot be processed", rawUpdate._, peer.dialog.pts, rawUpdate.pts)
+        //     onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
+        // }
+    // }
+    else {
         console.debug("[channel] channel update has no pts")
         onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
     }
@@ -108,7 +110,7 @@ export class ChannelUpdatesProcessor {
             }
         } else {
             this.queue.push(rawUpdate)
-            console.warn("[channel] waiting for diff")
+            // console.warn("[channel] waiting for diff")
         }
     }
 
@@ -218,16 +220,19 @@ export class ChannelUpdatesProcessor {
 
             // if not final then fetch next diff with provided pts
             if (rawDifferenceWithPeer.pFlags.final === true) {
-                console.warn("difference is final", rawDifferenceWithPeer)
+                // console.warn("difference is final", rawDifferenceWithPeer)
 
                 this.isWaitingForDifference = false
                 rawDifferenceWithPeer.__peer.dialog.pts = rawDifferenceWithPeer.pts
                 this.processQueue()
 
             } else {
-                console.warn("[channel] difference is not final", rawDifferenceWithPeer)
+                // console.warn("[channel] difference is not final", rawDifferenceWithPeer)
 
                 this.isWaitingForDifference = true
+
+                // comment below if there are gaps
+                rawDifferenceWithPeer.__peer.dialog.pts = rawDifferenceWithPeer.pts
 
                 this.getChannelDifference(rawDifferenceWithPeer.__channel, rawDifferenceWithPeer.pts, rawDifferenceWithPeer.__peer).then(rawDifference => {
                     this.processDifference(rawDifference)
@@ -250,7 +255,7 @@ export class ChannelUpdatesProcessor {
             this.processQueue()
 
         } else if (rawDifferenceWithPeer._ === "updates.channelDifferenceEmpty") {
-            console.warn("difference empty")
+            // console.warn("difference empty")
 
             this.isWaitingForDifference = false
             rawDifferenceWithPeer.__peer.dialog.pts = rawDifferenceWithPeer.pts
@@ -268,7 +273,7 @@ export class ChannelUpdatesProcessor {
             return Promise.reject("provided peer is invalid")
         }
 
-        console.warn("[channel] fetching difference")
+        // console.warn("[channel] fetching difference")
 
         return MTProto.invokeMethod("updates.getChannelDifference", {
             flags: 0,
