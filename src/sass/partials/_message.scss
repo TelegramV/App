@@ -53,6 +53,85 @@
             }
         }
 
+        .box {
+            font-size: 14px;
+            margin: 5px;
+            padding: 5px;
+            margin-bottom: -5px;
+            border-radius: 4px;
+            transition: anim(background-color);
+            user-select: none;
+
+            &:hover {
+                cursor: pointer;
+            }
+
+            &.web {
+                display: block;
+                margin: 0;
+                padding: 5px 0;
+
+                &:link {
+                    color: black;
+                }
+
+                &:visited {
+                    color: black;
+                }
+
+                &:hover {
+                    color: black;
+                    text-decoration: none;
+                }
+
+                &:active {
+                    color: black;
+                }
+
+                .quote {
+                    // box-sizing: border-box;
+                }
+
+                .preview {
+                    max-height: 300px;
+                    width: auto;
+                    max-width: 100%;
+                    border-radius: 4px;
+                    background-size: cover;
+                    background-position: center;
+                    margin-bottom: 6px;
+                }
+
+                .title {
+                    line-height: 1.4;
+                    font-weight: 500;
+
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
+
+                .text {
+                    line-height: 1.2;
+                    overflow: hidden;
+                    position: relative;
+                    max-height: 6.9em;
+                    text-align: justify;
+                    margin-right: -1em;
+                    padding-right: 1em;
+                }
+            }
+
+            .quote {
+                padding-left: 8px;
+            }
+
+            .name {
+                font-weight: 500;
+                padding-bottom: 4px;
+            }
+        }
+
         .audio {
             display: flex;
             width: 100%;
@@ -140,86 +219,6 @@
             }
         }
 
-        .box {
-            font-size: 14px;
-            margin: 5px;
-            padding: 5px;
-            margin-bottom: -5px;
-            border-radius: 4px;
-            transition: anim(background-color);
-            user-select: none;
-
-            &:hover {
-                cursor: pointer;
-            }
-
-            &.web {
-                display: block;
-                margin: 0;
-                padding: 5px 0;
-
-                &:link {
-                    color: black;
-                }
-
-                &:visited {
-                    color: black;
-                }
-
-                &:hover {
-                    color: black;
-                    text-decoration: none;
-                }
-
-                &:active {
-                    color: black;
-                }
-
-                .quote {
-                    // box-sizing: border-box;
-                }
-
-                .preview {
-                    max-height: 300px;
-                    width: auto;
-                    max-width: 100%;
-                    border-radius: 4px;
-                    background-size: cover;
-                    background-position: center;
-                    margin-bottom: 6px;
-                }
-
-                .title {
-                    line-height: 1.4;
-                    font-weight: 500;
-
-                    &:hover {
-                        text-decoration: underline;
-                    }
-                }
-
-                .text {
-                    line-height: 1.2;
-                    overflow: hidden;
-                    position: relative;
-                    max-height: 6.9em;
-                    text-align: justify;
-                    margin-right: -1em;
-                    padding-right: 1em;
-                }
-            }
-
-            .quote {
-                padding-left: 8px;
-            }
-
-            .name {
-                font-weight: 500;
-                padding-bottom: 4px;
-            }
-        }
-
-
         .username,
         .fwd {
             color: $blueonline;
@@ -239,6 +238,7 @@
                 width: 100%;
                 min-width: 100px;
                 min-height: 100px;
+                max-height: 512px; //idk
 
                 display: flex;
                 justify-content: center;
