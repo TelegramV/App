@@ -7,7 +7,7 @@ import PeersManager from "../peers/peersManager"
  * @return {boolean}
  */
 function hasUpdatePts(rawUpdate) {
-    return "pts" in rawUpdate
+    return rawUpdate.hasOwnProperty("pts")
 }
 
 /**
@@ -15,7 +15,7 @@ function hasUpdatePts(rawUpdate) {
  * @return {boolean}
  */
 function hasUpdatePtsCount(rawUpdate) {
-    return "pts_count" in rawUpdate
+    return rawUpdate.hasOwnProperty("pts_count")
 }
 
 
@@ -26,7 +26,7 @@ function hasUpdatePtsCount(rawUpdate) {
  * @param onFail
  */
 function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
-    if (hasUpdatePtsCount(rawUpdate)) {
+    if (hasUpdatePts(rawUpdate) && hasUpdatePtsCount(rawUpdate)) {
         if ((peer.dialog.pts + rawUpdate.pts_count) === rawUpdate.pts) {
             onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         } else if ((peer.dialog.pts + rawUpdate.pts_count) > rawUpdate.pts) {

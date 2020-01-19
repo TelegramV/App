@@ -1,4 +1,5 @@
 import CryptoWorker from "../workers/crypto.worker"
+import PQWorker from "../workers/pq.worker"
 import {aesDecryptSync, aesEncryptSync} from "./aes"
 import {createLogger} from "../../common/logger"
 import {sha1HashSync, sha256HashSync} from "./sha"
@@ -12,8 +13,10 @@ const Logger = createLogger("CryptoManager", {
 let _canWork = window.Worker || false
 let _lastTaskId = 0
 let _waitingTasks = {}
+let _waitingPqTasks = {}
 
 const _cryptoWorker = _canWork ? new CryptoWorker() : undefined
+const _pqWorker = _canWork ? new PQWorker() : undefined
 
 /**
  * @param {number} taskId
@@ -22,11 +25,26 @@ const _cryptoWorker = _canWork ? new CryptoWorker() : undefined
 function resolveTask(taskId, taskResult) {
     const resolve = _waitingTasks[taskId]
 
-    Logger.debug(`resolving task = `, taskId)
+    // Logger.debug(`resolving task = `, taskId)
 
     if (resolve) {
         resolve(taskResult)
         delete _waitingTasks[taskId]
+    }
+}
+
+/**
+ * @param {number} taskId
+ * @param {*} taskResult
+ */
+function resolvePqTask(taskId, taskResult) {
+    const resolve = _waitingPqTasks[taskId]
+
+    // Logger.debug(`resolving task = `, taskId)
+
+    if (resolve) {
+        resolve(taskResult)
+        delete _waitingPqTasks[taskId]
     }
 }
 
@@ -40,9 +58,28 @@ function performTask(task, data, promise) {
 
     _waitingTasks[_lastTaskId] = promise
 
-    Logger.debug(`performing task [${task}] = `, _lastTaskId)
+    // Logger.debug(`performing task [${task}] = `, _lastTaskId)
 
     _cryptoWorker.postMessage({
+        task: task,
+        taskId: _lastTaskId,
+        taskData: data
+    })
+}
+
+/**
+ * @param {string} task
+ * @param {*} data
+ * @param {function} promise
+ */
+function performPqTask(task, data, promise) {
+    _lastTaskId++
+
+    _waitingPqTasks[_lastTaskId] = promise
+
+    // Logger.debug(`performing task [${task}] = `, _lastTaskId)
+
+    _pqWorker.postMessage({
         task: task,
         taskId: _lastTaskId,
         taskData: data
@@ -117,7 +154,7 @@ function srpCheckPassword(g, p, salt1, salt2, srp_id, srp_B, password) {
 function decomposePQ(pq) {
     if (_canWork) {
         return new Promise(resolve => {
-            performTask("decomposePQ", {
+            performPqTask("decomposePQ", {
                 pq
             }, resolve)
         })
@@ -164,6 +201,12 @@ if (_canWork) {
     _cryptoWorker.addEventListener("message", event => {
         if (event.data.taskId) {
             resolveTask(event.data.taskId, event.data.taskResult)
+        }
+    })
+
+    _pqWorker.addEventListener("message", event => {
+        if (event.data.taskId) {
+            resolvePqTask(event.data.taskId, event.data.taskResult)
         }
     })
 }

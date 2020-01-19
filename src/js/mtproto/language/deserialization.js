@@ -30,7 +30,7 @@ export class TLDeserialization {
 
         const i = this.intView[this.offset / 4]
 
-        Logger.debug(_ => _("<<<", i.toString(16), i, field))
+        // Logger.debug(_ => _("<<<", i.toString(16), i, field))
 
         this.offset += 4
 
@@ -46,8 +46,8 @@ export class TLDeserialization {
         const intView = new Int32Array(buffer)
         const doubleView = new Float64Array(buffer)
 
-        intView[0] = this.readInt(field + ":double[low]"),
-            intView[1] = this.readInt(field + ":double[high]")
+        intView[0] = this.readInt(field + ":double[low]")
+        intView[1] = this.readInt(field + ":double[high]")
 
         return doubleView[0]
     }
@@ -56,9 +56,7 @@ export class TLDeserialization {
         const iLow = this.readInt(field + ":long[low]")
         const iHigh = this.readInt(field + ":long[high]")
 
-        const longDec = bigint(iHigh).shiftLeft(32).add(bigint(iLow)).toString()
-
-        return longDec
+        return bigint(iHigh).shiftLeft(32).add(bigint(iLow)).toString()
     }
 
     fetchBool(field) {
@@ -99,7 +97,7 @@ export class TLDeserialization {
             s = sUTF8
         }
 
-        //Logger.debug("<<<", s, field + ":string")
+        //// Logger.debug("<<<", s, field + ":string")
 
         return s
     }
@@ -121,7 +119,7 @@ export class TLDeserialization {
             this.offset++
         }
 
-        Logger.debug(_ => _("<<<", Bytes.asHex(bytes), field + ":bytes"))
+        // Logger.debug(_ => _("<<<", Bytes.asHex(bytes), field + ":bytes"))
 
         return bytes
     }
@@ -143,7 +141,7 @@ export class TLDeserialization {
             bytes.push(this.byteView[this.offset++])
         }
 
-        Logger.debug(_ => _("<<<", Bytes.asHex(bytes), field + ":int" + bits))
+        // Logger.debug(_ => _("<<<", Bytes.asHex(bytes), field + ":int" + bits))
 
         return bytes
     }
@@ -168,7 +166,7 @@ export class TLDeserialization {
             bytes.push(this.byteView[this.offset++])
         }
 
-        Logger.debug(_ => _("<<<", Bytes.asHex(bytes), field))
+        // Logger.debug(_ => _("<<<", Bytes.asHex(bytes), field))
 
         return bytes
     }

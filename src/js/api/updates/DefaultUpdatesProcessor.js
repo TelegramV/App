@@ -6,7 +6,7 @@ import PeersManager from "../peers/peersManager"
  * @return {boolean}
  */
 function hasUpdatePts(rawUpdate) {
-    return "pts" in rawUpdate
+    return rawUpdate.hasOwnProperty("pts")
 }
 
 /**
@@ -14,7 +14,7 @@ function hasUpdatePts(rawUpdate) {
  * @return {boolean}
  */
 function hasUpdatePtsCount(rawUpdate) {
-    return "pts_count" in rawUpdate
+    return rawUpdate.hasOwnProperty("pts_count")
 }
 
 
@@ -25,7 +25,7 @@ function hasUpdatePtsCount(rawUpdate) {
  * @param onFail
  */
 function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
-    if (hasUpdatePtsCount(rawUpdate)) {
+    if (hasUpdatePts(rawUpdate) && hasUpdatePtsCount(rawUpdate)) {
         if ((state.pts + rawUpdate.pts_count) === rawUpdate.pts) {
             onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         } else if ((state.pts + rawUpdate.pts_count) > rawUpdate.pts) {
@@ -163,8 +163,8 @@ export class DefaultUpdatesProcessor {
             this.isWaitingForDifference = true
 
             this.getDifference({pts: rawDifference.pts}).then(rawDifference => {
-                self.updatesManager.State.pts = rawDifference.pts
-                self.processDifference(rawDifference)
+                this.updatesManager.State.pts = rawDifference.pts
+                this.processDifference(rawDifference)
             }).catch(e => {
                 console.error("BUG: difference obtaining failed", e)
                 this.isWaitingForDifference = false
@@ -205,10 +205,10 @@ export class DefaultUpdatesProcessor {
             this.updatesManager.State = rawDifference.intermediate_state
 
             this.getDifference(this.updatesManager.State).then(rawDifference => {
-                self.queueIsProcessing = false
-                self.isWaitingForDifference = false
-                self.updatesManager.State.pts = rawDifference.pts
-                self.processDifference(rawDifference)
+                this.queueIsProcessing = false
+                this.isWaitingForDifference = false
+                this.updatesManager.State.pts = rawDifference.pts
+                this.processDifference(rawDifference)
             }).catch(e => {
                 console.error("BUG: difference obtaining failed", e)
                 this.isWaitingForDifference = false
@@ -221,7 +221,7 @@ export class DefaultUpdatesProcessor {
     }
 
     getDifference(State = {}, onTooLong = undefined) {
-        MTProto.invokeMethod("updates.getDifference", {
+        return MTProto.invokeMethod("updates.getDifference", {
             pts: State.pts || this.updatesManager.State.pts,
             date: State.date || this.updatesManager.State.date,
             qts: State.qts || this.updatesManager.State.qts,

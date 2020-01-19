@@ -88,7 +88,7 @@ export class TLSerialization {
      * @param field
      */
     writeInt(value, field = "") {
-        Logger.debug(_ => _(">>>", value.toString(16), value, field))
+        // Logger.debug(_ => _(">>>", value.toString(16), value, field))
 
         this.checkLength(4)
         this.intView[this.offset / 4] = value
@@ -177,7 +177,7 @@ export class TLSerialization {
      * @param field
      */
     storeString(s, field = "") {
-        Logger.debug(">>>", s, field + ":string")
+        // Logger.debug(">>>", s, field + ":string")
 
         if (s === undefined) {
             s = ""
@@ -217,7 +217,7 @@ export class TLSerialization {
             bytes = []
         }
 
-        Logger.debug(_ => _(">>>", Bytes.asHex(bytes), field + ":bytes"))
+        // Logger.debug(_ => _(">>>", Bytes.asHex(bytes), field + ":bytes"))
 
         const len = bytes.byteLength || bytes.length
         this.checkLength(len + 8)
@@ -255,7 +255,7 @@ export class TLSerialization {
             throw new Error("Invalid bits: " + bits + ", " + len)
         }
 
-        Logger.debug(_ => _(">>>", Bytes.asHex(bytes), field + ":int" + bits))
+        // Logger.debug(_ => _(">>>", Bytes.asHex(bytes), field + ":int" + bits))
 
         this.checkLength(len)
 
@@ -273,7 +273,7 @@ export class TLSerialization {
         }
         const len = bytes.length
 
-        Logger.debug(_ => _(">>>", Bytes.asHex(bytes), field))
+        // Logger.debug(_ => _(">>>", Bytes.asHex(bytes), field))
 
         this.checkLength(len)
 
@@ -357,7 +357,7 @@ export class TLSerialization {
         }
 
         if (obj instanceof Array) {
-            Logger.debug(type)
+            // Logger.debug(type)
 
             if (type.substr(0, 6) === "Vector") {
                 this.writeInt(0x1cb5c415, field + "[id]")

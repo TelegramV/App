@@ -6,33 +6,27 @@
 export const DialogAvatarComponent = ({dialog}) => {
     let hasAvatar = !dialog.peer.photo.isEmpty && !dialog.peer.photo._isFetchingSmall
 
-    const classes = {
-        "avatar": true,
-    }
+    if (hasAvatar) {
+        return (
+            <div className={`avatar`}>
+                <span/>
 
-    classes[`placeholder-${dialog.peer.photo.letter.num}`] = !hasAvatar
+                <div className="avatar-outer" css-opacity="1">
+                    <img className="avatar-inner" src={dialog.peer.photo.smallUrl} alt={dialog.peer.photo.letter.text}/>
+                </div>
 
-    const letter = hasAvatar ? "" : dialog.peer.photo.letter.text
-
-    const cssBackgroundImage = hasAvatar ? `url(${dialog.peer.photo.smallUrl})` : "none"
-    const cssOpacity = hasAvatar ? 1 : 0
-
-    return (
-        <div className={classes}>
-            <span>{letter}</span>
-
-            <div className="avatar-outer" css-opacity={cssOpacity}>
-            {
-                hasAvatar ?
-                    <img className="avatar-inner" src={dialog.peer.photo.smallUrl}/>
-                    :
-                    ""
-            }
             </div>
+        )
+    } else {
+        return (
+            <div className={`avatar placeholder-${dialog.peer.photo.letter.num}`}>
+                <span>{dialog.peer.photo.letter.text}</span>
 
-            {/*<div className="avatar-inner"*/}
-            {/*     css-background-image={cssBackgroundImage}*/}
-            {/*     css-opacity={cssOpacity}/>*/}
-        </div>
-    )
+                <div className="avatar-outer" css-opacity="0">
+
+                </div>
+
+            </div>
+        )
+    }
 }

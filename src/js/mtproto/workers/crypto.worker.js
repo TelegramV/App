@@ -2,7 +2,6 @@ import {sha1HashSync, sha256HashSync} from "../crypto/sha"
 import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
 import mt_srp_check_password from "../crypto/mt_srp/mt_srp";
 import Bytes from "../utils/bytes"
-import PQ from "../utils/pq"
 
 self.addEventListener("message", event => {
     const eventData = event.data
@@ -14,10 +13,6 @@ self.addEventListener("message", event => {
     let result = null
 
     switch (task) {
-        case "decomposePQ":
-            result = PQ.decompose(taskData.pq)
-
-            break
 
         case "modPow":
             result = Bytes.modPow(taskData.x, taskData.y, taskData.m)

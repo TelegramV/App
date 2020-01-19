@@ -35,20 +35,20 @@ export class MtpTimeManager {
     }
 
     applyServerTime(serverTime, localTime) {
-        Logger.warn("serverTime = ", serverTime)
-        Logger.warn("localTime = ", localTime)
+        // Logger.warn("serverTime = ", serverTime)
+        // Logger.warn("localTime = ", localTime)
 
         const newTimeOffset = serverTime - Math.floor((localTime || tsNow()) / 1000)
         const changed = Math.abs(this.timeOffset - newTimeOffset) > 10
 
-        Logger.warn("newTimeOffset = ", newTimeOffset)
+        // Logger.warn("newTimeOffset = ", newTimeOffset)
 
         AppTemporaryStorage.setItem("server_time_offset", newTimeOffset)
 
         this.lastMessageID = [0, 0]
         this.timeOffset = newTimeOffset
 
-        Logger.debug("Apply server timeManager", serverTime, localTime, newTimeOffset, changed)
+        // Logger.debug("Apply server timeManager", serverTime, localTime, newTimeOffset, changed)
 
         return changed
     }

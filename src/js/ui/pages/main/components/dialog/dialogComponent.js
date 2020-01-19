@@ -27,19 +27,21 @@ export function DialogComponent({dialog}) {
     const peer = dialog.peer
     const unread = dialog.messages.unreadMentionsCount > 0 ? "@" : (dialog.messages.unreadCount > 0 ? dialog.messages.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
 
-    let personClasses = ["person", "rp"]
-    if (peer instanceof UserPeer && peer.onlineStatus.online) {
-        personClasses.push("online")
+    const personClasses = {
+        "person": true,
+        "rp": true,
+        "online": peer instanceof UserPeer && peer.onlineStatus.online,
+        "active": AppSelectedDialog.check(dialog),
+        "unread": unread !== "",
+        "muted": dialog.isMuted,
     }
-    if (AppSelectedDialog.check(dialog)) {
-        personClasses.push("active")
-    }
-    if (unread !== "") personClasses.push("unread")
-    if (dialog.isMuted) personClasses.push("muted")
-    if (dialog.messages.last.isOut) {
-        personClasses.push("sent")
 
-        if (dialog.messages.last.isRead) personClasses.push("read")
+    if (dialog.messages.last.isOut) {
+        personClasses["sent"] = true
+
+        if (dialog.messages.last.isRead) {
+            personClasses["read"] = true
+        }
     }
 
     return (
@@ -64,9 +66,11 @@ export function DialogComponent({dialog}) {
                     <DialogTextComponent dialog={dialog}/>
 
                     <div css-display={dialog.messages.unreadMentionsCount === 0 ? "none" : ""}
-                         className="badge tgico">@</div>
-                    <div css-display={dialog.messages.unreadCount === 0 || dialog.messages.unreadMentionsCount > 0 ? "none" : ""}
-                         className="badge tgico">{dialog.messages.unreadCount}</div>
+                         className="badge tgico">@
+                    </div>
+                    <div
+                        css-display={dialog.messages.unreadCount === 0 || dialog.messages.unreadMentionsCount > 0 ? "none" : ""}
+                        className="badge tgico">{dialog.messages.unreadCount}</div>
                     <div css-display={!dialog.unreadMark ? "none" : ""} className="badge tgico">?</div>
                 </div>
             </div>

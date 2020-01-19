@@ -87,9 +87,6 @@ export class DialogListComponent extends Component {
             this.elements.$generalDialogs.style.display = ""
 
             Sortable.create(this.elements.$pinnedDialogs)
-            // this.state.generalSortable = new Sortable(this.elements.$generalDialogs, {
-            //     dataIdAttr: "data-date"
-            // })
         })
 
         AppEvents.Dialogs.listenAny(this._handleDialogUpdates)
@@ -137,9 +134,6 @@ export class DialogListComponent extends Component {
 
                     if ($foundRendered) {
                         this.elements.$generalDialogs.insertBefore($rendered, $foundRendered)
-                    } else {
-                        $rendered.remove()
-                        dialogElements.delete(dialog.id)
                     }
                 }
             }

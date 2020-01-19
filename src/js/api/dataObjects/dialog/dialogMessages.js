@@ -265,6 +265,21 @@ export class DialogMessages {
         }
     }
 
+    /**
+     * @param {number} maxMessageId
+     */
+    deleteUnreadBy(maxMessageId) {
+        if (this.unreadMessagesIds.size === 0) {
+            this.clearUnread()
+        } else {
+            this.unreadMessagesIds.forEach(messageId => {
+                if (messageId <= maxMessageId) {
+                    this.deleteUnread(messageId)
+                }
+            })
+        }
+    }
+
     clearUnread() {
         this.clearUnreadIds()
         this._unreadCount = 0
