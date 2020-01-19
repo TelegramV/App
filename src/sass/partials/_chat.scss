@@ -1,13 +1,4 @@
-@keyframes slide-up {
-    0% {
-        opacity: 0;
-        transform: translateY(1px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+@import "animation";
 
 #message_list {
     width: 100%;
@@ -614,7 +605,7 @@
         }
 
         .in {
-            animation: slide-up 0.4s ease;
+            animation: slide-up-message 0.4s ease;
 
             //align-items: flex-start;
 
@@ -693,7 +684,7 @@
         }
 
         .out {
-            animation: slide-up 0.4s ease;
+            animation: slide-up-message 0.4s ease;
 
             align-items: flex-end;
 
