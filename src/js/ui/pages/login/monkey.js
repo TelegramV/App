@@ -1,4 +1,3 @@
-
 export class MonkeyController {
     constructor() {
 
@@ -18,6 +17,8 @@ export class MonkeyController {
         this.peeking = false;
         this.closed = false;
 
+        this.trackSym = 0;
+
         this.frameHandler = this._frameListener.bind(this);
 
         this.completionHandler = this._completionListener.bind(this);
@@ -29,12 +30,41 @@ export class MonkeyController {
         this.monkey.addEventListener("complete", this.completionHandler);
     }
 
-    monkeyLook(i) {
-        if(i === 0) {
-            this.idle()
+    monkeyLook(symbols) {
+        console.log(this)
+        if (symbols === 0) {
+            this.monkey.setSpeed(2);
+            this.monkey.play();
+            this.smoothIdle(); //take a glorious look at empty code and back to idle
+            this.trackSym = 0;
             return
         }
-        this.track(1 + i)
+        if (symbols == this.trackSym) return;
+
+        let start = 10;
+        let nextFrame = start + symbols * 3;
+
+        if (this.trackSym == 0) {
+            if (symbols > 0) { //started typing
+                this.track().then(() => {
+                    this.monkey.setSpeed(1);
+                    this.monkey.play();
+                    this.nextPauseFrame = nextFrame;
+                })
+            }
+        } else if (this.trackSym > 0) {
+            if (symbols > this.trackSym) { //adding new
+                this.nextPauseFrame = nextFrame;
+                this.monkey.setSpeed(1);
+                this.monkey.play();
+            } else { //deleting
+                this.nextPauseFrame = nextFrame;
+                this.monkey.setSpeed(-1);
+                this.monkey.play();
+            }
+        }
+
+        this.trackSym = symbols;
     }
 
     idle(start) {
@@ -51,7 +81,7 @@ export class MonkeyController {
 
     track(start) {
         let that = this;
-        this.monkey.load(this.states.tracking).then(function() {
+        return this.monkey.load(this.states.tracking).then(function() {
             that.monkey.setLooping(true);
             that.monkey.setSpeed(1);
             if (start) {
@@ -162,9 +192,12 @@ export class MonkeyController {
     }
 
     _frameListener(event) {
-        if (this.nextPauseFrame > -1 && event.detail.seeker >= this.nextPauseFrame) {
-            this.monkey.pause();
-            this.nextPauseFrame = -1;
+        if (this.nextPauseFrame > -1) {
+            if (this.monkey.getLottie().playSpeed > 0 && event.detail.seeker >= this.nextPauseFrame ||
+                this.monkey.getLottie().playSpeed < 0 && event.detail.seeker <= this.nextPauseFrame) {
+                this.monkey.pause();
+                this.nextPauseFrame = -1;
+            }
         }
     }
 
@@ -173,6 +206,7 @@ export class MonkeyController {
             if (this.nextState != this.peek) this.peeking = false;
             if (this.nextState != this.close) this.closed = false;
             this.nextState(this.nextStartFrame);
+            this.monkey.setSpeed(1);
             this.nextState = null;
             this.nextStartFrame = null;
         }
