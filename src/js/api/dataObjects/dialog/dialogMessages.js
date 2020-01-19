@@ -274,8 +274,12 @@ export class DialogMessages {
         } else {
             this.unreadMessagesIds.forEach(messageId => {
                 if (messageId <= maxMessageId) {
-                    this.deleteUnread(messageId)
+                    this._unreadIds.delete(messageId)
                 }
+            })
+
+            AppEvents.Dialogs.fire("updateUnread", {
+                dialog: this._dialog
             })
         }
     }
