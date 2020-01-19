@@ -118,11 +118,15 @@ export class PeerPhoto {
     fillRaw(rawPhoto) {
         if (rawPhoto && rawPhoto._ !== "chatPhotoEmpty" && rawPhoto._ !== "userProfilePhotoEmpty") {
             this._type = rawPhoto._
-            this._photoSmall = rawPhoto.photo_small
+
+            if (!this._photoSmall || this._photoSmall.volume_id !== rawPhoto.photo_small.volume_id || this._photoSmall.local_id !== rawPhoto.photo_small.local_id) {
+                this._photoSmall = rawPhoto.photo_small
+                this.fetchSmall()
+            }
+
             this._photoBig = rawPhoto.photo_big
             this._dcId = rawPhoto.dc_id
 
-            this.fetchSmall()
 
         } else {
             this._type = this._peer.type === "user" ? "userProfilePhotoEmpty" : "chatPhotoEmpty"

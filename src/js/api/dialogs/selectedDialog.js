@@ -9,7 +9,7 @@ export function parseHashQuery() {
     const queryPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
 
     if (queryPeer.length < 2) {
-        throw Error("invalid peer")
+        return {type: "", id: 0}
     }
 
     return {type: queryPeer[0], id: parseInt(queryPeer[1])}
@@ -41,6 +41,32 @@ class SelectedDialog {
             this._selectSubscribers.forEach(listener => {
                 listener(this._dialog)
             })
+        })
+
+        DialogsStore.onSet(dialog => {
+            if (AppFramework.Router.activeRoute.queryParams && AppFramework.Router.activeRoute.queryParams.p) {
+                if (AppFramework.Router.activeRoute.queryParams.p.startsWith("@")) {
+                    if (dialog.peer.username === AppFramework.Router.activeRoute.queryParams.p.substring(1)) {
+                        this._previousDialog = this._dialog
+                        this._dialog = dialog
+
+                        this._selectSubscribers.forEach(listener => {
+                            listener(this._dialog)
+                        })
+                    }
+                } else {
+                    const queryParams = parseHashQuery()
+
+                    if (dialog.type === queryParams.type && dialog.id === queryParams.id) {
+                        this._previousDialog = this._dialog
+                        this._dialog = dialog
+
+                        this._selectSubscribers.forEach(listener => {
+                            listener(this._dialog)
+                        })
+                    }
+                }
+            }
         })
     }
 

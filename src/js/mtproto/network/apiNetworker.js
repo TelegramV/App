@@ -68,7 +68,7 @@ export class ApiNetworker extends Networker {
         const authKeyID = deserializer.fetchIntBytes(64, false, "auth_key_id")
 
         if (!Bytes.compare(authKeyID, this.auth.authKeyID)) {
-            throw new Error("bad server auth_key_id: " + Bytes.asHex(authKeyID) + ", dc id " + this.auth.dcID)
+            throw new Error(`bad server auth_key_id: ${Bytes.asHex(authKeyID)}, dc id ${this.auth.dcID}`)
         }
 
         const msgKey = deserializer.fetchIntBytes(128, true, "msg_key")
@@ -87,13 +87,6 @@ export class ApiNetworker extends Networker {
             const salt = deserializer.fetchIntBytes(64, false, "salt") // ??
             const sessionID = deserializer.fetchIntBytes(64, false, "session_id")
             const messageID = deserializer.fetchLong("message_id")
-
-            // TODO wtf?
-            if (!Bytes.compare(sessionID, this.auth.sessionID) &&
-                (!self.prevSessionID || !Bytes.compare(sessionID, self.prevSessionID))) {
-                // Logger.warn("Sessions", sessionID, self.sessionID, self.prevSessionID)
-                throw new Error("bad server session_id: " + Bytes.asHex(sessionID))
-            }
 
             const seqNo = deserializer.fetchInt("seq_no")
 
@@ -121,11 +114,10 @@ export class ApiNetworker extends Networker {
 
             const deserializerOptions = {
                 mtproto: true,
-                // TODO binary schema
                 schema: schema,
                 override: {
                     mt_rpc_result: function (result, field) {
-                        result.req_msg_id = this.fetchLong(field + "[req_msg_id]")
+                        result.req_msg_id = this.fetchLong(`${field}[req_msg_id]`)
 
                         const sentMessage = self.messageProcessor.sentMessages[result.req_msg_id]
                         const type = sentMessage && sentMessage.resultType || "Object"
@@ -134,7 +126,7 @@ export class ApiNetworker extends Networker {
                             return
                         }
 
-                        result.result = this.fetchObject(type, field + "[result]")
+                        result.result = this.fetchObject(type, `${field}[result]`)
                     }
                 }
             }
@@ -307,8 +299,8 @@ export class ApiNetworker extends Networker {
         }
 
 
-        //Logger.debug("Api call", method, params, messageID, seqNo, options)
-        Logger.debug("Api call", method, params)
+        //// Logger.debug("Api call", method, params, messageID, seqNo, options)
+        // Logger.debug("Api call", method, params)
 
         return new Promise((resolve, reject) => {
             this.messageProcessor.listenRpc(message.msg_id, resolve, reject)

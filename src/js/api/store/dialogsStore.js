@@ -9,6 +9,8 @@ class DialogsMapStore extends MappedStore {
                 ["user", new Map()],
             ])
         });
+
+        this.onSetSubscribers = new Set()
     }
 
     /**
@@ -40,6 +42,7 @@ class DialogsMapStore extends MappedStore {
         // if (dialog instanceof Dialog) {
         if (this.data.has(dialog.type)) {
             this.data.get(dialog.type).set(dialog.id, dialog)
+            this.onSetSubscribers.forEach(s => s(dialog))
             return this
         } else {
             console.error("invalid dialog type")
@@ -112,6 +115,15 @@ class DialogsMapStore extends MappedStore {
      */
     has(type, id) {
         return this.data.get(type).has(id)
+    }
+
+    /**
+     *
+     * @param {function(dialog: Dialog)} callback
+     */
+    onSet(callback) {
+        this.onSetSubscribers.add(callback)
+        console.log(this.onSetSubscribers)
     }
 }
 
