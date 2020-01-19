@@ -769,3 +769,16 @@
         }
     }
 }
+
+@media (max-width: 780px) {
+    #chat:not(.responsive-selected-chat) {
+        display: none;
+    }
+}
+
+@media (min-width: 780px) {
+    // прикрутиш стилі ок
+    .responsive-only-mobile {
+        display: none;
+    }
+}

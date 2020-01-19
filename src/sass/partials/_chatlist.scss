@@ -360,3 +360,17 @@
     line-height: 60px;
   }
 }
+
+
+
+
+@media (max-width: 780px) {
+  .chatlist {
+    max-width: 100%;
+    border-right: none;
+  }
+
+  .responsive-selected-chatlist {
+    display: none;
+  }
+}

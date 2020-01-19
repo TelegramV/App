@@ -3,12 +3,20 @@ import LoaderComponent from "../loading/loader"
 import ChatInfoComponent from "./chatInfo/chatInfoComponent"
 import Component from "../../../../framework/vrdom/component"
 import BubblesComponent from "./bubblesComponent"
+import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 
 
 /**
  * CRITICAL: never rerender this component!
  */
 class ChatComponent extends Component {
+    constructor() {
+        super()
+        this.reactive = {
+            dialog: AppSelectedDialog.Reactive.FireOnly,
+        }
+    }
+
     h() {
         return (
             <div id="chat">
@@ -26,6 +34,16 @@ class ChatComponent extends Component {
                 <BubblesComponent/>
             </div>
         )
+    }
+
+    changed(key, value) {
+        if (key === "dialog") {
+            if (value) {
+                this.$el.classList.add("responsive-selected-chat")
+            } else {
+                this.$el.classList.remove("responsive-selected-chat")
+            }
+        }
     }
 }
 

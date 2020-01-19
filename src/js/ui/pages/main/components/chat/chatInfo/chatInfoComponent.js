@@ -18,6 +18,10 @@ class ChatInfoComponent extends Component {
             <div id="messages-wrapper-chat-info" className="chat-info">
                 <div className="person">
 
+                    <button class="responsive-only-mobile" onClick={() => location.hash = "#/"}>
+                        {"<-"}
+                    </button>
+
                     <ChatInfoAvatarComponent/>
 
                     <div className="content">
