@@ -48,46 +48,65 @@ function insertAt(str, position, length, b) {
 }*/
 
 export function parseMessageEntities(text, messageEntities, noLinks = false) {
-    if(!messageEntities)
-        return text.replace(/(?:\r\n|\r|\n)/g, "<br/>")
+    messageEntities = messageEntities || []
+
     const handlersText = {
-        messageEntityBold: (l, a) => `<b>${a}</b>`,
-        messageEntityItalic: (l, a) => `<i>${a}</i>`,
-        messageEntityCode: (l, a) => `<pre>${a}</pre>`,
-        messageEntityPre: (l, a) => `<pre>${a}</pre>`,
-        messageEntityUnderline: (l, a) => `<u>${a}</u>`,
-        messageEntityStrike: (l, a) => `<s>${a}</s>`,
-        messageEntityBlockquote: (l, a) => `<blockquote>${a}</blockquote>`
+        messageEntityBold: (l, a) => <b>{a}</b>,
+        messageEntityItalic: (l, a) => <i>{a}</i>,
+        messageEntityCode: (l, a) => <code>{a}</code>,
+        messageEntityPre: (l, a) => <pre>{a}</pre>,
+        messageEntityUnderline: (l, a) => <u>{a}</u>,
+        messageEntityStrike: (l, a) => <s>{a}</s>,
+        messageEntityBlockquote: (l, a) => <blockquote>{a}</blockquote>
     }
 
     const handlersLinks = {
-        messageEntityMention: (l, a) => `<a href="/#/?p=${a}">${a}</a>`,
-        messageEntityHashtag: (l, a) => `<a href="#">${a}</a>`,
-        messageEntityBotCommand: (l, a) => `<a href="#">${a}</a>`,
-        messageEntityUrl: (l, a) => `<a target="_blank" href="${!a.startsWith("http") ? "https://" + a : a}">${a}</a>`,
-        messageEntityEmail: (l, a) => `<a href="mailto:${a}">${a}</a>`,
-        messageEntityTextUrl: (l, a) => `<a target="_blank" href="${l.url}">${a}</a>`, // TODO can be problems when there's " symbol isnide. should be fixed!
-        messageEntityMentionName: (l, a) => `<a>${a}</a>`,
-        inputMessageEntityMentionName: (l, a) => `<a>${a}</a>`,
-        messageEntityPhone: (l, a) => `<a href="tel:${a}">${a}</a>`,
-        messageEntityCashtag: (l, a) => `<a href="#">${a}</a>`,
+        messageEntityMention: (l, a) => <a href={"/#/?p=${a}"}>{a}</a>,
+        messageEntityHashtag: (l, a) => <a href="#">{a}</a>,
+        messageEntityBotCommand: (l, a) => <a href="#">{a}</a>,
+        messageEntityUrl: (l, a) => <a target="_blank" href={!a.startsWith("http") ? "https://" + a : a}>{a}</a>,
+        messageEntityEmail: (l, a) => <a href={"mailto:${a}"}>{a}</a>,
+        messageEntityTextUrl: (l, a) => <a target="_blank" href={l.url}>{a}</a>, // TODO can be problems when there's " symbol isnide. should be fixed!
+        messageEntityMentionName: (l, a) => <a>{a}</a>,
+        inputMessageEntityMentionName: (l, a) => <a>{a}</a>,
+        messageEntityPhone: (l, a) => <a href={"tel:${a}"}>{a}</a>,
+        messageEntityCashtag: (l, a) => <a href="#">{a}</a>,
     }
 
+    let elements = []
+
     const handlers = noLinks ? handlersText : Object.assign({}, handlersText, handlersLinks)
-    let globalOffset = 0
+    let prevOffset = 0
     messageEntities.forEach(l => {
-        const offset = l.offset + globalOffset
+        const offset = l.offset
         const length = l.length
         const handler = handlers[l._]
-        if(!handler) return
-        const result = handlers[l._](l, text.substr(offset, length))
+        if (!handler) return
+        const component = handlers[l._](l, text.substr(offset, length))
 
-        // console.log(result)
-        const before = text
-        // console.log(l, "BEFORE", text)
-        text = insertAt(text, offset, length, result)
-        globalOffset += text.length - before.length
-        // console.log("AFTER", text, globalOffset)
+
+        if(offset + length > prevOffset) {
+            const splitted = text.substr(prevOffset, offset - prevOffset).split("\n")
+            for(let i = 0; i < splitted.length; i++) {
+                elements.push(<span>{splitted[i]}</span>)
+                if(i !== splitted.length - 1) {
+                    elements.push(<br/>)
+                }
+            }
+        }
+
+        elements.push(component)
+        prevOffset = offset + length
     })
-    return text.replace(/(?:\r\n|\r|\n)/g, "<br/>")
+    if(prevOffset < text.length) {
+        const splitted = text.substr(prevOffset, text.length - prevOffset).split("\n")
+        for(let i = 0; i < splitted.length; i++) {
+            elements.push(<span>{splitted[i]}</span>)
+            if(i !== splitted.length - 1) {
+                elements.push(<br/>)
+            }
+        }
+    }
+
+    return elements
 }

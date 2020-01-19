@@ -160,7 +160,7 @@ const TextWrapperComponent = ({ message, slot}) => {
     if (!text) return "";
     return (
         <div class="text-wrapper">
-            <span class="text" dangerouslySetInnerHTML={text}/>
+            {text}
             {slot}
             <MessageTimeComponent message={message}/>
         </div>
