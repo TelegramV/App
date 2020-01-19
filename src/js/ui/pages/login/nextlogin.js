@@ -819,8 +819,7 @@ class CodeAndPasswordPaneComponent extends PaneComponent {
         if(e) {
             this.state.monkey.peek()
        } else {
-            // TODO тут треба unpeek
-            this.state.monkey.peek()
+            this.state.monkey.open()
         }
     }
 
