@@ -29,7 +29,7 @@ function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
         if ((state.pts + rawUpdate.pts_count) === rawUpdate.pts) {
             onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         } else if ((state.pts + rawUpdate.pts_count) > rawUpdate.pts) {
-            console.debug("[default] update already processed")
+            // console.debug("[default] update already processed")
             onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         } else {
             // console.warn("[default] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
@@ -40,7 +40,7 @@ function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
         // if (state.pts === rawUpdate.pts) {
         //     onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         // } else if (state.pts > rawUpdate.pts) {
-        //     console.debug("[default] [no pts_count] update already processed")
+        //     // console.debug("[default] [no pts_count] update already processed")
         //     onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         // } else {
         //     // console.warn("[default] [no pts_count] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
@@ -48,7 +48,7 @@ function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
         // }
     // }
     else {
-        console.debug("[default] update has no pts")
+        // console.debug("[default] update has no pts")
         onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
     }
 }
@@ -142,7 +142,7 @@ export class DefaultUpdatesProcessor {
     }
 
     processDifference(rawDifference) {
-        console.debug("[default] got difference", rawDifference)
+        // console.debug("[default] got difference", rawDifference)
 
         if (rawDifference._ === "updates.difference") {
 

@@ -1,6 +1,5 @@
 import DialogsManager from "../../../../../api/dialogs/dialogsManager"
 import {DialogComponent} from "./dialogComponent"
-import DialogsStore from "../../../../../api/store/dialogsStore"
 import AppEvents from "../../../../../api/eventBus/appEvents"
 import Sortable from "sortablejs"
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
@@ -14,15 +13,7 @@ export class DialogListComponent extends Component {
                 selectedDialog: AppSelectedDialog.Reactive.FireOnly
             },
             state: {
-                renderedDialogsElements: new Map([
-                    ["chat", new Map()],
-                    ["channel", new Map()],
-                    ["user", new Map()],
-                ]),
-
                 isInLoadingMoreScroll: false,
-
-                previousSelectedDialog: undefined,
             }
         })
 
@@ -78,16 +69,22 @@ export class DialogListComponent extends Component {
             Sortable.create(this.elements.$pinnedDialogs)
         })
 
-        AppEvents.Dialogs.subscribeAny(this._handleDialogUpdates)
-        AppEvents.Peers.subscribeAny(this._handlePeerUpdates)
+        AppEvents.Dialogs.subscribe("updateMany", event => {
+                event.pinnedDialogs.forEach(dialog => {
+                    this._renderDialog(dialog, "append")
+                })
+
+                event.dialogs.forEach(dialog => {
+                    this._renderDialog(dialog, "append")
+                })
+            }
+        )
 
         this._registerResizer()
     }
 
     changed(key, value) {
         if (key === "selectedDialog") {
-            this._patchSelectedDialog()
-
             if (value) {
                 this.$el.classList.add("responsive-selected-chatlist")
             } else {
@@ -106,217 +103,27 @@ export class DialogListComponent extends Component {
             throw new Error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
         }
 
-        const dialogElements = this.state.renderedDialogsElements.get(dialog.type)
-        let $rendered = dialogElements.get(dialog.id) || false
+        const newVDialog = <DialogComponent $pinned={this.elements.$pinnedDialogs}
+                                            $general={this.elements.$generalDialogs}
+                                            dialog={dialog}/>
 
-        if ($rendered) {
-            // console.warn("already rendered")
-            if (String(dialog.isPinned) !== $rendered.dataset.pinned) {
-
-                if (dialog.isPinned) {
-                    this.elements.$pinnedDialogs.prepend($rendered)
-                } else {
-                    const $foundRendered = this._findRenderedDialogToInsertBefore(dialog, $rendered)
-
-                    if ($foundRendered) {
-                        this.elements.$generalDialogs.insertBefore($rendered, $foundRendered)
-                    }
-                }
-
-            } else if (parseInt($rendered.dataset.date) !== dialog.messages.last.date) {
-                if (!dialog.isPinned) {
-                    const $foundRendered = this._findRenderedDialogToInsertBefore(dialog, $rendered)
-
-                    if ($foundRendered) {
-                        this.elements.$generalDialogs.insertBefore($rendered, $foundRendered)
-                    }
-                }
-            }
-
-            this._patchDialog.bind(this)(dialog, $rendered)
-        } else {
-            // console.log("rendering new")
-            const newVDialog = <DialogComponent dialog={dialog}/>
-
-            if (appendOrPrepend === "append") {
-                if (dialog.isPinned) {
-                    $rendered = VRDOM.append(newVDialog, this.elements.$pinnedDialogs)
-                    dialogElements.set(dialog.id, $rendered)
-                } else {
-                    $rendered = VRDOM.append(newVDialog, this.elements.$generalDialogs)
-                    dialogElements.set(dialog.id, $rendered)
-                }
-            } else if (appendOrPrepend === "prepend") {
-                if (dialog.isPinned) {
-                    $rendered = VRDOM.append(newVDialog, this.elements.$pinnedDialogs)
-                    dialogElements.set(dialog.id, $rendered)
-                } else {
-                    $rendered = VRDOM.append(newVDialog, this.elements.$generalDialogs)
-                    dialogElements.set(dialog.id, $rendered)
-                }
+        if (appendOrPrepend === "append") {
+            if (dialog.isPinned) {
+                VRDOM.append(newVDialog, this.elements.$pinnedDialogs)
             } else {
-                if (dialog.isPinned) {
-                    $rendered = VRDOM.prepend(newVDialog, this.elements.$pinnedDialogs)
-                    dialogElements.set(dialog.id, $rendered)
-                } else {
-                    const $foundRendered = this._findRenderedDialogToInsertBefore(dialog)
-
-                    if ($foundRendered) {
-                        $rendered = this.elements.$generalDialogs.insertBefore(VRDOM.render(newVDialog), $foundRendered)
-                        dialogElements.set(dialog.id, $rendered)
-                    }
-                }
+                VRDOM.append(newVDialog, this.elements.$generalDialogs)
             }
-        }
-    }
-
-    /**
-     * @param {Dialog} dialog
-     * @param $ignore
-     * @return {ChildNode|Element|Node|undefined}
-     * @private
-     */
-    _findRenderedDialogToInsertBefore(dialog, $ignore = undefined) {
-        const renderedDialogs = [
-            ...this.state.renderedDialogsElements.get("user").values(),
-            ...this.state.renderedDialogsElements.get("chat").values(),
-            ...this.state.renderedDialogsElements.get("channel").values(),
-        ]
-
-        if (renderedDialogs.size === 0) {
-            return undefined
-        }
-
-        let minDiff = 999999999999
-
-        /**
-         * @type {undefined|Element|Node}
-         */
-        let $dialog = undefined
-
-        const lastMessageDate = parseInt(dialog.messages.last.date)
-
-        renderedDialogs.forEach($rendered => {
-            if ($rendered !== $ignore && $rendered.dataset.pinned !== "true") {
-                const datasetDate = parseInt($rendered.dataset.date)
-                const nextDiff = Math.abs(lastMessageDate - datasetDate)
-
-                if (minDiff > nextDiff) {
-                    minDiff = nextDiff
-                    $dialog = $rendered
-                }
+        } else if (appendOrPrepend === "prepend") {
+            if (dialog.isPinned) {
+                VRDOM.append(newVDialog, this.elements.$pinnedDialogs)
+            } else {
+                VRDOM.append(newVDialog, this.elements.$generalDialogs)
             }
-        })
-
-        if (parseInt($dialog.dataset.date) > lastMessageDate && $dialog.nextSibling) {
-            return $dialog.nextSibling
-        }
-
-        return $dialog  // fuuuuuuck
-    }
-
-    /**
-     * Handles Dialog updates
-     * @param event
-     * @private
-     */
-    _handleDialogUpdates(event) {
-        switch (event.type) {
-            case "updateMany":
-                event.pinnedDialogs.forEach(dialog => {
-                    this._renderDialog(dialog, "append")
-                })
-
-                event.dialogs.forEach(dialog => {
-                    this._renderDialog(dialog, "append")
-                })
-
-                break
-
-            case "newMessage":
-                this._renderDialog(event.dialog)
-
-                break
-
-            case "updateSingle":
-                this._renderDialog(event.dialog)
-
-                break
-
-            case "updateDraftMessage":
-                this._renderDialog(event.dialog)
-
-                break
-
-            case "updateReadHistoryInbox":
-                this._patchDialog(event.dialog)
-
-                break
-
-            case "readHistory":
-                this._patchDialog(event.dialog)
-
-                break
-
-            case "updateReadHistoryOutbox":
-                this._patchDialog(event.dialog)
-
-                break
-
-            case "updateReadChannelInbox":
-                this._patchDialog(event.dialog)
-
-                break
-
-            case "updateReadChannelOutbox":
-                this._patchDialog(event.dialog)
-
-                break
-
-            case "updatePinned":
-                this._renderDialog(event.dialog)
-
-                break
-
-        }
-    }
-
-    _patchDialog(dialog, $dialog = undefined) {
-        if (!$dialog) {
-            const dialogElements = this.state.renderedDialogsElements.get(dialog.type)
-            $dialog = dialogElements.get(dialog.id) || false
-
-            if (!$dialog) {
-                return
-            }
-        }
-
-        VRDOM.patch($dialog, <DialogComponent dialog={dialog}/>)
-    }
-
-    _patchSelectedDialog() {
-        if (this.reactive.selectedDialog) {
-            if (AppSelectedDialog.PreviousDialog) {
-                this._patchDialog(AppSelectedDialog.PreviousDialog)
-            }
-
-            this._patchDialog(this.reactive.selectedDialog)
-        }
-    }
-
-    /**
-     * Handles Peer updates
-     * @param event
-     * @private
-     */
-    _handlePeerUpdates(event) {
-        const dialog = DialogsStore.get(event.peer.type, event.peer.id)
-
-        if (dialog) {
-            if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
-                this._patchDialog(dialog)
-            } else if (event.type === "updateUserStatus") {
-                this._patchDialog(dialog)
+        } else {
+            if (dialog.isPinned) {
+                VRDOM.prepend(newVDialog, this.elements.$pinnedDialogs)
+            } else {
+                VRDOM.append(newVDialog, this.elements.$generalDialogs)
             }
         }
     }

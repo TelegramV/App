@@ -9,7 +9,7 @@ class Cache {
         this._dbName = "cache"
         this._dbVersion = 1
         this._dbReady = false
-        this._dbReadyListeners = []
+        this._dbReadyListeners = new Set()
 
         this._sectorNames = new Set([
             "peerAvatars",
@@ -30,7 +30,7 @@ class Cache {
      * @param {function} callback
      */
     onReady(callback) {
-        this._dbReadyListeners.push(callback)
+        this._dbReadyListeners.add(callback)
     }
 
     /**

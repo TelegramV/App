@@ -9,9 +9,9 @@ export class EventBus {
         this._subscribers = new Map()
 
         /**
-         * @type {Array<function()>}
+         * @type {Set<function(*)>}
          */
-        this._subscribersAny = []
+        this._subscribersAny = new Set()
     }
 
     /**
@@ -62,6 +62,6 @@ export class EventBus {
      * })} callback
      */
     subscribeAny(callback) {
-        this._subscribersAny.push(callback)
+        this._subscribersAny.add(callback)
     }
 }

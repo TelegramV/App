@@ -1,9 +1,11 @@
 import {EventBus} from "./index"
+import {DialogsEventBus} from "./DialogsEventBus"
+import {PeersEventBus} from "./PeersEventBus"
 
 class AppEventBus {
     constructor(props) {
-        this.Dialogs = new EventBus()
-        this.Peers = new EventBus()
+        this.Dialogs = new DialogsEventBus()
+        this.Peers = new PeersEventBus()
         this.General = new EventBus()
     }
 }
