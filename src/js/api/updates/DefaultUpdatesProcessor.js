@@ -35,17 +35,19 @@ function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
             console.warn("[default] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
             onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
         }
-    } else if (hasUpdatePts(rawUpdate)) {
-        if (state.pts === rawUpdate.pts) {
-            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
-        } else if (state.pts > rawUpdate.pts) {
-            console.debug("[default] [no pts_count] update already processed")
-            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
-        } else {
-            console.warn("[default] [no pts_count] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
-            onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
-        }
-    } else {
+    }
+    // else if (hasUpdatePts(rawUpdate)) {
+        // if (state.pts === rawUpdate.pts) {
+        //     onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
+        // } else if (state.pts > rawUpdate.pts) {
+        //     console.debug("[default] [no pts_count] update already processed")
+        //     onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
+        // } else {
+        //     console.warn("[default] [no pts_count] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
+        //     onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
+        // }
+    // }
+    else {
         console.debug("[default] update has no pts")
         onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
     }
