@@ -95,6 +95,10 @@ export class Message {
         return this._message.media
     }
 
+    get action() {
+        return this._message.action;
+    }
+
     getDate(locale, format) {
         return new Date(this.date * 1000).toLocaleString(locale, format)
     }

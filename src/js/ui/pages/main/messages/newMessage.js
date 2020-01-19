@@ -1,5 +1,6 @@
 import { parseMessageEntities } from "../../../../mtproto/utils/htmlHelpers";
 import { FileAPI } from "../../../../api/fileAPI"
+import {LocaleController} from "../../../../common/locale/localization"
 
 const Message = ({ message }) => {
     /*if (!message.type) {
@@ -15,8 +16,14 @@ const Message = ({ message }) => {
         // voice: vMessageWithVoiceAudioTemplate,
         sticker: StickerMessageComponent,
         // document: TextMessage,
-        webpage: WebpageMessageComponent
-        // service: vServiceMessageTemplate
+        //location:
+        //beacon:
+        //game:
+        //poll:
+        //invoice:
+        //contact:
+        webpage: WebpageMessageComponent,
+        service: ServiceMessageComponent
     }
 
     const Handler = handlers[message.type]
@@ -24,11 +31,19 @@ const Message = ({ message }) => {
     if (Handler) {
         return <Handler message={message}/>
     } else {
-        message._message.message = "NO HANDLER!"
+        message._message.message = "Unsupported message type!"
         return (
             <TextMessageComponent message={message}/>
         )
     }
+}
+
+const ServiceMessageComponent = ({message}) => {
+    return (
+        <div className="service">
+            <div className="service-msg">Service Message [{message.action._}]</div>
+        </div>
+        )
 }
 
 const AudioMessageComponent = ({message}) => {
@@ -88,9 +103,9 @@ const WebpageMessageComponent = ({ message }) => {
                 <a href={webpage.url} target="_blank" className="box web rp">
                     <div className="quote">
                         {photoUrl?<img className="preview" src={photoUrl}/>: ""}
-                        <div className="name">{webpage.site_name}</div>
-                        <div className="title">{webpage.title}</div>
-                        <div className="text">{webpage.description}</div>
+                        {webpage.site_name?<div className="name">{webpage.site_name}</div>:""}
+                        {webpage.title?<div className="title">{webpage.title}</div>: ""}
+                        {webpage.description?<div className="text">{webpage.description}</div>: ""}
                     </div>
                 </a>
                 </TextWrapperComponent>
