@@ -166,6 +166,7 @@ export class DefaultUpdatesProcessor {
             })
 
             this.isWaitingForDifference = false
+            this.updatesManager.State = rawDifference.state
             this.processQueue()
 
         } else if (rawDifference._ === "updates.differenceTooLong") {
