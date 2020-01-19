@@ -17,7 +17,7 @@ class PeerManager extends Manager {
     }
 
     init() {
-        MTProto.UpdatesManager.listenUpdate("updateUserStatus", update => {
+        MTProto.UpdatesManager.subscribe("updateUserStatus", update => {
             const peer = PeersStore.get("user", update.user_id)
 
             if (peer instanceof UserPeer) {
@@ -28,7 +28,7 @@ class PeerManager extends Manager {
                 })
             }
         })
-        MTProto.UpdatesManager.listenUpdate("updateUserPhoto", update => {
+        MTProto.UpdatesManager.subscribe("updateUserPhoto", update => {
             const peer = PeersStore.get("user", update.user_id)
 
             if (peer instanceof UserPeer) {

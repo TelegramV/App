@@ -3,7 +3,7 @@
  * @param rawUpdate
  */
 function processShort(manager, rawUpdate) {
-    console.warn("processing updateShort is not properly implement now", rawUpdate)
+    // console.warn("processing updateShort is not properly implement now", rawUpdate)
 
     manager.processUpdate(rawUpdate.update._, rawUpdate.update)
 }

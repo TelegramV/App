@@ -29,14 +29,24 @@ function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
         if ((state.pts + rawUpdate.pts_count) === rawUpdate.pts) {
             onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         } else if ((state.pts + rawUpdate.pts_count) > rawUpdate.pts) {
-            console.log("update already processed")
+            console.debug("[default] update already processed")
             onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         } else {
-            console.warn("update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
+            console.warn("[default] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
+            onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
+        }
+    } else if (hasUpdatePts(rawUpdate)) {
+        if (state.pts === rawUpdate.pts) {
+            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
+        } else if (state.pts > rawUpdate.pts) {
+            console.debug("[default] [no pts_count] update already processed")
+            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
+        } else {
+            console.warn("[default] [no pts_count] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
             onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
         }
     } else {
-        console.log("channel update has no pts")
+        console.debug("[default] update has no pts")
         onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
     }
 }
@@ -65,11 +75,12 @@ export class DefaultUpdatesProcessor {
     }
 
     applyUpdate(rawUpdate) {
-        this.updatesManager.resolveUpdateListeners(rawUpdate)
+        this.updatesManager.fire(rawUpdate)
     }
 
     enqueue(rawUpdate) {
         if (!this.isWaitingForDifference) {
+            // should never be true, but who knows
             if (this.differenceUpdateTypes.includes(rawUpdate._)) {
                 this.processDifference(rawUpdate)
             } else {
@@ -77,9 +88,8 @@ export class DefaultUpdatesProcessor {
 
                 this.processQueue()
             }
-        } else if (this.differenceUpdateTypes.includes(rawUpdate._)) {
-            this.processDifference(rawUpdate)
         } else {
+            this.queue.push(rawUpdate)
             console.warn("[default] waiting for diff")
         }
     }
@@ -91,6 +101,10 @@ export class DefaultUpdatesProcessor {
 
     processQueue(next) {
         if ((next || this.queue.length > 0) && !this.queueIsProcessing) {
+            if (this.isWaitingForDifference) {
+                console.error("[default] BUG: processing queue while waiting for difference")
+            }
+
             this.queueIsProcessing = true
 
             const rawUpdate = next ? next : this.dequeue()
@@ -99,28 +113,26 @@ export class DefaultUpdatesProcessor {
 
             checkUpdatePts(self.updatesManager.State, rawUpdate, {
                 onSuccess(type) {
-                    if (type === MTProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
-                        self.applyUpdate(rawUpdate)
-                    } else if (type === MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED) {
-                        // peer.dialog.pts = rawUpdate.pts
-                    } else {
+                    if (type === MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED) {
                         self.updatesManager.State.pts = rawUpdate.pts
+                        self.applyUpdate(rawUpdate)
+                    } else if (type === MTProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
                         self.applyUpdate(rawUpdate)
                     }
 
                     self.queueIsProcessing = false
+                    self.processQueue()
                 },
                 onFail(type) {
                     self.queueIsProcessing = false
                     self.isWaitingForDifference = true
 
                     self.getDifference(this.updatesManager.State).then(rawDifference => {
-                        self.isWaitingForDifference = false
-                        self.updatesManager.State.pts = rawDifference.pts
                         self.processDifference(rawDifference)
                     }).catch(e => {
-                        console.error("BUG: difference obtaining failed", e)
+                        console.error("[default] BUG: difference obtaining failed", e)
                         self.isWaitingForDifference = false
+                        self.processQueue()
                     })
                 }
             })
@@ -128,8 +140,7 @@ export class DefaultUpdatesProcessor {
     }
 
     processDifference(rawDifference) {
-        console.log("got difference", rawDifference)
-        this.isWaitingForDifference = false
+        console.debug("[default] got difference", rawDifference)
 
         if (rawDifference._ === "updates.difference") {
 
@@ -155,33 +166,41 @@ export class DefaultUpdatesProcessor {
             })
 
             this.isWaitingForDifference = false
-            this.queueIsProcessing = false
+            this.updatesManager.State.pts = rawDifference.pts
+            this.processQueue()
 
         } else if (rawDifference._ === "updates.differenceTooLong") {
+            console.warn("[default] difference too long", rawDifference)
 
-            console.error("difference too long", rawDifference)
             this.isWaitingForDifference = true
+
+            // The difference is too long, and the specified state must be used to refetch updates.
 
             this.updatesManager.State.pts = rawDifference.pts
 
             this.getDifference(this.updatesManager.State).then(rawDifference => {
-                this.updatesManager.State.pts = rawDifference.pts
                 this.processDifference(rawDifference)
             }).catch(e => {
                 console.error("BUG: difference obtaining failed", e)
+
                 this.isWaitingForDifference = false
                 this.processQueue()
             })
 
         } else if (rawDifference._ === "updates.differenceEmpty") {
-            console.warn("difference empty")
+            console.warn("[default] difference empty")
 
             this.updatesManager.State.date = rawDifference.date
             this.updatesManager.State.qts = rawDifference.qts
 
             this.isWaitingForDifference = false
             this.queueIsProcessing = false
+
+            this.processQueue()
+
         } else if (rawDifference._ === "updates.differenceSlice") {
+
+            // Incomplete list of occurred events.
 
             rawDifference.users.forEach(user => PeersManager.setFromRawAndFire(user))
             rawDifference.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
@@ -207,14 +226,11 @@ export class DefaultUpdatesProcessor {
             this.updatesManager.State = rawDifference.intermediate_state
 
             this.getDifference(this.updatesManager.State).then(rawDifference => {
-                this.queueIsProcessing = false
-                this.isWaitingForDifference = false
-                this.updatesManager.State.pts = rawDifference.pts
                 this.processDifference(rawDifference)
             }).catch(e => {
                 console.error("BUG: difference obtaining failed", e)
+
                 this.isWaitingForDifference = false
-                this.queueIsProcessing = false
                 this.processQueue()
             })
         } else {
@@ -227,6 +243,7 @@ export class DefaultUpdatesProcessor {
             pts: State.pts || this.updatesManager.State.pts,
             date: State.date || this.updatesManager.State.date,
             qts: State.qts || this.updatesManager.State.qts,
+            pts_total_limit: 100,
             flags: 0
         }).then(rawDifference => {
             return rawDifference

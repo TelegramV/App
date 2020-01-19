@@ -1,11 +1,9 @@
-/**
- * @property {Map<number, Message>} _messages
- */
 import AppSelectedDialog from "../../dialogs/selectedDialog"
 import AppEvents from "../../eventBus/appEvents"
 
 /**
  * @property {Message} _lastMessage
+ * @property {Map<number, Message>} _messages
  */
 export class DialogMessages {
 
@@ -213,7 +211,7 @@ export class DialogMessages {
         this._messages.delete(messageId)
         this.deleteUnread(messageId)
 
-        if (messageId === this.last.id) {
+        if (this.last && messageId === this.last.id) {
             this._lastMessage = this._prevLastMessage
             this._prevLastMessage = undefined
         }

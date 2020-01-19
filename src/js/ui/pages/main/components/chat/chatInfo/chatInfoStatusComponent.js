@@ -29,7 +29,7 @@ class ChatInfoStatusComponent extends Component {
     }
 
     mounted() {
-        AppEvents.Peers.listenAny(event => {
+        AppEvents.Peers.subscribeAny(event => {
             if (AppSelectedDialog.check(event.peer.dialog)) {
                 if (this.state.patchEvents.has(event.type)) {
                     this.__patch()

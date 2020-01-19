@@ -45,7 +45,7 @@ class BubblesComponent extends Component {
         this.elements.$bubblesInner = this.$el.querySelector("#bubbles-inner")
         this.elements.$loader = this.$el.parentElement.querySelector("#messages-wrapper-messages-loader")
 
-        AppEvents.Dialogs.listenAny(event => {
+        AppEvents.Dialogs.subscribeAny(event => {
             const dialog = event.dialog
 
             if (AppSelectedDialog.check(dialog)) {

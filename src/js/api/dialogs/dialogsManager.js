@@ -23,7 +23,7 @@ class DialogManager extends Manager {
 
 
     init() {
-        AppSelectedDialog.listen(_ => {
+        AppSelectedDialog.subscribe(_ => {
             if (AppSelectedDialog.PreviousDialog) {
                 AppSelectedDialog.PreviousDialog.messages.clear()
             }
@@ -54,15 +54,15 @@ class DialogManager extends Manager {
             })
         }
 
-        MTProto.UpdatesManager.listenUpdate("updateShortMessage", async update => {
+        MTProto.UpdatesManager.subscribe("updateShortMessage", async update => {
             updateDialogLastMessage(await this.findOrFetch("user", update.user_id), update)
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateShortChatMessage", async update => {
+        MTProto.UpdatesManager.subscribe("updateShortChatMessage", async update => {
             updateDialogLastMessage(await this.findOrFetch("chat", update.chat_id), update)
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateNewMessage", async update => {
+        MTProto.UpdatesManager.subscribe("updateNewMessage", async update => {
             let dialog = undefined
 
             if (update.message.pFlags.out && update.message.to_id) {
@@ -75,7 +75,7 @@ class DialogManager extends Manager {
             updateDialogLastMessage(dialog, update.message)
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateDeleteChannelMessages", update => {
+        MTProto.UpdatesManager.subscribe("updateDeleteChannelMessages", update => {
             const dialog = DialogsStore.get("channel", update.channel_id)
 
             if (dialog) {
@@ -97,7 +97,7 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateDeleteMessages", update => {
+        MTProto.UpdatesManager.subscribe("updateDeleteMessages", update => {
             DialogsStore.data.forEach((data, type) => data.forEach(/** @param {Dialog} dialog */(dialog, id) => {
                 if (dialog.type !== "channel") {
                     dialog.messages.startTransaction()
@@ -117,7 +117,7 @@ class DialogManager extends Manager {
             }))
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateDialogPinned", async update => {
+        MTProto.UpdatesManager.subscribe("updateDialogPinned", async update => {
             const peerType = getPeerTypeFromType(update.peer.peer._)
             const dialog = await this.findOrFetch(peerType, update.peer.peer[`${peerType}_id`])
 
@@ -127,11 +127,11 @@ class DialogManager extends Manager {
         })
 
 
-        MTProto.UpdatesManager.listenUpdate("updateChannel", async update => {
+        MTProto.UpdatesManager.subscribe("updateChannel", async update => {
             await this.findOrFetch("channel", update.channel_id)
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateNewChannelMessage", async update => {
+        MTProto.UpdatesManager.subscribe("updateNewChannelMessage", async update => {
             const dialog = await this.findOrFetch("channel", update.message.to_id.channel_id)
             // if(!dialog || !PeersManager.find("user", update.message.from_id)) {
             //     MTProto.invokeMethod("updates.getDifference", {
@@ -156,7 +156,7 @@ class DialogManager extends Manager {
             updateDialogLastMessage(dialog, update.message)
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateDraftMessage", update => {
+        MTProto.UpdatesManager.subscribe("updateDraftMessage", update => {
             const dialog = this.findByPeer(update.peer)
 
             if (dialog) {
@@ -164,7 +164,7 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateReadHistoryInbox", update => {
+        MTProto.UpdatesManager.subscribe("updateReadHistoryInbox", update => {
             const dialog = this.findByPeer(update.peer)
 
             if (dialog) {
@@ -179,14 +179,14 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateReadHistoryOutbox", update => {
+        MTProto.UpdatesManager.subscribe("updateReadHistoryOutbox", update => {
             const dialog = this.findByPeer(update.peer)
             if (dialog) {
                 dialog.messages.readOutboxMaxId = update.max_id
             }
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateReadChannelInbox", update => {
+        MTProto.UpdatesManager.subscribe("updateReadChannelInbox", update => {
             const dialog = this.find("channel", update.channel_id)
 
             if (dialog) {
@@ -206,7 +206,7 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.listenUpdate("updateReadChannelOutbox", update => {
+        MTProto.UpdatesManager.subscribe("updateReadChannelOutbox", update => {
             const dialog = this.find("channel", update.channel_id)
             if (dialog) {
                 dialog.messages.readOutboxMaxId = update.max_id

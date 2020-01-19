@@ -89,8 +89,8 @@ export class DialogListComponent extends Component {
             Sortable.create(this.elements.$pinnedDialogs)
         })
 
-        AppEvents.Dialogs.listenAny(this._handleDialogUpdates)
-        AppEvents.Peers.listenAny(this._handlePeerUpdates)
+        AppEvents.Dialogs.subscribeAny(this._handleDialogUpdates)
+        AppEvents.Peers.subscribeAny(this._handlePeerUpdates)
 
         this._registerResizer()
     }

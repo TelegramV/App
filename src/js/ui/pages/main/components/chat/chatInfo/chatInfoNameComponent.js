@@ -28,7 +28,7 @@ class ChatInfoNameComponent extends Component {
     mounted() {
         console.log(`${this.name} mounted`)
 
-        AppEvents.Peers.listenAny(event => {
+        AppEvents.Peers.subscribeAny(event => {
             if (AppSelectedDialog.check(event.peer.dialog)) {
                 if (event.type === "updateName") {
                     this.__patch()

@@ -25,7 +25,7 @@ class ChatInfoAvatarComponent extends Component {
     }
 
     mounted() {
-        AppEvents.Peers.listenAny(event => {
+        AppEvents.Peers.subscribeAny(event => {
             if (AppSelectedDialog.check(event.peer.dialog)) {
                 if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
                     console.log(event.peer.dialog, AppSelectedDialog.Dialog)

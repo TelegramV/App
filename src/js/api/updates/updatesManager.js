@@ -8,6 +8,7 @@ import processUpdates from "./processUpdates"
 import {ChannelUpdatesProcessor} from "./ChannelUpdatesProcessor"
 import {DefaultUpdatesProcessor} from "./DefaultUpdatesProcessor"
 import processShortSentMessage from "./processShortSentMessage"
+import {arrayDelete} from "../../common/utils/utils"
 
 class UpdateManager extends Manager {
     constructor() {
@@ -23,6 +24,9 @@ class UpdateManager extends Manager {
         this.channelUpdatesProcessor = new ChannelUpdatesProcessor(this)
         this.defaultUpdatesProcessor = new DefaultUpdatesProcessor(this)
 
+        /**
+         * @type {Map<string, function()[]>}
+         */
         this.updateListeners = new Map()
 
         this.customUpdatesProcessors = new Map([
@@ -42,7 +46,7 @@ class UpdateManager extends Manager {
 
     set State(State) {
         this._State = State
-        console.log("State was set = ", State)
+        console.debug("State was set = ", State)
     }
 
     init() {
@@ -51,9 +55,7 @@ class UpdateManager extends Manager {
         })
     }
 
-    listenUpdate(type, listener) {
-        console.log("listening", type, listeners)
-
+    subscribe(type, listener) {
         let listeners = this.updateListeners.get(type)
 
         if (!listeners) {
@@ -63,13 +65,21 @@ class UpdateManager extends Manager {
         listeners.push(listener)
     }
 
-    resolveUpdateListeners(rawUpdate) {
+    unsubscribe(type, listener) {
+        let listeners = this.updateListeners.get(type)
+
+        if (listeners) {
+            arrayDelete(listeners, listener)
+        }
+    }
+
+    fire(rawUpdate) {
         if (this.updateListeners.has(rawUpdate._)) {
             this.updateListeners.get(rawUpdate._).forEach(l => {
                 l(rawUpdate)
             })
         } else {
-            console.warn("unexpected update = ", rawUpdate._, rawUpdate)
+            // console.warn("unexpected update = ", rawUpdate._, rawUpdate)
         }
     }
 

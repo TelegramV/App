@@ -4,6 +4,7 @@ class AppEventBus {
     constructor(props) {
         this.Dialogs = new EventBus()
         this.Peers = new EventBus()
+        this.General = new EventBus()
     }
 }
 

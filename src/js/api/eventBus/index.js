@@ -4,14 +4,14 @@
 export class EventBus {
     constructor() {
         /**
-         * @type {Map<string, Array<Function>>}
+         * @type {Map<string, Array<function()>>}
          */
-        this._listeners = new Map()
+        this._subscribers = new Map()
 
         /**
-         * @type {Array<Function>}
+         * @type {Array<function()>}
          */
-        this._listenersAny = []
+        this._subscribersAny = []
     }
 
     /**
@@ -19,20 +19,21 @@ export class EventBus {
      * @param {*} event
      */
     fire(type, event) {
-        const listeners = this._listeners.get(type)
+        const subscribers = this._subscribers.get(type)
+
         event = {
             type,
             ...event
         }
 
-        if (listeners) {
-            for (const listener of listeners) {
-                listener(event)
+        if (subscribers) {
+            for (const subscriber of subscribers) {
+                subscriber(event)
             }
         }
 
-        for (const listener of this._listenersAny) {
-            listener(event)
+        for (const subscriber of this._subscribersAny) {
+            subscriber(event)
         }
     }
 
@@ -40,15 +41,15 @@ export class EventBus {
      * @param {string} type
      * @param {Function} callback
      */
-    listen(type, callback) {
-        let listeners = this._listeners.get(type)
+    subscribe(type, callback) {
+        let subscribers = this._subscribers.get(type)
 
-        if (!listeners) {
-            this._listeners.set(type, [])
-            listeners = this._listeners.get(type)
+        if (!subscribers) {
+            this._subscribers.set(type, [])
+            subscribers = this._subscribers.get(type)
         }
 
-        listeners.push(callback)
+        subscribers.push(callback)
     }
 
     /**
@@ -60,7 +61,7 @@ export class EventBus {
      *     messages: Message[],
      * })} callback
      */
-    listenAny(callback) {
-        this._listenersAny.push(callback)
+    subscribeAny(callback) {
+        this._subscribersAny.push(callback)
     }
 }

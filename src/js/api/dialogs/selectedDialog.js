@@ -3,6 +3,7 @@ import {AppFramework} from "../../ui/framework/framework"
 import DialogsStore from "../store/dialogsStore"
 import DialogsManager from "./dialogsManager"
 import {Dialog} from "../dataObjects/dialog/dialog"
+import {arrayDelete} from "../../common/utils/utils"
 
 export function parseHashQuery() {
     const queryPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
@@ -22,13 +23,22 @@ class SelectedDialog {
         this._previousDialog = undefined
         this._dialog = dialog
 
-        this._selectListeners = []
+        this._selectSubscribers = []
+
+        this._Reactive = ReactiveCallback(resolve => {
+            this.subscribe(resolve)
+            this._previousDialog = this._dialog
+            this._dialog = this.findFromQueryParams(AppFramework.Router.activeRoute.queryParams)
+            return this._dialog
+        }, resolve => {
+            this.unsubscribe(resolve)
+        })
 
         AppFramework.Router.onQueryChange(queryParams => {
             this._previousDialog = this._dialog
             this._dialog = this.findFromQueryParams(queryParams)
 
-            this._selectListeners.forEach(listener => {
+            this._selectSubscribers.forEach(listener => {
                 listener(this._dialog)
             })
         })
@@ -67,34 +77,21 @@ class SelectedDialog {
      * @return {{Default: Dialog, FireOnly: Dialog, PatchOnly: Dialog}}
      */
     get Reactive() {
-        return ReactiveCallback(resolve => {
-            this.listen(resolve)
-            this._previousDialog = this._dialog
-            this._dialog = this.findFromQueryParams(AppFramework.Router.activeRoute.queryParams)
-            return this._dialog
-        }, resolve => {
-            this.shutUp(resolve)
-        })
+        return this._Reactive
     }
 
     /**
      * @param {function(dialog: Dialog)} resolve
      */
-    listen(resolve) {
-        this._selectListeners.push(resolve)
+    subscribe(resolve) {
+        this._selectSubscribers.push(resolve)
     }
 
     /**
      * @param {function(dialog: Dialog)} resolve
      */
-    shutUp(resolve) {
-        const index = this._selectListeners.findIndex(value => value === resolve)
-
-        if (index > -1) {
-            this._selectListeners.splice(index, 1)
-        } else {
-            console.error("cannot find resolve")
-        }
+    unsubscribe(resolve) {
+        arrayDelete(this._selectSubscribers, resolve)
     }
 
     /**

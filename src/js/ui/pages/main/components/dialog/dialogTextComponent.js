@@ -17,6 +17,10 @@ function Action({user, action}) {
 }
 
 function Text({user, text}) {
+    if (text.length > 50) {
+        text = text.substring(0, 50)
+    }
+
     return (
         <div className="message">
             <span className="sender">{user}</span>
