@@ -144,7 +144,9 @@ export class ChannelUpdatesProcessor {
             const peer = PeersStore.get("channel", channelId)
 
             if (!peer.dialog) {
-                console.error("dialog was not found! potential bug! we should fetch new!")
+                console.error("BUG: dialog was not found! we should fetch new!", rawUpdate)
+                this.queueIsProcessing = false
+                this.processQueue()
                 return
             }
 
@@ -171,6 +173,7 @@ export class ChannelUpdatesProcessor {
                     if (!peer.dialog) {
                         console.error("BUG: dialog wan not found, processing next update")
                         self.isWaitingForDifference = false
+                        this.processQueue()
                         return
                     }
 
@@ -178,6 +181,7 @@ export class ChannelUpdatesProcessor {
                         console.error("BUG: peer is min, processing next update")
                         self.isWaitingForDifference = false
                         peer.dialog.pts = rawUpdate.pts
+                        this.processQueue()
                         return
                     }
 
@@ -263,6 +267,8 @@ export class ChannelUpdatesProcessor {
         if (!(peer instanceof Peer)) {
             return Promise.reject("provided peer is invalid")
         }
+
+        console.warn("[channel] fetching difference")
 
         return MTProto.invokeMethod("updates.getChannelDifference", {
             flags: 0,
