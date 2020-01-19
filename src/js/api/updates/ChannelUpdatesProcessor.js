@@ -165,8 +165,8 @@ export class ChannelUpdatesProcessor {
                     self.processQueue()
                 },
                 onFail(type) {
-                    self.queueIsProcessing = false
                     self.isWaitingForDifference = true
+                    self.queueIsProcessing = false
 
                     let inputPeer = peer.input
 
