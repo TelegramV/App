@@ -114,7 +114,7 @@ export class DefaultUpdatesProcessor {
                     self.queueIsProcessing = false
                     self.isWaitingForDifference = true
 
-                    self.getDifference().then(rawDifference => {
+                    self.getDifference(this.updatesManager.State).then(rawDifference => {
                         self.isWaitingForDifference = false
                         self.updatesManager.State.pts = rawDifference.pts
                         self.processDifference(rawDifference)
@@ -162,7 +162,9 @@ export class DefaultUpdatesProcessor {
             console.error("difference too long", rawDifference)
             this.isWaitingForDifference = true
 
-            this.getDifference({pts: rawDifference.pts}).then(rawDifference => {
+            this.updatesManager.State.pts = rawDifference.pts
+
+            this.getDifference(this.updatesManager.State).then(rawDifference => {
                 this.updatesManager.State.pts = rawDifference.pts
                 this.processDifference(rawDifference)
             }).catch(e => {
@@ -220,7 +222,7 @@ export class DefaultUpdatesProcessor {
         }
     }
 
-    getDifference(State = {}, onTooLong = undefined) {
+    getDifference(State = this.updatesManager.State, onTooLong = undefined) {
         return MTProto.invokeMethod("updates.getDifference", {
             pts: State.pts || this.updatesManager.State.pts,
             date: State.date || this.updatesManager.State.date,

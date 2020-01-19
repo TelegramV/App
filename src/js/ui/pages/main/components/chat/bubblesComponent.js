@@ -89,12 +89,17 @@ class BubblesComponent extends Component {
      * @return {Element|Node}
      */
     _renderMessage(message, prepend = false) {
+
         const $mount = prepend ? VRDOM.prepend : VRDOM.append
         let $message = undefined
         $message = $mount(<Message message={message}/>, this.elements.$bubblesInner); //TODO Давид поправ як має бути
         if (message.media) {
             if (message.media.photo) {
-                FileAPI.photoThumnail(message.media.photo, data => {
+
+                // я зробив щоб качало мінімальний розмір фоток, щоб менше напрягалось
+                // більший можна буде показувати при кліку
+
+                FileAPI.photoThumbnail(message.media.photo, data => {
                     message.media.photo.real = {
                         src: data.src,
                         sizes: data.size,
@@ -104,7 +109,7 @@ class BubblesComponent extends Component {
                 })
             }
             if (message.media.webpage && message.media.webpage.photo) {
-                FileAPI.photoThumnail(message.media.webpage.photo,data => {
+                FileAPI.photoThumbnail(message.media.webpage.photo, data => {
                     message.media.webpage.photo.real = {
                         url: data.src
                     }

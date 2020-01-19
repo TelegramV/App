@@ -83,8 +83,12 @@ export class FileAPI {
         return file.sizes[file.sizes.length - 1]
     }
 
-    static photoThumnail(file, resolve) {
-        const max = FileAPI.getMaxSize(file)
+    static getMinSize(file) {
+        return file.sizes[0]
+    }
+
+    static photoThumbnail(file, resolve) {
+        const max = FileAPI.getMinSize(file)
 
         try {
             resolve({

@@ -348,6 +348,37 @@ class DialogManager extends Manager {
         return DialogsStore.get(key, peer[keyId])
     }
 
+    fetchFromMessage(rawMessage) {
+        const peerData = {
+            _: "inputDialogPeer",
+            peer: {
+                _: "inputPeerUserFromMessage",
+                peer: {
+                    
+                }
+            }
+        }
+
+        return MTProto.invokeMethod("messages.getPeerDialogs", {
+            peers: [peerData]
+        }).then(_dialogsSlice => {
+            _dialogsSlice.users.forEach(l => {
+                PeersManager.setFromRawAndFire(l)
+            })
+            _dialogsSlice.chats.forEach(l => {
+                PeersManager.setFromRawAndFire(l)
+            })
+
+            const dialogs = _dialogsSlice.dialogs.map(_dialog => {
+                return this.resolveDialogWithSlice(_dialog, _dialogsSlice)
+            })
+
+            AppEvents.Dialogs.fire("updateSingle", {
+                dialog: dialogs[0],
+            })
+        })
+    }
+
     fetchPlainPeerDialogs(peer) {
         const peerData = {
             _: "inputDialogPeer",
@@ -371,10 +402,6 @@ class DialogManager extends Manager {
             AppEvents.Dialogs.fire("updateSingle", {
                 dialog: dialogs[0],
             })
-
-            // dialogs.forEach(async dialog => {
-            //     await dialog.peer.getAvatar()
-            // })
         })
     }
 

@@ -18,6 +18,10 @@ export class Peer {
         this._photo = PeerPhoto.createEmpty(this)
         this._accessHash = undefined
 
+        // for min constructor
+        this._min_messageId = undefined
+        this._min_inputPeer = undefined
+
         this._full = undefined
 
         this.fillRaw(rawPeer)
@@ -114,6 +118,33 @@ export class Peer {
         return getInputFromPeer(this.type, this.id, this.accessHash)
     }
 
+    get inputPeerFromMessage() {
+        if (this.type === "user") {
+            return {
+                _: "inputPeerUserFromMessage",
+                peer: this._min_inputPeer,
+                msg_id: this._min_messageId,
+                user_id: this.id
+            }
+        } else if (this.type === "channel") {
+            return {
+                _: "inputPeerChannelFromMessage",
+                peer: this._min_inputPeer,
+                msg_id: this._min_messageId,
+                channel_id: this.id
+            }
+        } else {
+            console.warn("Potential BUG: cannot get inputPeerFromMessage, returning channel")
+
+            return {
+                _: "inputPeerChannelFromMessage",
+                peer: this._min_inputPeer,
+                msg_id: this._min_messageId,
+                channel_id: this.id
+            }
+        }
+    }
+
     /**
      * @return {PeerPhoto}
      */
@@ -168,8 +199,8 @@ export class Peer {
             throw new Error("peer data cannot be filled")
         }
 
+        // When receiving said constructors, the client must first check if user or chat object without min flag is already present in local cache. If it is present, then the client should just ignore constructors with min flag and use local one instead.
         if (rawPeer.pFlags && rawPeer.pFlags.min === true && this._filled) {
-            // console.warn("fixme: set min to non min")
             return
         }
 
