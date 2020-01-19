@@ -127,7 +127,7 @@ export class DefaultUpdatesProcessor {
                     self.queueIsProcessing = false
                     self.isWaitingForDifference = true
 
-                    self.getDifference(this.updatesManager.State).then(rawDifference => {
+                    self.getDifference(self.updatesManager.State).then(rawDifference => {
                         self.processDifference(rawDifference)
                     }).catch(e => {
                         console.error("[default] BUG: difference obtaining failed", e)

@@ -62,7 +62,7 @@ export class FrameworkRouter {
         }
 
         if (window.location.hash === "") {
-            history.replaceState({}, "", this.hash);
+            history.replaceState({}, "", this.hash)
         }
 
         this.renderActive()
@@ -99,7 +99,7 @@ export class FrameworkRouter {
         if (options.queryParams) {
             hash += `?${queryParamsToString(options.queryParams)}`
         }
-        window.location.hash = hash
+        location.hash = hash
     }
 
     renderRoute(route) {

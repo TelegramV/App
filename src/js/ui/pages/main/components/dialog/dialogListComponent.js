@@ -14,12 +14,6 @@ export class DialogListComponent extends Component {
                 selectedDialog: AppSelectedDialog.Reactive.FireOnly
             },
             state: {
-                // note: mb this is redundant, but we should be careful with this
-                renderedDialogsIds: {
-                    pinned: new Set(),
-                    general: new Set(),
-                },
-
                 renderedDialogsElements: new Map([
                     ["chat", new Map()],
                     ["channel", new Map()],
@@ -29,8 +23,6 @@ export class DialogListComponent extends Component {
                 isInLoadingMoreScroll: false,
 
                 previousSelectedDialog: undefined,
-
-                generalSortable: undefined,
             }
         })
 
@@ -38,9 +30,6 @@ export class DialogListComponent extends Component {
             $loader: undefined,
             $dialogsWrapper: undefined,
             $pinnedDialogs: undefined,
-            /**
-             * @type {Element|Node}
-             */
             $generalDialogs: undefined,
         }
     }
@@ -98,6 +87,12 @@ export class DialogListComponent extends Component {
     changed(key, value) {
         if (key === "selectedDialog") {
             this._patchSelectedDialog()
+
+            if (value) {
+                this.$el.classList.add("responsive-selected-chatlist")
+            } else {
+                this.$el.classList.remove("responsive-selected-chatlist")
+            }
         }
     }
 
