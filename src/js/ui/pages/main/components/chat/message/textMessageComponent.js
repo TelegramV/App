@@ -19,7 +19,8 @@ function TextMessageComponent({message}) {
 
                     <div className={`message ${username ? "nopad" : ""}`}>
                         <div className="fwd">Forwarded from {message.raw.fwd_from.from_id}</div>
-                        <span dangerouslySetInnerHTML={text}/>
+                        {text}
+                        {/*<span dangerouslySetInnerHTML={text}/>*/}
                         <MessageTimeComponent message={message}/>
                     </div>
                 </div>
@@ -33,7 +34,8 @@ function TextMessageComponent({message}) {
                 {username ? <div className="username">{message.from.name}</div> : ""}
 
                 <div className={`message ${username ? "nopad" : ""}`}>
-                    <span dangerouslySetInnerHTML={text}/>
+                    {text.map(l => "lol")}
+                    {/*<span dangerouslySetInnerHTML={text}/>*/}
                     <MessageTimeComponent message={message}/>
                 </div>
             </div>
