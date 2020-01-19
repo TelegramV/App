@@ -2,6 +2,17 @@
   display: none;
 }
 
+@keyframes slide-up {
+  0% {
+    //opacity: 0;
+    transform: translateY(2px);
+  }
+  100% {
+    //opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .chatlist {
   background-color: #fff;
   border-right: 1px $lightgrey solid;
@@ -111,6 +122,8 @@
 }
 
 .person {
+  animation: slide-up 0.4s ease;
+
   border-radius: 10px;
   background-color: #fff;
   padding: 9px;
