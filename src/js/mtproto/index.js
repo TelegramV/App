@@ -10,6 +10,7 @@ import {attach} from "../api/notifications";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import Bytes from "./utils/bytes"
 import authKeyCreation from "./connect/authKeyCreation"
+import {FileNetworker} from "./network/fileNetworker";
 
 window.id = 202466030
 window.send = (method, params) => {
@@ -98,6 +99,7 @@ class MobileProtocol {
         this.MessageProcessor = this.networker.messageProcessor
         this.connected = true
 
+        // TODO definitely not a right place for notifications -_-
         attach()
     }
 
@@ -133,7 +135,7 @@ class MobileProtocol {
     async createFileNetworker(dcID) {
         if (AppPermanentStorage.exists("authKey" + dcID)) {
             // i changed it to MTProtoNetworker cause Networker does not have `invokeMethod` function @undrfined
-            const networker = new ApiNetworker({
+            const networker = new FileNetworker({
                 dcID: dcID,
                 nonce: createNonce(16),
                 sessionID: createNonce(8), // TODO check if secure?
@@ -159,7 +161,7 @@ class MobileProtocol {
         return new Promise(resolve => {
             const mtprotoNetworker = new MTProtoNetworker(authContext)
             authKeyCreation(mtprotoNetworker).then(response => {
-                const networker = new ApiNetworker(authContext)
+                const networker = new FileNetworker(authContext)
 
                 const list = this.fileNetworkers[dcID]
                 this.fileNetworkers[dcID] = networker
