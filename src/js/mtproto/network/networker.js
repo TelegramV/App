@@ -20,6 +20,10 @@ export class Networker {
         }, this, this.dcUrl)
     }
 
+    reconnect() {
+
+    }
+
     onDisconnect() {
 
     }

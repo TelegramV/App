@@ -452,8 +452,10 @@
                 line-height: 1.2;
                 word-wrap: break-word;
                 padding: 5px 9px;
+                user-select: text;
 
                 .media-wrapper {
+                    position: relative;
                     width: 100%;
                     min-width: 100px;
                     min-height: 100px;
@@ -463,6 +465,13 @@
                     align-items: center;
                     overflow: hidden;
                     background-color: black;
+
+                    .progress {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                    }
 
                     .attachment {
                         max-width: 100%;
@@ -474,7 +483,7 @@
 
                     .attachment-thumb {
                         filter: blur(10px);
-                        padding: 10px;
+                        transform: scale(1.1);
                     }
                 }
 

@@ -49,8 +49,11 @@ function mt_init_transportation(url)
             console.log("CRASHED");
         }
         disconnect_processors[url]()
-        mt_init_transportation(url)
         console.log('code: ' + ev.code + ' reason: ' + ev.reason);
+        delete disconnect_processors[url]
+        delete high_level_contexts[url]
+        delete high_level_processors[url]
+        transportation_streams.delete(url)
     };
     
     transportation_streams.set(url, {

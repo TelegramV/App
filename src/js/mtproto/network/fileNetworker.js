@@ -2,59 +2,21 @@ import {Networker} from "./networker";
 import {TLSerialization} from "../language/serialization";
 import {TLDeserialization} from "../language/deserialization";
 import {createLogger} from "../../common/logger";
+import {ApiNetworker} from "./apiNetworker";
+import MTProto from "../index";
 
 const Logger = createLogger("FileNetworker")
 
-export class FileNetworker extends Networker {
-    handler
-
+export class FileNetworker extends ApiNetworker {
     constructor(authContext) {
         super(authContext)
     }
 
-    addHeader(message) {
-        const requestLength = message.body.byteLength
-
-        const serializer = new TLSerialization()
-        serializer.storeLongP(0, 0, "auth_key_id")
-        serializer.storeLong(message.msg_id, "msg_id")
-        serializer.storeInt(requestLength, "request_length")
-        serializer.storeRawBytes(message.body, "request_body")
-
-        return serializer.getBuffer()
+    reconnect() {
     }
 
-    invokeMethod(method, params, options = {}) {
-        const serializer = new TLSerialization(options)
-
-        options.resultType = serializer.storeMethod(method, params)
-
-        const messageID = this.timeManager.generateMessageID()
-        const message = {
-            msg_id: messageID,
-            body: serializer.getBuffer(),
-            isAPI: false
-        }
-
-        Logger.debug("MTProto call", method, params)
-
-        this.sendMessage(message)
-
-        return new Promise(resolve => {
-            this.handler = resolve
-        })
-    }
-
-    sendMessage(message) {
-        super.sendMessage(this.addHeader(message));
-    }
-
-    processResponse(data) {
-        const deserializer = new TLDeserialization(data, {mtproto: true})
-        const auth_key_id = deserializer.fetchLong("auth_key_id")
-        const msg_id = deserializer.fetchLong("msg_id")
-        const msg_len = deserializer.fetchInt("msg_len")
-
-        this.handler(deserializer)
+    onDisconnect() {
+        console.error(`File networker #${this.auth.dcID} died, respawning...`)
+        this.reconnect()
     }
 }

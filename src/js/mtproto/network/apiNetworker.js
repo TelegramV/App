@@ -12,6 +12,7 @@ import AppCryptoManager from "../crypto/cryptoManager";
 import {schema} from "../language/schema";
 import Bytes from "../utils/bytes"
 import Random from "../utils/random"
+import MTProto from "../index";
 
 const Logger = createLogger("ApiNetworker", {
     level: "warn"
@@ -56,6 +57,9 @@ export class ApiNetworker extends Networker {
         this.pings[pingMessage.msg_id] = pingID
 
         this.messageProcessor.listenPong(pingMessage.msg_id, l => {
+            if(this.connected === false) {
+                document.querySelector("#connecting_message").style.display = "none";
+            }
             delete this.pings[pingMessage.msg_id]
 
         })
@@ -166,6 +170,12 @@ export class ApiNetworker extends Networker {
         // TODO reconnect
         // ALSO if there"s no internet it doesn"t disconnect ws, should ping prob
         document.querySelector("#connecting_message").style.display = "flex";
+        this.reconnect()
+        this.connected = false
+    }
+
+    reconnect() {
+        super.reconnect();
     }
 
     getAesKeyIv(msgKey, isOut) {

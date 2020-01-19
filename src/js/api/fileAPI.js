@@ -80,7 +80,9 @@ export class FileAPI {
     }
 
     static getMaxSize(file) {
-        return file.sizes[file.sizes.length - 1]
+        return file.sizes.reduce(function(prev, current) {
+            return (prev.w > current.w) ? prev : current
+        })
     }
 
     static getMinSize(file) {
