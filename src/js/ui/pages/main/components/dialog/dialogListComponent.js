@@ -179,9 +179,6 @@ export class DialogListComponent extends Component {
         }
 
         const resize = event => {
-            if (this.state.renderedDialogsElements.size > 50) {
-                setmin()
-            } else {
                 const computedSize = parseInt(getComputedStyle($element).width) + event.x - prevPosition
 
                 if (computedSize < 150 && $searchElement) {
@@ -199,7 +196,6 @@ export class DialogListComponent extends Component {
                     prevPosition = event.x
                     $searchElement.classList.remove("d-none")
                     $connectingMessageText.classList.remove("d-none")
-                }
             }
         }
 
