@@ -59,17 +59,21 @@ class DialogManager extends Manager {
         }
 
         MTProto.UpdatesManager.subscribe("updateShortMessage", async update => {
+            console.log(update)
             updateDialogLastMessage(await this.findOrFetch("user", update.user_id), update)
         })
 
         MTProto.UpdatesManager.subscribe("updateShortChatMessage", async update => {
+            console.log(update)
             updateDialogLastMessage(await this.findOrFetch("chat", update.chat_id), update)
         })
 
         MTProto.UpdatesManager.subscribe("updateNewMessage", async update => {
+            console.log(update)
+
             let dialog = undefined
 
-            if (update.message.pFlags.out && update.message.to_id) {
+            if (update.message.pFlags.out || update.message.to_id) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 dialog = await this.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
             } else {
@@ -340,9 +344,7 @@ class DialogManager extends Manager {
             _: "inputDialogPeer",
             peer: {
                 _: "inputPeerUserFromMessage",
-                peer: {
-                    
-                }
+                peer: {}
             }
         }
 

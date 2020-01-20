@@ -8,10 +8,14 @@ import {ContextMenuComponent} from "../../contextMenuManager";
 
 function initUIManagers() {
     UpdatesManager.init().then(() => {
-        DialogsManager.init()
+        // todo: move this to DialogsManager logic
+        DialogsManager.fetchDialogs({}).then(() => {
+            DialogsManager.init()
+        })
+
         PeersManager.init()
     })
-    LocaleController.init();
+    LocaleController.init()
 }
 
 export function MainPage() {
