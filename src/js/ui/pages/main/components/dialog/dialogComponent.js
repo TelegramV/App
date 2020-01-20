@@ -104,7 +104,8 @@ export class DialogComponent extends Component {
                     <div className="top">
                         <div className="title">{peer.isSelf ? "Saved Messages" : peer.name}</div>
                         <div className="status tgico"/>
-                        <div className="time">{dialog.messages.last.getDate("en", tsNow(true) - dialog.messages.last.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)}</div>
+                        <div
+                            className="time">{dialog.messages.last.getDate("en", tsNow(true) - dialog.messages.last.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)}</div>
                     </div>
 
                     <div className="bottom">
@@ -154,6 +155,8 @@ export class DialogComponent extends Component {
 
                 if ($foundRendered) {
                     this.props.$general.insertBefore(this.$el, $foundRendered)
+                } else {
+                    this.__delete() // ...
                 }
             }
 
@@ -205,35 +208,16 @@ export class DialogComponent extends Component {
             return undefined
         }
 
-        let minDiff = 999999999999
-
-        /**
-         * @type {undefined|Element|Node}
-         */
-        let $dialog = undefined
-
         const lastMessageDate = parseInt(dialog.messages.last.date)
 
-        // there is a better way to do this.
-        // looks like $general.childNodes already sorted, so we do not need to check each node
-        // i will implement it later
-
-        renderedDialogs.forEach($rendered => {
+        for (const $rendered of renderedDialogs) {
             if ($rendered !== this.$el) {
-                const datasetDate = parseInt($rendered.dataset.date)
-                const nextDiff = Math.abs(lastMessageDate - datasetDate)
-
-                if (minDiff > nextDiff) {
-                    minDiff = nextDiff
-                    $dialog = $rendered
+                if (lastMessageDate >= parseInt($rendered.dataset.date)) {
+                    return $rendered // todo: fix if dialog is last in the list
                 }
             }
-        })
-
-        if (parseInt($dialog.dataset.date) > lastMessageDate && $dialog.nextSibling) {
-            return $dialog.nextSibling
         }
 
-        return $dialog  // fuuuuuuck
+        return undefined
     }
 }
