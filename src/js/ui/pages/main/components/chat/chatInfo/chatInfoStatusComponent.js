@@ -17,7 +17,7 @@ class ChatInfoStatusComponent extends Component {
                     "fullLoaded",
                 ]),
             }
-        });
+        })
     }
 
     h() {

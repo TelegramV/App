@@ -5,6 +5,7 @@
  * @returns {boolean}
  */
 function bvdom_isComponent(potentialNamedComponent) {
+    throw new Error("deprecated")
     return (
         typeof potentialNamedComponent === "object" &&
         typeof potentialNamedComponent.name === "string" &&

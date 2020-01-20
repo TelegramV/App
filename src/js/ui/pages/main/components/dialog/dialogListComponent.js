@@ -110,7 +110,7 @@ export class DialogListComponent extends Component {
         this._registerResizer()
     }
 
-    changed(key, value) {
+    reactiveChanged(key, value) {
         if (key === "selectedDialog") {
             if (value) {
                 this.$el.classList.add("responsive-selected-chatlist")
@@ -121,6 +121,8 @@ export class DialogListComponent extends Component {
     }
 
     /**
+     * CRITICAL: this method must be called only once per unique dialog.
+     *
      * @param {Dialog} dialog
      * @param {boolean|string} appendOrPrepend if `false` then it will try to find dialog to insert before
      * @private
@@ -206,33 +208,36 @@ export class DialogListComponent extends Component {
         }
 
         const resize = event => {
-                const computedSize = parseInt(getComputedStyle($element).width) + event.x - prevPosition
+            const computedSize = parseInt(getComputedStyle($element).width) + event.x - prevPosition
 
-                if (computedSize < 150 && $searchElement) {
-                    $searchElement.classList.add("d-none")
-                } else {
-                    $searchElement.classList.remove("d-none")
-                }
+            if (computedSize < 150 && $searchElement) {
+                $searchElement.classList.add("d-none")
+            } else {
+                $searchElement.classList.remove("d-none")
+            }
 
-                if (computedSize <= (MIN_WIDTH + 20) && !sticked) {
-                    setmin()
-                    prevPosition = event.x
-                } else if (computedSize >= MIN_WIDTH) {
-                    sticked = false
-                    $element.style.width = `${computedSize}px`
-                    prevPosition = event.x
-                    $searchElement.classList.remove("d-none")
-                    $connectingMessageText.classList.remove("d-none")
+            if (computedSize <= (DEFAULT_WIDTH - 2) && !sticked) {
+                setmin()
+            } else if (computedSize >= MIN_WIDTH) {
+                setdef()
             }
         }
 
+        const self = this
+
         $element.addEventListener("mousedown", function (event) {
+            document.body.classList.add("grabbable")
             isMoving = true
             if (event.offsetX > 10 && isMoving) {
                 prevPosition = event.x
 
                 document.addEventListener("mousemove", resize, false)
             }
+        }, false)
+
+        document.addEventListener("mouseup", function () {
+            document.body.classList.remove("grabbable")
+            document.removeEventListener("mousemove", resize)
         }, false)
 
         $element.addEventListener("dblclick", function (event) {
@@ -243,9 +248,5 @@ export class DialogListComponent extends Component {
                 setmin()
             }
         })
-
-        document.addEventListener("mouseup", function () {
-            document.removeEventListener("mousemove", resize)
-        }, false)
     }
 }

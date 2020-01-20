@@ -23,6 +23,10 @@ class DialogManager extends Manager {
 
 
     init() {
+        if (this._inited) {
+            return
+        }
+
         AppSelectedDialog.subscribe(_ => {
             if (AppSelectedDialog.PreviousDialog) {
                 AppSelectedDialog.PreviousDialog.messages.clear()
@@ -197,6 +201,8 @@ class DialogManager extends Manager {
                 })
             }
         })
+
+        this._inited = true
 
         // MTProto.UpdatesManager.listenUpdate("updateShort", async update => {
         //     if (update._ === "updateUserStatus") {

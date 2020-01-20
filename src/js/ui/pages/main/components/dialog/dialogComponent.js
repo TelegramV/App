@@ -12,6 +12,13 @@ const DATE_FORMAT = {
     hour12: false
 }
 
+
+const patchAndResortEventTypes = new Set([
+    "newMessage",
+    "updateSingle",
+    "updatePinned"
+])
+
 /**
  * @param {Dialog} dialog
  */
@@ -25,13 +32,32 @@ function handleClick(dialog) {
     })
 }
 
+// NEVER CREATE THIS COMPONENT WITH THE SAME DIALOG
 export class DialogComponent extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props)
 
         this.reactive = {
             selectedDialog: AppSelectedDialog.Reactive.FireOnly
         }
+
+        this.appEvents = new Set([
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "newMessage").FireOnly,
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateSingle").FireOnly,
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updatePinned").FireOnly,
+
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateDraftMessage").PatchOnly,
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadHistoryInbox").PatchOnly,
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadHistoryOutbox").PatchOnly,
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "readHistory").PatchOnly,
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadChannelInbox").PatchOnly,
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadChannelOutbox").PatchOnly,
+
+            AppEvents.Peers.reactiveOnlySingle(this.props.dialog.peer, "updatePhoto").PatchOnly,
+            AppEvents.Peers.reactiveOnlySingle(this.props.dialog.peer, "updatePhotoSmall").PatchOnly,
+            AppEvents.Peers.reactiveOnlySingle(this.props.dialog.peer, "updateUserStatus").PatchOnly,
+        ])
+
     }
 
     h() {
@@ -69,7 +95,7 @@ export class DialogComponent extends Component {
 
                 <div className="content">
                     <div className="top">
-                        <div className="title">{peer.name}</div>
+                        <div className="title">{peer.isSelf ? "Saved Messages" : peer.name}</div>
                         <div className="status tgico"/>
                         <div className="time">{dialog.messages.last.getDate("en", DATE_FORMAT)}</div>
                     </div>
@@ -91,11 +117,11 @@ export class DialogComponent extends Component {
     }
 
     mounted() {
-        AppEvents.Dialogs.subscribeAnySingle(this.props.dialog, this._handleDialogUpdates)
-        AppEvents.Peers.subscribeAnySingle(this.props.dialog.peer, this._handlePeerUpdates)
+        // AppEvents.Dialogs.subscribeAnySingle(this.props.dialog, this._handleDialogUpdates)
+        // AppEvents.Peers.subscribeAnySingle(this.props.dialog.peer, this._handlePeerUpdates)
     }
 
-    changed(key, value) {
+    reactiveChanged(key, value) {
         if (key === "selectedDialog") {
 
             if (value) {
@@ -128,67 +154,20 @@ export class DialogComponent extends Component {
             // todo: handle no last message
         } else if (parseInt(this.$el.dataset.date) !== this.props.dialog.messages.last.date) {
             if (!this.props.dialog.isPinned) {
-                this.props.$general.prepend(this.$el)
+                if (this.$el.previousSibling) {
+                    this.props.$general.prepend(this.$el)
+                }
             }
         }
 
         this.__patch()
     }
 
-    /**
-     * Handles Dialog updates
-     * @param event
-     * @private
-     */
-    _handleDialogUpdates(event) {
-        switch (event.type) {
-            case "newMessage":
-                this._patchAndResort()
-
-                break
-
-            case "updateSingle":
-                this._patchAndResort()
-
-                break
-
-            case "updateDraftMessage":
-                this.__patch()
-
-                break
-
-            case "updateReadHistoryInbox":
-                this.__patch()
-
-                break
-
-            case "readHistory":
-                this.__patch()
-
-                break
-
-            case "updateReadHistoryOutbox":
-                this.__patch()
-
-                break
-
-            case "updateReadChannelInbox":
-                this.__patch()
-
-                break
-
-            case "updateReadChannelOutbox":
-                this.__patch()
-
-                break
-
-            case "updatePinned":
-                this._patchAndResort()
-
-                break
+    eventFired(bus, event) {
+        if (bus === AppEvents.Dialogs && patchAndResortEventTypes.has(event.type)) {
+            this._patchAndResort()
         }
     }
-
 
     /**
      * Handles Peer updates
@@ -196,10 +175,14 @@ export class DialogComponent extends Component {
      * @private
      */
     _handlePeerUpdates(event) {
-        if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
-            this.__patch()
-        } else if (event.type === "updateUserStatus") {
-            this.__patch()
+        if (event.peer === this.props.dialog.peer) {
+            if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
+                console.log("patch peer update photo")
+                this.__patch()
+            } else if (event.type === "updateUserStatus") {
+                this.__patch()
+                console.log("patch peer update status")
+            }
         }
     }
 

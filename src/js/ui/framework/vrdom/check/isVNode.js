@@ -7,6 +7,7 @@
 import {VRNode} from "../VRNode"
 
 function vdom_isVNode(potentialVNode) {
+    throw new Error("deprecated")
     return typeof potentialVNode instanceof VRNode
 }
 

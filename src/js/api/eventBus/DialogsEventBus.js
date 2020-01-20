@@ -1,4 +1,5 @@
 import {EventBus} from "./index"
+import ReactiveEvent from "../../ui/framework/reactive/reactiveEvent"
 
 export class DialogsEventBus extends EventBus {
     constructor(props) {
@@ -8,17 +9,53 @@ export class DialogsEventBus extends EventBus {
          * @type {Map<Dialog, Set<function(*)>>}
          * @private
          */
-        this._singleSubscribers = new Map()
+        this._singleAnySubscribers = new Map()
+
+        /**
+         * @type {Map<Dialog, Set<function(EventBus, *)>>}
+         * @private
+         */
+        this._reactiveSingleAnySubscribers = new Map()
+
+        /**
+         * @type {Map<Dialog, Map<string, Set<function(EventBus, *)>>>}
+         * @private
+         */
+        this._reactiveSingleSubscribers = new Map()
     }
 
     fire(type, event) {
-        if (event.dialog && this._singleSubscribers.has(event.dialog)) {
-            this._singleSubscribers
-                .get(event.dialog)
-                .forEach(s => s({
-                    type,
-                    ...event
-                }))
+        if (event.dialog) {
+            if (this._singleAnySubscribers.has(event.dialog)) {
+                this._singleAnySubscribers
+                    .get(event.dialog)
+                    .forEach(s => s({
+                        type,
+                        ...event
+                    }))
+            }
+
+            if (this._reactiveSingleAnySubscribers.has(event.dialog)) {
+                this._reactiveSingleAnySubscribers
+                    .get(event.dialog)
+                    .forEach(s => s(this, {
+                        __any: true,
+                        type,
+                        ...event
+                    }))
+            }
+
+            if (this._reactiveSingleSubscribers.has(event.dialog)) {
+                const types = this._reactiveSingleSubscribers.get(event.dialog)
+
+                if (types.has(type)) {
+                    types.get(type)
+                        .forEach(s => s(this, {
+                            type,
+                            ...event
+                        }))
+                }
+            }
         }
 
         super.fire(type, event)
@@ -29,10 +66,67 @@ export class DialogsEventBus extends EventBus {
      * @param {function(Dialog)} callback
      */
     subscribeAnySingle(dialog, callback) {
-        if (!this._singleSubscribers.has(dialog)) {
-            this._singleSubscribers.set(dialog, new Set())
-        }
+        this._singleAnySubscribers.get(dialog).add(callback)
+    }
 
-        this._singleSubscribers.get(dialog).add(callback)
+    /**
+     * @param {Dialog} dialog
+     * @return {{Default: *, FireOnly: *, PatchOnly: *}}
+     */
+    reactiveAnySingle(dialog) {
+        return ReactiveEvent(this, resolve => {
+            if (!this._reactiveSingleAnySubscribers.has(dialog)) {
+                this._reactiveSingleAnySubscribers.set(dialog, new Set())
+            }
+
+            this._reactiveSingleAnySubscribers.get(dialog).add(resolve)
+
+            return "*"
+        }, resolve => {
+            if (this._reactiveSingleAnySubscribers.has(dialog)) {
+                this._reactiveSingleAnySubscribers.get(dialog).delete(resolve)
+            } else {
+                console.error("BUG: reactiveAnySingle")
+            }
+        })
+    }
+
+    /**
+     * PYZDEC
+     *
+     * @param {Dialog} dialog
+     * @param {string} eventType
+     * @return {{Default: *, FireOnly: *, PatchOnly: *}}
+     */
+    reactiveOnlySingle(dialog, eventType) {
+        return ReactiveEvent(this, resolve => {
+            let subscriberTypes = this._reactiveSingleSubscribers.get(dialog)
+
+            if (!subscriberTypes) {
+                subscriberTypes = this._reactiveSingleSubscribers.set(dialog, new Map()).get(dialog)
+
+                subscriberTypes.set(eventType, new Set()).get(eventType).add(resolve)
+
+            } else if (!subscriberTypes.has(eventType)) {
+                subscriberTypes.set(eventType, new Set()).get(eventType).add(resolve)
+            } else {
+                subscriberTypes.get(eventType).add(resolve)
+            }
+
+            return eventType
+        }, resolve => {
+            if (this._reactiveSingleSubscribers.has(dialog)) {
+                let subscriberTypes = this._reactiveSingleSubscribers.get(dialog)
+
+                if (subscriberTypes.has(eventType)) {
+                    subscriberTypes.get(eventType).delete(resolve)
+                } else {
+                    console.error("BUG: reactiveOnlySingle no type")
+                }
+
+            } else {
+                console.error("BUG: reactiveOnlySingle no dialog")
+            }
+        })
     }
 }

@@ -39,17 +39,14 @@ function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
             onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
         }
     }
-    // else if (hasUpdatePts(rawUpdate)) {
-        // if (peer.dialog.pts === rawUpdate.pts) {
-        //     onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
-        // } else if (peer.dialog.pts > rawUpdate.pts) {
-        //     // console.debug("[channel] [no pts_count] channel update already processed")
-        //     onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
-        // } else {
-        //     // console.warn("[channel] [no pts_count] channel update cannot be processed", rawUpdate._, peer.dialog.pts, rawUpdate.pts)
-        //     onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
-        // }
-    // }
+    else if (hasUpdatePts(rawUpdate)) {
+        if (peer.dialog.pts > rawUpdate.pts) {
+            // console.debug("[channel] [no pts_count] channel update already processed")
+            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
+        } else {
+            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
+        }
+    }
     else {
         // console.debug("[channel] channel update has no pts")
         onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)

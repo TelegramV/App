@@ -8,16 +8,27 @@ class Component {
             mounted: false,
             destroyed: false,
             created: false,
-            reactiveOffCallbacks: new Map(),
-            patchingSelf: false
+            patchingSelf: false,
+            /**
+             * @type {Map<string, *>}
+             */
+            reactiveContexts: new Map(),
+
+            /**
+             * @type {Map<EventBus, Map<string, *>>}
+             */
+            appEventContexts: new Map(),
         }
         this.identifier = undefined
         this.name = props.name || this.constructor.name
         this.$el = props.$el || undefined
         this.state = props.state || {}
         this.reactive = props.reactive || {}
-        this.methods = props.methods || {}
-        this.props = {}
+        /**
+         * @type {Set<*>}
+         */
+        this.appEvents = props.appEvents || new Set()
+        this.props = props.props || {}
         this.slot = props.slot
 
         this.refs = AppFramework.mountedComponents
@@ -35,10 +46,6 @@ class Component {
     created() {
     }
 
-    // changed reactive property event
-    changed(key, value) {
-    }
-
     // mounted event; normally called once per component
     // on this stage `this.$el` is accessible; if not, then report bug
     // always called after `created`
@@ -47,6 +54,14 @@ class Component {
 
     // destroy event (not destroyed)
     destroy() {
+    }
+
+    // changed reactive property event
+    reactiveChanged(key, value) {
+    }
+
+    // will be called when selected app event was fired
+    eventFired(bus, event) {
     }
 
     // patch request interceptor; return `false` to decline.
@@ -70,8 +85,8 @@ class Component {
 
     // do not override this if there is no critical reason
     __disableReactive() {
-        for (const [resolve, offCallback] of this.__.reactiveOffCallbacks.values()) {
-            offCallback(resolve)
+        for (const context of this.__.reactiveContexts) {
+            context.offCallback(context.resolve)
         }
     }
 
@@ -130,25 +145,97 @@ class Component {
             this.h = this.h.bind(this)
             this.created = this.created.bind(this)
             this.mounted = this.mounted.bind(this)
-            this.changed = this.changed.bind(this)
+            this.reactiveChanged = this.reactiveChanged.bind(this)
             this.patch = this.patch.bind(this)
 
             this.__delete = this.__delete.bind(this)
             this.__render = this.__render.bind(this)
             this.__patch = this.__patch.bind(this)
 
-            for (const [k, v] of Object.entries(this.reactive)) {
-                if (v && v.__rc) {
-                    v.component = this
-                    v.key = k
-                    this.reactive[k] = v.defaultValue
-                    this.__.reactiveOffCallbacks.set(k, [v.resolve, v.offCallback])
+            for (const [key, context] of Object.entries(this.reactive)) {
+                if (context) {
+                    if (context.__rc) {
+                        this.__.reactiveContexts.set(key, context)
+                        this.reactive[key] = context.callback(value => this.__resolveReactivePropertyChange(key, value))
+                    } else {
+                        console.error(`not reactive value ${key}`, context)
+                    }
                 } else {
-                    console.error(`not reactive value ${k}`, v)
+                    console.error(`not reactive value ${key}`, context)
+                }
+            }
+
+            for (const context of this.appEvents) {
+                if (context.__re) {
+
+                    const bus = context.bus
+                    const eventType = context.callback(this.__resolveReactiveEventFired.bind(this))
+
+                    if (!this.__.appEventContexts.has(bus)) {
+                        this.__.appEventContexts.set(bus, new Map())
+                    }
+
+                    this.__.appEventContexts.get(bus).set(eventType, context)
+
+                } else {
+                    console.error(`not reactive event ${key}`, context)
                 }
             }
 
             this.__.inited = true
+        }
+    }
+
+    __resolveReactivePropertyChange(key, newValue) {
+        if (this.__.reactiveContexts.has(key)) {
+
+            const context = this.__.reactiveContexts.get(key)
+
+            if (context.patchOnly) {
+                this.reactive[key] = newValue
+                this.__patch()
+            } else if (context.fireOnly) {
+                this.reactive[key] = newValue
+                this.reactiveChanged(key, newValue)
+            } else {
+                this.reactive[key] = newValue
+                this.reactiveChanged(key, newValue)
+                this.__patch()
+            }
+
+        } else {
+            console.error("BUG: reactive context was not found!")
+        }
+    }
+
+    __resolveReactiveEventFired(bus, event) {
+        if (this.__.appEventContexts.has(bus)) {
+
+            let eventType = undefined
+
+            if (event.__any) {
+                eventType = "*"
+            } else {
+                eventType = event.type
+            }
+
+            const context = this.__.appEventContexts.get(bus).get(eventType)
+
+            if (context) {
+                if (context.patchOnly) {
+                    this.__patch()
+                } else if (context.fireOnly) {
+                    this.eventFired(bus, event)
+                } else {
+                    this.eventFired(bus, event)
+                    this.__patch()
+                }
+            } else {
+                console.error("BUG: invalid event!", bus, event)
+            }
+
+        } else {
+            console.error("BUG: invalid event bus!")
         }
     }
 }

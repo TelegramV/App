@@ -36,7 +36,7 @@ class ChatComponent extends Component {
         )
     }
 
-    changed(key, value) {
+    reactiveChanged(key, value) {
         if (key === "dialog") {
             if (value) {
                 this.$el.classList.add("responsive-selected-chat")

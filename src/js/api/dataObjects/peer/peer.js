@@ -108,6 +108,13 @@ export class Peer {
     }
 
     /**
+     * @return {boolean}
+     */
+    get isSelf() {
+        return this.raw.pFlags && this.raw.pFlags.self === true
+    }
+
+    /**
      * @return {{_: string, chat_id: *}|{user_id: *, access_hash: string, _: string}|{access_hash: string, channel_id: *, _: string}|{_: string}}
      */
     get inputPeer() {
