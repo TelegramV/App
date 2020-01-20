@@ -38,7 +38,10 @@ class DialogManager extends Manager {
          * @param {Object} lastMessage
          */
         const updateDialogLastMessage = (dialog, lastMessage) => {
-            if (!dialog) return
+            if (!dialog) {
+                console.error("BUG: dialog was not found")
+                return
+            }
 
             const message = new Message(dialog, lastMessage)
 

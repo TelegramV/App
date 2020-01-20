@@ -29,18 +29,11 @@ function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
         if ((state.pts + rawUpdate.pts_count) === rawUpdate.pts) {
             onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         } else if ((state.pts + rawUpdate.pts_count) > rawUpdate.pts) {
-            // console.debug("[default] update already processed")
+            console.debug("[default] update already processed  (it is actually bug, but should work anyway)")
             onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         } else {
             // console.warn("[default] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
             onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
-        }
-    } else if (hasUpdatePts(rawUpdate)) {
-        if (state.pts.pts > rawUpdate.pts) {
-            // console.debug("[channel] [no pts_count] channel update already processed")
-            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
-        } else {
-            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         }
     } else {
         // console.debug("[default] update has no pts")
@@ -79,7 +72,7 @@ export class DefaultUpdatesProcessor {
         if (!this.isWaitingForDifference) {
             // should never be true, but who knows
             if (this.differenceUpdateTypes.includes(rawUpdate._)) {
-                this.processDifference(rawUpdate)
+                console.error("BUG: difference was passed to enqueue")
             } else {
                 this.queue.push(rawUpdate)
 

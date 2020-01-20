@@ -11,9 +11,8 @@ function initUIManagers() {
         // todo: move this to DialogsManager logic
         DialogsManager.fetchDialogs({}).then(() => {
             DialogsManager.init()
+            PeersManager.init()
         })
-
-        PeersManager.init()
     })
     LocaleController.init()
 }

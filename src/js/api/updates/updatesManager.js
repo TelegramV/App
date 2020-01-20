@@ -89,7 +89,7 @@ class UpdateManager extends Manager {
     }
 
     processUpdate(type, rawUpdate) {
-        if (this.channelUpdatesProcessor.updateTypes.includes(rawUpdate._) || this.channelUpdatesProcessor.differenceUpdateTypes.includes(rawUpdate._)) {
+        if (this.channelUpdatesProcessor.updateTypes.includes(rawUpdate._)) {
             this.channelUpdatesProcessor.enqueue(rawUpdate)
         } else {
             this.defaultUpdatesProcessor.enqueue(rawUpdate)
