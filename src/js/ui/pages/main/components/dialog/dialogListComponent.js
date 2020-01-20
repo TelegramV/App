@@ -100,24 +100,21 @@ export class DialogListComponent extends Component {
         this.elements.$pinnedDialogs = this.elements.$dialogsWrapper.querySelector("#dialogsPinned")
         this.elements.$generalDialogs = this.elements.$dialogsWrapper.querySelector("#dialogs")
 
-        DialogsManager.fetchDialogs({}).then(() => {
+        AppEvents.Dialogs.subscribe("updateMany", event => {
             this.elements.$loader.style.display = "none"
             this.elements.$pinnedDialogs.style.display = ""
             this.elements.$generalDialogs.style.display = ""
 
             Sortable.create(this.elements.$pinnedDialogs)
+
+            event.pinnedDialogs.forEach(dialog => {
+                this._renderDialog(dialog, "append")
+            })
+
+            event.dialogs.forEach(dialog => {
+                this._renderDialog(dialog, "append")
+            })
         })
-
-        AppEvents.Dialogs.subscribe("updateMany", event => {
-                event.pinnedDialogs.forEach(dialog => {
-                    this._renderDialog(dialog, "append")
-                })
-
-                event.dialogs.forEach(dialog => {
-                    this._renderDialog(dialog, "append")
-                })
-            }
-        )
 
         //this._registerResizer()
     }

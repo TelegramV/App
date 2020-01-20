@@ -37,6 +37,7 @@ class BubblesComponent extends Component {
                 <div id="bubbles-inner">
 
                 </div>
+                <div class="anchor"></div>
             </div>
         )
     }
@@ -176,8 +177,8 @@ class BubblesComponent extends Component {
         for (const message of messages) {
             this.state.renderedMessageElements.push(this._renderMessage(message))
         }
-
-        this.$el.scrollTop += this.elements.$bubblesInner.clientHeight - k
+        //TODO fix initial scroll position
+        //this.$el.scrollTop += this.elements.$bubblesInner.clientHeight - k
     }
 
     /**

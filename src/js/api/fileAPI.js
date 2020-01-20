@@ -64,23 +64,23 @@ export class FileAPI {
      * @return {Promise<string>}
      */
     static getPeerPhoto(file, dcID, peer, big) {
-        return new Promise(resolve => {
-            return AppCache.get("peerAvatars", file.volume_id + "_" + file.local_id).then(blob => {
-                return URL.createObjectURL(blob)
-            }).catch(error => {
-                return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
-                    const blob = new Blob(new Array(response.bytes), {type: 'application/jpeg'})
+        return AppCache.get("peerAvatars", file.volume_id + "_" + file.local_id).then(blob => {
+            return URL.createObjectURL(blob)
+        }).catch(error => {
+            return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
+                const blob = new Blob(new Array(response.bytes), {type: 'application/jpeg'})
 
-                    AppCache.put("peerAvatars", file.volume_id + "_" + file.local_id, blob)
-
-                    return URL.createObjectURL(blob)
+                AppCache.put("peerAvatars", file.volume_id + "_" + file.local_id, blob).catch(error => {
+                    //
                 })
-            }).then(resolve)
+
+                return URL.createObjectURL(blob)
+            })
         })
     }
 
     static getMaxSize(file) {
-        return file.sizes.reduce(function(prev, current) {
+        return file.sizes.reduce(function (prev, current) {
             return (prev.w > current.w) ? prev : current
         })
     }
@@ -112,26 +112,29 @@ export class FileAPI {
     }
 
     static getFile(file, thumb_size = "") {
-        return new Promise(resolve => {
 
-            const key = Bytes.asHex(file.file_reference)
+        const key = Bytes.asHex(file.file_reference)
 
-            AppCache.get("files", key).then(blob => {
-                return URL.createObjectURL(blob)
-            }).catch(error => {
-                return this.getFileLocation({
-                    _: this.getInputName(file),
-                    id: file.id,
-                    access_hash: file.access_hash,
-                    file_reference: file.file_reference,
-                    thumb_size: thumb_size
-                }, file.dc_id).then(response => {
-                    const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
-                    const blob = new Blob([response.bytes], {type: type})
-                    AppCache.put("files", key, blob)
-                    return URL.createObjectURL(blob)
+        return AppCache.get("files", key).then(blob => {
+            return URL.createObjectURL(blob)
+        }).catch(error => {
+
+            return this.getFileLocation({
+                _: this.getInputName(file),
+                id: file.id,
+                access_hash: file.access_hash,
+                file_reference: file.file_reference,
+                thumb_size: thumb_size
+            }, file.dc_id).then(response => {
+                const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
+                const blob = new Blob([response.bytes], {type: type})
+
+                AppCache.put("files", key, blob).catch(error => {
+                    //
                 })
-            }).then(resolve)
+
+                return URL.createObjectURL(blob)
+            })
         })
     }
 

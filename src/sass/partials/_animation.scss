@@ -18,9 +18,13 @@
 
 @keyframes jump-in {
   0% {
-    transform: scaleY(0.1) translateY(100%);
+    max-height: 10px;
+    transform: translateY(100%);
+    opacity: 0.4;
   }
   100% {
-    transform: scaleY(1) translateY(0%);
+    max-height: 1000px;
+    transform: translateY(0);
+    opacity: 1;
   }
 }

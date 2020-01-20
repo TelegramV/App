@@ -69,7 +69,7 @@ class DialogManager extends Manager {
         MTProto.UpdatesManager.subscribe("updateNewMessage", async update => {
             let dialog = undefined
 
-            if (update.message.pFlags.out && update.message.to_id) {
+            if (update.message.pFlags.out || update.message.to_id) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 dialog = await this.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
             } else {
@@ -340,9 +340,7 @@ class DialogManager extends Manager {
             _: "inputDialogPeer",
             peer: {
                 _: "inputPeerUserFromMessage",
-                peer: {
-                    
-                }
+                peer: {}
             }
         }
 

@@ -75,7 +75,7 @@ class Cache {
     get(sectorName, key) {
         return new Promise((resolve, reject) => {
             if (!this.isReady) {
-                reject("is not ready")
+                reject("db is not ready")
             }
 
             const transaction = this.transaction(sectorName, "readonly")
@@ -96,7 +96,7 @@ class Cache {
     put(sectorName, key, value) {
         return new Promise((resolve, reject) => {
             if (!this.isReady) {
-                return reject("is not ready")
+                return reject("db is not ready")
             }
 
             const transaction = this.transaction(sectorName, "readwrite")

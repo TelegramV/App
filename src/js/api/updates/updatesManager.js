@@ -105,4 +105,6 @@ class UpdateManager extends Manager {
     }
 }
 
-export default new UpdateManager()
+const UpdatesManager = new UpdateManager()
+
+export default UpdatesManager
