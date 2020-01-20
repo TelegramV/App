@@ -32,22 +32,13 @@ function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
         if ((peer.dialog.pts + rawUpdate.pts_count) === rawUpdate.pts) {
             onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         } else if ((peer.dialog.pts + rawUpdate.pts_count) > rawUpdate.pts) {
-            // console.debug("[channel] update already processed")
+            console.debug("[channel] update already processed (it is actually bug, but should work anyway)")
             onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         } else {
             // console.warn("[channel] channel update cannot be processed", rawUpdate._, peer.dialog.pts, rawUpdate.pts_count, rawUpdate.pts)
             onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
         }
-    }
-    else if (hasUpdatePts(rawUpdate)) {
-        if (peer.dialog.pts > rawUpdate.pts) {
-            // console.debug("[channel] [no pts_count] channel update already processed")
-            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
-        } else {
-            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
-        }
-    }
-    else {
+    } else {
         // console.debug("[channel] channel update has no pts")
         onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
     }
@@ -102,8 +93,8 @@ export class ChannelUpdatesProcessor {
                 this.processQueue()
             } else
                 // should never be true, but who knows
-                if (this.differenceUpdateTypes.includes(rawUpdate._)) {
-                this.processDifference(rawUpdate)
+            if (this.differenceUpdateTypes.includes(rawUpdate._)) {
+                console.error("BUG: difference was passed to enqueue")
             }
         } else {
             this.queue.push(rawUpdate)
@@ -219,8 +210,8 @@ export class ChannelUpdatesProcessor {
             if (rawDifferenceWithPeer.pFlags.final === true) {
                 // console.warn("difference is final", rawDifferenceWithPeer)
 
-                this.isWaitingForDifference = false
                 rawDifferenceWithPeer.__peer.dialog.pts = rawDifferenceWithPeer.pts
+                this.isWaitingForDifference = false
                 this.processQueue()
 
             } else {
