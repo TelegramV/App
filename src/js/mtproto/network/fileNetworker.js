@@ -12,11 +12,7 @@ export class FileNetworker extends ApiNetworker {
         super(authContext)
     }
 
-    reconnect() {
-    }
-
     onDisconnect() {
         console.error(`File networker #${this.auth.dcID} died, respawning...`)
-        this.reconnect()
     }
 }

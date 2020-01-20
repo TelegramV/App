@@ -295,6 +295,10 @@ export class TLDeserialization {
 
         predicate = constructorData.predicate
 
+        if(predicate == "vector") {
+        	return this.fetchObject("vector<T>","vector"); //special case for Vector at root
+        }
+
         let result = {"_": predicate}
         let overrideKey = (this.mtproto ? "mt_" : "") + predicate
         let self = this

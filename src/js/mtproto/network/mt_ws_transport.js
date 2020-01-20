@@ -16,6 +16,7 @@ export function mt_set_disconnect_processor(processor, url) {
 }
 function mt_init_transportation(url)
 {
+    console.log("mt_init_transportation")
     var transportation_socket = new WebSocket(url, "binary");
     transportation_socket.binaryType = "arraybuffer";
 

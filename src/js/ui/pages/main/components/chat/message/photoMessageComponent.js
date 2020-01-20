@@ -54,14 +54,18 @@ import {FileAPI} from "../../../../../../api/fileAPI";
 // }
 
 const MessageMediaImage = ({ src, alt = "", size, isThumb}) => {
+    const w = size[1] > 512 ? 512 / size[1] * size[0] : size[0]
     return (
         <div className="media-wrapper">
             <img className={["attachment", isThumb ? "attachment-thumb" : ""]}
                  src={src}
-                 alt={alt} css-width={size[0] + "px"} />
+                 alt={alt} css-width={w + "px"} />
             {
                 isThumb ?
                     <div className="progress">
+                        <div className="pause-button">
+                            <i className="tgico tgico-close"/>
+                        </div>
                         <progress className="progress-circular big white"></progress>
                     </div>
                     : ""
