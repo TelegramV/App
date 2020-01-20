@@ -479,8 +479,8 @@ function CountryDropdownItemComponent({flag, name, code}) {
 }
 
 class PaneComponent extends Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props)
     }
 
     set isShown(value) {
@@ -490,8 +490,8 @@ class PaneComponent extends Component {
 }
 
 class PhoneInputComponent extends PaneComponent {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props)
 
         this.state = {
             country: null,

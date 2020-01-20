@@ -125,8 +125,7 @@ export class DialogComponent extends Component {
     }
 
     mounted() {
-        // AppEvents.Dialogs.subscribeAnySingle(this.props.dialog, this._handleDialogUpdates)
-        // AppEvents.Peers.subscribeAnySingle(this.props.dialog.peer, this._handlePeerUpdates)
+
     }
 
     reactiveChanged(key, value) {
