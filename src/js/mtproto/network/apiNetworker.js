@@ -170,12 +170,7 @@ export class ApiNetworker extends Networker {
         // TODO reconnect
         // ALSO if there"s no internet it doesn"t disconnect ws, should ping prob
         document.querySelector("#connecting_message").style.display = "flex";
-        this.reconnect()
         this.connected = false
-    }
-
-    reconnect() {
-        super.reconnect();
     }
 
     getAesKeyIv(msgKey, isOut) {
