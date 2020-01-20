@@ -159,6 +159,14 @@
       }
     }
 
+    &.placeholder-icon {
+      font-size: 48px;
+    }
+
+    &.placeholder-saved {
+      background-color: $blue;
+    }
+
     &.placeholder-0 {
       background-color: #cc90e2;
     }
