@@ -17,6 +17,10 @@ class PeerManager extends Manager {
     }
 
     init() {
+        if (this._inited) {
+            return
+        }
+
         MTProto.UpdatesManager.subscribe("updateUserStatus", update => {
             const peer = PeersStore.get("user", update.user_id)
 
@@ -36,6 +40,8 @@ class PeerManager extends Manager {
                 peer.photo.fillRaw(update.photo)
             }
         })
+
+        this._inited = true
     }
 
     listenPeerInit(peerName, peerId, listener) {

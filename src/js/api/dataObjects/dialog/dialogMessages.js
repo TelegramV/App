@@ -48,7 +48,7 @@ export class DialogMessages {
      * @return {Message}
      */
     get last() {
-        return this._lastMessage
+        return this._lastMessage || this._prevLastMessage
     }
 
     /**

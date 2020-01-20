@@ -10,14 +10,15 @@ function vrdom_renderComponentVNode(componentVNode) {
     /**
      * @type {Component}
      */
-    const componentInstance = new (componentVNode.component)
+    const componentInstance = new (componentVNode.component)({
+        props: componentVNode.props,
+        slot: componentVNode.slot,
+    })
 
     const newId = componentVNode.ref ? componentVNode.ref : latestInstantiatedComponent++
 
     componentInstance.identifier = newId
     componentInstance.__init.bind(componentInstance)()
-    componentInstance.props = componentVNode.props
-    componentInstance.slot = componentVNode.slot
 
     const vNode = componentInstance.h()
 

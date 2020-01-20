@@ -10,7 +10,9 @@ import Component from "./ui/framework/vrdom/component"
 import AppCache from "./api/cache"
 import {loadSchema} from "./mtproto/language/schema"
 import PeersStore from "./api/store/peersStore"
+import AppEvents from "./api/eventBus/appEvents"
 
+const isProduction = false
 
 const authContext = {
     dcID: 2,
@@ -157,7 +159,7 @@ class Parent extends Component {
         )
     }
 
-    changed(key, value) {
+    reactiveChanged(key, value) {
         console.log("changed", key, value, this)
     }
 
@@ -184,8 +186,11 @@ class Parent extends Component {
 
 
 global.Peers = PeersStore
+global.EVE = AppEvents
 
-AppCache.open()
+if (isProduction) {
+    AppCache.open()
+}
 
 
 loadSchema().then(() => MTProto.connect(authContext).then(start))

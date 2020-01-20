@@ -1,17 +1,21 @@
 /**
- * Додаємо реактивності і дано-рушійності в компоненти!!!
+ * Цетралізує логіку оброблення оновлень реактивних значень в компонентах. Тільки в компонентах.
  *
- * @see AppSelectedDialog.Reactive
+ * Про користь цієї штуки я поки не буду говорити, але в теорії воно має працювати швидше ніж {@link ReactiveCallback}.
  *
- * @param {function(function(*))} callback анонімна функція, що приймає за параметр обробника реактивного оновлення. В компонентах він або патчить (__patch), або викликає changed.
- * @param {function(function(*))} offCallback анонімна функція, приймає обробника (того самого що в попередньому параметрі) параметром, якого має видаляти з нижчого (чи вищого, я запутався) рівня і більше НІКОЛИ не виконувати. Викликається під час видалення компонента.
+ * WARNING: NOT IMPLEMENTED NOW!
+ *
+ * @see ReactiveCallback
+ *
+ * @param {function(*)} callback
+ * @param {function(*)} offCallback
+ * @param {undefined|function(*)} customFilter
  * @return {{Default: *, FireOnly: *, PatchOnly: *}}
  */
-function ReactiveCallback(callback, offCallback) {
+function ComponentReactive(callback, offCallback, customFilter = undefined) {
     if (typeof callback !== "function") {
         throw new Error("callback is not a function")
     }
-
     if (typeof offCallback !== "function") {
         throw new Error("offCallback is not a function")
     }
@@ -25,7 +29,7 @@ function ReactiveCallback(callback, offCallback) {
         get Default() {
             const context = Object.create(null)
 
-            context.__rc = true
+            context.__r_component = true
 
             context.callback = callback
             context.offCallback = offCallback
@@ -69,4 +73,4 @@ function ReactiveCallback(callback, offCallback) {
     }
 }
 
-export default ReactiveCallback
+export default ComponentReactive

@@ -64,7 +64,7 @@ class BubblesComponent extends Component {
         })
     }
 
-    changed(key, value) {
+    reactiveChanged(key, value) {
         // check if selected dialog was changed
         if (key === "dialog") {
             if (value) {

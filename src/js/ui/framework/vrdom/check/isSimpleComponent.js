@@ -5,6 +5,7 @@
  * @returns {boolean}
  */
 function vdom_isSimpleComponent(potentialSimpleComponent) {
+    throw new Error("deprecated")
     return (
         typeof potentialSimpleComponent === "function"
     )

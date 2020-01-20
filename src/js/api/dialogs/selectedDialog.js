@@ -3,7 +3,6 @@ import {AppFramework} from "../../ui/framework/framework"
 import DialogsStore from "../store/dialogsStore"
 import DialogsManager from "./dialogsManager"
 import {Dialog} from "../dataObjects/dialog/dialog"
-import {arrayDelete} from "../../common/utils/utils"
 
 export function parseHashQuery() {
     const queryPeer = AppFramework.Router.activeRoute.queryParams.p.split(".")
@@ -15,6 +14,7 @@ export function parseHashQuery() {
     return {type: queryPeer[0], id: parseInt(queryPeer[1])}
 }
 
+// TODO: THIS SHOULD BE PEER NOT DIALOG!
 class SelectedDialog {
     /**
      * @param {Dialog} dialog
@@ -23,7 +23,7 @@ class SelectedDialog {
         this._previousDialog = undefined
         this._dialog = dialog
 
-        this._selectSubscribers = []
+        this._selectSubscribers = new Set()
 
         this._Reactive = ReactiveCallback(resolve => {
             this.subscribe(resolve)
@@ -110,14 +110,14 @@ class SelectedDialog {
      * @param {function(dialog: Dialog)} resolve
      */
     subscribe(resolve) {
-        this._selectSubscribers.push(resolve)
+        this._selectSubscribers.add(resolve)
     }
 
     /**
      * @param {function(dialog: Dialog)} resolve
      */
     unsubscribe(resolve) {
-        arrayDelete(this._selectSubscribers, resolve)
+        this._selectSubscribers.delete(resolve)
     }
 
     /**

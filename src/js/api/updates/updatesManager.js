@@ -50,8 +50,13 @@ class UpdateManager extends Manager {
     }
 
     init() {
+        if (this._inited) {
+            return
+        }
+
         return MTProto.invokeMethod("updates.getState", {}).then(state => {
             this.State = state
+            this._inited = true
         })
     }
 
