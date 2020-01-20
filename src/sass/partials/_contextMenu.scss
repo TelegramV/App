@@ -1,35 +1,64 @@
-.context-menu {
-  width: 200px;
-  background: white;
-  color: black;
+.context-menu-wrapper {
   position: absolute;
+  width: 100%;
+  height: 100%;
   z-index: 99999;
-  border-radius: 10px;
-  box-shadow: 2px 3px 4px 2px rgba(16, 35, 47, 0.15);
-  display: flex;
-  flex-direction: column;
 
   &.hidden {
     display: none;
+    pointer-events: none;
   }
 
-  .element {
-    width: 100%;
-    height: 64px;
+  .context-menu {
+    width: 220px;
+    background: white;
+    color: black;
+    position: absolute;
+    border-radius: 10px;
+    box-shadow: 0 5px 8px 1px rgba(0, 0, 0, .25);
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
 
-    .tgico {
-      color: $darkgrey;
-      width: 56px;
-      height: 56px;
-      font-size: 26px;
+    .element {
+      height: 64px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      transition: anim(background-color);
+      cursor: pointer;
+
+      .tgico {
+        color: $darkgrey;
+        min-width: 56px;
+        width: 56px;
+        height: 56px;
+        font-size: 26px;
+        line-height: 56px;
+        text-align: center;
+      }
+
+      span {
+        margin-left: 16px;
+        width: 100%;
+      }
+
+      .badge {
+        background-color: $grey;
+        min-width: 24px;
+        height: 24px;
+        text-align: center;
+        border-radius: 12px;
+        font-size: 14px;
+        color: #fff;
+        line-height: 24px;
+        font-weight: 700;
+        margin-right: 16px;
+      }
+
+      &:hover {
+        background-color: $light;
+      }
     }
 
-    span {
-      margin-left: 16px;
-    }
   }
-
 }

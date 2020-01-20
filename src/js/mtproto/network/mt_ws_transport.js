@@ -22,8 +22,10 @@ function mt_init_transportation(url)
 
     transportation_socket.onopen = function(ev)
     {
+        console.log("onopen")
         var transportation_stream = transportation_streams.get(url);
         for (var i = 0; i < transportation_stream.transportation_queue_len; i++) {
+            console.log("mt_inob_send")
             mt_inob_send(transportation_socket, transportation_stream.transportation_queue[i], transportation_stream.transportation_queue[i].byteLength, url);
             //console.log("transported buffer / 0");
             //console.log(transportation_queue[i].byteLength);
@@ -49,7 +51,7 @@ function mt_init_transportation(url)
         {
             console.log("CRASHED");
         }
-        disconnect_processors[url]()
+        if(disconnect_processors[url]) disconnect_processors[url]()
         console.log('code: ' + ev.code + ' reason: ' + ev.reason);
         delete disconnect_processors[url]
         delete high_level_contexts[url]

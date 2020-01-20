@@ -6,6 +6,8 @@ import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import Component from "../../../../framework/vrdom/component"
 import VRDOM from "../../../../framework/vrdom"
 import {ContextMenuManager} from "../../../../contextMenuManager";
+import MTProto from "../../../../../mtproto";
+import {AppFramework} from "../../../../framework/framework";
 
 export class DialogListComponent extends Component {
     constructor() {
@@ -30,10 +32,11 @@ export class DialogListComponent extends Component {
         return (
             <div className="chatlist">
                 <div className="toolbar">
-                    <i className="btn-icon rp rps tgico-menu" onClick={_ => ContextMenuManager.open([
+                    <i className="btn-icon rp rps tgico-menu" onClick={ev => ContextMenuManager.openBelow([
                         {
                             icon: "newgroup",
-                            title: "New group"
+                            title: "New group",
+                            onClick: _ => {}
                         },
                         {
                             icon: "newprivate",
@@ -46,7 +49,16 @@ export class DialogListComponent extends Component {
                         },
                         {
                             icon: "savedmessages",
-                            title: "Saved"
+                            title: "Saved",
+                            onClick: _ => {
+                                const p = MTProto.getAuthorizedUser().user.username ? `@${MTProto.getAuthorizedUser().user.username}` : `user.${MTProto.getAuthorizedUser().user.id}`
+
+                                AppFramework.Router.push("/", {
+                                    queryParams: {
+                                        p
+                                    }
+                                })
+                            }
                         },
                         {
                             icon: "settings",
@@ -56,7 +68,7 @@ export class DialogListComponent extends Component {
                             icon: "help",
                             title: "Help"
                         }
-                    ])}/>
+                    ], ev.target)}/>
                     <div className="search">
                         <div className="input-search">
                             <input type="text" placeholder="Search"/>
@@ -104,7 +116,7 @@ export class DialogListComponent extends Component {
             })
         })
 
-        this._registerResizer()
+        //this._registerResizer()
     }
 
     reactiveChanged(key, value) {
