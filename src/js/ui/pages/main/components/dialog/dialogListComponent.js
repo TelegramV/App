@@ -5,6 +5,7 @@ import Sortable from "sortablejs"
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import Component from "../../../../framework/vrdom/component"
 import VRDOM from "../../../../framework/vrdom"
+import {ContextMenuManager} from "../../../../contextMenuManager";
 
 export class DialogListComponent extends Component {
     constructor() {
@@ -29,7 +30,33 @@ export class DialogListComponent extends Component {
         return (
             <div className="chatlist">
                 <div className="toolbar">
-                    <div className="btn-icon rp rps tgico-menu"/>
+                    <i className="btn-icon rp rps tgico-menu" onClick={_ => ContextMenuManager.open([
+                        {
+                            icon: "newgroup",
+                            title: "New group"
+                        },
+                        {
+                            icon: "newprivate",
+                            title: "Contacts"
+                        },
+                        {
+                            icon: "archive",
+                            title: "Archived",
+                            counter: 3
+                        },
+                        {
+                            icon: "savedmessages",
+                            title: "Saved"
+                        },
+                        {
+                            icon: "settings",
+                            title: "Settings"
+                        },
+                        {
+                            icon: "help",
+                            title: "Help"
+                        }
+                    ])}/>
                     <div className="search">
                         <div className="input-search">
                             <input type="text" placeholder="Search"/>

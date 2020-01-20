@@ -1,0 +1,35 @@
+.context-menu {
+  width: 200px;
+  background: white;
+  color: black;
+  position: absolute;
+  z-index: 99999;
+  border-radius: 10px;
+  box-shadow: 2px 3px 4px 2px rgba(16, 35, 47, 0.15);
+  display: flex;
+  flex-direction: column;
+
+  &.hidden {
+    display: none;
+  }
+
+  .element {
+    width: 100%;
+    height: 64px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .tgico {
+      color: $darkgrey;
+      width: 56px;
+      height: 56px;
+      font-size: 26px;
+    }
+
+    span {
+      margin-left: 16px;
+    }
+  }
+
+}

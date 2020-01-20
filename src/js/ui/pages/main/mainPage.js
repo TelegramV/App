@@ -4,6 +4,7 @@ import UpdatesManager from "../../../api/updates/updatesManager"
 import PeersManager from "../../../api/peers/peersManager"
 import ChatComponent from "./components/chat/chatComponent"
 import {LocaleController} from "../../../common/locale/localization"
+import {ContextMenuComponent} from "../../contextMenuManager";
 
 function initUIManagers() {
     UpdatesManager.init().then(() => {
@@ -20,6 +21,7 @@ export function MainPage() {
         <div class="app">
             <DialogListComponent/>
             <ChatComponent/>
+            <ContextMenuComponent/>
         </div>
     )
 }
