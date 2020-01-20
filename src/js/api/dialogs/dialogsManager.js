@@ -59,18 +59,14 @@ class DialogManager extends Manager {
         }
 
         MTProto.UpdatesManager.subscribe("updateShortMessage", async update => {
-            console.log(update)
             updateDialogLastMessage(await this.findOrFetch("user", update.user_id), update)
         })
 
         MTProto.UpdatesManager.subscribe("updateShortChatMessage", async update => {
-            console.log(update)
             updateDialogLastMessage(await this.findOrFetch("chat", update.chat_id), update)
         })
 
         MTProto.UpdatesManager.subscribe("updateNewMessage", async update => {
-            console.log(update)
-
             let dialog = undefined
 
             if (update.message.pFlags.out || update.message.to_id) {
