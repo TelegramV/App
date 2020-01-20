@@ -433,8 +433,6 @@
     }
 
     .in {
-        animation: slide-up-message 0.4s ease;
-
         //align-items: flex-start;
 
         .box:hover {
@@ -528,8 +526,6 @@
     }
 
     .out {
-        animation: slide-up-message 0.4s ease;
-
         align-items: flex-end;
 
         .box:hover {
