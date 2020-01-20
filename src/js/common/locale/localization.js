@@ -4,13 +4,19 @@ import AppCache from "../../api/cache"
 const PACK_NAME = "tdesktop";
 const FILE_SECTION = "languages";
 
-export class LocaleController {
+class LocaleController0 {
     constructor(currentLanguageCode = "en") {
-        this.currentLanguage = this.retrieveLanguage(currentLanguageCode);
+        this.currentLanguageCode = currentLanguageCode;
+        this.currentLanguage = undefined;
     }
+
+    init() {
+        this.currentLanguage = this.retrieveLanguage(this.currentLanguageCode);
+    }
+
     getLanguages() {
         MTProto.invokeMethod("langpack.getLanguages", { lang_pack: PACK_NAME }).then(l => {
-            console.log(l)
+            //TODO cache this list, use for panel
         })
     }
 
@@ -27,16 +33,17 @@ export class LocaleController {
         let blob = new Blob([text], { type: "text/plain" });
         AppCache.put(FILE_SECTION, key, blob);
         this.currentLanguage = blob;
-        this.languageParser = new LanguageParser(blob);
+        this.parser = new LanguageParser(blob);
     }
 
     retrieveLanguage(code) {
         let that = this;
+        //TODO save meta (version, name...)
         AppCache.get(FILE_SECTION, PACK_NAME + "_" + code).then(blob => that.currentLanguage = blob, that.setLanguage(code));
     }
 
     getLanguageParser() {
-        return this.languageParser;
+        return this.parser;
     }
 }
 
@@ -45,22 +52,25 @@ export class LanguageParser {
         let that = this;
         this.strings = {}
         let obj = new Response(blob).json().then(json => {
-            for (let i = 0; i < json.length; i++) {
-                that.strings[json[i].key] = json[i].value;
+            for (const iter of json) {
+                that.strings[iter.key] = iter.value;
             }
         });
 
     }
 
-    get(key) {
-        return this.strings[key] || key;
-    }
-
-    get(key, replace) {
-    	let str = this.get(key);
+    get(key, replace = {}) {
+    	let str = this.strings[key] || key;
     	for(let val in replace) {
-    		str = str.replace("{"+val+"}", replace.val);
+            if(val ===null || val ===undefined) continue;
+    		str = str.replace("{"+val+"}", replace[val]);
     	}
     	return str;
     }
 }
+
+export const LocaleController = new LocaleController0("en");
+let L;
+export default L = (key, replace={})=>{
+    return LocaleController.getLanguageParser().get(key,replace)
+};
