@@ -119,13 +119,14 @@ export class PeerPhoto {
         if (rawPhoto && rawPhoto._ !== "chatPhotoEmpty" && rawPhoto._ !== "userProfilePhotoEmpty") {
             this._type = rawPhoto._
 
+            this._dcId = rawPhoto.dc_id
+            this._photoBig = rawPhoto.photo_big
+
             if (!this._photoSmall || this._photoSmall.volume_id !== rawPhoto.photo_small.volume_id || this._photoSmall.local_id !== rawPhoto.photo_small.local_id) {
                 this._photoSmall = rawPhoto.photo_small
                 this.fetchSmall()
             }
 
-            this._photoBig = rawPhoto.photo_big
-            this._dcId = rawPhoto.dc_id
 
 
         } else {
