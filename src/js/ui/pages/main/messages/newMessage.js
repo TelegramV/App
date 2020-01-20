@@ -10,6 +10,8 @@ import RoundVideoMessageComponent from "../components/chat/message/roundVideoMes
 import WebpageMessageComponent from "../components/chat/message/webpageMessageComponent";
 import StickerMessageComponent from "../components/chat/message/stickerMessageComponent";
 import PhotoMessageComponent from "../components/chat/message/photoMessageComponent";
+import ContactMessageComponent from "../components/chat/message/contactMessageComponent";
+import DocumentMessageComponent from "../components/chat/message/documentMessageComponent";
 
 const Message = ({ message }) => {
     /*if (!message.type) {
@@ -24,13 +26,13 @@ const Message = ({ message }) => {
         audio: AudioMessageComponent,
         // voice: vMessageWithVoiceAudioTemplate,
         sticker: StickerMessageComponent,
-        // document: TextMessage,
+        document: DocumentMessageComponent,
         //location:
         //beacon:
         //game:
         //poll:
         //invoice:
-        //contact:
+        contact: ContactMessageComponent,
         webpage: WebpageMessageComponent,
         service: ServiceMessageComponent
     }
