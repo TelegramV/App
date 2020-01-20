@@ -238,7 +238,7 @@
                 width: 100%;
                 min-width: 100px;
                 min-height: 100px;
-                max-height: 400px; //seems like TDesktop limit
+                max-height: 512px; //seems like TDesktop limit 400px
 
                 display: flex;
                 justify-content: center;
@@ -256,6 +256,31 @@
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
+
+                    .pause-button {
+                        background: rgba(0, 0, 0, 0.3);
+                        width: 64px;
+                        height: 64px;
+                        line-height: 62px;
+                        position: absolute;
+                        border-radius: 100%;
+                        text-align: center;
+                        cursor: pointer;
+
+
+                        .tgico {
+                            position: relative;
+                            color: white;
+                            font-size: 40px;
+                        }
+                    }
+
+                    progress {
+                        position: relative;
+                        top: 0;
+                        left: 0;
+                        pointer-events: none;
+                    }
                 }
 
                 .attachment {
