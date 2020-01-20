@@ -10,7 +10,7 @@ class StickerMessageComponent extends Component {
         let size = message.media.document.attributes.find(l => l._ === "documentAttributeImageSize")
         let height = size ? size.h / size.w * 250 : 250
         let sticker = src !== "" ? (animated ?
-                <tgs-player className="sticker" autoplay loop mode="normal" src={src}/>
+                <tgs-player className="sticker" autoplay loop mode="normal" src={src} css-width="250px" css-height={height + "px"}/>
         :
             <img className="sticker" src={src}/>) : <div className="sticker loading" css-width="250px" css-height={height + "px"}/>
         return (
