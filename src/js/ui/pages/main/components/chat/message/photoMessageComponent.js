@@ -58,7 +58,7 @@ const MessageMediaImage = ({ src, alt = "", size, isThumb}) => {
         <div className="media-wrapper">
             <img className={["attachment", isThumb ? "attachment-thumb" : ""]}
                  src={src}
-                 alt={alt} css-width={size[0] + "px"} />
+                 alt={alt} css-height={size[1] + "px"} />
             {
                 isThumb ?
                     <div className="progress">
