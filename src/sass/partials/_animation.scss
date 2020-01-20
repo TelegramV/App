@@ -15,3 +15,12 @@
     transform: translateY(0);
   }
 }
+
+@keyframes jump-in {
+  0% {
+    transform: scaleY(0.1) translateY(100%);
+  }
+  100% {
+    transform: scaleY(1) translateY(0%);
+  }
+}
