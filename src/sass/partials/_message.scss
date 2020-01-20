@@ -35,10 +35,14 @@
         //overflow: hidden; ЖЕРЕ ХВОСТИ В ПОВІДОМЛЕНЬ
 
         .sticker {
-            width: 20vw;
+            width: 250px;
             max-width: 512px;
             height: auto;
             max-height: 512px;
+            cursor: pointer;
+
+            &.loading {
+            }
         }
 
         .round-video-wrapper {

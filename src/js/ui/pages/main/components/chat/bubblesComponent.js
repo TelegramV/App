@@ -129,13 +129,13 @@ class BubblesComponent extends Component {
                 })
             }
             if (message.media.document) {
-                if (message.type == "sticker") {
-                    FileAPI.getFile(message.media.document, "application/x-tgsticker").then(data => {
+                if (message.type === "sticker") {
+                    FileAPI.getFile(message.media.document).then(data => {
                         message.media.document.real = { url: data };
                         VRDOM.patch($message, <Message message={message}/>);
                     });
                 }
-                if (message.type == "round" || message.type=="video" || message.type=="audio") {
+                if (message.type === "round" || message.type === "video" || message.type === "audio") {
                     FileAPI.getFile(message.media.document, "").then(data => {
                         message.media.document.real = { url: data };
                         VRDOM.patch($message, <Message message={message}/>);

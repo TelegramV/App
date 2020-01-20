@@ -86,11 +86,15 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
 
 
         if(offset + length > prevOffset) {
-            const splitted = text.substr(prevOffset, offset - prevOffset).split("\n")
-            for(let i = 0; i < splitted.length; i++) {
-                elements.push(<span>{splitted[i]}</span>)
-                if(i !== splitted.length - 1) {
-                    elements.push(<br/>)
+            if(noLinks) {
+                elements.push(<span>{text.substr(prevOffset, offset - prevOffset)}</span>)
+            } else {
+                const splitted = text.substr(prevOffset, offset - prevOffset).split("\n")
+                for (let i = 0; i < splitted.length; i++) {
+                    elements.push(<span>{splitted[i]}</span>)
+                    if (i !== splitted.length - 1) {
+                        elements.push(<br/>)
+                    }
                 }
             }
         }
@@ -99,11 +103,15 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
         prevOffset = offset + length
     })
     if(prevOffset < text.length) {
-        const splitted = text.substr(prevOffset, text.length - prevOffset).split("\n")
-        for(let i = 0; i < splitted.length; i++) {
-            elements.push(<span>{splitted[i]}</span>)
-            if(i !== splitted.length - 1) {
-                elements.push(<br/>)
+        if(noLinks) {
+            elements.push(<span>{text.substr(prevOffset, text.length - prevOffset)}</span>)
+        } else {
+            const splitted = text.substr(prevOffset, text.length - prevOffset).split("\n")
+            for(let i = 0; i < splitted.length; i++) {
+                elements.push(<span>{splitted[i]}</span>)
+                if(i !== splitted.length - 1) {
+                    elements.push(<br/>)
+                }
             }
         }
     }

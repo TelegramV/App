@@ -1,8 +1,10 @@
-function Draft({text}) {
+import {parseMessageEntities} from "../../../../../mtproto/utils/htmlHelpers";
+
+function Draft({text, entities}) {
     return (
         <div className="message">
             <span className="draft">Draft: </span>
-            {text}
+            {parseMessageEntities(text, entities, true)}
         </div>
     )
 }
@@ -16,7 +18,7 @@ function Action({user, action}) {
     )
 }
 
-function Text({user, text}) {
+function Text({user, text, entities}) {
     if (text.length > 50) {
         text = text.substring(0, 50)
     }
@@ -24,7 +26,7 @@ function Text({user, text}) {
     return (
         <div className="message">
             <span className="sender">{user}</span>
-            {text}
+            {parseMessageEntities(text, entities, true)}
         </div>
     )
 }
@@ -37,14 +39,14 @@ function Text({user, text}) {
 export const DialogTextComponent = ({dialog}) => {
     if (dialog.draft.isPresent) {
         return (
-            <Draft text={dialog.draft.message}/>
+            <Draft text={dialog.draft.message} entities={dialog.draft.entities}/>
         )
     }
 
     if (Object.keys(dialog.messageActions).length === 0) {
         return (
             <Text user={dialog.messages.last.prefix}
-                  text={dialog.messages.last.text}/>
+                  text={dialog.messages.last.text} entities={dialog.messages.last.entities}/>
         )
     }
 
