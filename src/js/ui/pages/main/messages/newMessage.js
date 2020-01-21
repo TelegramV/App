@@ -5,6 +5,7 @@ import MessageWrapperComponent from "../components/chat/message/messageWrapperCo
 import TextMessageComponent from "../components/chat/message/textMessageComponent";
 import ServiceMessageComponent from "../components/chat/message/serviceMessageComponent";
 import AudioMessageComponent from "../components/chat/message/audioMessageComponent";
+import VoiceMessageComponent from "../components/chat/message/voiceMessageComponent";
 import VideoMessageComponent from "../components/chat/message/videoMessageComponent";
 import RoundVideoMessageComponent from "../components/chat/message/roundVideoMessageComponent";
 import WebpageMessageComponent from "../components/chat/message/webpageMessageComponent";
@@ -25,7 +26,7 @@ const Message = ({ message }) => {
         round: RoundVideoMessageComponent,
         video: VideoMessageComponent,
         audio: AudioMessageComponent,
-        // voice: vMessageWithVoiceAudioTemplate,
+        voice: VoiceMessageComponent,
         sticker: StickerMessageComponent,
         document: DocumentMessageComponent,
         //location:

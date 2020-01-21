@@ -485,10 +485,6 @@
         }
     }
 
-    .out {
-        flex-direction: column;
-    }
-
     .in {
         //align-items: flex-start;
 
@@ -501,6 +497,20 @@
 
             .name {
                 color: $darkblue;
+            }
+        }
+
+        .audio {
+            .audio-wrapper {
+                .back {
+                    fill: #c4c9cc;
+                }
+                .progress {
+                    fill: $blue;
+                }
+            }
+            .play {
+                background-color: $blue;
             }
         }
 
@@ -584,6 +594,7 @@
 
     .out {
         align-items: flex-end;
+        flex-direction: column;
 
         .box:hover {
             background-color: rgba($green, 0.12);
@@ -594,6 +605,20 @@
 
             .name {
                 color: $darkgreen;
+            }
+        }
+
+        .audio {
+            .audio-wrapper {
+                .back {
+                    fill: lighten($darkgreen, 25%);
+                }
+                .progress {
+                    fill: $darkgreen;
+                }
+            }
+            .play {
+                background-color: $darkgreen;
             }
         }
 

@@ -1,12 +1,16 @@
-export default class Voice {
-    constructor(audio, waveform, options = {id: Math.random(), mainColor: "green", secondaryColor: "grey"}) {
-        this.element = document.createElement("div");
-        this.audio = audio;
-        this.options = options;
-        this.heights = this._waveToArray(waveform);
+import Component from "../../../../../framework/vrdom/component"
+import { FileAPI } from "../../../../../../api/fileAPI"
+import MessageWrapperComponent from "./messageWrapperComponent"
+
+export default class VoiceMessageComponent extends Component {
+    constructor(props) {
+        super(props);
+        let parse = this._parseMessage(this.props.message);
+        this.audioPromise = parse.audio;
+        this.heights = this._waveToArray(parse.waveform);
+        this.duration = parse.duration || 0;
 
         this.playing = false;
-        this.bind = false;
 
         this.barWidth = 2;
         this.barMargin = 2;
@@ -17,6 +21,33 @@ export default class Voice {
         this.leaveHandler = this._handleLeave.bind(this);
         this.moveHandler = this._handleMove.bind(this);
 
+        let onAudio = this._onAudioReady.bind(this);
+        this.audioPromise.then(onAudio);
+    }
+
+    _parseMessage(message) {
+    	console.log(message)
+        let audio;
+        let waveform;
+        let duration;
+
+        let doc = message.media.document;
+        for (const attr of doc.attributes) {
+            if (attr._ == "documentAttributeAudio" && attr.pFlags.voice) {
+                waveform = attr.waveform;
+                duration = attr.duration;
+            }
+        }
+        audio = FileAPI.getFile(doc);
+        return {
+            audio: audio,
+            waveform: waveform,
+            duration: duration
+        }
+    }
+
+    _onAudioReady(audio) {
+        this.audio = new Audio(audio);
         this.audio.addEventListener("timeupdate", this._audioTimeUpdate.bind(this));
         this.audio.addEventListener("ended", this._playButtonClick.bind(this));
     }
@@ -35,33 +66,31 @@ export default class Voice {
         this.audio.pause();
     }
 
-    setAudio(audio) {
-        this.audio = audio;
-    }
-
-    getElement() {
-        return this.element;
-    }
-
-    asJSX() {
-        return (<div class="audio" id={"audio-"+this.options.id}>
-            <div class="play tgico tgico-play" onMouseDown={this._playButtonClick.bind(this)}/>
-            <div class="audio-wrapper">
-                <svg css-width={`${this.width}px`} css-transform="scale(1,-1)" onMouseEnter={this.enterHandler} onMouseLeave={this.leaveHandler} onMouseDown={this.moveHandler}>
-                    <defs>
-                        <mask id="bars">
-                            {this._generateBars()}
-                        </mask>
-                    </defs>
-                    <rect x="0" y="0" width={this.width + "px"} height="100%" fill={this.options.secondaryColor} mask="url(#bars)"/>
-                    <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%" fill={this.options.mainColor} mask="url(#bars)"/>
-                </svg>
-                <div class="timer">
-                    {this.options.duration ? this.options.duration : this._timeToFormat(this.audio.duration)}
-                    <span class="read"></span>
-                </div>
-            </div>
-        </div>);
+    h() {
+        return (
+            <MessageWrapperComponent message={this.props.message}>
+        	<div class="message">
+	        	<div class="audio">
+		            <div class="play tgico tgico-play" onMouseDown={this._playButtonClick.bind(this)}/>
+		            <div class="audio-wrapper">
+		                <svg css-width={`${this.width}px`} css-transform="scale(1,-1)" onMouseEnter={this.enterHandler} onMouseLeave={this.leaveHandler} onMouseDown={this.moveHandler}>
+		                    <defs>
+		                        <mask id="bars">
+		                            {this._generateBars()}
+		                        </mask>
+		                    </defs>
+		                    <rect class="back" x="0" y="0" width={this.width + "px"} height="100%" mask="url(#bars)"/>
+		                    <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%" mask="url(#bars)"/>
+		                </svg>
+		                <div class="timer">
+		                    {this._timeToFormat(this.duration)}
+		                    <span class="read"></span>
+		                </div>
+		            </div>
+	            </div>
+        	</div>
+        	</MessageWrapperComponent>
+        );
     }
 
     _audioTimeUpdate() {
@@ -78,7 +107,6 @@ export default class Voice {
     }
 
     _handleEnter(e) {
-    	if(!this.bind) this._boundElement(document.getElementById("audio-"+this.options.id));
         this.svgContainer.addEventListener("mousemove", this.moveHandler);
     }
 
@@ -97,8 +125,6 @@ export default class Voice {
     }
 
     _playButtonClick(e) {
-    	if(!this.bind) this._boundElement(document.getElementById("audio-"+this.options.id));
-
         if (this.playing) {
             this.pause();
             this.playButton.classList.remove("tgico-pause");
@@ -110,13 +136,11 @@ export default class Voice {
         }
     }
 
-    _boundElement(elem) { //Давид зроби івент
-    	this.timer = elem.querySelector(".timer");
-    	this.progress = elem.querySelector(".progress");
-    	this.svgContainer = elem.querySelector("svg");
-    	this.playButton = elem.querySelector(".play");
-
-    	this.bind = true;
+    mounted() {
+        this.timer = this.$el.querySelector(".timer");
+        this.progress = this.$el.querySelector(".progress");
+        this.svgContainer = this.$el.querySelector("svg");
+        this.playButton = this.$el.querySelector(".play");
     }
 
     _generateBars() {
@@ -164,16 +188,17 @@ export default class Voice {
         return getVpPos(el.parentNode);
     }
 
-    _waveToArray(form) {
-        var buf = "";
-        var arr = [];
-        for (var i in form) {
-            var n = form[i].toString(2);
+    _waveToArray(waveform) {
+        let buf = "";
+        let arr = [];
+        let splitSize = 5;
+        for (var i of waveform) {
+            var n = (i >>> 0).toString(2).substr(-8);
             n = "00000000".substr(n.length) + n;
             buf += n;
-            while (buf.length > 5) {
-                arr.push(parseInt(buf.substr(0, 5), 2));
-                buf = buf.substr(5);
+            while (buf.length >= splitSize) {
+                arr.push(parseInt(buf.substr(0,splitSize), 2));
+                buf = buf.substr(splitSize);
             }
         }
         return arr;
