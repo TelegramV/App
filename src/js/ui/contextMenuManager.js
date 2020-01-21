@@ -21,12 +21,17 @@ export class ContextMenuComponent extends Component {
                 <div className={["context-menu", this.state.animation]} css-top={this.state.y + "px"} css-left={this.state.x + "px"}>
                     {this.state.data.map(l => {
                         return <div className={["element", "rp", "rps", l.red ? "red" : ""]} onClick={q => this.select(l, q)}>
-                            <i className={["tgico", "tgico-" + l.icon]}/>
+                            {l.icon ?
+                                <i className={["tgico", "tgico-" + l.icon]}/>
+                            :""}
                             <span>{l.title}</span>
                             {l.counter ?
                                 <div className="badge">{l.counter}</div>
                                 : ""
                             }
+                            {l.after ?
+                                <div className="after">{l.after}</div>
+                            : ""}
                         </div>
                     })}
                 </div>
@@ -35,7 +40,6 @@ export class ContextMenuComponent extends Component {
     }
 
     select(l, ev) {
-        console.log("Select")
         if(l.onClick) {
             l.onClick()
         }
@@ -46,7 +50,8 @@ export class ContextMenuComponent extends Component {
     close() {
         // weird bug with patcher here
         // @kohutd plz fix
-        //this.state.data = []
+        // TODO remove this for animation
+        // this.state.data = []
         this.state.hidden = true
         this.__patch()
 

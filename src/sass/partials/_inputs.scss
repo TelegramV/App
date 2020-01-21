@@ -7,7 +7,7 @@ input[type="password"] {
 	background-color: transparent;
 	outline: 0;
 	border: 0;
-	font-family: "Roboto";
+	font-family: "Roboto", sans-serif;
 	font-size: 16px;
 	color: #000;
 	box-sizing: border-box;
@@ -19,6 +19,22 @@ input[type="password"] {
 	}
 }
 
+.btn-flat {
+	font-family: "Roboto", sans-serif;
+	background: transparent;
+	border: 0;
+	color: $blue;
+	text-transform: uppercase;
+	font-weight: 500;
+	margin: 12px;
+	padding: 0;
+	margin-left: 0;
+	outline: none;
+	font-size: 15px;
+	&.red {
+		color: $red;
+	}
+}
 .input-field {
 	position: relative;
 	width: 360px;

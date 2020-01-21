@@ -1,4 +1,5 @@
 import {ContextMenuManager} from "../../../../../contextMenuManager";
+import {ChatInputManager} from "../chatInput/chatInputComponent";
 
 const MessageWrapperComponent = ({ message, transparent = false, slot }) => {
     const className = {
@@ -27,7 +28,8 @@ const MessageWrapperComponent = ({ message, transparent = false, slot }) => {
         <div className={className} data-id={message.id} data-peer={`${from.type}.${from.id}`} onContextMenu={ContextMenuManager.listener([
             {
                 icon: "reply",
-                title: "Reply"
+                title: "Reply",
+                onClick: l => ChatInputManager.replyTo(message)
             },
             {
                 icon: "copy",
@@ -46,7 +48,7 @@ const MessageWrapperComponent = ({ message, transparent = false, slot }) => {
                 title: "Delete",
                 red: true
             },
-        ])}>
+        ])} onDoubleClick={l => ChatInputManager.replyTo(message)}>
             {!message.isPost && className.in ? (
                 <div className={classes}
                      css-background-image={cssBackgroundImage}>

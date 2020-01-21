@@ -127,8 +127,16 @@ class DialogAPI {
     }
 
     // Should be moved to peer?
-    sendMessage(text) {
+    sendMessage(text, replyTo = null, silent = false, clearDraft = true) {
+        console.log(replyTo)
+
         MTProto.invokeMethod("messages.sendMessage", {
+            pFlags: {
+                clear_draft: clearDraft,
+                silent: silent,
+                reply_to_msg_id: replyTo
+            },
+
             peer: this.dialog.peer.inputPeer,
             message: text,
             random_id: createNonce(8)

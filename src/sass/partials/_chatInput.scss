@@ -12,43 +12,124 @@
     display: flex;
     align-items: flex-end;
 
-    .input-field {
-      display: flex;
+    .input-field-wrapper {
       background: white;
       width: 100%;
       height: auto;
       border-radius: 10px;
       box-shadow: 0 1px 2px 0 rgba(16, 35, 47, .15);
       border-bottom-right-radius: 0 !important;
-      margin-right: 11px;
       position: relative;
+      margin-right: 11px;
       z-index: 0;
-      align-items: flex-end;
-      padding: 16px;
 
-      .textarea {
-        align-self: center;
-        display: inline-block;
-        border: none;
-        word-break: break-word;
-        resize: none;
+      .media {
+        display: flex;
         width: 100%;
-        outline: none;
-        padding: 0 15px;
-        align-items: center;
+        height: auto;
+        padding: 11px 16px 0;
 
-        &.empty::before {
-          content: "Message";
-          display: inline-block;
-          color: $grey;
+        .attachment {
+          width: $attachment-width;
+          height: $attachment-width;
+          margin-right: 5px;
+          position: relative;
+
+          .tgico-close {
+            position: absolute;
+            height: 15px;
+            width: 15px;
+            border-radius: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            z-index: 1;
+            text-align: center;
+            line-height: 15px;
+            right: -5px;
+            top: -5px;
+            font-size: 12px;
+            cursor: pointer;
+          }
+
+          &.photo {
+            img {
+              filter: brightness(50%);
+              border-radius: 3px;
+              width: 100%;
+              height: 100%;
+            }
+          }
         }
       }
 
-      .tgico {
-        text-align: center;
-        color: $darkgrey;
-        font-size: 22px;
-        cursor: pointer;
+      .reply {
+        display: flex;
+        width: 100%;
+        height: auto;
+        padding: 11px 16px 0;
+        align-items: center;
+
+        .message {
+          border-left: 2px solid $blue;
+          display: flex;
+          flex-direction: column;
+          padding: 0 10px;
+          font-size: 14px;
+          margin: 0 15px;
+
+          .title {
+            color: $blue;
+            font-weight: 500;
+            margin-bottom: 2px;
+          }
+
+          .description {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+          }
+        }
+
+        .tgico {
+          text-align: center;
+          color: $darkgrey;
+          font-size: 22px;
+          cursor: pointer;
+        }
+      }
+
+      .input-field {
+        display: flex;
+        width: 100%;
+        height: auto;
+
+        align-items: flex-end;
+        padding: 16px;
+
+        .textarea {
+          align-self: center;
+          display: inline-block;
+          border: none;
+          word-break: break-word;
+          resize: none;
+          width: 100%;
+          outline: none;
+          padding: 0 15px;
+          align-items: center;
+
+          &.empty::before {
+            content: "Message";
+            display: inline-block;
+            color: $grey;
+          }
+        }
+
+        .tgico {
+          text-align: center;
+          color: $darkgrey;
+          font-size: 22px;
+          cursor: pointer;
+        }
       }
 
       &:before {

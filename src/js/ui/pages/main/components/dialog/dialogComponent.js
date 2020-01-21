@@ -10,6 +10,9 @@ import {ContextMenuManager} from "../../../../contextMenuManager";
 import {ChannelPeer} from "../../../../../api/dataObjects/peer/channelPeer";
 import {GroupPeer} from "../../../../../api/dataObjects/peer/groupPeer";
 import {SupergroupPeer} from "../../../../../api/dataObjects/peer/supergroupPeer";
+import {ModalManager} from "../../../../modalManager";
+import ChatInfoAvatarComponent from "../chat/chatInfo/chatInfoAvatarComponent";
+import {FlatButtonComponent} from "../input/flatButtonComponent";
 
 const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -127,7 +130,19 @@ export class DialogComponent extends Component {
                 {
                     icon: "delete",
                     title: "Delete chat",
-                    red: true
+                    red: true,
+                    onClick: _ => {
+                        ModalManager.open(<div className="delete-chat-title">
+                            <DialogAvatarComponent dialog={dialog}/>
+                            Delete Chat?
+                            </div>,
+                            <div className="delete-chat-body">
+                                <span className="text">Are you sure you want to delete chat with <b>{dialog.peer.name}</b>?</span>
+                                <FlatButtonComponent red label={`Delete for me and ${dialog.peer.name}`}/>
+                                <FlatButtonComponent red label="Delete just for me"/>
+                                <FlatButtonComponent label="Cancel"/>
+                            </div>)
+                    }
                 },
                 ])}>
 

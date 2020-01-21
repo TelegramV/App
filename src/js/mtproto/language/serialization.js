@@ -306,6 +306,21 @@ export class TLSerialization {
         let i, condType
         let fieldBit
         let len = methodData.params.length
+        for (i = 0; i < len; i++) {
+            param = methodData.params[i]
+            type = param.type
+            if (type.indexOf("?") !== -1) {
+                condType = type.split("?")
+                fieldBit = condType[0].split(".")
+                if (!(params[fieldBit[0]] & (1 << fieldBit[1]))) {
+                    if(params.pFlags && params.pFlags[param.name]) {
+                        console.log("add", param.name, params.pFlags[param.name])
+                        params[fieldBit[0]] |= 1 << fieldBit[1]
+                        params[param.name] = params.pFlags[param.name]
+                    }
+                }
+            }
+        }
 
         for (i = 0; i < len; i++) {
             param = methodData.params[i]

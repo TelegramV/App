@@ -29,6 +29,7 @@ $connecting-color: #FED85A;
 
 $max-chat-width: 700px;
 $chat-input-height: 54px;
+$attachment-width: 54px;
 
 @function anim($elem) {
 	@return 150ms ease-out $elem;

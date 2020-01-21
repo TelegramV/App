@@ -6,6 +6,7 @@ import ChatComponent from "./components/chat/chatComponent"
 import {LocaleController} from "../../../common/locale/localization"
 import {ContextMenuComponent} from "../../contextMenuManager";
 import {DialogInfoComponent} from "./components/dialog/dialogInfoComponent";
+import {ModalComponent} from "../../modalManager";
 
 function initUIManagers() {
     UpdatesManager.init().then(() => {
@@ -23,11 +24,12 @@ export function MainPage() {
 
     return (
         <div class="app">
+            <ContextMenuComponent/>
+            <ModalComponent/>
+
             <DialogListComponent/>
             <ChatComponent/>
             <DialogInfoComponent/>
-
-            <ContextMenuComponent/>
         </div>
     )
 }

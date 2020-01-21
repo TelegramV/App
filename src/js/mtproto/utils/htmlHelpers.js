@@ -47,6 +47,10 @@ function insertAt(str, position, length, b) {
     return text
 }*/
 
+export function domToMessageEntities(elem) {
+
+}
+
 export function parseMessageEntities(text, messageEntities, noLinks = false) {
     messageEntities = messageEntities || []
 
