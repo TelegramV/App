@@ -155,6 +155,8 @@ export class Dialog {
         this._draft = DraftMessage.createEmpty(this)
         this._folderId = undefined
 
+        this._messages = undefined
+
         if (topMessage) {
             if (topMessage instanceof Message) {
                 topMessage.dialog = this

@@ -36,7 +36,8 @@ export class DialogListComponent extends Component {
                         {
                             icon: "newgroup",
                             title: "New group",
-                            onClick: _ => {}
+                            onClick: _ => {
+                            }
                         },
                         {
                             icon: "newprivate",
@@ -116,6 +117,10 @@ export class DialogListComponent extends Component {
             })
         })
 
+        AppEvents.Dialogs.subscribe("newFetched", event => {
+            this._renderDialog(event.dialog, "prepend") // fixme: this should insert in proper place
+        })
+
         //this._registerResizer()
     }
 
@@ -138,7 +143,8 @@ export class DialogListComponent extends Component {
      */
     _renderDialog(dialog, appendOrPrepend = false) {
         if (!this.elements.$pinnedDialogs || !this.elements.$generalDialogs) {
-            throw new Error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
+            console.error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
+            return
         }
 
         const newVDialog = <DialogComponent $pinned={this.elements.$pinnedDialogs}
@@ -153,9 +159,9 @@ export class DialogListComponent extends Component {
             }
         } else if (appendOrPrepend === "prepend") {
             if (dialog.isPinned) {
-                VRDOM.append(newVDialog, this.elements.$pinnedDialogs)
+                VRDOM.prepend(newVDialog, this.elements.$pinnedDialogs)
             } else {
-                VRDOM.append(newVDialog, this.elements.$generalDialogs)
+                VRDOM.prepend(newVDialog, this.elements.$generalDialogs)
             }
         } else {
             if (dialog.isPinned) {

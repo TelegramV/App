@@ -81,7 +81,7 @@ export class DialogComponent extends Component {
             "muted": dialog.isMuted,
         }
 
-        if (dialog.messages.last.isOut) {
+        if (dialog.messages.last.isOut && !dialog.messages.last.isPost && !dialog.peer.isSelf) {
             personClasses["sent"] = true
 
             if (dialog.messages.last.isRead) {

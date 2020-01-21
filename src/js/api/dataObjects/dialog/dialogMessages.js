@@ -24,7 +24,17 @@ export class DialogMessages {
     } = {}) {
         this._dialog = dialog
         this._messages = new Map()
+
+        /**
+         * @type {Message|undefined}
+         * @private
+         */
         this._prevLastMessage = undefined
+
+        /**
+         * @type {Message|undefined}
+         * @private
+         */
         this._lastMessage = undefined
 
         this.appendMany(messages)
@@ -48,14 +58,14 @@ export class DialogMessages {
      * @return {Message}
      */
     get last() {
-        return this._lastMessage || this._prevLastMessage
+        return this._lastMessage || this._prevLastMessage || this.sortedArray[this.sortedArray.length - 1]
     }
 
     /**
      * @param {Message} message
      */
     set last(message) {
-        if (!this._lastMessage || message.date > this._lastMessage.date) {
+        if (!this._lastMessage || message.date >= this._lastMessage.date) {
             this._prevLastMessage = this._lastMessage
             this._lastMessage = message
         }

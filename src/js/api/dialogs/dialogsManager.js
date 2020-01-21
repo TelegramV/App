@@ -39,7 +39,7 @@ class DialogManager extends Manager {
          */
         const updateDialogLastMessage = (dialog, lastMessage) => {
             if (!dialog) {
-                console.error("BUG: dialog was not found")
+                console.error("BUG: dialog was not found", lastMessage)
                 return
             }
 
@@ -62,6 +62,7 @@ class DialogManager extends Manager {
         }
 
         MTProto.UpdatesManager.subscribe("updateShortMessage", async update => {
+            console.log("message", update)
             updateDialogLastMessage(await this.findOrFetch("user", update.user_id), update)
         })
 
@@ -72,7 +73,12 @@ class DialogManager extends Manager {
         MTProto.UpdatesManager.subscribe("updateNewMessage", async update => {
             let dialog = undefined
 
-            if (update.message.pFlags.out || update.message.to_id) {
+            console.log("message", update)
+
+            if (update.message.pFlags.out) {
+                const peerType = getPeerTypeFromType(update.message.to_id._)
+                dialog = await this.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
+            } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUser().user.id) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 dialog = await this.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
             } else {
@@ -338,12 +344,16 @@ class DialogManager extends Manager {
         return DialogsStore.get(key, peer[keyId])
     }
 
-    fetchFromMessage(rawMessage) {
+    fetchFromMessage(rawMessage, peer = null) {
         const peerData = {
             _: "inputDialogPeer",
             peer: {
                 _: "inputPeerUserFromMessage",
-                peer: {}
+                peer: {
+                    _: "inputPeerEmpty"
+                },
+                msg_id: rawMessage.id,
+                user_id: rawMessage.user_id
             }
         }
 
@@ -368,6 +378,8 @@ class DialogManager extends Manager {
     }
 
     fetchPlainPeerDialogs(peer) {
+        console.log("fetching new dialog")
+
         const peerData = {
             _: "inputDialogPeer",
             peer: !peer.access_hash ? getInputPeerFromPeerWithoutAccessHash(peer._, peer.id) : getInputPeerFromPeer(peer._, peer.id, peer.access_hash)
@@ -376,6 +388,8 @@ class DialogManager extends Manager {
         return MTProto.invokeMethod("messages.getPeerDialogs", {
             peers: [peerData]
         }).then(_dialogsSlice => {
+            console.log("dialog fetched", _dialogsSlice)
+
             _dialogsSlice.users.forEach(l => {
                 PeersManager.setFromRawAndFire(l)
             })
@@ -387,7 +401,7 @@ class DialogManager extends Manager {
                 return this.resolveDialogWithSlice(_dialog, _dialogsSlice)
             })
 
-            AppEvents.Dialogs.fire("updateSingle", {
+            AppEvents.Dialogs.fire("newFetched", {
                 dialog: dialogs[0],
             })
         })

@@ -160,12 +160,12 @@ export class ChannelUpdatesProcessor {
 
                     let inputPeer = peer.input
 
-                    if (!peer.dialog) {
-                        console.error("BUG: dialog wan not found, processing next update")
-                        self.isWaitingForDifference = false
-                        this.processQueue()
-                        return
-                    }
+                    // if (!peer.dialog) {
+                    //     console.error("BUG: dialog wan not found, processing next update")
+                    //     self.isWaitingForDifference = false
+                    //     this.processQueue()
+                    //     return
+                    // }
 
                     if (peer.isMin) {
                         console.error("BUG: peer is min, processing next update")
