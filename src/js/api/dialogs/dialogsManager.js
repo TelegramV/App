@@ -61,6 +61,10 @@ class DialogManager extends Manager {
             })
         }
 
+        MTProto.UpdatesManager.subscribe("updateShortSentMessage", async update => {
+            updateDialogLastMessage(update.dialog, update)
+        })
+
         MTProto.UpdatesManager.subscribe("updateShortMessage", async update => {
             updateDialogLastMessage(await this.findOrFetch("user", update.user_id), update)
         })

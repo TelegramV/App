@@ -163,10 +163,14 @@ export class Message {
                         }
                     }
                 	break;
+                case "messageMediaEmpty":
+                    this.type = "text"
+                    break
                 case "messageMediaUnsupported":
                 default:
                     console.log("unsupported", message.media);
                     this.type = undefined;
+                    break
             }
         }
         if (message._ === "messageService") {

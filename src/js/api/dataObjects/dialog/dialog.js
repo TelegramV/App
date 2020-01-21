@@ -1,6 +1,6 @@
 import MTProto from "../../../mtproto";
 import {Message} from "../message";
-import {tsNow} from "../../../mtproto/timeManager";
+import TimeManager, {tsNow} from "../../../mtproto/timeManager";
 import {generateDialogIndex} from "../../dialogs/messageIdManager";
 import PeersManager from "../../peers/peersManager";
 import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util"
@@ -128,8 +128,6 @@ class DialogAPI {
 
     // Should be moved to peer?
     sendMessage(text, replyTo = null, silent = false, clearDraft = true) {
-        console.log(replyTo)
-
         MTProto.invokeMethod("messages.sendMessage", {
             pFlags: {
                 clear_draft: clearDraft,
@@ -139,8 +137,12 @@ class DialogAPI {
 
             peer: this.dialog.peer.inputPeer,
             message: text,
-            random_id: createNonce(8)
+            random_id: TimeManager.generateMessageID()
         }).then(response => {
+            response.dialog = this.dialog
+            response.message = text
+            response.reply_to_msg_id = replyTo
+            response.silent = silent
             MTProto.UpdatesManager.process(response)
         })
     }
@@ -151,7 +153,7 @@ class DialogAPI {
                 peer: this.dialog.peer.inputPeer,
                 message: text,
                 media: f,
-                random_id: createNonce(8)
+                random_id: TimeManager.generateMessageID()
             }).then(response => {
                 MTProto.UpdatesManager.process(response)
             })
