@@ -79,6 +79,10 @@ export class FileAPI {
         })
     }
 
+    static hasThumbnail(file) {
+        return file.sizes.some(l => l.type === "i")
+    }
+
     static getMaxSize(file) {
         return file.sizes.reduce(function (prev, current) {
             return (prev.w > current.w) ? prev : current
