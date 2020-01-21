@@ -1,6 +1,7 @@
 import Component from "../../../../../framework/vrdom/component"
 import { FileAPI } from "../../../../../../api/fileAPI"
 import MessageWrapperComponent from "./messageWrapperComponent"
+import TextWrapperComponent from "./textWrapperComponent"
 
 export default class VoiceMessageComponent extends Component {
     constructor(props) {
@@ -89,6 +90,7 @@ export default class VoiceMessageComponent extends Component {
 		                </div>
 		            </div>
 	            </div>
+	            <TextWrapperComponent message={this.props.message}/>
         	</div>
         	</MessageWrapperComponent>
         );
