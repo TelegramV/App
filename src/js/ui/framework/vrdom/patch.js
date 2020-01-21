@@ -27,22 +27,21 @@ function patchEvents($node, newEvents) {
  * @param {Object} newAttrs
  */
 function patchAttrs($node, newAttrs) {
-    const oldAttrs = $node.attributes
+    if ($node.nodeType !== Node.TEXT_NODE) {
+        const oldAttrs = $node.attributes
 
-    for (const [k, v] of Object.entries(newAttrs)) {
-        if ($node.nodeType !== Node.TEXT_NODE) {
+        for (const [k, v] of Object.entries(newAttrs)) {
             const nv = Array.isArray(v) ? v.join(" ") : v
 
             if ($node.getAttribute(k) !== nv) {
                 $node.setAttribute(k, nv)
             }
         }
-    }
 
-    for (const k of oldAttrs) {
-        if (!newAttrs.hasOwnProperty(k)) {
-            if ($node.nodeType !== Node.TEXT_NODE) {
-                $node.removeAttribute(k)
+        for (let i = 0; i < oldAttrs.length; i++) {
+            const attr = oldAttrs.item(i)
+            if (!newAttrs.hasOwnProperty(attr.name)) {
+                $node.removeAttribute(attr.name)
             }
         }
     }

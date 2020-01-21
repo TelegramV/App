@@ -20,7 +20,7 @@ class ChatInfoNameComponent extends Component {
 
         return (
             <div id="messages-title" className="title">
-                {peer.name}
+                {peer.isSelf ? "Saved Messages" : peer.name}
             </div>
         )
     }

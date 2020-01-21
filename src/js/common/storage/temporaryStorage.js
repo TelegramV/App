@@ -17,9 +17,6 @@ export class TemporaryStorage {
         this.name = options.name || ""
 
         this.driver = options.driver || new PerTabStorageDriver(this.name)
-        this.logger = createLogger(`TemporaryStorage${this.name}`, {
-            level: "log"
-        })
     }
 
     getItem(key, defaultValue = undefined) {
@@ -30,7 +27,6 @@ export class TemporaryStorage {
             } else {
                 value = this.driver.getItem(key)
             }
-            this.logger.debug(`read [${key}]`, value)
             return value
         } else {
             if (typeof defaultValue !== "undefined") {
@@ -50,13 +46,11 @@ export class TemporaryStorage {
             setValue = value
         }
         this.driver.setItem(key, setValue)
-        this.logger.debug(`set [${key}]`, value)
         return setValue
     }
 
     removeItem(key) {
         this.driver.removeItem(key)
-        this.logger.debug(`removed [${key}]`)
     }
 
     exists(key) {
@@ -64,7 +58,6 @@ export class TemporaryStorage {
     }
 
     clear() {
-        this.logger.debug(`cleared`)
         this.driver.clear()
     }
 }
@@ -82,7 +75,7 @@ class PerTabStorageDriver {
         if (this.exists(key)) {
             return window[`perTabStorage${this.name}`][key]
         } else {
-            throw new Error(`${key} was not found`)
+            console.error(`${key} was not found`)
         }
     }
 

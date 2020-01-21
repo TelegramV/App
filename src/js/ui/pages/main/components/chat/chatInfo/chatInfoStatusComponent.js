@@ -5,7 +5,6 @@ import {GroupPeer} from "../../../../../../api/dataObjects/peer/groupPeer"
 import {BotPeer} from "../../../../../../api/dataObjects/peer/botPeer"
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 import AppEvents from "../../../../../../api/eventBus/appEvents"
-import AppFramework from "../../../../../framework/framework"
 import Component from "../../../../../framework/vrdom/component"
 
 class ChatInfoStatusComponent extends Component {
@@ -18,24 +17,6 @@ class ChatInfoStatusComponent extends Component {
                 "fullLoaded",
             ]),
         }
-    }
-
-    h() {
-        return (
-            <div className="bottom">
-                <div id="messages-online" className="info">{this.statusLine}</div>
-            </div>
-        )
-    }
-
-    mounted() {
-        AppEvents.Peers.subscribeAny(event => {
-            if (AppSelectedDialog.check(event.peer.dialog)) {
-                if (this.state.patchEvents.has(event.type)) {
-                    this.__patch()
-                }
-            }
-        })
     }
 
     get statusLine() {
@@ -79,6 +60,25 @@ class ChatInfoStatusComponent extends Component {
         }
 
         return status
+    }
+
+    h() {
+        return (
+            <div className="bottom">
+                <div css-display={AppSelectedDialog.isSelected && AppSelectedDialog.Dialog.peer.isSelf ? "none" : ""}
+                     id="messages-online" className="info">{this.statusLine}</div>
+            </div>
+        )
+    }
+
+    mounted() {
+        AppEvents.Peers.subscribeAny(event => {
+            if (AppSelectedDialog.check(event.peer.dialog)) {
+                if (this.state.patchEvents.has(event.type)) {
+                    this.__patch()
+                }
+            }
+        })
     }
 }
 
