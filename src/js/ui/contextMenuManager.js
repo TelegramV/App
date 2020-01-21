@@ -35,6 +35,7 @@ export class ContextMenuComponent extends Component {
     }
 
     select(l, ev) {
+        console.log("Select")
         if(l.onClick) {
             l.onClick()
         }
