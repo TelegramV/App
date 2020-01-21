@@ -14,7 +14,7 @@
   }
 
   .context-menu {
-    width: 220px;
+    min-width: 220px;
     background: white;
     color: black;
     position: absolute;
@@ -69,6 +69,7 @@
 
       span {
         margin-left: 16px;
+        margin-right: 16px;
         width: 100%;
       }
 

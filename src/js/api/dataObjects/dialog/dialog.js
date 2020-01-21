@@ -149,6 +149,19 @@ class DialogAPI {
             })
         })
     }
+
+    markDialogUnread(unread) {
+        MTProto.invokeMethod("messages.markDialogUnread", {
+            flags: 0,
+            pFlags: {
+                unread: unread
+            },
+            unread: unread,
+            peer: this.dialog.peer.inputPeer
+        }).then(response => {
+            console.log(response)
+        })
+    }
 }
 
 export class Dialog {

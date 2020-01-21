@@ -6,6 +6,10 @@ import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import Component from "../../../../framework/vrdom/component"
 import AppEvents from "../../../../../api/eventBus/appEvents"
 import {tsNow} from "../../../../../mtproto/timeManager"
+import {ContextMenuManager} from "../../../../contextMenuManager";
+import {ChannelPeer} from "../../../../../api/dataObjects/peer/channelPeer";
+import {GroupPeer} from "../../../../../api/dataObjects/peer/groupPeer";
+import {SupergroupPeer} from "../../../../../api/dataObjects/peer/supergroupPeer";
 
 const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -96,7 +100,36 @@ export class DialogComponent extends Component {
                  data-pinned={dialog.isPinned === undefined ? false : dialog.isPinned}
                  className={personClasses}
                  onClick={handleClick(dialog)}
-                 data-index={dialog.index}>
+                 data-index={dialog.index} onContextMenu={ContextMenuManager.listener([
+                {
+                    icon: "archive",
+                    title: "Archive chat"
+                },
+                {
+                    icon: dialog.isPinned ? "unpin" : "pin",
+                    title: dialog.isPinned ? "Unpin from top" : "Pin to top"
+                },
+                {
+                    icon: "info",
+                    title: dialog.peer instanceof ChannelPeer ? "View channel info" : (dialog.peer instanceof GroupPeer || dialog.peer instanceof SupergroupPeer ? "View group info" : "View profile")
+                },
+                {
+                    icon: dialog.isMuted ? "unmute" : "mute",
+                    title: dialog.isMuted ? "Enable notifications" : "Disable notifications"
+                },
+                {
+                    icon: unread !== "" ? "message" : "unread",
+                    title: unread !== "" ? "Mark as read" : "Mark as unread",
+                    onClick: _ => {
+                        dialog.API.markDialogUnread(unread === "")
+                    }
+                },
+                {
+                    icon: "delete",
+                    title: "Delete chat",
+                    red: true
+                },
+                ])}>
 
                 <DialogAvatarComponent dialog={dialog}/>
 
@@ -117,7 +150,7 @@ export class DialogComponent extends Component {
                         <div
                             css-display={dialog.messages.unreadCount === 0 || dialog.messages.unreadMentionsCount > 0 ? "none" : ""}
                             className="badge tgico">{dialog.messages.unreadCount}</div>
-                        <div css-display={!dialog.unreadMark ? "none" : ""} className="badge tgico">?</div>
+                        <div css-display={!dialog.unreadMark ? "none" : ""} className="badge tgico"></div>
                     </div>
                 </div>
             </div>
