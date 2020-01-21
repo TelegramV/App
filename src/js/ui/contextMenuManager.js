@@ -115,7 +115,7 @@ export class ContextMenuComponent extends Component {
         }
     }
 }
-
-window.oncontextmenu = function (ev) {
+//TODO uncomment before production
+/*window.oncontextmenu = function (ev) {
     ev.preventDefault()
-}
+}*/

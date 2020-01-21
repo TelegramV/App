@@ -1,7 +1,6 @@
 import CardMessageComponent from "./cardMessageComponent"
 
 const DocumentMessageComponent = ({message}) => {
-	console.log(message);
 	let doc = message.media.document;
 
 	let title = getFilename(doc.attributes);
