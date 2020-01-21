@@ -42,11 +42,11 @@ function vrdom_jsx(tagName, attributes, ...children) {
 
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
-            let key = k.toLowerCase()
+            let key = typeof tagName === "function" ? k : k.toLowerCase()
 
             if (key.startsWith("on")) {
-                events.set(key.substring(2), v)
-            } else if (key === "dangerouslydetinnerhtml") {
+                events.set(key.substring(2).toLowerCase(), v)
+            } else if (key === "dangerouslySetInnerHTML") {
                 dangerouslySetInnerHTML = v
                 attrs[key] = v
             } else if (key.startsWith("css-")) {

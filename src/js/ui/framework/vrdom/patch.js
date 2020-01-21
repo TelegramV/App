@@ -75,12 +75,9 @@ function patchChildren($parent, $children, newVChildren) {
  * @param dangerouslySetInnerHTML
  */
 function patchDangerouslySetInnerHTML($node, dangerouslySetInnerHTML) {
-    if ($node.getAttribute("dangerouslySetInnerHTML") === dangerouslySetInnerHTML) {
-        return $node
-    } else {
-        $node.innerHTML = dangerouslySetInnerHTML
-        return $node
-    }
+    // we should actually check diff here, but fuck it, do not use this thing
+    $node.innerHTML = dangerouslySetInnerHTML
+    return $node
 }
 
 /**

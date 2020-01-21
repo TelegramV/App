@@ -55,7 +55,7 @@ export class ChatInputComponent extends Component {
                     <div className="input-field">
                         <i className="tgico tgico-smile"></i>
                         <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]} placeholder="Message"
-                             contentEditable onInput={this.onInput} onKeyPress={this.onKeyPress} onContextMenu={ContextMenuManager.listener([
+                             contentEditable={true} onInput={this.onInput} onKeyPress={this.onKeyPress} onContextMenu={ContextMenuManager.listener([
                             {
                                 title: "Bold",
                                 after: "Ctrl+B",
