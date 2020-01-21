@@ -53,15 +53,15 @@ import {FileAPI} from "../../../../../../api/fileAPI";
 //     )
 // }
 
-const MessageMediaImage = ({ src, alt = "", size, isThumb}) => {
+const MessageMediaImage = ({ src, alt = "", size, thumb}) => {
     const w = size[1] > 512 ? 512 / size[1] * size[0] : size[0]
     return (
         <div className="media-wrapper">
-            <img className={["attachment", isThumb ? "attachment-thumb" : ""]}
+            <img className={["attachment", thumb ? "attachment-thumb" : ""]}
                  src={src}
                  alt={alt} css-width={w + "px"} />
             {
-                isThumb ?
+                thumb ?
                     <div className="progress">
                         <div className="pause-button">
                             <i className="tgico tgico-close"/>
@@ -80,7 +80,7 @@ const PhotoMessageComponent = ({ message }) => {
     return (
         <MessageWrapperComponent message={message}>
             <div className="message no-pad">
-                <MessageMediaImage src={imageLoaded ? imageLoaded.src : ""} size={imageLoaded ? imageLoaded.sizes : [0, 0]} isThumb={!imageLoaded || !!imageLoaded.thumbnail}/>
+                <MessageMediaImage src={imageLoaded ? imageLoaded.src : ""} size={imageLoaded ? imageLoaded.sizes : [0, 0]} thumb={!imageLoaded || imageLoaded.thumbnail}/>
 
                 <TextWrapperComponent message={message}/>
             </div>
