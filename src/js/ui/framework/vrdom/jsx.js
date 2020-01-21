@@ -42,15 +42,15 @@ function vrdom_jsx(tagName, attributes, ...children) {
 
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
-            let key = k
+            let key = k.toLowerCase()
 
-            if (k.startsWith("on")) {
-                events.set(k.substring(2).toLowerCase(), v)
-            } else if (k === "dangerouslySetInnerHTML") {
+            if (key.startsWith("on")) {
+                events.set(key.substring(2), v)
+            } else if (key === "dangerouslydetinnerhtml") {
                 dangerouslySetInnerHTML = v
-                attrs[k] = v
-            } else if (k.startsWith("css-")) {
-                const styleKey = k.substring(4)
+                attrs[key] = v
+            } else if (key.startsWith("css-")) {
+                const styleKey = key.substring(4)
 
                 if (attrs.style) {
                     attrs.style += `;${styleKey}: ${v};`
@@ -65,7 +65,7 @@ function vrdom_jsx(tagName, attributes, ...children) {
                     key = jsxAttributesMap.get(k)
                     attrs[key] = v
                 } else {
-                    attrs[k] = v
+                    attrs[key] = v
                 }
             }
 
