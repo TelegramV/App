@@ -3,6 +3,10 @@ import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 import Component from "../../../../../framework/vrdom/component"
 
 class ChatInfoAvatarComponent extends Component {
+    constructor(props) {
+        super(props)
+    }
+
     h() {
         if (AppSelectedDialog.isNotSelected) {
             return (
@@ -13,15 +17,43 @@ class ChatInfoAvatarComponent extends Component {
             )
         }
 
-        const peer = AppSelectedDialog.Dialog.peer
+        const dialog = AppSelectedDialog.Dialog
+        let hasAvatar = !dialog.peer.photo.isEmpty && !dialog.peer.photo._isFetchingSmall
 
-        return (
-            <div id="messages-photo"
-                 className={"avatar " + (peer.photo.isEmpty ? `placeholder-${peer.photo.letter.num}` : "")}
-                 style={`background-image: url(${peer.photo.smallUrl});`}>
-                {peer.photo.isEmpty ? peer.photo.letter.text : ""}
-            </div>
-        )
+        if (dialog.peer.isSelf) {
+            return (
+                <div className="avatar placeholder-saved placeholder-icon">
+                    <i className="tgico tgico-avatar_savedmessages"/>
+                </div>
+            )
+        }
+
+        if (dialog.peer.isDeleted) {
+            return (
+                <div className={`avatar placeholder-${dialog.peer.photo.letter.num} placeholder-icon`}>
+                    <i className="tgico tgico-avatar_deletedaccount"/>
+                </div>
+            )
+        }
+        if (hasAvatar) {
+            return (
+                <div id="messages-photo"
+                     className="avatar"
+                     style={`background-image: url(${dialog.peer.photo.smallUrl});`}>
+                </div>
+            )
+        } else {
+            return (
+                <div className={`avatar placeholder-${dialog.peer.photo.letter.num}`}>
+                    <span>{dialog.peer.photo.letter.text}</span>
+
+                    <div className="avatar-outer" css-opacity="0">
+
+                    </div>
+
+                </div>
+            )
+        }
     }
 
     mounted() {

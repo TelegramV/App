@@ -62,7 +62,6 @@ class DialogManager extends Manager {
         }
 
         MTProto.UpdatesManager.subscribe("updateShortMessage", async update => {
-            console.log("message", update)
             updateDialogLastMessage(await this.findOrFetch("user", update.user_id), update)
         })
 

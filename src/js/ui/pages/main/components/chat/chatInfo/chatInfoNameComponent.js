@@ -3,6 +3,10 @@ import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 import Component from "../../../../../framework/vrdom/component"
 
 class ChatInfoNameComponent extends Component {
+    constructor(props) {
+        super(props)
+    }
+
     h() {
         if (AppSelectedDialog.isNotSelected) {
             return (
@@ -16,7 +20,7 @@ class ChatInfoNameComponent extends Component {
 
         return (
             <div id="messages-title" className="title">
-                {peer.name}
+                {peer.isSelf ? "Saved Messages" : peer.name}
             </div>
         )
     }

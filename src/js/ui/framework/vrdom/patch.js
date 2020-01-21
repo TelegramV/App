@@ -12,7 +12,7 @@ import Component from "./component"
 function patchEvents($node, newEvents) {
     for (const [k, v] of newEvents.entries()) {
         // if ($node.hasOwnProperty(`on${k}`)) {
-            $node[`on${k}`] = v
+        $node[`on${k}`] = v
         // } else {
         //     console.warn("[patch] The node hasn't such event setter. Adding event by `addEventListener` which has bugs.")
         //
@@ -27,22 +27,21 @@ function patchEvents($node, newEvents) {
  * @param {Object} newAttrs
  */
 function patchAttrs($node, newAttrs) {
-    const oldAttrs = $node.attributes
+    if ($node.nodeType !== Node.TEXT_NODE) {
+        const oldAttrs = $node.attributes
 
-    for (const [k, v] of Object.entries(newAttrs)) {
-        if ($node.nodeType !== Node.TEXT_NODE) {
+        for (const [k, v] of Object.entries(newAttrs)) {
             const nv = Array.isArray(v) ? v.join(" ") : v
 
             if ($node.getAttribute(k) !== nv) {
                 $node.setAttribute(k, nv)
             }
         }
-    }
 
-    for (const k of oldAttrs) {
-        if (!newAttrs.hasOwnProperty(k)) {
-            if ($node.nodeType !== Node.TEXT_NODE) {
-                $node.removeAttribute(k)
+        for (let i = 0; i < oldAttrs.length; i++) {
+            const attr = oldAttrs.item(i)
+            if (!newAttrs.hasOwnProperty(attr.name)) {
+                $node.removeAttribute(attr.name)
             }
         }
     }
@@ -61,8 +60,12 @@ function patchChildren($parent, $children, newVChildren) {
         vrdom_patch($oldChild, newVChildren[i])
     })
 
-    for (const additionalVChild of newVChildren.slice($children.length)) {
-        vrdom_append(additionalVChild, $parent)
+    if (newVChildren.length > $children.length) {
+        for (let i = $children.length; i < newVChildren.length; i++) {
+            vrdom_append(newVChildren[i], $parent)
+        }
+    } else if (newVChildren.length < $children.length) {
+        vrdom_deepDeleteRealNodeComponents(Array.from($children.values()).slice(newVChildren.length))
     }
 }
 
@@ -107,7 +110,7 @@ function deepDeleteComponents(vRNode) {
 /**
  * @param {Element[]|Node[]|NodeListOf<ChildNode>} $childNodes
  */
-function deepDeleteRealNodeComponents($childNodes) {
+export function vrdom_deepDeleteRealNodeComponents($childNodes) {
     for (const $child of $childNodes) {
         if ($child.nodeType !== Node.TEXT_NODE) {
             if ($child.hasAttribute("data-component-id")) {
@@ -115,15 +118,18 @@ function deepDeleteRealNodeComponents($childNodes) {
                 const component = AppFramework.mountedComponents.get($child.getAttribute("data-component-id"))
 
                 if (component) {
-                    deepDeleteRealNodeComponents($child.childNodes)
                     component.__delete()
                 } else {
-                    deepDeleteRealNodeComponents($child.childNodes)
+                    vrdom_deepDeleteRealNodeComponents($child.childNodes)
+                    $child.remove()
                 }
 
             } else {
-                deepDeleteRealNodeComponents($child.childNodes)
+                vrdom_deepDeleteRealNodeComponents($child.childNodes)
+                $child.remove()
             }
+        } else {
+            $child.remove()
         }
     }
 }
@@ -193,7 +199,6 @@ function vrdom_patch($node, newVNode) {
             if (mounted) {
 
                 if (!mounted.__.patchingSelf) {
-                    deepDeleteRealNodeComponents($node.childNodes)
                     return mounted.__delete()
                 }
 

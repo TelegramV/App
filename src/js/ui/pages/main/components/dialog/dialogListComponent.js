@@ -10,15 +10,16 @@ import MTProto from "../../../../../mtproto";
 import {AppFramework} from "../../../../framework/framework";
 
 export class DialogListComponent extends Component {
-    constructor() {
-        super({
-            reactive: {
-                selectedDialog: AppSelectedDialog.Reactive.FireOnly
-            },
-            state: {
-                isInLoadingMoreScroll: false,
-            }
-        })
+    constructor(props) {
+        super(props)
+
+        this.reactive = {
+            selectedDialog: AppSelectedDialog.Reactive.FireOnly
+        }
+
+        this.state = {
+            isInLoadingMoreScroll: false,
+        }
 
         this.elements = {
             $loader: undefined,

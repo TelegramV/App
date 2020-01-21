@@ -5,12 +5,11 @@ import Component from "../../../../../framework/vrdom/component"
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 
 class ChatInfoComponent extends Component {
-    constructor() {
-        super({
-            reactive: {
-                dialog: AppSelectedDialog.Reactive.Default // reactive property
-            }
-        });
+    constructor(props) {
+        super(props)
+        this.reactive = {
+            dialog: AppSelectedDialog.Reactive.Default // reactive property
+        }
     }
 
     h() {

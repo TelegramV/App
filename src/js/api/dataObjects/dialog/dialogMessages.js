@@ -51,7 +51,7 @@ export class DialogMessages {
         this._readOutboxMaxId = readOutboxMaxId
         this._readInboxMaxId = readInboxMaxId
 
-        this._fireTransactionCount = 0
+        this._fireTransaction = false
     }
 
     /**
@@ -179,7 +179,7 @@ export class DialogMessages {
     }
 
     get isTransaction() {
-        return this._fireTransactionCount > 0
+        return this._fireTransaction
     }
 
     /**
@@ -329,20 +329,19 @@ export class DialogMessages {
     }
 
     startTransaction() {
-        this._fireTransactionCount++
+        this._fireTransaction = true
     }
 
     stopTransaction() {
-        if (this._fireTransactionCount !== 0) {
-            this._fireTransactionCount--
-        }
+        this._fireTransaction = false
     }
 
     fireTransaction(eventName = "updateSingle") {
+        this.stopTransaction()
+
         AppEvents.Dialogs.fire(eventName, {
             dialog: this._dialog
         })
 
-        this.stopTransaction()
     }
 }
