@@ -73,7 +73,8 @@ export default class VoiceMessageComponent extends Component {
 	        	<div class="audio">
 		            <div class="play tgico tgico-play" onMouseDown={this._playButtonClick.bind(this)}/>
 		            <div class="audio-wrapper">
-		                <svg css-width={`${this.width}px`} css-transform="scale(1,-1)" onMouseEnter={this.enterHandler} onMouseLeave={this.leaveHandler} onMouseDown={this.moveHandler}>
+		                <svg css-width={`${this.width}px`} css-transform="scale(1,-1)" 
+		                onMouseEnter={this.enterHandler} onMouseLeave={this.leaveHandler} onMouseDown={this.moveHandler}>
 		                    <defs>
 		                        <mask id="bars">
 		                            {this._generateBars()}
