@@ -123,6 +123,17 @@ class DialogAPI {
     readAllHistory() {
         this.readHistory(this.dialog.messages.last.id)
     }
+
+    // Should be moved to peer?
+    sendMessage(text) {
+        MTProto.invokeMethod("messages.sendMessage", {
+            peer: this.dialog.peer.inputPeer,
+            message: text,
+            random_id: createNonce(8)
+        }).then(response => {
+            console.log(response)
+        })
+    }
 }
 
 export class Dialog {

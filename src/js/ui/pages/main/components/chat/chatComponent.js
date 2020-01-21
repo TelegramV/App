@@ -4,6 +4,7 @@ import ChatInfoComponent from "./chatInfo/chatInfoComponent"
 import Component from "../../../../framework/vrdom/component"
 import BubblesComponent from "./bubblesComponent"
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
+import {ChatInputComponent} from "./chatInput/chatInputComponent";
 
 
 /**
@@ -32,6 +33,7 @@ class ChatComponent extends Component {
                 <LoaderComponent id="messages-wrapper-messages-loader" full={true} show={true}/>
 
                 <BubblesComponent/>
+                <ChatInputComponent/>
             </div>
         )
     }
