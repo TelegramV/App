@@ -128,7 +128,7 @@ export class DefaultUpdatesProcessor {
                 }
             })
         } else {
-            console.warn("queue already processing or there is no updates to process", this.queue, this.queue[this.queue.length - 1])
+            // console.warn("queue is already processing or there are no updates to process", this.queue, this.queue[this.queue.length - 1])
         }
     }
 

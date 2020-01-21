@@ -11,12 +11,14 @@ import Component from "./component"
  */
 function patchEvents($node, newEvents) {
     for (const [k, v] of newEvents.entries()) {
-        // todo: fix this thing
-        $node.removeEventListener(k, v)
-    }
-
-    for (const [k, v] of newEvents.entries()) {
-        $node.addEventListener(k, v)
+        // if ($node.hasOwnProperty(`on${k}`)) {
+            $node[`on${k}`] = v
+        // } else {
+        //     console.warn("[patch] The node hasn't such event setter. Adding event by `addEventListener` which has bugs.")
+        //
+        //     $node.removeEventListener(k, v)
+        //     $node.addEventListener(k, v)
+        // }
     }
 }
 

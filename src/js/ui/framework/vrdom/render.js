@@ -62,8 +62,13 @@ function vrdom_render(vNode, xmlns = null) {
             }
         }
 
-        for (const [kEvent, vEvent] of vNode.events.entries()) {
-            $node.addEventListener(kEvent, vEvent)
+        for (const [k, v] of vNode.events.entries()) {
+            // if ($node.hasOwnProperty(`on${k}`)) {
+                $node[`on${k}`] = v
+            // } else {
+            //     console.warn("[render] The node hasn't such event setter. Adding event by `addEventListener` which has bugs.")
+            //     $node.addEventListener(k, v)
+            // }
         }
 
         for (const child of vNode.children) {

@@ -122,7 +122,7 @@ export class ApiNetworker extends Networker {
                     mt_rpc_result: function (result, field) {
                         result.req_msg_id = this.fetchLong(`${field}[req_msg_id]`)
 
-                        const sentMessage = self.messageProcessor.sentMessages[result.req_msg_id]
+                        const sentMessage = self.messageProcessor.sentMessages.get(result.req_msg_id)
                         const type = sentMessage && sentMessage.resultType || "Object"
 
                         if (result.req_msg_id && !sentMessage) {
@@ -241,7 +241,7 @@ export class ApiNetworker extends Networker {
     }
 
     sendMessage(message) {
-        this.messageProcessor.sentMessages[message.msg_id] = message
+        this.messageProcessor.sentMessages.set(message.msg_id, message)
 
         const dataWithPadding = this.addHeader(message)
 
