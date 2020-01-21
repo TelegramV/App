@@ -73,6 +73,7 @@ class DialogManager extends Manager {
         MTProto.UpdatesManager.subscribe("updateNewMessage", async update => {
             let dialog = undefined
 
+
             console.log("message", update)
 
             if (update.message.pFlags.out) {

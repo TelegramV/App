@@ -122,15 +122,18 @@ export class DefaultUpdatesProcessor {
                     }).catch(e => {
                         console.error("[default] BUG: difference obtaining failed", e)
                         self.isWaitingForDifference = false
+                        self.queueIsProcessing = false
                         self.processQueue()
                     })
                 }
             })
+        } else {
+            console.warn("queue already processing or there is no updates to process", this.queue, this.queue[this.queue.length - 1])
         }
     }
 
     processDifference(rawDifference) {
-        // console.debug("[default] got difference", rawDifference)
+        console.debug("[default] got difference", rawDifference)
 
         if (rawDifference._ === "updates.difference") {
 
@@ -156,11 +159,12 @@ export class DefaultUpdatesProcessor {
             })
 
             this.isWaitingForDifference = false
+            this.queueIsProcessing = false
             this.updatesManager.State = rawDifference.state
             this.processQueue()
 
         } else if (rawDifference._ === "updates.differenceTooLong") {
-            // console.warn("[default] difference too long", rawDifference)
+            console.warn("[default] difference too long", rawDifference)
 
             this.isWaitingForDifference = true
 
@@ -174,6 +178,7 @@ export class DefaultUpdatesProcessor {
                 console.error("BUG: difference obtaining failed", e)
 
                 this.isWaitingForDifference = false
+                this.queueIsProcessing = false
                 this.processQueue()
             })
 
@@ -221,6 +226,7 @@ export class DefaultUpdatesProcessor {
                 console.error("BUG: difference obtaining failed", e)
 
                 this.isWaitingForDifference = false
+                this.queueIsProcessing = false
                 this.processQueue()
             })
         } else {

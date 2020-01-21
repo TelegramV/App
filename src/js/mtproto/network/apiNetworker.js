@@ -12,7 +12,6 @@ import AppCryptoManager from "../crypto/cryptoManager";
 import {schema} from "../language/schema";
 import Bytes from "../utils/bytes"
 import Random from "../utils/random"
-import MTProto from "../index";
 
 const Logger = createLogger("ApiNetworker", {
     level: "warn"
@@ -57,7 +56,7 @@ export class ApiNetworker extends Networker {
         this.pings[pingMessage.msg_id] = pingID
 
         this.messageProcessor.listenPong(pingMessage.msg_id, l => {
-            if(this.connected === false) {
+            if (this.connected === false) {
                 document.querySelector("#connecting_message").style.display = "none";
             }
             delete this.pings[pingMessage.msg_id]
@@ -214,9 +213,9 @@ export class ApiNetworker extends Networker {
     }
 
     resendMessage(messageId) {
-        if (!this.messageProcessor.sentMessages[messageId])
+        if (!this.messageProcessor.sentMessages.has(messageId))
             throw new Error("Message to resend does not exist")
-        this.sendMessage(this.messageProcessor.sentMessages[messageId])
+        this.sendMessage(this.messageProcessor.sentMessages.get(messageId))
     }
 
     addHeader(message) {
@@ -298,10 +297,10 @@ export class ApiNetworker extends Networker {
             body: serializer.getBytes(true),
             isAPI: true
         }
-        this.messageProcessor.sentMessagesDebug[messageID] = {
+        this.messageProcessor.sentMessagesDebug.set(messageID, {
             _: method,
             params: params
-        }
+        })
 
 
         //// Logger.debug("Api call", method, params, messageID, seqNo, options)

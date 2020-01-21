@@ -88,13 +88,10 @@ export function base64ToBlob(base64str, mimeType) {
 }
 
 export function dataUrlToBlob(url) {
-    // var name = 'b64blob ' + url.length
-    // console.timeManager(name)
     const urlParts = url.split(',')
     const base64str = urlParts[1]
     const mimeType = urlParts[0].split(':')[1].split(';')[0]
     const blob = base64ToBlob(base64str, mimeType)
-    // console.timeEnd(name)
     return blob
 }
 

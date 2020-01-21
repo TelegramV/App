@@ -19,10 +19,6 @@ window.send = (method, params) => {
     })
 }
 
-window.createNonce = (len) => {
-    return createNonce(len)
-}
-
 class MobileProtocolAPIAuth {
     constructor(options = {}) {
         if (!options.MTProto) {

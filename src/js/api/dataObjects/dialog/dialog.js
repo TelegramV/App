@@ -9,8 +9,8 @@ import {Peer} from "../peer/peer"
 import {DialogMessages} from "./dialogMessages"
 import AppEvents from "../../eventBus/appEvents"
 import {DraftMessage} from "./draftMessage"
-import Random from "../../../mtproto/utils/random";
 import {FileAPI} from "../../fileAPI";
+import {createNonce} from "../../../mtproto/utils/bin"
 
 /**
  * @property {Dialog} dialog
@@ -133,7 +133,7 @@ class DialogAPI {
             message: text,
             random_id: createNonce(8)
         }).then(response => {
-            console.log(response)
+            MTProto.UpdatesManager.process(response)
         })
     }
 
@@ -145,7 +145,7 @@ class DialogAPI {
                 media: f,
                 random_id: createNonce(8)
             }).then(response => {
-                console.log("sent media", response)
+                MTProto.UpdatesManager.process(response)
             })
         })
     }
