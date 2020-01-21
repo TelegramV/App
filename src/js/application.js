@@ -11,6 +11,7 @@ import AppCache from "./api/cache"
 import {loadSchema} from "./mtproto/language/schema"
 import PeersStore from "./api/store/peersStore"
 import AppEvents from "./api/eventBus/appEvents"
+import {createNonce} from "./mtproto/utils/bin"
 
 const isProduction = false
 
