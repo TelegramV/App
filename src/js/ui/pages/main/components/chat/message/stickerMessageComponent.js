@@ -12,7 +12,7 @@ class StickerMessageComponent extends Component {
         let sticker = src !== "" ? (animated ?
                 <tgs-player className="sticker" autoplay loop mode="normal" src={src} css-width="250px" css-height={height + "px"}/>
         :
-            <img className="sticker" src={src}/>) : <div className="sticker loading" css-width="250px" css-height={height + "px"}/>
+            <img className="sticker" src={src} css-width="250px" css-height={height + "px"}/>) : <div className="sticker loading" css-width="250px" css-height={height + "px"}/>
         return (
             <MessageWrapperComponent message={message} transparent={true}>
                 {sticker}

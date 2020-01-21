@@ -169,6 +169,15 @@ export class Message {
                     this.type = undefined;
             }
         }
-        if (message._ == "messageService") this.type = "service";
+        if (message._ === "messageService") {
+            switch (message.action._) {
+                case "messageActionPhoneCall":
+                    this.type = "phoneCall"
+                    break
+                default:
+                    this.type = "service"
+                    break
+            }
+        }
     }
 }

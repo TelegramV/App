@@ -15,7 +15,7 @@ $lightgrey: #dadce0;
 $grey: #c4c9cc;
 $darkgrey: #707579;
 
-$red: red;
+$red: #DF3F40;
 
 $light: rgba($darkgrey, 0.08);
 
@@ -26,6 +26,9 @@ $text-size: 16px;
 $time-size: 12px;
 
 $connecting-color: #FED85A;
+
+$max-chat-width: 700px;
+$chat-input-height: 54px;
 
 @function anim($elem) {
 	@return 150ms ease-out $elem;

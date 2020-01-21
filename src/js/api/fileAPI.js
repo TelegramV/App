@@ -47,11 +47,11 @@ export class FileAPI {
         }))
     }
 
-    static getFileLocation(location, dcID = null) {
+    static getFileLocation(location, dcID = null, offset = 0) {
         return MTProto.invokeMethod("upload.getFile", {
             location: location,
             flags: 0,
-            offset: 0,
+            offset: offset,
             limit: 1024 * 1024
         }, dcID)
     }
@@ -77,6 +77,10 @@ export class FileAPI {
                 return URL.createObjectURL(blob)
             })
         })
+    }
+
+    static hasThumbnail(file) {
+        return file.sizes.some(l => l.type === "i")
     }
 
     static getMaxSize(file) {
@@ -118,22 +122,37 @@ export class FileAPI {
         return AppCache.get("files", key).then(blob => {
             return URL.createObjectURL(blob)
         }).catch(error => {
+            return new Promise(async (resolve, reject) => {
+                const parts = []
+                let offset = 0
+                if(thumb_size !== "" && file.sizes) {
+                    const size = file.sizes.find(l => l.type === thumb_size)
+                    if(!size) throw new Error("Thumb not found")
+                    file.size = size.size
+                }
+                if(!file.size) throw new Error("No size specified")
 
-            return this.getFileLocation({
-                _: this.getInputName(file),
-                id: file.id,
-                access_hash: file.access_hash,
-                file_reference: file.file_reference,
-                thumb_size: thumb_size
-            }, file.dc_id).then(response => {
+                while(offset < file.size) {
+                    console.log(`downloading part #${parts.length + 1} at offset ${offset}...`)
+                    let response = await this.getFileLocation({
+                        _: this.getInputName(file),
+                        id: file.id,
+                        access_hash: file.access_hash,
+                        file_reference: file.file_reference,
+                        thumb_size: thumb_size
+                    }, file.dc_id, offset)
+
+                    offset += response.bytes.length
+                    parts.push(response.bytes)
+                }
+
                 const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
-                const blob = new Blob([response.bytes], {type: type})
-
+                const blob = new Blob(parts, {type: type})
                 AppCache.put("files", key, blob).catch(error => {
                     //
                 })
 
-                return URL.createObjectURL(blob)
+                resolve(URL.createObjectURL(blob))
             })
         })
     }
