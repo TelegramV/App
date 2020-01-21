@@ -13,10 +13,6 @@ const _XML_NAMESPACES = new Map([
  * @return {Element|Node}
  */
 function vrdom_render(vNode, xmlns = null) {
-    if (Array.isArray(vNode)) {
-        throw new Error("wtf")
-    }
-
     if (vNode instanceof ComponentVRNode) {
         return vrdom_renderComponentVNode(vNode)
     }
@@ -64,7 +60,7 @@ function vrdom_render(vNode, xmlns = null) {
 
         for (const [k, v] of vNode.events.entries()) {
             // if ($node.hasOwnProperty(`on${k}`)) {
-                $node[`on${k}`] = v
+            $node[`on${k}`] = v
             // } else {
             //     console.warn("[render] The node hasn't such event setter. Adding event by `addEventListener` which has bugs.")
             //     $node.addEventListener(k, v)

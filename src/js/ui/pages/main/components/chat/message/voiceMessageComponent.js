@@ -76,12 +76,12 @@ export default class VoiceMessageComponent extends Component {
 		                <svg css-width={`${this.width}px`} css-transform="scale(1,-1)" 
 		                onMouseEnter={this.enterHandler} onMouseLeave={this.leaveHandler} onMouseDown={this.moveHandler}>
 		                    <defs>
-		                        <mask id="bars">
+		                        <mask id={`bars-${this.props.message.id}`}>
 		                            {this._generateBars()}
 		                        </mask>
 		                    </defs>
-		                    <rect class="back" x="0" y="0" width={this.width + "px"} height="100%" mask="url(#bars)"/>
-		                    <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%" mask="url(#bars)"/>
+		                    <rect class="back" x="0" y="0" width={this.width + "px"} height="100%" mask={`url(#bars-${this.props.message.id})`}/>
+		                    <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%" mask={`url(#bars-${this.props.message.id})`}/>
 		                </svg>
 		                <div class="timer">
 		                    {this._timeToFormat(this.duration)}
