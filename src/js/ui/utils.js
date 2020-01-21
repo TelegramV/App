@@ -43,6 +43,8 @@ export function getMediaPreviewName(message) {
             return "Contact"
         case "messageMediaDocument":
             return "Document" // TODO other documents
+        case "messageMediaEmpty":
+            return ""
         case "messageMediaUnsupported":
         default:
             console.log("unsupported", message.media)

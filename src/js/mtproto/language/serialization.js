@@ -314,7 +314,6 @@ export class TLSerialization {
                 fieldBit = condType[0].split(".")
                 if (!(params[fieldBit[0]] & (1 << fieldBit[1]))) {
                     if(params.pFlags && params.pFlags[param.name]) {
-                        console.log("add", param.name, params.pFlags[param.name])
                         params[fieldBit[0]] |= 1 << fieldBit[1]
                         params[param.name] = params.pFlags[param.name]
                     }
@@ -333,6 +332,8 @@ export class TLSerialization {
                 }
                 type = condType[1]
             }
+
+            // console.log(param.name, params[param.name])
 
             this.storeObject(params[param.name], type, methodName + "[" + param.name + "]")
         }
