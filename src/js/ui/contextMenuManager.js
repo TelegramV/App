@@ -92,6 +92,13 @@ export class ContextMenuComponent extends Component {
         let rect = elem.getBoundingClientRect()
         this.openXY(data, rect.x, rect.y + rect.height + 10)
     }
+
+    listener(data = []) {
+        return ev => {
+            ev.preventDefault()
+            ContextMenuManager.openXY(data, ev.clientX, ev.clientY)
+        }
+    }
 }
 
 window.oncontextmenu = function(ev) {

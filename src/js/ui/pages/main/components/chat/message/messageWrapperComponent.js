@@ -1,31 +1,5 @@
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 
-const onContextMenu = ev => {
-    ev.preventDefault()
-    ContextMenuManager.openXY([
-        {
-            icon: "reply",
-            title: "Reply"
-        },
-        {
-            icon: "copy",
-            title: "Copy"
-        },
-        {
-            icon: "pin",
-            title: "Pin"
-        },
-        {
-            icon: "forward",
-            title: "Forward"
-        },
-        {
-            icon: "delete",
-            title: "Delete",
-            red: true
-        },
-    ], ev.clientX, ev.clientY)
-}
 const MessageWrapperComponent = ({ message, transparent = false, slot }) => {
     const className = {
         "channel": message.isPost,
@@ -50,7 +24,29 @@ const MessageWrapperComponent = ({ message, transparent = false, slot }) => {
     const cssBackgroundImage = hasAvatar ? `url(${from.photo.smallUrl})` : "none"
 
     return (
-        <div className={className} data-id={message.id} data-peer={`${from.type}.${from.id}`} onContextMenu={onContextMenu}>
+        <div className={className} data-id={message.id} data-peer={`${from.type}.${from.id}`} onContextMenu={ContextMenuManager.listener([
+            {
+                icon: "reply",
+                title: "Reply"
+            },
+            {
+                icon: "copy",
+                title: "Copy"
+            },
+            {
+                icon: "pin",
+                title: "Pin"
+            },
+            {
+                icon: "forward",
+                title: "Forward"
+            },
+            {
+                icon: "delete",
+                title: "Delete",
+                red: true
+            },
+        ])}>
             {!message.isPost && className.in ? (
                 <div className={classes}
                      css-background-image={cssBackgroundImage}>
