@@ -1,5 +1,5 @@
 import {MonkeyController} from "./monkey"
-import {countries, hasClass} from "../../utils"
+import {askForFile, countries, hasClass} from "../../utils"
 import {MTProto} from "../../../mtproto"
 import {AppPermanentStorage} from "../../../common/storage"
 import {AppFramework} from "../../framework/framework"
@@ -317,25 +317,7 @@ function initCodeInput() {
 }
 
 
-function askForFile(accept, callback) {
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.accept = accept;
 
-    input.onchange = e => {
-        var file = e.target.files[0];
-
-        var reader = new FileReader();
-        reader.readAsDataURL(file);
-
-        reader.onload = readerEvent => {
-            var content = readerEvent.target.result;
-            callback(content);
-        }
-
-    }
-    input.click();
-}
 
 
 function initCropper(image) {

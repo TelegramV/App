@@ -9,6 +9,8 @@ import {Peer} from "../peer/peer"
 import {DialogMessages} from "./dialogMessages"
 import AppEvents from "../../eventBus/appEvents"
 import {DraftMessage} from "./draftMessage"
+import Random from "../../../mtproto/utils/random";
+import {FileAPI} from "../../fileAPI";
 
 /**
  * @property {Dialog} dialog
@@ -132,6 +134,19 @@ class DialogAPI {
             random_id: createNonce(8)
         }).then(response => {
             console.log(response)
+        })
+    }
+
+    sendMedia(text, file, f) {
+        FileAPI.saveFilePart(f.file.id, file).then(l => {
+            MTProto.invokeMethod("messages.sendMedia", {
+                peer: this.dialog.peer.inputPeer,
+                message: text,
+                media: f,
+                random_id: createNonce(8)
+            }).then(response => {
+                console.log("sent media", response)
+            })
         })
     }
 }

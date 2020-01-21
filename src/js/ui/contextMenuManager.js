@@ -93,6 +93,12 @@ export class ContextMenuComponent extends Component {
         this.openXY(data, rect.x, rect.y + rect.height + 10)
     }
 
+
+    openAbove(data = [], elem) {
+        let rect = elem.getBoundingClientRect()
+        this.openXY(data, rect.x, rect.y - 10)
+    }
+
     listener(data = []) {
         return ev => {
             ev.preventDefault()

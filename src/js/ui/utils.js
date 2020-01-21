@@ -67,6 +67,29 @@ export function getMessagePreviewDialog(message, peerName, showSender) {
     return text
 }
 
+export function askForFile(accept, callback, asBuffer = false) {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = accept;
+
+    input.onchange = e => {
+        var file = e.target.files[0];
+
+        var reader = new FileReader();
+        if(asBuffer) {
+            reader.readAsArrayBuffer(file)
+        } else {
+            reader.readAsDataURL(file);
+        }
+
+        reader.onload = readerEvent => {
+            callback(reader.result, file);
+        }
+
+    }
+    input.click();
+}
+
 export function formatTimeAudio(seconds) {
     const dt = new Date(0)
     dt.setSeconds(seconds)

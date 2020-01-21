@@ -1,5 +1,10 @@
 import Component from "../../../../../framework/vrdom/component";
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog";
+import {ContextMenuManager} from "../../../../../contextMenuManager";
+import MTProto from "../../../../../../mtproto";
+import {AppFramework} from "../../../../../framework/framework";
+import {askForFile} from "../../../../../utils";
+import Random from "../../../../../../mtproto/utils/random";
 
 export class ChatInputComponent extends Component {
     h() {
@@ -9,7 +14,22 @@ export class ChatInputComponent extends Component {
                 <div className="input-field">
                     <i className="tgico tgico-smile"></i>
                     <div className="textarea empty" placeholder="Message" contentEditable onInput={this.onInput}/>
-                    <i className="tgico tgico-attach"></i>
+                    <i className="tgico tgico-attach" onClick={l => ContextMenuManager.openAbove([
+                        {
+                            icon: "photo",
+                            title: "Photo or Video",
+                            onClick: _ => {
+                                this.pickFile(false)
+                            }
+                        },
+                        {
+                            icon: "document",
+                            title: "Document",
+                            onClick: _ => {
+                                this.pickFile(true)
+                            }
+                        },
+                    ], l.target)}/>
 
                 </div>
                 <div className="send-button" onClick={this.onSend}>
@@ -17,6 +37,29 @@ export class ChatInputComponent extends Component {
                 </div>
             </div>
         </div>
+    }
+
+    pickFile(document) {
+        askForFile("image/*", function(bytes, file) {
+            const id = [Random.nextInteger(0xffffffff), Random.nextInteger(0xffffffff)]
+            AppSelectedDialog.Dialog.API.sendMedia("test message", bytes, {
+                _: document ? "inputMediaUploadedDocument" : "inputMediaUploadedPhoto",
+                flags: 0,
+                file: {
+                    _: "inputFile",
+                    id: id,
+                    parts: 1,
+                    name: file.name
+                },
+                mime_type: "octec/stream",
+                attributes: [
+                    {
+                        _: "documentAttributeFilename",
+                        file_name: file.name
+                    }
+                ]
+            })
+        }, true)
     }
 
     mounted() {
