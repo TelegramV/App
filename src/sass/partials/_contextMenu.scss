@@ -5,8 +5,12 @@
   z-index: 99999;
 
   &.hidden {
-    display: none;
+    //display: none;
     pointer-events: none;
+
+    .context-menu {
+      transform: scale(0, 0);
+    }
   }
 
   .context-menu {
@@ -18,6 +22,24 @@
     box-shadow: 0 5px 8px 1px rgba(0, 0, 0, .25);
     display: flex;
     flex-direction: column;
+    transition: anim(transform);
+    transform: scale(1, 1);
+
+    &.left-top {
+      transform-origin: left top;
+    }
+
+    &.left-bottom {
+      transform-origin: left bottom;
+    }
+
+    &.right-top {
+      transform-origin: right top;
+    }
+
+    &.right-bottom {
+      transform-origin: right bottom;
+    }
 
     .element {
       height: 64px;
@@ -26,6 +48,14 @@
       align-items: center;
       transition: anim(background-color);
       cursor: pointer;
+
+      &.red {
+        color: $red;
+
+        .tgico {
+          color: $red;
+        }
+      }
 
       .tgico {
         color: $darkgrey;
