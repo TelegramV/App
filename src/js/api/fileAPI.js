@@ -123,7 +123,6 @@ export class FileAPI {
             return URL.createObjectURL(blob)
         }).catch(error => {
             return new Promise(async (resolve, reject) => {
-                console.log(file)
                 const parts = []
                 let offset = 0
                 if(thumb_size !== "" && file.sizes) {
@@ -145,7 +144,6 @@ export class FileAPI {
 
                     offset += response.bytes.length
                     parts.push(response.bytes)
-                    console.log(`loaded, total bytes ${offset}`, response)
                 }
 
                 const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
@@ -153,7 +151,6 @@ export class FileAPI {
                 AppCache.put("files", key, blob).catch(error => {
                     //
                 })
-                console.log("resolve", type)
 
                 resolve(URL.createObjectURL(blob))
             })

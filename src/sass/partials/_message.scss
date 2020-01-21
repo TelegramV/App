@@ -347,6 +347,9 @@
 
                 .attachment-thumb {
                     filter: blur(10px);
+                    // needed to fix black edges: https://telegra.ph/file/7aad6eed39a29cf7dd893.jpg
+                    // do not remove unless better method found
+                    transform: scale(1.1);
                 }
             }
 
