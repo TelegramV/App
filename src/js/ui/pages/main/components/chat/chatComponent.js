@@ -11,8 +11,8 @@ import {ChatInputComponent} from "./chatInput/chatInputComponent";
  * CRITICAL: never rerender this component!
  */
 class ChatComponent extends Component {
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.reactive = {
             dialog: AppSelectedDialog.Reactive.FireOnly,
         }

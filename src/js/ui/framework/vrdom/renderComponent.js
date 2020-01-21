@@ -26,6 +26,7 @@ function vrdom_renderComponentVNode(componentVNode) {
 
     AppFramework.mountedComponents.set(String(newId), componentInstance)
 
+    componentInstance.__created()
     componentInstance.created()
     componentInstance.__.created = true
 

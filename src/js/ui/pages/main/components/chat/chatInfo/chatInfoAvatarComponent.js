@@ -3,6 +3,10 @@ import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 import Component from "../../../../../framework/vrdom/component"
 
 class ChatInfoAvatarComponent extends Component {
+    constructor(props) {
+        super(props)
+    }
+
     h() {
         if (AppSelectedDialog.isNotSelected) {
             return (

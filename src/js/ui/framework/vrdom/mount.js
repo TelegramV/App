@@ -21,6 +21,7 @@ export function vrdom_mount_resolveComponentMounted($mounted) {
 
             if (!component.__.mounted) {
                 component.__.mounted = true
+                component.__mounted()
                 component.mounted()
             }
         } else {

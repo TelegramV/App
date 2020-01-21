@@ -23,11 +23,11 @@ export function MainPage() {
 
     return (
         <div class="app">
+            <ContextMenuComponent/>
+
             <DialogListComponent/>
             <ChatComponent/>
             <DialogInfoComponent/>
-
-            <ContextMenuComponent/>
         </div>
     )
 }

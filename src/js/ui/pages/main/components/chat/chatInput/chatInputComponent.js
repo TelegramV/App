@@ -1,12 +1,14 @@
 import Component from "../../../../../framework/vrdom/component";
 import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog";
 import {ContextMenuManager} from "../../../../../contextMenuManager";
-import MTProto from "../../../../../../mtproto";
-import {AppFramework} from "../../../../../framework/framework";
 import {askForFile} from "../../../../../utils";
 import Random from "../../../../../../mtproto/utils/random";
 
 export class ChatInputComponent extends Component {
+    constructor(props) {
+        super(props)
+    }
+
     h() {
         return <div className="chat-input-wrapper">
             <div className="chat-input">
@@ -40,7 +42,7 @@ export class ChatInputComponent extends Component {
     }
 
     pickFile(document) {
-        askForFile("image/*", function(bytes, file) {
+        askForFile("image/*", function (bytes, file) {
             const id = [Random.nextInteger(0xffffffff), Random.nextInteger(0xffffffff)]
             AppSelectedDialog.Dialog.API.sendMedia("test message", bytes, {
                 _: document ? "inputMediaUploadedDocument" : "inputMediaUploadedPhoto",
@@ -73,7 +75,7 @@ export class ChatInputComponent extends Component {
     }
 
     onInput(ev) {
-        if(this.textarea.textContent.length > 0) {
+        if (this.textarea.textContent.length > 0) {
             this.textarea.classList.remove("empty")
         } else {
             this.textarea.classList.add("empty")

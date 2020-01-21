@@ -5,7 +5,9 @@ export let ContextMenuManager
 export class ContextMenuComponent extends Component {
     constructor(props) {
         super(props)
+
         ContextMenuManager = this
+
         this.state = {
             hidden: true,
             data: [],
@@ -16,26 +18,34 @@ export class ContextMenuComponent extends Component {
     }
 
     h() {
+        console.log(this.state)
+
         return (
-            <div className={["context-menu-wrapper", this.state.hidden ? "hidden" : ""]} onClick={this.close} onContextMenu={this.close}>
-                <div className={["context-menu", this.state.animation]} css-top={this.state.y + "px"} css-left={this.state.x + "px"}>
-                    {this.state.data.map(l => {
-                        return <div className={["element", "rp", "rps", l.red ? "red" : ""]} onClick={q => this.select(l, q)}>
+            <div className={["context-menu-wrapper", this.state.hidden ? "hidden" : ""]} onClick={this.close}
+                 onContextMenu={this.close}>
+                <div className={["context-menu", this.state.animation]} css-top={this.state.y + "px"}
+                     css-left={this.state.x + "px"}>
+                    {this.state.data.map(l =>
+                        <div className={["element", "rp", "rps", l.red ? "red" : ""]}
+                             onClick={q => this.select(l, q)}>
+
                             <i className={["tgico", "tgico-" + l.icon]}/>
+
                             <span>{l.title}</span>
+
                             {l.counter ?
                                 <div className="badge">{l.counter}</div>
                                 : ""
                             }
                         </div>
-                    })}
+                    )}
                 </div>
             </div>
         )
     }
 
     select(l, ev) {
-        if(l.onClick) {
+        if (l.onClick) {
             l.onClick()
         }
         ev.stopPropagation()
@@ -67,13 +77,13 @@ export class ContextMenuComponent extends Component {
         const windowHeight = window.innerHeight
 
         this.state.animation = "left-top"
-        if(x + width >= windowWidth) {
+        if (x + width >= windowWidth) {
             x = x - width
             this.state.animation = "right-top"
         }
-        if(y + height >= windowHeight) {
+        if (y + height >= windowHeight) {
             y = y - height
-            if(this.state.animation === "right-top") {
+            if (this.state.animation === "right-top") {
                 this.state.animation = "right-bottom"
             } else {
                 this.state.animation = "left-bottom"
@@ -109,6 +119,6 @@ export class ContextMenuComponent extends Component {
     }
 }
 
-window.oncontextmenu = function(ev) {
+window.oncontextmenu = function (ev) {
     ev.preventDefault()
 }

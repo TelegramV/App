@@ -9,15 +9,15 @@ import AppFramework from "../../../../../framework/framework"
 import Component from "../../../../../framework/vrdom/component"
 
 class ChatInfoStatusComponent extends Component {
-    constructor() {
-        super({
-            state: {
-                patchEvents: new Set([
-                    "updateUserStatus",
-                    "fullLoaded",
-                ]),
-            }
-        })
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            patchEvents: new Set([
+                "updateUserStatus",
+                "fullLoaded",
+            ]),
+        }
     }
 
     h() {

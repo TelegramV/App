@@ -1,8 +1,9 @@
 import AppFramework from "../../framework"
 import VRDOM from "../index"
+import {vrdom_deepDeleteRealNodeComponents} from "../patch"
 
 class Component {
-    constructor(props = {}) {
+    constructor(props) {
         this.__ = {
             inited: false,
             mounted: false,
@@ -18,7 +19,19 @@ class Component {
              * @type {Map<EventBus, Map<string, *>>}
              */
             appEventContexts: new Map(),
+
+            reactiveInited: false
+
         }
+
+        /**
+         * 0: reactive events and properties will be initialized after mount
+         * 1: reactive events and properties will be initialized during the component init process
+         * 2: reactive events and properties will be initialized after create
+         * @type {number}
+         */
+        this.reactiveStrategy = 0 // todo: implement it
+
         this.identifier = undefined
         this.name = props.name || this.constructor.name
         this.$el = props.$el || undefined
@@ -74,18 +87,39 @@ class Component {
         //
     }
 
+    __mounted() {
+        // if (this.reactiveStrategy === 0) {
+        //     this.__initReactive()
+        // }
+    }
+
+    __created() {
+        // if (this.reactiveStrategy === 0) {
+        this.__initReactive()
+        // }
+    }
+
     // deletes component
     // do not override this if there is no critical reason
     __delete() {
         this.destroy()
         this.__disableReactive()
+        this.__deepDeleteInnerComponents()
         AppFramework.mountedComponents.delete(this.$el.getAttribute("data-component-id"))
         this.$el.remove()
+    }
+
+    __deepDeleteInnerComponents() {
+        vrdom_deepDeleteRealNodeComponents(this.$el.childNodes)
     }
 
     // do not override this if there is no critical reason
     __disableReactive() {
         for (const context of this.__.reactiveContexts) {
+            context.offCallback(context.resolve)
+        }
+
+        for (const context of this.__.appEventContexts) {
             context.offCallback(context.resolve)
         }
     }
@@ -151,12 +185,21 @@ class Component {
             this.__delete = this.__delete.bind(this)
             this.__render = this.__render.bind(this)
             this.__patch = this.__patch.bind(this)
+            this.__mounted = this.__mounted.bind(this)
 
+            this.__.inited = true
+        }
+    }
+
+    __initReactive() {
+        if (!this.__.reactiveInited) {
             for (const [key, context] of Object.entries(this.reactive)) {
+                console.log(key)
                 if (context) {
                     if (context.__rc) {
+                        context.resolve = value => this.__resolveReactivePropertyChange(key, value)
                         this.__.reactiveContexts.set(key, context)
-                        this.reactive[key] = context.callback(value => this.__resolveReactivePropertyChange(key, value))
+                        this.reactive[key] = context.callback(context.resolve)
                     } else {
                         console.error(`not reactive value ${key}`, context)
                     }
@@ -168,8 +211,9 @@ class Component {
             for (const context of this.appEvents) {
                 if (context.__re) {
 
+                    context.resolve = this.__resolveReactiveEventFired.bind(this)
                     const bus = context.bus
-                    const eventType = context.callback(this.__resolveReactiveEventFired.bind(this))
+                    const eventType = context.callback(context.resolve)
 
                     if (!this.__.appEventContexts.has(bus)) {
                         this.__.appEventContexts.set(bus, new Map())
@@ -178,11 +222,11 @@ class Component {
                     this.__.appEventContexts.get(bus).set(eventType, context)
 
                 } else {
-                    console.error(`not reactive event ${key}`, context)
+                    console.error(`not reactive event`, context)
                 }
             }
 
-            this.__.inited = true
+            this.__.reactiveInited = true
         }
     }
 

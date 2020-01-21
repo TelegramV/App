@@ -47,36 +47,38 @@ function insertAt(str, position, length, b) {
     return text
 }*/
 
+
+const handlersText = {
+    messageEntityBold: (l, a) => <b>{a}</b>,
+    messageEntityItalic: (l, a) => <i>{a}</i>,
+    messageEntityCode: (l, a) => <code>{a}</code>,
+    messageEntityPre: (l, a) => <code>{a}</code>,
+    messageEntityUnderline: (l, a) => <u>{a}</u>,
+    messageEntityStrike: (l, a) => <s>{a}</s>,
+    messageEntityBlockquote: (l, a) => <blockquote>{a}</blockquote>
+}
+
+const handlersLinks = {
+    messageEntityMention: (l, a) => <a href={"/#/?p=${a}"}>{a}</a>,
+    messageEntityHashtag: (l, a) => <a href="#">{a}</a>,
+    messageEntityBotCommand: (l, a) => <a href="#">{a}</a>,
+    messageEntityUrl: (l, a) => <a target="_blank" href={!a.startsWith("http") ? "https://" + a : a}>{a}</a>,
+    messageEntityEmail: (l, a) => <a href={`mailto:${a}`}>{a}</a>,
+    messageEntityTextUrl: (l, a) => <a target="_blank" href={l.url}>{a}</a>,
+    messageEntityMentionName: (l, a) => <a>{a}</a>,
+    inputMessageEntityMentionName: (l, a) => <a>{a}</a>,
+    messageEntityPhone: (l, a) => <a href={`tel:${a}`}>{a}</a>,
+    messageEntityCashtag: (l, a) => <a href="#">{a}</a>,
+}
+
 export function parseMessageEntities(text, messageEntities, noLinks = false) {
     messageEntities = messageEntities || []
-
-    const handlersText = {
-        messageEntityBold: (l, a) => <b>{a}</b>,
-        messageEntityItalic: (l, a) => <i>{a}</i>,
-        messageEntityCode: (l, a) => <code>{a}</code>,
-        messageEntityPre: (l, a) => <code>{a}</code>,
-        messageEntityUnderline: (l, a) => <u>{a}</u>,
-        messageEntityStrike: (l, a) => <s>{a}</s>,
-        messageEntityBlockquote: (l, a) => <blockquote>{a}</blockquote>
-    }
-
-    const handlersLinks = {
-        messageEntityMention: (l, a) => <a href={"/#/?p=${a}"}>{a}</a>,
-        messageEntityHashtag: (l, a) => <a href="#">{a}</a>,
-        messageEntityBotCommand: (l, a) => <a href="#">{a}</a>,
-        messageEntityUrl: (l, a) => <a target="_blank" href={!a.startsWith("http") ? "https://" + a : a}>{a}</a>,
-        messageEntityEmail: (l, a) => <a href={`mailto:${a}`}>{a}</a>,
-        messageEntityTextUrl: (l, a) => <a target="_blank" href={l.url}>{a}</a>,
-        messageEntityMentionName: (l, a) => <a>{a}</a>,
-        inputMessageEntityMentionName: (l, a) => <a>{a}</a>,
-        messageEntityPhone: (l, a) => <a href={`tel:${a}`}>{a}</a>,
-        messageEntityCashtag: (l, a) => <a href="#">{a}</a>,
-    }
 
     let elements = []
 
     const handlers = noLinks ? handlersText : Object.assign({}, handlersText, handlersLinks)
     let prevOffset = 0
+
     messageEntities.forEach(l => {
         const offset = l.offset
         const length = l.length

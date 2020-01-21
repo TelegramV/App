@@ -1,7 +1,7 @@
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import AppEvents from "../../../../../api/eventBus/appEvents"
-import { FileAPI } from "../../../../../api/fileAPI"
-import { isElementInViewport } from "../../../../framework/utils"
+import {FileAPI} from "../../../../../api/fileAPI"
+import {isElementInViewport} from "../../../../framework/utils"
 
 import Message from "./../../messages/newMessage"
 import Component from "../../../../framework/vrdom/component"
@@ -9,20 +9,20 @@ import VRDOM from "../../../../framework/vrdom"
 
 
 class BubblesComponent extends Component {
-    constructor() {
-        super({
-            reactive: {
-                dialog: AppSelectedDialog.Reactive.FireOnly,
-            },
+    constructor(props) {
+        super(props)
 
-            state: {
-                /**
-                 * @var {Array<Node|Element>|[]} renderedMessageElements
-                 */
-                renderedMessageElements: [],
-                isFetchingNextPage: false,
-            },
-        })
+        this.reactive = {
+            dialog: AppSelectedDialog.Reactive.FireOnly,
+        }
+
+        this.state = {
+            /**
+             * @var {Array<Node|Element>|[]} renderedMessageElements
+             */
+            renderedMessageElements: [],
+            isFetchingNextPage: false,
+        }
 
         this.elements = {
             $bubblesInner: undefined,
@@ -102,7 +102,7 @@ class BubblesComponent extends Component {
 
                 //console.log(message.media.photo)
                 const max = FileAPI.getMaxSize(message.media.photo)
-                if(FileAPI.hasThumbnail(message.media.photo)) {
+                if (FileAPI.hasThumbnail(message.media.photo)) {
                     const thumbnail = FileAPI.getThumbnail(message.media.photo)
                     message.media.photo.real = {
                         src: thumbnail,
@@ -133,13 +133,13 @@ class BubblesComponent extends Component {
             if (message.media.document) {
                 if (message.type === "sticker") {
                     FileAPI.getFile(message.media.document).then(data => {
-                        message.media.document.real = { url: data };
+                        message.media.document.real = {url: data};
                         VRDOM.patch($message, <Message message={message}/>);
                     });
                 }
                 if (message.type === "round" || message.type === "video" || message.type === "audio") {
                     FileAPI.getFile(message.media.document, "").then(data => {
-                        message.media.document.real = { url: data };
+                        message.media.document.real = {url: data};
                         VRDOM.patch($message, <Message message={message}/>);
                     });
                 }
