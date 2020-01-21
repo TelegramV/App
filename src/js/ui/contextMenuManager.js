@@ -43,7 +43,9 @@ export class ContextMenuComponent extends Component {
     }
 
     close() {
-        this.state.data = []
+        // weird bug with patcher here
+        // @kohutd plz fix
+        //this.state.data = []
         this.state.hidden = true
         this.__patch()
 
