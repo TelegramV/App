@@ -14,6 +14,7 @@ export class ChatInputComponent extends Component {
         ChatInputManager = this
         this.state = {
             value: "",
+            valueString: "",
             attachments: [],
             reply: null
         }
@@ -136,7 +137,7 @@ export class ChatInputComponent extends Component {
                         }
                     },
                 ], l.target)}>
-                    <i className="tgico tgico-send"/>
+                    <i className={["tgico", this.state.valueString.length > 0 ? "tgico-send" : "tgico-microphone"]}/>
                 </div>
             </div>
         </div>
@@ -207,7 +208,14 @@ export class ChatInputComponent extends Component {
     }
 
     onInput(ev) {
-        this.state.value = this.textarea.innerHTML
+        if(this.state.valueString.length === 0 || this.textarea.textContent.length === 0) {
+            this.state.value = this.textarea.innerHTML
+            this.state.valueString = this.textarea.textContent
+            this.__patch()
+        } else {
+            this.state.value = this.textarea.innerHTML
+            this.state.valueString = this.textarea.textContent
+        }
         if (this.textarea.textContent.length > 0) {
             this.textarea.classList.remove("empty")
         } else {
