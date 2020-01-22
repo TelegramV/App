@@ -343,6 +343,10 @@
                     max-height: 512px;
                     background-size: cover;
                     display: block;
+
+                    &.photo {
+                        cursor: pointer;
+                    }
                 }
 
                 .attachment-thumb {

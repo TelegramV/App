@@ -7,6 +7,7 @@ import {LocaleController} from "../../../common/locale/localization"
 import {ContextMenuComponent} from "../../contextMenuManager";
 import {DialogInfoComponent} from "./components/dialog/dialogInfoComponent";
 import {ModalComponent} from "../../modalManager";
+import {MediaViewerComponent} from "../../mediaViewerManager";
 
 function initUIManagers() {
     UpdatesManager.init().then(() => {
@@ -26,6 +27,7 @@ export function MainPage() {
         <div class="app">
             <ContextMenuComponent/>
             <ModalComponent/>
+            <MediaViewerComponent/>
 
             <DialogListComponent/>
             <ChatComponent/>

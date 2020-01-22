@@ -2,6 +2,7 @@ import MessageWrapperComponent from "./messageWrapperComponent"
 import MessageTimeComponent from "./messageTimeComponent"
 import TextWrapperComponent from "./textWrapperComponent";
 import {FileAPI} from "../../../../../../api/fileAPI";
+import {MediaViewerManager} from "../../../../../mediaViewerManager";
 
 // const MessageMediaImage = ({src, size, alt = "", isThumb}) => {
 //     let width = isThumb ? parseInt(size[0]) >= 460 ? "460px" : `${size[0]}px` : parseInt(size[0]) >= 480 ? "480px" : `${size[0]}px`
@@ -53,11 +54,15 @@ import {FileAPI} from "../../../../../../api/fileAPI";
 //     )
 // }
 
-const MessageMediaImage = ({ src, alt = "", size, thumb}) => {
+const openViewer = message => {
+    MediaViewerManager.open(message)
+}
+
+const MessageMediaImage = ({ message, src, alt = "", size, thumb}) => {
     const w = size[1] > 512 ? 512 / size[1] * size[0] : size[0]
     return (
-        <div className="media-wrapper">
-            <img className={["attachment", thumb ? "attachment-thumb" : ""]}
+        <div className="media-wrapper" onClick={l => openViewer(message)}>
+            <img className={["attachment", "photo", thumb ? "attachment-thumb" : ""]}
                  src={src}
                  alt={alt} css-width={w + "px"} />
             {
@@ -80,7 +85,7 @@ const PhotoMessageComponent = ({ message }) => {
     return (
         <MessageWrapperComponent message={message}>
             <div className="message no-pad">
-                <MessageMediaImage src={imageLoaded ? imageLoaded.src : ""} size={imageLoaded ? imageLoaded.sizes : [0, 0]} thumb={!imageLoaded || imageLoaded.thumbnail}/>
+                <MessageMediaImage message={message} src={imageLoaded ? imageLoaded.src : ""} size={imageLoaded ? imageLoaded.sizes : [0, 0]} thumb={!imageLoaded || imageLoaded.thumbnail}/>
 
                 <TextWrapperComponent message={message}/>
             </div>
