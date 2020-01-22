@@ -428,16 +428,37 @@ export class TLSerialization {
         let len = constructorData.params.length
         for (let i = 0; i < len; i++) {
             param = constructorData.params[i]
+
             type = param.type
             if (type.indexOf("?") !== -1) {
                 condType = type.split("?")
                 fieldBit = condType[0].split(".")
                 if (!(obj[fieldBit[0]] & (1 << fieldBit[1]))) {
+                    if(obj.pFlags && obj.pFlags[param.name]) {
+                        obj[fieldBit[0]] |= 1 << fieldBit[1]
+                        obj[param.name] = obj.pFlags[param.name]
+                    }
+                }
+            }
+        }
+
+        for (let i = 0; i < len; i++) {
+            param = constructorData.params[i]
+
+            type = param.type
+            if (type.indexOf("?") !== -1) {
+                condType = type.split("?")
+                fieldBit = condType[0].split(".")
+                if (!(obj[fieldBit[0]] & (1 << fieldBit[1]))) {
+                    // console.log("Fail!", type, param)
+
                     continue
                 }
                 type = condType[1]
             }
 
+            // console.log(param.name, params[param.name])
+            // console.log("store ", param.name, type, obj[param.name])
             this.storeObject(obj[param.name], type, field + "[" + predicate + "][" + param.name + "]")
         }
 
