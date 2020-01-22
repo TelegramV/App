@@ -4,6 +4,7 @@ import VRDOM from "./index"
 const jsxAttributesMap = new Map([
     ["className", "class"],
     ["htmlFor", "for"],
+    ["xlinkHref", "xlink:href"],
 ])
 
 const classAttrProcessor = value => {
