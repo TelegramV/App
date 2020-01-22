@@ -5,6 +5,8 @@ import MTProto from "../../../../../../mtproto";
 import {AppFramework} from "../../../../../framework/framework";
 import {askForFile} from "../../../../../utils";
 import Random from "../../../../../../mtproto/utils/random";
+import TimeManager from "../../../../../../mtproto/timeManager";
+import {createNonce} from "../../../../../../mtproto/utils/bin";
 
 export let ChatInputManager
 
@@ -121,7 +123,7 @@ export class ChatInputComponent extends Component {
                     </div>
                 </div>
 
-                <div className="send-button" onClick={this.onSend} onContextMenu={l => ContextMenuManager.openAbove([
+                <div className="send-button" onClick={this.onSend} onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp} onContextMenu={l => ContextMenuManager.openAbove([
                     {
                         icon: "mute",
                         title: "Send without sound",
@@ -188,7 +190,82 @@ export class ChatInputComponent extends Component {
     }
 
     onSend(ev) {
+        if(this.isVoiceMode) return
         this.send()
+    }
+
+    get isVoiceMode() {
+        return this.state.valueString.length === 0
+    }
+
+    onMouseUp(ev) {
+        if(!this.isVoiceMode) return
+
+        this.recorder.stop()
+        this.microphone.getTracks().forEach(function(track) {
+            track.stop();
+        });
+        this.microphone = null
+        this.recorder = null
+
+        console.log("MouseUp")
+    }
+
+    onRecordingReady(ev) {
+
+        const id = TimeManager.generateMessageID()
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(ev.data);
+        reader.onloadend = (event) => {
+            // The contents of the BLOB are in reader.result:
+
+            AppSelectedDialog.Dialog.API.sendMedia("", reader.result, {
+                _: "inputMediaUploadedDocument",
+                flags: 0,
+                file: {
+                    _: "inputFile",
+                    id: id,
+                    parts: 1,
+                    name: "audio.ogg"
+                },
+                mime_type: "audio/ogg",
+                attributes: [
+                    {
+                        //flags: 1024,
+                        // duration: 100,
+                        _: "documentAttributeAudio",
+                        pFlags: {
+                            voice: true,
+                            waveform: createNonce(63)
+                        },
+                    },
+                    {
+                        _: "documentAttributeFilename",
+                        file_name: ""
+                    }
+                ]
+            })
+        }
+        console.log("onRecordingReady", ev)
+    }
+
+    onMouseDown(ev) {
+        if(!this.isVoiceMode) return
+        if(!this.microphone) {
+            navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(l => {
+                this.recorder = new MediaRecorder(l, {
+                    mimeType: "audio/webm;codecs=opus"
+                });
+
+                this.recorder.addEventListener('dataavailable', this.onRecordingReady);
+                this.recorder.start()
+                this.microphone = l
+            })
+            return
+        }
+        this.recorder.start()
+
+        console.log("MouseDown")
     }
 
     onKeyPress(ev) {
