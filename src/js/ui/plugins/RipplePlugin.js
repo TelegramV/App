@@ -1,6 +1,6 @@
 import {VRDOMPlugin} from "../framework/vrdom/plugin"
 
-export class RippleVRDOMPlugin extends VRDOMPlugin {
+class RippleVRDOMPlugin extends VRDOMPlugin {
     elementMounted($el) {
         if ($el.nodeType !== Node.TEXT_NODE && $el.classList.contains("rp")) {
             $el.addEventListener("mousedown", function (e) {
