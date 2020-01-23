@@ -1,5 +1,6 @@
 import MessageWrapperComponent from "./messageWrapperComponent";
 import TextWrapperComponent from "./textWrapperComponent";
+import {InstantViewManager} from "../../../../../instantViewManager";
 
 const WebpageMessageComponent = ({ message }) => {
     let webpage = message.media.webpage;
@@ -7,6 +8,7 @@ const WebpageMessageComponent = ({ message }) => {
     if(webpage.photo && webpage.photo.real) {
         photoUrl = webpage.photo.real.url;
     }
+    console.log(webpage)
     return (
         <MessageWrapperComponent message={message}>
             <div className="message">
@@ -19,6 +21,8 @@ const WebpageMessageComponent = ({ message }) => {
                             {webpage.description?<div className="text">{webpage.description}</div>: ""}
                         </div>
                     </a>
+                    {webpage.cached_page ? <div className="instant-view-button" onClick={l => InstantViewManager.open(webpage.cached_page, webpage.site_name)}>Instant View</div> : "" }
+
                 </TextWrapperComponent>
             </div>
         </MessageWrapperComponent>

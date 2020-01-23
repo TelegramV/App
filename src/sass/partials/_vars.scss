@@ -33,6 +33,10 @@ $max-chat-width: 700px;
 $chat-input-height: 54px;
 $attachment-width: 54px;
 
+$instantview-link-background: #ECF2FF;
+$instantview-link-foreground: #348AE1;
+$instantview-light-blue: #F3F8FC;
+
 @function anim($elem) {
 	@return 150ms ease-out $elem;
 }

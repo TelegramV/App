@@ -8,6 +8,7 @@ import {ContextMenuComponent} from "../../contextMenuManager";
 import {DialogInfoComponent} from "./components/dialog/dialogInfoComponent";
 import {ModalComponent} from "../../modalManager";
 import {MediaViewerComponent} from "../../mediaViewerManager";
+import {InstantViewComponent} from "../../instantViewManager";
 
 function initUIManagers() {
     UpdatesManager.init().then(() => {
@@ -28,6 +29,7 @@ export function MainPage() {
             <ContextMenuComponent/>
             <ModalComponent/>
             <MediaViewerComponent/>
+            <InstantViewComponent/>
 
             <DialogListComponent/>
             <ChatComponent/>
