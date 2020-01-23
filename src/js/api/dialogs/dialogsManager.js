@@ -4,7 +4,6 @@ import TimeManager from "../../mtproto/timeManager"
 import PeersManager from "../peers/peersManager"
 import {Dialog} from "../dataObjects/dialog/dialog";
 import {Manager} from "../manager";
-import {UserPeer} from "../dataObjects/peer/userPeer";
 import {Peer} from "../dataObjects/peer/peer";
 import {Message} from "../dataObjects/messages/message";
 import {PeerAPI} from "../peerAPI"
@@ -52,10 +51,6 @@ class DialogManager extends Manager {
                 dialog.messages.addUnread(message.id)
             }
 
-            if (message.from instanceof UserPeer) {
-                dialog.removeMessageAction(message.from)
-            }
-
             AppEvents.Dialogs.fire("newMessage", {
                 message,
                 dialog // todo: remove
@@ -76,9 +71,6 @@ class DialogManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateNewMessage", async update => {
             let dialog = undefined
-
-
-            console.log("message", update)
 
             if (update.message.pFlags.out) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
@@ -108,10 +100,14 @@ class DialogManager extends Manager {
                         _: dialog.peer.type,
                         id: dialog.peer.id,
                         access_hash: dialog.peer.accessHash
+                    }).then(dialog => {
+                        AppEvents.Dialogs.fire("updateSingle", {
+                            dialog: dialog
+                        })
                     })
-                } else {
-                    dialog.messages.fireTransaction()
                 }
+
+                dialog.messages.fireTransaction()
             }
         })
 
@@ -128,6 +124,10 @@ class DialogManager extends Manager {
                         this.fetchPlainPeerDialogs({
                             _: dialog.peer.type,
                             id: dialog.peer.id
+                        }).then(dialog => {
+                            AppEvents.Dialogs.fire("updateSingle", {
+                                dialog,
+                            })
                         })
                     }
                     dialog.messages.fireTransaction()
@@ -217,75 +217,6 @@ class DialogManager extends Manager {
         })
 
         this._inited = true
-
-        // MTProto.UpdatesManager.listenUpdate("updateShort", async update => {
-        //     if (update._ === "updateUserStatus") {
-        //         const dialog = this.find("user", update.user_id)
-        //
-        //         if (dialog && dialog.peer instanceof UserPeer) {
-        //             dialog.peer.peer.status = update.status
-        //             this.resolveListeners({
-        //                 type: "updateUserStatus",
-        //                 dialog: dialog
-        //             })
-        //         }
-        //     } else if (update._ === "updateChatUserTyping") {
-        //         const dialog = this.find("chat", update.chat_id) || this.find("channel", update.chat_id)
-        //
-        //         if (!dialog) {
-        //             return; // prob should download the chat
-        //         }
-        //
-        //         let peer = PeersManager.find("user", update.user_id)
-        //         if (!peer) {
-        //             await this.updateChatFull(dialog)
-        //
-        //             peer = PeersManager.find("user", update.user_id)
-        //             if (!peer) {
-        //                 return
-        //             }
-        //         }
-        //         if (dialog && peer) {
-        //             dialog.addMessageAction(peer, update.action)
-        //             this.resolveListeners({
-        //                 type: "updateSingle",
-        //                 dialog: dialog
-        //             })
-        //         }
-        //
-        //     } else if (update._ === "updateUserTyping") {
-        //         // console.log(update)
-        //         const dialog = this.find("user", update.user_id)
-        //
-        //         if (!dialog) {
-        //             return; // prob should download the chat
-        //         }
-        //
-        //         if (dialog) {
-        //             dialog.addMessageAction(dialog.peer, update.action)
-        //             this.resolveListeners({
-        //                 type: "updateSingle",
-        //                 dialog: dialog
-        //             })
-        //         }
-        //     } else if (update._ === "updateReadChannelOutbox") {
-        //         const dialog = this.find("channel", update.channel_id)
-        //
-        //         if (!dialog) {
-        //             return // prob should be fixed
-        //         }
-        //
-        //         dialog._dialog.read_outbox_max_id = update.max_id
-        //         this.resolveListeners({
-        //             type: "updateSingle",
-        //             dialog: dialog
-        //         })
-        //     } else if (update._ === "updateReadHistoryOutbox") {
-        //         console.log("updateReadHistoryOutbox", update)
-        //     } else {
-        //         console.log("Short", update)
-        //     }
-        // })
     }
 
     fetchNextPage({limit = 40}) {
@@ -301,10 +232,18 @@ class DialogManager extends Manager {
 
         const data = {
             limit: limit,
-            offset_peer: offsetPeer
+            offset_peer: offsetPeer,
+            exclude_pinned: true
         }
 
-        return this.fetchDialogs(data)
+        return this.fetchDialogs(data).then(dialogs => {
+            AppEvents.Dialogs.fire("nextPage", {
+                dialogs: dialogs.filter(dialog => !dialog.isPinned),
+                pinnedDialogs: dialogs.filter(dialog => dialog.isPinned)
+            })
+
+            return dialogs
+        })
     }
 
     /**
@@ -397,23 +336,19 @@ class DialogManager extends Manager {
 
         return MTProto.invokeMethod("messages.getPeerDialogs", {
             peers: [peerData]
-        }).then(_dialogsSlice => {
-            console.log("dialog fetched", _dialogsSlice)
+        }).then(rawDialogs => {
+            console.log("dialog fetched", rawDialogs)
 
-            _dialogsSlice.users.forEach(l => {
+            rawDialogs.users.forEach(l => {
                 PeersManager.setFromRawAndFire(l)
             })
-            _dialogsSlice.chats.forEach(l => {
+            rawDialogs.chats.forEach(l => {
                 PeersManager.setFromRawAndFire(l)
             })
 
-            const dialogs = _dialogsSlice.dialogs.map(_dialog => {
-                return this.resolveDialogWithSlice(_dialog, _dialogsSlice)
-            })
-
-            AppEvents.Dialogs.fire("newFetched", {
-                dialog: dialogs[0],
-            })
+            return rawDialogs.dialogs.map(_dialog => {
+                return this.resolveDialogWithSlice(_dialog, rawDialogs)
+            })[0]
         })
     }
 
@@ -434,6 +369,17 @@ class DialogManager extends Manager {
         return this.setFromRaw(rawDialog, peer, new Message(undefined, rawTopMessage))
     }
 
+    /**
+     * @param limit
+     * @param flags
+     * @param exclude_pinned
+     * @param folder_id
+     * @param offset_date
+     * @param offset_id
+     * @param offset_peer
+     * @param hash
+     * @return {Promise<*>}
+     */
     fetchDialogs({
                      limit = 20,
                      flags = 0,
@@ -447,14 +393,12 @@ class DialogManager extends Manager {
                      hash = ""
                  }) {
 
-        if (DialogsStore.data.size >= this.count) {
+        if (DialogsStore.count >= this.count) {
             console.warn("all dialogs were fetched")
-            return
         }
 
         if (this.dialogsOffsetDate) {
             this.offsetDate = this.dialogsOffsetDate + TimeManager.timeOffset
-            flags |= 1
         }
 
         return MTProto.invokeMethod("messages.getDialogs", {
@@ -505,12 +449,19 @@ class DialogManager extends Manager {
 
             this.latestDialog = dialogs[dialogs.length - 1]
 
-            AppEvents.Dialogs.fire("updateMany", {
+            return dialogs
+        })
+    }
+
+    fetchFirstPage() {
+        return this.fetchDialogs({}).then(dialogs => {
+            AppEvents.Dialogs.fire("firstPage", {
                 dialogs: dialogs.filter(dialog => !dialog.isPinned),
                 pinnedDialogs: dialogs.filter(dialog => dialog.isPinned)
             })
-        })
 
+            return dialogs
+        })
     }
 
     setFromRaw(rawDialog, peer, topMessage) {

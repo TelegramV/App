@@ -10,6 +10,7 @@ class PeersMapStore extends MappedStore {
         super({
             initialData: new Map([
                 ["chat", new Map()],
+                ["chatForbidden", new Map()],
                 ["channel", new Map()],
                 ["user", new Map()],
             ])

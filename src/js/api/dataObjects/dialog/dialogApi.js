@@ -28,7 +28,7 @@ export class DialogAPI {
             offset_id: props.offset_id,
             offset_date: 0,
             add_offset: 0,
-            limit: props.limit || 20,
+            limit: props.limit || 50,
             max_id: 0,
             min_id: 0,
             hash: 0
@@ -69,7 +69,7 @@ export class DialogAPI {
             },
             pinned
         }).then(l => {
-            this.pinned = l
+            this.dialog.pinned = l
         })
     }
 

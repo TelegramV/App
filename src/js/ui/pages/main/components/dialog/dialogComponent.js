@@ -50,6 +50,7 @@ export class DialogComponent extends Component {
             AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadHistoryInbox").PatchOnly,
             AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadHistoryOutbox").PatchOnly,
             AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "readHistory").PatchOnly,
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateUnreadCount").PatchOnly,
             AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadChannelInbox").PatchOnly,
             AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadChannelOutbox").PatchOnly,
 
@@ -220,23 +221,6 @@ export class DialogComponent extends Component {
     eventFired(bus, event) {
         if (bus === AppEvents.Dialogs && patchAndResortEventTypes.has(event.type)) {
             this._patchAndResort()
-        }
-    }
-
-    /**
-     * Handles Peer updates
-     * @param event
-     * @private
-     */
-    _handlePeerUpdates(event) {
-        if (event.peer === this.props.dialog.peer) {
-            if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
-                console.log("patch peer update photo")
-                this.__patch()
-            } else if (event.type === "updateUserStatus") {
-                this.__patch()
-                console.log("patch peer update status")
-            }
         }
     }
 

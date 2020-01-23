@@ -102,7 +102,7 @@ export class DialogMessages {
      * @param {number} unreadCount
      */
     set unreadCount(unreadCount) {
-        this._unreadCount = unreadCount || this._unreadCount
+        this._unreadCount = unreadCount
 
         if (!this.isTransaction) {
             AppEvents.Dialogs.fire("updateUnreadCount", {
@@ -280,11 +280,13 @@ export class DialogMessages {
         if (this.unreadMessagesIds.size === 0) {
             this.clearUnread()
         } else {
+            this.startTransaction()
             this.unreadMessagesIds.forEach(messageId => {
                 if (messageId <= maxMessageId) {
-                    this._unreadIds.delete(messageId)
+                    this.deleteUnread(messageId)
                 }
             })
+            this.stopTransaction()
 
             AppEvents.Dialogs.fire("updateUnread", {
                 dialog: this._dialog

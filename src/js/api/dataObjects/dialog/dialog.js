@@ -45,10 +45,6 @@ export class Dialog {
         this._API = new DialogAPI(this)
 
         this.fillRaw(rawDialog)
-
-        this._activeActions = new Map()
-
-        this.messageActions = {}
     }
 
     /**
@@ -147,7 +143,7 @@ export class Dialog {
         }, peer, lastMessage)
     }
 
-    /** љ
+    /**
      * @param rawDialog
      */
     fillRaw(rawDialog) {
@@ -162,44 +158,22 @@ export class Dialog {
 
         this._pts = rawDialog.pts || -1
 
-        this.messages.startTransaction()
         this.messages.unreadCount = rawDialog.unread_count || 0
         this.messages.readInboxMaxId = rawDialog.read_inbox_max_id || 0
         this.messages.readOutboxMaxId = rawDialog.read_outbox_max_id || 0
         this.messages.unreadMentionsCount = rawDialog.unread_mentions_count || 0
-        this.messages.stopTransaction()
 
         this._draft.fillRaw(this, rawDialog.draft)
     }
 
+    /**
+     * @param rawDialog
+     */
     fillRawAndFire(rawDialog) {
         this.fillRaw(rawDialog)
 
         AppEvents.Dialogs.fire("updateSingle", {
             dialog: this
         })
-    }
-
-
-    addMessageAction(user, action) {
-        this.messageActions[user.id] = {
-            action: action,
-            expires: tsNow(true) + 6
-        }
-        setTimeout(l => {
-            if (this.messageActions[user.id] && tsNow(true) >= this.messageActions[user.id].expires) {
-                this.removeMessageAction(user)
-            }
-        }, 2000)
-    }
-
-    removeMessageAction(user) {
-        if (this.messageActions[user.id]) {
-            delete this.messageActions[user.id]
-
-            AppEvents.Dialogs.fire("updateSingle", {
-                dialog: this
-            })
-        }
     }
 }

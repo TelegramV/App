@@ -13,7 +13,7 @@ import {InstantViewComponent} from "../../instantViewManager";
 function initUIManagers() {
     UpdatesManager.init().then(() => {
         // todo: move this to DialogsManager logic
-        DialogsManager.fetchDialogs({}).then(() => {
+        DialogsManager.fetchFirstPage().then(() => {
             DialogsManager.init()
             PeersManager.init()
         })

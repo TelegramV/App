@@ -101,6 +101,10 @@ export class Message {
      * @return {Peer}
      */
     get to() {
+        if (this.dialog) {
+            return this.dialog.peer
+        }
+
         if (this._toPeer) {
             return this._toPeer
         }
