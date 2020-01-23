@@ -3,9 +3,10 @@ import AppEvents from "../../../../../api/eventBus/appEvents"
 import {FileAPI} from "../../../../../api/fileAPI"
 import {isElementInViewport} from "../../../../framework/utils"
 
-import Message from "./../../messages/newMessage"
+import MessageComponent from "./../../messages/newMessage"
 import Component from "../../../../framework/vrdom/component"
 import VRDOM from "../../../../framework/vrdom"
+import {vrdom_deepDeleteRealNodeInnerComponents} from "../../../../framework/vrdom/patch"
 
 
 class BubblesComponent extends Component {
@@ -37,7 +38,7 @@ class BubblesComponent extends Component {
                 <div id="bubbles-inner">
 
                 </div>
-                <div class="anchor"></div>
+                <div class="anchor"/>
             </div>
         )
     }
@@ -93,7 +94,7 @@ class BubblesComponent extends Component {
 
         const $mount = prepend ? VRDOM.prepend : VRDOM.append
         let $message = undefined
-        $message = $mount(<Message message={message}/>, this.elements.$bubblesInner); //TODO Давид поправ як має бути
+        $message = $mount(<MessageComponent message={message}/>, this.elements.$bubblesInner); //TODO Давид поправ як має бути
         if (message.media) {
             if (message.media.photo) {
 
@@ -110,7 +111,7 @@ class BubblesComponent extends Component {
                         thumbnail: true
                     }
 
-                    VRDOM.patch($message, <Message message={message}/>);
+                    VRDOM.patch($message, <MessageComponent message={message}/>);
                 }
 
                 FileAPI.getFile(message.media.photo, max.type).then(file => {
@@ -119,7 +120,7 @@ class BubblesComponent extends Component {
                         sizes: [max.w, max.h],
                         thumbnail: false
                     }
-                    VRDOM.patch($message, <Message message={message}/>);
+                    VRDOM.patch($message, <MessageComponent message={message}/>);
                 })
             }
             if (message.media.webpage && message.media.webpage.photo) {
@@ -127,20 +128,20 @@ class BubblesComponent extends Component {
                     message.media.webpage.photo.real = {
                         url: data.src
                     }
-                    VRDOM.patch($message, <Message message={message}/>);
+                    VRDOM.patch($message, <MessageComponent message={message}/>);
                 })
             }
             if (message.media.document) {
                 if (message.type === "sticker") {
                     FileAPI.getFile(message.media.document).then(data => {
                         message.media.document.real = {url: data};
-                        VRDOM.patch($message, <Message message={message}/>);
+                        VRDOM.patch($message, <MessageComponent message={message}/>);
                     });
                 }
                 if (message.type === "round" || message.type === "video" || message.type === "audio") {
                     FileAPI.getFile(message.media.document, "").then(data => {
                         message.media.document.real = {url: data};
-                        VRDOM.patch($message, <Message message={message}/>);
+                        VRDOM.patch($message, <MessageComponent message={message}/>);
                     });
                 }
             }
@@ -223,9 +224,7 @@ class BubblesComponent extends Component {
     _clearBubbles() {
         this.state.renderedMessageElements = []
 
-        while (this.elements.$bubblesInner.firstChild) {
-            this.elements.$bubblesInner.firstChild.remove()
-        }
+        vrdom_deepDeleteRealNodeInnerComponents(this.elements.$bubblesInner)
     }
 
     _markAllAsRead() {
@@ -239,8 +238,11 @@ class BubblesComponent extends Component {
         if ($element.scrollTop === 0 && !this.state.isFetchingNextPage) {
             this.state.isFetchingNextPage = true
 
+            this._toggleMessagesLoader(false)
+
             this.reactive.dialog.API.fetchNextPage().then(() => {
                 this.state.isFetchingNextPage = false
+                this._toggleMessagesLoader(true)
             })
 
         } else if ($bi) {

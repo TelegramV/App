@@ -4,8 +4,8 @@ import AppEvents from "../../eventBus/appEvents";
 
 export class GroupPeer extends Peer {
 
-    constructor(rawPeer) {
-        super(rawPeer)
+    constructor(rawPeer, dialog = undefined) {
+        super(rawPeer, dialog)
     }
 
     /**

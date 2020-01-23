@@ -57,7 +57,9 @@ export function getMessagePreviewDialog(message, peerName, showSender) {
     if (message._ === "messageService") {
         return "Service message" // TODO parse service messages
     }
+
     let text = ""
+
     if (message.media) {
         const p = getMediaPreviewName(message)
         if (p.length > 0) {
@@ -66,6 +68,7 @@ export function getMessagePreviewDialog(message, peerName, showSender) {
     } else if (message.message.length > 0 && showSender) {
         text += peerName + ": "
     }
+
     return text
 }
 
@@ -78,7 +81,7 @@ export function askForFile(accept, callback, asBuffer = false) {
         var file = e.target.files[0];
 
         var reader = new FileReader();
-        if(asBuffer) {
+        if (asBuffer) {
             reader.readAsArrayBuffer(file)
         } else {
             reader.readAsDataURL(file);

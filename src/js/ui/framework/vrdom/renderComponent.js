@@ -15,7 +15,7 @@ function vrdom_renderComponentVNode(componentVNode) {
         slot: componentVNode.slot,
     })
 
-    const newId = componentVNode.ref ? componentVNode.ref : latestInstantiatedComponent++
+    const newId = String(componentVNode.ref ? componentVNode.ref : latestInstantiatedComponent++)
 
     componentInstance.identifier = newId
     componentInstance.__init.bind(componentInstance)()
@@ -24,7 +24,7 @@ function vrdom_renderComponentVNode(componentVNode) {
 
     vNode.attrs["data-component-id"] = newId
 
-    AppFramework.mountedComponents.set(String(newId), componentInstance)
+    AppFramework.mountedComponents.set(newId, componentInstance)
 
     componentInstance.__created()
     componentInstance.created()

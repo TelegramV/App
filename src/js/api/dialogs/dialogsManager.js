@@ -6,7 +6,7 @@ import {Dialog} from "../dataObjects/dialog/dialog";
 import {Manager} from "../manager";
 import {UserPeer} from "../dataObjects/peer/userPeer";
 import {Peer} from "../dataObjects/peer/peer";
-import {Message} from "../dataObjects/message";
+import {Message} from "../dataObjects/messages/message";
 import {PeerAPI} from "../peerAPI"
 import DialogsStore from "../store/dialogsStore"
 import AppEvents from "../eventBus/appEvents"
@@ -19,12 +19,13 @@ class DialogManager extends Manager {
         this.latestDialog = undefined
         this.dialogsOffsetDate = 0 // TODO
         this.offsetDate = 0
+        this.count = undefined
     }
 
 
     init() {
         if (this._inited) {
-            return
+            return Promise.resolve()
         }
 
         AppSelectedDialog.subscribe(_ => {
@@ -116,7 +117,7 @@ class DialogManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateDeleteMessages", update => {
             DialogsStore.data.forEach((data, type) => data.forEach(/** @param {Dialog} dialog */(dialog, id) => {
-                if (dialog.type !== "channel") {
+                if (dialog.peer.type !== "channel") {
                     dialog.messages.startTransaction()
 
                     update.messages.sort().forEach(mId => {
@@ -288,6 +289,11 @@ class DialogManager extends Manager {
     }
 
     fetchNextPage({limit = 40}) {
+        if (DialogsStore.count >= this.count) {
+            console.warn("all dialogs were fetched")
+            return Promise.reject()
+        }
+
         const latestDialog = this.latestDialog
         const peer = latestDialog.peer
 
@@ -413,17 +419,17 @@ class DialogManager extends Manager {
 
     /**
      * @param {Object} rawDialog
-     * @param {Object} _slice
+     * @param {Object} rawSlice
      * @param config
      * @return {Dialog|undefined}
      */
-    resolveDialogWithSlice(rawDialog, _slice, config = {}) {
+    resolveDialogWithSlice(rawDialog, rawSlice, config = {}) {
         const plainPeer = PeerAPI.getPlain(rawDialog.peer, false)
 
-        const rawPeer = (plainPeer._ === "user" ? _slice.users : _slice.chats).find(l => l.id === plainPeer.id)
-        const rawTopMessage = _slice.messages.find(l => l.id === rawDialog.top_message)
+        const rawPeer = (plainPeer._ === "user" ? rawSlice.users : rawSlice.chats).find(l => l.id === plainPeer.id)
+        const rawTopMessage = rawSlice.messages.find(l => l.id === rawDialog.top_message)
 
-        const peer = PeersManager.setFromRawAndFire(rawPeer)
+        const peer = PeersManager.setFromRaw(rawPeer)
 
         return this.setFromRaw(rawDialog, peer, new Message(undefined, rawTopMessage))
     }
@@ -436,10 +442,15 @@ class DialogManager extends Manager {
                      offset_date = this.offsetDate,
                      offset_id = -1,
                      offset_peer = {
-                         _: "inputPeerEmpty"
+                         _: "inputPeerEmpty",
                      },
                      hash = ""
                  }) {
+
+        if (DialogsStore.data.size >= this.count) {
+            console.warn("all dialogs were fetched")
+            return
+        }
 
         if (this.dialogsOffsetDate) {
             this.offsetDate = this.dialogsOffsetDate + TimeManager.timeOffset
@@ -457,24 +468,34 @@ class DialogManager extends Manager {
             offset_peer: offset_peer,
             limit: limit,
             hash: hash
-        }).then(_dialogsSlice => {
+        }).then(rawDialogs => {
 
-            if (parseInt(_dialogsSlice.count) === 0) {
+            if (rawDialogs.count === 0) {
+                this.count = 0
+                console.warn("there is no dialogs")
                 return
             }
 
-            _dialogsSlice.users.forEach(l => {
-                PeersManager.setFromRawAndFire(l)
+            if (rawDialogs.count) {
+                this.count = rawDialogs.count
+            }
+
+            if (parseInt(rawDialogs.count) === 0) {
+                return
+            }
+
+            rawDialogs.users.forEach(rawUser => {
+                PeersManager.setFromRaw(rawUser)
             })
-            _dialogsSlice.chats.forEach(l => {
-                PeersManager.setFromRawAndFire(l)
+            rawDialogs.chats.forEach(rawChat => {
+                PeersManager.setFromRaw(rawChat)
             })
 
-            const dialogs = _dialogsSlice.dialogs.map(_dialog => {
-                const dialog = this.resolveDialogWithSlice(_dialog, _dialogsSlice)
+            const dialogs = rawDialogs.dialogs.map(rawDialog => {
+                const dialog = this.resolveDialogWithSlice(rawDialog, rawDialogs)
 
-                // todo: rewrite this
                 this.offsetDate = dialog.messages.last.date
+
                 if (this.offsetDate && !dialog.isPinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
                     this.dialogsOffsetDate = this.offsetDate
                 }
@@ -485,8 +506,8 @@ class DialogManager extends Manager {
             this.latestDialog = dialogs[dialogs.length - 1]
 
             AppEvents.Dialogs.fire("updateMany", {
-                dialogs: dialogs.filter(l => !l.isPinned),
-                pinnedDialogs: dialogs.filter(l => l.isPinned)
+                dialogs: dialogs.filter(dialog => !dialog.isPinned),
+                pinnedDialogs: dialogs.filter(dialog => dialog.isPinned)
             })
         })
 
@@ -500,7 +521,7 @@ class DialogManager extends Manager {
             dialog.fillRaw(rawDialog)
             return dialog
         } else {
-            const dialog = new Dialog(rawDialog, {peer, topMessage})
+            const dialog = new Dialog(rawDialog, peer, topMessage)
             DialogsStore.set(dialog)
             return dialog
         }
@@ -514,7 +535,7 @@ class DialogManager extends Manager {
             dialog.fillRawAndFire(rawDialog)
             return dialog
         } else {
-            const dialog = new Dialog(rawDialog, {peer, topMessage})
+            const dialog = new Dialog(rawDialog, peer, topMessage)
             DialogsStore.set(dialog)
 
             AppEvents.Dialogs.fire("updateSingle", {

@@ -126,9 +126,6 @@ export class PeerPhoto {
                 this._photoSmall = rawPhoto.photo_small
                 this.fetchSmall()
             }
-
-
-
         } else {
             this._type = this._peer.type === "user" ? "userProfilePhotoEmpty" : "chatPhotoEmpty"
         }

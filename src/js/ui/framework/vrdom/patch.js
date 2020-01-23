@@ -40,7 +40,8 @@ function patchAttrs($node, newAttrs) {
 
         for (let i = 0; i < oldAttrs.length; i++) {
             const attr = oldAttrs.item(i)
-            if (!newAttrs.hasOwnProperty(attr.name)) {
+
+            if (!newAttrs.hasOwnProperty(attr.name) && attr.name !== "data-component-id") {
                 $node.removeAttribute(attr.name)
             }
         }
@@ -65,7 +66,10 @@ function patchChildren($parent, $children, newVChildren) {
             vrdom_append(newVChildren[i], $parent)
         }
     } else if (newVChildren.length < $children.length) {
-        vrdom_deepDeleteRealNodeComponents(Array.from($children.values()).slice(newVChildren.length))
+        Array.from($children.values()).slice(newVChildren.length).forEach($node => {
+            vrdom_deepDeleteRealNodeInnerComponents($node)
+            $node.remove()
+        })
     }
 }
 
@@ -81,53 +85,34 @@ function patchDangerouslySetInnerHTML($node, dangerouslySetInnerHTML) {
 }
 
 /**
- * @param $node
- * @param {ComponentVRNode} componentVNode
+ * @param {Element|Node} $node
  */
-function patchComponentVNode($node, componentVNode) {
-    //
-}
+export function vrdom_deepDeleteRealNodeInnerComponents($node) {
+    while ($node.firstChild) {
 
-/**
- * @param {VRNode} vRNode
- */
-function deepDeleteComponents(vRNode) {
-    for (const child of vRNode.children) {
-        // console.log("removing child", child)
-        if (child instanceof ComponentVRNode) {
-            console.error("cannot remove plain component")
-        } else if (vRNode instanceof Component) {
-            vRNode.__delete()
+        const $child = $node.firstChild
 
-            deepDeleteComponents(vRNode.children)
-        }
-    }
-}
-
-/**
- * @param {Element[]|Node[]|NodeListOf<ChildNode>} $childNodes
- */
-export function vrdom_deepDeleteRealNodeComponents($childNodes) {
-    for (const $child of $childNodes) {
         if ($child.nodeType !== Node.TEXT_NODE) {
             if ($child.hasAttribute("data-component-id")) {
 
-                const component = AppFramework.mountedComponents.get($child.getAttribute("data-component-id"))
+                const rawId = $child.getAttribute("data-component-id")
+                const component = AppFramework.mountedComponents.get(rawId)
 
                 if (component) {
                     component.__delete()
                 } else {
-                    vrdom_deepDeleteRealNodeComponents($child.childNodes)
+                    vrdom_deepDeleteRealNodeInnerComponents($child)
                     $child.remove()
                 }
 
             } else {
-                vrdom_deepDeleteRealNodeComponents($child.childNodes)
+                vrdom_deepDeleteRealNodeInnerComponents($child)
                 $child.remove()
             }
         } else {
             $child.remove()
         }
+
     }
 }
 
@@ -247,7 +232,11 @@ function vrdom_patch($node, newVNode) {
     } else {
 
         if ($node.nodeType === Node.TEXT_NODE) {
-            return vrdom_mount(newVNode, $node)
+            if ($node.textContent !== String(newVNode)) {
+                return vrdom_mount(newVNode, $node)
+            }
+
+            return $node
         }
 
         if ($node.hasAttribute("data-component-id")) {

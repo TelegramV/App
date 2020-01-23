@@ -6,6 +6,26 @@ import BubblesComponent from "./bubblesComponent"
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import {ChatInputComponent} from "./chatInput/chatInputComponent";
 
+const NoChatTemplate = (
+    <div id="noChat">
+        <div className="placeholder tgico tgico-chatsplaceholder"/>
+        <div className="text"><p>Open Chat</p> <p>or create a new one</p></div>
+        <div className="buttons">
+            <div className="button-wrapper">
+                <div className="button rp"><i className="tgico tgico-newprivate"/></div>
+                <p>Private</p>
+            </div>
+            <div className="button-wrapper">
+                <div className="button rp"><i className="tgico tgico-newgroup"/></div>
+                <p>Group</p>
+            </div>
+            <div className="button-wrapper">
+                <div className="button rp"><i className="tgico tgico-newchannel"/></div>
+                <p>Channel</p>
+            </div>
+        </div>
+    </div>
+)
 
 /**
  * CRITICAL: never rerender this component!
@@ -21,8 +41,6 @@ class ChatComponent extends Component {
     h() {
         return (
             <div id="chat">
-                <LoaderComponent id="messages-wrapper-full-loader" full={true} show={false}/>
-
                 <div id="topbar">
                     <ChatInfoComponent/>
                     <Pinned/>

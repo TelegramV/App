@@ -2,16 +2,16 @@ const MessageTimeComponent = ({ message, bg = false }) => {
     let classes = "time" + (bg ? " bg" : "");
 
     let views = "";
-    if (message.raw.views) {
+    if (message.views) {
         views = (
             <span class="views">
-                {numberFormat(message.raw.views)}
+                {numberFormat(message.views)}
                 <span class="tgico tgico-channelviews"/>
             </span>
         )
     }
 
-    let edited = message.raw.edit_date ? (<span class="edited">edited</span>) : "";
+    let edited = message.editDate ? (<span class="edited">edited</span>) : "";
 
     return (
         <span class={classes}>

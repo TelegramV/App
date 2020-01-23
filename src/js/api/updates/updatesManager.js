@@ -51,7 +51,7 @@ class UpdateManager extends Manager {
 
     init() {
         if (this._inited) {
-            return
+            return Promise.resolve()
         }
 
         return MTProto.invokeMethod("updates.getState", {}).then(state => {

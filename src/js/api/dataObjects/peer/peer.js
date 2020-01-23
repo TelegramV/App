@@ -1,11 +1,11 @@
 import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util";
 import MTProto from "../../../mtproto"
 import AppEvents from "../../eventBus/appEvents"
-import DialogsStore from "../../store/dialogsStore"
 import {PeerPhoto} from "./peerPhoto"
+import {Dialog} from "../dialog/dialog"
 
 export class Peer {
-    constructor(rawPeer) {
+    constructor(rawPeer, dialog = undefined) {
         this._rawPeer = rawPeer
         this._filled = false
 
@@ -13,7 +13,7 @@ export class Peer {
          * @type {Dialog|undefined}
          * @private
          */
-        this._dialog = undefined
+        this._dialog = Dialog.createEmpty(this)
 
         this._photo = PeerPhoto.createEmpty(this)
         this._accessHash = undefined
@@ -54,10 +54,6 @@ export class Peer {
      * @return {Dialog|undefined}
      */
     get dialog() {
-        if (!this._dialog) {
-            this.dialog = DialogsStore.get(this.type, this.id)
-        }
-
         return this._dialog
     }
 
@@ -203,10 +199,10 @@ export class Peer {
      */
     fillRaw(rawPeer) {
         if (rawPeer._ !== this.type || rawPeer.id !== this.id) {
-            throw new Error("peer data cannot be filled")
+            console.error("BUG: what the hell??")
         }
 
-        // When receiving said constructors, the client must first check if user or chat object without min flag is already present in local cache. If it is present, then the client should just ignore constructors with min flag and use local one instead.
+        // When receiving said (min) constructors, the client must first check if user or chat object without min flag is already present in local cache. If it is present, then the client should just ignore constructors with min flag and use local one instead.
         if (rawPeer.pFlags && rawPeer.pFlags.min === true && this._filled) {
             return
         }

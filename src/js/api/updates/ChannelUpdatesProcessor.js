@@ -140,6 +140,14 @@ export class ChannelUpdatesProcessor {
                 return
             }
 
+            if (peer.dialog.pts === -1) {
+                console.warn("found dialog created manually")
+                this.queueIsProcessing = false
+                peer.dialog.pts = rawUpdate.pts
+                this.applyUpdate(rawUpdate)
+                return
+            }
+
             const self = this
 
             checkChannelUpdatePts(peer, rawUpdate, {
@@ -168,10 +176,10 @@ export class ChannelUpdatesProcessor {
                     // }
 
                     if (peer.isMin) {
-                        console.error("BUG: peer is min, processing next update")
+                        console.error("BUG: peer is min, processing next update", peer)
                         self.isWaitingForDifference = false
                         peer.dialog.pts = rawUpdate.pts
-                        this.processQueue()
+                        self.processQueue()
                         return
                     }
 

@@ -215,6 +215,7 @@ class MobileProtocol {
         if (!this.authorizedUser) {
             this.authorizedUser = AppPermanentStorage.getItem("authorizationData")
         }
+
         return this.authorizedUser
     }
 

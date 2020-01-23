@@ -31,7 +31,7 @@ export function MainPage() {
 
             <DialogListComponent/>
             <ChatComponent/>
-            <DialogInfoComponent/>
+            {/*<DialogInfoComponent/>*/}
         </div>
     )
 }

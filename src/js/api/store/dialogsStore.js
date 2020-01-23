@@ -21,6 +21,19 @@ class DialogsMapStore extends MappedStore {
     }
 
     /**
+     * @return {number}
+     */
+    get count() {
+        let count = 0
+
+        this.data.forEach(type => {
+            count += type.size
+        })
+
+        return count
+    }
+
+    /**
      * @param {string} type
      * @param {number} id
      * @return {Dialog|boolean}
@@ -40,8 +53,8 @@ class DialogsMapStore extends MappedStore {
     set(dialog) {
         // todo: make this check
         // if (dialog instanceof Dialog) {
-        if (this.data.has(dialog.type)) {
-            this.data.get(dialog.type).set(dialog.id, dialog)
+        if (this.data.has(dialog.peer.type)) {
+            this.data.get(dialog.peer.type).set(dialog.peer.id, dialog)
             this.onSetSubscribers.forEach(s => s(dialog))
             return this
         } else {
