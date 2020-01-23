@@ -33,113 +33,6 @@ class DialogManager extends Manager {
             }
         })
 
-        /**
-         * @param {Dialog} dialog
-         * @param {Object} lastMessage
-         */
-        const updateDialogLastMessage = (dialog, lastMessage) => {
-            if (!dialog) {
-                console.error("BUG: dialog was not found", lastMessage)
-                return
-            }
-
-            const message = new Message(dialog, lastMessage)
-
-            dialog.messages.appendSingle(message)
-
-            if (!message.isOut) {
-                dialog.messages.addUnread(message.id)
-            }
-
-            AppEvents.Dialogs.fire("newMessage", {
-                message,
-                dialog // todo: remove
-            })
-        }
-
-        MTProto.UpdatesManager.subscribe("updateShortSentMessage", async update => {
-            updateDialogLastMessage(update.dialog, update)
-        })
-
-        MTProto.UpdatesManager.subscribe("updateShortMessage", async update => {
-            updateDialogLastMessage(await this.findOrFetch("user", update.user_id), update)
-        })
-
-        MTProto.UpdatesManager.subscribe("updateShortChatMessage", async update => {
-            updateDialogLastMessage(await this.findOrFetch("chat", update.chat_id), update)
-        })
-
-        MTProto.UpdatesManager.subscribe("updateNewMessage", async update => {
-            let dialog = undefined
-
-            if (update.message.pFlags.out) {
-                const peerType = getPeerTypeFromType(update.message.to_id._)
-                dialog = await this.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
-            } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUser().user.id) {
-                const peerType = getPeerTypeFromType(update.message.to_id._)
-                dialog = await this.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
-            } else {
-                dialog = await this.findOrFetch("user", update.message.from_id)
-            }
-
-            updateDialogLastMessage(dialog, update.message)
-        })
-
-        MTProto.UpdatesManager.subscribe("updateDeleteChannelMessages", update => {
-            const dialog = DialogsStore.get("channel", update.channel_id)
-
-            if (dialog) {
-                dialog.messages.startTransaction()
-
-                update.messages.sort().forEach(mId => {
-                    dialog.messages.deleteSingle(mId)
-                })
-
-                if (!dialog.messages.last) {
-                    this.fetchPlainPeerDialogs({
-                        _: dialog.peer.type,
-                        id: dialog.peer.id,
-                        access_hash: dialog.peer.accessHash
-                    }).then(dialog => {
-                        AppEvents.Dialogs.fire("updateSingle", {
-                            dialog: dialog
-                        })
-                    })
-                }
-
-                dialog.messages.fireTransaction("deleteChannelMessages", {
-                    messages: update.messages
-                })
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateDeleteMessages", update => {
-            DialogsStore.data.forEach((data, type) => data.forEach(/** @param {Dialog} dialog */(dialog, id) => {
-                if (dialog.peer.type !== "channel") {
-                    dialog.messages.startTransaction()
-
-                    update.messages.sort().forEach(mId => {
-                        dialog.messages.deleteSingle(mId)
-                    })
-
-                    if (!dialog.messages.last) {
-                        this.fetchPlainPeerDialogs({
-                            _: dialog.peer.type,
-                            id: dialog.peer.id
-                        }).then(dialog => {
-                            AppEvents.Dialogs.fire("updateSingle", {
-                                dialog,
-                            })
-                        })
-                    }
-
-                    dialog.messages.fireTransaction("deleteMessages", {
-                        messages: update.messages
-                    })
-                }
-            }))
-        })
-
         MTProto.UpdatesManager.subscribe("updateDialogPinned", async update => {
             const peerType = getPeerTypeFromType(update.peer.peer._)
             const dialog = await this.findOrFetch(peerType, update.peer.peer[`${peerType}_id`])
@@ -152,20 +45,6 @@ class DialogManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateChannel", async update => {
             await this.findOrFetch("channel", update.channel_id)
-        })
-
-        MTProto.UpdatesManager.subscribe("updateNewChannelMessage", async update => {
-            const dialog = await this.findOrFetch("channel", update.message.to_id.channel_id)
-
-            updateDialogLastMessage(dialog, update.message)
-        })
-
-        MTProto.UpdatesManager.subscribe("updateDraftMessage", update => {
-            const dialog = this.findByPeer(update.peer)
-
-            if (dialog) {
-                dialog.draft.fillRawAndFire(update.draft)
-            }
         })
 
         MTProto.UpdatesManager.subscribe("updateReadHistoryInbox", update => {
@@ -241,7 +120,7 @@ class DialogManager extends Manager {
             exclude_pinned: true
         }
 
-        return this.fetchDialogs(data).then(dialogs => {
+        return this.getDialogs(data).then(dialogs => {
             AppEvents.Dialogs.fire("nextPage", {
                 dialogs: dialogs.filter(dialog => !dialog.isPinned),
                 pinnedDialogs: dialogs.filter(dialog => dialog.isPinned)
@@ -269,7 +148,7 @@ class DialogManager extends Manager {
         let dialog = DialogsStore.get(type, id)
 
         if (!dialog) {
-            dialog = await this.fetchPlainPeerDialogs({_: type, id})
+            dialog = await this.getPeerDialogs({_: type, id})
         }
 
         return dialog
@@ -331,7 +210,7 @@ class DialogManager extends Manager {
         })
     }
 
-    fetchPlainPeerDialogs(peer) {
+    getPeerDialogs(peer) {
         console.log("fetching new dialog")
 
         const peerData = {
@@ -385,18 +264,18 @@ class DialogManager extends Manager {
      * @param hash
      * @return {Promise<*>}
      */
-    fetchDialogs({
-                     limit = 20,
-                     flags = 0,
-                     exclude_pinned = false,
-                     folder_id = -1,
-                     offset_date = this.offsetDate,
-                     offset_id = -1,
-                     offset_peer = {
-                         _: "inputPeerEmpty",
-                     },
-                     hash = ""
-                 }) {
+    getDialogs({
+                   limit = 20,
+                   flags = 0,
+                   exclude_pinned = false,
+                   folder_id = -1,
+                   offset_date = this.offsetDate,
+                   offset_id = -1,
+                   offset_peer = {
+                       _: "inputPeerEmpty",
+                   },
+                   hash = ""
+               }) {
 
         if (DialogsStore.count >= this.count) {
             console.warn("all dialogs were fetched")
@@ -459,7 +338,7 @@ class DialogManager extends Manager {
     }
 
     fetchFirstPage() {
-        return this.fetchDialogs({}).then(dialogs => {
+        return this.getDialogs({}).then(dialogs => {
             AppEvents.Dialogs.fire("firstPage", {
                 dialogs: dialogs.filter(dialog => !dialog.isPinned),
                 pinnedDialogs: dialogs.filter(dialog => dialog.isPinned)
