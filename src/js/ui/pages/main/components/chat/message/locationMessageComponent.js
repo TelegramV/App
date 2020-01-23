@@ -2,7 +2,6 @@ import MapComponent from "./mapComponent"
 import {MessageType} from "../../../../../../api/dataObjects/messages/message"
 import MessageWrapperComponent from "./messageWrapperComponent"
 const LocationMessageComponent = ({message}) => {
-	console.log(message)
 	let geo = message.media.geo;
 	let venue = "";
 	if(message.type == MessageType.VENUE) {

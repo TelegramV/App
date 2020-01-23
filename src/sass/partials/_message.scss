@@ -213,10 +213,22 @@
                 color: $darkgrey;
             }
         }
-        
+
         .embed-map {
             width: 250px;
             height: 250px;
+        }
+
+        .game {
+            .title {
+                font-weight: bold;
+            }
+            .info {
+                margin: 5px 0;
+            }
+            .game-image {
+                max-width: 100%;
+            }
         }
 
         .audio {

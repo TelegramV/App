@@ -65,7 +65,7 @@ export function getMediaPreviewName(message) {
         case MessageType.SERVICE:
             return "Service message"
         default:
-            console.log("Unsupported",message);
+            console.log("Unsupported message type",message)
             return "Unsupported"
     }
 }

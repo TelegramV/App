@@ -1,3 +1,4 @@
+import {MTProto} from "../../../../../mtproto"
 import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import AppEvents from "../../../../../api/eventBus/appEvents"
 import {FileAPI} from "../../../../../api/fileAPI"
@@ -170,6 +171,32 @@ class BubblesComponent extends Component {
                         VRDOM.patch($message, MessageComponentGeneral(message));
                     });
                 }
+            }
+            if(message.media.game) {
+                //Отримуємо лінк
+                //Отримуємо прев'ю
+                //Отримуємо велику картинку
+                MTProto.invokeMethod("messages.getBotCallbackAnswer", {
+                    flags: 2,
+                    peer: message.from.inputPeer,
+                    msg_id: message.id
+                }).then(data => {
+                    message.media.game.real = {
+                        url: data.url
+                    }
+                    VRDOM.patch($message, MessageComponentGeneral(message));
+                    FileAPI.photoThumbnail(message.media.game.photo, data => {
+                        message.media.game.photo.real = {
+                            url: data.src
+                        }
+                        VRDOM.patch($message, MessageComponentGeneral(message));
+                        //immediatly tring to get better image
+                        FileAPI.getFile(message.media.game.photo, "x").then(data => {
+                            message.media.game.photo.real = {url: data};
+                            VRDOM.patch($message, MessageComponentGeneral(message));
+                        });
+                    })
+                })
             }
         }
         /*if (message.media) {

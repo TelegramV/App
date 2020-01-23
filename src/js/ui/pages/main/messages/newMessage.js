@@ -11,6 +11,7 @@ import ContactMessageComponent from "../components/chat/message/contactMessageCo
 import DocumentMessageComponent from "../components/chat/message/documentMessageComponent";
 import PhoneCallMessageComponent from "../components/chat/message/phoneCallMessageComponent";
 import LocationMessageComponent from "../components/chat/message/locationMessageComponent";
+import GameMessageComponent from "../components/chat/message/gameMessageComponent";
 import {MessageType} from "../../../../api/dataObjects/messages/message"
 
 /**
@@ -22,7 +23,7 @@ const handlers = new Map([
     [MessageType.GEO, LocationMessageComponent],
     [MessageType.GEO_LIVE, LocationMessageComponent],
     [MessageType.VENUE, LocationMessageComponent],
-    //GAME
+    [MessageType.GAME, GameMessageComponent],
     //POLL
     //INVOICE
     [MessageType.WEB_PAGE, WebpageMessageComponent],
