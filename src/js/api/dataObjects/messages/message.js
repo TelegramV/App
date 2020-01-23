@@ -6,21 +6,23 @@ export const MessageType = {
     UNSUPPORTED: undefined,
     TEXT: 0,
     PHOTO: 1,
-    LOCATION: 2,
-    BEACON: 3,
-    GAME: 4,
-    POLL: 5,
-    INVOICE: 6,
-    WEB_PAGE: 7,
-    CONTACT: 8,
-    DOCUMENT: 9,
-    STICKER: 10,
-    VOICE: 11,
-    AUDIO: 12,
-    ROUND: 13,
-    VIDEO: 14,
-    PHONE_CALL: 15,
-    SERVICE: 15,
+    GEO: 2,
+    GEO_LIVE: 3,
+    VENUE: 4,
+    GAME: 5,
+    POLL: 6,
+    INVOICE: 7,
+    WEB_PAGE: 8,
+    CONTACT: 9,
+    DOCUMENT: 10,
+    GIF: 11,
+    STICKER: 12,
+    VOICE: 13,
+    AUDIO: 14,
+    ROUND: 15,
+    VIDEO: 16,
+    PHONE_CALL: 17,
+    SERVICE: 18,
 }
 
 export class Message {
@@ -138,7 +140,7 @@ export class Message {
         const showSender = (this.isOut || this.from !== this.dialog.peer) && !this.isPost
         const sender = this.isOut ? "You" : from.name
 
-        return getMessagePreviewDialog(this._rawMessage, sender, showSender)
+        return getMessagePreviewDialog(this, sender, showSender)
     }
 
     /**
@@ -260,7 +262,6 @@ export class Message {
      */
     parseMessageType() {
         const message = this.raw
-
         const media = message.media
 
         if (media) {
@@ -269,10 +270,13 @@ export class Message {
                     this.type = MessageType.PHOTO
                     break;
                 case "messageMediaGeo":
-                    this.type = MessageType.LOCATION
+                    this.type = MessageType.GEO
                     break;
                 case "messageMediaGeoLive":
-                    this.type = MessageType.BEACON
+                    this.type = MessageType.GEO_LIVE
+                    break;
+                case "messageMediaVenue":
+                    this.type = MessageType.VENUE;
                     break;
                 case "messageMediaGame":
                     this.type = MessageType.GAME
@@ -293,10 +297,13 @@ export class Message {
                     this.type = MessageType.DOCUMENT
 
                     const attrs = media.document.attributes;
-                    for (let i = 0; i < attrs.length; i++) {
-                        const attr = attrs[i];
+                    for (const attr of attrs) {
                         if (attr._ === "documentAttributeSticker") {
                             this.type = MessageType.STICKER
+                            break;
+                        }
+                        if (attr._ === "documentAttributeAnimated") {
+                            this.type = MessageType.GIF
                             break;
                         }
                         if (attr._ === "documentAttributeAudio") {
@@ -308,13 +315,11 @@ export class Message {
                                 break;
                             }
                         }
-                        if (attr._ === "documentAttributeVideo") {
+                        if (attr._ === "documentAttributeVideo") { //tl;dr do not add break here, of GIF's will be broken
                             if (attr.pFlags.round_message) {
                                 this.type = MessageType.ROUND
-                                break;
                             } else {
                                 this.type = MessageType.VIDEO
-                                break;
                             }
                         }
                     }

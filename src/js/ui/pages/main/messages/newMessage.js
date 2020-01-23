@@ -10,6 +10,7 @@ import PhotoMessageComponent from "../components/chat/message/photoMessageCompon
 import ContactMessageComponent from "../components/chat/message/contactMessageComponent";
 import DocumentMessageComponent from "../components/chat/message/documentMessageComponent";
 import PhoneCallMessageComponent from "../components/chat/message/phoneCallMessageComponent";
+import LocationMessageComponent from "../components/chat/message/locationMessageComponent";
 import {MessageType} from "../../../../api/dataObjects/messages/message"
 
 /**
@@ -18,15 +19,22 @@ import {MessageType} from "../../../../api/dataObjects/messages/message"
 const handlers = new Map([
     [MessageType.TEXT, TextMessageComponent],
     [MessageType.PHOTO, PhotoMessageComponent],
+    [MessageType.GEO, LocationMessageComponent],
+    //GEO_LIVE
+    //VENUE
+    //GAME
+    //POLL
+    //INVOICE
+    [MessageType.WEB_PAGE, WebpageMessageComponent],
+    [MessageType.CONTACT, ContactMessageComponent],
+    [MessageType.DOCUMENT, DocumentMessageComponent],
+    [MessageType.GIF, VideoMessageComponent], //TODO own gif component
+    [MessageType.STICKER, StickerMessageComponent],
+    [MessageType.VOICE, VoiceMessageComponent],
+    [MessageType.AUDIO, AudioMessageComponent],
     [MessageType.ROUND, RoundVideoMessageComponent],
     [MessageType.VIDEO, VideoMessageComponent],
-    [MessageType.AUDIO, AudioMessageComponent],
-    [MessageType.VOICE, VoiceMessageComponent],
-    [MessageType.STICKER, StickerMessageComponent],
-    [MessageType.DOCUMENT, DocumentMessageComponent],
     [MessageType.PHONE_CALL, PhoneCallMessageComponent],
-    [MessageType.CONTACT, ContactMessageComponent],
-    [MessageType.WEB_PAGE, WebpageMessageComponent],
     [MessageType.SERVICE, ServiceMessageComponent],
 ])
 

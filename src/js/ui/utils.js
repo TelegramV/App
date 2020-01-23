@@ -1,4 +1,5 @@
 import EmojiConverter from "emoji-js";
+import {MessageType} from "../api/dataObjects/messages/message"
 
 export const emoji = new EmojiConverter();
 
@@ -22,8 +23,64 @@ export function addRipple() {
     }
 }
 
-// If there's no message it it should display "Photo" or smth
+/**
+    message - wrapper message with type
+**/
+
 export function getMediaPreviewName(message) {
+    switch(message.type) {
+        case MessageType.PHOTO:
+            return "Photo"
+        case MessageType.GEO:
+        case MessageType.VENUE:
+            return "Location"
+        case MessageType.GEO_LIVE:
+            return "Live Location"
+        case MessageType.GAME:
+            return "🎮 " + message.media.game.title
+        case MessageType.POLL:
+            return message.media.poll.question;
+        case MessageType.INVOICE:
+            return "Invoice"
+        case MessageType.CONTACT:
+            return "Contact"
+        case MessageType.DOCUMENT:
+            return "Document"
+        case MessageType.GIF:
+            return "GIF"
+        case MessageType.STICKER:
+            return getStickerEmoji(message.media.document)+" Sticker"
+        case MessageType.VOICE:
+            return "Voice"
+        case MessageType.AUDIO:
+            return "Audio"
+        case MessageType.ROUND:
+        case MessageType.VIDEO:
+            return "Video"
+        case MessageType.PHONE_CALL:
+            return "Phone call"
+        case MessageType.TEXT:
+        case MessageType.WEB_PAGE:
+            return "";
+        case MessageType.SERVICE:
+            return "Service message"
+        default:
+            console.log("Unsupported",message);
+            return "Unsupported"
+    }
+}
+
+export function getStickerEmoji(document) {
+    for (const attr of document.attributes) {
+        if(attr._==="documentAttributeSticker") {
+            return attr.alt;
+        }
+    }
+    return "";
+}
+
+// If there's no message it it should display "Photo" or smth
+/*export function getMediaPreviewName(message) {
     switch (message.media._) {
         case "messageMediaPhoto":
             return "Photo"
@@ -51,21 +108,18 @@ export function getMediaPreviewName(message) {
             return "Unsupported"
 
     }
-}
-
+}*/
+//TODO rewrite this
 export function getMessagePreviewDialog(message, peerName, showSender) {
-    if (message._ === "messageService") {
-        return "Service message" // TODO parse service messages
-    }
-
     let text = ""
 
+    const p = getMediaPreviewName(message)
     if (message.media) {
-        const p = getMediaPreviewName(message)
+        
         if (p.length > 0) {
-            text = (showSender ? peerName + ": " : "") + p + (message.message.length > 0 ? ", " : "")
+            text = (showSender ? peerName + ": " : "") + p + (message.text.length > 0 ? ", " : "")
         }
-    } else if (message.message.length > 0 && showSender) {
+    } else if (message.text.length > 0 && showSender) {
         text += peerName + ": "
     }
 
