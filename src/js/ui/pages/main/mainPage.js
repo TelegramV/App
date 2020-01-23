@@ -9,6 +9,7 @@ import {DialogInfoComponent} from "./components/dialog/dialogInfoComponent";
 import {ModalComponent} from "../../modalManager";
 import {MediaViewerComponent} from "../../mediaViewerManager";
 import {InstantViewComponent} from "../../instantViewManager";
+import MessagesManager from "../../../api/messages/MessagesManager"
 
 function initUIManagers() {
     UpdatesManager.init().then(() => {
@@ -16,6 +17,7 @@ function initUIManagers() {
         DialogsManager.fetchFirstPage().then(() => {
             DialogsManager.init()
             PeersManager.init()
+            MessagesManager.init()
         })
     })
     LocaleController.init()

@@ -42,7 +42,6 @@ const MessageComponent = ({message}) => {
         return <Handler message={message}/>
     } else {
         message.raw.message = "Unsupported message type!"
-
         return (
             <TextMessageComponent message={message}/>
         )

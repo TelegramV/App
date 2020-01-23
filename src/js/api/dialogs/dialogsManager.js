@@ -107,7 +107,9 @@ class DialogManager extends Manager {
                     })
                 }
 
-                dialog.messages.fireTransaction()
+                dialog.messages.fireTransaction("deleteChannelMessages", {
+                    messages: update.messages
+                })
             }
         })
 
@@ -130,7 +132,10 @@ class DialogManager extends Manager {
                             })
                         })
                     }
-                    dialog.messages.fireTransaction()
+
+                    dialog.messages.fireTransaction("deleteMessages", {
+                        messages: update.messages
+                    })
                 }
             }))
         })

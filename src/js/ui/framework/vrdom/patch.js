@@ -102,6 +102,27 @@ export function vrdom_deepDeleteRealNodeInnerComponents($node) {
     }
 }
 
+/**
+ * @param {Element|Node} $node
+ */
+export function vrdom_deepDeleteRealNode($node) {
+    if ($node.hasAttribute("data-component-id")) {
+
+        const rawId = $node.getAttribute("data-component-id")
+        const component = AppFramework.mountedComponents.get(rawId)
+
+        if (component) {
+            component.__delete()
+        } else {
+            vrdom_deepDeleteRealNodeInnerComponents($node)
+            $node.remove()
+        }
+
+    } else {
+        $node.remove()
+    }
+}
+
 function diffProps(oldProps, newProps) {
     const oldEntries = Object.entries(oldProps)
     const newEntries = Object.entries(newProps)

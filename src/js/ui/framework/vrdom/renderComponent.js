@@ -21,7 +21,7 @@ function vrdom_renderComponentVNode(componentVNode) {
     componentInstance.__init.bind(componentInstance)()
 
     const vNode = componentInstance.h()
-
+    
     vNode.attrs["data-component-id"] = newId
 
     AppFramework.mountedComponents.set(newId, componentInstance)

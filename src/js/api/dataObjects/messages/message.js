@@ -1,5 +1,6 @@
 import {getMessagePreviewDialog} from "../../../ui/utils"
 import PeersStore from "../../store/peersStore"
+import MessagesManager from "../../messages/MessagesManager"
 
 export const MessageType = {
     UNSUPPORTED: undefined,
@@ -41,11 +42,11 @@ export class Message {
         this._fromPeer = null
         this._toPeer = null
 
-        this.parseMessageType()
+        this.fillRaw(rawMessage)
     }
 
     /**
-     * @return {*}
+     * @return {number}
      */
     get id() {
         return this._rawMessage.id
@@ -76,19 +77,7 @@ export class Message {
         // TODO there's type of message when channel message is resent to chat
         // should check it!
 
-        if (this.isOut) {
-            this._fromPeer = PeersStore.self()
-        } else if (this._rawMessage.from_id) {
-            this._fromPeer = PeersStore.get("user", this._rawMessage.from_id)
-        } else if (this._rawMessage.user_id) {
-            this._fromPeer = PeersStore.get("user", this._rawMessage.user_id)
-        } else if (this._rawMessage.channel_id) {
-            this._fromPeer = PeersStore.get("channel", this._rawMessage.channel_id)
-        } else if (this._rawMessage.chat_id) {
-            this._fromPeer = PeersStore.get("chat", this._rawMessage.chat_id)
-        } else {
-            this._fromPeer = this.to
-        }
+        this._fromPeer = MessagesManager.getFromPeerMessage(this.raw)
 
         if (!this._fromPeer) {
             debugger
@@ -109,17 +98,7 @@ export class Message {
             return this._toPeer
         }
 
-        if (this._rawMessage.to_id && this._rawMessage.to_id._ === "peerChannel") {
-            this._toPeer = PeersStore.get("channel", this._rawMessage.to_id.channel_id)
-        }
-
-        if (this._rawMessage.to_id && this._rawMessage.to_id._ === "peerChat") {
-            this._toPeer = PeersStore.get("chat", this._rawMessage.to_id.chat_id)
-        }
-
-        if (this._rawMessage.to_id && this._rawMessage.to_id._ === "peerUser") {
-            this._toPeer = PeersStore.get("user", this._rawMessage.to_id.user_id)
-        }
+        this._toPeer = MessagesManager.getToPeerMessage(this.raw)
 
         return this._toPeer
     }
@@ -280,7 +259,7 @@ export class Message {
      * ...
      */
     parseMessageType() {
-        const message = this._rawMessage
+        const message = this.raw
 
         const media = message.media
 
@@ -362,5 +341,10 @@ export class Message {
                     break
             }
         }
+    }
+
+    fillRaw(rawMessage) {
+        this._rawMessage = rawMessage
+        this.parseMessageType()
     }
 }

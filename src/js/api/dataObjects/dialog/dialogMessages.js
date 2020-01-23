@@ -55,6 +55,13 @@ export class DialogMessages {
     }
 
     /**
+     * @return {Map<number, Message>}
+     */
+    get data() {
+        return this._messages
+    }
+
+    /**
      * @return {Message}
      */
     get last() {
@@ -338,12 +345,12 @@ export class DialogMessages {
         this._fireTransaction = false
     }
 
-    fireTransaction(eventName = "updateSingle") {
+    fireTransaction(eventName = "updateSingle", data = {}) {
         this.stopTransaction()
 
-        AppEvents.Dialogs.fire(eventName, {
+        AppEvents.Dialogs.fire(eventName, Object.assign({
             dialog: this._dialog
-        })
+        }, data))
 
     }
 }
