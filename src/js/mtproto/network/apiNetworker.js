@@ -165,11 +165,15 @@ export class ApiNetworker extends Networker {
     }
 
     onDisconnect() {
-        console.log("disconnect")
         // TODO reconnect
         // ALSO if there"s no internet it doesn"t disconnect ws, should ping prob
-        document.querySelector("#connecting_message").style.display = "flex";
+        document.querySelector("#connecting_message").style.display = "flex"
         this.connected = false
+    }
+
+    onConnect() {
+        document.querySelector("#connecting_message").style.display = "none"
+        this.connected = true
     }
 
     getAesKeyIv(msgKey, isOut) {

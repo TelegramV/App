@@ -15,7 +15,7 @@ html, body, #app {
 		height: 100%;
 		left: 0;
 		opacity: 1;
-		transition: left 0.5s, opacity 0.5s;
+		transition: left 0.4s, opacity 0.4s;
 
 		&.fade-out {
 			left: -300%;
@@ -47,6 +47,7 @@ html, body, #app {
 	}
 
 	.info .header {
+		color: $dark;
 		font-weight: bold;
 		font-size: 32px;
 		margin-bottom: 15px;
@@ -59,7 +60,7 @@ html, body, #app {
 	.info .description {
 		color: $darkgrey;
 		font-size: 16px;
-		line-height: 25px;
+		line-height: 22px;
 		margin-bottom: 25px;
 		padding: 0 60px;
 	}
@@ -128,25 +129,23 @@ html, body, #app {
 			height: 50px;
 
 			.country-flag {
-				padding: 10px;
+				padding: 15px 0 10px 20px;
+
+				-ms-interpolation-mode: bicubic;
 
 				.emoji-sizer {
-					font-size: 24px;
+					font-size: 20px;
 				}
-			}
-
-			.country-flag>img {
-				width: 20px;
-				height: 20px;
 			}
 
 			.country-name {
 				width: 100%;
+				font-size: 14px;
 				padding-left: 10px;
 			}
 
 			.country-code {
-				color: $grey;
+				color: $darkgrey;
 				width: 100px;
 				padding-right: 10px;
 			}

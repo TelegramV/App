@@ -1,7 +1,7 @@
 export const CheckboxComponent = ({label, checked = false, id}) => {
     return (
         <div className="checkbox-input">
-            <label>
+            <label htmlFor={id}>
                 {
                     checked ?
                         <input type="checkbox" name={id} id={id} checked/>

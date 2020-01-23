@@ -13,6 +13,6 @@ export class FileNetworker extends ApiNetworker {
     }
 
     onDisconnect() {
-        console.error(`File networker #${this.auth.dcID} died, respawning...`)
+        console.error(`File networker died, respawning...`)
     }
 }

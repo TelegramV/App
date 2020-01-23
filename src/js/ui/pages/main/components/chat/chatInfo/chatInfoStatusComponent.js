@@ -28,7 +28,9 @@ class ChatInfoStatusComponent extends Component {
 
         let status = ""
 
-        if (peer instanceof UserPeer) {
+        if(peer.id === 777000) {
+            status = "service notifications"
+        } else if (peer instanceof UserPeer) {
             if (peer.onlineStatus.status === "bot") {
                 status = peer.onlineStatus.status
             } else {
