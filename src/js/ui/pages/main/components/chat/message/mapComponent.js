@@ -1,7 +1,7 @@
-const MapComponent = ({long, lat}) => {
+const MapComponent = ({long, lat, place_id}) => {
 	let url = `https://www.google.com/maps?q=${lat},${long}&output=embed`;
 	return (
-		<iframe src={url}/>
+		<iframe class="embed-map" src={url}/>
 		)
 }
 

@@ -32,8 +32,9 @@ export class InstantViewComponent extends Component {
             case "textFixed":
                 return <code>{this.parseRichText(richText.text)}</code>
             case "textUrl":
-                if(richText.webpage_id !== "0") {
-                    return <a onClick={l => this.downloadAndOpen(richText.url)} className="has-instant-view">{this.parseRichText(richText.text)}</a>
+                if (richText.webpage_id !== "0") {
+                    return <a onClick={l => this.downloadAndOpen(richText.url)}
+                              className="has-instant-view">{this.parseRichText(richText.text)}</a>
                 } else {
                     return <a href={richText.url}>{this.parseRichText(richText.text)}</a>
                 }
@@ -61,9 +62,9 @@ export class InstantViewComponent extends Component {
     }
 
     parseBlock(l) {
-        switch(l._) {
+        switch (l._) {
             case "pageBlockCover":
-                return this.parseBlock(l.cover)
+                return <div className="cover">{this.parseBlock(l.cover)}</div>
 
             case "pageBlockChannel":
                 return <div className="channel">Channel: {l.channel.title}</div>
@@ -74,10 +75,13 @@ export class InstantViewComponent extends Component {
             case "pageBlockKicker":
                 return <span>{this.parseRichText(l.text)}</span>
             case "pageBlockAuthorDate":
-                return <div className="byline">
-                    {l.author._ !== "textEmpty" ? <address className="author">by <a rel="author" href="#">{this.parseRichText(l.author)}</a></address> : ""}
-                    {l.published_date > 0 ? <time>on {l.published_date}</time> : ""}
-                </div>
+                return <span className="byline">
+                    {l.author._ !== "textEmpty" ?
+                        <address className="author">by {this.parseRichText(l.author)}</address> : ""}
+                    {l.published_date > 0 ? <time>on {new Date(l.published_date * 1000).toLocaleString("en", {
+                        year: 'numeric', month: 'long', day: 'numeric', hour12: false, timeZone: "UTC", hour: "numeric", minute: "numeric"
+                    })}</time> : ""}
+                </span>
 
             case "pageBlockParagraph":
                 return <p>{this.parseRichText(l.text)}</p>
@@ -93,13 +97,13 @@ export class InstantViewComponent extends Component {
             case "pageBlockDivider":
                 return <hr/>
             case "pageBlockAnchor":
-                return <a id={l.name}/>
+                return <a id={l.name} className="anchor"/>
             case "pageBlockOrderedList":
                 return <ol>
                     {l.items.map(l => {
-                        if(l._ === "pageListOrderedItemText") {
+                        if (l._ === "pageListOrderedItemText") {
                             return <li value={l.num}>{this.parseRichText(l.text)}</li>
-                        } else if(l._ === "pageListOrderedItemBlocks") {
+                        } else if (l._ === "pageListOrderedItemBlocks") {
                             return <li value={l.num}>{l.blocks.map(this.parseBlock)}</li>
                         }
                     })}
@@ -107,9 +111,9 @@ export class InstantViewComponent extends Component {
             case "pageBlockList":
                 return <ul>
                     {l.items.map(l => {
-                        if(l._ === "pageListItemText") {
+                        if (l._ === "pageListItemText") {
                             return <li>{this.parseRichText(l.text)}</li>
-                        } else if(l._ === "pageListItemBlocks") {
+                        } else if (l._ === "pageListItemBlocks") {
                             return <li>{l.blocks.map(this.parseBlock)}</li>
                         }
                     })}
@@ -134,11 +138,60 @@ export class InstantViewComponent extends Component {
                 return <slideshow/>
 
             case "pageBlockTable":
-                return <table/>
+                const classes = {
+                    bordered: l.pFlags.bordered,
+                    striped: l.pFlags.striped
+                }
+                console.log(classes)
+                return <figure>
+                    <table className={classes}>
+                        {l.rows.map(q => {
+                            return <tr>{q.cells.map(w => {
+                                const classList = {
+                                    left: !l.pFlags.align_center && !l.pFlags.align_right,
+                                    center: l.pFlags.align_center,
+                                    right: l.pFlags.align_right,
+                                    "valign-top": !l.pFlags.valign_bottom && !l.pFlags.valign_middle,
+                                    "valign-center": l.pFlags.valign_middle,
+                                    "valign-bottom": l.pFlags.valign_bottom
+                                }
+                                if (w.pFlags.header) {
+                                    return <th colSpan={w.colspan} rowSpan={w.rowspan} className={classList}>{this.parseRichText(w.text)}</th>
+                                } else {
+                                    return <td colSpan={w.colspan} rowSpan={w.rowspan} className={classList}>{this.parseRichText(w.text)}</td>
+                                }
+                            })}</tr>
+                        })}
+                    </table>
+                    <caption>{this.parseRichText(l.title)}</caption>
+
+                </figure>
             case "pageBlockDetails":
-                return <details/>
+                if (l.pFlags.open) {
+                    return <details open>
+                        <summary>{this.parseRichText(l.title)}</summary>
+                        {l.blocks.map(q => this.parseBlock(q))}
+                    </details>
+                } else {
+                    return <details>
+                        <summary>{this.parseRichText(l.title)}</summary>
+                        {l.blocks.map(q => this.parseBlock(q))}
+                    </details>
+                }
             case "pageBlockRelatedArticles":
-                return <related/>
+                console.log("related", l)
+                return <div className="related">
+                    <div className="title">{this.parseRichText(l.title)}</div>
+                    <div className="articles">{l.articles.map(q => {
+                        return <div className="article">
+                            <PhotoComponent photo={this.findPhoto(q.photo_id)}/>
+                            <div className="article-name">{q.title}</div>
+                            <div className="article-description">by {q.author} on {new Date(q.published_date * 1000).toLocaleString("en", {
+                                year: 'numeric', month: 'long', day: 'numeric', hour12: false, timeZone: "UTC", hour: "numeric", minute: "numeric"
+                            })}</div>
+                        </div>
+                    })}</div>
+                </div>
             case "pageBlockMap":
                 return <iframe/>
 
@@ -166,6 +219,7 @@ export class InstantViewComponent extends Component {
                         </div>
                         <div className="content">
                             {this.state.page.blocks.map(this.parseBlock)}
+                            <div className="feedback">Leave feedback about this preview</div>
                         </div>
                     </div>
                     : ""}
@@ -175,10 +229,10 @@ export class InstantViewComponent extends Component {
 
     close() {
         this.state.page = null
-        if(this.state.history.length > 0) {
+        if (this.state.history.length > 0) {
             this.state.page = this.state.history.pop()
         }
-        if(!this.state.page) {
+        if (!this.state.page) {
             this.state.hidden = true
         }
         this.__patch()
@@ -189,18 +243,18 @@ export class InstantViewComponent extends Component {
             url: url
         }).then(l => {
             console.log(l)
-            l.cached_page.photos.push(l.photo)
-            this.open(l.cached_page, l.site_name)
+            this.open(l.cached_page, l.site_name, l.photo)
         })
     }
 
-    open(page, siteName = "") {
-        if(this.state.page !== null) {
+    open(page, siteName = "", photo = null) {
+        if (this.state.page !== null) {
             this.state.history.push(this.state.page)
         }
         this.state.hidden = false
         this.state.page = page
         this.state.page.siteName = siteName
+        this.state.page.photos.push(photo)
         this.__patch()
     }
 }

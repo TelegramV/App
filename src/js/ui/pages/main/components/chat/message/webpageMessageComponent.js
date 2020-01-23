@@ -21,7 +21,7 @@ const WebpageMessageComponent = ({ message }) => {
                             {webpage.description?<div className="text">{webpage.description}</div>: ""}
                         </div>
                     </a>
-                    {webpage.cached_page ? <div className="instant-view-button" onClick={l => InstantViewManager.open(webpage.cached_page, webpage.site_name)}>Instant View</div> : "" }
+                    {webpage.cached_page ? <div className="instant-view-button" onClick={l => InstantViewManager.open(webpage.cached_page, webpage.site_name, webpage.photo)}>Instant View</div> : "" }
 
                 </TextWrapperComponent>
             </div>
