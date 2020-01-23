@@ -7,6 +7,7 @@ import MessageComponent from "./../../messages/newMessage"
 import Component from "../../../../framework/vrdom/component"
 import VRDOM from "../../../../framework/vrdom"
 import {vrdom_deepDeleteRealNodeInnerComponents} from "../../../../framework/vrdom/patch"
+import {MessageType} from "../../../../../api/dataObjects/messages/message"
 
 
 class BubblesComponent extends Component {
@@ -132,13 +133,13 @@ class BubblesComponent extends Component {
                 })
             }
             if (message.media.document) {
-                if (message.type === "sticker") {
+                if (message.type === MessageType.STICKER) {
                     FileAPI.getFile(message.media.document).then(data => {
                         message.media.document.real = {url: data};
                         VRDOM.patch($message, <MessageComponent message={message}/>);
                     });
                 }
-                if (message.type === "round" || message.type === "video" || message.type === "audio") {
+                if (message.type === MessageType.ROUND || message.type === MessageType.VIDEO || message.type === MessageType.AUDIO) {
                     FileAPI.getFile(message.media.document, "").then(data => {
                         message.media.document.real = {url: data};
                         VRDOM.patch($message, <MessageComponent message={message}/>);

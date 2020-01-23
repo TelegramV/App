@@ -143,7 +143,7 @@ export class ChannelUpdatesProcessor {
             if (peer.dialog.pts === -1) {
                 console.warn("found dialog created manually")
                 this.queueIsProcessing = false
-                peer.dialog.pts = rawUpdate.pts
+                peer.dialog.pts = rawUpdate.pts || -1
                 this.applyUpdate(rawUpdate)
                 return
             }
@@ -167,13 +167,6 @@ export class ChannelUpdatesProcessor {
                     self.queueIsProcessing = false
 
                     let inputPeer = peer.input
-
-                    // if (!peer.dialog) {
-                    //     console.error("BUG: dialog wan not found, processing next update")
-                    //     self.isWaitingForDifference = false
-                    //     this.processQueue()
-                    //     return
-                    // }
 
                     if (peer.isMin) {
                         console.error("BUG: peer is min, processing next update", peer)

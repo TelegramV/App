@@ -3,7 +3,6 @@ import {VRNode} from "./VRNode"
 import AppFramework from "../framework"
 import vrdom_mount from "./mount"
 import vrdom_append from "./appendChild"
-import Component from "./component"
 
 /**
  * @param {Element|Node} $node
@@ -11,14 +10,7 @@ import Component from "./component"
  */
 function patchEvents($node, newEvents) {
     for (const [k, v] of newEvents.entries()) {
-        // if ($node.hasOwnProperty(`on${k}`)) {
         $node[`on${k}`] = v
-        // } else {
-        //     console.warn("[patch] The node hasn't such event setter. Adding event by `addEventListener` which has bugs.")
-        //
-        //     $node.removeEventListener(k, v)
-        //     $node.addEventListener(k, v)
-        // }
     }
 }
 
@@ -28,21 +20,15 @@ function patchEvents($node, newEvents) {
  */
 function patchAttrs($node, newAttrs) {
     if ($node.nodeType !== Node.TEXT_NODE) {
-        const oldAttrs = $node.attributes
-
         for (const [k, v] of Object.entries(newAttrs)) {
-            const nv = Array.isArray(v) ? v.join(" ") : v
-
-            if ($node.getAttribute(k) !== nv) {
-                $node.setAttribute(k, nv)
+            if ($node.getAttribute(k) !== v) {
+                $node.setAttribute(k, String(v))
             }
         }
 
-        for (let i = 0; i < oldAttrs.length; i++) {
-            const attr = oldAttrs.item(i)
-
-            if (!newAttrs.hasOwnProperty(attr.name) && attr.name !== "data-component-id") {
-                $node.removeAttribute(attr.name)
+        for (const name of $node.getAttributeNames()) {
+            if (name !== "data-component-id" && !newAttrs.hasOwnProperty(name)) {
+                $node.removeAttribute(name)
             }
         }
     }
