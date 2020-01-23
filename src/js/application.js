@@ -1,6 +1,7 @@
 import "../sass/application.scss"
 
-import "./ui/vendor/tgs_player"
+let lottie = "@lottiefiles/lottie-player"
+require(`${lottie}`); //Trick to bypass "Critical dependency" warning
 import AppFramework from "./ui/framework/framework"
 import MTProto from "./mtproto"
 import {MainPage} from "./ui/pages/main/mainPage"

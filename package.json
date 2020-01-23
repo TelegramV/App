@@ -16,6 +16,7 @@
     "analize-bundle": "webpack --json | webpack-bundle-size-analyzer"
   },
   "dependencies": {
+    "@lottiefiles/lottie-player": "^0.3.0-rc2",
     "croppie": "^2.6.4",
     "emoji-js": "^3.4.1",
     "rusha": "^0.8.13",
