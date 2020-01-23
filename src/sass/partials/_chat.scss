@@ -4,228 +4,230 @@
     width: 100%;
 }
 
-#noChat {
-    align-self: center;
-    margin: auto;
-
+.chat-wrapper {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    .placeholder {
-        font-size: 150px;
-        color: lighten($darkgrey, 20%);
-        margin-bottom: 25px;
-    }
-
-    .text {
-        text-align: center;
-        width: 300px;
-        font-size: 24px;
-        color: $darkgrey;
-        font-weight: bold;
-        margin-bottom: 40px;
-
-        p {
-            margin-top: 5px;
-        }
-    }
-
-    .buttons {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-
-    .button-wrapper {
-        margin: 0 30px;
-        text-align: center;
-
-        p {
-            margin-top: 10px;
-            color: $darkgrey;
-        }
-    }
-
-    .button {
-        width: 70px;
-        height: 70px;
-        background-color: white;
-        border-radius: 50%;
-        cursor: pointer;
-
-        position: relative;
-
-        .tgico {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translateY(-50%) translateX(-50%);
-            color: $darkgrey;
-            font-size: 30px;
-        }
-
-        &:hover {
-            background-color: $blue;
-
-            .tgico {
-                color: white;
-            }
-
-            &~p {
-                color: $blue;
-            }
-        }
-    }
-}
-
-#chat {
-    display: flex;
-    // padding: 200px;
     width: 100%;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
-    flex-direction: column;
 
-    #topbar {
-        width: 100%;
-        background-color: #fff;
-        padding: 0 9px;
-        box-sizing: border-box;
-        user-select: none;
+    #noChat {
+        align-self: center;
+        margin: auto;
+
         display: flex;
+        flex-direction: column;
         align-items: center;
-        box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.07);
-        z-index: 1;
 
-        &>* {
-            margin: 0 2px;
+        .placeholder {
+            font-size: 150px;
+            color: lighten($darkgrey, 20%);
+            margin-bottom: 25px;
         }
 
-        .chat-info {
-            flex-grow: 1;
+        .text {
+            text-align: center;
+            width: 300px;
+            font-size: 24px;
+            color: $darkgrey;
+            font-weight: bold;
+            margin-bottom: 40px;
+
+            p {
+                margin-top: 5px;
+            }
         }
 
-        .content {
-            padding-left: 16px;
+        .buttons {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
         }
 
-        .pin {
-            width: 200px;
-            padding: 0 10px;
-            box-sizing: border-box;
-            font-size: 14px;
+        .button-wrapper {
+            margin: 0 30px;
+            text-align: center;
+
+            p {
+                margin-top: 10px;
+                color: $darkgrey;
+            }
+        }
+
+        .button {
+            width: 70px;
+            height: 70px;
+            background-color: white;
+            border-radius: 50%;
+            cursor: pointer;
 
             transition: anim(background-color);
 
-            &.pinned-message {
-                border-left: 2px solid $blue;
-                cursor: pointer;
+            position: relative;
+
+            .tgico {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translateY(-50%) translateX(-50%);
+                color: $darkgrey;
+                font-size: 30px;
             }
 
-            &.active-audio {
-                .play {
-                    height: 50px;
-                    width: 50px;
-                    background-color: $blue;
-                    color: white;
+            &:hover {
+                background-color: $blue;
 
-                    &.tgico-play {
-                        margin-right: 5px;
+                .tgico {
+                    color: white;
+                }
+
+                &~p {
+                    color: $blue;
+                }
+            }
+        }
+    }
+
+    #chat {
+        display: flex;
+        // padding: 200px;
+        width: 100%;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        flex-direction: column;
+
+        #topbar {
+            width: 100%;
+            background-color: #fff;
+            padding: 0 9px;
+            box-sizing: border-box;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.07);
+            z-index: 1;
+
+            &>* {
+                margin: 0 2px;
+            }
+
+            .chat-info {
+                flex-grow: 1;
+            }
+
+            .content {
+                padding-left: 16px;
+            }
+
+            .pin {
+                width: 200px;
+                padding: 0 10px;
+                box-sizing: border-box;
+                font-size: 14px;
+
+                transition: anim(background-color);
+
+                &.pinned-message {
+                    border-left: 2px solid $blue;
+                    cursor: pointer;
+                }
+
+                &.active-audio {
+                    .play {
+                        height: 50px;
+                        width: 50px;
+                        background-color: $blue;
+                        color: white;
+
+                        &.tgico-play {
+                            margin-right: 5px;
+                        }
+                    }
+                }
+
+                &:hover {
+                    background-color: $light;
+                }
+
+                .title {
+                    color: $blue;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                }
+
+                .description {
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                }
+            }
+
+            .person {
+                padding: 8px;
+
+                &:hover {
+                    background-color: transparent;
+                }
+
+                .avatar {
+                    width: 44px;
+                    height: 44px;
+                    flex-shrink: 0;
+                }
+
+                .bottom {
+                    font-size: 14px;
+                    line-height: 18px;
+
+                    .info.online {
+                        color: $blueonline;
+                    }
+                }
+            }
+        }
+
+        #bubbles {
+            width: 100%;
+
+            overflow-y: hidden;
+
+            &:hover {
+                overflow-y: overlay;
+            }
+
+            @supports not(overflow-y: overlay) {
+                &:hover {
+                    overflow-y: auto;
+                }
+            }
+
+            #bubbles-inner {
+                max-width: $max-chat-width;
+                width: 100%;
+                display: flex;
+                flex-direction: column-reverse;
+                flex-shrink: 1;
+                padding: 9px;
+                margin: 0 auto;
+                box-sizing: border-box;
+                overflow: hidden;
+
+                &>* {
+                    display: flex;
+                    padding: 5px 0;
+
+                    &:first-child {
+
+                        transform-origin: bottom center;
+                        animation-name: jump-in;
+                        animation-duration: 0.2s;
+                        animation-timing-function: ease-in-out;
                     }
                 }
             }
 
-            &:hover {
-                background-color: $light;
-            }
-
-            .title {
-                color: $blue;
-                font-weight: bold;
-                margin-bottom: 10px;
-            }
-
-            .description {
-                white-space: nowrap;
-                text-overflow: ellipsis;
-                overflow: hidden;
-            }
-        }
-
-        .person {
-            padding: 8px;
-
-            &:hover {
-                background-color: transparent;
-            }
-
-            .avatar {
-                width: 44px;
-                height: 44px;
-                flex-shrink: 0;
-            }
-
-            .bottom {
-                font-size: 14px;
-                line-height: 18px;
-
-                .info.online {
-                    color: $blueonline;
-                }
-            }
-        }
-    }
-
-    #bubbles {
-        width: 100%;
-
-        overflow-y: hidden;
-
-        &:hover {
-            overflow-y: overlay;
-        }
-
-        @supports not(overflow-y: overlay) {
-            &:hover {
-                overflow-y: auto;
-            }
-        }
-
-        #bubbles-inner {
-            overflow-anchor: none;
-            max-width: $max-chat-width;
-            width: 100%;
-            display: flex;
-            flex-direction: column-reverse;
-            flex-shrink: 1;
-            padding: 9px;
-            margin: 0 auto;
-            box-sizing: border-box;
-            overflow: hidden;
-
-            &>* {
-                display: flex;
-                padding: 5px 0;
-
-                &:first-child {
-
-                    transform-origin: bottom center;
-                    animation-name: jump-in;
-                    animation-duration: 0.2s;
-                    animation-timing-function: ease-in-out;
-                }
-            }
-        }
-        .anchor {
-            overflow-anchor: auto;
-            height: 1px;
-        }
-
-        /*
+            /*
             MESSAGES NOW IN _message.scss!
-        */
+        	*/
+        }
     }
 }
 

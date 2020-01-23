@@ -1,6 +1,6 @@
 import AppFramework from "../../framework"
 import VRDOM from "../index"
-import {vrdom_deepDeleteRealNodeComponents} from "../patch"
+import {vrdom_deepDeleteRealNodeInnerComponents} from "../patch"
 
 class Component {
     constructor(props) {
@@ -105,22 +105,24 @@ class Component {
         this.destroy()
         this.__disableReactive()
         this.__deepDeleteInnerComponents()
-        AppFramework.mountedComponents.delete(this.$el.getAttribute("data-component-id"))
+        AppFramework.mountedComponents.delete(this.identifier)
         this.$el.remove()
     }
 
     __deepDeleteInnerComponents() {
-        vrdom_deepDeleteRealNodeComponents(this.$el.childNodes)
+        vrdom_deepDeleteRealNodeInnerComponents(this.$el)
     }
 
     // do not override this if there is no critical reason
     __disableReactive() {
-        for (const context of this.__.reactiveContexts) {
+        for (const [key, context] of this.__.reactiveContexts) {
             context.offCallback(context.resolve)
         }
 
-        for (const context of this.__.appEventContexts) {
-            context.offCallback(context.resolve)
+        for (const [bus, contexts] of this.__.appEventContexts) {
+            for (const [updateType, context] of contexts) {
+                context.offCallback(context.resolve)
+            }
         }
     }
 

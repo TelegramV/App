@@ -7,6 +7,7 @@ import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
 class ChatInfoComponent extends Component {
     constructor(props) {
         super(props)
+
         this.reactive = {
             dialog: AppSelectedDialog.Reactive.Default // reactive property
         }
@@ -17,7 +18,7 @@ class ChatInfoComponent extends Component {
             <div id="messages-wrapper-chat-info" className="chat-info">
                 <div className="person">
 
-                    <button class="responsive-only-mobile" onClick={() => location.hash = "#/"}>
+                    <button class="responsive-only-mobile" onClick={this._backToMainPage}>
                         {"<-"}
                     </button>
 
@@ -34,6 +35,10 @@ class ChatInfoComponent extends Component {
                 </div>
             </div>
         )
+    }
+
+    _backToMainPage() {
+        location.hash = "#/"
     }
 }
 

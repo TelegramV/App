@@ -133,11 +133,25 @@ export class ChannelUpdatesProcessor {
 
             const peer = PeersStore.get("channel", channelId)
 
-            if (!peer.dialog) {
-                console.error("BUG: dialog was not found! we should fetch new!", rawUpdate)
+            if (!peer) {
                 this.queueIsProcessing = false
+                this.applyUpdate(rawUpdate)
                 this.processQueue()
-                return
+            }
+
+            if (!peer.dialog) {
+                console.error("BUG: dialog was not found! we should fetch new!", peer, rawUpdate)
+                this.queueIsProcessing = false
+                this.applyUpdate(rawUpdate)
+                this.processQueue()
+            }
+
+            if (peer.dialog.pts === -1) {
+                console.warn("found dialog created manually", peer, rawUpdate)
+                this.queueIsProcessing = false
+                peer.dialog.pts = rawUpdate.pts || -1
+                this.applyUpdate(rawUpdate)
+                this.processQueue()
             }
 
             const self = this
@@ -160,18 +174,11 @@ export class ChannelUpdatesProcessor {
 
                     let inputPeer = peer.input
 
-                    // if (!peer.dialog) {
-                    //     console.error("BUG: dialog wan not found, processing next update")
-                    //     self.isWaitingForDifference = false
-                    //     this.processQueue()
-                    //     return
-                    // }
-
                     if (peer.isMin) {
-                        console.error("BUG: peer is min, processing next update")
+                        console.error("BUG: peer is min, processing next update", peer)
                         self.isWaitingForDifference = false
                         peer.dialog.pts = rawUpdate.pts
-                        this.processQueue()
+                        self.processQueue()
                         return
                     }
 

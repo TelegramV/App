@@ -55,6 +55,13 @@ export class DialogMessages {
     }
 
     /**
+     * @return {Map<number, Message>}
+     */
+    get data() {
+        return this._messages
+    }
+
+    /**
      * @return {Message}
      */
     get last() {
@@ -102,7 +109,7 @@ export class DialogMessages {
      * @param {number} unreadCount
      */
     set unreadCount(unreadCount) {
-        this._unreadCount = unreadCount || this._unreadCount
+        this._unreadCount = unreadCount
 
         if (!this.isTransaction) {
             AppEvents.Dialogs.fire("updateUnreadCount", {
@@ -280,11 +287,13 @@ export class DialogMessages {
         if (this.unreadMessagesIds.size === 0) {
             this.clearUnread()
         } else {
+            this.startTransaction()
             this.unreadMessagesIds.forEach(messageId => {
                 if (messageId <= maxMessageId) {
-                    this._unreadIds.delete(messageId)
+                    this.deleteUnread(messageId)
                 }
             })
+            this.stopTransaction()
 
             AppEvents.Dialogs.fire("updateUnread", {
                 dialog: this._dialog
@@ -336,12 +345,12 @@ export class DialogMessages {
         this._fireTransaction = false
     }
 
-    fireTransaction(eventName = "updateSingle") {
+    fireTransaction(eventName = "updateSingle", data = {}) {
         this.stopTransaction()
 
-        AppEvents.Dialogs.fire(eventName, {
+        AppEvents.Dialogs.fire(eventName, Object.assign({
             dialog: this._dialog
-        })
+        }, data))
 
     }
 }

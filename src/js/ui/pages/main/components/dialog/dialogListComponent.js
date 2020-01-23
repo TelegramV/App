@@ -102,13 +102,23 @@ export class DialogListComponent extends Component {
         this.elements.$pinnedDialogs = this.elements.$dialogsWrapper.querySelector("#dialogsPinned")
         this.elements.$generalDialogs = this.elements.$dialogsWrapper.querySelector("#dialogs")
 
-        AppEvents.Dialogs.subscribe("updateMany", event => {
+        Sortable.create(this.elements.$pinnedDialogs)
+
+        AppEvents.Dialogs.subscribe("firstPage", event => {
             this.elements.$loader.style.display = "none"
             this.elements.$pinnedDialogs.style.display = ""
             this.elements.$generalDialogs.style.display = ""
 
-            Sortable.create(this.elements.$pinnedDialogs)
+            event.pinnedDialogs.forEach(dialog => {
+                this._renderDialog(dialog, "append")
+            })
 
+            event.dialogs.forEach(dialog => {
+                this._renderDialog(dialog, "append")
+            })
+        })
+
+        AppEvents.Dialogs.subscribe("nextPage", event => {
             event.pinnedDialogs.forEach(dialog => {
                 this._renderDialog(dialog, "append")
             })
@@ -120,6 +130,12 @@ export class DialogListComponent extends Component {
 
         AppEvents.Dialogs.subscribe("newFetched", event => {
             this._renderDialog(event.dialog, "prepend") // fixme: this should insert in proper place
+        })
+
+        AppEvents.Dialogs.subscribe("newMessage", event => {
+            if (!AppFramework.mountedComponents.has(`dialog-${event.dialog.peer.type}-${event.dialog.peer.id}`)) {
+                this._renderDialog(event.dialog, "prepend")
+            }
         })
 
         //this._registerResizer()
@@ -150,7 +166,8 @@ export class DialogListComponent extends Component {
 
         const newVDialog = <DialogComponent $pinned={this.elements.$pinnedDialogs}
                                             $general={this.elements.$generalDialogs}
-                                            dialog={dialog}/>
+                                            dialog={dialog}
+                                            ref={`dialog-${dialog.peer.type}-${dialog.peer.id}`}/>
 
         if (appendOrPrepend === "append") {
             if (dialog.isPinned) {

@@ -1,4 +1,3 @@
-// TODO
 import {MTProto} from "../mtproto";
 
 export class AuthAPI {

@@ -9,13 +9,15 @@ import {DialogInfoComponent} from "./components/dialog/dialogInfoComponent";
 import {ModalComponent} from "../../modalManager";
 import {MediaViewerComponent} from "../../mediaViewerManager";
 import {InstantViewComponent} from "../../instantViewManager";
+import MessagesManager from "../../../api/messages/MessagesManager"
 
 function initUIManagers() {
     UpdatesManager.init().then(() => {
         // todo: move this to DialogsManager logic
-        DialogsManager.fetchDialogs({}).then(() => {
+        DialogsManager.fetchFirstPage().then(() => {
             DialogsManager.init()
             PeersManager.init()
+            MessagesManager.init()
         })
     })
     LocaleController.init()
@@ -33,7 +35,7 @@ export function MainPage() {
 
             <DialogListComponent/>
             <ChatComponent/>
-            <DialogInfoComponent/>
+            {/*<DialogInfoComponent/>*/}
         </div>
     )
 }

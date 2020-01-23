@@ -8,10 +8,10 @@ export const DialogInfoComponent = () => {
                 </div>
             <div class="content">
                 <div class="photo-container">
-                    <img class="photo" src="https://i.pinimg.com/originals/85/78/bf/8578bfd439ef6ee41e103ae82b561986.png"/>
+                    <img class="photo" src=""/>
                 </div>
                 <div class="description">
-                    <div class="name">Steve Minecraft</div>
+                    <div class="name">Noboby</div>
                     {/*<div class="status">online</div>*/}
                     <div class="subscribers">335,356 subscribers</div>
                 </div>

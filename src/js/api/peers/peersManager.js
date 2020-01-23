@@ -9,16 +9,11 @@ import {PeerPhoto} from "../dataObjects/peer/peerPhoto";
 class PeerManager extends Manager {
     constructor() {
         super()
-        this.peerInitListeners = {
-            user: {},
-            chat: {},
-            channel: {}
-        }
     }
 
     init() {
         if (this._inited) {
-            return
+            return Promise.resolve()
         }
 
         MTProto.UpdatesManager.subscribe("updateUserStatus", update => {
@@ -32,6 +27,7 @@ class PeerManager extends Manager {
                 })
             }
         })
+
         MTProto.UpdatesManager.subscribe("updateUserPhoto", update => {
             const peer = PeersStore.get("user", update.user_id)
 
@@ -42,24 +38,6 @@ class PeerManager extends Manager {
         })
 
         this._inited = true
-    }
-
-    listenPeerInit(peerName, peerId, listener) {
-        if (!this.peerInitListeners[peerName]) {
-            this.peerInitListeners[peerName] = {}
-        }
-
-        peerId = parseInt(peerId)
-
-        if (!this.peerInitListeners[peerName][peerId]) {
-            this.peerInitListeners[peerName][peerId] = []
-        }
-
-        if (PeersStore.get(peerName, peerId)) {
-            listener(PeersStore.get(peerName, peerId))
-        } else {
-            this.peerInitListeners[peerName][peerId].push(listener)
-        }
     }
 
     setFromRaw(rawPeer) {

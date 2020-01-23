@@ -5,6 +5,7 @@ class DialogsMapStore extends MappedStore {
         super({
             initialData: new Map([
                 ["chat", new Map()],
+                ["chatForbidden", new Map()],
                 ["channel", new Map()],
                 ["user", new Map()],
             ])
@@ -18,6 +19,19 @@ class DialogsMapStore extends MappedStore {
      */
     get data() {
         return super.data
+    }
+
+    /**
+     * @return {number}
+     */
+    get count() {
+        let count = 0
+
+        this.data.forEach(type => {
+            count += type.size
+        })
+
+        return count
     }
 
     /**
@@ -38,10 +52,14 @@ class DialogsMapStore extends MappedStore {
      * @return {this}
      */
     set(dialog) {
+        if (!dialog) {
+            console.error("BUG (DialogsStore): invalid peer was provided!")
+            return this
+        }
         // todo: make this check
         // if (dialog instanceof Dialog) {
-        if (this.data.has(dialog.type)) {
-            this.data.get(dialog.type).set(dialog.id, dialog)
+        if (this.data.has(dialog.peer.type)) {
+            this.data.get(dialog.peer.type).set(dialog.peer.id, dialog)
             this.onSetSubscribers.forEach(s => s(dialog))
             return this
         } else {

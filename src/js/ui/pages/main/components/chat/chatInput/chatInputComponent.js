@@ -279,6 +279,8 @@ export class ChatInputComponent extends Component {
         let reply = this.state.reply ? this.state.reply.message.id : null
         AppSelectedDialog.Dialog.API.sendMessage(this.textarea.textContent, reply, silent)
         this.textarea.innerHTML = ""
+        this.state.value = ""
+        this.state.valueString = ""
         this.state.reply = null
         this.state.attachments = []
         this.__patch()

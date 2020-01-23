@@ -24,6 +24,7 @@ export function getInputPeerFromPeer(peerName, peerId, accessHash = "") {
             }
     }
 }
+
 export function getInputFromPeer(peerName, peerId, accessHash = "") {
     switch (peerName) {
         case "chat":
@@ -73,19 +74,6 @@ export function getInputPeerFromPeerWithoutAccessHash(peerName, peerId) {
             return {
                 _: "inputPeerEmpty"
             }
-    }
-}
-
-export function getPeersInput(peerName) {
-    switch (peerName) {
-        case "chat":
-            return "messages.getFullChat"
-        case "user":
-            return "users.getFullUser"
-        case "channel":
-            return "channel.getFullChannel"
-        default:
-            return ""
     }
 }
 

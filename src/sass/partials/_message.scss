@@ -203,6 +203,21 @@
                 padding-bottom: 4px;
             }
         }
+        .venue {
+            padding: 10px;
+            font-size: 14px;
+            .title {
+                font-weight: bold;
+            }
+            .address {
+                color: $darkgrey;
+            }
+        }
+        
+        .embed-map {
+            width: 250px;
+            height: 250px;
+        }
 
         .audio {
             display: flex;
@@ -244,7 +259,7 @@
                     cursor: pointer;
 
                     rect {
-                        transition: width 0.15s linear;
+                        transition: width 0.25s linear;
                     }
                 }
 

@@ -1,11 +1,6 @@
 import {AppTemporaryStorage} from "../../common/storage"
 import {longFromInts} from "../utils/bin"
-import {createLogger} from "../../common/logger"
 import Random from "../utils/random"
-
-const Logger = createLogger("MtpTimeManager", {
-    level: "log"
-})
 
 export class MtpTimeManager {
     constructor() {
@@ -25,7 +20,7 @@ export class MtpTimeManager {
 
         let messageID = [timeSec, (timeMSec << 21) | (random << 3) | 4]
 
-        if (this.lastMessageID[0] > messageID[0] || this.lastMessageID[0] == messageID[0] && this.lastMessageID[1] >= messageID[1]) {
+        if (this.lastMessageID[0] > messageID[0] || this.lastMessageID[0] === messageID[0] && this.lastMessageID[1] >= messageID[1]) {
             messageID = [this.lastMessageID[0], this.lastMessageID[1] + 4]
         }
 

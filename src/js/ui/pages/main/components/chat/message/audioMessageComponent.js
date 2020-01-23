@@ -6,9 +6,7 @@ const AudioMessageComponent = ({message}) => {
     return (
         <MessageWrapperComponent message={message}>
             <div class="message">
-                <audio constrols>
-                    <source src={audioSrc} type={message.media.document.mime_type}/>
-                </audio>
+                <audio controls src={audioSrc} type={message.media.document.mime_type}/>
                 <TextWrapperComponent message={message}/>
             </div>
         </MessageWrapperComponent>

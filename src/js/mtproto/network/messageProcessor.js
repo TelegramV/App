@@ -27,7 +27,7 @@ export class MessageProcessor {
     }
 
     processNewSessionCreated(message, messageID, sessionID) {
-
+        console.error("BUG: new session created! We should handle this!")
     }
 
     listenPong(messageId, handler) {

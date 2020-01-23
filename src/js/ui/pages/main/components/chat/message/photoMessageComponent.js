@@ -1,11 +1,8 @@
 import MessageWrapperComponent from "./messageWrapperComponent"
-import MessageTimeComponent from "./messageTimeComponent"
 import TextWrapperComponent from "./textWrapperComponent";
 import {FileAPI} from "../../../../../../api/fileAPI";
 import {MediaViewerManager} from "../../../../../mediaViewerManager";
 import Component from "../../../../../framework/vrdom/component";
-import VRDOM from "../../../../../framework/vrdom";
-import Message from "../../../messages/newMessage";
 
 // const MessageMediaImage = ({src, size, alt = "", isThumb}) => {
 //     let width = isThumb ? parseInt(size[0]) >= 460 ? "460px" : `${size[0]}px` : parseInt(size[0]) >= 480 ? "480px" : `${size[0]}px`
@@ -112,13 +109,13 @@ export class PhotoComponent extends Component {
     }
 }
 
-const MessageMediaImage = ({ message, src, alt = "", size, thumb}) => {
+const MessageMediaImage = ({message, src, alt = "", size, thumb}) => {
     const w = size[1] > 512 ? 512 / size[1] * size[0] : size[0]
     return (
         <div className="media-wrapper" onClick={l => openViewer(message)}>
             <img className={["attachment", "photo", thumb ? "attachment-thumb" : ""]}
                  src={src}
-                 alt={alt} css-width={w + "px"} />
+                 alt={alt} css-width={w + "px"}/>
             {
                 thumb ?
                     <div className="progress">
@@ -133,13 +130,15 @@ const MessageMediaImage = ({ message, src, alt = "", size, thumb}) => {
     )
 }
 
-const PhotoMessageComponent = ({ message }) => {
+const PhotoMessageComponent = ({message}) => {
     let imageLoaded = message.media.photo.real;
 
     return (
         <MessageWrapperComponent message={message}>
             <div className="message no-pad">
-                <MessageMediaImage message={message} src={imageLoaded ? imageLoaded.src : ""} size={imageLoaded ? imageLoaded.sizes : [0, 0]} thumb={!imageLoaded || imageLoaded.thumbnail}/>
+                <MessageMediaImage message={message} src={imageLoaded ? imageLoaded.src : ""}
+                                   size={imageLoaded ? imageLoaded.sizes : [0, 0]}
+                                   thumb={!imageLoaded || imageLoaded.thumbnail}/>
 
                 <TextWrapperComponent message={message}/>
             </div>

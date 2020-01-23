@@ -38,6 +38,8 @@ class SelectedDialog {
             this._previousDialog = this._dialog
             this._dialog = this.findFromQueryParams(queryParams)
 
+
+
             this._selectSubscribers.forEach(listener => {
                 listener(this._dialog)
             })
@@ -57,7 +59,7 @@ class SelectedDialog {
                 } else {
                     const queryParams = parseHashQuery()
 
-                    if (dialog.type === queryParams.type && dialog.id === queryParams.id) {
+                    if (dialog.peer.type === queryParams.type && dialog.peer.id === queryParams.id) {
                         this._previousDialog = this._dialog
                         this._dialog = dialog
 
@@ -152,7 +154,7 @@ class SelectedDialog {
             return false
         }
 
-        return this.Dialog === dialog && this.Dialog.type === dialog.type && this.Dialog.id === dialog.id
+        return this.Dialog === dialog && this.Dialog.peer.type === dialog.peer.type && this.Dialog.peer.id === dialog.peer.id
     }
 }
 

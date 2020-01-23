@@ -11,7 +11,6 @@ import {ChannelPeer} from "../../../../../api/dataObjects/peer/channelPeer";
 import {GroupPeer} from "../../../../../api/dataObjects/peer/groupPeer";
 import {SupergroupPeer} from "../../../../../api/dataObjects/peer/supergroupPeer";
 import {ModalManager} from "../../../../modalManager";
-import ChatInfoAvatarComponent from "../chat/chatInfo/chatInfoAvatarComponent";
 import {FlatButtonComponent} from "../input/flatButtonComponent";
 
 const DATE_FORMAT_TIME = {
@@ -33,19 +32,6 @@ const patchAndResortEventTypes = new Set([
     "updatePinned"
 ])
 
-/**
- * @param {Dialog} dialog
- */
-function handleClick(dialog) {
-    const p = dialog.peer.username ? `@${dialog.peer.username}` : `${dialog.type}.${dialog.id}`
-
-    return () => AppFramework.Router.push("/", {
-        queryParams: {
-            p
-        }
-    })
-}
-
 // NEVER CREATE THIS COMPONENT WITH THE SAME DIALOG
 export class DialogComponent extends Component {
     constructor(props) {
@@ -64,6 +50,7 @@ export class DialogComponent extends Component {
             AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadHistoryInbox").PatchOnly,
             AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadHistoryOutbox").PatchOnly,
             AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "readHistory").PatchOnly,
+            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateUnreadCount").PatchOnly,
             AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadChannelInbox").PatchOnly,
             AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadChannelOutbox").PatchOnly,
 
@@ -88,7 +75,7 @@ export class DialogComponent extends Component {
             "muted": dialog.isMuted,
         }
 
-        if (dialog.messages.last.isOut && !dialog.messages.last.isPost && !dialog.peer.isSelf) {
+        if (dialog.messages.last.isOut && !dialog.peer.isSelf) {
             personClasses["sent"] = true
 
             if (dialog.messages.last.isRead) {
@@ -97,54 +84,55 @@ export class DialogComponent extends Component {
         }
 
         return (
-            <div data-peer-username={dialog.peer.username} data-peer={`${dialog.type}.${dialog.id}`}
+            <div data-peer-username={dialog.peer.username} data-peer={`${dialog.peer.type}.${dialog.peer.id}`}
                  data-message-id={dialog.messages.last.id}
                  data-date={dialog.messages.last.date}
                  data-pinned={dialog.isPinned === undefined ? false : dialog.isPinned}
                  className={personClasses}
-                 onClick={handleClick(dialog)}
-                 data-index={dialog.index} onContextMenu={ContextMenuManager.listener([
-                {
-                    icon: "archive",
-                    title: "Archive chat"
-                },
-                {
-                    icon: dialog.isPinned ? "unpin" : "pin",
-                    title: dialog.isPinned ? "Unpin from top" : "Pin to top"
-                },
-                {
-                    icon: "info",
-                    title: dialog.peer instanceof ChannelPeer ? "View channel info" : (dialog.peer instanceof GroupPeer || dialog.peer instanceof SupergroupPeer ? "View group info" : "View profile")
-                },
-                {
-                    icon: dialog.isMuted ? "unmute" : "mute",
-                    title: dialog.isMuted ? "Enable notifications" : "Disable notifications"
-                },
-                {
-                    icon: unread !== "" ? "message" : "unread",
-                    title: unread !== "" ? "Mark as read" : "Mark as unread",
-                    onClick: _ => {
-                        dialog.API.markDialogUnread(unread === "")
-                    }
-                },
-                {
-                    icon: "delete",
-                    title: "Delete chat",
-                    red: true,
-                    onClick: _ => {
-                        ModalManager.open(<div className="delete-chat-title">
-                            <DialogAvatarComponent dialog={dialog}/>
-                            Delete Chat?
-                            </div>,
-                            <div className="delete-chat-body">
-                                <span className="text">Are you sure you want to delete chat with <b>{dialog.peer.name}</b>?</span>
-                                <FlatButtonComponent red label={`Delete for me and ${dialog.peer.name}`}/>
-                                <FlatButtonComponent red label="Delete just for me"/>
-                                <FlatButtonComponent label="Cancel"/>
-                            </div>)
-                    }
-                },
-                ])}>
+                 onClick={this._handleClick}
+                 onContextMenu={ContextMenuManager.listener([
+                     {
+                         icon: "archive",
+                         title: "Archive chat"
+                     },
+                     {
+                         icon: dialog.isPinned ? "unpin" : "pin",
+                         title: dialog.isPinned ? "Unpin from top" : "Pin to top"
+                     },
+                     {
+                         icon: "info",
+                         title: dialog.peer instanceof ChannelPeer ? "View channel info" : (dialog.peer instanceof GroupPeer || dialog.peer instanceof SupergroupPeer ? "View group info" : "View profile")
+                     },
+                     {
+                         icon: dialog.isMuted ? "unmute" : "mute",
+                         title: dialog.isMuted ? "Enable notifications" : "Disable notifications"
+                     },
+                     {
+                         icon: unread !== "" ? "message" : "unread",
+                         title: unread !== "" ? "Mark as read" : "Mark as unread",
+                         onClick: _ => {
+                             dialog.API.markDialogUnread(unread === "")
+                         }
+                     },
+                     {
+                         icon: "delete",
+                         title: "Delete chat",
+                         red: true,
+                         onClick: _ => {
+                             ModalManager.open(<div className="delete-chat-title">
+                                     <DialogAvatarComponent dialog={dialog}/>
+                                     Delete Chat?
+                                 </div>,
+                                 <div className="delete-chat-body">
+                                     <span
+                                         className="text">Are you sure you want to delete chat with <b>{dialog.peer.name}</b>?</span>
+                                     <FlatButtonComponent red label={`Delete for me and ${dialog.peer.name}`}/>
+                                     <FlatButtonComponent red label="Delete just for me"/>
+                                     <FlatButtonComponent label="Cancel"/>
+                                 </div>)
+                         }
+                     },
+                 ])}>
 
                 <DialogAvatarComponent dialog={dialog}/>
 
@@ -165,11 +153,21 @@ export class DialogComponent extends Component {
                         <div
                             css-display={dialog.messages.unreadCount === 0 || dialog.messages.unreadMentionsCount > 0 ? "none" : ""}
                             className="badge tgico">{dialog.messages.unreadCount}</div>
-                        <div css-display={!dialog.unreadMark ? "none" : ""} className="badge tgico"></div>
+                        <div css-display={!dialog.unreadMark ? "none" : ""} className="badge tgico"/>
                     </div>
                 </div>
             </div>
         )
+    }
+
+    _handleClick() {
+        const p = this.props.dialog.peer.username ? `@${this.props.dialog.peer.username}` : `${this.props.dialog.peer.type}.${this.props.dialog.peer.id}`
+
+        AppFramework.Router.push("/", {
+            queryParams: {
+                p
+            }
+        })
     }
 
     mounted() {
@@ -223,23 +221,6 @@ export class DialogComponent extends Component {
     eventFired(bus, event) {
         if (bus === AppEvents.Dialogs && patchAndResortEventTypes.has(event.type)) {
             this._patchAndResort()
-        }
-    }
-
-    /**
-     * Handles Peer updates
-     * @param event
-     * @private
-     */
-    _handlePeerUpdates(event) {
-        if (event.peer === this.props.dialog.peer) {
-            if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
-                console.log("patch peer update photo")
-                this.__patch()
-            } else if (event.type === "updateUserStatus") {
-                this.__patch()
-                console.log("patch peer update status")
-            }
         }
     }
 

@@ -1,5 +1,6 @@
 import MappedStore from "./MappedStore"
 import {PeerAPI} from "../peerAPI"
+import MTProto from "../../mtproto"
 
 /**
  * @property {Map<string, Map<number, Peer>>} _data
@@ -9,10 +10,13 @@ class PeersMapStore extends MappedStore {
         super({
             initialData: new Map([
                 ["chat", new Map()],
+                ["chatForbidden", new Map()],
                 ["channel", new Map()],
                 ["user", new Map()],
             ])
-        });
+        })
+
+        this._self = undefined
     }
 
     /**
@@ -20,6 +24,17 @@ class PeersMapStore extends MappedStore {
      */
     get data() {
         return super.data
+    }
+
+    /**
+     * @return {Peer}
+     */
+    self() {
+        if (!this._self) {
+            this._self = this.get("user", MTProto.getAuthorizedUser().user.id)
+        }
+
+        return this._self
     }
 
     /**
@@ -54,8 +69,6 @@ class PeersMapStore extends MappedStore {
      * @return {this}
      */
     set(peer) {
-        // todo: make this check
-        // if (peer instanceof Peer) {
         if (this.data.has(peer.type)) {
             this.data.get(peer.type).set(peer.id, peer)
             return this
@@ -63,9 +76,6 @@ class PeersMapStore extends MappedStore {
             console.error("invalid peer type", peer)
             return this
         }
-        // } else {
-        //     console.error("the given peer is not Peer instance")
-        // }
     }
 
     /**

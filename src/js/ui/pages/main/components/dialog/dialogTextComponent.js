@@ -43,16 +43,8 @@ export const DialogTextComponent = ({dialog}) => {
         )
     }
 
-    if (Object.keys(dialog.messageActions).length === 0) {
-        return (
-            <Text user={dialog.messages.last.prefix}
-                  text={dialog.messages.last.text} entities={dialog.messages.last.entities}/>
-        )
-    }
-
-    // typing by default? what? fixme please
     return (
-        <Action user={""}
-                action={"typing..."}/>
+        <Text user={dialog.messages.last.prefix}
+              text={dialog.messages.last.text} entities={dialog.messages.last.entities}/>
     )
 }

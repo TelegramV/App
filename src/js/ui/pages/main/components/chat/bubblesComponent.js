@@ -3,10 +3,14 @@ import AppEvents from "../../../../../api/eventBus/appEvents"
 import {FileAPI} from "../../../../../api/fileAPI"
 import {isElementInViewport} from "../../../../framework/utils"
 
-import Message from "./../../messages/newMessage"
+import MessageComponent from "./../../messages/newMessage"
 import Component from "../../../../framework/vrdom/component"
 import VRDOM from "../../../../framework/vrdom"
+import {vrdom_deepDeleteRealNode, vrdom_deepDeleteRealNodeInnerComponents} from "../../../../framework/vrdom/patch"
+import {MessageType} from "../../../../../api/dataObjects/messages/message"
 
+
+const MessageComponentGeneral = message => <MessageComponent message={message}/>
 
 class BubblesComponent extends Component {
     constructor(props) {
@@ -17,11 +21,10 @@ class BubblesComponent extends Component {
         }
 
         this.state = {
-            /**
-             * @var {Array<Node|Element>|[]} renderedMessageElements
-             */
-            renderedMessageElements: [],
+            renderedMessages: new Map(),
             isFetchingNextPage: false,
+            isFetching: false,
+            messagesWaitingForRendering: new Set()
         }
 
         this.elements = {
@@ -37,7 +40,6 @@ class BubblesComponent extends Component {
                 <div id="bubbles-inner">
 
                 </div>
-                <div class="anchor"></div>
             </div>
         )
     }
@@ -55,9 +57,27 @@ class BubblesComponent extends Component {
                 } else if (event.type === "fetchedMessagesNextPage") {
                     this._appendMessages(event.messages)
                 } else if (event.type === "newMessage") {
-                    if (isElementInViewport(this._prependMessages([event.message])[0])) {
-                        this._markAllAsRead()
+                    if (!this.state.isFetching) {
+                        if (isElementInViewport(this._prependMessages([event.message])[0])) {
+                            this._markAllAsRead()
+                        }
+                    } else {
+                        this.state.messagesWaitingForRendering.add(event.message)
                     }
+                } else if (event.type === "editMessage") {
+                    const $el = this.state.renderedMessages.get(event.message.id)
+
+                    if ($el) {
+                        VRDOM.patch($el, MessageComponentGeneral(event.message))
+                    }
+                } else if (event.type === "deleteMessages") {
+                    event.messages.forEach(messageId => {
+                        const $el = this.state.renderedMessages.get(messageId)
+
+                        if ($el) {
+                            vrdom_deepDeleteRealNode($el)
+                        }
+                    })
                 } else {
 
                 }
@@ -87,13 +107,20 @@ class BubblesComponent extends Component {
      * @param {Message} message
      * @param prepend
      * @private
-     * @return {Element|Node}
+     * @return {Element|Node|boolean}
      */
     _renderMessage(message, prepend = false) {
 
+        if (this.state.renderedMessages.has(message.id)) {
+            return false
+        }
+
         const $mount = prepend ? VRDOM.prepend : VRDOM.append
+
         let $message = undefined
-        $message = $mount(<Message message={message}/>, this.elements.$bubblesInner); //TODO Давид поправ як має бути
+
+        $message = $mount(MessageComponentGeneral(message), this.elements.$bubblesInner); //TODO Давид поправ як має бути
+
         if (message.media) {
             if (message.media.photo) {
 
@@ -110,7 +137,7 @@ class BubblesComponent extends Component {
                         thumbnail: true
                     }
 
-                    VRDOM.patch($message, <Message message={message}/>);
+                    VRDOM.patch($message, MessageComponentGeneral(message));
                 }
 
                 FileAPI.getFile(message.media.photo, max.type).then(file => {
@@ -119,7 +146,7 @@ class BubblesComponent extends Component {
                         sizes: [max.w, max.h],
                         thumbnail: false
                     }
-                    VRDOM.patch($message, <Message message={message}/>);
+                    VRDOM.patch($message, MessageComponentGeneral(message));
                 })
             }
             if (message.media.webpage && message.media.webpage.photo) {
@@ -127,20 +154,20 @@ class BubblesComponent extends Component {
                     message.media.webpage.photo.real = {
                         url: data.src
                     }
-                    VRDOM.patch($message, <Message message={message}/>);
+                    VRDOM.patch($message, MessageComponentGeneral(message));
                 })
             }
             if (message.media.document) {
-                if (message.type === "sticker") {
+                if (message.type === MessageType.STICKER) {
                     FileAPI.getFile(message.media.document).then(data => {
                         message.media.document.real = {url: data};
-                        VRDOM.patch($message, <Message message={message}/>);
+                        VRDOM.patch($message, MessageComponentGeneral(message));
                     });
                 }
-                if (message.type === "round" || message.type === "video" || message.type === "audio") {
+                if (message.type === MessageType.ROUND || message.type === MessageType.VIDEO || message.type === MessageType.AUDIO) {
                     FileAPI.getFile(message.media.document, "").then(data => {
                         message.media.document.real = {url: data};
-                        VRDOM.patch($message, <Message message={message}/>);
+                        VRDOM.patch($message, MessageComponentGeneral(message));
                     });
                 }
             }
@@ -177,10 +204,13 @@ class BubblesComponent extends Component {
         let k = this.elements.$bubblesInner.clientHeight
 
         for (const message of messages) {
-            this.state.renderedMessageElements.push(this._renderMessage(message))
+            const $rendered = this._renderMessage(message)
+
+            if ($rendered) {
+                this.state.renderedMessages.set(message.id, $rendered)
+            }
+            this.$el.scrollTop += this.elements.$bubblesInner.clientHeight - k
         }
-        //TODO fix initial scroll position
-        //this.$el.scrollTop += this.elements.$bubblesInner.clientHeight - k
     }
 
     /**
@@ -197,11 +227,13 @@ class BubblesComponent extends Component {
         const pushed = []
 
         for (const message of messages) {
-            // todo sticky date
-            // todo push only new
-            const rendered = this._renderMessage(message, true)
-            this.state.renderedMessageElements.push(rendered)
-            pushed.push(rendered)
+            const $rendered = this._renderMessage(message, true)
+
+            if ($rendered) {
+                this.state.renderedMessages.set(message.id, $rendered)
+            }
+
+            pushed.push($rendered)
         }
 
         if (reset) {
@@ -212,20 +244,24 @@ class BubblesComponent extends Component {
     }
 
     _refreshMessages() {
+        this.state.isFetching = true
         this._toggleMessagesLoader(false)
         this._clearBubbles()
 
         this.reactive.dialog.API.fetchInitialMessages().then(messages => {
             this._toggleMessagesLoader(true)
+            this.state.isFetching = false
+            this.state.messagesWaitingForRendering.forEach(message => {
+                this._prependMessages([message])
+            })
+            this.state.messagesWaitingForRendering.clear()
         })
     }
 
     _clearBubbles() {
-        this.state.renderedMessageElements = []
+        this.state.renderedMessages.clear()
 
-        while (this.elements.$bubblesInner.firstChild) {
-            this.elements.$bubblesInner.firstChild.remove()
-        }
+        vrdom_deepDeleteRealNodeInnerComponents(this.elements.$bubblesInner)
     }
 
     _markAllAsRead() {
@@ -239,8 +275,11 @@ class BubblesComponent extends Component {
         if ($element.scrollTop === 0 && !this.state.isFetchingNextPage) {
             this.state.isFetchingNextPage = true
 
+            this._toggleMessagesLoader(false)
+
             this.reactive.dialog.API.fetchNextPage().then(() => {
                 this.state.isFetchingNextPage = false
+                this._toggleMessagesLoader(true)
             })
 
         } else if ($bi) {

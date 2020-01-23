@@ -47,9 +47,10 @@ function vrdom_jsx(tagName, attributes, ...children) {
 
             if (key.startsWith("on")) {
                 events.set(key.substring(2).toLowerCase(), v)
-            } else if (key === "dangerouslySetInnerHTML") {
+            } else if (key === "dangerouslySetInnerHTML" || key === "dangerouslysetinnerhtml") {
                 dangerouslySetInnerHTML = v
-                attrs[key] = v
+                console.log(v)
+                attrs["f-dsil"] = true
             } else if (key.startsWith("css-")) {
                 const styleKey = key.substring(4)
 

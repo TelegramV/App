@@ -1,7 +1,7 @@
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 import {ChatInputManager} from "../chatInput/chatInputComponent";
 
-const MessageWrapperComponent = ({ message, transparent = false, slot }) => {
+const MessageWrapperComponent = ({message, transparent = false, slot}) => {
     const className = {
         "channel": message.isPost,
         "out": !message.isPost && message.isOut,
@@ -25,30 +25,31 @@ const MessageWrapperComponent = ({ message, transparent = false, slot }) => {
     const cssBackgroundImage = hasAvatar ? `url(${from.photo.smallUrl})` : "none"
 
     return (
-        <div className={className} data-id={message.id} data-peer={`${from.type}.${from.id}`} onContextMenu={ContextMenuManager.listener([
-            {
-                icon: "reply",
-                title: "Reply",
-                onClick: l => ChatInputManager.replyTo(message)
-            },
-            {
-                icon: "copy",
-                title: "Copy"
-            },
-            {
-                icon: "pin",
-                title: "Pin"
-            },
-            {
-                icon: "forward",
-                title: "Forward"
-            },
-            {
-                icon: "delete",
-                title: "Delete",
-                red: true
-            },
-        ])} onDoubleClick={l => ChatInputManager.replyTo(message)}>
+        <div className={className} id={`message-${message.id}`}
+             onContextMenu={ContextMenuManager.listener([
+                 {
+                     icon: "reply",
+                     title: "Reply",
+                     onClick: l => ChatInputManager.replyTo(message)
+                 },
+                 {
+                     icon: "copy",
+                     title: "Copy"
+                 },
+                 {
+                     icon: "pin",
+                     title: "Pin"
+                 },
+                 {
+                     icon: "forward",
+                     title: "Forward"
+                 },
+                 {
+                     icon: "delete",
+                     title: "Delete",
+                     red: true
+                 },
+             ])} onDoubleClick={l => ChatInputManager.replyTo(message)}>
             {!message.isPost && className.in ? (
                 <div className={classes}
                      css-background-image={cssBackgroundImage}>

@@ -2,8 +2,8 @@ import {Peer} from "./peer";
 
 export class ChannelForbiddenPeer extends Peer {
 
-    constructor(rawPeer) {
-        super(rawPeer)
+    constructor(rawPeer, dialog = undefined) {
+        super(rawPeer, dialog)
     }
 
     /**
