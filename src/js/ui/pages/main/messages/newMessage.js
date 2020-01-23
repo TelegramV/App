@@ -12,6 +12,7 @@ import DocumentMessageComponent from "../components/chat/message/documentMessage
 import PhoneCallMessageComponent from "../components/chat/message/phoneCallMessageComponent";
 import LocationMessageComponent from "../components/chat/message/locationMessageComponent";
 import GameMessageComponent from "../components/chat/message/gameMessageComponent";
+import InvoiceMessageComponent from "../components/chat/message/invoiceMessageComponent";
 import {MessageType} from "../../../../api/dataObjects/messages/message"
 
 /**
@@ -25,7 +26,7 @@ const handlers = new Map([
     [MessageType.VENUE, LocationMessageComponent],
     [MessageType.GAME, GameMessageComponent],
     //POLL
-    //INVOICE
+    [MessageType.INVOICE, InvoiceMessageComponent], //requires encryption, component just tells to use other app
     [MessageType.WEB_PAGE, WebpageMessageComponent],
     [MessageType.CONTACT, ContactMessageComponent],
     [MessageType.DOCUMENT, DocumentMessageComponent],
