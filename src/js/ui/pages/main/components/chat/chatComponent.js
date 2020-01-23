@@ -55,12 +55,21 @@ class ChatComponent extends Component {
         )
     }
 
+    mounted() {
+        this.$noChat = this.$el.querySelector("#noChat")
+        this.$chat = this.$el.querySelector("#chat")
+    }
+
     reactiveChanged(key, value) {
         if (key === "dialog") {
             if (value) {
-                this.$el.classList.add("responsive-selected-chat")
+                this.$noChat.style.display = "none"
+                this.$chat.style.display = ""
+                this.$chat.classList.add("responsive-selected-chat")
             } else {
-                this.$el.classList.remove("responsive-selected-chat")
+                this.$noChat.style.display = ""
+                this.$chat.style.display = "none"
+                this.$chat.classList.remove("responsive-selected-chat")
             }
         }
     }

@@ -52,6 +52,10 @@ class DialogsMapStore extends MappedStore {
      * @return {this}
      */
     set(dialog) {
+        if (!dialog) {
+            console.error("BUG (DialogsStore): invalid peer was provided!")
+            return this
+        }
         // todo: make this check
         // if (dialog instanceof Dialog) {
         if (this.data.has(dialog.peer.type)) {

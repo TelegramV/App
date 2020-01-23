@@ -10,6 +10,7 @@ import {PeerAPI} from "../peerAPI"
 import DialogsStore from "../store/dialogsStore"
 import AppEvents from "../eventBus/appEvents"
 import AppSelectedDialog from "./selectedDialog"
+import PeersStore from "../store/peersStore"
 
 class DialogManager extends Manager {
     constructor() {
@@ -148,7 +149,15 @@ class DialogManager extends Manager {
         let dialog = DialogsStore.get(type, id)
 
         if (!dialog) {
-            dialog = await this.getPeerDialogs({_: type, id})
+            let peer = PeersStore.get(type, id)
+
+            if (peer) {
+                dialog = peer.dialog
+                DialogsStore.set(dialog)
+            } else {
+                dialog = await this.getPeerDialogs({_: type, id})
+                DialogsStore.set(dialog)
+            }
         }
 
         return dialog

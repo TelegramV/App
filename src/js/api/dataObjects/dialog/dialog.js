@@ -140,6 +140,15 @@ export class Dialog {
             read_inbox_max_id: 0,
             read_outbox_max_id: 0,
             unread_mentions_count: 0,
+            notify_settings: {
+                _: "peerNotifySettings",
+                pFlags: {},
+                flags: 0,
+                show_previews: true,
+                silent: false,
+                mute_until: 0,
+                sound: "default"
+            },
         }, peer, lastMessage)
     }
 
