@@ -20,8 +20,8 @@ const handlers = new Map([
     [MessageType.TEXT, TextMessageComponent],
     [MessageType.PHOTO, PhotoMessageComponent],
     [MessageType.GEO, LocationMessageComponent],
-    //GEO_LIVE
-    //VENUE
+    [MessageType.GEO_LIVE, LocationMessageComponent],
+    [MessageType.VENUE, LocationMessageComponent],
     //GAME
     //POLL
     //INVOICE
