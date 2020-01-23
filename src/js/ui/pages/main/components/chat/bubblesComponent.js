@@ -40,7 +40,6 @@ class BubblesComponent extends Component {
                 <div id="bubbles-inner">
 
                 </div>
-                <div class="anchor"/>
             </div>
         )
     }
@@ -210,6 +209,7 @@ class BubblesComponent extends Component {
             if ($rendered) {
                 this.state.renderedMessages.set(message.id, $rendered)
             }
+            this.$el.scrollTop += this.elements.$bubblesInner.clientHeight - k
         }
     }
 

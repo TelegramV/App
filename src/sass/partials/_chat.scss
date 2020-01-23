@@ -7,6 +7,7 @@
 .chat-wrapper {
     display: flex;
     width: 100%;
+
     #noChat {
         align-self: center;
         margin: auto;
@@ -199,7 +200,6 @@
             }
 
             #bubbles-inner {
-                overflow-anchor: none;
                 max-width: $max-chat-width;
                 width: 100%;
                 display: flex;
@@ -224,14 +224,9 @@
                 }
             }
 
-            .anchor {
-                overflow-anchor: auto;
-                height: 1px;
-            }
-
             /*
             MESSAGES NOW IN _message.scss!
-        */
+        	*/
         }
     }
 }
