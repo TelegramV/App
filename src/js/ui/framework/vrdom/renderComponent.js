@@ -24,10 +24,11 @@ function vrdom_renderComponentVNode(componentVNode) {
     
     vNode.attrs["data-component-id"] = newId
 
-    AppFramework.mountedComponents.set(newId, componentInstance)
+    AppFramework.MountedComponents.set(newId, componentInstance)
 
     componentInstance.__created()
     componentInstance.created()
+    AppFramework.Plugins.forEach(plugin => plugin.componentCreated(componentInstance))
     componentInstance.__.created = true
 
     return vrdom_render(vNode)

@@ -4,12 +4,24 @@ import VRDOM from "./vrdom"
 global.VRDOM = VRDOM
 
 /**
+ * @type {Set<VRDOMPlugin>}
+ */
+const Plugins = new Set()
+
+/**
  * @type {Map<string, Component>}
  */
-const mountedComponents = new Map()
+const MountedComponents = new Map()
 
+/**
+ * @type {FrameworkRouter}
+ */
 const Router = new FrameworkRouter()
 
+
+/**
+ * @param {string} selector
+ */
 function mount(selector) {
     const $mountElement = document.querySelector(selector)
 
@@ -20,10 +32,19 @@ function mount(selector) {
     }
 }
 
+/**
+ * @param {VRDOMPlugin} vRDOMPlugin
+ */
+function registerPlugin(vRDOMPlugin) {
+    Plugins.add(vRDOMPlugin)
+}
+
 export const AppFramework = {
     Router,
-    mountedComponents,
+    MountedComponents,
+    Plugins,
     mount,
+    registerPlugin,
 }
 
 global.F = AppFramework

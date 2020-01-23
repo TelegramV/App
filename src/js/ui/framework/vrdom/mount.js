@@ -14,7 +14,7 @@ import AppFramework from "../framework"
  */
 export function vrdom_mount_resolveComponentMounted($mounted) {
     if ($mounted.nodeType !== Node.TEXT_NODE && $mounted.hasAttribute("data-component-id")) {
-        const component = AppFramework.mountedComponents.get($mounted.getAttribute("data-component-id"))
+        const component = AppFramework.MountedComponents.get($mounted.getAttribute("data-component-id"))
 
         if (component) {
             component.$el = $mounted
@@ -23,6 +23,7 @@ export function vrdom_mount_resolveComponentMounted($mounted) {
                 component.__.mounted = true
                 component.__mounted()
                 component.mounted()
+                AppFramework.Plugins.forEach(plugin => plugin.componentMounted(component))
             }
         } else {
             console.error("component was not found. it means that there is a potential bug in the vrdom")
@@ -33,6 +34,8 @@ export function vrdom_mount_resolveComponentMounted($mounted) {
 function vrdom_mount(vNode, $target) {
     const $mounted = vrdom_realMount(vrdom_render(vNode), $target)
 
+    AppFramework.Plugins.forEach(plugin => plugin.elementMounted($mounted))
+
     vrdom_mount_resolveComponentMounted($mounted)
 
     return $mounted
@@ -41,10 +44,9 @@ function vrdom_mount(vNode, $target) {
 /**
  * @param {Element} $node
  * @param {Element|string} $target
- * @param vNode
  * @return {Element|Node}
  */
-export function vrdom_realMount($node, $target, vNode = undefined) {
+export function vrdom_realMount($node, $target) {
     if (typeof $target === "string") {
         $target = document.querySelector($target)
     }

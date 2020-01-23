@@ -133,7 +133,7 @@ export class DialogListComponent extends Component {
         })
 
         AppEvents.Dialogs.subscribe("newMessage", event => {
-            if (!AppFramework.mountedComponents.has(`dialog-${event.dialog.peer.type}-${event.dialog.peer.id}`)) {
+            if (!AppFramework.MountedComponents.has(`dialog-${event.dialog.peer.type}-${event.dialog.peer.id}`)) {
                 this._renderDialog(event.dialog, "prepend")
             }
         })

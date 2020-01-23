@@ -85,7 +85,7 @@ export class FrameworkRouter {
             } else {
                 // console.log("[router] triggering replace")
                 // todo: patch tree not delete it
-                AppFramework.mountedComponents.forEach(c => {
+                AppFramework.MountedComponents.forEach(c => {
                     c.__delete()
                 })
 

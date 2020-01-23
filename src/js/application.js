@@ -10,6 +10,7 @@ import {loadSchema} from "./mtproto/language/schema"
 import PeersStore from "./api/store/peersStore"
 import AppEvents from "./api/eventBus/appEvents"
 import {createNonce} from "./mtproto/utils/bin"
+import RipplePlugin from "./ui/plugins/RipplePlugin"
 
 const isProduction = false
 
@@ -26,6 +27,8 @@ function start() {
             // TODO country response.country
         }
     })
+
+    AppFramework.registerPlugin(RipplePlugin)
 
     AppFramework.Router.route("/login", "login", {
         h() {
