@@ -11,8 +11,10 @@ $darkgreen: #50af4f;
 
 $dotgreen: #0ac630;
 
+$verylightgrey: #eceef2;
 $lightgrey: #dadce0;
 $grey: #c4c9cc;
+$dark: #222;
 $darkgrey: #707579;
 $darkgreytext: #8b8b8b;
 $darkgreyicon: #8c8c8c;
@@ -38,7 +40,7 @@ $instantview-link-foreground: #348AE1;
 $instantview-light-blue: #F3F8FC;
 
 @function anim($elem) {
-	@return 150ms ease-out $elem;
+	@return 150ms ease-in-out $elem;
 }
 
 @import "ico";
