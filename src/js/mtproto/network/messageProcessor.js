@@ -23,6 +23,7 @@ export class MessageProcessor {
             "msgs_ack": this.processMessagesAck.bind(this),
             "bad_server_salt": this.processBadServerSalt.bind(this),
             "new_session_created": this.processNewSessionCreated.bind(this),
+            "msg_new_detailed_info": this.processMessageNewDetailedInfo.bind(this)
         }
     }
 
@@ -72,6 +73,10 @@ export class MessageProcessor {
     processBadServerSalt(message, messageID, sessionID) {
         this.networker.updateServerSalt(longToBytes(message.new_server_salt))
         this.networker.resendMessage(message.bad_msg_id)
+    }
+
+    processMessageNewDetailedInfo(message, messageID, sessionID) {
+        // dunno what's this for but whatever
     }
 
     processPong(message, messageID, sessionID) {

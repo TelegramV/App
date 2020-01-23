@@ -134,6 +134,12 @@ function mt_inob_send_init(socket, url)
     obfuscation_init[url] = true;
 }
 
+export function mt_inob_clear(url) {
+    delete obfuscation_init[url]
+    delete aes_encryptors[url]
+    delete aes_decryptors[url]
+}
+
 export function mt_inob_send(socket, buffer, buffer_len, url)
 {
     if(!obfuscation_init[url])
