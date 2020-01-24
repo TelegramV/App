@@ -1,7 +1,7 @@
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 import {ChatInputManager} from "../chatInput/ChatInputComponent";
 
-const MessageWrapperComponent = ({message, transparent = false, slot}) => {
+const MessageWrapperComponent = ({message, transparent = false, slot, noPad = false}) => {
     const className = {
         "channel": message.isPost,
         "out": !message.isPost && message.isOut,
@@ -13,6 +13,11 @@ const MessageWrapperComponent = ({message, transparent = false, slot}) => {
         "transparent": transparent,
         "read": message.isRead,
         "sent": !message.isRead //TODO more convenient method to do this
+    }
+
+    let messageClasses = {
+        "message": true,
+        "no-pad": noPad
     }
 
     const from = message.from
@@ -57,7 +62,9 @@ const MessageWrapperComponent = ({message, transparent = false, slot}) => {
                 </div>
             ) : ""}
             <div className={wrapClasses}>
-                {slot}
+                <div className={messageClasses}>
+                    {slot}
+                </div>
             </div>
         </div>
     )

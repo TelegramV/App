@@ -22,6 +22,17 @@
     height: 64px;
     font-size: 8px;
   }
+
+  &.paused {
+    &:indeterminate {
+      animation: none;
+
+      &::before {
+        animation: none;
+        border: none;
+      }
+    }
+  }
 }
 
 .full-size-loader {

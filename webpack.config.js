@@ -4,7 +4,7 @@ const path = require("path")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const {CleanWebpackPlugin} = require("clean-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
-
+const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 
 require("@babel/polyfill")
@@ -35,6 +35,9 @@ const config = {
         }),
         new HtmlWebpackPlugin({template: "./src/index.html"}),
         new CleanWebpackPlugin(),
+        new FilterWarningsPlugin({
+          exclude: /Critical dependency: the request of a dependency is an expression/,
+        }),
     ],
     module: {
         rules: [
@@ -87,7 +90,6 @@ const config = {
             chunks: "all"
         }
     },
-    externals: [{ '@lottiefiles/lottie-player': '@lottiefiles/lottie-player' }],
 }
 
 module.exports = config

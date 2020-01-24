@@ -1,4 +1,4 @@
-figure.photo, figure.video {
+figure.photo, figure.video, figure.round-video {
   background-color: black;
   position: relative;
   display: flex;
@@ -11,6 +11,14 @@ figure.photo, figure.video {
     >img {
       filter: blur(10px);
       transform: scale(1.2);
+    }
+  }
+
+  &.round-video {
+    border-radius: 100%;
+
+    video {
+      width: 100%;
     }
   }
 
@@ -39,7 +47,7 @@ figure.photo, figure.video {
       >.tgico {
         position: relative;
         color: white;
-        font-size: 40px;
+        font-size: 32px;
       }
     }
 

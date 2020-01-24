@@ -13,12 +13,10 @@ const LocationMessageComponent = ({message}) => {
 			)
 	}
 	return (
-		<MessageWrapperComponent message={message}>
-			<div class="message no-pad">
-				{venue}
-				<div class="media-wrapper">
-					<MapComponent long={geo.long} lat={geo.lat}/>
-				</div>
+		<MessageWrapperComponent message={message} noPad>
+			{venue}
+			<div class="media-wrapper">
+				<MapComponent long={geo.long} lat={geo.lat}/>
 			</div>
 		</MessageWrapperComponent>
 	)

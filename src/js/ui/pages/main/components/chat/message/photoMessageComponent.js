@@ -56,14 +56,11 @@ import {PhotoComponent} from "../../basic/photoComponent";
 // }
 
 const PhotoMessageComponent = ({message}) => {
-    console.log("PhotoMessageComponent!", message.media.photo)
     return (
-        <MessageWrapperComponent message={message}>
-            <div className="message no-pad">
-                <PhotoComponent photo={message.media.photo}/>
+        <MessageWrapperComponent message={message} noPad>
+            <PhotoComponent photo={message.media.photo}/>
 
-                <TextWrapperComponent message={message}/>
-            </div>
+            <TextWrapperComponent message={message}/>
         </MessageWrapperComponent>
     )
 }

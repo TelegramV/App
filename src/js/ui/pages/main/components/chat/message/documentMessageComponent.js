@@ -51,7 +51,7 @@ function getColor(extension) {
 
 function getFilename(attrs) {
 	for(const elem of attrs) {
-		if(elem._=="documentAttributeFilename") {
+		if(elem._==="documentAttributeFilename") {
 			return elem.file_name;
 		}
 	}
