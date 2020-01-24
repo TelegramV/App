@@ -1,6 +1,6 @@
 import "../sass/application.scss"
 
-import "./ui/vendor/tgs_player"
+import "@lottiefiles/lottie-player"
 import AppFramework from "./ui/framework/framework"
 import MTProto from "./mtproto"
 import {MainPage} from "./ui/pages/main/mainPage"
@@ -10,6 +10,7 @@ import {loadSchema} from "./mtproto/language/schema"
 import PeersStore from "./api/store/peersStore"
 import AppEvents from "./api/eventBus/appEvents"
 import {createNonce} from "./mtproto/utils/bin"
+import RipplePlugin from "./ui/plugins/RipplePlugin"
 
 const isProduction = false
 
@@ -26,6 +27,8 @@ function start() {
             // TODO country response.country
         }
     })
+
+    AppFramework.registerPlugin(RipplePlugin)
 
     AppFramework.Router.route("/login", "login", {
         h() {

@@ -1,5 +1,6 @@
 import vrdom_render from "./render"
 import {vrdom_mount_resolveComponentMounted} from "./mount"
+import AppFramework from "../framework"
 
 /**
  * @param vNode
@@ -9,6 +10,8 @@ import {vrdom_mount_resolveComponentMounted} from "./mount"
  */
 function vrdom_append(vNode, $element, {xmlns = null} = {}) {
     const $mounted = $element.appendChild(vrdom_render(vNode, xmlns))
+
+    AppFramework.Plugins.forEach(plugin => plugin.elementMounted($mounted))
 
     vrdom_mount_resolveComponentMounted($mounted)
 

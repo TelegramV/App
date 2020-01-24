@@ -2,6 +2,7 @@ import {ComponentVRNode} from "./componentVRNode"
 import {VRNode} from "./VRNode"
 import vrdom_renderComponentVNode from "./renderComponent"
 import vrdom_append from "./appendChild"
+import AppFramework from "../framework"
 
 const _XML_NAMESPACES = new Map([
     ["svg", "http://www.w3.org/2000/svg"]
@@ -66,6 +67,8 @@ function vrdom_render(vNode, xmlns = null) {
             //     $node.addEventListener(k, v)
             // }
         }
+
+        AppFramework.Plugins.forEach(plugin => plugin.elementCreated($node))
 
         for (const child of vNode.children) {
             vrdom_append(child, $node, {xmlns})

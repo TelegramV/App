@@ -86,7 +86,8 @@ const config = {
         splitChunks: {
             chunks: "all"
         }
-    }
+    },
+    externals: [{ '@lottiefiles/lottie-player': '@lottiefiles/lottie-player' }],
 }
 
 module.exports = config

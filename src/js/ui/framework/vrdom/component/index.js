@@ -2,6 +2,9 @@ import AppFramework from "../../framework"
 import VRDOM from "../index"
 import {vrdom_deepDeleteRealNodeInnerComponents} from "../patch"
 
+/**
+ * @property {Element|Node} $el
+ */
 class Component {
     constructor(props) {
         this.__ = {
@@ -10,6 +13,7 @@ class Component {
             destroyed: false,
             created: false,
             patchingSelf: false,
+
             /**
              * @type {Map<string, *>}
              */
@@ -21,7 +25,6 @@ class Component {
             appEventContexts: new Map(),
 
             reactiveInited: false
-
         }
 
         /**
@@ -44,7 +47,7 @@ class Component {
         this.props = props.props || {}
         this.slot = props.slot
 
-        this.refs = AppFramework.mountedComponents
+        this.refs = AppFramework.MountedComponents
     }
 
     /**
@@ -105,7 +108,7 @@ class Component {
         this.destroy()
         this.__disableReactive()
         this.__deepDeleteInnerComponents()
-        AppFramework.mountedComponents.delete(this.identifier)
+        AppFramework.MountedComponents.delete(this.identifier)
         this.$el.remove()
     }
 
