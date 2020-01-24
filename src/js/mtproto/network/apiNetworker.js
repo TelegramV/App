@@ -172,7 +172,10 @@ export class ApiNetworker extends Networker {
     }
 
     onConnect() {
-        document.querySelector("#connecting_message").style.display = "none"
+        const q = document.querySelector("#connecting_message")
+        if(q) {
+            q.style.display = "none"
+        }
         this.connected = true
     }
 

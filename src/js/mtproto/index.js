@@ -11,6 +11,7 @@ import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import Bytes from "./utils/bytes"
 import authKeyCreation from "./connect/authKeyCreation"
 import {FileNetworker} from "./network/fileNetworker";
+import {AppFramework} from "../ui/framework/framework";
 
 window.id = 202466030
 window.send = (method, params) => {
@@ -56,7 +57,7 @@ class MobileProtocolAPIAuth {
     }
 
     signUp(phoneNumber, phoneCodeHash, firstName, lastName, options = {}) {
-        return this.MTProto.invokeMethod("auth.signUp", Object.assign({
+        return this.MTProto.invokeMethod("auth.signU", Object.assign({
             phone_number: phoneNumber,
             phone_code_hash: phoneCodeHash,
             first_name: firstName,
@@ -205,6 +206,11 @@ class MobileProtocol {
         }
 
         return this.networker.invokeMethod(method, parameters)
+    }
+
+    logout() {
+        AppPermanentStorage.clear()
+        AppFramework.Router.push("/login", {})
     }
 
     isUserAuthorized() {

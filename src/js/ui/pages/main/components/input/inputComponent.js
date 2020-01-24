@@ -56,6 +56,24 @@ export class InputComponent extends Component {
             target.previousValue = target.value
             target.previousSelectionStart = target.selectionStart
             target.previousSelectionEnd = target.selectionEnd
+        } else {
+            const previousValue = target.previousValue || ""
+            const previousSelectionStart = target.previousSelectionStart || 0
+            const previousSelectionEnd = target.previousSelectionEnd || 0
+
+            if (input && !input(ev)) {
+                target.value = previousValue
+                target.setSelectionRange(previousSelectionStart, previousSelectionEnd)
+            } else {
+                if(this.error) {
+                    this.error = undefined
+                }
+            }
+            this.state.value = target.value
+
+            target.previousValue = target.value
+            target.previousSelectionStart = target.selectionStart
+            target.previousSelectionEnd = target.selectionEnd
         }
     }
 

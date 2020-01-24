@@ -34,11 +34,29 @@ html, body, #app {
 		}
 	}
 
+	.qr-login-button {
+		width: 100%;
+		text-align: center;
+		cursor: pointer;
+		color: $bluehover;
+	}
+
 	.object {
 		display: block;
 		width: 160px;
 		height: 160px;
 		margin: 50px auto 42px 100px;
+
+		&.big {
+			width: 240px;
+			height: 240px;
+			margin: auto;
+			margin-bottom: 42px;
+
+			canvas {
+				width: 100%;
+			}
+		}
 	}
 
 	.info {
@@ -63,6 +81,10 @@ html, body, #app {
 		line-height: 22px;
 		margin-bottom: 25px;
 		padding: 0 60px;
+
+		ol {
+			text-align: left;
+		}
 	}
 
 	.btn {
@@ -177,7 +199,7 @@ html, body, #app {
 		}
 	}
 
-	#registerPane {
+	.registerPane {
 
 		.picture {
 			border-radius: 50%;
@@ -292,6 +314,7 @@ html, body, #app {
 
 #cropperModal {
 	.done-button {
+		z-index: 1;
 		position: absolute;
 		right: 20px;
 		bottom: 10px;

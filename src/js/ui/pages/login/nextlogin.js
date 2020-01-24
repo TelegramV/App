@@ -10,173 +10,20 @@ import {InputComponent} from "../main/components/input/inputComponent";
 import {CheckboxComponent} from "../main/components/input/checkboxComponent";
 import {ButtonWithProgressBarComponent} from "../main/components/input/buttonComponent";
 import Component from "../../framework/vrdom/component";
+import AppConfiguration from "../../../configuration";
+import UpdatesManager from "../../../api/updates/updatesManager";
+import {tsNow} from "../../../mtproto/timeManager";
+import {defaultDcID} from "../../../application";
+import {ModalComponent, ModalManager} from "../../modalManager";
 
 const Croppie = require("croppie")
+const QRCodeStyling = require("qr-code-styling")
 const Emoji = require("emoji-js");
 let emoji = new Emoji();
 
-let $countryInput = null
-let $list = null
-let $openDropdown = null
-let $parent = null
-let $phoneInput = null
-let $codeInput = null
-let $passwordInput = null
-let $peekBtn = null
-let $passwordNext = null
 let cropperEl
 let cropper;
 let pictureBlob;
-
-let Monkey = null
-
-let _formData = {}
-
-function isNumberValid(number) {
-    return number.length > 9
-}
-
-function isCodeValid(code) {
-    return /^\d{5}$/.test(code)
-}
-
-function resetNextButton(button, text = "NEXT") {
-    button.querySelector("span").innerHTML = text
-    button.querySelector("progress").style.display = "none"
-    button.dataset.loading = "0"
-}
-
-function handlePhoneSend() {
-    return event => {
-        event.preventDefault()
-        if (document.getElementById("next").disabled || document.getElementById("next").dataset.loading === "1") return
-
-        const phoneNumber = $phoneInput.value
-        document.querySelector("#next span").innerHTML = "PLEASE WAIT..."
-        document.querySelector("#next progress").style.display = "block"
-        document.getElementById("next").dataset.loading = "1"
-
-        if (isNumberValid(phoneNumber)) {
-
-            MTProto.Auth.sendCode(phoneNumber).then(sentCode => {
-                resetNextButton(document.getElementById("next"))
-
-                fadeOut(document.getElementById("phonePane"));
-                fadeIn(document.getElementById("codePane"));
-
-                let phone = document.getElementById("phonePreview");
-                if (phone.firstChild.tagName.toLowerCase() === "span") {
-                    phone.removeChild(phone.firstChild);
-                }
-                let text = document.createElement("span");
-                text.textContent = $phoneInput.value;
-                phone.prepend(text);
-                _formData.phoneNumber = phoneNumber
-                _formData.sentCode = sentCode
-            }, error => {
-                const messages = {
-                    PHONE_NUMBER_INVALID: "Invalid phone number",
-                    PHONE_NUMBER_BANNED: "Phone number is banned",
-                    PHONE_NUMBER_FLOOD: "Too many attempts",
-                    AUTH_RESTART: "Auth restarting"
-                }
-                if (error.type === "AUTH_RESTART") {
-                    window.location.reload() // TODO should probably save session state
-                }
-                const msg = messages[error.type] || "Error occured"
-                $phoneInput.classList.add("invalid");
-                $phoneInput.nextElementSibling.innerHTML = msg;
-                resetNextButton(document.getElementById("next"))
-            })
-        } else {
-
-            $phoneInput.classList.add("invalid");
-            $phoneInput.nextElementSibling.innerHTML = "Invalid phone number";
-            resetNextButton(document.getElementById("next"))
-        }
-    }
-}
-
-
-function handleSignUp() {
-    return event => {
-        event.preventDefault()
-
-        document.querySelector("#start span").innerHTML = "PLEASE WAIT..."
-        document.querySelector("#start progress").style.display = "block"
-        document.getElementById("start").dataset.loading = "1"
-
-        const firstName = document.getElementById("name").value
-        const lastName = document.getElementById("lastName").value
-
-        MTProto.Auth.signUp(_formData.phoneNumber, _formData.phoneCodeHash, firstName, lastName).then(async authorization => {
-            if (authorization._ === "auth.authorization") {
-                console.log("signup success!")
-                if (pictureBlob) {
-                    console.log(pictureBlob)
-                    FileAPI.uploadProfilePhoto("avatar.jpg", pictureBlob).then(l => {
-                        AppPermanentStorage.setItem("authorizationData", authorization)
-                        AppFramework.Router.push("/")
-                    }, error => {
-                        console.log(error)
-                    });
-                } else {
-                    AppPermanentStorage.setItem("authorizationData", authorization)
-                    AppFramework.Router.push("/")
-                }
-            } else {
-                console.log(authorization)
-            }
-        }, error => {
-            let msg = "Something went terribly wrong"
-            if (error.type === "FIRSTNAME_INVALID") {
-                msg = "Invalid first name"
-                document.getElementById("name").classList.add("invalid");
-                document.getElementById("name").nextElementSibling.innerHTML = msg;
-            } else if (error.type === "LASTNAME_INVALID") {
-                msg = "Invalid last name"
-                document.getElementById("lastName").classList.add("invalid");
-                document.getElementById("lastName").nextElementSibling.innerHTML = msg;
-            }
-            console.log(error)
-            resetNextButton(document.getElementById("start"), "START MESSAGING")
-        })
-    }
-}
-
-function toggleList() {
-    if (hasClass($list, "hidden")) {
-        showList()
-    } else {
-        hideList()
-    }
-}
-
-
-function hideList() {
-    $list.classList.add("hidden");
-    $parent.classList.add("down");
-    $parent.classList.remove("up");
-
-    $openDropdown.classList.add("tgico-down");
-    $openDropdown.classList.remove("tgico-up");
-
-}
-
-function showList() {
-    $list.classList.remove("hidden");
-    $parent.classList.remove("down");
-    $parent.classList.add("up");
-
-
-    $openDropdown.classList.remove("tgico-down");
-    $openDropdown.classList.add("tgico-up");
-}
-
-function fadeBack(elem) {
-    elem.classList.remove("fade-in");
-    elem.classList.add("hidden");
-}
 
 
 function successfulAuth() {
@@ -197,163 +44,6 @@ function generateFullDropdown() {
         }
     })
 }
-
-function fillDropdown(str) {
-    // while ($list.firstChild) {
-    //     $list.removeChild($list.firstChild);
-    // }
-    for (let i = 0; i < $list.childNodes.length; i++) {
-        let elem = $list.childNodes[i]
-        let name = elem.dataset.name
-        if (!str || str.length === 0 || countryTest(str, name)) {
-            elem.style.display = "flex"
-        } else {
-            elem.style.display = "none"
-        }
-    }
-
-    Array.from(document.getElementsByClassName("dropdown-item")).forEach(function (element) {
-        element.addEventListener("click", function (event) {
-            event.preventDefault();
-            $countryInput.value = event.currentTarget.dataset.name;
-            $phoneInput.value = event.currentTarget.dataset.code;
-            $phoneInput.dataset.code = event.currentTarget.dataset.code;
-            setTimeout(hideList, 1); //idk, it doesn't work without it
-        });
-    });
-}
-
-function countryTest(input, country) {
-    if (country.toLowerCase().includes(input.toLowerCase())) return true;
-    let split = country.split(/\b(?=[a-z])/ig);
-    if (split.length > 1) {
-        let abbr = split.map(token => token[0]).join("").toLowerCase();
-        if (abbr.includes(input.toLowerCase())) return true;
-    }
-}
-
-function formatPhoneNumber() {
-    let code = $phoneInput.dataset.code;
-    if (!code) { //Autofill... Make user select country again
-        $phoneInput.value = "";
-        $countryInput.value = "";
-        fillDropdown();
-        return;
-    }
-    let value = $phoneInput.value.substring(code.length).replace(/\s/g, '');
-
-    let newValue = "";
-    let second = true;
-    for (let d = value.length - 1; d > -1; d--) {
-        if (second) {
-            newValue = " " + newValue;
-        }
-        newValue = value[d] + newValue;
-        second = !second;
-    }
-    newValue = code + " " + newValue;
-    $phoneInput.value = newValue.trim();
-
-    if ($phoneInput.value.length > code.length) { //we have number
-        document.getElementById("next").disabled = false
-    } else {
-        document.getElementById("next").disabled = true
-    }
-
-    if ($phoneInput.classList.contains("invalid")) {
-        $phoneInput.classList.remove("invalid");
-        $phoneInput.nextElementSibling.innerHTML = "Phone Number";
-    }
-}
-
-
-function initDropdown() {
-
-    setInputFilter($countryInput, function (value) {
-        return /^[a-z]*$/i.test(value);
-    });
-
-    fillDropdown($countryInput.value);
-    $countryInput.addEventListener("focus", showList);
-    $countryInput.addEventListener("input", showList);
-    $openDropdown.onclick = l => {
-        toggleList()
-    }
-    //countryInput.addEventListener("blur", hideList); //conflict with arrow click
-    // $countryInput.parentElement.getElementsByClassName("arrow")[0].addEventListener("click", toggleList);
-
-    const k = ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"]
-    k.forEach(function (event) {
-        $countryInput.addEventListener(event, function () {
-            fillDropdown($countryInput.value);
-        });
-    });
-
-}
-
-let prevValue = ""
-
-function initCodeInput() {
-    $codeInput.addEventListener("focus", Monkey.smoothTrack.bind(Monkey));
-    $codeInput.addEventListener("input", Monkey.checkTrack.bind(Monkey)); //input calls blur when window changes, but not focus
-    $codeInput.addEventListener("blur", Monkey.smoothIdle.bind(Monkey));
-
-    ["input"].forEach(function (event) {
-        $codeInput.addEventListener(event, function () {
-            let value = $codeInput.value;
-            if (value.length > 5) { //limit length
-                $codeInput.value = value.substring(0, 5);
-                value = $codeInput.value;
-            }
-            if (value.length === 5 && value !== prevValue) {
-                prevValue = value
-                handleSignIn(value)
-            } else if ($codeInput.classList.contains("invalid")) {
-                $codeInput.classList.remove("invalid");
-                $codeInput.nextElementSibling.innerHTML = "Code";
-            }
-        });
-    });
-}
-
-
-
-
-
-function initCropper(image) {
-    cropper = new Croppie(cropperEl, {
-        enableExif: true,
-        showZoomer: false,
-        viewport: {
-            width: 310,
-            height: 310,
-            type: 'circle'
-        },
-        boundary: {
-            width: 350,
-            height: 350
-        }
-    });
-
-    document.getElementById("photoDone").addEventListener("click", function () {
-        cropper.result({
-            type: 'base64'
-        }).then(function (base) {
-            const bytes = Uint8Array.from(atob(base.split(",")[1]), c => c.charCodeAt(0))
-            console.log(bytes, base)
-            pictureBlob = bytes;
-            let blob = new Blob([bytes], {type: "image/png"});
-            console.log(blob)
-            var url = URL.createObjectURL(blob);
-            var picture = document.getElementById("picture");
-            picture.style.backgroundImage = 'url("' + url + '")';
-            picture.querySelector(".tint").classList.remove("hidden");
-
-            hideModal();
-        });
-    });
-}
-
 
 function initModals() {
     Array.from(document.querySelectorAll(".modal")).forEach(function (element) {
@@ -376,72 +66,6 @@ function hideModal() {
     });
 }
 
-function load() {
-    $countryInput = document.getElementById("country")
-    $list = document.getElementById("countryList")
-    $openDropdown = document.getElementById("openDropdown")
-    $parent = $countryInput.parentElement
-    $phoneInput = document.getElementById("phone")
-    $codeInput = document.getElementById("code")
-    $passwordInput = document.getElementById("password")
-    $peekBtn = document.getElementById("peekButton")
-    $passwordNext = document.getElementById("passwordNext")
-    $passwordNext.style.display = "flex"
-    cropperEl = document.getElementById("cropper")
-
-    document.getElementById("start").addEventListener("click", handleSignUp())
-
-
-    document.addEventListener("click", e => {
-        hideList()
-    })
-    $openDropdown.addEventListener("click", e => {
-        e.stopPropagation()
-    })
-    $countryInput.addEventListener("click", e => {
-        e.stopPropagation()
-    })
-
-
-    document.getElementById("editPhone").addEventListener("click", e => {
-        fadeOut(document.getElementById("codePane"));
-        fadeIn(document.getElementById("phonePane"));
-        $codeInput.value = ""
-    })
-
-
-    setInputFilter($phoneInput, function (value) {
-        return /^\+[\d ]*$/.test(value)
-    })
-
-    Monkey = new MonkeyController(document.getElementById("monkey"))
-    Monkey.reset()
-    Monkey.stop()
-
-    setInputFilter($codeInput, value => {
-        return /^\d*$/.test(value)
-    })
-
-    initDropdown()
-    initPhoneInput()
-    initCodeInput()
-    initCropper()
-    initModals()
-
-    document.getElementById("picture").addEventListener("click", function () {
-        askForFile("image/*", function (file) {
-            cropper.bind({
-                url: file
-            });
-            console.log(cropper)
-            showModal(document.getElementById("cropperModal"));
-        });
-    });
-
-    $passwordNext.addEventListener("click", handlePasswordSend())
-
-    document.getElementById("next").onclick = handlePhoneSend()
-}
 
 const InfoComponent = ({header, description}) => {
     return (
@@ -503,8 +127,20 @@ class PhoneInputComponent extends PaneComponent {
                 <CheckboxComponent label="Keep me signed in" id="keepLogger" checked/>
                 <ButtonWithProgressBarComponent label="Next" disabled={this.state.nextDisabled}
                                                 click={this.handlePhoneSend} ref="next"/>
+                <div className="qr-login-button" onClick={this.qrLogin}>Quick log in using QR code</div>
             </div>
         )
+    }
+
+    qrLogin(ev) {
+
+        MTProto.invokeMethod("auth.exportLoginToken", {
+            api_id: AppConfiguration.mtproto.api.api_id,
+            api_hash: AppConfiguration.mtproto.api.api_hash,
+            except_ids: []
+        }).then(l => {
+            this.props.qrLoginInit(l)
+        })
     }
 
     handlePhoneSend() {
@@ -540,7 +176,7 @@ class PhoneInputComponent extends PaneComponent {
         }, error => {
             if (error.type === "AUTH_RESTART") {
                 AppPermanentStorage.clear()
-                handlePhoneSend()
+                this.handlePhoneSend()
                 return
             }
             const msg = {
@@ -559,6 +195,11 @@ class PhoneInputComponent extends PaneComponent {
 
     phoneInput(ev) {
         // Add + if entering a number
+        if(defaultDcID === 0) { // test dc
+            this.state.nextDisabled = false
+            this.refs.get("next").setDisabled(false)
+            return true
+        }
         if (!ev.target.value.startsWith("+") && ev.target.value.length > 0) {
             ev.target.value = "+" + ev.target.value
         }
@@ -649,7 +290,10 @@ class CodeInputComponent extends PaneComponent {
                 // show sign up
                 //fadeOut(document.getElementById("codePane"));
                 //fadeIn(document.getElementById("registerPane"));
-                this.props.signUp()
+                this.props.signUp({
+                    phoneCodeHash: phoneCodeHash,
+                    phone: this.state.phone
+                })
                 return
             } else {
                 this.props.finished(authorization)
@@ -702,7 +346,8 @@ class PasswordInputComponent extends PaneComponent {
             <InfoComponent header="Enter a Password"
                            description="Your account is protected with an additional password."/>
 
-            <InputComponent label={"Hint: " + (this.state.response ? this.state.response.hint : "")} type="password" hide ref="passwordInput" peekChange={this.onPeekChange}/>
+            <InputComponent label={"Hint: " + (this.state.response ? this.state.response.hint : "")} type="password"
+                            hide ref="passwordInput" peekChange={this.onPeekChange}/>
 
 
             <ButtonWithProgressBarComponent label="Next" click={this.handlePasswordSend} ref="nextPassword"/>
@@ -792,15 +437,18 @@ class CodeAndPasswordPaneComponent extends PaneComponent {
         return <div className={classList.join(" ")}>
             <tgs-player id="monkey" className="object"/>
             <CodeInputComponent ref="code" cancel={this.props.cancelCode} finished={this.props.finished}
-                                password={this.onPassword} monkeyLook={this.state.monkey.monkeyLook.bind(this.state.monkey)}/>
-            <PasswordInputComponent ref="password" finished={this.props.finished} monkeyClose={this.state.monkey.close.bind(this.state.monkey)} monkeyPeek={this.monkeyPeek}/>
+                                password={this.onPassword}
+                                monkeyLook={this.state.monkey.monkeyLook.bind(this.state.monkey)} signUp={this.props.signUp}/>
+            <PasswordInputComponent ref="password" finished={this.props.finished}
+                                    monkeyClose={this.state.monkey.close.bind(this.state.monkey)}
+                                    monkeyPeek={this.monkeyPeek}/>
         </div>
     }
 
     monkeyPeek(e) {
-        if(e) {
+        if (e) {
             this.state.monkey.peek()
-       } else {
+        } else {
             this.state.monkey.open()
         }
     }
@@ -818,6 +466,153 @@ class CodeAndPasswordPaneComponent extends PaneComponent {
 }
 
 class RegisterPaneComponent extends PaneComponent {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoading: false
+        }
+    }
+
+    h() {
+        let classList = ["fading-block", "registerPane"]
+        if (this.state.isShown === true) {
+            classList.push("fade-in");
+        } else if (this.state.isShown === false) {
+            classList.push("fade-out");
+        } else {
+            classList.push("hidden");
+        }
+
+        return <div className={classList.join(" ")}>
+            <div id="picture" className="object picture rp rps" onClick={this.addPicture}>
+                <div className="tint hidden"/>
+                <i className="add-icon tgico tgico-cameraadd"/></div>
+            <InfoComponent header="Your name" description="Enter your name and add a profile picture"/>
+
+            <InputComponent label="Name" type="text" ref="firstNameInput"/>
+            <InputComponent label="Last Name (Optional)" type="text" ref="lastNameInput"/>
+
+            <ButtonWithProgressBarComponent label="Start Messaging" click={this.handleSignUp} ref="nextSignUp"/>
+
+        </div>
+    }
+
+    initCropper() {
+        this.state.cropper = new Croppie(document.querySelector("#cropper"), {
+            enableExif: true,
+            showZoomer: false,
+            viewport: {
+                width: 310,
+                height: 310,
+                type: 'circle'
+            },
+            boundary: {
+                width: 350,
+                height: 350
+            }
+        });
+    }
+
+    addPictureConfirm() {
+        this.state.cropper.result({
+            type: 'base64'
+        }).then(function (base) {
+            const bytes = Uint8Array.from(atob(base.split(",")[1]), c => c.charCodeAt(0))
+            console.log(bytes, base)
+            this.state.pictureBlob = bytes;
+            let blob = new Blob([bytes], {type: "image/png"});
+            console.log(blob)
+            const url = URL.createObjectURL(blob);
+            const picture = this.$el.querySelector("#picture");
+            picture.style.backgroundImage = 'url("' + url + '")';
+            picture.querySelector(".tint").classList.remove("hidden");
+
+            ModalManager.close()
+        }.bind(this));
+    }
+
+    addPicture() {
+        askForFile("image/*", function (file) {
+            ModalManager.open("Drag to Reposition",
+                <div id="cropperModal" className="body">
+                    <div id="cropper">
+                    </div>
+                    <div className="done-button rp" onClick={this.addPictureConfirm}><i className="tgico tgico-check"/></div>
+                </div>)
+            this.initCropper()
+
+            this.state.cropper.bind({
+                url: file
+            });
+
+        }.bind(this))
+    }
+
+    setData(ev) {
+        console.log(ev)
+        this.state.phone = ev.phone
+        this.state.phoneCodeHash = ev.phoneCodeHash
+    }
+
+    handleSignUp() {
+        if (this.state.isLoading) return
+        this.state.isLoading = true
+
+        const firstNameInput = this.refs.get("firstNameInput")
+        const lastNameInput = this.refs.get("lastNameInput")
+        const next = this.refs.get("nextSignUp")
+        const firstName = firstNameInput.getValue()
+        const lastName = lastNameInput.getValue()
+
+        next.isLoading = true
+        next.label = "Please wait..."
+
+        MTProto.Auth.signUp(this.state.phone, this.state.phoneCodeHash, firstName, lastName).then(async authorization => {
+            if (authorization._ === "auth.authorization") {
+                if (this.state.pictureBlob) {
+                    FileAPI.uploadProfilePhoto("avatar.jpg", this.state.pictureBlob).then(l => {
+                        console.log("WOW finished", l)
+                        this.props.finished(authorization)
+                    }, error => {
+                        console.log(error)
+                        AppFramework.Router.push("/")
+                    });
+                } else {
+                    this.props.finished(authorization)
+                }
+            } else {
+                console.log(authorization)
+            }
+        }, error => {
+            if (error.type === "FIRSTNAME_INVALID") {
+                firstNameInput.error = "Invalid first name"
+            } else if (error.type === "LASTNAME_INVALID") {
+                lastNameInput.error = "Invalid last name"
+            } else {
+                firstNameInput.error = error.type
+            }
+            console.log(error)
+        }).finally(l => {
+            this.state.isLoading = false
+            next.isLoading = false
+            next.label = "Start Messaging"
+        })
+    }
+}
+
+class QrLoginPaneComponent extends PaneComponent {
+    constructor(props) {
+        super(props);
+        MTProto.UpdatesManager.subscribe("updateLoginToken", l => {
+            MTProto.invokeMethod("auth.exportLoginToken", {
+                api_id: AppConfiguration.mtproto.api.api_id,
+                api_hash: AppConfiguration.mtproto.api.api_hash,
+                except_ids: []
+            }).then(l => {
+                this.open(l)
+            })
+        })
+    }
 
     h() {
         let classList = ["fading-block"]
@@ -828,25 +623,69 @@ class RegisterPaneComponent extends PaneComponent {
         } else {
             classList.push("hidden");
         }
+        return (
+            <div className={classList.join(" ")}>
+                <div className="object big" />
+                <InfoComponent header="Scan from mobile Telegram"
+                               description={<ol>
+                                   <li>Open Telegram on your phone</li>
+                                   <li>Go to Settings -> Devices -> Scan QR Code</li>
+                                   <li>Scan this image to Log In</li>
+                               </ol>}/>
+                <div className="qr-login-button" onClick={this.props.backToPhone}>Or log in using your phone number</div>
 
-        return <div id="registerPane" className={classList.join(" ")}>
-            <div id="picture" className="object picture">
-                <div className="tint hidden"/>
-                <i className="add-icon tgico tgico-cameraadd"/></div>
-            <InfoComponent header="Your name" description="Enter your name and add a profile picture"/>
 
-            <div className="input-field">
-                <input type="text" id="name" placeholder="Name" autoComplete="off"/>
-                <label htmlFor="name" required>Name</label>
             </div>
-            <div className="input-field">
-                <input type="text" id="lastName" placeholder="Last Name (Optional)" autoComplete="off"/>
-                <label htmlFor="lastName" required>Last Name (Optional)</label>
-            </div>
-            <div id="start" className="btn rp"><span className="button-text">START MESSAGING</span>
-                <progress className="progress-circular white"/>
-            </div>
-        </div>
+        )
+    }
+
+    open(l) {
+        // TODO recreate QR when expired
+        // TODO multiple DCs
+        if(l._ === "auth.loginTokenSuccess") {
+            this.props.finished(l.authorization)
+            return
+        }
+        console.log(l)
+        const b64encoded = btoa(String.fromCharCode.apply(null, l.token)).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '')
+        const string = "tg://login?token=" + b64encoded
+        console.log(string)
+        const qrCode = new QRCodeStyling({
+            width: 240,
+            height: 240,
+            data: string,
+            image: "./static/images/logo.svg",
+            dotsOptions: {
+                color: "#000000",
+                type: "rounded"
+            },
+            imageOptions: {
+                imageSize: 0.5
+            },
+            backgroundOptions: {
+                color: "#ffffff",
+            },
+            qrOptions: {
+                errorCorrectionLevel: "L"
+            }
+        })
+
+        const obj = this.$el.querySelector(".object")
+        if(obj.firstChild) obj.removeChild(obj.firstChild)
+        setTimeout(l => {
+            obj.appendChild(qrCode._canvas._canvas)
+        }, 0)
+        console.log(l.expires - tsNow(true))
+        setTimeout(l => {
+            if(MTProto.isUserAuthorized()) return
+            MTProto.invokeMethod("auth.exportLoginToken", {
+                api_id: AppConfiguration.mtproto.api.api_id,
+                api_hash: AppConfiguration.mtproto.api.api_hash,
+                except_ids: []
+            }).then(l => {
+                this.open(l)
+            })
+        }, 1000 * (l.expires - tsNow(true)))
     }
 }
 
@@ -860,18 +699,38 @@ class Login extends Component {
     h() {
         return (
             <div id="login">
-                <PhoneInputComponent finished={this.handleSendCode} ref="phonePane"/>
+                <PhoneInputComponent finished={this.handleSendCode} ref="phonePane" qrLoginInit={this.qrLoginInit}/>
                 <CodeAndPasswordPaneComponent ref="codeAndPassword" cancelCode={this.cancelCode}
-                                              password={this.password} finished={this.loginSuccess}/>
-                <RegisterPaneComponent ref="register"/>
+                                              password={this.password} finished={this.loginSuccess} signUp={this.signUp}/>
+                <QrLoginPaneComponent ref="qrLoginPane" finished={this.loginSuccess} backToPhone={this.backToPhone}/>
+                <RegisterPaneComponent ref="registerPane" finished={this.loginSuccess}/>
             </div>
         )
+    }
+
+    backToPhone(l) {
+        this.fadeOut(this.refs.get("qrLoginPane"));
+        this.fadeIn(this.refs.get("phonePane"));
+    }
+
+    qrLoginInit(l) {
+        this.refs.get("qrLoginPane").open(l)
+
+        this.fadeOut(this.refs.get("phonePane"));
+        this.fadeIn(this.refs.get("qrLoginPane"));
     }
 
     loginSuccess(response) {
         AppPermanentStorage.setItem("authorizationData", response)
         AppFramework.Router.push("/")
         console.log("login success!")
+    }
+
+    signUp(ev) {
+        this.refs.get("registerPane").setData(ev)
+
+        this.fadeIn(this.refs.get("registerPane"));
+        this.fadeOut(this.refs.get("codeAndPassword"));
     }
 
     password() {
@@ -905,22 +764,8 @@ class Login extends Component {
 export function LoginPage() {
     return (
         <div>
+            <ModalComponent/>
             <Login/>
-            <div id="cropperModal" className="modal hidden">
-                <div className="dialog">
-                    <div className="content">
-                        <div className="header">
-                            <i className="btn-icon rp rps tgico tgico-close close-button"/>
-                            <div className="title">Drag to Reposition</div>
-                        </div>
-                        <div className="body">
-                            <div id="cropper">
-                            </div>
-                            <div id="photoDone" className="done-button rp"><i className="tgico tgico-check"/></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div style="position: absolute; bottom: 0; right: 0;">
                 <button onClick={l => {
                     AppPermanentStorage.clear() + window.location.reload()

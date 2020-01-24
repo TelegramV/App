@@ -14,8 +14,10 @@ import RipplePlugin from "./ui/plugins/RipplePlugin"
 
 const isProduction = false
 
+export const defaultDcID = 0
+
 const authContext = {
-    dcID: 2,
+    dcID: defaultDcID,
     nonce: createNonce(16),
     sessionID: createNonce(8)
 }
