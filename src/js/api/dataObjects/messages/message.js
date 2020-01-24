@@ -82,7 +82,7 @@ export class Message {
         this._fromPeer = MessagesManager.getFromPeerMessage(this.raw)
 
         if (!this._fromPeer) {
-            debugger
+            console.warn("no from peer")
         }
 
         return this._fromPeer
