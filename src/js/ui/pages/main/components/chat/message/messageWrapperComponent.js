@@ -2,7 +2,34 @@ import {ContextMenuManager} from "../../../../../contextMenuManager";
 import {ChatInputManager} from "../chatInput/ChatInputComponent";
 
 const MessageWrapperComponent = ({message, transparent = false, slot, noPad = false}) => {
-    const className = {
+    const contextMenuHandler = ContextMenuManager.listener([
+        {
+            icon: "reply",
+            title: "Reply",
+            onClick: _ => ChatInputManager.replyTo(message)
+        },
+        {
+            icon: "copy",
+            title: "Copy"
+        },
+        {
+            icon: "pin",
+            title: "Pin"
+        },
+        {
+            icon: "forward",
+            title: "Forward"
+        },
+        {
+            icon: "delete",
+            title: "Delete",
+            red: true
+        },
+    ])
+
+    const doubleClickHandler = _ => ChatInputManager.replyTo(message)
+
+    const topLevelClasses = {
         "channel": message.isPost,
         "out": !message.isPost && message.isOut,
         "in": message.isPost || !message.isOut,
@@ -20,47 +47,45 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
         "no-pad": noPad
     }
 
-    const from = message.from
 
-    let hasAvatar = !from.photo.isEmpty
+    if (!message.isPost && topLevelClasses.in) {
 
-    const classes = "avatar" + (!hasAvatar ? ` placeholder-${from.photo.letter.num}` : "")
-    const letter = hasAvatar ? "" : from.photo.letter.text
+        const hasAvatar = !message.from.photo.isEmpty
 
-    const cssBackgroundImage = hasAvatar ? `url(${from.photo.smallUrl})` : "none"
+        const avatarClasses = ["avatar"]
+
+        if (!hasAvatar) {
+            avatarClasses.push(`placeholder-${message.from.photo.letter.num}`)
+        }
+
+        const cssBackgroundImage = hasAvatar ? `url(${message.from.photo.smallUrl})` : "none"
+
+        return (
+            <div className={topLevelClasses}
+                 id={`message-${message.id}`}
+                 onContextMenu={contextMenuHandler}
+                 onDoubleClick={doubleClickHandler}>
+
+                <div className={avatarClasses}
+                     css-background-image={cssBackgroundImage}>
+                    {hasAvatar ? message.from.photo.letter.text : ""}
+                </div>
+
+                <div className={wrapClasses}>
+                    <div className={messageClasses}>
+                        {slot}
+                    </div>
+                </div>
+            </div>
+        )
+    }
 
     return (
-        <div className={className} id={`message-${message.id}`}
-             onContextMenu={ContextMenuManager.listener([
-                 {
-                     icon: "reply",
-                     title: "Reply",
-                     onClick: l => ChatInputManager.replyTo(message)
-                 },
-                 {
-                     icon: "copy",
-                     title: "Copy"
-                 },
-                 {
-                     icon: "pin",
-                     title: "Pin"
-                 },
-                 {
-                     icon: "forward",
-                     title: "Forward"
-                 },
-                 {
-                     icon: "delete",
-                     title: "Delete",
-                     red: true
-                 },
-             ])} onDoubleClick={l => ChatInputManager.replyTo(message)}>
-            {!message.isPost && className.in ? (
-                <div className={classes}
-                     css-background-image={cssBackgroundImage}>
-                    {letter}
-                </div>
-            ) : ""}
+        <div className={topLevelClasses}
+             id={`message-${message.id}`}
+             onContextMenu={contextMenuHandler}
+             onDoubleClick={doubleClickHandler}>
+
             <div className={wrapClasses}>
                 <div className={messageClasses}>
                     {slot}

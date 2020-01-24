@@ -5,6 +5,10 @@ import AppSelectedPeer from "../../../../../reactive/selectedPeer"
 class ChatInfoNameComponent extends Component {
     constructor(props) {
         super(props)
+
+        this.appEvents = new Set([
+            AppEvents.Peers.reactiveAny().FireOnly
+        ])
     }
 
     h() {
@@ -29,16 +33,14 @@ class ChatInfoNameComponent extends Component {
         console.log(`${this.name} created`)
     }
 
-    mounted() {
-        console.log(`${this.name} mounted`)
-
-        AppEvents.Peers.subscribeAny(event => {
+    eventFired(bus, event) {
+        if (bus === AppEvents.Peers) {
             if (AppSelectedPeer.check(event.peer)) {
                 if (event.type === "updateName") {
                     this.__patch()
                 }
             }
-        })
+        }
     }
 }
 

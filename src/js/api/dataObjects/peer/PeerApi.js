@@ -24,7 +24,7 @@ export class PeerApi {
             offset_id: props.offset_id,
             offset_date: 0,
             add_offset: 0,
-            limit: props.limit || 100,
+            limit: props.limit || 50,
             max_id: 0,
             min_id: 0,
             hash: 0

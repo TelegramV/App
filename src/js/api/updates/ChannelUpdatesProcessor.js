@@ -99,7 +99,8 @@ export class ChannelUpdatesProcessor {
                 console.error("BUG: difference was passed to enqueue")
             }
         } else {
-            if (this.latestDifferenceTime + 2 > new Date().getTime()) {
+            if ((this.latestDifferenceTime + 2000) < (new Date).getTime()) {
+                console.log(this.latestDifferenceTime, (new Date).getTime())
                 AppEvents.General.fire("waitingForDifference", {
                     diffType: 0 // channel
                 })
@@ -177,7 +178,7 @@ export class ChannelUpdatesProcessor {
                     self.processQueue()
                 },
                 onFail(type) {
-                    self.latestDifferenceTime = new Date().getTime()
+                    self.latestDifferenceTime = (new Date).getTime()
                     self.isWaitingForDifference = true
                     self.queueIsProcessing = false
 
@@ -190,10 +191,6 @@ export class ChannelUpdatesProcessor {
                         self.processQueue()
                         return
                     }
-
-                    AppEvents.General.fire("waitingForDifference", {
-                        diffType: 0 // channel
-                    })
 
                     self.getChannelDifference(inputPeer, peer.dialog.pts, peer).then(rawDifference => {
                         self.processDifference(rawDifference)

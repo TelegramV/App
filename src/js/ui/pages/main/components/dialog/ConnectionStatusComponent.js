@@ -11,14 +11,17 @@ export class ConnectionStatusComponent extends Component {
     }
 
     h() {
-        let statusString = "Waiting for network..."
+        let statusString = "Connecting..."
 
-        if (this.reactive.status === AppConnectionStatus.FETCHING_DIFFERENCE) {
+        if (this.reactive.status === AppConnectionStatus.WAITING_FOR_NETTWORK) {
+            statusString = "Waiting for network..."
+        } else if (this.reactive.status === AppConnectionStatus.FETCHING_DIFFERENCE) {
             statusString = "Fetching updates..."
         }
 
         return (
-            <div css-display={this.reactive.status === AppConnectionStatus.OK ? "none" : "flex"} className="connecting"
+            <div css-display={this.reactive.status === AppConnectionStatus.OK ? "none" : "flex"}
+                 className="connecting"
                  id="connecting_message">
                 <progress className="progress-circular"/>
                 <span>{statusString}</span>

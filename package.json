@@ -20,10 +20,10 @@
     "emoji-js": "^3.4.1",
     "qr-code-styling": "^1.0.1",
     "rusha": "^0.8.13",
-    "sortablejs": "^1.10.2",
-    "webpack-filter-warnings-plugin": "^1.2.1"
+    "sortablejs": "^1.10.2"
   },
   "devDependencies": {
+    "webpack-filter-warnings-plugin": "^1.2.1",
     "@babel/core": "^7.6.4",
     "@babel/plugin-proposal-class-properties": "^7.7.0",
     "@babel/plugin-transform-react-jsx": "^7.7.0",

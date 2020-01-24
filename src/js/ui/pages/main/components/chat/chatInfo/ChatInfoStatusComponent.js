@@ -7,16 +7,18 @@ import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import Component from "../../../../../framework/vrdom/component"
 import AppSelectedPeer from "../../../../../reactive/selectedPeer"
 
+const patchEvents = new Set([
+    "updateUserStatus",
+    "fullLoaded",
+])
+
 class ChatInfoStatusComponent extends Component {
     constructor(props) {
         super(props)
 
-        this.state = {
-            patchEvents: new Set([
-                "updateUserStatus",
-                "fullLoaded",
-            ]),
-        }
+        this.appEvents = new Set([
+            AppEvents.Peers.reactiveAny().FireOnly
+        ])
     }
 
     get statusLine() {
@@ -73,14 +75,14 @@ class ChatInfoStatusComponent extends Component {
         )
     }
 
-    mounted() {
-        AppEvents.Peers.subscribeAny(event => {
+    eventFired(bus, event) {
+        if (bus === AppEvents.Peers) {
             if (AppSelectedPeer.check(event.peer)) {
-                if (this.state.patchEvents.has(event.type)) {
+                if (patchEvents.has(event.type)) {
                     this.__patch()
                 }
             }
-        })
+        }
     }
 }
 

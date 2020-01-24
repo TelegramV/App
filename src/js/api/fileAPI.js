@@ -85,7 +85,7 @@ export class FileAPI {
 
     static getMaxSize(file) {
         const video = this.getAttribute(file, "documentAttributeVideo")
-        if(video) {
+        if (video) {
             return video
         }
 
@@ -134,15 +134,15 @@ export class FileAPI {
             return new Promise(async (resolve, reject) => {
                 const parts = []
                 let offset = 0
-                if(thumb_size !== "" && file.sizes) {
+                if (thumb_size !== "" && file.sizes) {
                     const size = file.sizes.find(l => l.type === thumb_size)
-                    if(!size) throw new Error("Thumb not found")
+                    if (!size) throw new Error("Thumb not found")
                     file.size = size.size
                 }
-                if(!file.size) throw new Error("No size specified")
+                if (!file.size) throw new Error("No size specified")
 
-                while(offset < file.size) {
-                    if(onProgress && !onProgress(offset, file.size)) {
+                while (offset < file.size) {
+                    if (onProgress && !onProgress(offset, file.size)) {
                         reject("Cancelled by user")
                         return
                     }
@@ -158,7 +158,7 @@ export class FileAPI {
                     parts.push(response.bytes)
                 }
 
-                if(onProgress && !onProgress(offset, file.size)) {
+                if (onProgress && !onProgress(offset, file.size)) {
                     reject("Cancelled by user [file downloaded tho]")
                     return
                 }

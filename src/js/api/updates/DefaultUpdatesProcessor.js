@@ -1,7 +1,6 @@
 import MTProto from "../../mtproto"
 import PeersManager from "../peers/PeersManager"
 import AppEvents from "../eventBus/AppEvents"
-import {tsNow} from "../../mtproto/timeManager"
 
 /**
  * @param rawUpdate
@@ -83,7 +82,7 @@ export class DefaultUpdatesProcessor {
                 this.processQueue()
             }
         } else {
-            if (this.latestDifferenceTime + 2 > new Date().getTime()) {
+            if ((this.latestDifferenceTime + 2000) < (new Date).getTime()) {
                 AppEvents.General.fire("waitingForDifference", {
                     diffType: 1 // default
                 })
@@ -123,7 +122,7 @@ export class DefaultUpdatesProcessor {
                     self.processQueue()
                 },
                 onFail(type) {
-                    self.latestDifferenceTime = new Date().getTime()
+                    self.latestDifferenceTime = (new Date).getTime()
                     self.isWaitingForDifference = true
                     self.queueIsProcessing = false
 

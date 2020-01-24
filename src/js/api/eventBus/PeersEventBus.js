@@ -12,6 +12,12 @@ export class PeersEventBus extends EventBus {
         this._singleSubscribers = new Map()
 
         /**
+         * @type {Set<function(EventBus, *)>}
+         * @private
+         */
+        this._reactiveAnySubscribers = new Set()
+
+        /**
          * @type {Map<Peer, Set<function(EventBus, *)>>}
          * @private
          */
@@ -34,6 +40,13 @@ export class PeersEventBus extends EventBus {
                         ...event
                     }))
             }
+
+            this._reactiveAnySubscribers
+                .forEach(s => s(this, {
+                    __any: true,
+                    type,
+                    ...event
+                }))
 
             if (this._reactiveSingleAnySubscribers.has(event.peer)) {
                 this._reactiveSingleAnySubscribers
@@ -71,6 +84,19 @@ export class PeersEventBus extends EventBus {
         }
 
         this._singleSubscribers.get(peer).add(callback)
+    }
+
+    /**
+     * @return {{Default: *, FireOnly: *, PatchOnly: *}}
+     */
+    reactiveAny() {
+        return ReactiveEvent(this, resolve => {
+            this._reactiveAnySubscribers.add(resolve)
+
+            return "*"
+        }, resolve => {
+            this._reactiveAnySubscribers.delete(resolve)
+        })
     }
 
     /**
