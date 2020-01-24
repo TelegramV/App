@@ -1,6 +1,5 @@
 import {MTProto} from "../../../../../mtproto"
-import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
-import AppEvents from "../../../../../api/eventBus/appEvents"
+import AppEvents from "../../../../../api/eventBus/AppEvents"
 import {FileAPI} from "../../../../../api/fileAPI"
 import {isElementInViewport} from "../../../../framework/utils"
 
@@ -8,7 +7,8 @@ import MessageComponent from "./../../messages/newMessage"
 import Component from "../../../../framework/vrdom/component"
 import VRDOM from "../../../../framework/vrdom"
 import {vrdom_deepDeleteRealNode, vrdom_deepDeleteRealNodeInnerComponents} from "../../../../framework/vrdom/patch"
-import {MessageType} from "../../../../../api/dataObjects/messages/message"
+import {MessageType} from "../../../../../api/dataObjects/messages/Message"
+import AppSelectedPeer from "../../../../reactive/selectedPeer"
 
 
 const MessageComponentGeneral = message => <MessageComponent message={message}/>
@@ -18,7 +18,7 @@ class BubblesComponent extends Component {
         super(props)
 
         this.reactive = {
-            dialog: AppSelectedDialog.Reactive.FireOnly,
+            peer: AppSelectedPeer.Reactive.FireOnly,
         }
 
         this.state = {
@@ -52,7 +52,7 @@ class BubblesComponent extends Component {
         AppEvents.Dialogs.subscribeAny(event => {
             const dialog = event.dialog
 
-            if (AppSelectedDialog.check(dialog)) {
+            if (dialog && AppSelectedPeer.check(dialog.peer)) {
                 if (event.type === "fetchedInitialMessages") {
                     this._appendMessages(event.messages)
                 } else if (event.type === "fetchedMessagesNextPage") {
@@ -87,11 +87,11 @@ class BubblesComponent extends Component {
     }
 
     reactiveChanged(key, value) {
-        // check if selected dialog was changed
-        if (key === "dialog") {
+        // check if selected peer was changed
+        if (key === "peer") {
             if (value) {
-                if (!this.reactive.dialog.peer.full) {
-                    this.reactive.dialog.peer.fetchFull()
+                if (!this.reactive.peer.full) {
+                    this.reactive.peer.fetchFull()
                 }
 
                 this._markAllAsRead()
@@ -145,7 +145,7 @@ class BubblesComponent extends Component {
                     // });
                 }
             }
-            if(message.media.game) {
+            if (message.media.game) {
                 //Отримуємо лінк
                 //Отримуємо прев'ю
                 //Отримуємо велику картинку
@@ -248,7 +248,7 @@ class BubblesComponent extends Component {
         this._toggleMessagesLoader(false)
         this._clearBubbles()
 
-        this.reactive.dialog.API.fetchInitialMessages().then(messages => {
+        this.reactive.peer.api.fetchInitialMessages().then(messages => {
             this._toggleMessagesLoader(true)
             this.state.isFetching = false
             this.state.messagesWaitingForRendering.forEach(message => {
@@ -265,7 +265,9 @@ class BubblesComponent extends Component {
     }
 
     _markAllAsRead() {
-        return this.reactive.dialog.API.readAllHistory()
+        if (this.reactive.peer) {
+            return this.reactive.peer.api.readAllHistory()
+        }
     }
 
     _onScrollBubbles(event) {
@@ -277,7 +279,7 @@ class BubblesComponent extends Component {
 
             this._toggleMessagesLoader(false)
 
-            this.reactive.dialog.API.fetchNextPage().then(() => {
+            this.reactive.peer.api.fetchNextPage().then(() => {
                 this.state.isFetchingNextPage = false
                 this._toggleMessagesLoader(true)
             })

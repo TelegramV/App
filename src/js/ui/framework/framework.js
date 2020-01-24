@@ -39,10 +39,18 @@ function registerPlugin(vRDOMPlugin) {
     Plugins.add(vRDOMPlugin)
 }
 
+/**
+ * @param {function(FrameworkRouter)} routesRegister
+ */
+function useRoutes(routesRegister) {
+    routesRegister(Router)
+}
+
 export const AppFramework = {
     Router,
     MountedComponents,
     Plugins,
+    useRoutes,
     mount,
     registerPlugin,
 }

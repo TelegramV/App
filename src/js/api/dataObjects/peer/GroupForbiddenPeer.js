@@ -1,4 +1,4 @@
-import {Peer} from "./peer";
+import {Peer} from "./Peer";
 
 export class GroupForbiddenPeer extends Peer {
 

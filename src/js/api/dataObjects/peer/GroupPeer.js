@@ -1,6 +1,6 @@
-import {Peer} from "./peer";
+import {Peer} from "./Peer";
 import MTProto from "../../../mtproto";
-import AppEvents from "../../eventBus/appEvents";
+import AppEvents from "../../eventBus/AppEvents";
 
 export class GroupPeer extends Peer {
 

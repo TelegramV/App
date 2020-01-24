@@ -17,7 +17,27 @@ export class VRDOMPlugin {
     }
 
     /**
-     * Be careful with this. Because `$el` can be component's mounted $element.
+     * Currently is not implement.
+     *
+     * @param {Component} component
+     * @return boolean false to prevent mounting
+     */
+    componentMounting(component) {
+
+    }
+
+    /**
+     * Currently is not implement.
+     *
+     * @param {Element} $el
+     * @return boolean false to prevent mounting
+     */
+    elementMounting($el) {
+
+    }
+
+    /**
+     * Be careful with this: `$el` can be component's created $element.
      *
      * @param {Element|Node} $el
      */
@@ -26,7 +46,7 @@ export class VRDOMPlugin {
     }
 
     /**
-     * Be careful with this. Because `$el` can be component's mounted $element.
+     * Be careful with this: `$el` can be component's mounted $element.
      *
      * @param {Element|Node} $el
      */

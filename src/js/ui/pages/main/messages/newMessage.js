@@ -13,7 +13,7 @@ import PhoneCallMessageComponent from "../components/chat/message/phoneCallMessa
 import LocationMessageComponent from "../components/chat/message/locationMessageComponent";
 import GameMessageComponent from "../components/chat/message/gameMessageComponent";
 import InvoiceMessageComponent from "../components/chat/message/invoiceMessageComponent";
-import {MessageType} from "../../../../api/dataObjects/messages/message"
+import {MessageType} from "../../../../api/dataObjects/messages/Message"
 
 /**
  * @type {Map<number, function({message: *}): *>}

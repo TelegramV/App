@@ -1,10 +1,10 @@
 import {Pinned} from "../../../../pinnedController"
 import LoaderComponent from "../loading/loader"
-import ChatInfoComponent from "./chatInfo/chatInfoComponent"
+import ChatInfoComponent from "./chatInfo/ChatInfoComponent"
 import Component from "../../../../framework/vrdom/component"
 import BubblesComponent from "./bubblesComponent"
-import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import {ChatInputComponent} from "./chatInput/chatInputComponent";
+import AppSelectedPeer from "../../../../reactive/selectedPeer"
 
 /**
  * CRITICAL: never rerender this component!
@@ -13,14 +13,17 @@ class ChatComponent extends Component {
     constructor(props) {
         super(props)
         this.reactive = {
-            dialog: AppSelectedDialog.Reactive.FireOnly,
+            peer: AppSelectedPeer.Reactive.FireOnly,
         }
     }
 
     h() {
         return (
             <div class="chat-wrapper">
-                <div id="noChat">
+
+                <LoaderComponent id="chat-wrapper-loader" full={true} show={true}/>
+
+                <div id="noChat" css-display="none">
                     <div className="placeholder tgico tgico-chatsplaceholder"/>
                     <div className="text"><p>Open Chat</p> <p>or create a new one</p></div>
                     <div className="buttons">
@@ -58,10 +61,13 @@ class ChatComponent extends Component {
     mounted() {
         this.$noChat = this.$el.querySelector("#noChat")
         this.$chat = this.$el.querySelector("#chat")
+        this.$wrapperLoader = this.$el.querySelector("#chat-wrapper-loader")
     }
 
     reactiveChanged(key, value) {
-        if (key === "dialog") {
+        if (key === "peer") {
+            this.$wrapperLoader.style.display = "none"
+
             if (value) {
                 this.$noChat.style.display = "none"
                 this.$chat.style.display = ""

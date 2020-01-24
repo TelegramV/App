@@ -1,16 +1,16 @@
 import {MTProto} from "../../mtproto"
 import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash, getPeerTypeFromType} from "./util"
 import TimeManager from "../../mtproto/timeManager"
-import PeersManager from "../peers/peersManager"
-import {Dialog} from "../dataObjects/dialog/dialog";
+import PeersManager from "../peers/PeersManager"
+import {Dialog} from "../dataObjects/dialog/Dialog";
 import {Manager} from "../manager";
-import {Peer} from "../dataObjects/peer/peer";
-import {Message} from "../dataObjects/messages/message";
+import {Peer} from "../dataObjects/peer/Peer";
+import {Message} from "../dataObjects/messages/Message";
 import {PeerAPI} from "../peerAPI"
-import DialogsStore from "../store/dialogsStore"
-import AppEvents from "../eventBus/appEvents"
-import AppSelectedDialog from "./selectedDialog"
-import PeersStore from "../store/peersStore"
+import DialogsStore from "../store/DialogsStore"
+import AppEvents from "../eventBus/AppEvents"
+import PeersStore from "../store/PeersStore"
+import AppSelectedPeer from "../../ui/reactive/selectedPeer"
 
 class DialogManager extends Manager {
     constructor() {
@@ -28,9 +28,9 @@ class DialogManager extends Manager {
             return Promise.resolve()
         }
 
-        AppSelectedDialog.subscribe(_ => {
-            if (AppSelectedDialog.PreviousDialog) {
-                AppSelectedDialog.PreviousDialog.messages.clear()
+        AppSelectedPeer.subscribe(_ => {
+            if (AppSelectedPeer.Previous) {
+                AppSelectedPeer.Previous.dialog.messages.clear()
             }
         })
 
@@ -331,7 +331,11 @@ class DialogManager extends Manager {
             const dialogs = rawDialogs.dialogs.map(rawDialog => {
                 const dialog = this.resolveDialogWithSlice(rawDialog, rawDialogs)
 
-                this.offsetDate = dialog.messages.last.date
+                if (dialog.messages.last) {
+                    this.offsetDate = dialog.messages.last.date
+                } else {
+                    console.error("BUG: no last message!")
+                }
 
                 if (this.offsetDate && !dialog.isPinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
                     this.dialogsOffsetDate = this.offsetDate

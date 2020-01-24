@@ -1,11 +1,11 @@
-import {UserPeer} from "../../../../../../api/dataObjects/peer/userPeer"
-import {ChannelPeer} from "../../../../../../api/dataObjects/peer/channelPeer"
-import {SupergroupPeer} from "../../../../../../api/dataObjects/peer/supergroupPeer"
-import {GroupPeer} from "../../../../../../api/dataObjects/peer/groupPeer"
-import {BotPeer} from "../../../../../../api/dataObjects/peer/botPeer"
-import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
-import AppEvents from "../../../../../../api/eventBus/appEvents"
+import {UserPeer} from "../../../../../../api/dataObjects/peer/UserPeer"
+import {ChannelPeer} from "../../../../../../api/dataObjects/peer/ChannelPeer"
+import {SupergroupPeer} from "../../../../../../api/dataObjects/peer/SupergroupPeer"
+import {GroupPeer} from "../../../../../../api/dataObjects/peer/GroupPeer"
+import {BotPeer} from "../../../../../../api/dataObjects/peer/BotPeer"
+import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import Component from "../../../../../framework/vrdom/component"
+import AppSelectedPeer from "../../../../../reactive/selectedPeer"
 
 class ChatInfoStatusComponent extends Component {
     constructor(props) {
@@ -20,15 +20,15 @@ class ChatInfoStatusComponent extends Component {
     }
 
     get statusLine() {
-        if (AppSelectedDialog.isNotSelected) {
+        if (AppSelectedPeer.isNotSelected) {
             return "..."
         }
 
-        const peer = AppSelectedDialog.Dialog.peer
+        const peer = AppSelectedPeer.Current
 
         let status = ""
 
-        if(peer.id === 777000) {
+        if (peer.id === 777000) {
             status = "service notifications"
         } else if (peer instanceof UserPeer) {
             if (peer.onlineStatus.status === "bot") {
@@ -67,7 +67,7 @@ class ChatInfoStatusComponent extends Component {
     h() {
         return (
             <div className="bottom">
-                <div css-display={AppSelectedDialog.isSelected && AppSelectedDialog.Dialog.peer.isSelf ? "none" : ""}
+                <div css-display={AppSelectedPeer.isSelected && AppSelectedPeer.isSelf ? "none" : ""}
                      id="messages-online" className="info">{this.statusLine}</div>
             </div>
         )
@@ -75,7 +75,7 @@ class ChatInfoStatusComponent extends Component {
 
     mounted() {
         AppEvents.Peers.subscribeAny(event => {
-            if (AppSelectedDialog.check(event.peer.dialog)) {
+            if (AppSelectedPeer.check(event.peer)) {
                 if (this.state.patchEvents.has(event.type)) {
                     this.__patch()
                 }

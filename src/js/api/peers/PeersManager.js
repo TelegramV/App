@@ -1,10 +1,10 @@
 import {Manager} from "../manager";
-import PeersStore from "../store/peersStore"
-import AppEvents from "../eventBus/appEvents"
+import PeersStore from "../store/PeersStore"
+import AppEvents from "../eventBus/AppEvents"
 import {MTProto} from "../../mtproto"
-import {UserPeer} from "../dataObjects/peer/userPeer"
+import {UserPeer} from "../dataObjects/peer/UserPeer"
 import PeerFactory from "../dataObjects/peerFactory"
-import {PeerPhoto} from "../dataObjects/peer/peerPhoto";
+import {PeerPhoto} from "../dataObjects/peer/PeerPhoto";
 
 class PeerManager extends Manager {
     constructor() {

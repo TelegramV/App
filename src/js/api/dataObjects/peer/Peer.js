@@ -1,8 +1,9 @@
 import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util";
 import MTProto from "../../../mtproto"
-import AppEvents from "../../eventBus/appEvents"
-import {PeerPhoto} from "./peerPhoto"
-import {Dialog} from "../dialog/dialog"
+import AppEvents from "../../eventBus/AppEvents"
+import {PeerPhoto} from "./PeerPhoto"
+import {Dialog} from "../dialog/Dialog"
+import {PeerApi} from "./PeerApi"
 
 export class Peer {
     constructor(rawPeer, dialog = undefined) {
@@ -13,7 +14,7 @@ export class Peer {
          * @type {Dialog|undefined}
          * @private
          */
-        this._dialog = Dialog.createEmpty(this)
+        this._dialog = dialog || Dialog.createEmpty(this)
 
         this._photo = PeerPhoto.createEmpty(this)
         this._accessHash = undefined
@@ -24,7 +25,16 @@ export class Peer {
 
         this._full = undefined
 
+        this._api = new PeerApi(this)
+
         this.fillRaw(rawPeer)
+    }
+
+    /**
+     * @return {PeerApi}
+     */
+    get api() {
+        return this._api
     }
 
     /**

@@ -1,6 +1,6 @@
-import AppEvents from "../../../../../../api/eventBus/appEvents"
-import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
+import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import Component from "../../../../../framework/vrdom/component"
+import AppSelectedPeer from "../../../../../reactive/selectedPeer"
 
 class ChatInfoNameComponent extends Component {
     constructor(props) {
@@ -8,7 +8,7 @@ class ChatInfoNameComponent extends Component {
     }
 
     h() {
-        if (AppSelectedDialog.isNotSelected) {
+        if (AppSelectedPeer.isNotSelected) {
             return (
                 <div id="messages-title" className="title">
                     ...
@@ -16,7 +16,7 @@ class ChatInfoNameComponent extends Component {
             )
         }
 
-        const peer = AppSelectedDialog.Dialog.peer
+        const peer = AppSelectedPeer.Current
 
         return (
             <div id="messages-title" className="title">
@@ -33,7 +33,7 @@ class ChatInfoNameComponent extends Component {
         console.log(`${this.name} mounted`)
 
         AppEvents.Peers.subscribeAny(event => {
-            if (AppSelectedDialog.check(event.peer.dialog)) {
+            if (AppSelectedPeer.check(event.peer)) {
                 if (event.type === "updateName") {
                     this.__patch()
                 }

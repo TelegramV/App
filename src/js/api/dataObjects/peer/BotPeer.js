@@ -1,4 +1,4 @@
-import {UserPeer} from "./userPeer";
+import {UserPeer} from "./UserPeer";
 
 export class BotPeer extends UserPeer {
     get onlineStatus() {

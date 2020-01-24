@@ -1,12 +1,10 @@
 import Component from "../../../../../framework/vrdom/component";
-import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog";
 import {ContextMenuManager} from "../../../../../contextMenuManager";
-import MTProto from "../../../../../../mtproto";
-import {AppFramework} from "../../../../../framework/framework";
 import {askForFile} from "../../../../../utils";
 import Random from "../../../../../../mtproto/utils/random";
 import TimeManager from "../../../../../../mtproto/timeManager";
 import {createNonce} from "../../../../../../mtproto/utils/bin";
+import AppSelectedPeer from "../../../../../reactive/selectedPeer"
 
 export let ChatInputManager
 
@@ -20,6 +18,10 @@ export class ChatInputComponent extends Component {
             attachments: [],
             reply: null
         }
+    }
+
+    get isVoiceMode() {
+        return this.state.valueString.length === 0
     }
 
     h() {
@@ -58,50 +60,51 @@ export class ChatInputComponent extends Component {
                     <div className="input-field">
                         <i className="tgico tgico-smile"></i>
                         <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]} placeholder="Message"
-                             contentEditable={true} onInput={this.onInput} onKeyPress={this.onKeyPress} onContextMenu={ContextMenuManager.listener([
-                            {
-                                title: "Bold",
-                                after: "Ctrl+B",
-                                onClick: _ => {
-                                }
-                            },
-                            {
-                                title: "Italic",
-                                after: "Ctrl+I",
-                                onClick: _ => {
-                                }
-                            },
-                            {
-                                title: "Underline",
-                                after: "Ctrl+U",
-                                onClick: _ => {
-                                }
-                            },
-                            {
-                                title: "Strikethrough",
-                                after: "Ctrl+Shift+X",
-                                onClick: _ => {
-                                }
-                            },
-                            {
-                                title: "Monospace",
-                                after: "Ctrl+Shift+M",
-                                onClick: _ => {
-                                }
-                            },
-                            {
-                                title: "Create link",
-                                after: "Ctrl+K",
-                                onClick: _ => {
-                                }
-                            },
-                            {
-                                title: "Normal text",
-                                after: "Ctrl+Shift+N",
-                                onClick: _ => {
-                                }
-                            }
-                        ])} dangerouslySetInnerHTML={this.state.value}>
+                             contentEditable={true} onInput={this.onInput} onKeyPress={this.onKeyPress}
+                             onContextMenu={ContextMenuManager.listener([
+                                 {
+                                     title: "Bold",
+                                     after: "Ctrl+B",
+                                     onClick: _ => {
+                                     }
+                                 },
+                                 {
+                                     title: "Italic",
+                                     after: "Ctrl+I",
+                                     onClick: _ => {
+                                     }
+                                 },
+                                 {
+                                     title: "Underline",
+                                     after: "Ctrl+U",
+                                     onClick: _ => {
+                                     }
+                                 },
+                                 {
+                                     title: "Strikethrough",
+                                     after: "Ctrl+Shift+X",
+                                     onClick: _ => {
+                                     }
+                                 },
+                                 {
+                                     title: "Monospace",
+                                     after: "Ctrl+Shift+M",
+                                     onClick: _ => {
+                                     }
+                                 },
+                                 {
+                                     title: "Create link",
+                                     after: "Ctrl+K",
+                                     onClick: _ => {
+                                     }
+                                 },
+                                 {
+                                     title: "Normal text",
+                                     after: "Ctrl+Shift+N",
+                                     onClick: _ => {
+                                     }
+                                 }
+                             ])} dangerouslySetInnerHTML={this.state.value}>
                         </div>
                         <i className="tgico tgico-attach" onClick={l => ContextMenuManager.openAbove([
                             {
@@ -123,7 +126,8 @@ export class ChatInputComponent extends Component {
                     </div>
                 </div>
 
-                <div className="send-button" onClick={this.onSend} onMouseDown={this.onMouseDown} onMouseUp={this.onMouseUp} onContextMenu={l => ContextMenuManager.openAbove([
+                <div className="send-button" onClick={this.onSend} onMouseDown={this.onMouseDown}
+                     onMouseUp={this.onMouseUp} onContextMenu={l => ContextMenuManager.openAbove([
                     {
                         icon: "mute",
                         title: "Send without sound",
@@ -164,7 +168,7 @@ export class ChatInputComponent extends Component {
             this.__patch()
             return
             const id = [Random.nextInteger(0xffffffff), Random.nextInteger(0xffffffff)]
-            AppSelectedDialog.Dialog.API.sendMedia("test message", bytes, {
+            AppSelectedPeer.Current.api.sendMedia("test message", bytes, {
                 _: document ? "inputMediaUploadedDocument" : "inputMediaUploadedPhoto",
                 flags: 0,
                 file: {
@@ -190,19 +194,15 @@ export class ChatInputComponent extends Component {
     }
 
     onSend(ev) {
-        if(this.isVoiceMode) return
+        if (this.isVoiceMode) return
         this.send()
     }
 
-    get isVoiceMode() {
-        return this.state.valueString.length === 0
-    }
-
     onMouseUp(ev) {
-        if(!this.isVoiceMode) return
+        if (!this.isVoiceMode) return
 
         this.recorder.stop()
-        this.microphone.getTracks().forEach(function(track) {
+        this.microphone.getTracks().forEach(function (track) {
             track.stop();
         });
         this.microphone = null
@@ -219,7 +219,7 @@ export class ChatInputComponent extends Component {
         reader.onloadend = (event) => {
             // The contents of the BLOB are in reader.result:
 
-            AppSelectedDialog.Dialog.API.sendMedia("", reader.result, {
+            AppSelectedPeer.Current.api.sendMedia("", reader.result, {
                 _: "inputMediaUploadedDocument",
                 flags: 0,
                 file: {
@@ -250,9 +250,9 @@ export class ChatInputComponent extends Component {
     }
 
     onMouseDown(ev) {
-        if(!this.isVoiceMode) return
-        if(!this.microphone) {
-            navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(l => {
+        if (!this.isVoiceMode) return
+        if (!this.microphone) {
+            navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
                 this.recorder = new MediaRecorder(l, {
                     mimeType: "audio/webm;codecs=opus"
                 });
@@ -269,7 +269,7 @@ export class ChatInputComponent extends Component {
     }
 
     onKeyPress(ev) {
-        if(ev.which === 13 || ev.which === 10) {
+        if (ev.which === 13 || ev.which === 10) {
             this.send()
             ev.preventDefault()
         }
@@ -277,7 +277,7 @@ export class ChatInputComponent extends Component {
 
     send(silent = false) {
         let reply = this.state.reply ? this.state.reply.message.id : null
-        AppSelectedDialog.Dialog.API.sendMessage(this.textarea.textContent, reply, silent)
+        AppSelectedPeer.Current.api.sendMessage(this.textarea.textContent, reply, silent)
         this.textarea.innerHTML = ""
         this.state.value = ""
         this.state.valueString = ""
@@ -287,7 +287,7 @@ export class ChatInputComponent extends Component {
     }
 
     onInput(ev) {
-        if(this.state.valueString.length === 0 || this.textarea.textContent.length === 0) {
+        if (this.state.valueString.length === 0 || this.textarea.textContent.length === 0) {
             this.state.value = this.textarea.innerHTML
             this.state.valueString = this.textarea.textContent
             this.__patch()

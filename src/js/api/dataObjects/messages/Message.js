@@ -1,5 +1,5 @@
 import {getMessagePreviewDialog} from "../../../ui/utils"
-import PeersStore from "../../store/peersStore"
+import PeersStore from "../../store/PeersStore"
 import MessagesManager from "../../messages/MessagesManager"
 
 export const MessageType = {
@@ -92,12 +92,12 @@ export class Message {
      * @return {Peer}
      */
     get to() {
-        if (this.dialog) {
-            return this.dialog.peer
-        }
-
         if (this._toPeer) {
             return this._toPeer
+        }
+
+        if (this.dialog) {
+            return this._toPeer = this.dialog.peer
         }
 
         this._toPeer = MessagesManager.getToPeerMessage(this.raw)

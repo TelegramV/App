@@ -17,6 +17,8 @@ class PeersMapStore extends MappedStore {
         })
 
         this._self = undefined
+
+        this.onSetSubscribers = new Set()
     }
 
     /**
@@ -71,6 +73,7 @@ class PeersMapStore extends MappedStore {
     set(peer) {
         if (this.data.has(peer.type)) {
             this.data.get(peer.type).set(peer.id, peer)
+            this.onSetSubscribers.forEach(s => s(peer))
             return this
         } else {
             console.error("invalid peer type", peer)
@@ -144,6 +147,14 @@ class PeersMapStore extends MappedStore {
         }
 
         return this.data.get(type).has(id)
+    }
+
+    /**
+     *
+     * @param {function(peer: Peer)} callback
+     */
+    onSet(callback) {
+        this.onSetSubscribers.add(callback)
     }
 }
 

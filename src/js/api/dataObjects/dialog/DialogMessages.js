@@ -1,5 +1,5 @@
-import AppSelectedDialog from "../../dialogs/selectedDialog"
-import AppEvents from "../../eventBus/appEvents"
+import AppEvents from "../../eventBus/AppEvents"
+import AppSelectedPeer from "../../../ui/reactive/selectedPeer"
 
 /**
  * @property {Message} _lastMessage
@@ -197,7 +197,7 @@ export class DialogMessages {
             return
         }
 
-        if (AppSelectedDialog.check(this._dialog)) {
+        if (AppSelectedPeer.check(this._dialog.peer)) {
             for (const message of messages) {
                 this.appendSingle(message)
             }
@@ -211,7 +211,7 @@ export class DialogMessages {
      * @param {Message} message
      */
     appendSingle(message) {
-        if (AppSelectedDialog.check(this._dialog)) {
+        if (AppSelectedPeer.check(this._dialog.peer)) {
             this._messages.set(message.id, message)
             this._alreadySorted = false
 
@@ -248,7 +248,7 @@ export class DialogMessages {
      * @param {number} messageId
      */
     addUnread(messageId) {
-        if (AppSelectedDialog.check(this._dialog)) {
+        if (AppSelectedPeer.check(this._dialog.peer)) {
             this._unreadIds.add(messageId)
         } else {
             this._unreadCount++
@@ -265,7 +265,7 @@ export class DialogMessages {
      * @param {number} messageId
      */
     deleteUnread(messageId) {
-        if (AppSelectedDialog.check(this._dialog) || this.unreadMessagesIds.has(messageId)) {
+        if (AppSelectedPeer.check(this._dialog.peer) || this.unreadMessagesIds.has(messageId)) {
             this._unreadIds.delete(messageId)
         } else {
             if (this._unreadCount > 0) {

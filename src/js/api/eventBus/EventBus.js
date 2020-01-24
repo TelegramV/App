@@ -18,7 +18,7 @@ export class EventBus {
      * @param {string} type
      * @param {*} event
      */
-    fire(type, event) {
+    fire(type, event = {}) {
         const subscribers = this._subscribers.get(type)
 
         event = {

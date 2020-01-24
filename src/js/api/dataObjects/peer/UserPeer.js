@@ -1,6 +1,6 @@
 import {tsNow} from "../../../mtproto/timeManager";
 import {getLastSeenMessage} from "../utils";
-import {Peer} from "./peer";
+import {Peer} from "./Peer";
 
 export class UserPeer extends Peer {
     get name() {

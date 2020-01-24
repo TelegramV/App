@@ -12,6 +12,7 @@ import AppCryptoManager from "../crypto/cryptoManager";
 import {schema} from "../language/schema";
 import Bytes from "../utils/bytes"
 import Random from "../utils/random"
+import AppEvents from "../../api/eventBus/AppEvents"
 
 const Logger = createLogger("ApiNetworker", {
     level: "warn"
@@ -57,7 +58,7 @@ export class ApiNetworker extends Networker {
 
         this.messageProcessor.listenPong(pingMessage.msg_id, l => {
             if (this.connected === false) {
-                document.querySelector("#connecting_message").style.display = "none";
+                AppEvents.General.fire("connectionRestored")
             }
             delete this.pings[pingMessage.msg_id]
 
@@ -165,14 +166,14 @@ export class ApiNetworker extends Networker {
     }
 
     onDisconnect() {
+        AppEvents.General.fire("connectionLost")
         // TODO reconnect
         // ALSO if there"s no internet it doesn"t disconnect ws, should ping prob
-        document.querySelector("#connecting_message").style.display = "flex"
         this.connected = false
     }
 
     onConnect() {
-        document.querySelector("#connecting_message").style.display = "none"
+        AppEvents.General.fire("connectionRestored")
         this.connected = true
     }
 

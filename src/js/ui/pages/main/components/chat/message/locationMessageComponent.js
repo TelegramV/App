@@ -1,5 +1,5 @@
 import MapComponent from "./mapComponent"
-import {MessageType} from "../../../../../../api/dataObjects/messages/message"
+import {MessageType} from "../../../../../../api/dataObjects/messages/Message"
 import MessageWrapperComponent from "./messageWrapperComponent"
 const LocationMessageComponent = ({message}) => {
 	let geo = message.media.geo;

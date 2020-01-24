@@ -1,17 +1,17 @@
-import {UserPeer} from "../../../../../api/dataObjects/peer/userPeer"
-import {DialogTextComponent} from "./dialogTextComponent"
+import {UserPeer} from "../../../../../api/dataObjects/peer/UserPeer"
+import {DialogTextComponent} from "./DialogTextComponent"
 import {AppFramework} from "../../../../framework/framework"
-import {DialogAvatarComponent} from "./dialogAvatarComponent"
-import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
+import {DialogAvatarComponent} from "./DialogAvatarComponent"
 import Component from "../../../../framework/vrdom/component"
-import AppEvents from "../../../../../api/eventBus/appEvents"
+import AppEvents from "../../../../../api/eventBus/AppEvents"
 import {tsNow} from "../../../../../mtproto/timeManager"
 import {ContextMenuManager} from "../../../../contextMenuManager";
-import {ChannelPeer} from "../../../../../api/dataObjects/peer/channelPeer";
-import {GroupPeer} from "../../../../../api/dataObjects/peer/groupPeer";
-import {SupergroupPeer} from "../../../../../api/dataObjects/peer/supergroupPeer";
+import {ChannelPeer} from "../../../../../api/dataObjects/peer/ChannelPeer";
+import {GroupPeer} from "../../../../../api/dataObjects/peer/GroupPeer";
+import {SupergroupPeer} from "../../../../../api/dataObjects/peer/SupergroupPeer";
 import {ModalManager} from "../../../../modalManager";
 import {FlatButtonComponent} from "../input/flatButtonComponent";
+import AppSelectedPeer from "../../../../reactive/selectedPeer"
 
 const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -38,7 +38,7 @@ export class DialogComponent extends Component {
         super(props)
 
         this.reactive = {
-            selectedDialog: AppSelectedDialog.Reactive.FireOnly
+            selectedPeer: AppSelectedPeer.Reactive.FireOnly
         }
 
         this.appEvents = new Set([
@@ -70,7 +70,7 @@ export class DialogComponent extends Component {
             "person": true,
             "rp": true,
             "online": peer instanceof UserPeer && peer.onlineStatus.online,
-            "active": AppSelectedDialog.check(dialog),
+            "active": AppSelectedPeer.check(dialog.peer),
             "unread": unread !== "",
             "muted": dialog.isMuted,
         }
@@ -111,7 +111,7 @@ export class DialogComponent extends Component {
                          icon: unread !== "" ? "message" : "unread",
                          title: unread !== "" ? "Mark as read" : "Mark as unread",
                          onClick: _ => {
-                             dialog.API.markDialogUnread(unread === "")
+                             dialog.api.markDialogUnread(unread === "")
                          }
                      },
                      {
@@ -175,7 +175,7 @@ export class DialogComponent extends Component {
     }
 
     reactiveChanged(key, value) {
-        if (key === "selectedDialog") {
+        if (key === "selectedPeer") {
 
             if (value) {
                 this.$el.classList.add("responsive-selected-chatlist")
@@ -183,7 +183,7 @@ export class DialogComponent extends Component {
                 this.$el.classList.remove("responsive-selected-chatlist")
             }
 
-            if (value === this.props.dialog || AppSelectedDialog.PreviousDialog === this.props.dialog) {
+            if (value === this.props.dialog.peer || AppSelectedPeer.Previous === this.props.dialog.peer) {
                 this.__patch()
             }
 

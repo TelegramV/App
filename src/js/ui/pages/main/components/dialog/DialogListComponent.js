@@ -1,20 +1,21 @@
-import DialogsManager from "../../../../../api/dialogs/dialogsManager"
-import {DialogComponent} from "./dialogComponent"
-import AppEvents from "../../../../../api/eventBus/appEvents"
+import DialogsManager from "../../../../../api/dialogs/DialogsManager"
+import {DialogComponent} from "./DialogComponent"
+import AppEvents from "../../../../../api/eventBus/AppEvents"
 import Sortable from "sortablejs"
-import AppSelectedDialog from "../../../../../api/dialogs/selectedDialog"
 import Component from "../../../../framework/vrdom/component"
 import VRDOM from "../../../../framework/vrdom"
 import {ContextMenuManager} from "../../../../contextMenuManager";
 import MTProto from "../../../../../mtproto";
 import {AppFramework} from "../../../../framework/framework";
+import AppSelectedPeer from "../../../../reactive/selectedPeer"
+import {ConnectionStatusComponent} from "./ConnectionStatusComponent"
 
 export class DialogListComponent extends Component {
     constructor(props) {
         super(props)
 
         this.reactive = {
-            selectedDialog: AppSelectedDialog.Reactive.FireOnly
+            selectedPeer: AppSelectedPeer.Reactive.FireOnly
         }
 
         this.state = {
@@ -79,10 +80,7 @@ export class DialogListComponent extends Component {
                     </div>
                 </div>
 
-                <div className="connecting" id="connecting_message">
-                    <progress className="progress-circular"/>
-                    <span>Waiting for network...</span>
-                </div>
+                <ConnectionStatusComponent/>
 
                 <div id="dialogsWrapper" onScroll={this._scrollHandler}>
                     <div className="full-size-loader" id="loader">
@@ -142,7 +140,7 @@ export class DialogListComponent extends Component {
     }
 
     reactiveChanged(key, value) {
-        if (key === "selectedDialog") {
+        if (key === "selectedPeer") {
             if (value) {
                 this.$el.classList.add("responsive-selected-chatlist")
             } else {

@@ -1,9 +1,9 @@
-import {Message} from "../messages/message";
+import {Message} from "../messages/Message";
 import {tsNow} from "../../../mtproto/timeManager";
-import {DialogMessages} from "./dialogMessages"
-import AppEvents from "../../eventBus/appEvents"
-import {DraftMessage} from "./draftMessage"
-import {DialogAPI} from "./dialogApi"
+import {DialogMessages} from "./DialogMessages"
+import AppEvents from "../../eventBus/AppEvents"
+import {DraftMessage} from "./DraftMessage"
+import {DialogApi} from "./DialogApi"
 
 export class Dialog {
 
@@ -42,16 +42,16 @@ export class Dialog {
             this._messages = new DialogMessages(this)
         }
 
-        this._API = new DialogAPI(this)
+        this._api = new DialogApi(this)
 
         this.fillRaw(rawDialog)
     }
 
     /**
-     * @return {DialogAPI}
+     * @return {DialogApi}
      */
-    get API() {
-        return this._API
+    get api() {
+        return this._api
     }
 
     get pts() {

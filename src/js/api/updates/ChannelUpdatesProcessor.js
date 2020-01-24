@@ -1,8 +1,8 @@
 import MTProto from "../../mtproto"
-import PeersStore from "../store/peersStore"
-import PeersManager from "../peers/peersManager"
-import {Peer} from "../dataObjects/peer/peer"
-import AppEvents from "../eventBus/appEvents"
+import PeersStore from "../store/PeersStore"
+import PeersManager from "../peers/PeersManager"
+import {Peer} from "../dataObjects/peer/Peer"
+import AppEvents from "../eventBus/AppEvents"
 
 /**
  * @param rawUpdate
@@ -79,6 +79,8 @@ export class ChannelUpdatesProcessor {
          * @private
          */
         this.queue = []
+
+        this.latestDifferenceTime = 0
     }
 
     applyUpdate(rawUpdate) {
@@ -97,6 +99,12 @@ export class ChannelUpdatesProcessor {
                 console.error("BUG: difference was passed to enqueue")
             }
         } else {
+            if (this.latestDifferenceTime + 2 > new Date().getTime()) {
+                AppEvents.General.fire("waitingForDifference", {
+                    diffType: 0 // channel
+                })
+            }
+
             this.queue.push(rawUpdate)
             // console.warn("[channel] waiting for diff")
         }
@@ -169,6 +177,7 @@ export class ChannelUpdatesProcessor {
                     self.processQueue()
                 },
                 onFail(type) {
+                    self.latestDifferenceTime = new Date().getTime()
                     self.isWaitingForDifference = true
                     self.queueIsProcessing = false
 
@@ -181,6 +190,10 @@ export class ChannelUpdatesProcessor {
                         self.processQueue()
                         return
                     }
+
+                    AppEvents.General.fire("waitingForDifference", {
+                        diffType: 0 // channel
+                    })
 
                     self.getChannelDifference(inputPeer, peer.dialog.pts, peer).then(rawDifference => {
                         self.processDifference(rawDifference)
@@ -217,6 +230,11 @@ export class ChannelUpdatesProcessor {
             if (rawDifferenceWithPeer.pFlags.final === true) {
                 // console.warn("difference is final", rawDifferenceWithPeer)
 
+
+                AppEvents.General.fire("gotDifference", {
+                    diffType: 0 // channel
+                })
+
                 rawDifferenceWithPeer.__peer.dialog.pts = rawDifferenceWithPeer.pts
                 this.isWaitingForDifference = false
                 this.processQueue()
@@ -251,6 +269,11 @@ export class ChannelUpdatesProcessor {
 
         } else if (rawDifferenceWithPeer._ === "updates.channelDifferenceEmpty") {
             // console.warn("difference empty")
+
+
+            AppEvents.General.fire("gotDifference", {
+                diffType: 0 // channel
+            })
 
             this.isWaitingForDifference = false
             rawDifferenceWithPeer.__peer.dialog.pts = rawDifferenceWithPeer.pts

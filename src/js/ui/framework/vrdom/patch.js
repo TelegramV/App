@@ -160,7 +160,7 @@ function vrdom_patch($node, newVNode) {
             const mounted = AppFramework.MountedComponents.get($node.getAttribute("data-component-id"))
 
             if (mounted) {
-                if (!mounted.__.patchingSelf) {
+                if (!mounted.__.patchingItself) {
                     mounted.props = newVNode.props
                     mounted.slot = newVNode.slot
 
@@ -187,7 +187,7 @@ function vrdom_patch($node, newVNode) {
 
             if (mounted) {
 
-                if (!mounted.__.patchingSelf) {
+                if (!mounted.__.patchingItself) {
                     return mounted.__delete()
                 }
 

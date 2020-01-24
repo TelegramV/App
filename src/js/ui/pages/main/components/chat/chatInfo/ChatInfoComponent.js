@@ -1,15 +1,15 @@
-import ChatInfoStatusComponent from "./chatInfoStatusComponent"
-import ChatInfoAvatarComponent from "./chatInfoAvatarComponent"
-import ChatInfoNameComponent from "./chatInfoNameComponent"
+import ChatInfoStatusComponent from "./ChatInfoStatusComponent"
+import ChatInfoAvatarComponent from "./ChatInfoAvatarComponent"
+import ChatInfoNameComponent from "./ChatInfoNameComponent"
 import Component from "../../../../../framework/vrdom/component"
-import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
+import AppSelectedPeer from "../../../../../reactive/selectedPeer"
 
 class ChatInfoComponent extends Component {
     constructor(props) {
         super(props)
 
         this.reactive = {
-            dialog: AppSelectedDialog.Reactive.Default // reactive property
+            peer: AppSelectedPeer.Reactive.Default
         }
     }
 

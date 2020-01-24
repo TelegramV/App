@@ -1,4 +1,4 @@
-import {EventBus} from "./index"
+import {EventBus} from "./EventBus"
 import {DialogsEventBus} from "./DialogsEventBus"
 import {PeersEventBus} from "./PeersEventBus"
 

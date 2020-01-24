@@ -1,5 +1,5 @@
 import EmojiConverter from "emoji-js";
-import {MessageType} from "../api/dataObjects/messages/message"
+import {MessageType} from "../api/dataObjects/messages/Message"
 
 export const emoji = new EmojiConverter();
 

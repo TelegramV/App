@@ -1,4 +1,4 @@
-import AppEvents from "../../eventBus/appEvents"
+import AppEvents from "../../eventBus/AppEvents"
 import {FileAPI} from "../../fileAPI"
 
 export class PeerPhoto {

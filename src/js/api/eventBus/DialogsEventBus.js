@@ -1,4 +1,4 @@
-import {EventBus} from "./index"
+import {EventBus} from "./EventBus"
 import ReactiveEvent from "../../ui/framework/reactive/reactiveEvent"
 
 export class DialogsEventBus extends EventBus {

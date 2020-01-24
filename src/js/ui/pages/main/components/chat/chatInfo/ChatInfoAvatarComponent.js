@@ -1,6 +1,6 @@
-import AppEvents from "../../../../../../api/eventBus/appEvents"
-import AppSelectedDialog from "../../../../../../api/dialogs/selectedDialog"
+import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import Component from "../../../../../framework/vrdom/component"
+import AppSelectedPeer from "../../../../../reactive/selectedPeer"
 
 class ChatInfoAvatarComponent extends Component {
     constructor(props) {
@@ -8,7 +8,7 @@ class ChatInfoAvatarComponent extends Component {
     }
 
     h() {
-        if (AppSelectedDialog.isNotSelected) {
+        if (AppSelectedPeer.isNotSelected) {
             return (
                 <div id="messages-photo"
                      className="avatar placeholder-1">
@@ -17,10 +17,10 @@ class ChatInfoAvatarComponent extends Component {
             )
         }
 
-        const dialog = AppSelectedDialog.Dialog
-        let hasAvatar = !dialog.peer.photo.isEmpty && !dialog.peer.photo._isFetchingSmall
+        const peer = AppSelectedPeer.Current
+        let hasAvatar = !peer.photo.isEmpty && !peer.photo._isFetchingSmall
 
-        if (dialog.peer.isSelf) {
+        if (peer.isSelf) {
             return (
                 <div className="avatar placeholder-saved placeholder-icon">
                     <i className="tgico tgico-avatar_savedmessages"/>
@@ -28,9 +28,9 @@ class ChatInfoAvatarComponent extends Component {
             )
         }
 
-        if (dialog.peer.isDeleted) {
+        if (peer.isDeleted) {
             return (
-                <div className={`avatar placeholder-${dialog.peer.photo.letter.num} placeholder-icon`}>
+                <div className={`avatar placeholder-${peer.photo.letter.num} placeholder-icon`}>
                     <i className="tgico tgico-avatar_deletedaccount"/>
                 </div>
             )
@@ -39,13 +39,13 @@ class ChatInfoAvatarComponent extends Component {
             return (
                 <div id="messages-photo"
                      className="avatar"
-                     style={`background-image: url(${dialog.peer.photo.smallUrl});`}>
+                     style={`background-image: url(${peer.photo.smallUrl});`}>
                 </div>
             )
         } else {
             return (
-                <div className={`avatar placeholder-${dialog.peer.photo.letter.num}`}>
-                    <span>{dialog.peer.photo.letter.text}</span>
+                <div className={`avatar placeholder-${peer.photo.letter.num}`}>
+                    <span>{peer.photo.letter.text}</span>
 
                     <div className="avatar-outer" css-opacity="0">
 
@@ -58,8 +58,9 @@ class ChatInfoAvatarComponent extends Component {
 
     mounted() {
         console.log(`${this.name} mounted`)
+
         AppEvents.Peers.subscribeAny(event => {
-            if (AppSelectedDialog.check(event.peer.dialog)) {
+            if (AppSelectedPeer.check(event.peer)) {
                 if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
                     this.__patch()
                 }

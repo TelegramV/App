@@ -1,21 +1,17 @@
 import MTProto from "../../../mtproto"
-import PeersManager from "../../peers/peersManager"
-import {Message} from "../messages/message"
-import AppEvents from "../../eventBus/appEvents"
+import PeersManager from "../../peers/PeersManager"
+import {Message} from "../messages/Message"
+import AppEvents from "../../eventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util"
 import TimeManager from "../../../mtproto/timeManager"
 import {FileAPI} from "../../fileAPI"
 
-/**
- * @property {Dialog} dialog
- */
-export class DialogAPI {
-
+export class PeerApi {
     /**
-     * @param {Dialog} dialog
+     * @param {Peer} peer
      */
-    constructor(dialog) {
-        this.dialog = dialog
+    constructor(peer) {
+        this.peer = peer
     }
 
     /**
@@ -24,11 +20,11 @@ export class DialogAPI {
      */
     async getHistory(props = {offset_id: 0, limit: 20}) {
         const messagesSlice = await MTProto.invokeMethod("messages.getHistory", {
-            peer: this.dialog.peer.inputPeer,
+            peer: this.peer.inputPeer,
             offset_id: props.offset_id,
             offset_date: 0,
             add_offset: 0,
-            limit: props.limit || 50,
+            limit: props.limit || 100,
             max_id: 0,
             min_id: 0,
             hash: 0
@@ -43,45 +39,32 @@ export class DialogAPI {
         })
 
         return messagesSlice.messages.map(rawMessage => {
-            return new Message(this.dialog, rawMessage)
+            return new Message(this.peer.dialog, rawMessage)
         })
     }
-
 
     fetchInitialMessages() {
         return this.getHistory({}).then(messages => {
             if (messages.length > 0) {
-                this.dialog.messages.appendMany(messages)
+                this.peer.dialog.messages.appendMany(messages)
 
                 AppEvents.Dialogs.fire("fetchedInitialMessages", {
-                    dialog: this.dialog,
+                    dialog: this.peer.dialog,
                     messages: messages
                 })
             }
         })
     }
 
-
-    setPinned(pinned) {
-        return MTProto.invokeMethod("messages.toggleDialogPin", {
-            peer: {
-                _: "inputDialogPeer"
-            },
-            pinned
-        }).then(l => {
-            this.dialog.pinned = l
-        })
-    }
-
     fetchNextPage() {
-        let oldest = this.dialog.messages.oldest
+        let oldest = this.peer.dialog.messages.oldest
 
         return this.getHistory({offset_id: oldest.id}).then(messages => {
             if (messages.length > 0) {
-                this.dialog.messages.appendMany(messages)
+                this.peer.dialog.messages.appendMany(messages)
 
                 AppEvents.Dialogs.fire("fetchedMessagesNextPage", {
-                    dialog: this.dialog,
+                    dialog: this.peer.dialog,
                     messages: messages
                 })
             }
@@ -89,38 +72,39 @@ export class DialogAPI {
     }
 
     readHistory(maxId) {
-        if (this.dialog.peer.type === "channel") {
+        if (this.peer.type === "channel") {
             return MTProto.invokeMethod("channels.readHistory", {
-                channel: getInputFromPeer(this.dialog.peer.type, this.dialog.peer.id, this.dialog.peer.accessHash),
+                channel: getInputFromPeer(this.peer.type, this.peer.id, this.peer.accessHash),
                 max_id: maxId
             }).then(response => {
                 if (response._ === "boolTrue") {
-                    this.dialog.messages.deleteUnreadBy(maxId)
+                    this.peer.dialog.messages.deleteUnreadBy(maxId)
                     // this.dialog.messages.clearUnread()
                     AppEvents.Dialogs.fire("readHistory", {
-                        dialog: this.dialog
+                        dialog: this.peer.dialog
                     })
                 }
             })
         } else {
             return MTProto.invokeMethod("messages.readHistory", {
-                peer: getInputPeerFromPeer(this.dialog.peer.type, this.dialog.peer.id, this.dialog.peer.accessHash),
+                peer: getInputPeerFromPeer(this.peer.type, this.peer.id, this.peer.accessHash),
                 max_id: maxId
             }).then(response => {
-                this.dialog.messages.deleteUnreadBy(maxId)
+                this.peer.dialog.messages.deleteUnreadBy(maxId)
                 // this.dialog.messages.clearUnread()
                 AppEvents.Dialogs.fire("readHistory", {
-                    dialog: this.dialog
+                    dialog: this.peer.dialog
                 })
             })
         }
     }
 
     readAllHistory() {
-        this.readHistory(this.dialog.messages.last.id)
+        if (this.peer.dialog.messages.last) {
+            this.readHistory(this.peer.dialog.messages.last.id)
+        }
     }
 
-    // Should be moved to peer?
     sendMessage(text, replyTo = null, silent = false, clearDraft = true) {
         MTProto.invokeMethod("messages.sendMessage", {
             pFlags: {
@@ -129,11 +113,11 @@ export class DialogAPI {
                 reply_to_msg_id: replyTo
             },
 
-            peer: this.dialog.peer.inputPeer,
+            peer: this.peer.inputPeer,
             message: text,
             random_id: TimeManager.generateMessageID()
         }).then(response => {
-            response.dialog = this.dialog
+            response.dialog = this.peer.dialog
             response.message = text
             response.reply_to_msg_id = replyTo
             response.silent = silent
@@ -144,26 +128,13 @@ export class DialogAPI {
     sendMedia(text, file, f) {
         FileAPI.saveFilePart(f.file.id, file).then(l => {
             MTProto.invokeMethod("messages.sendMedia", {
-                peer: this.dialog.peer.inputPeer,
+                peer: this.peer.inputPeer,
                 message: text,
                 media: f,
                 random_id: TimeManager.generateMessageID()
             }).then(response => {
                 MTProto.UpdatesManager.process(response)
             })
-        })
-    }
-
-    markDialogUnread(unread) {
-        MTProto.invokeMethod("messages.markDialogUnread", {
-            flags: 0,
-            pFlags: {
-                unread: unread
-            },
-            unread: unread,
-            peer: this.dialog.peer.inputPeer
-        }).then(response => {
-            console.log(response)
         })
     }
 }

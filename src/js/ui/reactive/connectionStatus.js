@@ -1,8 +1,14 @@
-import ComponentReactive from "../framework/reactive/componentReactive"
+import AppEvents from "../../api/eventBus/AppEvents"
+import ReactiveCallback from "../framework/reactive/reactiveCallback"
 
 class ConnectionStatus {
     constructor() {
-        this._status = true
+        this.OK = 0
+        this.WAITING_FOR_NETTWORK = 1
+        this.FETCHING_DIFFERENCE = 2
+
+        this._nettworkOk = true
+        this._differenceOk = true
 
         /**
          * @type {Set<*>}
@@ -11,36 +17,71 @@ class ConnectionStatus {
         this._subscribers = new Set()
 
         /**
-         * @type {Set<Component>}
+         * @type {Set<function(number)>}
          * @private
          */
-        this._componentSubscribers = new Set()
+        this._subscribers = new Set()
 
-        this._componentReactive = ComponentReactive(component => {
-            this._componentSubscribers.add(component)
-            return this._status
-        }, component => {
-            this._componentSubscribers.delete(component)
+        this._reactive = ReactiveCallback(resolve => {
+            this._subscribers.add(resolve)
+            return this.Status
+        }, resolve => {
+            this._subscribers.delete(resolve)
+        })
+
+
+        AppEvents.General.subscribe("connectionRestored", event => {
+            console.log("connectionRestored")
+            this._nettworkOk = true
+
+            this._subscribers.forEach(listener => {
+                listener(this.Status)
+            })
+        })
+
+        AppEvents.General.subscribe("connectionLost", event => {
+            console.log("connectionLost")
+            this._nettworkOk = false
+
+            this._subscribers.forEach(listener => {
+                listener(this.Status)
+            })
+        })
+
+        AppEvents.General.subscribe("gotDifference", event => {
+            this._differenceOk = true
+
+            this._subscribers.forEach(listener => {
+                listener(this.Status)
+            })
+        })
+
+        AppEvents.General.subscribe("waitingForDifference", event => {
+            this._differenceOk = false
+
+            this._subscribers.forEach(listener => {
+                listener(this.Status)
+            })
         })
     }
 
     /**
-     * @return {boolean}
+     * @return {number}
      */
     get Status() {
-        return this._status
+        if (!this._nettworkOk) {
+            return this.WAITING_FOR_NETTWORK
+        }
+
+        if (!this._differenceOk) {
+            return this.FETCHING_DIFFERENCE
+        }
+
+        return this.OK
     }
 
-    /**
-     * @param status
-     */
-    set Status(status) {
-        this._status = status
-        this._subscribers.forEach(s => s(status))
-    }
-
-    get ComponentReactive() {
-        return this._componentReactive
+    get Reactive() {
+        return this._reactive
     }
 }
 

@@ -1,7 +1,7 @@
 
-import {GroupPeer} from "./groupPeer";
+import {GroupPeer} from "./GroupPeer";
 import MTProto from "../../../mtproto"
-import AppEvents from "../../eventBus/appEvents"
+import AppEvents from "../../eventBus/AppEvents"
 
 // It should actually extend from channel but who cares
 export class SupergroupPeer extends GroupPeer {
