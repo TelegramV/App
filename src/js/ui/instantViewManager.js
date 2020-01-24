@@ -207,7 +207,7 @@ export class InstantViewComponent extends Component {
     }
 
     h() {
-        console.log(this.state.page)
+        //console.log(this.state.page)
         return (
             <div className={["instant-view-wrapper", this.state.hidden ? "hidden" : ""]}>
                 {this.state.page ?

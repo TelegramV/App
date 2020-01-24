@@ -213,6 +213,8 @@ export class TLSerialization {
     storeBytes(bytes, field = "") {
         if (bytes instanceof ArrayBuffer) {
             bytes = new Uint8Array(bytes)
+        } else if(Number.isInteger(bytes)) {
+            bytes = [bytes]
         } else if (bytes === undefined) {
             bytes = []
         }
@@ -247,6 +249,8 @@ export class TLSerialization {
     storeIntBytes(bytes, bits, field = "") {
         if (bytes instanceof ArrayBuffer) {
             bytes = new Uint8Array(bytes)
+        } else if(Number.isInteger(bytes)) {
+            bytes = [bytes]
         }
 
         const len = bytes.length
@@ -270,6 +274,8 @@ export class TLSerialization {
     storeRawBytes(bytes, field = "") {
         if (bytes instanceof ArrayBuffer) {
             bytes = new Uint8Array(bytes)
+        } else if(Number.isInteger(bytes)) {
+            bytes = [bytes]
         }
         const len = bytes.length
 
@@ -382,10 +388,16 @@ export class TLSerialization {
             }
 
             const itemType = type.substr(7, type.length - 8); // for "Vector<itemType>"
-            this.writeInt(obj.length, field + "[count]")
-            for (let i = 0; i < obj.length; i++) {
-                this.storeObject(obj[i], itemType, field + "[" + i + "]")
-            }
+            /*switch(itemType) {
+                case "bytes":
+                    this.storeBytes(obj,field);
+                    break;
+                default:*/
+                    this.writeInt(obj.length, field + "[count]")
+                    for (let i = 0; i < obj.length; i++) {
+                        this.storeObject(obj[i], itemType, field + "[" + i + "]")
+                    }
+            //}
             return true
         } else if (type.substr(0, 6).toLowerCase() === "vector") {
             throw new Error("Invalid vector object")
