@@ -13,7 +13,7 @@ import AppRoutes from "./ui/routing"
 
 const isProduction = false
 
-export const defaultDcID = 0
+export const defaultDcID = 2
 
 const authContext = {
     dcID: defaultDcID,
