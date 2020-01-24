@@ -21,7 +21,7 @@ export function loadSchema() {
                     byteOffset += 1
                     const sa = new Uint8Array(arrayBuffer).subarray(byteOffset, byteOffset + len)
                     byteOffset += len
-                    return atob(Bytes.asBase64(sa))
+                    return new TextDecoder("ascii").decode(sa)
                 }
 
                 const k = {

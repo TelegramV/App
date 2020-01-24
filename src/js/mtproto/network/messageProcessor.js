@@ -98,11 +98,6 @@ export class MessageProcessor {
             this.rpcErrorHandlers.get(message.req_msg_id)(error)
 
             this.rpcErrorHandlers.delete(message.req_msg_id)
-
-            if(message.result.error_message === "AUTH_KEY_UNREGISTERED")
-            {
-                // MTProto.logout()
-            }
         } else {
             this.rpcResultHandlers.get(message.req_msg_id)(message.result)
 
