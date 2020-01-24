@@ -76,28 +76,26 @@ export default class VoiceMessageComponent extends Component {
     h() {
         return (
             <MessageWrapperComponent message={this.props.message}>
-        	<div class="message">
-	        	<div class="audio">
-		            <div class="play tgico tgico-play" onMouseDown={this._playButtonClick.bind(this)}/>
-		            <div class="audio-wrapper">
-		                <svg css-width={`${this.width}px`} css-transform="scale(1,-1)" 
-		                onMouseEnter={this.enterHandler} onMouseLeave={this.leaveHandler} onMouseDown={this.moveHandler}>
-		                    <defs>
-		                        <mask id={`bars-${this.props.message.id}`}>
-		                            {this._generateBars()}
-		                        </mask>
-		                    </defs>
-		                    <rect class="back" x="0" y="0" width={this.width + "px"} height="100%" mask={`url(#bars-${this.props.message.id})`}/>
-		                    <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%" mask={`url(#bars-${this.props.message.id})`}/>
-		                </svg>
-		                <div class="timer">
-		                    {this._timeToFormat(this.duration)}
-		                    <span class="read"></span>
-		                </div>
-		            </div>
-	            </div>
-	            <TextWrapperComponent message={this.props.message}/>
-        	</div>
+            <div class="audio">
+                <div class="play tgico tgico-play" onMouseDown={this._playButtonClick.bind(this)}/>
+                <div class="audio-wrapper">
+                    <svg css-width={`${this.width}px`} css-transform="scale(1,-1)"
+                    onMouseEnter={this.enterHandler} onMouseLeave={this.leaveHandler} onMouseDown={this.moveHandler}>
+                        <defs>
+                            <mask id={`bars-${this.props.message.id}`}>
+                                {this._generateBars()}
+                            </mask>
+                        </defs>
+                        <rect class="back" x="0" y="0" width={this.width + "px"} height="100%" mask={`url(#bars-${this.props.message.id})`}/>
+                        <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%" mask={`url(#bars-${this.props.message.id})`}/>
+                    </svg>
+                    <div class="timer">
+                        {this._timeToFormat(this.duration)}
+                        <span class="read"></span>
+                    </div>
+                </div>
+            </div>
+            <TextWrapperComponent message={this.props.message}/>
         	</MessageWrapperComponent>
         );
     }

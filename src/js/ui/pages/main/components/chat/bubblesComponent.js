@@ -124,12 +124,12 @@ class BubblesComponent extends Component {
 
         if (message.media) {
             if (message.media.webpage && message.media.webpage.photo) {
-                FileAPI.photoThumbnail(message.media.webpage.photo, data => {
-                    message.media.webpage.photo.real = {
-                        url: data.src
-                    }
-                    VRDOM.patch($message, MessageComponentGeneral(message));
-                })
+                // FileAPI.photoThumbnail(message.media.webpage.photo, data => {
+                //     message.media.webpage.photo.real = {
+                //         url: data.src
+                //     }
+                //     VRDOM.patch($message, MessageComponentGeneral(message));
+                // })
             }
             if (message.media.document) {
                 if (message.type === MessageType.STICKER) {

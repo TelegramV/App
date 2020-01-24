@@ -124,7 +124,7 @@ export class FileAPI {
         }
     }
 
-    static getFile(file, thumb_size = "") {
+    static getFile(file, thumb_size = "", onProgress = undefined) {
 
         const key = Bytes.asHex(file.file_reference)
 
@@ -142,7 +142,10 @@ export class FileAPI {
                 if(!file.size) throw new Error("No size specified")
 
                 while(offset < file.size) {
-                    console.log(`downloading part #${parts.length + 1} at offset ${offset}...`)
+                    if(onProgress && !onProgress(offset, file.size)) {
+                        reject("Cancelled by user")
+                        return
+                    }
                     let response = await this.getFileLocation({
                         _: this.getInputName(file),
                         id: file.id,
@@ -153,6 +156,11 @@ export class FileAPI {
 
                     offset += response.bytes.length
                     parts.push(response.bytes)
+                }
+
+                if(onProgress && !onProgress(offset, file.size)) {
+                    reject("Cancelled by user [file downloaded tho]")
+                    return
                 }
 
                 const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')

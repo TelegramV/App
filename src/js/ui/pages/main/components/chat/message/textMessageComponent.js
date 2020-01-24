@@ -7,9 +7,7 @@ const TextMessageComponent = ({message}) => {
     return (
         <MessageWrapperComponent message={message}>
             {username ? <div className="username">{message.from.name}</div> : ""}
-            <div className="message">
-                <TextWrapperComponent message={message}/>
-            </div>
+            <TextWrapperComponent message={message}/>
         </MessageWrapperComponent>
     )
 }

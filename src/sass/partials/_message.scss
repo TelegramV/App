@@ -97,18 +97,6 @@
             }
         }
 
-        .round-video-wrapper {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            overflow: hidden;
-
-            video {
-                width: 100%;
-                height: auto;
-            }
-        }
-
         .instant-view-button {
             height: 32px;
             margin-top: 8px;
@@ -335,13 +323,18 @@
             padding: 5px 9px;
 
             figure {
-                &.photo {
+                &.round-video {
+                    width: 240px;
+                    height: 240px;
+                }
+
+                &.photo, &.video {
                     //min-width: 100px;
                     //min-height: 100px;
                     max-height: 512px;
 
 
-                    img {
+                    img, video {
                         max-height: 512px;
                     }
                 }

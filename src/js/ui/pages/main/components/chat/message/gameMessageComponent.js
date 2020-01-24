@@ -7,13 +7,11 @@ const GameMessageComponent = ({message}) => {
 	//DRAFT VERSION
 	return (
 		<MessageWrapperComponent message={message}>
-			<div class="message">
-				<div class="game">
-					<div class="title">{game.title}</div>
-					<div class="info">{message.text? parseMessageEntities(message.text) : game.description}</div>
-					<img class="game-image" src={photoUrl}/> {/*TODO support gifs*/}
-					<a href={gameUrl} style="display:block;width:100%;height:50px;background-color:grey;cursor:pointer;line-height:50px;text-align:center" target="_blank">Play</a>
-				</div>
+			<div class="game">
+				<div class="title">{game.title}</div>
+				<div class="info">{message.text? parseMessageEntities(message.text) : game.description}</div>
+				<img class="game-image" src={photoUrl}/> {/*TODO support gifs*/}
+				<a href={gameUrl} style="display:block;width:100%;height:50px;background-color:grey;cursor:pointer;line-height:50px;text-align:center" target="_blank">Play</a>
 			</div>
 		</MessageWrapperComponent>
 		)

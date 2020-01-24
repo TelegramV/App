@@ -1,14 +1,12 @@
 import MessageWrapperComponent from "./messageWrapperComponent";
 import MessageTimeComponent from "./messageTimeComponent";
+import {VideoComponent} from "../../basic/videoComponent";
 
 const RoundVideoMessageComponent = ({message}) => {
-    let videoSrc = message.media.document.real ? message.media.document.real.url : "";
     return (
-        <MessageWrapperComponent message={message} transparent={true}>
-            <div className="round-video-wrapper">
-                <video controls src={videoSrc} type={message.media.document.mime_type}/>
-            </div>
-            <MessageTimeComponent message={message} bg={true}/>
+        <MessageWrapperComponent message={message} transparent={true} noPad>
+                <VideoComponent video={message.media.document} round/>
+                <MessageTimeComponent message={message} bg={true}/>
         </MessageWrapperComponent>
     )
 }

@@ -3,7 +3,7 @@
 import {FileAPI} from "../../../../../api/fileAPI";
 import {ObjectWithThumbnailComponent} from "./objectWithThumbnailComponent";
 
-const loadObject = photo => {
+const loadObject = (photo, onProgress) => {
     const max = FileAPI.getMaxSize(photo)
     photo.real = {
         src: FileAPI.hasThumbnail(photo) ? FileAPI.getThumbnail(photo) : "",
@@ -11,22 +11,22 @@ const loadObject = photo => {
         thumbnail: true
     }
 
-    return FileAPI.getFile(photo, max.type).then(file => {
+    return FileAPI.getFile(photo, max.type, onProgress).then(file => {
         photo.real.src = file
         photo.real.thumbnail = false
     })
 }
 
-const slotLoaded = photo => {
-    return <img src={photo.src} alt=""/>
+const slotLoaded = (photo, real) => {
+    return <img src={real.src} alt=""/>
 }
 
-const slotLoadingWidth = photo => {
-    return <img src={photo.src} alt="" width={photo.size.width ? photo.size.width + "px" : ""}/>
+const slotLoadingWidth = (photo, real) => {
+    return <img src={real.src} alt="" width={real.size.width ? real.size.width + "px" : ""}/>
 }
 
-const slotLoadingHeight = photo => {
-    return <img src={photo.src} alt="" height={photo.size.height ? photo.size.height + "px" : ""}/>
+const slotLoadingHeight = (photo, real) => {
+    return <img src={real.src} alt="" height={real.size.height ? real.size.height + "px" : ""}/>
 }
 
 export const PhotoComponent = ({photo}) => {

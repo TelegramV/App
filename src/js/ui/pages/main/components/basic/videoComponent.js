@@ -2,13 +2,11 @@ import {FileAPI} from "../../../../../api/fileAPI";
 import {ObjectWithThumbnailComponent} from "./objectWithThumbnailComponent";
 import VRDOM from "../../../../framework/vrdom";
 
-const loadObject = video => {
-    console.log(video)
+const loadObject = (video, onProgress) => {
     // FileAPI.getFile(message.media.document, "").then(data => {
     //     message.media.document.real = {url: data};
     //     VRDOM.patch($message, MessageComponentGeneral(message));
     // });
-
     const max = FileAPI.getMaxSize(video)
     video.real = {
         src: FileAPI.hasThumbnail(video) ? FileAPI.getThumbnail(video) : "",
@@ -16,29 +14,30 @@ const loadObject = video => {
         thumbnail: true
     }
 
-    return new Promise(resolve => {
-         FileAPI.getFile(video).then(file => {
-            video.real.src = file
-            video.real.thumbnail = false
-             setTimeout(resolve, 1000)
-        })
+    return FileAPI.getFile(video, "", onProgress).then(file => {
+        video.real.src = file
+        video.real.thumbnail = false
     })
 }
 
-const slotLoaded = video => {
-    // TODO  type={message.media.document.mime_type}
-    return <video controls src={video.src}/>
+const slotLoaded = (video, real) => {
+    const attribute = FileAPI.getAttribute(video, "documentAttributeVideo")
+    if(attribute.pFlags.round_message) {
+        return <video autoPlay muted loop onCanPlay={l => l.target.muted = true} src={real.src} type={video.mime_type}/>
+    } else {
+        return <video controls src={real.src} type={video.mime_type}/>
+    }
 }
 
-const slotLoadingWidth = video => {
-    return <img src={video.src} alt="" width={video.size.width ? video.size.width + "px" : ""}/>
+const slotLoadingWidth = (video, real) => {
+    return <img src={real.src} alt="" width={real.size.width ? real.size.width + "px" : ""}/>
 }
 
-const slotLoadingHeight = video => {
-    return <img src={video.src} alt="" height={video.size.height ? video.size.height + "px" : ""}/>
+const slotLoadingHeight = (video, real) => {
+    return <img src={real.src} alt="" height={real.size.height ? real.size.height + "px" : ""}/>
 }
 
-export const VideoComponent = ({video}) => {
-    return <ObjectWithThumbnailComponent type="video" loadObject={loadObject} object={video} slotLoaded={slotLoaded}
+export const VideoComponent = ({video, round = false}) => {
+    return <ObjectWithThumbnailComponent type={round ? "round-video" : "video"} loadObject={loadObject} object={video} slotLoaded={slotLoaded}
                                          slotLoadingWidth={slotLoadingWidth} slotLoadingHeight={slotLoadingHeight}/>
 }
