@@ -2,7 +2,7 @@ import DialogsManager from "../../../api/dialogs/DialogsManager"
 import {DialogListComponent} from "./components/dialog/DialogListComponent"
 import UpdatesManager from "../../../api/updates/updatesManager"
 import PeersManager from "../../../api/peers/PeersManager"
-import ChatComponent from "./components/chat/chatComponent"
+import ChatComponent from "./components/chat/ChatComponent"
 import {LocaleController} from "../../../common/locale/localization"
 import {ContextMenuComponent} from "../../contextMenuManager";
 import {DialogInfoComponent} from "./components/dialog/DialogInfoComponent";
