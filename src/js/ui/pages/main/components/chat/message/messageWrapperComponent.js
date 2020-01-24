@@ -68,7 +68,7 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
 
                 <div className={avatarClasses}
                      css-background-image={cssBackgroundImage}>
-                    {hasAvatar ? message.from.photo.letter.text : ""}
+                    {!hasAvatar ? message.from.photo.letter.text : ""}
                 </div>
 
                 <div className={wrapClasses}>
