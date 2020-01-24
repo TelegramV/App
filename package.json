@@ -16,11 +16,11 @@
     "analize-bundle": "webpack --json | webpack-bundle-size-analyzer"
   },
   "dependencies": {
-    "@lottiefiles/lottie-player": "^0.3.0-rc2",
     "croppie": "^2.6.4",
     "emoji-js": "^3.4.1",
     "rusha": "^0.8.13",
-    "sortablejs": "^1.10.2"
+    "sortablejs": "^1.10.2",
+    "webpack-filter-warnings-plugin": "^1.2.1"
   },
   "devDependencies": {
     "@babel/core": "^7.6.4",

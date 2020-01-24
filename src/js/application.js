@@ -1,6 +1,6 @@
 import "../sass/application.scss"
 
-import "@lottiefiles/lottie-player"
+import './ui/vendor/tgs-player.js';
 import AppFramework from "./ui/framework/framework"
 import MTProto from "./mtproto"
 import {MainPage} from "./ui/pages/main/mainPage"
