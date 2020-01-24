@@ -62,7 +62,6 @@ class SelectedPeer {
             this.subscribe(resolve)
             this._previousPeer = this._peer
             this._peer = this.findFromQueryParams(parseHashQuery())
-            console.log(this._peer)
             return this._peer
         }, resolve => {
             this.unsubscribe(resolve)
