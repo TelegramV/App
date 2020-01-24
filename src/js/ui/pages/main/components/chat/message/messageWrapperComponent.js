@@ -1,5 +1,5 @@
 import {ContextMenuManager} from "../../../../../contextMenuManager";
-import {ChatInputManager} from "../chatInput/chatInputComponent";
+import {ChatInputManager} from "../chatInput/ChatInputComponent";
 
 const MessageWrapperComponent = ({message, transparent = false, slot, noPad = false}) => {
     const className = {

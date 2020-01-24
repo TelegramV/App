@@ -1,17 +1,17 @@
-import DialogsManager from "../../../api/dialogs/dialogsManager"
-import {DialogListComponent} from "./components/dialog/dialogListComponent"
+import DialogsManager from "../../../api/dialogs/DialogsManager"
+import {DialogListComponent} from "./components/dialog/DialogListComponent"
 import UpdatesManager from "../../../api/updates/updatesManager"
-import PeersManager from "../../../api/peers/peersManager"
-import ChatComponent from "./components/chat/chatComponent"
+import PeersManager from "../../../api/peers/PeersManager"
+import ChatComponent from "./components/chat/ChatComponent"
 import {LocaleController} from "../../../common/locale/localization"
 import {ContextMenuComponent} from "../../contextMenuManager";
-import {DialogInfoComponent} from "./components/dialog/dialogInfoComponent";
+import {DialogInfoComponent} from "./components/dialog/DialogInfoComponent";
 import {ModalComponent} from "../../modalManager";
 import {MediaViewerComponent} from "../../mediaViewerManager";
 import {InstantViewComponent} from "../../instantViewManager";
 import MessagesManager from "../../../api/messages/MessagesManager"
 
-function initUIManagers() {
+function initHighLevelManagers() {
     UpdatesManager.init().then(() => {
         // todo: move this to DialogsManager logic
         DialogsManager.fetchFirstPage().then(() => {
@@ -24,7 +24,7 @@ function initUIManagers() {
 }
 
 export function MainPage() {
-    initUIManagers()
+    initHighLevelManagers()
 
     return (
         <div class="app">

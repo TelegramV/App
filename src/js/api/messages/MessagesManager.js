@@ -1,10 +1,10 @@
 import {Manager} from "../manager"
 import {MTProto} from "../../mtproto"
-import PeersStore from "../store/peersStore"
-import AppEvents from "../eventBus/appEvents"
-import {Message} from "../dataObjects/messages/message"
-import DialogsManager from "../dialogs/dialogsManager"
-import DialogsStore from "../store/dialogsStore"
+import PeersStore from "../store/PeersStore"
+import AppEvents from "../eventBus/AppEvents"
+import {Message} from "../dataObjects/messages/Message"
+import DialogsManager from "../dialogs/DialogsManager"
+import DialogsStore from "../store/DialogsStore"
 import {getPeerTypeFromType} from "../dialogs/util"
 
 class MessageManager extends Manager {

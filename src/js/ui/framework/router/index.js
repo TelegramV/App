@@ -20,11 +20,6 @@ export class FrameworkRouter {
          */
         this.$mountElement = options.$mountElement || false
 
-        /**
-         * @type {Element|Node|boolean}
-         */
-        this.$mountElementInner = undefined
-
         this.mountId = options.mountId || "app"
         this.routes = options.routes || []
 

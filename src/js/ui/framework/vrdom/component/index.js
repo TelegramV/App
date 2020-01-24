@@ -12,7 +12,7 @@ class Component {
             mounted: false,
             destroyed: false,
             created: false,
-            patchingSelf: false,
+            patchingItself: false,
 
             /**
              * @type {Map<string, *>}
@@ -29,24 +29,74 @@ class Component {
 
         /**
          * 0: reactive events and properties will be initialized after mount
-         * 1: reactive events and properties will be initialized during the component init process
+         * 1: reactive events and properties will be initialized during component init process
          * 2: reactive events and properties will be initialized after create
          * @type {number}
          */
         this.reactiveStrategy = 0 // todo: implement it
 
-        this.identifier = undefined
-        this.name = props.name || this.constructor.name
-        this.$el = props.$el || undefined
-        this.state = props.state || {}
-        this.reactive = props.reactive || {}
         /**
+         * Unique identifier of the element in VRDOM
+         * @type {string}
+         */
+        this.identifier = undefined
+
+        /**
+         * Component's name
+         */
+        this.name = props.name || this.constructor.name
+
+        /**
+         * Real DOM element with which component is associated
+         *
+         * If not present there is a good reason to delete component completely by using `__delete`
+         *
+         * @type {Node|Element|undefined}
+         */
+        this.$el = props.$el || undefined
+
+        /**
+         * Component's non-reactive state.
+         * @type {object}
+         */
+        this.state = props.state || {}
+
+        /**
+         * Component's reactive state.
+         *
+         * @see ReactiveCallback
+         *
+         * @type {object}
+         */
+        this.reactive = props.reactive || {}
+
+        /**
+         * AppEvents that component is listening.
+         *
+         * @see AppEventBus
+         * @see ReactiveEvent
+         *
          * @type {Set<*>}
          */
         this.appEvents = props.appEvents || new Set()
+
+        /**
+         * Component's properties (attributes) passed from parent.
+         *
+         * @type {object}
+         */
         this.props = props.props || {}
+
+        /**
+         * @type {undefined|VRNode|ComponentVRNode}
+         */
         this.slot = props.slot
 
+        /**
+         * All mounted components.
+         *
+         * @type {Map<string, Component>}
+         */
         this.refs = AppFramework.MountedComponents
     }
 
@@ -81,7 +131,7 @@ class Component {
     }
 
     // patch request interceptor; return `false` to decline.
-    patch(vNode) {
+    patchRequest(vNode) {
         return vNode
     }
 
@@ -98,7 +148,6 @@ class Component {
 
     __created() {
         // if (this.reactiveStrategy === 0) {
-        this.__initReactive()
         // }
     }
 
@@ -143,7 +192,7 @@ class Component {
             Object.assign(this.props, props)
         }
 
-        const vNode = this.h(props)
+        const vNode = this.h()
 
         vNode.component = this
         vNode.attrs["data-component"] = this.name
@@ -152,19 +201,19 @@ class Component {
     }
 
     // do not override this if there is no critical reason
-    __patch(props) {
+    __patch() {
         if (this.__.mounted) {
-            this.__.patchingSelf = true
+            this.__.patchingItself = true
             this.__init()
 
-            const rendered = this.__render(props)
+            const rendered = this.__render()
 
-            if (this.patch(rendered)) {
+            if (this.patchRequest(rendered)) {
                 this.$el = VRDOM.patch(this.$el, rendered)
                 this.patched()
             }
 
-            this.__.patchingSelf = false
+            this.__.patchingItself = false
         } else {
             console.warn("component is not mounted")
         }
@@ -181,16 +230,7 @@ class Component {
                 }
             }
 
-            this.h = this.h.bind(this)
-            this.created = this.created.bind(this)
-            this.mounted = this.mounted.bind(this)
-            this.reactiveChanged = this.reactiveChanged.bind(this)
-            this.patch = this.patch.bind(this)
-
-            this.__delete = this.__delete.bind(this)
-            this.__render = this.__render.bind(this)
-            this.__patch = this.__patch.bind(this)
-            this.__mounted = this.__mounted.bind(this)
+            this.__initReactive()
 
             this.__.inited = true
         }
@@ -199,7 +239,6 @@ class Component {
     __initReactive() {
         if (!this.__.reactiveInited) {
             for (const [key, context] of Object.entries(this.reactive)) {
-                console.log(key)
                 if (context) {
                     if (context.__rc) {
                         context.resolve = value => this.__resolveReactivePropertyChange(key, value)

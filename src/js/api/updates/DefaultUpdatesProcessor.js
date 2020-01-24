@@ -1,5 +1,7 @@
 import MTProto from "../../mtproto"
-import PeersManager from "../peers/peersManager"
+import PeersManager from "../peers/PeersManager"
+import AppEvents from "../eventBus/AppEvents"
+import {tsNow} from "../../mtproto/timeManager"
 
 /**
  * @param rawUpdate
@@ -62,6 +64,8 @@ export class DefaultUpdatesProcessor {
          * @private
          */
         this.queue = []
+
+        this.latestDifferenceTime = 0
     }
 
     applyUpdate(rawUpdate) {
@@ -79,6 +83,11 @@ export class DefaultUpdatesProcessor {
                 this.processQueue()
             }
         } else {
+            if (this.latestDifferenceTime + 2 > new Date().getTime()) {
+                AppEvents.General.fire("waitingForDifference", {
+                    diffType: 1 // default
+                })
+            }
             this.queue.push(rawUpdate)
             // console.warn("[default] waiting for diff")
         }
@@ -114,6 +123,7 @@ export class DefaultUpdatesProcessor {
                     self.processQueue()
                 },
                 onFail(type) {
+                    self.latestDifferenceTime = new Date().getTime()
                     self.isWaitingForDifference = true
                     self.queueIsProcessing = false
 
@@ -136,6 +146,10 @@ export class DefaultUpdatesProcessor {
         console.debug("[default] got difference", rawDifference)
 
         if (rawDifference._ === "updates.difference") {
+
+            AppEvents.General.fire("gotDifference", {
+                diffType: 1 // channel
+            })
 
             rawDifference.users.forEach(user => PeersManager.setFromRawAndFire(user))
             rawDifference.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
@@ -184,6 +198,10 @@ export class DefaultUpdatesProcessor {
 
         } else if (rawDifference._ === "updates.differenceEmpty") {
             // console.warn("[default] difference empty")
+
+            AppEvents.General.fire("gotDifference", {
+                diffType: 1 // channel
+            })
 
             this.updatesManager.State.date = rawDifference.date
             this.updatesManager.State.qts = rawDifference.qts
