@@ -1,7 +1,7 @@
 import Component from "./framework/vrdom/component";
 import ChatInfoAvatarComponent from "./pages/main/components/chat/chatInfo/chatInfoAvatarComponent";
-import {PhotoComponent} from "./pages/main/components/chat/message/photoMessageComponent";
 import MTProto from "../mtproto";
+import {PhotoComponent} from "./pages/main/components/basic/photoComponent";
 
 export let InstantViewManager
 

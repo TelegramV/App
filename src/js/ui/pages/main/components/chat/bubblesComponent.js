@@ -123,33 +123,6 @@ class BubblesComponent extends Component {
         $message = $mount(MessageComponentGeneral(message), this.elements.$bubblesInner); //TODO Давид поправ як має бути
 
         if (message.media) {
-            if (message.media.photo) {
-
-                // я зробив щоб качало мінімальний розмір фоток, щоб менше напрягалось
-                // більший можна буде показувати при кліку
-
-                //console.log(message.media.photo)
-                const max = FileAPI.getMaxSize(message.media.photo)
-                if (FileAPI.hasThumbnail(message.media.photo)) {
-                    const thumbnail = FileAPI.getThumbnail(message.media.photo)
-                    message.media.photo.real = {
-                        src: thumbnail,
-                        sizes: [max.w, max.h],
-                        thumbnail: true
-                    }
-
-                    VRDOM.patch($message, MessageComponentGeneral(message));
-                }
-
-                FileAPI.getFile(message.media.photo, max.type).then(file => {
-                    message.media.photo.real = {
-                        src: file,
-                        sizes: [max.w, max.h],
-                        thumbnail: false
-                    }
-                    VRDOM.patch($message, MessageComponentGeneral(message));
-                })
-            }
             if (message.media.webpage && message.media.webpage.photo) {
                 FileAPI.photoThumbnail(message.media.webpage.photo, data => {
                     message.media.webpage.photo.real = {
@@ -166,10 +139,10 @@ class BubblesComponent extends Component {
                     });
                 }
                 if (message.type === MessageType.ROUND || message.type === MessageType.VIDEO || message.type === MessageType.AUDIO) {
-                    FileAPI.getFile(message.media.document, "").then(data => {
-                        message.media.document.real = {url: data};
-                        VRDOM.patch($message, MessageComponentGeneral(message));
-                    });
+                    // FileAPI.getFile(message.media.document, "").then(data => {
+                    //     message.media.document.real = {url: data};
+                    //     VRDOM.patch($message, MessageComponentGeneral(message));
+                    // });
                 }
             }
             if(message.media.game) {
