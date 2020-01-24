@@ -7,7 +7,7 @@ import {FileAPI} from "../../../api/fileAPI"
 import AppCryptoManager from "../../../mtproto/crypto/cryptoManager"
 import {DropdownComponent} from "../main/components/input/dropdownComponent";
 import {InputComponent} from "../main/components/input/inputComponent";
-import {CheckboxComponent} from "../main/components/input/checkboxComponent";
+import CheckboxComponent from "../main/components/input/checkboxComponent";
 import {ButtonWithProgressBarComponent} from "../main/components/input/buttonComponent";
 import Component from "../../framework/vrdom/component";
 import AppConfiguration from "../../../configuration";

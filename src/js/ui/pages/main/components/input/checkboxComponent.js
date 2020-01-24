@@ -1,4 +1,4 @@
-export const CheckboxComponent = ({label, checked = false, id}) => {
+const CheckboxComponent = ({label="", checked = false, id}) => {
     return (
         <div className="checkbox-input">
             <label htmlFor={id}>
@@ -11,8 +11,10 @@ export const CheckboxComponent = ({label, checked = false, id}) => {
                 <span className="checkmark">
                         <div className="tgico tgico-check"/>
                 </span>
+                <span className="checkbox-label">{label}</span>
             </label>
-            <span className="checkbox-label">{label}</span>
         </div>
     )
 }
+
+export default CheckboxComponent;
