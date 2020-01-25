@@ -1,4 +1,4 @@
-import {VRDOMPlugin} from "../framework/vrdom/plugin"
+import {VRDOMPlugin} from "../v/vrdom/plugin"
 
 class RippleVRDOMPlugin extends VRDOMPlugin {
     elementCreated($el) {

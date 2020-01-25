@@ -2,7 +2,7 @@ import MessageWrapperComponent from "./messageWrapperComponent"
 import TextWrapperComponent from "./TextWrapperComponent";
 import {FileAPI} from "../../../../../../api/fileAPI";
 import {MediaViewerManager} from "../../../../../mediaViewerManager";
-import Component from "../../../../../framework/vrdom/component";
+import Component from "../../../../../v/vrdom/component";
 import {PhotoComponent} from "../../basic/photoComponent";
 
 // const MessageMediaImage = ({src, size, alt = "", isThumb}) => {

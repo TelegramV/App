@@ -1,39 +1,50 @@
-import AppFramework from "../../framework"
+// @flow
+
+import V from "../../VFramework"
 import VRDOM from "../index"
 import {vrdom_deepDeleteRealNodeInnerComponents} from "../patch"
+import {ReactiveObject} from "../../reactive/ReactiveObject"
+import {EventBus} from "../../../../api/eventBus/EventBus"
 
-/**
- * @property {Element|Node} $el
- */
 class Component {
-    constructor(props) {
-        this.__ = {
-            inited: false,
-            mounted: false,
-            destroyed: false,
-            created: false,
-            patchingItself: false,
 
-            /**
-             * @type {Map<string, *>}
-             */
-            reactiveContexts: new Map(),
-
-            /**
-             * @type {Map<EventBus, Map<string, *>>}
-             */
-            appEventContexts: new Map(),
-
-            reactiveInited: false
-        }
+    __ = {
+        inited: false,
+        mounted: false,
+        destroyed: false,
+        created: false,
+        patchingItself: false,
 
         /**
-         * 0: reactive events and properties will be initialized after mount
-         * 1: reactive events and properties will be initialized during component init process
-         * 2: reactive events and properties will be initialized after create
-         * @type {number}
+         * @type {Map<string, any>}
          */
-        this.reactiveStrategy = 0 // todo: implement it
+        reactiveContexts: new Map(),
+
+        /**
+         * @type {Map<EventBus, Map<string, any>>}
+         */
+        appEventContexts: new Map(),
+
+        reactiveInited: false
+    }
+
+    /**
+     * 0: reactive events and properties will be initialized after mount
+     * 1: reactive events and properties will be initialized during component init process
+     * 2: reactive events and properties will be initialized after create
+     * @type {number}
+     */
+    reactiveStrategy = 0 // todo: implement it
+
+    name = "GeneralComponent"
+    identifier = -1
+    $el
+    state = {}
+    appEvents = new Set()
+    props = {}
+    reactive = {}
+
+    constructor(props) {
 
         /**
          * Unique identifier of the element in VRDOM
@@ -51,7 +62,7 @@ class Component {
          *
          * If not present there is a good reason to delete component completely by using `__delete`
          *
-         * @type {Node|Element|undefined}
+         * @type {Element}
          */
         this.$el = props.$el || undefined
 
@@ -97,7 +108,7 @@ class Component {
          *
          * @type {Map<string, Component>}
          */
-        this.refs = AppFramework.MountedComponents
+        this.refs = V.mountedComponents
     }
 
     // do initialization logic here
@@ -128,7 +139,7 @@ class Component {
     }
 
     // changed reactive property event
-    reactiveChanged(key, value) {
+    reactiveChanged(key, value, event) {
     }
 
     // will be called when selected app event was fired
@@ -162,7 +173,7 @@ class Component {
         this.destroy()
         this.__disableReactive()
         this.__deepDeleteInnerComponents()
-        AppFramework.MountedComponents.delete(this.identifier)
+        V.mountedComponents.delete(this.identifier)
         this.$el.remove()
     }
 
@@ -173,7 +184,15 @@ class Component {
     // do not override this if there is no critical reason
     __disableReactive() {
         for (const [key, context] of this.__.reactiveContexts) {
-            context.offCallback(context.resolve)
+            if (context.__obj) {
+                if (this.reactive[key] instanceof ReactiveObject) {
+                    this.reactive[key].unsubscribe(context.resolve)
+                } else {
+                    console.error(`BUG: invalid reactive property found while disabling reactive properties. ${key} = ${this.reactive[key]}`)
+                }
+            } else {
+                context.offCallback(context.resolve)
+            }
         }
 
         for (const [bus, contexts] of this.__.appEventContexts) {
@@ -248,8 +267,15 @@ class Component {
         if (!this.__.reactiveInited) {
             for (const [key, context] of Object.entries(this.reactive)) {
                 if (context) {
-                    if (context.__rc) {
-                        context.resolve = value => this.__resolveReactivePropertyChange(key, value)
+                    if (context instanceof ReactiveObject) {
+                        const newContext = Object.create(null)
+                        newContext.__obj = true
+                        newContext.resolve = (value, event) => this.__resolveReactivePropertyChange(key, value, event)
+                        this.__.reactiveContexts.set(key, newContext)
+                        context.subscribe(newContext.resolve)
+                    } else if (context.__rc) {
+                        console.warn("avoid using reactive callbacks, use reactive objects instead")
+                        context.resolve = (value, event) => this.__resolveReactivePropertyChange(key, value, event)
                         this.__.reactiveContexts.set(key, context)
                         this.reactive[key] = context.callback(context.resolve)
                     } else {
@@ -282,21 +308,25 @@ class Component {
         }
     }
 
-    __resolveReactivePropertyChange(key, newValue) {
+    __resolveReactivePropertyChange(key, newValue, event) {
         if (this.__.reactiveContexts.has(key)) {
 
             const context = this.__.reactiveContexts.get(key)
 
-            if (context.patchOnly) {
-                this.reactive[key] = newValue
-                this.__patch()
-            } else if (context.fireOnly) {
-                this.reactive[key] = newValue
-                this.reactiveChanged(key, newValue)
+            if (context.__obj) {
+                this.reactiveChanged(key, newValue, event)
             } else {
-                this.reactive[key] = newValue
-                this.reactiveChanged(key, newValue)
-                this.__patch()
+                if (context.patchOnly) {
+                    this.reactive[key] = newValue
+                    this.__patch()
+                } else if (context.fireOnly) {
+                    this.reactive[key] = newValue
+                    this.reactiveChanged(key, newValue, event)
+                } else {
+                    this.reactive[key] = newValue
+                    this.reactiveChanged(key, newValue, event)
+                    this.__patch()
+                }
             }
 
         } else {

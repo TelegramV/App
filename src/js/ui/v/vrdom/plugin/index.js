@@ -1,3 +1,5 @@
+import Component from "../component"
+
 export class VRDOMPlugin {
     constructor() {
     }
@@ -19,27 +21,23 @@ export class VRDOMPlugin {
     /**
      * Currently is not implement.
      *
-     * @param {Component} component
-     * @return boolean false to prevent mounting
+     * @return {boolean} false to prevent mounting
      */
     componentMounting(component) {
-
+        return true
     }
 
     /**
      * Currently is not implement.
      *
-     * @param {Element} $el
-     * @return boolean false to prevent mounting
+     * @return {boolean} false to prevent mounting
      */
     elementMounting($el) {
-
+        return true
     }
 
     /**
      * Be careful with this: `$el` can be component's created $element.
-     *
-     * @param {Element|Node} $el
      */
     elementCreated($el) {
 
@@ -47,8 +45,6 @@ export class VRDOMPlugin {
 
     /**
      * Be careful with this: `$el` can be component's mounted $element.
-     *
-     * @param {Element|Node} $el
      */
     elementMounted($el) {
 

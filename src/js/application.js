@@ -1,7 +1,7 @@
 import "../sass/application.scss"
 
 import './ui/vendor/tgs-player.js';
-import AppFramework from "./ui/framework/framework"
+import V from "./ui/v/VFramework"
 import MTProto from "./mtproto"
 import AppCache from "./api/cache"
 import {loadSchema} from "./mtproto/language/schema"
@@ -37,11 +37,11 @@ function start() {
         }
     })
 
-    AppFramework.registerPlugin(RipplePlugin)
+    V.registerPlugin(RipplePlugin)
 
-    AppFramework.useRoutes(AppRoutes)
+    V.useRoutes(AppRoutes)
 
-    AppFramework.mount("#app")
+    V.mount("#app")
 }
 
 global.Peers = PeersStore
@@ -53,8 +53,6 @@ if (isProduction) {
 } else {
     window.StickerManager = StickerManager
 }
-
-
 
 loadSchema().then(() => {
     MTProto.connect(authContext)

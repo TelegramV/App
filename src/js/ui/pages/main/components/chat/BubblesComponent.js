@@ -1,12 +1,12 @@
 import AppEvents from "../../../../../api/eventBus/AppEvents"
-import {isElementInViewport} from "../../../../framework/utils"
+import {isElementInViewport} from "../../../../utils"
 
 import MessageComponent from "./../../messages/newMessage"
-import Component from "../../../../framework/vrdom/component"
-import VRDOM from "../../../../framework/vrdom"
-import {vrdom_deepDeleteRealNodeInnerComponents} from "../../../../framework/vrdom/patch"
+import Component from "../../../../v/vrdom/component"
+import VRDOM from "../../../../v/vrdom"
+import {vrdom_deepDeleteRealNodeInnerComponents} from "../../../../v/vrdom/patch"
 import {MessageType} from "../../../../../api/dataObjects/messages/Message"
-import AppSelectedPeer from "../../../../reactive/selectedPeer"
+import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import {FileAPI} from "../../../../../api/fileAPI"
 import MTProto from "../../../../../mtproto"
 

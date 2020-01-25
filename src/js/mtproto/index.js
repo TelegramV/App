@@ -11,7 +11,7 @@ import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import Bytes from "./utils/bytes"
 import authKeyCreation from "./connect/authKeyCreation"
 import {FileNetworker} from "./network/fileNetworker";
-import {AppFramework} from "../ui/framework/framework";
+import V from "../ui/v/VFramework";
 
 window.id = 202466030
 window.send = (method, params) => {
@@ -210,7 +210,7 @@ class MobileProtocol {
 
     logout() {
         AppPermanentStorage.clear()
-        AppFramework.Router.push("/login", {})
+        V.router.push("/login", {})
     }
 
     isUserAuthorized() {

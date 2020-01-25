@@ -5,11 +5,13 @@ import MTProto from "../../../mtproto"
  */
 export class DialogApi {
 
+    #dialog
+
     /**
      * @param {Dialog} dialog
      */
     constructor(dialog) {
-        this.dialog = dialog
+        this.#dialog = dialog
     }
 
     setPinned(pinned) {
@@ -19,7 +21,7 @@ export class DialogApi {
             },
             pinned
         }).then(l => {
-            this.dialog.pinned = l
+            this.#dialog.pinned = l
         })
     }
 
@@ -30,7 +32,7 @@ export class DialogApi {
                 unread: unread
             },
             unread: unread,
-            peer: this.dialog.peer.inputPeer
+            peer: this.#dialog.peer.inputPeer
         }).then(response => {
             console.log(response)
         })

@@ -1,4 +1,4 @@
-import Component from "./framework/vrdom/component";
+import Component from "./v/vrdom/component";
 import ChatInfoAvatarComponent from "./pages/main/components/chat/chatInfo/ChatInfoAvatarComponent";
 import MTProto from "../mtproto";
 import {PhotoComponent} from "./pages/main/components/basic/photoComponent";

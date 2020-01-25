@@ -1,7 +1,6 @@
 import {Manager} from "../manager"
 import {MTProto} from "../../mtproto"
 import PeersStore from "../store/PeersStore"
-import AppEvents from "../eventBus/AppEvents"
 import {Message} from "../dataObjects/messages/Message"
 import DialogsManager from "../dialogs/DialogsManager"
 import DialogsStore from "../store/DialogsStore"
@@ -31,9 +30,8 @@ class MessageManager extends Manager {
                 dialog.messages.addUnread(message.id)
             }
 
-            AppEvents.Dialogs.fire("newMessage", {
-                message,
-                dialog // todo: remove
+            dialog.fire("newMessage", {
+                message
             })
         }
 
@@ -82,7 +80,7 @@ class MessageManager extends Manager {
                         id: dialog.peer.id,
                         access_hash: dialog.peer.accessHash
                     }).then(dialog => {
-                        AppEvents.Dialogs.fire("updateSingle", {
+                        dialog.fire("updateSingle", {
                             dialog: dialog
                         })
                     })
@@ -108,7 +106,7 @@ class MessageManager extends Manager {
                             _: dialog.peer.type,
                             id: dialog.peer.id
                         }).then(dialog => {
-                            AppEvents.Dialogs.fire("updateSingle", {
+                            dialog.fire("updateSingle", {
                                 dialog,
                             })
                         })
@@ -130,9 +128,8 @@ class MessageManager extends Manager {
                 if (message) {
                     message.fillRaw(update.message)
 
-                    AppEvents.Dialogs.fire("editMessage", {
+                    to.dialog.fire("editMessage", {
                         message: message,
-                        dialog: to.dialog,
                     })
                 }
             }
@@ -147,9 +144,8 @@ class MessageManager extends Manager {
                 if (message) {
                     message.fillRaw(update.message)
 
-                    AppEvents.Dialogs.fire("editMessage", {
+                    to.dialog.fire("editMessage", {
                         message: message,
-                        dialog: to.dialog,
                     })
                 }
             }

@@ -1,5 +1,5 @@
 import {EventBus} from "./EventBus"
-import ReactiveEvent from "../../ui/framework/reactive/reactiveEvent"
+import ReactiveEvent from "../../ui/v/reactive/ReactiveEvent"
 
 export class DialogsEventBus extends EventBus {
     constructor(props) {

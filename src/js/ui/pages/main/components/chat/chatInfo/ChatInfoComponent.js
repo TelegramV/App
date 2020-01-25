@@ -1,8 +1,8 @@
 import ChatInfoStatusComponent from "./ChatInfoStatusComponent"
 import ChatInfoAvatarComponent from "./ChatInfoAvatarComponent"
 import ChatInfoNameComponent from "./ChatInfoNameComponent"
-import Component from "../../../../../framework/vrdom/component"
-import AppSelectedPeer from "../../../../../reactive/selectedPeer"
+import Component from "../../../../../v/vrdom/component"
+import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 
 class ChatInfoComponent extends Component {
     constructor(props) {

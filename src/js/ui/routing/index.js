@@ -1,10 +1,10 @@
 import {LoginPage} from "../pages/login/nextlogin"
 import {MainPage} from "../pages/main/mainPage"
 import MTProto from "../../mtproto"
-import AppFramework from "../framework/framework"
+import V from "../v/VFramework"
 
 /**
- * @param {FrameworkRouter} router
+ * @param {VFrameworkRouter} router
  */
 function AppRoutes(router) {
     router.route("/login", "login", {
@@ -25,7 +25,7 @@ function AppRoutes(router) {
                 return {
                     next: false,
                     doNext: () => {
-                        AppFramework.Router.push("/login")
+                        V.router.replace("/login")
                     },
                 }
             }
@@ -34,7 +34,7 @@ function AppRoutes(router) {
                 return {
                     next: false,
                     doNext: () => {
-                        AppFramework.Router.push("/")
+                        V.router.replace("/")
                     }
                 }
             }

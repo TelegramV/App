@@ -1,4 +1,4 @@
-import Component from "../../../../../framework/vrdom/component"
+import Component from "../../../../../v/vrdom/component"
 import { FileAPI } from "../../../../../../api/fileAPI"
 import MessageWrapperComponent from "./messageWrapperComponent"
 import TextWrapperComponent from "./TextWrapperComponent"

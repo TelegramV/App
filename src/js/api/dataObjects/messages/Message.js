@@ -1,6 +1,7 @@
 import {getMessagePreviewDialog} from "../../../ui/utils"
 import PeersStore from "../../store/PeersStore"
 import MessagesManager from "../../messages/MessagesManager"
+import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 
 export const MessageType = {
     UNSUPPORTED: undefined,
@@ -26,24 +27,28 @@ export const MessageType = {
     ANIMATED_EMOJI: 19
 }
 
-export class Message {
+export class Message extends ReactiveObject {
+
+    type = MessageType.TEXT
+    dialog = undefined
+
+    #rawMessage
+    #fromPeer
+    #toPeer
 
     /**
      * @param {Dialog} dialog
      * @param rawMessage
      */
     constructor(dialog, rawMessage) {
+        super()
+
         this.dialog = dialog
 
-        this._rawMessage = rawMessage
+        this.#rawMessage = rawMessage
 
-        /**
-         * @type {number}
-         */
-        this.type = MessageType.TEXT
-
-        this._fromPeer = null
-        this._toPeer = null
+        this.#fromPeer = null
+        this.#toPeer = null
 
         this.fillRaw(rawMessage)
     }
@@ -52,76 +57,76 @@ export class Message {
      * @return {number}
      */
     get id() {
-        return this._rawMessage.id
+        return this.#rawMessage.id
     }
 
     /**
      * @return {string}
      */
     get text() {
-        return this._rawMessage.message || ""
+        return this.#rawMessage.message || ""
     }
 
     /**
      * @return {*}
      */
     get entities() {
-        return this._rawMessage.entities
+        return this.#rawMessage.entities
     }
 
     /**
      * @return {Peer}
      */
     get from() {
-        if (this._fromPeer) {
-            return this._fromPeer
+        if (this.#fromPeer) {
+            return this.#fromPeer
         }
 
         // TODO there's type of message when channel message is resent to chat
         // should check it!
 
-        this._fromPeer = MessagesManager.getFromPeerMessage(this.raw)
+        this.#fromPeer = MessagesManager.getFromPeerMessage(this.raw)
 
-        if (!this._fromPeer) {
+        if (!this.#fromPeer) {
             console.warn("no from peer")
         }
 
-        return this._fromPeer
+        return this.#fromPeer
     }
 
     /**
      * @return {Peer}
      */
     get to() {
-        if (this._toPeer) {
-            return this._toPeer
+        if (this.#toPeer) {
+            return this.#toPeer
         }
 
         if (this.dialog) {
-            return this._toPeer = this.dialog.peer
+            return this.#toPeer = this.dialog.peer
         }
 
-        this._toPeer = MessagesManager.getToPeerMessage(this.raw)
+        this.#toPeer = MessagesManager.getToPeerMessage(this.raw)
 
-        return this._toPeer
+        return this.#toPeer
     }
 
     /**
      * @return {boolean}
      */
     get isOut() {
-        if (this._rawMessage.pFlags.out) {
+        if (this.#rawMessage.pFlags.out) {
             return true
         }
 
-        return this._rawMessage.from_id === PeersStore.self().id || this._rawMessage.user_id === PeersStore.self().id
+        return this.#rawMessage.from_id === PeersStore.self().id || this.#rawMessage.user_id === PeersStore.self().id
     }
 
     /**
      * @return {boolean}
      */
     get isPost() {
-        return this._rawMessage.pFlags.post || false
+        return this.#rawMessage.pFlags.post || false
     }
 
     /**
@@ -129,10 +134,6 @@ export class Message {
      */
     get isRead() {
         return this.dialog.messages.readOutboxMaxId >= this.id || this.dialog.messages.readInboxMaxId >= this.id
-    }
-    
-    get replyMarkup() {
-        return this.raw.reply_markup
     }
 
     /**
@@ -152,105 +153,105 @@ export class Message {
      * @return {number}
      */
     get replyToMsgId() {
-        return this._rawMessage.reply_to_msg_id
+        return this.#rawMessage.reply_to_msg_id
     }
 
     /**
      * @return {*}
      */
     get viaBotId() {
-        return this._rawMessage.via_bot_id
+        return this.#rawMessage.via_bot_id
     }
 
     /**
      * @return {*}
      */
     get fwdFrom() {
-        return this._rawMessage.fwd_from
+        return this.#rawMessage.fwd_from
     }
 
     /**
      * @return {number}
      */
     get isScheduled() {
-        return this._rawMessage.pFlags && this._rawMessage.pFlags.from_scheduled
+        return this.#rawMessage.pFlags && this.#rawMessage.pFlags.from_scheduled
     }
 
     /**
      * @return {number}
      */
     get isSilent() {
-        return this._rawMessage.pFlags && this._rawMessage.pFlags.silent
+        return this.#rawMessage.pFlags && this.#rawMessage.pFlags.silent
     }
 
     /**
      * @return {boolean}
      */
     get isEditHide() {
-        return this._rawMessage.pFlags && this._rawMessage.pFlags.edit_hide
+        return this.#rawMessage.pFlags && this.#rawMessage.pFlags.edit_hide
     }
 
     /**
      * @return {number}
      */
     get date() {
-        return this._rawMessage.date
+        return this.#rawMessage.date
     }
 
     /**
      * @return {*}
      */
     get raw() {
-        return this._rawMessage
+        return this.#rawMessage
     }
 
     /**
      * @return {*}
      */
     get media() {
-        return this._rawMessage.media
+        return this.#rawMessage.media
     }
 
     /**
      * @return {*}
      */
     get action() {
-        return this._rawMessage.action
+        return this.#rawMessage.action
     }
 
     /**
      * @return {*}
      */
     get views() {
-        return this._rawMessage.views
+        return this.#rawMessage.views
     }
 
     /**
      * @return {*}
      */
     get replyMarkup() {
-        return this._rawMessage.reply_markup
+        return this.#rawMessage.reply_markup
     }
 
     /**
      * @return {number|undefined}
      */
     get editDate() {
-        return this._rawMessage.edit_date
+        return this.#rawMessage.edit_date
     }
 
     /**
      * @return {string|undefined}
      */
     get postAuthor() {
-        return this._rawMessage.post_author
+        return this.#rawMessage.post_author
     }
 
     /**
      * @return {number|undefined}
      */
     get groupedId() {
-        return this._rawMessage.grouped_id
+        return this.#rawMessage.grouped_id
     }
 
     /**
@@ -304,7 +305,7 @@ export class Message {
                     const attrs = media.document.attributes;
                     for (const attr of attrs) {
                         if (attr._ === "documentAttributeSticker") {
-                            if(media.isAnimatedEmoji) {
+                            if (media.isAnimatedEmoji) {
                                 this.type = MessageType.ANIMATED_EMOJI
                             } else {
                                 this.type = MessageType.STICKER
@@ -345,7 +346,7 @@ export class Message {
             }
         } else {
             const l = StickerManager.getAnimatedEmoji(this.text)
-            if(l) {
+            if (l) {
                 this.raw.media = {
                     _: "messageMediaDocument",
                     isAnimatedEmoji: true,
@@ -369,7 +370,7 @@ export class Message {
     }
 
     fillRaw(rawMessage) {
-        this._rawMessage = rawMessage
+        this.#rawMessage = rawMessage
         this.parseMessageType()
     }
 }

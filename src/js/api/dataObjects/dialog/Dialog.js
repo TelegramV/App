@@ -4,8 +4,19 @@ import {DialogMessages} from "./DialogMessages"
 import AppEvents from "../../eventBus/AppEvents"
 import {DraftMessage} from "./DraftMessage"
 import {DialogApi} from "./DialogApi"
+import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 
-export class Dialog {
+export class Dialog extends ReactiveObject {
+
+    peer = undefined
+    pts = -1
+
+    #rawDialog = {}
+    #pinned = false
+    #unreadMark = false
+    #draft = DraftMessage.createEmpty(this)
+    #messages = undefined
+    #folderId = undefined
 
     /**
      * @param {Object} rawDialog
@@ -13,33 +24,29 @@ export class Dialog {
      * @param {Message} topMessage
      */
     constructor(rawDialog, peer, topMessage) {
-        this._rawDialog = rawDialog
+        super()
 
-        this._pinned = false
-        this._unreadMark = false
+        this.#rawDialog = rawDialog
+
+        this.#pinned = false
+        this.#unreadMark = false
 
         if (peer) {
-            this._peer = peer
-            this._peer.dialog = this
+            this.peer = peer
+            this.peer.dialog = this
         } else {
             console.error("BUG: peer was not provided.")
         }
 
-        this._pts = -1 // `-1` means that dialog was created manually.
-        this._draft = DraftMessage.createEmpty(this)
-        this._folderId = undefined
-
-        this._messages = undefined
-
         if (topMessage) {
             if (topMessage instanceof Message) {
                 topMessage.dialog = this
-                this._messages = new DialogMessages(this, [topMessage])
+                this.#messages = new DialogMessages(this, [topMessage])
             } else {
                 console.error("BUG: invalid message was provided.")
             }
         } else {
-            this._messages = new DialogMessages(this)
+            this.#messages = new DialogMessages(this)
         }
 
         this._api = new DialogApi(this)
@@ -55,41 +62,32 @@ export class Dialog {
     }
 
     get pts() {
-        return this._pts
+        return this.pts
     }
 
     set pts(pts) {
-        this._pts = pts
+        this.pts = pts
     }
 
     get raw() {
-        return this._rawDialog
+        return this.#rawDialog
     }
 
     /**
      * @return {DialogMessages}
      */
     get messages() {
-        return this._messages
-    }
-
-    /**
-     * @return {Peer}
-     */
-    get peer() {
-        return this._peer
+        return this.#messages
     }
 
     get isPinned() {
-        return this._pinned
+        return this.#pinned
     }
 
     set pinned(pinned) {
-        this._pinned = pinned || false
+        this.#pinned = pinned || false
 
-        AppEvents.Dialogs.fire("updatePinned", {
-            dialog: this
-        })
+        this.fire("updatePinned")
     }
 
     get messageAction() {
@@ -100,7 +98,7 @@ export class Dialog {
      * @return {DraftMessage}
      */
     get draft() {
-        return this._draft
+        return this.#draft
     }
 
     /**
@@ -121,7 +119,7 @@ export class Dialog {
      * @return {boolean}
      */
     get unreadMark() {
-        return this._unreadMark
+        return this.#unreadMark
     }
 
     /**
@@ -156,23 +154,23 @@ export class Dialog {
      * @param rawDialog
      */
     fillRaw(rawDialog) {
-        this._rawDialog = rawDialog
-        this._pinned = rawDialog.pFlags && rawDialog.pFlags.pinned || false
-        this._unreadMark = rawDialog.pFlags && rawDialog.pFlags.unread_mark || false
-        this._folderId = rawDialog.folder_id || false
+        this.#rawDialog = rawDialog
+        this.#pinned = rawDialog.pFlags && rawDialog.pFlags.pinned || false
+        this.#unreadMark = rawDialog.pFlags && rawDialog.pFlags.unread_mark || false
+        this.#folderId = rawDialog.folder_id || false
 
-        if (!this._peer) {
+        if (!this.peer) {
             console.error("BUG: there is no peer connected to this dialog.", this)
         }
 
-        this._pts = rawDialog.pts || -1
+        this.pts = rawDialog.pts || -1
 
         this.messages.unreadCount = rawDialog.unread_count || 0
         this.messages.readInboxMaxId = rawDialog.read_inbox_max_id || 0
         this.messages.readOutboxMaxId = rawDialog.read_outbox_max_id || 0
         this.messages.unreadMentionsCount = rawDialog.unread_mentions_count || 0
 
-        this._draft.fillRaw(this, rawDialog.draft)
+        this.#draft.fillRaw(this, rawDialog.draft)
     }
 
     /**

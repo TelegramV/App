@@ -10,7 +10,7 @@ import {PeerAPI} from "../peerAPI"
 import DialogsStore from "../store/DialogsStore"
 import AppEvents from "../eventBus/AppEvents"
 import PeersStore from "../store/PeersStore"
-import AppSelectedPeer from "../../ui/reactive/selectedPeer"
+import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 
 class DialogManager extends Manager {
     constructor() {
@@ -84,9 +84,7 @@ class DialogManager extends Manager {
                 }
                 dialog.messages.stopTransaction()
 
-                AppEvents.Dialogs.fire("updateReadChannelInbox", {
-                    dialog
-                })
+                dialog.fire("updateReadChannelInbox")
             }
         })
 
@@ -95,9 +93,7 @@ class DialogManager extends Manager {
             if (dialog) {
                 dialog.messages.readOutboxMaxId = update.max_id
 
-                AppEvents.Dialogs.fire("updateReadChannelOutbox", {
-                    dialog: dialog
-                })
+                dialog.fire("updateReadChannelOutbox")
             }
         })
 
@@ -213,9 +209,7 @@ class DialogManager extends Manager {
                 return this.resolveDialogWithSlice(_dialog, _dialogsSlice)
             })
 
-            AppEvents.Dialogs.fire("updateSingle", {
-                dialog: dialogs[0],
-            })
+            dialogs[0].fire("updateSingle")
         })
     }
 
@@ -386,9 +380,7 @@ class DialogManager extends Manager {
             const dialog = new Dialog(rawDialog, peer, topMessage)
             DialogsStore.set(dialog)
 
-            AppEvents.Dialogs.fire("updateSingle", {
-                dialog: dialog
-            })
+            dialog.fire("updateSingle")
 
             return dialog
         }

@@ -1,13 +1,12 @@
 import DialogsManager from "../../../../../api/dialogs/DialogsManager"
 import {DialogComponent} from "./DialogComponent"
 import AppEvents from "../../../../../api/eventBus/AppEvents"
-import Sortable from "sortablejs"
-import Component from "../../../../framework/vrdom/component"
-import VRDOM from "../../../../framework/vrdom"
+import Component from "../../../../v/vrdom/component"
+import VRDOM from "../../../../v/vrdom"
 import {ContextMenuManager} from "../../../../contextMenuManager";
 import MTProto from "../../../../../mtproto";
-import {AppFramework} from "../../../../framework/framework";
-import AppSelectedPeer from "../../../../reactive/selectedPeer"
+import V from "../../../../v/VFramework";
+import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import {ConnectionStatusComponent} from "./ConnectionStatusComponent"
 
 export class DialogListComponent extends Component {
@@ -56,7 +55,7 @@ export class DialogListComponent extends Component {
                             onClick: _ => {
                                 const p = MTProto.getAuthorizedUser().user.username ? `@${MTProto.getAuthorizedUser().user.username}` : `user.${MTProto.getAuthorizedUser().user.id}`
 
-                                AppFramework.Router.push("/", {
+                                V.router.push("/", {
                                     queryParams: {
                                         p
                                     }
@@ -133,7 +132,7 @@ export class DialogListComponent extends Component {
         })
 
         AppEvents.Dialogs.subscribe("newMessage", event => {
-            if (!AppFramework.MountedComponents.has(`dialog-${event.dialog.peer.type}-${event.dialog.peer.id}`)) {
+            if (!V.mountedComponents.has(`dialog-${event.dialog.peer.type}-${event.dialog.peer.id}`)) {
                 this._renderDialog(event.dialog, "prepend")
             }
         })

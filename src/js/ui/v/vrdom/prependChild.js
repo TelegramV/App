@@ -1,6 +1,6 @@
 import vrdom_render from "./render"
 import {vrdom_mount_resolveComponentMounted} from "./mount"
-import AppFramework from "../framework"
+import V from "../VFramework"
 
 /**
  * @param vNode
@@ -13,7 +13,7 @@ function vrdom_prepend(vNode, $element, {xmlns = null} = {}) {
 
     $element.prepend($node)
 
-    AppFramework.Plugins.forEach(plugin => plugin.elementMounted($node))
+    V.plugins.forEach(plugin => plugin.elementMounted($node))
 
     vrdom_mount_resolveComponentMounted($node)
 

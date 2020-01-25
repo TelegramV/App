@@ -295,7 +295,7 @@ export class TLSerialization {
     storeMethod(methodName, params) {
         let methodData = false
 
-        for (i = 0; i < this.schema.methods.length; i++) {
+        for (let i = 0; i < this.schema.methods.length; i++) {
             if (String(this.schema.methods[i].method) === String(methodName)) {
                 methodData = this.schema.methods[i]
                 break

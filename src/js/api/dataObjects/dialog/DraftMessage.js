@@ -1,30 +1,40 @@
 import AppEvents from "../../eventBus/AppEvents"
 
 export class DraftMessage {
+    
+    #dialog
+    #rawDraftMessage
+    #type = "draftMessageEmpty"
+    #noWebpage = true
+    #replyToMsgId = -1
+    #message = ""
+    #entities = []
+    #date = 0
+    
     constructor(dialog, rawDraftMessage) {
-        this._dialog = dialog
-        this._rawDraftMessage = rawDraftMessage
+        this.#dialog = dialog
+        this.#rawDraftMessage = rawDraftMessage
 
-        this._type = "draftMessageEmpty"
-        this._noWebpage = true
-        this._replyToMsgId = -1
-        this._message = ""
-        this._entities = []
-        this._date = 0
+        this.#type = "draftMessageEmpty"
+        this.#noWebpage = true
+        this.#replyToMsgId = -1
+        this.#message = ""
+        this.#entities = []
+        this.#date = 0
 
         this.fillRaw(rawDraftMessage)
     }
 
     get raw() {
-        return this._rawDraftMessage
+        return this.#rawDraftMessage
     }
 
     get dialog() {
-        return this._dialog
+        return this.#dialog
     }
 
     get isEmpty() {
-        return this._type === "draftMessageEmpty" || this.message === ""
+        return this.#type === "draftMessageEmpty" || this.message === ""
     }
 
     get isPresent() {
@@ -32,23 +42,23 @@ export class DraftMessage {
     }
 
     get noWebpage() {
-        return this._noWebpage
+        return this.#noWebpage
     }
 
     get replyToMsgId() {
-        return this._replyToMsgId
+        return this.#replyToMsgId
     }
 
     get message() {
-        return this._message
+        return this.#message
     }
 
     get entities() {
-        return this._entities
+        return this.#entities
     }
 
     get date() {
-        return this._date
+        return this.#date
     }
 
     /**
@@ -63,14 +73,14 @@ export class DraftMessage {
 
     fillRaw(rawDraftMessage) {
         if (!rawDraftMessage || rawDraftMessage._ === "draftMessageEmpty") {
-            this._type = "draftMessageEmpty"
+            this.#type = "draftMessageEmpty"
         } else {
-            this._type = rawDraftMessage._ || true
-            this._noWebpage = rawDraftMessage.no_webpage || true
-            this._replyToMsgId = rawDraftMessage.reply_to_msg_id || -1
-            this._message = rawDraftMessage.message || ""
-            this._entities = rawDraftMessage.entities || []
-            this._date = rawDraftMessage.date || 0
+            this.#type = rawDraftMessage._ || true
+            this.#noWebpage = rawDraftMessage.no_webpage || true
+            this.#replyToMsgId = rawDraftMessage.reply_to_msg_id || -1
+            this.#message = rawDraftMessage.message || ""
+            this.#entities = rawDraftMessage.entities || []
+            this.#date = rawDraftMessage.date || 0
         }
     }
 

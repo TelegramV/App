@@ -56,6 +56,8 @@ export class PeerPhoto {
     set smallUrl(smallUrl) {
         this._photoSmallUrl = smallUrl
 
+        this._peer.fire("updatePhotoSmall")
+
         AppEvents.Peers.fire("updatePhotoSmall", {
             peer: this._peer
         })
@@ -89,6 +91,8 @@ export class PeerPhoto {
      */
     set bigUrl(bigUrl) {
         this._photoBigUrl = bigUrl
+
+        this._peer.fire("updatePhotoBig")
 
         AppEvents.Peers.fire("updatePhotoBig", {
             peer: this._peer

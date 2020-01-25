@@ -1,6 +1,6 @@
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
-import Component from "../../../../../framework/vrdom/component"
-import AppSelectedPeer from "../../../../../reactive/selectedPeer"
+import Component from "../../../../../v/vrdom/component"
+import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 
 class ChatInfoAvatarComponent extends Component {
     constructor(props) {

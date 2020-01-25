@@ -1,5 +1,5 @@
 import vrdom_render from "./render"
-import AppFramework from "../framework"
+import V from "../VFramework"
 import {ComponentVRNode} from "./componentVRNode"
 
 let latestInstantiatedComponent = 0
@@ -29,11 +29,11 @@ function vrdom_renderComponentVNode(componentVNode) {
 
     vNode.attrs["data-component-id"] = newId
 
-    AppFramework.MountedComponents.set(newId, componentInstance)
+    V.mountedComponents.set(newId, componentInstance)
 
     componentInstance.__created()
     componentInstance.created()
-    AppFramework.Plugins.forEach(plugin => plugin.componentCreated(componentInstance))
+    V.plugins.forEach(plugin => plugin.componentCreated(componentInstance))
     componentInstance.__.created = true
 
     return vrdom_render(vNode)

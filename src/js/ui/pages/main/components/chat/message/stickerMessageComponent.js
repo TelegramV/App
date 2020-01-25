@@ -1,6 +1,6 @@
 import MessageWrapperComponent from "./messageWrapperComponent";
 import MessageTimeComponent from "./messageTimeComponent";
-import Component from "../../../../../framework/vrdom/component";
+import Component from "../../../../../v/vrdom/component";
 import {MessageType} from "../../../../../../api/dataObjects/messages/Message";
 
 class StickerMessageComponent extends Component {

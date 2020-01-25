@@ -8,9 +8,9 @@
  */
 import VRDOM from "../vrdom"
 import {VRNode} from "../vrdom/VRNode"
-import AppFramework from "../framework"
+import V from "../VFramework"
 
-export class FrameworkRouter {
+export class VFrameworkRouter {
     constructor(options = {}) {
         this.mode = options.mode || "hash"
         this.hash = options.hash || "#/"
@@ -56,13 +56,13 @@ export class FrameworkRouter {
             this.$mountElement = $mountElement
         }
 
-        if (window.location.hash === "") {
+        if (this.mode === "hash" && window.location.hash === "") {
             history.replaceState({}, "", this.hash)
         }
 
         this.renderActive()
 
-        window.addEventListener("hashchange", () => {
+        window.addEventListener("popstate", () => {
             // check if hash path was changed
             // if wasn't then router will not re-render the component
             // if was then it means that query was changed, so we trigger handlers
@@ -80,7 +80,7 @@ export class FrameworkRouter {
             } else {
                 // console.log("[router] triggering replace")
                 // todo: patch tree not delete it
-                AppFramework.MountedComponents.forEach(c => {
+                V.mountedComponents.forEach(c => {
                     c.__delete()
                 })
 
@@ -90,11 +90,27 @@ export class FrameworkRouter {
     }
 
     push(path, options = {}) {
+        let hash = this.buildHash(path, options)
+        history.pushState({}, null, `${this.mode === "hash" ? "#" : ""}${hash}`)
+        window.dispatchEvent(new Event("popstate"))
+    }
+
+    replace(path, options = {}) {
+        let hash = this.buildHash(path, options)
+        history.replaceState({}, null, `${this.mode === "hash" ? "#" : ""}${hash}`)
+        window.dispatchEvent(new Event("popstate"))
+    }
+
+    buildHash(path, options = {}) {
         let hash = path.startsWith("/") ? path : `/${path}`
         if (options.queryParams) {
-            hash += `?${queryParamsToString(options.queryParams)}`
+            if (options.replaceQuery) {
+                hash += `?${queryParamsToString(options.queryParams)}`
+            } else {
+                hash += `?${queryParamsToString(Object.assign(this.activeRoute.queryParams, options.queryParams))}`
+            }
         }
-        location.hash = hash
+        return hash
     }
 
     renderRoute(route) {

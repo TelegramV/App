@@ -3,7 +3,7 @@ import PeersStore from "../store/PeersStore"
 import PeersManager from "../peers/PeersManager"
 import {Peer} from "../dataObjects/peer/Peer"
 import AppEvents from "../eventBus/AppEvents"
-import AppConnectionStatus from "../../ui/reactive/connectionStatus"
+import AppConnectionStatus from "../../ui/reactive/ConnectionStatus"
 import {tsNow} from "../../mtproto/timeManager"
 
 /**
@@ -111,18 +111,18 @@ export class ChannelUpdatesProcessor {
             }
 
             if ((this.latestDifferenceTime + 10) < tsNow(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
-                this.isWaitingForDifference = true
-                this.queueIsProcessing = false
-                console.warn("refetching difference")
-
-                this.getChannelDifference(this.latestDifferencePeer).then(rawDifference => {
-                    this.processDifference(rawDifference)
-                }).catch(e => {
-                    console.error("[default] BUG: difference refetching failed", e)
-                    this.isWaitingForDifference = false
-                    this.queueIsProcessing = false
-                    this.processQueue()
-                })
+                // this.isWaitingForDifference = true
+                // this.queueIsProcessing = false
+                // console.warn("refetching difference")
+                //
+                // this.getChannelDifference(this.latestDifferencePeer).then(rawDifference => {
+                //     this.processDifference(rawDifference)
+                // }).catch(e => {
+                //     console.error("[default] BUG: difference refetching failed", e)
+                //     this.isWaitingForDifference = false
+                //     this.queueIsProcessing = false
+                //     this.processQueue()
+                // })
             }
 
             this.queue.push(rawUpdate)

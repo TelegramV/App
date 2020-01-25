@@ -4,28 +4,28 @@ import AppEvents from "../../eventBus/AppEvents"
 import {PeerPhoto} from "./PeerPhoto"
 import {Dialog} from "../dialog/Dialog"
 import {PeerApi} from "./PeerApi"
+import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 
-export class Peer {
+export class Peer extends ReactiveObject {
+
+    #rawPeer
+    #filled = false
+    #dialog
+    #photo
+    #accessHash
+    #min_messageId
+    #min_inputPeer
+    #full
+    #api
+
     constructor(rawPeer, dialog = undefined) {
-        this._rawPeer = rawPeer
-        this._filled = false
+        super()
 
-        /**
-         * @type {Dialog|undefined}
-         * @private
-         */
-        this._dialog = dialog || Dialog.createEmpty(this)
+        this.#rawPeer = rawPeer
+        this.#dialog = dialog || Dialog.createEmpty(this)
 
-        this._photo = PeerPhoto.createEmpty(this)
-        this._accessHash = undefined
-
-        // for min constructor
-        this._min_messageId = undefined
-        this._min_inputPeer = undefined
-
-        this._full = undefined
-
-        this._api = new PeerApi(this)
+        this.#photo = PeerPhoto.createEmpty(this)
+        this.#api = new PeerApi(this)
 
         this.fillRaw(rawPeer)
     }
@@ -34,7 +34,7 @@ export class Peer {
      * @return {PeerApi}
      */
     get api() {
-        return this._api
+        return this.#api
     }
 
     /**
@@ -42,7 +42,7 @@ export class Peer {
      * @return {*}
      */
     get raw() {
-        return this._rawPeer
+        return this.#rawPeer
     }
 
     /**
@@ -50,7 +50,7 @@ export class Peer {
      * @param rawPeer
      */
     set raw(rawPeer) {
-        this._rawPeer = rawPeer
+        this.#rawPeer = rawPeer
     }
 
     /**
@@ -64,18 +64,18 @@ export class Peer {
      * @return {Dialog|undefined}
      */
     get dialog() {
-        return this._dialog
+        return this.#dialog
     }
 
     /**
      * @param {Dialog} dialog
      */
     set dialog(dialog) {
-        this._dialog = dialog
+        this.#dialog = dialog
     }
 
     get accessHash() {
-        return this._accessHash
+        return this.#accessHash
     }
 
     /**
@@ -135,15 +135,15 @@ export class Peer {
         if (this.type === "user") {
             return {
                 _: "inputPeerUserFromMessage",
-                peer: this._min_inputPeer,
-                msg_id: this._min_messageId,
+                peer: this.#min_inputPeer,
+                msg_id: this.#min_messageId,
                 user_id: this.id
             }
         } else if (this.type === "channel") {
             return {
                 _: "inputPeerChannelFromMessage",
-                peer: this._min_inputPeer,
-                msg_id: this._min_messageId,
+                peer: this.#min_inputPeer,
+                msg_id: this.#min_messageId,
                 channel_id: this.id
             }
         } else {
@@ -151,8 +151,8 @@ export class Peer {
 
             return {
                 _: "inputPeerChannelFromMessage",
-                peer: this._min_inputPeer,
-                msg_id: this._min_messageId,
+                peer: this.#min_inputPeer,
+                msg_id: this.#min_messageId,
                 channel_id: this.id
             }
         }
@@ -162,7 +162,7 @@ export class Peer {
      * @return {PeerPhoto}
      */
     get photo() {
-        return this._photo
+        return this.#photo
     }
 
     /**
@@ -170,14 +170,14 @@ export class Peer {
      * @param photo
      */
     set photo(photo) {
-        this._photo = photo
+        this.#photo = photo
     }
 
     /**
      * @return {*|undefined}
      */
     get full() {
-        return this._full
+        return this.#full
     }
 
     /**
@@ -195,8 +195,11 @@ export class Peer {
         return MTProto.invokeMethod("users.getFullUser", {
             id: this.inputPeer
         }).then(userFull => {
-            this._full = userFull
+            this.#full = userFull
 
+            this.fire("fullLoaded")
+
+            // todo: delete this thing
             AppEvents.Peers.fire("fullLoaded", {
                 peer: this
             })
@@ -213,7 +216,7 @@ export class Peer {
         }
 
         // When receiving said (min) constructors, the client must first check if user or chat object without min flag is already present in local cache. If it is present, then the client should just ignore constructors with min flag and use local one instead.
-        if (rawPeer.pFlags && rawPeer.pFlags.min === true && this._filled) {
+        if (rawPeer.pFlags && rawPeer.pFlags.min === true && this.#filled) {
             return
         }
 
@@ -221,18 +224,18 @@ export class Peer {
 
         // НЕ РУХАЙ
         if (this.accessHash === undefined) {
-            this._accessHash = this.raw.access_hash
+            this.#accessHash = this.raw.access_hash
         } else if (rawPeer.pFlags && !rawPeer.pFlags.min) {
-            this._accessHash = this.raw.access_hash
+            this.#accessHash = this.raw.access_hash
         }
 
         if (this.isMin) {
-            this._photo.fillRaw(false)
+            this.#photo.fillRaw(false)
         } else {
-            this._photo.fillRaw(rawPeer.photo)
+            this.#photo.fillRaw(rawPeer.photo)
         }
 
-        this._filled = true
+        this.#filled = true
     }
 
     /**
@@ -240,6 +243,8 @@ export class Peer {
      */
     fillRawAndFire(rawPeer) {
         this.fillRaw(rawPeer)
+
+        this.fire("updateSingle")
 
         AppEvents.Peers.fire("updateSingle", {
             peer: this

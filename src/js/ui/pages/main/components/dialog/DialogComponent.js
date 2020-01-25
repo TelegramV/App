@@ -1,8 +1,8 @@
 import {UserPeer} from "../../../../../api/dataObjects/peer/UserPeer"
 import {DialogTextComponent} from "./DialogTextComponent"
-import {AppFramework} from "../../../../framework/framework"
+import V from "../../../../v/VFramework"
 import {DialogAvatarComponent} from "./DialogAvatarComponent"
-import Component from "../../../../framework/vrdom/component"
+import Component from "../../../../v/vrdom/component"
 import AppEvents from "../../../../../api/eventBus/AppEvents"
 import {tsNow} from "../../../../../mtproto/timeManager"
 import {ContextMenuManager} from "../../../../contextMenuManager";
@@ -11,7 +11,7 @@ import {GroupPeer} from "../../../../../api/dataObjects/peer/GroupPeer";
 import {SupergroupPeer} from "../../../../../api/dataObjects/peer/SupergroupPeer";
 import {ModalManager} from "../../../../modalManager";
 import {FlatButtonComponent} from "../input/flatButtonComponent";
-import AppSelectedPeer from "../../../../reactive/selectedPeer"
+import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 
 const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -48,17 +48,13 @@ const patchPeerEventTypes = new Set([
 
 // NEVER CREATE THIS COMPONENT WITH THE SAME DIALOG
 export class DialogComponent extends Component {
-    constructor(props) {
-        super(props)
 
+    init() {
         this.reactive = {
-            selectedPeer: AppSelectedPeer.Reactive.FireOnly
+            selectedPeer: AppSelectedPeer.Reactive.FireOnly,
+            dialog: this.props.dialog,
+            peer: this.props.dialog.peer
         }
-
-        this.appEvents = new Set([
-            AppEvents.Dialogs.reactiveAnySingle(this.props.dialog).FireOnly,
-            AppEvents.Peers.reactiveAnySingle(this.props.dialog.peer).FireOnly,
-        ])
 
         this._contextMenuListener = ContextMenuManager.listener([
             {
@@ -165,7 +161,7 @@ export class DialogComponent extends Component {
     _handleClick() {
         const p = this.props.dialog.peer.username ? `@${this.props.dialog.peer.username}` : `${this.props.dialog.peer.type}.${this.props.dialog.peer.id}`
 
-        AppFramework.Router.push("/", {
+        V.router.push("/", {
             queryParams: {
                 p
             }
@@ -176,7 +172,7 @@ export class DialogComponent extends Component {
 
     }
 
-    reactiveChanged(key, value) {
+    reactiveChanged(key, value, event) {
         if (key === "selectedPeer") {
 
             if (value) {
@@ -186,6 +182,20 @@ export class DialogComponent extends Component {
             }
 
             if (value === this.props.dialog.peer || AppSelectedPeer.Previous === this.props.dialog.peer) {
+                this.__patch()
+            }
+
+        } else if (key === "dialog") {
+
+            if (patchAndResortDialogEventTypes.has(event.type)) {
+                this._patchAndResort()
+            } else if (patchDialogEventTypes.has(event.type)) {
+                this.__patch()
+            }
+
+        } else if (key === "peer") {
+
+            if (patchPeerEventTypes.has(event.type)) {
                 this.__patch()
             }
 
@@ -218,20 +228,6 @@ export class DialogComponent extends Component {
         }
 
         this.__patch()
-    }
-
-    eventFired(bus, event) {
-        if (bus === AppEvents.Dialogs) {
-            if (patchAndResortDialogEventTypes.has(event.type)) {
-                this._patchAndResort()
-            } else if (patchDialogEventTypes.has(event.type)) {
-                this.__patch()
-            }
-        } else if (bus === AppEvents.Peers) {
-            if (patchPeerEventTypes.has(event.type)) {
-                this.__patch()
-            }
-        }
     }
 
     /**

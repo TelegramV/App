@@ -1,10 +1,10 @@
-import Component from "../../../../../framework/vrdom/component";
+import Component from "../../../../../v/vrdom/component";
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 import {askForFile} from "../../../../../utils";
 import Random from "../../../../../../mtproto/utils/random";
 import TimeManager from "../../../../../../mtproto/timeManager";
 import {createNonce} from "../../../../../../mtproto/utils/bin";
-import AppSelectedPeer from "../../../../../reactive/selectedPeer"
+import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {InlineKeyboardComponent} from "../message/inlineKeyboardComponent";
 
 export let ChatInputManager

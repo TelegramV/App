@@ -88,17 +88,17 @@ export class DefaultUpdatesProcessor {
                     diffType: 1 // default
                 })
             } else if ((this.latestDifferenceTime + 10) < tsNow(true)) {
-                this.isWaitingForDifference = true
-                this.queueIsProcessing = false
-
-                this.getDifference(this.updatesManager.State).then(rawDifference => {
-                    this.processDifference(rawDifference)
-                }).catch(e => {
-                    console.error("[default] BUG: difference refetching failed", e)
-                    this.isWaitingForDifference = false
-                    this.queueIsProcessing = false
-                    this.processQueue()
-                })
+                // this.isWaitingForDifference = true
+                // this.queueIsProcessing = false
+                //
+                // this.getDifference(this.updatesManager.State).then(rawDifference => {
+                //     this.processDifference(rawDifference)
+                // }).catch(e => {
+                //     console.error("[default] BUG: difference refetching failed", e)
+                //     this.isWaitingForDifference = false
+                //     this.queueIsProcessing = false
+                //     this.processQueue()
+                // })
             }
 
             this.queue.push(rawUpdate)

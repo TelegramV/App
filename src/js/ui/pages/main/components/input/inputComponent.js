@@ -1,4 +1,4 @@
-import Component from "../../../../framework/vrdom/component";
+import Component from "../../../../v/vrdom/component";
 
 export class InputComponent extends Component {
     constructor(props) {

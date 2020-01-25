@@ -1,5 +1,5 @@
 import AppEvents from "../../api/eventBus/AppEvents"
-import ReactiveCallback from "../framework/reactive/reactiveCallback"
+import ReactiveCallback from "../v/reactive/ReactiveCallback"
 
 class ConnectionStatus {
     constructor() {

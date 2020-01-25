@@ -7,14 +7,14 @@
  */
 import vrdom_render from "./render"
 import {ComponentVRNode} from "./componentVRNode"
-import AppFramework from "../framework"
+import V from "../VFramework"
 
 /**
  * @param {Node|Element} $mounted
  */
 export function vrdom_mount_resolveComponentMounted($mounted) {
     if ($mounted.nodeType !== Node.TEXT_NODE && $mounted.hasAttribute("data-component-id")) {
-        const component = AppFramework.MountedComponents.get($mounted.getAttribute("data-component-id"))
+        const component = V.mountedComponents.get($mounted.getAttribute("data-component-id"))
 
         if (component) {
             component.$el = $mounted
@@ -23,7 +23,7 @@ export function vrdom_mount_resolveComponentMounted($mounted) {
                 component.__.mounted = true
                 component.__mounted()
                 component.mounted()
-                AppFramework.Plugins.forEach(plugin => plugin.componentMounted(component))
+                V.plugins.forEach(plugin => plugin.componentMounted(component))
             }
         } else {
             console.error("component was not found. it means that there is a potential bug in the vrdom")
@@ -34,7 +34,7 @@ export function vrdom_mount_resolveComponentMounted($mounted) {
 function vrdom_mount(vNode, $target) {
     const $mounted = vrdom_realMount(vrdom_render(vNode), $target)
 
-    AppFramework.Plugins.forEach(plugin => plugin.elementMounted($mounted))
+    V.plugins.forEach(plugin => plugin.elementMounted($mounted))
 
     vrdom_mount_resolveComponentMounted($mounted)
 

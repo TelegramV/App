@@ -1,10 +1,10 @@
 import {Pinned} from "../../../../pinnedController"
 import LoaderComponent from "../loading/LoaderComponent"
 import ChatInfoComponent from "./chatInfo/ChatInfoComponent"
-import Component from "../../../../framework/vrdom/component"
+import Component from "../../../../v/vrdom/component"
 import BubblesComponent from "./BubblesComponent"
 import {ChatInputComponent} from "./chatInput/ChatInputComponent";
-import AppSelectedPeer from "../../../../reactive/selectedPeer"
+import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 
 /**
  * CRITICAL: never rerender this component!

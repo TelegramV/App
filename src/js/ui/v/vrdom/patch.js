@@ -1,6 +1,6 @@
 import {ComponentVRNode} from "./componentVRNode"
 import {VRNode} from "./VRNode"
-import AppFramework from "../framework"
+import V from "../VFramework"
 import vrdom_mount from "./mount"
 import vrdom_append from "./appendChild"
 
@@ -84,7 +84,7 @@ export function vrdom_deepDeleteRealNodeInnerComponents($node) {
             if ($child.hasAttribute("data-component-id")) {
 
                 const rawId = $child.getAttribute("data-component-id")
-                const component = AppFramework.MountedComponents.get(rawId)
+                const component = V.mountedComponents.get(rawId)
 
                 if (component) {
                     component.__delete()
@@ -111,7 +111,7 @@ export function vrdom_deepDeleteRealNode($node) {
     if ($node.hasAttribute("data-component-id")) {
 
         const rawId = $node.getAttribute("data-component-id")
-        const component = AppFramework.MountedComponents.get(rawId)
+        const component = V.mountedComponents.get(rawId)
 
         if (component) {
             component.__delete()
@@ -159,7 +159,7 @@ function vrdom_patch($node, newVNode) {
         if ($node.hasAttribute("data-component-id")) {
             // console.log("[patch component] $node component")
 
-            const mounted = AppFramework.MountedComponents.get($node.getAttribute("data-component-id"))
+            const mounted = V.mountedComponents.get($node.getAttribute("data-component-id"))
 
             if (mounted) {
                 if (!mounted.__.patchingItself) {
@@ -185,7 +185,7 @@ function vrdom_patch($node, newVNode) {
         if ($node.hasAttribute("data-component-id")) {
             // console.log("[patch node] $node component")
 
-            const mounted = AppFramework.MountedComponents.get($node.getAttribute("data-component-id"))
+            const mounted = V.mountedComponents.get($node.getAttribute("data-component-id"))
 
             if (mounted) {
 
@@ -224,7 +224,7 @@ function vrdom_patch($node, newVNode) {
         if ($node.hasAttribute("data-component-id")) {
             // console.log("[patch undefined] $node component")
 
-            const component = AppFramework.MountedComponents.get($node.getAttribute("data-component-id"))
+            const component = V.mountedComponents.get($node.getAttribute("data-component-id"))
 
             if (component) {
                 component.__delete()
@@ -251,7 +251,7 @@ function vrdom_patch($node, newVNode) {
         if ($node.hasAttribute("data-component-id")) {
             // console.log("[patch undefined] $node unexpected")
 
-            const component = AppFramework.MountedComponents.get($node.getAttribute("data-component-id"))
+            const component = V.mountedComponents.get($node.getAttribute("data-component-id"))
 
             if (component) {
                 component.__delete()

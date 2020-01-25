@@ -2,7 +2,7 @@ import {ComponentVRNode} from "./componentVRNode"
 import {VRNode} from "./VRNode"
 import vrdom_renderComponentVNode from "./renderComponent"
 import vrdom_append from "./appendChild"
-import AppFramework from "../framework"
+import V from "../VFramework"
 
 const _XML_NAMESPACES = new Map([
     ["svg", "http://www.w3.org/2000/svg"]
@@ -58,15 +58,10 @@ function vrdom_render(vNode, xmlns = null) {
         }
 
         for (const [k, v] of vNode.events.entries()) {
-            // if ($node.hasOwnProperty(`on${k}`)) {
             $node[`on${k}`] = v
-            // } else {
-            //     console.warn("[render] The node hasn't such event setter. Adding event by `addEventListener` which has bugs.")
-            //     $node.addEventListener(k, v)
-            // }
         }
 
-        AppFramework.Plugins.forEach(plugin => plugin.elementCreated($node))
+        V.plugins.forEach(plugin => plugin.elementCreated($node))
 
         for (const child of vNode.children) {
             vrdom_append(child, $node, {xmlns})

@@ -4,8 +4,8 @@ import {SupergroupPeer} from "../../../../../../api/dataObjects/peer/SupergroupP
 import {GroupPeer} from "../../../../../../api/dataObjects/peer/GroupPeer"
 import {BotPeer} from "../../../../../../api/dataObjects/peer/BotPeer"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
-import Component from "../../../../../framework/vrdom/component"
-import AppSelectedPeer from "../../../../../reactive/selectedPeer"
+import Component from "../../../../../v/vrdom/component"
+import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 
 const patchEvents = new Set([
     "updateUserStatus",

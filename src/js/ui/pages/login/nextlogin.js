@@ -2,14 +2,14 @@ import {MonkeyController} from "./monkey"
 import {askForFile, countries, hasClass} from "../../utils"
 import {MTProto} from "../../../mtproto"
 import {AppPermanentStorage} from "../../../common/storage"
-import {AppFramework} from "../../framework/framework"
+import V from "../../v/VFramework"
 import {FileAPI} from "../../../api/fileAPI"
 import AppCryptoManager from "../../../mtproto/crypto/cryptoManager"
 import {DropdownComponent} from "../main/components/input/dropdownComponent";
 import {InputComponent} from "../main/components/input/inputComponent";
 import CheckboxComponent from "../main/components/input/checkboxComponent";
 import {ButtonWithProgressBarComponent} from "../main/components/input/buttonComponent";
-import Component from "../../framework/vrdom/component";
+import Component from "../../v/vrdom/component";
 import AppConfiguration from "../../../configuration";
 import UpdatesManager from "../../../api/updates/updatesManager";
 import {tsNow} from "../../../mtproto/timeManager";
@@ -575,7 +575,7 @@ class RegisterPaneComponent extends PaneComponent {
                         this.props.finished(authorization)
                     }, error => {
                         console.log(error)
-                        AppFramework.Router.push("/")
+                        V.router.push("/")
                     });
                 } else {
                     this.props.finished(authorization)
@@ -722,7 +722,7 @@ class Login extends Component {
 
     loginSuccess(response) {
         AppPermanentStorage.setItem("authorizationData", response)
-        AppFramework.Router.push("/")
+        V.router.push("/")
         console.log("login success!")
     }
 

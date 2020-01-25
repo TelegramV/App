@@ -22,9 +22,7 @@ class PeerManager extends Manager {
             if (peer instanceof UserPeer) {
                 peer.raw.status = update.status
 
-                AppEvents.Peers.fire("updateUserStatus", {
-                    peer
-                })
+                peer.fire("updateUserStatus")
             }
         })
 
