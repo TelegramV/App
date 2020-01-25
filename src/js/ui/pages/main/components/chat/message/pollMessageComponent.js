@@ -90,18 +90,17 @@ export default class PollMessageComponent extends Component {
     }
 
     _answerInput(event) {
-        console.log("Answer click!");
     	let option = event.currentTarget.closest(".answer").getAttribute("option");
     	this.addAnswer(option);
     }
 }
 
-const AnswerComponent = ({answer, result, total_voters=0, name, click}) => {
+const AnswerComponent = ({answer, result, total_voters=0, name, input}) => {
     if (!result) {
             return (
                 <div class="answer" option={answer.option}>
                     <div class="result-wrapper">
-                        <RadioComponent name={name} click={click}/>
+                        <RadioComponent name={name} input={input}/>
                     </div>
                     <div class="options-wrapper">
                         <div class="answer-text">{answer.text}</div>
