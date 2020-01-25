@@ -5,6 +5,7 @@ import Random from "../../../../../../mtproto/utils/random";
 import TimeManager from "../../../../../../mtproto/timeManager";
 import {createNonce} from "../../../../../../mtproto/utils/bin";
 import AppSelectedPeer from "../../../../../reactive/selectedPeer"
+import {InlineKeyboardComponent} from "../message/inlineKeyboardComponent";
 
 export let ChatInputManager
 
@@ -28,105 +29,128 @@ export class ChatInputComponent extends Component {
         return <div className="chat-input-wrapper">
             <div className="chat-input">
 
-                <div className="input-field-wrapper">
-                    {
-                        this.state.reply ?
-                            <div className="reply">
-                                <i className="tgico tgico-close" onClick={l => {
-                                    this.state.reply = null
-                                    this.__patch()
-                                }
-                                }/>
-                                <div className="message">
-                                    <div className="title">{this.state.reply.title}</div>
-                                    <div className="description">{this.state.reply.description}</div>
+                <div className="input-and-keyboard-wrapper">
+                    <div className="input-field-wrapper">
+                        {
+                            this.state.reply ?
+                                <div className="reply">
+                                    <i className="tgico tgico-close" onClick={l => {
+                                        this.state.reply = null
+                                        this.__patch()
+                                    }
+                                    }/>
+                                    <div className="message">
+                                        <div className="title">{this.state.reply.title}</div>
+                                        <div className="description">{this.state.reply.description}</div>
+                                    </div>
                                 </div>
+                                : ""
+                        }
+                        {this.state.attachments.length > 0 ?
+                            <div className="media">
+                                {this.state.attachments.map(l => {
+                                    return <div className="attachment photo">
+                                        <i className="tgico tgico-close" onClick={_ => {
+                                            this.state.attachments = this.state.attachments.filter(e => e !== l)
+                                            this.__patch()
+                                        }}/>
+                                        <img src={l.src} alt=""/>
+                                    </div>
+                                })}
+                            </div>
+                            : ""}
+                        <div className="input-field">
+                            <i className="tgico tgico-smile"></i>
+                            <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]}
+                                 placeholder="Message"
+                                 contentEditable={true} onInput={this.onInput} onKeyPress={this.onKeyPress}
+                                 onContextMenu={ContextMenuManager.listener([
+                                     {
+                                         title: "Bold",
+                                         after: "Ctrl+B",
+                                         onClick: _ => {
+                                         }
+                                     },
+                                     {
+                                         title: "Italic",
+                                         after: "Ctrl+I",
+                                         onClick: _ => {
+                                         }
+                                     },
+                                     {
+                                         title: "Underline",
+                                         after: "Ctrl+U",
+                                         onClick: _ => {
+                                         }
+                                     },
+                                     {
+                                         title: "Strikethrough",
+                                         after: "Ctrl+Shift+X",
+                                         onClick: _ => {
+                                         }
+                                     },
+                                     {
+                                         title: "Monospace",
+                                         after: "Ctrl+Shift+M",
+                                         onClick: _ => {
+                                         }
+                                     },
+                                     {
+                                         title: "Create link",
+                                         after: "Ctrl+K",
+                                         onClick: _ => {
+                                         }
+                                     },
+                                     {
+                                         title: "Normal text",
+                                         after: "Ctrl+Shift+N",
+                                         onClick: _ => {
+                                         }
+                                     }
+                                 ])} dangerouslySetInnerHTML={this.state.value}>
+                            </div>
+                            {this.state.keyboardMarkup ?
+                                // TODO replace icon to keyboard
+                                <i className="tgico tgico-smallscreen"/>
+                                : ""}
+                            <i className="tgico tgico-attach" onClick={l => ContextMenuManager.openAbove([
+                                {
+                                    icon: "photo",
+                                    title: "Photo or Video",
+                                    onClick: _ => {
+                                        this.pickFile(false)
+                                    }
+                                },
+                                {
+                                    icon: "document",
+                                    title: "Document",
+                                    onClick: _ => {
+                                        this.pickFile(true)
+                                    }
+                                },
+                            ], l.target)}/>
+
+                        </div>
+
+                    </div>
+
+                    {
+                        this.state.keyboardMarkup ?
+                            <div className="keyboard-markup">
+                                {this.state.keyboardMarkup.rows.map(l => {
+                                    return <div className="row">
+                                        {l.buttons.map(q => {
+                                            return InlineKeyboardComponent.parseButton(q)
+                                        })}
+                                    </div>
+                                })}
                             </div>
                             : ""
                     }
-                    {this.state.attachments.length > 0 ?
-                        <div className="media">
-                            {this.state.attachments.map(l => {
-                                return <div className="attachment photo">
-                                    <i className="tgico tgico-close" onClick={_ => {
-                                        this.state.attachments = this.state.attachments.filter(e => e !== l)
-                                        this.__patch()
-                                    }}/>
-                                    <img src={l.src} alt=""/>
-                                </div>
-                            })}
-                        </div>
-                        : ""}
-                    <div className="input-field">
-                        <i className="tgico tgico-smile"></i>
-                        <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]} placeholder="Message"
-                             contentEditable={true} onInput={this.onInput} onKeyPress={this.onKeyPress}
-                             onContextMenu={ContextMenuManager.listener([
-                                 {
-                                     title: "Bold",
-                                     after: "Ctrl+B",
-                                     onClick: _ => {
-                                     }
-                                 },
-                                 {
-                                     title: "Italic",
-                                     after: "Ctrl+I",
-                                     onClick: _ => {
-                                     }
-                                 },
-                                 {
-                                     title: "Underline",
-                                     after: "Ctrl+U",
-                                     onClick: _ => {
-                                     }
-                                 },
-                                 {
-                                     title: "Strikethrough",
-                                     after: "Ctrl+Shift+X",
-                                     onClick: _ => {
-                                     }
-                                 },
-                                 {
-                                     title: "Monospace",
-                                     after: "Ctrl+Shift+M",
-                                     onClick: _ => {
-                                     }
-                                 },
-                                 {
-                                     title: "Create link",
-                                     after: "Ctrl+K",
-                                     onClick: _ => {
-                                     }
-                                 },
-                                 {
-                                     title: "Normal text",
-                                     after: "Ctrl+Shift+N",
-                                     onClick: _ => {
-                                     }
-                                 }
-                             ])} dangerouslySetInnerHTML={this.state.value}>
-                        </div>
-                        <i className="tgico tgico-attach" onClick={l => ContextMenuManager.openAbove([
-                            {
-                                icon: "photo",
-                                title: "Photo or Video",
-                                onClick: _ => {
-                                    this.pickFile(false)
-                                }
-                            },
-                            {
-                                icon: "document",
-                                title: "Document",
-                                onClick: _ => {
-                                    this.pickFile(true)
-                                }
-                            },
-                        ], l.target)}/>
-
-                    </div>
                 </div>
 
-                <div className="send-button" onClick={this.onSend} onMouseDown={this.onMouseDown}
+
+                <div className="send-button rp rps" onClick={this.onSend} onMouseDown={this.onMouseDown}
                      onMouseUp={this.onMouseUp} onContextMenu={l => ContextMenuManager.openAbove([
                     {
                         icon: "mute",
@@ -154,6 +178,20 @@ export class ChatInputComponent extends Component {
             title: message.from.name,
             description: message.text,
             message: message
+        }
+        this.__patch()
+    }
+
+    setKeyboardMarkup(markup) {
+        // TODO selective
+        if(markup._ === "replyKeyboardMarkup") {
+            this.state.keyboardMarkup = markup
+        } else if(markup._ === "replyKeyboardForceReply") {
+
+        } else if(markup._ === "replyKeyboardHide") {
+            this.state.keyboardMarkup = null
+        } else {
+            return
         }
         this.__patch()
     }

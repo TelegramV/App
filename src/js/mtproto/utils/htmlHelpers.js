@@ -75,6 +75,7 @@ const handlersLinks = {
     messageEntityCashtag: (l, a) => <a href="#">{a}</a>,
 }
 
+// TODO fix multiple entities overlap
 export function parseMessageEntities(text, messageEntities, noLinks = false) {
     messageEntities = messageEntities || []
 

@@ -1,0 +1,80 @@
+.inline-keyboard, .keyboard-markup {
+  display: flex;
+  flex-direction: column;
+  margin-top: 3px;
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    margin-top: 5px;
+
+    .button {
+      background-color: rgba($darkgrey, 0.4);
+      width: 100%;
+      text-align: center;
+      padding: 10px;
+      border-radius: 6px;
+      margin-right: 8px;
+      cursor: pointer;
+      color: white;
+      font-size: 15px;
+
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      flex-direction: column;
+
+      transition: anim(background-color);
+
+      progress {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        font-size: 4px;
+        width: 10px;
+        height: 10px;
+        transition: anim(opacity);
+
+        &.disabled {
+          display: none;
+          opacity: 0;
+        }
+      }
+
+      &.link::before {
+        content: $tgico-next;
+        transform: rotate(-45deg);
+      }
+
+      &.switch-inline::before {
+        // TODO should be not filled
+        content: $tgico-forward;
+      }
+
+      &.link::before, &.switch-inline::before {
+        position: absolute;
+        -moz-osx-font-smoothing: grayscale;
+        right: 0;
+        top: 0;
+        font-family: "#{$tgico-font-family}" !important;
+        speak: none;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        //line-height: 1;
+
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
+
+      &:hover {
+        background-color: rgba($darkgrey, 0.6);
+      }
+    }
+  }
+}

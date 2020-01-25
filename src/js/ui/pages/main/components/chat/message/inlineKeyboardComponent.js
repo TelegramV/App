@@ -14,30 +14,30 @@ export class InlineKeyboardComponent extends Component {
             {message.replyMarkup.rows.map(l => {
                 return <div className="row">
                     {l.buttons.map(q => {
-                        return this.parseButton(q)
+                        return InlineKeyboardComponent.parseButton(q)
                     })}
                 </div>
             })}
         </div>
     }
 
-    parseButton(button) {
+    static parseButton(button) {
         const loader = <progress className="progress-circular white disabled"/>
         const handlers = {
-            "keyboardButton": l => <div className="button rp rps" onClick={q => this.callbackButton(q.target, l.text)}>{l.text}{loader}</div>,
+            "keyboardButton": l => <div className="button rp rps" onClick={q => this.callbackButton(this.props.message, q.target, l.text)}>{l.text}{loader}</div>,
             "keyboardButtonUrl": l => <a className="button rp rps link" href={l.url} target="_blank">{l.text}{loader}</a>,
-            "keyboardButtonCallback": l => <div className="button rp rps" onClick={q => this.callbackButton(q.target, l.data)}>{l.text}{loader}</div>,
+            "keyboardButtonCallback": l => <div className="button rp rps" onClick={q => this.callbackButton(this.props.message, q.target, l.data)}>{l.text}{loader}</div>,
             "keyboardButtonRequestPhone": l => <div className="button rp rps" onClick={this.requestPhone}>{l.text}{loader}</div>,
             "keyboardButtonRequestGeoLocation": l => <div className="button rp rps" onClick={this.requestGeo}>{l.text}{loader}</div>,
-            "keyboardButtonSwitchInline": l => <div className="button rp rps" onClick={_ => this.switchInline(l)}>{l.text}{loader}</div>,
-            "keyboardButtonGame": l => <div className="button rp rps" onClick={q => this.startGame(q.target)}>{l.text}{loader}</div>,
+            "keyboardButtonSwitchInline": l => <div className="button rp rps switch-inline" onClick={_ => this.switchInline(l)}>{l.text}{loader}</div>,
+            "keyboardButtonGame": l => <div className="button rp rps" onClick={q => this.startGame(this.props.message, q.target)}>{l.text}{loader}</div>,
             "keyboardButtonBuy": l => <div className="button rp rps" onClick={this.buy}>{l.text}{loader}</div>,
             "keyboardButtonUrlAuth": l => <div className="button rp rps" onClick={_ => this.auth(l)}>{l.text}{loader}</div>
         }
         return handlers[button._](button)
     }
 
-    callbackButton(target, bytes, isGame = false) {
+    static callbackButton(message, target, bytes, isGame = false) {
         const progress = target.querySelector("progress")
         progress.classList.remove("disabled")
         return MTProto.invokeMethod("messages.getBotCallbackAnswer", {
@@ -45,8 +45,8 @@ export class InlineKeyboardComponent extends Component {
                 data: isGame ? undefined : bytes,
                 game: isGame
             },
-            peer: this.props.message.to.inputPeer,
-            msg_id: this.props.message.id,
+            peer: message.to.inputPeer,
+            msg_id: message.id,
         }).then(l => {
             //if(l.message) alert(l.message)
 
@@ -57,31 +57,31 @@ export class InlineKeyboardComponent extends Component {
         })
     }
 
-    requestPhone() {
+    static requestPhone() {
 
     }
 
-    requestGeo() {
+    static requestGeo() {
 
     }
 
-    switchInline(l) {
+    static switchInline(l) {
 
     }
 
-    startGame(target) {
-        this.callbackButton(target, undefined, true).then(l => {
+    static startGame(message, target) {
+        this.callbackButton(message, target, undefined, true).then(l => {
             if(l.pFlags.has_url) {
                 window.open(l.url)
             }
         })
     }
 
-    buy() {
+    static buy() {
 
     }
 
-    auth(l) {
+    static auth(l) {
 
     }
 }

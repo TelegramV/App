@@ -49,7 +49,11 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
         "no-pad": noPad
     }
 
-    const inlineKeyboard = message.replyMarkup ? <InlineKeyboardComponent message={message}/> : ""
+    const inlineKeyboard = message.replyMarkup && message.replyMarkup._ === "replyInlineMarkup" ? <InlineKeyboardComponent message={message}/> : ""
+    // FIXME this should be called upon message receiving
+    if(message.replyMarkup && (message.replyMarkup._ === "replyKeyboardHide" || message.replyMarkup._ === "replyKeyboardForceReply" || message.replyMarkup._ === "replyKeyboardMarkup")) {
+        ChatInputManager.setKeyboardMarkup(message.replyMarkup)
+    }
 
     if (!message.isPost && topLevelClasses.in) {
 
