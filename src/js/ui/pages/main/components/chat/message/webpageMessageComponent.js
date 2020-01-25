@@ -5,7 +5,6 @@ import {PhotoComponent} from "../../basic/photoComponent";
 
 const WebpageMessageComponent = ({ message }) => {
     let webpage = message.media.webpage;
-    console.log(webpage)
     return (
         <MessageWrapperComponent message={message}>
             <TextWrapperComponent message={message}>
