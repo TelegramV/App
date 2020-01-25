@@ -3,6 +3,8 @@ import PeersStore from "../store/PeersStore"
 import PeersManager from "../peers/PeersManager"
 import {Peer} from "../dataObjects/peer/Peer"
 import AppEvents from "../eventBus/AppEvents"
+import AppConnectionStatus from "../../ui/reactive/connectionStatus"
+import {tsNow} from "../../mtproto/timeManager"
 
 /**
  * @param rawUpdate
@@ -81,6 +83,8 @@ export class ChannelUpdatesProcessor {
         this.queue = []
 
         this.latestDifferenceTime = 0
+
+        this.latestDifferencePeer = undefined
     }
 
     applyUpdate(rawUpdate) {
@@ -99,10 +103,25 @@ export class ChannelUpdatesProcessor {
                 console.error("BUG: difference was passed to enqueue")
             }
         } else {
-            if ((this.latestDifferenceTime + 2000) < (new Date).getTime()) {
-                console.log(this.latestDifferenceTime, (new Date).getTime())
+            // console.log("got update", rawUpdate)
+            if ((this.latestDifferenceTime + 2) < tsNow(true)) {
                 AppEvents.General.fire("waitingForDifference", {
                     diffType: 0 // channel
+                })
+            }
+
+            if ((this.latestDifferenceTime + 10) < tsNow(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
+                this.isWaitingForDifference = true
+                this.queueIsProcessing = false
+                console.warn("refetching difference")
+
+                this.getChannelDifference(this.latestDifferencePeer).then(rawDifference => {
+                    this.processDifference(rawDifference)
+                }).catch(e => {
+                    console.error("[default] BUG: difference refetching failed", e)
+                    this.isWaitingForDifference = false
+                    this.queueIsProcessing = false
+                    this.processQueue()
                 })
             }
 
@@ -178,11 +197,9 @@ export class ChannelUpdatesProcessor {
                     self.processQueue()
                 },
                 onFail(type) {
-                    self.latestDifferenceTime = (new Date).getTime()
+                    self.latestDifferenceTime = tsNow(true)
                     self.isWaitingForDifference = true
                     self.queueIsProcessing = false
-
-                    let inputPeer = peer.input
 
                     if (peer.isMin) {
                         console.error("BUG: peer is min, processing next update", peer)
@@ -192,7 +209,7 @@ export class ChannelUpdatesProcessor {
                         return
                     }
 
-                    self.getChannelDifference(inputPeer, peer.dialog.pts, peer).then(rawDifference => {
+                    self.getChannelDifference(peer).then(rawDifference => {
                         self.processDifference(rawDifference)
                     }).catch(e => {
                         console.error("BUG: channel difference obtaining failed", e)
@@ -205,7 +222,7 @@ export class ChannelUpdatesProcessor {
     }
 
     processDifference(rawDifferenceWithPeer) {
-        // console.debug("[channel] got difference", rawDifferenceWithPeer)
+        console.debug("[channel] got difference", rawDifferenceWithPeer)
 
         if (rawDifferenceWithPeer._ === "updates.channelDifference") {
 
@@ -244,7 +261,7 @@ export class ChannelUpdatesProcessor {
                 // comment below if there are gaps
                 rawDifferenceWithPeer.__peer.dialog.pts = rawDifferenceWithPeer.pts
 
-                this.getChannelDifference(rawDifferenceWithPeer.__channel, rawDifferenceWithPeer.pts, rawDifferenceWithPeer.__peer).then(rawDifference => {
+                this.getChannelDifference(rawDifferenceWithPeer.__peer).then(rawDifference => {
                     this.processDifference(rawDifference)
                 }).catch(e => {
                     console.error("BUG: channel difference obtaining failed", e)
@@ -283,24 +300,30 @@ export class ChannelUpdatesProcessor {
         }
     }
 
-    getChannelDifference(channel, pts, peer) {
+    /**
+     * @param {Peer} peer
+     * @return {Promise<never>|Promise<T>}
+     */
+    getChannelDifference(peer) {
         if (!(peer instanceof Peer)) {
             return Promise.reject("provided peer is invalid")
         }
 
-        // console.warn("[channel] fetching difference")
+        this.latestDifferencePeer = peer
+
+        console.warn("[channel] fetching difference")
 
         return MTProto.invokeMethod("updates.getChannelDifference", {
             flags: 0,
             force: false,
-            channel: channel,
+            channel: peer.input,
             filter: {
                 "_": "channelMessagesFilterEmpty"
             },
-            pts: pts,
+            pts: peer.dialog.pts,
             limit: 100,
         }).then(rawDifference => {
-            rawDifference.__channel = channel
+            rawDifference.__channel = peer.input
             rawDifference.__peer = peer
             return rawDifference
         })

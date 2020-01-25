@@ -1,6 +1,6 @@
 import MessageWrapperComponent from "./messageWrapperComponent";
 import MessageTimeComponent from "./messageTimeComponent";
-import TextWrapperComponent from "./textWrapperComponent";
+import TextWrapperComponent from "./TextWrapperComponent";
 
 const CardMessageComponent = ({ message, icon, title, description }) => {
 	let text = message.text;

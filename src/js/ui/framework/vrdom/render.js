@@ -52,9 +52,7 @@ function vrdom_render(vNode, xmlns = null) {
         }
 
         for (const [k, v] of Object.entries(vNode.attrs)) {
-            if (Array.isArray(v)) {
-                $node.setAttribute(k, v.join(" "))
-            } else {
+            if (v !== undefined) {
                 $node.setAttribute(k, v)
             }
         }

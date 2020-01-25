@@ -100,6 +100,11 @@ class Component {
         this.refs = AppFramework.MountedComponents
     }
 
+    // do initialization logic here
+    init() {
+
+    }
+
     /**
      * @return {VRNode|ComponentVRNode}
      */
@@ -224,11 +229,14 @@ class Component {
     // do not override this if there is no critical reason
     __init() {
         if (!this.__.inited) {
+
             for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(this))) {
                 if (typeof this[key] === "function") {
                     this[key] = this[key].bind(this)
                 }
             }
+
+            this.init()
 
             this.__initReactive()
 

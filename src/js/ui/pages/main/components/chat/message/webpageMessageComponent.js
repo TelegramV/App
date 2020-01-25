@@ -1,5 +1,5 @@
 import MessageWrapperComponent from "./messageWrapperComponent";
-import TextWrapperComponent from "./textWrapperComponent";
+import TextWrapperComponent from "./TextWrapperComponent";
 import {InstantViewManager} from "../../../../../instantViewManager";
 import {PhotoComponent} from "../../basic/photoComponent";
 

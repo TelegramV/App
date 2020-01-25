@@ -1,5 +1,5 @@
 import MessageWrapperComponent from "./messageWrapperComponent";
-import TextWrapperComponent from "./textWrapperComponent";
+import TextWrapperComponent from "./TextWrapperComponent";
 
 const AudioMessageComponent = ({message}) => {
     let audioSrc = message.media.document.real ? message.media.document.real.url : "";

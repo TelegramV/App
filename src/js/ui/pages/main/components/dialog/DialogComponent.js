@@ -34,12 +34,10 @@ const patchAndResortDialogEventTypes = new Set([
 
 const patchDialogEventTypes = new Set([
     "updateDraftMessage",
-    "updateReadHistoryInbox",
-    "updateReadHistoryOutbox",
     "readHistory",
     "updateUnreadCount",
-    "updateReadChannelInbox",
-    "updateReadChannelOutbox",
+    "updateReadInboxMaxId",
+    "updateReadOutboxMaxId",
 ])
 
 const patchPeerEventTypes = new Set([
@@ -59,21 +57,7 @@ export class DialogComponent extends Component {
 
         this.appEvents = new Set([
             AppEvents.Dialogs.reactiveAnySingle(this.props.dialog).FireOnly,
-            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "newMessage").FireOnly,
-            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateSingle").FireOnly,
-            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updatePinned").FireOnly,
-
-            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateDraftMessage").PatchOnly,
-            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadHistoryInbox").PatchOnly,
-            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadHistoryOutbox").PatchOnly,
-            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "readHistory").PatchOnly,
-            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateUnreadCount").PatchOnly,
-            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadChannelInbox").PatchOnly,
-            AppEvents.Dialogs.reactiveOnlySingle(this.props.dialog, "updateReadChannelOutbox").PatchOnly,
-
-            AppEvents.Peers.reactiveOnlySingle(this.props.dialog.peer, "updatePhoto").PatchOnly,
-            AppEvents.Peers.reactiveOnlySingle(this.props.dialog.peer, "updatePhotoSmall").PatchOnly,
-            AppEvents.Peers.reactiveOnlySingle(this.props.dialog.peer, "updateUserStatus").PatchOnly,
+            AppEvents.Peers.reactiveAnySingle(this.props.dialog.peer).FireOnly,
         ])
 
         this._contextMenuListener = ContextMenuManager.listener([

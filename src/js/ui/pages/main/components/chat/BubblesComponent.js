@@ -1,14 +1,13 @@
-import {MTProto} from "../../../../../mtproto"
 import AppEvents from "../../../../../api/eventBus/AppEvents"
-import {FileAPI} from "../../../../../api/fileAPI"
 import {isElementInViewport} from "../../../../framework/utils"
 
 import MessageComponent from "./../../messages/newMessage"
 import Component from "../../../../framework/vrdom/component"
 import VRDOM from "../../../../framework/vrdom"
-import {vrdom_deepDeleteRealNode, vrdom_deepDeleteRealNodeInnerComponents} from "../../../../framework/vrdom/patch"
+import {vrdom_deepDeleteRealNodeInnerComponents} from "../../../../framework/vrdom/patch"
 import {MessageType} from "../../../../../api/dataObjects/messages/Message"
 import AppSelectedPeer from "../../../../reactive/selectedPeer"
+import {FileAPI} from "../../../../../api/fileAPI"
 
 
 const MessageComponentGeneral = message => <MessageComponent message={message}/>
@@ -54,9 +53,13 @@ class BubblesComponent extends Component {
 
             if (dialog && AppSelectedPeer.check(dialog.peer)) {
                 if (event.type === "fetchedInitialMessages") {
+
                     this._appendMessages(event.messages)
+
                 } else if (event.type === "fetchedMessagesNextPage") {
+
                     this._appendMessages(event.messages)
+
                 } else if (event.type === "newMessage") {
                     if (!this.state.isFetching) {
                         if (isElementInViewport(this._prependMessages([event.message])[0])) {
@@ -65,22 +68,6 @@ class BubblesComponent extends Component {
                     } else {
                         this.state.messagesWaitingForRendering.add(event.message)
                     }
-                } else if (event.type === "editMessage") {
-                    const $el = this.state.renderedMessages.get(event.message.id)
-
-                    if ($el) {
-                        VRDOM.patch($el, MessageComponentGeneral(event.message))
-                    }
-                } else if (event.type === "deleteMessages") {
-                    event.messages.forEach(messageId => {
-                        const $el = this.state.renderedMessages.get(messageId)
-
-                        if ($el) {
-                            vrdom_deepDeleteRealNode($el)
-                        }
-                    })
-                } else {
-
                 }
             }
         })
@@ -265,9 +252,9 @@ class BubblesComponent extends Component {
     }
 
     _markAllAsRead() {
-        if (this.reactive.peer) {
-            return this.reactive.peer.api.readAllHistory()
-        }
+        // if (this.reactive.peer) {
+        return this.reactive.peer.api.readAllHistory()
+        // }
     }
 
     _onScrollBubbles(event) {

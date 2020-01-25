@@ -1,5 +1,5 @@
 import MessageWrapperComponent from "./messageWrapperComponent";
-import TextWrapperComponent from "./textWrapperComponent";
+import TextWrapperComponent from "./TextWrapperComponent";
 import {VideoComponent} from "../../basic/videoComponent";
 
 const VideoMessageComponent = ({message}) => {
