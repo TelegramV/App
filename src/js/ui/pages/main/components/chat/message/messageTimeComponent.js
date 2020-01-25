@@ -1,4 +1,4 @@
-const MessageTimeComponent = ({ message, bg = false }) => {
+const MessageTimeComponent = ({message, bg = false}) => {
     let classes = "time" + (bg ? " bg" : "");
 
     let views = "";
@@ -15,9 +15,9 @@ const MessageTimeComponent = ({ message, bg = false }) => {
 
     return (
         <span class={classes}>
-                {views}
+            {views}
             <div class="inner status tgico">
-                    {edited}
+                {edited}
                 {message.getDate('en', {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -31,11 +31,11 @@ const MessageTimeComponent = ({ message, bg = false }) => {
 function numberFormat(num) {
     let digits = 1;
     const si = [
-        { value: 1, symbol: "" },
-        { value: 1E3, symbol: "K" },
-        { value: 1E6, symbol: "M" },
-        { value: 1E9, symbol: "B" },
-        { value: 1E12, symbol: "T" }
+        {value: 1, symbol: ""},
+        {value: 1E3, symbol: "K"},
+        {value: 1E6, symbol: "M"},
+        {value: 1E9, symbol: "B"},
+        {value: 1E12, symbol: "T"}
     ];
     const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
     let i;

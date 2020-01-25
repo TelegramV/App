@@ -100,7 +100,7 @@ export class DialogListComponent extends Component {
         this.elements.$pinnedDialogs = this.elements.$dialogsWrapper.querySelector("#dialogsPinned")
         this.elements.$generalDialogs = this.elements.$dialogsWrapper.querySelector("#dialogs")
 
-        Sortable.create(this.elements.$pinnedDialogs)
+        // Sortable.create(this.elements.$pinnedDialogs)
 
         AppEvents.Dialogs.subscribe("firstPage", event => {
             this.elements.$loader.style.display = "none"

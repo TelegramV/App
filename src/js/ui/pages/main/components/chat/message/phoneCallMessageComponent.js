@@ -1,7 +1,7 @@
 import {parseMessageEntities} from "../../../../../../mtproto/utils/htmlHelpers"
 import MessageWrapperComponent from "./messageWrapperComponent"
 import MessageTimeComponent from "./messageTimeComponent"
-import TextWrapperComponent from "./textWrapperComponent";
+import TextWrapperComponent from "./TextWrapperComponent";
 import CardMessageComponent from "./cardMessageComponent";
 
 

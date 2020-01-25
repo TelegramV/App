@@ -1,5 +1,6 @@
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 import {ChatInputManager} from "../chatInput/ChatInputComponent";
+import {MessageAvatarComponent} from "./MessageAvatarComponent"
 import {InlineKeyboardComponent} from "./inlineKeyboardComponent";
 
 const MessageWrapperComponent = ({message, transparent = false, slot, noPad = false}) => {
@@ -52,26 +53,14 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
 
     if (!message.isPost && topLevelClasses.in) {
 
-        const hasAvatar = !message.from.photo.isEmpty
-
-        const avatarClasses = ["avatar"]
-
-        if (!hasAvatar) {
-            avatarClasses.push(`placeholder-${message.from.photo.letter.num}`)
-        }
-
-        const cssBackgroundImage = hasAvatar ? `url(${message.from.photo.smallUrl})` : "none"
-
         return (
             <div className={topLevelClasses}
                  id={`message-${message.id}`}
                  onContextMenu={contextMenuHandler}
-                 onDoubleClick={doubleClickHandler}>
+                 onDoubleClick={doubleClickHandler}
+                 data-peer={`${message.from.id}`}>
 
-                <div className={avatarClasses}
-                     css-background-image={cssBackgroundImage}>
-                    {!hasAvatar ? message.from.photo.letter.text : ""}
-                </div>
+                <MessageAvatarComponent message={message}/>
 
                 <div className="bubble-outer">
                     <div className={wrapClasses}>

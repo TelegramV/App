@@ -1,5 +1,5 @@
 import MessageWrapperComponent from "./messageWrapperComponent"
-import TextWrapperComponent from "./textWrapperComponent";
+import TextWrapperComponent from "./TextWrapperComponent";
 import {FileAPI} from "../../../../../../api/fileAPI";
 import {MediaViewerManager} from "../../../../../mediaViewerManager";
 import Component from "../../../../../framework/vrdom/component";

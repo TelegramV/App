@@ -1,7 +1,7 @@
 import Component from "../../../../../framework/vrdom/component"
 import { FileAPI } from "../../../../../../api/fileAPI"
 import MessageWrapperComponent from "./messageWrapperComponent"
-import TextWrapperComponent from "./textWrapperComponent"
+import TextWrapperComponent from "./TextWrapperComponent"
 
 export default class VoiceMessageComponent extends Component {
     constructor(props) {

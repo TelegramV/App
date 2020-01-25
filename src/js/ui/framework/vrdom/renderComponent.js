@@ -1,5 +1,6 @@
 import vrdom_render from "./render"
 import AppFramework from "../framework"
+import {ComponentVRNode} from "./componentVRNode"
 
 let latestInstantiatedComponent = 0
 
@@ -21,7 +22,11 @@ function vrdom_renderComponentVNode(componentVNode) {
     componentInstance.__init.bind(componentInstance)()
 
     const vNode = componentInstance.h()
-    
+
+    if (vNode instanceof ComponentVRNode) {
+        throw new Error("Components on top level are forbidden.")
+    }
+
     vNode.attrs["data-component-id"] = newId
 
     AppFramework.MountedComponents.set(newId, componentInstance)

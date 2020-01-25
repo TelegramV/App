@@ -21,7 +21,9 @@ function patchEvents($node, newEvents) {
 function patchAttrs($node, newAttrs) {
     if ($node.nodeType !== Node.TEXT_NODE) {
         for (const [k, v] of Object.entries(newAttrs)) {
-            if ($node.getAttribute(k) !== v) {
+            if (v === undefined) {
+                $node.removeAttribute(k)
+            } else if ($node.getAttribute(k) !== v) {
                 $node.setAttribute(k, String(v))
             }
         }

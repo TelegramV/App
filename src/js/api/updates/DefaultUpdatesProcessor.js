@@ -1,6 +1,7 @@
 import MTProto from "../../mtproto"
 import PeersManager from "../peers/PeersManager"
 import AppEvents from "../eventBus/AppEvents"
+import {tsNow} from "../../mtproto/timeManager"
 
 /**
  * @param rawUpdate
@@ -82,11 +83,24 @@ export class DefaultUpdatesProcessor {
                 this.processQueue()
             }
         } else {
-            if ((this.latestDifferenceTime + 2000) < (new Date).getTime()) {
+            if ((this.latestDifferenceTime + 2) < tsNow(true)) {
                 AppEvents.General.fire("waitingForDifference", {
                     diffType: 1 // default
                 })
+            } else if ((this.latestDifferenceTime + 10) < tsNow(true)) {
+                this.isWaitingForDifference = true
+                this.queueIsProcessing = false
+
+                this.getDifference(this.updatesManager.State).then(rawDifference => {
+                    this.processDifference(rawDifference)
+                }).catch(e => {
+                    console.error("[default] BUG: difference refetching failed", e)
+                    this.isWaitingForDifference = false
+                    this.queueIsProcessing = false
+                    this.processQueue()
+                })
             }
+
             this.queue.push(rawUpdate)
             // console.warn("[default] waiting for diff")
         }
@@ -122,7 +136,7 @@ export class DefaultUpdatesProcessor {
                     self.processQueue()
                 },
                 onFail(type) {
-                    self.latestDifferenceTime = (new Date).getTime()
+                    self.latestDifferenceTime = tsNow(true)
                     self.isWaitingForDifference = true
                     self.queueIsProcessing = false
 
