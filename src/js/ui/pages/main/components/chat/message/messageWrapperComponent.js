@@ -1,5 +1,6 @@
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 import {ChatInputManager} from "../chatInput/ChatInputComponent";
+import {InlineKeyboardComponent} from "./inlineKeyboardComponent";
 
 const MessageWrapperComponent = ({message, transparent = false, slot, noPad = false}) => {
     const contextMenuHandler = ContextMenuManager.listener([
@@ -47,6 +48,7 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
         "no-pad": noPad
     }
 
+    const inlineKeyboard = message.replyMarkup ? <InlineKeyboardComponent message={message}/> : ""
 
     if (!message.isPost && topLevelClasses.in) {
 
@@ -71,10 +73,14 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
                     {!hasAvatar ? message.from.photo.letter.text : ""}
                 </div>
 
-                <div className={wrapClasses}>
-                    <div className={messageClasses}>
-                        {slot}
+                <div className="bubble-outer">
+                    <div className={wrapClasses}>
+                        <div className={messageClasses}>
+                            {slot}
+                        </div>
                     </div>
+
+                    {inlineKeyboard}
                 </div>
             </div>
         )
@@ -86,10 +92,14 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
              onContextMenu={contextMenuHandler}
              onDoubleClick={doubleClickHandler}>
 
-            <div className={wrapClasses}>
-                <div className={messageClasses}>
-                    {slot}
+            <div className="bubble-outer">
+                <div className={wrapClasses}>
+                    <div className={messageClasses}>
+                        {slot}
+                    </div>
                 </div>
+
+                {inlineKeyboard}
             </div>
         </div>
     )

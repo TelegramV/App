@@ -129,6 +129,10 @@ export class Message {
     get isRead() {
         return this.dialog.messages.readOutboxMaxId >= this.id || this.dialog.messages.readInboxMaxId >= this.id
     }
+    
+    get replyMarkup() {
+        return this.raw.reply_markup
+    }
 
     /**
      * TODO: cache this thing
