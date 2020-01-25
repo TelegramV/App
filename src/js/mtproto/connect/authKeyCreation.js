@@ -156,7 +156,7 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
         throw new Error("gA <= 1")
     }
 
-    if (gABigInt.compareTo(dhPrimeBigInt.subtract(VBigInt.ONE)) >= 0) {
+    if (gABigInt.greaterThanOrEqual(dhPrimeBigInt.subtract(VBigInt.ONE))) {
         throw new Error("gA >= dhPrime - 1")
     }
 
