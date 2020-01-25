@@ -2,6 +2,7 @@ import {bigint, gzipUncompress} from "../utils/bin"
 import {createLogger} from "../../common/logger"
 import {schema} from "./schema";
 import Bytes from "../utils/bytes"
+import VBigInt from "../bigint/VBigInt"
 
 const Logger = createLogger("TLDeserialization", {
     level: "log"
@@ -56,7 +57,7 @@ export class TLDeserialization {
         const iLow = this.readInt(field + ":long[low]")
         const iHigh = this.readInt(field + ":long[high]")
 
-        return bigint(iHigh).shiftLeft(32).add(bigint(iLow)).toString()
+        return VBigInt.create(iHigh).leftShift(32).add(iLow).toString()
     }
 
     fetchBool(field) {

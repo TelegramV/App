@@ -60,8 +60,6 @@ export class VFrameworkRouter {
             history.replaceState({}, "", this.hash)
         }
 
-        this.renderActive()
-
         window.addEventListener("popstate", () => {
             // check if hash path was changed
             // if wasn't then router will not re-render the component
@@ -87,6 +85,8 @@ export class VFrameworkRouter {
                 this.renderActive()
             }
         })
+
+        this.renderActive()
     }
 
     push(path, options = {}) {

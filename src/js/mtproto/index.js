@@ -89,6 +89,8 @@ class MobileProtocol {
         })
 
         this.authorizedUser = undefined
+
+        this.queue = []
     }
 
     createApiNetworker(authContext) {
@@ -98,6 +100,13 @@ class MobileProtocol {
 
         // TODO definitely not a right place for notifications -_-
         attach()
+    }
+
+    onConnected() {
+        this.queue.forEach(l => {
+            this.invokeMethod(l.method, l.parameters).then(l.resolve)
+        })
+        this.queue = []
     }
 
     connect(authContext) {
@@ -116,6 +125,7 @@ class MobileProtocol {
                 this.createApiNetworker(authContext)
 
                 initManagers()
+                this.onConnected()
             })
         } else {
             authContext.authKey = new Uint8Array(Bytes.fromHex(AppPermanentStorage.getItem("authKey" + this.authContext.dcID)))
@@ -124,6 +134,7 @@ class MobileProtocol {
             this.createApiNetworker(authContext)
 
             initManagers()
+            this.onConnected()
 
             return Promise.resolve()
         }
@@ -183,7 +194,14 @@ class MobileProtocol {
 
     invokeMethod(method, parameters = {}, dcID = null) {
         if (!this.connected) {
-            throw new Error("Looks like you have not connected yet..")
+            console.info("Not connected, putting in queue")
+            return new Promise(resolve => {
+                this.queue.push({
+                    method: method,
+                    parameters: parameters,
+                    resolve: resolve
+                })
+            })
         }
 
         if (dcID !== null && dcID !== this.authContext.dcID) {

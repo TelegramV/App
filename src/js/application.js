@@ -11,6 +11,7 @@ import {createNonce} from "./mtproto/utils/bin"
 import RipplePlugin from "./ui/plugins/RipplePlugin"
 import AppRoutes from "./ui/routing"
 import {StickerManager} from "./api/stickersManager";
+import VBigInt from "./mtproto/bigint/VBigInt"
 
 const isProduction = false
 
@@ -36,7 +37,9 @@ function start() {
             })
         }
     })
+}
 
+function startUI() {
     V.registerPlugin(RipplePlugin)
 
     V.useRoutes(AppRoutes)
@@ -48,12 +51,15 @@ global.Peers = PeersStore
 global.Dialogs = PeersStore
 global.EVE = AppEvents
 
+global.bi = VBigInt
+
 if (isProduction) {
     AppCache.open()
 } else {
     window.StickerManager = StickerManager
 }
 
+startUI()
 loadSchema().then(() => {
     MTProto.connect(authContext)
         .then(start)
