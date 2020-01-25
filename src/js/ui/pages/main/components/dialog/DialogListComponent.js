@@ -82,7 +82,7 @@ export class DialogListComponent extends Component {
 
                 <ConnectionStatusComponent/>
 
-                <div id="dialogsWrapper" onScroll={this._scrollHandler}>
+                <div id="dialogsWrapper">
                     <div className="full-size-loader" id="loader">
                         <progress className="progress-circular big"/>
                     </div>
@@ -99,6 +99,8 @@ export class DialogListComponent extends Component {
         this.elements.$dialogsWrapper = this.$el.querySelector("#dialogsWrapper")
         this.elements.$pinnedDialogs = this.elements.$dialogsWrapper.querySelector("#dialogsPinned")
         this.elements.$generalDialogs = this.elements.$dialogsWrapper.querySelector("#dialogs")
+
+        this.elements.$dialogsWrapper.addEventListener("scroll", this._scrollHandler, {passive: true})
 
         // Sortable.create(this.elements.$pinnedDialogs)
 
@@ -189,25 +191,6 @@ export class DialogListComponent extends Component {
     }
 
     /**
-     * Handles dialogs scroll. If at the bottom, then gets next page of dialogs.
-     * @param event
-     * @private
-     */
-    _scrollHandler(event) {
-        const $element = event.target
-
-        if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.state.isInLoadingMoreScroll) {
-            this.state.isInLoadingMoreScroll = true
-
-            console.log("fetching next page")
-
-            DialogsManager.fetchNextPage({}).then(() => {
-                this.state.isInLoadingMoreScroll = false
-            })
-        }
-    }
-
-    /**
      * Makes the sidebar resizeable.
      * TODO: mb will be better to have this in another file
      * @private
@@ -279,5 +262,26 @@ export class DialogListComponent extends Component {
                 setmin()
             }
         })
+    }
+
+    /**
+     * Handles dialogs scroll. If at the bottom, then gets next page of dialogs.
+     * @param event
+     * @private
+     */
+    _scrollHandler(event) {
+        const $element = event.target
+
+        if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.state.isInLoadingMoreScroll) {
+            this.state.isInLoadingMoreScroll = true
+
+            console.log("fetching next page")
+
+            DialogsManager.fetchNextPage({}).then(() => {
+                this.state.isInLoadingMoreScroll = false
+            })
+        }
+
+
     }
 }

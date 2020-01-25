@@ -153,6 +153,7 @@ class BubblesComponent extends Component {
                 //         VRDOM.patch($message, MessageComponentGeneral(message));
                 //         //immediatly tring to get better image
                 //         FileAPI.getFile(message.media.game.photo, "x").then(data => {
+                //         FileAPI.getFile(message.media.game.photo, "x").then(data => {
                 //             message.media.game.photo.real = {url: data};
                 //             VRDOM.patch($message, MessageComponentGeneral(message));
                 //         });
@@ -190,6 +191,7 @@ class BubblesComponent extends Component {
      */
     _appendMessages(messages) {
         let k = this.elements.$bubblesInner.clientHeight
+        let z = 0
 
         for (const message of messages) {
             const $rendered = this._renderMessage(message)
@@ -197,8 +199,9 @@ class BubblesComponent extends Component {
             if ($rendered) {
                 this.state.renderedMessages.set(message.id, $rendered)
             }
-            this.$el.scrollTop += this.elements.$bubblesInner.clientHeight - k
+            // z += this.elements.$bubblesInner.clientHeight - k
         }
+        // this.$el.scrollTop += z
     }
 
     /**
