@@ -16,7 +16,7 @@ class StickerMessageComponent extends Component {
         :
             <img className="sticker" src={src} css-width={s + "px"} css-height={height + "px"}/>) : <div className="sticker loading" css-width={s + "px"} css-height={height + "px"}/>
         return (
-            <MessageWrapperComponent message={message} transparent={true}>
+            <MessageWrapperComponent message={message} transparent={true} noPad>
                 {sticker}
                 <MessageTimeComponent message={message} bg={true}/>
             </MessageWrapperComponent>
