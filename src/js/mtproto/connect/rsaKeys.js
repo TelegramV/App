@@ -1,7 +1,7 @@
 import {TLSerialization} from "../language/serialization"
-import {bigStringInt} from "../utils/bin"
 import {sha1BytesSync} from "../crypto/sha"
 import Bytes from "../utils/bytes"
+import VBigInt from "../bigint/VBigInt"
 
 const keys = [
     {
@@ -53,7 +53,7 @@ function prepare() {
 
 export function rsaKeyByFingerprints(fingerprints) {
     for (let i = 0; i < fingerprints.length; i++) {
-        let fingerprintHex = bigStringInt(fingerprints[i]).toString(16)
+        let fingerprintHex = VBigInt.create(fingerprints[i]).toString(16)
         let foundKey = publicRsaKeys()[fingerprintHex]
 
         if (foundKey) {

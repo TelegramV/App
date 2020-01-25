@@ -43,7 +43,7 @@ export class ApiNetworker extends Networker {
     }
 
     checkConnection() {
-        if (Object.keys(this.pings) > 1) { // Probably disconnected
+        if (Object.keys(this.pings).length > 1) { // Probably disconnected
             // TODO Show disconnection badge
         }
 

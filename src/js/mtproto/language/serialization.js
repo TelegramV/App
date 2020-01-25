@@ -1,7 +1,7 @@
-import {bigint, bigStringInt, intToUint} from "../utils/bin"
+import {intToUint} from "../utils/bin"
 import {createLogger} from "../../common/logger";
 import {schema} from "./schema";
-import Bytes from "../utils/bytes"
+import VBigInt from "../bigint/VBigInt"
 
 const Logger = createLogger("TLSerialization", {
     level: "log"
@@ -151,10 +151,10 @@ export class TLSerialization {
             sLong = sLong ? sLong.toString() : "0"
         }
 
-        const divRem = bigStringInt(sLong).divideAndRemainder(bigint(0x100000000))
+        const divRem = VBigInt.create(sLong).divideAndRemainder(VBigInt.create(0x100000000))
 
-        this.writeInt(intToUint(divRem[1].intValue()), field + ":long[low]")
-        this.writeInt(intToUint(divRem[0].intValue()), field + ":long[high]")
+        this.writeInt(intToUint(divRem[1].toNumber()), field + ":long[low]")
+        this.writeInt(intToUint(divRem[0].toNumber()), field + ":long[high]")
     }
 
     /**
@@ -213,7 +213,7 @@ export class TLSerialization {
     storeBytes(bytes, field = "") {
         if (bytes instanceof ArrayBuffer) {
             bytes = new Uint8Array(bytes)
-        } else if(Number.isInteger(bytes)) {
+        } else if (Number.isInteger(bytes)) {
             bytes = [bytes]
         } else if (bytes === undefined) {
             bytes = []
@@ -249,7 +249,7 @@ export class TLSerialization {
     storeIntBytes(bytes, bits, field = "") {
         if (bytes instanceof ArrayBuffer) {
             bytes = new Uint8Array(bytes)
-        } else if(Number.isInteger(bytes)) {
+        } else if (Number.isInteger(bytes)) {
             bytes = [bytes]
         }
 
@@ -274,7 +274,7 @@ export class TLSerialization {
     storeRawBytes(bytes, field = "") {
         if (bytes instanceof ArrayBuffer) {
             bytes = new Uint8Array(bytes)
-        } else if(Number.isInteger(bytes)) {
+        } else if (Number.isInteger(bytes)) {
             bytes = [bytes]
         }
         const len = bytes.length
@@ -319,7 +319,7 @@ export class TLSerialization {
                 condType = type.split("?")
                 fieldBit = condType[0].split(".")
                 if (!(params[fieldBit[0]] & (1 << fieldBit[1]))) {
-                    if(params.pFlags && params.pFlags[param.name]) {
+                    if (params.pFlags && params.pFlags[param.name]) {
                         params[fieldBit[0]] |= 1 << fieldBit[1]
                         params[param.name] = params.pFlags[param.name]
                     }
@@ -393,10 +393,10 @@ export class TLSerialization {
                     this.storeBytes(obj,field);
                     break;
                 default:*/
-                    this.writeInt(obj.length, field + "[count]")
-                    for (let i = 0; i < obj.length; i++) {
-                        this.storeObject(obj[i], itemType, field + "[" + i + "]")
-                    }
+            this.writeInt(obj.length, field + "[count]")
+            for (let i = 0; i < obj.length; i++) {
+                this.storeObject(obj[i], itemType, field + "[" + i + "]")
+            }
             //}
             return true
         } else if (type.substr(0, 6).toLowerCase() === "vector") {
@@ -446,7 +446,7 @@ export class TLSerialization {
                 condType = type.split("?")
                 fieldBit = condType[0].split(".")
                 if (!(obj[fieldBit[0]] & (1 << fieldBit[1]))) {
-                    if(obj.pFlags && obj.pFlags[param.name]) {
+                    if (obj.pFlags && obj.pFlags[param.name]) {
                         obj[fieldBit[0]] |= 1 << fieldBit[1]
                         obj[param.name] = obj.pFlags[param.name]
                     }

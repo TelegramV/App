@@ -11,6 +11,7 @@ import {createNonce} from "./mtproto/utils/bin"
 import RipplePlugin from "./ui/plugins/RipplePlugin"
 import AppRoutes from "./ui/routing"
 import {StickerManager} from "./api/stickersManager";
+import VBigInt from "./mtproto/bigint/VBigInt"
 
 const isProduction = false
 
@@ -47,6 +48,8 @@ function start() {
 global.Peers = PeersStore
 global.Dialogs = PeersStore
 global.EVE = AppEvents
+
+global.bi = VBigInt
 
 if (isProduction) {
     AppCache.open()

@@ -3,6 +3,7 @@ import CryptoJS from "../vendor/crypto"
 import {Zlib} from "../vendor/zlib"
 import crypto from "crypto"
 import Bytes from "./bytes"
+import VBigInt from "../bigint/VBigInt"
 // import {str2bigInt} from "BigInt"
 
 // Create a random Buffer
@@ -171,9 +172,9 @@ export function convertToByteArray(bytes) {
 }
 
 export function longToInts(sLong) {
-    const divRem = bigStringInt(sLong).divideAndRemainder(bigint(0x100000000))
+    const divRem = VBigInt.create(sLong).divideAndRemainder(VBigInt.create(0x100000000))
 
-    return [divRem[0].intValue(), divRem[1].intValue()]
+    return [divRem[0].toNumber(), divRem[1].toNumber()]
 }
 
 export function longToBytes(sLong) {

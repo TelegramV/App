@@ -8,9 +8,9 @@ import {sha1BytesSync} from "../crypto/sha"
 import crypto from "crypto"
 import {TLDeserialization} from "../language/deserialization"
 import {tsNow} from "../timeManager"
-import {BigInteger} from "../vendor/jsbn/jsbn"
 import {createLogger} from "../../common/logger"
 import {SecureRandomSingleton} from "../utils/singleton"
+import VBigInt from "../bigint/VBigInt"
 
 const Logger = createLogger("authKeyCreation")
 
@@ -149,25 +149,24 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
         throw new Error("DH params are not verified: unknown dhPrime")
     }
 
-    const gABigInt = new BigInteger(Bytes.asHex(authContext.gA), 16)
-    const dhPrimeBigInt = new BigInteger(dhPrimeHex, 16)
+    const gABigInt = VBigInt.create("0x" + Bytes.asHex(authContext.gA))
+    const dhPrimeBigInt = VBigInt.create("0x" + dhPrimeHex)
 
-    if (gABigInt.compareTo(BigInteger.ONE) <= 0) {
+    if (gABigInt.lessThanOrEqual(VBigInt.ONE)) {
         throw new Error("gA <= 1")
     }
 
-    if (gABigInt.compareTo(dhPrimeBigInt.subtract(BigInteger.ONE)) >= 0) {
+    if (gABigInt.compareTo(dhPrimeBigInt.subtract(VBigInt.ONE)) >= 0) {
         throw new Error("gA >= dhPrime - 1")
     }
 
-    const two = new BigInteger(null)
-    two.fromInt(2)
-    const twoPow = two.pow(2048 - 64)
+    const two = VBigInt.TWO
+    const twoPow = two.pow(VBigInt.create(2048 - 64))
 
-    if (gABigInt.compareTo(twoPow) < 0) {
+    if (gABigInt.lessThan(twoPow)) {
         throw new Error("gA < 2^{2048-64}")
     }
-    if (gABigInt.compareTo(dhPrimeBigInt.subtract(twoPow)) >= 0) {
+    if (gABigInt.greaterThanOrEqual(dhPrimeBigInt.subtract(twoPow))) {
         throw new Error("gA > dhPrime - 2^{2048-64}")
     }
 
