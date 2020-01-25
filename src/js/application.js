@@ -37,7 +37,9 @@ function start() {
             })
         }
     })
+}
 
+function startUI() {
     V.registerPlugin(RipplePlugin)
 
     V.useRoutes(AppRoutes)
@@ -57,6 +59,7 @@ if (isProduction) {
     window.StickerManager = StickerManager
 }
 
+startUI()
 loadSchema().then(() => {
     MTProto.connect(authContext)
         .then(start)
