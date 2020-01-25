@@ -2,9 +2,8 @@ import Component from "../../../../../framework/vrdom/component"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
 
 export class MessageAvatarComponent extends Component {
-    constructor(props) {
-        super(props)
 
+    init() {
         this.appEvents = new Set([
             AppEvents.Peers.reactiveOnlySingle(this.props.message.from, "updatePhotoSmall").PatchOnly
         ])

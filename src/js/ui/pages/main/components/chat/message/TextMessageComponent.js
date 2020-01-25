@@ -9,7 +9,7 @@ class TextMessageComponent extends GeneralMessageComponent {
         const username = this.message.from.name && !this.message.isPost && !this.message.isOut
 
         return (
-            <MessageWrapperComponent message={this.message}>
+            <MessageWrapperComponent ref={`msg-${this.message.id}`} message={this.message}>
                 {username ? <div className="username">{this.message.from.name}</div> : ""}
                 <TextWrapperComponent message={this.message}/>
             </MessageWrapperComponent>

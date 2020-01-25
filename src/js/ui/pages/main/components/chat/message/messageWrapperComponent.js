@@ -55,7 +55,8 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
             <div className={topLevelClasses}
                  id={`message-${message.id}`}
                  onContextMenu={contextMenuHandler}
-                 onDoubleClick={doubleClickHandler}>
+                 onDoubleClick={doubleClickHandler}
+                 data-peer={`${message.from.id}`}>
 
                 <MessageAvatarComponent message={message}/>
 

@@ -8,6 +8,7 @@ import {vrdom_deepDeleteRealNodeInnerComponents} from "../../../../framework/vrd
 import {MessageType} from "../../../../../api/dataObjects/messages/Message"
 import AppSelectedPeer from "../../../../reactive/selectedPeer"
 import {FileAPI} from "../../../../../api/fileAPI"
+import MTProto from "../../../../../mtproto"
 
 
 const MessageComponentGeneral = message => <MessageComponent message={message}/>

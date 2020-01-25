@@ -77,13 +77,13 @@ export class DialogComponent extends Component {
                 icon: this.props.dialog.isMuted ? "unmute" : "mute",
                 title: this.props.dialog.isMuted ? "Enable notifications" : "Disable notifications"
             },
-            {
-                // icon: unread !== "" ? "message" : "unread",
-                // title: unread !== "" ? "Mark as read" : "Mark as unread",
-                // onClick: _ => {
-                //     this.props.dialog.api.markDialogUnread(unread === "")
-                // }
-            },
+            // {
+            //     icon: unread !== "" ? "message" : "unread",
+            //     title: unread !== "" ? "Mark as read" : "Mark as unread",
+            //     onClick: _ => {
+            //         this.props.dialog.api.markDialogUnread(unread === "")
+            //     }
+            // },
             {
                 icon: "delete",
                 title: "Delete chat",
