@@ -23,6 +23,7 @@ export const MessageType = {
     VIDEO: 16,
     PHONE_CALL: 17,
     SERVICE: 18,
+    ANIMATED_EMOJI: 19
 }
 
 export class Message {
@@ -303,7 +304,11 @@ export class Message {
                     const attrs = media.document.attributes;
                     for (const attr of attrs) {
                         if (attr._ === "documentAttributeSticker") {
-                            this.type = MessageType.STICKER
+                            if(media.isAnimatedEmoji) {
+                                this.type = MessageType.ANIMATED_EMOJI
+                            } else {
+                                this.type = MessageType.STICKER
+                            }
                             break;
                         }
                         if (attr._ === "documentAttributeAnimated") {
@@ -337,6 +342,17 @@ export class Message {
                     console.log("unsupported", message.media);
                     this.type = MessageType.UNSUPPORTED;
                     break
+            }
+        } else {
+            const l = StickerManager.getAnimatedEmoji(this.text)
+            if(l) {
+                this.raw.media = {
+                    _: "messageMediaDocument",
+                    isAnimatedEmoji: true,
+                    document: l
+                }
+                this.parseMessageType()
+                return
             }
         }
 

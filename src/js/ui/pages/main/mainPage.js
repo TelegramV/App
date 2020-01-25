@@ -21,6 +21,7 @@ function initHighLevelManagers() {
         })
     })
     LocaleController.init()
+    StickerManager.getAnimatedEmojiSet()
 }
 
 export function MainPage() {

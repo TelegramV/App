@@ -10,6 +10,7 @@ import AppEvents from "./api/eventBus/AppEvents"
 import {createNonce} from "./mtproto/utils/bin"
 import RipplePlugin from "./ui/plugins/RipplePlugin"
 import AppRoutes from "./ui/routing"
+import {StickerManager} from "./api/stickersManager";
 
 const isProduction = false
 
@@ -49,7 +50,10 @@ global.EVE = AppEvents
 
 if (isProduction) {
     AppCache.open()
+} else {
+    window.StickerManager = StickerManager
 }
+
 
 
 loadSchema().then(() => {

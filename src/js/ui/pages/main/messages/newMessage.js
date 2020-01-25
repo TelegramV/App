@@ -39,6 +39,7 @@ const handlers = new Map([
     [MessageType.VIDEO, VideoMessageComponent],
     [MessageType.PHONE_CALL, PhoneCallMessageComponent],
     [MessageType.SERVICE, ServiceMessageComponent],
+    [MessageType.ANIMATED_EMOJI, StickerMessageComponent]
 ])
 
 /**

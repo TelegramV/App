@@ -1,6 +1,7 @@
 import MessageWrapperComponent from "./messageWrapperComponent";
 import MessageTimeComponent from "./messageTimeComponent";
 import Component from "../../../../../framework/vrdom/component";
+import {MessageType} from "../../../../../../api/dataObjects/messages/Message";
 
 class StickerMessageComponent extends Component {
     h() {
@@ -8,11 +9,12 @@ class StickerMessageComponent extends Component {
         let animated = message.media.document.mime_type === "application/x-tgsticker";
         let src = message.media.document.real ? message.media.document.real.url : "";
         let size = message.media.document.attributes.find(l => l._ === "documentAttributeImageSize")
-        let height = size ? size.h / size.w * 250 : 250
+        const s = this.props.message.type === MessageType.ANIMATED_EMOJI ? 150 : 250
+        let height = size ? size.h / size.w * s : s
         let sticker = src !== "" ? (animated ?
-                <tgs-player className="sticker" autoplay loop mode="normal" src={src} css-width="250px" css-height={height + "px"}/>
+                <tgs-player className={["sticker", this.props.message.type === MessageType.ANIMATED_EMOJI ? "emoji" : ""]} autoplay loop mode="normal" src={src} css-width={s + "px"} css-height={height + "px"}/>
         :
-            <img className="sticker" src={src} css-width="250px" css-height={height + "px"}/>) : <div className="sticker loading" css-width="250px" css-height={height + "px"}/>
+            <img className="sticker" src={src} css-width={s + "px"} css-height={height + "px"}/>) : <div className="sticker loading" css-width={s + "px"} css-height={height + "px"}/>
         return (
             <MessageWrapperComponent message={message} transparent={true}>
                 {sticker}

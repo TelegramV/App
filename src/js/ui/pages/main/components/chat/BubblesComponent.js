@@ -120,7 +120,7 @@ class BubblesComponent extends Component {
                 // })
             }
             if (message.media.document) {
-                if (message.type === MessageType.STICKER) {
+                if (message.type === MessageType.STICKER || message.type === MessageType.ANIMATED_EMOJI) {
                     FileAPI.getFile(message.media.document).then(data => {
                         message.media.document.real = {url: data};
                         VRDOM.patch($message, MessageComponentGeneral(message));

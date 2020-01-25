@@ -102,6 +102,10 @@
 
                 &.loading {
                 }
+
+                &.emoji {
+                    cursor: default;
+                }
             }
 
             .instant-view-button {

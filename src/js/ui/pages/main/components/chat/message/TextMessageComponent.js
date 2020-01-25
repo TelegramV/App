@@ -4,6 +4,10 @@ import GeneralMessageComponent from "./GeneralMessageComponent"
 
 
 class TextMessageComponent extends GeneralMessageComponent {
+    constructor(props) {
+        super(props);
+    }
+
 
     h() {
         const username = this.message.from.name && !this.message.isPost && !this.message.isOut
