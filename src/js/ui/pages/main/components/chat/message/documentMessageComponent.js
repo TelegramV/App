@@ -22,30 +22,39 @@ const DocumentMessageComponent = ({message}) => {
 
 function getColor(extension) {
 	extension = extension.toLowerCase();
+	let colors = [
+	"#E93A3A", //red
+	"#4FAE4E", //green
+	"#4BA8FD", //blue
+	"#F58505", //yellow
+	]
 	switch(extension) {
-		case "pdf": //Adobe PDF
-			return "#E93A3A";
-		case "zip": //Archive
+		case "pdf": //red
+		case "ppt":
+		case "pptx":
+		case "key":
+			return colors[0];
+		case "xls": //green
+		case "xlsx":
+		case "csv":
+			return colors[1];
+		case "doc": //blue
+		case "docx":
+		case "rtf":
+		case "txt":
+		case "psd":
+			return colors[2];
+		case "zip": //yellow
 		case "7z":
 		case "rar":
 		case "tar":
-			return "#F58505";
-		case "doc": //Text Editors
-		case "docx":
-		case "rtf":
-			return "#4BA8FD";
-		case "ppt": //PowerPoint
-		case "pptx":
-			return "#D04325";
-		case "accdb": //Access
-			return "#A33538";
-		case "xls":
-		case "xlsx":
-			return "#1F6E44";
-		case "apk":
-		case "txt":
+		case "ai":
+		case "mp3":
+		case "mov":
+		case "avi":
+			return colors[3];
 		default:
-			return "#4FAE4E";
+			return colors[extension.charCodeAt(0)%4];
 	}
 }
 

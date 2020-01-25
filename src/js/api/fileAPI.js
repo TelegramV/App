@@ -56,6 +56,41 @@ export class FileAPI {
         }, dcID)
     }
 
+    static getWebFile(webFileLocation) {
+        return this.getWebFileLocation(webFileLocation).then(file => {
+            return new Promise(async (resolve, reject) => {
+                const blob = new Blob(new Array(file.bytes), {type: file.mime_type});
+                resolve(URL.createObjectURL(blob))
+                //TODO cache
+            })
+        })
+    }
+
+    static getWebFileLocation(webFileLocation, dcID = 4, offset = 0) {
+        return MTProto.invokeMethod("upload.getWebFile", {
+            location: webFileLocation,
+            offset: offset,
+            limit: 1024 * 1024
+        }, dcID)
+    }
+
+    static prepareWebFileLocation(geoPoint, w=512, h=512, zoom=20, scale=1) {
+        let geo = {
+            _: "inputGeoPoint",
+            lat: geoPoint.lat,
+            long: geoPoint.long
+        }
+        return {
+            _: "inputWebFileGeoPointLocation",
+            geo_point: geo,
+            access_hash: geoPoint.access_hash,
+            w: w,
+            h: h,
+            zoom: zoom,
+            scale: scale
+        }
+    }
+
     /**
      * @param file
      * @param dcID

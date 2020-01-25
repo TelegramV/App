@@ -4,6 +4,7 @@ import MessageWrapperComponent from "./messageWrapperComponent"
 const LocationMessageComponent = ({message}) => {
 	let geo = message.media.geo;
 	let venue = "";
+	console.log(message);
 	if(message.type == MessageType.VENUE) {
 		venue = (
 			<div class="venue">
@@ -15,9 +16,7 @@ const LocationMessageComponent = ({message}) => {
 	return (
 		<MessageWrapperComponent message={message} noPad>
 			{venue}
-			<div class="media-wrapper">
-				<MapComponent long={geo.long} lat={geo.lat}/>
-			</div>
+			<MapComponent map={geo}/>
 		</MessageWrapperComponent>
 	)
 }

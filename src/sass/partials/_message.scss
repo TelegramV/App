@@ -45,8 +45,7 @@
             .card {
                 display: flex;
 
-                .card-icon {
-                }
+                .card-icon {}
 
                 .card-info {
                     margin-left: 5px;
@@ -100,8 +99,7 @@
                 max-height: 512px;
                 cursor: pointer;
 
-                &.loading {
-                }
+                &.loading {}
 
                 &.emoji {
                     cursor: default;
@@ -218,9 +216,24 @@
                 }
             }
 
-            .embed-map {
-                width: 250px;
-                height: 250px;
+            .map {
+                position: relative;
+                cursor: pointer;
+
+                &.media-wrapper {
+                    max-width: 300px;
+                    max-height: 300px;
+                }
+
+                .pin-point {
+                    position: absolute;
+                    //top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -100%);
+                    svg {
+                        transform: scale(2,2);
+                    }
+                }
             }
 
             .game {
@@ -423,13 +436,15 @@
                         height: 240px;
                     }
 
-                    &.photo, &.video {
+                    &.photo,
+                    &.video {
                         //min-width: 100px;
                         //min-height: 100px;
                         max-height: 512px;
 
 
-                        img, video {
+                        img,
+                        video {
                             max-height: 512px;
                         }
                     }
@@ -670,10 +685,12 @@
                 .back {
                     fill: #c4c9cc;
                 }
+
                 .progress {
                     fill: $blue;
                 }
             }
+
             .play {
                 background-color: $blue;
             }
@@ -787,10 +804,12 @@
                 .back {
                     fill: lighten($darkgreen, 25%);
                 }
+
                 .progress {
                     fill: $darkgreen;
                 }
             }
+
             .play {
                 background-color: $darkgreen;
             }
