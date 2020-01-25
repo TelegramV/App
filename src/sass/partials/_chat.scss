@@ -199,6 +199,10 @@
                 }
             }
 
+            @media (max-width: 1000px) {
+                overflow-y: auto;
+            }
+
             #bubbles-inner {
                 max-width: $max-chat-width;
                 width: 100%;

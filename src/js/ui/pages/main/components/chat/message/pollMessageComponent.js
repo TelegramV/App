@@ -1,6 +1,7 @@
 import Component from "../../../../../v/vrdom/component"
 import MTProto from "../../../../../../mtproto"
 import MessageWrapperComponent from "./messageWrapperComponent"
+import RadioComponent from "../../input/radioComponent"
 
 export default class PollMessageComponent extends Component {
     constructor(props) {
@@ -73,13 +74,13 @@ export default class PollMessageComponent extends Component {
         let answers = [];
         if (!this.isVoted()) {
             for (const answer of this.poll.answers) {
-                answers.push(this._answerComponent(answer))
+                answers.push(<AnswerComponent answer={answer} input={this._answerInput} name={this.props.message.id}/>)
             }
         } else {
             for (const answer of this.poll.answers) {
                 for (const result of this.results.results) {
                     if (answer.option[0] === result.option[0]) {
-                        answers.push(this._answerComponent(answer, result, this.results.total_voters));
+                        answers.push(<AnswerComponent answer={answer} result={result} total_voters={this.results.total_voters}/>);
                         break;
                     }
                 }
@@ -88,38 +89,38 @@ export default class PollMessageComponent extends Component {
         return answers;
     }
 
-    _answerComponent(answer, result, total_voters=0) {
-    	if (!result) {
-	        return (
-	            <div class="answer" option={answer.option}>
-	            	<div class="result-wrapper">
-						<input type="radio" onClick={this._answerClick}/>
-					</div>
-					<div class="options-wrapper">
-						<div class="answer-text">{answer.text}</div>
-					</div>
-				</div>
-	        )
-	    } else {
-	    	let percent = (result.voters? (result.voters/total_voters)*100 : 0) + "%";
-	        return (
-	            <div class="answer" option={answer.option}>
-					<div class="result-wrapper">
-						<div class="percent">{percent}</div>
-						<div class="voted">{result.pFlags.chosen? <span class="tgico tgico-check"/> : ""}</div>
-					</div>
-					<div class="options-wrapper">
-						<div class="answer-text">{answer.text}</div>
-						<div class="progress-wrapper"><div class="progress" css-width={percent}></div></div>
-					</div>
-				</div>
-	        )
-	    }
-    }
-
-    _answerClick(event) {
+    _answerInput(event) {
+        console.log("Answer click!");
     	let option = event.currentTarget.closest(".answer").getAttribute("option");
     	this.addAnswer(option);
     }
+}
 
+const AnswerComponent = ({answer, result, total_voters=0, name, click}) => {
+    if (!result) {
+            return (
+                <div class="answer" option={answer.option}>
+                    <div class="result-wrapper">
+                        <RadioComponent name={name} click={click}/>
+                    </div>
+                    <div class="options-wrapper">
+                        <div class="answer-text">{answer.text}</div>
+                    </div>
+                </div>
+            )
+        } else {
+            let percent = (result.voters? (result.voters/total_voters)*100 : 0) + "%";
+            return (
+                <div class="answer" option={answer.option}>
+                    <div class="result-wrapper">
+                        <div class="percent">{percent}</div>
+                        <div class="voted">{result.pFlags.chosen? <span class="tgico tgico-check"/> : ""}</div>
+                    </div>
+                    <div class="options-wrapper">
+                        <div class="answer-text">{answer.text}</div>
+                        <div class="progress-wrapper"><div class="progress" css-width={percent}></div></div>
+                    </div>
+                </div>
+            )
+        }
 }

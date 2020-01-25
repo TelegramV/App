@@ -37,6 +37,10 @@
       overflow-y: auto;
     }
   }
+
+  @media (max-width: 1000px) {
+    overflow-y: auto;
+  }
 }
 
 .list {

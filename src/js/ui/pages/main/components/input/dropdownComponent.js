@@ -19,9 +19,9 @@ export class DropdownComponent extends Component {
         return (
             <div className="dropdown-container">
                 <div className="input-field dropdown down">
-                    <input type="text" autoComplete="nah" placeholder={this.props.label} onBlur={this.onBlur}
+                    <input type="text" id={this.props.name} autocomplete="pls,no" placeholder={this.props.label} onBlur={this.onBlur}
                            onFocus={this.onFocus} onInput={this.onInput} value={this.state.value}/>
-                    <label htmlFor="country" required>{this.props.label}</label>
+                    <label htmlFor={this.props.name} required>{this.props.label}</label>
                     <i className={arrowClasses.join(" ")} onMouseDown={this.onClick}/>
                 </div>
                 <div className={dropdownClasses.join(" ")}>
@@ -66,7 +66,8 @@ export class DropdownComponent extends Component {
             const node = this.props.nodes[i]
 
             // TODO create other check functions as well
-            if(!this.props.data[i].name.toLowerCase().includes(current)) {
+            if(!this.countryTest(current, this.props.data[i].name)) {
+            //if(!this.props.data[i].name.toLowerCase().includes(current)) {
                 node.classList.add("hidden")
             } else {
                 node.classList.remove("hidden")
@@ -74,6 +75,16 @@ export class DropdownComponent extends Component {
             //this.__patch()
         }
     }
+
+    countryTest(input, country) {
+        if(country.toLowerCase().includes(input.toLowerCase())) return true;
+        let split = country.split(/\b(?=[a-z])/ig);
+        if(split.length > 1) {
+            let abbr = split.map(token => token[0]).join("").toLowerCase();
+            if(abbr.includes(input.toLowerCase())) return true;
+        }
+    }
+
 
     onInput(ev) {
         const current = ev.target.value

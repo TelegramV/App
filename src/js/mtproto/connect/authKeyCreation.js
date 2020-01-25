@@ -19,7 +19,7 @@ async function step1_req_pq_multi(networker) {
 
     Logger.debug("step1 authContext = ", authContext)
 
-    const deserializer = await networker.invokeMethod("req_pq_multi", {
+    const deserializer = await networker.invokeMethod("req_pq", {
         nonce: authContext.nonce
     })
 

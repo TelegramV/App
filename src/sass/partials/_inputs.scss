@@ -3,261 +3,318 @@ $input-height: 54px;
 input[type="text"],
 input[type="tel"],
 input[type="password"] {
-	caret-color: $blue;
-	background-color: transparent;
-	outline: 0;
-	border: 0;
-	font-family: "Roboto", sans-serif;
-	font-size: 16px;
-	color: #000;
-	box-sizing: border-box;
-	width: 100%;
+    caret-color: $blue;
+    background-color: transparent;
+    outline: 0;
+    border: 0;
+    font-family: "Roboto", sans-serif;
+    font-size: 16px;
+    color: #000;
+    box-sizing: border-box;
+    width: 100%;
 
-	&::placeholder {
-		color: $darkgrey;
-		opacity: 0.8;
-	}
+    &::placeholder {
+        color: $darkgrey;
+        opacity: 0.8;
+    }
 }
 
 .btn-flat {
-	font-family: "Roboto", sans-serif;
-	background: transparent;
-	border: 0;
-	color: $blue;
-	text-transform: uppercase;
-	font-weight: 500;
-	margin: 12px;
-	padding: 0;
-	margin-left: 0;
-	outline: none;
-	font-size: 15px;
-	&.red {
-		color: $red;
-	}
+    font-family: "Roboto", sans-serif;
+    background: transparent;
+    border: 0;
+    color: $blue;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin: 12px;
+    padding: 0;
+    margin-left: 0;
+    outline: none;
+    font-size: 15px;
+
+    &.red {
+        color: $red;
+    }
 }
+
 .input-field {
-	position: relative;
-	width: 360px;
-	height: $input-height;
-	box-sizing: border-box;
+    position: relative;
+    width: 360px;
+    height: $input-height;
+    box-sizing: border-box;
 
-	label {
-		position: absolute;
-		top: 50%;
-		left: 11px;
-		transform: translateY(-50%);
-		cursor: text;
-		user-select: none;
-		transition: 100ms ease-in-out all;
-		font-size: 16px;
-		color: $grey;
-		padding: 5px;
-		border-radius: 1em;
-		pointer-events: none;
-	}
+    label {
+        position: absolute;
+        top: 50%;
+        left: 11px;
+        transform: translateY(-50%);
+        cursor: text;
+        user-select: none;
+        transition: 100ms ease-in-out all;
+        font-size: 16px;
+        color: $grey;
+        padding: 5px;
+        border-radius: 1em;
+        pointer-events: none;
+    }
 
-	.text {
-		height: 54px;
-	}
+    .text {
+        height: 54px;
+    }
 
-	input {
-		height: 100%;
-		padding: 0 15px;
-		border: 1px solid $lightgrey;
-		transition: 100ms ease-in-out border-color;
-		border-radius: 10px;
+    input {
+        height: 100%;
+        padding: 0 15px;
+        border: 1px solid $lightgrey;
+        transition: 100ms ease-in-out border-color;
+        border-radius: 10px;
 
-		&:hover {
-			//border-color: #aaa;
-			border-width: 2px;
-		}
+        &:hover {
+            //border-color: #aaa;
+            border-width: 2px;
+        }
 
-		&::placeholder {
-			color: transparent;
-		}
+        &::placeholder {
+            color: transparent;
+        }
 
-		&.invalid {
-			border-color: $red;
-		}
+        &.invalid {
+            border-color: $red;
+        }
 
-		&:focus {
-			border-width: 2px;
-			border-color: $blue;
-		}
+        &:focus {
+            border-width: 2px;
+            border-color: $blue;
+        }
 
-		&.invalid:focus {
-			border-width: 2px;
-			border-color: $red;
-		}
+        &.invalid:focus {
+            border-width: 2px;
+            border-color: $red;
+        }
 
-		&:focus:not(:placeholder-shown)+label {
-			color: $blue;
-		}
+        &:focus:not(:placeholder-shown)+label {
+            color: $blue;
+        }
 
-		&.invalid:focus:not(:placeholder-shown)+label {
-			color: $red;
-		}
+        &.invalid:focus:not(:placeholder-shown)+label {
+            color: $red;
+        }
 
-		&:not(:focus):not(:placeholder-shown)+label {
-			color: $darkgrey;
-		}
+        &:not(:focus):not(:placeholder-shown)+label {
+            color: $darkgrey;
+        }
 
-		&.invalid:not(:focus):not(:placeholder-shown)+label {
-			color: $red;
-		}
+        &.invalid:not(:focus):not(:placeholder-shown)+label {
+            color: $red;
+        }
 
-		&:not(:placeholder-shown)+label {
-			background-color: #fff;
-			top: 0;
-			font-size: 12px;
-			font-weight: 500;
-		}
-	}
+        &:not(:placeholder-shown)+label {
+            background-color: #fff;
+            top: 0;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    }
 }
 
 .checkbox-input {
-	display: block;
-	position: relative;
-	user-select: none;
+    display: block;
+    position: relative;
+    user-select: none;
 
-	padding-top: 3px;
+    padding-top: 3px;
 
-	font-size: 16px;
+    font-size: 16px;
 
-	input {
-		position: absolute;
-		opacity: 0;
-		cursor: default;
-		height: 0;
-		width: 0;
+    input {
+        position: absolute;
+        opacity: 0;
+        cursor: default;
+        height: 0;
+        width: 0;
 
-		&:checked~.checkmark {
-			background-color: $blue;
-			color: white;
-			border: 1px solid $blue;
-		}
+        &:checked~.checkmark {
+            background-color: $blue;
+            color: white;
+            border: 1px solid $blue;
+        }
 
-		&:checked~.checkmark:after {
-			display: block;
-		}
-	}
+        &:checked~.checkmark:after {
+            display: block;
+        }
+    }
 
-	.checkmark {
-		position: absolute;
-		top: 0;
-		left: 0;
-		height: 20px;
-		width: 20px;
-		border: 1px solid $lightgrey;
-		border-radius: 20%;
-		transition: background-color 0.2s ease-in-out;
+    .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 20px;
+        width: 20px;
+        border: 1px solid $lightgrey;
+        border-radius: 20%;
+        transition: background-color 0.2s ease-in-out;
+        cursor: pointer;
+
+        font-size: 19px;
+        color: transparent;
+        transition: anim(all);
+
+        &:hover {
+            background-color: $light;
+        }
+
+        &:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+    }
+
+    .checkbox-label {
+        margin-left: 50px;
+    }
+}
+
+.radio-input {
+	label {
 		cursor: pointer;
-
-		font-size: 19px;
-		color: transparent;
-		transition: anim(all);
-
-		&:hover {
-			background-color: $light;
-		}
-
-		&:after {
-			content: "";
-			position: absolute;
-			display: none;
-		}
 	}
+    input[type=radio] {
+        z-index: -1;
+        position: relative;
 
-	.checkbox-label {
-		margin-left: 50px;
-	}
+        &:before {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            z-index: 1;
+
+            background-color: white;
+            border: 2px solid $darkgrey;
+            transition: anim(border-color)
+        }
+
+        &:after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            z-index: 2;
+
+            transition: anim(background-color);
+        }
+
+        &:checked {
+        	&:before {
+        		border-color: $blue;
+        	}
+        	&:after {
+        		background-color: $blue;
+        	}
+        }
+    }
+    .radio-label {
+    	margin-left: 5px;
+    	cursor: text;
+    }
 }
 
 .password-input.peekable {
-	position: relative;
+    position: relative;
 
-	input {
-		font: large Verdana, sans-serif;
-		letter-spacing: 1px;
-	}
+    input {
+        font: large Verdana, sans-serif;
+        letter-spacing: 1px;
+    }
 
-	&:not(.peekable) .btn-icon {
-		display: none;
-	}
+    &:not(.peekable) .btn-icon {
+        display: none;
+    }
 
-	.btn-icon {
-		position: absolute;
-		font-size: 28px;
-		right: 10px;
-		top: 10%;
+    .btn-icon {
+        position: absolute;
+        font-size: 28px;
+        right: 10px;
+        top: 10%;
 
-		&:before {
-			content: $tgico-eye1;
-		}
+        &:before {
+            content: $tgico-eye1;
+        }
 
-		&.peek:before {
-			content: $tgico-eye2;
-		}
-	}
+        &.peek:before {
+            content: $tgico-eye2;
+        }
+    }
 }
 
 .dropdown-container {
-	position: relative;
+    position: relative;
 
-	.dropdown {
-		position: relative;
-		cursor: pointer;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
+    .dropdown {
+        position: relative;
+        cursor: pointer;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
 
-		i {
-			font-size: 30px;
-			position: absolute;
-			right: 10px;
+        i {
+            font-size: 30px;
+            position: absolute;
+            right: 10px;
 
-			cursor: pointer;
-		}
+            cursor: pointer;
+        }
 
-	}
+    }
 
-	.dropdown-list {
-		/*display: flex;
+    .dropdown-list {
+        /*display: flex;
 		flex-direction: column;*/
 
-		position: absolute;
-		width: 100%;
-		top: $input-height;
+        position: absolute;
+        width: 100%;
+        top: $input-height;
 
-		background-color: white;
-		border-radius: 8px;
-		z-index: 42;
-		border: 2px solid $verylightgrey;
-		box-shadow: 0 0 20px #ddd;
+        background-color: white;
+        border-radius: 8px;
+        z-index: 42;
+        border: 2px solid $verylightgrey;
+        box-shadow: 0 0 20px #ddd;
 
-		overflow-y: overlay;
-		margin-top: 8px;
-		max-height: 30vh;
+        overflow-y: overlay;
+        margin-top: 8px;
+        max-height: 30vh;
 
-		@supports not(overflow-y: overlay) {
-			overflow-y: auto;
-		}
+        @supports not(overflow-y: overlay) {
+            overflow-y: auto;
+        }
 
-		&.hidden {
-			display: none;
-		}
+        &.hidden {
+            display: none;
+        }
 
-		.dropdown-item {
-			cursor: pointer;
-			min-height: 20px;
+        .dropdown-item {
+            cursor: pointer;
+            min-height: 20px;
 
-			&.hidden {
-				display: none !important;
-			}
+            &.hidden {
+                display: none !important;
+            }
 
-			&:hover {
-				background-color: $verylightgrey;
-			}
-		}
-	}
+            &:hover {
+                background-color: $verylightgrey;
+            }
+        }
+    }
 }

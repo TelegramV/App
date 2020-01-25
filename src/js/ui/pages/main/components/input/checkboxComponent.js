@@ -1,17 +1,12 @@
-const CheckboxComponent = ({label="", checked = false, id}) => {
+const CheckboxComponent = ({ label = "", checked, input }) => {
     return (
         <div className="checkbox-input">
-            <label htmlFor={id}>
-                {
-                    checked ?
-                        <input type="checkbox" name={id} id={id} checked/>
-                    :
-                        <input type="checkbox" name={id} id={id}/>
-                }
+        	<label onInput={input}>
+        		<input type="checkbox" checked={checked? true : undefined}/>
                 <span className="checkmark">
-                        <div className="tgico tgico-check"/>
+                    <span className="tgico tgico-check"/>
                 </span>
-                <span className="checkbox-label">{label}</span>
+                {label?<span className="checkbox-label">{label}</span>:""}
             </label>
         </div>
     )

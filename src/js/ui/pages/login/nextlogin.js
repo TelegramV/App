@@ -21,13 +21,19 @@ const QRCodeStyling = require("qr-code-styling")
 const Emoji = require("emoji-js");
 let emoji = new Emoji();
 
+let keepLogged = true;
+
 let cropperEl
 let cropper;
 let pictureBlob;
 
+function checkboxInput(ev) {
+    keepLogged = ev.currentTarget.querySelector("input[type=checkbox]").checked;
+}
+
 
 function successfulAuth() {
-    if (!document.getElementById("keepLogger").checked) {
+    if (!keepLogged) {
 
         window.addEventListener("beforeunload", function (e) {
             AppPermanentStorage.clear() // tODO move this to proper place
@@ -124,7 +130,7 @@ class PhoneInputComponent extends PaneComponent {
                                    ref="dropdown"/>
                 <InputComponent label="Phone Number" type="tel"
                                 filter={value => /^\+?[\d ]*$/.test(value)} input={this.phoneInput} ref="phone"/>
-                <CheckboxComponent label="Keep me signed in" id="keepLogger" checked/>
+                <CheckboxComponent label="Keep me signed in" checked input={checkboxInput}/>
                 <ButtonWithProgressBarComponent label="Next" disabled={this.state.nextDisabled}
                                                 click={this.handlePhoneSend} ref="next"/>
                 <div className="qr-login-button" onClick={this.qrLogin}>Quick log in using QR code</div>
@@ -258,7 +264,7 @@ class CodeInputComponent extends PaneComponent {
                 </div>
                 <div className="description">We have sent you an SMS with the code.</div>
             </div>
-            <InputComponent label="Code" type="text" filter={value => /^[\d]{0,5}$/.test(value)} input={this.onInput}
+            <InputComponent label="Code" type="number" filter={value => /^[\d]{0,5}$/.test(value)} input={this.onInput}
                             ref="codeInput"/>
         </div>
     }

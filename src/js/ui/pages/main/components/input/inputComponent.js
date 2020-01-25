@@ -19,7 +19,7 @@ export class InputComponent extends Component {
                         : ""
                 }
                 <input type={this.props.type === "password" && !this.props.hide ? "text" : this.props.type}
-                       autoComplete="nah" placeholder={this.props.error || this.props.label}
+                       autocomplete="pls,no" placeholder={this.props.error || this.props.label}
                        value={this.props.error || this.props.value || ""}
                        onInput={l => this.onInput(l, this.props.filter, this.props.input)} className={this.props.error ? "invalid" : ""}/>
                 <label>{this.props.error || this.props.label}</label>

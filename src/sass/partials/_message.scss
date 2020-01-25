@@ -830,6 +830,12 @@
                 line-height: 12px;
                 vertical-align: top;
             }
+
+            .radio-input input[type=radio]{
+                &:before {
+                    background-color: $lightgreen
+                }
+            }
         }
 
         .bubble.read {
