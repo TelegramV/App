@@ -34,8 +34,12 @@ export class ApiNetworker extends Networker {
         this.seqNo = 0
         this.connectionInited = false
 
+        this.initPings()
+    }
+
+    initPings() {
         this.pings = {}
-        setInterval(this.checkConnection.bind(this), 1000)
+        this.checkConnection()
     }
 
     checkConnection() {
@@ -64,6 +68,8 @@ export class ApiNetworker extends Networker {
 
         })
         this.sendMessage(pingMessage)
+        setTimeout(this.checkConnection, 1000)
+
     }
 
     processResponse(data) {
