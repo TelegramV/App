@@ -13,7 +13,7 @@ import PhoneCallMessageComponent from "../components/chat/message/phoneCallMessa
 import LocationMessageComponent from "../components/chat/message/locationMessageComponent";
 import GameMessageComponent from "../components/chat/message/gameMessageComponent";
 import InvoiceMessageComponent from "../components/chat/message/invoiceMessageComponent";
-import PollMessageComponent from "../components/chat/message/pollMessageComponent";
+import PollMessageComponent from "../components/chat/message/PollMessageComponent";
 import {MessageType} from "../../../../api/dataObjects/messages/Message"
 
 /**
@@ -54,6 +54,7 @@ const MessageComponent = ({message}) => {
         return <Handler message={message}/>
     } else {
         message.raw.message = "Unsupported message type!"
+        message.raw.entities = undefined;
         return (
             <TextMessageComponent message={message}/>
         )

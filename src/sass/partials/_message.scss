@@ -264,10 +264,33 @@
                     color: $darkgrey;
                 }
 
+                &.voted {
+                    .answer {
+                        cursor: default;
+                        &:hover {
+                            background-color: transparent;
+                        }
+                    }
+                }
+
                 .answer {
                     width: 100%;
                     display: flex;
                     height: 40px;
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: $light;
+                    }
+
+                    &.wrong {
+                        .options-wrapper > .progress-wrapper > .progress {
+                            background-color: $red;
+                        }
+                        .result-wrapper > .voted:not(:empty){
+                            background-color: $red;
+                        }
+                    }
 
                     .result-wrapper {
                         display: flex;
@@ -276,6 +299,11 @@
                         align-items: flex-end;
                         width: 40px;
                         margin-right: 5px;
+
+                        .checkbox-input {
+                            margin-right: 30px;
+                            margin-bottom: 20px;
+                        }
 
                         .percent {
                             font-weight: bold;
@@ -317,6 +345,28 @@
                                 transition: anim(width);
                             }
                         }
+                    }
+                }
+
+                .action-button {
+                    width: 100%;
+                    text-align: center;
+                    height: 30px;
+                    line-height: 30px;
+                    
+                    color: $blue;
+                    font-weight: bold;
+                    cursor: pointer;
+
+                    transition: anim(color) anim(background-color);
+
+                    &.disabled {
+                        cursor: default;
+                        color: $grey;
+                    }
+
+                    &:not(.disabled):hover {
+                        background-color: $light;
                     }
                 }
 

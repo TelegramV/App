@@ -3,8 +3,8 @@ import {ChatInputManager} from "../chatInput/ChatInputComponent";
 import {MessageAvatarComponent} from "./MessageAvatarComponent"
 import {InlineKeyboardComponent} from "./inlineKeyboardComponent";
 
-const MessageWrapperComponent = ({message, transparent = false, slot, noPad = false}) => {
-    const contextMenuHandler = ContextMenuManager.listener([
+const MessageWrapperComponent = ({message, transparent = false, slot, noPad = false, contextActions}) => {
+    const defaultContextActions = [
         {
             icon: "reply",
             title: "Reply",
@@ -27,7 +27,8 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
             title: "Delete",
             red: true
         },
-    ])
+    ];
+    const contextMenuHandler = ContextMenuManager.listener(contextActions? contextActions : defaultContextActions);
 
     const doubleClickHandler = _ => ChatInputManager.replyTo(message)
 

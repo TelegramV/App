@@ -1,5 +1,5 @@
 import AppEvents from "../../../../../api/eventBus/AppEvents"
-import {isElementInViewport} from "../../../../utils"
+import {isElementInViewport} from "../../../../utils/index"
 
 import MessageComponent from "./../../messages/newMessage"
 import Component from "../../../../v/vrdom/component"
