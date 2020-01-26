@@ -1,6 +1,6 @@
 import "../sass/application.scss"
 
-import './ui/vendor/tgs-player.js';
+import "./ui/vendor/tgs-player.js";
 import V from "./ui/v/VFramework"
 import MTProto from "./mtproto"
 import AppCache from "./api/cache"
@@ -9,6 +9,7 @@ import PeersStore from "./api/store/PeersStore"
 import AppEvents from "./api/eventBus/AppEvents"
 import {createNonce} from "./mtproto/utils/bin"
 import RipplePlugin from "./ui/plugins/RipplePlugin"
+import EmojiPlugin from "./ui/plugins/EmojiPlugin"
 import AppRoutes from "./ui/routing"
 import {StickerManager} from "./api/stickersManager";
 import VBigInt from "./mtproto/bigint/VBigInt"
@@ -41,6 +42,7 @@ function start() {
 
 function startUI() {
     V.registerPlugin(RipplePlugin)
+    V.registerPlugin(EmojiPlugin)
 
     V.useRoutes(AppRoutes)
 
