@@ -1,5 +1,11 @@
 {
     "constructors": [
+			{
+	      "id": "481674261",
+	      "predicate": "vector",
+	      "params": [],
+	      "type": "Vector t"
+	    },
         {
             "id": 85337187,
             "predicate": "resPQ",
@@ -1104,12 +1110,20 @@
             "type": "InputMedia"
         },
         {
-            "id": 112424539,
+            "id": -1410741723,
             "predicate": "inputMediaPoll",
             "params": [
                 {
+                    "name": "flags",
+                    "type": "#"
+                },
+                {
                     "name": "poll",
                     "type": "Poll"
+                },
+                {
+                    "name": "correct_answers",
+                    "type": "flags.0?Vector<bytes>"
                 }
             ],
             "type": "InputMedia"
@@ -13709,7 +13723,7 @@
             "type": "PollAnswerVoters"
         },
         {
-            "id": 1465219162,
+            "id": -932174686,
             "predicate": "pollResults",
             "params": [
                 {
@@ -13727,6 +13741,10 @@
                 {
                     "name": "total_voters",
                     "type": "flags.2?int"
+                },
+                {
+                    "name": "recent_voters",
+                    "type": "flags.3?Vector<int>"
                 }
             ],
             "type": "PollResults"
@@ -14359,12 +14377,6 @@
                 }
             ],
             "type": "InputTheme"
-        },
-        {
-            "id": 1211967244,
-            "predicate": "themeDocumentNotModified",
-            "params": [],
-            "type": "Theme"
         },
         {
             "id": 42930452,
@@ -20266,6 +20278,79 @@
                 }
             ],
             "type": "Vector<WallPaper>"
+        },
+        {
+            "id": -233638547,
+            "method": "messageUserVote",
+            "params": [
+                {
+                    "name": "user_id",
+                    "type": "int"
+                },
+                {
+                    "name": "option",
+                    "type": "bytes"
+                }
+            ],
+            "type": "MessageUserVote"
+        },
+        {
+            "id": 136574537,
+            "method": "messages.votesList",
+            "params": [
+                {
+                    "name": "flags",
+                    "type": "#"
+                },
+                {
+                    "name": "count",
+                    "type": "int"
+                },
+                {
+                    "name": "votes",
+                    "type": "Vector<MessageUserVote>"
+                },
+                {
+                    "name": "users",
+                    "type": "Vector<User>"
+                },
+                {
+                    "name": "next_offset",
+                    "type": "flags.0?string"
+                }
+            ],
+            "type": "messages.VotesList"
+        },
+        {
+            "id": -1200736242,
+            "method": "messages.getPollVotes",
+            "params": [
+                {
+                    "name": "flags",
+                    "type": "#"
+                },
+                {
+                    "name": "peer",
+                    "type": "InputPeer"
+                },
+                {
+                    "name": "id",
+                    "type": "int"
+                },
+                {
+                    "name": "option",
+                    "type": "flags.0?bytes"
+                },
+                {
+                    "name": "offset",
+                    "type": "flags.1?string"
+                },
+                {
+                    "name": "limit",
+                    "type": "int"
+                }
+            ],
+            "type": "messages.VotesList"
         }
     ]
 }
