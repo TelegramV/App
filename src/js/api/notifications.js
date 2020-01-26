@@ -1,10 +1,10 @@
 import MTProto from "../mtproto";
-import {playSound} from "../ui/audio";
+import AudioManager from "../ui/audioManager";
 
 export function notify(update) {
     // TODO parse current chat etc
     const sound = document.hasFocus() ? "in" : "notification"
-    playSound(sound)
+    AudioManager.playNotification(sound)
 }
 
 export function attach() {

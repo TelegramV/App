@@ -1,4 +1,4 @@
-import {Pinned} from "../../../../pinnedController"
+import {PinnedComponent} from "../../../../pinnedController"
 import LoaderComponent from "../loading/LoaderComponent"
 import ChatInfoComponent from "./chatInfo/ChatInfoComponent"
 import Component from "../../../../v/vrdom/component"
@@ -44,7 +44,7 @@ class ChatComponent extends Component {
                 <div id="chat" css-display="none">
                     <div id="topbar">
                         <ChatInfoComponent/>
-                        <Pinned/>
+                        <PinnedComponent/>
                         <div className="btn-icon rp rps tgico-search"/>
                         <div className="btn-icon rp rps tgico-more"/>
                     </div>

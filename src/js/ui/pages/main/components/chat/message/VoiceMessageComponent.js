@@ -3,6 +3,8 @@ import {FileAPI} from "../../../../../../api/fileAPI"
 import MessageWrapperComponent from "./common/MessageWrapperComponent"
 import TextWrapperComponent from "./common/TextWrapperComponent"
 
+import AudioManager from "../../../../../audioManager"
+
 export default class VoiceMessageComponent extends Component {
     constructor(props) {
         super(props);
@@ -64,12 +66,22 @@ export default class VoiceMessageComponent extends Component {
     }
 
     play() {
+        if(this.audio.ended || this.audio.played.length==0) {
+            this.skipAnim = true;
+            this.progress.setAttribute("style", "transition: all 0s ease 0s !important;");
+            this.setPercent(0);
+        }
+        this.playButton.classList.add("tgico-pause");
+        this.playButton.classList.remove("tgico-play");
         this.playing = true;
         this.audio.play();
+        AudioManager.set(this);
     }
 
     pause() {
         this.playing = false;
+        this.playButton.classList.remove("tgico-pause");
+        this.playButton.classList.add("tgico-play");
         this.audio.pause();
     }
 
@@ -146,17 +158,14 @@ export default class VoiceMessageComponent extends Component {
     _playButtonClick(e) {
         if (this.playing) {
             this.pause();
-            this.playButton.classList.remove("tgico-pause");
-            this.playButton.classList.add("tgico-play");
         } else {
             if (this.audio.ended || this.audio.played.length == 0) {
                 this.skipAnim = true;
                 this.progress.setAttribute("style", "transition: all 0s ease 0s !important;");
                 this.setPercent(0);
             }
+
             this.play();
-            this.playButton.classList.add("tgico-pause");
-            this.playButton.classList.remove("tgico-play");
         }
     }
 
