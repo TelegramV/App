@@ -11,7 +11,8 @@ export default class PollMessageComponent extends Component {
         console.log(message);
         this.poll = message.raw.media.poll;
         this.results = message.raw.media.results;
-        this.results.most_voters = this.getWinningAnswer()?.voters;
+
+        this.results.most_voters = this.getWinningAnswer()? this.getWinningAnswer().voters : 0;
 
         this.multiple = this.poll.pFlags.multiple_choice;
         this.public = this.poll.pFlags.public_voters;

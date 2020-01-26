@@ -159,12 +159,6 @@ export default class VoiceMessageComponent extends Component {
         if (this.playing) {
             this.pause();
         } else {
-            if (this.audio.ended || this.audio.played.length == 0) {
-                this.skipAnim = true;
-                this.progress.setAttribute("style", "transition: all 0s ease 0s !important;");
-                this.setPercent(0);
-            }
-
             this.play();
         }
     }
