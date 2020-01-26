@@ -1,51 +1,67 @@
-let pinned = null;
-let audio = null;
+import Component from "./v/vrdom/component";
 
-export function pin(msg) {
-    pinned = msg;
-}
+export let PinManager
 
-export function unpin() {
-    pinned = null;
-}
+export class PinnedComponent extends Component {
+    constructor(props) {
+        super(props);
 
-export function pinAudio(a) {
-    audio = a;
-}
-
-export function unpinAudio() {
-    audio = null;
-    //stop audio?
-}
-
-export function getPinned() {
-    return pinned;
-}
-
-export function hasAudio() {
-    return !!audio;
-}
-
-export function getAudio() {
-    return audio;
-}
-
-export const Pinned = () => {
-    if (audio) {
-        return <div id="messages-wrapper-pinned" className="pin active-audio">
-        			<div className="play tgico tgico-play"/>
-        			<div className="text-wrapper">
-                		<div className="title">Pinned message</div>
-                		<div className="description">See you tomorrow at 18:00 at the park</div>
-                	</div>
-                </div>
+        PinManager = this;
     }
-    if (pinned) {
-        return <div id="messages-wrapper-pinned" className="pin pinned-message">
-                	<div className="title">Pinned message</div>
-                	<div className="description">See you tomorrow at 18:00 at the park</div>
+
+    pinAudio(audio) {
+        this.audio = audio;
+        this.updatePin();
+    }
+
+    pinVoice(voice) {
+        this.voice = voice;
+        this.updatePin();
+    }
+
+    pinMessage(message) {
+        this.message = message;
+        this.updatePin();
+    }
+
+    unpinMedia() {
+        this.audio = null;
+        this.voice = null;
+        this.updatePin();
+    }
+
+    getDisplayedPin() {
+        if (this.audio || this.voice) {
+            return this.audio || this.voice;
+        } else return this.message;
+    }
+
+    updatePin() {
+        this.__patch();
+    }
+
+    h() {
+        if (this.audio || this.voice) {
+            return (
+                <div className="pin active-audio">
+                    <div className="play">
+                        <i class="tgico tgico-play"/>
+                    </div>
+                    <div className="audio-info">
+                        <div className="title">Title</div>
+                        <div className="description">Musician</div>
+                    </div>
                 </div>
-    } else {
-        return <div id="messages-wrapper-pinned" className="pin pinned-message"/>
+            )
+        } else if(this.message) {
+            return (
+                <div className="pin pinned-message">
+                    <div className="title">Pinned message</div>
+                    <div className="description">See you tomorrow at 18:00 at the park</div>
+                </div>
+            )
+        } else {
+            return <div className="pin"/>;
+        }
     }
 }
