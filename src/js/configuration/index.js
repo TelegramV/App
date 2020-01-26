@@ -21,7 +21,10 @@ export const AppConfiguration = {
             app_version: "0.1.0"
         }
     },
-    useNativeBigInt: BigInt || false
+    get useNativeBigInt() {
+        // return BigInt || false
+        return false
+    }
 }
 
 export default AppConfiguration

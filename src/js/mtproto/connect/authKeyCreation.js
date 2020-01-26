@@ -69,7 +69,10 @@ async function step4_req_DH_params(pAndQ, networker) {
     let dataWithHash = sha1BytesSync(data_serializer.getBuffer())
     dataWithHash = dataWithHash.concat(data_serializer.getBytes())
 
-    dataWithHash = dataWithHash.concat(crypto.randomBytes(255 - dataWithHash.length))
+    // const randPadding  = dataWithHash instanceof ArrayBuffer || dataWithHash instanceof Buffer || dataWithHash instanceof Uint8Array ? crypto.randomBytes(255 - dataWithHash.length) : new Array(crypto.randomBytes(255 - dataWithHash.length))
+    // dataWithHash = dataWithHash.concat(randPadding)
+    //
+    // console.warn("x", dataWithHash)
 
     let encryptedData = rsaEncrypt(authContext.publicKey, dataWithHash)
 

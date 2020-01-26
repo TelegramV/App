@@ -285,10 +285,10 @@ const Bytes = {
     asBase64,
     fromHex,
     asHex: asHex,
-    fromArrayBuffer,
+    fromArrayBuffer: fromArrayBuffer,
     fromBigInteger: fromBigInteger,
     modPow: modPow,
-    addPadding,
+    addPadding: addPadding,
     concat,
     concatBuffer,
 }

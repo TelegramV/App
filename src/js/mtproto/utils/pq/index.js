@@ -34,9 +34,7 @@ const abs = (a, b) => {
 }
 
 /**
- * TODO: rewrite the algorithm @ponyruletheworld
- *
- * @param {VBigInt} pq
+ * @param {*} pq
  */
 function decompose(pq) {
     pq = VBigInt.create(pq)
@@ -47,14 +45,14 @@ function decompose(pq) {
 
     if (pq.remainder(big2).equal(big0)) {
         return {
-            p: big2.getBytes(),
-            q: pq.divide(big2).getBytes()
+            p: big2.getBytes(4),
+            q: pq.divide(big2).getBytes(4)
         }
     }
 
     let y = big1.add(VBigInt.create(Random.nextInteger(64)).remainder(pq.subtract(big1))),
         c = big1.add(VBigInt.create(Random.nextInteger(64)).remainder(pq.subtract(big1))),
-        m = big1.add(VBigInt.create(Random.nextInteger(64)).remainder(pq.subtract(big1))) // todo clone
+        m = big1.add(VBigInt.create(Random.nextInteger(64)).remainder(pq.subtract(big1)))
 
     let g = big1,
         r = big1,
@@ -100,13 +98,12 @@ function decompose(pq) {
     q = pq.divide(p)
 
     return (p.lessThan(q)) ? {
-        p: p.getBytes(),
-        q: q.getBytes()
+        p: p.getBytes(4),
+        q: q.getBytes(4)
     } : {
-        p: q.getBytes(),
-        q: p.getBytes()
+        p: q.getBytes(4),
+        q: p.getBytes(4)
     }
-
 }
 
 // function decompose(pq) {
