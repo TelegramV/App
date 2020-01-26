@@ -1,4 +1,4 @@
-import {bigint, gzipUncompress} from "../utils/bin"
+import {gzipUncompress} from "../utils/bin"
 import {createLogger} from "../../common/logger"
 import {schema} from "./schema";
 import Bytes from "../utils/bytes"
@@ -296,8 +296,8 @@ export class TLDeserialization {
 
         predicate = constructorData.predicate
 
-        if(predicate == "vector") {
-        	return this.fetchObject("vector<T>","vector"); //special case for Vector at root
+        if (predicate == "vector") {
+            return this.fetchObject("vector<T>", "vector"); //special case for Vector at root
         }
 
         let result = {"_": predicate}

@@ -68,9 +68,15 @@ async function step4_req_DH_params(pAndQ, networker) {
 
     let dataWithHash = sha1BytesSync(data_serializer.getBuffer())
     dataWithHash = dataWithHash.concat(data_serializer.getBytes())
-    dataWithHash = dataWithHash.concat(crypto.randomBytes(255 - dataWithHash.length))
+
+    // const randPadding  = dataWithHash instanceof ArrayBuffer || dataWithHash instanceof Buffer || dataWithHash instanceof Uint8Array ? crypto.randomBytes(255 - dataWithHash.length) : new Array(crypto.randomBytes(255 - dataWithHash.length))
+    // dataWithHash = dataWithHash.concat(randPadding)
+    //
+    // console.warn("x", dataWithHash)
 
     let encryptedData = rsaEncrypt(authContext.publicKey, dataWithHash)
+
+    console.log(encryptedData)
 
     const deserializer = await networker.invokeMethod("req_DH_params", {
         nonce: authContext.nonce,
@@ -152,15 +158,15 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
     const gABigInt = VBigInt.create("0x" + Bytes.asHex(authContext.gA))
     const dhPrimeBigInt = VBigInt.create("0x" + dhPrimeHex)
 
-    if (gABigInt.lessThanOrEqual(VBigInt.ONE)) {
+    if (gABigInt.lessThanOrEqual(VBigInt.create(1))) {
         throw new Error("gA <= 1")
     }
 
-    if (gABigInt.greaterThanOrEqual(dhPrimeBigInt.subtract(VBigInt.ONE))) {
+    if (gABigInt.greaterThanOrEqual(dhPrimeBigInt.subtract(VBigInt.create(1)))) {
         throw new Error("gA >= dhPrime - 1")
     }
 
-    const two = VBigInt.TWO
+    const two = VBigInt.create(2)
     const twoPow = two.pow(VBigInt.create(2048 - 64))
 
     if (gABigInt.lessThan(twoPow)) {

@@ -1,4 +1,3 @@
-import {BigInteger} from "jsbn"
 import CryptoJS from "../vendor/crypto"
 import {Zlib} from "../vendor/zlib"
 import crypto from "crypto"
@@ -14,14 +13,6 @@ export function createRandomBuffer(bytesLength) {
 // Create a new nonce
 export function createNonce(bytesLength) {
     return createRandomBuffer(bytesLength);
-}
-
-export function bigint(num) {
-    return new BigInteger(num.toString(16), 16)
-}
-
-export function bigStringInt(strNum) {
-    return new BigInteger(strNum, 10)
 }
 
 export function bytesToWords(bytes) {
@@ -182,7 +173,7 @@ export function longToBytes(sLong) {
 }
 
 export function longFromInts(high, low) {
-    return bigint(high).shiftLeft(32).add(bigint(low)).toString(10)
+    return VBigInt.create(high).leftShift(32).add(low).toString(10)
 }
 
 export function intToBytes(int) {

@@ -1,4 +1,7 @@
-import JSBI from "jsbi"
+// import JSBI from "jsbi"
+import {BigInteger} from "../vendor/jsbn/jsbn"
+import Bytes from "../utils/bytes"
+import AppConfiguration from "../../configuration"
 
 /**
  * Native BigInt wrapper
@@ -8,59 +11,201 @@ import JSBI from "jsbi"
 class VBigInt {
 
     /**
-     * @type {JSBI|BigInt}
+     * @type {BigInteger|BigInt}
      */
     value = undefined
 
-    canNative = window.BigInt
-
     isNative = false
 
-    constructor(value) {
+    constructor(value, native = false) {
         this.value = value
-        this.isNative = typeof value === "bigint"
-    }
 
-    static get ZERO() {
-        return VBigInt.create(this.canNative ? window.BigInt(0) : JSBI.BigInt(0))
-    }
-
-    static get ONE() {
-        return VBigInt.create(this.canNative ? window.BigInt(1) : JSBI.BigInt(1))
-    }
-
-    static get TWO() {
-        return VBigInt.create(this.canNative ? window.BigInt(2) : JSBI.BigInt(2))
-    }
-
-    static get THREE() {
-        return VBigInt.create(this.canNative ? window.BigInt(3) : JSBI.BigInt(3))
-    }
-
-    static get FOUR() {
-        return VBigInt.create(this.canNative ? window.BigInt(4) : JSBI.BigInt(4))
-    }
-
-    static get FIVE() {
-        return VBigInt.create(this.canNative ? window.BigInt(5) : JSBI.BigInt(5))
+        this.isNative = native || typeof value === "bigint"
     }
 
     /**
-     * @param {string|number} a
+     * @param {string|number|BigInt|BigInteger} a
+     * @param b
      * @return {VBigInt}
      */
-    static create(a) {
-        if (this.canNative) {
-            return new VBigInt(window.BigInt(a))
+    static create(a, b = 10) {
+        if (AppConfiguration.useNativeBigInt) {
+
+            if (typeof a === "bigint") {
+                return new VBigInt(a, true)
+            } else if (b === 16 && typeof a === "string" && !a.startsWith("0x")) {
+                return new VBigInt(BigInt("0x" + a), true)
+            } else if (a instanceof Array || a instanceof ArrayBuffer || a instanceof Uint8Array) {
+                return new VBigInt(BigInt(`0x${Bytes.asHex(a)}`), true)
+            }
+
+            return new VBigInt(BigInt(a), true)
+
         } else {
-            if (a instanceof JSBI) {
+            if (a instanceof BigInteger) {
                 return new VBigInt(a)
             } else {
-                return new VBigInt(JSBI.BigInt(a))
+                if (typeof a === "string") {
+                    if (a.startsWith("0x")) {
+                        a = a.substring(2)
+                        return new VBigInt(new BigInteger(a, 16))
+                    } else {
+                        return new VBigInt(new BigInteger(a, b))
+                    }
+                } else if (a instanceof Array || a instanceof ArrayBuffer || a instanceof Uint8Array) {
+                    return new VBigInt(new BigInteger(a))
+                } else {
+                    return new VBigInt(new BigInteger(a.toString(16), 16))
+                }
             }
         }
     }
 
+    /**
+     * @param le
+     * @return {[]}
+     */
+    toByteArray(le = false) {
+        if (this.isNative) {
+
+            const result = []
+            let value = this.value
+
+            while (value > BigInt(0)) {
+                result.push(Number(value % BigInt(256)))
+                value /= BigInt(256);
+            }
+            if (result.length === 0) {
+                result.push(0)
+            }
+
+            return le ? result : result.reverse()
+
+        } else {
+            return this.value.toByteArray()
+        }
+    }
+
+    // fallback for jsbn
+    getBytes(length, le) {
+        if (this.isNative) {
+            let bytes = Bytes.fromHex(this.toString(16))
+            bytes = new Uint8Array(bytes)
+
+            console.warn("b", bytes)
+
+            if (length && bytes.length < length) {
+                const padding = []
+                for (let i = 0, needPadding = length - bytes.length; i < needPadding; i++) {
+                    padding[i] = 0
+                }
+                if (bytes instanceof ArrayBuffer) {
+                    bytes = Bytes.concatBuffer(padding, bytes)
+                } else {
+                    bytes = padding.concat(bytes)
+                }
+            } else {
+                while (!bytes[0] && (!length || bytes.length > length)) {
+                    bytes = bytes.slice(1)
+                }
+            }
+
+            return bytes
+        } else {
+            let bytes = new Uint8Array(this.value.toByteArray())
+
+            if (length && bytes.length < length) {
+                const padding = []
+                for (let i = 0, needPadding = length - bytes.length; i < needPadding; i++) {
+                    padding[i] = 0
+                }
+                if (bytes instanceof ArrayBuffer) {
+                    bytes = Bytes.concatBuffer(padding, bytes)
+                } else {
+                    bytes = padding.concat(bytes)
+                }
+            } else {
+                while (!bytes[0] && (!length || bytes.length > length)) {
+                    bytes = bytes.slice(1)
+                }
+            }
+
+            return bytes
+        }
+    }
+
+    /**
+     * @param {VBigInt|number|string} b
+     * @param {VBigInt|number|string} n
+     * @return {VBigInt}
+     */
+    modPow(b, n) {
+        if (!(b instanceof VBigInt)) {
+            b = VBigInt.create(b)
+        }
+
+        if (!(n instanceof VBigInt)) {
+            n = VBigInt.create(n)
+        }
+
+        if (this.isNative) {
+            let a = this.value
+            b = b.value
+            n = n.value
+
+            a %= n;
+            let result = BigInt(1)
+            let x = a
+            let big1 = BigInt(1)
+            let big2 = BigInt(2)
+
+            while (b > 0) {
+                const leastSignificantBit = b % big2
+                b /= big2
+
+                if (leastSignificantBit === big1) {
+                    result *= x
+                    result %= n
+                }
+
+                x *= x
+                x %= n
+            }
+            return VBigInt.create(result)
+        } else {
+            return VBigInt.create(this.value.modPow(b.value, n.value))
+        }
+    }
+
+    /**
+     * @param {VBigInt|number|string} b
+     * @return {VBigInt}
+     */
+    gcd(b) {
+        if (!(b instanceof VBigInt)) {
+            b = VBigInt.create(b)
+        }
+
+        if (this.isNative) {
+            let a = this.value
+            b = b.value
+
+            while (b) {
+                const tmp = a
+                a = b
+                b = tmp % b
+            }
+
+            return VBigInt.create(a)
+        } else {
+            return VBigInt.create(this.value.gcd(b.value))
+        }
+    }
+
+    /**
+     * @param radix
+     * @return {string}
+     */
     toString(radix) {
         return this.value.toString(radix)
     }
@@ -74,7 +219,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value + b.value : JSBI.add(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value + b.value : this.value.add(b.value))
     }
 
     /**
@@ -86,7 +231,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value - b.value : JSBI.subtract(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value - b.value : this.value.subtract(b.value))
     }
 
     /**
@@ -98,7 +243,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value * b.value : JSBI.multiply(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value * b.value : this.value.multiply(b.value))
     }
 
     /**
@@ -110,7 +255,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value / b.value : JSBI.divide(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value / b.value : this.value.divide(b.value))
     }
 
     /**
@@ -122,7 +267,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value % b.value : JSBI.remainder(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value % b.value : this.value.remainder(b.value))
     }
 
     /**
@@ -134,7 +279,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value ** b.value : JSBI.exponentiate(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value ** b.value : this.value.pow(b.value))
     }
 
     /**
@@ -153,14 +298,14 @@ class VBigInt {
      * @return {VBigInt}
      */
     unaryMinus() {
-        return VBigInt.create(this.isNative ? -this.value : JSBI.unaryMinus(this.value))
+        return VBigInt.create(this.isNative ? -this.value : this.value.negate())
     }
 
     /**
      * @return {VBigInt}
      */
     bitwiseNot() {
-        return VBigInt.create(this.isNative ? ~this.value : JSBI.bitwiseNot(this.value))
+        return VBigInt.create(this.isNative ? ~this.value : this.value.not())
     }
 
     /**
@@ -172,20 +317,20 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        const remainder = this.isNative ?
-            VBigInt.create(this.value % b.value) :
-            this.remainder(b)
+        if (this.isNative) {
+            const remainder = VBigInt.create(this.value % b.value)
+            const quotient = VBigInt.create((this.value - remainder.value) / b.value)
 
-        const quotient = this.isNative ?
-            VBigInt.create((this.value - remainder.value) / b.value) :
-            this.subtract(remainder).divide(b)
+            return [quotient, remainder]
+        } else {
+            const r = this.value.divideAndRemainder(b.value)
+            return [VBigInt.create(r[0]), VBigInt.create(r[1])]
+        }
 
-
-        return [quotient, remainder]
     }
 
     toNumber() {
-        return this.isNative ? Number(this.value) : JSBI.toNumber(this.value)
+        return this.isNative ? Number(this.value) : this.value.intValue()
     }
 
     /**
@@ -197,7 +342,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value << b.value : JSBI.leftShift(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value << b.value : this.value.shiftLeft(b.value))
     }
 
     /**
@@ -209,7 +354,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value >> b.value : JSBI.signedRightShift(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value >> b.value : this.value.shiftRight(b.value))
     }
 
     /**
@@ -221,7 +366,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value & b.value : JSBI.bitwiseAnd(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value & b.value : this.value.and(b.value))
     }
 
     /**
@@ -233,7 +378,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value | b.value : JSBI.bitwiseOr(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value | b.value : this.value.or(b.value))
     }
 
     /**
@@ -245,7 +390,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return VBigInt.create(this.isNative ? this.value ^ b.value : JSBI.bitwiseXor(this.value, b.value))
+        return VBigInt.create(this.isNative ? this.value ^ b.value : this.value.xor(b.value))
     }
 
     /**
@@ -257,7 +402,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return this.isNative ? this.value === b.value : JSBI.equal(this.value, b.value)
+        return this.isNative ? this.value === b.value : this.value.equals(b.value)
     }
 
     /**
@@ -269,7 +414,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return this.isNative ? this.value !== b.value : JSBI.notEqual(this.value, b.value)
+        return this.isNative ? this.value !== b.value : !this.value.equals(b.value)
     }
 
     /**
@@ -281,7 +426,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return this.isNative ? this.value < b.value : JSBI.lessThan(this.value, b.value)
+        return this.isNative ? this.value < b.value : this.value.compareTo(b.value) < 0
     }
 
     /**
@@ -293,7 +438,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return this.isNative ? this.value <= b.value : JSBI.lessThanOrEqual(this.value, b.value)
+        return this.isNative ? this.value <= b.value : this.value.compareTo(b.value) <= 0
     }
 
     /**
@@ -305,7 +450,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return this.isNative ? this.value > b.value : JSBI.greaterThan(this.value, b.value)
+        return this.isNative ? this.value > b.value : this.value.compareTo(b.value) > 0
     }
 
     /**
@@ -317,7 +462,7 @@ class VBigInt {
             b = VBigInt.create(b)
         }
 
-        return this.isNative ? this.value >= b.value : JSBI.greaterThanOrEqual(this.value, b.value)
+        return this.isNative ? this.value >= b.value : this.value.compareTo(b.value) >= 0
     }
 }
 

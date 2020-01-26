@@ -20,6 +20,10 @@ export const AppConfiguration = {
             api_hash: "4acddf30a6113bfe220f7fd67ab7f468",
             app_version: "0.1.0"
         }
+    },
+    get useNativeBigInt() {
+        // return BigInt || false
+        return false
     }
 }
 
