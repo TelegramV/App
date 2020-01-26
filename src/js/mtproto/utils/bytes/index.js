@@ -1,7 +1,8 @@
-import {BigInteger} from "../../vendor/jsbn/jsbn"
 import {uint6ToBase64} from "../bin"
 import {SecureRandomSingleton} from "../singleton"
 import crypto from "crypto"
+import VBigInt from "../../bigint/VBigInt"
+import {BigInteger} from "../../vendor/jsbn/jsbn"
 
 /**
  * @param {Array|ArrayLike|ArrayBufferLike} a
@@ -145,6 +146,7 @@ function fromBigInteger(bigInteger, length = undefined) {
     return bytes
 }
 
+
 /**
  * @param {Array|ArrayLike|ArrayBufferLike} x
  * @param {Array|ArrayLike|ArrayBufferLike} y
@@ -153,6 +155,18 @@ function fromBigInteger(bigInteger, length = undefined) {
  */
 function modPow(x, y, m) {
     try {
+        const xBigInt = VBigInt.create(asHex(x), 16)
+        const yBigInt = VBigInt.create(asHex(y), 16)
+        const mBigInt = VBigInt.create(asHex(m), 16)
+        let res = xBigInt.modPow(yBigInt, mBigInt).toByteArray()
+        if (res.length > 256) {
+            res = res.splice(res.length - 256)
+        } else if (res.length < 256) {
+            return res.unshift(0)
+        }
+
+        return res
+        /*
         const xBigInt = new BigInteger(asHex(x), 16)
         const yBigInt = new BigInteger(asHex(y), 16)
         const mBigInt = new BigInteger(asHex(m), 16)
@@ -164,12 +178,14 @@ function modPow(x, y, m) {
         }
 
         return resBigInt
+         */
     } catch (e) {
         console.error("mod pow error", e)
     }
 
-    return Bytes.fromBigInteger(new BigInteger(x).modPow(new BigInteger(y), new BigInteger(m)), 256)
+    return VBigInt.create(x).modPow(y, m).getBytes(256)
 }
+
 
 /**
  * @param {Array|ArrayLike|ArrayBufferLike} bytes
@@ -268,10 +284,10 @@ const Bytes = {
     asUint8Array,
     asBase64,
     fromHex,
-    asHex,
+    asHex: asHex,
     fromArrayBuffer,
-    fromBigInteger,
-    modPow,
+    fromBigInteger: fromBigInteger,
+    modPow: modPow,
     addPadding,
     concat,
     concatBuffer,
