@@ -8,7 +8,8 @@
           "babel-plugin-transform-exponentiation-operator"
         ]
       }
-    ]
+    ],
+    "@babel/preset-flow"
   ],
   "plugins": [
     "@babel/plugin-transform-regenerator",

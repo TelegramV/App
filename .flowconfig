@@ -1,6 +1,8 @@
 [ignore]
-./node_modules
-./src/js/mtproto
+.*/node_modules/.*
+.*/public/.*
+.*/vendor/.*
+.*/.*.min\..*
 
 [include]
 ./src/js
@@ -10,6 +12,7 @@
 [lints]
 
 [options]
+module.ignore_non_literal_requires=true
 module.file_ext=.js
 module.file_ext=.jsx
 module.file_ext=.json

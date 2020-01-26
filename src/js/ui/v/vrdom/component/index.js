@@ -1,5 +1,3 @@
-// @flow
-
 import V from "../../VFramework"
 import VRDOM from "../index"
 import {vrdom_deepDeleteRealNodeInnerComponents} from "../patch"
