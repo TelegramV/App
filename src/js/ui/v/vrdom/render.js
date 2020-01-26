@@ -61,11 +61,11 @@ function vrdom_render(vNode, xmlns = null) {
             $node[`on${k}`] = v
         }
 
-        V.plugins.forEach(plugin => plugin.elementCreated($node))
-
         for (const child of vNode.children) {
             vrdom_append(child, $node, {xmlns})
         }
+
+        V.plugins.forEach(plugin => plugin.elementCreated($node))
 
         return $node
     } else if (!vNode) {

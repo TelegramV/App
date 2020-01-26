@@ -1,28 +1,65 @@
 import MessageWrapperComponent from "./common/MessageWrapperComponent";
 import MessageTimeComponent from "./common/MessageTimeComponent"
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
-import {MessageType} from "../../../../../../api/messages/Message"
+import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
+
+const StickerFragment = ({id, url, w, h}) => {
+    if (url === "") {
+        return <div id={`sticker-${id}`}
+                    className="sticker loading"
+                    css-width={`${w}px`}
+                    css-height={`${h}px`}/>
+    } else {
+        return <img id={`sticker-${id}`}
+                    className="sticker"
+                    src={url} css-width={`${w}px`}
+                    css-height={`${h}px`} alt="Sticker"/>
+    }
+}
 
 class StickerMessageComponent extends GeneralMessageComponent {
+
+    message: StickerMessage
+    $sticker: Element
+
+    width: 250
+    height: 250
+
     h() {
-        const message = this.props.message
-        let animated = message.raw.media.document.mime_type === "application/x-tgsticker";
-        let src = message.raw.media.document.real ? message.raw.media.document.real.url : "";
-        let size = message.raw.media.document.attributes.find(l => l._ === "documentAttributeImageSize")
-        const s = this.props.message.type === MessageType.ANIMATED_EMOJI ? 150 : 250
-        let height = size ? size.h / size.w * s : s
-        let sticker = src !== "" ? (animated ?
-            <tgs-player className={["sticker", this.props.message.type === MessageType.ANIMATED_EMOJI ? "emoji" : ""]}
-                        autoplay loop mode="normal" src={src} css-width={s + "px"} css-height={height + "px"}/>
-            :
-            <img className="sticker" src={src} css-width={s + "px"} css-height={height + "px"}/>) :
-            <div className="sticker loading" css-width={s + "px"} css-height={height + "px"}/>
+        this.calculateSize()
+
         return (
-            <MessageWrapperComponent message={message} transparent={true} noPad>
-                {sticker}
-                <MessageTimeComponent message={message} bg={true}/>
+            <MessageWrapperComponent message={this.message} transparent={true} noPad>
+
+                <StickerFragment id={this.message.id}
+                                 url={this.message.srcUrl}
+                                 w={this.width}
+                                 h={this.height}/>
+
+                <MessageTimeComponent message={this.message} bg={true}/>
+
             </MessageWrapperComponent>
         )
+    }
+
+    mounted() {
+        this.$sticker = this.$el.querySelector(`#sticker-${this.message.id}`)
+    }
+
+    calculateSize() {
+        this.width = 250
+        this.height = this.message.h ? this.message.h / this.message.w * w : 250
+    }
+
+    reactiveChanged(key: *, value: *, event: *) {
+        super.reactiveChanged(key, value, event)
+
+        if (event.type === "stickerLoaded") {
+            VRDOM.patch(this.$sticker, <StickerFragment id={this.message.id}
+                                                        url={this.message.srcUrl}
+                                                        w={this.width}
+                                                        h={this.height}/>)
+        }
     }
 }
 

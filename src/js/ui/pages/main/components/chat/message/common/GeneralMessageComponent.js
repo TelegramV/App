@@ -12,12 +12,25 @@ class GeneralMessageComponent extends Component {
 
     init() {
         this.message = this.props.message
+
+        this.reactive = {
+            message: this.message
+        }
+
         this.prevReadStatus = this.message.isRead
         this.appEvents.add(AppEvents.Dialogs.reactiveAnySingle(this.message.dialog).FireOnly)
     }
 
     created() {
         this.message.show()
+    }
+
+    reactiveChanged(key: *, value: *, event: *) {
+        if (key === "message") {
+            if (event.type === "show" || event.type === "edit") {
+                this.__patch()
+            }
+        }
     }
 
     eventFired(bus: EventBus, event: any): boolean {
