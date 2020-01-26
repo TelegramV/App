@@ -5,7 +5,7 @@ import Random from "../../../../../../mtproto/utils/random";
 import TimeManager from "../../../../../../mtproto/timeManager";
 import {createNonce} from "../../../../../../mtproto/utils/bin";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
-import {InlineKeyboardComponent} from "../message/inlineKeyboardComponent";
+import {InlineKeyboardComponent} from "../message/common/InlineKeyboardComponent";
 
 export let ChatInputManager
 
@@ -184,11 +184,11 @@ export class ChatInputComponent extends Component {
 
     setKeyboardMarkup(markup) {
         // TODO selective
-        if(markup._ === "replyKeyboardMarkup") {
+        if (markup._ === "replyKeyboardMarkup") {
             this.state.keyboardMarkup = markup
-        } else if(markup._ === "replyKeyboardForceReply") {
+        } else if (markup._ === "replyKeyboardForceReply") {
 
-        } else if(markup._ === "replyKeyboardHide") {
+        } else if (markup._ === "replyKeyboardHide") {
             this.state.keyboardMarkup = null
         } else {
             return

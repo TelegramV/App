@@ -40,11 +40,11 @@ function vrdom_render(vNode, xmlns = null) {
             if (Array.isArray(vNode.children)) {
                 if (vNode.children.length > 0) {
                     console.error(vNode)
-                    throw new Error("Element with `dangerouslySetInnerHTML` should not have children.")
+                    throw new Error("Element with `dangerouslySetInnerHTML` must not have children.")
                 }
             } else if (vNode.children) {
                 console.error(vNode)
-                throw new Error("Element with `dangerouslySetInnerHTML` should not have children.")
+                throw new Error("Element with `dangerouslySetInnerHTML` must not have children.")
             }
 
             $node.innerHTML = vNode.dangerouslySetInnerHTML

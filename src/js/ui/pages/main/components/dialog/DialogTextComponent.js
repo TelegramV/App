@@ -45,6 +45,6 @@ export const DialogTextComponent = ({dialog}) => {
 
     return (
         <Text user={dialog.messages.last.prefix}
-              text={dialog.messages.last.text} entities={dialog.messages.last.entities}/>
+              text={dialog.messages.last.text.substring(0, 50)} entities={dialog.messages.last.raw.entities}/>
     )
 }

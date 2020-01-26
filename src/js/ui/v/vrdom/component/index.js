@@ -1,8 +1,16 @@
+// @flow
+
+//
+// WARNING: Flow JS does not support Babel JSX.
+//          DO NOT USE FlOW JS WITH COMPONENTS
+//
+
 import V from "../../VFramework"
 import VRDOM from "../index"
 import {vrdom_deepDeleteRealNodeInnerComponents} from "../patch"
 import {ReactiveObject} from "../../reactive/ReactiveObject"
 import {EventBus} from "../../../../api/eventBus/EventBus"
+import {VRNode} from "../VRNode"
 
 class Component {
 
@@ -16,12 +24,12 @@ class Component {
         /**
          * @type {Map<string, any>}
          */
-        reactiveContexts: new Map(),
+        reactiveContexts: new Map<string, any>(),
 
         /**
          * @type {Map<EventBus, Map<string, any>>}
          */
-        appEventContexts: new Map(),
+        appEventContexts: new Map<EventBus, Map<string, any>>(),
 
         reactiveInited: false
     }
@@ -34,15 +42,17 @@ class Component {
      */
     reactiveStrategy = 0 // todo: implement it
 
-    name = "GeneralComponent"
-    identifier = -1
-    $el
-    state = {}
-    appEvents = new Set()
-    props = {}
-    reactive = {}
+    name: string = "GeneralComponent"
+    identifier: any = -1
+    $el: Element
+    state: Object = {}
+    appEvents: Set<any> = new Set()
+    props: Object = {}
+    reactive: Object = {}
+    slot: any = undefined
+    refs: Map<string, Component>
 
-    constructor(props) {
+    constructor(props: Object) {
 
         /**
          * Unique identifier of the element in VRDOM
@@ -137,15 +147,15 @@ class Component {
     }
 
     // changed reactive property event
-    reactiveChanged(key, value, event) {
+    reactiveChanged(key: any, value: any, event: any) {
     }
 
     // will be called when selected app event was fired
-    eventFired(bus, event) {
+    eventFired(bus: EventBus, event: any): any {
     }
 
     // patch request interceptor; return `false` to decline.
-    patchRequest(vNode) {
+    patchRequest(vNode: VRNode) {
         return vNode
     }
 
@@ -207,7 +217,7 @@ class Component {
      * @private
      * @return {VRNode}
      */
-    __render(props) {
+    __render(props: Object) {
         this.__init()
 
         if (props) {
@@ -248,7 +258,9 @@ class Component {
         if (!this.__.inited) {
 
             for (const key of Object.getOwnPropertyNames(Object.getPrototypeOf(this))) {
+                // $FlowIssue
                 if (typeof this[key] === "function") {
+                    // $FlowIssue
                     this[key] = this[key].bind(this)
                 }
             }
@@ -273,8 +285,10 @@ class Component {
                         context.subscribe(newContext.resolve)
                     } else if (context.__rc) {
                         console.warn("avoid using reactive callbacks, use reactive objects instead")
+                        // $FlowIssue
                         context.resolve = (value, event) => this.__resolveReactivePropertyChange(key, value, event)
                         this.__.reactiveContexts.set(key, context)
+                        // $FlowIssue
                         this.reactive[key] = context.callback(context.resolve)
                     } else {
                         console.error(`not reactive value ${key}`, context)
@@ -295,6 +309,7 @@ class Component {
                         this.__.appEventContexts.set(bus, new Map())
                     }
 
+                    //$FlowIssue
                     this.__.appEventContexts.get(bus).set(eventType, context)
 
                 } else {
@@ -306,17 +321,20 @@ class Component {
         }
     }
 
-    __resolveReactivePropertyChange(key, newValue, event) {
+    __resolveReactivePropertyChange(key: any, newValue: any, event: any) {
         if (this.__.reactiveContexts.has(key)) {
 
             const context = this.__.reactiveContexts.get(key)
 
+            // $FlowIssue
             if (context.__obj) {
                 this.reactiveChanged(key, newValue, event)
             } else {
+                // $FlowIssue
                 if (context.patchOnly) {
                     this.reactive[key] = newValue
                     this.__patch()
+                    // $FlowIssue
                 } else if (context.fireOnly) {
                     this.reactive[key] = newValue
                     this.reactiveChanged(key, newValue, event)
@@ -332,7 +350,7 @@ class Component {
         }
     }
 
-    __resolveReactiveEventFired(bus, event) {
+    __resolveReactiveEventFired(bus: EventBus, event: any) {
         if (this.__.appEventContexts.has(bus)) {
 
             let eventType = undefined
@@ -343,6 +361,7 @@ class Component {
                 eventType = event.type
             }
 
+            // $FlowIssue
             const context = this.__.appEventContexts.get(bus).get(eventType)
 
             if (context) {

@@ -7,46 +7,46 @@ export class VRDOMPlugin {
     /**
      * @param {Component} component
      */
-    componentCreated(component) {
+    componentCreated(component: Component) {
 
     }
 
     /**
      * @param {Component} component
      */
-    componentMounted(component) {
+    componentMounted(component: Component) {
 
     }
 
     /**
-     * Currently is not implement.
+     * Currently is not implemented.
      *
      * @return {boolean} false to prevent mounting
      */
-    componentMounting(component) {
+    componentMounting(component: Component) {
         return true
     }
 
     /**
-     * Currently is not implement.
+     * Currently is not implemented.
      *
      * @return {boolean} false to prevent mounting
      */
-    elementMounting($el) {
+    elementMounting($el: Element) {
         return true
     }
 
     /**
      * Be careful with this: `$el` can be component's created $element.
      */
-    elementCreated($el) {
+    elementCreated($el: Element) {
 
     }
 
     /**
      * Be careful with this: `$el` can be component's mounted $element.
      */
-    elementMounted($el) {
+    elementMounted($el: Element) {
 
     }
 }

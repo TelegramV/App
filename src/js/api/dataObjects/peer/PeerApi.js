@@ -1,10 +1,10 @@
 import MTProto from "../../../mtproto"
 import PeersManager from "../../peers/PeersManager"
-import {Message} from "../messages/Message"
 import AppEvents from "../../eventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util"
 import TimeManager from "../../../mtproto/timeManager"
 import {FileAPI} from "../../fileAPI"
+import {MessageFactory} from "../../messages/MessageFactory"
 
 export class PeerApi {
 
@@ -45,12 +45,13 @@ export class PeerApi {
         })
 
         return messagesSlice.messages.map(rawMessage => {
-            return new Message(this.#peer.dialog, rawMessage)
+            return MessageFactory.fromRaw(this.#peer.dialog, rawMessage)
         })
     }
 
     fetchInitialMessages() {
         return this.getHistory({}).then(messages => {
+            console.log("xxx", messages)
             if (messages.length > 0) {
                 this.#peer.dialog.messages.appendMany(messages)
 

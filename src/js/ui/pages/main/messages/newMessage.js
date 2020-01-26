@@ -1,20 +1,21 @@
-import TextMessageComponent from "../components/chat/message/TextMessageComponent";
-import ServiceMessageComponent from "../components/chat/message/serviceMessageComponent";
-import AudioMessageComponent from "../components/chat/message/audioMessageComponent";
-import VoiceMessageComponent from "../components/chat/message/voiceMessageComponent";
-import VideoMessageComponent from "../components/chat/message/videoMessageComponent";
-import RoundVideoMessageComponent from "../components/chat/message/roundVideoMessageComponent";
-import WebpageMessageComponent from "../components/chat/message/webpageMessageComponent";
-import StickerMessageComponent from "../components/chat/message/stickerMessageComponent";
-import PhotoMessageComponent from "../components/chat/message/photoMessageComponent";
-import ContactMessageComponent from "../components/chat/message/contactMessageComponent";
-import DocumentMessageComponent from "../components/chat/message/documentMessageComponent";
-import PhoneCallMessageComponent from "../components/chat/message/phoneCallMessageComponent";
-import LocationMessageComponent from "../components/chat/message/locationMessageComponent";
-import GameMessageComponent from "../components/chat/message/gameMessageComponent";
-import InvoiceMessageComponent from "../components/chat/message/invoiceMessageComponent";
-import PollMessageComponent from "../components/chat/message/PollMessageComponent";
-import {MessageType} from "../../../../api/dataObjects/messages/Message"
+import {MessageType} from "../../../../api/messages/Message"
+import UnsupportedMessageComponent from "../components/chat/message/UnsupportedMessageComponent"
+import TextMessageComponent from "../components/chat/message/TextMessageComponent"
+import PhotoMessageComponent from "../components/chat/message/PhotoMessageComponent"
+import LocationMessageComponent from "../components/chat/message/LocationMessageComponent"
+import GameMessageComponent from "../components/chat/message/GameMessageComponent"
+import PollMessageComponent from "../components/chat/message/PollMessageComponent"
+import InvoiceMessageComponent from "../components/chat/message/InvoiceMessageComponent"
+import WebpageMessageComponent from "../components/chat/message/WebpageMessageComponent"
+import ContactMessageComponent from "../components/chat/message/ContactMessageComponent"
+import DocumentMessageComponent from "../components/chat/message/DocumentMessageComponent"
+import VideoMessageComponent from "../components/chat/message/VideoMessageComponent"
+import StickerMessageComponent from "../components/chat/message/StickerMessageComponent"
+import VoiceMessageComponent from "../components/chat/message/VoiceMessageComponent"
+import AudioMessageComponent from "../components/chat/message/AudioMessageComponent"
+import RoundVideoMessageComponent from "../components/chat/message/RoundVideoMessageComponent"
+import PhoneCallMessageComponent from "../components/chat/message/PhoneCallMessageComponent"
+import ServiceMessageComponent from "../components/chat/message/ServiceMessageComponent"
 
 /**
  * @type {Map<number, function({message: *}): *>}
@@ -53,10 +54,8 @@ const MessageComponent = ({message}) => {
     if (Handler) {
         return <Handler message={message}/>
     } else {
-        message.raw.message = "Unsupported message type!"
-        message.raw.entities = undefined;
         return (
-            <TextMessageComponent message={message}/>
+            <UnsupportedMessageComponent message={message}/>
         )
     }
 }

@@ -21,6 +21,8 @@ class RippleVRDOMPlugin extends VRDOMPlugin {
                 setTimeout(function () {
                     $rippleDiv.remove()
                 }, 900)
+            }, {
+                passive: true
             })
         }
     }

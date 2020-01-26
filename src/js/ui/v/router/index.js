@@ -61,7 +61,7 @@ export class VFrameworkRouter {
         }
 
         window.addEventListener("popstate", () => {
-            // check if hash path was changed
+            // check whether the hash path was changed
             // if wasn't then router will not re-render the component
             // if was then it means that query was changed, so we trigger handlers
             if (this.activeRoute && this.activeRoute.route && this.activeRoute.route.path === parseHash(window.location.hash).path) {

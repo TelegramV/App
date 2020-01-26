@@ -1,10 +1,10 @@
-import {Message} from "../messages/Message";
 import {tsNow} from "../../../mtproto/timeManager";
 import {DialogMessages} from "./DialogMessages"
 import AppEvents from "../../eventBus/AppEvents"
 import {DraftMessage} from "./DraftMessage"
 import {DialogApi} from "./DialogApi"
 import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
+import type {Message} from "../../messages/Message"
 
 export class Dialog extends ReactiveObject {
 
@@ -23,7 +23,7 @@ export class Dialog extends ReactiveObject {
      * @param {Peer} peer
      * @param {Message} topMessage
      */
-    constructor(rawDialog, peer, topMessage) {
+    constructor(rawDialog, peer, topMessage: Message) {
         super()
 
         this.#rawDialog = rawDialog
@@ -39,12 +39,8 @@ export class Dialog extends ReactiveObject {
         }
 
         if (topMessage) {
-            if (topMessage instanceof Message) {
-                topMessage.dialog = this
-                this.#messages = new DialogMessages(this, [topMessage])
-            } else {
-                console.error("BUG: invalid message was provided.")
-            }
+            topMessage.dialog = this
+            this.#messages = new DialogMessages(this, [topMessage])
         } else {
             this.#messages = new DialogMessages(this)
         }

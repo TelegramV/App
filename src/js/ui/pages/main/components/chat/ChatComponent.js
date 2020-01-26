@@ -64,7 +64,7 @@ class ChatComponent extends Component {
         this.$wrapperLoader = this.$el.querySelector("#chat-wrapper-loader")
     }
 
-    reactiveChanged(key, value) {
+    reactiveChanged(key, value, event) {
         if (key === "peer") {
             this.$wrapperLoader.style.display = "none"
 

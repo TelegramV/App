@@ -5,35 +5,29 @@ import MessageComponent from "./../../messages/newMessage"
 import Component from "../../../../v/vrdom/component"
 import VRDOM from "../../../../v/vrdom"
 import {vrdom_deepDeleteRealNodeInnerComponents} from "../../../../v/vrdom/patch"
-import {MessageType} from "../../../../../api/dataObjects/messages/Message"
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
-import {FileAPI} from "../../../../../api/fileAPI"
-import MTProto from "../../../../../mtproto"
-
-
-const MessageComponentGeneral = message => <MessageComponent message={message}/>
+import type {Message} from "../../../../../api/messages/Message"
+import {MessageType} from "../../../../../api/messages/Message"
 
 class BubblesComponent extends Component {
-    constructor(props) {
-        super(props)
 
+    elements: [string, Element] = {
+        $bubblesInner: undefined,
+        $loader: undefined,
+    }
+
+    state: [string, any] = {
+        renderedMessages: new Map(),
+        isFetchingNextPage: false,
+        isFetching: false,
+        messagesWaitingForRendering: new Set()
+    }
+
+    init() {
         this.reactive = {
             peer: AppSelectedPeer.Reactive.FireOnly,
         }
-
-        this.state = {
-            renderedMessages: new Map(),
-            isFetchingNextPage: false,
-            isFetching: false,
-            messagesWaitingForRendering: new Set()
-        }
-
-        this.elements = {
-            $bubblesInner: undefined,
-            $loader: undefined,
-        }
     }
-
 
     h() {
         return (
@@ -74,7 +68,7 @@ class BubblesComponent extends Component {
         })
     }
 
-    reactiveChanged(key, value) {
+    reactiveChanged(key, value, event) {
         // check if selected peer was changed
         if (key === "peer") {
             if (value) {
@@ -108,7 +102,7 @@ class BubblesComponent extends Component {
 
         let $message = undefined
 
-        $message = $mount(MessageComponentGeneral(message), this.elements.$bubblesInner); //TODO Давид поправ як має бути
+        $message = $mount(<MessageComponent message={message}/>, this.elements.$bubblesInner); //TODO Давид поправ як має бути
 
         if (message.media) {
             if (message.media.webpage && message.media.webpage.photo) {
@@ -121,10 +115,10 @@ class BubblesComponent extends Component {
             }
             if (message.media.document) {
                 if (message.type === MessageType.STICKER || message.type === MessageType.ANIMATED_EMOJI) {
-                    FileAPI.getFile(message.media.document).then(data => {
-                        message.media.document.real = {url: data};
-                        VRDOM.patch($message, MessageComponentGeneral(message));
-                    });
+                    // FileAPI.getFile(message.media.document).then(data => {
+                    //     message.media.document.real = {url: data};
+                    //     VRDOM.patch($message, MessageComponentGeneral(message));
+                    // });
                 }
                 if (message.type === MessageType.ROUND || message.type === MessageType.VIDEO || message.type === MessageType.AUDIO) {
                     // FileAPI.getFile(message.media.document, "").then(data => {
@@ -190,9 +184,6 @@ class BubblesComponent extends Component {
      * @private
      */
     _appendMessages(messages) {
-        let k = this.elements.$bubblesInner.clientHeight
-        let z = 0
-
         for (const message of messages) {
             const $rendered = this._renderMessage(message)
 

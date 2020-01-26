@@ -1,30 +1,26 @@
+// @flow
+
+export type Event = {
+    type: string,
+    [string]: any,
+}
+
 /**
  * Simple Event Bus class
  */
 export class EventBus {
-    constructor() {
-        /**
-         * @type {Map<string, Array<function()>>}
-         */
-        this._subscribers = new Map()
 
-        /**
-         * @type {Set<function(*)>}
-         */
-        this._subscribersAny = new Set()
-    }
+    subscribers: Map<string, Set<(Event | Object) => any>> = new Map()
+    subscribersAny: Set<(Event | Object) => any> = new Set()
 
     /**
      * @param {string} type
-     * @param {*} event
+     * @param props
      */
-    fire(type, event = {}) {
-        const subscribers = this._subscribers.get(type)
+    fire(type: string, props: Object) {
+        const subscribers = this.subscribers.get(type)
 
-        event = {
-            type,
-            ...event
-        }
+        const event: Event = {type, ...props}
 
         if (subscribers) {
             for (const subscriber of subscribers) {
@@ -32,7 +28,7 @@ export class EventBus {
             }
         }
 
-        for (const subscriber of this._subscribersAny) {
+        for (const subscriber of this.subscribersAny) {
             subscriber(event)
         }
     }
@@ -41,15 +37,16 @@ export class EventBus {
      * @param {string} type
      * @param {Function} callback
      */
-    subscribe(type, callback) {
-        let subscribers = this._subscribers.get(type)
+    subscribe(type: string, callback: Event => any) {
+        let subscribers = this.subscribers.get(type)
 
         if (!subscribers) {
-            this._subscribers.set(type, [])
-            subscribers = this._subscribers.get(type)
+            this.subscribers.set(type, new Set())
+            subscribers = this.subscribers.get(type)
         }
 
-        subscribers.push(callback)
+        // $FlowFixMe
+        subscribers.add(callback)
     }
 
     /**
@@ -61,7 +58,7 @@ export class EventBus {
      *     messages: Message[],
      * })} callback
      */
-    subscribeAny(callback) {
-        this._subscribersAny.add(callback)
+    subscribeAny(callback: (Event | Object) => any) {
+        this.subscribersAny.add(callback)
     }
 }

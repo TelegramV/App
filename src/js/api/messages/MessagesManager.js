@@ -1,10 +1,10 @@
 import {Manager} from "../manager"
 import {MTProto} from "../../mtproto"
 import PeersStore from "../store/PeersStore"
-import {Message} from "../dataObjects/messages/Message"
 import DialogsManager from "../dialogs/DialogsManager"
 import DialogsStore from "../store/DialogsStore"
 import {getPeerTypeFromType} from "../dialogs/util"
+import {MessageFactory} from "./MessageFactory"
 
 class MessageManager extends Manager {
     init() {
@@ -22,8 +22,8 @@ class MessageManager extends Manager {
                 return
             }
 
-            const message = new Message(dialog, lastMessage)
-
+            const message = MessageFactory.fromRaw(dialog, lastMessage)
+            
             dialog.messages.appendSingle(message)
 
             if (!message.isOut) {

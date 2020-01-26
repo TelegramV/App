@@ -1,4 +1,3 @@
-// import JSBI from "jsbi"
 import {BigInteger} from "../vendor/jsbn/jsbn"
 import Bytes from "../utils/bytes"
 import AppConfiguration from "../../configuration"

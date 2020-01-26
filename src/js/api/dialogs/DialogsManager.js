@@ -5,12 +5,12 @@ import PeersManager from "../peers/PeersManager"
 import {Dialog} from "../dataObjects/dialog/Dialog";
 import {Manager} from "../manager";
 import {Peer} from "../dataObjects/peer/Peer";
-import {Message} from "../dataObjects/messages/Message";
 import {PeerAPI} from "../peerAPI"
 import DialogsStore from "../store/DialogsStore"
 import AppEvents from "../eventBus/AppEvents"
 import PeersStore from "../store/PeersStore"
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
+import {MessageFactory} from "../messages/MessageFactory"
 
 class DialogManager extends Manager {
     constructor() {
@@ -253,7 +253,9 @@ class DialogManager extends Manager {
 
         const peer = PeersManager.setFromRaw(rawPeer)
 
-        return this.setFromRaw(rawDialog, peer, new Message(undefined, rawTopMessage))
+        const dialog = this.setFromRaw(rawDialog, peer)
+        dialog.messages.last = MessageFactory.fromRaw(dialog, rawTopMessage)
+        return dialog
     }
 
     /**
