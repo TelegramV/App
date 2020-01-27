@@ -49,4 +49,12 @@ export class VRDOMPlugin {
     elementMounted($el: Element) {
 
     }
+
+    textCreated($text: Text) {
+
+    }
+
+    textMounted($text: Text) {
+
+    }
 }

@@ -2,6 +2,22 @@ import {ContextMenuManager} from "../../../../../../contextMenuManager";
 import {ChatInputManager} from "../../chatInput/ChatInputComponent";
 import {MessageAvatarComponent} from "./MessageAvatarComponent"
 import {InlineKeyboardComponent} from "./InlineKeyboardComponent";
+import {ReplyFragment} from "./ReplyFragment"
+
+const ReplyToMessageFragment = ({message}) => {
+    if (!message.raw.reply_to_msg_id) {
+        return <ReplyFragment id={`message-${message.id}-rpl`} show={false}/>
+    } else if (!message.replyToMessage) {
+        return <ReplyFragment id={`message-${message.id}-rpl`} show={true}/>
+    }
+
+    return (
+        <ReplyFragment id={`message-${message.id}-rpl`}
+                       name={message.replyToMessage.from.name}
+                       text={message.replyToMessage.text}
+                       show={true}/>
+    )
+}
 
 const MessageWrapperComponent = ({message, transparent = false, slot, noPad = false, contextActions}) => {
     const defaultContextActions = [
@@ -70,6 +86,9 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
 
                 <div className="bubble-outer">
                     <div className={wrapClasses}>
+
+                        <ReplyToMessageFragment message={message}/>
+
                         <div className={messageClasses}>
                             {slot}
                         </div>
@@ -89,6 +108,9 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
 
             <div className="bubble-outer">
                 <div className={wrapClasses}>
+
+                    <ReplyToMessageFragment message={message}/>
+
                     <div className={messageClasses}>
                         {slot}
                     </div>
@@ -99,4 +121,5 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
         </div>
     )
 }
+
 export default MessageWrapperComponent

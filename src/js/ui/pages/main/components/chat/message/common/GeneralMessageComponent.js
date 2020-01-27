@@ -4,6 +4,7 @@ import Component from "../../../../../../v/vrdom/component"
 import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 import {EventBus} from "../../../../../../../api/eventBus/EventBus"
 import type {Message} from "../../../../../../../api/messages/Message"
+import {ReplyFragment} from "./ReplyFragment"
 
 class GeneralMessageComponent extends Component {
 
@@ -21,7 +22,7 @@ class GeneralMessageComponent extends Component {
         this.appEvents.add(AppEvents.Dialogs.reactiveAnySingle(this.message.dialog).FireOnly)
     }
 
-    created() {
+    mounted() {
         this.message.show()
     }
 
@@ -29,6 +30,17 @@ class GeneralMessageComponent extends Component {
         if (key === "message") {
             if (event.type === "show" || event.type === "edit") {
                 this.__patch()
+            } else if (event.type === "replyToMessageFound") {
+                if (this.__.mounted) {
+                    VRDOM.patch(
+                        this.$el.querySelector(`#message-${this.message.id}-rpl`),
+                        <ReplyFragment
+                            id={`message-${this.message.id}-rpl`}
+                            show={true}
+                            name={this.message.replyToMessage.from.name}
+                            text={this.message.replyToMessage.text}/>
+                    )
+                }
             }
         }
     }

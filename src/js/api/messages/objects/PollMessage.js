@@ -8,6 +8,6 @@ export class PollMessage extends AbstractMessage {
     type = MessageType.POLL
 
     show() {
-        //
+        super.show()
     }
 }

@@ -8,6 +8,6 @@ export class VideoMessage extends AbstractMessage {
     type = MessageType.VIDEO
 
     show() {
-        //
+        super.show()
     }
 }

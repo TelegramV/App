@@ -10,7 +10,9 @@ import vrdom_append from "./appendChild"
  */
 function patchEvents($node, newEvents) {
     for (const [k, v] of newEvents.entries()) {
-        $node[`on${k}`] = v
+        if ($node[`on${k}`] !== v) {
+            $node[`on${k}`] = v
+        }
     }
 }
 

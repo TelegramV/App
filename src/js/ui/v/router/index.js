@@ -101,10 +101,16 @@ export class VFrameworkRouter {
         window.dispatchEvent(new Event("popstate"))
     }
 
+    replaceQuery(path, options = {}) {
+        let hash = this.buildHash(parseHash(window.location.hash).path, options)
+        history.replaceState({}, null, `${this.mode === "hash" ? "#" : ""}${hash}`)
+        window.dispatchEvent(new Event("popstate"))
+    }
+
     buildHash(path, options = {}) {
         let hash = path.startsWith("/") ? path : `/${path}`
         if (options.queryParams) {
-            if (options.replaceQuery) {
+            if (options.fullQueryReplace) {
                 hash += `?${queryParamsToString(options.queryParams)}`
             } else {
                 hash += `?${queryParamsToString(Object.assign(this.activeRoute.queryParams, options.queryParams))}`

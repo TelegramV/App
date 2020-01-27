@@ -30,7 +30,7 @@ export class ChannelPeer extends Peer {
         return MTProto.invokeMethod("channels.getFullChannel", {
             channel: this.input
         }).then(channelFull => {
-            this._full = channelFull.full_chat
+            this.full = channelFull.full_chat
 
             AppEvents.Peers.fire("fullLoaded", {
                 peer: this

@@ -8,6 +8,6 @@ export class GameMessage extends AbstractMessage {
     type = MessageType.GAME
 
     show() {
-        //
+        super.show()
     }
 }

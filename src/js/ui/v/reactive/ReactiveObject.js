@@ -6,20 +6,20 @@ export class ReactiveObject {
      * @type {Set<function(object: self, event: *)>}
      * @private
      */
-    #subscribers: Set<ReactiveObjectSubscriber> = new Set()
+    _subscribers: Set<ReactiveObjectSubscriber> = new Set()
 
     /**
      * @param {function(object: self, event: *)} resolve
      */
     subscribe(resolve: ReactiveObjectSubscriber) {
-        this.#subscribers.add(resolve)
+        this._subscribers.add(resolve)
     }
 
     /**
      * @param {function(object: self, event: *)} resolve
      */
     unsubscribe(resolve: ReactiveObjectSubscriber) {
-        this.#subscribers.delete(resolve)
+        this._subscribers.delete(resolve)
     }
 
     /**
@@ -27,7 +27,7 @@ export class ReactiveObject {
      * @param props
      */
     fire(type: string, props: Object = {}) {
-        this.#subscribers.forEach(subscriber => subscriber(this, Object.assign({
+        this._subscribers.forEach(subscriber => subscriber(this, Object.assign({
             type
         }, props)))
     }

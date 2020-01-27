@@ -8,6 +8,6 @@ export class WebpageMessage extends AbstractMessage {
     type = MessageType.WEB_PAGE
 
     show() {
-        //
+        super.show()
     }
 }

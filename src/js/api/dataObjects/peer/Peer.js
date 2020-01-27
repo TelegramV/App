@@ -8,24 +8,24 @@ import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 
 export class Peer extends ReactiveObject {
 
-    #rawPeer
-    #filled = false
-    #dialog
-    #photo
-    #accessHash
-    #min_messageId
-    #min_inputPeer
-    #full
-    #api
+    _rawPeer
+    _filled = false
+    _dialog
+    _photo
+    _accessHash
+    _min_messageId
+    _min_inputPeer
+    full
+    _api
 
     constructor(rawPeer, dialog = undefined) {
         super()
 
-        this.#rawPeer = rawPeer
-        this.#dialog = dialog || Dialog.createEmpty(this)
+        this._rawPeer = rawPeer
+        this._dialog = dialog || Dialog.createEmpty(this)
 
-        this.#photo = PeerPhoto.createEmpty(this)
-        this.#api = new PeerApi(this)
+        this._photo = PeerPhoto.createEmpty(this)
+        this._api = new PeerApi(this)
 
         this.fillRaw(rawPeer)
     }
@@ -34,7 +34,7 @@ export class Peer extends ReactiveObject {
      * @return {PeerApi}
      */
     get api() {
-        return this.#api
+        return this._api
     }
 
     /**
@@ -42,7 +42,7 @@ export class Peer extends ReactiveObject {
      * @return {*}
      */
     get raw() {
-        return this.#rawPeer
+        return this._rawPeer
     }
 
     /**
@@ -50,7 +50,7 @@ export class Peer extends ReactiveObject {
      * @param rawPeer
      */
     set raw(rawPeer) {
-        this.#rawPeer = rawPeer
+        this._rawPeer = rawPeer
     }
 
     /**
@@ -64,18 +64,18 @@ export class Peer extends ReactiveObject {
      * @return {Dialog|undefined}
      */
     get dialog() {
-        return this.#dialog
+        return this._dialog
     }
 
     /**
      * @param {Dialog} dialog
      */
     set dialog(dialog) {
-        this.#dialog = dialog
+        this._dialog = dialog
     }
 
     get accessHash() {
-        return this.#accessHash
+        return this._accessHash
     }
 
     /**
@@ -135,15 +135,15 @@ export class Peer extends ReactiveObject {
         if (this.type === "user") {
             return {
                 _: "inputPeerUserFromMessage",
-                peer: this.#min_inputPeer,
-                msg_id: this.#min_messageId,
+                peer: this._min_inputPeer,
+                msg_id: this._min_messageId,
                 user_id: this.id
             }
         } else if (this.type === "channel") {
             return {
                 _: "inputPeerChannelFromMessage",
-                peer: this.#min_inputPeer,
-                msg_id: this.#min_messageId,
+                peer: this._min_inputPeer,
+                msg_id: this._min_messageId,
                 channel_id: this.id
             }
         } else {
@@ -151,8 +151,8 @@ export class Peer extends ReactiveObject {
 
             return {
                 _: "inputPeerChannelFromMessage",
-                peer: this.#min_inputPeer,
-                msg_id: this.#min_messageId,
+                peer: this._min_inputPeer,
+                msg_id: this._min_messageId,
                 channel_id: this.id
             }
         }
@@ -162,7 +162,7 @@ export class Peer extends ReactiveObject {
      * @return {PeerPhoto}
      */
     get photo() {
-        return this.#photo
+        return this._photo
     }
 
     /**
@@ -170,14 +170,7 @@ export class Peer extends ReactiveObject {
      * @param photo
      */
     set photo(photo) {
-        this.#photo = photo
-    }
-
-    /**
-     * @return {*|undefined}
-     */
-    get full() {
-        return this.#full
+        this._photo = photo
     }
 
     /**
@@ -195,10 +188,10 @@ export class Peer extends ReactiveObject {
         return MTProto.invokeMethod("users.getFullUser", {
             id: this.inputPeer
         }).then(userFull => {
-            this.#full = userFull
+            this.full = userFull
 
             this.fire("fullLoaded")
-
+            
             // todo: delete this thing
             AppEvents.Peers.fire("fullLoaded", {
                 peer: this
@@ -216,7 +209,7 @@ export class Peer extends ReactiveObject {
         }
 
         // When receiving said (min) constructors, the client must first check if user or chat object without min flag is already present in local cache. If it is present, then the client should just ignore constructors with min flag and use local one instead.
-        if (rawPeer.pFlags && rawPeer.pFlags.min === true && this.#filled) {
+        if (rawPeer.pFlags && rawPeer.pFlags.min === true && this._filled) {
             return
         }
 
@@ -224,18 +217,18 @@ export class Peer extends ReactiveObject {
 
         // НЕ РУХАЙ
         if (this.accessHash === undefined) {
-            this.#accessHash = this.raw.access_hash
+            this._accessHash = this.raw.access_hash
         } else if (rawPeer.pFlags && !rawPeer.pFlags.min) {
-            this.#accessHash = this.raw.access_hash
+            this._accessHash = this.raw.access_hash
         }
 
         if (this.isMin) {
-            this.#photo.fillRaw(false)
+            this._photo.fillRaw(false)
         } else {
-            this.#photo.fillRaw(rawPeer.photo)
+            this._photo.fillRaw(rawPeer.photo)
         }
 
-        this.#filled = true
+        this._filled = true
     }
 
     /**

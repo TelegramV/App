@@ -8,6 +8,7 @@ import MTProto from "../../../../../mtproto";
 import V from "../../../../v/VFramework";
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import {ConnectionStatusComponent} from "./ConnectionStatusComponent"
+import Sortable from "sortablejs"
 
 export class DialogListComponent extends Component {
     constructor(props) {
@@ -101,7 +102,7 @@ export class DialogListComponent extends Component {
 
         this.elements.$dialogsWrapper.addEventListener("scroll", this._scrollHandler, {passive: true})
 
-        // Sortable.create(this.elements.$pinnedDialogs)
+        Sortable.create(this.elements.$pinnedDialogs)
 
         AppEvents.Dialogs.subscribe("firstPage", event => {
             this.elements.$loader.style.display = "none"

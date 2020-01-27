@@ -11,7 +11,11 @@ import V from "../VFramework"
 function vrdom_append(vNode, $element, {xmlns = null} = {}) {
     const $mounted = $element.appendChild(vrdom_render(vNode, xmlns))
 
-    V.plugins.forEach(plugin => plugin.elementMounted($mounted))
+    if ($mounted.nodeType === Node.TEXT_NODE) {
+        V.plugins.forEach(plugin => plugin.textMounted($mounted))
+    } else {
+        V.plugins.forEach(plugin => plugin.elementMounted($mounted))
+    }
 
     vrdom_mount_resolveComponentMounted($mounted)
 

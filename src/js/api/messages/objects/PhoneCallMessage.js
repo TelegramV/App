@@ -8,6 +8,6 @@ export class PhoneCallMessage extends AbstractMessage {
     type = MessageType.PHONE_CALL
 
     show() {
-        //
+        super.show()
     }
 }

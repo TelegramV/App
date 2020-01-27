@@ -8,6 +8,6 @@ export class InvoiceMessage extends AbstractMessage {
     type = MessageType.INVOICE
 
     show() {
-        //
+        super.show()
     }
 }

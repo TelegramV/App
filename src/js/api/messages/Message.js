@@ -1,7 +1,7 @@
 // @flow
 
-import type {MessageConstructor} from "../../mtproto/language/types"
 import {Peer} from "../dataObjects/peer/Peer"
+import {Dialog} from "../dataObjects/dialog/Dialog"
 
 export const MessageType = {
     UNSUPPORTED: -1,
@@ -31,7 +31,8 @@ export const MessageType = {
 export interface Message {
 
     +type: number,
-    +raw: MessageConstructor;
+    +raw: Object;
+    +dialog: Dialog;
 
     +id: number;
     +to: Peer;
@@ -48,11 +49,12 @@ export interface Message {
     +isFromScheduled: boolean;
     +isLegacy: boolean;
     +isEditHide: boolean;
+    +replyToMessage: Message;
 
     +prefix: string; // why this is here??
 
     show(): void;
 
-    fillRaw(raw: MessageConstructor): void;
+    fillRaw(raw: Object): Message;
 
 }

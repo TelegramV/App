@@ -2,7 +2,6 @@
 
 import {AbstractMessage} from "../AbstractMessage"
 import {MessageType} from "../Message"
-import type {MessageConstructor} from "../../../mtproto/language/types"
 import {FileAPI} from "../../fileAPI"
 
 export class StickerMessage extends AbstractMessage {
@@ -15,17 +14,20 @@ export class StickerMessage extends AbstractMessage {
     h = 0
 
     show() {
+        super.show()
         FileAPI.getFile(this.raw.media.document).then(srcUrl => {
             this.srcUrl = srcUrl
             this.fire("stickerLoaded")
         })
     }
 
-    fillRaw(raw: MessageConstructor) {
+    fillRaw(raw: Object): StickerMessage {
         super.fillRaw(raw)
 
         const size = this.raw.media.document.attributes.find(a => a._ === "documentAttributeImageSize")
         this.w = size ? size.w : null
         this.h = size ? size.h : null
+
+        return this
     }
 }

@@ -63,9 +63,9 @@ const handlersText = {
 }
 
 const handlersLinks = {
-    messageEntityMention: (l, a) => <a href={"/#/?p=${a}"}>{a}</a>,
-    messageEntityHashtag: (l, a) => <a href="#">{a}</a>,
-    messageEntityBotCommand: (l, a) => <a href="#">{a}</a>,
+    messageEntityMention: (l, a) => <a href={`/#/?p=${a}`}>{a}</a>,
+    messageEntityHashtag: (l, a) => <a>{a}</a>,
+    messageEntityBotCommand: (l, a) => <a>{a}</a>,
     messageEntityUrl: (l, a) => <a target="_blank" href={!a.startsWith("http") ? "https://" + a : a}>{a}</a>,
     messageEntityEmail: (l, a) => <a href={`mailto:${a}`}>{a}</a>,
     messageEntityTextUrl: (l, a) => <a target="_blank" href={l.url}>{a}</a>,
@@ -92,8 +92,8 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
         const component = handlers[l._](l, text.substr(offset, length))
 
 
-        if(offset + length > prevOffset) {
-            if(noLinks) {
+        if (offset + length > prevOffset) {
+            if (noLinks) {
                 elements.push(<span>{text.substr(prevOffset, offset - prevOffset)}</span>)
             } else {
                 const splitted = text.substr(prevOffset, offset - prevOffset).split("\n")
@@ -109,14 +109,14 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
         elements.push(component)
         prevOffset = offset + length
     })
-    if(prevOffset < text.length) {
-        if(noLinks) {
+    if (prevOffset < text.length) {
+        if (noLinks) {
             elements.push(<span>{text.substr(prevOffset, text.length - prevOffset)}</span>)
         } else {
             const splitted = text.substr(prevOffset, text.length - prevOffset).split("\n")
-            for(let i = 0; i < splitted.length; i++) {
+            for (let i = 0; i < splitted.length; i++) {
                 elements.push(<span>{splitted[i]}</span>)
-                if(i !== splitted.length - 1) {
+                if (i !== splitted.length - 1) {
                     elements.push(<br/>)
                 }
             }
