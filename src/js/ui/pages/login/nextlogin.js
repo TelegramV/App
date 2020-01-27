@@ -18,8 +18,6 @@ import {ModalComponent, ModalManager} from "../../modalManager";
 
 const Croppie = require("croppie")
 const QRCodeStyling = require("qr-code-styling")
-const Emoji = require("emoji-js");
-let emoji = new Emoji();
 
 let keepLogged = true;
 
@@ -44,7 +42,7 @@ function successfulAuth() {
 function generateFullDropdown() {
     return countries.map(l => {
         return {
-            flag: emoji.replace_colons(":flag-" + l[2].toLowerCase() + ":"),
+            flag: (":flag-" + l[2].toLowerCase() + ":"),
             name: l[1],
             code: l[0]
         }
@@ -441,7 +439,7 @@ class CodeAndPasswordPaneComponent extends PaneComponent {
         }
 
         return <div className={classList.join(" ")}>
-            <tgs-player id="monkey" className="object"/>
+            <div id="monkey" className="object"/>
             <CodeInputComponent ref="code" cancel={this.props.cancelCode} finished={this.props.finished}
                                 password={this.onPassword}
                                 monkeyLook={this.state.monkey.monkeyLook.bind(this.state.monkey)} signUp={this.props.signUp}/>
