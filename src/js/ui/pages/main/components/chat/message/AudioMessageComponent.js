@@ -1,4 +1,4 @@
-import MessageWrapperComponent from "./common/MessageWrapperComponent"
+import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import TextWrapperComponent from "./common/TextWrapperComponent";
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 import {FileAPI} from "../../../../../../api/fileAPI"
@@ -21,10 +21,10 @@ class AudioMessageComponent extends GeneralMessageComponent {
     h() {
         let audioSrc = this.message.raw.media.document.real ? this.message.raw.media.document.real.url : "";
         return (
-            <MessageWrapperComponent message={this.message}>
+            <MessageWrapperFragment message={this.message}>
                 <audio controls src={audioSrc} type={this.message.raw.media.document.mime_type} onPlay={this.onPlay}/>
                 <TextWrapperComponent message={this.message}/>
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         )
     }
 

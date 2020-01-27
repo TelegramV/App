@@ -16,6 +16,8 @@ export class AbstractMessage extends ReactiveObject implements Message {
     _from: Peer
     prefix: string
     replyToMessage: Message
+    forwarded: any
+    forwardedMessageId: number
 
     constructor(dialog: Dialog) {
         super()
@@ -86,6 +88,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     // always call super
     show() {
         this.findReplyTo()
+        this.findForwarded()
     }
 
     findReplyTo() {
@@ -111,16 +114,56 @@ export class AbstractMessage extends ReactiveObject implements Message {
         }
     }
 
+    findForwarded(fire = false) {
+        if (!this.forwarded && this.raw.fwd_from) {
+            if (!this.raw.fwd_from.from_id) {
+                if (this.raw.fwd_from.from_name) {
+                    this.forwarded = this.raw.fwd_from.from_name
+                    this.fire("forwardedNameOnlyFound")
+                }
+            } else {
+                const forwarded = PeersStore.get("user", this.raw.fwd_from.from_id)
+
+                if (forwarded) {
+                    this.forwarded = forwarded
+                    this.fire("forwardedUserFound")
+                }
+            }
+
+            if (this.raw.fwd_from.channel_id) {
+                const forwarded = PeersStore.get("channel", this.raw.fwd_from.channel_id)
+
+                if (forwarded) {
+                    this.forwarded = forwarded
+                    this.forwardedMessageId = this.raw.fwd_from.channel_post
+                    this.fire("forwardedChannelFound")
+                }
+            }
+        }
+    }
+
     // WARNING: always call super
     fillRaw(raw: Object): Message {
         this.raw = raw
         this.prefix = MessageParser.getDialogPrefix(this)
 
+        // reply
         const replyToMessage = this.dialog.messages.data.get(this.raw.reply_to_msg_id)
-
         if (replyToMessage) {
             this.replyToMessage = replyToMessage
         }
+
+        // forwarded
+        // if (!this.forwarded && this.raw.fwd_from) {
+        //     const peerType = this.raw.fwd_from.from_id ? "user" : "channel"
+        //     const peerId = this.raw.fwd_from.from_id ? this.raw.fwd_from.from_id : this.raw.fwd_from.channel_id
+        //     const forwarded = PeersStore.get(peerType, peerId)
+        //     if (forwarded) {
+        //         this.forwarded = forwarded
+        //     }
+        // }
+
+        // ...
 
         return this
     }

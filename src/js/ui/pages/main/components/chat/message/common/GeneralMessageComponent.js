@@ -5,6 +5,7 @@ import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 import {EventBus} from "../../../../../../../api/eventBus/EventBus"
 import type {Message} from "../../../../../../../api/messages/Message"
 import {ReplyFragment} from "./ReplyFragment"
+import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 
 class GeneralMessageComponent extends Component {
 
@@ -42,6 +43,13 @@ class GeneralMessageComponent extends Component {
                             show={true}
                             name={this.message.replyToMessage.from.name}
                             text={this.message.replyToMessage.text}/>
+                    )
+                }
+            } else if (event.type === "forwardedNameOnlyFound" || event.type === "forwardedUserFound" || event.type === "forwardedChannelFound") {
+                if (this.__.mounted) {
+                    VRDOM.patch(
+                        this.$el.querySelector(`#message-${this.message.id}-fwd`),
+                        <ForwardedHeaderFragment message={this.message}/>
                     )
                 }
             }

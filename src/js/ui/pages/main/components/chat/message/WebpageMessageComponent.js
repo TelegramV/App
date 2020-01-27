@@ -1,5 +1,5 @@
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
-import MessageWrapperComponent from "./common/MessageWrapperComponent"
+import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import TextWrapperComponent from "./common/TextWrapperComponent"
 import {PhotoComponent} from "../../basic/photoComponent"
 import {InstantViewManager} from "../../../../../instantViewManager"
@@ -9,7 +9,7 @@ class WebpageMessageComponent extends GeneralMessageComponent {
     h() {
         let webpage = this.message.raw.media.webpage;
         return (
-            <MessageWrapperComponent message={this.message}>
+            <MessageWrapperFragment message={this.message}>
                 <TextWrapperComponent message={this.message}>
                     <a href={webpage.url} target="_blank" className="box web rp">
                         <div className="quote">
@@ -24,7 +24,7 @@ class WebpageMessageComponent extends GeneralMessageComponent {
                         View</div> : ""}
 
                 </TextWrapperComponent>
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         )
     }
 }

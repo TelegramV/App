@@ -1,11 +1,11 @@
-import MessageWrapperComponent from "./MessageWrapperComponent";
+import MessageWrapperFragment from "./MessageWrapperFragment";
 import MessageTimeComponent from "./MessageTimeComponent";
 import TextWrapperComponent from "./TextWrapperComponent";
 
 const CardMessageWrapperComponent = ({message, icon, title, description}) => {
     let text = message.text;
     return (
-        <MessageWrapperComponent message={message}>
+        <MessageWrapperFragment message={message}>
             <div class="card">
                 <div class="card-icon">
                     {icon}
@@ -21,7 +21,7 @@ const CardMessageWrapperComponent = ({message, icon, title, description}) => {
                 {!text ? <MessageTimeComponent message={message}/> : ""}
             </div>
             {text ? <TextWrapperComponent message={message}/> : ""}
-        </MessageWrapperComponent>
+        </MessageWrapperFragment>
     )
 }
 

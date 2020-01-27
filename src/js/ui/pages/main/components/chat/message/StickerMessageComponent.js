@@ -1,4 +1,4 @@
-import MessageWrapperComponent from "./common/MessageWrapperComponent";
+import MessageWrapperFragment from "./common/MessageWrapperFragment";
 import MessageTimeComponent from "./common/MessageTimeComponent"
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
@@ -30,7 +30,7 @@ class StickerMessageComponent extends GeneralMessageComponent {
         this.calculateSize()
 
         return (
-            <MessageWrapperComponent message={this.message} transparent={true} noPad>
+            <MessageWrapperFragment message={this.message} transparent={true} noPad>
 
                 <StickerFragment id={`sticker-${this.message.id}`}
                                  url={this.message.srcUrl}
@@ -39,7 +39,7 @@ class StickerMessageComponent extends GeneralMessageComponent {
 
                 <MessageTimeComponent message={this.message} bg={true}/>
 
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         )
     }
 

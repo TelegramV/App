@@ -1,4 +1,4 @@
-import MessageWrapperComponent from "./common/MessageWrapperComponent"
+import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import TextWrapperComponent from "./common/TextWrapperComponent";
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 
@@ -8,10 +8,10 @@ class TextMessageComponent extends GeneralMessageComponent {
         const username = this.message.from.name && !this.message.isPost && !this.message.isOut
 
         return (
-            <MessageWrapperComponent ref={`msg-${this.message.id}`} message={this.message}>
+            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message}>
                 {username ? <div className="username">{this.message.from.name}</div> : ""}
                 <TextWrapperComponent message={this.message}/>
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         )
     }
 }

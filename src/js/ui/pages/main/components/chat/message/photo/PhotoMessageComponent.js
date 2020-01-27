@@ -1,4 +1,4 @@
-import MessageWrapperComponent from "../common/MessageWrapperComponent"
+import MessageWrapperFragment from "../common/MessageWrapperFragment"
 import TextWrapperComponent from "../common/TextWrapperComponent";
 import GeneralMessageComponent from "../common/GeneralMessageComponent"
 import {PhotoMessage} from "../../../../../../../api/messages/objects/PhotoMessage"
@@ -25,12 +25,12 @@ class PhotoMessageComponent extends GeneralMessageComponent {
 
     h() {
         return (
-            <MessageWrapperComponent message={this.message} noPad>
+            <MessageWrapperFragment message={this.message} noPad>
                 <MessagePhotoFigureFragment message={this.message}
                                             clickLoader={this.toggleLoading}/>
 
                 <TextWrapperComponent message={this.message}/>
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         )
     }
 

@@ -1,4 +1,4 @@
-import MessageWrapperComponent from "./common/MessageWrapperComponent";
+import MessageWrapperFragment from "./common/MessageWrapperFragment";
 import MessageTimeComponent from "./common/MessageTimeComponent"
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
@@ -29,13 +29,13 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
         this.calculateSize()
 
         return (
-            <MessageWrapperComponent message={this.message} transparent={true} noPad>
+            <MessageWrapperFragment message={this.message} transparent={true} noPad>
 
                 <AnimatedStickerFragment message={this.message}/>
 
                 <MessageTimeComponent message={this.message} bg={true}/>
 
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         )
     }
 
