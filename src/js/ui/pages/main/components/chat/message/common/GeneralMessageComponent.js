@@ -27,13 +27,15 @@ class GeneralMessageComponent extends Component {
 
     mounted() {
         this.message.show()
-        this.intersectionObserver.observe(this.$el)
+        if (this.intersectionObserver) {
+            this.intersectionObserver.observe(this.$el)
+        }
     }
 
     reactiveChanged(key: *, value: *, event: *) {
         if (key === "message") {
-            if (event.type === "show" || event.type === "edit") {
-                this.__patch()
+            if (event.type === "edit") {
+                this.onEdit()
             } else if (event.type === "replyToMessageFound") {
                 if (this.__.mounted) {
                     VRDOM.patch(
@@ -54,6 +56,10 @@ class GeneralMessageComponent extends Component {
                 }
             }
         }
+    }
+
+    onEdit() {
+        this.__patch()
     }
 
     eventFired(bus: EventBus, event: any): boolean {
@@ -80,7 +86,9 @@ class GeneralMessageComponent extends Component {
     }
 
     destroy() {
-        this.intersectionObserver.unobserve(this.$el)
+        if (this.intersectionObserver) {
+            this.intersectionObserver.unobserve(this.$el)
+        }
     }
 }
 
