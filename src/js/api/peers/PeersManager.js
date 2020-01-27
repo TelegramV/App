@@ -4,7 +4,6 @@ import AppEvents from "../eventBus/AppEvents"
 import {MTProto} from "../../mtproto"
 import {UserPeer} from "../dataObjects/peer/UserPeer"
 import PeerFactory from "../dataObjects/peerFactory"
-import {PeerPhoto} from "../dataObjects/peer/PeerPhoto";
 
 class PeerManager extends Manager {
     constructor() {
@@ -23,6 +22,10 @@ class PeerManager extends Manager {
                 peer.raw.status = update.status
 
                 peer.fire("updateUserStatus")
+
+                AppEvents.Peers.fire("updateUserStatus", {
+                    peer
+                })
             }
         })
 
@@ -30,7 +33,6 @@ class PeerManager extends Manager {
             const peer = PeersStore.get("user", update.user_id)
 
             if (peer instanceof UserPeer) {
-                peer.photo = PeerPhoto.createEmpty(peer)
                 peer.photo.fillRaw(update.photo)
             }
         })

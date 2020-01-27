@@ -2,44 +2,44 @@ import AppSelectedPeer from "../../../ui/reactive/SelectedPeer"
 
 /**
  * @property {Message} _lastMessage
- * @property {Map<number, Message>} #messages
+ * @property {Map<number, Message>} _messages
  */
 export class DialogMessages {
 
     /**
      * @type Dialog
      */
-    #dialog = undefined
+    _dialog = undefined
 
     /**
      * @type {Map<number, Message>}
      */
-    #messages = new Map
+    _messages = new Map
 
     /**
      * @type {Message|undefined}
      * @private
      */
-    #prevLastMessage = undefined
+    _prevLastMessage = undefined
 
     /**
      * @type {Message|undefined}
      * @private
      */
-    #lastMessage = undefined
+    _lastMessage = undefined
 
-    #sortedArray = []
+    _sortedArray = []
 
-    #alreadySorted = false
+    _alreadySorted = false
 
-    #unreadIds
+    _unreadIds
 
-    #unreadCount
-    #readOutboxMaxId
-    #readInboxMaxId
-    #unreadMentionsCount
+    _unreadCount
+    _readOutboxMaxId
+    _readInboxMaxId
+    _unreadMentionsCount
 
-    #fireTransaction = false
+    _fireTransaction = false
 
     /**
      * @param {Dialog} dialog
@@ -56,43 +56,43 @@ export class DialogMessages {
         readOutboxMaxId = 0,
         readInboxMaxId = 0,
     } = {}) {
-        this.#dialog = dialog
+        this._dialog = dialog
 
         this.appendMany(messages)
 
-        this.#sortedArray = []
-        this.#alreadySorted = false
+        this._sortedArray = []
+        this._alreadySorted = false
 
-        this.#unreadIds = new Set()
-        this.#unreadCount = unreadCount || 0
-        this.#readOutboxMaxId = readOutboxMaxId || 0
-        this.#readInboxMaxId = readInboxMaxId || 0
-        this.#unreadMentionsCount = unreadMentionsCount
+        this._unreadIds = new Set()
+        this._unreadCount = unreadCount || 0
+        this._readOutboxMaxId = readOutboxMaxId || 0
+        this._readInboxMaxId = readInboxMaxId || 0
+        this._unreadMentionsCount = unreadMentionsCount
 
-        this.#fireTransaction = false
+        this._fireTransaction = false
     }
 
     /**
      * @return {Map<number, Message>}
      */
     get data() {
-        return this.#messages
+        return this._messages
     }
 
     /**
      * @return {Message}
      */
     get last() {
-        return this.#lastMessage || this.#prevLastMessage || this.sortedArray[this.sortedArray.length - 1]
+        return this._lastMessage || this._prevLastMessage || this.sortedArray[this.sortedArray.length - 1]
     }
 
     /**
      * @param {Message} message
      */
     set last(message) {
-        if (!this.#lastMessage || message.date >= this.#lastMessage.date) {
-            this.#prevLastMessage = this.#lastMessage
-            this.#lastMessage = message
+        if (!this._lastMessage || message.date >= this._lastMessage.date) {
+            this._prevLastMessage = this._lastMessage
+            this._lastMessage = message
         }
     }
 
@@ -107,30 +107,30 @@ export class DialogMessages {
      * @return {Message[]}
      */
     get sortedArray() {
-        if (!this.#alreadySorted) {
-            this.#sortedArray = this._sortMessagesArray(Array.from(this.#messages.values()))
+        if (!this._alreadySorted) {
+            this._sortedArray = this._sortMessagesArray(Array.from(this._messages.values()))
 
-            this.#alreadySorted = true
+            this._alreadySorted = true
         }
 
-        return this.#sortedArray
+        return this._sortedArray
     }
 
     /**
      * @return {number}
      */
     get unreadCount() {
-        return this.#unreadCount + this.#unreadIds.size
+        return this._unreadCount + this._unreadIds.size
     }
 
     /**
      * @param {number} unreadCount
      */
     set unreadCount(unreadCount) {
-        this.#unreadCount = unreadCount
+        this._unreadCount = unreadCount
 
         if (!this.isTransaction) {
-            this.#dialog.fire("updateUnreadCount")
+            this._dialog.fire("updateUnreadCount")
         }
     }
 
@@ -138,17 +138,17 @@ export class DialogMessages {
      * @return {number}
      */
     get unreadMentionsCount() {
-        return this.#unreadMentionsCount
+        return this._unreadMentionsCount
     }
 
     /**
      * @param {number} unreadMentionsCount
      */
     set unreadMentionsCount(unreadMentionsCount) {
-        this.#unreadMentionsCount = unreadMentionsCount || this.#unreadMentionsCount
+        this._unreadMentionsCount = unreadMentionsCount || this._unreadMentionsCount
 
         if (!this.isTransaction) {
-            this.#dialog.fire("updateUnreadMentionsCount")
+            this._dialog.fire("updateUnreadMentionsCount")
         }
     }
 
@@ -156,17 +156,17 @@ export class DialogMessages {
      * @return {number}
      */
     get readOutboxMaxId() {
-        return this.#readOutboxMaxId
+        return this._readOutboxMaxId
     }
 
     /**
      * @param {number} readOutboxMaxId
      */
     set readOutboxMaxId(readOutboxMaxId) {
-        this.#readOutboxMaxId = readOutboxMaxId || this.#readOutboxMaxId
+        this._readOutboxMaxId = readOutboxMaxId || this._readOutboxMaxId
 
         if (!this.isTransaction) {
-            this.#dialog.fire("updateReadOutboxMaxId")
+            this._dialog.fire("updateReadOutboxMaxId")
         }
     }
 
@@ -174,17 +174,17 @@ export class DialogMessages {
      * @return {number}
      */
     get readInboxMaxId() {
-        return this.#readInboxMaxId
+        return this._readInboxMaxId
     }
 
     /**
      * @param {number} readInboxMaxId
      */
     set readInboxMaxId(readInboxMaxId) {
-        this.#readInboxMaxId = readInboxMaxId || this.#readInboxMaxId
+        this._readInboxMaxId = readInboxMaxId || this._readInboxMaxId
 
         if (!this.isTransaction) {
-            this.#dialog.fire("updateReadInboxMaxId")
+            this._dialog.fire("updateReadInboxMaxId")
         }
     }
 
@@ -192,11 +192,11 @@ export class DialogMessages {
      * @return {Set<number>}
      */
     get unreadMessagesIds() {
-        return this.#unreadIds
+        return this._unreadIds
     }
 
     get isTransaction() {
-        return this.#fireTransaction
+        return this._fireTransaction
     }
 
     /**
@@ -207,7 +207,7 @@ export class DialogMessages {
             return
         }
 
-        if (AppSelectedPeer.check(this.#dialog.peer)) {
+        if (AppSelectedPeer.check(this._dialog.peer)) {
             for (const message of messages) {
                 this.appendSingle(message)
             }
@@ -221,9 +221,9 @@ export class DialogMessages {
      * @param {Message} message
      */
     appendSingle(message) {
-        if (AppSelectedPeer.check(this.#dialog.peer)) {
-            this.#messages.set(message.id, message)
-            this.#alreadySorted = false
+        if (AppSelectedPeer.check(this._dialog.peer)) {
+            this._messages.set(message.id, message)
+            this._alreadySorted = false
 
             this.last = message
         } else {
@@ -235,20 +235,20 @@ export class DialogMessages {
      * @param {number} messageId
      */
     deleteSingle(messageId) {
-        this.#messages.delete(messageId)
+        this._messages.delete(messageId)
         this.deleteUnread(messageId)
 
         if (this.last && messageId === this.last.id) {
-            this.#lastMessage = this.#prevLastMessage
-            this.#prevLastMessage = undefined
+            this._lastMessage = this._prevLastMessage
+            this._prevLastMessage = undefined
         }
 
-        if (this.#prevLastMessage && messageId === this.#prevLastMessage.id) {
-            this.#lastMessage = undefined
+        if (this._prevLastMessage && messageId === this._prevLastMessage.id) {
+            this._lastMessage = undefined
         }
 
         if (!this.isTransaction) {
-            this.#dialog.fire("deleteMessage", {
+            this._dialog.fire("deleteMessage", {
                 messageId
             })
         }
@@ -258,14 +258,14 @@ export class DialogMessages {
      * @param {number} messageId
      */
     addUnread(messageId) {
-        if (AppSelectedPeer.check(this.#dialog.peer)) {
-            this.#unreadIds.add(messageId)
+        if (AppSelectedPeer.check(this._dialog.peer)) {
+            this._unreadIds.add(messageId)
         } else {
-            this.#unreadCount++
+            this._unreadCount++
         }
 
         if (!this.isTransaction) {
-            this.#dialog.fire("updateUnread")
+            this._dialog.fire("updateUnread")
         }
     }
 
@@ -273,16 +273,16 @@ export class DialogMessages {
      * @param {number} messageId
      */
     deleteUnread(messageId) {
-        if (AppSelectedPeer.check(this.#dialog.peer) || this.unreadMessagesIds.has(messageId)) {
-            this.#unreadIds.delete(messageId)
+        if (AppSelectedPeer.check(this._dialog.peer) || this.unreadMessagesIds.has(messageId)) {
+            this._unreadIds.delete(messageId)
         } else {
-            if (this.#unreadCount > 0) {
-                this.#unreadCount--
+            if (this._unreadCount > 0) {
+                this._unreadCount--
             }
         }
 
         if (!this.isTransaction) {
-            this.#dialog.fire("updateUnread")
+            this._dialog.fire("updateUnread")
         }
     }
 
@@ -301,25 +301,25 @@ export class DialogMessages {
             })
             this.stopTransaction()
 
-            this.#dialog.fire("updateUnread")
+            this._dialog.fire("updateUnread")
         }
     }
 
     clearUnread() {
         this.clearUnreadIds()
-        this.#unreadCount = 0
+        this._unreadCount = 0
 
         if (!this.isTransaction) {
-            this.#dialog.fire("updateUnread")
+            this._dialog.fire("updateUnread")
         }
     }
 
     clearUnreadIds() {
-        this.#unreadIds.clear()
+        this._unreadIds.clear()
     }
 
     clear() {
-        this.#messages.clear()
+        this._messages.clear()
     }
 
     /**
@@ -340,17 +340,17 @@ export class DialogMessages {
     }
 
     startTransaction() {
-        this.#fireTransaction = true
+        this._fireTransaction = true
     }
 
     stopTransaction() {
-        this.#fireTransaction = false
+        this._fireTransaction = false
     }
 
     fireTransaction(eventName = "updateSingle", data = {}) {
         this.stopTransaction()
 
-        this.#dialog.fire(eventName, data)
+        this._dialog.fire(eventName, data)
 
     }
 }

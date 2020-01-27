@@ -38,7 +38,7 @@ class ChatInfoComponent extends Component {
     }
 
     _backToMainPage() {
-        location.hash = "#/"
+        V.router.replace("/")
     }
 }
 

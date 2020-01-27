@@ -35,7 +35,9 @@ class GeneralMessageComponent extends Component {
 
     eventFired(bus: EventBus, event: any): boolean {
         if (bus === AppEvents.Dialogs) {
+            console.log("deleting request",event)
             if (event.type === "deleteMessages" && event.messages.indexOf(this.message.id) > -1) {
+                console.log("deleting request")
                 this.__delete()
                 return false
             } else if (this.message === event.message) {

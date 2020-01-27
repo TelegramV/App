@@ -1,10 +1,9 @@
 import type {Message} from "./Message"
-import type {MessageConstructor} from "../../mtproto/language/types"
 import {MessageType} from "./Message"
 
 export class MessageParser {
 
-    static getType(messageConstructor: MessageConstructor) {
+    static getType(messageConstructor: Object) {
         let type = MessageType.TEXT
         const message = messageConstructor
         const media = message.media
@@ -161,7 +160,7 @@ export class MessageParser {
         }
     }
 
-    static getDialogPrefix(message) {
+    static getDialogPrefix(message: Message) {
         const from = message.from
         const showSender = (message.isOut || message.from !== message.dialog.peer) && !message.isPost
         const peerName = message.isOut ? "You" : from.name
@@ -169,7 +168,7 @@ export class MessageParser {
         let text = ""
 
         const p = MessageParser.getMediaPreviewName(message)
-        if (message.media) {
+        if (message.raw.media) {
 
             if (p.length > 0) {
                 text = (showSender ? peerName + ": " : "") + p + (message.text.length > 0 ? ", " : "")

@@ -5,6 +5,7 @@ import DialogsManager from "../dialogs/DialogsManager"
 import DialogsStore from "../store/DialogsStore"
 import {getPeerTypeFromType} from "../dialogs/util"
 import {MessageFactory} from "./MessageFactory"
+import AppEvents from "../eventBus/AppEvents"
 
 class MessageManager extends Manager {
     init() {
@@ -32,6 +33,11 @@ class MessageManager extends Manager {
 
             dialog.fire("newMessage", {
                 message
+            })
+
+            AppEvents.Dialogs.fire("newMessage", {
+                message,
+                dialog
             })
         }
 
@@ -89,6 +95,10 @@ class MessageManager extends Manager {
                 dialog.messages.fireTransaction("deleteChannelMessages", {
                     messages: update.messages
                 })
+
+                dialog.messages.fireTransaction("deleteMessages", {
+                    messages: update.messages
+                })
             }
         })
 
@@ -128,6 +138,8 @@ class MessageManager extends Manager {
                 if (message) {
                     message.fillRaw(update.message)
 
+                    message.fire("edit")
+
                     to.dialog.fire("editMessage", {
                         message: message,
                     })
@@ -143,6 +155,8 @@ class MessageManager extends Manager {
 
                 if (message) {
                     message.fillRaw(update.message)
+
+                    message.fire("edit")
 
                     to.dialog.fire("editMessage", {
                         message: message,

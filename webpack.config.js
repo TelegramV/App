@@ -1,7 +1,7 @@
 const webpack = require("webpack")
 const path = require("path")
 
-const FlowWebpackPlugin = require("flow-webpack-plugin")
+// const FlowWebpackPlugin = require("flow-webpack-plugin")
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const {CleanWebpackPlugin} = require("clean-webpack-plugin")
@@ -30,7 +30,7 @@ const config = {
         new CopyWebpackPlugin([{
             from: "public"
         }]),
-        new FlowWebpackPlugin(),
+        // new FlowWebpackPlugin(),
         new MiniCssExtractPlugin({
             filename: "bundle.[hash].css",
             chunkFilename: "./src/sass/application.scss",

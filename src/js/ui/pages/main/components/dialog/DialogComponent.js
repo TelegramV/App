@@ -161,7 +161,7 @@ export class DialogComponent extends Component {
     _handleClick() {
         const p = this.props.dialog.peer.username ? `@${this.props.dialog.peer.username}` : `${this.props.dialog.peer.type}.${this.props.dialog.peer.id}`
 
-        V.router.push("/", {
+        V.router.replace("/", {
             queryParams: {
                 p
             }

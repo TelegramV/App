@@ -51,7 +51,6 @@ export class PeerApi {
 
     fetchInitialMessages() {
         return this.getHistory({}).then(messages => {
-            console.log("xxx", messages)
             if (messages.length > 0) {
                 this.#peer.dialog.messages.appendMany(messages)
 

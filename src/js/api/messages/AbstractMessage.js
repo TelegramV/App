@@ -1,6 +1,5 @@
 // @flow
 
-import type {MessageConstructor} from "../../mtproto/language/types"
 import {Dialog} from "../dataObjects/dialog/Dialog"
 import {Message, MessageType} from "./Message"
 import {ReactiveObject} from "../../ui/v/reactive/ReactiveObject"
@@ -13,15 +12,14 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     type = MessageType.UNSUPPORTED
 
-    #to: Peer
-    #from: Peer
+    _to: Peer
+    _from: Peer
+    prefix: string
 
-    constructor(dialog: Dialog, raw: MessageConstructor) {
+    constructor(dialog: Dialog) {
         super()
 
         this.dialog = dialog
-
-        this.fillRaw(raw)
     }
 
     get id(): number {
@@ -53,27 +51,27 @@ export class AbstractMessage extends ReactiveObject implements Message {
             return this.dialog.peer
         }
 
-        if (this.#to) {
-            return this.#to
+        if (this._to) {
+            return this._to
         }
 
-        this.#to = MessagesManager.getToPeerMessage(this.raw)
+        this._to = MessagesManager.getToPeerMessage(this.raw)
 
-        return this.#to
+        return this._to
     }
 
     get from(): Peer {
-        if (this.#from) {
-            return this.#from
+        if (this._from) {
+            return this._from
         }
 
-        this.#from = MessagesManager.getFromPeerMessage(this.raw)
+        this._from = MessagesManager.getFromPeerMessage(this.raw)
 
-        if (!this.#from) {
+        if (!this._from) {
             console.warn("no from peer")
         }
 
-        return this.#from
+        return this._from
     }
 
     get date() {
@@ -89,14 +87,18 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     // WARNING: always call super
-    fillRaw(raw: MessageConstructor) {
+    fillRaw(raw: Object): Message {
         this.raw = raw
         this.prefix = MessageParser.getDialogPrefix(this)
+
+        return this
     }
 
-    fillRawAndFire(raw: MessageConstructor) {
+    fillRawAndFire(raw: Object): Message {
         this.fillRaw(raw)
-        
+
         this.fire("rawFilled")
+
+        return this
     }
 }

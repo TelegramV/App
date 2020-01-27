@@ -15,7 +15,7 @@ export class GroupPeer extends Peer {
         return MTProto.invokeMethod("messages.getFullChat", {
             chat_id: this.id
         }).then(chatFull => {
-            this._full = chatFull.full_chat
+            this.full = chatFull.full_chat
 
             AppEvents.Peers.fire("fullLoaded", {
                 peer: this

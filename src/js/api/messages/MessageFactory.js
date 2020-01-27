@@ -1,11 +1,11 @@
 // @flow
 
 import {Dialog} from "../dataObjects/dialog/Dialog"
-import type {MessageConstructor} from "../../mtproto/language/types"
 import {MessageParser} from "./MessageParser"
 import {TextMessage} from "./objects/TextMessage"
 import {UnsupportedMessage} from "./UnsupportedMessage"
 import {PhotoMessage} from "./objects/PhotoMessage"
+import type {Message} from "./Message"
 import {MessageType} from "./Message"
 import {LocationMessage} from "./objects/LocationMessage"
 import {GameMessage} from "./objects/GameMessage"
@@ -47,14 +47,14 @@ const messageObjects = new Map([
 
 export class MessageFactory {
 
-    static fromRaw(dialog: Dialog, raw: MessageConstructor) {
+    static fromRaw(dialog: Dialog, raw: Object): Message {
         const type = MessageParser.getType(raw)
 
         if (messageObjects.has(type)) {
             // $ignore
-            return new (messageObjects.get(type))(dialog, raw)
+            return new (messageObjects.get(type))(dialog, raw).fillRaw(raw)
         } else {
-            return new UnsupportedMessage(dialog, raw)
+            return new UnsupportedMessage(dialog).fillRaw(raw)
         }
     }
 }
