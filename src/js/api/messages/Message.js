@@ -49,6 +49,7 @@ export interface Message {
     +isFromScheduled: boolean;
     +isLegacy: boolean;
     +isEditHide: boolean;
+    +replyToMessage: Message;
 
     +prefix: string; // why this is here??
 

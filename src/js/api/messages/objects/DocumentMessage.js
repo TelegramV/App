@@ -8,6 +8,6 @@ export class DocumentMessage extends AbstractMessage {
     type = MessageType.DOCUMENT
 
     show() {
-        //
+        super.show()
     }
 }

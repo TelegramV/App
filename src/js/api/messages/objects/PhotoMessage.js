@@ -22,6 +22,7 @@ export class PhotoMessage extends AbstractMessage {
     maxSizeType = "" // why?
 
     show() {
+        super.show()
         this.fetchMax()
     }
 

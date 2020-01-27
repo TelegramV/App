@@ -8,6 +8,6 @@ export class VoiceMessage extends AbstractMessage {
     type = MessageType.VOICE
 
     show() {
-        //
+        super.show()
     }
 }

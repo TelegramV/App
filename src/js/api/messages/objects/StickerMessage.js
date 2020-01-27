@@ -14,6 +14,7 @@ export class StickerMessage extends AbstractMessage {
     h = 0
 
     show() {
+        super.show()
         FileAPI.getFile(this.raw.media.document).then(srcUrl => {
             this.srcUrl = srcUrl
             this.fire("stickerLoaded")

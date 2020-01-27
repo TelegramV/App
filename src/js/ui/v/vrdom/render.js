@@ -72,9 +72,13 @@ function vrdom_render(vNode, xmlns = null) {
         return document.createTextNode(String(vNode))
     } else {
         if (typeof vNode === "object") {
-            return document.createTextNode(JSON.stringify(vNode))
+            const $node = document.createTextNode(JSON.stringify(vNode))
+            V.plugins.forEach(plugin => plugin.textCreated($node))
+            return $node
         } else {
-            return document.createTextNode(String(vNode))
+            const $node =  document.createTextNode(String(vNode))
+            V.plugins.forEach(plugin => plugin.textCreated($node))
+            return $node
         }
     }
 }

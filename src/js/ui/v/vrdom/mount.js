@@ -34,7 +34,11 @@ export function vrdom_mount_resolveComponentMounted($mounted) {
 function vrdom_mount(vNode, $target) {
     const $mounted = vrdom_realMount(vrdom_render(vNode), $target)
 
-    V.plugins.forEach(plugin => plugin.elementMounted($mounted))
+    if ($mounted.nodeType === Node.TEXT_NODE) {
+        V.plugins.forEach(plugin => plugin.textMounted($mounted))
+    } else {
+        V.plugins.forEach(plugin => plugin.elementMounted($mounted))
+    }
 
     vrdom_mount_resolveComponentMounted($mounted)
 

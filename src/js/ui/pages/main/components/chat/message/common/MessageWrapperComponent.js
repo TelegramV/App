@@ -2,52 +2,21 @@ import {ContextMenuManager} from "../../../../../../contextMenuManager";
 import {ChatInputManager} from "../../chatInput/ChatInputComponent";
 import {MessageAvatarComponent} from "./MessageAvatarComponent"
 import {InlineKeyboardComponent} from "./InlineKeyboardComponent";
+import {ReplyFragment} from "./ReplyFragment"
 
-const ReplyFragment = ({message}) => {
-    if (message.raw.reply_to_msg_id) {
-
-        const replyMessage = message.dialog.messages.data.get(message.raw.reply_to_msg_id)
-
-        if (replyMessage) {
-
-
-            const onClick = () => {
-                const $bi = document.getElementById(`bubbles-inner`)
-                const $el = document.getElementById(`message-${message.raw.reply_to_msg_id}`)
-
-                // console.log("sc", $bi, $el)
-
-                if ($el) {
-                    $el.scrollTop = 0
-                    // const y = $el.getBoundingClientRect().top + $bi.scrollY
-                    // window.scroll({
-                    //     top: y,
-                    //     behavior: "smooth"
-                    // })
-                }
-            }
-
-            return (
-                <div className="box rp" onClick={onClick}>
-                    <div className="quote">
-                        <div className="name">{replyMessage.from.name}</div>
-                        <div className="text">{replyMessage.text.substring(0, 100)}</div>
-                    </div>
-                </div>
-            )
-        } else {
-            return (
-                <div className="box rp">
-                    <div className="quote">
-                        <div className="name">{"..."}</div>
-                        <div className="text">{"..."}</div>
-                    </div>
-                </div>
-            )
-        }
+const ReplyToMessageFragment = ({message}) => {
+    if (!message.raw.reply_to_msg_id) {
+        return <ReplyFragment id={`message-${message.id}-rpl`} show={false}/>
+    } else if (!message.replyToMessage) {
+        return <ReplyFragment id={`message-${message.id}-rpl`} show={true}/>
     }
 
-    return ""
+    return (
+        <ReplyFragment id={`message-${message.id}-rpl`}
+                       name={message.replyToMessage.from.name}
+                       text={message.replyToMessage.text}
+                       show={true}/>
+    )
 }
 
 const MessageWrapperComponent = ({message, transparent = false, slot, noPad = false, contextActions}) => {
@@ -118,7 +87,7 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
                 <div className="bubble-outer">
                     <div className={wrapClasses}>
 
-                        <ReplyFragment message={message}/>
+                        <ReplyToMessageFragment message={message}/>
 
                         <div className={messageClasses}>
                             {slot}
@@ -140,7 +109,7 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
             <div className="bubble-outer">
                 <div className={wrapClasses}>
 
-                    <ReplyFragment message={message}/>
+                    <ReplyToMessageFragment message={message}/>
 
                     <div className={messageClasses}>
                         {slot}

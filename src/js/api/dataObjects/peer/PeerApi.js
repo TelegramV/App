@@ -11,13 +11,13 @@ export class PeerApi {
     /**
      * @type {Peer}
      */
-    #peer
+    _peer
 
     /**
      * @param {Peer} peer
      */
     constructor(peer) {
-        this.#peer = peer
+        this._peer = peer
     }
 
     /**
@@ -26,14 +26,14 @@ export class PeerApi {
      */
     async getHistory(props = {offset_id: 0, limit: 20}) {
         const messagesSlice = await MTProto.invokeMethod("messages.getHistory", {
-            peer: this.#peer.inputPeer,
+            peer: this._peer.inputPeer,
             offset_id: props.offset_id,
-            offset_date: 0,
-            add_offset: 0,
+            offset_date: props.offset_date || 0,
+            add_offset: props.add_offset || 0,
             limit: props.limit || 50,
-            max_id: 0,
-            min_id: 0,
-            hash: 0
+            max_id: props.max_id ||0,
+            min_id: props.min_id ||0,
+            hash: props.hash ||0
         })
 
         messagesSlice.chats.forEach(chat => {
@@ -45,17 +45,17 @@ export class PeerApi {
         })
 
         return messagesSlice.messages.map(rawMessage => {
-            return MessageFactory.fromRaw(this.#peer.dialog, rawMessage)
+            return MessageFactory.fromRaw(this._peer.dialog, rawMessage)
         })
     }
 
     fetchInitialMessages() {
         return this.getHistory({}).then(messages => {
             if (messages.length > 0) {
-                this.#peer.dialog.messages.appendMany(messages)
+                this._peer.dialog.messages.appendMany(messages)
 
                 AppEvents.Dialogs.fire("fetchedInitialMessages", {
-                    dialog: this.#peer.dialog,
+                    dialog: this._peer.dialog,
                     messages: messages
                 })
             }
@@ -63,14 +63,14 @@ export class PeerApi {
     }
 
     fetchNextPage() {
-        let oldest = this.#peer.dialog.messages.oldest
+        let oldest = this._peer.dialog.messages.oldest
 
         return this.getHistory({offset_id: oldest.id}).then(messages => {
             if (messages.length > 0) {
-                this.#peer.dialog.messages.appendMany(messages)
+                this._peer.dialog.messages.appendMany(messages)
 
                 AppEvents.Dialogs.fire("fetchedMessagesNextPage", {
-                    dialog: this.#peer.dialog,
+                    dialog: this._peer.dialog,
                     messages: messages
                 })
             }
@@ -78,36 +78,36 @@ export class PeerApi {
     }
 
     readHistory(maxId) {
-        if (this.#peer.type === "channel") {
+        if (this._peer.type === "channel") {
             return MTProto.invokeMethod("channels.readHistory", {
-                channel: getInputFromPeer(this.#peer.type, this.#peer.id, this.#peer.accessHash),
+                channel: getInputFromPeer(this._peer.type, this._peer.id, this._peer.accessHash),
                 max_id: maxId
             }).then(response => {
                 if (response._ === "boolTrue") {
-                    this.#peer.dialog.messages.deleteUnreadBy(maxId)
+                    this._peer.dialog.messages.deleteUnreadBy(maxId)
                     // this.dialog.messages.clearUnread()
                     AppEvents.Dialogs.fire("readHistory", {
-                        dialog: this.#peer.dialog
+                        dialog: this._peer.dialog
                     })
                 }
             })
         } else {
             return MTProto.invokeMethod("messages.readHistory", {
-                peer: getInputPeerFromPeer(this.#peer.type, this.#peer.id, this.#peer.accessHash),
+                peer: getInputPeerFromPeer(this._peer.type, this._peer.id, this._peer.accessHash),
                 max_id: maxId
             }).then(response => {
-                this.#peer.dialog.messages.deleteUnreadBy(maxId)
+                this._peer.dialog.messages.deleteUnreadBy(maxId)
                 // this.dialog.messages.clearUnread()
                 AppEvents.Dialogs.fire("readHistory", {
-                    dialog: this.#peer.dialog
+                    dialog: this._peer.dialog
                 })
             })
         }
     }
 
     readAllHistory() {
-        if (this.#peer.dialog.messages.last) {
-            this.readHistory(this.#peer.dialog.messages.last.id)
+        if (this._peer.dialog.messages.last) {
+            this.readHistory(this._peer.dialog.messages.last.id)
         }
     }
 
@@ -119,11 +119,11 @@ export class PeerApi {
                 reply_to_msg_id: replyTo
             },
 
-            peer: this.#peer.inputPeer,
+            peer: this._peer.inputPeer,
             message: text,
             random_id: TimeManager.generateMessageID()
         }).then(response => {
-            response.dialog = this.#peer.dialog
+            response.dialog = this._peer.dialog
             response.message = text
             response.reply_to_msg_id = replyTo
             response.silent = silent
@@ -134,7 +134,7 @@ export class PeerApi {
     sendMedia(text, file, f) {
         FileAPI.saveFilePart(f.file.id, file).then(l => {
             MTProto.invokeMethod("messages.sendMedia", {
-                peer: this.#peer.inputPeer,
+                peer: this._peer.inputPeer,
                 message: text,
                 media: f,
                 random_id: TimeManager.generateMessageID()

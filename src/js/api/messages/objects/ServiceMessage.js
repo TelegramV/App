@@ -8,6 +8,6 @@ export class ServiceMessage extends AbstractMessage {
     type = MessageType.SERVICE
 
     show() {
-        //
+        super.show()
     }
 }

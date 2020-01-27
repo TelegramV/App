@@ -8,6 +8,6 @@ export class RoundVideoMessage extends AbstractMessage {
     type = MessageType.ROUND
 
     show() {
-        //
+        super.show()
     }
 }

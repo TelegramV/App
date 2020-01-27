@@ -35,6 +35,7 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     }
 
     mounted() {
+        super.mounted()
         this.$figure = this.$el.querySelector(`#msg-photo-figure-${this.message.id}`)
     }
 

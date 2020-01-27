@@ -7,6 +7,7 @@ import {MessageParser} from "./MessageParser"
 import {Peer} from "../dataObjects/peer/Peer"
 import MessagesManager from "./MessagesManager"
 import PeersStore from "../store/PeersStore"
+import MTProto from "../../mtproto"
 
 export class AbstractMessage extends ReactiveObject implements Message {
 
@@ -15,6 +16,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     _to: Peer
     _from: Peer
     prefix: string
+    replyToMessage: Message
 
     constructor(dialog: Dialog) {
         super()
@@ -82,8 +84,34 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return new Date(this.date * 1000).toLocaleString(locale, format)
     }
 
+    // always call super
     show() {
-        console.warn("unimplemented show method")
+        this.findReplyTo()
+    }
+
+    findReplyTo() {
+        if (this.raw.reply_to_msg_id) {
+            const replyToMessage = this.dialog.messages.data.get(this.raw.reply_to_msg_id)
+
+            if (replyToMessage) {
+                this.replyToMessage = replyToMessage
+                this.fire("replyToMessageFound")
+            } else {
+                this.dialog.peer.api.getHistory({
+                    offset_id: this.raw.reply_to_msg_id, // ???
+                    add_offset: -1,
+                    limit: 1
+                }).then(messages => {
+                    console.warn("messages", messages, this.raw.reply_to_msg_id)
+                    if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
+                        console.warn("message", messages[0])
+                        this.dialog.messages.appendSingle(messages[0])
+                        this.replyToMessage = messages[0]
+                        this.fire("replyToMessageFound")
+                    }
+                })
+            }
+        }
     }
 
     // WARNING: always call super

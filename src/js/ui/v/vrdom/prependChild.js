@@ -13,7 +13,11 @@ function vrdom_prepend(vNode, $element, {xmlns = null} = {}) {
 
     $element.prepend($node)
 
-    V.plugins.forEach(plugin => plugin.elementMounted($node))
+    if ($node.nodeType === Node.TEXT_NODE) {
+        V.plugins.forEach(plugin => plugin.textMounted($node))
+    } else {
+        V.plugins.forEach(plugin => plugin.elementMounted($node))
+    }
 
     vrdom_mount_resolveComponentMounted($node)
 

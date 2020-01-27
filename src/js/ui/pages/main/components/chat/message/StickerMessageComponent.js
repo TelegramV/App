@@ -44,6 +44,7 @@ class StickerMessageComponent extends GeneralMessageComponent {
     }
 
     mounted() {
+        super.mounted()
         this.$sticker = this.$el.querySelector(`#sticker-${this.message.id}`)
     }
 
