@@ -14,17 +14,16 @@ const LoadingFragment = ({id, loading = true, click = undefined, show = true}) =
     )
 }
 
-export const PhotoFigureFragment = ({type = "photo", message, clickLoader}) => {
+export const PhotoFigureFragment = ({type = "photo", id, srcUrl, thumbnail, width, height, loading, loaded, clickLoader}) => {
     return (
-        <figure id={`msg-photo-figure-${message.id}`} className={[type, message.thumbnail ? "thumbnail" : ""]}>
+        <figure id={id} className={[type, thumbnail ? "thumbnail" : ""]}>
 
-            <PhotoFragment url={message.srcUrl}
-                           thumb={message.thumbnail}
-                           width={message.width}
-                           height={message.height}/>
+            <PhotoFragment url={srcUrl}
+                           thumb={thumbnail}
+                           width={width}
+                           height={height}/>
 
-
-            <LoadingFragment loading={message.loading} show={!message.loaded} click={clickLoader}/>
+            <LoadingFragment loading={loading} show={!loaded} click={clickLoader}/>
 
         </figure>
     )

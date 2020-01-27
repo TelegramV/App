@@ -13,12 +13,12 @@
     "prod": "webpack -p --mode production",
     "watch": "webpack -d --mode development --watch --info-verbosity verbose",
     "dev": "webpack-dev-server --color -d --mode development --watch --info-verbosity verbose --host 0.0.0.0",
-    "analize-bundle": "webpack --json | webpack-bundle-size-analyzer"
+    "analize-bundle": "webpack --json | webpack-bundle-size-analyzer",
+    "test": "jest"
   },
   "dependencies": {
     "croppie": "^2.6.4",
     "emoji-js": "^3.4.1",
-    "jsbi": "^3.1.1",
     "qr-code-styling": "^1.0.1",
     "rusha": "^0.8.13",
     "sortablejs": "^1.10.2",
@@ -34,7 +34,9 @@
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-flow": "^7.8.3",
     "autoprefixer": "latest",
+    "babel-jest": "^25.1.0",
     "babel-loader": "^8.0.6",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "babel-plugin-transform-jsbi-to-bigint": "^1.3.1",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^5.0.5",
@@ -44,6 +46,7 @@
     "flow-bin": "^0.116.1",
     "flow-webpack-plugin": "^1.2.0",
     "html-webpack-plugin": "^3.2.0",
+    "jest": "^25.1.0",
     "mini-css-extract-plugin": "^0.8.0",
     "net": "^1.0.2",
     "node-sass": "^4.13.0",
@@ -54,11 +57,22 @@
     "style-loader": "^1.0.0",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "url-loader": "^2.2.0",
-    "webpack": "^4.41.2",
+    "webpack": "^4.41.5",
     "webpack-bundle-size-analyzer": "^3.1.0",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0",
     "webpack-filter-warnings-plugin": "^1.2.1",
     "worker-loader": "^2.0.0"
+  },
+  "jest": {
+    "moduleFileExtensions": [
+      "js",
+      "jsx"
+    ],
+    "moduleDirectories": [
+      "node_modules",
+      "bower_components",
+      "shared"
+    ]
   }
 }

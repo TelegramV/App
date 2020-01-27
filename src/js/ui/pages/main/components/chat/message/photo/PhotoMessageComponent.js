@@ -4,6 +4,19 @@ import GeneralMessageComponent from "../common/GeneralMessageComponent"
 import {PhotoMessage} from "../../../../../../../api/messages/objects/PhotoMessage"
 import {PhotoFigureFragment} from "./PhotoFigureFragment"
 
+const MessagePhotoFigureFragment = ({message, clickLoader}) => {
+    return (
+        <PhotoFigureFragment id={`msg-photo-figure-${message.id}`}
+                             srcUrl={message.srcUrl}
+                             thumbnail={message.thumbnail}
+                             width={message.width}
+                             height={message.height}
+                             loading={message.loading}
+                             loaded={message.loaded}
+                             clickLoader={clickLoader}/>
+    )
+}
+
 class PhotoMessageComponent extends GeneralMessageComponent {
 
     message: PhotoMessage
@@ -13,7 +26,9 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     h() {
         return (
             <MessageWrapperComponent message={this.message} noPad>
-                <PhotoFigureFragment message={this.message} clickLoader={this.toggleLoading}/>
+                <MessagePhotoFigureFragment message={this.message}
+                                            clickLoader={this.toggleLoading}/>
+
                 <TextWrapperComponent message={this.message}/>
             </MessageWrapperComponent>
         )
@@ -32,12 +47,14 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     }
 
     patchFigure() {
-        VRDOM.patch(this.$figure, <PhotoFigureFragment message={this.message}/>)
+        VRDOM.patch(this.$figure, <MessagePhotoFigureFragment message={this.message}
+                                                              clickLoader={this.toggleLoading}/>)
     }
 
     toggleLoading() {
         if (this.message.loading) {
             this.message.loading = false
+            this.message.interrupted = true
         } else {
             this.message.fetchMax()
         }

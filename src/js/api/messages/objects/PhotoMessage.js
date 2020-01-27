@@ -15,7 +15,9 @@ export class PhotoMessage extends AbstractMessage {
 
     thumbnail = true
     loaded = false
-    loading = 1
+    loading = true
+
+    interrupted: false
 
     maxSizeType = "" // why?
 
@@ -24,9 +26,15 @@ export class PhotoMessage extends AbstractMessage {
     }
 
     fetchMax() {
+        if (this.interrupted && this.loaded) {
+            this.interrupted = false
+            this.fire("photoLoaded")
+            return
+        }
+
         this.thumbnail = true
         this.loaded = false
-        this.loading = 1
+        this.loading = true
 
         FileAPI.getFile(this.raw.media.photo, this.maxSizeType).then(srcUrl => {
             this.srcUrl = srcUrl
@@ -35,7 +43,10 @@ export class PhotoMessage extends AbstractMessage {
             this.loaded = true
             this.loading = false
 
-            this.fire("photoLoaded")
+            if (!this.interrupted) {
+                this.interrupted = false
+                this.fire("photoLoaded")
+            }
         })
     }
 
