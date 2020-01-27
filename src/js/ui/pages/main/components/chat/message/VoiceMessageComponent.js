@@ -4,6 +4,7 @@ import MessageWrapperComponent from "./common/MessageWrapperComponent"
 import TextWrapperComponent from "./common/TextWrapperComponent"
 
 import AudioManager from "../../../../../audioManager"
+import PeersStore from "../../../../../../api/store/PeersStore"
 
 export default class VoiceMessageComponent extends Component {
     constructor(props) {
@@ -56,6 +57,7 @@ export default class VoiceMessageComponent extends Component {
     }
 
     _onAudioReady(audio) {
+        this.audioURL=audio;
         this.audio = new Audio(audio);
         this.audio.addEventListener("timeupdate", this._audioTimeUpdate.bind(this));
         this.audio.addEventListener("ended", this._playButtonClick.bind(this));
@@ -66,7 +68,7 @@ export default class VoiceMessageComponent extends Component {
     }
 
     play() {
-        if(this.audio.ended || this.audio.played.length==0) {
+        if(!this.audio || this.audio.ended || this.audio.played.length==0) {
             this.skipAnim = true;
             this.progress.setAttribute("style", "transition: all 0s ease 0s !important;");
             this.setPercent(0);
@@ -83,6 +85,10 @@ export default class VoiceMessageComponent extends Component {
         this.playButton.classList.remove("tgico-pause");
         this.playButton.classList.add("tgico-play");
         this.audio.pause();
+    }
+
+    isPlaying() {
+        return this.playing;
     }
 
     h() {
@@ -113,6 +119,31 @@ export default class VoiceMessageComponent extends Component {
                 <TextWrapperComponent message={this.props.message}/>
             </MessageWrapperComponent>
         );
+    }
+
+    getURL() {
+        return this.audioURL;
+    }
+
+    getMeta() {
+        return new Promise(async (resolve, reject) => {
+            let message = this.props.message;
+            let peer = message.raw.fwd_from ? await PeersStore.get("user", message.raw.fwd_from.from_id) : message.from;
+            console.log(message);
+
+            let chatName = message.dialog.peer.type != "user" ? message.dialog.peer.name : "";
+            let avatar = await peer.photo.fetchBig();
+            resolve ({
+                title: peer.name || "Unknown user",
+                artist: "Voice message",
+                album:  chatName,
+                artwork: [{
+                    src: avatar,
+                    type: "image/png",
+                    sizes: "640x640" //hardcoded, todo: get image size
+                }]
+            })
+        })
     }
 
     _audioTimeUpdate() {

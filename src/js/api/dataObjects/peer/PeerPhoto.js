@@ -149,7 +149,7 @@ export class PeerPhoto {
         return FileAPI.getPeerPhoto(this._photoSmall, this._dcId, this._peer, false).then(url => {
             this._isFetchingSmall = false
 
-            this.smallUrl = url
+            return this.smallUrl = url
         })
     }
 
@@ -162,7 +162,7 @@ export class PeerPhoto {
         return FileAPI.getPeerPhoto(this._photoBig, this._dcId, this._peer, true).then(url => {
             this._isFetchingBig = false
 
-            this.bigUrl = url
+            return this.bigUrl = url
         })
     }
 }
