@@ -31,7 +31,7 @@ function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
         if ((state.pts + rawUpdate.pts_count) === rawUpdate.pts) {
             onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         } else if ((state.pts + rawUpdate.pts_count) > rawUpdate.pts) {
-            console.debug("[default] update already processed  (it is actually bug, but should work anyway)")
+            // console.debug("[default] update already processed  (it is actually bug, but should work anyway)")
             onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         } else {
             // console.warn("[default] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)

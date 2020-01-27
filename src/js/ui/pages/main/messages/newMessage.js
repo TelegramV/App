@@ -16,6 +16,7 @@ import AudioMessageComponent from "../components/chat/message/AudioMessageCompon
 import RoundVideoMessageComponent from "../components/chat/message/RoundVideoMessageComponent"
 import PhoneCallMessageComponent from "../components/chat/message/PhoneCallMessageComponent"
 import ServiceMessageComponent from "../components/chat/message/ServiceMessageComponent"
+import AnimatedStickerMessageComponent from "../components/chat/message/AnimatedStickerMessageComponent"
 
 /**
  * @type {Map<number, function({message: *}): *>}
@@ -33,26 +34,27 @@ const handlers = new Map([
     [MessageType.CONTACT, ContactMessageComponent],
     [MessageType.DOCUMENT, DocumentMessageComponent],
     [MessageType.GIF, VideoMessageComponent], //TODO own gif component
-    [MessageType.STICKER, StickerMessageComponent],
+    [MessageType.STICKER, AnimatedStickerMessageComponent],
     [MessageType.VOICE, VoiceMessageComponent],
     [MessageType.AUDIO, AudioMessageComponent],
     [MessageType.ROUND, RoundVideoMessageComponent],
     [MessageType.VIDEO, VideoMessageComponent],
     [MessageType.PHONE_CALL, PhoneCallMessageComponent],
     [MessageType.SERVICE, ServiceMessageComponent],
-    [MessageType.ANIMATED_EMOJI, StickerMessageComponent]
+    [MessageType.ANIMATED_EMOJI, AnimatedStickerMessageComponent]
 ])
 
 /**
  * @param message
+ * @param intersectionObserver
  * @return {*}
  * @constructor
  */
-const MessageComponent = ({message}) => {
+const MessageComponent = ({message, intersectionObserver}) => {
     const Handler = handlers.get(message.type)
 
     if (Handler) {
-        return <Handler message={message}/>
+        return <Handler intersectionObserver={intersectionObserver} message={message}/>
     } else {
         return (
             <UnsupportedMessageComponent message={message}/>

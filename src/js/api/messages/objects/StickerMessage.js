@@ -28,6 +28,8 @@ export class StickerMessage extends AbstractMessage {
         this.w = size ? size.w : null
         this.h = size ? size.h : null
 
+        this.animated = this.raw.media.document.mime_type === "application/x-tgsticker"
+
         return this
     }
 }

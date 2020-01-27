@@ -7,7 +7,6 @@ import {MessageParser} from "./MessageParser"
 import {Peer} from "../dataObjects/peer/Peer"
 import MessagesManager from "./MessagesManager"
 import PeersStore from "../store/PeersStore"
-import MTProto from "../../mtproto"
 
 export class AbstractMessage extends ReactiveObject implements Message {
 
@@ -90,7 +89,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     findReplyTo() {
-        if (this.raw.reply_to_msg_id) {
+        if (!this.replyToMessage && this.raw.reply_to_msg_id) {
             const replyToMessage = this.dialog.messages.data.get(this.raw.reply_to_msg_id)
 
             if (replyToMessage) {
@@ -102,9 +101,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
                     add_offset: -1,
                     limit: 1
                 }).then(messages => {
-                    console.warn("messages", messages, this.raw.reply_to_msg_id)
                     if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
-                        console.warn("message", messages[0])
                         this.dialog.messages.appendSingle(messages[0])
                         this.replyToMessage = messages[0]
                         this.fire("replyToMessageFound")
@@ -118,6 +115,12 @@ export class AbstractMessage extends ReactiveObject implements Message {
     fillRaw(raw: Object): Message {
         this.raw = raw
         this.prefix = MessageParser.getDialogPrefix(this)
+
+        const replyToMessage = this.dialog.messages.data.get(this.raw.reply_to_msg_id)
+
+        if (replyToMessage) {
+            this.replyToMessage = replyToMessage
+        }
 
         return this
     }

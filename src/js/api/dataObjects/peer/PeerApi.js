@@ -25,7 +25,7 @@ export class PeerApi {
      * @return {Promise<Message[]>}
      */
     async getHistory(props = {offset_id: 0, limit: 20}) {
-        const messagesSlice = await MTProto.invokeMethod("messages.getHistory", {
+        const Messages = await MTProto.invokeMethod("messages.getHistory", {
             peer: this._peer.inputPeer,
             offset_id: props.offset_id,
             offset_date: props.offset_date || 0,
@@ -36,15 +36,20 @@ export class PeerApi {
             hash: props.hash ||0
         })
 
-        messagesSlice.chats.forEach(chat => {
+
+        if (Messages._ === "messages.channelMessages") {
+            this._peer.dialog.pts = Messages.pts
+        }
+
+        Messages.chats.forEach(chat => {
             PeersManager.setFromRawAndFire(chat)
         })
 
-        messagesSlice.users.forEach(user => {
+        Messages.users.forEach(user => {
             PeersManager.setFromRawAndFire(user)
         })
 
-        return messagesSlice.messages.map(rawMessage => {
+        return Messages.messages.map(rawMessage => {
             return MessageFactory.fromRaw(this._peer.dialog, rawMessage)
         })
     }

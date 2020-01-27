@@ -10,8 +10,10 @@ class GeneralMessageComponent extends Component {
 
     message: Message
     prevReadStatus: boolean = false
+    intersectionObserver: IntersectionObserver
 
     init() {
+        this.intersectionObserver = this.props.intersectionObserver
         this.message = this.props.message
 
         this.reactive = {
@@ -24,6 +26,7 @@ class GeneralMessageComponent extends Component {
 
     mounted() {
         this.message.show()
+        this.intersectionObserver.observe(this.$el)
     }
 
     reactiveChanged(key: *, value: *, event: *) {
@@ -66,6 +69,10 @@ class GeneralMessageComponent extends Component {
         }
 
         return true
+    }
+
+    destroy() {
+        this.intersectionObserver.unobserve(this.$el)
     }
 }
 

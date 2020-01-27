@@ -21,6 +21,7 @@ import {AudioMessage} from "./objects/AudioMessage"
 import {RoundVideoMessage} from "./objects/RoundVideoMessage"
 import {PhoneCallMessage} from "./objects/PhoneCallMessage"
 import {ServiceMessage} from "./objects/ServiceMessage"
+import {AnimatedStickerMessage} from "./objects/AnimatedStickerMessage"
 
 const messageObjects = new Map([
     [MessageType.TEXT, TextMessage],
@@ -42,7 +43,7 @@ const messageObjects = new Map([
     [MessageType.VIDEO, VideoMessage],
     [MessageType.PHONE_CALL, PhoneCallMessage],
     [MessageType.SERVICE, ServiceMessage],
-    [MessageType.ANIMATED_EMOJI, StickerMessage]
+    [MessageType.ANIMATED_EMOJI, AnimatedStickerMessage]
 ])
 
 export class MessageFactory {
