@@ -3,10 +3,10 @@ import CryptoJS from "../vendor/crypto"
 import {bytesFromWords, bytesToWords} from "../utils/bin"
 import Bytes from "../utils/bytes"
 
-const rusha = new Rusha(1024 * 1024);
+export const RushaSingleton = new Rusha(1024 * 1024);
 
 export function sha1HashSync(bytes) {
-    const rushaInstance = rusha || new Rusha(1024 * 1024)
+    const rushaInstance = RushaSingleton || new Rusha(1024 * 1024)
 
     return rushaInstance.rawDigest(bytes).buffer
 }

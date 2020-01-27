@@ -34,7 +34,7 @@ function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
         if ((peer.dialog.pts + rawUpdate.pts_count) === rawUpdate.pts) {
             onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         } else if ((peer.dialog.pts + rawUpdate.pts_count) > rawUpdate.pts) {
-            console.debug("[channel] update already processed (it is actually bug, but should work anyway)")
+            // console.debug("[channel] update already processed (it is actually bug, but should work anyway)")
             onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         } else {
             // console.warn("[channel] channel update cannot be processed", rawUpdate._, peer.dialog.pts, rawUpdate.pts_count, rawUpdate.pts)

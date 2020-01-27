@@ -83,16 +83,15 @@ export class MessageParser {
                     break
             }
         } else {
-            // const l = StickerManager.getAnimatedEmoji(message.message)
-            // if (l) {
-            //     this.raw.media = {
-            //         _: "messageMediaDocument",
-            //         isAnimatedEmoji: true,
-            //         document: l
-            //     }
-            //     this.parseMessageType()
-            //     return
-            // }
+            const emoji = StickerManager.getAnimatedEmoji(message.message)
+
+            if (emoji) {
+                return MessageParser.getType({
+                    _: "messageMediaDocument",
+                    isAnimatedEmoji: true,
+                    document: emoji
+                })
+            }
         }
 
         if (message._ === "messageService") {

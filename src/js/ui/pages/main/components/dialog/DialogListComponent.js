@@ -100,6 +100,18 @@ export class DialogListComponent extends Component {
         this.elements.$pinnedDialogs = this.elements.$dialogsWrapper.querySelector("#dialogsPinned")
         this.elements.$generalDialogs = this.elements.$dialogsWrapper.querySelector("#dialogs")
 
+        function onIntersection(entries) {
+            entries.forEach(entry => {
+                entry.target.style.opacity = entry.intersectionRatio > 0 ? 1 : 0
+            })
+        }
+
+        this.intersectionObserver = new IntersectionObserver(onIntersection, {
+            root: this.elements.$dialogsWrapper,
+            rootMargin: "250px",
+            threshold: 1.0
+        })
+
         this.elements.$dialogsWrapper.addEventListener("scroll", this._scrollHandler, {passive: true})
 
         Sortable.create(this.elements.$pinnedDialogs)
@@ -171,21 +183,21 @@ export class DialogListComponent extends Component {
 
         if (appendOrPrepend === "append") {
             if (dialog.isPinned) {
-                VRDOM.append(newVDialog, this.elements.$pinnedDialogs)
+                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.elements.$pinnedDialogs))
             } else {
-                VRDOM.append(newVDialog, this.elements.$generalDialogs)
+                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.elements.$generalDialogs))
             }
         } else if (appendOrPrepend === "prepend") {
             if (dialog.isPinned) {
-                VRDOM.prepend(newVDialog, this.elements.$pinnedDialogs)
+                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.elements.$pinnedDialogs))
             } else {
-                VRDOM.prepend(newVDialog, this.elements.$generalDialogs)
+                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.elements.$generalDialogs))
             }
         } else {
             if (dialog.isPinned) {
-                VRDOM.prepend(newVDialog, this.elements.$pinnedDialogs)
+                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.elements.$pinnedDialogs))
             } else {
-                VRDOM.append(newVDialog, this.elements.$generalDialogs)
+                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.elements.$generalDialogs))
             }
         }
     }

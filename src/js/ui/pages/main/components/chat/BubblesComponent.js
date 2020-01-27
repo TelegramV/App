@@ -7,7 +7,6 @@ import VRDOM from "../../../../v/vrdom"
 import {vrdom_deepDeleteRealNodeInnerComponents} from "../../../../v/vrdom/patch"
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import type {Message} from "../../../../../api/messages/Message"
-import {MessageType} from "../../../../../api/messages/Message"
 
 class BubblesComponent extends Component {
 
@@ -22,6 +21,8 @@ class BubblesComponent extends Component {
         isFetching: false,
         messagesWaitingForRendering: new Set()
     }
+
+    intersectionObserver: IntersectionObserver
 
     init() {
         this.reactive = {
@@ -42,6 +43,19 @@ class BubblesComponent extends Component {
     mounted() {
         this.elements.$bubblesInner = this.$el.querySelector("#bubbles-inner")
         this.elements.$loader = this.$el.parentElement.querySelector("#messages-wrapper-messages-loader")
+
+        function onIntersection(entries) {
+            entries.forEach(entry => {
+                entry.target.style.opacity = entry.intersectionRatio > 0 ? 1 : 0
+            })
+        }
+
+        this.intersectionObserver = new IntersectionObserver(onIntersection, {
+            root: this.$el,
+            rootMargin: "250px",
+            threshold: 1.0
+        })
+
 
         AppEvents.Dialogs.subscribeAny(event => {
             const dialog = event.dialog
@@ -94,6 +108,10 @@ class BubblesComponent extends Component {
      */
     _renderMessage(message, prepend = false) {
 
+        if (!this.__.mounted) {
+            return
+        }
+
         if (this.state.renderedMessages.has(message.id)) {
             return false
         }
@@ -102,77 +120,8 @@ class BubblesComponent extends Component {
 
         let $message = undefined
 
-        $message = $mount(<MessageComponent message={message}/>, this.elements.$bubblesInner); //TODO Давид поправ як має бути
-
-        if (message.media) {
-            if (message.media.webpage && message.media.webpage.photo) {
-                // FileAPI.photoThumbnail(message.media.webpage.photo, data => {
-                //     message.media.webpage.photo.real = {
-                //         url: data.src
-                //     }
-                //     VRDOM.patch($message, MessageComponentGeneral(message));
-                // })
-            }
-            if (message.media.document) {
-                if (message.type === MessageType.STICKER || message.type === MessageType.ANIMATED_EMOJI) {
-                    // FileAPI.getFile(message.media.document).then(data => {
-                    //     message.media.document.real = {url: data};
-                    //     VRDOM.patch($message, MessageComponentGeneral(message));
-                    // });
-                }
-                if (message.type === MessageType.ROUND || message.type === MessageType.VIDEO || message.type === MessageType.AUDIO) {
-                    // FileAPI.getFile(message.media.document, "").then(data => {
-                    //     message.media.document.real = {url: data};
-                    //     VRDOM.patch($message, MessageComponentGeneral(message));
-                    // });
-                }
-            }
-            if (message.media.game) {
-                //Отримуємо лінк
-                //Отримуємо прев'ю
-                //Отримуємо велику картинку
-                // MTProto.invokeMethod("messages.getBotCallbackAnswer", {
-                //     flags: 2,
-                //     peer: message.from.inputPeer,
-                //     msg_id: message.id
-                // }).then(data => {
-                //     message.media.game.real = {
-                //         url: data.url
-                //     }
-                //     VRDOM.patch($message, MessageComponentGeneral(message));
-                //     FileAPI.photoThumbnail(message.media.game.photo, data => {
-                //         message.media.game.photo.real = {
-                //             url: data.src
-                //         }
-                //         VRDOM.patch($message, MessageComponentGeneral(message));
-                //         //immediatly tring to get better image
-                //         FileAPI.getFile(message.media.game.photo, "x").then(data => {
-                //         FileAPI.getFile(message.media.game.photo, "x").then(data => {
-                //             message.media.game.photo.real = {url: data};
-                //             VRDOM.patch($message, MessageComponentGeneral(message));
-                //         });
-                //     })
-                // })
-            }
-        }
-        /*if (message.media) {
-            if (message.media.photo) {
-                $message = $mount(<ImageMessageComponent message={message} image={false}/>, this.elements.$bubblesInner)
-
-                FileAPI.photoThumnail(message.media.photo, data => {
-                    VDOM.patchReal($message, <ImageMessageComponent message={message} image={{
-                        imgSrc: data.src,
-                        imgSize: data.size,
-                        thumbnail: data.thumbnail
-                    }}/>)
-                })
-
-            } else {
-                $message = $mount(<TextMessageComponent message={message}/>, this.elements.$bubblesInner)
-            }
-        } else {
-            $message = $mount(<TextMessageComponent message={message}/>, this.elements.$bubblesInner)
-        }*/
+        $message = $mount(<MessageComponent intersectionObserver={this.intersectionObserver}
+                                            message={message}/>, this.elements.$bubblesInner)
 
         return $message
     }

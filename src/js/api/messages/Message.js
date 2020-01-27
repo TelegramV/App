@@ -25,7 +25,7 @@ export const MessageType = {
     PHONE_CALL: 17,
     SERVICE: 18,
     ANIMATED_EMOJI: 19,
-    GROUP_PHOTO: 1,
+    GROUP_PHOTO: 20,
 }
 
 export interface Message {
