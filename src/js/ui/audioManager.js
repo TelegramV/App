@@ -92,6 +92,7 @@ class AudioManager0 {
     }
 
     updateBrowserMeta(meta) {
+        if(!navigator.mediaSession) return;
         this._extractMetadata().then(meta => {
             for(const artwork of meta.artwork) {
                 if(!artwork.src) artwork.src = "./static/images/logo-192x192.png";

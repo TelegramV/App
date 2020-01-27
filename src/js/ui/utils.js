@@ -1,7 +1,3 @@
-import EmojiConverter from "emoji-js";
-
-export const emoji = new EmojiConverter();
-
 export function askForFile(accept, callback, asBuffer = false) {
     var input = document.createElement('input');
     input.type = 'file';
