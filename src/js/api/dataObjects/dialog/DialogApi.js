@@ -1,4 +1,4 @@
-import MTProto from "../../../mtproto"
+import {XProto} from "../../../mtproto/XProto"
 
 /**
  * @property {Dialog} dialog
@@ -15,7 +15,7 @@ export class DialogApi {
     }
 
     setPinned(pinned) {
-        return MTProto.invokeMethod("messages.toggleDialogPin", {
+        return XProto.invokeMethod("messages.toggleDialogPin", {
             peer: {
                 _: "inputDialogPeer"
             },
@@ -26,7 +26,7 @@ export class DialogApi {
     }
 
     markDialogUnread(unread) {
-        MTProto.invokeMethod("messages.markDialogUnread", {
+        XProto.invokeMethod("messages.markDialogUnread", {
             flags: 0,
             pFlags: {
                 unread: unread

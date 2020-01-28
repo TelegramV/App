@@ -1,5 +1,5 @@
 import {Manager} from "./manager";
-import MTProto from "../mtproto";
+import {XProto} from "../mtproto/XProto"
 
 class StickersManager extends Manager {
     constructor(props) {
@@ -10,7 +10,7 @@ class StickersManager extends Manager {
     getStickerSet(stickerSet) {
         if (stickerSet._ === "inputStickerSetAnimatedEmoji") stickerSet.id = "inputStickerSetAnimatedEmoji"
         if (this.stickerSets[stickerSet.id]) return Promise.resolve(this.stickerSets[stickerSet.id])
-        MTProto.invokeMethod("messages.getStickerSet", {
+        XProto.invokeMethod("messages.getStickerSet", {
             stickerset: stickerSet
         }).then(l => {
             l.packs.forEach(q => {

@@ -1,10 +1,10 @@
 import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util";
-import MTProto from "../../../mtproto"
 import AppEvents from "../../eventBus/AppEvents"
 import {PeerPhoto} from "./PeerPhoto"
 import {Dialog} from "../dialog/Dialog"
 import {PeerApi} from "./PeerApi"
 import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
+import {XProto} from "../../../mtproto/XProto"
 
 export class Peer extends ReactiveObject {
 
@@ -185,7 +185,7 @@ export class Peer extends ReactiveObject {
      * @return {Promise<*>}
      */
     fetchFull() {
-        return MTProto.invokeMethod("users.getFullUser", {
+        return XProto.invokeMethod("users.getFullUser", {
             id: this.inputPeer
         }).then(userFull => {
             this.full = userFull

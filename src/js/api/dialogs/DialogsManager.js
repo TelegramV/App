@@ -1,4 +1,3 @@
-import {MTProto} from "../../mtproto"
 import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash, getPeerTypeFromType} from "./util"
 import TimeManager from "../../mtproto/timeManager"
 import PeersManager from "../peers/PeersManager"
@@ -11,6 +10,7 @@ import AppEvents from "../eventBus/AppEvents"
 import PeersStore from "../store/PeersStore"
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import {MessageFactory} from "../messages/MessageFactory"
+import {XProto} from "../../mtproto/XProto"
 
 class DialogManager extends Manager {
     constructor() {
@@ -34,7 +34,7 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.subscribe("updateDialogPinned", async update => {
+        XProto.UpdatesManager.subscribe("updateDialogPinned", async update => {
             const peerType = getPeerTypeFromType(update.peer.peer._)
             const dialog = await this.findOrFetch(peerType, update.peer.peer[`${peerType}_id`])
 
@@ -44,11 +44,11 @@ class DialogManager extends Manager {
         })
 
 
-        MTProto.UpdatesManager.subscribe("updateChannel", async update => {
+        XProto.UpdatesManager.subscribe("updateChannel", async update => {
             await this.findOrFetch("channel", update.channel_id)
         })
 
-        MTProto.UpdatesManager.subscribe("updateReadHistoryInbox", update => {
+        XProto.UpdatesManager.subscribe("updateReadHistoryInbox", update => {
             const dialog = this.findByPeer(update.peer)
 
             if (dialog) {
@@ -63,14 +63,14 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.subscribe("updateReadHistoryOutbox", update => {
+        XProto.UpdatesManager.subscribe("updateReadHistoryOutbox", update => {
             const dialog = this.findByPeer(update.peer)
             if (dialog) {
                 dialog.messages.readOutboxMaxId = update.max_id
             }
         })
 
-        MTProto.UpdatesManager.subscribe("updateReadChannelInbox", update => {
+        XProto.UpdatesManager.subscribe("updateReadChannelInbox", update => {
             const dialog = this.find("channel", update.channel_id)
 
             if (dialog) {
@@ -88,7 +88,7 @@ class DialogManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.subscribe("updateReadChannelOutbox", update => {
+        XProto.UpdatesManager.subscribe("updateReadChannelOutbox", update => {
             const dialog = this.find("channel", update.channel_id)
             if (dialog) {
                 dialog.messages.readOutboxMaxId = update.max_id
@@ -195,7 +195,7 @@ class DialogManager extends Manager {
             }
         }
 
-        return MTProto.invokeMethod("messages.getPeerDialogs", {
+        return XProto.invokeMethod("messages.getPeerDialogs", {
             peers: [peerData]
         }).then(_dialogsSlice => {
             _dialogsSlice.users.forEach(l => {
@@ -221,7 +221,7 @@ class DialogManager extends Manager {
             peer: !peer.access_hash ? getInputPeerFromPeerWithoutAccessHash(peer._, peer.id) : getInputPeerFromPeer(peer._, peer.id, peer.access_hash)
         }
 
-        return MTProto.invokeMethod("messages.getPeerDialogs", {
+        return XProto.invokeMethod("messages.getPeerDialogs", {
             peers: [peerData]
         }).then(rawDialogs => {
             console.log("dialog fetched", rawDialogs)
@@ -290,7 +290,7 @@ class DialogManager extends Manager {
             this.offsetDate = this.dialogsOffsetDate + TimeManager.timeOffset
         }
 
-        return MTProto.invokeMethod("messages.getDialogs", {
+        return XProto.invokeMethod("messages.getDialogs", {
             flags: flags,
             pFlags: {
                 exclude_pinned: exclude_pinned

@@ -8,11 +8,10 @@ import {MessageProcessor} from "./messageProcessor"
 
 import AppConfiguration from "../../configuration"
 import {Networker} from "./networker";
-import AppCryptoManager from "../crypto/cryptoManager";
 import {schema} from "../language/schema";
 import Bytes from "../utils/bytes"
 import Random from "../utils/random"
-import AppEvents from "../../api/eventBus/AppEvents"
+import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
 
 const Logger = createLogger("ApiNetworker", {
     level: "warn"
@@ -62,7 +61,7 @@ export class ApiNetworker extends Networker {
 
         this.messageProcessor.listenPong(pingMessage.msg_id, l => {
             if (this.connected === false) {
-                AppEvents.General.fire("connectionRestored")
+                // AppEvents.General.fire("connectionRestored")
             }
             delete this.pings[pingMessage.msg_id]
 
@@ -172,14 +171,14 @@ export class ApiNetworker extends Networker {
     }
 
     onDisconnect() {
-        AppEvents.General.fire("connectionLost")
+        // AppEvents.General.fire("connectionLost")
         // TODO reconnect
         // ALSO if there"s no internet it doesn"t disconnect ws, should ping prob
         this.connected = false
     }
 
     onConnect() {
-        AppEvents.General.fire("connectionRestored")
+        // AppEvents.General.fire("connectionRestored")
         this.connected = true
     }
 
@@ -215,11 +214,11 @@ export class ApiNetworker extends Networker {
         const msgKey = this.getMsgKey(dataWithPadding, true)
         const keyIv = this.getAesKeyIv(msgKey, true)
 
-        return AppCryptoManager.aesEncrypt(dataWithPadding, keyIv[0], keyIv[1]).then(encryptedBytes => {
-            return {
-                bytes: encryptedBytes,
-                msgKey: msgKey
-            }
+        const encryptedBytes = aesEncryptSync(dataWithPadding, keyIv[0], keyIv[1])
+
+        return Promise.resolve({
+            bytes: encryptedBytes,
+            msgKey: msgKey
         })
     }
 
@@ -266,9 +265,9 @@ export class ApiNetworker extends Networker {
         })
     }
 
-    async getDecryptedMessage(msgKey, encryptedData) {
+    getDecryptedMessage(msgKey, encryptedData) {
         const keyIv = this.getAesKeyIv(msgKey, false)
-        return new Uint8Array(await AppCryptoManager.aesDecrypt(encryptedData, keyIv[0], keyIv[1]))
+        return Promise.resolve(new Uint8Array(aesDecryptSync(encryptedData, keyIv[0], keyIv[1])))
     }
 
     invokeMethod(method, params, options = {}) {

@@ -1,5 +1,5 @@
-import { MTProto } from "../../mtproto";
 import AppCache from "../../api/cache"
+import {XProto} from "../../mtproto/XProto"
 
 const PACK_NAME = "tdesktop";
 const FILE_SECTION = "languages";
@@ -15,14 +15,18 @@ class LocaleController0 {
     }
 
     getLanguages() {
-        MTProto.invokeMethod("langpack.getLanguages", { lang_pack: PACK_NAME }).then(l => {
+        XProto.invokeMethod("langpack.getLanguages", {lang_pack: PACK_NAME}).then(l => {
             //TODO cache this list, use for panel
         })
     }
 
     setLanguage(code) {
         let that = this;
-        MTProto.invokeMethod("langpack.getDifference", { lang_pack: PACK_NAME, lang_code: code, from_version: 0 }).then(diff => {
+        XProto.invokeMethod("langpack.getDifference", {
+            lang_pack: PACK_NAME,
+            lang_code: code,
+            from_version: 0
+        }).then(diff => {
             that.saveStrings(code, diff.strings);
         })
     }
@@ -30,7 +34,7 @@ class LocaleController0 {
     saveStrings(code, strings) {
         let text = JSON.stringify(strings);
         let key = PACK_NAME + "_" + code;
-        let blob = new Blob([text], { type: "text/plain" });
+        let blob = new Blob([text], {type: "text/plain"});
         AppCache.put(FILE_SECTION, key, blob);
         this.currentLanguage = blob;
         this.parser = new LanguageParser(blob);
@@ -60,17 +64,17 @@ export class LanguageParser {
     }
 
     get(key, replace = {}) {
-    	let str = this.strings[key] || key;
-    	for(let val in replace) {
-            if(val ===null || val ===undefined) continue;
-    		str = str.replace("{"+val+"}", replace[val]);
-    	}
-    	return str;
+        let str = this.strings[key] || key;
+        for (let val in replace) {
+            if (val === null || val === undefined) continue;
+            str = str.replace("{" + val + "}", replace[val]);
+        }
+        return str;
     }
 }
 
 export const LocaleController = new LocaleController0("en");
 let L;
-export default L = (key, replace={})=>{
-    return LocaleController.getLanguageParser().get(key,replace)
+export default L = (key, replace = {}) => {
+    return LocaleController.getLanguageParser().get(key, replace)
 };

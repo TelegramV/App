@@ -1,5 +1,4 @@
 import DialogsManager from "../../../api/dialogs/DialogsManager"
-import UpdatesManager from "../../../api/updates/updatesManager"
 import PeersManager from "../../../api/peers/PeersManager"
 import {LocaleController} from "../../../common/locale/localization"
 import MessagesManager from "../../../api/messages/MessagesManager"
@@ -9,9 +8,10 @@ import {MediaViewerComponent} from "../../mediaViewerManager"
 import {InstantViewComponent} from "../../instantViewManager"
 import {DialogListComponent} from "./components/dialog/DialogListComponent"
 import ChatComponent from "./components/chat/ChatComponent"
+import {XUpdatesManager} from "../../../api/updates/XUpdatesManager"
 
 function initHighLevelManagers() {
-    UpdatesManager.init().then(() => {
+    XUpdatesManager.init().then(() => {
         // todo: move this to DialogsManager logic
         DialogsManager.fetchFirstPage().then(() => {
             DialogsManager.init()

@@ -1,10 +1,11 @@
-import MTProto from "../../../mtproto"
 import PeersManager from "../../peers/PeersManager"
 import AppEvents from "../../eventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util"
 import TimeManager from "../../../mtproto/timeManager"
 import {FileAPI} from "../../fileAPI"
 import {MessageFactory} from "../../messages/MessageFactory"
+
+import {XProto} from "../../../mtproto/XProto"
 
 export class PeerApi {
 
@@ -25,7 +26,7 @@ export class PeerApi {
      * @return {Promise<Message[]>}
      */
     async getHistory(props = {offset_id: 0, limit: 20}) {
-        const Messages = await MTProto.invokeMethod("messages.getHistory", {
+        const Messages = await XProto.invokeMethod("messages.getHistory", {
             peer: this._peer.inputPeer,
             offset_id: props.offset_id,
             offset_date: props.offset_date || 0,
@@ -86,7 +87,7 @@ export class PeerApi {
 
     readHistory(maxId) {
         if (this._peer.type === "channel") {
-            return MTProto.invokeMethod("channels.readHistory", {
+            return XProto.invokeMethod("channels.readHistory", {
                 channel: getInputFromPeer(this._peer.type, this._peer.id, this._peer.accessHash),
                 max_id: maxId
             }).then(response => {
@@ -99,7 +100,7 @@ export class PeerApi {
                 }
             })
         } else {
-            return MTProto.invokeMethod("messages.readHistory", {
+            return XProto.invokeMethod("messages.readHistory", {
                 peer: getInputPeerFromPeer(this._peer.type, this._peer.id, this._peer.accessHash),
                 max_id: maxId
             }).then(response => {
@@ -119,7 +120,7 @@ export class PeerApi {
     }
 
     sendMessage(text, replyTo = null, silent = false, clearDraft = true) {
-        MTProto.invokeMethod("messages.sendMessage", {
+        XProto.invokeMethod("messages.sendMessage", {
             pFlags: {
                 clear_draft: clearDraft,
                 silent: silent,
@@ -134,19 +135,19 @@ export class PeerApi {
             response.message = text
             response.reply_to_msg_id = replyTo
             response.silent = silent
-            MTProto.UpdatesManager.process(response)
+            XProto.UpdatesManager.process(response)
         })
     }
 
     sendMedia(text, file, f) {
         FileAPI.saveFilePart(f.file.id, file).then(l => {
-            MTProto.invokeMethod("messages.sendMedia", {
+            XProto.invokeMethod("messages.sendMedia", {
                 peer: this._peer.inputPeer,
                 message: text,
                 media: f,
                 random_id: TimeManager.generateMessageID()
             }).then(response => {
-                MTProto.UpdatesManager.process(response)
+                XProto.UpdatesManager.process(response)
             })
         })
     }

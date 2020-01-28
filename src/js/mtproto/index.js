@@ -2,23 +2,12 @@ import {ApiNetworker} from "./network/apiNetworker"
 import {AppConfiguration} from "../configuration"
 import {createNonce} from "./utils/bin"
 import TimeManager from "./timeManager"
-import {createLogger} from "../common/logger"
 import {AppPermanentStorage} from "../common/storage"
-import {AuthAPI} from "../api/auth";
-import UpdatesManager from "../api/updates/updatesManager"
-import {attach} from "../api/notifications";
+import {AuthAPI} from "./auth";
 import {MTProtoNetworker} from "./network/mtprotoNetworker";
 import Bytes from "./utils/bytes"
 import authKeyCreation from "./connect/authKeyCreation"
 import {FileNetworker} from "./network/fileNetworker";
-import V from "../ui/v/VFramework";
-
-window.id = 202466030
-window.send = (method, params) => {
-    MTProto.invokeMethod(method, params).then(l => {
-        console.log(l)
-    })
-}
 
 class MobileProtocolAPIAuth {
     constructor(options = {}) {
@@ -70,6 +59,8 @@ function initManagers() {
     // init non-ui managers
 }
 
+export const MobileProtocolUpdateHandlers = []
+
 class MobileProtocol {
     constructor(options = {}) {
         this.authContext = options.authContext || {}
@@ -77,11 +68,6 @@ class MobileProtocol {
         this.fileNetworkers = {}
         this.timeManager = options.timeManager || TimeManager
         this.configuration = options.configuration
-        this.logger = options.logger || createLogger("MTProto", {
-            level: "debug"
-        })
-
-        this.UpdatesManager = UpdatesManager
 
         this.connected = false
         this.Auth = new MobileProtocolAPIAuth({
@@ -99,7 +85,7 @@ class MobileProtocol {
         this.connected = true
 
         // TODO definitely not a right place for notifications -_-
-        attach()
+        // attach()
     }
 
     onConnected() {
@@ -228,7 +214,7 @@ class MobileProtocol {
 
     logout() {
         AppPermanentStorage.clear()
-        V.router.push("/login", {})
+        // V.router.push("/login", {})
     }
 
     isUserAuthorized() {

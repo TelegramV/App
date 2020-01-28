@@ -1,7 +1,7 @@
-
 import {GroupPeer} from "./GroupPeer";
-import MTProto from "../../../mtproto"
 import AppEvents from "../../eventBus/AppEvents"
+import {XProto} from "../../../mtproto/XProto"
+
 
 // It should actually extend from channel but who cares
 export class SupergroupPeer extends GroupPeer {
@@ -23,7 +23,7 @@ export class SupergroupPeer extends GroupPeer {
      * @return {Promise<*>}
      */
     fetchFull() {
-        return MTProto.invokeMethod("channels.getFullChannel", {
+        return XProto.invokeMethod("channels.getFullChannel", {
             channel: this.input
         }).then(channelFull => {
             this.full = channelFull.full_chat

@@ -1,5 +1,4 @@
 import {Manager} from "../manager";
-import MTProto from "../../mtproto";
 import processUpdatesTooLong from "./processUpdatesTooLong"
 import processShortMessage from "./processShortMessage"
 import processShort from "./processShort"
@@ -9,6 +8,7 @@ import {ChannelUpdatesProcessor} from "./ChannelUpdatesProcessor"
 import {DefaultUpdatesProcessor} from "./DefaultUpdatesProcessor"
 import processShortSentMessage from "./processShortSentMessage"
 import {arrayDelete} from "../../common/utils/utils"
+import {XProto} from "../../mtproto/XProto"
 
 class UpdateManager extends Manager {
     constructor() {
@@ -54,7 +54,7 @@ class UpdateManager extends Manager {
             return Promise.resolve()
         }
 
-        return MTProto.invokeMethod("updates.getState", {}).then(state => {
+        return XProto.invokeMethod("updates.getState", {}).then(state => {
             this.State = state
             this._inited = true
         })
@@ -105,6 +105,4 @@ class UpdateManager extends Manager {
     }
 }
 
-const UpdatesManager = new UpdateManager()
-
-export default UpdatesManager
+export const XUpdatesManager = new UpdateManager()

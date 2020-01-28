@@ -1,4 +1,4 @@
-import {parseMessageEntities} from "../../../../../mtproto/utils/htmlHelpers";
+import {parseMessageEntities} from "../../../../htmlHelpers";
 
 function Draft({text, entities}) {
     return (

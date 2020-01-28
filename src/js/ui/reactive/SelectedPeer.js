@@ -77,33 +77,33 @@ class SelectedPeer {
             })
         })
 
-        PeersStore.onSet(peer => {
-            const p = parseHashQuery()
-
-            if (p.invalid) {
-                return
-            }
-
-            if (p.username) {
-                if (p.username === peer.username) {
-                    this._previousPeer = this._peer
-                    this._peer = peer
-
-                    this._subscribers.forEach(listener => {
-                        listener(this._peer)
-                    })
-                }
-            } else {
-                if (peer.type === p.type && peer.id === p.id) {
-                    this._previousPeer = this._peer
-                    this._peer = peer
-
-                    this._subscribers.forEach(listener => {
-                        listener(this._peer)
-                    })
-                }
-            }
-        })
+        // PeersStore.onSet(peer => {
+        //     const p = parseHashQuery()
+        //
+        //     if (p.invalid) {
+        //         return
+        //     }
+        //
+        //     if (p.username) {
+        //         if (p.username === peer.username) {
+        //             this._previousPeer = this._peer
+        //             this._peer = peer
+        //
+        //             this._subscribers.forEach(listener => {
+        //                 listener(this._peer)
+        //             })
+        //         }
+        //     } else {
+        //         if (peer.type === p.type && peer.id === p.id) {
+        //             this._previousPeer = this._peer
+        //             this._peer = peer
+        //
+        //             this._subscribers.forEach(listener => {
+        //                 listener(this._peer)
+        //             })
+        //         }
+        //     }
+        // })
     }
 
     /**

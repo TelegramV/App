@@ -1,4 +1,4 @@
-import {createLogger} from "../logger"
+const window = {}
 
 /**
  * Data stored in this storage has expiration time.
@@ -40,7 +40,7 @@ export class TemporaryStorage {
 
     setItem(key, value) {
         let setValue = null
-        if (this.driver === window.localStorage) {
+        if (this.driver === localStorage) {
             setValue = JSON.stringify(value)
         } else {
             setValue = value

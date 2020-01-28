@@ -1,5 +1,4 @@
 import {BigInteger} from "../../vendor/jsbn/jsbn"
-import Bytes from "../bytes"
 import Random from "../random"
 import VBigInt from "../../bigint/VBigInt"
 

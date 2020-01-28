@@ -1,11 +1,11 @@
 import {Manager} from "../manager"
-import {MTProto} from "../../mtproto"
 import PeersStore from "../store/PeersStore"
 import DialogsManager from "../dialogs/DialogsManager"
 import DialogsStore from "../store/DialogsStore"
 import {getPeerTypeFromType} from "../dialogs/util"
 import {MessageFactory} from "./MessageFactory"
 import AppEvents from "../eventBus/AppEvents"
+import {XProto} from "../../mtproto/XProto"
 
 class MessageManager extends Manager {
     init() {
@@ -24,7 +24,7 @@ class MessageManager extends Manager {
             }
 
             const message = MessageFactory.fromRaw(dialog, lastMessage)
-            
+
             dialog.messages.appendSingle(message)
 
             if (!message.isOut) {
@@ -41,25 +41,25 @@ class MessageManager extends Manager {
             })
         }
 
-        MTProto.UpdatesManager.subscribe("updateShortSentMessage", async update => {
+        XProto.UpdatesManager.subscribe("updateShortSentMessage", async update => {
             updateDialogLastMessage(update.dialog, update)
         })
 
-        MTProto.UpdatesManager.subscribe("updateShortMessage", async update => {
+        XProto.UpdatesManager.subscribe("updateShortMessage", async update => {
             updateDialogLastMessage(await DialogsManager.findOrFetch("user", update.user_id), update)
         })
 
-        MTProto.UpdatesManager.subscribe("updateShortChatMessage", async update => {
+        XProto.UpdatesManager.subscribe("updateShortChatMessage", async update => {
             updateDialogLastMessage(await DialogsManager.findOrFetch("chat", update.chat_id), update)
         })
 
-        MTProto.UpdatesManager.subscribe("updateNewMessage", async update => {
+        XProto.UpdatesManager.subscribe("updateNewMessage", async update => {
             let dialog = undefined
 
             if (update.message.pFlags.out) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 dialog = await DialogsManager.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
-            } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUser().user.id) {
+            } else if (update.message.to_id && update.message.to_id.user_id !== XProto.getAuthorizedUser().user.id) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 dialog = await DialogsManager.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
             } else {
@@ -70,7 +70,7 @@ class MessageManager extends Manager {
         })
 
 
-        MTProto.UpdatesManager.subscribe("updateDeleteChannelMessages", update => {
+        XProto.UpdatesManager.subscribe("updateDeleteChannelMessages", update => {
             const dialog = DialogsStore.get("channel", update.channel_id)
 
             if (dialog) {
@@ -102,7 +102,7 @@ class MessageManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.subscribe("updateDeleteMessages", update => {
+        XProto.UpdatesManager.subscribe("updateDeleteMessages", update => {
             DialogsStore.data.forEach((data, type) => data.forEach(/** @param {Dialog} dialog */(dialog, id) => {
                 if (dialog.peer.type !== "channel") {
                     dialog.messages.startTransaction()
@@ -129,7 +129,7 @@ class MessageManager extends Manager {
             }))
         })
 
-        MTProto.UpdatesManager.subscribe("updateEditMessage", update => {
+        XProto.UpdatesManager.subscribe("updateEditMessage", update => {
             const to = this.getToPeerMessage(update.message)
 
             if (to) {
@@ -147,7 +147,7 @@ class MessageManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.subscribe("updateEditChannelMessage", update => {
+        XProto.UpdatesManager.subscribe("updateEditChannelMessage", update => {
             const to = this.getToPeerMessage(update.message)
 
             if (to) {
@@ -165,13 +165,13 @@ class MessageManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.subscribe("updateNewChannelMessage", async update => {
+        XProto.UpdatesManager.subscribe("updateNewChannelMessage", async update => {
             const dialog = await DialogsManager.findOrFetch("channel", update.message.to_id.channel_id)
 
             updateDialogLastMessage(dialog, update.message)
         })
 
-        MTProto.UpdatesManager.subscribe("updateDraftMessage", update => {
+        XProto.UpdatesManager.subscribe("updateDraftMessage", update => {
             const dialog = DialogsManager.findByPeer(update.peer)
 
             if (dialog) {

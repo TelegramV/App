@@ -1,7 +1,7 @@
-import MTProto from "../../mtproto"
 import PeersManager from "../peers/PeersManager"
 import AppEvents from "../eventBus/AppEvents"
 import {tsNow} from "../../mtproto/timeManager"
+import {XProto} from "../../mtproto/XProto"
 
 /**
  * @param rawUpdate
@@ -29,17 +29,17 @@ function hasUpdatePtsCount(rawUpdate) {
 function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
     if (hasUpdatePts(rawUpdate) && hasUpdatePtsCount(rawUpdate)) {
         if ((state.pts + rawUpdate.pts_count) === rawUpdate.pts) {
-            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
+            onSuccess(XProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         } else if ((state.pts + rawUpdate.pts_count) > rawUpdate.pts) {
             // console.debug("[default] update already processed  (it is actually bug, but should work anyway)")
-            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
+            onSuccess(XProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         } else {
             // console.warn("[default] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
-            onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
+            onFail(XProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
         }
     } else {
         // console.debug("[default] update has no pts")
-        onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
+        onSuccess(XProto.UpdatesManager.UPDATE_HAS_NO_PTS)
     }
 }
 
@@ -125,10 +125,10 @@ export class DefaultUpdatesProcessor {
 
             checkUpdatePts(self.updatesManager.State, rawUpdate, {
                 onSuccess(type) {
-                    if (type === MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED) {
+                    if (type === XProto.UpdatesManager.UPDATE_CAN_BE_APPLIED) {
                         self.updatesManager.State.pts = rawUpdate.pts
                         self.applyUpdate(rawUpdate)
-                    } else if (type === MTProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
+                    } else if (type === XProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
                         self.applyUpdate(rawUpdate)
                     }
 
@@ -270,7 +270,7 @@ export class DefaultUpdatesProcessor {
             debugger
         }
 
-        return MTProto.invokeMethod("updates.getDifference", {
+        return XProto.invokeMethod("updates.getDifference", {
             pts: State.pts || this.updatesManager.State.pts,
             date: State.date || this.updatesManager.State.date,
             qts: State.qts || this.updatesManager.State.qts,

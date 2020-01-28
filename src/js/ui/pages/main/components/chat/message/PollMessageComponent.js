@@ -1,5 +1,4 @@
 import Component from "../../../../../v/vrdom/Component"
-import MTProto from "../../../../../../mtproto"
 import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import RadioComponent from "../../input/radioComponent"
 import CheckboxComponent from "../../input/checkboxComponent"
@@ -12,7 +11,7 @@ export default class PollMessageComponent extends Component {
         this.poll = message.raw.media.poll;
         this.results = message.raw.media.results;
 
-        this.results.most_voters = this.getWinningAnswer()? this.getWinningAnswer().voters : 0;
+        this.results.most_voters = this.getWinningAnswer() ? this.getWinningAnswer().voters : 0;
 
         this.multiple = this.poll.pFlags.multiple_choice;
         this.public = this.poll.pFlags.public_voters;
@@ -79,7 +78,7 @@ export default class PollMessageComponent extends Component {
     }
 
     closeVoting() {
-        MTProto.invokeMethod("messages.sendVote", {})
+        XProto.invokeMethod("messages.sendVote", {})
     }
 
     addAnswer(option) {
@@ -97,13 +96,13 @@ export default class PollMessageComponent extends Component {
     sendVote() {
         if (this.answers.length == 0) return;
         let message = this.props.message;
-        MTProto.invokeMethod("messages.sendVote", {
+        XProto.invokeMethod("messages.sendVote", {
             peer: message.from.inputPeer,
             msg_id: message.id,
             options: this.answers
         }).then(response => {
             console.log(response)
-            MTProto.UpdatesManager.process(response);
+            XProto.UpdatesManager.process(response);
         });
     }
 

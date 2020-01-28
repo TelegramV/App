@@ -1,10 +1,10 @@
-import MTProto from "../../mtproto"
 import PeersStore from "../store/PeersStore"
 import PeersManager from "../peers/PeersManager"
 import {Peer} from "../dataObjects/peer/Peer"
 import AppEvents from "../eventBus/AppEvents"
 import AppConnectionStatus from "../../ui/reactive/ConnectionStatus"
 import {tsNow} from "../../mtproto/timeManager"
+import {XProto} from "../../mtproto/XProto"
 
 /**
  * @param rawUpdate
@@ -32,17 +32,17 @@ function hasUpdatePtsCount(rawUpdate) {
 function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
     if (hasUpdatePts(rawUpdate) && hasUpdatePtsCount(rawUpdate)) {
         if ((peer.dialog.pts + rawUpdate.pts_count) === rawUpdate.pts) {
-            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
+            onSuccess(XProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
         } else if ((peer.dialog.pts + rawUpdate.pts_count) > rawUpdate.pts) {
             // console.debug("[channel] update already processed (it is actually bug, but should work anyway)")
-            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
+            onSuccess(XProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
         } else {
             // console.warn("[channel] channel update cannot be processed", rawUpdate._, peer.dialog.pts, rawUpdate.pts_count, rawUpdate.pts)
-            onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
+            onFail(XProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
         }
     } else {
         // console.debug("[channel] channel update has no pts")
-        onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
+        onSuccess(XProto.UpdatesManager.UPDATE_HAS_NO_PTS)
     }
 }
 
@@ -186,10 +186,10 @@ export class ChannelUpdatesProcessor {
 
             checkChannelUpdatePts(peer, rawUpdate, {
                 onSuccess(type) {
-                    if (type === MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED) {
+                    if (type === XProto.UpdatesManager.UPDATE_CAN_BE_APPLIED) {
                         peer.dialog.pts = rawUpdate.pts
                         self.applyUpdate(rawUpdate)
-                    } else if (type === MTProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
+                    } else if (type === XProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
                         self.applyUpdate(rawUpdate)
                     }
 
@@ -313,7 +313,7 @@ export class ChannelUpdatesProcessor {
 
         console.warn("[channel] fetching difference")
 
-        return MTProto.invokeMethod("updates.getChannelDifference", {
+        return XProto.invokeMethod("updates.getChannelDifference", {
             flags: 0,
             force: false,
             channel: peer.input,

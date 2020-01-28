@@ -1,4 +1,4 @@
-import {parseMessageEntities} from "../../../../../../../mtproto/utils/htmlHelpers";
+import {parseMessageEntities} from "../../../../../../htmlHelpers";
 import MessageTimeComponent from "./MessageTimeComponent";
 
 const TextWrapperComponent = ({message, time = true, slot}) => {

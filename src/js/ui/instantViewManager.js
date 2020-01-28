@@ -1,7 +1,7 @@
 import Component from "./v/vrdom/Component";
-import ChatInfoAvatarComponent from "./pages/main/components/chat/chatInfo/ChatInfoAvatarComponent";
-import MTProto from "../mtproto";
 import {PhotoComponent} from "./pages/main/components/basic/photoComponent";
+
+import {XProto} from "../mtproto/XProto"
 
 export let InstantViewManager
 
@@ -239,7 +239,7 @@ export class InstantViewComponent extends Component {
     }
 
     downloadAndOpen(url) {
-        MTProto.invokeMethod("messages.getWebPage", {
+        XProto.invokeMethod("messages.getWebPage", {
             url: url
         }).then(l => {
             console.log(l)

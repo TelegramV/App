@@ -1,9 +1,9 @@
 import {Manager} from "../manager";
 import PeersStore from "../store/PeersStore"
 import AppEvents from "../eventBus/AppEvents"
-import {MTProto} from "../../mtproto"
 import {UserPeer} from "../dataObjects/peer/UserPeer"
 import PeerFactory from "../dataObjects/peerFactory"
+import {XProto} from "../../mtproto/XProto"
 
 class PeerManager extends Manager {
     constructor() {
@@ -15,7 +15,7 @@ class PeerManager extends Manager {
             return Promise.resolve()
         }
 
-        MTProto.UpdatesManager.subscribe("updateUserStatus", update => {
+        XProto.UpdatesManager.subscribe("updateUserStatus", update => {
             const peer = PeersStore.get("user", update.user_id)
 
             if (peer instanceof UserPeer) {
@@ -29,7 +29,7 @@ class PeerManager extends Manager {
             }
         })
 
-        MTProto.UpdatesManager.subscribe("updateUserPhoto", update => {
+        XProto.UpdatesManager.subscribe("updateUserPhoto", update => {
             const peer = PeersStore.get("user", update.user_id)
 
             if (peer instanceof UserPeer) {

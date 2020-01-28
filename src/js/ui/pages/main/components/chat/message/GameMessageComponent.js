@@ -1,7 +1,7 @@
 import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import {PhotoComponent} from "../../basic/photoComponent";
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
-import {parseMessageEntities} from "../../../../../../mtproto/utils/htmlHelpers"
+import {parseMessageEntities} from "../../../../../htmlHelpers"
 
 class GameMessageComponent extends GeneralMessageComponent {
 

@@ -1,7 +1,7 @@
-import {MTProto} from "../mtproto";
 import Bytes from "../mtproto/utils/bytes"
 import Random from "../mtproto/utils/random"
 import AppCache from "./cache"
+import {XProto} from "../mtproto/XProto"
 
 export class FileAPI {
     static getInputName(file) {
@@ -27,7 +27,7 @@ export class FileAPI {
     }
 
     static saveFilePart(id, bytes) {
-        return MTProto.invokeMethod("upload.saveFilePart", {
+        return XProto.invokeMethod("upload.saveFilePart", {
             file_id: id,
             file_part: 0,
             bytes
@@ -37,7 +37,7 @@ export class FileAPI {
     static uploadProfilePhoto(name, bytes) {
         const id = [Random.nextInteger(0xffffffff), Random.nextInteger(0xffffffff)]
 
-        return this.saveFilePart(id, bytes).then(MTProto.invokeMethod("photos.uploadProfilePhoto", {
+        return this.saveFilePart(id, bytes).then(XProto.invokeMethod("photos.uploadProfilePhoto", {
             file: {
                 _: "inputFile",
                 id,
@@ -48,7 +48,7 @@ export class FileAPI {
     }
 
     static getFileLocation(location, dcID = null, offset = 0) {
-        return MTProto.invokeMethod("upload.getFile", {
+        return XProto.invokeMethod("upload.getFile", {
             location: location,
             flags: 0,
             offset: offset,
@@ -67,7 +67,7 @@ export class FileAPI {
     }
 
     static getWebFileLocation(webFileLocation, dcID = 4, offset = 0) {
-        return MTProto.invokeMethod("upload.getWebFile", {
+        return XProto.invokeMethod("upload.getWebFile", {
             location: webFileLocation,
             offset: offset,
             limit: 1024 * 1024

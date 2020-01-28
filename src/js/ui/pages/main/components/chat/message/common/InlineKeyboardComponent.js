@@ -1,6 +1,5 @@
 import Component from "../../../../../../v/vrdom/Component";
-import MTProto from "../../../../../../../mtproto";
-
+import {XProto} from "../../../../../../../mtproto/XProto"
 
 export class InlineKeyboardComponent extends Component {
     constructor(props) {
@@ -48,7 +47,7 @@ export class InlineKeyboardComponent extends Component {
     static callbackButton(message, target, bytes, isGame = false) {
         const progress = target.querySelector("progress")
         progress.classList.remove("disabled")
-        return MTProto.invokeMethod("messages.getBotCallbackAnswer", {
+        return XProto.invokeMethod("messages.getBotCallbackAnswer", {
             pFlags: {
                 data: isGame ? undefined : bytes,
                 game: isGame

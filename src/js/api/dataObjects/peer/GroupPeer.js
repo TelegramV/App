@@ -1,6 +1,6 @@
 import {Peer} from "./Peer";
-import MTProto from "../../../mtproto";
 import AppEvents from "../../eventBus/AppEvents";
+import {XProto} from "../../../mtproto/XProto"
 
 export class GroupPeer extends Peer {
 
@@ -12,7 +12,7 @@ export class GroupPeer extends Peer {
      * @return {Promise<*>}
      */
     fetchFull() {
-        return MTProto.invokeMethod("messages.getFullChat", {
+        return XProto.invokeMethod("messages.getFullChat", {
             chat_id: this.id
         }).then(chatFull => {
             this.full = chatFull.full_chat

@@ -44,12 +44,10 @@ const config = {
         rules: [
             {
                 test: /\.worker\.js$/,
-                use: {
-                    loader: "worker-loader",
-                    options: {
-                        // inline: true
-                    }
-                }
+                use: [
+                    {loader: 'worker-loader'},
+                    {loader: 'babel-loader'}
+                ]
             },
             {
                 test: /\.js$/,

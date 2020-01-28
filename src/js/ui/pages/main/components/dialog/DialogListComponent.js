@@ -4,11 +4,11 @@ import AppEvents from "../../../../../api/eventBus/AppEvents"
 import Component from "../../../../v/vrdom/Component"
 import VRDOM from "../../../../v/vrdom/VRDOM"
 import {ContextMenuManager} from "../../../../contextMenuManager";
-import MTProto from "../../../../../mtproto";
 import V from "../../../../v/VFramework";
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import {ConnectionStatusComponent} from "./ConnectionStatusComponent"
 import Sortable from "sortablejs"
+import {XProto} from "../../../../../mtproto/XProto"
 
 export class DialogListComponent extends Component {
     constructor(props) {
@@ -54,7 +54,7 @@ export class DialogListComponent extends Component {
                             icon: "savedmessages",
                             title: "Saved",
                             onClick: _ => {
-                                const p = MTProto.getAuthorizedUser().user.username ? `@${MTProto.getAuthorizedUser().user.username}` : `user.${MTProto.getAuthorizedUser().user.id}`
+                                const p = XProto.getAuthorizedUser().user.username ? `@${XProto.getAuthorizedUser().user.username}` : `user.${XProto.getAuthorizedUser().user.id}`
 
                                 V.router.push("/", {
                                     queryParams: {

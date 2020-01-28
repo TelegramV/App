@@ -1,6 +1,6 @@
 import {Peer} from "./Peer";
-import MTProto from "../../../mtproto";
 import AppEvents from "../../eventBus/AppEvents";
+import {XProto} from "../../../mtproto/XProto"
 
 export class ChannelPeer extends Peer {
 
@@ -27,7 +27,7 @@ export class ChannelPeer extends Peer {
      * @return {Promise<*>}
      */
     fetchFull() {
-        return MTProto.invokeMethod("channels.getFullChannel", {
+        return XProto.invokeMethod("channels.getFullChannel", {
             channel: this.input
         }).then(channelFull => {
             this.full = channelFull.full_chat

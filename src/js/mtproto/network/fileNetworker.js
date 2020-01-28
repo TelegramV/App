@@ -1,9 +1,5 @@
-import {Networker} from "./networker";
-import {TLSerialization} from "../language/serialization";
-import {TLDeserialization} from "../language/deserialization";
 import {createLogger} from "../../common/logger";
 import {ApiNetworker} from "./apiNetworker";
-import MTProto from "../index";
 
 const Logger = createLogger("FileNetworker")
 

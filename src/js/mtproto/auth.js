@@ -1,4 +1,4 @@
-import {MTProto} from "../mtproto";
+import {MTProto} from "./index";
 
 export class AuthAPI {
     static exportAuth(dcID) {
