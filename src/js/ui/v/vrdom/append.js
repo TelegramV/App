@@ -1,15 +1,18 @@
-import vrdom_render from "./render"
+import VRNode from "./VRNode"
+import type {VRRenderProps} from "./types/types"
 import {vrdom_mount_resolveComponentMounted} from "./mount"
+import vrdom_render from "./render"
 import V from "../VFramework"
 
 /**
- * @param vNode
- * @param {Element} $element
- * @param xmlns
- * @return {Element}
+ * Appends VRNode to Real DOM Element children
+ *
+ * @param node
+ * @param $el
+ * @param props
  */
-function vrdom_append(vNode, $element, {xmlns = null} = {}) {
-    const $mounted = $element.appendChild(vrdom_render(vNode, xmlns))
+const vrdom_append = (node: VRNode, $el: Element, props?: VRRenderProps) => {
+    const $mounted = $el.appendChild(vrdom_render(node, props))
 
     if ($mounted.nodeType === Node.TEXT_NODE) {
         V.plugins.forEach(plugin => plugin.textMounted($mounted))
@@ -17,6 +20,7 @@ function vrdom_append(vNode, $element, {xmlns = null} = {}) {
         V.plugins.forEach(plugin => plugin.elementMounted($mounted))
     }
 
+    // $ignore
     vrdom_mount_resolveComponentMounted($mounted)
 
     return $mounted

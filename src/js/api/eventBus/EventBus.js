@@ -1,17 +1,17 @@
 // @flow
 
-export type Event = {
+export type BusEvent = {
     type: string,
     [string]: any,
 }
 
 /**
- * Simple Event Bus class
+ * Simple BusEvent Bus class
  */
 export class EventBus {
 
-    subscribers: Map<string, Set<(Event | Object) => any>> = new Map()
-    subscribersAny: Set<(Event | Object) => any> = new Set()
+    subscribers: Map<string, Set<(BusEvent | Object) => any>> = new Map()
+    subscribersAny: Set<(BusEvent | Object) => any> = new Set()
 
     /**
      * @param {string} type
@@ -20,7 +20,7 @@ export class EventBus {
     fire(type: string, props: Object) {
         const subscribers = this.subscribers.get(type)
 
-        const event: Event = {type, ...props}
+        const event: BusEvent = {type, ...props}
 
         if (subscribers) {
             for (const subscriber of subscribers) {
@@ -37,7 +37,7 @@ export class EventBus {
      * @param {string} type
      * @param {Function} callback
      */
-    subscribe(type: string, callback: Event => any) {
+    subscribe(type: string, callback: BusEvent => any) {
         let subscribers = this.subscribers.get(type)
 
         if (!subscribers) {
@@ -58,7 +58,7 @@ export class EventBus {
      *     messages: Message[],
      * })} callback
      */
-    subscribeAny(callback: (Event | Object) => any) {
+    subscribeAny(callback: (BusEvent | Object) => any) {
         this.subscribersAny.add(callback)
     }
 }

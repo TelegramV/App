@@ -1,18 +1,9 @@
-/**
- * Mounts VRNode to $real.
- *
- * @param {VRNode|ComponentVRNode}vNode
- * @param {Element|string} $target
- * @return {Element}
- */
 import vrdom_render from "./render"
-import {ComponentVRNode} from "./componentVRNode"
+import type VRNode from "./VRNode"
+import type {VRRenderProps} from "./types/types"
 import V from "../VFramework"
 
-/**
- * @param {Node|Element} $mounted
- */
-export function vrdom_mount_resolveComponentMounted($mounted) {
+export function vrdom_mount_resolveComponentMounted($mounted: Element) {
     if ($mounted.nodeType !== Node.TEXT_NODE && $mounted.hasAttribute("data-component-id")) {
         const component = V.mountedComponents.get($mounted.getAttribute("data-component-id"))
 
@@ -31,8 +22,15 @@ export function vrdom_mount_resolveComponentMounted($mounted) {
     }
 }
 
-function vrdom_mount(vNode, $target) {
-    const $mounted = vrdom_realMount(vrdom_render(vNode), $target)
+/**
+ * Mounts VRNode to Real DOM Element
+ *
+ * @param node
+ * @param $el
+ * @param props
+ */
+function vrdom_mount(node: VRNode, $el: Element | Node | Text, props?: VRRenderProps): Element | Node | Text {
+    const $mounted = vrdom_realMount(vrdom_render(node, props), $el)
 
     if ($mounted.nodeType === Node.TEXT_NODE) {
         V.plugins.forEach(plugin => plugin.textMounted($mounted))
@@ -45,19 +43,16 @@ function vrdom_mount(vNode, $target) {
     return $mounted
 }
 
-/**
- * @param {Element} $node
- * @param {Element|string} $target
- * @return {Element|Node}
- */
-export function vrdom_realMount($node, $target) {
+export function vrdom_realMount($el: Element | Node | Text, $target: Element | Node | Text): Element {
     if (typeof $target === "string") {
         $target = document.querySelector($target)
     }
 
-    $target.replaceWith($node)
+    // $ignore
+    $target.replaceWith($el)
 
-    return $node
+    // $ignore
+    return $el
 }
 
 export default vrdom_mount

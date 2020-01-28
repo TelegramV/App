@@ -1,3 +1,7 @@
+import VRDOM from "../vrdom/VRDOM"
+import VRNode from "../vrdom/VRNode"
+import V from "../VFramework"
+
 /**
  * Why? I do not know.
  *
@@ -6,10 +10,6 @@
  * @version undefined
  * @author kohutd
  */
-import VRDOM from "../vrdom"
-import {VRNode} from "../vrdom/VRNode"
-import V from "../VFramework"
-
 export class VFrameworkRouter {
     constructor(options = {}) {
         this.mode = options.mode || "hash"

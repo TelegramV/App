@@ -1,6 +1,4 @@
-// @flow
-
-import Component from "../../../../../../v/vrdom/component"
+import Component from "../../../../../../v/vrdom/Component"
 import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 import {EventBus} from "../../../../../../../api/eventBus/EventBus"
 import type {Message} from "../../../../../../../api/messages/Message"

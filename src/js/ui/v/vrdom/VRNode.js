@@ -1,17 +1,29 @@
-/**
- * @constructor
- */
-export function VRNode(tagName, props) {
-    this.__virtual = true
+import type {VRAttrs, VREvents, VRNodeProps, VRTagName} from "./types/types"
 
-    this.tagName = tagName
+class VRNode {
 
-    this.attrs = props.attrs || {}
-    this.events = props.events
+    __vrnode: boolean = true
 
-    this.dangerouslySetInnerHTML = props.dangerouslySetInnerHTML
+    tagName: VRTagName
 
-    this.children = props.children || []
+    attrs: VRAttrs = {}
 
-    this.component = props.component || false
+    events: VREvents = new Map()
+
+    dangerouslySetInnerHTML: any | boolean = false
+
+    children: Array<VRNode> = []
+
+    constructor(tagName: VRTagName, props: VRNodeProps) {
+        this.tagName = tagName
+
+        this.attrs = props.attrs || {}
+        this.events = props.events || new Map()
+
+        this.dangerouslySetInnerHTML = props.dangerouslySetInnerHTML || false
+
+        this.children = props.children || []
+    }
 }
+
+export default VRNode

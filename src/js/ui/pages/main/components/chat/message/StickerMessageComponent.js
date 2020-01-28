@@ -2,7 +2,7 @@ import MessageWrapperFragment from "./common/MessageWrapperFragment";
 import MessageTimeComponent from "./common/MessageTimeComponent"
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
-import VRDOM from "../../../../../v/vrdom"
+import VRDOM from "../../../../../v/vrdom/VRDOM"
 
 // this is needed to make direct patches without patching full component
 const StickerFragment = ({id, url, w, h}) => {

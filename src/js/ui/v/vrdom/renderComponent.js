@@ -1,17 +1,15 @@
 import vrdom_render from "./render"
 import V from "../VFramework"
-import {ComponentVRNode} from "./componentVRNode"
+import ComponentVRNode from "./ComponentVRNode"
+import Component from "./Component"
 
 let latestInstantiatedComponent = 0
 
 /**
  * @param {ComponentVRNode} componentVNode
  */
-function vrdom_renderComponentVNode(componentVNode) {
-    /**
-     * @type {Component}
-     */
-    const componentInstance = new (componentVNode.component)({
+function vrdom_renderComponentVNode(componentVNode: ComponentVRNode) {
+    const componentInstance: Component = new (componentVNode.component)({
         props: componentVNode.props,
         slot: componentVNode.slot,
     })

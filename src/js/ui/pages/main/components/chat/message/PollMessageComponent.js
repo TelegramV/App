@@ -1,4 +1,4 @@
-import Component from "../../../../../v/vrdom/component"
+import Component from "../../../../../v/vrdom/Component"
 import MTProto from "../../../../../../mtproto"
 import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import RadioComponent from "../../input/radioComponent"

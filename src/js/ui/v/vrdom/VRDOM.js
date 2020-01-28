@@ -1,10 +1,12 @@
 import vrdom_createElement from "./createElement"
-import vrdom_jsx from "./jsx"
+import vrdom_jsx from "./jsx/jsx"
 import vrdom_render from "./render"
 import vrdom_mount from "./mount"
-import vrdom_patch from "./patch"
-import vrdom_append from "./appendChild"
-import vrdom_prepend from "./prependChild"
+import vrdom_delete from "./delete"
+import vrdom_patch from "./patch/patch"
+import vrdom_append from "./append"
+import vrdom_prepend from "./prepend"
+import vrdom_deleteInner from "./deleteInner"
 
 /**
  * Virtual DOM that operates on Real DOM and does not save previous rendered state.
@@ -19,6 +21,9 @@ const VRDOM = {
     patch: vrdom_patch,
     append: vrdom_append,
     prepend: vrdom_prepend,
+
+    delete: vrdom_delete,
+    deleteInner: vrdom_deleteInner,
 
     Fragment: 69
 }
