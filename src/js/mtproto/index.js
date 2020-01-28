@@ -2,7 +2,6 @@ import {ApiNetworker} from "./network/apiNetworker"
 import {AppConfiguration} from "../configuration"
 import {createNonce} from "./utils/bin"
 import TimeManager from "./timeManager"
-import {createLogger} from "../common/logger"
 import {AppPermanentStorage} from "../common/storage"
 import {AuthAPI} from "../api/auth";
 import UpdatesManager from "../api/updates/updatesManager"
@@ -77,9 +76,6 @@ class MobileProtocol {
         this.fileNetworkers = {}
         this.timeManager = options.timeManager || TimeManager
         this.configuration = options.configuration
-        this.logger = options.logger || createLogger("MTProto", {
-            level: "debug"
-        })
 
         this.UpdatesManager = UpdatesManager
 
@@ -166,33 +162,32 @@ class MobileProtocol {
             updates: false
         }
 
-        return new Promise(resolve => {
-            const mtprotoNetworker = new MTProtoNetworker(authContext)
-            authKeyCreation(mtprotoNetworker).then(response => {
-                const networker = new FileNetworker(authContext)
+        const mtprotoNetworker = new MTProtoNetworker(authContext)
 
-                const list = this.fileNetworkers[dcID]
-                this.fileNetworkers[dcID] = networker
+        return await authKeyCreation(mtprotoNetworker).then(response => {
+            const networker = new FileNetworker(authContext)
+
+            const list = this.fileNetworkers[dcID]
+            this.fileNetworkers[dcID] = networker
+            authContext.authKey = new Uint8Array(authContext.authKey)
+            authContext.serverSalt = new Uint8Array(authContext.serverSalt)
+
+            return AuthAPI.importAuth(authContext.exportedAuth, dcID).then(response => {
+                list.forEach(async l => {
+                    l.resolve(networker.invokeMethod(l.method, l.parameters))
+                })
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
-                AuthAPI.importAuth(authContext.exportedAuth, dcID).then(response => {
-                    list.forEach(async l => {
-                        l.resolve(networker.invokeMethod(l.method, l.parameters))
-                    })
-                    authContext.authKey = new Uint8Array(authContext.authKey)
-                    authContext.serverSalt = new Uint8Array(authContext.serverSalt)
+                AppPermanentStorage.setItem("authKey" + authContext.dcID, Bytes.asHex(authContext.authKey))
+                AppPermanentStorage.setItem("serverSalt" + authContext.dcID, Bytes.asHex(authContext.serverSalt))
 
-                    AppPermanentStorage.setItem("authKey" + authContext.dcID, Bytes.asHex(authContext.authKey))
-                    AppPermanentStorage.setItem("serverSalt" + authContext.dcID, Bytes.asHex(authContext.serverSalt))
-
-                    resolve(networker)
-                })
+                return networker
             })
         })
     }
 
-    invokeMethod(method, parameters = {}, dcID = null) {
+    invokeMethod(method, parameters = {}, dcID = null, file = false) {
         if (!this.connected) {
             console.info("Not connected, putting in queue")
             return new Promise(resolve => {
@@ -204,7 +199,7 @@ class MobileProtocol {
             })
         }
 
-        if (dcID !== null && dcID !== this.authContext.dcID) {
+        if (file && dcID !== null) {
             let networker = this.fileNetworkers[dcID]
             if (Array.isArray(networker)) {
                 return new Promise(resolve => {
@@ -213,10 +208,8 @@ class MobileProtocol {
             }
             if (!networker) {
                 this.fileNetworkers[dcID] = []
-                return new Promise(resolve => {
-                    return this.createFileNetworker(dcID).then(networker => {
-                        networker.invokeMethod(method, parameters).then(resolve)
-                    })
+                return this.createFileNetworker(dcID).then(networker => {
+                    return networker.invokeMethod(method, parameters)
                 })
             }
 
@@ -228,7 +221,7 @@ class MobileProtocol {
 
     logout() {
         AppPermanentStorage.clear()
-        V.router.push("/login", {})
+        V.router.replace("/login")
     }
 
     isUserAuthorized() {

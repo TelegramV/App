@@ -53,7 +53,7 @@ export class FileAPI {
             flags: 0,
             offset: offset,
             limit: 1024 * 1024
-        }, dcID)
+        }, dcID, true)
     }
 
     static getWebFile(webFileLocation) {
@@ -71,7 +71,7 @@ export class FileAPI {
             location: webFileLocation,
             offset: offset,
             limit: 1024 * 1024
-        }, dcID)
+        }, dcID, true)
     }
 
     static prepareWebFileLocation(geoPoint, w = 512, h = 512, zoom = 20, scale = 1) {

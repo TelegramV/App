@@ -9,7 +9,7 @@ export class MTProtoNetworker extends Networker {
     handler
 
     constructor(authContext) {
-        super(authContext)
+        super(authContext, true)
     }
 
     addHeader(message) {

@@ -48,7 +48,7 @@ export class MessageProcessor {
                 MTProto.UpdatesManager.process(message)
             }
         } catch (e) {
-            console.error(e)
+            console.error(e, message, this)
         }
 
     }

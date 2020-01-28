@@ -197,6 +197,30 @@ function sha256Hash(bytes) {
     }
 }
 
+function aes_decryptor(url, data) {
+    if (_canWork) {
+        return new Promise(resolve => {
+            performTask("aes_decryptor", {
+                url, data
+            }, resolve)
+        })
+    } else {
+        throw new Error("fuck")
+    }
+}
+
+function set_aes_decryptor(url, deobf_key_256, deobf_vector_128) {
+    if (_canWork) {
+        return new Promise(resolve => {
+            performTask("set_aes_decryptor", {
+                deobf_key_256, deobf_vector_128
+            }, resolve)
+        })
+    } else {
+        throw new Error("fuck")
+    }
+}
+
 if (_canWork) {
     _cryptoWorker.addEventListener("message", event => {
         if (event.data.taskId) {
@@ -217,7 +241,9 @@ const AppCryptoManager = {
     srpCheckPassword,
     decomposePQ,
     sha1Hash,
-    sha256Hash
+    sha256Hash,
+    aes_decryptor,
+    set_aes_decryptor,
 }
 
 export default AppCryptoManager

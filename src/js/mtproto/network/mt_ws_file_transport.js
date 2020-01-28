@@ -2,7 +2,7 @@
 //Copyright 2019 Oleg Tsenilov
 //https://github.com/OTsenilov
 
-import {mt_inob_send, mt_inob_recv, mt_inob_clear} from "./mt_inob_codec"
+import {mt_file_inob_send, mt_file_inob_recv, mt_file_inob_clear} from "./mt_file_inob_codec"
 
 var transportation_streams = new Map();
 
@@ -12,12 +12,12 @@ let disconnect_processors = {};
 let connect_processors = {};
 
 let dbg_reconnecting = false
-export function mt_set_disconnect_processor(processor, url) {
+export function mt_file_set_disconnect_processor(processor, url) {
     if(!disconnect_processors[url])
         disconnect_processors[url] = processor
 }
 
-export function mt_set_connect_processor(processor, url) {
+export function mt_file_set_connect_processor(processor, url) {
     if(!connect_processors[url])
         connect_processors[url] = processor
 }
@@ -27,7 +27,7 @@ window.killMainSocket = _ => {
     transportation_streams.values().next().value.transportation_socket.close(4999, "user requested")
 }
 
-function mt_init_transportation(url)
+function mt_file_init_transportation(url)
 {
     var transportation_socket = new WebSocket(url, "binary");
     transportation_socket.binaryType = "arraybuffer";
@@ -36,7 +36,7 @@ function mt_init_transportation(url)
     {
         var transportation_stream = transportation_streams.get(url);
         for (var i = 0; i < transportation_stream.transportation_queue_len; i++) {
-            mt_inob_send(transportation_socket, transportation_stream.transportation_queue[i], transportation_stream.transportation_queue[i].byteLength, url);
+            mt_file_inob_send(transportation_socket, transportation_stream.transportation_queue[i], transportation_stream.transportation_queue[i].byteLength, url);
             //console.log("transported buffer / 0");
             //console.log(transportation_queue[i].byteLength);
         }
@@ -48,7 +48,7 @@ function mt_init_transportation(url)
     transportation_socket.onmessage = async function(ev)
     {
         if(dbg_reconnecting) console.warn("onmessage!")
-        var data_buffer = await mt_inob_recv(ev, url);
+        var data_buffer = await mt_file_inob_recv(ev, url);
         high_level_processors[url].call(high_level_contexts[url], data_buffer);
     };
 
@@ -70,7 +70,7 @@ function mt_init_transportation(url)
         // delete high_level_contexts[url]
         // delete high_level_processors[url]
         transportation_streams.delete(url)
-        mt_inob_clear(url)
+        mt_file_inob_clear(url)
     };
     
     transportation_streams.set(url, {
@@ -82,13 +82,13 @@ function mt_init_transportation(url)
                                     });
 }
 
-export function mt_ws_set_processor(processor, context, url)
+export function mt_file_ws_set_processor(processor, context, url)
 {
     high_level_processors[url] = processor;
     high_level_contexts[url] = context;
 }
 
-export function mt_ws_transport(url, buffer)
+export function mt_file_ws_transport(url, buffer)
 {
     var transportation_init = false;
     var transportation_establishing = false;
@@ -103,7 +103,7 @@ export function mt_ws_transport(url, buffer)
     {
         if(!transportation_establishing)
         {
-            mt_init_transportation(url);
+            mt_file_init_transportation(url);
             transportation_stream = transportation_streams.get(url);
 
             transportation_stream.transportation_queue[transportation_stream.transportation_queue_len] = buffer;
@@ -119,6 +119,6 @@ export function mt_ws_transport(url, buffer)
         }
         return;
     }
-    mt_inob_send(transportation_stream.transportation_socket, buffer, buffer.byteLength, url);
+    mt_file_inob_send(transportation_stream.transportation_socket, buffer, buffer.byteLength, url);
     //console.log("transported buffer");
 }

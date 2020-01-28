@@ -19,8 +19,8 @@ const Logger = createLogger("ApiNetworker", {
 })
 
 export class ApiNetworker extends Networker {
-    constructor(auth) {
-        super(auth)
+    constructor(auth, setProcessor = true) {
+        super(auth, setProcessor)
         this.messageProcessor = new MessageProcessor({
             networker: this
         })
