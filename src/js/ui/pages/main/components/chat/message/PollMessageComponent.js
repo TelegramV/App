@@ -1,6 +1,6 @@
-import Component from "../../../../../v/vrdom/component"
+import Component from "../../../../../v/vrdom/Component"
 import MTProto from "../../../../../../mtproto"
-import MessageWrapperComponent from "./common/MessageWrapperComponent"
+import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import RadioComponent from "../../input/radioComponent"
 import CheckboxComponent from "../../input/checkboxComponent"
 
@@ -51,14 +51,14 @@ export default class PollMessageComponent extends Component {
         let classes = "poll" + (this.isVoted() ? " voted" : "");
         let type = this.quiz ? "Quiz" : this.public ? "Public poll" : "Anonymous poll";
         return (
-            <MessageWrapperComponent message={this.props.message} contextActions={this.contextActions}>
+            <MessageWrapperFragment message={this.props.message} contextActions={this.contextActions}>
                 <div class={classes}>
                     <div class="question">{this.poll.question}</div>
                     <div class="poll-type">{type}</div>
                     {this._prepareAnswerBlock()}
                     {footer}
                 </div>
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         )
     }
 

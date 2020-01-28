@@ -1,4 +1,4 @@
-import Component from "../../../../v/vrdom/component";
+import Component from "../../../../v/vrdom/Component";
 
 export class ObjectWithThumbnailComponent extends Component {
     constructor(props) {

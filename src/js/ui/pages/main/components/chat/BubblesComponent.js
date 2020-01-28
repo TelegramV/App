@@ -2,9 +2,8 @@ import AppEvents from "../../../../../api/eventBus/AppEvents"
 import {isElementInViewport} from "../../../../utils/index"
 
 import MessageComponent from "./../../messages/newMessage"
-import Component from "../../../../v/vrdom/component"
-import VRDOM from "../../../../v/vrdom"
-import {vrdom_deepDeleteRealNodeInnerComponents} from "../../../../v/vrdom/patch"
+import Component from "../../../../v/vrdom/Component"
+import VRDOM from "../../../../v/vrdom/VRDOM"
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import type {Message} from "../../../../../api/messages/Message"
 
@@ -46,7 +45,7 @@ class BubblesComponent extends Component {
 
         function onIntersection(entries) {
             entries.forEach(entry => {
-                entry.target.style.opacity = entry.intersectionRatio > 0 ? 1 : 0
+                // entry.target.style.opacity = entry.intersectionRatio > 0 ? 1 : 0
             })
         }
 
@@ -192,7 +191,7 @@ class BubblesComponent extends Component {
     _clearBubbles() {
         this.state.renderedMessages.clear()
 
-        vrdom_deepDeleteRealNodeInnerComponents(this.elements.$bubblesInner)
+        VRDOM.deleteInner(this.elements.$bubblesInner)
     }
 
     _markAllAsRead() {

@@ -1,45 +1,28 @@
-import vrdom_createElement from "./createElement"
-import VRDOM from "./index"
-
-const jsxAttributesMap = new Map([
-    ["className", "class"],
-    ["htmlFor", "for"],
-    ["xlinkHref", "xlink:href"],
-])
-
-const classAttrProcessor = value => {
-    if (Array.isArray(value)) {
-        return value.join(" ")
-    } else if (typeof value === "object") {
-        return Object.entries(value)
-            .filter(attr => attr[1])
-            .map(attr => attr[0])
-            .join(" ")
-    } else {
-        return value
-    }
-}
-
-const attrProcessorsMap = new Map([
-    ["class", classAttrProcessor]
-])
+import type {VRAttrs, VREvents, VRNodeProps, VRTagName} from "../types/types"
+import VRNode from "../VRNode"
+import attrAliases from "./attrAliases"
+import attrProcessors from "./attrProcessors/attrProcessors"
+import vrdom_createElement from "../createElement"
+import VRDOM from "../VRDOM"
 
 /**
+ * JSX Translator
+ *
  * @param tagName
  * @param attributes
  * @param children
- * @return {VRNode}
  */
-function vrdom_jsx(tagName, attributes, ...children) {
+function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<VRNode | VRNodeProps>) {
     if (tagName === VRDOM.Fragment) {
         throw new Error("fragments are not implemented")
     }
 
+    // $ignore
     children = children.flat(Infinity)
 
-    const attrs = {}
-    const events = new Map()
-    let dangerouslySetInnerHTML = false
+    const attrs: VRAttrs = Object.create(null)
+    const events: VREvents = new Map()
+    let dangerouslySetInnerHTML: boolean = false
 
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
@@ -48,6 +31,7 @@ function vrdom_jsx(tagName, attributes, ...children) {
             if (key.startsWith("on")) {
                 events.set(key.substring(2).toLowerCase(), v)
             } else if (key === "dangerouslySetInnerHTML" || key === "dangerouslysetinnerhtml") {
+                // $ignore
                 dangerouslySetInnerHTML = v
                 attrs["f-dsil"] = true
             } else if (key.startsWith("css-")) {
@@ -62,16 +46,16 @@ function vrdom_jsx(tagName, attributes, ...children) {
                     attrs.style = `${styleKey}: ${v};`
                 }
             } else {
-                if (jsxAttributesMap.has(k)) {
-                    key = jsxAttributesMap.get(k)
+                if (attrAliases.has(k)) {
+                    key = attrAliases.get(k)
                     attrs[key] = v
                 } else {
                     attrs[key] = v
                 }
             }
 
-            if (attrProcessorsMap.has(key)) {
-                attrs[key] = attrProcessorsMap.get(key)(v)
+            if (attrProcessors.has(key)) {
+                attrs[key] = attrProcessors.get(key)(v)
             }
         }
     }
@@ -79,6 +63,7 @@ function vrdom_jsx(tagName, attributes, ...children) {
     return vrdom_createElement(tagName, {
         attrs,
         events,
+        // $ignore
         children,
 
         dangerouslySetInnerHTML

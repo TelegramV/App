@@ -1,4 +1,4 @@
-import Component from "../../../../../v/vrdom/component";
+import Component from "../../../../../v/vrdom/Component";
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 import {askForFile} from "../../../../../utils";
 import Random from "../../../../../../mtproto/utils/random";

@@ -3,10 +3,11 @@ import {ChatInputManager} from "../../chatInput/ChatInputComponent";
 import {MessageAvatarComponent} from "./MessageAvatarComponent"
 import {InlineKeyboardComponent} from "./InlineKeyboardComponent";
 import {ReplyFragment} from "./ReplyFragment"
+import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 
 const ReplyToMessageFragment = ({message}) => {
     if (!message.raw.reply_to_msg_id) {
-        return <ReplyFragment id={`message-${message.id}-rpl`} show={false}/>
+        return ""
     } else if (!message.replyToMessage) {
         return <ReplyFragment id={`message-${message.id}-rpl`} show={true}/>
     }
@@ -19,7 +20,7 @@ const ReplyToMessageFragment = ({message}) => {
     )
 }
 
-const MessageWrapperComponent = ({message, transparent = false, slot, noPad = false, contextActions}) => {
+const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, contextActions}) => {
     const defaultContextActions = [
         {
             icon: "reply",
@@ -90,6 +91,7 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
                         <ReplyToMessageFragment message={message}/>
 
                         <div className={messageClasses}>
+                            <ForwardedHeaderFragment message={message}/>
                             {slot}
                         </div>
                     </div>
@@ -112,6 +114,7 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
                     <ReplyToMessageFragment message={message}/>
 
                     <div className={messageClasses}>
+                        <ForwardedHeaderFragment message={message}/>
                         {slot}
                     </div>
                 </div>
@@ -122,4 +125,4 @@ const MessageWrapperComponent = ({message, transparent = false, slot, noPad = fa
     )
 }
 
-export default MessageWrapperComponent
+export default MessageWrapperFragment

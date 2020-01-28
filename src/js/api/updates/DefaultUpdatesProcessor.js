@@ -8,7 +8,7 @@ import {tsNow} from "../../mtproto/timeManager"
  * @return {boolean}
  */
 function hasUpdatePts(rawUpdate) {
-    return rawUpdate.hasOwnProperty("pts")
+    return rawUpdate.pts !== undefined
 }
 
 /**
@@ -16,7 +16,7 @@ function hasUpdatePts(rawUpdate) {
  * @return {boolean}
  */
 function hasUpdatePtsCount(rawUpdate) {
-    return rawUpdate.hasOwnProperty("pts_count")
+    return rawUpdate.pts_count !== undefined
 }
 
 

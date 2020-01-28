@@ -61,6 +61,13 @@ if (isProduction) {
     window.StickerManager = StickerManager
 }
 
+console.log(
+    <div>
+        <span>text</span>
+        <a ref="some" href="http://google.com">Google</a>
+    </div>
+)
+
 startUI()
 loadSchema().then(() => {
     MTProto.connect(authContext)

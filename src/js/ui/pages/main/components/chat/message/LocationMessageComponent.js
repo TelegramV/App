@@ -1,6 +1,6 @@
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 import {MessageType} from "../../../../../../api/messages/Message"
-import MessageWrapperComponent from "./common/MessageWrapperComponent"
+import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import MapComponent from "./common/MapComponent"
 
 class LocationMessageComponent extends GeneralMessageComponent {
@@ -18,10 +18,10 @@ class LocationMessageComponent extends GeneralMessageComponent {
         }
 
         return (
-            <MessageWrapperComponent message={this.message} noPad>
+            <MessageWrapperFragment message={this.message} noPad>
                 {venue}
                 <MapComponent map={geo}/>
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         )
     }
 }

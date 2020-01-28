@@ -1,13 +1,15 @@
-import {VRNode} from "./VRNode"
-import {ComponentVRNode} from "./componentVRNode"
-import Component from "./component"
+import type {VRNodeProps, VRTagName} from "./types/types"
+import Component from "./Component"
+import ComponentVRNode from "./ComponentVRNode"
+import VRNode from "./VRNode"
 
 /**
- * @param {function} tagName
+ * Creates VRNode
+ *
+ * @param tagName
  * @param props
- * @return {VRNode|ComponentVRNode}
  */
-function vrdom_createElement(tagName, props) {
+function vrdom_createElement(tagName: VRTagName, props: VRNodeProps): VRNode | ComponentVRNode {
     if (typeof tagName === "function") {
         if (tagName.prototype instanceof Component) {
             return new ComponentVRNode(tagName, props.attrs, props.children)
@@ -15,6 +17,8 @@ function vrdom_createElement(tagName, props) {
             return tagName({...props.attrs, slot: props.children})
         }
     }
+
+    // console.log("creating", tagName)
 
     return new VRNode(tagName, props)
 }

@@ -1,6 +1,6 @@
-import Component from "../../../../../v/vrdom/component"
+import Component from "../../../../../v/vrdom/Component"
 import {FileAPI} from "../../../../../../api/fileAPI"
-import MessageWrapperComponent from "./common/MessageWrapperComponent"
+import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import TextWrapperComponent from "./common/TextWrapperComponent"
 
 import AudioManager from "../../../../../audioManager"
@@ -93,7 +93,7 @@ export default class VoiceMessageComponent extends Component {
 
     h() {
         return (
-            <MessageWrapperComponent message={this.props.message}>
+            <MessageWrapperFragment message={this.props.message}>
                 <div class="audio">
                     <div class="play tgico tgico-play" onMouseDown={this._playButtonClick.bind(this)}/>
                     <div class="audio-wrapper">
@@ -117,7 +117,7 @@ export default class VoiceMessageComponent extends Component {
                     </div>
                 </div>
                 <TextWrapperComponent message={this.props.message}/>
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         );
     }
 

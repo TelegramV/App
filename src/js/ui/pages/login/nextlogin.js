@@ -9,7 +9,7 @@ import {DropdownComponent} from "../main/components/input/dropdownComponent";
 import {InputComponent} from "../main/components/input/inputComponent";
 import CheckboxComponent from "../main/components/input/checkboxComponent";
 import {ButtonWithProgressBarComponent} from "../main/components/input/buttonComponent";
-import Component from "../../v/vrdom/component";
+import Component from "../../v/vrdom/Component";
 import AppConfiguration from "../../../configuration";
 import UpdatesManager from "../../../api/updates/updatesManager";
 import {tsNow} from "../../../mtproto/timeManager";

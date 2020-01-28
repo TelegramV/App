@@ -1,4 +1,4 @@
-import MessageWrapperComponent from "./common/MessageWrapperComponent"
+import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 
 class UnsupportedMessageComponent extends GeneralMessageComponent {
@@ -7,10 +7,10 @@ class UnsupportedMessageComponent extends GeneralMessageComponent {
         const username = this.message.from.name && !this.message.isPost && !this.message.isOut
 
         return (
-            <MessageWrapperComponent ref={`msg-${this.message.id}`} message={this.message}>
+            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message}>
                 {username ? <div className="username">{this.message.from.name}</div> : ""}
                 <i>Unsupported Message</i>
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         )
     }
 }

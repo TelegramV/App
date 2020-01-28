@@ -1,16 +1,18 @@
-// @flow
-
-import Component from "../../../../../../v/vrdom/component"
+import Component from "../../../../../../v/vrdom/Component"
 import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 import {EventBus} from "../../../../../../../api/eventBus/EventBus"
 import type {Message} from "../../../../../../../api/messages/Message"
 import {ReplyFragment} from "./ReplyFragment"
+import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 
 class GeneralMessageComponent extends Component {
 
     message: Message
     prevReadStatus: boolean = false
     intersectionObserver: IntersectionObserver
+
+    editedIdPrefix = "msg-edited-"
+    readIdPrefix = "msg-read-"
 
     init() {
         this.intersectionObserver = this.props.intersectionObserver
@@ -26,13 +28,15 @@ class GeneralMessageComponent extends Component {
 
     mounted() {
         this.message.show()
-        this.intersectionObserver.observe(this.$el)
+        if (this.intersectionObserver) {
+            this.intersectionObserver.observe(this.$el)
+        }
     }
 
     reactiveChanged(key: *, value: *, event: *) {
         if (key === "message") {
-            if (event.type === "show" || event.type === "edit") {
-                this.__patch()
+            if (event.type === "edit") {
+                this.onEdit()
             } else if (event.type === "replyToMessageFound") {
                 if (this.__.mounted) {
                     VRDOM.patch(
@@ -44,8 +48,19 @@ class GeneralMessageComponent extends Component {
                             text={this.message.replyToMessage.text}/>
                     )
                 }
+            } else if (event.type === "forwardedNameOnlyFound" || event.type === "forwardedUserFound" || event.type === "forwardedChannelFound") {
+                if (this.__.mounted) {
+                    VRDOM.patch(
+                        this.$el.querySelector(`#message-${this.message.id}-fwd`),
+                        <ForwardedHeaderFragment message={this.message}/>
+                    )
+                }
             }
         }
+    }
+
+    onEdit() {
+        this.__patch()
     }
 
     eventFired(bus: EventBus, event: any): boolean {
@@ -72,7 +87,9 @@ class GeneralMessageComponent extends Component {
     }
 
     destroy() {
-        this.intersectionObserver.unobserve(this.$el)
+        if (this.intersectionObserver) {
+            this.intersectionObserver.unobserve(this.$el)
+        }
     }
 }
 

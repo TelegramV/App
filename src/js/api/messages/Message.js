@@ -50,6 +50,9 @@ export interface Message {
     +isLegacy: boolean;
     +isEditHide: boolean;
     +replyToMessage: Message;
+    +replyToMessage: Message;
+    +forwarded: any;
+    +forwardedMessageId: number;
 
     +prefix: string; // why this is here??
 

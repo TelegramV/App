@@ -1,7 +1,8 @@
-import MessageWrapperComponent from "./common/MessageWrapperComponent";
+import MessageWrapperFragment from "./common/MessageWrapperFragment";
 import MessageTimeComponent from "./common/MessageTimeComponent"
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
+import VRDOM from "../../../../../v/vrdom/VRDOM"
 
 // this is needed to make direct patches without patching full component
 const StickerFragment = ({id, url, w, h}) => {
@@ -14,7 +15,8 @@ const StickerFragment = ({id, url, w, h}) => {
         return <img id={id}
                     className="sticker"
                     src={url} css-width={`${w}px`}
-                    css-height={`${h}px`} alt="Sticker"/>
+                    css-height={`${h}px`}
+                    alt="Sticker"/>
     }
 }
 
@@ -30,7 +32,7 @@ class StickerMessageComponent extends GeneralMessageComponent {
         this.calculateSize()
 
         return (
-            <MessageWrapperComponent message={this.message} transparent={true} noPad>
+            <MessageWrapperFragment message={this.message} transparent={true} noPad>
 
                 <StickerFragment id={`sticker-${this.message.id}`}
                                  url={this.message.srcUrl}
@@ -39,7 +41,7 @@ class StickerMessageComponent extends GeneralMessageComponent {
 
                 <MessageTimeComponent message={this.message} bg={true}/>
 
-            </MessageWrapperComponent>
+            </MessageWrapperFragment>
         )
     }
 
@@ -54,7 +56,7 @@ class StickerMessageComponent extends GeneralMessageComponent {
     }
 
     patchSticker() {
-        VRDOM.patch(this.$sticker, <StickerFragment id={`#sticker-${this.message.id}`}
+        VRDOM.patch(this.$sticker, <StickerFragment id={`sticker-${this.message.id}`}
                                                     url={this.message.srcUrl}
                                                     w={this.width}
                                                     h={this.height}/>)

@@ -1,6 +1,6 @@
 import {FileAPI} from "../../../../../api/fileAPI";
 import {ObjectWithThumbnailComponent} from "./objectWithThumbnailComponent";
-import VRDOM from "../../../../v/vrdom";
+import VRDOM from "../../../../v/vrdom/VRDOM";
 
 const loadObject = (video, onProgress) => {
     // FileAPI.getFile(message.media.document, "").then(data => {

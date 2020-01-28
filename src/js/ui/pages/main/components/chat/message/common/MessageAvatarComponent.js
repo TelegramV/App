@@ -1,4 +1,4 @@
-import Component from "../../../../../../v/vrdom/component"
+import Component from "../../../../../../v/vrdom/Component"
 import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 
 export class MessageAvatarComponent extends Component {

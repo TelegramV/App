@@ -2,7 +2,7 @@ import {UserPeer} from "../../../../../api/dataObjects/peer/UserPeer"
 import {DialogTextComponent} from "./DialogTextComponent"
 import V from "../../../../v/VFramework"
 import {DialogAvatarComponent} from "./DialogAvatarComponent"
-import Component from "../../../../v/vrdom/component"
+import Component from "../../../../v/vrdom/Component"
 import AppEvents from "../../../../../api/eventBus/AppEvents"
 import {tsNow} from "../../../../../mtproto/timeManager"
 import {ContextMenuManager} from "../../../../contextMenuManager";

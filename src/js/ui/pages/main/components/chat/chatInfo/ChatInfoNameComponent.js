@@ -1,5 +1,5 @@
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
-import Component from "../../../../../v/vrdom/component"
+import Component from "../../../../../v/vrdom/Component"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 
 class ChatInfoNameComponent extends Component {
