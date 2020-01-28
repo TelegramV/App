@@ -381,6 +381,7 @@
                 height: 56px;
                 flex-direction: row;
                 align-items: center;
+                position: relative;
 
                 .play {
                     background-color: $blue;
@@ -403,12 +404,65 @@
                     }
                 }
 
+                .progress-circular {
+                    position: absolute;
+                    width: 50px;
+                    height: 50px;
+                    color: white;
+                }
+
                 .audio-wrapper {
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
                     padding: 0 10px;
                     height: 100%;
+                    flex-grow: 1;
+                    min-width: 200px;
+                    
+                    .audio-name {
+                        font-weight: bold;
+                        text-overflow: ellipsis;
+                    }
+                    .progress-container {
+                        padding: 0 1px;
+                        .progress-wrapper {
+                            position: relative;
+                            .progress-line {
+                                width: 100%;
+                                height: 4px;
+                                margin: 5px 0;
+                                border-radius: 2px;
+                                background-color: $grey;
+                            }
+                            .listened-wrapper {
+                                display: flex;
+                                width: 100%;
+                                height: 14px;
+                                position: absolute;
+                                top: -5px;
+                                align-items: center;
+                                cursor: pointer;
+
+                                .listened {
+                                    width: 1%;
+                                    height: 4px;
+                                    border-radius: 2px;
+                                    background-color: $blue;
+                                }
+                                .control-ball {
+                                    width: 10px;
+                                    height: 10px;
+                                    border-radius: 5px;
+                                    background-color: $blue;
+                                    cursor: pointer;
+
+                                    margin-left: -5px;
+
+                                }
+                            }
+                        }
+                    }
 
                     svg {
                         height: 50%;

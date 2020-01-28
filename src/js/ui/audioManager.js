@@ -1,5 +1,3 @@
-const mm = require("music-metadata-browser");
-
 import VoiceMessageComponent from "./pages/main/components/chat/message/VoiceMessageComponent"
 
 class AudioManager0 {
@@ -45,20 +43,23 @@ class AudioManager0 {
             navigator.mediaSession.playbackState = "none";
             return;
         } else {
-            if(this.active.isPlaying()) {
-                navigator.mediaSession.playbackState = "playing";
-            } else {
-                navigator.mediaSession.playbackState = "paused";
-            }
+            this.update();
         }
         this.hasMeta = !!this.active.getMeta;
         this.updateBrowserMeta();
     }
 
     pause() {
-        console.log(this.active);
         if(this.active) {
             this.active.pause();
+            navigator.mediaSession.playbackState = "paused";
+        }
+    }
+
+    update() {
+        if(this.active.isPlaying()) {
+            navigator.mediaSession.playbackState = "playing";
+        } else {
             navigator.mediaSession.playbackState = "paused";
         }
     }
@@ -68,32 +69,10 @@ class AudioManager0 {
         this.active = null;
     }
 
-    async _extractMetadata() {
-        if(!this.active) return;
-        if(!this.hasMeta) {
-            let url = this.active.getURL();
-            return mm.fetchFromUrl(url).then(metadata => {
-                let pictureURL = metadata.common.picture ?
-                 URL.createObjectURL(new Blob([metadata.common.picture[0].data], {type: 'image/png'}))
-                 : undefined;
-                return {
-                    title: metadata.common.title || "Telegram",
-                    artist: metadata.common.artist || "Unknown artist",
-                    album: metadata.common.album || "",
-                    artwork: [{
-                        src: pictureURL,
-                        sizes: "192x192" //hardcoded, todo: get image size
-                    }]
-                }
-            })
-        } else {
-            return this.active.getMeta();
-        }
-    }
-
-    updateBrowserMeta(meta) {
+    updateBrowserMeta() {
         if(!navigator.mediaSession) return;
-        this._extractMetadata().then(meta => {
+        this.active.getMeta().then(meta => {
+            if(!meta || !meta.artwork) return;
             for(const artwork of meta.artwork) {
                 if(!artwork.src) artwork.src = "./static/images/logo-192x192.png";
             }

@@ -121,10 +121,6 @@ export default class VoiceMessageComponent extends Component {
         );
     }
 
-    getURL() {
-        return this.audioURL;
-    }
-
     getMeta() {
         return new Promise(async (resolve, reject) => {
             let message = this.props.message;

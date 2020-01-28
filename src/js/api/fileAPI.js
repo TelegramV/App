@@ -133,6 +133,19 @@ export class FileAPI {
         return file.sizes[0]
     }
 
+    static getThumbSize(file) {
+        if(!file.thumbs) return undefined;
+        for(const thumb of file.thumbs) {
+            if(thumb._ !== "photoSize") continue;
+            return {
+                w: thumb.w,
+                h: thumb.h
+            }
+        }
+        
+        return undefined;
+    }
+
     static getAttribute(file, attribute) {
         return file.attributes && file.attributes.find(l => l._ === attribute)
     }
