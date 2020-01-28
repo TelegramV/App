@@ -31,9 +31,9 @@ export class PeerApi {
             offset_date: props.offset_date || 0,
             add_offset: props.add_offset || 0,
             limit: props.limit || 50,
-            max_id: props.max_id ||0,
-            min_id: props.min_id ||0,
-            hash: props.hash ||0
+            max_id: props.max_id || 0,
+            min_id: props.min_id || 0,
+            hash: props.hash || 0
         })
 
 
@@ -69,6 +69,8 @@ export class PeerApi {
 
     fetchNextPage() {
         let oldest = this._peer.dialog.messages.oldest
+
+        console.log(oldest)
 
         return this.getHistory({offset_id: oldest.id}).then(messages => {
             if (messages.length > 0) {

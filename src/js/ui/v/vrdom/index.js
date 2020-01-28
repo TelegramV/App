@@ -7,7 +7,7 @@ import vrdom_append from "./appendChild"
 import vrdom_prepend from "./prependChild"
 
 /**
- * Virtual DOM that operates on Real DOM and does not save previous rendered node.
+ * Virtual DOM that operates on Real DOM and does not save previous rendered state.
  *
  * @author kohutd
  */

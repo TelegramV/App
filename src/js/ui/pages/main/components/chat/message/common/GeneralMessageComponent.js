@@ -13,6 +13,9 @@ class GeneralMessageComponent extends Component {
     prevReadStatus: boolean = false
     intersectionObserver: IntersectionObserver
 
+    editedIdPrefix = "msg-edited-"
+    readIdPrefix = "msg-read-"
+
     init() {
         this.intersectionObserver = this.props.intersectionObserver
         this.message = this.props.message

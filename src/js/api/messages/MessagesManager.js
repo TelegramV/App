@@ -133,7 +133,7 @@ class MessageManager extends Manager {
             const to = this.getToPeerMessage(update.message)
 
             if (to) {
-                const message = to.dialog.messages.data.get(update.message.id)
+                const message = to.dialog.messages.get(update.message.id)
 
                 if (message) {
                     message.fillRaw(update.message)
@@ -151,7 +151,7 @@ class MessageManager extends Manager {
             const to = this.getToPeerMessage(update.message)
 
             if (to) {
-                const message = to.dialog.messages.data.get(update.message.id)
+                const message = to.dialog.messages.get(update.message.id)
 
                 if (message) {
                     message.fillRaw(update.message)

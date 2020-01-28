@@ -68,7 +68,7 @@ class Component {
         /**
          * Real DOM element with which component is associated
          *
-         * If not present there is a good reason to delete component completely by using `__delete`
+         * If not present then there is a good reason to delete component completely by using `__delete`
          *
          * @type {Element}
          */

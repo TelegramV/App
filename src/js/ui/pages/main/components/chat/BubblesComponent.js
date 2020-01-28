@@ -46,7 +46,7 @@ class BubblesComponent extends Component {
 
         function onIntersection(entries) {
             entries.forEach(entry => {
-                entry.target.style.opacity = entry.intersectionRatio > 0 ? 1 : 0
+                // entry.target.style.opacity = entry.intersectionRatio > 0 ? 1 : 0
             })
         }
 

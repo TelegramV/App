@@ -3,7 +3,7 @@
  *
  * @see AppSelectedPeer.Reactive
  *
- * @param {function(function(*))} callback анонімна функція, що приймає за параметр обробника реактивного оновлення. В компонентах він або патчить (__patch), або викликає changed.
+ * @param {function(function(*))} callback анонімна функція, що приймає за параметр обробника реактивного оновлення. В компонентах він або патчить (__patch), або викликає reactiveChanged.
  * @param {function(function(*))} offCallback анонімна функція, приймає обробника (того самого що в попередньому параметрі) параметром, якого має видаляти з нижчого (чи вищого, я запутався) рівня і більше НІКОЛИ не виконувати. Викликається під час видалення компонента.
  * @return {{Default: *, FireOnly: *, PatchOnly: *}}
  */
@@ -18,7 +18,7 @@ function ReactiveCallback(callback, offCallback) {
 
     return {
         /**
-         * Means that both `__patch` and `changed` will be called.
+         * Means that both `__patch` and `reactiveChanged` will be called.
          *
          * @return {*}
          */
@@ -34,7 +34,7 @@ function ReactiveCallback(callback, offCallback) {
         },
 
         /**
-         * Means that the only `changed` will be called. No re-rendering.
+         * Means that the only `reactiveChanged` will be called. No re-rendering.
          *
          * @return {*}
          */

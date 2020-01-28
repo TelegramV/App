@@ -93,7 +93,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     findReplyTo() {
         if (!this.replyToMessage && this.raw.reply_to_msg_id) {
-            const replyToMessage = this.dialog.messages.data.get(this.raw.reply_to_msg_id)
+            const replyToMessage = this.dialog.messages.get(this.raw.reply_to_msg_id)
 
             if (replyToMessage) {
                 this.replyToMessage = replyToMessage
@@ -105,7 +105,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
                     limit: 1
                 }).then(messages => {
                     if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
-                        this.dialog.messages.appendSingle(messages[0])
+                        this.dialog.messages.appendOtherSingle(messages[0])
                         this.replyToMessage = messages[0]
                         this.fire("replyToMessageFound")
                     }
@@ -148,7 +148,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         this.prefix = MessageParser.getDialogPrefix(this)
 
         // reply
-        const replyToMessage = this.dialog.messages.data.get(this.raw.reply_to_msg_id)
+        const replyToMessage = this.dialog.messages.get(this.raw.reply_to_msg_id)
         if (replyToMessage) {
             this.replyToMessage = replyToMessage
         }

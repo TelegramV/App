@@ -1,4 +1,6 @@
 import AppSelectedPeer from "../../../ui/reactive/SelectedPeer"
+import {Dialog} from "./Dialog"
+import type {Message} from "../../messages/Message"
 
 /**
  * @property {Message} _lastMessage
@@ -6,40 +8,24 @@ import AppSelectedPeer from "../../../ui/reactive/SelectedPeer"
  */
 export class DialogMessages {
 
-    /**
-     * @type Dialog
-     */
-    _dialog = undefined
+    _dialog: Dialog = undefined
 
-    /**
-     * @type {Map<number, Message>}
-     */
-    _messages = new Map
+    _messages: Map<number, Message> = new Map
+    _otherMessages: Map<number, Message> = new Map // replies etc.
+    _sortedArray: Array<Message> = []
+    _alreadySorted: boolean = false
 
-    /**
-     * @type {Message|undefined}
-     * @private
-     */
-    _prevLastMessage = undefined
+    _prevLastMessage: Message = undefined
+    _lastMessage: Message = undefined
 
-    /**
-     * @type {Message|undefined}
-     * @private
-     */
-    _lastMessage = undefined
+    _unreadIds: Set<number> = new Set()
+    _unreadCount: number = 0
 
-    _sortedArray = []
+    _readOutboxMaxId: number = 0
+    _readInboxMaxId: number = 0
+    _unreadMentionsCount: number = 0
 
-    _alreadySorted = false
-
-    _unreadIds
-
-    _unreadCount
-    _readOutboxMaxId
-    _readInboxMaxId
-    _unreadMentionsCount
-
-    _fireTransaction = false
+    _fireTransaction: boolean = false
 
     /**
      * @param {Dialog} dialog
@@ -60,35 +46,31 @@ export class DialogMessages {
 
         this.appendMany(messages)
 
-        this._sortedArray = []
-        this._alreadySorted = false
-
         this._unreadIds = new Set()
         this._unreadCount = unreadCount || 0
         this._readOutboxMaxId = readOutboxMaxId || 0
         this._readInboxMaxId = readInboxMaxId || 0
-        this._unreadMentionsCount = unreadMentionsCount
+        this._unreadMentionsCount = unreadMentionsCount || 0
 
         this._fireTransaction = false
     }
 
-    /**
-     * @return {Map<number, Message>}
-     */
-    get data() {
+    get messages(): Map<number, Message> {
         return this._messages
     }
 
-    /**
-     * @return {Message}
-     */
-    get last() {
+    get otherMessages(): Map<number, Message> {
+        return this._otherMessages
+    }
+
+    get(id: number): Message | undefined {
+        return this._messages.get(id) || this._otherMessages.get(id)
+    }
+
+    get last(): Message | undefined {
         return this._lastMessage || this._prevLastMessage || this.sortedArray[this.sortedArray.length - 1]
     }
 
-    /**
-     * @param {Message} message
-     */
     set last(message) {
         if (!this._lastMessage || message.date >= this._lastMessage.date) {
             this._prevLastMessage = this._lastMessage
@@ -96,17 +78,11 @@ export class DialogMessages {
         }
     }
 
-    /**
-     * @return {Message}
-     */
-    get oldest() {
+    get oldest(): Message | undefined {
         return this.sortedArray[0]
     }
 
-    /**
-     * @return {Message[]}
-     */
-    get sortedArray() {
+    get sortedArray(): Array<Message> {
         if (!this._alreadySorted) {
             this._sortedArray = this._sortMessagesArray(Array.from(this._messages.values()))
 
@@ -116,17 +92,11 @@ export class DialogMessages {
         return this._sortedArray
     }
 
-    /**
-     * @return {number}
-     */
-    get unreadCount() {
+    get unreadCount(): number {
         return this._unreadCount + this._unreadIds.size
     }
 
-    /**
-     * @param {number} unreadCount
-     */
-    set unreadCount(unreadCount) {
+    set unreadCount(unreadCount: number) {
         this._unreadCount = unreadCount
 
         if (!this.isTransaction) {
@@ -134,17 +104,11 @@ export class DialogMessages {
         }
     }
 
-    /**
-     * @return {number}
-     */
-    get unreadMentionsCount() {
+    get unreadMentionsCount(): number {
         return this._unreadMentionsCount
     }
 
-    /**
-     * @param {number} unreadMentionsCount
-     */
-    set unreadMentionsCount(unreadMentionsCount) {
+    set unreadMentionsCount(unreadMentionsCount: number) {
         this._unreadMentionsCount = unreadMentionsCount || this._unreadMentionsCount
 
         if (!this.isTransaction) {
@@ -152,17 +116,14 @@ export class DialogMessages {
         }
     }
 
-    /**
-     * @return {number}
-     */
-    get readOutboxMaxId() {
+    get readOutboxMaxId(): number {
         return this._readOutboxMaxId
     }
 
     /**
      * @param {number} readOutboxMaxId
      */
-    set readOutboxMaxId(readOutboxMaxId) {
+    set readOutboxMaxId(readOutboxMaxId: number) {
         this._readOutboxMaxId = readOutboxMaxId || this._readOutboxMaxId
 
         if (!this.isTransaction) {
@@ -218,17 +179,38 @@ export class DialogMessages {
     }
 
     /**
+     * @param {Message[]} messages
+     */
+    appendOtherMany(messages) {
+        if (messages.length === 0) {
+            return
+        }
+
+        for (const message of messages) {
+            this.appendOtherSingle(message)
+        }
+    }
+
+    /**
      * @param {Message} message
      */
-    appendSingle(message) {
+    appendSingle(message: Message) {
         if (AppSelectedPeer.check(this._dialog.peer)) {
             this._messages.set(message.id, message)
             this._alreadySorted = false
 
             this.last = message
         } else {
+            this._alreadySorted = false
             this.last = message
         }
+    }
+
+    /**
+     * @param {Message} message
+     */
+    appendOtherSingle(message: Message) {
+        this._otherMessages.set(message.id, message)
     }
 
     /**
@@ -236,6 +218,7 @@ export class DialogMessages {
      */
     deleteSingle(messageId) {
         this._messages.delete(messageId)
+        this._otherMessages.delete(messageId)
         this.deleteUnread(messageId)
 
         if (this.last && messageId === this.last.id) {
@@ -320,6 +303,7 @@ export class DialogMessages {
 
     clear() {
         this._messages.clear()
+        this._otherMessages.clear()
     }
 
     /**
