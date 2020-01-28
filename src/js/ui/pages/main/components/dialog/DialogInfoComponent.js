@@ -1,10 +1,7 @@
-import Component from "../../../../v/vrdom/component";
-import MTProto from "../../../../../mtproto";
 import AppSelectedInfoPeer from "../../../../reactive/SelectedInfoPeer";
 import AppEvents from "../../../../../api/eventBus/AppEvents";
-import AppSelectedPeer from "../../../../reactive/SelectedPeer";
 import {UserPeer} from "../../../../../api/dataObjects/peer/UserPeer";
-import {BotPeer} from "../../../../../api/dataObjects/peer/BotPeer";
+import Component from "../../../../v/vrdom/Component";
 
 const DetailsFragment = ({icon, text, label, hidden = false, id}) => {
     return <div className={["details", hidden ? "hidden" : ""]} id={id}>
@@ -137,6 +134,16 @@ export class DialogInfoComponent extends Component {
     }
 
     open(peer) {
+        // MTProto.invokeMethod("messages.search", {
+        //     peer: peer.inputPeer,
+        //     q: "",
+        //     filter: {
+        //         _: "inputMessagesFilterPhotos"
+        //     },
+        //     limit: 100
+        // }).then(l => {
+        //     console.log(l)
+        // })
         this.state.hidden = false
         this.state.peer = peer
 
@@ -150,16 +157,6 @@ export class DialogInfoComponent extends Component {
 
         peer.fetchFull()
         //
-        // MTProto.invokeMethod("messages.search", {
-        //     peer: peer.inputPeer,
-        //     q: "",
-        //     filter: {
-        //         _: "inputMessagesFilterPhotos"
-        //     },
-        //     limit: 100
-        // }).then(l => {
-        //     console.log(l)
-        // })
 
     }
 
