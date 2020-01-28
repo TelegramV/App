@@ -6,6 +6,7 @@ import {BotPeer} from "../../../../../../api/dataObjects/peer/BotPeer"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import Component from "../../../../../v/vrdom/Component"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
+import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer";
 
 const patchEvents = new Set([
     "updateUserStatus",

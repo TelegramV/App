@@ -1,5 +1,6 @@
 import Component from "../../../../../../v/vrdom/Component"
 import AppEvents from "../../../../../../../api/eventBus/AppEvents"
+import AppSelectedInfoPeer from "../../../../../../reactive/SelectedInfoPeer";
 
 export class MessageAvatarComponent extends Component {
 
@@ -18,9 +19,13 @@ export class MessageAvatarComponent extends Component {
 
         return (
             <div className={avatarClasses}
-                 css-background-image={cssBackgroundImage}>
+                 css-background-image={cssBackgroundImage} onClick={this.openPeerInfo}>
                 {letterText}
             </div>
         )
+    }
+
+    openPeerInfo() {
+        AppSelectedInfoPeer.select(this.props.message.from)
     }
 }

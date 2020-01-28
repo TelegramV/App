@@ -3,6 +3,7 @@ import ChatInfoAvatarComponent from "./ChatInfoAvatarComponent"
 import ChatInfoNameComponent from "./ChatInfoNameComponent"
 import Component from "../../../../../v/vrdom/Component"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
+import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer";
 
 class ChatInfoComponent extends Component {
     constructor(props) {
@@ -15,7 +16,7 @@ class ChatInfoComponent extends Component {
 
     h() {
         return (
-            <div id="messages-wrapper-chat-info" className="chat-info">
+            <div id="messages-wrapper-chat-info" className="chat-info" onClick={this.openPeerInfo}>
                 <div className="person">
 
                     <button class="responsive-only-mobile" onClick={this._backToMainPage}>
@@ -35,6 +36,10 @@ class ChatInfoComponent extends Component {
                 </div>
             </div>
         )
+    }
+
+    openPeerInfo() {
+        AppSelectedInfoPeer.select(AppSelectedPeer.Current)
     }
 
     _backToMainPage() {
