@@ -20,7 +20,7 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
     // $ignore
     children = children.flat(Infinity)
 
-    const attrs: VRAttrs = {}
+    const attrs: VRAttrs = Object.create(null)
     const events: VREvents = new Map()
     let dangerouslySetInnerHTML: boolean = false
 

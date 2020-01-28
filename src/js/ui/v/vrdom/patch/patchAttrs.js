@@ -13,7 +13,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs) => {
 
         // $ignore
         for (const name of $el.getAttributeNames()) {
-            if (name !== "data-component-id" && !newAttrs.hasOwnProperty(name)) {
+            if (name !== "data-component-id" && newAttrs[name] === undefined) {
                 $el.removeAttribute(name)
             }
         }

@@ -58,13 +58,13 @@ class SelectedPeer {
          * @type {{Default: Peer, FireOnly: Peer, PatchOnly: Peer}}
          * @private
          */
-        this._Reactive = ReactiveCallback(resolve => {
-            this.subscribe(resolve)
+        this._Reactive = ReactiveCallback(subscription => {
+            this.subscribe(subscription)
             this._previousPeer = this._peer
             this._peer = this.findFromQueryParams(parseHashQuery())
             return this._peer
-        }, resolve => {
-            this.unsubscribe(resolve)
+        }, subscription => {
+            this.unsubscribe(subscription)
         })
 
         // listen query changes

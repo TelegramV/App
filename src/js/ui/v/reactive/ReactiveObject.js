@@ -1,34 +1,23 @@
-type ReactiveObjectSubscriber = (object: this, event: any) => any
+import {TypedPublisher} from "../../../api/eventBus/TypedPublisher"
+import type {BusEvent} from "../../../api/eventBus/EventBus"
 
-export class ReactiveObject {
+type ReactiveObjectSubscription = (object: this, event: any) => any
 
-    /**
-     * @type {Set<function(object: self, event: *)>}
-     * @private
-     */
-    _subscribers: Set<ReactiveObjectSubscriber> = new Set()
+export class ReactiveObject extends TypedPublisher<ReactiveObjectSubscription, BusEvent> {
 
     /**
-     * @param {function(object: self, event: *)} resolve
+     * @param {*} type
+     * @param event
      */
-    subscribe(resolve: ReactiveObjectSubscriber) {
-        this._subscribers.add(resolve)
-    }
+    fire(type: any, event: BusEvent = {}) {
 
-    /**
-     * @param {function(object: self, event: *)} resolve
-     */
-    unsubscribe(resolve: ReactiveObjectSubscriber) {
-        this._subscribers.delete(resolve)
-    }
-
-    /**
-     * @param {string} type
-     * @param props
-     */
-    fire(type: string, props: Object = {}) {
-        this._subscribers.forEach(subscriber => subscriber(this, Object.assign({
+        Object.assign(event, {
             type
-        }, props)))
+        })
+        this._subscriptions.get("*").forEach(subscription => subscription(this, event))
+
+        if (this._subscriptions.has(type)) {
+            this._subscriptions.get(type).forEach(subscription => subscription(this, event))
+        }
     }
 }

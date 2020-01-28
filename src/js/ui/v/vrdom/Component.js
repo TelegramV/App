@@ -23,7 +23,7 @@ import VRDOM from "./VRDOM"
  * V Component
  */
 class Component {
-    __: ComponentMeta = {
+    __: ComponentMeta = Object.assign(Object.create(null), {
         inited: false,
         mounted: false,
         destroyed: false,
@@ -35,7 +35,7 @@ class Component {
         appEventContexts: new Map(),
 
         reactiveInited: false
-    }
+    })
 
     /**
      * Component's name
@@ -262,14 +262,14 @@ class Component {
                         newContext.__obj = true
                         newContext.resolve = (value, event) => this.__resolveReactivePropertyChange(key, value, event)
                         this.__.reactiveContexts.set(key, newContext)
-                        context.subscribe(newContext.resolve)
+                        context.subscribeAny(newContext.resolve)
                     } else if (context.__rc) {
                         console.warn("avoid using reactive callbacks, use reactive objects instead")
                         // $FlowIssue
-                        context.resolve = (value, event) => this.__resolveReactivePropertyChange(key, value, event)
+                        context.subscription = (value, event) => this.__resolveReactivePropertyChange(key, value, event)
                         this.__.reactiveContexts.set(key, context)
                         // $FlowIssue
-                        this.reactive[key] = context.callback(context.resolve)
+                        this.reactive[key] = context.subscribe(context.subscription)
                     } else {
                         console.error(`not reactive value ${key}`, context)
                     }
@@ -310,7 +310,7 @@ class Component {
                     console.error(`BUG: invalid reactive property found while disabling reactive properties. ${key} = ${this.reactive[key]}`)
                 }
             } else {
-                context.offCallback(context.resolve)
+                context.unsubscribe(context.subscription)
             }
         }
 

@@ -13,7 +13,7 @@ export class TLDeserialization {
         schema: schema
     }) {
         this.offset = 0 // in bytes
-        this.override = options.override || {}
+        this.override = options.override || Object.create(null)
 
         this.schema = options.schema || schema
 
@@ -267,7 +267,7 @@ export class TLDeserialization {
 
             let index = this.schema.constructorsIndex
             if (!index) {
-                this.schema.constructorsIndex = index = {}
+                this.schema.constructorsIndex = index = Object.create(null)
                 for (let i = 0; i < this.schema.constructors.length; i++) {
                     index[this.schema.constructors[i].id] = i
                 }
@@ -300,7 +300,8 @@ export class TLDeserialization {
             return this.fetchObject("vector<T>", "vector"); //special case for Vector at root
         }
 
-        let result = {"_": predicate}
+        let result = Object.create(null)
+        result._ = predicate
         let overrideKey = (this.mtproto ? "mt_" : "") + predicate
         let self = this
 
@@ -316,8 +317,9 @@ export class TLDeserialization {
                 param = constructorData.params[i]
                 type = param.type
                 if (type === "#" && result.pFlags === undefined) {
-                    result.pFlags = {}
+                    result.pFlags = Object.create(null)
                 }
+
                 isCond = type.indexOf("?") !== -1
                 if (isCond) {
                     condType = type.split("?")

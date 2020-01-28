@@ -1,10 +1,12 @@
 import VRNode from "../VRNode"
 import {EventBus} from "../../../../api/eventBus/EventBus"
+import type {ReactiveCallbackContext} from "../../reactive/ReactiveCallback"
+import {ReactivePublisher} from "../../../../api/eventBus/ReactivePublisher"
 
 export type VRTagName = string | number | ({ ...VRAttrs, slot?: VRSlot }) => VRNode | Class<Component>
 
 export type VRAttrs = {
-    [key: string]: any
+    [string]: any
 }
 
 export type VREvents =
@@ -33,7 +35,7 @@ export type ComponentMeta = {
     created: boolean,
     mounted: boolean,
     isPatchingItself: boolean,
-    reactiveContexts: Map<string, any>,
+    reactiveContexts: Map<string, ReactiveCallbackContext>,
     appEventContexts: Map<EventBus, Map<string, any>>,
     reactiveInited: boolean,
 }
@@ -45,9 +47,9 @@ export type ComponentProps = {
 }
 
 export type ComponentState = {
-    [key: string]: any
+    [string]: any
 }
 
 export type ComponentReactiveState = {
-    [key: string]: any
+    [string]: ReactiveCallbackContext | ReactivePublisher
 }
