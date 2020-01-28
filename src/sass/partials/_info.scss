@@ -1,18 +1,13 @@
 .dialog-info {
-    max-width: 422px;
-    width: 100%;
     height: 100vh;
-    background-color: white;
-    border-left: 1px $grey solid;
     overflow: hidden;
 
     &:hover {
         overflow-y: overlay;
     }
 
-    .header {
-    	padding: 0 5px;
-        height: 54px;
+    >.header {
+        padding: 8px 14px;
         display: flex;
         align-items: center;
 
@@ -20,21 +15,13 @@
             width: 100%;
             font-size: 20px;
             font-weight: 500;
+            margin-left: 22px;
         }
 
         .tgico {
         	color: $darkgrey;
         	font-size: 24px;
         	flex-shrink: 0;
-        }
-
-        .tgico-close {
-            margin-right: 20px;
-            margin-left: 10px;
-        }
-
-        .tgico-more {
-            margin-right: 10px;
         }
     }
 
@@ -69,12 +56,10 @@
                 margin-top: 10px;
                 color: $blue;
                 font-size: 14px;
-            }
 
-            .subscribers {
-            	margin-top: 10px;
-                color: $darkgrey;
-                font-size: 14px;
+                &.offline {
+                    color: $darkgrey;
+                }
             }
         }
 
@@ -82,6 +67,10 @@
             align-items: center;
             margin: 10px 0 20px 0;
             display: flex;
+
+            &.hidden {
+                display: none;
+            }
 
             .icon {
                 margin-left: 25px;

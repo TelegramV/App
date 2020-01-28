@@ -92,6 +92,13 @@ export class Peer extends ReactiveObject {
         return this.raw.username
     }
 
+    get statusString() {
+        return {
+            text: "...",
+            online: false
+        }
+    }
+
     /**
      * @return {boolean}
      */

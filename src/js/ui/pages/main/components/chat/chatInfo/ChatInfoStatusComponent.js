@@ -28,42 +28,7 @@ class ChatInfoStatusComponent extends Component {
 
         const peer = AppSelectedPeer.Current
 
-        let status = ""
-
-        if (peer.id === 777000) {
-            status = "service notifications"
-        } else if (peer instanceof UserPeer) {
-            if (peer.onlineStatus.status === "bot") {
-                status = peer.onlineStatus.status
-            } else {
-                status = peer.onlineStatus.online ? "online" : "last seen " + peer.onlineStatus.status
-            }
-        } else if (peer instanceof ChannelPeer) {
-            if (peer.full) {
-                const user = peer.full.participants_count === 1 ? "member" : "members"
-                status = `${peer.full.participants_count} ${user}`
-            } else {
-                status = "loading info..."
-            }
-        } else if (peer instanceof SupergroupPeer) {
-            if (peer.full) {
-                const user = peer.full.participants_count === 1 ? "member" : "members"
-                status = `${peer.full.participants_count} ${user}, ${peer.full.online_count} online`
-            } else {
-                status = "loading info..."
-            }
-        } else if (peer instanceof GroupPeer) {
-            if (peer.full) {
-                const user = peer.raw.participants_count === 1 ? "member" : "members"
-                status = `${peer.raw.participants_count} ${user}, ${peer.full.online_count} online`
-            } else {
-                status = "loading info..."
-            }
-        } else if (peer instanceof BotPeer) {
-            status = "bot"
-        }
-
-        return status
+        return peer.statusString.text
     }
 
     h() {

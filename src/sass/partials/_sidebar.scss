@@ -1,0 +1,17 @@
+.sidebar {
+  $border: 1px $lightgrey solid;
+  background-color: #fff;
+  border-right: $border;
+  max-width: 422px;
+  width: 100%;
+  box-sizing: border-box;
+
+  &.hidden {
+    display: none;
+  }
+
+  &.right {
+    border-right: none;
+    border-left: $border;
+  }
+}

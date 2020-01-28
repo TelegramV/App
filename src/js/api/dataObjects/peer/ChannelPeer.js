@@ -23,6 +23,21 @@ export class ChannelPeer extends Peer {
         return "channel"
     }
 
+    get statusString() {
+        let status = ""
+        if (this.full) {
+            const user = this.full.participants_count === 1 ? "member" : "members"
+            status = `${this.full.participants_count} ${user}`
+        } else {
+            status = "loading info..."
+        }
+
+        return {
+            text: status,
+            online: false
+        }
+    }
+
     /**
      * @return {Promise<*>}
      */

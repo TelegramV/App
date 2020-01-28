@@ -32,7 +32,7 @@ export class DialogListComponent extends Component {
 
     h() {
         return (
-            <div className="chatlist">
+            <div className="chatlist sidebar">
                 <div className="toolbar">
                     <i className="btn-icon rp rps tgico-menu" onClick={ev => ContextMenuManager.openBelow([
                         {

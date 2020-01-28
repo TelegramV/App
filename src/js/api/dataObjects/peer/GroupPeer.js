@@ -23,6 +23,21 @@ export class GroupPeer extends Peer {
         })
     }
 
+    get statusString() {
+        let status = ""
+        if (this.full) {
+            const user = this.full.participants_count === 1 ? "member" : "members"
+            status = `${this.full.participants_count} ${user}, ${this.full.online_count} online`
+        } else {
+            status = "loading info..."
+        }
+
+        return {
+            text: status,
+            online: false
+        }
+    }
+
     /**
      * @return {string}
      */

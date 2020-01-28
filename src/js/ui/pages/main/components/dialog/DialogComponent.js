@@ -12,6 +12,8 @@ import {SupergroupPeer} from "../../../../../api/dataObjects/peer/SupergroupPeer
 import {ModalManager} from "../../../../modalManager";
 import {FlatButtonComponent} from "../input/flatButtonComponent";
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
+import {DialogInfoManager} from "./DialogInfoComponent";
+import AppSelectedInfoPeer from "../../../../reactive/SelectedInfoPeer";
 
 const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -67,7 +69,10 @@ export class DialogComponent extends Component {
             },
             {
                 icon: "info",
-                title: this.props.dialog.peer instanceof ChannelPeer ? "View channel info" : (this.props.dialog.peer instanceof GroupPeer || this.props.dialog.peer instanceof SupergroupPeer ? "View group info" : "View profile")
+                title: this.props.dialog.peer instanceof ChannelPeer ? "View channel info" : (this.props.dialog.peer instanceof GroupPeer || this.props.dialog.peer instanceof SupergroupPeer ? "View group info" : "View profile"),
+                onClick: _ => {
+                    AppSelectedInfoPeer.select(this.props.dialog.peer)
+                }
             },
             {
                 icon: this.props.dialog.isMuted ? "unmute" : "mute",

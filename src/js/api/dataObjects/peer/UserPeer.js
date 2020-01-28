@@ -19,6 +19,28 @@ export class UserPeer extends Peer {
         return this.raw.last_name || ""
     }
 
+    /**
+     * @return {*|string|T|boolean}
+     */
+    get phone() {
+        return this.raw.phone
+    }
+
+    get statusString() {
+        let status = ""
+        let online = false
+        if (this.id === 777000) {
+            status = "service notifications"
+        } else {
+            status = this.onlineStatus.online ? "online" : "last seen " + this.onlineStatus.status
+            online = this.onlineStatus.online
+        }
+        return {
+            text: status,
+            online: online
+        }
+    }
+
     get onlineStatus() {
         if (this.isDeleted || !this.raw.status) {
             return {

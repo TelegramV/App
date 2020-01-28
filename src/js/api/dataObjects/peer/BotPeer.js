@@ -7,4 +7,11 @@ export class BotPeer extends UserPeer {
             status: "bot"
         }
     }
+
+    get statusString() {
+        return {
+            text: "bot",
+            online: false
+        }
+    }
 }
