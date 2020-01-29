@@ -21,10 +21,6 @@ export class MonkeyController {
         this.closed = false;
 
         this.trackSym = 0;
-
-        this.frameHandler = this._frameListener.bind(this);
-
-        this.completionHandler = this._completionListener.bind(this);
     }
 
     init(player) {
@@ -42,7 +38,7 @@ export class MonkeyController {
         }
         if (symbols == this.trackSym) return;
 
-        let start = 10;
+        let start = 18;
         let nextFrame = start + symbols * 3;
 
         if (this.trackSym == 0) {
@@ -87,8 +83,8 @@ export class MonkeyController {
             })
 
             // this.animation.play()
-            this.animation.addEventListener("complete", this.completionHandler);
-            this.animation.addEventListener("enterFrame", this.frameHandler);
+            this.animation.addEventListener("loopComplete", this._completionListener.bind(this));
+            this.animation.addEventListener("enterFrame", this._frameListener.bind(this));
         })
     }
 
@@ -158,7 +154,7 @@ export class MonkeyController {
                 that.nextState = that.idle;
             });
         } else { //close -> open
-            this.monkey.play();
+            this.animation.play();
             this.nextState = this.idle;
         }
     }

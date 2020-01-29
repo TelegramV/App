@@ -36,7 +36,7 @@ export default class VoiceMessageComponent extends AudioComponent {
             let peer = message.raw.fwd_from ? await PeersStore.get("user", message.raw.fwd_from.from_id) : message.from;
 
             let chatName = message.dialog.peer.type != "user" ? message.dialog.peer.name : "";
-            let avatar = await peer.photo.fetchBig();
+            let avatar = peer.photo.bigUrl || (await peer.photo.fetchBig());
             resolve ({
                 title: peer.name,
                 artist: "Voice message",
