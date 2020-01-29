@@ -1,136 +1,44 @@
-import Component from "../../../../../v/vrdom/Component"
-import {FileAPI} from "../../../../../../api/fileAPI"
-import MessageWrapperFragment from "./common/MessageWrapperFragment"
-import TextWrapperComponent from "./common/TextWrapperComponent"
+import AudioComponent from "./common/AudioComponent"
 
+import {FileAPI} from "../../../../../../api/fileAPI"
 import AudioManager from "../../../../../audioManager"
 import PeersStore from "../../../../../../api/store/PeersStore"
 
-export default class VoiceMessageComponent extends Component {
+export default class VoiceMessageComponent extends AudioComponent {
     constructor(props) {
-        super(props);
-        let parse = this._parseMessage(this.props.message);
-        this.audioPromise = parse.audio;
-        this.heights = this._waveToArray(parse.waveform);
+    	super(props);
+    	let doc = this.message.raw.media.document;
+        for (const attr of doc.attributes) {
+            if (attr._ == "documentAttributeAudio" && attr.pFlags.voice) {
+                this.waveform = attr.waveform;
+            }
+        }
+        
+        this.heights = this._waveToArray(this.waveform);
         //maybe try another smooth functions?
         this.heights = this._smooth(this.heights, 0.05);
         //TODO adaptive bars count
         this.heights = this._largestTriangleThreeBuckets(this.heights, 50);
 
-        this.duration = parse.duration || 0;
-
-        this.playing = false;
-
         this.barWidth = 2;
         this.barMargin = 2;
 
-        this.skipAnim = false;
-
         this.width = this.heights.length * (this.barWidth + this.barMargin) + this.barMargin * 2;
-
-        this.enterHandler = this._handleEnter.bind(this);
-        this.leaveHandler = this._handleLeave.bind(this);
-        this.moveHandler = this._handleMove.bind(this);
-
-        let onAudio = this._onAudioReady.bind(this);
-        this.audioPromise.then(onAudio);
     }
 
-    _parseMessage(message) {
-        let audio;
-        let waveform;
-        let duration;
-
-        let doc = message.raw.media.document;
-        for (const attr of doc.attributes) {
-            if (attr._ == "documentAttributeAudio" && attr.pFlags.voice) {
-                waveform = attr.waveform;
-                duration = attr.duration;
-            }
-        }
-        audio = FileAPI.getFile(doc);
-        return {
-            audio: audio,
-            waveform: waveform,
-            duration: duration
-        }
-    }
-
-    _onAudioReady(audio) {
-        this.audioURL=audio;
-        this.audio = new Audio(audio);
-        this.audio.addEventListener("timeupdate", this._audioTimeUpdate.bind(this));
-        this.audio.addEventListener("ended", this._playButtonClick.bind(this));
-    }
-
-    setPercent(percent) {
+    updatePercent(percent) {
         this._setAttr(this.progress, "width", percent * this.width + "px");
-    }
-
-    play() {
-        if(!this.audio || this.audio.ended || this.audio.played.length==0) {
-            this.skipAnim = true;
-            this.progress.setAttribute("style", "transition: all 0s ease 0s !important;");
-            this.setPercent(0);
-        }
-        this.playButton.classList.add("tgico-pause");
-        this.playButton.classList.remove("tgico-play");
-        this.playing = true;
-        this.audio.play();
-        AudioManager.set(this);
-    }
-
-    pause() {
-        this.playing = false;
-        this.playButton.classList.remove("tgico-pause");
-        this.playButton.classList.add("tgico-play");
-        this.audio.pause();
-    }
-
-    isPlaying() {
-        return this.playing;
-    }
-
-    h() {
-        return (
-            <MessageWrapperFragment message={this.props.message}>
-                <div class="audio">
-                    <div class="play tgico tgico-play" onMouseDown={this._playButtonClick.bind(this)}/>
-                    <div class="audio-wrapper">
-                        <svg css-width={`${this.width}px`} css-transform="scale(1,-1)"
-                             onMouseEnter={this.enterHandler} onMouseLeave={this.leaveHandler}
-                             onMouseDown={this.moveHandler}>
-                            <defs>
-                                <mask id={`bars-${this.props.message.id}`}>
-                                    {this._generateBars()}
-                                </mask>
-                            </defs>
-                            <rect class="back" x="0" y="0" width={this.width + "px"} height="100%"
-                                  mask={`url(#bars-${this.props.message.id})`}/>
-                            <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%"
-                                  mask={`url(#bars-${this.props.message.id})`}/>
-                        </svg>
-                        <div class="timer">
-                            {this._timeToFormat(this.duration)}
-                            <span class="read"></span>
-                        </div>
-                    </div>
-                </div>
-                <TextWrapperComponent message={this.props.message}/>
-            </MessageWrapperFragment>
-        );
     }
 
     getMeta() {
         return new Promise(async (resolve, reject) => {
             let message = this.props.message;
             let peer = message.raw.fwd_from ? await PeersStore.get("user", message.raw.fwd_from.from_id) : message.from;
-            console.log(message);
 
             let chatName = message.dialog.peer.type != "user" ? message.dialog.peer.name : "";
             let avatar = await peer.photo.fetchBig();
             resolve ({
-                title: peer.name || "Unknown user",
+                title: peer.name,
                 artist: "Voice message",
                 album:  chatName,
                 artwork: [{
@@ -142,60 +50,53 @@ export default class VoiceMessageComponent extends Component {
         })
     }
 
-    _audioTimeUpdate() {
-        if (this.skipAnim) {
-            this.skipAnim = false;
-            this.progress.removeAttribute("style");
-        }
-
-        this.setPercent(this.audio.currentTime / this.audio.duration);
-        this.timer.textContent = this._timeToFormat(this.audio.currentTime);
+    getControls() {
+    	return (
+    		<div class="controls">
+	    		<svg css-width={`${this.width}px`} css-transform="scaleY(-1)"
+	                            onMouseEnter={this._handleEnter.bind(this)} onMouseLeave={this._handleLeave.bind(this)}
+			             		onMouseDown={this._handleMove.bind(this)}>
+		            <defs>
+		                <mask id={`bars-${this.message.id}`}>
+		                    {this._generateBars()}
+		                </mask>
+		            </defs>
+		            <rect class="back" x="0" y="0" width={this.width + "px"} height="100%"
+		                  mask={`url(#bars-${this.message.id})`}/>
+		            <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%"
+		                  mask={`url(#bars-${this.message.id})`}/>
+	        	</svg>
+	        	<div class="timer">
+		            <span class="time-played">{this._timeToFormat(this.duration)}</span>
+		        </div>
+            </div>
+        )
     }
 
-    _timeToFormat(time) {
-        let seconds = Math.floor(time % 60);
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-        let minutes = Math.floor((time - seconds) / 60);
+    controlsMounted() {
+        this.svgContainer = this.$el.querySelector("svg");
+        this.progress = this.svgContainer.querySelector(".progress")
 
-        return minutes + ":" + seconds;
-    }
+        this.timer = this.$el.querySelector(".time-played");
+		this.setTimerElement(this.timer);
+		this.setProgressElement(this.progress);
 
-    _handleEnter(e) {
-        this.svgContainer.addEventListener("mousemove", this.moveHandler);
-    }
-
-    _handleLeave(e) {
-        this.svgContainer.removeEventListener("mousemove", this.moveHandler);
+		this.download();
     }
 
     _handleMove(e) {
+    	if(!this.audio) return;
         if (e.buttons === undefined ?
             e.which === 1 :
             e.buttons === 1) {
-            if (!this.playing) {
-                this.skipAnim = true;
-                this.progress.setAttribute("style", "transition: all 0s ease 0s !important;");
-            }
-            let percent = (e.pageX - this._getVpPos(this.progress).x) / this.width;
-            this.setPercent(percent);
+        	let box = this.svgContainer.getBoundingClientRect();
+            let percent = (e.pageX - box.x) / box.width;
+            this.updatePercent(percent);
             this.audio.currentTime = this.audio.duration * percent;
         }
     }
 
-    _playButtonClick(e) {
-        if (this.playing) {
-            this.pause();
-        } else {
-            this.play();
-        }
-    }
-
-    mounted() {
-        this.timer = this.$el.querySelector(".timer");
-        this.progress = this.$el.querySelector(".progress");
-        this.svgContainer = this.$el.querySelector("svg");
-        this.playButton = this.$el.querySelector(".play");
-    }
+    //own methods
 
     _generateBars() {
         let x = this.barMargin;
@@ -203,15 +104,15 @@ export default class VoiceMessageComponent extends Component {
         let elemArr = [];
         for (let i = 0; i < this.heights.length; i++) {
             let value = this.heights[i];
-            let rect = this._newBar(x, width, this._heightToPercent(value));
+            let rect = this._newBar(x, width, this._heightToPx(value));
             elemArr.push(rect);
             x += width + this.barMargin;
         }
         return elemArr;
     }
 
-    _heightToPercent(height) {
-        return Math.min(((2 + height) / 33) * 100, 100) + "%";
+    _heightToPx(height) {
+        return Math.min(((2 + height) / 33) * 100, 100)/4 + "px";
     }
 
     _setAttr(elem, attr, value) {
