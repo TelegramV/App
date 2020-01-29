@@ -35,10 +35,27 @@ html, body, #app {
 	}
 
 	.qr-login-button {
+		margin-top: 10px;
 		width: 100%;
 		text-align: center;
 		cursor: pointer;
 		color: $bluehover;
+		position: relative;
+
+		&.loading {
+			progress {
+				display: block;
+			}
+		}
+
+		progress {
+			display: none;
+			position: absolute;
+			right: 16px;
+			width: 16px;
+			height: 16px;
+			top: 0;
+		}
 	}
 
 	.object {

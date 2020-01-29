@@ -131,18 +131,19 @@ class PhoneInputComponent extends PaneComponent {
                 <CheckboxComponent label="Keep me signed in" checked input={checkboxInput}/>
                 <ButtonWithProgressBarComponent label="Next" disabled={this.state.nextDisabled}
                                                 click={this.handlePhoneSend} ref="next"/>
-                <div className="qr-login-button" onClick={this.qrLogin}>Quick log in using QR code</div>
+                <div className="qr-login-button" onClick={this.qrLogin}>Quick log in using QR code<progress className="progress-circular"/></div>
             </div>
         )
     }
 
     qrLogin(ev) {
-
+        this.$el.querySelector(".qr-login-button").classList.add("loading")
         MTProto.invokeMethod("auth.exportLoginToken", {
             api_id: AppConfiguration.mtproto.api.api_id,
             api_hash: AppConfiguration.mtproto.api.api_hash,
             except_ids: []
         }).then(l => {
+            this.$el.querySelector(".qr-login-button").classList.remove("loading")
             this.props.qrLoginInit(l)
         })
     }
@@ -459,8 +460,8 @@ class CodeAndPasswordPaneComponent extends PaneComponent {
 
     open() {
         this.state.monkey.init(document.getElementById("monkey"))
-        this.state.monkey.reset()
-        this.state.monkey.stop()
+        // this.state.monkey.reset()
+        // this.state.monkey.stop()
     }
 
     onPassword(ev) {

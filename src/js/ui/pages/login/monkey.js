@@ -1,3 +1,6 @@
+import lottie from "lottie-web";
+import {convertToByteArray, gzipUncompress} from "../../../mtproto/utils/bin";
+
 export class MonkeyController {
     constructor() {
 
@@ -25,16 +28,15 @@ export class MonkeyController {
     }
 
     init(player) {
-        this.monkey = player;
-        this.monkey.addEventListener("frame", this.frameHandler);
-        this.monkey.addEventListener("complete", this.completionHandler);
+        this.$monkey = player
+        this.load(this.states.idle)
+        console.log("init!")
     }
 
     monkeyLook(symbols) {
-        console.log(this)
         if (symbols === 0) {
-            this.monkey.setSpeed(2);
-            this.monkey.play();
+            this.animation.setSpeed(2);
+            this.animation.play();
             this.smoothIdle(); //take a glorious look at empty code and back to idle
             this.trackSym = 0;
             return
@@ -47,61 +49,81 @@ export class MonkeyController {
         if (this.trackSym == 0) {
             if (symbols > 0) { //started typing
                 this.track().then(() => {
-                    this.monkey.setSpeed(1);
-                    this.monkey.play();
+                    this.animation.setSpeed(1);
+                    this.animation.play();
                     this.nextPauseFrame = nextFrame;
                 })
             }
         } else if (this.trackSym > 0) {
             if (symbols > this.trackSym) { //adding new
                 this.nextPauseFrame = nextFrame;
-                this.monkey.setSpeed(1);
-                this.monkey.play();
+                this.animation.setSpeed(1);
+                this.animation.play();
             } else { //deleting
                 this.nextPauseFrame = nextFrame;
-                this.monkey.setSpeed(-1);
-                this.monkey.play();
+                this.animation.setSpeed(-1);
+                this.animation.play();
             }
         }
 
         this.trackSym = symbols;
     }
 
+    load(path, loop = true) {
+        return fetch(path).then(l => {
+            return l.arrayBuffer().then(q => {
+                return gzipUncompress(convertToByteArray(q))
+            })
+        }).then(l => {
+            if (this.animation)
+                this.animation.destroy()
+            this.animation = lottie.loadAnimation({
+                container: this.$monkey, // the dom element that will contain the animation
+                renderer: 'canvas',
+                loop: loop,
+                autoplay: true,
+                name: path,
+                animationData: JSON.parse(String.fromCharCode.apply(null, l)) // the path to the animation json
+            })
+
+            // this.animation.play()
+            this.animation.addEventListener("complete", this.completionHandler);
+            this.animation.addEventListener("enterFrame", this.frameHandler);
+        })
+    }
+
     idle(start) {
         let that = this;
-        this.monkey.load(this.states.idle).then(function() {
-            that.monkey.setLooping(true);
-            that.monkey.setSpeed(1);
+        this.load(this.states.idle).then(function () {
+            that.animation.setSpeed(1);
             if (start) {
-                that.monkey.seek(start);
+                that.animation.seek(start);
             }
-            that.monkey.play();
+            that.animation.play();
         });
     }
 
     track(start) {
         let that = this;
-        return this.monkey.load(this.states.tracking).then(function() {
-            that.monkey.setLooping(true);
-            that.monkey.setSpeed(1);
+        return this.load(this.states.tracking).then(function () {
+            that.animation.setSpeed(1);
             if (start) {
-                that.monkey.seek(start);
+                that.animation.seek(start);
             }
-            that.monkey.play();
-            that.monkey.pause();
+            that.animation.play();
+            that.animation.pause();
         });
     }
 
     close(start) {
         let that = this;
         this.closed = true;
-        this.monkey.load(this.states.close).then(function() {
-            that.monkey.setLooping(false);
-            that.monkey.setSpeed(1);
+        this.load(this.states.close).then(function () {
+            that.animation.setSpeed(1);
             if (start) {
-                that.monkey.seek(start);
+                that.animation.seek(start);
             }
-            that.monkey.play();
+            that.animation.play();
             that.nextPauseFrame = 50;
         });
     }
@@ -110,21 +132,19 @@ export class MonkeyController {
         let that = this;
         this.peeking = true;
         if (this.closed) {
-            this.monkey.load(this.states.peek).then(function() {
-                that.monkey.setLooping(false);
+            this.load(this.states.peek, false).then(function () {
                 if (start) {
-                    that.monkey.seek(seek);
+                    that.animation.seek(seek);
                 }
-                that.monkey.play();
+                that.animation.play();
                 that.nextPauseFrame = 50;
             });
         } else {
-            this.monkey.load(this.states.closeAndPeek).then(function() {
-                that.monkey.setLooping(false);
+            this.load(this.states.closeAndPeek, false).then(function () {
                 if (start) {
-                    that.monkey.seek(seek);
+                    that.animation.seek(seek);
                 }
-                that.monkey.play();
+                that.animation.play();
                 that.nextPauseFrame = 95;
             });
         }
@@ -133,9 +153,8 @@ export class MonkeyController {
     open() {
         let that = this;
         if (this.peeking) {
-            this.monkey.load(this.states.closeAndPeekToIdle).then(function() {
-                that.monkey.setLooping(false);
-                that.monkey.play();
+            this.load(this.states.closeAndPeekToIdle).then(function () {
+                that.animation.play();
                 that.nextState = that.idle;
             });
         } else { //close -> open
@@ -146,56 +165,51 @@ export class MonkeyController {
 
     smoothTrack() {
         this.nextState = this.track;
-        this.monkey.setLooping(false);
-        this.monkey.setSpeed(2);
+        this.animation.setSpeed(2);
     }
 
     checkTrack() {
         this.nextState = this.track;
-        this.monkey.setLooping(false);
     }
 
     smoothIdle() {
         this.nextState = this.idle;
-        this.monkey.setLooping(false);
-        this.monkey.setSpeed(2);
+        this.animation.setSpeed(2);
     }
 
     smoothClose() {
         if (this.peeking) {
             this.nextState = this.close;
             this.nextStartFrame = "49%";
-            this.monkey.play();
+            this.animation.play();
         } else {
             this.nextState = this.close;
-            this.monkey.setLooping(false);
-            this.monkey.setSpeed(2);
+            this.animation.setSpeed(2);
         }
     }
 
     checkClose() {
         this.nextState = this.close;
-        this.monkey.setLooping(false);
     }
 
     reset() {
         this.peeking = false;
         this.nextPauseFrame = -1;
         this.nextState = null;
-        this.monkey.setLooping(false);
-        this.monkey.setSpeed(1);
+        if (this.animation) this.animation.setSpeed(1);
         this.idle();
     }
 
     stop() {
-        this.monkey.stop();
+        if (this.animation)
+            this.animation.stop();
     }
 
     _frameListener(event) {
         if (this.nextPauseFrame > -1) {
-            if (this.monkey.getLottie().playSpeed > 0 && event.detail.seeker >= this.nextPauseFrame ||
-                this.monkey.getLottie().playSpeed < 0 && event.detail.seeker <= this.nextPauseFrame) {
-                this.monkey.pause();
+            if (this.animation.playSpeed > 0 && event.currentTime >= this.nextPauseFrame ||
+                this.animation.playSpeed < 0 && event.currentTime <= this.nextPauseFrame) {
+                this.animation.pause();
                 this.nextPauseFrame = -1;
             }
         }
@@ -206,7 +220,7 @@ export class MonkeyController {
             if (this.nextState != this.peek) this.peeking = false;
             if (this.nextState != this.close) this.closed = false;
             this.nextState(this.nextStartFrame);
-            this.monkey.setSpeed(1);
+            this.animation.setSpeed(1);
             this.nextState = null;
             this.nextStartFrame = null;
         }
