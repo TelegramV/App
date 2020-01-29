@@ -30,7 +30,6 @@ export class MonkeyController {
     init(player) {
         this.$monkey = player
         this.load(this.states.idle)
-        console.log("init!")
     }
 
     monkeyLook(symbols) {
@@ -77,13 +76,14 @@ export class MonkeyController {
         }).then(l => {
             if (this.animation)
                 this.animation.destroy()
+            let beforeJson = new TextDecoder("utf-8").decode(l);
             this.animation = lottie.loadAnimation({
                 container: this.$monkey, // the dom element that will contain the animation
                 renderer: 'canvas',
                 loop: loop,
                 autoplay: true,
                 name: path,
-                animationData: JSON.parse(String.fromCharCode.apply(null, l)) // the path to the animation json
+                animationData: JSON.parse(new TextDecoder("utf-8").decode(l)) // the path to the animation json
             })
 
             // this.animation.play()
