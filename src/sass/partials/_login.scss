@@ -160,6 +160,8 @@ html, body, #app {
 			margin-left: 20px;
 		}
 
+		.dropdown-list {
+			padding: 10px 0;
 		.dropdown-item {
 			display: flex;
 			flex-direction: row;
@@ -168,13 +170,6 @@ html, body, #app {
 			height: 50px;
 
 			.country-flag {
-				padding: 15px 0 10px 20px;
-
-				-ms-interpolation-mode: bicubic;
-
-				.emoji-sizer {
-					font-size: 20px;
-				}
 			}
 
 			.country-name {
@@ -189,7 +184,7 @@ html, body, #app {
 				padding-right: 10px;
 			}
 		}
-
+	}
 
 	}
 

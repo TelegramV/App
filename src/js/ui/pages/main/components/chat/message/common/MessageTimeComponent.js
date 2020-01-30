@@ -2,10 +2,10 @@ const MessageTimeComponent = ({message, bg = false}) => {
     let classes = "time" + (bg ? " bg" : "");
 
     let views = "";
-    if (message.views) {
+    if (message.raw.views) {
         views = (
             <span class="views">
-                {numberFormat(message.views)}
+                {numberFormat(message.raw.views)}
                 <span class="tgico tgico-channelviews"/>
             </span>
         )
