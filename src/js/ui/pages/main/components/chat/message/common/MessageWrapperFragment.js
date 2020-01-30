@@ -20,7 +20,17 @@ const ReplyToMessageFragment = ({message}) => {
     )
 }
 
-const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, contextActions}) => {
+/**
+ * @param {Message} message
+ * @param transparent
+ * @param slot
+ * @param noPad
+ * @param contextActions
+ * @param showUsername
+ * @return {*}
+ * @constructor
+ */
+const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, contextActions, showUsername=true}) => {
     const defaultContextActions = [
         {
             icon: "reply",
@@ -55,6 +65,15 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         "in": message.isPost || !message.isOut,
     }
 
+    if (message.raw.fwd_from) {
+        console.log(message.raw.fwd_from)
+    }
+
+    if (message.raw.fwd_from && (message.raw.fwd_from.saved_from_peer || message.raw.fwd_from.saved_from_msg_id)) {
+        topLevelClasses["out"] = false
+        topLevelClasses["in"] = true
+    }
+
     let wrapClasses = {
         "bubble": true,
         "transparent": transparent,
@@ -74,6 +93,8 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         ChatInputManager.setKeyboardMarkup(message.replyMarkup)
     }
 
+    const username = showUsername && message.from.name && !message.isPost && !message.isOut && !message.raw.reply_to_msg_id && !message.raw.fwd_from
+
     if (!message.isPost && topLevelClasses.in) {
 
         return (
@@ -92,6 +113,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
 
                         <div className={messageClasses}>
                             <ForwardedHeaderFragment message={message}/>
+                            {username ? <div className="username">{message.from.name}</div> : ""}
                             {slot}
                         </div>
                     </div>
@@ -115,6 +137,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
 
                     <div className={messageClasses}>
                         <ForwardedHeaderFragment message={message}/>
+                        {username ? <div className="username">{message.from.name}</div> : ""}
                         {slot}
                     </div>
                 </div>

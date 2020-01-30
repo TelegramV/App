@@ -2,6 +2,7 @@ import VRNode from "../VRNode"
 import {EventBus} from "../../../../api/eventBus/EventBus"
 import type {ReactiveCallbackContext} from "../../reactive/ReactiveCallback"
 import {ReactivePublisher} from "../../../../api/eventBus/ReactivePublisher"
+import Component from "../Component"
 
 export type VRTagName = string | number | ({ ...VRAttrs, slot?: VRSlot }) => VRNode | Class<Component>
 

@@ -6,26 +6,25 @@ import {FileAPI} from "../../fileAPI"
 
 export class AnimatedStickerMessage extends StickerMessage {
 
-    type = MessageType.ANIMATED_EMOJI
+    type = MessageType.ANIMATED_STICKER
 
-    show() {
-        super.show()
-        FileAPI.getFile(this.raw.media.document).then(srcUrl => {
-            this.srcUrl = srcUrl
-            this.fire("stickerLoaded")
-        })
-    }
-
-    fillRaw(raw: Object): StickerMessage {
+    fillRaw(raw: Object): AnimatedStickerMessage {
         super.fillRaw(raw)
 
-        const emoji = StickerManager.getAnimatedEmoji(this.text)
+        if (this.raw.media.document.mime_type !== "application/x-tgsticker") {
+            const emoji = StickerManager.getAnimatedEmoji(this.text)
 
-        this.raw.media = {
-            _: "messageMediaDocument",
-            isAnimatedEmoji: true,
-            document: emoji
+            this.raw.media = {
+                _: "messageMediaDocument",
+                isAnimatedEmoji: true,
+                document: emoji
+            }
+
+            const size = this.raw.media.document.attributes.find(a => a._ === "documentAttributeImageSize")
+            this.w = size ? size.w : null
+            this.h = size ? size.h : null
         }
+
 
         return this
     }

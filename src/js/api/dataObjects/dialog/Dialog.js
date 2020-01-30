@@ -5,10 +5,11 @@ import {DraftMessage} from "./DraftMessage"
 import {DialogApi} from "./DialogApi"
 import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 import type {Message} from "../../messages/Message"
+import {Peer} from "../peer/Peer"
 
 export class Dialog extends ReactiveObject {
 
-    peer = undefined
+    peer: Peer = undefined
     pts = -1
 
     #rawDialog = {}

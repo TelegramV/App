@@ -26,6 +26,7 @@ export const MessageType = {
     SERVICE: 18,
     ANIMATED_EMOJI: 19,
     GROUP_PHOTO: 20,
+    ANIMATED_STICKER: 21,
 }
 
 export interface Message {

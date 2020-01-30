@@ -10,7 +10,7 @@ class GameMessageComponent extends GeneralMessageComponent {
 
         //DRAFT VERSION
         return (
-            <MessageWrapperFragment message={this.message}>
+            <MessageWrapperFragment message={this.message} showUsername={false}>
                 <div class="game">
                     <div class="title">{game.title}</div>
                     <div class="info">

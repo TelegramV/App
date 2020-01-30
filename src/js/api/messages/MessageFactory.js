@@ -37,13 +37,14 @@ const messageObjects = new Map([
     [MessageType.DOCUMENT, DocumentMessage],
     [MessageType.GIF, VideoMessage], //TODO own gif component
     [MessageType.STICKER, StickerMessage],
+    [MessageType.ANIMATED_STICKER, AnimatedStickerMessage],
+    [MessageType.ANIMATED_EMOJI, AnimatedStickerMessage],
     [MessageType.VOICE, VoiceMessage],
     [MessageType.AUDIO, AudioMessage],
     [MessageType.ROUND, RoundVideoMessage],
     [MessageType.VIDEO, VideoMessage],
     [MessageType.PHONE_CALL, PhoneCallMessage],
     [MessageType.SERVICE, ServiceMessage],
-    [MessageType.ANIMATED_EMOJI, AnimatedStickerMessage]
 ])
 
 export class MessageFactory {
