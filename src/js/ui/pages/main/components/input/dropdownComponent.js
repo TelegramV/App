@@ -12,10 +12,7 @@ export class DropdownComponent extends Component {
     h() {
         let arrowClasses = ["arrow", "btn-icon", "rp", "rps", "tgico"]
         arrowClasses.push(this.state.opened ? "tgico-up" : "tgico-down")
-        let dropdownClasses = ["dropdown-list"]
-        if (!this.state.opened) {
-            dropdownClasses.push("hidden")
-        }
+
         return (
             <div className="dropdown-container">
                 <div className="input-field dropdown down">
@@ -24,7 +21,7 @@ export class DropdownComponent extends Component {
                     <label htmlFor={this.props.name} required>{this.props.label}</label>
                     <i className={arrowClasses.join(" ")} onMouseDown={this.onClick}/>
                 </div>
-                <div className={dropdownClasses.join(" ")}>
+                <div className="dropdown-list hidden">
                     {
                         this.props.data.map(this.props.template)
                     }
@@ -40,11 +37,12 @@ export class DropdownComponent extends Component {
     select(i) {
         this.state.value = this.props.data[i].name
         this.__patch()
-        this.$el.querySelector("input").value = this.state.value
+        this.inputField.value = this.state.value
     }
 
     mounted() {
         super.mounted();
+        this.inputField = this.$el.querySelector("input");
 
         this.props.nodes = Array.from(this.$el.querySelector(".dropdown-list").childNodes)
         for (let i in this.props.nodes) {
@@ -55,24 +53,30 @@ export class DropdownComponent extends Component {
                 this.state.value = this.props.data[i].name
                 this.selected(i)
                 this.__patch()
-                this.$el.querySelector("input").value = this.state.value
+                this.inputField.value = this.state.value
             }.bind(this)
         }
     }
 
     patchDropdown() {
-        const current = this.$el.querySelector("input").value.toLowerCase()
+        const current = this.inputField.value.toLowerCase()
+
+        let visibleCount = 0;
         for (let i in this.props.nodes) {
             const node = this.props.nodes[i]
 
-            // TODO create other check functions as well
             if(!this.countryTest(current, this.props.data[i].name)) {
-            //if(!this.props.data[i].name.toLowerCase().includes(current)) {
                 node.classList.add("hidden")
             } else {
                 node.classList.remove("hidden")
+                visibleCount++;
             }
-            //this.__patch()
+        }
+        let list = this.$el.querySelector(".dropdown-list");
+        if(visibleCount==0) {
+            list.classList.add("hidden")
+        } else if(this.state.opened){
+            list.classList.remove("hidden")
         }
     }
 
@@ -86,8 +90,7 @@ export class DropdownComponent extends Component {
     }
 
 
-    onInput(ev) {
-        const current = ev.target.value
+    onInput() {
         this.patchDropdown()
     }
 
@@ -98,9 +101,9 @@ export class DropdownComponent extends Component {
 
         ev.preventDefault()
         if (this.state.opened) {
-            this.$el.querySelector("input").focus()
+            this.inputField.focus()
         } else {
-            this.$el.querySelector("input").blur()
+            this.inputField.blur()
         }
     }
 
@@ -116,6 +119,11 @@ export class DropdownComponent extends Component {
 
         this.state.opened = true
         this.__patch()
+    }
+
+    __patch() {
+        super.__patch();
+        this.patchDropdown()
     }
 
 }

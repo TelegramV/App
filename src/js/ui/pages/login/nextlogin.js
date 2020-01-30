@@ -42,7 +42,7 @@ function successfulAuth() {
 function generateFullDropdown() {
     return countries.map(l => {
         return {
-            flag: (":flag-" + l[2].toLowerCase() + ":"),
+            flag: l[3],
             name: l[1],
             code: l[0]
         }
@@ -82,7 +82,7 @@ const InfoComponent = ({header, description}) => {
 
 function CountryDropdownItemComponent({flag, name, code}) {
     return <div className="dropdown-item">
-        <div className="country-flag" dangerouslySetInnerHTML={flag}></div>
+        <div className="country-flag">{flag}</div>
         <div className="country-name">{name}</div>
         <div className="country-code">{code}</div>
     </div>
@@ -122,7 +122,7 @@ class PhoneInputComponent extends PaneComponent {
                 <img className="object" src="./static/images/logo.svg" alt=""
                      onClick={this.props.finished}/>
                 <InfoComponent header="Sign in to Telegram"
-                               description="Please confirm your country and enter your phone number"/>
+                               description="Please confirm your country🇺🇦 and enter your phone number"/>
                 <DropdownComponent label="Country" data={generateFullDropdown()}
                                    template={CountryDropdownItemComponent} selected={this.onDropdownSelect}
                                    ref="dropdown"/>
@@ -137,15 +137,7 @@ class PhoneInputComponent extends PaneComponent {
     }
 
     qrLogin(ev) {
-        this.$el.querySelector(".qr-login-button").classList.add("loading")
-        MTProto.invokeMethod("auth.exportLoginToken", {
-            api_id: AppConfiguration.mtproto.api.api_id,
-            api_hash: AppConfiguration.mtproto.api.api_hash,
-            except_ids: []
-        }).then(l => {
-            this.$el.querySelector(".qr-login-button").classList.remove("loading")
-            this.props.qrLoginInit(l)
-        })
+        this.props.qrLoginInit()
     }
 
     handlePhoneSend() {
@@ -609,13 +601,18 @@ class QrLoginPaneComponent extends PaneComponent {
     constructor(props) {
         super(props);
         MTProto.UpdatesManager.subscribe("updateLoginToken", l => {
-            MTProto.invokeMethod("auth.exportLoginToken", {
+            if(l._ === "auth.loginTokenSuccess") {
+                this.props.finished(l.authorization)
+                return
+            }
+            this.open();
+            /*MTProto.invokeMethod("auth.exportLoginToken", {
                 api_id: AppConfiguration.mtproto.api.api_id,
                 api_hash: AppConfiguration.mtproto.api.api_hash,
                 except_ids: []
             }).then(l => {
                 this.open(l)
-            })
+            })*/
         })
     }
 
@@ -630,7 +627,9 @@ class QrLoginPaneComponent extends PaneComponent {
         }
         return (
             <div className={classList.join(" ")}>
-                <div className="object big" />
+                <div className="object big">
+                    <span>Generating QR-code...</span>
+                </div>
                 <InfoComponent header="Scan from mobile Telegram"
                                description={<ol>
                                    <li>Open Telegram on your phone</li>
@@ -644,21 +643,57 @@ class QrLoginPaneComponent extends PaneComponent {
         )
     }
 
-    open(l) {
+
+
+    open() {
         // TODO recreate QR when expired
         // TODO multiple DCs
-        if(l._ === "auth.loginTokenSuccess") {
-            this.props.finished(l.authorization)
-            return
-        }
-        console.log(l)
-        const b64encoded = btoa(String.fromCharCode.apply(null, l.token)).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '')
-        const string = "tg://login?token=" + b64encoded
-        console.log(string)
-        const qrCode = new QRCodeStyling({
+        this.requestLoginToken().then(l => {
+            if(l._ === "auth.loginTokenSuccess") { //idk where it goes, Maks, fix pls
+                this.props.finished(l.authorization)
+                return
+            }
+            const b64encoded = btoa(String.fromCharCode.apply(null, l.token)).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '')
+            const string = "tg://login?token=" + b64encoded
+            const obj = this.$el.querySelector(".object")
+
+            if(obj.firstChild) obj.removeChild(obj.firstChild);
+            let qr = this.makeQR(string);
+            obj.appendChild(qr)
+
+            setTimeout(this.open, 1000 * (l.expires - tsNow(true)));
+        }).catch(reject => {
+            if(reject.reason == "authorized") return; //ignore
+        })
+    }
+
+    /**
+        Returns Promise
+    **/
+    requestLoginToken() {
+        return new Promise(async (resolve, reject) => {
+            if(MTProto.isUserAuthorized()) {
+                reject({reason: "authorized"});
+                return;
+            }
+
+            let l = await MTProto.invokeMethod("auth.exportLoginToken", {
+                api_id: AppConfiguration.mtproto.api.api_id,
+                api_hash: AppConfiguration.mtproto.api.api_hash,
+                except_ids: []
+            })
+            resolve(l);
+        })
+    }
+
+    /**
+        Returns canvas element to insert
+    **/
+    makeQR(data) {
+        return new QRCodeStyling({
             width: 240,
             height: 240,
-            data: string,
+            data: data,
             image: "./static/images/logo.svg",
             dotsOptions: {
                 color: "#000000",
@@ -673,24 +708,7 @@ class QrLoginPaneComponent extends PaneComponent {
             qrOptions: {
                 errorCorrectionLevel: "L"
             }
-        })
-
-        const obj = this.$el.querySelector(".object")
-        if(obj.firstChild) obj.removeChild(obj.firstChild)
-        setTimeout(l => {
-            obj.appendChild(qrCode._canvas._canvas)
-        }, 0)
-        console.log(l.expires - tsNow(true))
-        setTimeout(l => {
-            if(MTProto.isUserAuthorized()) return
-            MTProto.invokeMethod("auth.exportLoginToken", {
-                api_id: AppConfiguration.mtproto.api.api_id,
-                api_hash: AppConfiguration.mtproto.api.api_hash,
-                except_ids: []
-            }).then(l => {
-                this.open(l)
-            })
-        }, 1000 * (l.expires - tsNow(true)))
+        })._canvas._canvas;
     }
 }
 
@@ -718,8 +736,8 @@ class Login extends Component {
         this.fadeIn(this.refs.get("phonePane"));
     }
 
-    qrLoginInit(l) {
-        this.refs.get("qrLoginPane").open(l)
+    qrLoginInit() {
+        this.refs.get("qrLoginPane").open()
 
         this.fadeOut(this.refs.get("phonePane"));
         this.fadeIn(this.refs.get("qrLoginPane"));
