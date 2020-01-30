@@ -112,7 +112,7 @@ export default class VoiceMessageComponent extends AudioComponent {
     }
 
     _heightToPx(height) {
-        return Math.min(((2 + height) / 33) * 100, 100)/4 + "px";
+        return Math.max(2, height*(25/32)) + "px";
     }
 
     _setAttr(elem, attr, value) {

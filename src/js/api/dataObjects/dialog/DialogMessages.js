@@ -67,6 +67,13 @@ export class DialogMessages {
         return this._messages.get(id) || this._otherMessages.get(id)
     }
 
+    getPollsById(poll_id: number): Array<PollMessage> {
+        return (
+            [...this._messages.values()]
+            .filter(msg => msg.raw.media && msg.raw.media.poll && msg.raw.media.poll.id === poll_id)
+        )
+    }
+
     get last(): Message | undefined {
         return this._lastMessage || this._prevLastMessage || this.sortedArray[this.sortedArray.length - 1]
     }

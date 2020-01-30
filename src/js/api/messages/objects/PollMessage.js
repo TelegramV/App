@@ -10,4 +10,9 @@ export class PollMessage extends AbstractMessage {
     show() {
         super.show()
     }
+
+    fillPoll(poll, results) {
+        this.raw.media.poll = poll;
+        this.raw.media.results = results;
+    }
 }

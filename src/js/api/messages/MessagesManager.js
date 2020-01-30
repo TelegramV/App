@@ -6,6 +6,7 @@ import DialogsStore from "../store/DialogsStore"
 import {getPeerTypeFromType} from "../dialogs/util"
 import {MessageFactory} from "./MessageFactory"
 import AppEvents from "../eventBus/AppEvents"
+import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 
 class MessageManager extends Manager {
     init() {
@@ -144,6 +145,15 @@ class MessageManager extends Manager {
                         message: message,
                     })
                 }
+            }
+        })
+
+        MTProto.UpdatesManager.subscribe("updateMessagePoll", update => {
+            const messages = AppSelectedPeer.Current.dialog.messages.getPollsById(update.poll.id)
+            for(const message of messages) {
+                message.fillPoll(update.poll, update.results)
+                
+                message.fire("pollEdit")
             }
         })
 
