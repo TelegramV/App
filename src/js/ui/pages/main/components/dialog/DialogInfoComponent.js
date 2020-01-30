@@ -245,15 +245,16 @@ export class DialogInfoComponent extends Component {
 
     fetchPage(offsetId, filter) {
         if(this.state.offsetId === -1) return Promise.reject()
+        const limit = 33
 
         return MTProto.invokeMethod("messages.search", {
             peer: this.state.peer.inputPeer,
             q: "",
             filter: filter,
-            limit: 99, // /3
+            limit: limit, // /3
             offset_id: offsetId
         }).then(q => {
-            if(q.messages.length < 99) {
+            if(q.messages.length < limit) {
                 this.state.offsetId = -1
                 this.elements.$loader.classList.add("hidden")
             } else {
