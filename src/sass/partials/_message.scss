@@ -201,7 +201,10 @@
 
                 .name {
                     font-weight: 500;
-                    padding-bottom: 4px;
+                    margin-top: 5px;
+                    &:first-child {
+                        margin-top: 0px;
+                    }
                 }
             }
 
@@ -542,7 +545,7 @@
                 color: $blueonline;
                 font-weight: 500;
                 font-size: 14px;
-                padding: 5px 0;
+                padding: 2px 0;
             }
 
             .message {
