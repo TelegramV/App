@@ -178,6 +178,11 @@
                     flex-direction: row;
                     text-align: left;
                     width: 100%;
+                    transition: anim(background-color);
+
+                    &:hover {
+                        background-color: $light;
+                    }
 
                     .photo {
                         max-width: 48px;
@@ -188,6 +193,16 @@
                             object-fit: cover;
                             height: 48px;
                             width: 48px;
+                        }
+
+                        &.letter {
+                            color: white;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 1.5em;
+                            // TODO different colors for different letters like in avatars
+                            background-color: $blue;
                         }
 
                         border-radius: 6px;

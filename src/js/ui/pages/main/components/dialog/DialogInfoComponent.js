@@ -74,13 +74,13 @@ const DialogInfoPhotoComponent = ({photo}) => {
                                          slotLoadingWidth={slotLoadingWidth} slotLoadingHeight={slotLoadingHeight}/>
 }
 
-const DialogInfoLinkComponent = ({title, description, url, photo, displayUrl}) => {
+const DialogInfoLinkComponent = ({title, description, url, photo, displayUrl, letter}) => {
     return <a className="link rp" href={url} target="_blank">
         {
             photo ?
                 <PhotoComponent photo={photo}/>
             :
-                <div className="photo"/>
+                <div className="photo letter">{letter}</div>
         }
         <div className="details">
             <span className="title">{title}</span>
@@ -90,8 +90,31 @@ const DialogInfoLinkComponent = ({title, description, url, photo, displayUrl}) =
     </a>
 }
 
-const MaterialHeaderFragment = ({selected = false, text, hidden = false}) => {
-    return <div className={["item rp", selected ? "selected" : "", hidden ? "hidden" : ""]}><span>{text}</span></div>
+class MaterialHeaderFragment extends Component {
+    init() {
+        super.init()
+        this.state = {
+            selected: 1
+        }
+    }
+
+    h() {
+        return <div className="header">
+            <MaterialHeaderItemFragment text="Members" hidden click={this.select}/>
+            <MaterialHeaderItemFragment text="Media" click={this.select}/>
+            <MaterialHeaderItemFragment text="Docs" click={this.select}/>
+            <MaterialHeaderItemFragment selected text="Links" click={this.select}/>
+            <MaterialHeaderItemFragment text="Audio" click={this.select}/>
+        </div>
+    }
+
+    select(ev) {
+        console.log(ev)
+    }
+}
+
+const MaterialHeaderItemFragment = ({selected = false, text, hidden = false, click}) => {
+    return <div className={["item rp", selected ? "selected" : "", hidden ? "hidden" : ""]} onClick={click}><span>{text}</span></div>
 }
 
 export class DialogInfoComponent extends Component {
@@ -142,12 +165,7 @@ export class DialogInfoComponent extends Component {
                     <DetailsCheckboxFragment text="Notifications" label="Enabled"/>
 
                     <div class="materials">
-                        <div class="header">
-                            <MaterialHeaderFragment text="Media"/>
-                            <MaterialHeaderFragment text="Docs"/>
-                            <MaterialHeaderFragment selected text="Links"/>
-                            <MaterialHeaderFragment text="Audio"/>
-                        </div>
+                        <MaterialHeaderFragment/>
                         <div className="content">
                         </div>
                         <div className="content-loading">
@@ -295,7 +313,8 @@ export class DialogInfoComponent extends Component {
     }
 
     addLink(link) {
-        VRDOM.append(<DialogInfoLinkComponent photo={link.photo} title={link.title} description={link.description} url={link.url} displayUrl={link.display_url}/>, this.elements.$content)
+        const letter = link.site_name ? link.site_name[0] : ""
+        VRDOM.append(<DialogInfoLinkComponent letter={letter} photo={link.photo} title={link.title} description={link.description} url={link.url} displayUrl={link.display_url}/>, this.elements.$content)
     }
 
     patchDescription() {
