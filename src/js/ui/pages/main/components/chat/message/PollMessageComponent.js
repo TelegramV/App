@@ -1,10 +1,10 @@
-import Component from "../../../../../v/vrdom/Component"
+import GeneralMessageComponent from "./common/GeneralMessageComponent"
 import MTProto from "../../../../../../mtproto"
 import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import RadioComponent from "../../input/radioComponent"
 import CheckboxComponent from "../../input/checkboxComponent"
 
-export default class PollMessageComponent extends Component {
+export default class PollMessageComponent extends GeneralMessageComponent {
     constructor(props) {
         super(props);
         let message = this.props.message;
@@ -102,7 +102,7 @@ export default class PollMessageComponent extends Component {
             msg_id: message.id,
             options: this.answers
         }).then(response => {
-            console.log(response)
+            this.answers = [];
             MTProto.UpdatesManager.process(response);
         });
     }
@@ -114,10 +114,15 @@ export default class PollMessageComponent extends Component {
             if (result.voters > best.voters) best = result;
         }
         return best;
-    }
+    }    
 
-    showFullResults() {
-
+    reactiveChanged(key: *, value: *, event: *) {
+        super.reactiveChanged(key, value, event)
+        if (event.type === "pollEdit") {
+            this.poll = this.props.message.raw.media.poll;
+            this.results = this.props.message.raw.media.results;
+            this.__patch();
+        }
     }
 
     _prepareAnswerBlock() {
