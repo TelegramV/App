@@ -95,7 +95,6 @@ class MobileProtocol {
 
     createApiNetworker(authContext) {
         this.networker = new ApiNetworker(authContext)
-        this.MessageProcessor = this.networker.messageProcessor
         this.connected = true
 
         // TODO definitely not a right place for notifications -_-
@@ -166,28 +165,26 @@ class MobileProtocol {
             updates: false
         }
 
-        return new Promise(resolve => {
-            const mtprotoNetworker = new MTProtoNetworker(authContext)
-            authKeyCreation(mtprotoNetworker).then(response => {
-                const networker = new FileNetworker(authContext)
+        const mtprotoNetworker = new MTProtoNetworker(authContext)
+        return authKeyCreation(mtprotoNetworker).then(response => {
+            const networker = new FileNetworker(authContext)
 
-                const list = this.fileNetworkers[dcID]
-                this.fileNetworkers[dcID] = networker
+            const list = this.fileNetworkers[dcID]
+            this.fileNetworkers[dcID] = networker
+            authContext.authKey = new Uint8Array(authContext.authKey)
+            authContext.serverSalt = new Uint8Array(authContext.serverSalt)
+
+            return AuthAPI.importAuth(authContext.exportedAuth, dcID).then(response => {
+                list.forEach(async l => {
+                    l.resolve(networker.invokeMethod(l.method, l.parameters))
+                })
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
-                AuthAPI.importAuth(authContext.exportedAuth, dcID).then(response => {
-                    list.forEach(async l => {
-                        l.resolve(networker.invokeMethod(l.method, l.parameters))
-                    })
-                    authContext.authKey = new Uint8Array(authContext.authKey)
-                    authContext.serverSalt = new Uint8Array(authContext.serverSalt)
+                AppPermanentStorage.setItem("authKey" + authContext.dcID, Bytes.asHex(authContext.authKey))
+                AppPermanentStorage.setItem("serverSalt" + authContext.dcID, Bytes.asHex(authContext.serverSalt))
 
-                    AppPermanentStorage.setItem("authKey" + authContext.dcID, Bytes.asHex(authContext.authKey))
-                    AppPermanentStorage.setItem("serverSalt" + authContext.dcID, Bytes.asHex(authContext.serverSalt))
-
-                    resolve(networker)
-                })
+                return networker
             })
         })
     }
@@ -213,10 +210,8 @@ class MobileProtocol {
             }
             if (!networker) {
                 this.fileNetworkers[dcID] = []
-                return new Promise(resolve => {
-                    return this.createFileNetworker(dcID).then(networker => {
-                        networker.invokeMethod(method, parameters).then(resolve)
-                    })
+                return this.createFileNetworker(dcID).then(networker => {
+                    networker.invokeMethod(method, parameters)
                 })
             }
 

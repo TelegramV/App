@@ -7,7 +7,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
 
     h() {
         return (
-            <MessageWrapperFragment message={this.message} noPad>
+            <MessageWrapperFragment message={this.message} noPad showUsername={false}>
                 <VideoComponent video={this.message.raw.media.document}/>
                 <TextWrapperComponent message={this.message}/>
             </MessageWrapperFragment>

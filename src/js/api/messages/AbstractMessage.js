@@ -108,25 +108,31 @@ export class AbstractMessage extends ReactiveObject implements Message {
                         this.dialog.messages.appendOtherSingle(messages[0])
                         this.replyToMessage = messages[0]
                         this.fire("replyToMessageFound")
+                    } else {
+                        this.fire("replyToMessageNotFound")
                     }
                 })
             }
         }
     }
 
-    findForwarded(fire = false) {
+    findForwarded(fire = true) {
         if (!this.forwarded && this.raw.fwd_from) {
             if (!this.raw.fwd_from.from_id) {
                 if (this.raw.fwd_from.from_name) {
                     this.forwarded = this.raw.fwd_from.from_name
-                    this.fire("forwardedNameOnlyFound")
+                    if (fire) {
+                        this.fire("forwardedNameOnlyFound")
+                    }
                 }
             } else {
                 const forwarded = PeersStore.get("user", this.raw.fwd_from.from_id)
 
                 if (forwarded) {
                     this.forwarded = forwarded
-                    this.fire("forwardedUserFound")
+                    if (fire) {
+                        this.fire("forwardedUserFound")
+                    }
                 }
             }
 
@@ -136,7 +142,9 @@ export class AbstractMessage extends ReactiveObject implements Message {
                 if (forwarded) {
                     this.forwarded = forwarded
                     this.forwardedMessageId = this.raw.fwd_from.channel_post
-                    this.fire("forwardedChannelFound")
+                    if (fire) {
+                        this.fire("forwardedChannelFound")
+                    }
                 }
             }
         }
@@ -154,14 +162,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         }
 
         // forwarded
-        // if (!this.forwarded && this.raw.fwd_from) {
-        //     const peerType = this.raw.fwd_from.from_id ? "user" : "channel"
-        //     const peerId = this.raw.fwd_from.from_id ? this.raw.fwd_from.from_id : this.raw.fwd_from.channel_id
-        //     const forwarded = PeersStore.get(peerType, peerId)
-        //     if (forwarded) {
-        //         this.forwarded = forwarded
-        //     }
-        // }
+        this.findForwarded(false)
 
         // ...
 

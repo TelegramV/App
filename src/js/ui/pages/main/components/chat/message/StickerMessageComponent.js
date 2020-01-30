@@ -32,7 +32,7 @@ class StickerMessageComponent extends GeneralMessageComponent {
         this.calculateSize()
 
         return (
-            <MessageWrapperFragment message={this.message} transparent={true} noPad>
+            <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false}>
 
                 <StickerFragment id={`sticker-${this.message.id}`}
                                  url={this.message.srcUrl}
@@ -66,6 +66,7 @@ class StickerMessageComponent extends GeneralMessageComponent {
         super.reactiveChanged(key, value, event)
 
         if (event.type === "stickerLoaded") {
+            console.warn("sticker LOADED")
             this.patchSticker()
         }
     }

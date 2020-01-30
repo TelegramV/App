@@ -34,7 +34,8 @@ const handlers = new Map([
     [MessageType.CONTACT, ContactMessageComponent],
     [MessageType.DOCUMENT, DocumentMessageComponent],
     [MessageType.GIF, VideoMessageComponent], //TODO own gif component
-    [MessageType.STICKER, AnimatedStickerMessageComponent],
+    [MessageType.ANIMATED_STICKER, AnimatedStickerMessageComponent],
+    [MessageType.STICKER, StickerMessageComponent],
     [MessageType.VOICE, VoiceMessageComponent],
     [MessageType.AUDIO, AudioMessageComponent],
     [MessageType.ROUND, RoundVideoMessageComponent],

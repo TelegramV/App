@@ -40,7 +40,7 @@ class AudioMessageComponent extends GeneralMessageComponent {
 
     h() {
         return (
-            <MessageWrapperFragment message={this.message}>
+            <MessageWrapperFragment message={this.message} showUsername={false}>
                 <div class="audio">
                 	<progress class="progress-circular"/>
                     <div class="play tgico tgico-play" onMouseDown={this._playButtonClick.bind(this)}/>

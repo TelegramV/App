@@ -1,5 +1,5 @@
 //
-// WARNING: Flow JS does not support Babel JSX.
+// WARNING: Flow JS supports only React.
 //          DO NOT USE FlOW JS WITH COMPONENTS
 //
 
@@ -249,7 +249,6 @@ class Component {
     // do not use this
     __created() {
     }
-
 
     /* REACTIVE SECTION */
 

@@ -11,6 +11,22 @@ class ServiceMessageComponent extends GeneralMessageComponent {
             </div>
         )
     }
+
+    messageOnReplyFound() {
+        //
+    }
+
+    messageOnReplyNotFound() {
+        //
+    }
+
+    messageOnEdit() {
+        // what?
+    }
+
+    messageOnForwardedFound() {
+        //
+    }
 }
 
 function textByAction(message) {
