@@ -2,10 +2,6 @@
     height: 100vh;
     overflow: hidden;
 
-    &:hover {
-        overflow-y: overlay;
-    }
-
     >.header {
         padding: 8px 14px;
         display: flex;
@@ -26,6 +22,13 @@
     }
 
     .content {
+        overflow-y: hidden;
+        height: 100%;
+
+        &:hover {
+            overflow-y: overlay;
+        }
+
         .photo-container {
             height: 120px;
             width: 100%;
@@ -42,7 +45,7 @@
             }
         }
 
-        .description {
+        >.description {
             text-align: center;
             margin-top: 30px;
             margin-bottom: 20px;
@@ -63,7 +66,7 @@
             }
         }
 
-        .details {
+        >.details {
             align-items: center;
             margin: 10px 0 20px 0;
             display: flex;
@@ -108,23 +111,142 @@
             margin-top: 60px;
 
             .header {
-                width: 100%;
-                height: 24px;
                 display: flex;
                 flex-direction: row;
                 justify-content: space-around;
-                border-bottom: 1px $grey solid;
+                border-bottom: 1px $lightgrey solid;
             }
 
             .item {
+                padding: 12px;
+                position: relative;
             	height: 100%;
-            	font-weight: bold;
+            	font-weight: 500;
             	color: $darkgrey;
+                text-align: center;
+                width: 100%;
+                cursor: pointer;
+
+                span {
+                    position: relative;
+                    padding: 0 2px 0 2px;
+                }
             }
 
             .item.selected {
-                border-bottom: 3px $blue solid;
                 color: $blue;
+
+                span {
+                    &::after {
+                        content: "";
+                        position: absolute;
+                        border-bottom: 3px $blue solid;
+                        bottom: -12px;
+                        left: 0;
+                        width: 100%;
+                        border-top-left-radius: 2px;
+                        border-top-right-radius: 2px;
+                    }
+                }
+            }
+
+            .content-loading {
+                width: 100%;
+                height: 200px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &.hidden {
+                    display: none;
+                }
+            }
+
+            .content {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+
+                &:has(.photo) {
+                    padding: 8px 8px 4px 4px;
+                }
+
+                >.link {
+                    padding: 20px;
+                    margin-bottom: 4px;
+                    display: flex;
+                    flex-direction: row;
+                    text-align: left;
+                    width: 100%;
+
+                    .photo {
+                        max-width: 48px;
+                        min-width: 48px;
+                        height: 48px;
+
+                        img {
+                            object-fit: cover;
+                            height: 48px;
+                            width: 48px;
+                        }
+
+                        border-radius: 6px;
+                    }
+
+                    .details {
+                        display: flex;
+                        flex-direction: column;
+                        margin-left: 11px;
+                        margin-top: 5px;
+                        word-break: break-word;
+
+                        >* {
+                            margin-bottom: 3px;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            display: -webkit-box;
+                            // TODO js polyfill
+                            -webkit-line-clamp: 2;
+                            -webkit-box-orient: vertical;
+                        }
+
+                        .title {
+                            color: black;
+                        }
+
+                        .description {
+                            color: $darkgrey;
+                        }
+
+                        .url {
+                            color: $darkblue;
+                        }
+                    }
+                }
+
+                >.photo {
+                    // P R E C I S E
+                    flex: 1 0 calc(33.3333333333333333% - 4px);
+
+                    margin-left: 4px;
+                    margin-bottom: 4px;
+
+                    flex-grow: 0;
+
+                    :first-child {
+                        background-repeat: no-repeat;
+                        background-position: center;
+                        background-size: cover;
+                        width: 100%;
+                        height: 100%;
+                    }
+
+                    &:before {
+                        content: "";
+                        float: left;
+                        padding-top: 100%;
+                    }
+                }
             }
         }
     }

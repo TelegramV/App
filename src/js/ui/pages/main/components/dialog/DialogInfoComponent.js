@@ -2,6 +2,10 @@ import AppSelectedInfoPeer from "../../../../reactive/SelectedInfoPeer";
 import AppEvents from "../../../../../api/eventBus/AppEvents";
 import {UserPeer} from "../../../../../api/dataObjects/peer/UserPeer";
 import Component from "../../../../v/vrdom/Component";
+import {MTProto} from "../../../../../mtproto";
+import {FileAPI} from "../../../../../api/fileAPI";
+import {ObjectWithThumbnailComponent} from "../basic/objectWithThumbnailComponent";
+import {PhotoComponent} from "../basic/photoComponent";
 
 const DetailsFragment = ({icon, text, label, hidden = false, id}) => {
     return <div className={["details", hidden ? "hidden" : ""]} id={id}>
@@ -39,6 +43,56 @@ const DescriptionFragment = ({name, status, isOnline}) => {
     </div>
 }
 
+const loadObject = (photo, onProgress) => {
+    const max = FileAPI.getMaxSize(photo)
+    photo.real = {
+        src: FileAPI.hasThumbnail(photo) ? FileAPI.getThumbnail(photo) : "",
+        size: {width: max.w, height: max.h},
+        thumbnail: true
+    }
+
+    return FileAPI.getFile(photo, max.type, onProgress).then(file => {
+        photo.real.src = file
+        photo.real.thumbnail = false
+    })
+}
+
+const slotLoaded = (photo, real) => {
+    return <div css-background-image={`url(${real.src})`}/>
+}
+
+const slotLoadingWidth = (photo, real) => {
+    return <div css-background-image={`url(${real.src})`}/>
+}
+
+const slotLoadingHeight = (photo, real) => {
+    return <div css-background-image={`url(${real.src})`}/>
+}
+
+const DialogInfoPhotoComponent = ({photo}) => {
+    return <ObjectWithThumbnailComponent type="photo" loadObject={loadObject} object={photo} slotLoaded={slotLoaded}
+                                         slotLoadingWidth={slotLoadingWidth} slotLoadingHeight={slotLoadingHeight}/>
+}
+
+const DialogInfoLinkComponent = ({title, description, url, photo, displayUrl}) => {
+    return <a className="link rp" href={url} target="_blank">
+        {
+            photo ?
+                <PhotoComponent photo={photo}/>
+            :
+                <div className="photo"/>
+        }
+        <div className="details">
+            <span className="title">{title}</span>
+            <span className="description">{description}</span>
+            <a className="url">{displayUrl}</a>
+        </div>
+    </a>
+}
+
+const MaterialHeaderFragment = ({selected = false, text, hidden = false}) => {
+    return <div className={["item rp", selected ? "selected" : "", hidden ? "hidden" : ""]}><span>{text}</span></div>
+}
 
 export class DialogInfoComponent extends Component {
     constructor(props) {
@@ -69,12 +123,12 @@ export class DialogInfoComponent extends Component {
     h() {
         return (
             <div className={["dialog-info sidebar right", this.state.hidden ? "hidden" : ""]}>
-                <div class="header">
+                <div class="header toolbar">
                     <span class="btn-icon tgico tgico-close rp rps" onClick={this.close}/>
                     <div class="title">Info</div>
                     <span class="btn-icon tgico tgico-more rp rps"/>
                 </div>
-                <div class="content">
+                <div class="content" onScroll={this.onScroll}>
                     <div class="photo-container">
                         <img class="photo" src=""/>
                     </div>
@@ -89,10 +143,15 @@ export class DialogInfoComponent extends Component {
 
                     <div class="materials">
                         <div class="header">
-                            <div class="item selected">Media</div>
-                            <div class="item">Docs</div>
-                            <div class="item">Links</div>
-                            <div class="item">Audio</div>
+                            <MaterialHeaderFragment text="Media"/>
+                            <MaterialHeaderFragment text="Docs"/>
+                            <MaterialHeaderFragment selected text="Links"/>
+                            <MaterialHeaderFragment text="Audio"/>
+                        </div>
+                        <div className="content">
+                        </div>
+                        <div className="content-loading">
+                            <progress className="progress-circular big"/>
                         </div>
                     </div>
                 </div>
@@ -108,6 +167,8 @@ export class DialogInfoComponent extends Component {
             $bio: content.querySelector("#bio"),
             $phone: content.querySelector("#phone"),
             $username: content.querySelector("#username"),
+            $content: content.querySelector(".materials > .content"),
+            $loader: content.querySelector(".materials > .content-loading")
         }
     }
 
@@ -127,26 +188,87 @@ export class DialogInfoComponent extends Component {
         }
     }
 
+    onScroll(event) {
+        const $element = event.target
+
+        if ($element.scrollHeight - 200 <= $element.clientHeight + $element.scrollTop && !this.state.isFetchingNextPage) {
+            this.state.isFetchingNextPage = true
+
+            this.fetchNextLinksPage(this.state.offsetId).finally(_ => {
+                this.state.isFetchingNextPage = false
+            })
+
+            // TODO fetch next page
+            // this.reactive.peer.api.fetchNextPage().then(() => {
+            //     this.state.isFetchingNextPage = false
+            //     this._toggleMessagesLoader(true)
+            // })
+
+        }
+    }
+
     close() {
         this.$el.classList.add("hidden")
         this.state.hidden = true
+    }
 
+    fetchNextPhotoPage(offsetId = 0) {
+        if(this.state.offsetId === -1) return Promise.resolve()
+
+        console.log("fetchNextPhotoPage", offsetId)
+        return this.fetchPage(offsetId, {
+            _: "inputMessagesFilterPhotos"
+        }).then(l => {
+            l.messages.forEach(q => {
+                this.addPhoto(q.media)
+                this.state.offsetId = q.id
+            })
+        })
+    }
+
+    fetchNextLinksPage(offsetId = 0) {
+        if(this.state.offsetId === -1) return Promise.resolve()
+
+        console.log("fetchNextLinksPage", offsetId)
+        return this.fetchPage(offsetId, {
+            _: "inputMessagesFilterUrl"
+        }).then(l => {
+            l.messages.forEach(q => {
+                console.log(q)
+                // TODO fetch messageEntities urls
+                if(q.media && q.media.webpage)
+                this.addLink(q.media.webpage)
+                this.state.offsetId = q.id
+            })
+        })
+    }
+
+    fetchPage(offsetId, filter) {
+        if(this.state.offsetId === -1) return Promise.reject()
+
+        return MTProto.invokeMethod("messages.search", {
+            peer: this.state.peer.inputPeer,
+            q: "",
+            filter: filter,
+            limit: 99, // /3
+            offset_id: offsetId
+        }).then(q => {
+            if(q.messages.length < 99) {
+                this.state.offsetId = -1
+                this.elements.$loader.classList.add("hidden")
+            } else {
+                this.elements.$loader.classList.remove("hidden")
+            }
+            return q
+        })
     }
 
     open(peer) {
-        // MTProto.invokeMethod("messages.search", {
-        //     peer: peer.inputPeer,
-        //     q: "",
-        //     filter: {
-        //         _: "inputMessagesFilterPhotos"
-        //     },
-        //     limit: 100
-        // }).then(l => {
-        //     console.log(l)
-        // })
+        this.state.offsetId = 0
         this.state.hidden = false
         this.state.peer = peer
 
+        this.resetContent()
         this.patchDescription()
         this.patchPhoto()
         this.patchBio()
@@ -156,8 +278,23 @@ export class DialogInfoComponent extends Component {
         this.$el.classList.remove("hidden")
 
         peer.fetchFull()
-        //
+        this.fetchNextLinksPage()
+        //this.fetchNextPhotoPage()
 
+    }
+
+    resetContent() {
+        while(this.elements.$content.firstChild) {
+            this.elements.$content.removeChild(this.elements.$content.firstChild)
+        }
+    }
+
+    addPhoto(photo) {
+        VRDOM.append(<DialogInfoPhotoComponent photo={photo.photo}/>, this.elements.$content)
+    }
+
+    addLink(link) {
+        VRDOM.append(<DialogInfoLinkComponent photo={link.photo} title={link.title} description={link.description} url={link.url} displayUrl={link.display_url}/>, this.elements.$content)
     }
 
     patchDescription() {
