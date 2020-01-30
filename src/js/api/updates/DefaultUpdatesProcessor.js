@@ -1,4 +1,4 @@
-import MTProto from "../../mtproto"
+import MTProto from "../../mtproto/external"
 import PeersManager from "../peers/PeersManager"
 import AppEvents from "../eventBus/AppEvents"
 import {tsNow} from "../../mtproto/timeManager"

@@ -2,9 +2,8 @@ import "../sass/application.scss"
 
 import "./ui/vendor/tgs-player.js";
 import V from "./ui/v/VFramework"
-import MTProto from "./mtproto"
+import MTProto from "./mtproto/external"
 import AppCache from "./api/cache"
-import {loadSchema} from "./mtproto/language/schema"
 import PeersStore from "./api/store/PeersStore"
 import AppEvents from "./api/eventBus/AppEvents"
 import {createNonce} from "./mtproto/utils/bin"
@@ -69,7 +68,5 @@ console.log(
 )
 
 startUI()
-loadSchema().then(() => {
-    MTProto.connect(authContext)
-        .then(start)
-})
+MTProto.connect(authContext)
+    .then(start)

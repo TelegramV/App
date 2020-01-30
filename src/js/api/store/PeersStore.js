@@ -1,6 +1,6 @@
 import MappedStore from "./MappedStore"
 import {PeerAPI} from "../peerAPI"
-import MTProto from "../../mtproto"
+import MTProto from "../../mtproto/external"
 
 /**
  * @property {Map<string, Map<number, Peer>>} _data

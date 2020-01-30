@@ -2,7 +2,7 @@ import AppSelectedInfoPeer from "../../../../reactive/SelectedInfoPeer";
 import AppEvents from "../../../../../api/eventBus/AppEvents";
 import {UserPeer} from "../../../../../api/dataObjects/peer/UserPeer";
 import Component from "../../../../v/vrdom/Component";
-import {MTProto} from "../../../../../mtproto";
+import {MTProto} from "../../../../../mtproto/external";
 import {FileAPI} from "../../../../../api/fileAPI";
 import {ObjectWithThumbnailComponent} from "../basic/objectWithThumbnailComponent";
 import {PhotoComponent} from "../basic/photoComponent";

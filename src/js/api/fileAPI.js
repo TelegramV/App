@@ -1,4 +1,4 @@
-import {MTProto} from "../mtproto";
+import {MTProto} from "../mtproto/external";
 import Bytes from "../mtproto/utils/bytes"
 import Random from "../mtproto/utils/random"
 import AppCache from "./cache"

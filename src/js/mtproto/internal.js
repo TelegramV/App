@@ -1,73 +1,60 @@
+// NEVER USE THIS THING OUTSIDE mtproto FOLDER
+
 import {ApiNetworker} from "./network/apiNetworker"
 import {AppConfiguration} from "../configuration"
 import {createNonce} from "./utils/bin"
 import TimeManager from "./timeManager"
-import {createLogger} from "../common/logger"
-import {AppPermanentStorage} from "../common/storage"
-import {AuthAPI} from "../api/auth";
-import UpdatesManager from "../api/updates/updatesManager"
-import {attach} from "../api/notifications";
-import {MTProtoNetworker} from "./network/mtprotoNetworker";
+import {AuthAPI} from "./auth"
+import {MTProtoNetworker} from "./network/mtprotoNetworker"
 import Bytes from "./utils/bytes"
 import authKeyCreation from "./connect/authKeyCreation"
-import {FileNetworker} from "./network/fileNetworker";
-import V from "../ui/v/VFramework";
+import {FileNetworker} from "./network/fileNetworker"
 
-window.id = 202466030
-window.send = (method, params) => {
-    MTProto.invokeMethod(method, params).then(l => {
-        console.log(l)
-    })
-}
+// NEVER USE THIS THING OUTSIDE mtproto FOLDER
 
-class MobileProtocolAPIAuth {
-    constructor(options = {}) {
-        if (!options.MTProto) {
-            throw new Error("MTProto is not defined")
-        }
+// CURRENTLY WRITE ONLY
+// THIS IS NOT SAFE!!!!!!!!!!
+class MobileProtocolPermanentStorage {
+    constructor(mtp) {
+        /**
+         * @type MobileProtocol
+         */
+        this.mtp = mtp
 
-        this.MTProto = options.MTProto
+        this.storage = new Map()
     }
 
-    sendCode(phoneNumber, options = {}) {
-        return this.MTProto.invokeMethod("auth.sendCode", Object.assign({
-            flags: 0,
-            phone_number: phoneNumber,
-            api_id: AppConfiguration.mtproto.api.api_id,
-            api_hash: AppConfiguration.mtproto.api.api_hash,
-            settings: {
-                _: "codeSettings",
-                flags: 0,
-                pFlags: {
-                    current_number: false,
-                    allow_app_hash: false,
-                    allow_flashcall: false
-                }
-            },
-            lang_code: navigator.language || 'en'
-        }, options))
+    getItem(key) {
+        return this.storage.get(key)
     }
 
-    signIn(phoneNumber, phoneCodeHash, phoneCode, options = {}) {
-        return this.MTProto.invokeMethod("auth.signIn", Object.assign({
-            phone_number: phoneNumber,
-            phone_code_hash: phoneCodeHash,
-            phone_code: phoneCode
-        }, options))
+    setItem(key, value) {
+        this.storage.set(key, value)
+        return Promise.resolve(this.mtp.workerPostMessage({
+            type: "setLocalStorage",
+            key,
+            value
+        }))
     }
 
-    signUp(phoneNumber, phoneCodeHash, firstName, lastName, options = {}) {
-        return this.MTProto.invokeMethod("auth.signU", Object.assign({
-            phone_number: phoneNumber,
-            phone_code_hash: phoneCodeHash,
-            first_name: firstName,
-            last_name: lastName
-        }, options))
+    removeItem(key) {
+        this.storage.delete(key)
+        return Promise.resolve(this.mtp.workerPostMessage({
+            type: "removeLocalStorage",
+            key,
+        }))
     }
-}
 
-function initManagers() {
-    // init non-ui managers
+    clear() {
+        this.storage.clear()
+        return Promise.resolve(this.mtp.workerPostMessage({
+            type: "clearLocalStorage",
+        }))
+    }
+
+    exists(key) {
+        return this.storage.has(key)
+    }
 }
 
 class MobileProtocol {
@@ -77,28 +64,28 @@ class MobileProtocol {
         this.fileNetworkers = {}
         this.timeManager = options.timeManager || TimeManager
         this.configuration = options.configuration
-        this.logger = options.logger || createLogger("MTProto", {
-            level: "debug"
-        })
-
-        this.UpdatesManager = UpdatesManager
 
         this.connected = false
-        this.Auth = new MobileProtocolAPIAuth({
-            MTProto: this
-        })
 
-        this.authorizedUser = undefined
+        this.UpdatesHandler = () => {
+            console.error("no updates handler")
+        }
+
+        this.PermanentStorage = new MobileProtocolPermanentStorage(this)
+        this.workerPostMessage = () => {
+            console.error("fuck it is very badly")
+        }
 
         this.queue = []
+    }
+
+    processUpdate(update) {
+        this.UpdatesHandler(update)
     }
 
     createApiNetworker(authContext) {
         this.networker = new ApiNetworker(authContext)
         this.connected = true
-
-        // TODO definitely not a right place for notifications -_-
-        attach()
     }
 
     onConnected() {
@@ -108,31 +95,30 @@ class MobileProtocol {
         this.queue = []
     }
 
-    connect(authContext) {
+    connect(authContext, storage = {}) {
+        this.PermanentStorage.storage = storage
         this.authContext = authContext
 
-        if (!AppPermanentStorage.exists("authKey" + this.authContext.dcID)) {
+        if (!this.PermanentStorage.exists("authKey" + this.authContext.dcID)) {
             const mtprotoNetworker = new MTProtoNetworker(authContext)
 
             return authKeyCreation(mtprotoNetworker).then(_ => {
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
-                AppPermanentStorage.setItem("authKey" + this.authContext.dcID, Bytes.asHex(authContext.authKey))
-                AppPermanentStorage.setItem("serverSalt" + this.authContext.dcID, Bytes.asHex(authContext.serverSalt))
-
-                this.createApiNetworker(authContext)
-
-                initManagers()
-                this.onConnected()
+                this.PermanentStorage.setItem("authKey" + this.authContext.dcID, Bytes.asHex(authContext.authKey))
+                    .then(() => this.PermanentStorage.setItem("serverSalt" + this.authContext.dcID, Bytes.asHex(authContext.serverSalt)))
+                    .then(() => {
+                        this.createApiNetworker(authContext)
+                        this.onConnected()
+                    })
             })
         } else {
-            authContext.authKey = new Uint8Array(Bytes.fromHex(AppPermanentStorage.getItem("authKey" + this.authContext.dcID)))
-            authContext.serverSalt = Bytes.fromHex(AppPermanentStorage.getItem("serverSalt" + this.authContext.dcID))
+            authContext.authKey = new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("authKey" + this.authContext.dcID)))
+            authContext.serverSalt = Bytes.fromHex(this.PermanentStorage.getItem("serverSalt" + this.authContext.dcID))
 
             this.createApiNetworker(authContext)
 
-            initManagers()
             this.onConnected()
 
             return Promise.resolve()
@@ -140,15 +126,15 @@ class MobileProtocol {
     }
 
     async createFileNetworker(dcID) {
-        if (AppPermanentStorage.exists("authKey" + dcID)) {
+        if (this.PermanentStorage.exists("authKey" + dcID)) {
             // i changed it to MTProtoNetworker cause Networker does not have `invokeMethod` function @undrfined
             const networker = new FileNetworker({
                 dcID: dcID,
                 nonce: createNonce(16),
                 sessionID: createNonce(8), // TODO check if secure?
                 updates: false,
-                authKey: new Uint8Array(Bytes.fromHex(AppPermanentStorage.getItem("authKey" + dcID))),
-                serverSalt: new Uint8Array(Bytes.fromHex(AppPermanentStorage.getItem("serverSalt" + dcID)))
+                authKey: new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("authKey" + dcID))),
+                serverSalt: new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("serverSalt" + dcID)))
             })
             const list = this.fileNetworkers[dcID]
             this.fileNetworkers[dcID] = networker
@@ -181,10 +167,9 @@ class MobileProtocol {
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
-                AppPermanentStorage.setItem("authKey" + authContext.dcID, Bytes.asHex(authContext.authKey))
-                AppPermanentStorage.setItem("serverSalt" + authContext.dcID, Bytes.asHex(authContext.serverSalt))
-
-                return networker
+                return this.PermanentStorage.setItem("authKey" + authContext.dcID, Bytes.asHex(authContext.authKey))
+                    .then(() => this.PermanentStorage.setItem("serverSalt" + authContext.dcID, Bytes.asHex(authContext.serverSalt)))
+                    .then(() => networker)
             })
         })
     }
@@ -222,20 +207,9 @@ class MobileProtocol {
     }
 
     logout() {
-        AppPermanentStorage.clear()
-        V.router.push("/login", {})
-    }
-
-    isUserAuthorized() {
-        return AppPermanentStorage.exists("authorizationData")
-    }
-
-    getAuthorizedUser() {
-        if (!this.authorizedUser) {
-            this.authorizedUser = AppPermanentStorage.getItem("authorizationData")
-        }
-
-        return this.authorizedUser
+        this.PermanentStorage.clear().then(() => {
+            //
+        })
     }
 
     changeDefaultDC(dcID) {
@@ -243,8 +217,10 @@ class MobileProtocol {
     }
 }
 
-export const MTProto = new MobileProtocol({
+// NEVER USE THIS THING OUTSIDE mtproto FOLDER
+
+export const MTProtoInternal = new MobileProtocol({
     configuration: AppConfiguration
 })
 
-export default MTProto
+export default MTProtoInternal

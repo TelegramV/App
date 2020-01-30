@@ -1,6 +1,6 @@
 
 import {GroupPeer} from "./GroupPeer";
-import MTProto from "../../../mtproto"
+import MTProto from "../../../mtproto/external"
 import AppEvents from "../../eventBus/AppEvents"
 
 // It should actually extend from channel but who cares

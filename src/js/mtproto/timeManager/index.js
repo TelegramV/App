@@ -1,14 +1,14 @@
-import {AppTemporaryStorage} from "../../common/storage"
 import {longFromInts} from "../utils/bin"
 import Random from "../utils/random"
+import {MTProtoTempStorage} from "../MTProtoTempStorage"
 
 export class MtpTimeManager {
     constructor() {
         this.lastMessageID = [0, 0]
         this.timeOffset = 0
 
-        if (AppTemporaryStorage.exists("server_time_offset")) {
-            this.timeOffset = AppTemporaryStorage.getItem("server_time_offset")
+        if (MTProtoTempStorage.exists("server_time_offset")) {
+            this.timeOffset = MTProtoTempStorage.getItem("server_time_offset")
         }
     }
 
@@ -38,7 +38,7 @@ export class MtpTimeManager {
 
         // Logger.warn("newTimeOffset = ", newTimeOffset)
 
-        AppTemporaryStorage.setItem("server_time_offset", newTimeOffset)
+        MTProtoTempStorage.setItem("server_time_offset", newTimeOffset)
 
         this.lastMessageID = [0, 0]
         this.timeOffset = newTimeOffset

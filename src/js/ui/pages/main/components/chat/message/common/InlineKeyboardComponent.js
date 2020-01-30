@@ -1,5 +1,5 @@
 import Component from "../../../../../../v/vrdom/Component";
-import MTProto from "../../../../../../../mtproto";
+import MTProto from "../../../../../../../mtproto/external";
 
 
 export class InlineKeyboardComponent extends Component {

@@ -1,4 +1,4 @@
-import {MTProto} from "../../mtproto"
+import {MTProto} from "../../mtproto/external"
 import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash, getPeerTypeFromType} from "./util"
 import TimeManager from "../../mtproto/timeManager"
 import PeersManager from "../peers/PeersManager"

@@ -1,4 +1,4 @@
-import MTProto from "../../mtproto"
+import MTProto from "../../mtproto/external"
 import PeersStore from "../store/PeersStore"
 import PeersManager from "../peers/PeersManager"
 import {Peer} from "../dataObjects/peer/Peer"

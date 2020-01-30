@@ -1,5 +1,5 @@
 import {Manager} from "../manager";
-import MTProto from "../../mtproto";
+import MTProto from "../../mtproto/external";
 import processUpdatesTooLong from "./processUpdatesTooLong"
 import processShortMessage from "./processShortMessage"
 import processShort from "./processShort"

@@ -1,10 +1,10 @@
 import {MonkeyController} from "./monkey"
 import {askForFile, countries, hasClass} from "../../utils"
-import {MTProto} from "../../../mtproto"
+import {MTProto} from "../../../mtproto/external"
 import {AppPermanentStorage} from "../../../common/storage"
 import V from "../../v/VFramework"
 import {FileAPI} from "../../../api/fileAPI"
-import AppCryptoManager from "../../../mtproto/crypto/cryptoManager"
+import AppCryptoManager from "../../../api/cryptoManager"
 import {DropdownComponent} from "../main/components/input/dropdownComponent";
 import {InputComponent} from "../main/components/input/inputComponent";
 import CheckboxComponent from "../main/components/input/checkboxComponent";
@@ -388,6 +388,7 @@ class PasswordInputComponent extends PaneComponent {
         const srp_id = response.srp_id
         const srp_B = response.srp_B
 
+        // todo: remove this from worker
         const srp_ret = await AppCryptoManager.srpCheckPassword(g, p, salt1, salt2, srp_id, srp_B, password);
 
         MTProto.invokeMethod("auth.checkPassword", {

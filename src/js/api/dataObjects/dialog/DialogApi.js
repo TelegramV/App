@@ -1,4 +1,4 @@
-import MTProto from "../../../mtproto"
+import MTProto from "../../../mtproto/external"
 
 /**
  * @property {Dialog} dialog

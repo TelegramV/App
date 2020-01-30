@@ -1,5 +1,5 @@
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
-import MTProto from "../../../../../../mtproto"
+import MTProto from "../../../../../../mtproto/external"
 import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import RadioComponent from "../../input/radioComponent"
 import CheckboxComponent from "../../input/checkboxComponent"
