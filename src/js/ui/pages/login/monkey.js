@@ -21,16 +21,11 @@ export class MonkeyController {
         this.closed = false;
 
         this.trackSym = 0;
-
-        this.frameHandler = this._frameListener.bind(this);
-
-        this.completionHandler = this._completionListener.bind(this);
     }
 
     init(player) {
         this.$monkey = player
         this.load(this.states.idle)
-        console.log("init!")
     }
 
     monkeyLook(symbols) {
@@ -43,7 +38,7 @@ export class MonkeyController {
         }
         if (symbols == this.trackSym) return;
 
-        let start = 10;
+        let start = 18;
         let nextFrame = start + symbols * 3;
 
         if (this.trackSym == 0) {
@@ -77,18 +72,19 @@ export class MonkeyController {
         }).then(l => {
             if (this.animation)
                 this.animation.destroy()
+            let beforeJson = new TextDecoder("utf-8").decode(l);
             this.animation = lottie.loadAnimation({
                 container: this.$monkey, // the dom element that will contain the animation
                 renderer: 'canvas',
                 loop: loop,
                 autoplay: true,
                 name: path,
-                animationData: JSON.parse(String.fromCharCode.apply(null, l)) // the path to the animation json
+                animationData: JSON.parse(new TextDecoder("utf-8").decode(l)) // the path to the animation json
             })
 
             // this.animation.play()
-            this.animation.addEventListener("complete", this.completionHandler);
-            this.animation.addEventListener("enterFrame", this.frameHandler);
+            this.animation.addEventListener("loopComplete", this._completionListener.bind(this));
+            this.animation.addEventListener("enterFrame", this._frameListener.bind(this));
         })
     }
 
@@ -158,7 +154,7 @@ export class MonkeyController {
                 that.nextState = that.idle;
             });
         } else { //close -> open
-            this.monkey.play();
+            this.animation.play();
             this.nextState = this.idle;
         }
     }

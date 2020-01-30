@@ -1,6 +1,7 @@
 $input-height: 54px;
 
 input[type="text"],
+input[type="number"],
 input[type="tel"],
 input[type="password"] {
     caret-color: $blue;

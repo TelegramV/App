@@ -405,10 +405,14 @@
                 }
 
                 .progress-circular {
-                    position: absolute;
-                    width: 50px;
-                    height: 50px;
-                    color: white;
+                    display: none;
+                    &.visible {
+                        display: block;
+                        position: absolute;
+                        width: 50px;
+                        height: 50px;
+                        color: white;
+                    }
                 }
 
                 .audio-wrapper {
@@ -424,48 +428,60 @@
                         font-weight: bold;
                         text-overflow: ellipsis;
                     }
-                    .progress-container {
-                        padding: 0 1px;
-                        .progress-wrapper {
-                            position: relative;
-                            .progress-line {
-                                width: 100%;
+
+                    .audio-artist {
+                        &.hidden {
+                            display: none;
+                        }
+                    }
+
+                    .controls {
+                        height: 100%
+                    }
+
+                    .progress-wrapper {
+                        position: relative;
+                        &.hidden {
+                            display: none;
+                        }
+                        .progress-line {
+                            width: 100%;
+                            height: 4px;
+                            margin: 5px 0;
+                            border-radius: 2px;
+                            background-color: $grey;
+                        }
+                        .listened-wrapper {
+                            display: flex;
+                            width: 100%;
+                            height: 14px;
+                            position: absolute;
+                            top: -5px;
+                            align-items: center;
+                            cursor: pointer;
+
+                            .listened {
+                                width: 1%;
                                 height: 4px;
-                                margin: 5px 0;
                                 border-radius: 2px;
-                                background-color: $grey;
+                                background-color: $blue;
+                                transition: width 0.25s linear;
                             }
-                            .listened-wrapper {
-                                display: flex;
-                                width: 100%;
-                                height: 14px;
-                                position: absolute;
-                                top: -5px;
-                                align-items: center;
+                            .control-ball {
+                                width: 10px;
+                                height: 10px;
+                                border-radius: 5px;
+                                background-color: $blue;
                                 cursor: pointer;
 
-                                .listened {
-                                    width: 1%;
-                                    height: 4px;
-                                    border-radius: 2px;
-                                    background-color: $blue;
-                                }
-                                .control-ball {
-                                    width: 10px;
-                                    height: 10px;
-                                    border-radius: 5px;
-                                    background-color: $blue;
-                                    cursor: pointer;
+                                margin-left: -5px;
 
-                                    margin-left: -5px;
-
-                                }
                             }
                         }
                     }
 
                     svg {
-                        height: 50%;
+                        height: 30px;
                         cursor: pointer;
 
                         rect {
@@ -474,6 +490,9 @@
                     }
 
                     .timer {
+                        &.short .played-wrapper {
+                            display: none;
+                        }
                         margin-top: 5px;
                         color: grey;
                         font-size: 14px;

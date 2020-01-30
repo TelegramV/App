@@ -54,9 +54,9 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
             .then(r => {
                 return r.arrayBuffer().then(b => {
                     try {
-                        return JSON.parse(String.fromCharCode.apply(null, new Uint8Array(b)))
+                        return JSON.parse(new TextDecoder("utf-8").decode(new Uint8Array(b)))
                     } catch (e) {
-                        return JSON.parse(String.fromCharCode.apply(null, gzipUncompress(new Uint8Array(b))))
+                        return JSON.parse(new TextDecoder("utf-8").decode(gzipUncompress(new Uint8Array(b))))
                     }
                 })
             })
