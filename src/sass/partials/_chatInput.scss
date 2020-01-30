@@ -10,13 +10,14 @@
     margin-top: 10px;
 
     display: flex;
-    align-items: flex-start;
+    align-items: flex-end;
 
     .input-and-keyboard-wrapper {
       display: flex;
       flex-direction: column;
       width: 100%;
       margin-right: 11px;
+      z-index: 1;
     }
 
     .input-field-wrapper {
@@ -32,14 +33,33 @@
       .media {
         display: flex;
         width: 100%;
-        height: auto;
-        padding: 11px 16px 0;
+        margin-left: 5px;
+        align-items: center;
+        height: 64px;
+        //padding: 11px 16px 0;
+        transition: anim(height);
+        overflow: hidden;
+
+        &.hidden {
+          height: 0;
+        }
 
         .attachment {
           width: $attachment-width;
           height: $attachment-width;
           margin-right: 5px;
           position: relative;
+          animation-name: attachment-bottom-appear;
+          animation-duration: 150ms;
+
+          @keyframes attachment-bottom-appear {
+            from {
+              bottom: -60px
+            }
+            to {
+              bottom: 0;
+            }
+          }
 
           .tgico-close {
             position: absolute;
@@ -71,9 +91,14 @@
       .reply {
         display: flex;
         width: 100%;
-        height: auto;
-        padding: 11px 16px 0;
+        height: 47px;
         align-items: center;
+        transition: anim(height);
+        overflow: hidden;
+
+        &.hidden {
+          height: 0;
+        }
 
         .message {
           border-left: 2px solid $blue;
@@ -81,7 +106,7 @@
           flex-direction: column;
           padding: 0 10px;
           font-size: 14px;
-          margin: 0 15px;
+          margin-left: 5px;
 
           .title {
             color: $blue;
@@ -97,6 +122,7 @@
         }
 
         .tgico {
+          margin-left: 5px;
           text-align: center;
           color: $darkgrey;
           font-size: 22px;
@@ -105,12 +131,12 @@
       }
 
       .input-field {
+        z-index: 1;
         display: flex;
         width: 100%;
         height: auto;
 
-        align-items: flex-end;
-        padding: 16px;
+        align-items: center;
 
         .textarea {
           align-self: center;
@@ -122,6 +148,7 @@
           outline: none;
           padding: 0 15px;
           align-items: center;
+          height: 56px;
 
           &.empty::before {
             content: "Message";
@@ -131,10 +158,12 @@
         }
 
         .tgico {
+          margin: 6px;
           text-align: center;
           color: $darkgrey;
           font-size: 22px;
           cursor: pointer;
+          flex-shrink: 0;
         }
       }
 
@@ -168,20 +197,45 @@
       }
     }
 
-    .send-button {
+
+    .round-button-wrapper {
+      position: relative;
+
+      .voice-circle {
+        background-color: rgba($blue, 0.2);
+        border-radius: 100%;
+        width: 54px;
+        height: 54px;
+        position: absolute;
+        top: 0;
+        z-index: 0;
+        transform: scale(1);
+        transition: anim(transform);
+      }
+    }
+    .round-button {
       flex-shrink: 0;
       height: $chat-input-height;
       width: $chat-input-height;
-      background: $blue;
       border-radius: 100%;
       box-shadow: 0 2px 3px 0 rgba(16, 35, 47, .15);
       cursor: pointer;
       text-align: center;
+      z-index: 1;
+
+      &.send-button {
+        background: $blue;
+      }
+
+      &.delete-button {
+        background: $red;
+        margin-right: 8px;
+      }
 
       .tgico {
         color: white;
         line-height: $chat-input-height;
-        font-size: 26px;
+        font-size: 22px;
       }
     }
   }

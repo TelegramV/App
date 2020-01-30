@@ -31,36 +31,30 @@ export class ChatInputComponent extends Component {
 
                 <div className="input-and-keyboard-wrapper">
                     <div className="input-field-wrapper">
-                        {
-                            this.state.reply ?
-                                <div className="reply">
-                                    <i className="tgico tgico-close" onClick={l => {
-                                        this.state.reply = null
-                                        this.__patch()
-                                    }
-                                    }/>
-                                    <div className="message">
-                                        <div className="title">{this.state.reply.title}</div>
-                                        <div className="description">{this.state.reply.description}</div>
-                                    </div>
-                                </div>
-                                : ""
-                        }
-                        {this.state.attachments.length > 0 ?
-                            <div className="media">
-                                {this.state.attachments.map(l => {
-                                    return <div className="attachment photo">
-                                        <i className="tgico tgico-close" onClick={_ => {
-                                            this.state.attachments = this.state.attachments.filter(e => e !== l)
-                                            this.__patch()
-                                        }}/>
-                                        <img src={l.src} alt=""/>
-                                    </div>
-                                })}
+                        <div className={["reply", this.state.reply ? "" : "hidden"]}>
+                            <i className="tgico tgico-close btn-icon" onClick={l => {
+                                this.state.reply = null
+                                l.target.parentElement.classList.add("hidden")
+                            }
+                            }/>
+                            <div className="message">
+                                <div className="title">{this.state.reply && this.state.reply.title}</div>
+                                <div className="description">{this.state.reply && this.state.reply.description}</div>
                             </div>
-                            : ""}
+                        </div>
+                        <div className={["media", this.state.attachments.length > 0 ? "" : "hidden"]}>
+                            {this.state.attachments && this.state.attachments.map(l => {
+                                return <div className="attachment photo">
+                                    <i className="tgico tgico-close" onClick={_ => {
+                                        this.state.attachments = this.state.attachments.filter(e => e !== l)
+                                        this.__patch()
+                                    }}/>
+                                    <img src={l.src} alt=""/>
+                                </div>
+                            })}
+                        </div>
                         <div className="input-field">
-                            <i className="tgico tgico-smile"></i>
+                            <i className="tgico tgico-smile btn-icon rp rps"/>
                             <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]}
                                  placeholder="Message"
                                  contentEditable={true} onInput={this.onInput} onKeyPress={this.onKeyPress}
@@ -111,24 +105,25 @@ export class ChatInputComponent extends Component {
                             </div>
                             {this.state.keyboardMarkup ?
                                 // TODO replace icon to keyboard
-                                <i className="tgico tgico-smallscreen"/>
+                                <i className="tgico tgico-smallscreen btn-icon"/>
                                 : ""}
-                            <i className="tgico tgico-attach" onClick={l => ContextMenuManager.openAbove([
-                                {
-                                    icon: "photo",
-                                    title: "Photo or Video",
-                                    onClick: _ => {
-                                        this.pickFile(false)
-                                    }
-                                },
-                                {
-                                    icon: "document",
-                                    title: "Document",
-                                    onClick: _ => {
-                                        this.pickFile(true)
-                                    }
-                                },
-                            ], l.target)}/>
+                            <i className="tgico tgico-attach btn-icon rp rps"
+                               onClick={l => ContextMenuManager.openAbove([
+                                   {
+                                       icon: "photo",
+                                       title: "Photo or Video",
+                                       onClick: _ => {
+                                           this.pickFile(false)
+                                       }
+                                   },
+                                   {
+                                       icon: "document",
+                                       title: "Document",
+                                       onClick: _ => {
+                                           this.pickFile(true)
+                                       }
+                                   },
+                               ], l.target)}/>
 
                         </div>
 
@@ -150,24 +145,33 @@ export class ChatInputComponent extends Component {
                 </div>
 
 
-                <div className="send-button rp rps" onClick={this.onSend} onMouseDown={this.onMouseDown}
-                     onMouseUp={this.onMouseUp} onContextMenu={l => ContextMenuManager.openAbove([
-                    {
-                        icon: "mute",
-                        title: "Send without sound",
-                        onClick: _ => {
-                            this.send(true)
-                        }
-                    },
-                    {
-                        // TODO replace icon to calendar
-                        icon: "recent",
-                        title: "Schedule message",
-                        onClick: _ => {
-                        }
-                    },
-                ], l.target)}>
-                    <i className={["tgico", this.state.valueString.length > 0 ? "tgico-send" : "tgico-microphone"]}/>
+                <div className="round-button delete-button rp rps" onClick={this.onSend}>
+                    <i className="tgico tgico-delete_filled"/>
+                </div>
+
+                <div className="round-button-wrapper">
+                    <div className="round-button send-button rp rps" onClick={this.onSend}
+                         onMouseDown={this.onMouseDown}
+                         onMouseUp={this.onMouseUp} onContextMenu={l => ContextMenuManager.openAbove([
+                        {
+                            icon: "mute",
+                            title: "Send without sound",
+                            onClick: _ => {
+                                this.send(true)
+                            }
+                        },
+                        {
+                            // TODO replace icon to calendar
+                            icon: "recent",
+                            title: "Schedule message",
+                            onClick: _ => {
+                            }
+                        },
+                    ], l.target)}>
+                        <i className={["tgico", this.state.valueString.length > 0 ? "tgico-send" : "tgico-microphone"]}/>
+                    </div>
+                    <div className="voice-circle"/>
+
                 </div>
             </div>
         </div>
@@ -179,7 +183,7 @@ export class ChatInputComponent extends Component {
             description: message.text,
             message: message
         }
-        this.__patch()
+        this.$el.querySelector(".reply").classList.remove("hidden")
     }
 
     setKeyboardMarkup(markup) {
@@ -236,6 +240,10 @@ export class ChatInputComponent extends Component {
         this.send()
     }
 
+    get isRecording() {
+        return !!this.recorder
+    }
+
     onMouseUp(ev) {
         if (!this.isVoiceMode) return
 
@@ -251,39 +259,39 @@ export class ChatInputComponent extends Component {
 
     onRecordingReady(ev) {
 
-        const id = TimeManager.generateMessageID()
-        var reader = new FileReader();
-        reader.readAsArrayBuffer(ev.data);
-        reader.onloadend = (event) => {
-            // The contents of the BLOB are in reader.result:
-
-            AppSelectedPeer.Current.api.sendMedia("", reader.result, {
-                _: "inputMediaUploadedDocument",
-                flags: 0,
-                file: {
-                    _: "inputFile",
-                    id: id,
-                    parts: 1,
-                    name: "audio.ogg"
-                },
-                mime_type: "audio/ogg",
-                attributes: [
-                    {
-                        //flags: 1024,
-                        // duration: 100,
-                        _: "documentAttributeAudio",
-                        pFlags: {
-                            voice: true,
-                            waveform: createNonce(63)
-                        },
-                    },
-                    {
-                        _: "documentAttributeFilename",
-                        file_name: ""
-                    }
-                ]
-            })
-        }
+        // const id = TimeManager.generateMessageID()
+        // var reader = new FileReader();
+        // reader.readAsArrayBuffer(ev.data);
+        // reader.onloadend = (event) => {
+        //     // The contents of the BLOB are in reader.result:
+        //
+        //     AppSelectedPeer.Current.api.sendMedia("", reader.result, {
+        //         _: "inputMediaUploadedDocument",
+        //         flags: 0,
+        //         file: {
+        //             _: "inputFile",
+        //             id: id,
+        //             parts: 1,
+        //             name: "audio.ogg"
+        //         },
+        //         mime_type: "audio/ogg",
+        //         attributes: [
+        //             {
+        //                 //flags: 1024,
+        //                 // duration: 100,
+        //                 _: "documentAttributeAudio",
+        //                 pFlags: {
+        //                     voice: true,
+        //                     waveform: createNonce(63)
+        //                 },
+        //             },
+        //             {
+        //                 _: "documentAttributeFilename",
+        //                 file_name: ""
+        //             }
+        //         ]
+        //     })
+        // }
         console.log("onRecordingReady", ev)
     }
 
@@ -291,6 +299,43 @@ export class ChatInputComponent extends Component {
         if (!this.isVoiceMode) return
         if (!this.microphone) {
             navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
+
+                const processInput = audioProcessingEvent => {
+                    const tempArray = new Uint8Array(analyser.frequencyBinCount);
+
+                    analyser.getByteFrequencyData(tempArray);
+                    this.$el.querySelector(".voice-circle").style.transform = `scale(${getAverageVolume(tempArray)})`
+                    console.log(getAverageVolume(tempArray))
+                }
+
+                const getAverageVolume = array => {
+                    const length = array.length;
+                    let values = 0;
+                    let i = 0;
+
+                    for (; i < length; i++) {
+                        values += array[i];
+                    }
+
+                    return values / length;
+                }
+
+                const audioContext = new AudioContext();
+                const input = audioContext.createMediaStreamSource(l);
+                const analyser = audioContext.createAnalyser();
+                const scriptProcessor = audioContext.createScriptProcessor();
+
+                // Some analyser setup
+                analyser.smoothingTimeConstant = 0.3;
+                analyser.fftSize = 1024;
+
+                input.connect(analyser);
+                analyser.connect(scriptProcessor);
+                scriptProcessor.connect(audioContext.destination);
+
+                scriptProcessor.onaudioprocess = processInput;
+
+                console.log(l)
                 this.recorder = new MediaRecorder(l, {
                     mimeType: "audio/webm;codecs=opus"
                 });
