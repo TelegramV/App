@@ -122,7 +122,7 @@ class PhoneInputComponent extends PaneComponent {
                 <img className="object" src="./static/images/logo.svg" alt=""
                      onClick={this.props.finished}/>
                 <InfoComponent header="Sign in to Telegram"
-                               description="Please confirm your country🇺🇦 and enter your phone number"/>
+                               description="Please confirm your country and enter your phone number"/>
                 <DropdownComponent label="Country" data={generateFullDropdown()}
                                    template={CountryDropdownItemComponent} selected={this.onDropdownSelect}
                                    ref="dropdown"/>
