@@ -42,6 +42,8 @@
             // я тимчасово зламаю хвостики бо перероблюю цсс, вже маю трохи ідею як зробити свгшкою то всьо
             //                                                                          - @undrfined
 
+            //Коли вже svg?
+            //                                                                          - @prettydude
             .card {
                 display: flex;
 
@@ -230,8 +232,9 @@
                     //top: 50%;
                     left: 50%;
                     transform: translate(-50%, -100%);
+
                     svg {
-                        transform: scale(2,2);
+                        transform: scale(2, 2);
                     }
                 }
             }
@@ -267,6 +270,7 @@
                 &.voted {
                     .answer {
                         cursor: default;
+
                         &:hover {
                             background-color: transparent;
                         }
@@ -284,10 +288,11 @@
                     }
 
                     &.wrong {
-                        .options-wrapper > .progress-wrapper > .progress {
+                        .options-wrapper>.progress-wrapper>.progress {
                             background-color: $red;
                         }
-                        .result-wrapper > .voted:not(:empty){
+
+                        .result-wrapper>.voted:not(:empty) {
                             background-color: $red;
                         }
                     }
@@ -353,7 +358,7 @@
                     text-align: center;
                     height: 30px;
                     line-height: 30px;
-                    
+
                     color: $blue;
                     font-weight: bold;
                     cursor: pointer;
@@ -378,13 +383,12 @@
             .audio {
                 display: flex;
                 width: 100%;
-                height: 56px;
+                //height: 60px;
                 flex-direction: row;
                 align-items: center;
                 position: relative;
 
                 .play {
-                    background-color: $blue;
                     color: white;
                     width: 50px;
                     height: 50px;
@@ -406,6 +410,7 @@
 
                 .progress-circular {
                     display: none;
+
                     &.visible {
                         display: block;
                         position: absolute;
@@ -423,114 +428,111 @@
                     height: 100%;
                     flex-grow: 1;
                     min-width: 200px;
-                    
-                    .audio-name {
-                        font-weight: bold;
-                        text-overflow: ellipsis;
-                    }
-
-                    .audio-artist {
-                        &.hidden {
-                            display: none;
-                        }
-                    }
 
                     .controls {
-                        height: 100%
-                    }
+                        height: 100%;
+                        display: flex;
+                        flex-direction: column;
 
-                    .progress-wrapper {
-                        position: relative;
-                        &.hidden {
-                            display: none;
+                        &>* {
+                            margin: 1px 0; //small margin between children
                         }
-                        .progress-line {
-                            width: 100%;
-                            height: 4px;
-                            margin: 5px 0;
-                            border-radius: 2px;
-                            background-color: $grey;
-                        }
-                        .listened-wrapper {
-                            display: flex;
-                            width: 100%;
-                            height: 14px;
-                            position: absolute;
-                            top: -5px;
-                            align-items: center;
-                            cursor: pointer;
 
-                            .listened {
-                                width: 1%;
-                                height: 4px;
-                                border-radius: 2px;
-                                background-color: $blue;
-                                transition: width 0.25s linear;
+                        .audio-name {
+                            font-weight: bold;
+                            text-overflow: ellipsis;
+                            margin-top: 10px;
+                        }
+
+                        .audio-artist {
+                            font-size: 14px;
+
+                            &.hidden {
+                                display: none;
                             }
-                            .control-ball {
-                                width: 10px;
-                                height: 10px;
-                                border-radius: 5px;
-                                background-color: $blue;
+                        }
+
+                        .progress-wrapper {
+                            position: relative;
+                            height: 15px;
+
+                            &.hidden {
+                                display: none;
+                            }
+
+                            .progress-line {
+                                width: 100%;
+                                height: 3px;
+                                margin: 5px 0;
+                                border-radius: 1.5px;
+                            }
+
+                            .listened-wrapper {
+                                display: flex;
+                                width: 100%;
+                                height: 13px;
+                                position: absolute;
+                                top: 0;
+                                align-items: center;
                                 cursor: pointer;
 
-                                margin-left: -5px;
+                                .listened {
+                                    width: 1%;
+                                    height: 3px;
+                                    border-radius: 1.5px;
+                                    transition: width 0.25s linear;
+                                }
 
+                                .control-ball {
+                                    width: 10px;
+                                    height: 10px;
+                                    border-radius: 5px;
+                                    cursor: pointer;
+
+                                    margin-left: -5px;
+
+                                }
                             }
                         }
-                    }
 
-                    svg {
-                        height: 30px;
-                        cursor: pointer;
+                        svg {
+                            height: 30px;
+                            cursor: pointer;
 
-                        rect {
-                            transition: width 0.25s linear;
+                            rect {
+                                transition: width 0.25s linear;
+                            }
+                        }
+
+                        .timer {
+                            &.short .played-wrapper {
+                                display: none;
+                            }
+
+                            font-size: 14px;
                         }
                     }
 
-                    .timer {
-                        &.short .played-wrapper {
-                            display: none;
-                        }
-                        margin-top: 5px;
-                        color: grey;
-                        font-size: 14px;
-                    }
-                }
-
-                .inside {
-                    margin-left: 15px;
-                    display: flex;
-                    flex-direction: column;
-                    width: 100%;
-
-                    .bars {
-                        height: 27px;
-                        width: 100%;
+                    .inside {
+                        margin-left: 15px;
                         display: flex;
-                        flex-direction: row;
-                        align-items: flex-end;
-
-                        .bar {
-                            width: 2px;
-                            height: 100%;
-                            margin-right: 2px;
-                            background-color: $blue;
-                        }
-                    }
-
-                    .time {
-                        margin-top: 8px;
+                        flex-direction: column;
                         width: 100%;
-                    }
 
-                    .read {
-                        display: inline-block;
-                        width: 7px;
-                        height: 7px;
-                        background-color: $blue;
-                        border-radius: 100%;
+                        .bars {
+                            height: 27px;
+                            width: 100%;
+                            display: flex;
+                            flex-direction: row;
+                            align-items: flex-end;
+
+                            .bar {
+                                width: 2px;
+                                height: 100%;
+                                margin-right: 2px;
+                                background-color: $blue;
+                            }
+                        }
                     }
                 }
             }
@@ -540,8 +542,7 @@
                 color: $blueonline;
                 font-weight: 500;
                 font-size: 14px;
-                padding: 9px;
-                padding-bottom: 0px;
+                padding: 5px 0;
             }
 
             .message {
@@ -698,9 +699,6 @@
                 }
             }
         }
-
-
-
     }
 
     .bubble+.bubble {
@@ -811,6 +809,23 @@
 
                 .progress {
                     fill: $blue;
+                }
+
+                .controls {
+
+                    .audio-artist,
+                    .timer {
+                        color: $darkgrey;
+                    }
+
+                    .progress-line {
+                        background-color: $green
+                    }
+
+                    .control-ball,
+                    .listened {
+                        background-color: $blue;
+                    }
                 }
             }
 
@@ -931,6 +946,23 @@
                 .progress {
                     fill: $darkgreen;
                 }
+
+                .controls {
+
+                    .audio-artist,
+                    .timer {
+                        color: $darkgreen;
+                    }
+
+                    .progress-line {
+                        background-color: lighten($darkgreen, 25%);
+                    }
+
+                    .control-ball,
+                    .listened {
+                        background-color: $darkgreen;
+                    }
+                }
             }
 
             .play {
@@ -948,13 +980,19 @@
         }
 
         .bubble {
+
+            .username,
+            .fwd {
+                color: $darkgreen;
+            }
+
             .time .tgico.status:after {
                 font-size: 18px;
                 line-height: 12px;
                 vertical-align: top;
             }
 
-            .radio-input input[type=radio]{
+            .radio-input input[type=radio] {
                 &:before {
                     background-color: $lightgreen
                 }
