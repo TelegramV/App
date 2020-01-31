@@ -122,6 +122,7 @@
         }
 
         .tgico {
+          flex-shrink: 0;
           margin-left: 5px;
           text-align: center;
           color: $darkgrey;
@@ -262,6 +263,10 @@
         background: $red;
         transition: anim(all);
         transform: scale(0);
+
+        &:hover {
+          background: rgba($red, 0.8);
+        }
 
         &.open {
           margin-right: 64px;

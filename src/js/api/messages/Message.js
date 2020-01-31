@@ -52,6 +52,7 @@ export interface Message {
     +isEditHide: boolean;
     +replyToMessage: Message;
     +replyToMessage: Message;
+    +replyMarkup: any;
     +forwarded: any;
     +forwardedMessageId: number;
 

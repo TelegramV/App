@@ -11,25 +11,25 @@ export class InlineKeyboardComponent extends Component {
     h() {
         const message = this.props.message
         return <div className="inline-keyboard">
-            {message.raw.replyMarkup.rows.map(l => {
+            {message.replyMarkup.rows.map(l => {
                 return <div className="row">
                     {l.buttons.map(q => {
-                        return InlineKeyboardComponent.parseButton(q)
+                        return InlineKeyboardComponent.parseButton(message, q)
                     })}
                 </div>
             })}
         </div>
     }
 
-    static parseButton(button) {
+    static parseButton(message, button) {
         const loader = <progress className="progress-circular white disabled"/>
         const handlers = {
             "keyboardButton": l => <div className="button rp rps"
-                                        onClick={q => this.callbackButton(this.props.message, q.target, l.text)}>{l.text}{loader}</div>,
+                                        onClick={q => this.callbackButton(message, q.target, l.text)}>{l.text}{loader}</div>,
             "keyboardButtonUrl": l => <a className="button rp rps link" href={l.url}
                                          target="_blank">{l.text}{loader}</a>,
             "keyboardButtonCallback": l => <div className="button rp rps"
-                                                onClick={q => this.callbackButton(this.props.message, q.target, l.data)}>{l.text}{loader}</div>,
+                                                onClick={q => this.callbackButton(message, q.target, l.data)}>{l.text}{loader}</div>,
             "keyboardButtonRequestPhone": l => <div className="button rp rps"
                                                     onClick={this.requestPhone}>{l.text}{loader}</div>,
             "keyboardButtonRequestGeoLocation": l => <div className="button rp rps"
@@ -37,7 +37,7 @@ export class InlineKeyboardComponent extends Component {
             "keyboardButtonSwitchInline": l => <div className="button rp rps switch-inline"
                                                     onClick={_ => this.switchInline(l)}>{l.text}{loader}</div>,
             "keyboardButtonGame": l => <div className="button rp rps"
-                                            onClick={q => this.startGame(this.props.message, q.target)}>{l.text}{loader}</div>,
+                                            onClick={q => this.startGame(message, q.target)}>{l.text}{loader}</div>,
             "keyboardButtonBuy": l => <div className="button rp rps" onClick={this.buy}>{l.text}{loader}</div>,
             "keyboardButtonUrlAuth": l => <div className="button rp rps"
                                                onClick={_ => this.auth(l)}>{l.text}{loader}</div>
