@@ -92,7 +92,7 @@ class MobileProtocolAPIAuth {
     }
 
     signUp(phoneNumber, phoneCodeHash, firstName, lastName, options = {}) {
-        return this.MTProto.invokeMethod("auth.signU", Object.assign({
+        return this.MTProto.invokeMethod("auth.signUp", Object.assign({
             phone_number: phoneNumber,
             phone_code_hash: phoneCodeHash,
             first_name: firstName,
