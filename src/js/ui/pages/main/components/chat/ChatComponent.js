@@ -21,26 +21,8 @@ class ChatComponent extends Component {
     h() {
         return (
             <div class="chat-wrapper">
-
-                <LoaderComponent id="chat-wrapper-loader" full={true} show={true}/>
-
-                <div id="noChat" css-display="none">
-                    <div className="placeholder tgico tgico-chatsplaceholder"/>
-                    <div className="text"><p>Open Chat</p> <p>or create a new one</p></div>
-                    <div className="buttons">
-                        <div className="button-wrapper">
-                            <div className="button rp"><i className="tgico tgico-newprivate"/></div>
-                            <p>Private</p>
-                        </div>
-                        <div className="button-wrapper">
-                            <div className="button rp"><i className="tgico tgico-newgroup"/></div>
-                            <p>Group</p>
-                        </div>
-                        <div className="button-wrapper">
-                            <div className="button rp"><i className="tgico tgico-newchannel"/></div>
-                            <p>Channel</p>
-                        </div>
-                    </div>
+                <div id="noChat">
+                    <LoaderComponent id="chat-wrapper-loader" full={true} show={true}/>
                 </div>
                 <div id="chat" css-display="none">
                     <div id="topbar">
