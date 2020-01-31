@@ -1,5 +1,5 @@
-import Component from "../../../../v/vrdom/Component"
-import AppConnectionStatus from "../../../../reactive/ConnectionStatus"
+import Component from "../../../../../v/vrdom/Component"
+import AppConnectionStatus from "../../../../../reactive/ConnectionStatus"
 
 export class ConnectionStatusComponent extends Component {
     constructor(props) {

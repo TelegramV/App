@@ -1,5 +1,5 @@
 import Component from "./v/vrdom/Component";
-import ChatInfoAvatarComponent from "./pages/main/components/chat/chatInfo/ChatInfoAvatarComponent";
+import ChatInfoAvatarComponent from "./pages/main/sidebars/right/chatInfo/ChatInfoAvatarComponent";
 
 export let MediaViewerManager
 
