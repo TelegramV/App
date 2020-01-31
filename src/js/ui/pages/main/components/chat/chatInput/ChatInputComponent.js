@@ -6,6 +6,7 @@ import TimeManager from "../../../../../../mtproto/timeManager";
 import {createNonce} from "../../../../../../mtproto/utils/bin";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {InlineKeyboardComponent} from "../message/common/InlineKeyboardComponent";
+import {formatAudioTime} from "../../../../../utils"
 
 export let ChatInputManager
 
@@ -242,14 +243,7 @@ export class ChatInputComponent extends Component {
     }
 
     tickTimer() {
-        const t = 1000 / 10
-        const minute = Math.floor(this.i / 100 / 60)
-        let second = (Math.floor(this.i / 100) % 60).toString()
-        if(second.length === 1) second = "0" + second
-        let millisecond = (this.i % 100).toString()
-        if(millisecond.length === 1) millisecond = "0" + millisecond
-
-        const time = minute + ":" + second + "," + millisecond
+        const time = formatAudioTime(this.i/100)+","+this.i%100;
         this.$el.querySelector(".voice-seconds").innerHTML = time
         this.i++
         if(this.isRecording)
