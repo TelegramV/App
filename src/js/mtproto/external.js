@@ -37,7 +37,7 @@ function resolveTask(taskId, taskResult) {
 }
 
 function performTask(task, data, resolve) {
-    if (lastTaskId > 101010) {
+    if (lastTaskId === Number.MAX_VALUE) {
         lastTaskId = 0
     } else {
         lastTaskId++

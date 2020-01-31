@@ -3,7 +3,7 @@ import replaceEmoji from "../utils/emoji"
 
 class EmojiVRDOMPlugin extends VRDOMPlugin {
 
-    elementMounted($el) {
+    elementPatched($el) {
         if ($el.nodeType !== Node.TEXT_NODE && $el.textContent) {
             replaceEmoji($el);
         }

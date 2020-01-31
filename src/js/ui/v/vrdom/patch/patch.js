@@ -92,6 +92,8 @@ const vrdom_patch = <T: Element | Node | Text>($node: T, newNode: VRNode | Compo
             patchChildren($node, $node.childNodes, newNode.children)
         }
 
+        V.plugins.forEach(plugin => plugin.elementPatched($node))
+
         return $node
 
     } else if (newNode === undefined) {
