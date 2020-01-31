@@ -40,6 +40,31 @@ const BadgeFragment = ({id, show = false, slot}) => {
     )
 }
 
+const UnreadCountBadge = ({dialog}) => {
+    return (
+        <BadgeFragment id={`dialog-${dialog.peer.id}-unreadCount`}
+                       show={dialog.messages.unreadCount > 0}>
+
+            {dialog.messages.unreadCount}
+        </BadgeFragment>
+    )
+}
+
+const UnreadMentionsCountBadge = ({dialog}) => {
+    return (
+        <BadgeFragment id={`dialog-${dialog.peer.id}-mentionCount`}
+                       show={dialog.messages.unreadMentionsCount > 0}>
+            @
+        </BadgeFragment>
+    )
+}
+
+const UnreadMarkBadge = ({dialog}) => {
+    return (
+        <BadgeFragment id={`dialog-${dialog.peer.id}-unreadMark`} show={dialog.unreadMark}/>
+    )
+}
+
 const TimeFragment = ({id, dialog}) => {
     return (
         <div id={id} className="time">
@@ -73,14 +98,13 @@ export class DialogComponent extends Component {
     h() {
         const dialog = this.dialog
         const peer = dialog.peer
-        const isUnread = dialog.messages.unreadMentionsCount > 0 || dialog.messages.unreadCount > 0 || dialog.unreadMark
 
         const personClasses = {
             "person": true,
             "rp": true,
             "online": peer instanceof UserPeer && peer.onlineStatus.online,
             "active": AppSelectedPeer.check(dialog.peer),
-            "unread": isUnread,
+            "unread": dialog.messages.unreadMentionsCount > 0 || dialog.messages.unreadCount > 0 || dialog.unreadMark,
             "muted": dialog.isMuted,
         }
 
@@ -96,7 +120,9 @@ export class DialogComponent extends Component {
             <div data-message-id={dialog.messages.last.id}
                  data-date={dialog.messages.last.date}
                  data-pinned={dialog.isPinned === undefined ? false : dialog.isPinned}
+
                  className={personClasses}
+
                  onClick={this._handleClick}
                  onContextMenu={this._contextMenuListener}>
 
@@ -115,22 +141,12 @@ export class DialogComponent extends Component {
                     </div>
 
                     <div className="bottom">
-
                         <DialogTextComponent id={`dialog-${dialog.peer.id}-text`} dialog={dialog}/>
 
-                        <BadgeFragment id={`dialog-${dialog.peer.id}-mentionCount`}
-                                       show={dialog.messages.unreadMentionsCount > 0}>
-                            @
-                        </BadgeFragment>
+                        <UnreadMentionsCountBadge dialog={dialog}/>
+                        <UnreadCountBadge dialog={dialog}/>
 
-
-                        <BadgeFragment id={`dialog-${dialog.peer.id}-unreadCount`}
-                                       show={dialog.messages.unreadCount > 0}>
-                            {dialog.messages.unreadCount}
-                        </BadgeFragment>
-
-                        <BadgeFragment id={`dialog-${dialog.peer.id}-unreadMark`} show={dialog.unreadMark}/>
-
+                        <UnreadMarkBadge dialog={dialog}/>
                     </div>
                 </div>
             </div>
@@ -261,11 +277,7 @@ export class DialogComponent extends Component {
 
     _patchUnreadCount() {
         if (this.__.mounted) {
-            VRDOM.patch(this.$unreadCount,
-                <BadgeFragment id={`dialog-${this.dialog.peer.id}-unreadCount`}
-                               show={this.dialog.messages.unreadCount > 0}>
-                    {this.dialog.messages.unreadCount}
-                </BadgeFragment>)
+            VRDOM.patch(this.$unreadCount, <UnreadCountBadge dialog={this.dialog}/>)
         }
     }
 
