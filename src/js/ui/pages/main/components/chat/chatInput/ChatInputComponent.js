@@ -150,7 +150,7 @@ export class ChatInputComponent extends Component {
 
 
                 <div className="round-button-wrapper">
-                    <div className="round-button delete-button rp rps" onClick={this.onSend}>
+                    <div className="round-button delete-button rp rps" onClick={this.onSend} onMouseEnter={this.mouseEnterRemoveVoice} onMouseLeave={this.mouseLeaveRemoveVoice}>
                         <i className="tgico tgico-delete_filled"/>
                     </div>
 
@@ -178,6 +178,14 @@ export class ChatInputComponent extends Component {
                 </div>
             </div>
         </div>
+    }
+
+    mouseEnterRemoveVoice() {
+        this.state.isRemoveVoice = true
+    }
+
+    mouseLeaveRemoveVoice() {
+        this.state.isRemoveVoice = false
     }
 
     replyTo(message) {
@@ -298,6 +306,10 @@ export class ChatInputComponent extends Component {
 
     onRecordingReady(ev) {
 
+        if(this.state.isRemoveVoice) {
+            this.state.isRemoveVoice = false
+            return
+        }
         const id = TimeManager.generateMessageID()
         var reader = new FileReader();
         reader.readAsArrayBuffer(ev.data);

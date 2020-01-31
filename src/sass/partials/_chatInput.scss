@@ -263,6 +263,10 @@
         transition: anim(all);
         transform: scale(0);
 
+        &:hover {
+          background: rgba($red, 0.8);
+        }
+
         &.open {
           margin-right: 64px;
           transform: scale(1);
