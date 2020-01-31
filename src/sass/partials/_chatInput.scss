@@ -131,7 +131,6 @@
       }
 
       .input-field {
-        z-index: 1;
         display: flex;
         width: 100%;
         height: auto;
@@ -164,6 +163,33 @@
           font-size: 22px;
           cursor: pointer;
           flex-shrink: 0;
+
+          &.hidden {
+            // TODO animate
+            display: none;
+          }
+        }
+
+        .voice-seconds {
+          &.hidden {
+            // TODO animate
+            display: none;
+          }
+
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+
+          &::after {
+            content: "";
+            background-color: $red;
+            width: 10px;
+            height: 10px;
+            border-radius: 100%;
+            display: block;
+            margin-left: 19px;
+            margin-right: 22px;
+          }
         }
       }
 
@@ -200,6 +226,8 @@
 
     .round-button-wrapper {
       position: relative;
+      display: flex;
+      flex-direction: row;
 
       .voice-circle {
         background-color: rgba($blue, 0.2);
@@ -208,6 +236,7 @@
         height: 54px;
         position: absolute;
         top: 0;
+        right: 0;
         z-index: 0;
         transform: scale(1);
         transition: anim(transform);
@@ -225,11 +254,19 @@
 
       &.send-button {
         background: $blue;
+        position: absolute;
+        right: 0;
       }
 
       &.delete-button {
         background: $red;
-        margin-right: 8px;
+        transition: anim(all);
+        transform: scale(0);
+
+        &.open {
+          margin-right: 64px;
+          transform: scale(1);
+        }
       }
 
       .tgico {
