@@ -10,21 +10,15 @@ export class DropdownComponent extends Component {
     }
 
     h() {
-        let arrowClasses = ["arrow", "btn-icon", "rp", "rps", "tgico"]
-        arrowClasses.push(this.state.opened ? "tgico-up" : "tgico-down")
-        let dropdownClasses = ["dropdown-list"]
-        if (!this.state.opened) {
-            dropdownClasses.push("hidden")
-        }
         return (
             <div className="dropdown-container">
                 <div className="input-field dropdown down">
                     <input type="text" id={this.props.name} autocomplete="pls,no" placeholder={this.props.label} onBlur={this.onBlur}
                            onFocus={this.onFocus} onInput={this.onInput} value={this.state.value}/>
                     <label htmlFor={this.props.name} required>{this.props.label}</label>
-                    <i className={arrowClasses.join(" ")} onMouseDown={this.onClick}/>
+                    <i className="arrow btn-icon rp rps tgico tgico-down" onMouseDown={this.onClick}/>
                 </div>
-                <div className={dropdownClasses.join(" ")}>
+                <div className="dropdown-list hidden">
                     {
                         this.props.data.map(this.props.template)
                     }
@@ -35,48 +29,73 @@ export class DropdownComponent extends Component {
 
     selected(i) {
         this.props.selected(this.props.data[i])
+        this.state.value = this.props.data[i].name
+        this.inputField.value = this.state.value
+        this.setOpened(false);
     }
 
     select(i) {
         this.state.value = this.props.data[i].name
-        this.__patch()
-        this.$el.querySelector("input").value = this.state.value
+        this.inputField.value = this.state.value
     }
 
     mounted() {
         super.mounted();
+        this.inputField = this.$el.querySelector("input");
+        this.arrowEl = this.$el.querySelector(".arrow")
 
-        this.props.nodes = Array.from(this.$el.querySelector(".dropdown-list").childNodes)
-        for (let i in this.props.nodes) {
-            const node = this.props.nodes[i]
+        let nodes = Array.from(this.$el.querySelector(".dropdown-list").childNodes);
+        for (let i in nodes) {
+            const node = nodes[i]
 
             node.onmousedown = function (ev) {
                 // TODO filterby property
-                this.state.value = this.props.data[i].name
                 this.selected(i)
-                this.__patch()
-                this.$el.querySelector("input").value = this.state.value
             }.bind(this)
         }
     }
 
-    patchDropdown() {
-        const current = this.$el.querySelector("input").value.toLowerCase()
-        for (let i in this.props.nodes) {
-            const node = this.props.nodes[i]
+    setOpened(val) {
+        this.state.opened = !!val;
+        this.patchDropdown();
+        this.patchInput();
+    }
 
-            // TODO create other check functions as well
-            if(!this.countryTest(current, this.props.data[i].name)) {
-            //if(!this.props.data[i].name.toLowerCase().includes(current)) {
+    patchDropdown() {
+        const current = this.inputField.value.toLowerCase()
+
+        let nodes = Array.from(this.$el.querySelector(".dropdown-list").childNodes);
+        let visibleCount = 0;
+        for (let i in nodes) {
+            const node = nodes[i]
+
+            if(!this._countryTest(current, this.props.data[i].name)) {
                 node.classList.add("hidden")
             } else {
                 node.classList.remove("hidden")
+                visibleCount++;
             }
-            //this.__patch()
+        }
+
+        let list = this.$el.querySelector(".dropdown-list");
+        if(visibleCount==0 || !this.state.opened) {
+            list.classList.add("hidden")
+        } else if(this.state.opened){
+            list.classList.remove("hidden")
         }
     }
 
-    countryTest(input, country) {
+    patchInput() {
+        if(this.state.opened) {
+            this.arrowEl.classList.remove("tgico-down");
+            this.arrowEl.classList.add("tgico-up");
+        } else {
+            this.arrowEl.classList.add("tgico-down");
+            this.arrowEl.classList.remove("tgico-up");
+        }
+    }
+
+    _countryTest(input, country) {
         if(country.toLowerCase().includes(input.toLowerCase())) return true;
         let split = country.split(/\b(?=[a-z])/ig);
         if(split.length > 1) {
@@ -86,36 +105,30 @@ export class DropdownComponent extends Component {
     }
 
 
-    onInput(ev) {
-        const current = ev.target.value
-        this.patchDropdown()
+    onInput() {
+        this.setOpened(true)
     }
 
     onClick(ev) {
-        this.state.opened = !this.state.opened
-
-        this.__patch()
+        this.setOpened(!this.state.opened)
 
         ev.preventDefault()
         if (this.state.opened) {
-            this.$el.querySelector("input").focus()
+            this.inputField.focus()
         } else {
-            this.$el.querySelector("input").blur()
+            this.inputField.blur()
         }
     }
 
     onBlur(ev) {
         if (!this.state.opened) return
 
-        this.state.opened = false
-        this.__patch()
+        this.setOpened(false)
     }
 
     onFocus(ev) {
         if (this.state.opened) return
 
-        this.state.opened = true
-        this.__patch()
+        this.setOpened(true)
     }
-
 }

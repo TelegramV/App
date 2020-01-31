@@ -25,7 +25,7 @@ class PhotoMessageComponent extends GeneralMessageComponent {
 
     h() {
         return (
-            <MessageWrapperFragment message={this.message} noPad>
+            <MessageWrapperFragment message={this.message} noPad showUsername={false}>
                 <MessagePhotoFigureFragment message={this.message}
                                             clickLoader={this.toggleLoading}/>
 

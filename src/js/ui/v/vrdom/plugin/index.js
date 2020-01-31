@@ -57,4 +57,8 @@ export class VRDOMPlugin {
     textMounted($text: Text) {
 
     }
+
+    elementPatched($el: Element) {
+
+    }
 }

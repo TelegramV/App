@@ -1,363 +1,358 @@
-html, body, #app {
-	height: 100%;
+html,
+body,
+#app {
+    height: 100%;
 }
 
 #login {
-	top: 50px;
-	width: 360px;
-	margin: 0 auto;
-	position: relative;
-	display: flex;
-	flex-direction: column;
+    top: 50px;
+    width: 360px;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 
-	.fading-block {
-		position: absolute;
-		height: 100%;
-		left: 0;
-		opacity: 1;
-		transition: left 0.4s, opacity 0.4s;
+    .fading-block {
+        position: absolute;
+        height: 100%;
+        left: 0;
+        opacity: 1;
+        transition: left 0.4s, opacity 0.4s;
 
-		&.fade-out {
-			left: -300%;
-			opacity: 0;
-		}
+        &.fade-out {
+            left: -300%;
+            opacity: 0;
+        }
 
-		&.hidden {
-			left: 300%;
-			opacity: 0;
-			display: none;
-		}
+        &.hidden {
+            left: 300%;
+            opacity: 0;
+            display: none;
+        }
 
-		&.fade-in {
-			left: 0;
-			opacity: 1;
-		}
-	}
+        &.fade-in {
+            left: 0;
+            opacity: 1;
+        }
+    }
 
-	.qr-login-button {
-		margin-top: 10px;
-		width: 100%;
-		text-align: center;
-		cursor: pointer;
-		color: $bluehover;
-		position: relative;
+    .qr-login-button {
+        margin-top: 10px;
+        width: 100%;
+        text-align: center;
+        cursor: pointer;
+        color: $bluehover;
+        position: relative;
 
-		&.loading {
-			progress {
-				display: block;
-			}
-		}
+        &.loading {
+            progress {
+                display: block;
+            }
+        }
 
-		progress {
-			display: none;
-			position: absolute;
-			right: 16px;
-			width: 16px;
-			height: 16px;
-			top: 0;
-		}
-	}
+        progress {
+            display: none;
+            position: absolute;
+            right: 16px;
+            width: 16px;
+            height: 16px;
+            top: 0;
+        }
+    }
 
-	.object {
-		display: block;
-		width: 160px;
-		height: 160px;
-		margin: 50px auto 42px 100px;
+    .object {
+        display: block;
+        width: 160px;
+        height: 160px;
+        margin: 50px auto 42px 100px;
 
-		&.big {
-			width: 240px;
-			height: 240px;
-			margin: auto;
-			margin-bottom: 42px;
+        &.big {
+            width: 240px;
+            height: 240px;
+            margin: auto;
+            margin-bottom: 42px;
 
-			canvas {
-				width: 100%;
-			}
-		}
-	}
+            canvas {
+                width: 100%;
+            }
+        }
+    }
 
-	.info {
-		text-align: center;
-		margin-bottom: 20px;
-	}
+    .info {
+        text-align: center;
+        margin-bottom: 20px;
+    }
 
-	.info .header {
-		color: $dark;
-		font-weight: bold;
-		font-size: 32px;
-		margin-bottom: 15px;
+    .info .header {
+        color: $dark;
+        font-weight: bold;
+        font-size: 32px;
+        margin-bottom: 15px;
 
-		span {
-			margin-right: 5px;
-		}
-	}
+        span {
+            margin-right: 5px;
+        }
+    }
 
-	.info .description {
-		color: $darkgrey;
-		font-size: 16px;
-		line-height: 22px;
-		margin-bottom: 25px;
-		padding: 0 60px;
+    .info .description {
+        color: $darkgrey;
+        font-size: 16px;
+        line-height: 22px;
+        margin-bottom: 25px;
+        padding: 0 60px;
 
-		ol {
-			text-align: left;
-		}
-	}
+        ol {
+            text-align: left;
+        }
+    }
 
-	.btn {
-		display: flex;
-		//opacity: 0;
-		margin-top: 45px;
-		background-color: $blue;
-		width: 100%;
-		height: 54px;
-		border-radius: 12px;
-		color: white;
-		justify-content: center;
-		align-items: center;
-		transition: anim(all);
-		user-select: none;
-		text-transform: uppercase;
-		opacity: 1;
-		border: 0;
-		outline: 0;
-		cursor: pointer;
+    .btn {
+        display: flex;
+        //opacity: 0;
+        margin-top: 45px;
+        background-color: $blue;
+        width: 100%;
+        height: 54px;
+        border-radius: 12px;
+        color: white;
+        justify-content: center;
+        align-items: center;
+        transition: anim(all);
+        user-select: none;
+        text-transform: uppercase;
+        opacity: 1;
+        border: 0;
+        outline: 0;
+        cursor: pointer;
 
-		&:not(.disabled):hover {
-			background-color: $bluehover;
-		}
+        &:not(.disabled):hover {
+            background-color: $bluehover;
+        }
 
-		&.disabled {
-			opacity: 0;
-			cursor: auto;
-		}
+        &.disabled {
+            opacity: 0;
+            cursor: auto;
+        }
 
-		span {
-			height: fit-content;
-		}
+        span {
+            height: fit-content;
+        }
 
-		&.loading {
-			progress {
-				display: block;
-			}
-		}
+        &.loading {
+            progress {
+                display: block;
+            }
+        }
 
-		progress {
-			display: none;
-			position: absolute;
-			right: 16px;
-		}
-	}
+        progress {
+            display: none;
+            position: absolute;
+            right: 16px;
+        }
+    }
 
-	#phonePane {
-		width: 100%;
+    #phonePane {
+        width: 100%;
 
-		.input-field {
-			margin-bottom: 22px;
-		}
+        .input-field {
+            margin-bottom: 22px;
+        }
 
-		.checkbox-input {
-			margin-left: 20px;
-		}
+        .checkbox-input {
+            margin-left: 20px;
+        }
 
-		.dropdown-item {
-			display: flex;
-			flex-direction: row;
-			justify-content: space-between;
-			align-items: center;
-			height: 50px;
+        .dropdown-item {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            height: 50px;
 
-			.country-flag {
-				padding: 15px 0 10px 20px;
+            .country-flag {}
 
-				-ms-interpolation-mode: bicubic;
+            .country-name {
+                width: 100%;
+                font-size: 14px;
+                padding-left: 10px;
+            }
 
-				.emoji-sizer {
-					font-size: 20px;
-				}
-			}
+            .country-code {
+                color: $darkgrey;
+                width: 100px;
+                padding-right: 10px;
+            }
+        }
 
-			.country-name {
-				width: 100%;
-				font-size: 14px;
-				padding-left: 10px;
-			}
+    }
 
-			.country-code {
-				color: $darkgrey;
-				width: 100px;
-				padding-right: 10px;
-			}
-		}
+    #codePane {
+        width: 100%;
 
+        .info .description {
+            padding: 0 75px;
+        }
 
-	}
+        #monkey {
+            height: auto;
+            margin-bottom: 35px;
+        }
 
-	#codePane {
-		width: 100%;
+        #editPhone {
+            font-size: 28px;
+        }
+    }
 
-		.info .description {
-			padding: 0 75px;
-		}
+    #passwordPane {
+        .input-field {
+            margin: 30px 0;
+        }
+    }
 
-		#monkey {
-			height: auto;
-			margin-bottom: 35px;
-		}
+    .registerPane {
 
-		#editPhone {
-			font-size: 28px;
-		}
-	}
+        .picture {
+            border-radius: 50%;
+            background-color: $blue;
+            background-size: contain;
+            position: relative;
 
-	#passwordPane {
-		.input-field {
-			margin: 30px 0;
-		}
-	}
+            cursor: pointer;
 
-	.registerPane {
+            .tint {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                background-color: rgba(0, 0, 0, 0.4);
 
-		.picture {
-			border-radius: 50%;
-			background-color: $blue;
-			background-size: contain;
-			position: relative;
+                &.hidden {
+                    display: none;
+                }
+            }
 
-			cursor: pointer;
+            .add-icon {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
 
-			.tint {
-				width: 100%;
-				height: 100%;
-				border-radius: 50%;
-				background-color: rgba(0,0,0,0.4);
-				&.hidden {
-					display: none;
-				}
-			}
+                color: white;
+                font-size: 48px;
+            }
+        }
 
-			.add-icon {
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				transform: translate(-50%, -50%);
+        .info .description {
+            margin-bottom: 40px;
+            padding: 0 90px;
+        }
 
-				color: white;
-				font-size: 48px;
-			}
-		}
-
-		.info .description {
-			margin-bottom: 40px;
-			padding: 0 90px;
-		}
-
-		.input-field {
-			margin-bottom: 22px;
-		}
-	}
+        .input-field {
+            margin-bottom: 22px;
+        }
+    }
 }
 
 #cropper {
-	position: relative;
+    position: relative;
 
-	.cropper-container {
-		position: relative;
-		width: 350px;
-		height: 350px;
-		margin: 0px auto 50px;
-		z-index: 1;
+    .cropper-container {
+        position: relative;
+        width: 350px;
+        height: 350px;
+        margin: 0px auto 50px;
+        z-index: 1;
 
-		.boundary {
-			width: 350px;
-			height: 350px;
-			position: relative;
-			overflow: hidden;
-			margin: auto;
-			z-index: 3;
-			border-radius: 0.2em;
+        .boundary {
+            width: 350px;
+            height: 350px;
+            position: relative;
+            overflow: hidden;
+            margin: auto;
+            z-index: 3;
+            border-radius: 0.2em;
 
-			.image {
-				position: absolute;
-				top: 0;
-				left: 0;
-				z-index: -1;
-				max-width: none;
-				max-height: none;
-			}
+            .image {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index: -1;
+                max-width: none;
+                max-height: none;
+            }
 
-			.vignette {
-				position: absolute;
-				margin: auto;
-				width: 310px;
-				height: 310px;
-				border-radius: 50%;
-				top: 0;
-				bottom: 0;
-				right: 0;
-				left: 0;
-				box-shadow: 0 0 2000px 2000px rgba(255, 255, 255, 0.5);
-				z-index: 3;
-			}
+            .vignette {
+                position: absolute;
+                margin: auto;
+                width: 310px;
+                height: 310px;
+                border-radius: 50%;
+                top: 0;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                box-shadow: 0 0 2000px 2000px rgba(255, 255, 255, 0.5);
+                z-index: 3;
+            }
 
-			.overlay {
-				z-index: 5;
-				position: absolute;
-				cursor: move;
-				touch-action: none;
-			}
-		}
-	}
+            .overlay {
+                z-index: 5;
+                position: absolute;
+                cursor: move;
+                touch-action: none;
+            }
+        }
+    }
 
-	.btn {
-		position: absolute;
-		right: 0px;
-		bottom: -60px;
-		width: 55px;
-		height: 55px;
-		border-radius: 50%;
-		background-color: $blue;
+    .btn {
+        position: absolute;
+        right: 0px;
+        bottom: -60px;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        background-color: $blue;
 
-		.tgico {
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			font-size: 24px;
-		}
-	}
+        .tgico {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+        }
+    }
 
 }
 
 #cropperModal {
-	.done-button {
-		z-index: 1;
-		position: absolute;
-		right: 20px;
-		bottom: 10px;
-		width: 55px;
-		height: 55px;
-		border-radius: 50%;
-		cursor: pointer;
-		background-color: $blue;
+    .done-button {
+        z-index: 1;
+        position: absolute;
+        right: 20px;
+        bottom: 10px;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        cursor: pointer;
+        background-color: $blue;
 
-		.tgico {
-			position: absolute;
-			color: white;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
-			font-size: 24px;
-			z-index: 12;
-		}
-	}
+        .tgico {
+            position: absolute;
+            color: white;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            z-index: 12;
+        }
+    }
 
-	.body {
-		padding-bottom: 60px;
-	}
+    .body {
+        padding-bottom: 60px;
+    }
 }
+
 #cropper {
-	.cr-boundary {
-		border-radius: 0.5em;
-	}
+    .cr-boundary {
+        border-radius: 0.5em;
+    }
 }

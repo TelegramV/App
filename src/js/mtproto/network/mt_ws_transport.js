@@ -22,11 +22,6 @@ export function mt_set_connect_processor(processor, url) {
         connect_processors[url] = processor
 }
 
-window.killMainSocket = _ => {
-    dbg_reconnecting = true
-    transportation_streams.values().next().value.transportation_socket.close(4999, "user requested")
-}
-
 function mt_init_transportation(url)
 {
     var transportation_socket = new WebSocket(url, "binary");

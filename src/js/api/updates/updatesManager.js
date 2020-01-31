@@ -1,5 +1,5 @@
 import {Manager} from "../manager";
-import MTProto from "../../mtproto";
+import MTProto from "../../mtproto/external";
 import processUpdatesTooLong from "./processUpdatesTooLong"
 import processShortMessage from "./processShortMessage"
 import processShort from "./processShort"
@@ -9,6 +9,9 @@ import {ChannelUpdatesProcessor} from "./ChannelUpdatesProcessor"
 import {DefaultUpdatesProcessor} from "./DefaultUpdatesProcessor"
 import processShortSentMessage from "./processShortSentMessage"
 import {arrayDelete} from "../../common/utils/utils"
+import {tsNow} from "../../mtproto/timeManager"
+import AppConnectionStatus from "../../ui/reactive/ConnectionStatus"
+import AppEvents from "../eventBus/AppEvents"
 
 class UpdateManager extends Manager {
     constructor() {
@@ -57,6 +60,63 @@ class UpdateManager extends Manager {
         return MTProto.invokeMethod("updates.getState", {}).then(state => {
             this.State = state
             this._inited = true
+        }).then(() => {
+
+            if (this.updateStatusCheckingIntervalId === undefined) {
+                this.updateStatusCheckingIntervalId = setInterval(() => {
+                    if (this.channelUpdatesProcessor.isWaitingForDifference && (this.channelUpdatesProcessor.latestDifferenceTime + 2) <= tsNow(true)) {
+                        AppEvents.General.fire("waitingForDifference", {
+                            diffType: 0 // channel
+                        })
+                    }
+
+                    if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.defaultUpdatesProcessor.latestDifferenceTime + 2) <= tsNow(true)) {
+                        AppEvents.General.fire("waitingForDifference", {
+                            diffType: 1 // default
+                        })
+                    }
+
+                    if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.channelUpdatesProcessor.latestDifferenceTime + 5) <= tsNow(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
+                        this.channelUpdatesProcessor.isWaitingForDifference = true
+                        this.channelUpdatesProcessor.queueIsProcessing = false
+                        this.channelUpdatesProcessor.latestDifferenceTime = tsNow(true)
+                        console.warn("refetching difference")
+
+                        AppEvents.General.fire("waitingForDifference", {
+                            diffType: 0 // channel
+                        })
+
+                        this.channelUpdatesProcessor.getChannelDifference(this.channelUpdatesProcessor.latestDifferencePeer).then(rawDifference => {
+                            this.channelUpdatesProcessor.processDifference(rawDifference)
+                        }).catch(e => {
+                            console.error("[default] BUG: difference refetching failed", e)
+                            this.channelUpdatesProcessor.isWaitingForDifference = false
+                            this.channelUpdatesProcessor.queueIsProcessing = false
+                            this.processQueue()
+                        })
+                    }
+
+                    if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.defaultUpdatesProcessor.latestDifferenceTime + 5) <= tsNow(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
+                        this.defaultUpdatesProcessor.isWaitingForDifference = true
+                        this.defaultUpdatesProcessor.queueIsProcessing = false
+                        this.defaultUpdatesProcessor.latestDifferenceTime = tsNow(true)
+                        console.warn("refetching difference")
+
+                        AppEvents.General.fire("waitingForDifference", {
+                            diffType: 1 // default
+                        })
+
+                        this.defaultUpdatesProcessor.getDifference(this.defaultUpdatesProcessor.latestDifferencePeer).then(rawDifference => {
+                            this.defaultUpdatesProcessor.processDifference(rawDifference)
+                        }).catch(e => {
+                            console.error("[default] BUG: difference refetching failed", e)
+                            this.defaultUpdatesProcessor.isWaitingForDifference = false
+                            this.defaultUpdatesProcessor.queueIsProcessing = false
+                            this.processQueue()
+                        })
+                    }
+                }, 1000)
+            }
         })
     }
 

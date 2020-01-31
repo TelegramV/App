@@ -1,5 +1,5 @@
 //
-// WARNING: Flow JS does not support Babel JSX.
+// WARNING: Flow JS supports only React.
 //          DO NOT USE FlOW JS WITH COMPONENTS
 //
 
@@ -250,7 +250,6 @@ class Component {
     __created() {
     }
 
-
     /* REACTIVE SECTION */
 
     __initReactive() {
@@ -264,7 +263,7 @@ class Component {
                         this.__.reactiveContexts.set(key, newContext)
                         context.subscribeAny(newContext.resolve)
                     } else if (context.__rc) {
-                        console.warn("avoid using reactive callbacks, use reactive objects instead")
+                        // console.warn("avoid using reactive callbacks, use reactive objects instead")
                         // $FlowIssue
                         context.subscription = (value, event) => this.__resolveReactivePropertyChange(key, value, event)
                         this.__.reactiveContexts.set(key, context)

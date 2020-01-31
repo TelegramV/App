@@ -1,16 +1,16 @@
 import {bytesToArrayBuffer} from "../utils/bin"
 import Bytes from "../utils/bytes"
-import AppCryptoManager from "../crypto/cryptoManager"
 import {rsaKeyByFingerprints} from "./rsaKeys"
 import {TLSerialization} from "../language/serialization"
 import {rsaEncrypt} from "../crypto/rsa"
-import {sha1BytesSync} from "../crypto/sha"
-import crypto from "crypto"
+import {sha1BytesSync, sha1HashSync} from "../crypto/sha"
 import {TLDeserialization} from "../language/deserialization"
 import {tsNow} from "../timeManager"
 import {createLogger} from "../../common/logger"
 import {SecureRandomSingleton} from "../utils/singleton"
 import VBigInt from "../bigint/VBigInt"
+import PQ from "../utils/pq"
+import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
 
 const Logger = createLogger("authKeyCreation")
 
@@ -43,8 +43,8 @@ function step2_handle_resPQ(resPQ, authContext) {
     }
 }
 
-async function step3_decompose_pq(pq) {
-    return await AppCryptoManager.decomposePQ(pq)
+function step3_decompose_pq(pq) {
+    return Promise.resolve(PQ.decompose(pq))
 }
 
 async function step4_req_DH_params(pAndQ, networker) {
@@ -118,7 +118,7 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
             .slice(0, 4))
 
 
-    const answer_with_hash = await AppCryptoManager.aesDecrypt(ServerDHParams.encrypted_answer, authContext.tmpAesKey, authContext.tmpAesIv)
+    const answer_with_hash = aesDecryptSync(ServerDHParams.encrypted_answer, authContext.tmpAesKey, authContext.tmpAesIv)
 
     const hash = answer_with_hash.slice(0, 20)
     const answerWithPadding = answer_with_hash.slice(20)
@@ -208,7 +208,7 @@ async function step6_set_client_DH_params(networker, processor, proc_context) {
     const dataWithHash = sha1BytesSync(Client_DH_Inner_Data_serialization.getBuffer()).concat(Client_DH_Inner_Data_serialization.getBytes())
     Logger.debug("mtpSendSetClientDhParams", dataWithHash, authContext)
 
-    const encryptedData = await AppCryptoManager.aesEncrypt(dataWithHash, authContext.tmpAesKey, authContext.tmpAesIv)
+    const encryptedData = aesEncryptSync(dataWithHash, authContext.tmpAesKey, authContext.tmpAesIv)
     let Set_client_DH_params_answer_response = await networker.invokeMethod("set_client_DH_params", {
         nonce: authContext.nonce,
         server_nonce: authContext.serverNonce,
@@ -239,7 +239,7 @@ async function step6_set_client_DH_params(networker, processor, proc_context) {
 
     switch (Set_client_DH_params_answer._) {
         case "dh_gen_ok":
-            const newNonceHash1 = Bytes.fromArrayBuffer(await AppCryptoManager.sha1Hash(authContext.newNonce.concat([1], authKeyAux))).slice(-16)
+            const newNonceHash1 = Bytes.fromArrayBuffer(sha1HashSync(authContext.newNonce.concat([1], authKeyAux))).slice(-16)
 
             /**
              * FIXME: ...

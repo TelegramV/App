@@ -1,5 +1,5 @@
 import {longToBytes} from "../utils/bin";
-import MTProto from "../index"
+import MTProtoInternal from "../internal"
 
 export class MessageProcessor {
     constructor(options) {
@@ -45,7 +45,7 @@ export class MessageProcessor {
             if (this.handlers[message._]) {
                 this.handlers[message._](message, messageID, sessionID)
             } else {
-                MTProto.UpdatesManager.process(message)
+                MTProtoInternal.processUpdate(message)
             }
         } catch (e) {
             console.error(e)

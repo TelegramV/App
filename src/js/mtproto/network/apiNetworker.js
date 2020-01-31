@@ -3,16 +3,16 @@ import {sha1BytesSync, sha256HashSync} from "../crypto/sha"
 import {TLSerialization} from "../language/serialization"
 import {createLogger} from "../../common/logger"
 import {TLDeserialization} from "../language/deserialization"
-import {AppPermanentStorage} from "../../common/storage"
 import {MessageProcessor} from "./messageProcessor"
 
 import AppConfiguration from "../../configuration"
 import {Networker} from "./networker";
-import AppCryptoManager from "../crypto/cryptoManager";
 import {schema} from "../language/schema";
 import Bytes from "../utils/bytes"
 import Random from "../utils/random"
 import AppEvents from "../../api/eventBus/AppEvents"
+import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
+import MTProtoInternal from "../internal"
 
 const Logger = createLogger("ApiNetworker", {
     level: "warn"
@@ -158,7 +158,9 @@ export class ApiNetworker extends Networker {
 
     updateServerSalt(newSalt) {
         this.auth.serverSalt = newSalt
-        AppPermanentStorage.setItem("serverSalt" + this.auth.dcID, Bytes.asHex(newSalt))
+        MTProtoInternal.PermanentStorage.setItem("serverSalt" + this.auth.dcID, Bytes.asHex(newSalt)).then(() => {
+            //
+        })
     }
 
     getMsgKey(dataWithPadding, isOut) {
@@ -215,11 +217,12 @@ export class ApiNetworker extends Networker {
         const msgKey = this.getMsgKey(dataWithPadding, true)
         const keyIv = this.getAesKeyIv(msgKey, true)
 
-        return AppCryptoManager.aesEncrypt(dataWithPadding, keyIv[0], keyIv[1]).then(encryptedBytes => {
-            return {
-                bytes: encryptedBytes,
-                msgKey: msgKey
-            }
+        const encryptedBytes = aesEncryptSync(dataWithPadding, keyIv[0], keyIv[1])
+
+
+        return Promise.resolve({
+            bytes: encryptedBytes,
+            msgKey: msgKey
         })
     }
 
@@ -266,9 +269,9 @@ export class ApiNetworker extends Networker {
         })
     }
 
-    async getDecryptedMessage(msgKey, encryptedData) {
+    getDecryptedMessage(msgKey, encryptedData) {
         const keyIv = this.getAesKeyIv(msgKey, false)
-        return new Uint8Array(await AppCryptoManager.aesDecrypt(encryptedData, keyIv[0], keyIv[1]))
+        return Promise.resolve(new Uint8Array(aesDecryptSync(encryptedData, keyIv[0], keyIv[1])))
     }
 
     invokeMethod(method, params, options = {}) {
@@ -339,7 +342,9 @@ export class ApiNetworker extends Networker {
     applyServerSalt(newServerSalt) {
         const serverSalt = longToBytes(newServerSalt);
 
-        AppPermanentStorage.setItem(`dc${this.dcID}_server_salt`, Bytes.asHex(serverSalt))
+        MTProtoInternal.PermanentStorage.setItem(`dc${this.dcID}_server_salt`, Bytes.asHex(serverSalt)).then(() => {
+
+        })
 
         this.serverSalt = serverSalt
         return true

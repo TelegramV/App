@@ -1,5 +1,3 @@
-import {createLogger} from "../logger"
-
 /**
  * Data stored in this storage has expiration time.
  *
@@ -16,17 +14,13 @@ export class TemporaryStorage {
     constructor(options = {}) {
         this.name = options.name || ""
 
-        this.driver = options.driver || new PerTabStorageDriver(this.name)
+        this.driver = options.driver || new SimpleStorageDriver(this.name)
     }
 
     getItem(key, defaultValue = undefined) {
         if (this.exists(key)) {
             let value = null
-            if (this.driver === window.localStorage) {
-                value = JSON.parse(this.driver.getItem(key))
-            } else {
-                value = this.driver.getItem(key)
-            }
+            value = this.driver.getItem(key)
             return value
         } else {
             if (typeof defaultValue !== "undefined") {
@@ -40,11 +34,7 @@ export class TemporaryStorage {
 
     setItem(key, value) {
         let setValue = null
-        if (this.driver === window.localStorage) {
-            setValue = JSON.stringify(value)
-        } else {
-            setValue = value
-        }
+        setValue = value
         this.driver.setItem(key, setValue)
         return setValue
     }
@@ -62,37 +52,34 @@ export class TemporaryStorage {
     }
 }
 
-class PerTabStorageDriver {
+class SimpleStorageDriver {
     constructor(name = "") {
         this.name = name
-
-        if (!window[`perTabStorage${this.name}`]) {
-            window[`perTabStorage${this.name}`] = {}
-        }
+        this.data = {}
     }
 
     getItem(key) {
         if (this.exists(key)) {
-            return window[`perTabStorage${this.name}`][key]
+            return this.data[key]
         } else {
             console.error(`${key} was not found`)
         }
     }
 
     setItem(key, value) {
-        window[`perTabStorage${this.name}`][key] = value
+        this.data[key] = value
         return value
     }
 
     removeItem(key) {
-        delete window[`perTabStorage${this.name}`][key]
+        delete this.data[key]
     }
 
     exists(key) {
-        return !(!window[`perTabStorage${this.name}`][key])
+        return !(!this.data[key])
     }
 
     clear() {
-        window[`perTabStorage${this.name}`] = {}
+        this.data = {}
     }
 }

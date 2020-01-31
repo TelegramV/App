@@ -1,5 +1,5 @@
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
-import MTProto from "../../../../../../mtproto"
+import MTProto from "../../../../../../mtproto/external"
 import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import RadioComponent from "../../input/radioComponent"
 import CheckboxComponent from "../../input/checkboxComponent"
@@ -51,7 +51,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         let classes = "poll" + (this.isVoted() ? " voted" : "");
         let type = this.quiz ? "Quiz" : this.public ? "Public poll" : "Anonymous poll";
         return (
-            <MessageWrapperFragment message={this.props.message} contextActions={this.contextActions}>
+            <MessageWrapperFragment message={this.props.message} contextActions={this.contextActions} showUsername={false}>
                 <div class={classes}>
                     <div class="question">{this.poll.question}</div>
                     <div class="poll-type">{type}</div>

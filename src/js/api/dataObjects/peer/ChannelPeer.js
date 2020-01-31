@@ -1,5 +1,5 @@
 import {Peer} from "./Peer";
-import MTProto from "../../../mtproto";
+import MTProto from "../../../mtproto/external";
 import AppEvents from "../../eventBus/AppEvents";
 
 export class ChannelPeer extends Peer {

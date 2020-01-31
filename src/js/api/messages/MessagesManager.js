@@ -1,5 +1,5 @@
 import {Manager} from "../manager"
-import {MTProto} from "../../mtproto"
+import {MTProto} from "../../mtproto/external"
 import PeersStore from "../store/PeersStore"
 import DialogsManager from "../dialogs/DialogsManager"
 import DialogsStore from "../store/DialogsStore"

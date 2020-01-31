@@ -46,7 +46,11 @@ export class MessageParser {
                             if (media.isAnimatedEmoji) {
                                 type = MessageType.ANIMATED_EMOJI
                             } else {
-                                type = MessageType.STICKER
+                                if (media.document.mime_type === "application/x-tgsticker") {
+                                    type = MessageType.ANIMATED_STICKER
+                                } else {
+                                    type = MessageType.STICKER
+                                }
                             }
                             break;
                         }
@@ -139,6 +143,8 @@ export class MessageParser {
             case MessageType.GIF:
                 return "GIF"
             case MessageType.STICKER:
+                return MessageParser.getStickerEmoji(message.raw.media.document) + " Sticker"
+            case MessageType.ANIMATED_STICKER:
                 return MessageParser.getStickerEmoji(message.raw.media.document) + " Sticker"
             case MessageType.VOICE:
                 return "Voice"

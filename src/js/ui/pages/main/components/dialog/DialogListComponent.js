@@ -4,7 +4,7 @@ import AppEvents from "../../../../../api/eventBus/AppEvents"
 import Component from "../../../../v/vrdom/Component"
 import VRDOM from "../../../../v/vrdom/VRDOM"
 import {ContextMenuManager} from "../../../../contextMenuManager";
-import MTProto from "../../../../../mtproto";
+import MTProto from "../../../../../mtproto/external";
 import V from "../../../../v/VFramework";
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import {ConnectionStatusComponent} from "./ConnectionStatusComponent"
