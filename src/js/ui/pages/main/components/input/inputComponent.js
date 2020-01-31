@@ -11,11 +11,15 @@ export class InputComponent extends Component {
             classes.push("peekable")
             classes.push("password-input")
         }
+        let peekClasses = ["btn-icon", "rp", "rps", "tgico"]
+        if(!this.props.hide) {
+            peekClasses.push("peek")
+        }
         return (
             <div className={classes.join(" ")}>
                 {
                     this.props.type === "password" ?
-                        <i id="peekButton" className="btn-icon rp rps tgico" onClick={this.peek}/>
+                        <i id="peekButton" className={peekClasses.join(" ")} onClick={this.peek}/>
                         : ""
                 }
                 <input type={this.props.type === "password" && !this.props.hide ? "text" : this.props.type}
