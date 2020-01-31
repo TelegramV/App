@@ -150,10 +150,10 @@ export class DialogListComponent extends Component {
             }
         })
 
-        //this._registerResizer()
+        this._registerResizer()
     }
 
-    reactiveChanged(key, value) {
+    reactiveChanged(key, value, event) {
         if (key === "selectedPeer") {
             if (value) {
                 this.$el.classList.add("responsive-selected-chatlist")

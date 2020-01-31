@@ -9,7 +9,7 @@ import vrdom_prepend from "./prepend"
 import vrdom_deleteInner from "./deleteInner"
 
 /**
- * Virtual DOM that operates on Real DOM and does not save previous rendered state.
+ * Virtual DOM that operates on Real DOM and does not save previous rendered state. Written specially for Telegram V.
  *
  * @author kohutd
  */

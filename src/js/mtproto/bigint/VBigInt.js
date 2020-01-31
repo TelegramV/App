@@ -4,8 +4,6 @@ import AppConfiguration from "../../configuration"
 
 /**
  * Native BigInt wrapper
- *
- * @author kohutd
  */
 class VBigInt {
 

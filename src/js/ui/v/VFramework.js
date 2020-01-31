@@ -2,6 +2,8 @@ import {VFrameworkRouter} from "./router"
 import VRDOM from "./vrdom/VRDOM"
 
 /**
+ * V Framework - tool for building SPA-like application. Written specially for Telegram V.
+ *
  * @author kohutd
  */
 class VFramework {

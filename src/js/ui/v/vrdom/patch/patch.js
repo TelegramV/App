@@ -29,7 +29,7 @@ const vrdom_patch = <T: Element | Node | Text>($node: T, newNode: VRNode | Compo
 
 
             // such components have self patching logic, so we should not touch them. but...
-            console.warn("trying to patch class component, please avoid such behaviour")
+            // console.warn("trying to patch class component, please avoid such behaviour")
 
             // $ignore
             const mounted = V.mountedComponents.get($node.getAttribute("data-component-id"))
