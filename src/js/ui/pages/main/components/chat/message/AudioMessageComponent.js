@@ -1,5 +1,6 @@
 import AudioComponent from "./common/AudioComponent"
 import {FileAPI} from "../../../../../../api/fileAPI"
+import {formatAudioTime} from "../../../../../utils"
 
 import AudioManager from "../../../../../audioManager"
 
@@ -40,7 +41,7 @@ class AudioMessageComponent extends AudioComponent {
 		    		</div>
 				</div>
 		        <div class="timer short">
-		            <span class="played-wrapper"><span class="time-played"></span> / </span>{this._timeToFormat(this.duration)}
+		            <span class="played-wrapper"><span class="time-played"></span> / </span>{formatAudioTime(this.duration)}
 		        </div>
         	</div>
         )

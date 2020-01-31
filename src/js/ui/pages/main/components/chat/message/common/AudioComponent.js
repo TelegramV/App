@@ -2,10 +2,11 @@ import MessageWrapperFragment from "./MessageWrapperFragment"
 import TextWrapperComponent from "./TextWrapperComponent";
 import GeneralMessageComponent from "./GeneralMessageComponent"
 import {FileAPI} from "../../../../../../../api/fileAPI"
+import {formatAudioTime} from "../../../../../../utils"
 
 import AudioManager from "../../../../../../audioManager"
 
-class AudioMessageComponent extends GeneralMessageComponent {
+class AudioComponent extends GeneralMessageComponent {
     /*
         General component for voice and audio messages
 
@@ -152,23 +153,8 @@ class AudioMessageComponent extends GeneralMessageComponent {
     }
 
     _audioTimeUpdate() {
-        this.timer.textContent = this._timeToFormat(this.audio.currentTime);
+        this.timer.textContent = formatAudioTime(this.audio.currentTime);
         this.updatePercent(this.audio.currentTime / this.audio.duration);
-    }
-
-    _timeToFormat(time) {
-    	if(!time) return "0:00";
-    	time = Math.floor(time);
-	    let hours   = Math.floor(time / 3600)
-	    let minutes = Math.floor(time / 60) % 60
-	    let seconds = time % 60
-
-	    let formatted= [hours,minutes,seconds]
-	        .map(v => v < 10 ? "0" + v : v)
-	        .filter((v,i) => v !== "00" || i > 0)
-	        .join(":");
-	    if(formatted.startsWith("0")) formatted = formatted.substr(1);
-	    return formatted;
     }
 
     _handleEnter(e) {
@@ -201,4 +187,4 @@ class AudioMessageComponent extends GeneralMessageComponent {
 
 }
 
-export default AudioMessageComponent
+export default AudioComponent
