@@ -1,12 +1,12 @@
-import {UserPeer} from "../../../../../api/dataObjects/peer/UserPeer"
+import {UserPeer} from "../../../../../../api/dataObjects/peer/UserPeer"
 import {DialogTextComponent} from "./DialogTextComponent"
-import V from "../../../../v/VFramework"
+import V from "../../../../../v/VFramework"
 import {DialogAvatarComponent} from "./DialogAvatarComponent"
-import Component from "../../../../v/vrdom/Component"
-import {tsNow} from "../../../../../mtproto/timeManager"
-import AppSelectedPeer from "../../../../reactive/SelectedPeer"
+import Component from "../../../../../v/vrdom/Component"
+import {tsNow} from "../../../../../../mtproto/timeManager"
+import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {dialogContextMenu} from "./dialogContextMenu"
-import {Dialog} from "../../../../../api/dialogs/Dialog"
+import {Dialog} from "../../../../../../api/dialogs/Dialog"
 
 const DATE_FORMAT_TIME = {
     hour: '2-digit',

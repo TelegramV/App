@@ -29,6 +29,7 @@
         height: 100vh;
         overflow: hidden;
         flex-direction: column;
+        background-color: var(--chat-bg-color);
 
         #topbar {
             width: 100%;

@@ -1,6 +1,6 @@
 import {PinnedComponent} from "../../../../pinnedController"
 import LoaderComponent from "../loading/LoaderComponent"
-import ChatInfoComponent from "./chatInfo/ChatInfoComponent"
+import ChatInfoComponent from "../../sidebars/right/chatInfo/ChatInfoComponent"
 import Component from "../../../../v/vrdom/Component"
 import BubblesComponent from "./BubblesComponent"
 import {ChatInputComponent} from "./chatInput/ChatInputComponent";

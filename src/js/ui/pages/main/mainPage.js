@@ -7,9 +7,9 @@ import {ContextMenuComponent} from "../../contextMenuManager"
 import {ModalComponent} from "../../modalManager"
 import {MediaViewerComponent} from "../../mediaViewerManager"
 import {InstantViewComponent} from "../../instantViewManager"
-import {DialogListComponent} from "./components/dialog/DialogListComponent"
+import {DialogListComponent} from "./sidebars/left/dialog/DialogListComponent"
 import ChatComponent from "./components/chat/ChatComponent"
-import {DialogInfoComponent} from "./components/dialog/DialogInfoComponent";
+import {DialogInfoComponent} from "./sidebars/left/dialog/DialogInfoComponent";
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {

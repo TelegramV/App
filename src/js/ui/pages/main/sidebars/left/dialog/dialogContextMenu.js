@@ -1,12 +1,12 @@
-import {ContextMenuManager} from "../../../../contextMenuManager"
-import {ChannelPeer} from "../../../../../api/dataObjects/peer/ChannelPeer"
-import {GroupPeer} from "../../../../../api/dataObjects/peer/GroupPeer"
-import {SupergroupPeer} from "../../../../../api/dataObjects/peer/SupergroupPeer"
-import AppSelectedInfoPeer from "../../../../reactive/SelectedInfoPeer"
-import {ModalManager} from "../../../../modalManager"
+import {ContextMenuManager} from "../../../../../contextMenuManager"
+import {ChannelPeer} from "../../../../../../api/dataObjects/peer/ChannelPeer"
+import {GroupPeer} from "../../../../../../api/dataObjects/peer/GroupPeer"
+import {SupergroupPeer} from "../../../../../../api/dataObjects/peer/SupergroupPeer"
+import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer"
+import {ModalManager} from "../../../../../modalManager"
 import {DialogAvatarComponent} from "./DialogAvatarComponent"
-import {FlatButtonComponent} from "../input/flatButtonComponent"
-import {Dialog} from "../../../../../api/dialogs/Dialog"
+import {FlatButtonComponent} from "../../../components/input/flatButtonComponent"
+import {Dialog} from "../../../../../../api/dialogs/Dialog"
 
 export const dialogContextMenu = (dialog: Dialog) => {
     return ContextMenuManager.listener([
