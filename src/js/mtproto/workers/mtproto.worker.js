@@ -22,18 +22,31 @@ self.addEventListener("message", event => {
     const taskData = eventData.taskData
 
     if (task === "invokeMethod") {
-        MTProtoInternal.invokeMethod(taskData.method, taskData.params, taskData.dcID).then(r => {
-            postMessage({taskId: taskId, taskResult: r})
-        })
+        try {
+            MTProtoInternal.invokeMethod(taskData.method, taskData.params, taskData.dcID).then(r => {
+                postMessage({taskId: taskId, taskResult: r, failed: false})
+            }).catch(r => {
+                console.log("ERR", r)
+                postMessage({taskId: taskId, taskResult: r, failed: true})
+            })
+        } catch (e) {
+            console.log("ERR", e)
+            postMessage({taskId: taskId, taskResult: e, failed: true})
+        }
     }
 
     if (task === "connect") {
-        loadSchema().then(() => {
-            MTProtoInternal.connect(authContext, taskData.storage)
-                .then(() => {
-                    postMessage({taskId: taskId, taskResult: authContext})
+        try {
+            loadSchema().then(() => {
+                MTProtoInternal.connect(authContext, taskData.storage).then(() => {
+                    postMessage({taskId: taskId, taskResult: authContext, failed: false})
+                }).catch(r => {
+                    postMessage({taskId: taskId, taskResult: r, failed: true})
                 })
-        })
+            })
+        } catch (e) {
+            postMessage({taskId: taskId, taskResult: e, failed: true})
+        }
     }
 })
 

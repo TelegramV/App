@@ -23,32 +23,43 @@ MTProtoWorker.addEventListener("message", event => {
     }
 
     if (event.data.taskId) {
-        resolveTask(event.data.taskId, event.data.taskResult)
+        resolveTask(event.data.taskId, event.data.taskResult, event.data.failed)
     }
 })
 
-function resolveTask(taskId, taskResult) {
-    const resolve = waitingTasks.get(taskId)
+function resolveTask(taskId, taskResult, failed = false) {
+    let resolve = waitingTasks.get(taskId)
 
     if (resolve) {
+
+        if (failed) {
+            resolve = resolve[1]
+        } else {
+            resolve = resolve[0]
+        }
+
         resolve(taskResult)
         waitingTasks.delete(taskId)
+    } else {
+        console.error("BUG: task does not exist")
     }
 }
 
-function performTask(task, data, resolve) {
-    if (lastTaskId === Number.MAX_VALUE) {
-        lastTaskId = 0
-    } else {
-        lastTaskId++
-    }
+function performTask(task, data) {
+    return new Promise((resolve, reject) => {
+        if (lastTaskId === Number.MAX_VALUE) {
+            lastTaskId = 0
+        } else {
+            lastTaskId++
+        }
 
-    waitingTasks.set(lastTaskId, resolve)
+        waitingTasks.set(lastTaskId, [resolve, reject])
 
-    MTProtoWorker.postMessage({
-        task: task,
-        taskId: lastTaskId,
-        taskData: data
+        MTProtoWorker.postMessage({
+            task: task,
+            taskId: lastTaskId,
+            taskData: data
+        })
     })
 }
 
@@ -147,22 +158,18 @@ class MTProtoBridge {
             }
         })
 
-        return new Promise(resolve => {
-            performTask("connect", {
-                storage
-            }, resolve)
+        return performTask("connect", {
+            storage
         })
     }
 
 
     invokeMethod(method, params, dcID = null, isFile = false) {
-        return new Promise(resolve => {
-            performTask("invokeMethod", {
-                method,
-                params,
-                dcID,
-                isFile
-            }, resolve)
+        return performTask("invokeMethod", {
+            method,
+            params,
+            dcID,
+            isFile
         })
     }
 
