@@ -60,10 +60,10 @@ export default class QRLoginPaneComponent extends PaneComponent {
         // TODO recreate QR when expired
         // TODO multiple DCs
         this.requestLoginToken().then(l => {
-            if(l._ === "auth.loginTokenSuccess") { //idk where it goes, Maks, fix pls
+            /*if(l._ === "auth.loginTokenSuccess") { //idk where it goes, Maks, fix pls
                 this.props.finished(l.authorization)
                 return
-            }
+            }*/
             const b64encoded = btoa(String.fromCharCode.apply(null, l.token)).replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '')
             const string = "tg://login?token=" + b64encoded
             const obj = this.$el.querySelector(".object")

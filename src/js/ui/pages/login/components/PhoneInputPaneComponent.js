@@ -1,5 +1,5 @@
 import PaneComponent from "./common/PaneComponent"
-import {DropdownComponent} from "../../main/components/input/dropdownComponent";
+import {DropdownComponent} from "./common/dropdownComponent";
 import {InputComponent} from "../../main/components/input/inputComponent";
 import CheckboxComponent from "../../main/components/input/checkboxComponent";
 import {ButtonWithProgressBarComponent} from "../../main/components/input/buttonComponent";
