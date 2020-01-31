@@ -82,7 +82,7 @@ export class ChannelUpdatesProcessor {
          */
         this.queue = []
 
-        this.latestDifferenceTime = 0
+        this.latestDifferenceTime = Number.MAX_VALUE
 
         this.latestDifferencePeer = undefined
     }
@@ -104,26 +104,6 @@ export class ChannelUpdatesProcessor {
             }
         } else {
             // console.log("got update", rawUpdate)
-            if ((this.latestDifferenceTime + 2) < tsNow(true)) {
-                AppEvents.General.fire("waitingForDifference", {
-                    diffType: 0 // channel
-                })
-            }
-
-            if ((this.latestDifferenceTime + 10) < tsNow(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
-                // this.isWaitingForDifference = true
-                // this.queueIsProcessing = false
-                // console.warn("refetching difference")
-                //
-                // this.getChannelDifference(this.latestDifferencePeer).then(rawDifference => {
-                //     this.processDifference(rawDifference)
-                // }).catch(e => {
-                //     console.error("[default] BUG: difference refetching failed", e)
-                //     this.isWaitingForDifference = false
-                //     this.queueIsProcessing = false
-                //     this.processQueue()
-                // })
-            }
 
             this.queue.push(rawUpdate)
             // console.warn("[channel] waiting for diff")
@@ -310,6 +290,7 @@ export class ChannelUpdatesProcessor {
         }
 
         this.latestDifferencePeer = peer
+        this.latestDifferenceTime = tsNow(true)
 
         console.warn("[channel] fetching difference")
 

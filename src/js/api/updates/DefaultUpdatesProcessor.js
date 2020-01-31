@@ -65,7 +65,7 @@ export class DefaultUpdatesProcessor {
          */
         this.queue = []
 
-        this.latestDifferenceTime = 0
+        this.latestDifferenceTime = Number.MAX_VALUE
     }
 
     applyUpdate(rawUpdate) {
@@ -83,24 +83,6 @@ export class DefaultUpdatesProcessor {
                 this.processQueue()
             }
         } else {
-            if ((this.latestDifferenceTime + 2) < tsNow(true)) {
-                AppEvents.General.fire("waitingForDifference", {
-                    diffType: 1 // default
-                })
-            } else if ((this.latestDifferenceTime + 10) < tsNow(true)) {
-                // this.isWaitingForDifference = true
-                // this.queueIsProcessing = false
-                //
-                // this.getDifference(this.updatesManager.State).then(rawDifference => {
-                //     this.processDifference(rawDifference)
-                // }).catch(e => {
-                //     console.error("[default] BUG: difference refetching failed", e)
-                //     this.isWaitingForDifference = false
-                //     this.queueIsProcessing = false
-                //     this.processQueue()
-                // })
-            }
-
             this.queue.push(rawUpdate)
             // console.warn("[default] waiting for diff")
         }
@@ -269,6 +251,8 @@ export class DefaultUpdatesProcessor {
         if (State.pts === undefined || this.updatesManager.State.pts === undefined) {
             debugger
         }
+
+        this.latestDifferenceTime = tsNow(true)
 
         return MTProto.invokeMethod("updates.getDifference", {
             pts: State.pts || this.updatesManager.State.pts,

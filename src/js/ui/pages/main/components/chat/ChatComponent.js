@@ -5,6 +5,7 @@ import Component from "../../../../v/vrdom/Component"
 import BubblesComponent from "./BubblesComponent"
 import {ChatInputComponent} from "./chatInput/ChatInputComponent";
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
+import V from "../../../../v/VFramework"
 
 /**
  * CRITICAL: never rerender this component!
@@ -62,6 +63,11 @@ class ChatComponent extends Component {
         this.$noChat = this.$el.querySelector("#noChat")
         this.$chat = this.$el.querySelector("#chat")
         this.$wrapperLoader = this.$el.querySelector("#chat-wrapper-loader")
+
+        if (!V.router.activeRoute.queryParams.p) {
+            this.$noChat.style.display = ""
+            this.$wrapperLoader.style.display = "none"
+        }
     }
 
     reactiveChanged(key, value, event) {
@@ -77,6 +83,8 @@ class ChatComponent extends Component {
                 this.$chat.style.display = "none"
                 this.$chat.classList.remove("responsive-selected-chat")
             }
+
+            this.$wrapperLoader.style.display = "none"
         }
     }
 }

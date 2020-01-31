@@ -263,7 +263,7 @@ class Component {
                         this.__.reactiveContexts.set(key, newContext)
                         context.subscribeAny(newContext.resolve)
                     } else if (context.__rc) {
-                        console.warn("avoid using reactive callbacks, use reactive objects instead")
+                        // console.warn("avoid using reactive callbacks, use reactive objects instead")
                         // $FlowIssue
                         context.subscription = (value, event) => this.__resolveReactivePropertyChange(key, value, event)
                         this.__.reactiveContexts.set(key, context)
