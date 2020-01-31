@@ -122,6 +122,7 @@
         }
 
         .tgico {
+          flex-shrink: 0;
           margin-left: 5px;
           text-align: center;
           color: $darkgrey;

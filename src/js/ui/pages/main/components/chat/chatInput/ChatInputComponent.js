@@ -139,7 +139,7 @@ export class ChatInputComponent extends Component {
                                 {this.state.keyboardMarkup.rows.map(l => {
                                     return <div className="row">
                                         {l.buttons.map(q => {
-                                            return InlineKeyboardComponent.parseButton(q)
+                                            return InlineKeyboardComponent.parseButton(null, q)
                                         })}
                                     </div>
                                 })}
