@@ -2,7 +2,7 @@ import {MTProto} from "../../mtproto/external"
 import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash, getPeerTypeFromType} from "./util"
 import TimeManager from "../../mtproto/timeManager"
 import PeersManager from "../peers/PeersManager"
-import {Dialog} from "../dataObjects/dialog/Dialog";
+import {Dialog} from "./Dialog";
 import {Manager} from "../manager";
 import {Peer} from "../dataObjects/peer/Peer";
 import {PeerAPI} from "../peerAPI"

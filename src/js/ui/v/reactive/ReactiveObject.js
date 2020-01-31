@@ -6,14 +6,15 @@ type ReactiveObjectSubscription = (object: this, event: any) => any
 export class ReactiveObject extends TypedPublisher<ReactiveObjectSubscription, BusEvent> {
 
     /**
-     * @param {*} type
-     * @param event
+     * @param {string} type
+     * @param {BusEvent} event
      */
-    fire(type: any, event: BusEvent = {}) {
+    fire(type: string, event: BusEvent = {}) {
 
         Object.assign(event, {
             type
         })
+
         this._subscriptions.get("*").forEach(subscription => subscription(this, event))
 
         if (this._subscriptions.has(type)) {

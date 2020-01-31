@@ -66,7 +66,6 @@ class StickerMessageComponent extends GeneralMessageComponent {
         super.reactiveChanged(key, value, event)
 
         if (event.type === "stickerLoaded") {
-            console.warn("sticker LOADED")
             this.patchSticker()
         }
     }

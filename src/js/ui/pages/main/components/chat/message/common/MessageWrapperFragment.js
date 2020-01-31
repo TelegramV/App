@@ -65,10 +65,6 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         "in": message.isPost || !message.isOut,
     }
 
-    if (message.raw.fwd_from) {
-        console.log(message.raw.fwd_from)
-    }
-
     if (message.raw.fwd_from && (message.raw.fwd_from.saved_from_peer || message.raw.fwd_from.saved_from_msg_id)) {
         topLevelClasses["out"] = false
         topLevelClasses["in"] = true
@@ -85,8 +81,6 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         "message": true,
         "no-pad": noPad
     }
-
-    console.log(message.replyMarkup)
 
     const inlineKeyboard = message.replyMarkup && message.replyMarkup._ === "replyInlineMarkup" ?
         <InlineKeyboardComponent message={message}/> : ""

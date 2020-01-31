@@ -1,4 +1,4 @@
-import AppEvents from "../../eventBus/AppEvents"
+import AppEvents from "../eventBus/AppEvents"
 
 export class DraftMessage {
     

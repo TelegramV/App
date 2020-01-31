@@ -150,7 +150,7 @@ export class DialogListComponent extends Component {
             }
         })
 
-        this._registerResizer()
+        // this._registerResizer()
     }
 
     reactiveChanged(key, value, event) {

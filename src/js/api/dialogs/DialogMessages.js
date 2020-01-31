@@ -1,6 +1,6 @@
-import AppSelectedPeer from "../../../ui/reactive/SelectedPeer"
+import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import {Dialog} from "./Dialog"
-import type {Message} from "../../messages/Message"
+import type {Message} from "../messages/Message"
 
 /**
  * @property {Message} _lastMessage
@@ -67,7 +67,7 @@ export class DialogMessages {
         return this._messages.get(id) || this._otherMessages.get(id)
     }
 
-    getPollsById(poll_id: number): Array<PollMessage> {
+    getPollsById(poll_id: number): Array<Message> {
         return (
             [...this._messages.values()]
             .filter(msg => msg.raw.media && msg.raw.media.poll && msg.raw.media.poll.id === poll_id)

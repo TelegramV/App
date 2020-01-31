@@ -103,7 +103,6 @@ export class ChannelUpdatesProcessor {
                 console.error("BUG: difference was passed to enqueue")
             }
         } else {
-            // console.log("got update", rawUpdate)
 
             this.queue.push(rawUpdate)
             // console.warn("[channel] waiting for diff")

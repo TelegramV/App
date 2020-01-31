@@ -2,7 +2,7 @@ import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util";
 import MTProto from "../../../mtproto/external"
 import AppEvents from "../../eventBus/AppEvents"
 import {PeerPhoto} from "./PeerPhoto"
-import {Dialog} from "../dialog/Dialog"
+import {Dialog} from "../../dialogs/Dialog"
 import {PeerApi} from "./PeerApi"
 import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 

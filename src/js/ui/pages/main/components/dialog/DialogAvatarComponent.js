@@ -1,14 +1,15 @@
 /**
+ * @param id
  * @param {Dialog} dialog
  * @return {*}
  * @constructor
  */
-export const DialogAvatarComponent = ({dialog}) => {
+export const DialogAvatarComponent = ({id, dialog}) => {
     let hasAvatar = !dialog.peer.photo.isEmpty && !dialog.peer.photo._isFetchingSmall
 
     if(dialog.peer.isSelf) {
         return (
-            <div className="avatar placeholder-saved placeholder-icon">
+            <div id={id} className="avatar placeholder-saved placeholder-icon">
                 <i className="tgico tgico-avatar_savedmessages"/>
             </div>
         )
@@ -16,14 +17,14 @@ export const DialogAvatarComponent = ({dialog}) => {
 
     if(dialog.peer.isDeleted) {
         return (
-            <div className={`avatar placeholder-${dialog.peer.photo.letter.num} placeholder-icon`}>
+            <div id={id} className={`avatar placeholder-${dialog.peer.photo.letter.num} placeholder-icon`}>
                 <i className="tgico tgico-avatar_deletedaccount"/>
             </div>
         )
     }
     if (hasAvatar) {
         return (
-            <div className={`avatar`}>
+            <div id={id} className={`avatar`}>
                 <span/>
 
                 <div className="avatar-outer" css-opacity="1">
@@ -34,7 +35,7 @@ export const DialogAvatarComponent = ({dialog}) => {
         )
     } else {
         return (
-            <div className={`avatar placeholder-${dialog.peer.photo.letter.num}`}>
+            <div id={id} className={`avatar placeholder-${dialog.peer.photo.letter.num}`}>
                 <span>{dialog.peer.photo.letter.text}</span>
 
                 <div className="avatar-outer" css-opacity="0">

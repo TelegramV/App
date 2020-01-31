@@ -25,7 +25,7 @@ class MessageManager extends Manager {
             }
 
             const message = MessageFactory.fromRaw(dialog, lastMessage)
-            
+
             dialog.messages.appendSingle(message)
 
             if (!message.isOut) {
@@ -149,11 +149,13 @@ class MessageManager extends Manager {
         })
 
         MTProto.UpdatesManager.subscribe("updateMessagePoll", update => {
-            const messages = AppSelectedPeer.Current.dialog.messages.getPollsById(update.poll.id)
-            for(const message of messages) {
-                message.fillPoll(update.poll, update.results)
-                
-                message.fire("pollEdit")
+            if (AppSelectedPeer.isSelected) {
+                const messages = AppSelectedPeer.Current.dialog.messages.getPollsById(update.poll.id)
+                for (const message of messages) {
+                    message.fillPoll(update.poll, update.results)
+
+                    message.fire("pollEdit")
+                }
             }
         })
 

@@ -1,30 +1,30 @@
 import {parseMessageEntities} from "../../../../../mtproto/utils/htmlHelpers";
 
-function Draft({text, entities}) {
+function Draft({id, text, entities}) {
     return (
-        <div className="message">
+        <div id={id} className="message">
             <span className="draft">Draft: </span>
             {parseMessageEntities(text, entities, true)}
         </div>
     )
 }
 
-function Action({user, action}) {
+function Action({id, user, action}) {
     return (
-        <div className="message">
+        <div id={id} className="message">
             <span className="sender">{user}</span>
             {action}
         </div>
     )
 }
 
-function Text({user, text, entities}) {
+function Text({id, user, text, entities}) {
     if (text.length > 50) {
         text = text.substring(0, 50)
     }
 
     return (
-        <div className="message">
+        <div id={id} className="message">
             <span className="sender">{user}</span>
             {parseMessageEntities(text, entities, true)}
         </div>
@@ -32,19 +32,21 @@ function Text({user, text, entities}) {
 }
 
 /**
+ * @param id
  * @param {Dialog} dialog
  * @return {*}
  * @constructor
  */
-export const DialogTextComponent = ({dialog}) => {
+export const DialogTextComponent = ({id, dialog}) => {
     if (dialog.draft.isPresent) {
         return (
-            <Draft text={dialog.draft.message} entities={dialog.draft.entities}/>
+            <Draft id={id} text={dialog.draft.message} entities={dialog.draft.entities}/>
         )
     }
 
     return (
-        <Text user={dialog.messages.last.prefix}
+        <Text id={id}
+              user={dialog.messages.last.prefix}
               text={dialog.messages.last.text.substring(0, 50)} entities={dialog.messages.last.raw.entities}/>
     )
 }

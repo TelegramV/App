@@ -3,17 +3,10 @@ import {DialogTextComponent} from "./DialogTextComponent"
 import V from "../../../../v/VFramework"
 import {DialogAvatarComponent} from "./DialogAvatarComponent"
 import Component from "../../../../v/vrdom/Component"
-import AppEvents from "../../../../../api/eventBus/AppEvents"
 import {tsNow} from "../../../../../mtproto/timeManager"
-import {ContextMenuManager} from "../../../../contextMenuManager";
-import {ChannelPeer} from "../../../../../api/dataObjects/peer/ChannelPeer";
-import {GroupPeer} from "../../../../../api/dataObjects/peer/GroupPeer";
-import {SupergroupPeer} from "../../../../../api/dataObjects/peer/SupergroupPeer";
-import {ModalManager} from "../../../../modalManager";
-import {FlatButtonComponent} from "../input/flatButtonComponent";
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
-import {DialogInfoManager} from "./DialogInfoComponent";
-import AppSelectedInfoPeer from "../../../../reactive/SelectedInfoPeer";
+import {dialogContextMenu} from "./dialogContextMenu"
+import {Dialog} from "../../../../../api/dialogs/Dialog"
 
 const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -27,96 +20,67 @@ const DATE_FORMAT = {
     day: '2-digit',
 }
 
-
 const patchAndResortDialogEventTypes = new Set([
     "newMessage",
     "updateSingle",
     "updatePinned"
 ])
 
-const patchDialogEventTypes = new Set([
-    "updateDraftMessage",
-    "readHistory",
-    "updateUnreadCount",
-    "updateReadInboxMaxId",
-    "updateReadOutboxMaxId",
-])
+const BadgeFragment = ({id, show = false, slot}) => {
+    if (!show) {
+        return (
+            <div id={id} css-display="none" className="badge tgico"/>
+        )
+    }
 
-const patchPeerEventTypes = new Set([
-    "updatePhoto",
-    "updatePhotoSmall",
-    "updateUserStatus",
-])
+    return (
+        <div id={id} css-display="" className="badge tgico">
+            {slot}
+        </div>
+    )
+}
+
+const TimeFragment = ({id, dialog}) => {
+    return (
+        <div id={id} className="time">
+            {dialog.messages.last.getDate("en", tsNow(true) - dialog.messages.last.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)}
+        </div>
+    )
+}
 
 // NEVER CREATE THIS COMPONENT WITH THE SAME DIALOG
 export class DialogComponent extends Component {
 
+    dialog: Dialog
+
+    $avatar: HTMLElement
+    $text: HTMLElement
+    $time: HTMLElement
+    $unreadCount: HTMLElement
+
     init() {
+        this.dialog = this.props.dialog
+
         this.reactive = {
             selectedPeer: AppSelectedPeer.Reactive.FireOnly,
-            dialog: this.props.dialog,
-            peer: this.props.dialog.peer
+            dialog: this.dialog,
+            peer: this.dialog.peer
         }
 
-        this._contextMenuListener = ContextMenuManager.listener([
-            {
-                icon: "archive",
-                title: "Archive chat"
-            },
-            {
-                icon: this.props.dialog.isPinned ? "unpin" : "pin",
-                title: this.props.dialog.isPinned ? "Unpin from top" : "Pin to top"
-            },
-            {
-                icon: "info",
-                title: this.props.dialog.peer instanceof ChannelPeer ? "View channel info" : (this.props.dialog.peer instanceof GroupPeer || this.props.dialog.peer instanceof SupergroupPeer ? "View group info" : "View profile"),
-                onClick: _ => {
-                    AppSelectedInfoPeer.select(this.props.dialog.peer)
-                }
-            },
-            {
-                icon: this.props.dialog.isMuted ? "unmute" : "mute",
-                title: this.props.dialog.isMuted ? "Enable notifications" : "Disable notifications"
-            },
-            // {
-            //     icon: unread !== "" ? "message" : "unread",
-            //     title: unread !== "" ? "Mark as read" : "Mark as unread",
-            //     onClick: _ => {
-            //         this.props.dialog.api.markDialogUnread(unread === "")
-            //     }
-            // },
-            {
-                icon: "delete",
-                title: "Delete chat",
-                red: true,
-                onClick: _ => {
-                    ModalManager.open(<div className="delete-chat-title">
-                            <DialogAvatarComponent dialog={this.props.dialog}/>
-                            Delete Chat?
-                        </div>,
-                        <div className="delete-chat-body">
-                                     <span
-                                         className="text">Are you sure you want to delete chat with <b>{this.props.dialog.peer.name}</b>?</span>
-                            <FlatButtonComponent red label={`Delete for me and ${this.props.dialog.peer.name}`}/>
-                            <FlatButtonComponent red label="Delete just for me"/>
-                            <FlatButtonComponent label="Cancel"/>
-                        </div>)
-                }
-            },
-        ])
+        this._contextMenuListener = dialogContextMenu(this.dialog)
     }
 
     h() {
-        const dialog = this.props.dialog
+        const dialog = this.dialog
         const peer = dialog.peer
-        const unread = dialog.messages.unreadMentionsCount > 0 ? "@" : (dialog.messages.unreadCount > 0 ? dialog.messages.unreadCount.toString() : (dialog.unreadMark ? " " : ""))
+        const isUnread = dialog.messages.unreadMentionsCount > 0 || dialog.messages.unreadCount > 0 || dialog.unreadMark
 
         const personClasses = {
             "person": true,
             "rp": true,
             "online": peer instanceof UserPeer && peer.onlineStatus.online,
             "active": AppSelectedPeer.check(dialog.peer),
-            "unread": unread !== "",
+            "unread": isUnread,
             "muted": dialog.isMuted,
         }
 
@@ -129,88 +93,201 @@ export class DialogComponent extends Component {
         }
 
         return (
-            <div data-peer-username={dialog.peer.username} data-peer={`${dialog.peer.type}.${dialog.peer.id}`}
-                 data-message-id={dialog.messages.last.id}
+            <div data-message-id={dialog.messages.last.id}
                  data-date={dialog.messages.last.date}
                  data-pinned={dialog.isPinned === undefined ? false : dialog.isPinned}
                  className={personClasses}
                  onClick={this._handleClick}
                  onContextMenu={this._contextMenuListener}>
 
-                <DialogAvatarComponent dialog={dialog}/>
+                <DialogAvatarComponent id={`dialog-${dialog.peer.id}-avatar`} dialog={dialog}/>
 
                 <div className="content">
+
                     <div className="top">
-                        <div className="title">{peer.isSelf ? "Saved Messages" : peer.name}</div>
+                        <div className="title">
+                            {peer.isSelf ? "Saved Messages" : peer.name}
+                        </div>
+
                         <div className="status tgico"/>
-                        <div
-                            className="time">{dialog.messages.last.getDate("en", tsNow(true) - dialog.messages.last.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)}</div>
+
+                        <TimeFragment id={`dialog-${dialog.peer.id}-time`} dialog={dialog}/>
                     </div>
 
                     <div className="bottom">
-                        <DialogTextComponent dialog={dialog}/>
 
-                        <div css-display={dialog.messages.unreadMentionsCount === 0 ? "none" : ""}
-                             className="badge tgico">@
-                        </div>
-                        <div
-                            css-display={dialog.messages.unreadCount === 0 || dialog.messages.unreadMentionsCount > 0 ? "none" : ""}
-                            className="badge tgico">{dialog.messages.unreadCount}</div>
-                        <div css-display={!dialog.unreadMark ? "none" : ""} className="badge tgico"/>
+                        <DialogTextComponent id={`dialog-${dialog.peer.id}-text`} dialog={dialog}/>
+
+                        <BadgeFragment id={`dialog-${dialog.peer.id}-mentionCount`}
+                                       show={dialog.messages.unreadMentionsCount > 0}>
+                            @
+                        </BadgeFragment>
+
+
+                        <BadgeFragment id={`dialog-${dialog.peer.id}-unreadCount`}
+                                       show={dialog.messages.unreadCount > 0}>
+                            {dialog.messages.unreadCount}
+                        </BadgeFragment>
+
+                        <BadgeFragment id={`dialog-${dialog.peer.id}-unreadMark`} show={dialog.unreadMark}/>
+
                     </div>
                 </div>
             </div>
         )
     }
 
-    _handleClick() {
-        const p = this.props.dialog.peer.username ? `@${this.props.dialog.peer.username}` : `${this.props.dialog.peer.type}.${this.props.dialog.peer.id}`
-
-        V.router.replace("/", {
-            queryParams: {
-                p
-            }
-        })
-    }
-
     mounted() {
-
+        this.$avatar = this.$el.querySelector(`#dialog-${this.dialog.peer.id}-avatar`)
+        this.$text = this.$el.querySelector(`#dialog-${this.dialog.peer.id}-text`)
+        this.$time = this.$el.querySelector(`#dialog-${this.dialog.peer.id}-time`)
+        this.$unreadCount = this.$el.querySelector(`#dialog-${this.dialog.peer.id}-unreadCount`)
     }
 
     reactiveChanged(key, value, event) {
-        if (key === "selectedPeer") {
 
-            if (value) {
-                this.$el.classList.add("responsive-selected-chatlist")
-            } else {
-                this.$el.classList.remove("responsive-selected-chatlist")
+        if (this.__.mounted) {
+            if (key === "selectedPeer") {
+                if (value) {
+                    this.$el.classList.add("responsive-selected-chatlist")
+                } else {
+                    this.$el.classList.remove("responsive-selected-chatlist")
+                }
+
+                if (value === this.dialog.peer || AppSelectedPeer.Previous === this.dialog.peer) {
+                    this._patchActive()
+                }
+
+            } else if (key === "dialog") {
+
+                if (patchAndResortDialogEventTypes.has(event.type)) {
+
+                    this._patchMessageAndResort()
+
+                } else {
+                    switch (event.type) {
+                        case "updateDraftMessage":
+                            this._patchText()
+                            break
+
+                        case "readHistory":
+                            this._patchUnreadCount()
+                            break
+
+                        case "updateUnreadCount":
+                            this._patchUnreadCount()
+                            break
+
+                        case "updateUnread":
+                            this._patchUnreadCount()
+                            break
+
+                        case "updateReadInboxMaxId":
+                            this._patchUnreadCount()
+                            this._patchReadStatus()
+                            break
+
+                        case "updateReadOutboxMaxId":
+                            this._patchUnreadCount()
+                            this._patchReadStatus()
+                            break
+
+                        default:
+                            this.__patch()
+                            break
+                    }
+                }
+
+            } else if (key === "peer") {
+
+                if (event.type === "updateUserStatus") {
+                    this._patchStatus()
+                } else if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
+                    this._patchAvatar()
+                }
+
             }
-
-            if (value === this.props.dialog.peer || AppSelectedPeer.Previous === this.props.dialog.peer) {
-                this.__patch()
-            }
-
-        } else if (key === "dialog") {
-
-            if (patchAndResortDialogEventTypes.has(event.type)) {
-                this._patchAndResort()
-            } else if (patchDialogEventTypes.has(event.type)) {
-                this.__patch()
-            }
-
-        } else if (key === "peer") {
-
-            if (patchPeerEventTypes.has(event.type)) {
-                this.__patch()
-            }
-
         }
     }
 
-    _patchAndResort() {
-        if (String(this.props.dialog.isPinned) !== this.$el.dataset.pinned) {
+    _patchActive() {
+        if (AppSelectedPeer.check(this.dialog.peer)) {
+            this.$el.classList.add("active")
+        } else {
+            this.$el.classList.remove("active")
+        }
+    }
 
-            if (this.props.dialog.isPinned) {
+    _patchStatus() {
+        if (this.__.mounted) {
+            if (this.reactive.peer.onlineStatus.online) {
+                this.$el.classList.add("online")
+            } else {
+                this.$el.classList.remove("online")
+            }
+        }
+    }
+
+    _patchAvatar() {
+        if (this.__.mounted) {
+            VRDOM.patch(this.$avatar, <DialogAvatarComponent id={`dialog-${this.dialog.peer.id}-avatar`}
+                                                             dialog={this.dialog}/>)
+        }
+    }
+
+    _patchMessage() {
+        this.$el.setAttribute("data-date", this.dialog.messages.last.date)
+        this.$el.setAttribute("data-message-id", this.dialog.messages.last.id)
+
+        this._patchReadStatus()
+        this._patchText()
+        this._patchTime()
+        this._patchUnreadCount()
+    }
+
+    _patchText() {
+        if (this.__.mounted) {
+            VRDOM.patch(this.$text, <DialogTextComponent id={`dialog-${this.dialog.peer.id}-text`}
+                                                         dialog={this.dialog}/>)
+        }
+    }
+
+    _patchTime() {
+        if (this.__.mounted) {
+            VRDOM.patch(this.$time, <TimeFragment id={`dialog-${this.dialog.peer.id}-time`}
+                                                  dialog={this.dialog}/>)
+        }
+    }
+
+    _patchUnreadCount() {
+        if (this.__.mounted) {
+            VRDOM.patch(this.$unreadCount,
+                <BadgeFragment id={`dialog-${this.dialog.peer.id}-unreadCount`}
+                               show={this.dialog.messages.unreadCount > 0}>
+                    {this.dialog.messages.unreadCount}
+                </BadgeFragment>)
+        }
+    }
+
+    _patchReadStatus() {
+        if (this.dialog.messages.last.isOut && !this.dialog.peer.isSelf) {
+            this.$el.classList.add("sent")
+
+            if (this.dialog.messages.last.isRead) {
+                this.$el.classList.add("read")
+            } else {
+                this.$el.classList.remove("read")
+            }
+        } else {
+            this.$el.classList.remove("sent")
+            this.$el.classList.remove("read")
+        }
+    }
+
+    _patchMessageAndResort() {
+        if (String(this.dialog.isPinned) !== this.$el.dataset.pinned) {
+
+            if (this.dialog.isPinned) {
                 this.props.$pinned.prepend(this.$el)
             } else {
                 const $foundRendered = this._findRenderedDialogToInsertBefore()
@@ -222,17 +299,19 @@ export class DialogComponent extends Component {
                 }
             }
 
-        } else if (!this.props.dialog.messages.last) {
+            this.$el.setAttribute("data-pinned", this.dialog.isPinned === undefined ? false : this.dialog.isPinned)
+
+        } else if (!this.dialog.messages.last) {
             // todo: handle no last message
-        } else if (parseInt(this.$el.dataset.date) !== this.props.dialog.messages.last.date) {
-            if (!this.props.dialog.isPinned) {
+        } else if (parseInt(this.$el.getAttribute("data-date")) !== this.dialog.messages.last.date) {
+            if (!this.dialog.isPinned) {
                 if (this.$el.previousSibling) {
                     this.props.$general.prepend(this.$el)
                 }
             }
         }
 
-        this.__patch()
+        this._patchMessage()
     }
 
     /**
@@ -240,7 +319,7 @@ export class DialogComponent extends Component {
      * @private
      */
     _findRenderedDialogToInsertBefore() {
-        const dialog = this.props.dialog
+        const dialog = this.dialog
         const renderedDialogs = this.props.$general.childNodes
 
         if (renderedDialogs.size === 0) {
@@ -251,12 +330,22 @@ export class DialogComponent extends Component {
 
         for (const $rendered of renderedDialogs) {
             if ($rendered !== this.$el) {
-                if (lastMessageDate >= parseInt($rendered.dataset.date)) {
+                if (lastMessageDate >= parseInt($rendered.getAttribute("data-date"))) {
                     return $rendered // todo: fix if dialog is last in the list
                 }
             }
         }
 
         return undefined
+    }
+
+    _handleClick() {
+        const p = this.dialog.peer.username ? `@${this.dialog.peer.username}` : `${this.dialog.peer.type}.${this.dialog.peer.id}`
+
+        V.router.replace("/", {
+            queryParams: {
+                p
+            }
+        })
     }
 }

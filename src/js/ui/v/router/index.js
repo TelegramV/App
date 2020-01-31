@@ -3,12 +3,9 @@ import VRNode from "../vrdom/VRNode"
 import V from "../VFramework"
 
 /**
- * Why? I do not know.
+ * WARNING: legacy code
  *
  * Note: only `hash` mode works for now.
- *
- * @version undefined
- * @author kohutd
  */
 export class VFrameworkRouter {
     constructor(options = {}) {
@@ -70,10 +67,10 @@ export class VFrameworkRouter {
                 // console.log("[router] triggering query change")
 
                 // if (this.diffQueryParams(newQueryParams)) {
-                this.queryChangeHandlers.forEach(h => {
-                    this.activeRoute.queryParams = newQueryParams
-                    h(newQueryParams)
-                })
+                    this.queryChangeHandlers.forEach(h => {
+                        this.activeRoute.queryParams = newQueryParams
+                        h(newQueryParams)
+                    })
                 // }
             } else {
                 // console.log("[router] triggering replace")
@@ -134,16 +131,19 @@ export class VFrameworkRouter {
 
     diffQueryParams(queryParams) {
         if (Object.keys(queryParams).length !== Object.keys(this.activeRoute.queryParams).length) {
-            return false
+            return true
         }
 
+        console.log("q", this.activeRoute.queryParams, queryParams)
+
         for (const [k, v] of Object.entries(queryParams)) {
+            console.log(k, v, this.activeRoute.queryParams[k])
             if (this.activeRoute.queryParams[k] !== v) {
-                return false
+                return true
             }
         }
 
-        return true
+        return false
     }
 
     findRoute(path) {

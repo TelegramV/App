@@ -1,7 +1,7 @@
 // @flow
 
 import {Peer} from "../dataObjects/peer/Peer"
-import {Dialog} from "../dataObjects/dialog/Dialog"
+import {Dialog} from "../dialogs/Dialog"
 
 export const MessageType = {
     UNSUPPORTED: -1,

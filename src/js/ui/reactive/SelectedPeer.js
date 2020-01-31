@@ -69,12 +69,16 @@ class SelectedPeer {
 
         // listen query changes
         V.router.onQueryChange(queryParams => {
-            this._previousPeer = this._peer
-            this._peer = this.findFromQueryParams(parseHashQuery(queryParams))
+            const peer = this.findFromQueryParams(parseHashQuery(queryParams))
 
-            this._subscribers.forEach(listener => {
-                listener(this._peer)
-            })
+            if (peer !== this._peer) {
+                this._previousPeer = this._peer
+                this._peer = peer
+
+                this._subscribers.forEach(listener => {
+                    listener(this._peer)
+                })
+            }
         })
 
         PeersStore.onSet(peer => {

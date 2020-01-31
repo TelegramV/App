@@ -1,6 +1,6 @@
 // @flow
 
-import {Dialog} from "../dataObjects/dialog/Dialog"
+import {Dialog} from "../dialogs/Dialog"
 import {Message, MessageType} from "./Message"
 import {ReactiveObject} from "../../ui/v/reactive/ReactiveObject"
 import {MessageParser} from "./MessageParser"
