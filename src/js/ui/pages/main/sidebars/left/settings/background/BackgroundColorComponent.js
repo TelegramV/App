@@ -19,7 +19,7 @@ export class BackgroundColorComponent extends Component {
 		return (
 			<div class="background-color">
 				<div class="settings-header">
-					<i class="btn-icon tgico tgico-back"/>
+					<i class="btn-icon tgico tgico-back" onClick={this.props.back}/>
 					<div class="settings-title">Set a Color</div>
 				</div>
 				<div class="pallete">

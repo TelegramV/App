@@ -12,12 +12,17 @@ export class SettingsComponent extends Component {
 	h() {
 		return (
 			<div class="settings sidebar hidden">
-				<BackgroundColorComponent/>
+				<BackgroundColorComponent back={this.close}/>
 			</div>
 			)
 	}
 
 	open() {
 		this.$el.classList.remove("hidden");
+	}
+
+	close() {
+		console.log("close")
+		this.$el.classList.add("hidden");
 	}
 }

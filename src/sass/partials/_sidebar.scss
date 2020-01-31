@@ -19,9 +19,10 @@
   }
 
   &.settings {
+    height: 100%;
     position: absolute;
     z-index: 20;
-    
+
     &.hidden {
       display: none;
     }
