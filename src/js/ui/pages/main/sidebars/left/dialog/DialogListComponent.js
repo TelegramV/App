@@ -8,6 +8,7 @@ import MTProto from "../../../../../../mtproto/external";
 import V from "../../../../../v/VFramework";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {ConnectionStatusComponent} from "./ConnectionStatusComponent"
+import {SettingsComp} from "../settings/SettingsComponent"
 import Sortable from "sortablejs"
 
 export class DialogListComponent extends Component {
@@ -65,7 +66,10 @@ export class DialogListComponent extends Component {
                         },
                         {
                             icon: "settings",
-                            title: "Settings"
+                            title: "Settings",
+                            onClick: _ => {
+                                SettingsComp.open();
+                            }
                         },
                         {
                             icon: "help",

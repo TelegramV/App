@@ -297,8 +297,8 @@ export class DialogInfoComponent extends Component {
         this.$el.classList.remove("hidden")
 
         peer.fetchFull()
-        this.fetchNextLinksPage()
-        //this.fetchNextPhotoPage()
+        //this.fetchNextLinksPage()
+        this.fetchNextPhotoPage()
 
     }
 

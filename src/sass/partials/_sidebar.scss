@@ -17,4 +17,39 @@
     border-right: none;
     border-left: $border;
   }
+
+  &.settings {
+    position: absolute;
+    z-index: 20;
+    
+    &.hidden {
+      display: none;
+    }
+    .background-color {
+      padding: 0 5px;
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(8rem, 1fr));
+        grid-auto-rows: 1fr;
+
+        &::before {
+          content: '';
+          width: 0;
+          padding-bottom: 100%;
+          grid-row: 1 / 1;
+          grid-column: 1 / 1;
+        }
+
+        & > *:first-child {
+          grid-row: 1 / 1;
+          grid-column: 1 / 1;
+        }
+
+        .color-square {
+          margin: 2px;
+          cursor: pointer;
+        }
+      }
+    }
+  }
 }

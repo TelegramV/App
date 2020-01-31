@@ -9,7 +9,8 @@ import {MediaViewerComponent} from "../../mediaViewerManager"
 import {InstantViewComponent} from "../../instantViewManager"
 import {DialogListComponent} from "./sidebars/left/dialog/DialogListComponent"
 import ChatComponent from "./components/chat/ChatComponent"
-import {DialogInfoComponent} from "./sidebars/left/dialog/DialogInfoComponent";
+import {DialogInfoComponent} from "./sidebars/right/dialogInfo/DialogInfoComponent";
+import {SettingsComponent} from "./sidebars/left/settings/SettingsComponent"
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {
@@ -33,7 +34,8 @@ export function MainPage() {
             <ModalComponent/>
             <MediaViewerComponent/>
             <InstantViewComponent/>
-
+            <SettingsComponent/>
+            
             <DialogListComponent/>
             <ChatComponent/>
             <DialogInfoComponent/>
