@@ -150,7 +150,7 @@ class MessageManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateMessagePoll", update => {
             if (AppSelectedPeer.isSelected) {
-                const messages = AppSelectedPeer.Current.dialog.messages.getPollsById(update.poll.id)
+                const messages = AppSelectedPeer.Current.dialog.messages.getPollsById(update.poll_id)
                 for (const message of messages) {
                     message.fillPoll(update.poll, update.results)
 
