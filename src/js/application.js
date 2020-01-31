@@ -67,8 +67,6 @@ console.log(
     </div>
 )
 
-MTProto.invokeMethod("xxx").catch(e => console.warn("ERR", e))
-
 startUI()
 MTProto.connect(authContext)
     .then(start)
