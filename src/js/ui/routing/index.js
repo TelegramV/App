@@ -1,4 +1,4 @@
-import {LoginPage} from "../pages/login/nextlogin"
+import LoginPage from "../pages/login/nextlogin"
 import {MainPage} from "../pages/main/mainPage"
 import MTProto from "../../mtproto/external"
 import V from "../v/VFramework"
