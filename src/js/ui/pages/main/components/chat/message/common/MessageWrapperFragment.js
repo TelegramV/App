@@ -86,6 +86,8 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         "no-pad": noPad
     }
 
+    console.log(message.replyMarkup)
+
     const inlineKeyboard = message.replyMarkup && message.replyMarkup._ === "replyInlineMarkup" ?
         <InlineKeyboardComponent message={message}/> : ""
     // FIXME this should be called upon message receiving
@@ -101,7 +103,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
             <div className={topLevelClasses}
                  id={`message-${message.id}`}
                  onContextMenu={contextMenuHandler}
-                 onDoubleClick={doubleClickHandler}
+                 onDblClick={doubleClickHandler}
                  data-peer={`${message.from.id}`}>
 
                 <MessageAvatarComponent message={message}/>
@@ -128,7 +130,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         <div className={topLevelClasses}
              id={`message-${message.id}`}
              onContextMenu={contextMenuHandler}
-             onDoubleClick={doubleClickHandler}>
+             onDblClick={doubleClickHandler}>
 
             <div className="bubble-outer">
                 <div className={wrapClasses}>

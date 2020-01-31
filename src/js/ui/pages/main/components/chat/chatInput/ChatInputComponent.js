@@ -6,6 +6,7 @@ import TimeManager from "../../../../../../mtproto/timeManager";
 import {createNonce} from "../../../../../../mtproto/utils/bin";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {InlineKeyboardComponent} from "../message/common/InlineKeyboardComponent";
+import {formatAudioTime} from "../../../../../utils"
 
 export let ChatInputManager
 
@@ -124,6 +125,9 @@ export class ChatInputComponent extends Component {
                                        }
                                    },
                                ], l.target)}/>
+                               <div className="voice-seconds hidden">
+                                    0:02,43
+                               </div>
 
                         </div>
 
@@ -135,7 +139,7 @@ export class ChatInputComponent extends Component {
                                 {this.state.keyboardMarkup.rows.map(l => {
                                     return <div className="row">
                                         {l.buttons.map(q => {
-                                            return InlineKeyboardComponent.parseButton(q)
+                                            return InlineKeyboardComponent.parseButton(null, q)
                                         })}
                                     </div>
                                 })}
@@ -145,14 +149,14 @@ export class ChatInputComponent extends Component {
                 </div>
 
 
-                <div className="round-button delete-button rp rps" onClick={this.onSend}>
-                    <i className="tgico tgico-delete_filled"/>
-                </div>
 
                 <div className="round-button-wrapper">
+                    <div className="round-button delete-button rp rps" onClick={this.onSend} onMouseEnter={this.mouseEnterRemoveVoice} onMouseLeave={this.mouseLeaveRemoveVoice}>
+                        <i className="tgico tgico-delete_filled"/>
+                    </div>
+
                     <div className="round-button send-button rp rps" onClick={this.onSend}
-                         onMouseDown={this.onMouseDown}
-                         onMouseUp={this.onMouseUp} onContextMenu={l => ContextMenuManager.openAbove([
+                         onMouseDown={this.onMouseDown} onContextMenu={l => ContextMenuManager.openAbove([
                         {
                             icon: "mute",
                             title: "Send without sound",
@@ -175,6 +179,14 @@ export class ChatInputComponent extends Component {
                 </div>
             </div>
         </div>
+    }
+
+    mouseEnterRemoveVoice() {
+        this.state.isRemoveVoice = true
+    }
+
+    mouseLeaveRemoveVoice() {
+        this.state.isRemoveVoice = false
     }
 
     replyTo(message) {
@@ -230,6 +242,14 @@ export class ChatInputComponent extends Component {
         }.bind(this), true)
     }
 
+    tickTimer() {
+        const time = formatAudioTime(this.i/100)+","+this.i%100;
+        this.$el.querySelector(".voice-seconds").innerHTML = time
+        this.i++
+        if(this.isRecording)
+        setTimeout(this.tickTimer, 10)
+    }
+
     mounted() {
         super.mounted();
         this.textarea = this.$el.querySelector(".textarea")
@@ -253,45 +273,70 @@ export class ChatInputComponent extends Component {
         });
         this.microphone = null
         this.recorder = null
+        this.audioContext.close()
+        this.audioContext = null
 
-        console.log("MouseUp")
+        this.$el.querySelector(".delete-button").classList.remove("open")
+        this.$el.querySelector(".voice-seconds").classList.add("hidden")
+        this.$el.querySelector(".tgico-attach").classList.remove("hidden")
+        this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
+    }
+
+    convertBits(array, fromBits, toBits) {
+        let buf = "";
+        let arr = [];
+
+        for (var i of array) {
+            var n = (i >>> 0).toString(2).substr(-fromBits);
+            n = "0".repeat(fromBits).substr(n.length) + n;
+            buf += n;
+            while (buf.length >= toBits) {
+                arr.push(parseInt(buf.substr(0, toBits), 2));
+                buf = buf.substr(toBits);
+            }
+        }
+        return arr;
     }
 
     onRecordingReady(ev) {
 
-        // const id = TimeManager.generateMessageID()
-        // var reader = new FileReader();
-        // reader.readAsArrayBuffer(ev.data);
-        // reader.onloadend = (event) => {
-        //     // The contents of the BLOB are in reader.result:
-        //
-        //     AppSelectedPeer.Current.api.sendMedia("", reader.result, {
-        //         _: "inputMediaUploadedDocument",
-        //         flags: 0,
-        //         file: {
-        //             _: "inputFile",
-        //             id: id,
-        //             parts: 1,
-        //             name: "audio.ogg"
-        //         },
-        //         mime_type: "audio/ogg",
-        //         attributes: [
-        //             {
-        //                 //flags: 1024,
-        //                 // duration: 100,
-        //                 _: "documentAttributeAudio",
-        //                 pFlags: {
-        //                     voice: true,
-        //                     waveform: createNonce(63)
-        //                 },
-        //             },
-        //             {
-        //                 _: "documentAttributeFilename",
-        //                 file_name: ""
-        //             }
-        //         ]
-        //     })
-        // }
+        if(this.state.isRemoveVoice) {
+            this.state.isRemoveVoice = false
+            return
+        }
+        const id = TimeManager.generateMessageID()
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(ev.data);
+        reader.onloadend = (event) => {
+            // The contents of the BLOB are in reader.result:
+
+            AppSelectedPeer.Current.api.sendMedia("", reader.result, {
+                _: "inputMediaUploadedDocument",
+                flags: 0,
+                file: {
+                    _: "inputFile",
+                    id: id,
+                    parts: 1,
+                    name: "audio.ogg"
+                },
+                mime_type: "audio/ogg",
+                attributes: [
+                    {
+                        //flags: 1024,
+                        // duration: 100,
+                        _: "documentAttributeAudio",
+                        pFlags: {
+                            voice: true,
+                            waveform: this.convertBits(this.waveform, 8, 5)
+                        },
+                    },
+                    {
+                        _: "documentAttributeFilename",
+                        file_name: ""
+                    }
+                ]
+            })
+        }
         console.log("onRecordingReady", ev)
     }
 
@@ -299,13 +344,14 @@ export class ChatInputComponent extends Component {
         if (!this.isVoiceMode) return
         if (!this.microphone) {
             navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
-
+                this.waveform = []
                 const processInput = audioProcessingEvent => {
+                    console.log(this.waveform)
                     const tempArray = new Uint8Array(analyser.frequencyBinCount);
 
                     analyser.getByteFrequencyData(tempArray);
-                    this.$el.querySelector(".voice-circle").style.transform = `scale(${getAverageVolume(tempArray)})`
-                    console.log(getAverageVolume(tempArray))
+                    this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray)/255 * 25 + 1, 4)})`
+                    this.waveform.push(Math.floor(getAverageVolume(tempArray) / 255 * 32))
                 }
 
                 const getAverageVolume = array => {
@@ -320,10 +366,10 @@ export class ChatInputComponent extends Component {
                     return values / length;
                 }
 
-                const audioContext = new AudioContext();
-                const input = audioContext.createMediaStreamSource(l);
-                const analyser = audioContext.createAnalyser();
-                const scriptProcessor = audioContext.createScriptProcessor();
+                this.audioContext = new AudioContext();
+                const input = this.audioContext.createMediaStreamSource(l);
+                const analyser = this.audioContext.createAnalyser();
+                const scriptProcessor = this.audioContext.createScriptProcessor();
 
                 // Some analyser setup
                 analyser.smoothingTimeConstant = 0.3;
@@ -331,7 +377,7 @@ export class ChatInputComponent extends Component {
 
                 input.connect(analyser);
                 analyser.connect(scriptProcessor);
-                scriptProcessor.connect(audioContext.destination);
+                scriptProcessor.connect(this.audioContext.destination);
 
                 scriptProcessor.onaudioprocess = processInput;
 
@@ -343,12 +389,19 @@ export class ChatInputComponent extends Component {
                 this.recorder.addEventListener('dataavailable', this.onRecordingReady);
                 this.recorder.start()
                 this.microphone = l
+
+                document.addEventListener("mouseup", this.onMouseUp)
+                this.$el.querySelector(".delete-button").classList.add("open")
+                this.$el.querySelector(".voice-seconds").classList.remove("hidden")
+                this.$el.querySelector(".tgico-attach").classList.add("hidden")
+
+                this.i = 0
+                this.tickTimer()
+
             })
             return
         }
-        this.recorder.start()
-
-        console.log("MouseDown")
+        console.error("MouseDown")
     }
 
     onKeyPress(ev) {

@@ -3,6 +3,7 @@ import AudioComponent from "./common/AudioComponent"
 import {FileAPI} from "../../../../../../api/fileAPI"
 import AudioManager from "../../../../../audioManager"
 import PeersStore from "../../../../../../api/store/PeersStore"
+import {formatAudioTime} from "../../../../../utils"
 
 export default class VoiceMessageComponent extends AudioComponent {
     constructor(props) {
@@ -67,7 +68,7 @@ export default class VoiceMessageComponent extends AudioComponent {
 		                  mask={`url(#bars-${this.message.id})`}/>
 	        	</svg>
 	        	<div class="timer">
-		            <span class="time-played">{this._timeToFormat(this.duration)}</span>
+		            <span class="time-played">{formatAudioTime(this.duration)}</span>
 		        </div>
             </div>
         )

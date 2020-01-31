@@ -37,6 +37,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.raw.from_id === PeersStore.self().id || this.raw.user_id === PeersStore.self().id
     }
 
+    get replyMarkup(): any {
+        return this.raw.reply_markup
+    }
+
     get isPost(): boolean {
         return this.raw.pFlags.post || false
     }
