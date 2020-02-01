@@ -1,5 +1,5 @@
 import Component from "./v/vrdom/Component";
-import ChatInfoAvatarComponent from "./pages/main/sidebars/right/chatInfo/ChatInfoAvatarComponent";
+import ChatInfoAvatarComponent from "./pages/main/components/chat/chatInfo/ChatInfoAvatarComponent";
 import MTProto from "../mtproto/external";
 import {PhotoComponent} from "./pages/main/components/basic/photoComponent";
 
