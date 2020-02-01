@@ -1,5 +1,4 @@
 import Component from "./v/vrdom/Component";
-import ChatInfoAvatarComponent from "./pages/main/components/chat/chatInfo/ChatInfoAvatarComponent";
 import MTProto from "../mtproto/external";
 import {PhotoComponent} from "./pages/main/components/basic/photoComponent";
 
@@ -79,7 +78,13 @@ export class InstantViewComponent extends Component {
                     {l.author._ !== "textEmpty" ?
                         <address className="author">by {this.parseRichText(l.author)}</address> : ""}
                     {l.published_date > 0 ? <time>on {new Date(l.published_date * 1000).toLocaleString("en", {
-                        year: 'numeric', month: 'long', day: 'numeric', hour12: false, timeZone: "UTC", hour: "numeric", minute: "numeric"
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour12: false,
+                        timeZone: "UTC",
+                        hour: "numeric",
+                        minute: "numeric"
                     })}</time> : ""}
                 </span>
 
@@ -156,9 +161,11 @@ export class InstantViewComponent extends Component {
                                     "valign-bottom": l.pFlags.valign_bottom
                                 }
                                 if (w.pFlags.header) {
-                                    return <th colSpan={w.colspan} rowSpan={w.rowspan} className={classList}>{this.parseRichText(w.text)}</th>
+                                    return <th colSpan={w.colspan} rowSpan={w.rowspan}
+                                               className={classList}>{this.parseRichText(w.text)}</th>
                                 } else {
-                                    return <td colSpan={w.colspan} rowSpan={w.rowspan} className={classList}>{this.parseRichText(w.text)}</td>
+                                    return <td colSpan={w.colspan} rowSpan={w.rowspan}
+                                               className={classList}>{this.parseRichText(w.text)}</td>
                                 }
                             })}</tr>
                         })}
@@ -186,8 +193,15 @@ export class InstantViewComponent extends Component {
                         return <div className="article">
                             <PhotoComponent photo={this.findPhoto(q.photo_id)}/>
                             <div className="article-name">{q.title}</div>
-                            <div className="article-description">by {q.author} on {new Date(q.published_date * 1000).toLocaleString("en", {
-                                year: 'numeric', month: 'long', day: 'numeric', hour12: false, timeZone: "UTC", hour: "numeric", minute: "numeric"
+                            <div
+                                className="article-description">by {q.author} on {new Date(q.published_date * 1000).toLocaleString("en", {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour12: false,
+                                timeZone: "UTC",
+                                hour: "numeric",
+                                minute: "numeric"
                             })}</div>
                         </div>
                     })}</div>
@@ -210,19 +224,23 @@ export class InstantViewComponent extends Component {
         //console.log(this.state.page)
         return (
             <div className={["instant-view-wrapper", this.state.hidden ? "hidden" : ""]}>
-                {this.state.page ?
+                {this.state.page ? <div class="container">
+
+                    <div className="header" onClick={this.close}>
+                        <i className="tgico tgico-back"/>
+                        <span>{this.state.page.siteName}</span>
+                        <i className="tgico tgico-more"/>
+                    </div>
+
+
                     <div className="instant-view">
-                        <div className="header">
-                            <i className="tgico tgico-back" onClick={this.close}/>
-                            <span>{this.state.page.siteName}</span>
-                            <i className="tgico tgico-more"/>
-                        </div>
                         <div className="content">
                             {this.state.page.blocks.map(this.parseBlock)}
                             <div className="feedback">Leave feedback about this preview</div>
                         </div>
                     </div>
-                    : ""}
+
+                </div> : ""}
             </div>
         )
     }
