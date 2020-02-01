@@ -1,4 +1,3 @@
-import {createLogger} from "../../common/logger";
 import {ApiNetworker} from "./apiNetworker";
 
 export class FileNetworker extends ApiNetworker {
@@ -8,5 +7,9 @@ export class FileNetworker extends ApiNetworker {
 
     onDisconnect() {
         console.error(`File networker died, respawning...`)
+    }
+
+    initPings() {
+
     }
 }

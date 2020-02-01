@@ -87,8 +87,6 @@ export class ChannelUpdatesProcessor {
     }
 
     enqueue(rawUpdate) {
-        console.log("got update", rawUpdate)
-
         let channelId = this.getChannelIdFromUpdate(rawUpdate)
 
         if (!channelId) {

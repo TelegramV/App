@@ -45,7 +45,6 @@ export class MessageProcessor {
             if (this.handlers[message._]) {
                 this.handlers[message._](message, messageID, sessionID)
             } else {
-                console.log("got update in worker", message)
                 MTProtoInternal.processUpdate(message)
             }
         } catch (e) {
