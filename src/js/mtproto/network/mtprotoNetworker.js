@@ -6,8 +6,6 @@ import {createLogger} from "../../common/logger";
 const Logger = createLogger("MTProtoNetworker")
 
 export class MTProtoNetworker extends Networker {
-    handler
-
     constructor(authContext) {
         super(authContext)
     }
@@ -29,7 +27,7 @@ export class MTProtoNetworker extends Networker {
 
         options.resultType = serializer.storeMethod(method, params)
 
-        const messageID = this.timeManager.generateMessageID()
+        const messageID = this.timeManager.generateMessageID(this.auth.dcID)
         const message = {
             msg_id: messageID,
             body: serializer.getBuffer(),

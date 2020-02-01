@@ -164,6 +164,7 @@ export class DialogComponent extends Component {
 
         if (this.__.mounted) {
             if (key === "selectedPeer") {
+
                 if (value) {
                     this.$el.classList.add("responsive-selected-chatlist")
                 } else {
@@ -252,13 +253,15 @@ export class DialogComponent extends Component {
     }
 
     _patchMessage() {
-        this.$el.setAttribute("data-date", this.dialog.messages.last.date)
-        this.$el.setAttribute("data-message-id", this.dialog.messages.last.id)
+        if (this.__.mounted) {
+            this.$el.setAttribute("data-date", this.dialog.messages.last.date)
+            this.$el.setAttribute("data-message-id", this.dialog.messages.last.id)
 
-        this._patchReadStatus()
-        this._patchText()
-        this._patchTime()
-        this._patchUnreadCount()
+            this._patchReadStatus()
+            this._patchText()
+            this._patchTime()
+            this._patchUnreadCount()
+        }
     }
 
     _patchText() {

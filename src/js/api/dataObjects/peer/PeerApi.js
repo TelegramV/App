@@ -5,6 +5,7 @@ import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util"
 import TimeManager from "../../../mtproto/timeManager"
 import {FileAPI} from "../../fileAPI"
 import {MessageFactory} from "../../messages/MessageFactory"
+import AppConfiguration from "../../../configuration"
 
 export class PeerApi {
 
@@ -128,7 +129,7 @@ export class PeerApi {
 
             peer: this._peer.inputPeer,
             message: text,
-            random_id: TimeManager.generateMessageID()
+            random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
         }).then(response => {
             response.dialog = this._peer.dialog
             response.message = text
@@ -144,7 +145,7 @@ export class PeerApi {
                 peer: this._peer.inputPeer,
                 message: text,
                 media: f,
-                random_id: TimeManager.generateMessageID()
+                random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
             }).then(response => {
                 MTProto.UpdatesManager.process(response)
             })

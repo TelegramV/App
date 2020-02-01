@@ -1,4 +1,5 @@
 import AppConfiguration from "../../configuration"
+import MTProtoInternal from "../internal"
 
 const names = ["pluto", "venus", "aurora", "vesta", "flora"]
 const dc_list = AppConfiguration.mtproto.dataCenter.list
@@ -34,8 +35,18 @@ function chooseServer(dcId, upload = false) {
     return chosen_servers[dcId]
 }
 
+function getDcIdByServerSalt(serverSalt) {
+    for (const [k, v] of MTProtoInternal.PermanentStorage.data().entries()) {
+        if (serverSalt === v) {
+            return parseInt(k.substring(-1))
+        }
+    }
+
+    return undefined
+}
+
 const DataCenter = {
-    chooseServer
+    chooseServer: chooseServer
 }
 
 export default DataCenter

@@ -1,6 +1,7 @@
 export const AppConfiguration = {
     mtproto: {
         dataCenter: {
+            default: 2,
             test: false,
             list: [
                 {id: 0, host: "149.154.167.40", port: 80}, // test server

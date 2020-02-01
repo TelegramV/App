@@ -1,7 +1,6 @@
 import {createNonce, longToBytes, uintToInt} from "../utils/bin"
 import {sha1BytesSync, sha256HashSync} from "../crypto/sha"
 import {TLSerialization} from "../language/serialization"
-import {createLogger} from "../../common/logger"
 import {TLDeserialization} from "../language/deserialization"
 import {MessageProcessor} from "./messageProcessor"
 
@@ -13,10 +12,6 @@ import Random from "../utils/random"
 import AppEvents from "../../api/eventBus/AppEvents"
 import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
 import MTProtoInternal from "../internal"
-
-const Logger = createLogger("ApiNetworker", {
-    level: "warn"
-})
 
 export class ApiNetworker extends Networker {
     constructor(auth) {
@@ -34,16 +29,19 @@ export class ApiNetworker extends Networker {
         this.seqNo = 0
         this.connectionInited = false
 
-        this.initPings()
+        this.pings = new Map()
+
+        this.self = this
+
+        this.initPings.bind(this)()
     }
 
     initPings() {
-        this.pings = {}
-        this.checkConnection()
+        this.checkConnection.bind(this)()
     }
 
     checkConnection() {
-        if (Object.keys(this.pings).length > 1) { // Probably disconnected
+        if (this.pings.size > 1) { // Probably disconnected
             // TODO Show disconnection badge
         }
 
@@ -53,22 +51,24 @@ export class ApiNetworker extends Networker {
         serializer.storeMethod("ping", {ping_id: pingID})
 
         const pingMessage = {
-            msg_id: this.timeManager.generateMessageID(),
+            msg_id: this.timeManager.generateMessageID(this.auth.dcID),
             seq_no: this.generateSeqNo(true),
             body: serializer.getBytes()
         };
 
-        this.pings[pingMessage.msg_id] = pingID
+        this.pings.set(pingMessage.msg_id, pingID)
 
         this.messageProcessor.listenPong(pingMessage.msg_id, l => {
             if (this.connected === false) {
                 AppEvents.General.fire("connectionRestored")
             }
-            delete this.pings[pingMessage.msg_id]
+            this.pings.delete(pingMessage.msg_id)
 
         })
+
         this.sendMessage(pingMessage)
-        setTimeout(this.checkConnection, 1000)
+
+        setTimeout(this.checkConnection.bind(this), 1000)
 
     }
 
@@ -303,7 +303,7 @@ export class ApiNetworker extends Networker {
 
         options.resultType = serializer.storeMethod(method, params)
 
-        const messageID = this.timeManager.generateMessageID()
+        const messageID = this.timeManager.generateMessageID(this.auth.dcID)
         const seqNo = this.generateSeqNo()
         const message = {
             msg_id: messageID,
@@ -371,7 +371,7 @@ export class ApiNetworker extends Networker {
         const serializer = new TLSerialization({mtproto: true})
         serializer.storeObject(object, "Object")
 
-        const messageID = this.timeManager.generateMessageID()
+        const messageID = this.timeManager.generateMessageID(this.auth.dcID)
         const seqNo = this.generateSeqNo(true)
 
         //console.log("MT message", object, messageID, seqNo)

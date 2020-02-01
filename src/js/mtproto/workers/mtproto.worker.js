@@ -2,11 +2,10 @@ import '@babel/polyfill'
 import {createNonce} from "../utils/bin"
 import {loadSchema} from "../language/schema"
 import MTProtoInternal from "../internal"
-
-export const defaultDcID = 2
+import AppConfiguration from "../../configuration"
 
 const authContext = {
-    dcID: defaultDcID,
+    dcID: AppConfiguration.mtproto.dataCenter.default,
     nonce: createNonce(16),
     sessionID: createNonce(8)
 }

@@ -76,25 +76,25 @@ class UpdateManager extends Manager {
                         })
                     }
 
-                    if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.channelUpdatesProcessor.latestDifferenceTime + 5) <= tsNow(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
-                        this.channelUpdatesProcessor.isWaitingForDifference = true
-                        this.channelUpdatesProcessor.queueIsProcessing = false
-                        this.channelUpdatesProcessor.latestDifferenceTime = tsNow(true)
-                        console.warn("refetching difference")
-
-                        AppEvents.General.fire("waitingForDifference", {
-                            diffType: 0 // channel
-                        })
-
-                        this.channelUpdatesProcessor.getChannelDifference(this.channelUpdatesProcessor.latestDifferencePeer).then(rawDifference => {
-                            this.channelUpdatesProcessor.processDifference(rawDifference)
-                        }).catch(e => {
-                            console.error("[default] BUG: difference refetching failed", e)
-                            this.channelUpdatesProcessor.isWaitingForDifference = false
-                            this.channelUpdatesProcessor.queueIsProcessing = false
-                            this.processQueue()
-                        })
-                    }
+                    // if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.channelUpdatesProcessor.latestDifferenceTime + 5) <= tsNow(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
+                    //     this.channelUpdatesProcessor.isWaitingForDifference = true
+                    //     this.channelUpdatesProcessor.queueIsProcessing = false
+                    //     this.channelUpdatesProcessor.latestDifferenceTime = tsNow(true)
+                    //     console.warn("refetching difference")
+                    //
+                    //     AppEvents.General.fire("waitingForDifference", {
+                    //         diffType: 0 // channel
+                    //     })
+                    //
+                    //     this.channelUpdatesProcessor.getChannelDifference(this.channelUpdatesProcessor.latestDifferencePeer).then(rawDifference => {
+                    //         this.channelUpdatesProcessor.processDifference(this.channelUpdatesProcessor.latestDifferencePeer,rawDifference)
+                    //     }).catch(e => {
+                    //         console.error("[default] BUG: difference refetching failed", e)
+                    //         this.channelUpdatesProcessor.isWaitingForDifference = false
+                    //         this.channelUpdatesProcessor.queueIsProcessing = false
+                    //         this.processQueue()
+                    //     })
+                    // }
 
                     if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.defaultUpdatesProcessor.latestDifferenceTime + 5) <= tsNow(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
                         this.defaultUpdatesProcessor.isWaitingForDifference = true
@@ -140,8 +140,8 @@ class UpdateManager extends Manager {
 
     fire(rawUpdate) {
         if (this.updateListeners.has(rawUpdate._)) {
-            this.updateListeners.get(rawUpdate._).forEach(l => {
-                l(rawUpdate)
+            this.updateListeners.get(rawUpdate._).forEach(listener => {
+                listener(rawUpdate)
             })
         } else {
             // console.warn("unexpected update = ", rawUpdate._, rawUpdate)

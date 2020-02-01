@@ -182,7 +182,7 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
         throw new Error("server_DH_inner_data SHA1-hash mismatch")
     }
 
-    networker.timeManager.applyServerTime(authContext.serverTime, authContext.localTime)
+    networker.timeManager.applyServerTime(authContext.dcID, authContext.serverTime, authContext.localTime)
 
     return true
 }

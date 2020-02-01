@@ -28,6 +28,10 @@ class MobileProtocolPermanentStorage {
         return this.storage.get(key)
     }
 
+    data() {
+        return this.storage
+    }
+
     setItem(key, value) {
         this.storage.set(key, value)
         return Promise.resolve(this.mtp.workerPostMessage({
@@ -127,7 +131,6 @@ class MobileProtocol {
 
     async createFileNetworker(dcID) {
         if (this.PermanentStorage.exists("authKey" + dcID)) {
-            // i changed it to MTProtoNetworker cause Networker does not have `invokeMethod` function @undrfined
             const networker = new FileNetworker({
                 dcID: dcID,
                 nonce: createNonce(16),
@@ -136,6 +139,7 @@ class MobileProtocol {
                 authKey: new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("authKey" + dcID))),
                 serverSalt: new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("serverSalt" + dcID)))
             })
+            console.log("created file networker", this.networker, this)
             const list = this.fileNetworkers[dcID]
             this.fileNetworkers[dcID] = networker
             list.forEach(l => {

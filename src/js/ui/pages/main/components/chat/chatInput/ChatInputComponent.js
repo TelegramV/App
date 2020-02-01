@@ -304,7 +304,7 @@ export class ChatInputComponent extends Component {
             this.state.isRemoveVoice = false
             return
         }
-        const id = TimeManager.generateMessageID()
+        const id = TimeManager.generateMessageID(this.auth.dcID)
         var reader = new FileReader();
         reader.readAsArrayBuffer(ev.data);
         reader.onloadend = (event) => {
