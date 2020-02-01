@@ -107,7 +107,7 @@ class BubblesComponent extends Component {
      */
     _renderMessage(message, prepend = false) {
 
-        if (!this.__.mounted) {
+        if (!this.__.mounted || !AppSelectedPeer.check(message.dialog.peer)) {
             return
         }
 

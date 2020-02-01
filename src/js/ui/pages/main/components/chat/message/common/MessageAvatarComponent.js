@@ -2,12 +2,12 @@ import Component from "../../../../../../v/vrdom/Component"
 import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 import AppSelectedInfoPeer from "../../../../../../reactive/SelectedInfoPeer";
 import type {Message} from "../../../../../../../api/messages/Message"
-import {Peer} from "../../../../../../../api/dataObjects/peer/Peer"
 import AppSelectedPeer from "../../../../../../reactive/SelectedPeer"
 
 export class MessageAvatarComponent extends Component {
 
     init() {
+        this.show = this.props.show === undefined ? true : this.props.show
         let message: Message = this.props.message
         this.from = message.from
 
@@ -21,9 +21,10 @@ export class MessageAvatarComponent extends Component {
     }
 
     h() {
-        if (AppSelectedPeer.check(this.props.message.from)) {
-            return <div/>
+        if (!this.show || AppSelectedPeer.check(this.props.message.from) && !this.props.message.forwarded) {
+            return <div id={this.props.id} className="avatar">$</div>
         }
+
 
         const hasAvatar = !this.from.photo.isEmpty
 
@@ -32,8 +33,10 @@ export class MessageAvatarComponent extends Component {
         const letterText = !hasAvatar ? this.from.photo.letter.text : ""
 
         return (
-            <div className={avatarClasses}
+            <div id={this.props.id}
+                 className={avatarClasses}
                  css-background-image={cssBackgroundImage} onClick={this.openPeerInfo}>
+
                 {letterText}
             </div>
         )

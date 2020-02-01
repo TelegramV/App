@@ -1,16 +1,18 @@
 import Component from "../../../../../../v/vrdom/Component"
 import AppEvents from "../../../../../../../api/eventBus/AppEvents"
+import type {BusEvent} from "../../../../../../../api/eventBus/EventBus"
 import {EventBus} from "../../../../../../../api/eventBus/EventBus"
 import type {Message} from "../../../../../../../api/messages/Message"
 import {ReplyFragment} from "./ReplyFragment"
 import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
-import type {BusEvent} from "../../../../../../../api/eventBus/EventBus"
 
 class GeneralMessageComponent extends Component {
 
     message: Message
     prevReadStatus: boolean = false
     intersectionObserver: IntersectionObserver
+
+    showAvatar: boolean = true
 
     init() {
         this.intersectionObserver = this.props.intersectionObserver
@@ -26,11 +28,30 @@ class GeneralMessageComponent extends Component {
 
     mounted() {
         this.message.show()
+
         if (this.intersectionObserver) {
             this.intersectionObserver.observe(this.$el)
         }
-    }
 
+        this.$avatar = this.$el.querySelector(`#message-${this.message.id}-avatar`)
+
+        if (this.$el.previousElementSibling) {
+            if (this.$el.previousElementSibling.getAttribute("data-peer") === this.$el.getAttribute("data-peer")) {
+                this.showAvatar = false
+                if (this.$avatar) {
+                    this.$avatar.style.opacity = 0
+                }
+            }
+        } else if (this.$el.nextElementSibling) {
+            if (this.$el.nextElementSibling.getAttribute("data-peer") === this.$el.getAttribute("data-peer")) {
+                this.showAvatar = false
+                const $next = this.$el.nextElementSibling.querySelector(`#${this.$el.nextElementSibling.id}-avatar`)
+                if ($next) {
+                    $next.style.opacity = 0
+                }
+            }
+        }
+    }
 
     reactiveChanged(key: string, value: any, event: BusEvent) {
         if (key === "message") {

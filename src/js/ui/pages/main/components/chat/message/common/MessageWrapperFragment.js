@@ -27,10 +27,11 @@ const ReplyToMessageFragment = ({message}) => {
  * @param noPad
  * @param contextActions
  * @param showUsername
+ * @param showAvatar
  * @return {*}
  * @constructor
  */
-const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, contextActions, showUsername=true}) => {
+const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, contextActions, showUsername = true, showAvatar = true}) => {
     const defaultContextActions = [
         {
             icon: "reply",
@@ -98,9 +99,9 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
                  id={`message-${message.id}`}
                  onContextMenu={contextMenuHandler}
                  onDblClick={doubleClickHandler}
-                 data-peer={`${message.from.id}`}>
+                 data-peer={`${message.from.type}-${message.from.id}`}>
 
-                <MessageAvatarComponent message={message}/>
+                <MessageAvatarComponent id={`message-${message.id}-avatar`} show={showAvatar} message={message}/>
 
                 <div className="bubble-outer">
                     <div className={wrapClasses}>
