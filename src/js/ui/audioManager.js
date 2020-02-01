@@ -10,9 +10,7 @@ class AudioManager0 {
             "in": "/static/sound_in.mp3",
         }
 
-        navigator.mediaSession.setActionHandler('play', this.play.bind(this));
-
-        navigator.mediaSession.setActionHandler('pause', this.pause.bind(this));
+        this._bindNavigatorEvents();
     }
 
     playNotification(sound) {
@@ -29,7 +27,7 @@ class AudioManager0 {
     play() {
         if(this.active) {
             this.active.play();
-            navigator.mediaSession.playbackState = "playing";
+            setPlaybackState("playing");
         }
     }
 
@@ -40,7 +38,7 @@ class AudioManager0 {
         }
         this.active = audio;
         if(!audio) {
-            navigator.mediaSession.playbackState = "none";
+            setPlaybackState("none");
             return;
         } else {
             this.update();
@@ -52,21 +50,33 @@ class AudioManager0 {
     pause() {
         if(this.active) {
             this.active.pause();
-            navigator.mediaSession.playbackState = "paused";
+            setPlaybackState("paused");
         }
     }
 
     update() {
         if(this.active.isPlaying()) {
-            navigator.mediaSession.playbackState = "playing";
+            setPlaybackState("playing");
         } else {
-            navigator.mediaSession.playbackState = "paused";
+            setPlaybackState("paused");
         }
     }
 
     clear() {
         this.active.pause;
         this.active = null;
+    }
+
+    setPlaybackState(state) {
+    	if(!navigator.mediaSession) return;
+    	navigator.mediaSession.playbackState = state;
+    }
+
+    _bindNavigatorEvents() {
+    	if(!navigator.mediaSession) return;
+    	navigator.mediaSession.setActionHandler('play', this.play.bind(this));
+
+        navigator.mediaSession.setActionHandler('pause', this.pause.bind(this));
     }
 
     updateBrowserMeta() {
