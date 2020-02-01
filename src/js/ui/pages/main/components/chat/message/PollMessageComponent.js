@@ -24,8 +24,8 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         this.contextActions = [];
         if (!this.quiz && this.isVoted() && !this.poll.closed) {
             this.contextActions.push({
-                icon: "close",
-                title: "Cancel vote",
+                icon: "revote",
+                title: "Revote",
                 onClick: _ => this.cancelVote()
             })
         }
