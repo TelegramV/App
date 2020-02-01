@@ -11,6 +11,7 @@ import {DialogListComponent} from "./sidebars/left/dialog/DialogListComponent"
 import ChatComponent from "./components/chat/ChatComponent"
 import {DialogInfoComponent} from "./sidebars/right/dialogInfo/DialogInfoComponent";
 import {SettingsComponent} from "./sidebars/left/settings/SettingsComponent"
+import WallpaperManager from "../../wallpaperManager"
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {
@@ -23,6 +24,7 @@ function initHighLevelManagers() {
     })
     LocaleController.init()
     StickerManager.getAnimatedEmojiSet()
+    WallpaperManager.init();
 }
 
 export function MainPage() {

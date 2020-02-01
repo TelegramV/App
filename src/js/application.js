@@ -58,14 +58,12 @@ if (isProduction) {
     AppCache.open()
 } else {
     window.StickerManager = StickerManager
+    window.send = (method, params) => {
+         MTProto.invokeMethod(method, params).then(result => {
+            console.log(result);
+         })
+    }
 }
-
-console.log(
-    <div>
-        <span>text</span>
-        <a ref="some" href="http://google.com">Google</a>
-    </div>
-)
 
 startUI()
 MTProto.connect(authContext)
