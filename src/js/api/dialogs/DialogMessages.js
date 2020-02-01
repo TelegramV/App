@@ -79,7 +79,7 @@ export class DialogMessages {
     }
 
     set last(message) {
-        if (!this._lastMessage || message.date >= this._lastMessage.date) {
+        if (!this._lastMessage || (message.date >= this._lastMessage.date && message.id > this._lastMessage.id)) {
             this._prevLastMessage = this._lastMessage
             this._lastMessage = message
         }

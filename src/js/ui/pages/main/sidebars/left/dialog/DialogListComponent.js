@@ -175,6 +175,10 @@ export class DialogListComponent extends Component {
      * @private
      */
     _renderDialog(dialog, appendOrPrepend = false) {
+        if (dialog.folderId === 1) {
+            return // put it to archived
+        }
+
         if (!this.elements.$pinnedDialogs || !this.elements.$generalDialogs) {
             console.error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
             return

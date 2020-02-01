@@ -146,6 +146,10 @@ export class PeerPhoto {
     fetchSmall() {
         this._isFetchingSmall = true
 
+        if (!this._photoSmall) {
+            return Promise.reject("no small photo found")
+        }
+
         return FileAPI.getPeerPhoto(this._photoSmall, this._dcId, this._peer, false).then(url => {
             this._isFetchingSmall = false
 
@@ -158,6 +162,10 @@ export class PeerPhoto {
      */
     fetchBig() {
         this._isFetchingBig = true
+
+        if (!this._photoBig) {
+            return Promise.reject("no big photo found")
+        }
 
         return FileAPI.getPeerPhoto(this._photoBig, this._dcId, this._peer, true).then(url => {
             this._isFetchingBig = false

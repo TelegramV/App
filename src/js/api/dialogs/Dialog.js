@@ -100,6 +100,10 @@ export class Dialog extends ReactiveObject {
         }
     }
 
+    get folderId() {
+        return this._folderId
+    }
+
     static createEmpty(peer: Peer, lastMessage: Message = undefined) {
         return new Dialog({
             pFlags: {
