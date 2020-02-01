@@ -6,13 +6,18 @@ export class BackgroundColorComponent extends SettingsPane {
 		super(props);
 
 		this.defaultColors = [
-			"#FF0000",
-			"#FFFF00",
-			"#00FF00",
-			"#00FFFF",
-			"#0000FF",
-			"#FF00FF",
-			"#123456"
+			"#E6EBEE",
+			"#B2CEE0",
+			"#008DD0",
+			"#C6E7CB",
+			"#C4E1A6",
+			"#60B16E",
+			"#CCD0AF",
+			"#A6A997",
+			"#7A7072",
+			"#FDD7AF",
+			"#FDB76E",
+			"#DD8851"
 		]
 	}
 
@@ -47,7 +52,8 @@ export class BackgroundColorComponent extends SettingsPane {
 	}
 
 	applyColor(color) {
-		window.document.documentElement.style.setProperty("--chat-bg-color", color)
+		window.document.documentElement.style.setProperty("--chat-bg-image", "");
+		window.document.documentElement.style.setProperty("--chat-bg-color", color);
 	}
 
 	_fragmentClick(ev) {
