@@ -43,18 +43,18 @@ export interface Message {
 
     +isOut: boolean;
     +isRead: boolean;
-    +isMentioned: boolean;
-    +isMediaUnread: boolean;
-    +isSilent: boolean;
-    +isPost: boolean;
-    +isFromScheduled: boolean;
-    +isLegacy: boolean;
-    +isEditHide: boolean;
-    +replyToMessage: Message;
-    +replyToMessage: Message;
-    +replyMarkup: any;
-    +forwarded: any;
-    +forwardedMessageId: number;
+    +isMentioned?: boolean;
+    +isMediaUnread?: boolean; // todo: implement this thing
+    +isSilent?: boolean;
+    +isPost?: boolean;
+    +isFromScheduled?: boolean;
+    +isLegacy?: boolean;
+    +isEditHide?: boolean;
+    +replyToMessage?: Message;
+    +replyMarkup?: any;
+    +forwarded?: any;
+    +forwardedMessageId?: number;
+    +editDate?: number;
 
     +prefix: string; // why this is here??
 

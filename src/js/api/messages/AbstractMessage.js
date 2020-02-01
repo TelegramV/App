@@ -16,7 +16,9 @@ export class AbstractMessage extends ReactiveObject implements Message {
     _from: Peer
     prefix: string
     replyToMessage: Message
+    replyToMessageType: string
     forwarded: any
+    forwardedType: string
     forwardedMessageId: number
 
     constructor(dialog: Dialog) {
@@ -85,6 +87,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.raw.date
     }
 
+    get editDate() {
+        return this.raw.edit_date
+    }
+
     getDate(locale: any, format: any) {
         return new Date(this.date * 1000).toLocaleString(locale, format)
     }
@@ -95,13 +101,21 @@ export class AbstractMessage extends ReactiveObject implements Message {
         this.findForwarded()
     }
 
-    findReplyTo() {
-        if (!this.replyToMessage && this.raw.reply_to_msg_id) {
+    findReplyTo(fire = true) {
+        if (this.replyToMessage && this.replyToMessageType && fire) {
+            this.fire(this.replyToMessageType)
+        }
+
+        if (this.raw.reply_to_msg_id) {
             const replyToMessage = this.dialog.messages.get(this.raw.reply_to_msg_id)
 
             if (replyToMessage) {
                 this.replyToMessage = replyToMessage
-                this.fire("replyToMessageFound")
+                this.replyToMessageType = "replyToMessageFound"
+
+                if (fire) {
+                    this.fire("replyToMessageFound")
+                }
             } else {
                 this.dialog.peer.api.getHistory({
                     offset_id: this.raw.reply_to_msg_id, // ???
@@ -111,9 +125,17 @@ export class AbstractMessage extends ReactiveObject implements Message {
                     if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
                         this.dialog.messages.appendOtherSingle(messages[0])
                         this.replyToMessage = messages[0]
-                        this.fire("replyToMessageFound")
+                        this.replyToMessageType = "replyToMessageFound"
+
+                        if (fire) {
+                            this.fire("replyToMessageFound")
+                        }
                     } else {
-                        this.fire("replyToMessageNotFound")
+                        this.replyToMessageType = "replyToMessageNotFound"
+
+                        if (fire) {
+                            this.fire("replyToMessageNotFound")
+                        }
                     }
                 })
             }
@@ -121,10 +143,18 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     findForwarded(fire = true) {
-        if (!this.forwarded && this.raw.fwd_from) {
+        if (this.forwarded && this.forwardedType && fire) {
+            this.fire(this.forwardedType)
+
+            return
+        }
+
+        if (this.raw.fwd_from) {
             if (!this.raw.fwd_from.from_id) {
                 if (this.raw.fwd_from.from_name) {
                     this.forwarded = this.raw.fwd_from.from_name
+                    this.forwardedType = "forwardedNameOnlyFound"
+
                     if (fire) {
                         this.fire("forwardedNameOnlyFound")
                     }
@@ -134,6 +164,8 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
                 if (forwarded) {
                     this.forwarded = forwarded
+                    this.forwardedType = "forwardedUserFound"
+
                     if (fire) {
                         this.fire("forwardedUserFound")
                     }
@@ -146,6 +178,8 @@ export class AbstractMessage extends ReactiveObject implements Message {
                 if (forwarded) {
                     this.forwarded = forwarded
                     this.forwardedMessageId = this.raw.fwd_from.channel_post
+                    this.forwardedType = "forwardedChannelFound"
+
                     if (fire) {
                         this.fire("forwardedChannelFound")
                     }
