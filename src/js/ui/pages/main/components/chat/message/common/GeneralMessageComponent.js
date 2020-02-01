@@ -32,25 +32,6 @@ class GeneralMessageComponent extends Component {
         if (this.intersectionObserver) {
             this.intersectionObserver.observe(this.$el)
         }
-
-        this.$avatar = this.$el.querySelector(`#message-${this.message.id}-avatar`)
-
-        if (this.$el.previousElementSibling) {
-            if (this.$el.previousElementSibling.getAttribute("data-peer") === this.$el.getAttribute("data-peer")) {
-                this.showAvatar = false
-                if (this.$avatar) {
-                    this.$avatar.style.opacity = 0
-                }
-            }
-        } else if (this.$el.nextElementSibling) {
-            if (this.$el.nextElementSibling.getAttribute("data-peer") === this.$el.getAttribute("data-peer")) {
-                this.showAvatar = false
-                const $next = this.$el.nextElementSibling.querySelector(`#${this.$el.nextElementSibling.id}-avatar`)
-                if ($next) {
-                    $next.style.opacity = 0
-                }
-            }
-        }
     }
 
     reactiveChanged(key: string, value: any, event: BusEvent) {

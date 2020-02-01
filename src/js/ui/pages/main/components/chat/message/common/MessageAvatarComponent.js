@@ -21,8 +21,12 @@ export class MessageAvatarComponent extends Component {
     }
 
     h() {
-        if (!this.show || AppSelectedPeer.check(this.props.message.from) && !this.props.message.forwarded) {
-            return <div id={this.props.id} className="avatar">$</div>
+        if (AppSelectedPeer.check(this.props.message.from) && !this.props.message.forwarded) {
+            return <div/>
+        }
+
+        if (!this.show) {
+            return <div id={this.props.id} className="avatar"/>
         }
 
 
