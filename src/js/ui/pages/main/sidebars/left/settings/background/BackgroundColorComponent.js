@@ -1,6 +1,7 @@
 import Component from "../../../../../../v/vrdom/Component"
+import SettingsPane from "../SettingsPane"
 
-export class BackgroundColorComponent extends Component {
+export class BackgroundColorComponent extends SettingsPane {
 	constructor(props) {
 		super(props);
 
@@ -15,13 +16,14 @@ export class BackgroundColorComponent extends Component {
 		]
 	}
 
+	getId() {
+		return "background-color"
+	}
+
 	h() {
 		return (
-			<div class="background-color">
-				<div class="settings-header">
-					<i class="btn-icon tgico tgico-back" onClick={this.props.back}/>
-					<div class="settings-title">Set a Color</div>
-				</div>
+			<div class="background-color hidden">
+				{this.makeHeader()}
 				<div class="pallete">
 					Pallete goes here...
 				</div>
@@ -30,6 +32,10 @@ export class BackgroundColorComponent extends Component {
 				</div>
 			</div>
 			)
+	}
+
+	getName() {
+		return "Set a Color"
 	}
 
 	generateColorList() {
