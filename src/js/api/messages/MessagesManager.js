@@ -28,8 +28,6 @@ class MessageManager extends Manager {
 
             dialog.messages.appendSingle(message)
 
-            dialog.messages.clearUnread()
-
             if (!message.isOut) {
                 dialog.messages.addUnread(message.id)
             }
