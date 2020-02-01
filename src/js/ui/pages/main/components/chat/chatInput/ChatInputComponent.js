@@ -6,7 +6,8 @@ import TimeManager from "../../../../../../mtproto/timeManager";
 import {createNonce} from "../../../../../../mtproto/utils/bin";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {InlineKeyboardComponent} from "../message/common/InlineKeyboardComponent";
-import {formatAudioTime} from "../../../../../utils"
+import {formatAudioTime, convertBits} from "../../../../../utils"
+import ComposerComponent from "./ComposerComponent"
 
 export let ChatInputManager
 
@@ -28,6 +29,7 @@ export class ChatInputComponent extends Component {
 
     h() {
         return <div className="chat-input-wrapper">
+            <ComposerComponent mouseEnter={this.mouseEnterComposer} mouseLeave={this.mouseLeaveComposer}/>
             <div className="chat-input">
 
                 <div className="input-and-keyboard-wrapper">
@@ -54,8 +56,10 @@ export class ChatInputComponent extends Component {
                                 </div>
                             })}
                         </div>
+                        
                         <div className="input-field">
-                            <i className="tgico tgico-smile btn-icon rp rps"/>
+                            <i className="tgico tgico-smile btn-icon rp rps"
+                             onMouseEnter={this.mouseEnterEmoji} onMouseLeave={this.mouseLeaveEmoji}/>
                             <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]}
                                  placeholder="Message"
                                  contentEditable={true} onInput={this.onInput} onKeyPress={this.onKeyPress}
@@ -181,6 +185,31 @@ export class ChatInputComponent extends Component {
         </div>
     }
 
+    mouseEnterComposer() {
+        this.hideComposer = false;
+    }
+
+    mouseLeaveComposer() {
+        this.hideComposer = true;
+        this.planComposerClose()
+    }
+
+    mouseEnterEmoji() {
+        this.composer.classList.add("visible");
+        this.hideComposer = false;
+    }
+
+    mouseLeaveEmoji() {
+        this.hideComposer = true;
+        this.planComposerClose()
+    }
+
+    planComposerClose() {
+        setTimeout(()=> {
+            if(this.hideComposer) this.composer.classList.remove("visible");
+        }, 250);
+    }
+
     mouseEnterRemoveVoice() {
         this.state.isRemoveVoice = true
     }
@@ -253,6 +282,7 @@ export class ChatInputComponent extends Component {
     mounted() {
         super.mounted();
         this.textarea = this.$el.querySelector(".textarea")
+        this.composer = this.$el.querySelector(".composer")
     }
 
     onSend(ev) {
@@ -280,22 +310,6 @@ export class ChatInputComponent extends Component {
         this.$el.querySelector(".voice-seconds").classList.add("hidden")
         this.$el.querySelector(".tgico-attach").classList.remove("hidden")
         this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
-    }
-
-    convertBits(array, fromBits, toBits) {
-        let buf = "";
-        let arr = [];
-
-        for (var i of array) {
-            var n = (i >>> 0).toString(2).substr(-fromBits);
-            n = "0".repeat(fromBits).substr(n.length) + n;
-            buf += n;
-            while (buf.length >= toBits) {
-                arr.push(parseInt(buf.substr(0, toBits), 2));
-                buf = buf.substr(toBits);
-            }
-        }
-        return arr;
     }
 
     onRecordingReady(ev) {

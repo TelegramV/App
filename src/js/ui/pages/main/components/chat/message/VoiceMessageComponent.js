@@ -3,7 +3,7 @@ import AudioComponent from "./common/AudioComponent"
 import {FileAPI} from "../../../../../../api/fileAPI"
 import AudioManager from "../../../../../audioManager"
 import PeersStore from "../../../../../../api/store/PeersStore"
-import {formatAudioTime} from "../../../../../utils"
+import {formatAudioTime, convertBits} from "../../../../../utils"
 
 export default class VoiceMessageComponent extends AudioComponent {
     constructor(props) {
@@ -15,7 +15,7 @@ export default class VoiceMessageComponent extends AudioComponent {
             }
         }
         
-        this.heights = this._waveToArray(this.waveform);
+        this.heights = convertBits(this.waveform, 8, 5);
         //maybe try another smooth functions?
         this.heights = this._smooth(this.heights, 0.05);
         //TODO adaptive bars count
@@ -142,22 +142,6 @@ export default class VoiceMessageComponent extends AudioComponent {
             return el.parentNode.getBoundingClientRect();
         }
         return getVpPos(el.parentNode);
-    }
-
-    _waveToArray(waveform) {
-        let buf = "";
-        let arr = [];
-        let splitSize = 5;
-        for (var i of waveform) {
-            var n = (i >>> 0).toString(2).substr(-8);
-            n = "00000000".substr(n.length) + n;
-            buf += n;
-            while (buf.length >= splitSize) {
-                arr.push(parseInt(buf.substr(0, splitSize), 2));
-                buf = buf.substr(splitSize);
-            }
-        }
-        return arr;
     }
 
     _smooth(values, alpha) {

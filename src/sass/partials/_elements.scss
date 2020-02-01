@@ -1,0 +1,46 @@
+.tab-selector {
+    width: 100%;
+    display: flex;
+    margin-bottom: 5px;
+    border-bottom: 1px solid $grey;
+
+    .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        border-bottom: 1px $lightgrey solid;
+    }
+
+    .item {
+        padding: 12px;
+        position: relative;
+        height: 100%;
+        font-weight: 500;
+        color: $darkgrey;
+        text-align: center;
+        width: 100%;
+        cursor: pointer;
+
+        span {
+            position: relative;
+            padding: 0 2px 0 2px;
+        }
+    }
+
+    .item.selected {
+        color: $blue;
+
+        span {
+            &::after {
+                content: "";
+                position: absolute;
+                border-bottom: 3px $blue solid;
+                bottom: -12px;
+                left: 0;
+                width: 100%;
+                border-top-left-radius: 2px;
+                border-top-right-radius: 2px;
+            }
+        }
+    }
+}
