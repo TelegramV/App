@@ -16,7 +16,7 @@ import VBigInt from "./mtproto/bigint/VBigInt"
 const isProduction = false
 
 export const defaultDcID = 2
-
+//
 const authContext = {
     dcID: defaultDcID,
     nonce: createNonce(16),
@@ -38,33 +38,40 @@ function start() {
         }
     })
 }
+//
+// function startUI() {
+//     V.registerPlugin(RipplePlugin)
+//     V.registerPlugin(EmojiPlugin)
+//
+//     V.useRoutes(AppRoutes)
+//
+//     V.mount("#app")
+// }
+//
+// global.Peers = PeersStore
+// global.Dialogs = PeersStore
+// global.EVE = AppEvents
+//
+// global.bi = VBigInt
+//
+// if (isProduction) {
+//     AppCache.open()
+// } else {
+//     window.StickerManager = StickerManager
+//     window.send = (method, params) => {
+//          MTProto.invokeMethod(method, params).then(result => {
+//             console.log(result);
+//          })
+//     }
+// }
+//
+// startUI()
+// MTProto.connect(authContext)
+//     .then(start)
 
-function startUI() {
-    V.registerPlugin(RipplePlugin)
-    V.registerPlugin(EmojiPlugin)
+import {Some} from "./some"
 
-    V.useRoutes(AppRoutes)
+const some = new Some();
 
-    V.mount("#app")
-}
-
-global.Peers = PeersStore
-global.Dialogs = PeersStore
-global.EVE = AppEvents
-
-global.bi = VBigInt
-
-if (isProduction) {
-    AppCache.open()
-} else {
-    window.StickerManager = StickerManager
-    window.send = (method, params) => {
-         MTProto.invokeMethod(method, params).then(result => {
-            console.log(result);
-         })
-    }
-}
-
-startUI()
-MTProto.connect(authContext)
-    .then(start)
+console.log(some);
+console.log(some.one);

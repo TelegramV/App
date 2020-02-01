@@ -1,7 +1,7 @@
-export type BusEvent = {
-    type: string,
-    [string]: any,
-}
+// export type BusEvent = {
+//     type: string,
+//     [string]: any,
+// }
 
 /**
  * Simple BusEvent Bus class

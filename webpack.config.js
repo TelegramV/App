@@ -18,7 +18,7 @@ const config = {
         compress: true,
         port: 8090
     },
-    entry: ["@babel/polyfill", "./src/js/application.js"],
+    entry: "./src/js/application.ts",
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "bundle.[hash].js"
@@ -43,6 +43,11 @@ const config = {
     module: {
         rules: [
             {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
+            {
                 test: /\.worker\.js$/,
                 use: {
                     loader: "worker-loader",
@@ -51,11 +56,11 @@ const config = {
                     }
                 }
             },
-            {
-                test: /\.js$/,
-                use: "babel-loader",
-                exclude: /node_modules/
-            },
+            // {
+            //     test: /\.js$/,
+            //     use: "babel-loader",
+            //     exclude: /node_modules/
+            // },
             {
                 test: /\.s?css/i,
                 use: [
@@ -85,6 +90,9 @@ const config = {
                 },
             },
         ]
+    },
+    resolve: {
+        extensions: [ '.tsx', '.ts', '.js' ],
     },
     optimization: {
         splitChunks: {

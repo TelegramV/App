@@ -7,13 +7,6 @@ import AppConfiguration from "../../configuration"
  */
 class VBigInt {
 
-    /**
-     * @type {BigInteger|BigInt}
-     */
-    value = undefined
-
-    isNative = false
-
     constructor(value, native = false) {
         this.value = value
 

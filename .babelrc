@@ -9,7 +9,8 @@
         ]
       }
     ],
-    "@babel/preset-flow"
+    "@babel/preset-flow",
+    "@babel/typescript"
   ],
   "plugins": [
     "@babel/syntax-dynamic-import",

@@ -8,18 +8,19 @@ import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 
 export class Peer extends ReactiveObject {
 
-    _rawPeer
-    _filled = false
-    _dialog
-    _photo
-    _accessHash
-    _min_messageId
-    _min_inputPeer
-    full
-    _api
+    // _rawPeer
+    // _filled = false
+    // _dialog
+    // _photo
+    // _accessHash
+    // _min_messageId
+    // _min_inputPeer
+    // full
+    // _api
 
     constructor(rawPeer, dialog = undefined) {
         super()
+        this._filled = false
 
         this._rawPeer = rawPeer
         this._dialog = dialog || Dialog.createEmpty(this)
