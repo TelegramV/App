@@ -1,10 +1,10 @@
 import {PhotoFragment} from "./PhotoFragment"
 
-const LoadingFragment = ({id, loading = true, click = undefined, show = true}) => {
+export const LoadingFragment = ({id, loading = true, click = undefined, show = true, showPause = true}) => {
     return (
         <div css-display={show ? "" : "none"} id={id} className="progress" onClick={click}>
 
-            <div className="pause-button">
+            <div css-display={show ? "" : "none"} className="pause-button">
                 <i className={["tgico", loading ? "tgico-close" : "tgico-download"]}/>
             </div>
 

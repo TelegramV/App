@@ -30,6 +30,8 @@ class MessageManager extends Manager {
 
             if (!message.isOut) {
                 dialog.messages.addUnread(message.id)
+            } else {
+                dialog.messages.clearUnread()
             }
 
             dialog.fire("newMessage", {

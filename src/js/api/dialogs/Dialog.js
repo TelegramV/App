@@ -12,6 +12,7 @@ export class Dialog extends ReactiveObject {
     pts: number = -1
 
     _peer: Peer = undefined
+
     _rawDialog: Object = {}
     _pinned: boolean = false
     _unreadMark: boolean = false
@@ -90,6 +91,13 @@ export class Dialog extends ReactiveObject {
 
     get unreadMark(): boolean {
         return this._unreadMark
+    }
+
+    get input() {
+        return {
+            _: "inputDialogPeer",
+            peer: this.peer.inputPeer
+        }
     }
 
     static createEmpty(peer: Peer, lastMessage: Message = undefined) {

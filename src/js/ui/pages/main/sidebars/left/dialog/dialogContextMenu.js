@@ -14,9 +14,18 @@ export const dialogContextMenu = (dialog: Dialog) => {
             icon: "archive",
             title: "Archive chat"
         },
-        {
-            icon: dialog.isPinned ? "unpin" : "pin",
-            title: dialog.isPinned ? "Unpin from top" : "Pin to top"
+        () => {
+            return {
+                icon: dialog.isPinned ? "unpin" : "pin",
+                title: dialog.isPinned ? "Unpin from top" : "Pin to top",
+                onClick: _ => {
+                    if (dialog.isPinned) {
+                        dialog.api.setPinned(false)
+                    } else {
+                        dialog.api.setPinned(true)
+                    }
+                }
+            }
         },
         {
             icon: "info",

@@ -6,7 +6,7 @@ import {Dialog} from "./Dialog"
  */
 export class DialogApi {
 
-    _dialog
+    _dialog: Dialog
 
     /**
      * @param {Dialog} dialog
@@ -15,14 +15,14 @@ export class DialogApi {
         this._dialog = dialog
     }
 
-    setPinned(pinned) {
+    setPinned(pinned: boolean) {
         return MTProto.invokeMethod("messages.toggleDialogPin", {
-            peer: {
-                _: "inputDialogPeer"
-            },
+            peer: this._dialog.input,
             pinned
-        }).then(l => {
-            this._dialog.pinned = l
+        }).then(Bool => {
+            if (Bool._ === "boolTrue") {
+                this._dialog.pinned = pinned
+            }
         })
     }
 

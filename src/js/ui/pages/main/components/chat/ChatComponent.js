@@ -27,7 +27,7 @@ class ChatComponent extends Component {
                 <div id="chat" css-display="none">
                     <div class="wallpaper blur"></div>
                     <div id="topbar">
-                        <ChatInfoComponent/>
+                        <ChatInfoComponent/>    
                         <PinnedComponent/>
                         <div className="btn-icon rp rps tgico-search"/>
                         <div className="btn-icon rp rps tgico-more"/>

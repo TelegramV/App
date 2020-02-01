@@ -87,8 +87,6 @@ export class DraftMessage {
     fillRawAndFire(rawDraftMessage) {
         this.fillRaw(rawDraftMessage)
 
-        AppEvents.Dialogs.fire("updateDraftMessage", {
-            dialog: this.dialog
-        })
+        this.dialog.fire("updateDraftMessage")
     }
 }

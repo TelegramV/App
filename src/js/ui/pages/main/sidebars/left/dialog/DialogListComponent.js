@@ -76,7 +76,7 @@ export class DialogListComponent extends Component {
                             title: "Help"
                         }
                     ], ev.target)}/>
-                    <div className="search">
+                    <div className="search rp rps">
                         <div className="input-search">
                             <input type="text" placeholder="Search"/>
                             <span className="tgico tgico-search"/>

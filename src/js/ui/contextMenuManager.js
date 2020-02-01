@@ -23,11 +23,16 @@ export class ContextMenuComponent extends Component {
                  onContextMenu={this.close}>
                 <div className={["context-menu", this.state.animation]} css-top={this.state.y + "px"}
                      css-left={this.state.x + "px"}>
-                    {this.state.data.map(l =>
-                         <div className={["element", "rp", "rps", l.red ? "red" : ""]} onClick={q => this.select(l, q)}>
+                    {this.state.data.map(l => {
+                        if (typeof l === "function") {
+                            l = l()
+                        }
+
+                        return <div className={["element", "rp", "rps", l.red ? "red" : ""]}
+                                    onClick={q => this.select(l, q)}>
                             {l.icon ?
                                 <i className={["tgico", "tgico-" + l.icon]}/>
-                            :""}
+                                : ""}
                             <span>{l.title}</span>
 
                             {l.counter ?
@@ -36,8 +41,9 @@ export class ContextMenuComponent extends Component {
                             }
                             {l.after ?
                                 <div className="after">{l.after}</div>
-                            : ""}
+                                : ""}
                         </div>
+                    }
                     )}
                 </div>
             </div>
@@ -115,6 +121,7 @@ export class ContextMenuComponent extends Component {
         }
     }
 }
+
 //TODO uncomment before production
 /*window.oncontextmenu = function (ev) {
     ev.preventDefault()
