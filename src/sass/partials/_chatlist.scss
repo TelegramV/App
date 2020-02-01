@@ -227,13 +227,13 @@
 
   &.sent {
     .status:before {
-      content: $tgico-check-sent;
+      content: $tgico-check;
     }
   }
 
   &.read {
     .status:before {
-      content: $tgico-check-read;
+      content: $tgico-checks;
     }
   }
 

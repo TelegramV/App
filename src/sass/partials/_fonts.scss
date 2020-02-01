@@ -29,458 +29,485 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.tgico-check-sent {
+
+.tgico-check {
   &:before {
-    content: $tgico-check-sent;
+    content: $tgico-check; 
   }
 }
-.tgico-check-read {
+.tgico-checks {
   &:before {
-    content: $tgico-check-read;
+    content: $tgico-checks; 
   }
 }
 .tgico-activesessions {
   &:before {
-    content: $tgico-activesessions;
+    content: $tgico-activesessions; 
   }
 }
 .tgico-add {
   &:before {
-    content: $tgico-add;
+    content: $tgico-add; 
   }
 }
-.tgico-addmember {
+.tgico-addmember_filled {
   &:before {
-    content: $tgico-addmember;
+    content: $tgico-addmember_filled; 
   }
 }
 .tgico-adduser {
   &:before {
-    content: $tgico-adduser;
+    content: $tgico-adduser; 
   }
 }
 .tgico-admin {
   &:before {
-    content: $tgico-admin;
+    content: $tgico-admin; 
   }
 }
 .tgico-animals {
   &:before {
-    content: $tgico-animals;
+    content: $tgico-animals; 
   }
 }
 .tgico-archive {
   &:before {
-    content: $tgico-archive;
+    content: $tgico-archive; 
   }
 }
 .tgico-attach {
   &:before {
-    content: $tgico-attach;
+    content: $tgico-attach; 
   }
 }
 .tgico-avatar_archivedchats {
   &:before {
-    content: $tgico-avatar_archivedchats;
+    content: $tgico-avatar_archivedchats; 
   }
 }
 .tgico-avatar_deletedaccount {
   &:before {
-    content: $tgico-avatar_deletedaccount;
+    content: $tgico-avatar_deletedaccount; 
   }
 }
 .tgico-avatar_savedmessages {
   &:before {
-    content: $tgico-avatar_savedmessages;
+    content: $tgico-avatar_savedmessages; 
   }
 }
 .tgico-back {
   &:before {
-    content: $tgico-back;
+    content: $tgico-back; 
   }
 }
 .tgico-camera {
   &:before {
-    content: $tgico-camera;
+    content: $tgico-camera; 
   }
 }
 .tgico-cameraadd {
   &:before {
-    content: $tgico-cameraadd;
+    content: $tgico-cameraadd; 
   }
 }
 .tgico-car {
   &:before {
-    content: $tgico-car;
+    content: $tgico-car; 
   }
 }
 .tgico-channel {
   &:before {
-    content: $tgico-channel;
+    content: $tgico-channel; 
   }
 }
 .tgico-channelviews {
   &:before {
-    content: $tgico-channelviews;
+    content: $tgico-channelviews; 
   }
 }
 .tgico-chatsplaceholder {
   &:before {
-    content: $tgico-chatsplaceholder;
-  }
-}
-.tgico-check {
-  &:before {
-    content: $tgico-check;
+    content: $tgico-chatsplaceholder; 
   }
 }
 .tgico-checkbox {
   &:before {
-    content: $tgico-checkbox;
+    content: $tgico-checkbox; 
   }
 }
 .tgico-checkboxblock {
   &:before {
-    content: $tgico-checkboxblock;
+    content: $tgico-checkboxblock; 
   }
 }
 .tgico-checkboxempty {
   &:before {
-    content: $tgico-checkboxempty;
+    content: $tgico-checkboxempty; 
   }
 }
 .tgico-checkboxon {
   &:before {
-    content: $tgico-checkboxon;
+    content: $tgico-checkboxon; 
   }
 }
 .tgico-close {
   &:before {
-    content: $tgico-close;
+    content: $tgico-close; 
+  }
+}
+.tgico-colorize {
+  &:before {
+    content: $tgico-colorize; 
   }
 }
 .tgico-copy {
   &:before {
-    content: $tgico-copy;
+    content: $tgico-copy; 
   }
 }
 .tgico-data {
   &:before {
-    content: $tgico-data;
-  }
-}
-.tgico-delete_filled {
-  &:before {
-    content: $tgico-delete_filled;
+    content: $tgico-data; 
   }
 }
 .tgico-delete {
   &:before {
-    content: $tgico-delete;
+    content: $tgico-delete; 
   }
 }
 .tgico-deleteuser {
   &:before {
-    content: $tgico-deleteuser;
+    content: $tgico-deleteuser; 
   }
 }
 .tgico-document {
   &:before {
-    content: $tgico-document;
+    content: $tgico-document; 
   }
 }
 .tgico-down {
   &:before {
-    content: $tgico-down;
+    content: $tgico-down; 
   }
 }
 .tgico-download {
   &:before {
-    content: $tgico-download;
+    content: $tgico-download; 
   }
 }
 .tgico-eats {
   &:before {
-    content: $tgico-eats;
+    content: $tgico-eats; 
   }
 }
 .tgico-edit {
   &:before {
-    content: $tgico-edit;
+    content: $tgico-edit; 
   }
 }
 .tgico-eye1 {
   &:before {
-    content: $tgico-eye1;
+    content: $tgico-eye1; 
   }
 }
 .tgico-eye2 {
   &:before {
-    content: $tgico-eye2;
+    content: $tgico-eye2; 
   }
 }
 .tgico-flag {
   &:before {
-    content: $tgico-flag;
+    content: $tgico-flag; 
   }
 }
 .tgico-forward {
   &:before {
-    content: $tgico-forward;
+    content: $tgico-forward; 
   }
 }
 .tgico-fullscreen {
   &:before {
-    content: $tgico-fullscreen;
+    content: $tgico-fullscreen; 
   }
 }
 .tgico-group {
   &:before {
-    content: $tgico-group;
+    content: $tgico-group; 
   }
 }
 .tgico-help {
   &:before {
-    content: $tgico-help;
+    content: $tgico-help; 
   }
 }
 .tgico-info {
   &:before {
-    content: $tgico-info;
+    content: $tgico-info; 
   }
 }
 .tgico-lamp {
   &:before {
-    content: $tgico-lamp;
+    content: $tgico-lamp; 
   }
 }
 .tgico-language {
   &:before {
-    content: $tgico-language;
+    content: $tgico-language; 
   }
 }
 .tgico-largepause {
   &:before {
-    content: $tgico-largepause;
+    content: $tgico-largepause; 
   }
 }
 .tgico-largeplay {
   &:before {
-    content: $tgico-largeplay;
+    content: $tgico-largeplay; 
+  }
+}
+.tgico-livelocation {
+  &:before {
+    content: $tgico-livelocation; 
   }
 }
 .tgico-location {
   &:before {
-    content: $tgico-location;
+    content: $tgico-location; 
   }
 }
 .tgico-lock {
   &:before {
-    content: $tgico-lock;
+    content: $tgico-lock; 
   }
 }
 .tgico-logout {
   &:before {
-    content: $tgico-logout;
+    content: $tgico-logout; 
   }
 }
 .tgico-menu {
   &:before {
-    content: $tgico-menu;
+    content: $tgico-menu; 
   }
 }
 .tgico-message {
   &:before {
-    content: $tgico-message;
+    content: $tgico-message; 
   }
 }
 .tgico-microphone {
   &:before {
-    content: $tgico-microphone;
+    content: $tgico-microphone; 
+  }
+}
+.tgico-microphone2 {
+  &:before {
+    content: $tgico-microphone2; 
+  }
+}
+.tgico-minus {
+  &:before {
+    content: $tgico-minus; 
   }
 }
 .tgico-more {
   &:before {
-    content: $tgico-more;
+    content: $tgico-more; 
   }
 }
 .tgico-mute {
   &:before {
-    content: $tgico-mute;
+    content: $tgico-mute; 
   }
 }
 .tgico-newchannel {
   &:before {
-    content: $tgico-newchannel;
+    content: $tgico-newchannel; 
   }
 }
 .tgico-newchat_filled {
   &:before {
-    content: $tgico-newchat_filled;
+    content: $tgico-newchat_filled; 
   }
 }
 .tgico-newgroup {
   &:before {
-    content: $tgico-newgroup;
+    content: $tgico-newgroup; 
   }
 }
 .tgico-newprivate {
   &:before {
-    content: $tgico-newprivate;
+    content: $tgico-newprivate; 
   }
 }
 .tgico-next {
   &:before {
-    content: $tgico-next;
+    content: $tgico-next; 
+  }
+}
+.tgico-nosound {
+  &:before {
+    content: $tgico-nosound; 
   }
 }
 .tgico-pause {
   &:before {
-    content: $tgico-pause;
+    content: $tgico-pause; 
   }
 }
 .tgico-permissions {
   &:before {
-    content: $tgico-permissions;
+    content: $tgico-permissions; 
   }
 }
 .tgico-phone {
   &:before {
-    content: $tgico-phone;
+    content: $tgico-phone; 
   }
 }
 .tgico-photo {
   &:before {
-    content: $tgico-photo;
+    content: $tgico-photo; 
   }
 }
 .tgico-pin {
   &:before {
-    content: $tgico-pin;
+    content: $tgico-pin; 
   }
 }
 .tgico-pinnedchat {
   &:before {
-    content: $tgico-pinnedchat;
+    content: $tgico-pinnedchat; 
   }
 }
 .tgico-play {
   &:before {
-    content: $tgico-play;
+    content: $tgico-play; 
+  }
+}
+.tgico-poll {
+  &:before {
+    content: $tgico-poll; 
   }
 }
 .tgico-radiooff {
   &:before {
-    content: $tgico-radiooff;
+    content: $tgico-radiooff; 
   }
 }
 .tgico-radioon {
   &:before {
-    content: $tgico-radioon;
+    content: $tgico-radioon; 
   }
 }
-.tgico-recent {
+.tgico-recent_svg {
   &:before {
-    content: $tgico-recent;
+    content: $tgico-recent_svg; 
   }
 }
 .tgico-reply {
   &:before {
-    content: $tgico-reply;
+    content: $tgico-reply; 
+  }
+}
+.tgico-revote {
+  &:before {
+    content: $tgico-revote; 
   }
 }
 .tgico-savedmessages {
   &:before {
-    content: $tgico-savedmessages;
+    content: $tgico-savedmessages; 
   }
 }
 .tgico-search {
   &:before {
-    content: $tgico-search;
+    content: $tgico-search; 
   }
 }
 .tgico-send {
   &:before {
-    content: $tgico-send;
+    content: $tgico-send; 
   }
 }
 .tgico-send2 {
   &:before {
-    content: $tgico-send2;
+    content: $tgico-send2; 
   }
 }
 .tgico-sending {
   &:before {
-    content: $tgico-sending;
+    content: $tgico-sending; 
   }
 }
 .tgico-sendingerror {
   &:before {
-    content: $tgico-sendingerror;
+    content: $tgico-sendingerror; 
   }
 }
 .tgico-settings {
   &:before {
-    content: $tgico-settings;
+    content: $tgico-settings; 
   }
 }
 .tgico-smallscreen {
   &:before {
-    content: $tgico-smallscreen;
+    content: $tgico-smallscreen; 
   }
 }
 .tgico-smile {
   &:before {
-    content: $tgico-smile;
+    content: $tgico-smile; 
   }
 }
 .tgico-sport {
   &:before {
-    content: $tgico-sport;
+    content: $tgico-sport; 
   }
 }
 .tgico-stop {
   &:before {
-    content: $tgico-stop;
+    content: $tgico-stop; 
   }
 }
 .tgico-unarchive {
   &:before {
-    content: $tgico-unarchive;
+    content: $tgico-unarchive; 
   }
 }
 .tgico-unlock {
   &:before {
-    content: $tgico-unlock;
+    content: $tgico-unlock; 
   }
 }
 .tgico-unmute {
   &:before {
-    content: $tgico-unmute;
+    content: $tgico-unmute; 
   }
 }
 .tgico-unpin {
   &:before {
-    content: $tgico-unpin;
+    content: $tgico-unpin; 
   }
 }
 .tgico-unread {
   &:before {
-    content: $tgico-unread;
+    content: $tgico-unread; 
   }
 }
 .tgico-up {
   &:before {
-    content: $tgico-up;
+    content: $tgico-up; 
   }
 }
 .tgico-user {
   &:before {
-    content: $tgico-user;
+    content: $tgico-user; 
   }
 }
 .tgico-username {
   &:before {
-    content: $tgico-username;
+    content: $tgico-username; 
   }
 }
+

@@ -1007,13 +1007,13 @@
 
         .bubble.read {
             .time .tgico.status:after {
-                content: $tgico-check-read;
+                content: $tgico-checks;
             }
         }
 
         .bubble.sent {
             .time .tgico.status:after {
-                content: $tgico-check-sent;
+                content: $tgico-check;
             }
         }
 
