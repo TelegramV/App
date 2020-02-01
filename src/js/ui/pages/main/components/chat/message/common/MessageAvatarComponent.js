@@ -3,6 +3,7 @@ import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 import AppSelectedInfoPeer from "../../../../../../reactive/SelectedInfoPeer";
 import type {Message} from "../../../../../../../api/messages/Message"
 import {Peer} from "../../../../../../../api/dataObjects/peer/Peer"
+import AppSelectedPeer from "../../../../../../reactive/SelectedPeer"
 
 export class MessageAvatarComponent extends Component {
 
@@ -20,6 +21,9 @@ export class MessageAvatarComponent extends Component {
     }
 
     h() {
+        if (this.from === AppSelectedPeer) {
+            return <div/>
+        }
 
         const hasAvatar = !this.from.photo.isEmpty
 
