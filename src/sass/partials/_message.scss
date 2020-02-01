@@ -722,7 +722,7 @@
             border-radius: 0 !important;
         }
 
-        a {
+        a:not(.button) {
             color: $darkblue;
 
             &:hover {

@@ -21,7 +21,7 @@ export class MessageAvatarComponent extends Component {
     }
 
     h() {
-        if (this.from === AppSelectedPeer) {
+        if (AppSelectedPeer.check(this.props.message.from)) {
             return <div/>
         }
 

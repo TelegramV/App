@@ -20,7 +20,8 @@ export const PhotoFigureFragment = ({type = "photo", id, srcUrl, thumbnail, widt
 
             <PhotoFragment url={srcUrl}
                            thumb={thumbnail}
-                           width={width}/>
+                           width={width}
+                           height={height}/>
 
             <LoadingFragment loading={loading} show={!loaded} click={clickLoader}/>
 
