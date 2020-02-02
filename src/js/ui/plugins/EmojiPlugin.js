@@ -1,5 +1,5 @@
 import {VRDOMPlugin} from "../v/vrdom/plugin"
-import replaceEmoji from "../utils/emoji"
+import {replaceEmoji} from "../utils/emoji"
 
 class EmojiVRDOMPlugin extends VRDOMPlugin {
 
