@@ -8,6 +8,7 @@ import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {InlineKeyboardComponent} from "../message/common/InlineKeyboardComponent";
 import {formatAudioTime, convertBits} from "../../../../../utils"
 import ComposerComponent from "./ComposerComponent"
+import {MessageParser} from "../../../../../../api/messages/MessageParser";
 
 export let ChatInputManager
 
@@ -24,7 +25,7 @@ export class ChatInputComponent extends Component {
     }
 
     get isVoiceMode() {
-        return this.state.valueString.length === 0
+        return this.textarea && this.textarea.textContent.length === 0
     }
 
     h() {
@@ -41,6 +42,7 @@ export class ChatInputComponent extends Component {
                             }
                             }/>
                             <div className="message">
+                                <img src="" className="image hidden"/>
                                 <div className="title">{this.state.reply && this.state.reply.title}</div>
                                 <div className="description">{this.state.reply && this.state.reply.description}</div>
                             </div>
@@ -62,7 +64,7 @@ export class ChatInputComponent extends Component {
                              onMouseEnter={this.mouseEnterEmoji} onMouseLeave={this.mouseLeaveEmoji}/>
                             <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]}
                                  placeholder="Message"
-                                 contentEditable={true} onInput={this.onInput} onKeyPress={this.onKeyPress}
+                                 contentEditable onInput={this.onInput} onKeyPress={this.onKeyPress}
                                  onContextMenu={ContextMenuManager.listener([
                                      {
                                          title: "Bold",
@@ -115,6 +117,13 @@ export class ChatInputComponent extends Component {
                             <i className="tgico tgico-attach btn-icon rp rps"
                                onClick={l => ContextMenuManager.openAbove([
                                    {
+                                       icon: "poll",
+                                       title: "Poll",
+                                       onClick: _ => {
+                                           this.pickPoll()
+                                       }
+                                   },
+                                   {
                                        icon: "photo",
                                        title: "Photo or Video",
                                        onClick: _ => {
@@ -129,9 +138,7 @@ export class ChatInputComponent extends Component {
                                        }
                                    },
                                ], l.target)}/>
-                               <div className="voice-seconds hidden">
-                                    0:02,43
-                               </div>
+                               <div className="voice-seconds hidden"/>
 
                         </div>
 
@@ -156,7 +163,7 @@ export class ChatInputComponent extends Component {
 
                 <div className="round-button-wrapper">
                     <div className="round-button delete-button rp rps" onClick={this.onSend} onMouseEnter={this.mouseEnterRemoveVoice} onMouseLeave={this.mouseLeaveRemoveVoice}>
-                        <i className="tgico tgico-delete_filled"/>
+                        <i className="tgico tgico-delete"/>
                     </div>
 
                     <div className="round-button send-button rp rps" onClick={this.onSend}
@@ -176,7 +183,8 @@ export class ChatInputComponent extends Component {
                             }
                         },
                     ], l.target)}>
-                        <i className={["tgico", this.state.valueString.length > 0 ? "tgico-send" : "tgico-microphone"]}/>
+                        <i className="tgico tgico-send hidden"/>
+                        <i className="tgico tgico-microphone2"/>
                     </div>
                     <div className="voice-circle"/>
 
@@ -221,10 +229,16 @@ export class ChatInputComponent extends Component {
     replyTo(message) {
         this.state.reply = {
             title: message.from.name,
-            description: message.text,
-            message: message
+            description: MessageParser.getPrefixNoSender(message),
+            message: message,
+            image: message.getSmallPreviewImage()
         }
         this.$el.querySelector(".reply").classList.remove("hidden")
+        this.$el.querySelector(".reply .message .title").innerHTML = this.state.reply.title
+        this.$el.querySelector(".reply .message .description").innerHTML = this.state.reply.description
+        if(this.state.reply.image) {
+            this.$el.querySelector(".reply .message .image").src = this.state.reply.image
+        }
     }
 
     setKeyboardMarkup(markup) {
@@ -239,6 +253,10 @@ export class ChatInputComponent extends Component {
             return
         }
         this.__patch()
+    }
+
+    pickPoll() {
+
     }
 
     pickFile(document) {
@@ -429,26 +447,29 @@ export class ChatInputComponent extends Component {
         let reply = this.state.reply ? this.state.reply.message.id : null
         AppSelectedPeer.Current.api.sendMessage(this.textarea.textContent, reply, silent)
         this.textarea.innerHTML = ""
-        this.state.value = ""
-        this.state.valueString = ""
         this.state.reply = null
         this.state.attachments = []
-        this.__patch()
+        this.textarea.innerHTML = ""
+        this.updateSendButton()
     }
 
-    onInput(ev) {
-        if (this.state.valueString.length === 0 || this.textarea.textContent.length === 0) {
-            this.state.value = this.textarea.innerHTML
-            this.state.valueString = this.textarea.textContent
-            this.__patch()
+    updateSendButton() {
+        if (this.textarea.textContent.length === 0) {
+            this.$el.querySelector(".send-button>.tgico-send").classList.add("hidden")
+            this.$el.querySelector(".send-button>.tgico-microphone2").classList.remove("hidden")
         } else {
-            this.state.value = this.textarea.innerHTML
-            this.state.valueString = this.textarea.textContent
+            this.$el.querySelector(".send-button>.tgico-send").classList.remove("hidden")
+            this.$el.querySelector(".send-button>.tgico-microphone2").classList.add("hidden")
         }
+
         if (this.textarea.textContent.length > 0) {
             this.textarea.classList.remove("empty")
         } else {
             this.textarea.classList.add("empty")
         }
+    }
+
+    onInput(ev) {
+        this.updateSendButton()
     }
 }

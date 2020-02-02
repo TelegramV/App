@@ -165,6 +165,17 @@ export class MessageParser {
         }
     }
 
+    static getPrefixNoSender(message) {
+        const p = MessageParser.getMediaPreviewName(message)
+        if (message.raw.media) {
+            if(p.length > 0) {
+                return p + (message.text.length > 0 ? ", " + message.text : "")
+            }
+        } else {
+            return message.text
+        }
+    }
+
     static getDialogPrefix(message: Message) {
         const from = message.from
         const showSender = (message.isOut || message.from !== message.dialog.peer) && !message.isPost
