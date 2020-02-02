@@ -46,6 +46,7 @@
             //box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.15);
             position: relative;
             z-index: 0;
+            display: inline-table;
             overflow: hidden; // ЖЕРЕ ХВОСТИ В ПОВІДОМЛЕНЬ
             // я тимчасово зламаю хвостики бо перероблюю цсс, вже маю трохи ідею як зробити свгшкою то всьо
             //                                                                          - @undrfined
@@ -910,33 +911,6 @@
             }
         }
 
-        .bubble:not(.grouped):not(.transparent) {
-            &:before {
-                content: "";
-                position: absolute;
-                z-index: -2;
-                bottom: -1px;
-                left: -5px;
-                height: 20px;
-                width: 14px;
-                background-color: white;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            &:after {
-                content: "";
-                position: absolute;
-                z-index: -1;
-                bottom: 0;
-                left: -11px;
-                width: 10px;
-                height: 20px;
-                background-color: #e6ebee;
-                border-bottom-right-radius: 10px 15px;
-                border-right: 1px solid rgba(0, 0, 0, 0.1);
-            }
-        }
-
         .bubble:first-child {
             border-radius: 12px 12px 12px 6px;
 
@@ -1067,33 +1041,6 @@
 
             .media-wrapper {
                 border-radius: 12px 6px 6px 12px;
-            }
-        }
-
-        .bubble:not(.grouped):not(.transparent) {
-            &:before {
-                content: "";
-                position: absolute;
-                z-index: -2;
-                bottom: -1px;
-                right: -5px;
-                height: 20px;
-                width: 14px;
-                background-color: $lightgreen;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            &:after {
-                content: "";
-                position: absolute;
-                z-index: -1;
-                bottom: 0;
-                right: -11px;
-                width: 10px;
-                height: 20px;
-                background-color: #e6ebee;
-                border-bottom-left-radius: 10px 15px;
-                border-left: 1px solid rgba(0, 0, 0, 0.05);
             }
         }
 

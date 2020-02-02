@@ -197,6 +197,15 @@ export class ChatInputComponent extends Component {
         // TODO should create separate drag area!
         document.querySelector("body").addEventListener("drop", ev => {
             console.log(ev)
+            for(let i = 0; i < ev.dataTransfer.items.length; i++) {
+                const k = ev.dataTransfer.items[i]
+                console.log(k)
+                if(k.type.indexOf("image") === -1) continue
+                this.state.attachments.push({
+                    src: URL.createObjectURL(k.getAsFile())
+                })
+                this.__patch()
+            }
             ev.preventDefault()
         })
         document.querySelector("body").addEventListener("dragenter", ev => {
@@ -208,7 +217,7 @@ export class ChatInputComponent extends Component {
             ev.preventDefault()
         })
         document.querySelector("body").addEventListener("dragover", ev => {
-            console.log(ev)
+            // console.log(ev)
             ev.preventDefault()
         })
     }
@@ -248,7 +257,6 @@ export class ChatInputComponent extends Component {
 
 
     onPaste(ev) {
-        console.log(ev.clipboardData.items)
         for(let i = 0; i < ev.clipboardData.items.length; i++) {
             const k = ev.clipboardData.items[i]
             console.log(k.toString())
@@ -258,7 +266,6 @@ export class ChatInputComponent extends Component {
             })
             this.__patch()
         }
-        console.log(ev.clipboardData.items[0])
     }
 
     replyTo(message) {
