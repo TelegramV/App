@@ -33,11 +33,17 @@
     .bubble-outer {
         display: flex;
         flex-direction: column;
+        filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
+
+        &.in {
+            left: -8px;
+            position: relative;
+        }
 
         .bubble {
             max-width: 480px;
             border-radius: 12px;
-            box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.15);
+            //box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.15);
             position: relative;
             z-index: 0;
             overflow: hidden; // ЖЕРЕ ХВОСТИ В ПОВІДОМЛЕНЬ
@@ -46,6 +52,40 @@
 
             //Коли вже svg?
             //                                                                          - @prettydude
+
+            // https://youtu.be/ciL7OKWSu10
+            // Right behind you...
+            //                                                                          - @undrfined
+
+            // let total_wasted_hours = 16
+
+            &.in {
+                -webkit-mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left.svg");
+                mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left.svg");
+                padding-left: 10px;
+
+                -webkit-mask-position: 0% 100%;
+                mask-position: 0% 100%;
+                //-webkit-mask-composite: xor, source-over;
+            }
+
+            &.out {
+                -webkit-mask-image: url("../../public/static/images/tail-right.svg"), url("../../public/static/images/rect-right.svg");
+                mask-image: url("../../public/static/images/tail-right.svg"), url("../../public/static/images/rect-right.svg");
+                padding-right: 10px;
+
+                -webkit-mask-position: 100% 100%;
+                mask-position: 100% 100%;
+                //-webkit-mask-composite: xor, source-over;
+            }
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+
+            &.no-pad {
+                padding-left: 0;
+                padding-right: 0;
+            }
+
             .card {
                 display: flex;
 
@@ -733,6 +773,8 @@
         }
 
         .avatar {
+            filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
+
             height: 34px;
             width: 34px;
             flex-shrink: 0;

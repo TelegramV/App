@@ -24,12 +24,13 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     $figure: Element
 
     h() {
+        const text = this.message.text.length > 0 ? <TextWrapperComponent message={this.message}/> : ""
         return (
-            <MessageWrapperFragment message={this.message} noPad showUsername={false}>
+            <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""}>
                 <MessagePhotoFigureFragment message={this.message}
                                             clickLoader={this.toggleLoading}/>
 
-                <TextWrapperComponent message={this.message}/>
+               {text}
             </MessageWrapperFragment>
         )
     }
