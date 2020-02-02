@@ -31,7 +31,7 @@ const ReplyToMessageFragment = ({message}) => {
  * @return {*}
  * @constructor
  */
-const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, contextActions, showUsername = true, showAvatar = true}) => {
+const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, outerPad = true, contextActions, showUsername = true, showAvatar = true}) => {
     const defaultContextActions = [
         {
             icon: "reply",
@@ -73,14 +73,23 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
 
     let wrapClasses = {
         "bubble": true,
+        "out": !message.isPost && message.isOut,
+        "in": message.isPost || !message.isOut,
         "transparent": transparent,
         "read": message.isRead,
+        "no-pad": !outerPad,
         "sent": !message.isRead //TODO more convenient method to do this
     }
 
     let messageClasses = {
         "message": true,
         "no-pad": noPad
+    }
+
+    let wrapOuter = {
+        "bubble-outer": true,
+        "out": !message.isPost && message.isOut,
+        "in": message.isPost || !message.isOut,
     }
 
     const inlineKeyboard = message.replyMarkup && message.replyMarkup._ === "replyInlineMarkup" ?
@@ -103,7 +112,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
 
                 <MessageAvatarComponent id={`message-${message.id}-avatar`} show={showAvatar} message={message}/>
 
-                <div className="bubble-outer">
+                <div className={wrapOuter}>
                     <div className={wrapClasses}>
 
                         <ReplyToMessageFragment message={message}/>

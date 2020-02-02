@@ -108,7 +108,7 @@ export class ChatInputComponent extends Component {
                                          onClick: _ => {
                                          }
                                      }
-                                 ])} dangerouslySetInnerHTML={this.state.value}>
+                                 ])} onPaste={this.onPaste} dangerouslySetInnerHTML={this.state.value}>
                             </div>
                             {this.state.keyboardMarkup ?
                                 // TODO replace icon to keyboard
@@ -193,6 +193,26 @@ export class ChatInputComponent extends Component {
         </div>
     }
 
+    initDragArea() {
+        // TODO should create separate drag area!
+        document.querySelector("body").addEventListener("drop", ev => {
+            console.log(ev)
+            ev.preventDefault()
+        })
+        document.querySelector("body").addEventListener("dragenter", ev => {
+            console.log(ev)
+            ev.preventDefault()
+        })
+        document.querySelector("body").addEventListener("dragleave", ev => {
+            console.log(ev)
+            ev.preventDefault()
+        })
+        document.querySelector("body").addEventListener("dragover", ev => {
+            console.log(ev)
+            ev.preventDefault()
+        })
+    }
+
     mouseEnterComposer() {
         this.hideComposer = false;
     }
@@ -224,6 +244,21 @@ export class ChatInputComponent extends Component {
 
     mouseLeaveRemoveVoice() {
         this.state.isRemoveVoice = false
+    }
+
+
+    onPaste(ev) {
+        console.log(ev.clipboardData.items)
+        for(let i = 0; i < ev.clipboardData.items.length; i++) {
+            const k = ev.clipboardData.items[i]
+            console.log(k.toString())
+            if(k.type.indexOf("image") === -1) continue
+            this.state.attachments.push({
+                src: URL.createObjectURL(k.getAsFile())
+            })
+            this.__patch()
+        }
+        console.log(ev.clipboardData.items[0])
     }
 
     replyTo(message) {
@@ -301,6 +336,7 @@ export class ChatInputComponent extends Component {
         super.mounted();
         this.textarea = this.$el.querySelector(".textarea")
         this.composer = this.$el.querySelector(".composer")
+        this.initDragArea()
     }
 
     onSend(ev) {
