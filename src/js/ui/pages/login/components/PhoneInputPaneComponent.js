@@ -31,7 +31,7 @@ export default class PhoneInputComponent extends PaneComponent {
         }
         return (
             <div id="phonePane" className={classList.join(" ")}>
-                <img className="object" src="./static/images/logo.svg" alt=""
+                <img className="object" src="./static/images/loginlogo.svg" alt=""
                      onClick={this.props.finished}/>
                 <InfoComponent header="Sign in to Telegram"
                                description="Please confirm your country and enter your phone number"/>
