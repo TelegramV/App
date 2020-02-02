@@ -3,7 +3,6 @@ import MTProto from "../mtproto/external"
 
 export class WallpaperManagerClass {
 	init() {
-		
 		this.wallpapers = [];
 
 		this.receiveWallpaperList().then(q => {
@@ -25,8 +24,9 @@ export class WallpaperManagerClass {
 		return FileAPI.getFile(wallpaper.document);
 	}
 
+	// 5947530738516623361
 	setLegendaryCamomileWallpaper() {
-		this.downloadWallpaper(this.wallpapers[30]).then(url => {
+		this.downloadWallpaper(this.wallpapers.find(l => l.id === "5947530738516623361")).then(url => {
 			window.document.documentElement.style.setProperty("--chat-bg-image", `url("${url}")`);
 		})
 	}
