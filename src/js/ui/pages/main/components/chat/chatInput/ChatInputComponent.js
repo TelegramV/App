@@ -43,8 +43,11 @@ export class ChatInputComponent extends Component {
                             }/>
                             <div className="message">
                                 <img src="" className="image hidden"/>
-                                <div className="title">{this.state.reply && this.state.reply.title}</div>
-                                <div className="description">{this.state.reply && this.state.reply.description}</div>
+                                <div className="reply-wrapper">
+                                    <div className="title">{this.state.reply && this.state.reply.title}</div>
+                                    <div
+                                        className="description">{this.state.reply && this.state.reply.description}</div>
+                                </div>
                             </div>
                         </div>
                         <div className={["media", this.state.attachments.length > 0 ? "" : "hidden"]}>
@@ -58,88 +61,101 @@ export class ChatInputComponent extends Component {
                                 </div>
                             })}
                         </div>
-                        
-                        <div className="input-field">
-                            <i className="tgico tgico-smile btn-icon rp rps"
-                             onMouseEnter={this.mouseEnterEmoji} onMouseLeave={this.mouseLeaveEmoji}/>
-                            <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]}
-                                 placeholder="Message"
-                                 contentEditable onInput={this.onInput} onKeyPress={this.onKeyPress}
-                                 onContextMenu={ContextMenuManager.listener([
-                                     {
-                                         title: "Bold",
-                                         after: "Ctrl+B",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Italic",
-                                         after: "Ctrl+I",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Underline",
-                                         after: "Ctrl+U",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Strikethrough",
-                                         after: "Ctrl+Shift+X",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Monospace",
-                                         after: "Ctrl+Shift+M",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Create link",
-                                         after: "Ctrl+K",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Normal text",
-                                         after: "Ctrl+Shift+N",
-                                         onClick: _ => {
-                                         }
-                                     }
-                                 ])} onPaste={this.onPaste} dangerouslySetInnerHTML={this.state.value}>
-                            </div>
-                            {this.state.keyboardMarkup ?
-                                // TODO replace icon to keyboard
-                                <i className="tgico tgico-smallscreen btn-icon"/>
-                                : ""}
-                            <i className="tgico tgico-attach btn-icon rp rps"
-                               onClick={l => ContextMenuManager.openAbove([
-                                   {
-                                       icon: "poll",
-                                       title: "Poll",
-                                       onClick: _ => {
-                                           this.pickPoll()
-                                       }
-                                   },
-                                   {
-                                       icon: "photo",
-                                       title: "Photo or Video",
-                                       onClick: _ => {
-                                           this.pickFile(false)
-                                       }
-                                   },
-                                   {
-                                       icon: "document",
-                                       title: "Document",
-                                       onClick: _ => {
-                                           this.pickFile(true)
-                                       }
-                                   },
-                               ], l.target)}/>
-                               <div className="voice-seconds hidden"/>
 
+                        <div className="input-field">
+                            <div className="another-fucking-wrapper">
+                                <div className="ico-wrapper">
+                                    <i className="tgico tgico-smile btn-icon rp rps"
+                                       onMouseEnter={this.mouseEnterEmoji} onMouseLeave={this.mouseLeaveEmoji}/>
+                                </div>
+                                <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]}
+                                     placeholder="Message"
+                                     contentEditable onInput={this.onInput} onKeyPress={this.onKeyPress}
+                                     onContextMenu={ContextMenuManager.listener([
+                                         {
+                                             title: "Bold",
+                                             after: "Ctrl+B",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Italic",
+                                             after: "Ctrl+I",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Underline",
+                                             after: "Ctrl+U",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Strikethrough",
+                                             after: "Ctrl+Shift+X",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Monospace",
+                                             after: "Ctrl+Shift+M",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Create link",
+                                             after: "Ctrl+K",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Normal text",
+                                             after: "Ctrl+Shift+N",
+                                             onClick: _ => {
+                                             }
+                                         }
+                                     ])} onPaste={this.onPaste} dangerouslySetInnerHTML={this.state.value}>
+                                </div>
+
+                                    {this.state.keyboardMarkup ?
+                                        // TODO replace icon to keyboard
+                                        <div className="ico-wrapper">
+
+                                        <i className="tgico tgico-smallscreen btn-icon"/>
+                                        </div>
+
+                                        : ""}
+                                <div className="ico-wrapper">
+
+                                    <i className="tgico tgico-attach btn-icon rp rps"
+                                       onClick={l => ContextMenuManager.openAbove([
+                                           {
+                                               icon: "poll",
+                                               title: "Poll",
+                                               onClick: _ => {
+                                                   this.pickPoll()
+                                               }
+                                           },
+                                           {
+                                               icon: "photo",
+                                               title: "Photo or Video",
+                                               onClick: _ => {
+                                                   this.pickFile(false)
+                                               }
+                                           },
+                                           {
+                                               icon: "document",
+                                               title: "Document",
+                                               onClick: _ => {
+                                                   this.pickFile(true)
+                                               }
+                                           },
+                                       ], l.target)}/>
+                                </div>
+
+                                <div className="voice-seconds hidden"/>
+
+                            </div>
                         </div>
 
                     </div>
@@ -160,9 +176,9 @@ export class ChatInputComponent extends Component {
                 </div>
 
 
-
                 <div className="round-button-wrapper">
-                    <div className="round-button delete-button rp rps" onClick={this.onSend} onMouseEnter={this.mouseEnterRemoveVoice} onMouseLeave={this.mouseLeaveRemoveVoice}>
+                    <div className="round-button delete-button rp rps" onClick={this.onSend}
+                         onMouseEnter={this.mouseEnterRemoveVoice} onMouseLeave={this.mouseLeaveRemoveVoice}>
                         <i className="tgico tgico-delete"/>
                     </div>
 
@@ -197,10 +213,10 @@ export class ChatInputComponent extends Component {
         // TODO should create separate drag area!
         document.querySelector("body").addEventListener("drop", ev => {
             console.log(ev)
-            for(let i = 0; i < ev.dataTransfer.items.length; i++) {
+            for (let i = 0; i < ev.dataTransfer.items.length; i++) {
                 const k = ev.dataTransfer.items[i]
                 console.log(k)
-                if(k.type.indexOf("image") === -1) continue
+                if (k.type.indexOf("image") === -1) continue
                 this.state.attachments.push({
                     src: URL.createObjectURL(k.getAsFile())
                 })
@@ -242,8 +258,8 @@ export class ChatInputComponent extends Component {
     }
 
     planComposerClose() {
-        setTimeout(()=> {
-            if(this.hideComposer) this.composer.classList.remove("visible");
+        setTimeout(() => {
+            if (this.hideComposer) this.composer.classList.remove("visible");
         }, 250);
     }
 
@@ -257,10 +273,10 @@ export class ChatInputComponent extends Component {
 
 
     onPaste(ev) {
-        for(let i = 0; i < ev.clipboardData.items.length; i++) {
+        for (let i = 0; i < ev.clipboardData.items.length; i++) {
             const k = ev.clipboardData.items[i]
             console.log(k.toString())
-            if(k.type.indexOf("image") === -1) continue
+            if (k.type.indexOf("image") === -1) continue
             this.state.attachments.push({
                 src: URL.createObjectURL(k.getAsFile())
             })
@@ -273,12 +289,12 @@ export class ChatInputComponent extends Component {
             title: message.from.name,
             description: MessageParser.getPrefixNoSender(message),
             message: message,
-            image: message.getSmallPreviewImage()
+            image: message.smallPreviewImage
         }
         this.$el.querySelector(".reply").classList.remove("hidden")
         this.$el.querySelector(".reply .message .title").innerHTML = this.state.reply.title
         this.$el.querySelector(".reply .message .description").innerHTML = this.state.reply.description
-        if(this.state.reply.image) {
+        if (this.state.reply.image) {
             this.$el.querySelector(".reply .message .image").src = this.state.reply.image
         }
     }
@@ -332,11 +348,11 @@ export class ChatInputComponent extends Component {
     }
 
     tickTimer() {
-        const time = formatAudioTime(this.i/100)+","+this.i%100;
+        const time = formatAudioTime(this.i / 100) + "," + this.i % 100;
         this.$el.querySelector(".voice-seconds").innerHTML = time
         this.i++
-        if(this.isRecording)
-        setTimeout(this.tickTimer, 10)
+        if (this.isRecording)
+            setTimeout(this.tickTimer, 10)
     }
 
     mounted() {
@@ -375,7 +391,7 @@ export class ChatInputComponent extends Component {
 
     onRecordingReady(ev) {
 
-        if(this.state.isRemoveVoice) {
+        if (this.state.isRemoveVoice) {
             this.state.isRemoveVoice = false
             return
         }
@@ -425,7 +441,7 @@ export class ChatInputComponent extends Component {
                     const tempArray = new Uint8Array(analyser.frequencyBinCount);
 
                     analyser.getByteFrequencyData(tempArray);
-                    this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray)/255 * 25 + 1, 4)})`
+                    this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray) / 255 * 25 + 1, 4)})`
                     this.waveform.push(Math.floor(getAverageVolume(tempArray) / 255 * 32))
                 }
 
@@ -480,7 +496,7 @@ export class ChatInputComponent extends Component {
     }
 
     onKeyPress(ev) {
-        if (ev.which === 13 || ev.which === 10) {
+        if ((ev.which === 13 || ev.which === 10) && !ev.shiftKey && !ev.ctrlKey) {
             this.send()
             ev.preventDefault()
         }

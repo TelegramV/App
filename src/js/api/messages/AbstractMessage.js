@@ -101,6 +101,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
         this.findForwarded()
     }
 
+    get smallPreviewImage() {
+        return null
+    }
+
     findReplyTo(fire = true) {
         if (this.replyToMessage && this.replyToMessageType && fire) {
             this.fire(this.replyToMessageType)

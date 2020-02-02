@@ -109,29 +109,41 @@
 
         .message {
           border-left: 2px solid $blue;
-          display: flex;
-          flex-direction: column;
           padding: 0 10px;
           font-size: 14px;
           margin-left: 5px;
 
+          display: flex;
+          flex-direction: row;
+
           .image {
             .hidden {
               display: none;
+              margin-right: 0;
             }
 
+            border-radius: 3px;
+            width: 38px;
+            height: 38px;
+            object-fit: cover;
+            margin-right: 8px;
           }
 
-          .title {
-            color: $blue;
-            font-weight: 500;
-            margin-bottom: 2px;
-          }
+          .reply-wrapper {
 
-          .description {
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            .title {
+              color: $blue;
+              font-weight: 500;
+              margin-bottom: 2px;
+            }
+
+            .description {
+              white-space: nowrap;
+              text-overflow: ellipsis;
+              overflow: hidden;
+            }
           }
         }
 
@@ -147,22 +159,37 @@
 
       .input-field {
         display: flex;
-        width: 100%;
         height: auto;
+        width: 100%;
 
-        align-items: center;
+        align-items: flex-end;
+
+        .another-fucking-wrapper {
+          max-height: 400px;
+          overflow-y: auto;
+          width: 100%;
+          height: auto;
+          display: grid;
+          grid-template-columns: 56px auto 56px;
+          overflow-x: hidden;
+        }
 
         .textarea {
           align-self: center;
-          display: inline-block;
           border: none;
           word-break: break-word;
           resize: none;
-          width: 100%;
+          overflow: hidden;
           outline: none;
           padding: 0 15px;
           align-items: center;
-          height: 56px;
+          padding-top: 19px;
+          padding-bottom: 18px;
+          display: inline-flex;
+
+          * {
+            word-break: break-word !important;
+          }
 
           &.empty::before {
             content: "Message";
@@ -171,13 +198,21 @@
           }
         }
 
+        .ico-wrapper {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: flex-end;
+        }
+
         .tgico {
-          margin: 6px;
+          position: sticky;
+          bottom: 0;
+          padding: 6px;
           text-align: center;
           color: $darkgrey;
           font-size: 22px;
           cursor: pointer;
-          flex-shrink: 0;
 
           &.hidden {
             // TODO animate
