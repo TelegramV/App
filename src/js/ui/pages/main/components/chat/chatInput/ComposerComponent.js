@@ -1,7 +1,11 @@
 import Component from "../../../../../v/vrdom/Component";
+import VRDOM from "../../../../../v/vrdom/VRDOM";
 import TabSelectorComponent from "../../basic/TabSelectorComponent"
+import StickerComponent from "../message/common/StickerComponent"
 import {ChatInputManager} from "./ChatInputComponent"
 import {emojiCategories, replaceEmoji} from "../../../../../utils/emoji"
+import MTProto from "../../../../../../mtproto/external"
+import lottie from "lottie-web"
 
 export default class ComposerComponent extends Component {
 	constructor(props) {
@@ -10,16 +14,16 @@ export default class ComposerComponent extends Component {
 		this.tabItems = [
 			{
 				text: "Emoji",
-				click: this.openEmoji,
+				click: this.openEmoji.bind(this),
 				selected: true
 			},
 			{
 				text: "Stickers",
-				click: this.openStickers
+				click: this.openStickers.bind(this),
 			},
 			{
 				text: "GIFs",
-				click: this.openGIF
+				click: this.openGIF.bind(this),
 			}
 		]
 	}
@@ -76,6 +80,20 @@ export default class ComposerComponent extends Component {
 		})
 	}
 
+	onHide() {
+		this.stickerPanel.querySelector(".selected").childNodes.forEach(node => {
+			if(node.id) lottie.pause(node.id);
+		})
+		this.paused = true;
+	}
+
+	onShow() {
+		if(!this.paused) return;
+		this.stickerPanel.querySelector(".selected").childNodes.forEach(node => {
+			if(node.id) lottie.play(node.id);
+		})
+	}
+
 	openEmoji() {
 		if(!this.emojiPanel) return;
 		this.stickerPanel.classList.add("hidden");
@@ -84,8 +102,13 @@ export default class ComposerComponent extends Component {
 
 	openStickers() {
 		if(!this.stickerPanel) return;
+		this.loadRecentStickers();
 		this.emojiPanel.classList.add("hidden");
 		this.stickerPanel.classList.remove("hidden");
+	}
+
+	openGIF() {
+
 	}
 
 	loadRecentStickers() {
@@ -95,7 +118,10 @@ export default class ComposerComponent extends Component {
 		}).then(response => {
 			let packs = response.packs;
 			let stickers = response.stickers;
-			this.stickerPanel.querySelector(".selected");
+			let table = this.stickerPanel.querySelector(".selected");
+			for(let i = 0; i<Math.min(25, stickers.length); i++) {
+				VRDOM.append(<StickerComponent width={75} sticker={stickers[i]}/>, table);
+			}
 		})
 	}
 

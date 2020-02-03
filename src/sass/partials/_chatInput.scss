@@ -346,12 +346,16 @@
       overflow: hidden;
       height: 100%;
     }
+
     .emoji-wrapper,
     .sticker-wrapper {
       display: flex;
       flex-direction: column;
       overflow: hidden;
       height: 100%;
+      &.hidden {
+        display: none;
+      }
 
       .emoji-table,
       .sticker-table {
@@ -394,8 +398,8 @@
         align-items: center;
         background-color: white;
 
-        .emoji-type-item
-        .sticket-pack-item {
+        .emoji-type-item,
+        .sticker-packs-item {
           height: 40px;
           width: 50px;
           font-size: 24px;
@@ -416,7 +420,11 @@
       }
     }
     .sticker-wrapper {
-
+      .sticker-table {
+        & > * {
+          grid-template-columns: repeat(5, 1fr);
+        }
+      }
     }
   }
 }
