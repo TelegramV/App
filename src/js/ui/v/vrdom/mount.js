@@ -1,4 +1,4 @@
-import vrdom_render from "./render"
+import vrdom_render from "./render/render"
 import type VRNode from "./VRNode"
 import type {VRRenderProps} from "./types/types"
 import V from "../VFramework"

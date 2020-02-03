@@ -9,9 +9,13 @@ export class PhotoMessage extends AbstractMessage {
     type = MessageType.PHOTO
 
     srcUrl = ""
+    srcMaxSizeUrl = ""
 
     width = 0
     height = 0
+
+    maxWidth = 0
+    maxHeight = 0
 
     thumbnail = true
     loaded = false
@@ -19,6 +23,7 @@ export class PhotoMessage extends AbstractMessage {
 
     interrupted: false
 
+    minSizeType = "" // why?
     maxSizeType = "" // why?
 
     show() {
@@ -55,15 +60,31 @@ export class PhotoMessage extends AbstractMessage {
         })
     }
 
+    fetchMaxSize() {
+        return FileAPI.getFile(this.raw.media.photo, this.minSizeType).then(srcMaxUrl => {
+            this.srcMaxSizeUrl = srcMaxUrl
+
+            if (!this.interrupted) {
+                this.interrupted = false
+                this.fire("maxSizeLoaded")
+            }
+        })
+    }
+
     fillRaw(raw: Object): PhotoMessage {
         super.fillRaw(raw)
 
         this.srcUrl = FileAPI.hasThumbnail(this.raw.media.photo) ? FileAPI.getThumbnail(this.raw.media.photo) : ""
 
+        const minSize = FileAPI.getMinSize(this.raw.media.photo)
         const maxSize = FileAPI.getMaxSize(this.raw.media.photo)
 
-        this.width = maxSize.w
-        this.height = maxSize.h
+        this.width = minSize.w
+        this.height = minSize.h
+        this.minSizeType = minSize.type
+
+        this.maxWidth = maxSize.w
+        this.maxHeight = maxSize.h
         this.maxSizeType = maxSize.type
 
         return this

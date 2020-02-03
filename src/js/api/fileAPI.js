@@ -130,7 +130,14 @@ export class FileAPI {
     }
 
     static getMinSize(file) {
-        return file.sizes[0]
+        const video = this.getAttribute(file, "documentAttributeVideo")
+        if (video) {
+            return video
+        }
+
+        return (file.sizes || file.thumbs).reduce(function (prev, current) {
+            return (prev.w < current.w) ? prev : current
+        })
     }
 
     static getThumbSize(file) {

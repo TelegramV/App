@@ -45,13 +45,14 @@ class BubblesComponent extends Component {
 
         function onIntersection(entries) {
             entries.forEach(entry => {
-                entry.target.style.opacity = entry.intersectionRatio > 0 ? 1 : 0
+                entry.target.style.opacity = entry.intersectionRatio > 0 && entry.target.style.opacity !== 1 ? 1 : 0
+                console.log(entry.intersectionRatio)
             })
         }
 
         this.intersectionObserver = new IntersectionObserver(onIntersection, {
             root: this.$el,
-            rootMargin: "250px",
+            rootMargin: "40%",
             threshold: 1.0
         })
 
@@ -207,11 +208,11 @@ class BubblesComponent extends Component {
         if ($element.scrollTop === 0 && !this.state.isFetchingNextPage) {
             this.state.isFetchingNextPage = true
 
-            this._toggleMessagesLoader(false)
+            // this._toggleMessagesLoader(false)
 
             this.reactive.peer.api.fetchNextPage().then(() => {
                 this.state.isFetchingNextPage = false
-                this._toggleMessagesLoader(true)
+                // this._toggleMessagesLoader(true)
             })
 
         } else if ($bi) {

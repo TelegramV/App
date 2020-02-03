@@ -71,7 +71,7 @@ export default class StickerComponent extends Component {
                 this.animation = lottie.loadAnimation({
                     container: this.$el,
                     renderer: 'canvas',
-                    loop: true,
+                    loop: false,
                     autoplay: true,
                     name: this.id,
                     animationData: r

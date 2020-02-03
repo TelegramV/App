@@ -1,7 +1,7 @@
 import vrdom_render from "./render"
-import V from "../VFramework"
-import ComponentVRNode from "./ComponentVRNode"
-import Component from "./Component"
+import V from "../../VFramework"
+import ComponentVRNode from "../ComponentVRNode"
+import Component from "../Component"
 
 let latestInstantiatedComponent = 0
 
@@ -14,7 +14,7 @@ function vrdom_renderComponentVNode(componentVNode: ComponentVRNode) {
         slot: componentVNode.slot,
     })
 
-    const newId = String(componentVNode.ref ? componentVNode.ref : latestInstantiatedComponent++)
+    const newId = componentInstance.identifier ? String(componentInstance.identifier) : String(componentVNode.ref ? componentVNode.ref : latestInstantiatedComponent++)
 
     componentInstance.identifier = newId
     componentInstance.__init.bind(componentInstance)()
@@ -34,7 +34,11 @@ function vrdom_renderComponentVNode(componentVNode: ComponentVRNode) {
     V.plugins.forEach(plugin => plugin.componentCreated(componentInstance))
     componentInstance.__.created = true
 
-    return vrdom_render(vNode)
+    const $node = vrdom_render(vNode)
+
+    $node.__component = componentInstance
+
+    return $node
 }
 
 

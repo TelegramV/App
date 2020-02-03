@@ -1,7 +1,7 @@
 import V from "../VFramework"
 import type VRNode from "./VRNode"
 import type {VRRenderProps} from "./types/types"
-import vrdom_render from "./render"
+import vrdom_render from "./render/render"
 import {vrdom_mount_resolveComponentMounted} from "./mount"
 
 /**

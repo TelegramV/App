@@ -6,6 +6,9 @@ import VRNode from "../VRNode"
 import ComponentVRNode from "../ComponentVRNode"
 import patchChildren from "./patchChildren"
 import V from "../../VFramework"
+import patchComponentVRNode from "./patchComponent"
+import patchUndefined from "./patchUndefined"
+import patchText from "./patchText"
 
 /**
  * Patches VRNode to Real DOM Element
@@ -14,72 +17,32 @@ import V from "../../VFramework"
  * @param newNode
  */
 const vrdom_patch = <T: Element | Node | Text>($node: T, newNode: VRNode | ComponentVRNode | mixed): T => {
+    if ($node === undefined) {
+        console.error("BUG: `undefined` was passed as $node ")
+        return $node
+    }
+
     if (newNode instanceof ComponentVRNode) {
         // console.log("[patch] component patch")
 
-        if ($node.nodeType === Node.TEXT_NODE) {
-            // $ignore
-            return vrdom_mount(newNode, $node)
-        }
+        return patchComponentVRNode($node, newNode)
 
-
-        // $ignore
-        if ($node.hasAttribute("data-component-id")) {
-            // console.log("[patch component] $node component")
-
-
-            // such components have self patching logic, so we should not touch them. but...
-            // console.warn("trying to patch class component, please avoid such behaviour")
-
-            // $ignore
-            const mounted = V.mountedComponents.get($node.getAttribute("data-component-id"))
-
-            if (mounted) {
-                if (!mounted.__.isPatchingItself) {
-                    mounted.props = newNode.props
-                    mounted.slot = newNode.slot
-
-                    return mounted.__patch()
-                }
-            } else {
-                // $ignore
-                return vrdom_mount(newNode, $node)
-            }
-        } else {
-            // $ignore
-            return vrdom_mount(newNode, $node)
-        }
 
     } else if (newNode instanceof VRNode) {
         // console.log("[patch] node patch")
 
         if ($node.nodeType === Node.TEXT_NODE) {
-            // $ignore
             return vrdom_mount(newNode, $node)
         }
 
         // $ignore
-        if ($node.hasAttribute("data-component-id")) {
-            // console.log("[patch node] $node component")
-
-            // $ignore
-            const mounted = V.mountedComponents.get($node.getAttribute("data-component-id"))
-
-            if (mounted) {
-
-                if (!mounted.__.isPatchingItself) {
-                    return mounted.__delete()
-                }
-
-            } else {
-                // $ignore
-                return vrdom_mount(newNode, $node)
+        if ($node.__component) {
+            if (!$node.__component.__.isPatchingItself) {
+                return $node.__component.__delete()
             }
         }
 
-        // $ignore
         if ($node.tagName.toLowerCase() !== newNode.tagName) {
-            // $ignore
             return vrdom_mount(newNode, $node)
         }
 
@@ -99,47 +62,17 @@ const vrdom_patch = <T: Element | Node | Text>($node: T, newNode: VRNode | Compo
     } else if (newNode === undefined) {
         // console.log("[patch] undefined")
 
-        if ($node.nodeType === Node.TEXT_NODE) {
-            // $ignore
-            $node.remove()
-            // $ignore
-            return undefined
-        }
-
-        // $ignore
-        if ($node.hasAttribute("data-component-id")) {
-            // console.log("[patch undefined] $node component")
-
-            // $ignore
-            const component = V.mountedComponents.get($node.getAttribute("data-component-id"))
-
-            if (component) {
-                component.__delete()
-            } else {
-                console.warn("component was not found")
-            }
-
-        } else {
-            // $ignore
-            $node.remove()
-        }
-
-        // $ignore
-        return undefined
+        return patchUndefined($node)
 
     } else {
 
-        if ($node.nodeType === Node.TEXT_NODE) {
-            if ($node.textContent !== String(newNode)) {
-                // $ignore
-                return vrdom_mount(newNode, $node)
-            }
 
-            return $node
+        if ($node.nodeType === Node.TEXT_NODE) {
+            return patchText($node, newNode)
         }
 
         // $ignore
-        if ($node.hasAttribute("data-component-id")) {
+        if ($node.__component) {
             // console.log("[patch undefined] $node unexpected")
 
             // $ignore
@@ -152,7 +85,6 @@ const vrdom_patch = <T: Element | Node | Text>($node: T, newNode: VRNode | Compo
             }
 
         } else {
-            // $ignore
             return vrdom_mount(newNode, $node)
         }
 

@@ -1,6 +1,6 @@
 import vrdom_createElement from "./createElement"
 import vrdom_jsx from "./jsx/jsx"
-import vrdom_render from "./render"
+import vrdom_render from "./render/render"
 import vrdom_mount from "./mount"
 import vrdom_delete from "./delete"
 import vrdom_patch from "./patch/patch"
