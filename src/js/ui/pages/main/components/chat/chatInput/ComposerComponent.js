@@ -35,8 +35,8 @@ export default class ComposerComponent extends Component {
 							<div class="people selected" data-category="people"/>
 							<div class="nature" data-category="nature"></div>
 							<div class="food" data-category="food"></div>
-							<div class="activity" data-category="activity"></div>
 							<div class="travel" data-category="travel"></div>
+							<div class="activity" data-category="activity"></div>
 							<div class="objects" data-category="objects"></div>
 							<div class="symbols" data-category="symbols"></div>
 						</div>
@@ -45,8 +45,8 @@ export default class ComposerComponent extends Component {
 							<div class="rp emoji-type-item selected" data-category="people" onClick={this._emojiTypeClick}><i class="tgico tgico-smile"/></div>
 							<div class="rp emoji-type-item" data-category="nature" onClick={this._emojiTypeClick}><i class="tgico tgico-animals"/></div>
 							<div class="rp emoji-type-item" data-category="food" onClick={this._emojiTypeClick}><i class="tgico tgico-eats"/></div>
-							<div class="rp emoji-type-item" data-category="activity" onClick={this._emojiTypeClick}><i class="tgico tgico-car"/></div>
-							<div class="rp emoji-type-item" data-category="travel" onClick={this._emojiTypeClick}><i class="tgico tgico-sport"/></div>
+							<div class="rp emoji-type-item" data-category="travel" onClick={this._emojiTypeClick}><i class="tgico tgico-car"/></div>
+							<div class="rp emoji-type-item" data-category="activity" onClick={this._emojiTypeClick}><i class="tgico tgico-sport"/></div>
 							<div class="rp emoji-type-item" data-category="objects" onClick={this._emojiTypeClick}><i class="tgico tgico-lamp"/></div>
 							<div class="rp emoji-type-item" data-category="symbols" onClick={this._emojiTypeClick}><i class="tgico tgico-flag"/></div>
 						</div>
