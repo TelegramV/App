@@ -372,6 +372,12 @@
             width: 32px;
             height: 32px;
             cursor: pointer;
+            padding: 5px;
+            margin: 0 -5px;
+            border-radius: 50%;
+            &:hover {
+              background-color: $light;
+            }
           }
         }
       }
