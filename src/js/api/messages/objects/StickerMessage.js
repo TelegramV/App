@@ -9,17 +9,17 @@ export class StickerMessage extends AbstractMessage {
     type = MessageType.STICKER
 
     animated = false
-    srcUrl = ""
+    //srcUrl = ""
     w = 0
     h = 0
 
-    show() {
+    /*show() {
         super.show()
         FileAPI.getFile(this.raw.media.document).then(srcUrl => {
             this.srcUrl = srcUrl
             this.fire("stickerLoaded")
         })
-    }
+    }*/
 
     fillRaw(raw: Object): StickerMessage {
         super.fillRaw(raw)

@@ -8,7 +8,6 @@ export default class StickerComponent extends Component {
 	constructor(props) {
 		super(props);
 		this.sticker = this.props.sticker;
-		console.log(this.sticker);
 		this.width = this.props.width || 250;
 		let sizeAttr = this.sticker.attributes.find(l => l._ === "documentAttributeImageSize");
 		this.height = this.props.height || (sizeAttr ? sizeAttr.h / sizeAttr.w * this.width : this.width);
