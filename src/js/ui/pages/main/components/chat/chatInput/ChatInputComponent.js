@@ -17,9 +17,6 @@ export class ChatInputComponent extends Component {
         super(props);
         ChatInputManager = this
         this.state = {
-            value: "",
-            valueString: "",
-            attachments: [],
             reply: null
         }
     }
@@ -35,31 +32,15 @@ export class ChatInputComponent extends Component {
 
                 <div className="input-and-keyboard-wrapper">
                     <div className="input-field-wrapper">
-                        <div className={["reply", this.state.reply ? "" : "hidden"]}>
-                            <i className="tgico tgico-close btn-icon" onClick={l => {
-                                this.state.reply = null
-                                l.target.parentElement.classList.add("hidden")
-                            }
-                            }/>
+                        <div className="reply hidden">
+                            <i className="tgico tgico-close btn-icon" onClick={this.closeReply}/>
                             <div className="message">
                                 <img src="" className="image hidden"/>
                                 <div className="reply-wrapper">
-                                    <div className="title">{this.state.reply && this.state.reply.title}</div>
-                                    <div
-                                        className="description">{this.state.reply && this.state.reply.description}</div>
+                                    <div className="title"/>
+                                    <div className="description"/>
                                 </div>
                             </div>
-                        </div>
-                        <div className={["media", this.state.attachments.length > 0 ? "" : "hidden"]}>
-                            {this.state.attachments && this.state.attachments.map(l => {
-                                return <div className="attachment photo">
-                                    <i className="tgico tgico-close" onClick={_ => {
-                                        this.state.attachments = this.state.attachments.filter(e => e !== l)
-                                        this.__patch()
-                                    }}/>
-                                    <img src={l.src} alt=""/>
-                                </div>
-                            })}
                         </div>
 
                         <div className="input-field">
@@ -68,7 +49,7 @@ export class ChatInputComponent extends Component {
                                     <i className="tgico tgico-smile btn-icon rp rps"
                                        onMouseEnter={this.mouseEnterEmoji} onMouseLeave={this.mouseLeaveEmoji}/>
                                 </div>
-                                <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]}
+                                <div className="textarea empty"
                                      placeholder="Message"
                                      contentEditable onInput={this.onInput} onKeyPress={this.onKeyPress}
                                      onContextMenu={ContextMenuManager.listener([
@@ -114,17 +95,13 @@ export class ChatInputComponent extends Component {
                                              onClick: _ => {
                                              }
                                          }
-                                     ])} onPaste={this.onPaste} dangerouslySetInnerHTML={this.state.value}>
+                                     ])} onPaste={this.onPaste}>
                                 </div>
 
-                                    {this.state.keyboardMarkup ?
-                                        // TODO replace icon to keyboard
-                                        <div className="ico-wrapper">
+                                <div className="ico-wrapper">
 
-                                        <i className="tgico tgico-smallscreen btn-icon"/>
-                                        </div>
-
-                                        : ""}
+                                    <i className="tgico tgico-smallscreen btn-icon hidden"/>
+                                </div>
                                 <div className="ico-wrapper">
 
                                     <i className="tgico tgico-attach btn-icon rp rps"
@@ -160,19 +137,15 @@ export class ChatInputComponent extends Component {
 
                     </div>
 
-                    {
-                        this.state.keyboardMarkup ?
                             <div className="keyboard-markup">
-                                {this.state.keyboardMarkup.rows.map(l => {
-                                    return <div className="row">
-                                        {l.buttons.map(q => {
-                                            return InlineKeyboardComponent.parseButton(null, q)
-                                        })}
-                                    </div>
-                                })}
+                                {/*{this.state.keyboardMarkup.rows.map(l => {*/}
+                                {/*    return <div className="row">*/}
+                                {/*        {l.buttons.map(q => {*/}
+                                {/*            return InlineKeyboardComponent.parseButton(null, q)*/}
+                                {/*        })}*/}
+                                {/*    </div>*/}
+                                {/*})}*/}
                             </div>
-                            : ""
-                    }
                 </div>
 
 
@@ -207,6 +180,43 @@ export class ChatInputComponent extends Component {
                 </div>
             </div>
         </div>
+    }
+
+    allowedTags = [
+        "b", "u", "strong", "i", "s", "del", "code", "pre", "blockquote"
+    ]
+
+    removeStyle(elem) {
+        if(elem.style) {
+            // Not allowed? replace to span!
+            // FIXME causes recursive mutation cycle
+            // if(!this.allowedTags.includes(elem.tagName.toLowerCase())) {
+            //     const d = document.createElement("span")
+            //     d.innerHTML = elem.innerHTML
+            //     elem.parentNode.replaceChild(d, elem);
+            //     elem = d
+            // }
+            elem.style.cssText = null
+            elem.childNodes.forEach(l => {
+                console.log("child node!", l)
+                this.removeStyle(l)
+            })
+        }
+    }
+
+    onMutation(ev) {
+        console.log(ev)
+        ev.forEach(q => {
+            q.addedNodes.forEach(l => {
+                console.log("Remove", l)
+                this.removeStyle(l)
+            })
+        })
+    }
+
+    appendText(text) {
+        this.textarea.innerHTML += text
+        this.updateSendButton()
     }
 
     initDragArea() {
@@ -294,9 +304,17 @@ export class ChatInputComponent extends Component {
         this.$el.querySelector(".reply").classList.remove("hidden")
         this.$el.querySelector(".reply .message .title").innerHTML = this.state.reply.title
         this.$el.querySelector(".reply .message .description").innerHTML = this.state.reply.description
-        if (this.state.reply.image) {
+        if (this.state.reply.image !== null) {
+            this.$el.querySelector(".reply .message .image").classList.remove("hidden")
             this.$el.querySelector(".reply .message .image").src = this.state.reply.image
+        } else {
+            this.$el.querySelector(".reply .message .image").classList.add("hidden")
         }
+    }
+
+    closeReply() {
+        this.state.reply = null
+        this.$el.querySelector(".reply").classList.add("hidden")
     }
 
     setKeyboardMarkup(markup) {
@@ -358,6 +376,11 @@ export class ChatInputComponent extends Component {
     mounted() {
         super.mounted();
         this.textarea = this.$el.querySelector(".textarea")
+        const config = { childList: true, subtree: true };
+
+        const observer = new MutationObserver(this.onMutation);
+
+        observer.observe(this.textarea, config);
         this.composer = this.$el.querySelector(".composer")
         this.initDragArea()
     }
@@ -506,7 +529,7 @@ export class ChatInputComponent extends Component {
         let reply = this.state.reply ? this.state.reply.message.id : null
         AppSelectedPeer.Current.api.sendMessage(this.textarea.textContent, reply, silent)
         this.textarea.innerHTML = ""
-        this.state.reply = null
+        this.closeReply()
         this.state.attachments = []
         this.textarea.innerHTML = ""
         this.updateSendButton()
