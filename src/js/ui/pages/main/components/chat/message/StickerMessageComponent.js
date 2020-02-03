@@ -1,11 +1,12 @@
 import MessageWrapperFragment from "./common/MessageWrapperFragment";
 import MessageTimeComponent from "./common/MessageTimeComponent"
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
-import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
-import VRDOM from "../../../../../v/vrdom/VRDOM"
+import StickerComponent from "./common/StickerComponent"
+/*import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
+import VRDOM from "../../../../../v/vrdom/VRDOM"*/
 
 // this is needed to make direct patches without patching full component
-const StickerFragment = ({id, url, w, h}) => {
+/*const StickerFragment = ({id, url, w, h}) => {
     if (url === "") {
         return <div id={id}
                     className="sticker loading"
@@ -68,6 +69,20 @@ class StickerMessageComponent extends GeneralMessageComponent {
         if (event.type === "stickerLoaded") {
             this.patchSticker()
         }
+    }
+}*/
+
+class StickerMessageComponent extends GeneralMessageComponent {
+    h() {
+        return (
+            <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false}>
+
+                <StickerComponent width={200} sticker={this.message.raw.media.document}/>
+
+                <MessageTimeComponent message={this.message} bg={true}/>
+
+            </MessageWrapperFragment>
+        )
     }
 }
 

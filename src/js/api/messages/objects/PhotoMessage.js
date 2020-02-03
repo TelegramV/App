@@ -26,6 +26,10 @@ export class PhotoMessage extends AbstractMessage {
         this.fetchMax()
     }
 
+    get smallPreviewImage() {
+        return this.srcUrl
+    }
+
     fetchMax() {
         if (this.interrupted && this.loaded) {
             this.interrupted = false

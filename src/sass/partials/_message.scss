@@ -1,5 +1,7 @@
 #bubbles {
     height: 100%;
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) calc(100% - 16px), rgba(0,0,0,0));
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) calc(100% - 16px), rgba(0,0,0,0));
 
     .service {
         justify-content: center;
@@ -31,19 +33,60 @@
     .bubble-outer {
         display: flex;
         flex-direction: column;
+        filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
+
+        &.in {
+            left: -8px;
+            position: relative;
+        }
 
         .bubble {
             max-width: 480px;
             border-radius: 12px;
-            box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.15);
+            //box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.15);
             position: relative;
             z-index: 0;
+            display: inline-table;
             overflow: hidden; // ЖЕРЕ ХВОСТИ В ПОВІДОМЛЕНЬ
             // я тимчасово зламаю хвостики бо перероблюю цсс, вже маю трохи ідею як зробити свгшкою то всьо
             //                                                                          - @undrfined
 
             //Коли вже svg?
             //                                                                          - @prettydude
+
+            // https://youtu.be/ciL7OKWSu10
+            // Right behind you...
+            //                                                                          - @undrfined
+
+            // let total_wasted_hours = 16
+
+            &.in {
+                -webkit-mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left.svg");
+                mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left.svg");
+                padding-left: 10px;
+
+                -webkit-mask-position: 0% 100%;
+                mask-position: 0% 100%;
+                //-webkit-mask-composite: xor, source-over;
+            }
+
+            &.out {
+                -webkit-mask-image: url("../../public/static/images/tail-right.svg"), url("../../public/static/images/rect-right.svg");
+                mask-image: url("../../public/static/images/tail-right.svg"), url("../../public/static/images/rect-right.svg");
+                padding-right: 10px;
+
+                -webkit-mask-position: 100% 100%;
+                mask-position: 100% 100%;
+                //-webkit-mask-composite: xor, source-over;
+            }
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+
+            &.no-pad {
+                padding-left: 0;
+                padding-right: 0;
+            }
+
             .card {
                 display: flex;
 
@@ -731,6 +774,8 @@
         }
 
         .avatar {
+            filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
+
             height: 34px;
             width: 34px;
             flex-shrink: 0;
@@ -866,33 +911,6 @@
             }
         }
 
-        .bubble:not(.grouped):not(.transparent) {
-            &:before {
-                content: "";
-                position: absolute;
-                z-index: -2;
-                bottom: -1px;
-                left: -5px;
-                height: 20px;
-                width: 14px;
-                background-color: white;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            &:after {
-                content: "";
-                position: absolute;
-                z-index: -1;
-                bottom: 0;
-                left: -11px;
-                width: 10px;
-                height: 20px;
-                background-color: #e6ebee;
-                border-bottom-right-radius: 10px 15px;
-                border-right: 1px solid rgba(0, 0, 0, 0.1);
-            }
-        }
-
         .bubble:first-child {
             border-radius: 12px 12px 12px 6px;
 
@@ -1023,33 +1041,6 @@
 
             .media-wrapper {
                 border-radius: 12px 6px 6px 12px;
-            }
-        }
-
-        .bubble:not(.grouped):not(.transparent) {
-            &:before {
-                content: "";
-                position: absolute;
-                z-index: -2;
-                bottom: -1px;
-                right: -5px;
-                height: 20px;
-                width: 14px;
-                background-color: $lightgreen;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-            }
-
-            &:after {
-                content: "";
-                position: absolute;
-                z-index: -1;
-                bottom: 0;
-                right: -11px;
-                width: 10px;
-                height: 20px;
-                background-color: #e6ebee;
-                border-bottom-left-radius: 10px 15px;
-                border-left: 1px solid rgba(0, 0, 0, 0.05);
             }
         }
 

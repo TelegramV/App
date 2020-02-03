@@ -6,7 +6,10 @@ import TimeManager from "../../../../../../mtproto/timeManager";
 import {createNonce} from "../../../../../../mtproto/utils/bin";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {InlineKeyboardComponent} from "../message/common/InlineKeyboardComponent";
-import {formatAudioTime} from "../../../../../utils"
+import {formatAudioTime, convertBits} from "../../../../../utils"
+import {replaceEmoji} from "../../../../../utils/emoji"
+import ComposerComponent from "./ComposerComponent"
+import {MessageParser} from "../../../../../../api/messages/MessageParser";
 
 export let ChatInputManager
 
@@ -15,144 +18,142 @@ export class ChatInputComponent extends Component {
         super(props);
         ChatInputManager = this
         this.state = {
-            value: "",
-            valueString: "",
-            attachments: [],
             reply: null
         }
     }
 
     get isVoiceMode() {
-        return this.state.valueString.length === 0
+        return this.textarea && this.textarea.childNodes.length === 0
     }
 
     h() {
         return <div className="chat-input-wrapper">
+            <ComposerComponent mouseEnter={this.mouseEnterComposer} mouseLeave={this.mouseLeaveComposer}/>
             <div className="chat-input">
 
                 <div className="input-and-keyboard-wrapper">
                     <div className="input-field-wrapper">
-                        <div className={["reply", this.state.reply ? "" : "hidden"]}>
-                            <i className="tgico tgico-close btn-icon" onClick={l => {
-                                this.state.reply = null
-                                l.target.parentElement.classList.add("hidden")
-                            }
-                            }/>
+                        <div className="reply hidden">
+                            <i className="tgico tgico-close btn-icon" onClick={this.closeReply}/>
                             <div className="message">
-                                <div className="title">{this.state.reply && this.state.reply.title}</div>
-                                <div className="description">{this.state.reply && this.state.reply.description}</div>
-                            </div>
-                        </div>
-                        <div className={["media", this.state.attachments.length > 0 ? "" : "hidden"]}>
-                            {this.state.attachments && this.state.attachments.map(l => {
-                                return <div className="attachment photo">
-                                    <i className="tgico tgico-close" onClick={_ => {
-                                        this.state.attachments = this.state.attachments.filter(e => e !== l)
-                                        this.__patch()
-                                    }}/>
-                                    <img src={l.src} alt=""/>
+                                <img src="" className="image hidden"/>
+                                <div className="reply-wrapper">
+                                    <div className="title"/>
+                                    <div className="description"/>
                                 </div>
-                            })}
-                        </div>
-                        <div className="input-field">
-                            <i className="tgico tgico-smile btn-icon rp rps"/>
-                            <div className={["textarea", this.state.value.length > 0 ? "" : "empty"]}
-                                 placeholder="Message"
-                                 contentEditable={true} onInput={this.onInput} onKeyPress={this.onKeyPress}
-                                 onContextMenu={ContextMenuManager.listener([
-                                     {
-                                         title: "Bold",
-                                         after: "Ctrl+B",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Italic",
-                                         after: "Ctrl+I",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Underline",
-                                         after: "Ctrl+U",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Strikethrough",
-                                         after: "Ctrl+Shift+X",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Monospace",
-                                         after: "Ctrl+Shift+M",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Create link",
-                                         after: "Ctrl+K",
-                                         onClick: _ => {
-                                         }
-                                     },
-                                     {
-                                         title: "Normal text",
-                                         after: "Ctrl+Shift+N",
-                                         onClick: _ => {
-                                         }
-                                     }
-                                 ])} dangerouslySetInnerHTML={this.state.value}>
                             </div>
-                            {this.state.keyboardMarkup ?
-                                // TODO replace icon to keyboard
-                                <i className="tgico tgico-smallscreen btn-icon"/>
-                                : ""}
-                            <i className="tgico tgico-attach btn-icon rp rps"
-                               onClick={l => ContextMenuManager.openAbove([
-                                   {
-                                       icon: "photo",
-                                       title: "Photo or Video",
-                                       onClick: _ => {
-                                           this.pickFile(false)
-                                       }
-                                   },
-                                   {
-                                       icon: "document",
-                                       title: "Document",
-                                       onClick: _ => {
-                                           this.pickFile(true)
-                                       }
-                                   },
-                               ], l.target)}/>
-                               <div className="voice-seconds hidden">
-                                    0:02,43
-                               </div>
+                        </div>
 
+                        <div className="input-field">
+                            <div className="another-fucking-wrapper">
+                                <div className="ico-wrapper">
+                                    <i className="tgico tgico-smile btn-icon rp rps"
+                                       onMouseEnter={this.mouseEnterEmoji} onMouseLeave={this.mouseLeaveEmoji}/>
+                                </div>
+                                <div className="textarea empty"
+                                     placeholder="Message"
+                                     contentEditable onInput={this.onInput} onKeyPress={this.onKeyPress}
+                                     onContextMenu={ContextMenuManager.listener([
+                                         {
+                                             title: "Bold",
+                                             after: "Ctrl+B",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Italic",
+                                             after: "Ctrl+I",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Underline",
+                                             after: "Ctrl+U",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Strikethrough",
+                                             after: "Ctrl+Shift+X",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Monospace",
+                                             after: "Ctrl+Shift+M",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Create link",
+                                             after: "Ctrl+K",
+                                             onClick: _ => {
+                                             }
+                                         },
+                                         {
+                                             title: "Normal text",
+                                             after: "Ctrl+Shift+N",
+                                             onClick: _ => {
+                                             }
+                                         }
+                                     ])} onPaste={this.onPaste}>
+                                </div>
+
+                                <div className="ico-wrapper">
+
+                                    <i className="tgico tgico-smallscreen btn-icon hidden"/>
+                                </div>
+                                <div className="ico-wrapper">
+
+                                    <i className="tgico tgico-attach btn-icon rp rps"
+                                       onClick={l => ContextMenuManager.openAbove([
+                                           {
+                                               icon: "poll",
+                                               title: "Poll",
+                                               onClick: _ => {
+                                                   this.pickPoll()
+                                               }
+                                           },
+                                           {
+                                               icon: "photo",
+                                               title: "Photo or Video",
+                                               onClick: _ => {
+                                                   this.pickFile(false)
+                                               }
+                                           },
+                                           {
+                                               icon: "document",
+                                               title: "Document",
+                                               onClick: _ => {
+                                                   this.pickFile(true)
+                                               }
+                                           },
+                                       ], l.target)}/>
+                                </div>
+
+                                <div className="voice-seconds hidden"/>
+
+                            </div>
                         </div>
 
                     </div>
 
-                    {
-                        this.state.keyboardMarkup ?
                             <div className="keyboard-markup">
-                                {this.state.keyboardMarkup.rows.map(l => {
-                                    return <div className="row">
-                                        {l.buttons.map(q => {
-                                            return InlineKeyboardComponent.parseButton(null, q)
-                                        })}
-                                    </div>
-                                })}
+                                {/*{this.state.keyboardMarkup.rows.map(l => {*/}
+                                {/*    return <div className="row">*/}
+                                {/*        {l.buttons.map(q => {*/}
+                                {/*            return InlineKeyboardComponent.parseButton(null, q)*/}
+                                {/*        })}*/}
+                                {/*    </div>*/}
+                                {/*})}*/}
                             </div>
-                            : ""
-                    }
                 </div>
 
 
-
                 <div className="round-button-wrapper">
-                    <div className="round-button delete-button rp rps" onClick={this.onSend} onMouseEnter={this.mouseEnterRemoveVoice} onMouseLeave={this.mouseLeaveRemoveVoice}>
-                        <i className="tgico tgico-delete_filled"/>
+                    <div className="round-button delete-button rp rps" onClick={this.onSend}
+                         onMouseEnter={this.mouseEnterRemoveVoice} onMouseLeave={this.mouseLeaveRemoveVoice}>
+                        <i className="tgico tgico-delete"/>
                     </div>
 
                     <div className="round-button send-button rp rps" onClick={this.onSend}
@@ -172,13 +173,105 @@ export class ChatInputComponent extends Component {
                             }
                         },
                     ], l.target)}>
-                        <i className={["tgico", this.state.valueString.length > 0 ? "tgico-send" : "tgico-microphone"]}/>
+                        <i className="tgico tgico-send hidden"/>
+                        <i className="tgico tgico-microphone2"/>
                     </div>
                     <div className="voice-circle"/>
 
                 </div>
             </div>
         </div>
+    }
+
+    allowedTags = [
+        "b", "u", "strong", "i", "s", "del", "code", "pre", "blockquote", "img"
+    ]
+
+    removeStyle(elem) {
+        if(elem.style) {
+            // Not allowed? replace to span!
+            // FIXME causes recursive mutation cycle
+            // if(!this.allowedTags.includes(elem.tagName.toLowerCase())) {
+            //     const d = document.createElement("span")
+            //     d.innerHTML = elem.innerHTML
+            //     elem.parentNode.replaceChild(d, elem);
+            //     elem = d
+            // }
+            elem.style.cssText = null
+            elem.childNodes.forEach(l => {
+                console.log("child node!", l)
+                this.removeStyle(l)
+            })
+        }
+    }
+
+    onMutation(ev) {
+        console.log(ev)
+        ev.forEach(q => {
+            q.addedNodes.forEach(l => {
+                console.log("Remove", l)
+                this.removeStyle(l)
+            })
+        })
+    }
+
+    appendText(text) {
+        this.textarea.innerHTML += text
+        this.onInput();
+    }
+
+    initDragArea() {
+        // TODO should create separate drag area!
+        document.querySelector("body").addEventListener("drop", ev => {
+            console.log(ev)
+            for (let i = 0; i < ev.dataTransfer.items.length; i++) {
+                const k = ev.dataTransfer.items[i]
+                console.log(k)
+                if (k.type.indexOf("image") === -1) continue
+                this.state.attachments.push({
+                    src: URL.createObjectURL(k.getAsFile())
+                })
+                this.__patch()
+            }
+            ev.preventDefault()
+        })
+        document.querySelector("body").addEventListener("dragenter", ev => {
+            console.log(ev)
+            ev.preventDefault()
+        })
+        document.querySelector("body").addEventListener("dragleave", ev => {
+            console.log(ev)
+            ev.preventDefault()
+        })
+        document.querySelector("body").addEventListener("dragover", ev => {
+            // console.log(ev)
+            ev.preventDefault()
+        })
+    }
+
+    mouseEnterComposer() {
+        this.hideComposer = false;
+    }
+
+    mouseLeaveComposer() {
+        this.hideComposer = true;
+        this.planComposerClose()
+    }
+
+    mouseEnterEmoji() {
+        this.composer.classList.add("visible");
+        this.hideComposer = false;
+    }
+
+    mouseLeaveEmoji() {
+        this.hideComposer = true;
+        this.planComposerClose()
+    }
+
+    planComposerClose() {
+        setTimeout(() => {
+            if (this.hideComposer) this.composer.classList.remove("visible");
+        }, 250);
     }
 
     mouseEnterRemoveVoice() {
@@ -189,13 +282,40 @@ export class ChatInputComponent extends Component {
         this.state.isRemoveVoice = false
     }
 
+
+    onPaste(ev) {
+        for (let i = 0; i < ev.clipboardData.items.length; i++) {
+            const k = ev.clipboardData.items[i]
+            console.log(k.toString())
+            if (k.type.indexOf("image") === -1) continue
+            this.state.attachments.push({
+                src: URL.createObjectURL(k.getAsFile())
+            })
+            this.__patch()
+        }
+    }
+
     replyTo(message) {
         this.state.reply = {
             title: message.from.name,
-            description: message.text,
-            message: message
+            description: MessageParser.getPrefixNoSender(message),
+            message: message,
+            image: message.smallPreviewImage
         }
         this.$el.querySelector(".reply").classList.remove("hidden")
+        this.$el.querySelector(".reply .message .title").innerHTML = this.state.reply.title
+        this.$el.querySelector(".reply .message .description").innerHTML = this.state.reply.description
+        if (this.state.reply.image !== null) {
+            this.$el.querySelector(".reply .message .image").classList.remove("hidden")
+            this.$el.querySelector(".reply .message .image").src = this.state.reply.image
+        } else {
+            this.$el.querySelector(".reply .message .image").classList.add("hidden")
+        }
+    }
+
+    closeReply() {
+        this.state.reply = null
+        this.$el.querySelector(".reply").classList.add("hidden")
     }
 
     setKeyboardMarkup(markup) {
@@ -210,6 +330,10 @@ export class ChatInputComponent extends Component {
             return
         }
         this.__patch()
+    }
+
+    pickPoll() {
+
     }
 
     pickFile(document) {
@@ -243,16 +367,23 @@ export class ChatInputComponent extends Component {
     }
 
     tickTimer() {
-        const time = formatAudioTime(this.i/100)+","+this.i%100;
+        const time = formatAudioTime(this.i / 100) + "," + this.i % 100;
         this.$el.querySelector(".voice-seconds").innerHTML = time
         this.i++
-        if(this.isRecording)
-        setTimeout(this.tickTimer, 10)
+        if (this.isRecording)
+            setTimeout(this.tickTimer, 10)
     }
 
     mounted() {
         super.mounted();
         this.textarea = this.$el.querySelector(".textarea")
+        const config = { childList: true, subtree: true };
+
+        const observer = new MutationObserver(this.onMutation);
+
+        observer.observe(this.textarea, config);
+        this.composer = this.$el.querySelector(".composer")
+        this.initDragArea()
     }
 
     onSend(ev) {
@@ -282,25 +413,9 @@ export class ChatInputComponent extends Component {
         this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
     }
 
-    convertBits(array, fromBits, toBits) {
-        let buf = "";
-        let arr = [];
-
-        for (var i of array) {
-            var n = (i >>> 0).toString(2).substr(-fromBits);
-            n = "0".repeat(fromBits).substr(n.length) + n;
-            buf += n;
-            while (buf.length >= toBits) {
-                arr.push(parseInt(buf.substr(0, toBits), 2));
-                buf = buf.substr(toBits);
-            }
-        }
-        return arr;
-    }
-
     onRecordingReady(ev) {
 
-        if(this.state.isRemoveVoice) {
+        if (this.state.isRemoveVoice) {
             this.state.isRemoveVoice = false
             return
         }
@@ -350,7 +465,7 @@ export class ChatInputComponent extends Component {
                     const tempArray = new Uint8Array(analyser.frequencyBinCount);
 
                     analyser.getByteFrequencyData(tempArray);
-                    this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray)/255 * 25 + 1, 4)})`
+                    this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray) / 255 * 25 + 1, 4)})`
                     this.waveform.push(Math.floor(getAverageVolume(tempArray) / 255 * 32))
                 }
 
@@ -405,36 +520,49 @@ export class ChatInputComponent extends Component {
     }
 
     onKeyPress(ev) {
-        if (ev.which === 13 || ev.which === 10) {
+        if ((ev.which === 13 || ev.which === 10) && !ev.shiftKey && !ev.ctrlKey) {
             this.send()
             ev.preventDefault()
         }
     }
 
+    convertEmojiToText() {
+        for(const elem of this.textarea.childNodes) {
+            if(elem.alt) {
+                this.textarea.replaceChild(document.createTextNode(elem.alt),elem);
+            }
+        }
+    }
+
     send(silent = false) {
+        this.convertEmojiToText();
         let reply = this.state.reply ? this.state.reply.message.id : null
         AppSelectedPeer.Current.api.sendMessage(this.textarea.textContent, reply, silent)
         this.textarea.innerHTML = ""
-        this.state.value = ""
-        this.state.valueString = ""
-        this.state.reply = null
+        this.closeReply()
         this.state.attachments = []
-        this.__patch()
+        this.textarea.innerHTML = ""
+        this.updateSendButton()
     }
 
-    onInput(ev) {
-        if (this.state.valueString.length === 0 || this.textarea.textContent.length === 0) {
-            this.state.value = this.textarea.innerHTML
-            this.state.valueString = this.textarea.textContent
-            this.__patch()
+    updateSendButton() {
+        if (this.textarea.childNodes.length === 0) {
+            this.$el.querySelector(".send-button>.tgico-send").classList.add("hidden")
+            this.$el.querySelector(".send-button>.tgico-microphone2").classList.remove("hidden")
         } else {
-            this.state.value = this.textarea.innerHTML
-            this.state.valueString = this.textarea.textContent
+            this.$el.querySelector(".send-button>.tgico-send").classList.remove("hidden")
+            this.$el.querySelector(".send-button>.tgico-microphone2").classList.add("hidden")
         }
-        if (this.textarea.textContent.length > 0) {
+
+        if (this.textarea.childNodes.length > 0) {
             this.textarea.classList.remove("empty")
         } else {
             this.textarea.classList.add("empty")
         }
+    }
+
+    onInput(ev) {
+        this.updateSendButton();
+        replaceEmoji(this.textarea);
     }
 }

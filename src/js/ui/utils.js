@@ -36,6 +36,22 @@ export function formatAudioTime(time) {
     return formatted;
 }
 
+export function convertBits(array, fromBits, toBits) {
+        let buf = "";
+        let arr = [];
+
+        for (var i of array) {
+            var n = (i >>> 0).toString(2).substr(-fromBits);
+            n = "0".repeat(fromBits).substr(n.length) + n;
+            buf += n;
+            while (buf.length >= toBits) {
+                arr.push(parseInt(buf.substr(0, toBits), 2));
+                buf = buf.substr(toBits);
+            }
+        }
+        return arr;
+    }
+
 export const countries = [
     ["+93", "Afghanistan", "AF", "🇦🇫"],
     ["+358 18", "Åland Islands", "AX", "🇦🇽"],

@@ -1,7 +1,8 @@
 import MessageWrapperFragment from "./common/MessageWrapperFragment";
 import MessageTimeComponent from "./common/MessageTimeComponent"
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
-import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
+import StickerComponent from "./common/StickerComponent"
+/*import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
 
 import lottie, {AnimationItem} from "lottie-web"
 import {gzipUncompress} from "../../../../../../mtproto/utils/bin"
@@ -89,6 +90,20 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
         if (event.type === "stickerLoaded") {
             this.patchSticker()
         }
+    }
+}*/
+
+class AnimatedStickerMessageComponent extends GeneralMessageComponent {
+    h() {
+        return (
+            <MessageWrapperFragment message={this.message} transparent={true} noPad>
+
+                <StickerComponent width={200} sticker={this.message.raw.media.document}/>
+
+                <MessageTimeComponent message={this.message} bg={true}/>
+
+            </MessageWrapperFragment>
+        )
     }
 }
 

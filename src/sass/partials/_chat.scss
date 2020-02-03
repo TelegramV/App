@@ -10,6 +10,8 @@
 
     .wallpaper {
         position: absolute;
+        top: -10px;
+        left: -10px;
         width: calc(100% + 20px);
         height: calc(100% + 20px);
         background-color: var(--chat-bg-color);
@@ -152,7 +154,6 @@
             width: 100%;
 
             overflow-y: hidden;
-            z-index: 10;
 
             &:hover {
                 overflow-y: overlay;

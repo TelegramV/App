@@ -302,7 +302,6 @@ class DialogManager extends Manager {
             limit: limit,
             hash: hash
         }).then(rawDialogs => {
-
             if (rawDialogs.count === 0) {
                 this.count = 0
                 console.warn("there is no dialogs")

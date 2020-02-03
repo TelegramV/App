@@ -29,14 +29,13 @@ class ChatInfoStatusComponent extends Component {
 
         const peer = AppSelectedPeer.Current
 
-        return peer.statusString.text
+        return peer.statusString
     }
 
     h() {
         return (
             <div className="bottom">
-                <div css-display={AppSelectedPeer.isSelected && AppSelectedPeer.isSelf ? "none" : ""}
-                     id="messages-online" className="info">{this.statusLine}</div>
+                <div css-display={AppSelectedPeer.isSelected && AppSelectedPeer.Current.isSelf ? "none" : ""} className={["info", this.statusLine.online ? "online" : ""]}>{this.statusLine.text}</div>
             </div>
         )
     }

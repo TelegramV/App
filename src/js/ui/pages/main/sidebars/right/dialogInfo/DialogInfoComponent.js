@@ -6,6 +6,7 @@ import {MTProto} from "../../../../../../mtproto/external";
 import {FileAPI} from "../../../../../../api/fileAPI";
 import {ObjectWithThumbnailComponent} from "../../../components/basic/objectWithThumbnailComponent";
 import {PhotoComponent} from "../../../components/basic/photoComponent";
+import TabSelectorComponent from "../../../components/basic/TabSelectorComponent";
 
 const DetailsFragment = ({icon, text, label, hidden = false, id}) => {
     return <div className={["details", hidden ? "hidden" : ""]} id={id}>
@@ -90,33 +91,6 @@ const DialogInfoLinkComponent = ({title, description, url, photo, displayUrl, le
     </a>
 }
 
-class MaterialHeaderFragment extends Component {
-    init() {
-        super.init()
-        this.state = {
-            selected: 1
-        }
-    }
-
-    h() {
-        return <div className="header">
-            <MaterialHeaderItemFragment text="Members" hidden click={this.select}/>
-            <MaterialHeaderItemFragment text="Media" click={this.select}/>
-            <MaterialHeaderItemFragment text="Docs" click={this.select}/>
-            <MaterialHeaderItemFragment selected text="Links" click={this.select}/>
-            <MaterialHeaderItemFragment text="Audio" click={this.select}/>
-        </div>
-    }
-
-    select(ev) {
-        console.log(ev)
-    }
-}
-
-const MaterialHeaderItemFragment = ({selected = false, text, hidden = false, click}) => {
-    return <div className={["item rp", selected ? "selected" : "", hidden ? "hidden" : ""]} onClick={click}><span>{text}</span></div>
-}
-
 export class DialogInfoComponent extends Component {
     constructor(props) {
         super(props);
@@ -135,6 +109,26 @@ export class DialogInfoComponent extends Component {
         this.appEvents = new Set([
             AppEvents.Peers.reactiveAny().FireOnly
         ])
+
+        this.tabItems = [
+            {
+                text: "Members",
+                hidden: true,
+            },
+            {
+                text: "Media",
+                selected: true
+            },
+            {
+                text: "Docs",
+            },
+            {
+                text: "Links",
+            },
+            {
+                text: "Audio",
+            }
+        ]
     }
 
     reactiveChanged(key, value, event) {
@@ -165,7 +159,7 @@ export class DialogInfoComponent extends Component {
                     <DetailsCheckboxFragment text="Notifications" label="Enabled"/>
 
                     <div class="materials">
-                        <MaterialHeaderFragment/>
+                        <TabSelectorComponent items={this.tabItems}/>
                         <div className="content">
                         </div>
                         <div className="content-loading">
