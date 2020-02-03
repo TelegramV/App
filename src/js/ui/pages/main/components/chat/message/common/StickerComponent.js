@@ -4,7 +4,7 @@ import {FileAPI} from "../../../../../../../api/fileAPI"
 import lottie, {AnimationItem} from "lottie-web"
 import {gzipUncompress} from "../../../../../../../mtproto/utils/bin"
 
-let animatedCounter = 0;
+let stickerCounter = 0;
 
 export default class StickerComponent extends Component {
 	constructor(props) {
@@ -15,14 +15,13 @@ export default class StickerComponent extends Component {
 		this.height = this.props.height || (sizeAttr ? sizeAttr.h / sizeAttr.w * this.width : this.width);
 		this.animated = this.sticker.mime_type === "application/x-tgsticker";
 		this.url = undefined;
-		if(this.animated) this.id ="animated-"+animatedCounter++
+		this.identifier ="sticker-"+stickerCounter++
 	}
 
 	h() {
 		if(this.animated) {
 			return (
-	            <div id={this.id}
-	            	 className="sticker loading"
+	            <div className="sticker loading"
 	                 css-width={`${this.width}px`}
 	                 css-height={`${this.height}px`}/>
 	        )
@@ -73,7 +72,7 @@ export default class StickerComponent extends Component {
                     renderer: 'canvas',
                     loop: false,
                     autoplay: true,
-                    name: this.id,
+                    name: this.identifier,
                     animationData: r
                 })
                 this.animation.setSubframe(false);

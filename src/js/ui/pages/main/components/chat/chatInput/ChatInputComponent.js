@@ -18,7 +18,8 @@ export class ChatInputComponent extends Component {
         super(props);
         ChatInputManager = this
         this.state = {
-            reply: null
+            reply: null,
+            attachments: []
         }
     }
 
