@@ -79,6 +79,7 @@ export default class ComposerComponent extends Component {
 		this.$el.querySelector(".emoji-table").childNodes.forEach(node => node.classList.remove("selected"));
 		let newEl = this.$el.querySelector(".emoji-table").querySelector("."+category);
 		newEl.classList.add("selected");
+		while(newEl.firstChild) newEl.removeChild(newEl.firstChild)
 		newEl.innerText = emojiCategories[category];
 		replaceEmoji(newEl);
 		this._bindEmojiClickEvents();
@@ -93,6 +94,5 @@ export default class ComposerComponent extends Component {
 	_emojiClick(ev) {
 		let emoji = ev.currentTarget;
 		ChatInputManager.appendText(emoji.alt);
-		replaceEmoji(ChatInputManager.textarea);
 	}
 }

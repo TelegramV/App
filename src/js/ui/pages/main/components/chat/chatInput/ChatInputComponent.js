@@ -7,6 +7,7 @@ import {createNonce} from "../../../../../../mtproto/utils/bin";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {InlineKeyboardComponent} from "../message/common/InlineKeyboardComponent";
 import {formatAudioTime, convertBits} from "../../../../../utils"
+import {replaceEmoji} from "../../../../../utils/emoji"
 import ComposerComponent from "./ComposerComponent"
 import {MessageParser} from "../../../../../../api/messages/MessageParser";
 
@@ -22,7 +23,7 @@ export class ChatInputComponent extends Component {
     }
 
     get isVoiceMode() {
-        return this.textarea && this.textarea.textContent.length === 0
+        return this.textarea && this.textarea.childNodes.length === 0
     }
 
     h() {
@@ -183,7 +184,7 @@ export class ChatInputComponent extends Component {
     }
 
     allowedTags = [
-        "b", "u", "strong", "i", "s", "del", "code", "pre", "blockquote"
+        "b", "u", "strong", "i", "s", "del", "code", "pre", "blockquote", "img"
     ]
 
     removeStyle(elem) {
@@ -216,7 +217,7 @@ export class ChatInputComponent extends Component {
 
     appendText(text) {
         this.textarea.innerHTML += text
-        this.updateSendButton()
+        this.onInput();
     }
 
     initDragArea() {
@@ -525,7 +526,16 @@ export class ChatInputComponent extends Component {
         }
     }
 
+    convertEmojiToText() {
+        for(const elem of this.textarea.childNodes) {
+            if(elem.alt) {
+                this.textarea.replaceChild(document.createTextNode(elem.alt),elem);
+            }
+        }
+    }
+
     send(silent = false) {
+        this.convertEmojiToText();
         let reply = this.state.reply ? this.state.reply.message.id : null
         AppSelectedPeer.Current.api.sendMessage(this.textarea.textContent, reply, silent)
         this.textarea.innerHTML = ""
@@ -536,7 +546,7 @@ export class ChatInputComponent extends Component {
     }
 
     updateSendButton() {
-        if (this.textarea.textContent.length === 0) {
+        if (this.textarea.childNodes.length === 0) {
             this.$el.querySelector(".send-button>.tgico-send").classList.add("hidden")
             this.$el.querySelector(".send-button>.tgico-microphone2").classList.remove("hidden")
         } else {
@@ -544,7 +554,7 @@ export class ChatInputComponent extends Component {
             this.$el.querySelector(".send-button>.tgico-microphone2").classList.add("hidden")
         }
 
-        if (this.textarea.textContent.length > 0) {
+        if (this.textarea.childNodes.length > 0) {
             this.textarea.classList.remove("empty")
         } else {
             this.textarea.classList.add("empty")
@@ -552,6 +562,7 @@ export class ChatInputComponent extends Component {
     }
 
     onInput(ev) {
-        this.updateSendButton()
+        this.updateSendButton();
+        replaceEmoji(this.textarea);
     }
 }
