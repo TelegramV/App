@@ -108,6 +108,14 @@
 
         .materials {
             margin-top: 60px;
+            position: relative;
+
+            .tab-selector {
+                position: sticky;
+                justify-content: space-around;
+                top: 0;
+                z-index: 5;
+            }
 
             .content-loading {
                 width: 100%;

@@ -32,7 +32,7 @@ export default class ComposerComponent extends Component {
 					<div class="emoji-wrapper">
 						<div class="emoji-table">
 							<div class="recent" data-category="recent"></div>
-							<div class="people selected" data-category="people"/>
+							<div class="people" data-category="people"/>
 							<div class="nature" data-category="nature"></div>
 							<div class="food" data-category="food"></div>
 							<div class="travel" data-category="travel"></div>
@@ -51,6 +51,16 @@ export default class ComposerComponent extends Component {
 							<div class="rp emoji-type-item" data-category="symbols" onClick={this._emojiTypeClick}><i class="tgico tgico-flag"/></div>
 						</div>
 					</div>
+					<div class="sticker-wrapper hidden">
+						<div class="sticker-table">
+							<div class="selected">
+
+							</div>
+						</div>
+						<div class="sticker-packs">
+							<div class="rp sticker-packs-item selected"><i class="tgico tgico-sending"/></div>
+						</div>
+					</div>
 				</div>
 			</div>
 			)
@@ -58,6 +68,7 @@ export default class ComposerComponent extends Component {
 
 	mounted() {
 		this.emojiPanel = this.$el.querySelector(".emoji-wrapper");
+		this.stickerPanel = this.$el.querySelector(".sticker-wrapper");
 		this.$el.querySelector(".emoji-types").childNodes.forEach(el => {
 			if(el.classList.contains("selected")) {
 				el.click() //TODO rewrite this to not imitate click
@@ -67,7 +78,25 @@ export default class ComposerComponent extends Component {
 
 	openEmoji() {
 		if(!this.emojiPanel) return;
+		this.stickerPanel.classList.add("hidden");
 		this.emojiPanel.classList.remove("hidden");
+	}
+
+	openStickers() {
+		if(!this.stickerPanel) return;
+		this.emojiPanel.classList.add("hidden");
+		this.stickerPanel.classList.remove("hidden");
+	}
+
+	loadRecentStickers() {
+		MTProto.invokeMethod("messages.getRecentStickers",{
+			flags:0,
+			hash:0
+		}).then(response => {
+			let packs = response.packs;
+			let stickers = response.stickers;
+			this.stickerPanel.querySelector(".selected");
+		})
 	}
 
 	_emojiTypeClick(ev) {

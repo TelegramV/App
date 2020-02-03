@@ -1,15 +1,10 @@
 .tab-selector {
     width: 100%;
     display: flex;
+    justify-content: center;
     margin-bottom: 5px;
     border-bottom: 1px solid $grey;
-
-    .header {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-        border-bottom: 1px $lightgrey solid;
-    }
+    background-color: white; 
 
     .item {
         padding: 12px;
@@ -18,8 +13,8 @@
         font-weight: 500;
         color: $darkgrey;
         text-align: center;
-        width: 100%;
         cursor: pointer;
+        box-sizing: border-box;
 
         span {
             position: relative;
