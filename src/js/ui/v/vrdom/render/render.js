@@ -4,6 +4,8 @@ import type {VRRenderProps} from "../types/types"
 import vrdom_renderComponentVNode from "./renderComponent"
 import renderElement from "./renderElement"
 import renderText from "./renderText"
+import vrdom_renderVComponentVNode from "./renderVComponent"
+import VComponentVRNode from "../component/VComponentVRNode"
 
 /**
  * Creates Real DOM Element from VRNode
@@ -15,6 +17,8 @@ function vrdom_render(node: VRNode | ComponentVRNode, props?: VRRenderProps): HT
 
     if (node instanceof ComponentVRNode) {
         return vrdom_renderComponentVNode(node)
+    } else if (node instanceof VComponentVRNode) {
+        return vrdom_renderVComponentVNode(node)
     }
 
     if (node instanceof VRNode) {

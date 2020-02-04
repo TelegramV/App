@@ -1,6 +1,7 @@
 import ComponentVRNode from "../ComponentVRNode"
 import vrdom_mount from "../mount"
 import Component from "../Component"
+import {VComponent} from "../component/VComponent"
 
 const patchComponentVRNode = ($node: Element, newNode: ComponentVRNode) => {
     if ($node.nodeType === Node.TEXT_NODE) {
@@ -8,6 +9,13 @@ const patchComponentVRNode = ($node: Element, newNode: ComponentVRNode) => {
     }
 
     if ($node.__component instanceof Component) {
+        if (!$node.__component.__.isPatchingItself) {
+            $node.__component.props = newNode.props
+            $node.__component.slot = newNode.slot
+
+            return $node.__component.__patch()
+        }
+    } else if ($node.__component instanceof VComponent) {
         if (!$node.__component.__.isPatchingItself) {
             $node.__component.props = newNode.props
             $node.__component.slot = newNode.slot

@@ -20,7 +20,7 @@ import vrdom_delete from "./delete"
 import VRDOM from "./VRDOM"
 
 /**
- * VRDOM Component.
+ * VRDOM Component. VERY LEGACY THING! BUT STILL WORKS!!!
  * Deprecated since {@link VComponent} is available.
  *
  * @deprecated

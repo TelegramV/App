@@ -2,6 +2,7 @@ import LoginPage from "../pages/login/nextlogin"
 import {MainPage} from "../pages/main/mainPage"
 import MTProto from "../../mtproto/external"
 import V from "../v/VFramework"
+import {NewComponentPage} from "../pages/tests/NewComponentTestPage"
 
 /**
  * @param {VFrameworkRouter} router
@@ -16,6 +17,12 @@ function AppRoutes(router) {
     router.route("/", "main", {
         h() {
             return MainPage()
+        }
+    })
+
+    router.route("/test", "test", {
+        h() {
+            return NewComponentPage()
         }
     })
 

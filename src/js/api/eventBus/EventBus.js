@@ -1,5 +1,6 @@
 export type BusEvent = {
     type: string,
+    bus: EventBus,
     [string]: any,
 }
 
@@ -18,7 +19,7 @@ export class EventBus {
     fire(type: string, props: Object) {
         const subscribers = this.subscribers.get(type)
 
-        const event: BusEvent = {type, ...props}
+        const event: BusEvent = {type, ...props, bus: this}
 
         if (subscribers) {
             for (const subscriber of subscribers) {
@@ -43,8 +44,19 @@ export class EventBus {
             subscribers = this.subscribers.get(type)
         }
 
-        // $FlowFixMe
         subscribers.add(callback)
+    }
+
+    /**
+     * @param type
+     * @param {function(event: BusEvent)} subscription
+     */
+    unsubscribe(type: any, subscription: BusEvent => any) {
+        this.subscribersAny.delete(subscription)
+
+        if (this.subscribers.has(type)) {
+            this.subscribers.get(type).delete(subscription)
+        }
     }
 
     /**
@@ -58,5 +70,9 @@ export class EventBus {
      */
     subscribeAny(callback: (BusEvent | Object) => any) {
         this.subscribersAny.add(callback)
+    }
+
+    condition(condition, type: string, callback: BusEvent => any) {
+        console.error(this, `[${type}] -> [${condition}] conditions are not implemented`)
     }
 }
