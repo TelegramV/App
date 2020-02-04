@@ -5,23 +5,27 @@ import V from "../VFramework"
 import Component from "./Component"
 import {VComponent} from "./component/VComponent"
 
-export function vrdom_mount_resolveComponentMounted($mounted: Element) {
-    if ($mounted.nodeType !== Node.TEXT_NODE && $mounted.__component) {
-        const component = $mounted.__component
+export function vrdom_resolveMount($mounted: Element) {
+    if ($mounted.nodeType !== Node.TEXT_NODE) {
+        if ($mounted.__component) {
+            const component = $mounted.__component
 
-        if (component instanceof Component) {
-            component.$el = $mounted
+            if (component instanceof Component) {
+                component.$el = $mounted
 
-            if (!component.__.mounted) {
-                component.__.mounted = true
-                component.__mounted()
-                component.mounted()
-                V.plugins.forEach(plugin => plugin.componentMounted(component))
+                if (!component.__.mounted) {
+                    component.__.mounted = true
+                    component.__mounted()
+                    component.mounted()
+                    V.plugins.forEach(plugin => plugin.componentMounted(component))
+                }
+            } else if (component instanceof VComponent) {
+                component.__mount($mounted)
+            } else {
+                console.error("component was not found. it means that there is a potential bug in the vrdom")
             }
-        } else if (component instanceof VComponent) {
-            component.__mount($mounted)
-        } else {
-            console.error("component was not found. it means that there is a potential bug in the vrdom")
+        } else if ($mounted.__ref && !$mounted.__ref.__component_ref) {
+            $mounted.__ref.$el = $mounted
         }
     }
 }
@@ -42,7 +46,7 @@ function vrdom_mount(node: VRNode, $el: Element | Node | Text, props?: VRRenderP
         V.plugins.forEach(plugin => plugin.elementMounted($mounted))
     }
 
-    vrdom_mount_resolveComponentMounted($mounted)
+    vrdom_resolveMount($mounted)
 
     return $mounted
 }

@@ -9,23 +9,24 @@ import type {BusEvent} from "../../../../../../api/eventBus/EventBus";
 
 class GroupedMessageComponent extends GeneralMessageComponent {
 
-    init() {
-        super.init()
-        this.reactive = {
-            message: this.message
-        }
+    reactive(R) {
+        super.reactive(R)
+
+        R.object(this.message)
+            .on("updateGrouped", this.onUpdateGrouped)
     }
 
     h() {
         const text = this.message.text.length > 0 ? <TextWrapperComponent message={this.message}/> : ""
 
         return (
-            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message} noPad showUsername={false} outerPad={text !== ""}>
+            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message} noPad showUsername={false}
+                                    outerPad={text !== ""}>
                 <div className="grouped">
                     {this.message.group && this.message.group.map(l => {
-                        if(l instanceof PhotoMessage) {
+                        if (l instanceof PhotoMessage) {
                             return <PhotoComponent photo={l.raw.media.photo}/>
-                        } else if(l instanceof VideoMessage) {
+                        } else if (l instanceof VideoMessage) {
                             return <VideoComponent video={l.raw.media.document}/>
                         } else {
                             console.log(l)
@@ -38,17 +39,8 @@ class GroupedMessageComponent extends GeneralMessageComponent {
         )
     }
 
-
-
-    reactiveChanged(key: string, value: any, event: BusEvent) {
-        super.reactiveChanged(key, value, event)
-        console.log("reactiveChanged", key, value, event)
-        if (key === "message") {
-            if (event.type === "updateGrouped") {
-                console.log("updateGrouped!", this.message.groupInitializer)
-                this.__patch()
-            }
-        }
+    onUpdateGrouped = (event: BusEvent) => {
+        this.__patch()
     }
 
 }

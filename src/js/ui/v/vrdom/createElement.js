@@ -18,7 +18,21 @@ function vrdom_createElement(tagName: VRTagName, props: VRNodeProps): VRNode | C
         } else if (tagName.prototype instanceof VComponent) {
             return new VComponentVRNode(tagName, {attrs: props.attrs, ref: props.attrs.ref}, props.children)
         } else {
-            return tagName({...props.attrs, slot: props.children})
+            if (props.ref && props.ref.__fragment_ref) {
+                props.ref.slot = props.children
+                props.ref.props = props.attrs
+                if (props.ref.fragment) {
+                    return props.ref.fragment({...props.attrs, slot: props.children})
+                } else {
+                    props.ref.fragment = tagName
+
+                    const node = tagName({...props.attrs, slot: props.children})
+                    node.attrs.ref = props.ref
+                    return node
+                }
+            } else {
+                return tagName({...props.attrs, slot: props.children})
+            }
         }
     }
 

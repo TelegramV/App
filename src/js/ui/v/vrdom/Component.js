@@ -218,6 +218,7 @@ class Component {
         this.__disableReactive()
         vrdom_delete(this.$el)
         this.$el = undefined
+        this.__.isDeletingItself = false
         V.mountedComponents.delete(this.identifier)
     }
 
@@ -236,6 +237,7 @@ class Component {
 
             if (this.patchRequest(rendered)) {
                 this.$el = VRDOM.patch(this.$el, rendered)
+                this.$el.__component = this
                 this.patched()
             }
 

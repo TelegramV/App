@@ -14,6 +14,11 @@ function vrdom_renderComponentVNode(componentVNode: ComponentVRNode) {
         slot: componentVNode.slot,
     })
 
+    if (componentVNode.props.ref && componentVNode.props.ref.__component_ref) {
+        componentVNode.props.ref.component = componentInstance
+    }
+
+
     const newId = componentInstance.identifier ? String(componentInstance.identifier) : String(componentVNode.ref ? componentVNode.ref : latestInstantiatedComponent++)
 
     componentInstance.identifier = newId
@@ -37,6 +42,7 @@ function vrdom_renderComponentVNode(componentVNode: ComponentVRNode) {
     const $node = vrdom_render(vNode)
 
     $node.__component = componentInstance
+    componentInstance.$el = $node
 
     return $node
 }

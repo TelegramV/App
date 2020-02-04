@@ -60,7 +60,7 @@ function registerAppEvents_bus_callbackCondition(component: VComponent, bus: Eve
 
 function registerAppEvents_bus_callbackCondition_subscribe(component: VComponent, bus: EventBus, condition: any, type: string, resolve: any) {
 
-    component.__registerAppEventResolve(bus, type, resolve, condition)
+    component.__registerAppEventCallbackResolve(bus, type, resolve, condition)
 
     return {
         on: (type: string, resolve: any) => registerAppEvents_bus_callbackCondition_subscribe(component, bus, condition, type, resolve)

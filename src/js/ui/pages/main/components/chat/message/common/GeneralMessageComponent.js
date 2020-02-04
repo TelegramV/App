@@ -1,12 +1,13 @@
-import Component from "../../../../../../v/vrdom/Component"
 import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 import type {BusEvent} from "../../../../../../../api/eventBus/EventBus"
-import {EventBus} from "../../../../../../../api/eventBus/EventBus"
 import type {Message} from "../../../../../../../api/messages/Message"
 import {ReplyFragment} from "./ReplyFragment"
 import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
+import {VComponent} from "../../../../../../v/vrdom/component/VComponent"
 
-class GeneralMessageComponent extends Component {
+class GeneralMessageComponent extends VComponent {
+
+    useProxyState = false
 
     message: Message
     prevReadStatus: boolean = false
@@ -18,12 +19,7 @@ class GeneralMessageComponent extends Component {
         this.intersectionObserver = this.props.intersectionObserver
         this.message = this.props.message
 
-        this.reactive = {
-            message: this.message
-        }
-
         this.prevReadStatus = this.message.isRead
-        this.appEvents.add(AppEvents.Dialogs.reactiveAnySingle(this.message.dialog).FireOnly)
     }
 
     mounted() {
@@ -34,21 +30,40 @@ class GeneralMessageComponent extends Component {
         }
     }
 
-    reactiveChanged(key: string, value: any, event: BusEvent) {
-        if (key === "message") {
-            if (event.type === "edit") {
-                this.messageOnEdit()
-            } else if (event.type === "replyToMessageFound") {
-                this.messageOnReplyFound()
-            } else if (event.type === "replyToMessageNotFound") {
-                this.messageOnReplyNotFound()
-            } else if (event.type === "forwardedNameOnlyFound" || event.type === "forwardedUserFound" || event.type === "forwardedChannelFound") {
-                this.messageOnForwardedFound()
-            }
+    appEvents(E) {
+        E.bus(AppEvents.Dialogs)
+            .on("deleteMessages", this.onMessagesDeleteEvent)
+            .on("deleteChannelMessages", this.onMessagesDeleteEvent)
+            .on("editMessage", this.messageOnEdit)
+            .on("updateReadOutboxMaxId", this.onReadOutboxMaxId)
+    }
+
+    /**
+     * @param {RORC} R
+     */
+    reactive(R) {
+        R.object(this.message)
+            .on("edit", this.messageOnEdit)
+            .on("replyToMessageFound", this.messageOnReplyFound)
+            .on("replyToMessageNotFound", this.messageOnReplyNotFound)
+            .on("forwardedNameOnlyFound", this.messageOnForwardedFound)
+            .on("forwardedChannelFound", this.messageOnForwardedFound)
+    }
+
+    onMessagesDeleteEvent = (event: BusEvent) => {
+        if (event.messages.indexOf(this.message.id) > -1) {
+            this.messageOnDelete()
         }
     }
 
-    messageOnReplyFound() {
+    onReadOutboxMaxId = (event: BusEvent) => {
+        if (this.message.isRead !== this.prevReadStatus && this.message.isOut) {
+            this.prevReadStatus = this.message.isRead
+            this.messageOnRead()
+        }
+    }
+
+    messageOnReplyFound = () => {
         if (this.__.mounted) {
             VRDOM.patch(
                 this.$el.querySelector(`#message-${this.message.id}-rpl`),
@@ -62,7 +77,7 @@ class GeneralMessageComponent extends Component {
         }
     }
 
-    messageOnReplyNotFound() {
+    messageOnReplyNotFound = () => {
         if (this.__.mounted) {
             VRDOM.patch(
                 this.$el.querySelector(`#message-${this.message.id}-rpl`),
@@ -75,7 +90,7 @@ class GeneralMessageComponent extends Component {
         }
     }
 
-    messageOnForwardedFound() {
+    messageOnForwardedFound = () => {
         if (this.__.mounted) {
             VRDOM.patch(
                 this.$el.querySelector(`#message-${this.message.id}-fwd`),
@@ -84,38 +99,16 @@ class GeneralMessageComponent extends Component {
         }
     }
 
-    messageOnEdit() {
+    messageOnEdit = () => {
         this.__patch()
     }
 
-    messageOnDelete() {
+    messageOnDelete = () => {
         this.__delete()
     }
 
-    messageOnRead() {
+    messageOnRead = () => {
         this.$el.classList.add("read")
-    }
-
-    eventFired(bus: EventBus, event: any): boolean {
-        if (bus === AppEvents.Dialogs) {
-            if ((event.type === "deleteMessages" || event.type === "deleteChannelMessages") && event.messages.indexOf(this.message.id) > -1) {
-                this.messageOnDelete()
-                return false
-            } else if (this.message === event.message) {
-                if (event.type === "editMessage") {
-                    this.messageOnEdit()
-                    return false
-                }
-            } else if (
-                event.type === "updateReadOutboxMaxId"
-            ) {
-                if (this.message.isRead !== this.prevReadStatus && this.message.isOut) {
-                    this.messageOnRead()
-                }
-            }
-        }
-
-        return true
     }
 
     destroy() {

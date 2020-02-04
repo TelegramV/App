@@ -15,15 +15,19 @@ function vrdom_renderVComponentVNode(vComponentVNode: VComponentVRNode) {
         slot: vComponentVNode.slot,
     })
 
+    if (vComponentVNode.attrs.ref && vComponentVNode.attrs.ref.__component_ref) {
+        vComponentVNode.attrs.ref.component = componentInstance
+    }
+
     let identifier
 
     if (componentInstance.identifier) {
-        identifier = componentInstance.identifier
+        identifier = String(componentInstance.identifier)
     } else if (vComponentVNode.identifier) {
         identifier = String(vComponentVNode.identifier)
         componentInstance.identifier = identifier
     } else {
-        identifier = latestInstantiatedComponent++
+        identifier = String(latestInstantiatedComponent++)
         componentInstance.identifier = identifier
     }
 

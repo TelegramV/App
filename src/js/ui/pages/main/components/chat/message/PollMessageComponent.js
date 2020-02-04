@@ -37,6 +37,11 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         }
     }
 
+    reactive(R) {
+        R.object(this.message)
+            .on("pollEdit", this.onPollEdit)
+    }
+
     h() {
         let classes = "poll" + (this.isVoted() ? " voted" : "");
         let type = this.quiz ? "Quiz" : this.public ? "Public poll" : "Anonymous poll";
@@ -52,7 +57,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         )
     }
 
-    _prepareFooter() {
+    _prepareFooter = () => {
         if(this.isVoted) {
             if(this.public) {
                 return <div class="action-button" onClick={this._actionClick}>Results</div>;
@@ -73,7 +78,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         this._applyPercents();
     }
 
-    isVoted() {
+    isVoted = () => {
         if (!this.results.results) return false;
         for (const result of this.results.results) {
             if (result.pFlags.chosen) return true;
@@ -81,27 +86,27 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         return false;
     }
 
-    cancelVote() {
+    cancelVote = () => {
 
     }
 
-    closeVoting() {
+    closeVoting = () => {
         MTProto.invokeMethod("messages.sendVote", {})
     }
 
-    addAnswer(option) {
+    addAnswer = (option) => {
         if (option == undefined) return;
         this.answers.push(Number.parseInt(option));
         if (!this.multiple) this.sendVote();
     }
 
-    cancelAnswer(option) {
+    cancelAnswer = (option) => {
         if (option == undefined) return;
         option = Number.parseInt(option);
         this.answers = this.answers.filter(item => (item !== option)); //delete element from array
     }
 
-    sendVote() {
+    sendVote = () => {
         if (this.answers.length == 0) return;
         let message = this.props.message;
         MTProto.invokeMethod("messages.sendVote", {
@@ -114,30 +119,27 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         });
     }
 
-    getWinningAnswer() {
+    getWinningAnswer = () => {
         if (!this.results.results) return undefined;
         let best = this.results.results[0];
         for (const result of this.results.results) {
             if (result.voters > best.voters) best = result;
         }
         return best;
-    }    
-
-    reactiveChanged(key: *, value: *, event: *) {
-        super.reactiveChanged(key, value, event)
-        if (event.type === "pollEdit") {
-            this.poll = this.props.message.raw.media.poll;
-            this.results = this.props.message.raw.media.results;
-            this._patchAnswers();
-        }
     }
 
-    _patchAnswers() {
+    onPollEdit = () => {
+        this.poll = this.props.message.raw.media.poll;
+        this.results = this.props.message.raw.media.results;
+        this._patchAnswers();
+    }
+
+    _patchAnswers = () => {
         this.__patch();
         setTimeout(this._applyPercents,0);
     }
 
-    _applyPercents() {
+    _applyPercents = () => {
         if(!this.isVoted()) return;
         let answers = this.$el.querySelectorAll(".answer");
         let most_voters = this.getWinningAnswer().voters;
@@ -153,7 +155,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         }
     }
 
-    _prepareAnswerBlock() {
+    _prepareAnswerBlock = () => {
         let answers = [];
         if (!this.isVoted()) {
             for (const answer of this.poll.answers) {
@@ -172,7 +174,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         return answers;
     }
 
-    _answerClick(event) {
+    _answerClick = (event) => {
         let option = event.currentTarget.getAttribute("option");
         let elem = event.currentTarget.querySelector("input[type=radio],input[type=checkbox]");
         elem.checked = !elem.checked;
@@ -185,7 +187,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         this._updateAction();
     }
 
-    _actionClick(event) {
+    _actionClick = (event) => {
         if (event.currentTarget.classList.contains("disabled")) return;
         if (!this.isVoted()) {
             this.sendVote();
@@ -194,7 +196,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         }
     }
 
-    _updateAction() {
+    _updateAction = () => {
         if (this.actionButton) {
             if (this.multiple && !this.isVoted()) {
                 if (this.answers.length > 0) {

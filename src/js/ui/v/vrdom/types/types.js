@@ -20,6 +20,7 @@ export type VRRenderProps = {
 }
 
 export type VRNodeProps = {
+    ref: Object,
     attrs: VRAttrs,
     events: VREvents,
     dangerouslySetInnerHTML: any | boolean,
@@ -57,6 +58,7 @@ export type VComponentMeta = {
     reactiveObjectContexts: Map<ReactiveObject, Map<string, BusEvent => any>>,
     reactiveCallbackContexts: Map<ReactiveObject, Map<string, BusEvent => any>>,
     appEventContexts: Map<EventBus, Map<string, BusEvent => any>>,
+    reactiveCallbackAppEventContexts: Map<string, Map<EventBus, Map<string, BusEvent => any>>>,
     intervals: Set<number>,
     timeouts: Set<number>,
     reactiveInited: boolean,

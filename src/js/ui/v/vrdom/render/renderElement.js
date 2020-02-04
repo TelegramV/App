@@ -48,13 +48,17 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
         for (let [k, v] of Object.entries(node.attrs)) {
             if (k === "value") {
                 $el.value = v
+            } else if (k === "ref" && !v.__component_ref) {
+                $el.__ref = v
             } else if (v !== undefined) {
                 $el.setAttribute(k, v)
             }
         }
     } else {
         for (let [k, v] of Object.entries(node.attrs)) {
-            if (v !== undefined) {
+            if (k === "ref" && !v.__component_ref) {
+                $el.__ref = v
+            } else if (v !== undefined) {
                 $el.setAttribute(k, v)
             }
         }

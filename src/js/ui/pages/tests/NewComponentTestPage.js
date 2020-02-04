@@ -50,7 +50,13 @@ const changeXRC = v => {
     xrsubscribers.forEach(s => s(XC))
 }
 
+const DateFragment = ({date, click}) => {
+    return <h1 onClick={click}>{date}</h1>
+}
+
 class NewComponent extends VComponent {
+
+    dateFragmentRef = VComponent.createFragmentRef()
 
     init() {
         this.rc = new NewReactiveObject()
@@ -67,10 +73,10 @@ class NewComponent extends VComponent {
             XR: XRCallback.FireOnly,
         }
 
-        this.withInterval(() => {
-            // console.log("1")
-            this.state.someValue = new Date().toISOString()
-        }, 100)
+        // this.withInterval(() => {
+        //     // console.log("1")
+        //     this.state.someValue = new Date().toISOString()
+        // }, 100)
     }
 
     appEvents(E) {
@@ -79,8 +85,8 @@ class NewComponent extends VComponent {
             .on("xEvent", this.onEvent)
 
         // E.bus(AppEvents.General)
-            // .callbackCondition("someCallback")
-            // .on("someEvent")
+        // .callbackCondition("someCallback")
+        // .on("someEvent")
     }
 
     reactive(R) {
@@ -95,15 +101,21 @@ class NewComponent extends VComponent {
     h() {
         return (
             <div>
-                <h1>V Component {this.state.someValue}</h1>
-                <input type="text" value={this.state.someValue}
-                       onInput={event => this.state.someValue = event.target.value}/>
-                <textarea onInput={event => this.state.someValue = event.target.value} value={this.state.someValue}/>
-                <button onClick={this.handleButtonClick}>Click</button>
-                <button onClick={() => this.state.someValue = Math.random()}>Random</button>
-                <button onClick={() => changeXC(Math.random() * 10)}>Change XC</button>
-                <button onClick={() => this.callbacks.XR.someProp = "Huh" + Math.random()}>Fire XRC</button>
-                {Array.from({length: 100}, () => <div>{this.state.someValue}</div>)}
+
+                <DateFragment click={() => {
+                    this.dateFragmentRef.patch({date: new Date()})
+                }} ref={this.dateFragmentRef} date={"no date"}/>
+
+
+                {/*<h1>V Component {this.state.someValue}</h1>*/}
+                {/*<input type="text" value={this.state.someValue}*/}
+                {/*       onInput={event => this.state.someValue = event.target.value}/>*/}
+                {/*<textarea onInput={event => this.state.someValue = event.target.value} value={this.state.someValue}/>*/}
+                {/*<button onClick={this.handleButtonClick}>Click</button>*/}
+                {/*<button onClick={() => this.state.someValue = Math.random()}>Random</button>*/}
+                {/*<button onClick={() => changeXC(Math.random() * 10)}>Change XC</button>*/}
+                {/*<button onClick={() => this.callbacks.XR.someProp = "Huh" + Math.random()}>Fire XRC</button>*/}
+                {/*{Array.from({length: 100}, () => <div>{this.state.someValue}</div>)}*/}
             </div>
         )
     }

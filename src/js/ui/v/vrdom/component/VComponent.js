@@ -46,6 +46,12 @@ export class VComponent {
          */
         reactiveCallbackObjectContexts: new Map(),
 
+
+        /**
+         * @type {Map<string, Map<EventBus, Map<string, function(BusEvent)>>>}
+         */
+        reactiveCallbackAppEventContexts: new Map(),
+
         /**
          * @type {Set<number>}
          */
@@ -64,6 +70,7 @@ export class VComponent {
 
     patchingStrategy: number = VRDOM.COMPONENT_PATCH_DEFAULT
 
+    useProxyState = true
     state: ComponentState = {}
     callbacks = {}
 
@@ -72,15 +79,12 @@ export class VComponent {
     props: VRAttrs = {}
     slot: VRSlot = undefined
 
-    refs: Map<string, VComponent>
-
     _$el: HTMLElement
 
     constructor(props: ComponentProps) {
         this.name = props.name || this.constructor.name
         this.props = props.props || {}
         this.slot = props.slot
-        this.refs = V.mountedComponents
     }
 
     set $el($el) {
@@ -154,8 +158,8 @@ export class VComponent {
         }
 
         this.$el = $el
-        this.mounted()
         this.__.mounted = true
+        this.mounted()
         V.plugins.forEach(plugin => plugin.componentMounted(this))
     }
 
@@ -175,6 +179,7 @@ export class VComponent {
         this.$el = undefined
         this.__.destroyed = true
         this.__.mounted = false
+        this.__.isDeletingItself = false
         V.mountedComponents.delete(this.identifier)
     }
 
@@ -194,6 +199,8 @@ export class VComponent {
                 } else {
                     this.$el = VRDOM.patch(this.$el, rendered)
                 }
+
+                this.$el.__component = this
 
                 this.patched()
             }
@@ -238,6 +245,11 @@ export class VComponent {
 
             this.__initState = this.__initState.bind(this)
             this.stateTransaction = this.stateTransaction.bind(this)
+
+            this.withInterval = this.withInterval.bind(this)
+            this.withTimeout = this.withTimeout.bind(this)
+            this.clearIntervals = this.clearIntervals.bind(this)
+            this.clearTimeouts = this.clearTimeouts.bind(this)
 
             this.init()
 
@@ -388,6 +400,23 @@ export class VComponent {
         }
     }
 
+    __registerAppEventCallbackResolve(bus: EventBus, type: string, resolve: (event: BusEvent) => any, callbackName: any) {
+        let callbackContext = this.__.reactiveCallbackAppEventContexts.get(callbackName)
+
+        if (!callbackContext) {
+            callbackContext = this.__.reactiveCallbackContexts.set(bus, new Map()).get(bus)
+            callbackContext.set(type, resolve)
+        } else {
+            callbackContext.set(type, resolve)
+        }
+
+        if (condition === null) {
+            bus.subscribe(type, resolve)
+        } else {
+            bus.condition(condition, type, resolve)
+        }
+    }
+
     __registerReactiveObjectCallbackResolve(key: string, type: string, resolve: (event: BusEvent) => any) {
         //
     }
@@ -396,11 +425,13 @@ export class VComponent {
     // State
 
     __initState() {
-        this.state = new Proxy(this.state, {
-            set: (target: ComponentState, p: string | number, value: any): boolean => {
-                return this.proxyStatePropertyChanged(target, p, value)
-            }
-        })
+        if (this.useProxyState) {
+            this.state = new Proxy(this.state, {
+                set: (target: ComponentState, p: string | number, value: any): boolean => {
+                    return this.proxyStatePropertyChanged(target, p, value)
+                }
+            })
+        }
     }
 
     stateTransaction(resolve) {
@@ -458,5 +489,47 @@ export class VComponent {
 
     clearTimeouts() {
         this.__.timeouts.forEach(handle => clearTimeout(handle))
+    }
+
+    // ref
+
+    static createRef() {
+        return {
+            __ref: true,
+            $el: undefined,
+        }
+    }
+
+    static createFragmentRef() {
+        return {
+            __fragment_ref: true,
+            $el: undefined,
+            fragment: undefined,
+            props: {},
+            slot: undefined,
+
+            // warning: fastpatch by default
+            patch(props, fast = true) {
+                if (this.$el) {
+
+                    Object.assign(this.props, props)
+
+                    if (fast) {
+                        this.$el = VRDOM.fastpatch(this.$el, this.fragment({...this.props, slot: this.slot}))
+                    } else {
+                        this.$el = VRDOM.patch(this.$el, this.fragment({...this.props, slot: this.slot}))
+                    }
+                } else {
+                    console.log("el not found", this)
+                }
+            }
+        }
+    }
+
+    static createComponentRef() {
+        return {
+            __component_ref: true,
+            component: undefined
+        }
     }
 }
