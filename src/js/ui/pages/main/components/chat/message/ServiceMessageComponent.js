@@ -12,19 +12,19 @@ class ServiceMessageComponent extends GeneralMessageComponent {
         )
     }
 
-    messageOnReplyFound() {
+    messageOnReplyFound = () => {
         //
     }
 
-    messageOnReplyNotFound() {
+    messageOnReplyNotFound = () => {
         //
     }
 
-    messageOnEdit() {
+    messageOnEdit = () => {
         // what?
     }
 
-    messageOnForwardedFound() {
+    messageOnForwardedFound = () => {
         //
     }
 }
