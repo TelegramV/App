@@ -455,6 +455,11 @@
                     &.tgico-play:before {
                         margin-left: 5px;
                     }
+
+                    &.has-background {
+                        background-position: center;
+                        background-size: cover;
+                    }
                 }
 
                 .progress-circular {
