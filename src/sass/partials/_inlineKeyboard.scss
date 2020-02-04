@@ -1,20 +1,30 @@
 .inline-keyboard, .keyboard-markup {
   display: flex;
   flex-direction: column;
-  margin-top: 3px;
+  grid-area: keyboard;
 
   .row {
     display: flex;
     flex-direction: row;
     margin-top: 5px;
 
+    &:last-child {
+      .button:first-child {
+        border-bottom-left-radius: 12px;
+      }
+
+      .button:last-child {
+        border-bottom-right-radius: 12px;
+      }
+    }
+
     .button {
-      background-color: rgba($darkgrey, 0.4);
+      background-color: rgba(0, 0, 0, 0.20);
       width: 100%;
       text-align: center;
       padding: 10px;
       border-radius: 6px;
-      margin-right: 8px;
+      margin-right: 5px;
       cursor: pointer;
       color: white;
       font-size: 15px;
@@ -22,7 +32,8 @@
       display: flex;
       justify-content: center;
       align-content: center;
-      flex-direction: column;
+      flex-direction: row;
+      flex-wrap: wrap;
 
       transition: anim(background-color);
 
@@ -73,7 +84,7 @@
       }
 
       &:hover {
-        background-color: rgba($darkgrey, 0.6);
+        background-color: rgba(0, 0, 0, 0.30);
       }
     }
   }

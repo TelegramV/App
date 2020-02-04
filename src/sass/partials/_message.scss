@@ -31,16 +31,17 @@
     }
 
     .bubble-outer {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-areas:
+                "avatar bubble"
+                "_ keyboard";
         filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
 
-        &.in {
-            left: -8px;
-            position: relative;
-        }
+
+
 
         .bubble {
+            grid-area: bubble;
             max-width: 480px;
             border-radius: 12px;
             //box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.15);
@@ -778,14 +779,28 @@
             }
         }
 
+        &.in .bubble-outer {
+            .inline-keyboard {
+                margin-left: 9px;
+            }
+        }
+
+
+        &.out .bubble-outer {
+            .inline-keyboard {
+                margin-right: 9px;
+                margin-left: 0;
+            }
+        }
+
         .avatar {
+            grid-area: avatar;
             filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
 
             height: 34px;
             width: 34px;
             flex-shrink: 0;
             border-radius: 100%;
-            margin-right: 5px;
 
             display: flex;
             align-items: center;
