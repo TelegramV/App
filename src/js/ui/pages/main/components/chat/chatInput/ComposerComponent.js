@@ -2,6 +2,7 @@ import Component from "../../../../../v/vrdom/Component";
 import VRDOM from "../../../../../v/vrdom/VRDOM";
 import TabSelectorComponent from "../../basic/TabSelectorComponent"
 import StickerComponent from "../message/common/StickerComponent"
+import {VideoComponent} from "../../basic/videoComponent"
 import {ChatInputManager} from "./ChatInputComponent"
 import {emojiCategories, replaceEmoji} from "../../../../../utils/emoji"
 import {StickerManager} from "../../../../../../api/stickersManager"
@@ -68,6 +69,11 @@ export default class ComposerComponent extends Component {
 							<div class="rp sticker-packs-item selected"><i class="tgico tgico-sending"/></div>
 						</div>
 					</div>
+					<div class="gif-wrapper hidden">
+						<div class="gif-masonry scrollable">
+
+						</div>
+					</div>
 				</div>
 			</div>
 			)
@@ -76,6 +82,7 @@ export default class ComposerComponent extends Component {
 	mounted() {
 		this.emojiPanel = this.$el.querySelector(".emoji-wrapper");
 		this.stickerPanel = this.$el.querySelector(".sticker-wrapper");
+		this.gifPanel = this.$el.querySelector(".gif-wrapper");
 		this.$el.querySelector(".emoji-types").childNodes.forEach(el => {
 			if(el.classList.contains("selected")) {
 				el.click() //TODO rewrite this to not imitate click
@@ -87,6 +94,9 @@ export default class ComposerComponent extends Component {
 		this.stickerPanel.querySelector(".selected").childNodes.forEach(node => {
 			if(node.id) lottie.pause(node.id);
 		})
+		this.gifPanel.querySelectorAll("video").forEach(video => {
+			video.pause();
+		})
 		this.paused = true;
 	}
 
@@ -95,11 +105,16 @@ export default class ComposerComponent extends Component {
 		this.stickerPanel.querySelector(".selected").childNodes.forEach(node => {
 			if(node.id) lottie.play(node.id);
 		})
+		this.gifPanel.querySelectorAll("video").forEach(video => {
+			video.play();
+		})
+		this.paused = false;
 	}
 
 	openEmoji() {
 		if(!this.emojiPanel) return;
-		this.stickerPanel.classList.add("hidden");
+		this._closeStickers();
+		this.gifPanel.classList.add("hidden");
 		this.emojiPanel.classList.remove("hidden");
 	}
 
@@ -110,11 +125,24 @@ export default class ComposerComponent extends Component {
 		})
 		this.loadInstalledStickerSets();
 		this.emojiPanel.classList.add("hidden");
+		this.gifPanel.classList.add("hidden");
 		this.stickerPanel.classList.remove("hidden");
 	}
 
-	openGIF() {
+	_closeStickers() {
+		this.stickerPanel.classList.add("hidden");
+		let stickerTable = this.stickerPanel.querySelector(".selected");
+		stickerTable.childNodes.forEach(node => {
+			if(node.id) lottie.destroy(node.id);
+		})
+		while(stickerTable.firstChild) stickerTable.removeChild(stickerTable.firstChild);
+	}
 
+	openGIF() {
+		this.emojiPanel.classList.add("hidden");
+		this._closeStickers();
+		this.gifPanel.classList.remove("hidden");
+		this.loadSavedGifs();
 	}
 
 	_emojiTypeClick(ev) {
@@ -144,6 +172,7 @@ export default class ComposerComponent extends Component {
 	}
 
 	loadInstalledStickerSets() {
+		if(this.stickersInit) return;
 		StickerManager.getInstalledStickerSets().then(async sets => {
 			let container = this.stickerPanel.querySelector(".sticker-packs");
 			for(const set of sets) {
@@ -155,6 +184,7 @@ export default class ComposerComponent extends Component {
 				}
 			}
 		})
+		this.stickersInit = true;
 	}
 
 	_stickerPackClick(ev) {
@@ -196,10 +226,34 @@ export default class ComposerComponent extends Component {
 	_stickerClick(ev) {
 		let ref = ev.currentTarget.getAttribute("data-component-id");
 		if(!ref) return;
-		console.log(ref)
 		let sticker = this.refs.get(ref).sticker;
-		console.log(sticker)
-		AppSelectedPeer.Current.api.sendSticker(sticker);
+		AppSelectedPeer.Current.api.sendExistingMedia(sticker);
+	}
+
+	loadSavedGifs() {
+		let masonry = this.gifPanel.querySelector(".gif-masonry");
+		MTProto.invokeMethod("messages.getSavedGifs").then(response => {
+			for(const gif of response.gifs) {
+				let size = FileAPI.getMaxSize(gif);
+				const height = 100;
+				let width = Math.max((size.w/size.h)*height, 40);
+				VRDOM.append(<div class="masonry-item" css-width={width+"px"}><VideoComponent video={gif}/></div>, masonry);
+			}
+			this._bindGifClickEvents();
+		})
+	}
+
+	_bindGifClickEvents() {
+		this.gifPanel.querySelector(".gif-masonry").childNodes.forEach(node => {
+			node.firstChild.addEventListener("click", this._gifClick);
+		})
+	}
+
+	_gifClick(ev) {
+		let ref = ev.currentTarget.getAttribute("data-component-id");
+		if(!ref) return;
+		let gif = this.refs.get(ref).props.object;
+		AppSelectedPeer.Current.api.sendExistingMedia(gif);
 	}
 }
 
