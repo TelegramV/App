@@ -14,6 +14,7 @@ class ChatInfoAvatarComponent extends VComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
+            // .callbackCondition("peer")
             .on("updatePhoto", this.peersUpdatePhoto)
             .on("updatePhotoSmall", this.peersUpdatePhoto)
     }
@@ -46,6 +47,7 @@ class ChatInfoAvatarComponent extends VComponent {
                 </div>
             )
         }
+
         if (hasAvatar) {
             return (
                 <div onClick={this.openPeerInfo}

@@ -60,6 +60,7 @@ export type VComponentMeta = {
     intervals: Set<number>,
     timeouts: Set<number>,
     reactiveInited: boolean,
+    stateInTransactionMode: boolean,
 }
 
 export type ComponentProps = {

@@ -1,3 +1,4 @@
+import type {BusEvent} from "./EventBus"
 import {EventBus} from "./EventBus"
 import ReactiveEvent from "../../ui/v/reactive/ReactiveEvent"
 
@@ -6,7 +7,7 @@ export class PeersEventBus extends EventBus {
         super(props)
 
         /**
-         * @type {Map<Peer, Set<function(*)>>}
+         * @type {Map<Peer, Map<string, Set<function(*)>>>}
          * @private
          */
         this._singleSubscribers = new Map()
@@ -33,13 +34,22 @@ export class PeersEventBus extends EventBus {
     fire(type, event) {
         if (event.peer) {
             if (this._singleSubscribers.has(event.peer)) {
-                this._singleSubscribers
-                    .get(event.peer)
-                    .forEach(s => s({
+                const single = this._singleSubscribers.get(event.peer)
+
+                single.get("*").forEach(s => s({
+                    type,
+                    ...event,
+                    bus: this
+                }))
+
+                if (single.has(type)) {
+                    single.get(type).forEach(s => s({
                         type,
                         ...event,
                         bus: this
                     }))
+                }
+
             }
 
             this._reactiveAnySubscribers
@@ -84,14 +94,38 @@ export class PeersEventBus extends EventBus {
      */
     subscribeAnySingle(peer, callback) {
         if (!this._singleSubscribers.has(peer)) {
-            this._singleSubscribers.set(peer, new Set())
+            this._singleSubscribers.set(peer, new Map([
+                ["*", new Set()]
+            ]))
         }
 
-        this._singleSubscribers.get(peer).add(callback)
+        this._singleSubscribers.get(peer).get("*").add(callback)
+    }
+
+    /**
+     * @param {Peer} peer
+     * @param type
+     * @param {function(Peer)} callback
+     */
+    subscribeSingle(peer, type, callback) {
+        let single = this._singleSubscribers.get(peer)
+
+        if (!single) {
+            single.set(peer, new Map([
+                ["*", new Set()],
+                [type, new Set()]
+            ]))
+        } else if (!single.has(type)) {
+            single.set(type, new Set())
+        }
+
+        this._singleSubscribers.get(peer).get(type).add(callback)
     }
 
     /**
      * @return {{Default: *, FireOnly: *, PatchOnly: *}}
+     *
+     * @deprecated
      */
     reactiveAny() {
         return ReactiveEvent(this, resolve => {
@@ -100,28 +134,6 @@ export class PeersEventBus extends EventBus {
             return "*"
         }, resolve => {
             this._reactiveAnySubscribers.delete(resolve)
-        })
-    }
-
-    /**
-     * @param {Peer} peer
-     * @return {{Default: *, FireOnly: *, PatchOnly: *}}
-     */
-    reactiveAnySingle(peer) {
-        return ReactiveEvent(this, resolve => {
-            if (!this._reactiveSingleAnySubscribers.has(peer)) {
-                this._reactiveSingleAnySubscribers.set(peer, new Set())
-            }
-
-            this._reactiveSingleAnySubscribers.get(peer).add(resolve)
-
-            return "*"
-        }, resolve => {
-            if (this._reactiveSingleAnySubscribers.has(peer)) {
-                this._reactiveSingleAnySubscribers.get(peer).delete(resolve)
-            } else {
-                console.error("BUG: peer reactiveAnySingle")
-            }
         })
     }
 
@@ -162,5 +174,9 @@ export class PeersEventBus extends EventBus {
                 console.error("BUG: reactiveOnlySingle no peer")
             }
         })
+    }
+
+    condition(condition, type: string, callback: BusEvent => any) {
+        this.subscribeSingle(condition, type, callback)
     }
 }

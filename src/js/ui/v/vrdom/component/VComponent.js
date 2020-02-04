@@ -56,23 +56,25 @@ export class VComponent {
          */
         timeouts: new Set(),
 
+        /**
+         * @type {boolean}
+         */
+        stateInTransactionMode: false,
     }
+
+    patchingStrategy: number = VRDOM.COMPONENT_PATCH_DEFAULT
+
+    state: ComponentState = {}
+    callbacks = {}
 
     name: string
     identifier: string
     props: VRAttrs = {}
     slot: VRSlot = undefined
 
-    state: ComponentState = {}
-    callbacks: {| [key: string]: any |} = {}
-
     refs: Map<string, VComponent>
 
     _$el: HTMLElement
-
-    patchingStrategy: number = VRDOM.COMPONENT_PATCH_DEFAULT
-
-    stateInTransactionMode: boolean = false
 
     constructor(props: ComponentProps) {
         this.name = props.name || this.constructor.name
@@ -122,8 +124,12 @@ export class VComponent {
 
     }
 
-    // do not call this thing manually
-    reactive(R: RORC) {
+    /**
+     * do not call this thing manually
+     *
+     * @param {RORC} R
+     */
+    reactive(R) {
 
     }
 
@@ -398,22 +404,22 @@ export class VComponent {
     }
 
     stateTransaction(resolve) {
-        this.stateInTransactionMode = true
+        this.__.stateInTransactionMode = true
         resolve.bind(this)(this.state)
-        this.stateInTransactionMode = false
+        this.__.stateInTransactionMode = false
         this.stateChanged()
     }
 
     setState(data) {
         let stateWasChanged = false
-        this.stateInTransactionMode = true
+        this.__.stateInTransactionMode = true
         for (const [k, v] of Object.entries(data)) {
             if (this.state[k] !== v) {
                 this.state[k] = v
                 stateWasChanged = true
             }
         }
-        this.stateInTransactionMode = false
+        this.__.stateInTransactionMode = false
         if (stateWasChanged) {
             this.stateChanged()
         }
@@ -422,7 +428,7 @@ export class VComponent {
     proxyStatePropertyChanged(target, key, value) {
         if (target[key] !== value) {
             target[key] = value
-            if (!this.stateInTransactionMode) {
+            if (!this.__.stateInTransactionMode) {
                 this.stateChanged({target, key, value})
             }
             return true

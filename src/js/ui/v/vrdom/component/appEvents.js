@@ -29,6 +29,7 @@ export function registerAppEvents(component: VComponent): AE {
 function registerAppEvents_bus(component: VComponent, bus: EventBus) {
     return {
         condition: (condition: any) => registerAppEvents_bus_condition(component, bus, condition),
+        callbackCondition: (callbackName: any) => registerAppEvents_bus_callbackCondition(component, bus, callbackName),
         on: (type: string, resolve: any) => registerAppEvents_bus_condition_subscribe(component, bus, null, type, resolve)
     }
 }
@@ -45,5 +46,23 @@ function registerAppEvents_bus_condition_subscribe(component: VComponent, bus: E
 
     return {
         on: (type: string, resolve: any) => registerAppEvents_bus_condition_subscribe(component, bus, condition, type, resolve)
+    }
+}
+
+
+// callbackCondition
+
+function registerAppEvents_bus_callbackCondition(component: VComponent, bus: EventBus, condition: any) {
+    return {
+        on: (type: string, resolve: any) => registerAppEvents_bus_callbackCondition_subscribe(component, bus, condition, type, resolve)
+    }
+}
+
+function registerAppEvents_bus_callbackCondition_subscribe(component: VComponent, bus: EventBus, condition: any, type: string, resolve: any) {
+
+    component.__registerAppEventResolve(bus, type, resolve, condition)
+
+    return {
+        on: (type: string, resolve: any) => registerAppEvents_bus_callbackCondition_subscribe(component, bus, condition, type, resolve)
     }
 }
