@@ -17,19 +17,23 @@ class GroupedMessageComponent extends GeneralMessageComponent {
     }
 
     h() {
+        const text = this.message.text.length > 0 ? <TextWrapperComponent message={this.message}/> : ""
+
         return (
-            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message} showAvatar={this.showAvatar}>
-                {this.message.group && this.message.group.map(l => {
-                    if(l instanceof PhotoMessage) {
-                        return <PhotoComponent photo={l.raw.media.photo}/>
-                    } else if(l instanceof VideoMessage) {
-                        return <VideoComponent video={l.raw.media.document}/>
-                    } else {
-                        console.log(l)
-                        debugger;
-                    }
-                })}
-                <TextWrapperComponent message={this.message}/>
+            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message} noPad showUsername={false} outerPad={text !== ""}>
+                <div className="grouped">
+                    {this.message.group && this.message.group.map(l => {
+                        if(l instanceof PhotoMessage) {
+                            return <PhotoComponent photo={l.raw.media.photo}/>
+                        } else if(l instanceof VideoMessage) {
+                            return <VideoComponent video={l.raw.media.document}/>
+                        } else {
+                            console.log(l)
+                            debugger;
+                        }
+                    })}
+                </div>
+                {text}
             </MessageWrapperFragment>
         )
     }
