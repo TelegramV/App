@@ -4,6 +4,8 @@ import TabSelectorComponent from "../../basic/TabSelectorComponent"
 import StickerComponent from "../message/common/StickerComponent"
 import {ChatInputManager} from "./ChatInputComponent"
 import {emojiCategories, replaceEmoji} from "../../../../../utils/emoji"
+import {StickerManager} from "../../../../../../api/stickersManager"
+import {FileAPI} from "../../../../../../api/fileAPI"
 import MTProto from "../../../../../../mtproto/external"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import lottie from "lottie-web"
@@ -106,6 +108,7 @@ export default class ComposerComponent extends Component {
 		this.loadRecentStickers().then(_ => {
 			this._bindStickerClickEvents();
 		})
+		this.loadInstalledStickerSets();
 		this.emojiPanel.classList.add("hidden");
 		this.stickerPanel.classList.remove("hidden");
 	}
@@ -140,8 +143,38 @@ export default class ComposerComponent extends Component {
 		ChatInputManager.appendText(emoji.alt);
 	}
 
+	loadInstalledStickerSets() {
+		StickerManager.getInstalledStickerSets().then(async sets => {
+			let container = this.stickerPanel.querySelector(".sticker-packs");
+			for(const set of sets) {
+				if(set.set.thumb) {
+					//download thumb
+				} else { //first sticker
+					let url = await FileAPI.getThumb(set.documents[0], "min");
+					VRDOM.append(<StickerSetItemFragment setId={set.set.id} url={url} click={this._stickerPackClick.bind(this)}/>, container);
+				}
+			}
+		})
+	}
+
+	_stickerPackClick(ev) {
+		let id = ev.currentTarget.getAttribute("set-id");
+		if(!id) return;
+		this.setStickerSet(id);
+	}
+
+	setStickerSet(id) {
+		let table = this.stickerPanel.querySelector(".selected");
+		while(table.firstChild) table.removeChild(table.firstChild);
+		let set = StickerManager.getCachedStickerSet(id);
+		for(const sticker of set.documents) {
+			VRDOM.append(<StickerComponent width={75} sticker={sticker}/>, table);
+		}
+		this._bindStickerClickEvents();
+	}
+
 	loadRecentStickers() {
-		return MTProto.invokeMethod("messages.getRecentStickers",{
+		return MTProto.invokeMethod("messages.getRecentStickers", {
 			flags:0,
 			hash:0
 		}).then(response => {
@@ -168,4 +201,10 @@ export default class ComposerComponent extends Component {
 		console.log(sticker)
 		AppSelectedPeer.Current.api.sendSticker(sticker);
 	}
+}
+
+const StickerSetItemFragment = ({setId, url, click}) => {
+	return (
+		<div class="sticker-packs-item" set-id={setId} onClick={click}><img src={url}/></div>
+		)
 }

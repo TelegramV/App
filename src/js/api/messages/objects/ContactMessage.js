@@ -5,7 +5,7 @@ import {MessageType} from "../Message"
 
 export class ContactMessage extends AbstractMessage {
 
-    type = MessageType.AUDIO
+    type = MessageType.CONTACT
 
     show() {
         super.show()

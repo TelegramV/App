@@ -110,9 +110,11 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
                  onDblClick={doubleClickHandler}
                  data-peer={`${message.from.type}-${message.from.id}`}>
 
-                <MessageAvatarComponent id={`message-${message.id}-avatar`} show={showAvatar} message={message}/>
 
                 <div className={wrapOuter}>
+                    <MessageAvatarComponent id={`message-${message.id}-avatar`} show={showAvatar}
+                                            message={message}/>
+
                     <div className={wrapClasses}>
 
                         <ReplyToMessageFragment message={message}/>
@@ -126,6 +128,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
 
                     {inlineKeyboard}
                 </div>
+
             </div>
         )
     }
