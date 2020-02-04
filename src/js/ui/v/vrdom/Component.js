@@ -20,7 +20,10 @@ import vrdom_delete from "./delete"
 import VRDOM from "./VRDOM"
 
 /**
- * V Component
+ * VRDOM Component.
+ * Deprecated since {@link VComponent} is available.
+ *
+ * @deprecated
  */
 class Component {
     __: ComponentMeta = Object.assign(Object.create(null), {
@@ -29,6 +32,7 @@ class Component {
         destroyed: false,
         created: false,
         isPatchingItself: false,
+        isDeletingItself: false,
 
         reactiveContexts: new Map(),
 
@@ -209,9 +213,11 @@ class Component {
     // deletes component completely
     // do not override this if there is no critical reason
     __delete() {
+        this.__.isDeletingItself = true
         this.destroy()
         this.__disableReactive()
         vrdom_delete(this.$el)
+        this.$el = undefined
         V.mountedComponents.delete(this.identifier)
     }
 

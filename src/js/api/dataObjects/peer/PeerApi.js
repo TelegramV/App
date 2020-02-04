@@ -158,4 +158,24 @@ export class PeerApi {
             })
         })
     }
+
+    sendSticker(sticker) {
+        MTProto.invokeMethod("messages.sendMedia", {
+                peer: this._peer.inputPeer,
+                message: "",
+                media: {
+                    _: "inputMediaDocument",
+                    flags: 0,
+                    id: {
+                        _: "inputDocument",
+                        id: sticker.id,
+                        access_hash: sticker.access_hash,
+                        file_reference: sticker.file_reference,
+                    }
+                },
+                random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+            }).then(response => {
+                MTProto.UpdatesManager.process(response)
+            })
+    }
 }

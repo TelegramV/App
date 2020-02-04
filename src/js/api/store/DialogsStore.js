@@ -48,6 +48,21 @@ class DialogsMapStore extends MappedStore {
     }
 
     /**
+     * @param folderId
+     */
+    getAllInFolder(folderId) {
+        const folder = []
+
+        this.data.forEach(type => type.forEach(dialog => {
+            if (dialog.folderId === folderId) {
+                folder.push(dialog)
+            }
+        }))
+
+        return folder
+    }
+
+    /**
      * @param {Dialog} dialog
      * @return {this}
      */

@@ -19,7 +19,8 @@ export class ChatInputComponent extends Component {
         super(props);
         ChatInputManager = this
         this.state = {
-            reply: null
+            reply: null,
+            attachments: []
         }
     }
 
@@ -29,7 +30,7 @@ export class ChatInputComponent extends Component {
 
     h() {
         return <div className="chat-input-wrapper">
-            <ComposerComponent mouseEnter={this.mouseEnterComposer} mouseLeave={this.mouseLeaveComposer}/>
+            <ComposerComponent mouseEnter={this.mouseEnterComposer} mouseLeave={this.mouseLeaveComposer} ref="composer"/>
             <div className="chat-input">
 
                 <div className="input-and-keyboard-wrapper">
@@ -229,6 +230,7 @@ export class ChatInputComponent extends Component {
     }
 
     mouseEnterEmoji() {
+        this.refs.get("composer").onShow();
         this.composer.classList.add("visible");
         this.hideComposer = false;
     }
@@ -240,7 +242,10 @@ export class ChatInputComponent extends Component {
 
     planComposerClose() {
         setTimeout(() => {
-            if (this.hideComposer) this.composer.classList.remove("visible");
+            if (this.hideComposer) {
+                this.composer.classList.remove("visible");
+                this.refs.get("composer").onHide();
+            }
         }, 250);
     }
 
