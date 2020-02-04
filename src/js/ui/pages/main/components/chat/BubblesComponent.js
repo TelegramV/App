@@ -1,7 +1,7 @@
 import AppEvents from "../../../../../api/eventBus/AppEvents"
 import {isElementInViewport} from "../../../../utils/index"
 
-import MessageComponent from "./../../messages/newMessage"
+import MessageComponent from "./MessageComponent"
 import Component from "../../../../v/vrdom/Component"
 import VRDOM from "../../../../v/vrdom/VRDOM"
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
