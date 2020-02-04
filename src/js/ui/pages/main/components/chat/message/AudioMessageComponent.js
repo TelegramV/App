@@ -8,7 +8,6 @@ class AudioMessageComponent extends AudioComponent {
 
 	constructor(props) {
 		super(props);
-		console.log(this.message.raw.media)
 		let attrs = this.message.raw.media.document.attributes;
 		this.meta = {};
 
@@ -16,7 +15,7 @@ class AudioMessageComponent extends AudioComponent {
 			if(attr._=="documentAttributeAudio") {
 				this.meta = {
 					title: attr.title,
-					artist: attr.performer
+					artist: attr.performer || " "
 				}
 			}
 			if(attr._=="documentAttributeFilename") {
@@ -34,7 +33,7 @@ class AudioMessageComponent extends AudioComponent {
 		if(file.thumbs) {
 			FileAPI.getThumb(file, "max").then(l => {
 				// Tint
-				this.$el.querySelector(".play").style.background = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${l})`
+				this.$el.querySelector(".play").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${l})`
 				this.thumb = l
 			})
 		}
