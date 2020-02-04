@@ -428,6 +428,19 @@
           }
         }
       }
+      .sticker-packs {
+        overflow-x: auto;
+        justify-content: start;
+        .sticker-packs-item {
+          display: flex;
+          align-items: center;
+          flex-shrink: 0;
+          margin: 0 2px;
+          img {
+            width: 35px;
+          }
+        }
+      }
     }
   }
 }
