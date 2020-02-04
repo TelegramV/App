@@ -103,6 +103,9 @@ export class FileAPI {
             return URL.createObjectURL(blob)
         }).catch(error => {
             return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
+                if(!response) {
+                    return ""
+                }
                 const blob = new Blob(new Array(response.bytes), {type: 'application/jpeg'})
 
                 AppCache.put("peerAvatars", file.volume_id + "_" + file.local_id, blob).catch(error => {
@@ -124,7 +127,7 @@ export class FileAPI {
             return video
         }
 
-        return (file.sizes || file.thumbs).reduce(function (prev, current) {
+        return (file.sizes || file.thumbs).filter(l => l.type !== "i").reduce(function (prev, current) {
             return (prev.w > current.w) ? prev : current
         })
     }
@@ -135,7 +138,7 @@ export class FileAPI {
             return video
         }
 
-        return (file.sizes || file.thumbs).reduce(function (prev, current) {
+        return (file.sizes || file.thumbs).filter(l => l.type !== "i").reduce(function (prev, current) {
             return (prev.w < current.w) ? prev : current
         })
     }
@@ -179,54 +182,113 @@ export class FileAPI {
         }
     }
 
-    static getFile(file, thumb_size = "", onProgress = undefined) {
-
-        const key = Bytes.asHex(file.file_reference)
-
-        return AppCache.get("files", key).then(blob => {
+    static tryCache(file) {
+        return AppCache.get("files", Bytes.asHex(file.file_reference)).then(blob => {
             return URL.createObjectURL(blob)
-        }).catch(error => {
-            return new Promise(async (resolve, reject) => {
-                const parts = []
-                let offset = 0
-                if (thumb_size !== "" && file.sizes) {
-                    const size = file.sizes.find(l => l.type === thumb_size)
-                    if (!size) throw new Error("Thumb not found")
-                    file.size = size.size
-                }
-                if (!file.size) throw new Error("No size specified")
+        })
+    }
 
-                while (offset < file.size) {
-                    if (onProgress && !onProgress(offset, file.size)) {
-                        reject("Cancelled by user")
-                        return
-                    }
-                    let response = await this.getFileLocation({
-                        _: this.getInputName(file),
-                        id: file.id,
-                        access_hash: file.access_hash,
-                        file_reference: file.file_reference,
-                        thumb_size: thumb_size
-                    }, file.dc_id, offset)
+    static putCache(file, blob) {
+        AppCache.put("files", Bytes.asHex(file.file_reference), blob).catch(error => {
+            //
+        })
+    }
 
-                    offset += response.bytes.length
-                    parts.push(response.bytes)
-                }
+    static getAllParts(file, size, thumb_size, onProgress = undefined) {
+        return new Promise(async (resolve, reject) => {
+            let offset = 0
+            const parts = []
 
-                if (onProgress && !onProgress(offset, file.size)) {
-                    reject("Cancelled by user [file downloaded tho]")
+            while (offset < size) {
+                if (onProgress && !onProgress(offset, size)) {
+                    reject("Cancelled by user")
                     return
                 }
+                let response = await this.getFileLocation({
+                    _: this.getInputName(file),
+                    id: file.id,
+                    access_hash: file.access_hash,
+                    file_reference: file.file_reference,
+                    thumb_size: thumb_size
+                }, file.dc_id, offset)
 
-                const type = file.mime_type ? file.mime_type : (file._ === "photo" ? 'application/jpeg' : 'octec/stream')
-                const blob = new Blob(parts, {type: type})
-                AppCache.put("files", key, blob).catch(error => {
-                    //
-                })
+                if(!response.bytes) {
+                    console.error("Fatal error while loading part", response, file, offset, size)
+                }
 
-                resolve(URL.createObjectURL(blob))
-            })
+                offset += response.bytes.length
+                parts.push(response.bytes)
+            }
+
+            if (onProgress && !onProgress(offset, size)) {
+                reject("Cancelled by user [file downloaded tho]")
+                return
+            }
+            resolve(parts)
         })
+    }
+
+    static createBlobFromParts(file, mime, parts) {
+        const blob = new Blob(parts, {type: mime})
+        this.putCache(file, blob)
+
+        return URL.createObjectURL(blob)
+    }
+
+    static parseThumbSize(file, thumb_size) {
+        if(thumb_size === "max") {
+            return FileAPI.getMaxSize(file).type
+        }
+        if(thumb_size === "min") {
+            return FileAPI.getMinSize(file).type
+        }
+        return thumb_size
+    }
+
+    static getThumb(file, thumb_size = "", onProgress = undefined) {
+        return this.tryCache(file).catch(async _ => {
+            if(!file.thumbs) throw new Error("No thumbs specified for file", file)
+
+            thumb_size = this.parseThumbSize(file, thumb_size)
+            const size = file.thumbs.find(l => l.type === thumb_size).size
+
+            return this.createBlobFromParts(file, "application/jpeg", await this.getAllParts(file, size, thumb_size, onProgress))
+        })
+    }
+
+    static getPhoto(file, thumb_size = "", onProgress = undefined) {
+        return this.tryCache(file).catch(async _ => {
+            if (!file.sizes) throw new Error("No sizes specified for file", file)
+
+            thumb_size = this.parseThumbSize(file, thumb_size)
+            const size = file.sizes.find(l => l.type === thumb_size).size
+            return this.createBlobFromParts(file, "application/jpeg", await this.getAllParts(file, size, thumb_size, onProgress))
+        })
+    }
+
+    static getFull(file, onProgress = undefined) {
+        return this.tryCache(file).catch(async _ => {
+            if(!file.size) throw new Error("No size specified for file", file)
+
+            const size = file.size
+            return this.createBlobFromParts(file, file.mime_type, await this.getAllParts(file, size, "", onProgress))
+        })
+    }
+
+    /**
+     * @deprecated
+     * @param file
+     * @param thumb_size
+     * @param onProgress
+     */
+    static getFile(file, thumb_size = "", onProgress) {
+        if(thumb_size === "") {
+            return this.getFull(file, onProgress)
+        } else if(file._ === "photo") {
+            return this.getPhoto(file, thumb_size, onProgress)
+        } else {
+            return this.getThumb(file, thumb_size, onProgress)
+        }
     }
 
     static thumbHeader = Bytes.fromHex("ffd8ffe000104a46494600010100000100010000ffdb004300281c1e231e19282321232d2b28303c64413c37373c7b585d4964918099968f808c8aa0b4e6c3a0aadaad8a8cc8ffcbdaeef5ffffff9bc1fffffffaffe6fdfff8ffdb0043012b2d2d3c353c76414176f8a58ca5f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8ffc00011080000000003012200021101031101ffc4001f0000010501010101010100000000000000000102030405060708090a0bffc400b5100002010303020403050504040000017d01020300041105122131410613516107227114328191a1082342b1c11552d1f02433627282090a161718191a25262728292a3435363738393a434445464748494a535455565758595a636465666768696a737475767778797a838485868788898a92939495969798999aa2a3a4a5a6a7a8a9aab2b3b4b5b6b7b8b9bac2c3c4c5c6c7c8c9cad2d3d4d5d6d7d8d9dae1e2e3e4e5e6e7e8e9eaf1f2f3f4f5f6f7f8f9faffc4001f0100030101010101010101010000000000000102030405060708090a0bffc400b51100020102040403040705040400010277000102031104052131061241510761711322328108144291a1b1c109233352f0156272d10a162434e125f11718191a262728292a35363738393a434445464748494a535455565758595a636465666768696a737475767778797a82838485868788898a92939495969798999aa2a3a4a5a6a7a8a9aab2b3b4b5b6b7b8b9bac2c3c4c5c6c7c8c9cad2d3d4d5d6d7d8d9dae2e3e4e5e6e7e8e9eaf2f3f4f5f6f7f8f9faffda000c03010002110311003f00")

@@ -67,6 +67,13 @@ export class DialogMessages {
         return this._messages.get(id) || this._otherMessages.get(id)
     }
 
+    getByGroupedId(groupedId: string): Array<Message> {
+        return (
+            [...this._messages.values()]
+                .filter(l => l.groupedId === groupedId)
+        )
+    }
+
     getPollsById(poll_id: number): Array<Message> {
         return (
             [...this._messages.values()]

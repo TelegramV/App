@@ -47,12 +47,69 @@ function insertAt(str, position, length, b) {
     return text
 }*/
 
-export function domToMessageEntities(elem) {
+function elemToEntity(elem, offset, length) {
+    const handlers = {
+        b: "messageEntityBold",
+        strong: "messageEntityBold",
+        i: "messageEntityItalic",
+        code: "messageEntityCode",
+        pre: "messageEntityPre",
+        u: "messageEntityUnderline",
+        s: "messageEntityStrike",
+        blockquote: "messageEntityBlockquote",
+    }
 
+    const tagName = elem.tagName.toLowerCase()
+    if (handlers[tagName]) {
+        const handler = handlers[tagName]
+        let result
+        if (typeof handler == "string") {
+            result = {
+                _: handler
+            }
+        } else {
+            result = handler(elem)
+        }
+        result.offset = offset
+        result.length = length
+        return result
+    }
+}
+
+function getMessageEntities(elem, offset) {
+    // console.log("getMessageEntities!", elem.tagName, offset)
+    let entities = []
+    let from = offset
+    elem.childNodes.forEach(l => {
+        if (l.nodeType === Node.TEXT_NODE) {
+            // console.log("add text!", l.wholeText, l.wholeText.length)
+            offset += l.wholeText.length
+            return
+        }
+        let r = getMessageEntities(l, offset)
+        // console.log("add offset to", elem.tagName, r.offset, " from ", l.tagName)
+
+        offset = r.offset
+        entities.push(...r.entities)
+        // console.log(l)
+    })
+    let length = offset - from
+    entities.push(elemToEntity(elem, from, length))
+    return {
+        offset: offset,
+        entities: entities
+    }
+}
+
+export function domToMessageEntities(elem) {
+    return {
+        messageEntities: getMessageEntities(elem, 0).entities.filter(l => l !== undefined),
+        text: elem.textContent
+    }
 }
 
 function getNewlines(str, ignore = false) {
-    if(ignore) {
+    if (ignore) {
         return str
     }
     let elements = []

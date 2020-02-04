@@ -5,6 +5,7 @@ import StickerComponent from "../message/common/StickerComponent"
 import {ChatInputManager} from "./ChatInputComponent"
 import {emojiCategories, replaceEmoji} from "../../../../../utils/emoji"
 import MTProto from "../../../../../../mtproto/external"
+import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import lottie from "lottie-web"
 
 export default class ComposerComponent extends Component {
@@ -102,27 +103,15 @@ export default class ComposerComponent extends Component {
 
 	openStickers() {
 		if(!this.stickerPanel) return;
-		this.loadRecentStickers();
+		this.loadRecentStickers().then(_ => {
+			this._bindStickerClickEvents();
+		})
 		this.emojiPanel.classList.add("hidden");
 		this.stickerPanel.classList.remove("hidden");
 	}
 
 	openGIF() {
 
-	}
-
-	loadRecentStickers() {
-		MTProto.invokeMethod("messages.getRecentStickers",{
-			flags:0,
-			hash:0
-		}).then(response => {
-			let packs = response.packs;
-			let stickers = response.stickers;
-			let table = this.stickerPanel.querySelector(".selected");
-			for(let i = 0; i<Math.min(25, stickers.length); i++) {
-				VRDOM.append(<StickerComponent width={75} sticker={stickers[i]}/>, table);
-			}
-		})
 	}
 
 	_emojiTypeClick(ev) {
@@ -149,5 +138,34 @@ export default class ComposerComponent extends Component {
 	_emojiClick(ev) {
 		let emoji = ev.currentTarget;
 		ChatInputManager.appendText(emoji.alt);
+	}
+
+	loadRecentStickers() {
+		return MTProto.invokeMethod("messages.getRecentStickers",{
+			flags:0,
+			hash:0
+		}).then(response => {
+			let packs = response.packs;
+			let stickers = response.stickers;
+			let table = this.stickerPanel.querySelector(".selected");
+			for(let i = 0; i<Math.min(25, stickers.length); i++) {
+				VRDOM.append(<StickerComponent width={75} sticker={stickers[i]}/>, table);
+			}
+		})
+	}
+
+	_bindStickerClickEvents() {
+		this.$el.querySelector(".sticker-table > .selected").childNodes.forEach(node => {
+			node.addEventListener("click", this._stickerClick);
+		})
+	}
+
+	_stickerClick(ev) {
+		let ref = ev.currentTarget.getAttribute("data-component-id");
+		if(!ref) return;
+		console.log(ref)
+		let sticker = this.refs.get(ref).sticker;
+		console.log(sticker)
+		AppSelectedPeer.Current.api.sendSticker(sticker);
 	}
 }

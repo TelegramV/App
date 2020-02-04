@@ -122,6 +122,9 @@ export class MessageParser {
     }
 
     static getMediaPreviewName(message: Message) {
+        if(message.groupedId) {
+            return "Album"
+        }
         switch (message.type) {
             case MessageType.PHOTO:
                 return "Photo"
@@ -143,7 +146,6 @@ export class MessageParser {
             case MessageType.GIF:
                 return "GIF"
             case MessageType.STICKER:
-                return MessageParser.getStickerEmoji(message.raw.media.document) + " Sticker"
             case MessageType.ANIMATED_STICKER:
                 return MessageParser.getStickerEmoji(message.raw.media.document) + " Sticker"
             case MessageType.VOICE:

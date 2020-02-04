@@ -50,16 +50,23 @@ export class PeerApi {
             PeersManager.setFromRawAndFire(user)
         })
 
-        return Messages.messages.map(rawMessage => {
+        const messages = Messages.messages.map(rawMessage => {
             return MessageFactory.fromRaw(this._peer.dialog, rawMessage)
         })
+
+        this._peer.dialog.messages.appendMany(messages)
+
+        messages.map(message => {
+            message.init()
+        })
+
+
+        return messages
     }
 
     fetchInitialMessages() {
         return this.getHistory({}).then(messages => {
             if (messages.length > 0) {
-                this._peer.dialog.messages.appendMany(messages)
-
                 AppEvents.Dialogs.fire("fetchedInitialMessages", {
                     dialog: this._peer.dialog,
                     messages: messages
@@ -75,8 +82,6 @@ export class PeerApi {
 
         return this.getHistory({offset_id: oldest.id}).then(messages => {
             if (messages.length > 0) {
-                this._peer.dialog.messages.appendMany(messages)
-
                 AppEvents.Dialogs.fire("fetchedMessagesNextPage", {
                     dialog: this._peer.dialog,
                     messages: messages
@@ -119,12 +124,19 @@ export class PeerApi {
         }
     }
 
-    sendMessage(text, replyTo = null, silent = false, clearDraft = true) {
+    sendMessage({
+        text,
+        messageEntities = [],
+        replyTo = null,
+        silent = false,
+        clearDraft = true
+    }) {
         MTProto.invokeMethod("messages.sendMessage", {
             pFlags: {
                 clear_draft: clearDraft,
                 silent: silent,
-                reply_to_msg_id: replyTo
+                reply_to_msg_id: replyTo,
+                entities: messageEntities
             },
 
             peer: this._peer.inputPeer,
@@ -150,5 +162,25 @@ export class PeerApi {
                 MTProto.UpdatesManager.process(response)
             })
         })
+    }
+
+    sendSticker(sticker) {
+        MTProto.invokeMethod("messages.sendMedia", {
+                peer: this._peer.inputPeer,
+                message: "",
+                media: {
+                    _: "inputMediaDocument",
+                    flags: 0,
+                    id: {
+                        _: "inputDocument",
+                        id: sticker.id,
+                        access_hash: sticker.access_hash,
+                        file_reference: sticker.file_reference,
+                    }
+                },
+                random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+            }).then(response => {
+                MTProto.UpdatesManager.process(response)
+            })
     }
 }

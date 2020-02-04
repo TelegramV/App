@@ -27,6 +27,18 @@ class AudioMessageComponent extends AudioComponent {
 		}
 	}
 
+	init() {
+		super.init();
+		let file = this.message.raw.media.document
+
+		FileAPI.getThumb(file, "max").then(l => {
+			// Tint
+			this.$el.querySelector(".play").style.background = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${l})`
+			this.thumb = l
+		})
+
+	}
+
 	getControls() {
 		return (
 			<div class="controls">
@@ -62,15 +74,15 @@ class AudioMessageComponent extends AudioComponent {
 	}
 
 	async getMeta() {
-    	let doc = this.message.raw.media.document;
-    	//TODO download thumb
+    	let file = this.message.raw.media.document
+		const size = FileAPI.getMaxSize(file)
     	return {
     		title: this.meta.title,
     		artist: this.meta.artist,
     		album: "Telegram", //sorry, no data from TG on that. Maybe replace with dialog name?
     		artwork: [{
-    			src: undefined, //TODO FileAPI method
-    			sizes: "192x192",
+    			src: this.thumb,
+    			sizes: size.w + "x" + size.h,
     			type: "application/jpeg"
     		}]
     	}

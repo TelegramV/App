@@ -27,7 +27,7 @@ class AudioManager0 {
     play() {
         if(this.active) {
             this.active.play();
-            setPlaybackState("playing");
+            this.setPlaybackState("playing");
         }
     }
 
@@ -38,7 +38,7 @@ class AudioManager0 {
         }
         this.active = audio;
         if(!audio) {
-            setPlaybackState("none");
+            this.setPlaybackState("none");
             return;
         } else {
             this.update();
@@ -50,15 +50,15 @@ class AudioManager0 {
     pause() {
         if(this.active) {
             this.active.pause();
-            setPlaybackState("paused");
+            this.setPlaybackState("paused");
         }
     }
 
     update() {
         if(this.active.isPlaying()) {
-            setPlaybackState("playing");
+            this.setPlaybackState("playing");
         } else {
-            setPlaybackState("paused");
+            this.setPlaybackState("paused");
         }
     }
 
@@ -82,6 +82,7 @@ class AudioManager0 {
     updateBrowserMeta() {
         if(!navigator.mediaSession) return;
         this.active.getMeta().then(meta => {
+            console.log(meta)
             if(!meta || !meta.artwork) return;
             for(const artwork of meta.artwork) {
                 if(!artwork.src) artwork.src = "./static/images/logo-192x192.png";

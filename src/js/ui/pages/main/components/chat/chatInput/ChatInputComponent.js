@@ -10,6 +10,7 @@ import {formatAudioTime, convertBits} from "../../../../../utils"
 import {replaceEmoji} from "../../../../../utils/emoji"
 import ComposerComponent from "./ComposerComponent"
 import {MessageParser} from "../../../../../../api/messages/MessageParser";
+import {domToMessageEntities} from "../../../../../../mtproto/utils/htmlHelpers";
 
 export let ChatInputManager
 
@@ -18,7 +19,8 @@ export class ChatInputComponent extends Component {
         super(props);
         ChatInputManager = this
         this.state = {
-            reply: null
+            reply: null,
+            attachments: []
         }
     }
 
@@ -183,37 +185,6 @@ export class ChatInputComponent extends Component {
         </div>
     }
 
-    allowedTags = [
-        "b", "u", "strong", "i", "s", "del", "code", "pre", "blockquote", "img"
-    ]
-
-    removeStyle(elem) {
-        if(elem.style) {
-            // Not allowed? replace to span!
-            // FIXME causes recursive mutation cycle
-            // if(!this.allowedTags.includes(elem.tagName.toLowerCase())) {
-            //     const d = document.createElement("span")
-            //     d.innerHTML = elem.innerHTML
-            //     elem.parentNode.replaceChild(d, elem);
-            //     elem = d
-            // }
-            elem.style.cssText = null
-            elem.childNodes.forEach(l => {
-                console.log("child node!", l)
-                this.removeStyle(l)
-            })
-        }
-    }
-
-    onMutation(ev) {
-        console.log(ev)
-        ev.forEach(q => {
-            q.addedNodes.forEach(l => {
-                console.log("Remove", l)
-                this.removeStyle(l)
-            })
-        })
-    }
 
     appendText(text) {
         this.textarea.innerHTML += text
@@ -288,6 +259,12 @@ export class ChatInputComponent extends Component {
 
 
     onPaste(ev) {
+        ev.preventDefault();
+
+        const text = (ev.originalEvent || ev).clipboardData.getData('text/plain')
+
+        document.execCommand("insertText", false, text)
+
         for (let i = 0; i < ev.clipboardData.items.length; i++) {
             const k = ev.clipboardData.items[i]
             console.log(k.toString())
@@ -381,11 +358,6 @@ export class ChatInputComponent extends Component {
     mounted() {
         super.mounted();
         this.textarea = this.$el.querySelector(".textarea")
-        const config = { childList: true, subtree: true };
-
-        const observer = new MutationObserver(this.onMutation);
-
-        observer.observe(this.textarea, config);
         this.composer = this.$el.querySelector(".composer")
         this.initDragArea()
     }
@@ -530,18 +502,24 @@ export class ChatInputComponent extends Component {
         }
     }
 
-    convertEmojiToText() {
-        for(const elem of this.textarea.childNodes) {
+    convertEmojiToText(ee) {
+        if(ee.nodeType === Node.TEXT_NODE) return
+        for(const elem of ee.childNodes) {
             if(elem.alt) {
-                this.textarea.replaceChild(document.createTextNode(elem.alt),elem);
+                ee.replaceChild(document.createTextNode(elem.alt), elem)
             }
+            this.convertEmojiToText(elem)
         }
     }
 
     send(silent = false) {
-        this.convertEmojiToText();
+        this.convertEmojiToText(this.textarea)
         let reply = this.state.reply ? this.state.reply.message.id : null
-        AppSelectedPeer.Current.api.sendMessage(this.textarea.textContent, reply, silent)
+
+        const {text, messageEntities} = domToMessageEntities(this.textarea)
+
+        AppSelectedPeer.Current.api.sendMessage({text: text, messageEntities: messageEntities, replyTo: reply, silent: silent})
+
         this.textarea.innerHTML = ""
         this.closeReply()
         this.state.attachments = []
