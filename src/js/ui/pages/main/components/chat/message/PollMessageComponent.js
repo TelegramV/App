@@ -12,8 +12,6 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         this.poll = message.raw.media.poll;
         this.results = message.raw.media.results;
 
-        this.results.most_voters = this.getWinningAnswer()? this.getWinningAnswer().voters : 0;
-
         this.multiple = this.poll.pFlags.multiple_choice;
         this.public = this.poll.pFlags.public_voters;
         this.quiz = this.poll.pFlags.quiz;
@@ -40,14 +38,6 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     h() {
-        let footer;
-        if (!this.multiple && !this.isVoted()) footer = <div class="stats">{this.results.total_voters + " voted"}</div>;
-        if (this.multiple && !this.isVoted()) footer =
-            <div class="action-button disabled" onClick={this._actionClick}>Vote</div>;
-        if (this.isVoted() && this.public) footer =
-            <div class="action-button" onClick={this._actionClick}>Results</div>;
-        if (this.isVoted() && !this.public) footer = <div class="stats">{this.results.total_voters + " voted"}</div>
-
         let classes = "poll" + (this.isVoted() ? " voted" : "");
         let type = this.quiz ? "Quiz" : this.public ? "Public poll" : "Anonymous poll";
         return (
@@ -56,14 +46,31 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                     <div class="question">{this.poll.question}</div>
                     <div class="poll-type">{type}</div>
                     {this._prepareAnswerBlock()}
-                    {footer}
+                    {this._prepareFooter()}
                 </div>
             </MessageWrapperFragment>
         )
     }
 
+    _prepareFooter() {
+        if(this.isVoted) {
+            if(this.public) {
+                return <div class="action-button" onClick={this._actionClick}>Results</div>;
+            } else {
+                return <div class="stats">{this.results.total_voters + " voted"}</div>
+            }
+        } else {
+            if(this.multiple) {
+                return <div class="action-button disabled" onClick={this._actionClick}>Vote</div>;
+            } else {
+                return <div class="stats">{this.results.total_voters + " voted"}</div>;
+            }
+        }
+    }
+
     mounted() {
         this.actionButton = this.$el.querySelector(".action-button");
+        this._applyPercents();
     }
 
     isVoted() {
@@ -121,7 +128,28 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         if (event.type === "pollEdit") {
             this.poll = this.props.message.raw.media.poll;
             this.results = this.props.message.raw.media.results;
-            this.__patch();
+            this._patchAnswers();
+        }
+    }
+
+    _patchAnswers() {
+        this.__patch();
+        setTimeout(this._applyPercents,0);
+    }
+
+    _applyPercents() {
+        if(!this.isVoted()) return;
+        let answers = this.$el.querySelectorAll(".answer");
+        let most_voters = this.getWinningAnswer().voters;
+        for(let i = 0; i< this.poll.answers.length; i++) {
+            let result = this.results.results[i];
+            if(this.poll.answers[i].option[0] !== result.option[0]) {
+                console.log("POLL ANSWERS ORDER IS BROKEN!")
+                return;
+            }
+            let barPercent = (result.voters ? (result.voters / most_voters) * 100 : 0);
+            barPercent = Math.round(barPercent) + "%";
+            answers[i].querySelector(".progress").style.width = barPercent;
         }
     }
 
@@ -183,7 +211,6 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
 const AnswerComponent = ({answer, result, message, click}) => {
     let name = message.id;
-    let most_voters = message.raw.media.results.most_voters;
     let total_voters = message.raw.media.results.total_voters;
     let multiple = message.raw.media.poll.pFlags.multiple_choice;
     let quiz = message.raw.media.poll.pFlags.quiz;
@@ -202,8 +229,6 @@ const AnswerComponent = ({answer, result, message, click}) => {
     } else {
         let percent = (result.voters ? (result.voters / total_voters) * 100 : 0);
         percent = Math.round(percent) + "%";
-        let barPercent = (result.voters ? (result.voters / most_voters) * 100 : 0);
-        barPercent = Math.round(barPercent) + "%";
 
         let votedClass = "tgico tgico-";
         if (!quiz) {
@@ -230,7 +255,7 @@ const AnswerComponent = ({answer, result, message, click}) => {
                 <div class="options-wrapper">
                     <div class="answer-text">{answer.text}</div>
                     <div class="progress-wrapper">
-                        <div class="progress" css-width={barPercent}></div>
+                        <div class="progress" css-width="1px"></div>
                     </div>
                 </div>
             </div>

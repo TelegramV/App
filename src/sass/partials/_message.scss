@@ -278,11 +278,8 @@
                     position: absolute;
                     //top: 50%;
                     left: 50%;
-                    transform: translate(-50%, -100%);
-
-                    svg {
-                        transform: scale(2, 2);
-                    }
+                    transform: translate(-50%, -50%);
+                    font-size: 60px;
                 }
             }
 
@@ -397,7 +394,7 @@
                                 height: 5px;
                                 border-radius: 5px;
                                 background-color: $green;
-                                transition: anim(width);
+                                transition: 1s ease-in-out width;
                             }
                         }
                     }
