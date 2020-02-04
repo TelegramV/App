@@ -251,7 +251,6 @@ export class FileAPI {
 
             thumb_size = this.parseThumbSize(file, thumb_size)
             const size = file.thumbs.find(l => l.type === thumb_size).size
-            console.log("getThumb", file, thumb_size, size)
 
             return this.createBlobFromParts(file, "application/jpeg", await this.getAllParts(file, size, thumb_size, onProgress))
         })
