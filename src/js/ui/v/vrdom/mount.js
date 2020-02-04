@@ -2,12 +2,14 @@ import vrdom_render from "./render/render"
 import type VRNode from "./VRNode"
 import type {VRRenderProps} from "./types/types"
 import V from "../VFramework"
+import Component from "./Component"
+import {VComponent} from "./component/VComponent"
 
 export function vrdom_mount_resolveComponentMounted($mounted: Element) {
-    if ($mounted.nodeType !== Node.TEXT_NODE && $mounted.hasAttribute("data-component-id")) {
-        const component = V.mountedComponents.get($mounted.getAttribute("data-component-id"))
+    if ($mounted.nodeType !== Node.TEXT_NODE && $mounted.__component) {
+        const component = $mounted.__component
 
-        if (component) {
+        if (component instanceof Component) {
             component.$el = $mounted
 
             if (!component.__.mounted) {
@@ -16,6 +18,8 @@ export function vrdom_mount_resolveComponentMounted($mounted: Element) {
                 component.mounted()
                 V.plugins.forEach(plugin => plugin.componentMounted(component))
             }
+        } else if (component instanceof VComponent) {
+            component.__mount($mounted)
         } else {
             console.error("component was not found. it means that there is a potential bug in the vrdom")
         }
@@ -48,10 +52,8 @@ export function vrdom_realMount($el: Element | Node | Text, $target: Element | N
         $target = document.querySelector($target)
     }
 
-    // $ignore
     $target.replaceWith($el)
 
-    // $ignore
     return $el
 }
 

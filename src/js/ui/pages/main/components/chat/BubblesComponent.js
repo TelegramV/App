@@ -46,13 +46,12 @@ class BubblesComponent extends Component {
         function onIntersection(entries) {
             entries.forEach(entry => {
                 entry.target.style.opacity = entry.intersectionRatio > 0 && entry.target.style.opacity !== 1 ? 1 : 0
-                console.log(entry.intersectionRatio)
             })
         }
 
         this.intersectionObserver = new IntersectionObserver(onIntersection, {
             root: this.$el,
-            rootMargin: "40%",
+            rootMargin: "1000px",
             threshold: 1.0
         })
 

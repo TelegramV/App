@@ -1,10 +1,21 @@
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
-import Component from "../../../../../v/vrdom/Component"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
+import {VComponent} from "../../../../../v/vrdom/component/VComponent"
+import type {BusEvent} from "../../../../../../api/eventBus/EventBus"
+import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer"
 
-class ChatInfoAvatarComponent extends Component {
-    constructor(props) {
-        super(props)
+class ChatInfoAvatarComponent extends VComponent {
+
+    patchingStrategy = VRDOM.COMPONENT_PATCH_FAST
+
+    callbacks = {
+        peer: AppSelectedPeer.Reactive.Default
+    }
+
+    appEvents(E) {
+        E.bus(AppEvents.Peers)
+            .on("updatePhoto", this.peersUpdatePhoto)
+            .on("updatePhotoSmall", this.peersUpdatePhoto)
     }
 
     h() {
@@ -22,7 +33,7 @@ class ChatInfoAvatarComponent extends Component {
 
         if (peer.isSelf) {
             return (
-                <div className="avatar placeholder-saved placeholder-icon">
+                <div onClick={this.openPeerInfo} className="avatar placeholder-saved placeholder-icon">
                     <i className="tgico tgico-avatar_savedmessages"/>
                 </div>
             )
@@ -37,14 +48,15 @@ class ChatInfoAvatarComponent extends Component {
         }
         if (hasAvatar) {
             return (
-                <div id="messages-photo"
+                <div onClick={this.openPeerInfo}
+                     id="messages-photo"
                      className="avatar"
                      style={`background-image: url(${peer.photo.smallUrl});`}>
                 </div>
             )
         } else {
             return (
-                <div className={`avatar placeholder-${peer.photo.letter.num}`}>
+                <div onClick={this.openPeerInfo} className={`avatar placeholder-${peer.photo.letter.num}`}>
                     <span>{peer.photo.letter.text}</span>
 
                     <div className="avatar-outer" css-opacity="0">
@@ -56,16 +68,14 @@ class ChatInfoAvatarComponent extends Component {
         }
     }
 
-    mounted() {
-        console.log(`${this.name} mounted`)
+    openPeerInfo = () => {
+        AppSelectedInfoPeer.select(AppSelectedPeer.Current)
+    }
 
-        AppEvents.Peers.subscribeAny(event => {
-            if (AppSelectedPeer.check(event.peer)) {
-                if (event.type === "updatePhoto" || event.type === "updatePhotoSmall") {
-                    this.__patch()
-                }
-            }
-        })
+    peersUpdatePhoto = (event: BusEvent) => {
+        if (AppSelectedPeer.check(event.peer)) {
+            this.__patch()
+        }
     }
 }
 

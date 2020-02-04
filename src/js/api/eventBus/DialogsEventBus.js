@@ -31,7 +31,8 @@ export class DialogsEventBus extends EventBus {
                     .get(event.dialog)
                     .forEach(s => s({
                         type,
-                        ...event
+                        ...event,
+                        bus: this
                     }))
             }
 
@@ -41,7 +42,8 @@ export class DialogsEventBus extends EventBus {
                     .forEach(s => s(this, {
                         __any: true,
                         type,
-                        ...event
+                        ...event,
+                        bus: this
                     }))
             }
 
@@ -52,7 +54,8 @@ export class DialogsEventBus extends EventBus {
                     types.get(type)
                         .forEach(s => s(this, {
                             type,
-                            ...event
+                            ...event,
+                            bus: this
                         }))
                 }
             }

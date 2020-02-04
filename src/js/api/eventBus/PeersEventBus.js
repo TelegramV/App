@@ -37,7 +37,8 @@ export class PeersEventBus extends EventBus {
                     .get(event.peer)
                     .forEach(s => s({
                         type,
-                        ...event
+                        ...event,
+                        bus: this
                     }))
             }
 
@@ -45,7 +46,8 @@ export class PeersEventBus extends EventBus {
                 .forEach(s => s(this, {
                     __any: true,
                     type,
-                    ...event
+                    ...event,
+                    bus: this
                 }))
 
             if (this._reactiveSingleAnySubscribers.has(event.peer)) {
@@ -54,7 +56,8 @@ export class PeersEventBus extends EventBus {
                     .forEach(s => s(this, {
                         __any: true,
                         type,
-                        ...event
+                        ...event,
+                        bus: this
                     }))
             }
 
@@ -65,7 +68,8 @@ export class PeersEventBus extends EventBus {
                     types.get(type)
                         .forEach(s => s(this, {
                             type,
-                            ...event
+                            ...event,
+                            bus: this
                         }))
                 }
             }

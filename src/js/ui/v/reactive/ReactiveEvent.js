@@ -7,6 +7,8 @@
  * @param {function(function(*))} callback анонімна функція, що приймає за параметр обробника реактивного оновлення. В компонентах він або патчить (__patch), або викликає changed.
  * @param {function(function(*))} offCallback анонімна функція, приймає обробника (того самого що в попередньому параметрі) параметром, якого має видаляти з нижчого (чи вищого, я запутався) рівня і більше НІКОЛИ не виконувати. Викликається під час видалення компонента.
  * @return {{Default: *, FireOnly: *, PatchOnly: *}}
+ *
+ * @deprecated
  */
 function ReactiveEvent(bus, callback, offCallback) {
     if (typeof callback !== "function") {

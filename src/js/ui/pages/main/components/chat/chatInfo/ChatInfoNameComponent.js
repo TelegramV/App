@@ -1,19 +1,24 @@
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
-import Component from "../../../../../v/vrdom/Component"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer";
+import {VComponent} from "../../../../../v/vrdom/component/VComponent"
+import type {BusEvent} from "../../../../../../api/eventBus/EventBus"
 
-class ChatInfoNameComponent extends Component {
-    constructor(props) {
-        super(props)
+class ChatInfoNameComponent extends VComponent {
 
-        this.appEvents = new Set([
-            AppEvents.Peers.reactiveAny().FireOnly
-        ])
+    patchingStrategy = VRDOM.COMPONENT_PATCH_FAST
+
+    callbacks = {
+        peer: AppSelectedPeer.Reactive.PatchOnly
+    }
+
+    appEvents(E) {
+        E.bus(AppEvents.Peers)
+            .on("updateName", this.peersUpdateName)
     }
 
     h() {
-        if (AppSelectedPeer.isNotSelected) {
+        if (!this.callbacks.peer) {
             return (
                 <div id="messages-title" className="title">
                     ...
@@ -21,7 +26,7 @@ class ChatInfoNameComponent extends Component {
             )
         }
 
-        const peer = AppSelectedPeer.Current
+        const peer = this.callbacks.peer
 
         return (
             <div id="messages-title" className="title" onClick={this.openPeerInfo}>
@@ -30,22 +35,14 @@ class ChatInfoNameComponent extends Component {
         )
     }
 
-    openPeerInfo() {
-        AppSelectedInfoPeer.select(AppSelectedPeer.Current)
-    }
-
-    created() {
-        console.log(`${this.name} created`)
-    }
-
-    eventFired(bus, event) {
-        if (bus === AppEvents.Peers) {
-            if (AppSelectedPeer.check(event.peer)) {
-                if (event.type === "updateName") {
-                    this.__patch()
-                }
-            }
+    peersUpdateName = (event: BusEvent) => {
+        if (AppSelectedPeer.check(event.peer)) {
+                this.__patch()
         }
+    }
+
+    openPeerInfo = () => {
+        AppSelectedInfoPeer.select(this.callbacks.peer)
     }
 }
 
