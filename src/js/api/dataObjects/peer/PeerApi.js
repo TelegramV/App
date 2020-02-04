@@ -50,16 +50,22 @@ export class PeerApi {
             PeersManager.setFromRawAndFire(user)
         })
 
-        return Messages.messages.map(rawMessage => {
+        const messages = Messages.messages.map(rawMessage => {
             return MessageFactory.fromRaw(this._peer.dialog, rawMessage)
         })
+
+        this._peer.dialog.messages.appendMany(messages)
+
+        messages.map(message => {
+            message.init()
+        })
+
+        return messages
     }
 
     fetchInitialMessages() {
         return this.getHistory({}).then(messages => {
             if (messages.length > 0) {
-                this._peer.dialog.messages.appendMany(messages)
-
                 AppEvents.Dialogs.fire("fetchedInitialMessages", {
                     dialog: this._peer.dialog,
                     messages: messages
@@ -75,8 +81,6 @@ export class PeerApi {
 
         return this.getHistory({offset_id: oldest.id}).then(messages => {
             if (messages.length > 0) {
-                this._peer.dialog.messages.appendMany(messages)
-
                 AppEvents.Dialogs.fire("fetchedMessagesNextPage", {
                     dialog: this._peer.dialog,
                     messages: messages

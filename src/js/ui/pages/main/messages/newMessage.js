@@ -17,6 +17,7 @@ import RoundVideoMessageComponent from "../components/chat/message/RoundVideoMes
 import PhoneCallMessageComponent from "../components/chat/message/PhoneCallMessageComponent"
 import ServiceMessageComponent from "../components/chat/message/ServiceMessageComponent"
 import AnimatedStickerMessageComponent from "../components/chat/message/AnimatedStickerMessageComponent"
+import GroupedMessageComponent from "../components/chat/message/GroupedMessageComponent";
 
 /**
  * @type {Map<number, function({message: *}): *>}
@@ -42,7 +43,8 @@ const handlers = new Map([
     [MessageType.VIDEO, VideoMessageComponent],
     [MessageType.PHONE_CALL, PhoneCallMessageComponent],
     [MessageType.SERVICE, ServiceMessageComponent],
-    [MessageType.ANIMATED_EMOJI, AnimatedStickerMessageComponent]
+    [MessageType.ANIMATED_EMOJI, AnimatedStickerMessageComponent],
+    [MessageType.GROUP, GroupedMessageComponent]
 ])
 
 /**
@@ -52,7 +54,7 @@ const handlers = new Map([
  * @constructor
  */
 const MessageComponent = ({message, intersectionObserver}) => {
-    const Handler = handlers.get(message.type)
+    const Handler = handlers.get(message.groupedId ? MessageType.GROUP : message.type)
 
     if (Handler) {
         return <Handler intersectionObserver={intersectionObserver} message={message}/>

@@ -27,6 +27,7 @@ class MessageManager extends Manager {
             const message = MessageFactory.fromRaw(dialog, lastMessage)
 
             dialog.messages.appendSingle(message)
+            message.init()
 
             if (!message.isOut) {
                 dialog.messages.addUnread(message.id)

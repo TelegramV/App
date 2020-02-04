@@ -25,7 +25,7 @@ export const MessageType = {
     PHONE_CALL: 17,
     SERVICE: 18,
     ANIMATED_EMOJI: 19,
-    GROUP_PHOTO: 20,
+    GROUP: 20,
     ANIMATED_STICKER: 21,
 }
 
@@ -55,10 +55,15 @@ export interface Message {
     +forwarded?: any;
     +forwardedMessageId?: number;
     +editDate?: number;
+    // It's actually long?
+    +groupedId?: string;
+    +group: Array<Message> | undefined;
+    +groupInitializer: boolean;
 
     +prefix: string; // why this is here??
 
     show(): void;
+    init(): void;
 
     fillRaw(raw: Object): Message;
 

@@ -16,6 +16,7 @@ class BubblesComponent extends Component {
 
     state: [string, any] = {
         renderedMessages: new Map(),
+        renderedGroups: new Map(),
         isFetchingNextPage: false,
         isFetching: false,
         messagesWaitingForRendering: new Set()
@@ -120,6 +121,10 @@ class BubblesComponent extends Component {
 
         let $message = undefined
 
+
+        if(message.groupedId && this.state.renderedGroups.has(message.groupedId)) {
+            return null
+        }
         $message = $mount(<MessageComponent intersectionObserver={this.intersectionObserver}
                                             message={message}/>, this.elements.$bubblesInner)
 
@@ -138,6 +143,9 @@ class BubblesComponent extends Component {
 
             if ($rendered) {
                 this.state.renderedMessages.set(message.id, $rendered)
+                if(message.groupedId) {
+                    this.state.renderedGroups.set(message.groupedId, message)
+                }
             }
             // z += this.elements.$bubblesInner.clientHeight - k
         }
@@ -162,6 +170,9 @@ class BubblesComponent extends Component {
 
             if ($rendered) {
                 this.state.renderedMessages.set(message.id, $rendered)
+                if(message.groupedId) {
+                    this.state.renderedGroups.set(message.groupedId, message)
+                }
             }
 
             pushed.push($rendered)
@@ -191,6 +202,7 @@ class BubblesComponent extends Component {
 
     _clearBubbles() {
         this.state.renderedMessages.clear()
+        this.state.renderedGroups.clear()
 
         VRDOM.deleteInner(this.elements.$bubblesInner)
     }
