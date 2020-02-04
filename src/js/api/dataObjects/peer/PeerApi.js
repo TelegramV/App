@@ -119,12 +119,19 @@ export class PeerApi {
         }
     }
 
-    sendMessage(text, replyTo = null, silent = false, clearDraft = true) {
+    sendMessage({
+        text,
+        messageEntities = [],
+        replyTo = null,
+        silent = false,
+        clearDraft = true
+    }) {
         MTProto.invokeMethod("messages.sendMessage", {
             pFlags: {
                 clear_draft: clearDraft,
                 silent: silent,
-                reply_to_msg_id: replyTo
+                reply_to_msg_id: replyTo,
+                entities: messageEntities
             },
 
             peer: this._peer.inputPeer,
