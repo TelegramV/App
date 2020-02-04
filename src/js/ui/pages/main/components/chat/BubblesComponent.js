@@ -32,7 +32,7 @@ class BubblesComponent extends Component {
 
     h() {
         return (
-            <div id="bubbles" onScroll={this._onScrollBubbles}>
+            <div id="bubbles" class="scrollable" onScroll={this._onScrollBubbles}>
                 <div id="bubbles-inner">
 
                 </div>

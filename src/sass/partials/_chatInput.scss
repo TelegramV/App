@@ -366,7 +366,6 @@
         & > * {
           display: none;
           height: 100%;
-          overflow-y: auto;
           grid-template-columns: repeat(9, 1fr);
           &.selected {
             display: grid;

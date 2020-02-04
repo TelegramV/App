@@ -38,14 +38,14 @@ export default class ComposerComponent extends Component {
 				<div class="content">
 					<div class="emoji-wrapper">
 						<div class="emoji-table">
-							<div class="recent" data-category="recent"></div>
-							<div class="people" data-category="people"/>
-							<div class="nature" data-category="nature"></div>
-							<div class="food" data-category="food"></div>
-							<div class="travel" data-category="travel"></div>
-							<div class="activity" data-category="activity"></div>
-							<div class="objects" data-category="objects"></div>
-							<div class="symbols" data-category="symbols"></div>
+							<div class="recent scrollable" data-category="recent"></div>
+							<div class="people scrollable" data-category="people"/>
+							<div class="nature scrollable" data-category="nature"></div>
+							<div class="food scrollable" data-category="food"></div>
+							<div class="travel scrollable" data-category="travel"></div>
+							<div class="activity scrollable" data-category="activity"></div>
+							<div class="objects scrollable" data-category="objects"></div>
+							<div class="symbols scrollable" data-category="symbols"></div>
 						</div>
 						<div class="emoji-types">
 							<div class="rp emoji-type-item" data-category="recent" onClick={this._emojiTypeClick}><i class="tgico tgico-sending"/></div>
@@ -60,7 +60,7 @@ export default class ComposerComponent extends Component {
 					</div>
 					<div class="sticker-wrapper hidden">
 						<div class="sticker-table">
-							<div class="selected">
+							<div class="selected scrollable">
 
 							</div>
 						</div>

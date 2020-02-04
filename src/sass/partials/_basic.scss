@@ -121,3 +121,39 @@ body {
   scrollbar-color: rgba(129, 129, 129, .5) transparent;
   scrollbar-width: thin;
 }
+
+.scrollable {
+  overflow-y: hidden;
+
+  @media (max-width: 1000px) {
+    overflow-y: auto;
+  }
+
+  &:hover {
+    overflow-y: overlay;
+  }
+
+  @supports not(overflow-y: overlay) {
+    &:hover {
+      overflow-y: auto;
+    }
+  }
+}
+
+.scrollable-x {
+  overflow-x: hidden;
+
+  @media (max-width: 1000px) {
+    overflow-x: auto;
+  }
+
+  &:hover {
+    overflow-x: overlay;
+  }
+
+  @supports not(overflow-x: overlay) {
+    &:hover {
+      overflow-x: auto;
+    }
+  }
+}
