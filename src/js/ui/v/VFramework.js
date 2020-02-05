@@ -4,10 +4,10 @@ import {VComponent} from "./vrdom/component/VComponent"
 
 /**
  * V Framework - tool for building SPA-like application. Written specially for Telegram V.
- *
- * @author kohutd
  */
 class VFramework {
+
+    latestInstantiatedComponent = 0
 
     /**
      * @type {Set<VRDOMPlugin>}

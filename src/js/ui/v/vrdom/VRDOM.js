@@ -11,8 +11,6 @@ import vrdom_fastpatch from "./patch/fastpatch"
 
 /**
  * Virtual DOM that operates on Real DOM and does not save previous rendered state. Written specially for Telegram V.
- *
- * @author kohutd
  */
 const VRDOM = {
     createElement: vrdom_createElement,

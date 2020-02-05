@@ -74,18 +74,10 @@ const vrdom_patch = <T: Element | Node | Text>($node: T, newNode: VRNode | VComp
             return patchText($node, newNode)
         }
 
-        // $ignore
         if ($node.__component) {
             // console.log("[patch undefined] $node unexpected")
 
-            // $ignore
-            const component = V.mountedComponents.get($node.getAttribute("data-component-id"))
-
-            if (component) {
-                component.__delete()
-            } else {
-                console.warn("component was not found")
-            }
+            $node.__component.__delete()
 
         } else {
             return vrdom_mount(newNode, $node)

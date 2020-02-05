@@ -3,8 +3,6 @@ import V from "../../VFramework"
 import ComponentVRNode from "../ComponentVRNode"
 import Component from "../Component"
 
-let latestInstantiatedComponent = 0
-
 /**
  * @param {ComponentVRNode} componentVNode
  */
@@ -19,7 +17,7 @@ function vrdom_renderComponentVNode(componentVNode: ComponentVRNode) {
     }
 
 
-    const newId = componentInstance.identifier ? String(componentInstance.identifier) : String(componentVNode.ref ? componentVNode.ref : latestInstantiatedComponent++)
+    const newId = componentInstance.identifier ? String(componentInstance.identifier) : String(componentVNode.ref ? componentVNode.ref : V.latestInstantiatedComponent++)
 
     componentInstance.identifier = newId
     componentInstance.__init.bind(componentInstance)()

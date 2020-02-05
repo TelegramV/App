@@ -4,8 +4,6 @@ import ComponentVRNode from "../ComponentVRNode"
 import {VComponent} from "../component/VComponent"
 import VComponentVRNode from "../component/VComponentVRNode"
 
-let latestInstantiatedComponent = 0
-
 /**
  * @param {ComponentVRNode} vComponentVNode
  */
@@ -27,7 +25,7 @@ function vrdom_renderVComponentVNode(vComponentVNode: VComponentVRNode) {
         identifier = String(vComponentVNode.identifier)
         componentInstance.identifier = identifier
     } else {
-        identifier = String(latestInstantiatedComponent++)
+        identifier = String(V.latestInstantiatedComponent++)
         componentInstance.identifier = identifier
     }
 
