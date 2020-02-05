@@ -1,7 +1,6 @@
 import DialogsManager from "../../../../../../api/dialogs/DialogsManager"
 import {DialogComponent} from "./DialogComponent"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
-import Component from "../../../../../v/vrdom/Component"
 import VRDOM from "../../../../../v/vrdom/VRDOM"
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 import MTProto from "../../../../../../mtproto/external";
@@ -10,17 +9,29 @@ import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {ConnectionStatusComponent} from "./ConnectionStatusComponent"
 import {Settings} from "../settings/SettingsComponent"
 import Sortable from "sortablejs"
+import {VComponent} from "../../../../../v/vrdom/component/VComponent"
+import {LeftBarComponent} from "../LeftBarComponent"
+import UIEvents from "../../../../../eventBus/UIEvents"
 
-export class DialogListComponent extends Component {
+export class DialogListComponent extends LeftBarComponent {
+
+    barName = "dialogs"
+    barVisible = true
+
+    useProxyState = false
+
+    isLoadingMore = false
+
+    loaderRef = VComponent.createRef()
+    dialogsWrapperRef = VComponent.createRef()
+    pinnedDialogsRef = VComponent.createRef()
+    generalDialogsRef = VComponent.createRef()
+
     constructor(props) {
         super(props)
 
-        this.reactive = {
+        this.callbacks = {
             selectedPeer: AppSelectedPeer.Reactive.FireOnly
-        }
-
-        this.state = {
-            isInLoadingMoreScroll: false,
         }
 
         this.elements = {
@@ -68,7 +79,10 @@ export class DialogListComponent extends Component {
                             icon: "settings",
                             title: "Settings",
                             onClick: _ => {
-                                Settings.open();
+                                UIEvents.LeftSidebar.fire("show", {
+                                    barName: "settings"
+                                })
+                                // Settings.open();
                             }
                         },
                         {
@@ -86,24 +100,19 @@ export class DialogListComponent extends Component {
 
                 <ConnectionStatusComponent/>
 
-                <div id="dialogsWrapper" class="scrollable">
-                    <div className="full-size-loader" id="loader">
+                <div ref={this.dialogsWrapperRef} id="dialogsWrapper" class="scrollable">
+                    <div ref={this.loaderRef} className="full-size-loader" id="loader">
                         <progress className="progress-circular big"/>
                     </div>
 
-                    <div css-display="none" id="dialogsPinned" className="list pinned"/>
-                    <div css-display="none" id="dialogs" className="list"/>
+                    <div ref={this.pinnedDialogsRef} id="dialogsPinned" className="list pinned hidden"/>
+                    <div ref={this.generalDialogsRef} id="dialogs" className="list hidden"/>
                 </div>
             </div>
         )
     }
 
     mounted() {
-        this.elements.$loader = this.$el.querySelector("#loader")
-        this.elements.$dialogsWrapper = this.$el.querySelector("#dialogsWrapper")
-        this.elements.$pinnedDialogs = this.elements.$dialogsWrapper.querySelector("#dialogsPinned")
-        this.elements.$generalDialogs = this.elements.$dialogsWrapper.querySelector("#dialogs")
-
         function onIntersection(entries) {
             entries.forEach(entry => {
                 entry.target.style.opacity = entry.intersectionRatio > 0 ? 1 : 0
@@ -111,53 +120,64 @@ export class DialogListComponent extends Component {
         }
 
         this.intersectionObserver = new IntersectionObserver(onIntersection, {
-            root: this.elements.$dialogsWrapper,
+            root: this.dialogsWrapperRef.$el,
             rootMargin: "250px",
             threshold: 1.0
         })
 
-        this.elements.$dialogsWrapper.addEventListener("scroll", this._scrollHandler, {passive: true})
+        this.dialogsWrapperRef.$el.addEventListener("scroll", this._scrollHandler, {passive: true})
 
-        Sortable.create(this.elements.$pinnedDialogs)
-
-        AppEvents.Dialogs.subscribe("firstPage", event => {
-            this.elements.$loader.style.display = "none"
-            this.elements.$pinnedDialogs.style.display = ""
-            this.elements.$generalDialogs.style.display = ""
-
-            event.pinnedDialogs.forEach(dialog => {
-                this._renderDialog(dialog, "append")
-            })
-
-            event.dialogs.forEach(dialog => {
-                this._renderDialog(dialog, "append")
-            })
-        })
-
-        AppEvents.Dialogs.subscribe("nextPage", event => {
-            event.pinnedDialogs.forEach(dialog => {
-                this._renderDialog(dialog, "append")
-            })
-
-            event.dialogs.forEach(dialog => {
-                this._renderDialog(dialog, "append")
-            })
-        })
-
-        AppEvents.Dialogs.subscribe("newFetched", event => {
-            this._renderDialog(event.dialog, "prepend") // fixme: this should insert in proper place
-        })
-
-        AppEvents.Dialogs.subscribe("newMessage", event => {
-            if (!V.mountedComponents.has(`dialog-${event.dialog.peer.type}-${event.dialog.peer.id}`)) {
-                this._renderDialog(event.dialog, "prepend")
-            }
-        })
+        Sortable.create(this.pinnedDialogsRef.$el)
 
         // this._registerResizer()
     }
 
-    reactiveChanged(key, value, event) {
+    appEvents(E) {
+        super.appEvents(E)
+
+        E.bus(AppEvents.Dialogs)
+            .on("firstPage", this.onFirstPageUpdate)
+            .on("nextPage", this.onNextPageUpdate)
+            .on("newFetched", this.onNewFetchedUpdate)
+            .on("newMessage", this.onNewMessageUpdate)
+    }
+
+    onFirstPageUpdate = event => {
+        this.loaderRef.hide()
+        this.pinnedDialogsRef.show()
+        this.generalDialogsRef.show()
+
+        event.pinnedDialogs.forEach(dialog => {
+            this._renderDialog(dialog, "append")
+        })
+
+        event.dialogs.forEach(dialog => {
+            this._renderDialog(dialog, "append")
+        })
+    }
+
+    onNextPageUpdate = event => {
+        event.pinnedDialogs.forEach(dialog => {
+            this._renderDialog(dialog, "append")
+        })
+
+        event.dialogs.forEach(dialog => {
+            this._renderDialog(dialog, "append")
+        })
+    }
+
+    onNewFetchedUpdate = event => {
+        this._renderDialog(event.dialog, "prepend") // fixme: this should insert in proper place
+    }
+
+    onNewMessageUpdate = event => {
+        // dirty check, we must rewrite this
+        if (!V.mountedComponents.has(`dialog-${event.dialog.peer.type}-${event.dialog.peer.id}`)) {
+            this._renderDialog(event.dialog, "prepend")
+        }
+    }
+
+    callbackChanged(key: string, value: *) {
         if (key === "selectedPeer") {
             if (value) {
                 this.$el.classList.add("responsive-selected-chatlist")
@@ -179,33 +199,33 @@ export class DialogListComponent extends Component {
             return // put it to archived
         }
 
-        if (!this.elements.$pinnedDialogs || !this.elements.$generalDialogs) {
+        if (!this.pinnedDialogsRef.$el || !this.generalDialogsRef.$el) {
             console.error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
             return
         }
 
-        const newVDialog = <DialogComponent $pinned={this.elements.$pinnedDialogs}
-                                            $general={this.elements.$generalDialogs}
+        const newVDialog = <DialogComponent $pinned={this.pinnedDialogsRef.$el}
+                                            $general={this.generalDialogsRef.$el}
                                             dialog={dialog}
                                             ref={`dialog-${dialog.peer.type}-${dialog.peer.id}`}/>
 
         if (appendOrPrepend === "append") {
             if (dialog.isPinned) {
-                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.elements.$pinnedDialogs))
+                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.pinnedDialogsRef.$el))
             } else {
-                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.elements.$generalDialogs))
+                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.generalDialogsRef.$el))
             }
         } else if (appendOrPrepend === "prepend") {
             if (dialog.isPinned) {
-                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.elements.$pinnedDialogs))
+                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.pinnedDialogsRef.$el))
             } else {
-                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.elements.$generalDialogs))
+                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.generalDialogsRef.$el))
             }
         } else {
             if (dialog.isPinned) {
-                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.elements.$pinnedDialogs))
+                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.pinnedDialogsRef.$el))
             } else {
-                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.elements.$generalDialogs))
+                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.generalDialogsRef.$el))
             }
         }
     }
@@ -292,13 +312,13 @@ export class DialogListComponent extends Component {
     _scrollHandler(event) {
         const $element = event.target
 
-        if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.state.isInLoadingMoreScroll) {
-            this.state.isInLoadingMoreScroll = true
+        if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.isLoadingMore) {
+            this.isLoadingMore = true
 
             console.log("fetching next page")
 
             DialogsManager.fetchNextPage({}).then(() => {
-                this.state.isInLoadingMoreScroll = false
+                this.isLoadingMore = false
             })
         }
 

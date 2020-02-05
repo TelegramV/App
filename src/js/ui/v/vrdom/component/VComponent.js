@@ -10,6 +10,7 @@ import type {AE} from "./appEvents"
 import {registerAppEvents} from "./appEvents"
 import type {RORC} from "./reactive"
 import {registerReactive} from "./reactive"
+import {VUI} from "../../VUI"
 
 
 /**
@@ -691,20 +692,22 @@ export class VComponent {
 
     /**
      * Create ref for a simple node.
-     *
-     * @return {{__ref: boolean, $el: undefined}}
      */
     static createRef() {
         return {
             __ref: true,
             $el: undefined,
+            show() {
+                VUI.showElement(this.$el)
+            },
+            hide() {
+                VUI.hideElement(this.$el)
+            }
         }
     }
 
     /**
      * Create ref for a fragment.
-     *
-     * @return {{patch(*=, *=): void, fragment: undefined, __fragment_ref: boolean, $el: undefined, slot: undefined, props: {}}}
      */
     static createFragmentRef() {
         return {
@@ -734,8 +737,6 @@ export class VComponent {
 
     /**
      * Create ref for a component.
-     *
-     * @return {{component: undefined, __component_ref: boolean}}
      */
     static createComponentRef() {
         return {
