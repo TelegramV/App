@@ -13,7 +13,17 @@ import {registerReactive} from "./reactive"
 
 
 /**
- * Use this instead of {@link Component}
+ * Please use this instead of {@link Component}
+ *
+ * Features:
+ * - reactive state
+ * - app events
+ * - reactive objects
+ * - reactive callbacks
+ * - refs for nodes, fragments and components
+ * - timeouts
+ * - intervals
+ * - different patching strategies
  */
 export class VComponent {
 
@@ -68,17 +78,69 @@ export class VComponent {
         stateInTransactionMode: false,
     }
 
+    /**
+     * Set patching strategy.
+     *
+     * @see vrdom_patch
+     * @see vrdom_fastpatch
+     *
+     * @type {number}
+     */
     patchingStrategy: number = VRDOM.COMPONENT_PATCH_DEFAULT
 
+    /**
+     * If `true` than state will be replaced by Proxy.
+     *
+     * Note that `setState` will call patch event if `false`.
+     *
+     * @type {boolean}
+     */
     useProxyState = true
+
+    /**
+     * Component state.
+     *
+     * Note only that the proxy will be created only for top this object and not for inner.
+     *
+     * @type {{}}
+     */
     state: ComponentState = {}
+
+    /**
+     * Reactive callbacks.
+     *
+     * @see ReactiveCallback
+     *
+     * @type {{}}
+     */
     callbacks = {}
 
+    /**
+     * Name of the component.
+     */
     name: string
+
+    /**
+     * Unique identifier of the component.
+     */
     identifier: string
+
+    /**
+     * Component's props.
+     * @type {{}}
+     */
     props: VRAttrs = {}
+
+    /**
+     * Content inside the component.
+     *
+     * @type {undefined}
+     */
     slot: VRSlot = undefined
 
+    /**
+     * Mounted element.
+     */
     _$el: HTMLElement
 
     constructor(props: ComponentProps) {
@@ -101,26 +163,43 @@ export class VComponent {
         return this._$el
     }
 
+    /**
+     * @return {VRNode}
+     */
     h() {
 
     }
 
+    /**
+     * Do initialization logic here.
+     */
     init() {
     }
 
+    /**
+     * Component was mounted.
+     */
     mounted() {
     }
 
+    /**
+     * Component will be deleted.
+     */
     destroy() {
 
     }
 
+    /**
+     * Component was patched.
+     */
     patched() {
 
     }
 
     /**
-     * do not call this thing manually
+     * Register application events.
+     *
+     * @see AppEvents
      *
      * @param {AE} E
      */
@@ -129,7 +208,9 @@ export class VComponent {
     }
 
     /**
-     * do not call this thing manually
+     * Register reactive objects.
+     *
+     * @see ReactiveObject
      *
      * @param {RORC} R
      */
@@ -137,21 +218,40 @@ export class VComponent {
 
     }
 
+    /**
+     * ReactiveCallback was changed.
+     *
+     * @param key
+     * @param value
+     */
     callbackChanged(key: string, value: any) {
         //
     }
 
+    /**
+     * Component will be patched.
+     *
+     * Return `false` to prevent.
+     *
+     * @param node
+     * @return {VRNode}
+     */
     patchRequest(node: VRNode): VRNode | boolean {
         return node
     }
 
-
+    /**
+     * Internal use only.
+     */
     __render() {
         this.__init()
 
         return this.h()
     }
 
+    /**
+     * Internal use only.
+     */
     __mount($el: HTMLElement) {
         if (this.__.mounted) {
             console.warn("BUG: component was already mounted")
@@ -163,6 +263,9 @@ export class VComponent {
         V.plugins.forEach(plugin => plugin.componentMounted(this))
     }
 
+    /**
+     * Internal use only.
+     */
     __delete() {
         this.__.isDeletingItself = true
         this.destroy()
@@ -183,6 +286,9 @@ export class VComponent {
         V.mountedComponents.delete(this.identifier)
     }
 
+    /**
+     * Internal use only.
+     */
     __patch() {
 
         if (this.__.mounted) {
@@ -213,6 +319,9 @@ export class VComponent {
         return this.$el
     }
 
+    /**
+     * Internal use only.
+     */
     __init() {
 
         if (!this.__.inited) {
@@ -266,6 +375,9 @@ export class VComponent {
 
     // AppEvents
 
+    /**
+     * Internal use only.
+     */
     __registerAppEventResolve(bus: EventBus, type: string, resolve: (event: BusEvent) => any, condition: any) {
         let busContext = this.__.appEventContexts.get(bus)
 
@@ -283,12 +395,18 @@ export class VComponent {
         }
     }
 
+    /**
+     * Internal use only.
+     */
     __unregisterAppEventResolves() {
         this.__.appEventContexts.forEach((busContext, bus) => {
             busContext.forEach((resolve, type) => bus.unsubscribe(type, resolve))
         })
     }
 
+    /**
+     * Internal use only.
+     */
     __unregisterAppEventResolve(bus: EventBus, type: string) {
         let busContext = this.__.appEventContexts.get(bus)
 
@@ -303,6 +421,9 @@ export class VComponent {
         busContext.delete(type)
     }
 
+    /**
+     * Internal use only.
+     */
     __recreateAppEventsResolves() {
         this.__unregisterAppEventResolves()
 
@@ -312,6 +433,9 @@ export class VComponent {
 
     // ReactiveObjects
 
+    /**
+     * Internal use only.
+     */
     __registerReactiveObjectResolve(object: ReactiveObject, type: string, resolve: (event: BusEvent) => any) {
         let reactiveObjectContext = this.__.reactiveObjectContexts.get(object)
 
@@ -325,13 +449,18 @@ export class VComponent {
         object.subscribe(type, resolve)
     }
 
-
+    /**
+     * Internal use only.
+     */
     __unregisterReactiveObjectResolves() {
         this.__.reactiveObjectContexts.forEach((reactiveObjectContext, object) => {
             reactiveObjectContext.forEach((resolve, type) => object.unsubscribe(type, resolve))
         })
     }
 
+    /**
+     * Internal use only.
+     */
     __unregisterReactiveObjectResolve(object: ReactiveObject, type: string) {
         let reactiveObjectContext = this.__.reactiveObjectContexts.get(object)
 
@@ -346,6 +475,9 @@ export class VComponent {
         reactiveObjectContext.delete(type)
     }
 
+    /**
+     * Internal use only.
+     */
     __recreateReactiveObjects() {
         this.__unregisterReactiveObjectResolves()
 
@@ -356,6 +488,9 @@ export class VComponent {
     // ReactiveCallbacks
 
 
+    /**
+     * Internal use only.
+     */
     __registerReactiveCallbacks() {
         for (const [key, context] of Object.entries(this.callbacks)) {
             if (context.__rc) {
@@ -368,6 +503,9 @@ export class VComponent {
         }
     }
 
+    /**
+     * Internal use only.
+     */
     __unregisterReactiveCallbacks() {
         for (const [key, context] of this.__.reactiveCallbackContexts) {
             if (context.__rc) {
@@ -378,6 +516,9 @@ export class VComponent {
         }
     }
 
+    /**
+     * Internal use only.
+     */
     __resolveReactiveCallbackChange(key, value) {
 
         const context = this.__.reactiveCallbackContexts.get(key)
@@ -400,6 +541,9 @@ export class VComponent {
         }
     }
 
+    /**
+     * Internal use only.
+     */
     __registerAppEventCallbackResolve(bus: EventBus, type: string, resolve: (event: BusEvent) => any, callbackName: any) {
         let callbackContext = this.__.reactiveCallbackAppEventContexts.get(callbackName)
 
@@ -417,6 +561,9 @@ export class VComponent {
         }
     }
 
+    /**
+     * Internal use only.
+     */
     __registerReactiveObjectCallbackResolve(key: string, type: string, resolve: (event: BusEvent) => any) {
         //
     }
@@ -424,6 +571,9 @@ export class VComponent {
 
     // State
 
+    /**
+     * Internal use only.
+     */
     __initState() {
         if (this.useProxyState) {
             this.state = new Proxy(this.state, {
@@ -434,6 +584,9 @@ export class VComponent {
         }
     }
 
+    /**
+     * Internal use only.
+     */
     stateTransaction(resolve, callStateChanged = true) {
         this.__.stateInTransactionMode = true
         resolve.bind(this)(this.state)
@@ -443,6 +596,11 @@ export class VComponent {
         }
     }
 
+    /**
+     * Set state data.
+     *
+     * @param data
+     */
     setState(data) {
         let stateWasChanged = false
         this.__.stateInTransactionMode = true
@@ -458,6 +616,15 @@ export class VComponent {
         }
     }
 
+    /**
+     * State was changed by proxy.
+     * Internal use only. But if there is a need you can override this.
+     *
+     * @param target
+     * @param key
+     * @param value
+     * @return {boolean}
+     */
     proxyStatePropertyChanged(target, key, value) {
         if (target[key] !== value) {
             target[key] = value
@@ -470,6 +637,13 @@ export class VComponent {
         return false
     }
 
+    /**
+     * State was changed.
+     *
+     * @param target
+     * @param key
+     * @param value
+     */
     stateChanged({target, key, value}) {
         this.__patch()
     }
@@ -477,24 +651,49 @@ export class VComponent {
 
     // Intervals and Timeouts
 
+    /**
+     * Register interval.
+     *
+     * @param handler
+     * @param timeout
+     * @param args
+     */
     withInterval(handler: TimerHandler, timeout?: number, ...args: any[]) {
         this.__.intervals.add(setInterval(handler, timeout, ...args))
     }
 
+    /**
+     * Register timeout.
+     *
+     * @param handler
+     * @param timeout
+     * @param args
+     */
     withTimeout(handler: TimerHandler, timeout?: number, ...args: any[]) {
         this.__.timeouts.add(setTimeout(handler, timeout, ...args))
     }
 
+    /**
+     * Clear all intervals.
+     */
     clearIntervals() {
         this.__.intervals.forEach(handle => clearInterval(handle))
     }
 
+    /**
+     * Clear all timeouts.
+     */
     clearTimeouts() {
         this.__.timeouts.forEach(handle => clearTimeout(handle))
     }
 
     // ref
 
+    /**
+     * Create ref for a simple node.
+     *
+     * @return {{__ref: boolean, $el: undefined}}
+     */
     static createRef() {
         return {
             __ref: true,
@@ -502,6 +701,11 @@ export class VComponent {
         }
     }
 
+    /**
+     * Create ref for a fragment.
+     *
+     * @return {{patch(*=, *=): void, fragment: undefined, __fragment_ref: boolean, $el: undefined, slot: undefined, props: {}}}
+     */
     static createFragmentRef() {
         return {
             __fragment_ref: true,
@@ -528,6 +732,11 @@ export class VComponent {
         }
     }
 
+    /**
+     * Create ref for a component.
+     *
+     * @return {{component: undefined, __component_ref: boolean}}
+     */
     static createComponentRef() {
         return {
             __component_ref: true,

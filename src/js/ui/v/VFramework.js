@@ -1,6 +1,5 @@
 import {VFrameworkRouter} from "./router"
 import VRDOM from "./vrdom/VRDOM"
-import {VComponent} from "./vrdom/component/VComponent"
 
 /**
  * V Framework - tool for building SPA-like application. Written specially for Telegram V.
@@ -15,7 +14,7 @@ class VFramework {
     plugins = new Set()
 
     /**
-     * @type {Map<string, Component>}
+     * @type {Map<string, Component | VComponent>}
      */
     mountedComponents = new Map()
 

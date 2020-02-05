@@ -1,20 +1,20 @@
-import Component from "../Component"
+import {VComponent} from "../component/VComponent"
 
 export class VRDOMPlugin {
     constructor() {
     }
 
     /**
-     * @param {Component} component
+     * @param {VComponent} component
      */
-    componentCreated(component: Component) {
+    componentCreated(component: VComponent) {
 
     }
 
     /**
-     * @param {Component} component
+     * @param {VComponent} component
      */
-    componentMounted(component: Component) {
+    componentMounted(component: VComponent) {
 
     }
 
@@ -23,7 +23,7 @@ export class VRDOMPlugin {
      *
      * @return {boolean} false to prevent mounting
      */
-    componentMounting(component: Component) {
+    componentMounting(component: VComponent) {
         return true
     }
 
