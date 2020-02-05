@@ -7,10 +7,10 @@ import {DialogInfoUsernameComponent} from "./DialogInfoUsernameComponent"
 import {DialogInfoPhoneComponent} from "./DialogInfoPhoneComponent"
 import {DialogInfoNotficationStatusComponent} from "./DialogInfoNotficationStatusComponent"
 import TabSelectorComponent from "../../../components/basic/TabSelectorComponent"
-import MessagesSearch from "../../../../../../api/messages/MessagesSearch"
 import {DialogInfoPhotoComponent} from "./fragments/DialogInfoPhotoComponent"
 import {DialogInfoLinkComponent} from "./fragments/DialogInfoLinkComponent"
 import {DialogInfoDocumentComponent} from "./fragments/DialogInfoDocumentComponent"
+import SearchManager from "../../../../../../api/search/SearchManager"
 
 export class DialogInfoComponent extends VComponent {
 
@@ -203,7 +203,7 @@ export class DialogInfoComponent extends VComponent {
 
             this.toggleContentLoading(true)
 
-            MessagesSearch.search(AppSelectedInfoPeer.Current, {
+            SearchManager.searchMessages(AppSelectedInfoPeer.Current, {
                 offsetId: this.contentPages[refName].offsetId,
                 filter: {
                     _: filter

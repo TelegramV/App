@@ -1,9 +1,12 @@
 import {MTProto} from "../../mtproto/external"
 import PeersManager from "../peers/PeersManager"
+import {Manager} from "../manager"
 
-class MessagesSearch {
+class SearchManagerSingleton extends Manager {
 
-    static search(peer, {offsetId, filter, limit = 33, q = ""}) {
+    cachedRecent = new Set()
+
+    searchMessages(peer, {offsetId, filter, limit = 33, q = ""}) {
         return MTProto.invokeMethod("messages.search", {
             peer: peer.inputPeer,
             q: q,
@@ -25,6 +28,16 @@ class MessagesSearch {
             return Messages
         })
     }
+
+    globalSearch(q, {offsetId, filter, limit = 33}) {
+        // todo: implement
+    }
+
+    loadRecent() {
+        // todo: implement
+    }
 }
 
-export default MessagesSearch
+const SearchManager = new SearchManagerSingleton()
+
+export default SearchManager
