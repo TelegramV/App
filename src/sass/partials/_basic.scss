@@ -66,34 +66,6 @@ b {
   vertical-align: -0.3em;
 }
 
-@keyframes rippleEffect {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  30% {
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1000);
-    opacity: 0;
-  }
-}
-
-@keyframes rippleEffectSmall {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  30% {
-    opacity: 1;
-  }
-  100% {
-    transform: scale(100);
-    opacity: 0;
-  }
-}
-
 
 ::-webkit-scrollbar {
   width: 5px;

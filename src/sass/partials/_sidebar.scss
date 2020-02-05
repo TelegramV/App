@@ -1,16 +1,29 @@
 .sidebar {
     $border: 1px $lightgrey solid;
-    background-color: #fff;
+    background-color: white;
     border-right: $border;
     max-width: 422px;
     width: 100%;
+    height: 100%;
+    z-index: 2;
+    position: absolute;
     box-sizing: border-box;
-    padding-top: 60px;
-    position: relative;
     transition: anim(width);
 
-    &.hidden {
+    &.fade-in {
+        left: 0 !important;
+        opacity: 1;
+    }
+
+    &.fade-out {
+        left: -1000px !important;
+        opacity: 0;
+    }
+
+    &.hidden,
+    .hidden {
         width: 0;
+        display: none;
     }
 
     &.right {
@@ -36,27 +49,91 @@
             flex-shrink: 0;
         }
     }
-    .hidden {
-      display: none;
+
+    &.search {
+        margin-top: 60px;
+        padding: 0 10px;
+
+        .title {
+            color: $darkgrey;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .people-list {
+            display: flex;
+            justify-content: space-between;
+
+            .people-list-item {
+                margin: 0 2px;
+                padding: 5px;
+                border-radius: 5px;
+                cursor: pointer;
+
+                &:hover {
+                    background-color: $light;
+                }
+
+                .photo-container {
+                    display: flex;
+                    justify-content: center;
+
+                    img {
+                        width: 60px;
+                        height: 60px;
+                        border-radius: 50%;
+                    }
+                }
+
+                .name {
+                    font-size: 14px;
+                    text-align: center;
+                    margin-top: 5px;
+                }
+            }
+        }
+
+        .column-list {
+            display: flex;
+            flex-direction: column;
+
+            .contact {
+                display: flex;
+                padding: 2px;
+                margin-bottom: 5px;
+
+                .photo-container {
+                    img {
+                        height: 50px;
+                        width: 50px;
+                        border-radius: 50%;
+                    }
+                }
+
+                .info-container {
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    margin-left: 10px;
+
+                    .name {
+                        font-weight: bold;
+                    }
+
+                    .status {
+                        color: $darkgrey;
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
     }
 
     &.settings {
-        height: 100%;
-        position: absolute;
         overflow-x: hidden;
-        padding-top: 0;
-        z-index: 101;
 
         .settings-header {
             display: flex;
-        }
-
-        .fade-in {
-          left: 0 !important;
-        }
-
-        .fade-out {
-          left: -1000px !important;
         }
 
         .settings-main {
@@ -92,7 +169,8 @@
             }
 
             .list-menu {
-              margin-top: 20px;
+                margin-top: 20px;
+
                 .menu-item {
                     margin: 1px 5px;
                     display: flex;
@@ -114,38 +192,36 @@
                 }
             }
         }
+    }
 
-        .background-color {
-            padding: 0 5px;
-            position: absolute;
-            top: 0;
-            left: 500px;
-            height: 100%;
-            background-color: white;
-            transition: anim(left);
+    &.background-color {
+        padding: 0 5px;
+        top: 0;
+        left: 500px;
+        background-color: white;
+        transition: anim(left);
 
-            .gallery {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(8rem, 1fr));
-                grid-auto-rows: 1fr;
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(8rem, 1fr));
+            grid-auto-rows: 1fr;
 
-                &::before {
-                    content: '';
-                    width: 0;
-                    padding-bottom: 100%;
-                    grid-row: 1 / 1;
-                    grid-column: 1 / 1;
-                }
+            &::before {
+                content: '';
+                width: 0;
+                padding-bottom: 100%;
+                grid-row: 1 / 1;
+                grid-column: 1 / 1;
+            }
 
-                &>*:first-child {
-                    grid-row: 1 / 1;
-                    grid-column: 1 / 1;
-                }
+            &>*:first-child {
+                grid-row: 1 / 1;
+                grid-column: 1 / 1;
+            }
 
-                .color-square {
-                    margin: 2px;
-                    cursor: pointer;
-                }
+            .color-square {
+                margin: 2px;
+                cursor: pointer;
             }
         }
     }

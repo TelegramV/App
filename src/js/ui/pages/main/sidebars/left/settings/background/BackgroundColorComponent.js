@@ -2,8 +2,12 @@ import Component from "../../../../../../v/vrdom/Component"
 import SettingsPane from "../SettingsPane"
 
 export class BackgroundColorComponent extends SettingsPane {
+	barName = "background-color";
+
 	constructor(props) {
 		super(props);
+
+		this.name = "Set a Color"
 
 		this.defaultColors = [
 			"#E6EBEE",
@@ -21,13 +25,9 @@ export class BackgroundColorComponent extends SettingsPane {
 		]
 	}
 
-	getId() {
-		return "background-color"
-	}
-
 	h() {
 		return (
-			<div class="background-color hidden">
+			<div class="sidebar background-color scrollable hidden">
 				{this.makeHeader()}
 				<div class="pallete">
 					Pallete goes here...
@@ -39,10 +39,6 @@ export class BackgroundColorComponent extends SettingsPane {
 			)
 	}
 
-	getName() {
-		return "Set a Color"
-	}
-
 	generateColorList() {
 		let elements = [];
 		for(const color of this.defaultColors) {
@@ -51,12 +47,12 @@ export class BackgroundColorComponent extends SettingsPane {
 		return elements;
 	}
 
-	applyColor(color) {
+	applyColor = (color) => {
 		window.document.documentElement.style.setProperty("--chat-bg-image", "");
 		window.document.documentElement.style.setProperty("--chat-bg-color", color);
 	}
 
-	_fragmentClick(ev) {
+	_fragmentClick = (ev) => {
 		this.applyColor(ev.currentTarget.getAttribute("color"));
 	}
 }

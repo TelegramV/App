@@ -1,46 +1,44 @@
-import Component from "../../../../../v/vrdom/Component"
+import {LeftBarComponent} from "../LeftBarComponent"
+import UIEvents from "../../../../../eventBus/UIEvents"
 
-export default class SettingsPane extends Component {
+export default class SettingsPane extends LeftBarComponent {
     constructor(props) {
         super(props)
-        this.previousPane = props.props.previousPane;
-        props.props.addPane(this.getId(), this);
+
+        this.name = "Settings"
+        this.barVisible = false;
+
+        this.previous = this.props.previous;
     }
 
-    getId() {
-    	return "settings";
-    }
-
-    getName() {
-        return "Settings"
-    }
-
-    open() {
+    barOnShow = () => {
         this.$el.classList.remove("hidden")
         this.$el.classList.remove("fade-out")
         this.$el.classList.add("fade-in")
     }
 
-    close() {
+    barOnHide = () => {
         this.$el.classList.remove("fade-in")
         this.$el.classList.add("fade-out")
-        setTimeout(_ => {
-            this.$el.classList.add("hidden");
-            this.$el.classList.remove("fade-out")
-        }, 500);
+        this.$el.classList.add("hidden")
     }
 
-    onBack() {
-        this.close();
-        this.previousPane.open();
+    barAfterHide = () => {
+        this.$el.classList.remove("fade-out")
     }
 
-    makeHeader() {
+    onBack = () => {
+        UIEvents.LeftSidebar.fire("show", {
+            barName: this.previous
+        })
+    }
+
+    makeHeader = () => {
         return (
             <div class="sidebar-header">
-				<i class="btn-icon tgico tgico-back" onClick={this.onBack.bind(this)}/>
-				<div class="sidebar-title">{this.getName()}</div>
-			</div>
+                <i class="btn-icon tgico tgico-back" onClick={this.onBack.bind(this)}/>
+                <div class="sidebar-title">{this.name}</div>
+            </div>
         )
     }
 }

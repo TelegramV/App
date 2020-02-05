@@ -1,10 +1,12 @@
+@import "tgico";
+
 @import "partials/reset";
-@import "partials/animation";
 @import "partials/vars";
 
 @import "partials/basic";
 @import "partials/inputs";
 @import "partials/theme";
+@import "partials/animation";
 
 @import "partials/toolbar";
 @import "partials/chat";
@@ -20,8 +22,6 @@
 @import "partials/inlineKeyboard";
 @import "partials/sidebar";
 @import "partials/grouped";
-
-@import "tgico";
 
 @import "partials/loading";
 @import "partials/login";
