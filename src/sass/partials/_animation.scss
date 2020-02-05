@@ -1,3 +1,31 @@
+@keyframes rippleEffect {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1000);
+    opacity: 0;
+  }
+}
+
+@keyframes rippleEffectSmall {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(100);
+    opacity: 0;
+  }
+}
+
 @keyframes slide-up-message {
   0% {
     transform: translateY(1px);
@@ -26,5 +54,20 @@
     max-height: 1000px;
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+@keyframes menu-to-arrow {
+  0% {
+    content: $tgico-menu;
+  }
+
+  75% {
+    content: $tgico-back;
+  }
+
+  100% {
+    content: $tgico-back;
+    transform: rotate(360deg);
   }
 }

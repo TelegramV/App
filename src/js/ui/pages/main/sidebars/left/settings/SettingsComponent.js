@@ -1,16 +1,12 @@
 import Component from "../../../../../v/vrdom/Component"
-import {BackgroundColorComponent} from "./background/BackgroundColorComponent"
 import PeersStore from "../../../../../../api/store/PeersStore"
+import {LeftBarComponent} from "../LeftBarComponent"
+import UIEvents from "../../../../../eventBus/UIEvents"
 
-export let Settings;
-
-export class SettingsComponent extends Component {
+export class SettingsComponent extends LeftBarComponent {
+	barName = "settings";
 	constructor(props) {
 		super(props);
-
-		Settings = this;
-
-		this.panes = new Map();
 	}
 
 	h() {
@@ -18,7 +14,7 @@ export class SettingsComponent extends Component {
 			<div class="settings sidebar scrollable hidden">
 				<div class="settings-main">
 					<div class="sidebar-header">
-						<i class="btn-icon tgico tgico-back" onClick={this.close}/>
+						<i class="btn-icon tgico tgico-back" onClick={_ => this.openPane("dialogs")}/>
 						<div class="sidebar-title">Settings</div>
 						<span class="btn-icon tgico tgico-more rp rps"/>
 					</div>
@@ -35,31 +31,33 @@ export class SettingsComponent extends Component {
 	                	<MenuItemFragment icon="language" name="Language"/>
 	                </div>
 				</div>
-				<BackgroundColorComponent addPane={this.addPane} previousPane={this}/>
 			</div>
 			)
 	}
 
-	open() {
+	barOnShow = () => {
+		this.open();
+	}
+
+	open = () => {
 		this.fill();
 		this.$el.classList.remove("hidden");
-		this.$el.querySelector(".settings-main").style.display="block"
 	}
 
-	openPane(name) {
-		let pane = this.panes.get(name);
-		if(pane) pane.open();
-		setTimeout(_ => {this.$el.querySelector(".settings-main").style.display="none"},500)
+	openPane = (name) => {
+		UIEvents.LeftSidebar.fire("show", {
+            barName: name
+        })
 	}
 
-	addPane(name, pane) {
-		if(!this.panes.has(name)) this.panes.set(name, pane)
-	}
-
-	fill() {
+	fill= () => {
 		if(this.filled) return;
 
 		let peer = PeersStore.self();
+		if(!peer) {
+			this.openPane("dialogs") //cancelling opening, no info loaded yet
+			return;
+		}
 		if(peer.photo.bigUrl) {
 			this.$el.querySelector(".photo-container > .photo").src = peer.photo.bigUrl;
 		} else {
@@ -72,8 +70,12 @@ export class SettingsComponent extends Component {
 		this.filled = true;
 	}
 
-	close() {
-		this.$el.classList.toggle("hidden");
+	barOnHide = () => {
+		this.close();
+	}
+
+	close = () => {
+		this.$el.classList.add("hidden");
 	}
 }
 

@@ -46,7 +46,9 @@ export class DialogListComponent extends LeftBarComponent {
         return (
             <div className="chatlist sidebar">
                 <div className="toolbar">
-                    <i className="btn-icon rp rps tgico-menu" onClick={ev => ContextMenuManager.openBelow([
+                    <i className="btn-icon rp rps tgico-menu" onClick={ev => {
+                        if(ev.currentTarget.classList.contains("back")) return true; //Button currently in back state
+                        ContextMenuManager.openBelow([
                         {
                             icon: "newgroup",
                             title: "New group",
@@ -89,10 +91,10 @@ export class DialogListComponent extends LeftBarComponent {
                             icon: "help",
                             title: "Help"
                         }
-                    ], ev.target)}/>
+                    ], ev.target)}}/>
                     <div className="search rp rps">
                         <div className="input-search">
-                            <input type="text" placeholder="Search"/>
+                            <input type="text" placeholder="Search" onFocus={this.openSearch.bind(this)}/>
                             <span className="tgico tgico-search"/>
                         </div>
                     </div>
@@ -186,6 +188,28 @@ export class DialogListComponent extends LeftBarComponent {
             }
         }
     }
+
+    openSearch() {
+        let icon = this.$el.querySelector(".toolbar .btn-icon");
+        icon.classList.add("back");
+        icon.addEventListener("click", this._searchBackClick);
+
+        UIEvents.LeftSidebar.fire("show", {
+            barName: "search"
+        })
+    }
+
+    _searchBackClick(ev) {
+        let icon = ev.currentTarget;
+        UIEvents.LeftSidebar.fire("show", {
+            barName: "dialogs"
+        })
+        icon.classList.remove("back");
+        icon.removeEventListener("click", this._searchBackClick);
+    }
+    //Ми не ховаємось в тіні!!!
+    barOnShow = () => {}
+    barOnHide = () => {}
 
     /**
      * CRITICAL: this method must be called only once per unique dialog.

@@ -4,20 +4,20 @@
   display: none;
 }
 
-.chatlist {
+.chatlist:not(.hidden) {
   position: relative;
   padding-top: 60px;
   height: 100vh;
   z-index: 1;
 
-  &:before {
+  /*&:before {
     content: " ";
     position: absolute;
     right: -5px;
     width: 5px;
     height: 100vh;
     cursor: w-resize;
-  }
+  }*/
 }
 
 #dialogsWrapper {

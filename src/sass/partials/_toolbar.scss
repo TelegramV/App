@@ -9,6 +9,12 @@
 	width: 100%;
 	display: flex;
 	box-sizing: border-box;
+
+	.btn-icon.back:before {
+		display: block;
+		transition: anim(content);
+		animation: 0.2s menu-to-arrow linear forwards;
+	}
 }
 
 .btn-icon {
