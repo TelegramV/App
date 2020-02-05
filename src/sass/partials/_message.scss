@@ -80,6 +80,22 @@
                 mask-position: 100% 100%;
                 //-webkit-mask-composite: xor, source-over;
             }
+
+            &.transparent {
+                border-radius: 12px;
+                -webkit-mask-image: none;
+                mask-image: none;
+                &.in {
+                    padding-left: 0;
+                    margin-left: 10px;
+
+                }
+
+                &.out {
+                    padding-right: 0;
+                    margin-right: 10px;
+                }
+            }
             -webkit-mask-repeat: no-repeat;
             mask-repeat: no-repeat;
 

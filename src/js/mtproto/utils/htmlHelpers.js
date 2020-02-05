@@ -52,11 +52,18 @@ function elemToEntity(elem, offset, length) {
         b: "messageEntityBold",
         strong: "messageEntityBold",
         i: "messageEntityItalic",
-        code: "messageEntityCode",
+        sub: "messageEntityCode",
         pre: "messageEntityPre",
         u: "messageEntityUnderline",
         s: "messageEntityStrike",
+        strike: "messageEntityStrike",
         blockquote: "messageEntityBlockquote",
+        a: l => {
+            return {
+                _: "messageEntityTextUrl",
+                url: l.href
+            }
+        }
     }
 
     const tagName = elem.tagName.toLowerCase()

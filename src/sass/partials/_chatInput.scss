@@ -161,7 +161,7 @@
         }
       }
 
-      .input-field {
+      .field {
         display: flex;
         height: auto;
         width: 100%;
@@ -190,8 +190,14 @@
           display: inline-flex;
           width: 100%;
           align-self: start;
-          display: inline;
+          //display: inline;
+          white-space: pre;
 
+          sub {
+            font-size: initial;
+            font-family: monospace;
+            white-space: pre;
+          }
           * {
             word-break: break-word !important;
           }

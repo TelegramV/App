@@ -10,22 +10,14 @@ export class ModalComponent extends Component {
             hidden: true,
         }
     }
+    // TODO fix loginscreen modal
 
     h() {
         return (
             <div className={["modal-wrapper", this.state.hidden ? "hidden" : ""]}>
                 <div className="modal" onClick={this.close}>
                     <div className="dialog" onClick={l => l.stopPropagation()}>
-                        <div className="content">
-                            <div className="header">
-                                {/*<i className="btn-icon rp rps tgico tgico-close close-button" onClick={this.close}/>*/}
-                                <div className="title">{this.state.title}</div>
-                            </div>
-                            <div className="body">
-                                {this.state.body}
-                                {/*<div id="photoDone" className="done-button rp"><i className="tgico tgico-check"/></div>*/}
-                            </div>
-                        </div>
+                        {this.state.body}
                     </div>
                 </div>
             </div>
@@ -37,9 +29,8 @@ export class ModalComponent extends Component {
         this.__patch()
     }
 
-    open(title, body) {
+    open(body) {
         this.state.hidden = false
-        this.state.title = title
         this.state.body = body
         this.__patch()
     }

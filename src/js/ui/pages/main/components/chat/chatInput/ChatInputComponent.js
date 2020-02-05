@@ -11,6 +11,10 @@ import {replaceEmoji} from "../../../../../utils/emoji"
 import ComposerComponent from "./ComposerComponent"
 import {MessageParser} from "../../../../../../api/messages/MessageParser";
 import {domToMessageEntities} from "../../../../../../mtproto/utils/htmlHelpers";
+import {ModalManager} from "../../../../../modalManager";
+import {AttachFilesModal} from "../../../modals/AttachFilesModal";
+import {AttachPollModal} from "../../../modals/AttachPollModal";
+import {TextareaFragment} from "./TextareaFragment";
 
 export let ChatInputManager
 
@@ -22,10 +26,6 @@ export class ChatInputComponent extends Component {
             reply: null,
             attachments: []
         }
-    }
-
-    get isVoiceMode() {
-        return this.textarea && this.textarea.childNodes.length === 0
     }
 
     h() {
@@ -46,60 +46,13 @@ export class ChatInputComponent extends Component {
                             </div>
                         </div>
 
-                        <div className="input-field">
+                        <div className="field">
                             <div className="another-fucking-wrapper">
                                 <div className="ico-wrapper">
                                     <i className="tgico tgico-smile btn-icon rp rps"
                                        onMouseEnter={this.mouseEnterEmoji} onMouseLeave={this.mouseLeaveEmoji}/>
                                 </div>
-                                <div className="textarea empty"
-                                     placeholder="Message"
-                                     contentEditable onInput={this.onInput} onKeyPress={this.onKeyPress}
-                                     onContextMenu={ContextMenuManager.listener([
-                                         {
-                                             title: "Bold",
-                                             after: "Ctrl+B",
-                                             onClick: _ => {
-                                             }
-                                         },
-                                         {
-                                             title: "Italic",
-                                             after: "Ctrl+I",
-                                             onClick: _ => {
-                                             }
-                                         },
-                                         {
-                                             title: "Underline",
-                                             after: "Ctrl+U",
-                                             onClick: _ => {
-                                             }
-                                         },
-                                         {
-                                             title: "Strikethrough",
-                                             after: "Ctrl+Shift+X",
-                                             onClick: _ => {
-                                             }
-                                         },
-                                         {
-                                             title: "Monospace",
-                                             after: "Ctrl+Shift+M",
-                                             onClick: _ => {
-                                             }
-                                         },
-                                         {
-                                             title: "Create link",
-                                             after: "Ctrl+K",
-                                             onClick: _ => {
-                                             }
-                                         },
-                                         {
-                                             title: "Normal text",
-                                             after: "Ctrl+Shift+N",
-                                             onClick: _ => {
-                                             }
-                                         }
-                                     ])} onPaste={this.onPaste}>
-                                </div>
+                                <TextareaFragment />
 
                                 <div className="ico-wrapper">
 
@@ -191,6 +144,10 @@ export class ChatInputComponent extends Component {
         this.onInput();
     }
 
+    get isVoiceMode() {
+        return this.textarea && this.textarea.childNodes.length === 0
+    }
+
     initDragArea() {
         // TODO should create separate drag area!
         document.querySelector("body").addEventListener("drop", ev => {
@@ -258,23 +215,6 @@ export class ChatInputComponent extends Component {
     }
 
 
-    onPaste(ev) {
-        ev.preventDefault();
-
-        const text = (ev.originalEvent || ev).clipboardData.getData('text/plain')
-
-        document.execCommand("insertText", false, text)
-
-        for (let i = 0; i < ev.clipboardData.items.length; i++) {
-            const k = ev.clipboardData.items[i]
-            console.log(k.toString())
-            if (k.type.indexOf("image") === -1) continue
-            this.state.attachments.push({
-                src: URL.createObjectURL(k.getAsFile())
-            })
-            this.__patch()
-        }
-    }
 
     replyTo(message) {
         this.state.reply = {
@@ -314,7 +254,7 @@ export class ChatInputComponent extends Component {
     }
 
     pickPoll() {
-
+        ModalManager.open(<AttachPollModal/>)
     }
 
     pickFile(document) {
@@ -495,12 +435,7 @@ export class ChatInputComponent extends Component {
         console.error("MouseDown")
     }
 
-    onKeyPress(ev) {
-        if ((ev.which === 13 || ev.which === 10) && !ev.shiftKey && !ev.ctrlKey) {
-            this.send()
-            ev.preventDefault()
-        }
-    }
+
 
     convertEmojiToText(ee) {
         if(ee.nodeType === Node.TEXT_NODE) return
@@ -543,8 +478,4 @@ export class ChatInputComponent extends Component {
         }
     }
 
-    onInput(ev) {
-        this.updateSendButton();
-        replaceEmoji(this.textarea);
-    }
 }

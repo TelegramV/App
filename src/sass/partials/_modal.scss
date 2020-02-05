@@ -23,47 +23,106 @@
 
         background-color: rgba(0, 0, 0, 0.3);
         transition: anim(background-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         .dialog {
             min-width: 280px;
-            width: 400px;
+            //width: 400px;
             min-height: 200px;
             z-index: 10;
             transition: anim(opacity);
-            margin: auto;
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%);
 
-            .content {
-                padding: 18px;
-                background-color: white;
-                border-radius: 1em;
+            //padding: 18px;
+            background-color: white;
+            border-radius: 12px;
 
-                .header {
-                    //height: 54px;
-                    display: flex;
-                    width: 100%;
-                    flex-direction: row;
-                    align-items: center;
+            .header {
+                display: flex;
+                flex-direction: row;
+                height: 60px;
+                font-weight: 500;
+                align-items: center;
 
-                    .close-button {
-                        font-size: 24px;
-                        margin: 0 20px 0 10px;
-                    }
-
-                    .title {
-                        font-size: 20px;
-                        font-weight: bold;
-                    }
+                .tgico {
+                    margin-left: 10px;
+                    margin-right: 22px;
                 }
 
-                .body {
-                    //padding: 20px;
-                    position: relative;
-                    padding-top: 16px;
+                .modal-action-btn {
+                    margin-left: auto;
+                    margin-right: 20px;
+                    background: $blue;
+                    height: 36px;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding-left: 20px;
+                    padding-right: 20px;
+                    border-radius: 10px;
+                    text-transform: uppercase;
+                    font-weight: 400;
+                    font-size: 0.8em;
+                    transition: anim(background-color);
+                    cursor: pointer;
+
+                    &:hover {
+                        background-color: rgba($blue, 0.8)
+                    }
                 }
             }
+
+            .padded {
+                padding-left: 18px;
+                padding-right: 18px;
+
+                &.bottom {
+                    padding-bottom: 18px;
+                }
+            }
+            //.content {
+            //    padding: 18px;
+            //    background-color: white;
+            //    border-radius: 1em;
+            //
+            //    .header {
+            //        //height: 54px;
+            //        display: flex;
+            //        width: 100%;
+            //        flex-direction: row;
+            //        align-items: center;
+            //
+            //        .close-button {
+            //            font-size: 24px;
+            //            margin: 0 20px 0 10px;
+            //        }
+            //
+            //        .title {
+            //            font-size: 20px;
+            //            font-weight: bold;
+            //        }
+            //    }
+            //
+            //    .body {
+            //        //padding: 20px;
+            //        position: relative;
+            //        padding-top: 16px;
+            //    }
+            //}
+        }
+    }
+}
+
+.attach-modal {
+    width: 350px;
+    .input-field {
+        width: 100%;
+        margin-block-end: 15px;
+
+        input {
+            width: 100%;
         }
     }
 }

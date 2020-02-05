@@ -37,7 +37,7 @@ class ChatComponent extends Component {
                     <LoaderComponent id="messages-wrapper-messages-loader" full={true} show={true}/>
 
                     <BubblesComponent/>
-                    <ChatInputComponent/>
+                    <ChatInputComponent ref="chatInput"/>
                 </div>
             </div>
         )

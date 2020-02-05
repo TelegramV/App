@@ -3,6 +3,9 @@ import Component from "../../../../v/vrdom/Component";
 export class InputComponent extends Component {
     constructor(props) {
         super(props)
+        this.state = {
+            value: this.props.value
+        }
     }
 
     h() {
