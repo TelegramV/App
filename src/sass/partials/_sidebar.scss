@@ -8,7 +8,7 @@
     z-index: 2;
     position: absolute;
     box-sizing: border-box;
-    transition: anim(width, opacity);
+    transition: anim(width);
 
     &.fade-in {
         left: 0 !important;
