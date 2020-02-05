@@ -58,6 +58,7 @@ export class ChannelUpdatesProcessor {
 
         this.updateTypes = [
             "updateChannel",
+            "updateNewChannelMessage",
             "updateReadChannelInbox",
             "updateDeleteChannelMessages",
             "updateChannelMessageViews",
@@ -143,9 +144,13 @@ export class ChannelUpdatesProcessor {
 
             const rawUpdate = channelQueue.queue.shift()
 
+            console.log(rawUpdate._)
+
             if (this.customUpdateTypeProcessors.has(rawUpdate._)) {
                 this.customUpdateTypeProcessors.get(rawUpdate._)(channelId, rawUpdate)
                 channelQueue.isProcessing = false
+                return
+            } else {
                 return
             }
 

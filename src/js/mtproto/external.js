@@ -3,6 +3,7 @@ import {AppConfiguration} from "../configuration"
 import MobileProtoWorker from "./workers/mtproto.worker"
 import {AppPermanentStorage} from "../common/storage"
 import UpdatesManager from "../api/updates/updatesManager"
+import AppEvents from "../api/eventBus/AppEvents"
 
 let lastTaskId = 0
 let waitingTasks = new Map()
@@ -20,6 +21,10 @@ MTProtoWorker.addEventListener("message", event => {
         AppPermanentStorage.removeItem(event.data.key)
     } else if (event.data.type === "clearLocalStorage") {
         AppPermanentStorage.clear()
+    } else if (event.data.type === "connectionLost") {
+        AppEvents.General.fire("connectionLost")
+    } else if (event.data.type === "connectionRestored") {
+        AppEvents.General.fire("connectionRestored")
     }
 
     if (event.data.taskId) {

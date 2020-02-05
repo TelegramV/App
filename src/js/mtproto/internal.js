@@ -219,6 +219,18 @@ class MobileProtocol {
     changeDefaultDC(dcID) {
 
     }
+
+    connectionRestored() {
+        this.workerPostMessage({
+            type: "connectionRestored"
+        })
+    }
+
+    connectionLost() {
+        this.workerPostMessage({
+            type: "connectionLost"
+        })
+    }
 }
 
 // NEVER USE THIS THING OUTSIDE mtproto FOLDER
