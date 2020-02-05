@@ -102,7 +102,7 @@ export class VComponent {
     }
 
     h() {
-        return 69
+
     }
 
     init() {
@@ -434,11 +434,13 @@ export class VComponent {
         }
     }
 
-    stateTransaction(resolve) {
+    stateTransaction(resolve, callStateChanged = true) {
         this.__.stateInTransactionMode = true
         resolve.bind(this)(this.state)
         this.__.stateInTransactionMode = false
-        this.stateChanged()
+        if (callStateChanged) {
+            this.stateChanged()
+        }
     }
 
     setState(data) {

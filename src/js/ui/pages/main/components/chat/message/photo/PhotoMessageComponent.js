@@ -22,8 +22,6 @@ class PhotoMessageComponent extends GeneralMessageComponent {
 
     message: PhotoMessage
 
-    $figure: Element
-
     photoFigureRef = VComponent.createFragmentRef()
 
     reactive(R) {

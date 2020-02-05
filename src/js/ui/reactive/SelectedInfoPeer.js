@@ -9,6 +9,12 @@ class SelectedInfoPeer {
         this._peer = undefined
 
         /**
+         * @type {undefined|Peer}
+         * @private
+         */
+        this._previous = undefined
+
+        /**
          * @type {Set<function(Peer)>}
          * @private
          */
@@ -31,6 +37,13 @@ class SelectedInfoPeer {
      */
     get Current() {
         return this._peer
+    }
+
+    /**
+     * @return {undefined|Peer}
+     */
+    get Previous() {
+        return this._previous
     }
 
     /**
@@ -59,6 +72,7 @@ class SelectedInfoPeer {
      * @param {Peer} peer
      */
     select(peer) {
+        this._previous = this._peer
         this._peer = peer
         this._subscribers.forEach(listener => {
             listener(this._peer)

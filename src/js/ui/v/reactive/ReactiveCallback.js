@@ -33,7 +33,6 @@ export type ReactiveCallbackContext =
  * @param {function(function(*))} subscribe анонімна функція, що приймає за параметр обробника реактивного оновлення. В компонентах він або патчить (__patch), або викликає reactiveChanged.
  * @param {function(function(*))} unsubscribe анонімна функція, приймає обробника (того самого що в попередньому параметрі) параметром, якого має видаляти з нижчого (чи вищого, я запутався) рівня і більше НІКОЛИ не виконувати. Викликається під час видалення компонента.
  * @return {{Default: ReactiveCallbackContext, FireOnly: FireOnlyReactiveCallbackContext, PatchOnly: PatchOnlyReactiveCallbackContext}}
- * @deprecated
  */
 function ReactiveCallback(subscribe: Subscribe, unsubscribe: Unsubscribe) {
     if (typeof subscribe !== "function") {

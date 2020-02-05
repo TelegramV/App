@@ -1,7 +1,7 @@
 import {UserPeer} from "../../../../../../api/dataObjects/peer/UserPeer"
 import {DialogTextComponent} from "./DialogTextComponent"
 import V from "../../../../../v/VFramework"
-import {DialogAvatarComponent} from "./DialogAvatarComponent"
+import {DialogAvatarFragment} from "./DialogAvatarFragment"
 import Component from "../../../../../v/vrdom/Component"
 import {tsNow} from "../../../../../../mtproto/timeManager"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
@@ -126,7 +126,8 @@ export class DialogComponent extends Component {
                  onClick={this._handleClick}
                  onContextMenu={this._contextMenuListener}>
 
-                <DialogAvatarComponent id={`dialog-${dialog.peer.id}-avatar`} dialog={dialog}/>
+                <DialogAvatarFragment id={`dialog-${dialog.peer.id}-avatar`}
+                                      peer={dialog.peer}/>
 
                 <div className="content">
 
@@ -247,8 +248,8 @@ export class DialogComponent extends Component {
 
     _patchAvatar() {
         if (this.__.mounted) {
-            VRDOM.patch(this.$avatar, <DialogAvatarComponent id={`dialog-${this.dialog.peer.id}-avatar`}
-                                                             dialog={this.dialog}/>)
+            VRDOM.patch(this.$avatar, <DialogAvatarFragment id={`dialog-${this.dialog.peer.id}-avatar`}
+                                                            peer={this.dialog.peer}/>)
         }
     }
 

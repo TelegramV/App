@@ -4,6 +4,7 @@ import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer";
 import {VComponent} from "../../../../../v/vrdom/component/VComponent"
 import ChatInfoAvatarComponent from "./ChatInfoAvatarComponent"
+import V from "../../../../../v/VFramework"
 
 class ChatInfoComponent extends VComponent {
 

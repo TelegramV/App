@@ -1,11 +1,10 @@
-import Component from "../../../../v/vrdom/Component";
+import {VComponent} from "../../../../v/vrdom/component/VComponent"
 
-export class ObjectWithThumbnailComponent extends Component {
-    constructor(props) {
-        super(props);
+export class ObjectWithThumbnailComponent extends VComponent {
 
+    init() {
         this.state = {
-            object: props.props.object,
+            object: this.props.object,
             loading: true
         }
 
@@ -32,28 +31,27 @@ export class ObjectWithThumbnailComponent extends Component {
                         <div className="pause-button">
                             <i className={["tgico", this.state.loading ? "tgico-close" : "tgico-download"]}/>
                         </div>
-                        <progress className={["progress-circular", "big", "white", this.state.loading ? "" : "paused"]}/>
+                        <progress
+                            className={["progress-circular", "big", "white", this.state.loading ? "" : "paused"]}/>
                     </div>
                     : ""
             }
         </figure>
     }
 
-    loadObject() {
+    loadObject = () => {
         this.props.loadObject(this.state.object, this.onProgress.bind(this)).then(l => {
             this.state.loading = false
-            this.__patch()
         })
     }
 
-    onProgress(downloaded, total) {
+    onProgress = (downloaded, total) => {
         return this.state.loading
     }
 
-    toggleLoading(ev) {
+    toggleLoading = (ev) => {
+        if (!this.state.loading) this.loadObject()
         this.state.loading = !this.state.loading
-        if(this.state.loading) this.loadObject()
-        this.__patch()
     }
 
 }

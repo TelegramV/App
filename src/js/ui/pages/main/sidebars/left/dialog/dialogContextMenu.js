@@ -4,7 +4,7 @@ import {GroupPeer} from "../../../../../../api/dataObjects/peer/GroupPeer"
 import {SupergroupPeer} from "../../../../../../api/dataObjects/peer/SupergroupPeer"
 import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer"
 import {ModalManager} from "../../../../../modalManager"
-import {DialogAvatarComponent} from "./DialogAvatarComponent"
+import {DialogAvatarFragment} from "./DialogAvatarFragment"
 import {FlatButtonComponent} from "../../../components/input/flatButtonComponent"
 import {Dialog} from "../../../../../../api/dialogs/Dialog"
 
@@ -51,7 +51,7 @@ export const dialogContextMenu = (dialog: Dialog) => {
             red: true,
             onClick: _ => {
                 ModalManager.open(<div className="delete-chat-title">
-                        <DialogAvatarComponent dialog={dialog}/>
+                        <DialogAvatarFragment peer={dialog.peer}/>
                         Delete Chat?
                     </div>,
                     <div className="delete-chat-body">
