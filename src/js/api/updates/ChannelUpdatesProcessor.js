@@ -52,9 +52,12 @@ export class ChannelUpdatesProcessor {
     constructor(updatesManager) {
         this.updatesManager = updatesManager
 
+        this.customUpdateTypeProcessors = new Map([
+            ["updateNewChannelMessage", this.processNewChannelMessageQueue]
+        ])
+
         this.updateTypes = [
             "updateChannel",
-            "updateNewChannelMessage",
             "updateReadChannelInbox",
             "updateDeleteChannelMessages",
             "updateChannelMessageViews",
@@ -98,7 +101,7 @@ export class ChannelUpdatesProcessor {
             this.queues.set(channelId, {
                 isProcessing: false,
                 isWaitingForDifference: false,
-                queue: []
+                queue: [],
             })
         }
 
@@ -140,7 +143,11 @@ export class ChannelUpdatesProcessor {
 
             const rawUpdate = channelQueue.queue.shift()
 
-            let channelId = this.getChannelIdFromUpdate(rawUpdate)
+            if (this.customUpdateTypeProcessors.has(rawUpdate._)) {
+                this.customUpdateTypeProcessors.get(rawUpdate._)(channelId, rawUpdate)
+                channelQueue.isProcessing = false
+                return
+            }
 
             if (!channelId) {
                 channelQueue.isProcessing = false
@@ -207,6 +214,10 @@ export class ChannelUpdatesProcessor {
                 }
             })
         }
+    }
+
+    processNewChannelMessageQueue(channelId, rawUpdate) {
+        console.log("processing channel q", channelId, rawUpdate)
     }
 
     processDifference(channelQueue, rawDifferenceWithPeer) {

@@ -6,6 +6,7 @@ import {UserPeer} from "../dataObjects/peer/UserPeer"
 import PeerFactory from "../dataObjects/peerFactory"
 
 class PeerManager extends Manager {
+
     constructor() {
         super()
     }

@@ -25,7 +25,7 @@ export class InputComponent extends Component {
                         <i id="peekButton" className={peekClasses.join(" ")} onClick={this.peek}/>
                         : ""
                 }
-                <input type={this.props.type === "password" && !this.props.hide ? "text" : this.props.type}
+                <input onKeyDown={this.onKeyDown} type={this.props.type === "password" && !this.props.hide ? "text" : this.props.type}
                        autocomplete="pls,no" placeholder={this.props.error || this.props.label}
                        value={this.props.error || this.props.value || ""}
                        onInput={l => this.onInput(l, this.props.filter, this.props.input)} className={this.props.error ? "invalid" : ""}/>
@@ -41,6 +41,13 @@ export class InputComponent extends Component {
 
     get error() {
         return this.props.error
+    }
+
+    onKeyDown(ev) {
+        if ((ev.which === 13 || ev.which === 10) && !ev.shiftKey && !ev.ctrlKey) {
+            ev.preventDefault()
+            this.onInput(ev, this.props.filter, this.props.input)
+        }
     }
 
     onInput(ev, filter, input) {
