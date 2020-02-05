@@ -82,6 +82,7 @@ export default class StickerComponent extends Component {
 	}
 
 	destroy() {
+		console.log("destroing animation")
 		super.destroy();
 		if(this.animated && this.animation) {
 			this.animation.destroy();

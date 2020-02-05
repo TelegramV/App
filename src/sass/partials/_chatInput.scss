@@ -1,5 +1,4 @@
 .chat-input-wrapper {
-  position: relative;
   max-width: $max-chat-width;
   width: 100%;
   min-height: $chat-input-height;
@@ -7,6 +6,7 @@
 
   .chat-input {
     margin: 5px 5px 20px 5px;
+    position: relative;
 
     display: flex;
     align-items: flex-end;
@@ -338,18 +338,25 @@
     transform: scale(0, 0);
     transition: transform 250ms ease-in-out;
     transform-origin: left bottom;
+    border-radius: 5px;
+    overflow: hidden;
+
+    box-shadow: 0 2px 3px 0 rgba(16, 35, 47, .15);
 
     display: flex;
     background-color: white;
     border-radius: 10px;
     flex-direction: column;
-    bottom: 80px;
+    bottom: 70px;
+    left: 0;
     z-index: 900;
+
     &.visible {
       transform: scale(1, 1);
     }
     .content {
       overflow: hidden;
+      padding: 0 5px;
       height: 100%;
     }
 
@@ -367,15 +374,15 @@
       .sticker-table {
         width: 100%;
         height: 100%;
-        padding: 5px;
         overflow: hidden;
         & > * {
           display: none;
           height: 100%;
-          overflow-y: auto;
           grid-template-columns: repeat(9, 1fr);
           &.selected {
             display: grid;
+            justify-items: center;
+            align-items: center;
           }
           .emoji {
             display: block;
@@ -431,6 +438,44 @@
           grid-template-columns: repeat(5, 1fr);
           .sticker {
             cursor: pointer;
+          }
+        }
+      }
+      .sticker-packs {
+        overflow-x: auto;
+        justify-content: start;
+        .sticker-packs-item {
+          display: flex;
+          align-items: center;
+          flex-shrink: 0;
+          margin: 0 2px;
+          img {
+            width: 35px;
+          }
+        }
+      }
+    }
+    .gif-wrapper {
+      height: 100%;
+      .gif-masonry {
+        height: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        .masonry-item {
+          flex: 1 0 auto;
+          max-width: 100%;
+          height: 100px;
+          margin: 2.5px;
+          cursor: pointer;
+          figure {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            video {
+              max-width: unset;
+              object-fit: cover;
+              width: 102%;
+            }
           }
         }
       }

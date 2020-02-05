@@ -1,7 +1,7 @@
 import AppEvents from "../../../../../api/eventBus/AppEvents"
 import {isElementInViewport} from "../../../../utils/index"
 
-import MessageComponent from "./../../messages/newMessage"
+import MessageComponent from "./MessageComponent"
 import Component from "../../../../v/vrdom/Component"
 import VRDOM from "../../../../v/vrdom/VRDOM"
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
@@ -32,7 +32,7 @@ class BubblesComponent extends Component {
 
     h() {
         return (
-            <div id="bubbles" onScroll={this._onScrollBubbles}>
+            <div id="bubbles" class="scrollable" onScroll={this._onScrollBubbles}>
                 <div id="bubbles-inner">
 
                 </div>
@@ -47,13 +47,12 @@ class BubblesComponent extends Component {
         function onIntersection(entries) {
             entries.forEach(entry => {
                 entry.target.style.opacity = entry.intersectionRatio > 0 && entry.target.style.opacity !== 1 ? 1 : 0
-                console.log(entry.intersectionRatio)
             })
         }
 
         this.intersectionObserver = new IntersectionObserver(onIntersection, {
             root: this.$el,
-            rootMargin: "40%",
+            rootMargin: "1000px",
             threshold: 1.0
         })
 

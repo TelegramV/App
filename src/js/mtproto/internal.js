@@ -139,7 +139,7 @@ class MobileProtocol {
                 authKey: new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("authKey" + dcID))),
                 serverSalt: new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("serverSalt" + dcID)))
             })
-            console.log("created file networker", this.networker, this)
+            // console.log("created file networker", this.networker, this)
             const list = this.fileNetworkers[dcID]
             this.fileNetworkers[dcID] = networker
             list.forEach(l => {

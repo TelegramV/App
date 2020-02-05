@@ -3,6 +3,7 @@ import TextWrapperComponent from "../common/TextWrapperComponent";
 import GeneralMessageComponent from "../common/GeneralMessageComponent"
 import {PhotoMessage} from "../../../../../../../api/messages/objects/PhotoMessage"
 import {PhotoFigureFragment} from "./PhotoFigureFragment"
+import {VComponent} from "../../../../../../v/vrdom/component/VComponent"
 
 const MessagePhotoFigureFragment = ({message, clickLoader}) => {
     return (
@@ -23,37 +24,41 @@ class PhotoMessageComponent extends GeneralMessageComponent {
 
     $figure: Element
 
+    photoFigureRef = VComponent.createFragmentRef()
+
+    reactive(R) {
+        super.reactive(R)
+
+        R.object(this.message)
+            .on("photoLoaded", this.onPhotoLoaded)
+    }
+
     h() {
         const text = this.message.text.length > 0 ? <TextWrapperComponent message={this.message}/> : ""
         return (
             <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""}>
-                <MessagePhotoFigureFragment message={this.message}
+                <MessagePhotoFigureFragment ref={this.photoFigureRef}
+                                            message={this.message}
                                             clickLoader={this.toggleLoading}/>
 
-               {text}
+                {text}
             </MessageWrapperFragment>
         )
     }
 
-    mounted() {
-        super.mounted()
-        this.$figure = this.$el.querySelector(`#msg-photo-figure-${this.message.id}`)
+
+    onPhotoLoaded = event => {
+        this.patchFigure()
     }
 
-    reactiveChanged(key: *, value: *, event: *) {
-        super.reactiveChanged(key, value, event)
-
-        if (event.type === "photoLoaded") {
-            this.patchFigure()
-        }
+    patchFigure = () => {
+        this.photoFigureRef.patch({
+            message: this.message,
+            clickLoader: this.toggleLoading
+        })
     }
 
-    patchFigure() {
-        VRDOM.patch(this.$figure, <MessagePhotoFigureFragment message={this.message}
-                                                              clickLoader={this.toggleLoading}/>)
-    }
-
-    toggleLoading() {
+    toggleLoading = () => {
         if (this.message.loading) {
             this.message.loading = false
             this.message.interrupted = true
@@ -62,6 +67,12 @@ class PhotoMessageComponent extends GeneralMessageComponent {
         }
 
         this.patchFigure()
+    }
+
+    destroy() {
+        super.destroy()
+        this.photoFigureRef.$el = null
+        this.photoFigureRef.fragment = null
     }
 }
 

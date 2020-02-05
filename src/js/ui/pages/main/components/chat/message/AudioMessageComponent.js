@@ -8,7 +8,6 @@ class AudioMessageComponent extends AudioComponent {
 
 	constructor(props) {
 		super(props);
-
 		let attrs = this.message.raw.media.document.attributes;
 		this.meta = {};
 
@@ -16,7 +15,7 @@ class AudioMessageComponent extends AudioComponent {
 			if(attr._=="documentAttributeAudio") {
 				this.meta = {
 					title: attr.title,
-					artist: attr.performer
+					artist: attr.performer || " "
 				}
 			}
 			if(attr._=="documentAttributeFilename") {
@@ -31,11 +30,13 @@ class AudioMessageComponent extends AudioComponent {
 		super.init();
 		let file = this.message.raw.media.document
 
-		FileAPI.getThumb(file, "max").then(l => {
-			// Tint
-			this.$el.querySelector(".play").style.background = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${l})`
-			this.thumb = l
-		})
+		if(file.thumbs) {
+			FileAPI.getThumb(file, "max").then(l => {
+				// Tint
+				this.$el.querySelector(".play").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${l})`
+				this.thumb = l
+			})
+		}
 
 	}
 
@@ -75,15 +76,19 @@ class AudioMessageComponent extends AudioComponent {
 
 	async getMeta() {
     	let file = this.message.raw.media.document
-		const size = FileAPI.getMaxSize(file)
+		let size = FileAPI.getMaxSize(file)
+		let src = this.thumb;
+		const minSize = 114;
+		if(size.w < minSize || size.h < minSize) {
+			src = undefined; //won't show in tab
+		}
     	return {
     		title: this.meta.title,
     		artist: this.meta.artist,
     		album: "Telegram", //sorry, no data from TG on that. Maybe replace with dialog name?
     		artwork: [{
-    			src: this.thumb,
+    			src: src,
     			sizes: size.w + "x" + size.h,
-    			type: "application/jpeg"
     		}]
     	}
     }

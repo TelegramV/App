@@ -15,7 +15,7 @@ export class SettingsComponent extends Component {
 
 	h() {
 		return (
-			<div class="settings sidebar hidden">
+			<div class="settings sidebar scrollable hidden">
 				<div class="settings-main">
 					<div class="sidebar-header">
 						<i class="btn-icon tgico tgico-back" onClick={this.close}/>

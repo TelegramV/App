@@ -44,9 +44,23 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
 
     }
 
-    for (let [k, v] of Object.entries(node.attrs)) {
-        if (v !== undefined) {
-            $el.setAttribute(k, v)
+    if ($el instanceof HTMLInputElement || $el instanceof HTMLTextAreaElement) {
+        for (let [k, v] of Object.entries(node.attrs)) {
+            if (k === "value") {
+                $el.value = v
+            } else if (k === "ref" && !v.__component_ref) {
+                $el.__ref = v
+            } else if (v !== undefined) {
+                $el.setAttribute(k, v)
+            }
+        }
+    } else {
+        for (let [k, v] of Object.entries(node.attrs)) {
+            if (k === "ref" && !v.__component_ref) {
+                $el.__ref = v
+            } else if (v !== undefined) {
+                $el.setAttribute(k, v)
+            }
         }
     }
 
@@ -54,8 +68,12 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
         $el[`on${k}`] = v
     }
 
-    for (let child of node.children) {
-        vrdom_append(child, $el, {xmlns})
+    if ($el instanceof HTMLTextAreaElement) {
+        return $el
+    } else {
+        for (let child of node.children) {
+            vrdom_append(child, $el, {xmlns})
+        }
     }
 
     V.plugins.forEach(plugin => plugin.elementCreated($el))

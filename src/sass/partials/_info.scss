@@ -22,12 +22,7 @@
     }
 
     .content {
-        overflow-y: hidden;
         height: 100%;
-
-        &:hover {
-            overflow-y: overlay;
-        }
 
         .photo-container {
             height: 120px;

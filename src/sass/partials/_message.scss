@@ -292,13 +292,10 @@
 
                 .pin-point {
                     position: absolute;
-                    //top: 50%;
+                    top: 50%;
                     left: 50%;
-                    transform: translate(-50%, -100%);
-
-                    svg {
-                        transform: scale(2, 2);
-                    }
+                    transform: translate(-50%, -80%);
+                    font-size: 60px;
                 }
             }
 
@@ -413,7 +410,7 @@
                                 height: 5px;
                                 border-radius: 5px;
                                 background-color: $green;
-                                transition: anim(width);
+                                transition: 1s ease-in-out width;
                             }
                         }
                     }
@@ -464,6 +461,7 @@
                     justify-content: center;
                     flex-shrink: 0;
                     cursor: pointer;
+                    background-size: cover;
 
                     &:before {
                         font-size: 2em;
@@ -785,6 +783,29 @@
             background-color: transparent;
             box-shadow: none;
             border-radius: 0 !important;
+            position: relative;
+            overflow: visible;
+            .fwd {
+                display: none;
+            }
+            .reply {
+                position: absolute;
+                right: 0;
+                transform: translateX(110%);
+                background-color: white;
+                border-radius: 10px;
+                padding: 8px;
+                border: 1px solid $grey;
+
+                .quote {
+                    .text {
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        max-width: 250px;
+                    }
+                }
+            }
         }
 
         a:not(.button) {
@@ -906,7 +927,7 @@
                     }
 
                     .progress-line {
-                        background-color: $green
+                        background-color: $grey
                     }
 
                     .control-ball,
@@ -975,6 +996,14 @@
     .out {
         align-items: flex-end;
         flex-direction: column;
+
+        .bubble.transparent {
+            .reply {
+                left: 0;
+                right: unset;
+                transform: translateX(-110%);
+            }
+        }
 
         .box:hover {
             background-color: rgba($green, 0.12);

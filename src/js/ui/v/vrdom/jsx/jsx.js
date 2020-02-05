@@ -22,6 +22,8 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
 
     const attrs: VRAttrs = Object.create(null)
     const events: VREvents = new Map()
+
+    let ref = undefined
     let dangerouslySetInnerHTML: boolean = false
 
     if (attributes) {
@@ -34,6 +36,9 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
                 // $ignore
                 dangerouslySetInnerHTML = v
                 attrs["f-dsil"] = true
+            } else if (key === "ref") {
+                ref = v
+                attrs["ref"] = v // legacy components support
             } else if (key.startsWith("css-")) {
                 const styleKey = key.substring(4)
 
@@ -65,6 +70,7 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
         events,
         // $ignore
         children,
+        ref,
 
         dangerouslySetInnerHTML
     })

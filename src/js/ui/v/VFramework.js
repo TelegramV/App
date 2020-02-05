@@ -1,5 +1,6 @@
 import {VFrameworkRouter} from "./router"
 import VRDOM from "./vrdom/VRDOM"
+import {VComponent} from "./vrdom/component/VComponent"
 
 /**
  * V Framework - tool for building SPA-like application. Written specially for Telegram V.
@@ -57,8 +58,7 @@ const V = new VFramework({
     router: new VFrameworkRouter()
 })
 
-
 global.VRDOM = VRDOM
-global.V = V
+global.VIX = V
 
 export default V

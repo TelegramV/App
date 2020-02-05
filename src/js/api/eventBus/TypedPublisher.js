@@ -43,7 +43,7 @@ export class TypedPublisher<T: TypedSubscription | Function> {
         this._subscriptions.get("*").delete(subscription)
 
         if (this._subscriptions.has(type)) {
-            this._subscriptions.get(type).delete(type, subscription)
+            this._subscriptions.get(type).delete(subscription)
         }
     }
 

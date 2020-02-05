@@ -1,8 +1,10 @@
 import VRNode from "../VRNode"
+import type {BusEvent} from "../../../../api/eventBus/EventBus"
 import {EventBus} from "../../../../api/eventBus/EventBus"
 import type {ReactiveCallbackContext} from "../../reactive/ReactiveCallback"
 import {ReactivePublisher} from "../../../../api/eventBus/ReactivePublisher"
 import Component from "../Component"
+import {ReactiveObject} from "../../reactive/ReactiveObject"
 
 export type VRTagName = string | number | ({ ...VRAttrs, slot?: VRSlot }) => VRNode | Class<Component>
 
@@ -18,6 +20,7 @@ export type VRRenderProps = {
 }
 
 export type VRNodeProps = {
+    ref: Object,
     attrs: VRAttrs,
     events: VREvents,
     dangerouslySetInnerHTML: any | boolean,
@@ -31,14 +34,35 @@ export type ComponentVRNodeProps = {
     ref: string | void
 }
 
+export type VComponentVRNodeProps = {
+    attrs: VRAttrs,
+    identifier: string | void
+}
+
 export type ComponentMeta = {
     inited: boolean,
     created: boolean,
     mounted: boolean,
     isPatchingItself: boolean,
     reactiveContexts: Map<string, ReactiveCallbackContext>,
-    appEventContexts: Map<EventBus, Map<string, any>>,
+    reactiveObjectContexts: Map<string, ReactiveCallbackContext>,
     reactiveInited: boolean,
+}
+
+export type VComponentMeta = {
+    inited: boolean,
+    // created: boolean,
+    mounted: boolean,
+    destroyed: boolean,
+    isPatchingItself: boolean,
+    reactiveObjectContexts: Map<ReactiveObject, Map<string, BusEvent => any>>,
+    reactiveCallbackContexts: Map<ReactiveObject, Map<string, BusEvent => any>>,
+    appEventContexts: Map<EventBus, Map<string, BusEvent => any>>,
+    reactiveCallbackAppEventContexts: Map<string, Map<EventBus, Map<string, BusEvent => any>>>,
+    intervals: Set<number>,
+    timeouts: Set<number>,
+    reactiveInited: boolean,
+    stateInTransactionMode: boolean,
 }
 
 export type ComponentProps = {

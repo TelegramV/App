@@ -145,7 +145,7 @@ export class DialogInfoComponent extends Component {
                     <div class="title">Info</div>
                     <span class="btn-icon tgico tgico-more rp rps"/>
                 </div>
-                <div class="content" onScroll={this.onScroll}>
+                <div class="content scrollable" onScroll={this.onScroll}>
                     <div class="photo-container">
                         <img class="photo" src=""/>
                     </div>

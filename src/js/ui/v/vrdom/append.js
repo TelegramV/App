@@ -1,6 +1,6 @@
 import VRNode from "./VRNode"
 import type {VRRenderProps} from "./types/types"
-import {vrdom_mount_resolveComponentMounted} from "./mount"
+import {vrdom_resolveMount} from "./mount"
 import vrdom_render from "./render/render"
 import V from "../VFramework"
 
@@ -21,7 +21,7 @@ const vrdom_append = (node: VRNode, $el: Element, props?: VRRenderProps) => {
     }
 
     // $ignore
-    vrdom_mount_resolveComponentMounted($mounted)
+    vrdom_resolveMount($mounted)
 
     return $mounted
 }

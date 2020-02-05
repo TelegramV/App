@@ -86,7 +86,7 @@ export class DialogListComponent extends Component {
 
                 <ConnectionStatusComponent/>
 
-                <div id="dialogsWrapper">
+                <div id="dialogsWrapper" class="scrollable">
                     <div className="full-size-loader" id="loader">
                         <progress className="progress-circular big"/>
                     </div>

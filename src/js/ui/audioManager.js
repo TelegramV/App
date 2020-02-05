@@ -82,11 +82,14 @@ class AudioManager0 {
     updateBrowserMeta() {
         if(!navigator.mediaSession) return;
         this.active.getMeta().then(meta => {
-            console.log(meta)
             if(!meta || !meta.artwork) return;
             for(const artwork of meta.artwork) {
-                if(!artwork.src) artwork.src = "./static/images/logo-192x192.png";
+                if(!artwork.src) {
+                    artwork.src = "./static/images/logo-192x192.png";
+                    artwork.sizes = "192x192";
+                }
             }
+            console.log(meta)
             navigator.mediaSession.metadata = new MediaMetadata(meta);
         }).catch(error => console.log(error))
     }

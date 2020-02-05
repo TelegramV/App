@@ -1,25 +1,29 @@
-import {UserPeer} from "../../../../../../api/dataObjects/peer/UserPeer"
-import {ChannelPeer} from "../../../../../../api/dataObjects/peer/ChannelPeer"
-import {SupergroupPeer} from "../../../../../../api/dataObjects/peer/SupergroupPeer"
-import {GroupPeer} from "../../../../../../api/dataObjects/peer/GroupPeer"
-import {BotPeer} from "../../../../../../api/dataObjects/peer/BotPeer"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
-import Component from "../../../../../v/vrdom/Component"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
-import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer";
+import {VComponent} from "../../../../../v/vrdom/component/VComponent"
+import type {BusEvent} from "../../../../../../api/eventBus/EventBus"
 
-const patchEvents = new Set([
-    "updateUserStatus",
-    "fullLoaded",
-])
+class ChatInfoStatusComponent extends VComponent {
 
-class ChatInfoStatusComponent extends Component {
-    constructor(props) {
-        super(props)
+    patchingStrategy = VRDOM.COMPONENT_PATCH_FAST
 
-        this.appEvents = new Set([
-            AppEvents.Peers.reactiveAny().FireOnly
-        ])
+    callbacks = {
+        peer: AppSelectedPeer.Reactive.PatchOnly
+    }
+
+    appEvents(E) {
+        E.bus(AppEvents.Peers)
+            .on("updateUserStatus", this.peersBusFired)
+            .on("fullLoaded", this.peersBusFired)
+    }
+
+    h() {
+        return (
+            <div className="bottom">
+                <div css-display={AppSelectedPeer.isSelected && AppSelectedPeer.Current.isSelf ? "none" : ""}
+                     className={["info", this.statusLine.online ? "online" : ""]}>{this.statusLine.text}</div>
+            </div>
+        )
     }
 
     get statusLine() {
@@ -32,21 +36,9 @@ class ChatInfoStatusComponent extends Component {
         return peer.statusString
     }
 
-    h() {
-        return (
-            <div className="bottom">
-                <div css-display={AppSelectedPeer.isSelected && AppSelectedPeer.Current.isSelf ? "none" : ""} className={["info", this.statusLine.online ? "online" : ""]}>{this.statusLine.text}</div>
-            </div>
-        )
-    }
-
-    eventFired(bus, event) {
-        if (bus === AppEvents.Peers) {
-            if (AppSelectedPeer.check(event.peer)) {
-                if (patchEvents.has(event.type)) {
-                    this.__patch()
-                }
-            }
+    peersBusFired = (event: BusEvent) => {
+        if (AppSelectedPeer.check(event.peer)) {
+            this.__patch()
         }
     }
 }

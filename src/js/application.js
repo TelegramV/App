@@ -12,6 +12,9 @@ import EmojiPlugin from "./ui/plugins/EmojiPlugin"
 import AppRoutes from "./ui/routing"
 import {StickerManager} from "./api/stickersManager";
 import VBigInt from "./mtproto/bigint/VBigInt"
+import type {BusEvent} from "./api/eventBus/EventBus"
+import {VComponent} from "./ui/v/vrdom/component/VComponent"
+import AppSelectedPeer from "./ui/reactive/SelectedPeer"
 
 const isProduction = false
 
@@ -59,9 +62,9 @@ if (isProduction) {
 } else {
     window.StickerManager = StickerManager
     window.send = (method, params) => {
-         MTProto.invokeMethod(method, params).then(result => {
+        MTProto.invokeMethod(method, params).then(result => {
             console.log(result);
-         })
+        })
     }
 }
 

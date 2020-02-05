@@ -2,7 +2,7 @@ import V from "../VFramework"
 import type VRNode from "./VRNode"
 import type {VRRenderProps} from "./types/types"
 import vrdom_render from "./render/render"
-import {vrdom_mount_resolveComponentMounted} from "./mount"
+import {vrdom_resolveMount} from "./mount"
 
 /**
  * Prepends VRNode to Real DOM Element children
@@ -22,7 +22,7 @@ function vrdom_prepend<T: Element>(node: VRNode, $el: T, props?: VRRenderProps):
         V.plugins.forEach(plugin => plugin.elementMounted($node))
     }
 
-    vrdom_mount_resolveComponentMounted($node)
+    vrdom_resolveMount($node)
 
     // $ignore
     return $node

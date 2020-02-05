@@ -1,22 +1,15 @@
 import ChatInfoStatusComponent from "./ChatInfoStatusComponent"
-import ChatInfoAvatarComponent from "./ChatInfoAvatarComponent"
 import ChatInfoNameComponent from "./ChatInfoNameComponent"
-import Component from "../../../../../v/vrdom/Component"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer";
+import {VComponent} from "../../../../../v/vrdom/component/VComponent"
+import ChatInfoAvatarComponent from "./ChatInfoAvatarComponent"
 
-class ChatInfoComponent extends Component {
-    constructor(props) {
-        super(props)
-
-        this.reactive = {
-            peer: AppSelectedPeer.Reactive.Default
-        }
-    }
+class ChatInfoComponent extends VComponent {
 
     h() {
         return (
-            <div id="messages-wrapper-chat-info" className="chat-info" onClick={this.openPeerInfo}>
+            <div id="messages-wrapper-chat-info" className="chat-info">
                 <div className="person">
 
                     <button class="responsive-only-mobile" onClick={this._backToMainPage}>
@@ -25,7 +18,7 @@ class ChatInfoComponent extends Component {
 
                     <ChatInfoAvatarComponent/>
 
-                    <div className="content">
+                    <div className="content" onClick={this.openPeerInfo}>
 
                         <div className="top">
                             <ChatInfoNameComponent/>
@@ -38,11 +31,11 @@ class ChatInfoComponent extends Component {
         )
     }
 
-    openPeerInfo() {
+    openPeerInfo = () => {
         AppSelectedInfoPeer.select(AppSelectedPeer.Current)
     }
 
-    _backToMainPage() {
+    _backToMainPage = () => {
         V.router.replace("/")
     }
 }

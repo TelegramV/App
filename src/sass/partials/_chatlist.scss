@@ -21,22 +21,10 @@
 }
 
 #dialogsWrapper {
+
+  will-change: transform;
+
   height: 100%;
-  overflow-y: hidden;
-
-  &:hover {
-    overflow-y: overlay;
-  }
-
-  @supports not(overflow-y: overlay) {
-    &:hover {
-      overflow-y: auto;
-    }
-  }
-
-  @media (max-width: 1000px) {
-    overflow-y: auto;
-  }
 }
 
 .list {
