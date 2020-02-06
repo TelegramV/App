@@ -104,55 +104,7 @@
                 padding-right: 0;
             }
 
-            .card {
-                display: flex;
-
-                .card-icon {}
-
-                .card-info {
-                    margin-left: 5px;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-
-                    font-size: 14px;
-
-                    .title {
-                        font-weight: bold;
-                    }
-
-                    .description {
-                        padding-top: 5px;
-                        color: $darkgrey;
-                    }
-                }
-
-                .time {
-                    align-self: flex-end;
-                    margin-left: 0;
-                }
-
-                .contact-image {
-                    width: 60px;
-                    height: 60px;
-                    border-radius: 50%;
-                }
-
-                .svg-wrapper {
-                    position: relative;
-                    height: 54px;
-                    width: 54px;
-
-                    .extension {
-                        position: absolute;
-                        top: 60%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        color: white;
-                        font-size: 18px;
-                    }
-                }
-            }
+            
 
             .sticker {
                 width: 250px;

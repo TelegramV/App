@@ -23,7 +23,9 @@ export default class StickerComponent extends Component {
 			return (
 	            <div className="sticker loading"
 	                 css-width={`${this.width}px`}
-	                 css-height={`${this.height}px`}/>
+	                 css-height={`${this.height}px`}
+	             	 onMouseOver={this._mOver}
+	             	 onMouseOut={this._mOut}/>
 	        )
 		} else {
 			return (
@@ -41,12 +43,14 @@ export default class StickerComponent extends Component {
 
 	downloadAndApply() {
 		FileAPI.getFile(this.sticker).then(url => {
+			if(this.__.destroyed) return; //sorry, we're late
 			if(this.animated) {
 				this._applyAnimated(url);
 			} else {
 				this._applySticker(url);
 			}
 		}).then(_=> {
+			if(this.__.destroyed) return;
 			this.$el.classList.remove("loading");
 		})
 	}
@@ -81,8 +85,21 @@ export default class StickerComponent extends Component {
             })
 	}
 
+	_mOver = (ev) => {
+		this.hovered = true;
+		if(!this.animation) return;
+		this.animation.loop = true;
+		this.animation.play();
+	}
+
+	_mOut = (ev) => {
+		this.hovered = false;
+		if(!this.animation) return;
+		this.animation.loop = false;
+	}
+
 	destroy() {
-		console.log("destroing animation")
+		//console.log("destroing animation")
 		super.destroy();
 		if(this.animated && this.animation) {
 			this.animation.destroy();

@@ -28,6 +28,7 @@ export default class VoiceMessageComponent extends AudioComponent {
     }
 
     updatePercent(percent) {
+        if(this.__.destroyed) return;
         this._setAttr(this.progress, "width", percent * this.width + "px");
     }
 

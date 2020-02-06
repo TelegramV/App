@@ -89,7 +89,6 @@ class AudioManager0 {
                     artwork.sizes = "192x192";
                 }
             }
-            console.log(meta)
             navigator.mediaSession.metadata = new MediaMetadata(meta);
         }).catch(error => console.log(error))
     }
