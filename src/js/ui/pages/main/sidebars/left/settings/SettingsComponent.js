@@ -80,8 +80,8 @@ export class SettingsComponent extends LeftBarComponent {
         this.filled = true;
     }
 
-    barOnHide = (name) => {
-        if (this._isSettingsBar(name)) return;
+    barOnHide = (ev) => {
+        if (this._isSettingsBar(ev.barName)) return;
         this.close();
     }
 
