@@ -1,6 +1,6 @@
 import DialogsManager from "../../../api/dialogs/DialogsManager"
 import UpdatesManager from "../../../api/updates/updatesManager"
-import PeersManager from "../../../api/peers/PeersManager"
+import PeersManager from "../../../api/peers/objects/PeersManager"
 import {LocaleController} from "../../../common/locale/localization"
 import MessagesManager from "../../../api/messages/MessagesManager"
 import {ContextMenuComponent} from "../../contextMenuManager"

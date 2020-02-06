@@ -1,10 +1,10 @@
-import {BotPeer} from "./peer/BotPeer";
-import {UserPeer} from "./peer/UserPeer";
-import {SupergroupPeer} from "./peer/SupergroupPeer";
-import {ChannelPeer} from "./peer/ChannelPeer";
-import {GroupPeer} from "./peer/GroupPeer";
-import {GroupForbiddenPeer} from "./peer/GroupForbiddenPeer";
-import {ChannelForbiddenPeer} from "./peer/ChannelForbiddenPeer";
+import {BotPeer} from "./objects/BotPeer";
+import {UserPeer} from "./objects/UserPeer";
+import {SupergroupPeer} from "./objects/SupergroupPeer";
+import {ChannelPeer} from "./objects/ChannelPeer";
+import {GroupPeer} from "./objects/GroupPeer";
+import {GroupForbiddenPeer} from "./objects/GroupForbiddenPeer";
+import {ChannelForbiddenPeer} from "./objects/ChannelForbiddenPeer";
 
 class PeerFactory {
     static fromRaw(rawPeer) {

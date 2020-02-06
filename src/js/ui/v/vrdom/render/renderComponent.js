@@ -16,8 +16,7 @@ function vrdom_renderComponentVNode(componentVNode: ComponentVRNode) {
         componentVNode.props.ref.component = componentInstance
     }
 
-
-    const newId = componentInstance.identifier ? String(componentInstance.identifier) : String(componentVNode.ref ? componentVNode.ref : V.latestInstantiatedComponent++)
+    const newId = componentInstance.identifier ? String(componentInstance.identifier) : String(typeof componentVNode.ref === "string" ? componentVNode.ref : V.latestInstantiatedComponent++)
 
     componentInstance.identifier = newId
     componentInstance.__init.bind(componentInstance)()

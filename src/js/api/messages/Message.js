@@ -1,6 +1,6 @@
 // @flow
 
-import {Peer} from "../dataObjects/peer/Peer"
+import {Peer} from "../peers/objects/Peer"
 import {Dialog} from "../dialogs/Dialog"
 
 export const MessageType = {

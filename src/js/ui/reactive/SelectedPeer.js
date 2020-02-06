@@ -1,7 +1,7 @@
 import V from "../v/VFramework"
 import ReactiveCallback from "../v/reactive/ReactiveCallback"
 import PeersStore from "../../api/store/PeersStore"
-import {Peer} from "../../api/dataObjects/peer/Peer"
+import {Peer} from "../../api/peers/objects/Peer"
 
 function parseHashQuery(queryParams = undefined) {
     const p = queryParams ? queryParams.p : V.router.activeRoute.queryParams.p
@@ -36,6 +36,7 @@ function parseHashQuery(queryParams = undefined) {
 
 class SelectedPeer {
     constructor() {
+
         /**
          * @type {undefined|Peer}
          * @private

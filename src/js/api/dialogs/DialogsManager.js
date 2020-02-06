@@ -1,10 +1,10 @@
 import {MTProto} from "../../mtproto/external"
 import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash, getPeerTypeFromType} from "./util"
 import TimeManager from "../../mtproto/timeManager"
-import PeersManager from "../peers/PeersManager"
+import PeersManager from "../peers/objects/PeersManager"
 import {Dialog} from "./Dialog";
 import {Manager} from "../manager";
-import {Peer} from "../dataObjects/peer/Peer";
+import {Peer} from "../peers/objects/Peer";
 import {PeerAPI} from "../peerAPI"
 import DialogsStore from "../store/DialogsStore"
 import AppEvents from "../eventBus/AppEvents"
@@ -20,6 +20,8 @@ class DialogManager extends Manager {
         this.dialogsOffsetDate = 0 // TODO
         this.offsetDate = 0
         this.count = undefined
+
+        this.isFetched = false
     }
 
 
@@ -30,7 +32,7 @@ class DialogManager extends Manager {
 
         AppSelectedPeer.subscribe(_ => {
             if (AppSelectedPeer.Previous) {
-                AppSelectedPeer.Previous.dialog.messages.clear()
+                AppSelectedPeer.Previous.dialog.peer.messages.clear()
             }
         })
 
@@ -52,13 +54,13 @@ class DialogManager extends Manager {
             const dialog = this.findByPeer(update.peer)
 
             if (dialog) {
-                dialog.messages.readInboxMaxId = update.max_id
+                dialog.peer.messages.readInboxMaxId = update.max_id
 
                 if (update.still_unread_count === 0) {
-                    dialog.messages.clearUnread()
+                    dialog.peer.messages.clearUnread()
                 } else {
-                    dialog.messages.unreadCount = update.still_unread_count
-                    dialog.messages.clearUnreadIds()
+                    dialog.peer.messages.unreadCount = update.still_unread_count
+                    dialog.peer.messages.clearUnreadIds()
                 }
             }
         })
@@ -66,7 +68,7 @@ class DialogManager extends Manager {
         MTProto.UpdatesManager.subscribe("updateReadHistoryOutbox", update => {
             const dialog = this.findByPeer(update.peer)
             if (dialog) {
-                dialog.messages.readOutboxMaxId = update.max_id
+                dialog.peer.messages.readOutboxMaxId = update.max_id
             }
         })
 
@@ -74,15 +76,15 @@ class DialogManager extends Manager {
             const dialog = this.find("channel", update.channel_id)
 
             if (dialog) {
-                dialog.messages.startTransaction()
-                dialog.messages.readInboxMaxId = update.max_id
+                dialog.peer.messages.startTransaction()
+                dialog.peer.messages.readInboxMaxId = update.max_id
                 if (update.still_unread_count === 0) {
-                    dialog.messages.clearUnread()
+                    dialog.peer.messages.clearUnread()
                 } else {
-                    dialog.messages.unreadCount = update.still_unread_count
-                    dialog.messages.clearUnreadIds()
+                    dialog.peer.messages.unreadCount = update.still_unread_count
+                    dialog.peer.messages.clearUnreadIds()
                 }
-                dialog.messages.stopTransaction()
+                dialog.peer.messages.stopTransaction()
 
                 dialog.fire("updateReadChannelInbox")
             }
@@ -91,7 +93,7 @@ class DialogManager extends Manager {
         MTProto.UpdatesManager.subscribe("updateReadChannelOutbox", update => {
             const dialog = this.find("channel", update.channel_id)
             if (dialog) {
-                dialog.messages.readOutboxMaxId = update.max_id
+                dialog.peer.messages.readOutboxMaxId = update.max_id
 
                 dialog.fire("updateReadChannelOutbox")
             }
@@ -254,7 +256,7 @@ class DialogManager extends Manager {
         const peer = PeersManager.setFromRaw(rawPeer)
 
         const dialog = this.setFromRaw(rawDialog, peer)
-        dialog.messages.last = MessageFactory.fromRaw(dialog, rawTopMessage)
+        dialog.peer.messages.last = MessageFactory.fromRaw(dialog, rawTopMessage)
         return dialog
     }
 
@@ -326,8 +328,8 @@ class DialogManager extends Manager {
             const dialogs = rawDialogs.dialogs.map(rawDialog => {
                 const dialog = this.resolveDialogWithSlice(rawDialog, rawDialogs)
 
-                if (dialog.messages.last) {
-                    this.offsetDate = dialog.messages.last.date
+                if (dialog.peer.messages.last) {
+                    this.offsetDate = dialog.peer.messages.last.date
                 } else {
                     console.error("BUG: no last message!")
                 }
@@ -347,6 +349,8 @@ class DialogManager extends Manager {
 
     fetchFirstPage() {
         return this.getDialogs({}).then(dialogs => {
+            this.isFetched = true
+
             AppEvents.Dialogs.fire("firstPage", {
                 dialogs: dialogs.filter(dialog => !dialog.isPinned),
                 pinnedDialogs: dialogs.filter(dialog => dialog.isPinned)

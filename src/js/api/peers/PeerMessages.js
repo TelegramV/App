@@ -1,14 +1,14 @@
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
-import {Dialog} from "./Dialog"
 import type {Message} from "../messages/Message"
+import {Peer} from "./objects/Peer"
 
 /**
  * @property {Message} _lastMessage
  * @property {Map<number, Message>} _messages
  */
-export class DialogMessages {
+export class PeerMessages {
 
-    _dialog: Dialog = undefined
+    _peer: Peer = undefined
 
     _messages: Map<number, Message> = new Map
     _otherMessages: Map<number, Message> = new Map // replies etc.
@@ -28,7 +28,7 @@ export class DialogMessages {
     _fireTransaction: boolean = false
 
     /**
-     * @param {Dialog} dialog
+     * @param {Peer} peer
      * @param {Message[]} messages
      * @param unreadCount
      * @param unreadMark
@@ -36,13 +36,13 @@ export class DialogMessages {
      * @param readOutboxMaxId
      * @param readInboxMaxId
      */
-    constructor(dialog, messages = [], {
+    constructor(peer, messages = [], {
         unreadCount = 0,
         unreadMentionsCount = 0,
         readOutboxMaxId = 0,
         readInboxMaxId = 0,
     } = {}) {
-        this._dialog = dialog
+        this._peer = peer
 
         this.appendMany(messages)
 
@@ -77,7 +77,7 @@ export class DialogMessages {
     getPollsById(poll_id: number): Array<Message> {
         return (
             [...this._messages.values()]
-            .filter(msg => msg.raw.media && msg.raw.media.poll && msg.raw.media.poll.id === poll_id)
+                .filter(msg => msg.raw.media && msg.raw.media.poll && msg.raw.media.poll.id === poll_id)
         )
     }
 
@@ -114,7 +114,7 @@ export class DialogMessages {
         this._unreadCount = unreadCount
 
         if (!this.isTransaction) {
-            this._dialog.fire("updateUnreadCount")
+            this._peer.dialog.fire("updateUnreadCount")
         }
     }
 
@@ -126,7 +126,7 @@ export class DialogMessages {
         this._unreadMentionsCount = unreadMentionsCount || this._unreadMentionsCount
 
         if (!this.isTransaction) {
-            this._dialog.fire("updateUnreadMentionsCount")
+            this._peer.dialog.fire("updateUnreadMentionsCount")
         }
     }
 
@@ -141,7 +141,7 @@ export class DialogMessages {
         this._readOutboxMaxId = readOutboxMaxId || this._readOutboxMaxId
 
         if (!this.isTransaction) {
-            this._dialog.fire("updateReadOutboxMaxId")
+            this._peer.dialog.fire("updateReadOutboxMaxId")
         }
     }
 
@@ -159,7 +159,7 @@ export class DialogMessages {
         this._readInboxMaxId = readInboxMaxId || this._readInboxMaxId
 
         if (!this.isTransaction) {
-            this._dialog.fire("updateReadInboxMaxId")
+            this._peer.dialog.fire("updateReadInboxMaxId")
         }
     }
 
@@ -182,7 +182,7 @@ export class DialogMessages {
             return
         }
 
-        if (AppSelectedPeer.check(this._dialog.peer)) {
+        if (AppSelectedPeer.check(this._peer)) {
             for (const message of messages) {
                 this.appendSingle(message)
             }
@@ -209,7 +209,7 @@ export class DialogMessages {
      * @param {Message} message
      */
     appendSingle(message: Message) {
-        if (AppSelectedPeer.check(this._dialog.peer)) {
+        if (AppSelectedPeer.check(this._peer)) {
             this._messages.set(message.id, message)
             this._alreadySorted = false
 
@@ -245,7 +245,7 @@ export class DialogMessages {
         }
 
         if (!this.isTransaction) {
-            this._dialog.fire("deleteMessage", {
+            this._peer.dialog.fire("deleteMessage", {
                 messageId
             })
         }
@@ -255,14 +255,14 @@ export class DialogMessages {
      * @param {number} messageId
      */
     addUnread(messageId) {
-        if (AppSelectedPeer.check(this._dialog.peer)) {
+        if (AppSelectedPeer.check(this._peer.peer)) {
             this._unreadIds.add(messageId)
         } else {
             this._unreadCount++
         }
 
         if (!this.isTransaction) {
-            this._dialog.fire("updateUnread")
+            this._peer.dialog.fire("updateUnread")
         }
     }
 
@@ -270,7 +270,7 @@ export class DialogMessages {
      * @param {number} messageId
      */
     deleteUnread(messageId) {
-        if (AppSelectedPeer.check(this._dialog.peer) || this.unreadMessagesIds.has(messageId)) {
+        if (AppSelectedPeer.check(this._peer.peer) || this.unreadMessagesIds.has(messageId)) {
             this._unreadIds.delete(messageId)
         } else {
             if (this._unreadCount > 0) {
@@ -279,7 +279,7 @@ export class DialogMessages {
         }
 
         if (!this.isTransaction) {
-            this._dialog.fire("updateUnread")
+            this._peer.dialog.fire("updateUnread")
         }
     }
 
@@ -298,7 +298,7 @@ export class DialogMessages {
             })
             this.stopTransaction()
 
-            this._dialog.fire("updateUnread")
+            this._peer.dialog.fire("updateUnread")
         }
     }
 
@@ -307,7 +307,7 @@ export class DialogMessages {
         this._unreadCount = 0
 
         if (!this.isTransaction) {
-            this._dialog.fire("updateUnread")
+            this._peer.dialog.fire("updateUnread")
         }
     }
 
@@ -348,7 +348,7 @@ export class DialogMessages {
     fireTransaction(eventName = "updateSingle", data = {}) {
         this.stopTransaction()
 
-        this._dialog.fire(eventName, data)
+        this._peer.dialog.fire(eventName, data)
 
     }
 }

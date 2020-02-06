@@ -1,4 +1,4 @@
-import PeersManager from "../peers/PeersManager"
+import PeersManager from "../peers/objects/PeersManager"
 
 /**
  * @param {UpdateManager} manager

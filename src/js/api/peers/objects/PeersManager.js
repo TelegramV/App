@@ -1,9 +1,9 @@
-import {Manager} from "../manager";
-import PeersStore from "../store/PeersStore"
-import AppEvents from "../eventBus/AppEvents"
-import {MTProto} from "../../mtproto/external"
-import {UserPeer} from "../dataObjects/peer/UserPeer"
-import PeerFactory from "../dataObjects/peerFactory"
+import {Manager} from "../../manager";
+import PeersStore from "../../store/PeersStore"
+import AppEvents from "../../eventBus/AppEvents"
+import {MTProto} from "../../../mtproto/external"
+import {UserPeer} from "./UserPeer"
+import PeerFactory from "../PeerFactory"
 
 class PeerManager extends Manager {
 
