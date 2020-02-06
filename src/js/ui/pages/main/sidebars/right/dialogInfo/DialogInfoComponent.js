@@ -143,7 +143,7 @@ export class DialogInfoComponent extends VComponent {
         }
     }
 
-    fetchMediaNextPage() {
+    fetchMediaNextPage = () => {
         this.fetchContentNextPage("media", "inputMessagesFilterPhotos", this.appendMediaMessage)
     }
 

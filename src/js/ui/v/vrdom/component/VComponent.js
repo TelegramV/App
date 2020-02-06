@@ -745,3 +745,5 @@ export class VComponent {
         }
     }
 }
+
+export default VComponent
