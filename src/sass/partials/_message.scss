@@ -741,7 +741,8 @@
             border-radius: 0 !important;
             position: relative;
             overflow: visible;
-            .fwd {
+            .fwd,
+            .username {
                 display: none;
             }
             .reply {

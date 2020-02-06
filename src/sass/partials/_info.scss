@@ -1,6 +1,12 @@
-.dialog-info:not(.hidden) {
+.sidebar.dialog-info {
     position: relative;
     padding-top: 60px;
+    max-width: 100%;
+    transition: anim(width);
+
+    &.hidden {
+        display: block;
+    }
 
     >.header {
         padding: 8px 14px;
