@@ -111,17 +111,17 @@ export default class ComposerComponent extends Component {
 		this.paused = false;
 	}
 
-	openEmoji() {
+	openEmoji = () => {
 		if(!this.emojiPanel) return;
 		this._closeStickers();
 		this.gifPanel.classList.add("hidden");
 		this.emojiPanel.classList.remove("hidden");
 	}
 
-	openStickers() {
+	openStickers = () => {
 		if(!this.stickerPanel) return;
 		this.loadRecentStickers().then(_ => {
-			this._bindStickerClickEvents();
+			this._bindStickerEvents();
 		})
 		this.loadInstalledStickerSets();
 		this.emojiPanel.classList.add("hidden");
@@ -129,7 +129,7 @@ export default class ComposerComponent extends Component {
 		this.stickerPanel.classList.remove("hidden");
 	}
 
-	_closeStickers() {
+	_closeStickers = () => {
 		this.stickerPanel.classList.add("hidden");
 		let stickerTable = this.stickerPanel.querySelector(".selected");
 		stickerTable.childNodes.forEach(node => {
@@ -138,14 +138,14 @@ export default class ComposerComponent extends Component {
 		while(stickerTable.firstChild) stickerTable.removeChild(stickerTable.firstChild);
 	}
 
-	openGIF() {
+	openGIF = () => {
 		this.emojiPanel.classList.add("hidden");
 		this._closeStickers();
 		this.gifPanel.classList.remove("hidden");
 		this.loadSavedGifs();
 	}
 
-	_emojiTypeClick(ev) {
+	_emojiTypeClick = (ev) => {
 		let el = ev.currentTarget;
 		let category = el.getAttribute("data-category");
 		if(!category) return;
@@ -160,18 +160,18 @@ export default class ComposerComponent extends Component {
 		this._bindEmojiClickEvents();
 	}
 
-	_bindEmojiClickEvents() {
+	_bindEmojiClickEvents = () => {
 		this.$el.querySelector(".emoji-table > .selected").childNodes.forEach(node => {
 			node.addEventListener("click", this._emojiClick);
 		})
 	}
 
-	_emojiClick(ev) {
+	_emojiClick = (ev) => {
 		let emoji = ev.currentTarget;
 		ChatInputManager.appendText(emoji.alt);
 	}
 
-	loadInstalledStickerSets() {
+	loadInstalledStickerSets = () => {
 		if(this.stickersInit) return;
 		StickerManager.getInstalledStickerSets().then(async sets => {
 			let container = this.stickerPanel.querySelector(".sticker-packs");
@@ -187,23 +187,23 @@ export default class ComposerComponent extends Component {
 		this.stickersInit = true;
 	}
 
-	_stickerPackClick(ev) {
+	_stickerPackClick = (ev) => {
 		let id = ev.currentTarget.getAttribute("set-id");
 		if(!id) return;
 		this.setStickerSet(id);
 	}
 
-	setStickerSet(id) {
+	setStickerSet = (id) => {
 		let table = this.stickerPanel.querySelector(".selected");
 		while(table.firstChild) table.removeChild(table.firstChild);
 		let set = StickerManager.getCachedStickerSet(id);
 		for(const sticker of set.documents) {
 			VRDOM.append(<StickerComponent width={75} sticker={sticker}/>, table);
 		}
-		this._bindStickerClickEvents();
+		this._bindStickerEvents();
 	}
 
-	loadRecentStickers() {
+	loadRecentStickers = () => {
 		return MTProto.invokeMethod("messages.getRecentStickers", {
 			flags:0,
 			hash:0
@@ -217,20 +217,20 @@ export default class ComposerComponent extends Component {
 		})
 	}
 
-	_bindStickerClickEvents() {
+	_bindStickerEvents = () => {
 		this.$el.querySelector(".sticker-table > .selected").childNodes.forEach(node => {
 			node.addEventListener("click", this._stickerClick);
 		})
 	}
 
-	_stickerClick(ev) {
+	_stickerClick = (ev) => {
 		let ref = ev.currentTarget.getAttribute("data-component-id");
 		if(!ref) return;
 		let sticker = this.refs.get(ref).sticker;
 		AppSelectedPeer.Current.api.sendExistingMedia(sticker);
 	}
 
-	loadSavedGifs() {
+	loadSavedGifs = () => {
 		let masonry = this.gifPanel.querySelector(".gif-masonry");
 		MTProto.invokeMethod("messages.getSavedGifs").then(response => {
 			for(const gif of response.gifs) {
@@ -243,13 +243,13 @@ export default class ComposerComponent extends Component {
 		})
 	}
 
-	_bindGifClickEvents() {
+	_bindGifClickEvents = () => {
 		this.gifPanel.querySelector(".gif-masonry").childNodes.forEach(node => {
 			node.firstChild.addEventListener("click", this._gifClick);
 		})
 	}
 
-	_gifClick(ev) {
+	_gifClick = (ev) => {
 		let ref = ev.currentTarget.getAttribute("data-component-id");
 		if(!ref) return;
 		let gif = this.refs.get(ref).props.object;

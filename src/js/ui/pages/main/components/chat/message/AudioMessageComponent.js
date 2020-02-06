@@ -71,6 +71,7 @@ class AudioMessageComponent extends AudioComponent {
 	}
 
 	updatePercent(percent) {
+		if(this.__.destroyed) return;
 		this.listened.style.width = percent*100+"%";
 	}
 
@@ -94,6 +95,7 @@ class AudioMessageComponent extends AudioComponent {
     }
 
     _onDownload() {
+    	if(this.__.destroyed) return;
     	this.artistEl.classList.add("hidden");
     	this.progressEl.classList.remove("hidden");
     	this.$el.querySelector(".timer").classList.remove("short");

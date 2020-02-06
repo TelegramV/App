@@ -1,6 +1,6 @@
-.dialog-info {
-    height: 100vh;
-    width: 100%;
+.dialog-info:not(.hidden) {
+    position: relative;
+    padding-top: 60px;
 
     >.header {
         padding: 8px 14px;
@@ -131,6 +131,10 @@
 
                 &:has(.photo) {
                     padding: 8px 8px 4px 4px;
+                }
+
+                >.card {
+                    margin-left: 5px;
                 }
 
                 >.link {

@@ -434,8 +434,9 @@
     }
     .sticker-wrapper {
       .sticker-table {
-        & > * {
+        .selected {
           grid-template-columns: repeat(5, 1fr);
+          align-items: flex-start;
           .sticker {
             cursor: pointer;
           }
@@ -443,6 +444,7 @@
       }
       .sticker-packs {
         overflow-x: auto;
+        overflow-y: hidden;
         justify-content: start;
         .sticker-packs-item {
           display: flex;
