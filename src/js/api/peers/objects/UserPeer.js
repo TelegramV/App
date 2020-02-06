@@ -1,5 +1,5 @@
 import {tsNow} from "../../../mtproto/timeManager";
-import {getLastSeenMessage} from "../utils";
+import {getLastSeenMessage} from "../../dataObjects/utils";
 import {Peer} from "./Peer";
 
 export class UserPeer extends Peer {

@@ -1,10 +1,14 @@
+import {Publisher} from "../eventBus/Publisher"
+
 /**
  * Simple Store class
  *
  * @property {Map} _data
  */
-export default class MappedStore {
+export default class MappedStore extends Publisher {
     constructor(props) {
+        super()
+
         if (props.initialData) {
             if (props.initialData instanceof Map) {
                 this._data = props.initialData
@@ -55,5 +59,12 @@ export default class MappedStore {
      */
     delete(key) {
         return this.data.delete(key)
+    }
+
+    /**
+     * @param subscription
+     */
+    onSet(subscription) {
+        this.subscribe(subscription)
     }
 }

@@ -1,5 +1,5 @@
 import MTProto from "../../mtproto/external"
-import PeersManager from "../peers/PeersManager"
+import PeersManager from "../peers/objects/PeersManager"
 import AppEvents from "../eventBus/AppEvents"
 import {tsNow} from "../../mtproto/timeManager"
 

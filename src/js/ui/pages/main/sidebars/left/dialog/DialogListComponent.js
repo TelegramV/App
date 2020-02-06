@@ -7,7 +7,6 @@ import MTProto from "../../../../../../mtproto/external";
 import V from "../../../../../v/VFramework";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {ConnectionStatusComponent} from "./ConnectionStatusComponent"
-import {Settings} from "../settings/SettingsComponent"
 import Sortable from "sortablejs"
 import {VComponent} from "../../../../../v/vrdom/component/VComponent"
 import {LeftBarComponent} from "../LeftBarComponent"
@@ -33,13 +32,6 @@ export class DialogListComponent extends LeftBarComponent {
         this.callbacks = {
             selectedPeer: AppSelectedPeer.Reactive.FireOnly
         }
-
-        this.elements = {
-            $loader: undefined,
-            $dialogsWrapper: undefined,
-            $pinnedDialogs: undefined,
-            $generalDialogs: undefined,
-        }
     }
 
     h() {
@@ -47,54 +39,55 @@ export class DialogListComponent extends LeftBarComponent {
             <div className="chatlist sidebar">
                 <div className="toolbar">
                     <i className="btn-icon rp rps tgico-menu" onClick={ev => {
-                        if(ev.currentTarget.classList.contains("back")) return true; //Button currently in back state
+                        if (ev.currentTarget.classList.contains("back")) return true; //Button currently in back state
                         ContextMenuManager.openBelow([
-                        {
-                            icon: "newgroup",
-                            title: "New group",
-                            onClick: _ => {
-                            }
-                        },
-                        {
-                            icon: "newprivate",
-                            title: "Contacts"
-                        },
-                        {
-                            icon: "archive",
-                            title: "Archived",
-                            counter: 3
-                        },
-                        {
-                            icon: "savedmessages",
-                            title: "Saved",
-                            onClick: _ => {
-                                const p = MTProto.getAuthorizedUser().user.username ? `@${MTProto.getAuthorizedUser().user.username}` : `user.${MTProto.getAuthorizedUser().user.id}`
+                            {
+                                icon: "newgroup",
+                                title: "New group",
+                                onClick: _ => {
+                                }
+                            },
+                            {
+                                icon: "newprivate",
+                                title: "Contacts"
+                            },
+                            {
+                                icon: "archive",
+                                title: "Archived",
+                                counter: 3
+                            },
+                            {
+                                icon: "savedmessages",
+                                title: "Saved",
+                                onClick: _ => {
+                                    const p = MTProto.getAuthorizedUser().user.username ? `@${MTProto.getAuthorizedUser().user.username}` : `user.${MTProto.getAuthorizedUser().user.id}`
 
-                                V.router.push("/", {
-                                    queryParams: {
-                                        p
-                                    }
-                                })
+                                    V.router.push("/", {
+                                        queryParams: {
+                                            p
+                                        }
+                                    })
+                                }
+                            },
+                            {
+                                icon: "settings",
+                                title: "Settings",
+                                onClick: _ => {
+                                    UIEvents.LeftSidebar.fire("show", {
+                                        barName: "settings"
+                                    })
+                                    // Settings.open();
+                                }
+                            },
+                            {
+                                icon: "help",
+                                title: "Help"
                             }
-                        },
-                        {
-                            icon: "settings",
-                            title: "Settings",
-                            onClick: _ => {
-                                UIEvents.LeftSidebar.fire("show", {
-                                    barName: "settings"
-                                })
-                                // Settings.open();
-                            }
-                        },
-                        {
-                            icon: "help",
-                            title: "Help"
-                        }
-                    ], ev.target)}}/>
-                    <div className="search rp rps">
+                        ], ev.target)
+                    }}/>
+                    <div className="search">
                         <div className="input-search">
-                            <input type="text" placeholder="Search" onFocus={this.openSearch.bind(this)}/>
+                            <input type="text" placeholder="Search" onFocus={this.openSearch}/>
                             <span className="tgico tgico-search"/>
                         </div>
                     </div>
@@ -189,7 +182,10 @@ export class DialogListComponent extends LeftBarComponent {
         }
     }
 
-    openSearch() {
+    openSearch = () => {
+
+        // dude use ref pls
+
         let icon = this.$el.querySelector(".toolbar .btn-icon");
         icon.classList.add("back");
         icon.addEventListener("click", this._searchBackClick);
@@ -199,7 +195,8 @@ export class DialogListComponent extends LeftBarComponent {
         })
     }
 
-    _searchBackClick(ev) {
+    // навіщо ж так костильно(
+    _searchBackClick = (ev) => {
         let icon = ev.currentTarget;
         UIEvents.LeftSidebar.fire("show", {
             barName: "dialogs"
@@ -207,9 +204,12 @@ export class DialogListComponent extends LeftBarComponent {
         icon.classList.remove("back");
         icon.removeEventListener("click", this._searchBackClick);
     }
+
     //Ми не ховаємось в тіні!!!
-    barOnShow = () => {}
-    barOnHide = () => {}
+    barOnShow = () => {
+    }
+    barOnHide = () => {
+    }
 
     /**
      * CRITICAL: this method must be called only once per unique dialog.
@@ -218,10 +218,10 @@ export class DialogListComponent extends LeftBarComponent {
      * @param {boolean|string} appendOrPrepend if `false` then it will try to find dialog to insert before
      * @private
      */
-    _renderDialog(dialog, appendOrPrepend = false) {
-        if (dialog.folderId === 1) {
-            return // put it to archived
-        }
+    _renderDialog = (dialog, appendOrPrepend = false) => {
+        // if (dialog.folderId === 1) {
+        //     return // put it to archived
+        // }
 
         if (!this.pinnedDialogsRef.$el || !this.generalDialogsRef.$el) {
             console.error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
@@ -259,7 +259,7 @@ export class DialogListComponent extends LeftBarComponent {
      * TODO: mb will be better to have this in another file
      * @private
      */
-    _registerResizer() {
+    _registerResizer = () => {
         const $element = this.$el
         const MIN_WIDTH = 90
         const DEFAULT_WIDTH = 422
@@ -333,7 +333,7 @@ export class DialogListComponent extends LeftBarComponent {
      * @param event
      * @private
      */
-    _scrollHandler(event) {
+    _scrollHandler = (event) => {
         const $element = event.target
 
         if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.isLoadingMore) {

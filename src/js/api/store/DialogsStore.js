@@ -9,9 +9,7 @@ class DialogsMapStore extends MappedStore {
                 ["channel", new Map()],
                 ["user", new Map()],
             ])
-        });
-
-        this.onSetSubscribers = new Set()
+        })
     }
 
     /**
@@ -49,6 +47,7 @@ class DialogsMapStore extends MappedStore {
 
     /**
      * @param folderId
+     * @return {Array<Dialog>}
      */
     getAllInFolder(folderId) {
         const folder = []
@@ -71,19 +70,15 @@ class DialogsMapStore extends MappedStore {
             console.error("BUG (DialogsStore): invalid peer was provided!")
             return this
         }
-        // todo: make this check
-        // if (dialog instanceof Dialog) {
+
         if (this.data.has(dialog.peer.type)) {
             this.data.get(dialog.peer.type).set(dialog.peer.id, dialog)
-            this.onSetSubscribers.forEach(s => s(dialog))
+            this.fire(dialog)
             return this
         } else {
             console.error("invalid dialog type")
             return this
         }
-        // } else {
-        //     console.error("the given dialog is not Dialog instance")
-        // }
     }
 
     /**
@@ -152,11 +147,10 @@ class DialogsMapStore extends MappedStore {
 
     /**
      *
-     * @param {function(dialog: Dialog)} callback
+     * @param {function(dialog: Dialog)} subscription
      */
-    onSet(callback) {
-        this.onSetSubscribers.add(callback)
-        console.log(this.onSetSubscribers)
+    onSet(subscription) {
+        super.onSet(subscription)
     }
 }
 

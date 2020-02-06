@@ -1,4 +1,4 @@
-import {UserPeer} from "../../../../../../api/dataObjects/peer/UserPeer"
+import {UserPeer} from "../../../../../../api/peers/objects/UserPeer"
 import {DialogTextComponent} from "./DialogTextComponent"
 import V from "../../../../../v/VFramework"
 import {DialogAvatarFragment} from "./DialogAvatarFragment"
@@ -43,9 +43,9 @@ const BadgeFragment = ({id, show = false, slot}) => {
 const UnreadCountBadge = ({dialog}) => {
     return (
         <BadgeFragment id={`dialog-${dialog.peer.id}-unreadCount`}
-                       show={dialog.messages.unreadCount > 0}>
+                       show={dialog.peer.messages.unreadCount > 0}>
 
-            {dialog.messages.unreadCount}
+            {dialog.peer.messages.unreadCount}
         </BadgeFragment>
     )
 }
@@ -53,7 +53,7 @@ const UnreadCountBadge = ({dialog}) => {
 const UnreadMentionsCountBadge = ({dialog}) => {
     return (
         <BadgeFragment id={`dialog-${dialog.peer.id}-mentionCount`}
-                       show={dialog.messages.unreadMentionsCount > 0}>
+                       show={dialog.peer.messages.unreadMentionsCount > 0}>
             @
         </BadgeFragment>
     )
@@ -68,7 +68,7 @@ const UnreadMarkBadge = ({dialog}) => {
 const TimeFragment = ({id, dialog}) => {
     return (
         <div id={id} className="time">
-            {dialog.messages.last.getDate("en", tsNow(true) - dialog.messages.last.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)}
+            {dialog.peer.messages.last.getDate("en", tsNow(true) - dialog.peer.messages.last.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)}
         </div>
     )
 }
@@ -104,21 +104,21 @@ export class DialogComponent extends Component {
             "rp": true,
             "online": peer instanceof UserPeer && peer.onlineStatus.online,
             "active": AppSelectedPeer.check(dialog.peer),
-            "unread": dialog.messages.unreadMentionsCount > 0 || dialog.messages.unreadCount > 0 || dialog.unreadMark,
+            "unread": dialog.peer.messages.unreadMentionsCount > 0 || dialog.peer.messages.unreadCount > 0 || dialog.unreadMark,
             "muted": dialog.isMuted,
         }
 
-        if (dialog.messages.last.isOut && !dialog.peer.isSelf) {
+        if (dialog.peer.messages.last.isOut && !dialog.peer.isSelf) {
             personClasses["sent"] = true
 
-            if (dialog.messages.last.isRead) {
+            if (dialog.peer.messages.last.isRead) {
                 personClasses["read"] = true
             }
         }
 
         return (
-            <div data-message-id={dialog.messages.last.id}
-                 data-date={dialog.messages.last.date}
+            <div data-message-id={dialog.peer.messages.last.id}
+                 data-date={dialog.peer.messages.last.date}
                  data-pinned={dialog.isPinned === undefined ? false : dialog.isPinned}
 
                  className={personClasses}
@@ -255,8 +255,8 @@ export class DialogComponent extends Component {
 
     _patchMessage() {
         if (this.__.mounted) {
-            this.$el.setAttribute("data-date", this.dialog.messages.last.date)
-            this.$el.setAttribute("data-message-id", this.dialog.messages.last.id)
+            this.$el.setAttribute("data-date", this.dialog.peer.messages.last.date)
+            this.$el.setAttribute("data-message-id", this.dialog.peer.messages.last.id)
 
             this._patchReadStatus()
             this._patchText()
@@ -286,10 +286,10 @@ export class DialogComponent extends Component {
     }
 
     _patchReadStatus() {
-        if (this.dialog.messages.last.isOut && !this.dialog.peer.isSelf) {
+        if (this.dialog.peer.messages.last.isOut && !this.dialog.peer.isSelf) {
             this.$el.classList.add("sent")
 
-            if (this.dialog.messages.last.isRead) {
+            if (this.dialog.peer.messages.last.isRead) {
                 this.$el.classList.add("read")
             } else {
                 this.$el.classList.remove("read")
@@ -317,9 +317,9 @@ export class DialogComponent extends Component {
 
             this.$el.setAttribute("data-pinned", this.dialog.isPinned === undefined ? false : this.dialog.isPinned)
 
-        } else if (!this.dialog.messages.last) {
+        } else if (!this.dialog.peer.messages.last) {
             // todo: handle no last message
-        } else if (parseInt(this.$el.getAttribute("data-date")) !== this.dialog.messages.last.date) {
+        } else if (parseInt(this.$el.getAttribute("data-date")) !== this.dialog.peer.messages.last.date) {
             if (!this.dialog.isPinned) {
                 if (this.$el.previousSibling) {
                     this.props.$general.prepend(this.$el)
@@ -342,7 +342,7 @@ export class DialogComponent extends Component {
             return undefined
         }
 
-        const lastMessageDate = dialog.messages.last.date
+        const lastMessageDate = dialog.peer.messages.last.date
 
         for (const $rendered of renderedDialogs) {
             if ($rendered !== this.$el) {

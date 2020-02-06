@@ -51,7 +51,7 @@ export class ChatInputComponent extends Component {
                                     <i className="tgico tgico-smile btn-icon rp rps"
                                        onMouseEnter={this.mouseEnterEmoji} onMouseLeave={this.mouseLeaveEmoji}/>
                                 </div>
-                                <TextareaFragment />
+                                <TextareaFragment ref="chatInputTextarea" />
 
                                 <div className="ico-wrapper">
 
@@ -140,7 +140,7 @@ export class ChatInputComponent extends Component {
 
     appendText(text) {
         this.textarea.innerHTML += text
-        this.onInput();
+        this.refs.get("chatInputTextarea").onInput();
     }
 
     get isVoiceMode() {

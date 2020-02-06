@@ -121,7 +121,7 @@ class BubblesComponent extends Component {
         let $message = undefined
 
 
-        if(message.groupedId && this.state.renderedGroups.has(message.groupedId)) {
+        if (message.groupedId && this.state.renderedGroups.has(message.groupedId)) {
             return null
         }
         $message = $mount(<MessageComponent intersectionObserver={this.intersectionObserver}
@@ -142,7 +142,7 @@ class BubblesComponent extends Component {
 
             if ($rendered) {
                 this.state.renderedMessages.set(message.id, $rendered)
-                if(message.groupedId) {
+                if (message.groupedId) {
                     this.state.renderedGroups.set(message.groupedId, message)
                 }
             }
@@ -169,7 +169,7 @@ class BubblesComponent extends Component {
 
             if ($rendered) {
                 this.state.renderedMessages.set(message.id, $rendered)
-                if(message.groupedId) {
+                if (message.groupedId) {
                     this.state.renderedGroups.set(message.groupedId, message)
                 }
             }

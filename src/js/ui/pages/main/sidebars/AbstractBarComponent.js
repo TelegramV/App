@@ -10,15 +10,15 @@ export class AbstractBarComponent extends VComponent {
         if (event.barName === this.barName) {
             if (!this.barVisible) {
                 this.barVisible = true
-                this.barBeforeShow(event.barName)
-                this.barOnShow(event.barName)
-                this.barAfterShow(event.barName)
+                this.barBeforeShow(event)
+                this.barOnShow(event)
+                this.barAfterShow(event)
             }
         } else if (this.barVisible) {
             this.barVisible = false
-            this.barBeforeHide(event.barName)
-            this.barOnHide(event.barName)
-            this.barAfterHide(event.barName)
+            this.barBeforeHide(event)
+            this.barOnHide(event)
+            this.barAfterHide(event)
         }
     }
 
@@ -26,25 +26,25 @@ export class AbstractBarComponent extends VComponent {
 
     // show
 
-    barBeforeShow = () => {
+    barBeforeShow = (event) => {
     }
 
-    barOnShow = () => {
+    barOnShow = (event) => {
         VUI.showElement(this.$el)
     }
 
-    barAfterShow = () => {
+    barAfterShow = (event) => {
     }
 
     // hide
 
-    barBeforeHide = () => {
+    barBeforeHide = (event) => {
     }
 
-    barOnHide = () => {
+    barOnHide = (event) => {
         VUI.hideElement(this.$el)
     }
 
-    barAfterHide = () => {
+    barAfterHide = (event) => {
     }
 }

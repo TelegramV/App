@@ -25,6 +25,7 @@ const ReplyToMessageFragment = ({message}) => {
  * @param transparent
  * @param slot
  * @param noPad
+ * @param outerPad
  * @param contextActions
  * @param showUsername
  * @param showAvatar
@@ -66,11 +67,6 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         "in": message.isPost || !message.isOut,
     }
 
-    if (message.raw.fwd_from && (message.raw.fwd_from.saved_from_peer || message.raw.fwd_from.saved_from_msg_id)) {
-        topLevelClasses["out"] = false
-        topLevelClasses["in"] = true
-    }
-
     let wrapClasses = {
         "bubble": true,
         "out": !message.isPost && message.isOut,
@@ -90,6 +86,15 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         "bubble-outer": true,
         "out": !message.isPost && message.isOut,
         "in": message.isPost || !message.isOut,
+    }
+
+    if (message.raw.fwd_from && (message.raw.fwd_from.saved_from_peer || message.raw.fwd_from.saved_from_msg_id)) {
+        topLevelClasses["out"] = false
+        topLevelClasses["in"] = true
+        wrapClasses["out"] = false
+        wrapClasses["in"] = true
+        wrapOuter["out"] = false
+        wrapOuter["in"] = true
     }
 
     const inlineKeyboard = message.replyMarkup && message.replyMarkup._ === "replyInlineMarkup" ?

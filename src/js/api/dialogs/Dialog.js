@@ -1,11 +1,10 @@
 import {tsNow} from "../../mtproto/timeManager";
-import {DialogMessages} from "./DialogMessages"
 import AppEvents from "../eventBus/AppEvents"
 import {DraftMessage} from "./DraftMessage"
 import {DialogApi} from "./DialogApi"
 import {ReactiveObject} from "../../ui/v/reactive/ReactiveObject"
 import type {Message} from "../messages/Message"
-import {Peer} from "../dataObjects/peer/Peer"
+import {Peer} from "../peers/objects/Peer"
 
 export class Dialog extends ReactiveObject {
 
@@ -17,7 +16,6 @@ export class Dialog extends ReactiveObject {
     _pinned: boolean = false
     _unreadMark: boolean = false
     _draft: DraftMessage = DraftMessage.createEmpty(this)
-    _messages: DialogMessages = undefined
     _folderId: number = undefined
 
     constructor(rawDialog: Object, peer: Peer, topMessage: Message) {
@@ -31,20 +29,22 @@ export class Dialog extends ReactiveObject {
         if (peer) {
             this._peer = peer
             this._peer.dialog = this
+
+            if (topMessage) {
+                topMessage.dialog = this
+                this._peer.messages.appendSingle(topMessage)
+            }
         } else {
             console.error("BUG: peer was not provided.")
-        }
-
-        if (topMessage) {
-            topMessage.dialog = this
-            this._messages = new DialogMessages(this, [topMessage])
-        } else {
-            this._messages = new DialogMessages(this)
         }
 
         this._api = new DialogApi(this)
 
         this.fillRaw(rawDialog)
+    }
+
+    get messages() {
+        return this.peer.messages
     }
 
     get peer(): Peer {
@@ -61,10 +61,6 @@ export class Dialog extends ReactiveObject {
 
     get raw(): Object {
         return this._rawDialog
-    }
-
-    get messages(): DialogMessages {
-        return this._messages
     }
 
     get isPinned() {
@@ -139,14 +135,14 @@ export class Dialog extends ReactiveObject {
 
         this.pts = rawDialog.pts || -1
 
-        this.messages.startTransaction()
+        this.peer.messages.startTransaction()
 
-        this.messages.unreadCount = rawDialog.unread_count || 0
-        this.messages.readInboxMaxId = rawDialog.read_inbox_max_id || 0
-        this.messages.readOutboxMaxId = rawDialog.read_outbox_max_id || 0
-        this.messages.unreadMentionsCount = rawDialog.unread_mentions_count || 0
+        this.peer.messages.unreadCount = rawDialog.unread_count || 0
+        this.peer.messages.readInboxMaxId = rawDialog.read_inbox_max_id || 0
+        this.peer.messages.readOutboxMaxId = rawDialog.read_outbox_max_id || 0
+        this.peer.messages.unreadMentionsCount = rawDialog.unread_mentions_count || 0
 
-        this.messages.stopTransaction()
+        this.peer.messages.stopTransaction()
 
         this._draft.fillRaw(this, rawDialog.draft)
 

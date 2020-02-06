@@ -46,7 +46,7 @@ export const DialogTextComponent = ({id, dialog}) => {
 
     return (
         <Text id={id}
-              user={dialog.messages.last.prefix}
-              text={dialog.messages.last.text.substring(0, 50)} entities={dialog.messages.last.raw.entities}/>
+              user={dialog.peer.messages.last.prefix}
+              text={dialog.peer.messages.last.text.substring(0, 50)} entities={dialog.peer.messages.last.raw.entities}/>
     )
 }
