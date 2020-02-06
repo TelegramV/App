@@ -32,6 +32,7 @@ class AudioMessageComponent extends AudioComponent {
 
 		if(file.thumbs) {
 			FileAPI.getThumb(file, "max").then(l => {
+				if(this.__.destroyed) return;
 				// Tint
 				this.$el.querySelector(".play").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${l})`
 				this.thumb = l

@@ -43,7 +43,9 @@
 .card {
     display: flex;
 
-    .card-icon {}
+    .card-icon {
+        overflow: hidden;
+    }
 
     .card-info {
         margin-left: 5px;
