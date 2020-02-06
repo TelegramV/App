@@ -1,5 +1,5 @@
 import {MTProto} from "../../mtproto/external"
-import PeersManager from "../peers/PeersManager"
+import PeersManager from "../peers/objects/PeersManager"
 import {Manager} from "../manager"
 
 class SearchManagerSingleton extends Manager {

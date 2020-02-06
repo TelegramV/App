@@ -9,7 +9,6 @@ import {Networker} from "./networker";
 import {schema} from "../language/schema";
 import Bytes from "../utils/bytes"
 import Random from "../utils/random"
-import AppEvents from "../../api/eventBus/AppEvents"
 import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
 import MTProtoInternal from "../internal"
 
@@ -60,7 +59,7 @@ export class ApiNetworker extends Networker {
 
         this.messageProcessor.listenPong(pingMessage.msg_id, l => {
             if (this.connected === false) {
-                AppEvents.General.fire("connectionRestored")
+                MTProtoInternal.connectionRestored()
             }
             this.pings.delete(pingMessage.msg_id)
 
@@ -174,14 +173,14 @@ export class ApiNetworker extends Networker {
     }
 
     onDisconnect() {
-        AppEvents.General.fire("connectionLost")
+        MTProtoInternal.connectionLost()
         // TODO reconnect
         // ALSO if there"s no internet it doesn"t disconnect ws, should ping prob
         this.connected = false
     }
 
     onConnect() {
-        AppEvents.General.fire("connectionRestored")
+        MTProtoInternal.connectionRestored()
         this.connected = true
     }
 

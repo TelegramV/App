@@ -4,7 +4,7 @@ import {Dialog} from "../dialogs/Dialog"
 import {Message, MessageType} from "./Message"
 import {ReactiveObject} from "../../ui/v/reactive/ReactiveObject"
 import {MessageParser} from "./MessageParser"
-import {Peer} from "../dataObjects/peer/Peer"
+import {Peer} from "../peers/objects/Peer"
 import MessagesManager from "./MessagesManager"
 import PeersStore from "../store/PeersStore"
 
@@ -66,7 +66,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get isRead(): boolean {
-        return this.dialog.messages.readOutboxMaxId >= this.id || this.dialog.messages.readInboxMaxId >= this.id
+        return this.dialog.peer.messages.readOutboxMaxId >= this.id || this.dialog.peer.messages.readInboxMaxId >= this.id
     }
 
     get text(): string {
@@ -132,17 +132,16 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     findGrouped(fire = true) {
-        if(!this.groupedId) return
-        if(this.groupedId && !this.group) {
+        if (!this.groupedId) return
+        if (this.groupedId && !this.group) {
             let hasInit = false
-            this.group = this.dialog.messages.getByGroupedId(this.groupedId)
+            this.group = this.dialog.peer.messages.getByGroupedId(this.groupedId)
             this.group.forEach(l => {
                 l.group = this.group
                 hasInit |= l.groupInitializer
             })
             this.groupInitializer = !hasInit
-        }
-        if(this.groupedId) {
+        } else if (this.groupedId) {
             this.group.find(l => l.groupInitializer).fire("updateGrouped")
         }
     }
@@ -153,7 +152,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         }
 
         if (this.raw.reply_to_msg_id) {
-            const replyToMessage = this.dialog.messages.get(this.raw.reply_to_msg_id)
+            const replyToMessage = this.dialog.peer.messages.get(this.raw.reply_to_msg_id)
 
             if (replyToMessage) {
                 this.replyToMessage = replyToMessage
@@ -169,7 +168,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
                     limit: 1
                 }).then(messages => {
                     if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
-                        this.dialog.messages.appendOtherSingle(messages[0])
+                        this.dialog.peer.messages.appendOtherSingle(messages[0])
                         this.replyToMessage = messages[0]
                         this.replyToMessageType = "replyToMessageFound"
 
@@ -240,7 +239,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         this.prefix = MessageParser.getDialogPrefix(this)
 
         // reply
-        const replyToMessage = this.dialog.messages.get(this.raw.reply_to_msg_id)
+        const replyToMessage = this.dialog.peer.messages.get(this.raw.reply_to_msg_id)
         if (replyToMessage) {
             this.replyToMessage = replyToMessage
         }

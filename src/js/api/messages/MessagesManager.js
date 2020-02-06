@@ -26,13 +26,13 @@ class MessageManager extends Manager {
 
             const message = MessageFactory.fromRaw(dialog, lastMessage)
 
-            dialog.messages.appendSingle(message)
+            dialog.peer.messages.appendSingle(message)
             message.init()
 
             if (!message.isOut) {
-                dialog.messages.addUnread(message.id)
+                dialog.peer.messages.addUnread(message.id)
             } else {
-                dialog.messages.clearUnread()
+                dialog.peer.messages.clearUnread()
             }
 
             dialog.fire("newMessage", {
@@ -78,13 +78,13 @@ class MessageManager extends Manager {
             const dialog = DialogsStore.get("channel", update.channel_id)
 
             if (dialog) {
-                dialog.messages.startTransaction()
+                dialog.peer.messages.startTransaction()
 
                 update.messages.sort().forEach(mId => {
-                    dialog.messages.deleteSingle(mId)
+                    dialog.peer.messages.deleteSingle(mId)
                 })
 
-                if (!dialog.messages.last) {
+                if (!dialog.peer.messages.last) {
                     DialogsManager.getPeerDialogs({
                         _: dialog.peer.type,
                         id: dialog.peer.id,
@@ -96,11 +96,11 @@ class MessageManager extends Manager {
                     })
                 }
 
-                dialog.messages.fireTransaction("deleteChannelMessages", {
+                dialog.peer.messages.fireTransaction("deleteChannelMessages", {
                     messages: update.messages
                 })
 
-                dialog.messages.fireTransaction("deleteMessages", {
+                dialog.peer.messages.fireTransaction("deleteMessages", {
                     messages: update.messages
                 })
             }
@@ -109,13 +109,13 @@ class MessageManager extends Manager {
         MTProto.UpdatesManager.subscribe("updateDeleteMessages", update => {
             DialogsStore.data.forEach((data, type) => data.forEach(/** @param {Dialog} dialog */(dialog, id) => {
                 if (dialog.peer.type !== "channel") {
-                    dialog.messages.startTransaction()
+                    dialog.peer.messages.startTransaction()
 
                     update.messages.sort().forEach(mId => {
-                        dialog.messages.deleteSingle(mId)
+                        dialog.peer.messages.deleteSingle(mId)
                     })
 
-                    if (!dialog.messages.last) {
+                    if (!dialog.peer.messages.last) {
                         DialogsManager.getPeerDialogs({
                             _: dialog.peer.type,
                             id: dialog.peer.id
@@ -126,7 +126,7 @@ class MessageManager extends Manager {
                         })
                     }
 
-                    dialog.messages.fireTransaction("deleteMessages", {
+                    dialog.peer.messages.fireTransaction("deleteMessages", {
                         messages: update.messages
                     })
                 }
@@ -137,7 +137,7 @@ class MessageManager extends Manager {
             const to = this.getToPeerMessage(update.message)
 
             if (to) {
-                const message = to.dialog.messages.get(update.message.id)
+                const message = to.dialog.peer.messages.get(update.message.id)
 
                 if (message) {
                     message.fillRaw(update.message)
@@ -153,7 +153,7 @@ class MessageManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateMessagePoll", update => {
             if (AppSelectedPeer.isSelected) {
-                const messages = AppSelectedPeer.Current.dialog.messages.getPollsById(update.poll_id)
+                const messages = AppSelectedPeer.Current.dialog.peer.messages.getPollsById(update.poll_id)
                 for (const message of messages) {
                     message.fillPoll(update.poll, update.results)
 
@@ -166,7 +166,7 @@ class MessageManager extends Manager {
             const to = this.getToPeerMessage(update.message)
 
             if (to) {
-                const message = to.dialog.messages.get(update.message.id)
+                const message = to.dialog.peer.messages.get(update.message.id)
 
                 if (message) {
                     message.fillRaw(update.message)

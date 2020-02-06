@@ -1,11 +1,11 @@
-import MTProto from "../../../mtproto/external"
-import PeersManager from "../../peers/PeersManager"
-import AppEvents from "../../eventBus/AppEvents"
-import {getInputFromPeer, getInputPeerFromPeer} from "../../dialogs/util"
-import TimeManager from "../../../mtproto/timeManager"
-import {FileAPI} from "../../fileAPI"
-import {MessageFactory} from "../../messages/MessageFactory"
-import AppConfiguration from "../../../configuration"
+import MTProto from "../../mtproto/external"
+import PeersManager from "./objects/PeersManager"
+import AppEvents from "../eventBus/AppEvents"
+import {getInputFromPeer, getInputPeerFromPeer} from "../dialogs/util"
+import TimeManager from "../../mtproto/timeManager"
+import {FileAPI} from "../fileAPI"
+import {MessageFactory} from "../messages/MessageFactory"
+import AppConfiguration from "../../configuration"
 
 export class PeerApi {
 
@@ -54,12 +54,11 @@ export class PeerApi {
             return MessageFactory.fromRaw(this._peer.dialog, rawMessage)
         })
 
-        this._peer.dialog.messages.appendMany(messages)
+        this._peer.messages.appendMany(messages)
 
-        messages.map(message => {
+        messages.forEach(message => {
             message.init()
         })
-
 
         return messages
     }
@@ -76,7 +75,7 @@ export class PeerApi {
     }
 
     fetchNextPage() {
-        let oldest = this._peer.dialog.messages.oldest
+        let oldest = this._peer.messages.oldest
 
         console.log(oldest)
 
@@ -97,8 +96,8 @@ export class PeerApi {
                 max_id: maxId
             }).then(response => {
                 if (response._ === "boolTrue") {
-                    this._peer.dialog.messages.deleteUnreadBy(maxId)
-                    // this.dialog.messages.clearUnread()
+                    this._peer.dialog.peer.messages.deleteUnreadBy(maxId)
+                    // this.dialog.peer.messages.clearUnread()
                     AppEvents.Dialogs.fire("readHistory", {
                         dialog: this._peer.dialog
                     })
@@ -109,8 +108,8 @@ export class PeerApi {
                 peer: getInputPeerFromPeer(this._peer.type, this._peer.id, this._peer.accessHash),
                 max_id: maxId
             }).then(response => {
-                this._peer.dialog.messages.deleteUnreadBy(maxId)
-                // this.dialog.messages.clearUnread()
+                this._peer.dialog.peer.messages.deleteUnreadBy(maxId)
+                // this.dialog.peer.messages.clearUnread()
                 AppEvents.Dialogs.fire("readHistory", {
                     dialog: this._peer.dialog
                 })
@@ -119,18 +118,18 @@ export class PeerApi {
     }
 
     readAllHistory() {
-        if (this._peer.dialog.messages.last) {
-            this.readHistory(this._peer.dialog.messages.last.id)
+        if (this._peer.messages.last) {
+            this.readHistory(this._peer.messages.last.id)
         }
     }
 
     sendMessage({
-        text,
-        messageEntities = [],
-        replyTo = null,
-        silent = false,
-        clearDraft = true
-    }) {
+                    text,
+                    messageEntities = [],
+                    replyTo = null,
+                    silent = false,
+                    clearDraft = true
+                }) {
         MTProto.invokeMethod("messages.sendMessage", {
             pFlags: {
                 clear_draft: clearDraft,
@@ -166,21 +165,21 @@ export class PeerApi {
 
     sendExistingMedia(document) {
         MTProto.invokeMethod("messages.sendMedia", {
-                peer: this._peer.inputPeer,
-                message: "",
-                media: {
-                    _: "inputMediaDocument",
-                    flags: 0,
-                    id: {
-                        _: "inputDocument",
-                        id: document.id,
-                        access_hash: document.access_hash,
-                        file_reference: document.file_reference,
-                    }
-                },
-                random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
-            }).then(response => {
-                MTProto.UpdatesManager.process(response)
-            })
+            peer: this._peer.inputPeer,
+            message: "",
+            media: {
+                _: "inputMediaDocument",
+                flags: 0,
+                id: {
+                    _: "inputDocument",
+                    id: document.id,
+                    access_hash: document.access_hash,
+                    file_reference: document.file_reference,
+                }
+            },
+            random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+        }).then(response => {
+            MTProto.UpdatesManager.process(response)
+        })
     }
 }

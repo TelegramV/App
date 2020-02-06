@@ -3,8 +3,9 @@ import MTProto from "../../../mtproto/external"
 import AppEvents from "../../eventBus/AppEvents"
 import {PeerPhoto} from "./PeerPhoto"
 import {Dialog} from "../../dialogs/Dialog"
-import {PeerApi} from "./PeerApi"
+import {PeerApi} from "../PeerApi"
 import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
+import {PeerMessages} from "../PeerMessages"
 
 export class Peer extends ReactiveObject {
 
@@ -18,16 +19,26 @@ export class Peer extends ReactiveObject {
     full
     _api
 
+    _messages: PeerMessages
+
     constructor(rawPeer, dialog = undefined) {
         super()
 
         this._rawPeer = rawPeer
-        this._dialog = dialog || Dialog.createEmpty(this)
+        this._dialog = dialog
 
         this._photo = PeerPhoto.createEmpty(this)
         this._api = new PeerApi(this)
+        this._messages = new PeerMessages(this)
 
         this.fillRaw(rawPeer)
+    }
+
+    /**
+     * @return {PeerMessages}
+     */
+    get messages() {
+        return this._messages
     }
 
     /**
@@ -131,7 +142,7 @@ export class Peer extends ReactiveObject {
      * @return {{_: string, chat_id: *}|{user_id: *, access_hash: string, _: string}|{access_hash: string, channel_id: *, _: string}|{_: string}}
      */
     get inputPeer() {
-        return getInputPeerFromPeer(this.type, this.id, this.accessHash)
+        return this.isMin ? this.inputPeerFromMessage : getInputPeerFromPeer(this.type, this.id, this.accessHash)
     }
 
     get input() {
@@ -198,7 +209,7 @@ export class Peer extends ReactiveObject {
             this.full = userFull
 
             this.fire("fullLoaded")
-            
+
             // todo: delete this thing
             AppEvents.Peers.fire("fullLoaded", {
                 peer: this
