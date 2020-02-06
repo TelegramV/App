@@ -10,15 +10,15 @@ export class AbstractBarComponent extends VComponent {
         if (event.barName === this.barName) {
             if (!this.barVisible) {
                 this.barVisible = true
-                this.barBeforeShow()
-                this.barOnShow()
-                this.barAfterShow()
+                this.barBeforeShow(event.barName)
+                this.barOnShow(event.barName)
+                this.barAfterShow(event.barName)
             }
         } else if (this.barVisible) {
             this.barVisible = false
-            this.barBeforeHide()
-            this.barOnHide()
-            this.barAfterHide()
+            this.barBeforeHide(event.barName)
+            this.barOnHide(event.barName)
+            this.barAfterHide(event.barName)
         }
     }
 

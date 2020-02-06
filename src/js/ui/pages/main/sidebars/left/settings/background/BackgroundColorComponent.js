@@ -27,7 +27,7 @@ export class BackgroundColorComponent extends SettingsPane {
 
 	h() {
 		return (
-			<div class="sidebar background-color scrollable hidden">
+			<div class="sidebar background-color scrollable">
 				{this.makeHeader()}
 				<div class="pallete">
 					Pallete goes here...
