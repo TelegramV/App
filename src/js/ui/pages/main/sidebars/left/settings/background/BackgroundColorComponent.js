@@ -1,7 +1,6 @@
-import Component from "../../../../../../v/vrdom/Component"
 import SettingsPane from "../SettingsPane"
 
-export class BackgroundColorComponent extends SettingsPane {
+export default class BackgroundColorComponent extends SettingsPane {
 	barName = "background-color";
 
 	constructor(props) {
@@ -27,7 +26,7 @@ export class BackgroundColorComponent extends SettingsPane {
 
 	h() {
 		return (
-			<div class="sidebar background-color scrollable">
+			<div class="sidebar sub-settings background-color scrollable">
 				{this.makeHeader()}
 				<div class="pallete">
 					Pallete goes here...

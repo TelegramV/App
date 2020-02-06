@@ -2,8 +2,10 @@ import Component from "../../../../../v/vrdom/Component"
 import PeersStore from "../../../../../../api/store/PeersStore"
 import { LeftBarComponent } from "../LeftBarComponent"
 import UIEvents from "../../../../../eventBus/UIEvents"
-import { BackgroundColorComponent } from "./background/BackgroundColorComponent"
+import BackgroundColorComponent from "./background/BackgroundColorComponent"
+import BackgroundImageComponent from "./background/BackgroundImageComponent"
 import { ContextMenuManager } from "../../../../../contextMenuManager";
+import GeneralSettingsComponent from "./GeneralSettingsComponent"
 
 export class SettingsComponent extends LeftBarComponent {
     barName = "settings";
@@ -33,14 +35,16 @@ export class SettingsComponent extends LeftBarComponent {
 	                <div class="username"></div>
 	                <div class="phone-number"></div>
 	                <div class="list-menu">
-	                	<MenuItemFragment icon="edit" name="Edit Profile"/>
-	                	<MenuItemFragment icon="settings" name="General settings" click={_=>this.openPane("background-color")}/>
-	                	<MenuItemFragment icon="unmute" name="Notifications"/>
-	                	<MenuItemFragment icon="lock" name="Privacy and Security"/>
-	                	<MenuItemFragment icon="language" name="Language"/>
+	                	<ButtonWithIconFragment icon="edit" name="Edit Profile"/>
+	                	<ButtonWithIconFragment icon="settings" name="General settings" click={_=>this.openPane("general-settings")}/>
+	                	<ButtonWithIconFragment icon="unmute" name="Notifications"/>
+	                	<ButtonWithIconFragment icon="lock" name="Privacy and Security"/>
+	                	<ButtonWithIconFragment icon="language" name="Language"/>
 	                </div>
 				</div>
-				<BackgroundColorComponent previous="settings"/>
+				<GeneralSettingsComponent previous="settings"/>
+				<BackgroundImageComponent previous="general-settings"/>
+				<BackgroundColorComponent previous="background-image"/>
 			</div>
         )
     }
@@ -92,6 +96,7 @@ export class SettingsComponent extends LeftBarComponent {
     _isSettingsBar = (name) => {
         switch (name) {
             case "background-color":
+            case "general-settings":
                 return true;
             default:
                 return false;
@@ -99,12 +104,12 @@ export class SettingsComponent extends LeftBarComponent {
     }
 }
 
-const MenuItemFragment = ({ icon, name, click }) => {
-    let iconClasses = ["menu-icon", "tgico", "tgico-" + icon]
+export const ButtonWithIconFragment = ({ icon, name, click, slot }) => {
+    let iconClasses = ["button-icon", "tgico", "tgico-" + icon]
     return (
-        <div class="menu-item rp" onClick={click}>
-			<i class={iconClasses.join(" ")}/>
-			<div class="menu-title">{name}</div>
+        <div class="button-with-icon rp" onClick={click}>
+			{icon? <i class={iconClasses.join(" ")}/> : slot}
+			<div class="button-title">{name}</div>
 		</div>
     )
 }

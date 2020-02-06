@@ -25,6 +25,12 @@ export default class SettingsPane extends LeftBarComponent {
         })
     }
 
+    openPane = (name) => {
+        UIEvents.LeftSidebar.fire("show", {
+            barName: name
+        })
+    }
+
     makeHeader = () => {
         return (
             <div class="sidebar-header">
