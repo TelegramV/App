@@ -678,7 +678,7 @@
                 padding: 0px;
 
                 .fwd {
-                    padding-left: 5px;
+                    padding-left: 15px;
                 }
 
                 .text-wrapper {
@@ -747,7 +747,7 @@
             .reply {
                 position: absolute;
                 right: 0;
-                transform: translateX(110%);
+                transform: translateX(125%);
                 background-color: white;
                 border-radius: 10px;
                 padding: 8px;
@@ -956,7 +956,7 @@
             .reply {
                 left: 0;
                 right: unset;
-                transform: translateX(-110%);
+                transform: translateX(-125%);
             }
         }
 
@@ -1024,7 +1024,11 @@
         }
 
         .bubble {
-
+            .message.no-pad {
+                .fwd {
+                    padding-left: 5px;
+                }
+            }
             .username,
             .fwd {
                 color: $darkgreen;
