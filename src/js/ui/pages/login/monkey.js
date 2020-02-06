@@ -30,9 +30,9 @@ export class MonkeyController {
 
     monkeyLook(symbols) {
         if (symbols === 0) {
-            this.animation.setSpeed(2);
+            this.animation.setSpeed(-1);
             this.animation.play();
-            this.smoothIdle(); //take a glorious look at empty code and back to idle
+            this.smoothIdle();
             this.trackSym = 0;
             return
         }
@@ -65,14 +65,17 @@ export class MonkeyController {
     }
 
     load(path, loop = true) {
+        if (this.animation) {
+            this.animation.loop = false;
+        }
         return fetch(path).then(l => {
             return l.arrayBuffer().then(q => {
                 return gzipUncompress(convertToByteArray(q))
             })
         }).then(l => {
-            if (this.animation)
+            if (this.animation) {
                 this.animation.destroy()
-            let beforeJson = new TextDecoder("utf-8").decode(l);
+            }
             this.animation = lottie.loadAnimation({
                 container: this.$monkey, // the dom element that will contain the animation
                 renderer: 'canvas',

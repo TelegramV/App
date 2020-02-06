@@ -563,7 +563,7 @@
                 color: $blueonline;
                 font-weight: 500;
                 font-size: 14px;
-                padding: 2px 0;
+                padding: 3px 0;
             }
 
             .message {
@@ -676,6 +676,10 @@
 
             .message.no-pad {
                 padding: 0px;
+
+                .fwd {
+                    padding-left: 5px;
+                }
 
                 .text-wrapper {
                     padding: 5px 9px;
