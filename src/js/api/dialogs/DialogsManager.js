@@ -11,6 +11,7 @@ import AppEvents from "../eventBus/AppEvents"
 import PeersStore from "../store/PeersStore"
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import {MessageFactory} from "../messages/MessageFactory"
+import API from "../telegram/API"
 
 class DialogManager extends Manager {
     constructor() {
@@ -261,28 +262,19 @@ class DialogManager extends Manager {
     }
 
     /**
-     * @param limit
-     * @param flags
-     * @param exclude_pinned
-     * @param folder_id
-     * @param offset_date
-     * @param offset_id
-     * @param offset_peer
-     * @param hash
+     * @param params.limit
+     * @param params.flags
+     * @param params.exclude_pinned
+     * @param params.folder_id
+     * @param params.offset_date
+     * @param params.offset_id
+     * @param params.offset_peer
+     * @param params.hash
      * @return {Promise<*>}
      */
-    getDialogs({
-                   limit = 20,
-                   flags = 0,
-                   exclude_pinned = false,
-                   folder_id = -1,
-                   offset_date = this.offsetDate,
-                   offset_id = -1,
-                   offset_peer = {
-                       _: "inputPeerEmpty",
-                   },
-                   hash = ""
-               }) {
+    getDialogs(params) {
+
+        params.offset_date = params.offset_date || this.offsetDate
 
         if (DialogsStore.count >= this.count) {
             console.warn("all dialogs were fetched")
@@ -292,18 +284,7 @@ class DialogManager extends Manager {
             this.offsetDate = this.dialogsOffsetDate + TimeManager.timeOffset
         }
 
-        return MTProto.invokeMethod("messages.getDialogs", {
-            flags: flags,
-            pFlags: {
-                exclude_pinned: exclude_pinned
-            },
-            folder_id: folder_id,
-            offset_date: offset_date,
-            offset_id: offset_id,
-            offset_peer: offset_peer,
-            limit: limit,
-            hash: hash
-        }).then(rawDialogs => {
+        return API.messages.getDialogs(params).then(rawDialogs => {
             if (rawDialogs.count === 0) {
                 this.count = 0
                 console.warn("there is no dialogs")
