@@ -12,19 +12,11 @@ export default class SettingsPane extends LeftBarComponent {
     }
 
     barOnShow = () => {
-        this.$el.classList.remove("hidden")
-        this.$el.classList.remove("fade-out")
-        this.$el.classList.add("fade-in")
+        this.$el.classList.add("fade-in");
     }
 
     barOnHide = () => {
         this.$el.classList.remove("fade-in")
-        this.$el.classList.add("fade-out")
-        this.$el.classList.add("hidden")
-    }
-
-    barAfterHide = () => {
-        this.$el.classList.remove("fade-out")
     }
 
     onBack = () => {

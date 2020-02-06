@@ -5,12 +5,12 @@ export class MonkeyController {
     constructor() {
 
         this.states = {
-            close: "/static/monkey/TwoFactorSetupMonkeyClose.tgs",
-            closeAndPeek: "/static/monkey/TwoFactorSetupMonkeyCloseAndPeek.tgs",
-            closeAndPeekToIdle: "/static/monkey/TwoFactorSetupMonkeyCloseAndPeekToIdle.tgs",
-            idle: "/static/monkey/TwoFactorSetupMonkeyIdle.tgs",
-            peek: "/static/monkey/TwoFactorSetupMonkeyPeek.tgs",
-            tracking: "/static/monkey/TwoFactorSetupMonkeyTracking.tgs"
+            close: "./static/monkey/TwoFactorSetupMonkeyClose.tgs",
+            closeAndPeek: "./static/monkey/TwoFactorSetupMonkeyCloseAndPeek.tgs",
+            closeAndPeekToIdle: "./static/monkey/TwoFactorSetupMonkeyCloseAndPeekToIdle.tgs",
+            idle: "./static/monkey/TwoFactorSetupMonkeyIdle.tgs",
+            peek: "./static/monkey/TwoFactorSetupMonkeyPeek.tgs",
+            tracking: "./static/monkey/TwoFactorSetupMonkeyTracking.tgs"
         };
 
         this.nextState = null;

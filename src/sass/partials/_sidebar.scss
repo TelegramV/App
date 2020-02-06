@@ -12,12 +12,6 @@
 
     &.fade-in {
         left: 0 !important;
-        opacity: 1;
-    }
-
-    &.fade-out {
-        left: -1000px !important;
-        opacity: 0;
     }
 
     &.hidden,
@@ -192,36 +186,36 @@
                 }
             }
         }
-    }
 
-    &.background-color {
-        padding: 0 5px;
-        top: 0;
-        left: 500px;
-        background-color: white;
-        transition: anim(left);
+        .background-color {
+            padding: 0 5px;
+            top: 0;
+            left: 500px;
+            background-color: white;
+            transition: anim(left), anim(opacity);
 
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(8rem, 1fr));
-            grid-auto-rows: 1fr;
+            .gallery {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(8rem, 1fr));
+                grid-auto-rows: 1fr;
 
-            &::before {
-                content: '';
-                width: 0;
-                padding-bottom: 100%;
-                grid-row: 1 / 1;
-                grid-column: 1 / 1;
-            }
+                &::before {
+                    content: '';
+                    width: 0;
+                    padding-bottom: 100%;
+                    grid-row: 1 / 1;
+                    grid-column: 1 / 1;
+                }
 
-            &>*:first-child {
-                grid-row: 1 / 1;
-                grid-column: 1 / 1;
-            }
+                &>*:first-child {
+                    grid-row: 1 / 1;
+                    grid-column: 1 / 1;
+                }
 
-            .color-square {
-                margin: 2px;
-                cursor: pointer;
+                .color-square {
+                    margin: 2px;
+                    cursor: pointer;
+                }
             }
         }
     }

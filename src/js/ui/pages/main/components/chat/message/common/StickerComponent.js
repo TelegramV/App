@@ -1,4 +1,4 @@
-import Component from "../../../../../../v/vrdom/Component"
+import {VComponent} from "../../../../../../v/vrdom/component/VComponent"
 import {FileAPI} from "../../../../../../../api/fileAPI"
 
 import lottie, {AnimationItem} from "lottie-web"
@@ -6,7 +6,7 @@ import {gzipUncompress} from "../../../../../../../mtproto/utils/bin"
 
 let stickerCounter = 0;
 
-export default class StickerComponent extends Component {
+export default class StickerComponent extends VComponent {
 	constructor(props) {
 		super(props);
 		this.sticker = this.props.sticker;
