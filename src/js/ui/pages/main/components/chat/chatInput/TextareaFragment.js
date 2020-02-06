@@ -21,7 +21,6 @@ export class TextareaFragment extends Component {
     }
 
     onKeyDown(ev) {
-        console.log(ev)
         // Ctrl + Shift + M
         if(ev.keyCode === 77 && ev.shiftKey && ev.ctrlKey) {
             ev.preventDefault()
@@ -136,7 +135,7 @@ export class TextareaFragment extends Component {
 
     onInput(ev) {
         this.parent.updateSendButton()
-        replaceEmoji(ev.target)
+        replaceEmoji(this.$el)
     }
 
     contextMenu = l => {
