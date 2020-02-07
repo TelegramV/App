@@ -7,6 +7,7 @@ import {GroupForbiddenPeer} from "./objects/GroupForbiddenPeer";
 import {ChannelForbiddenPeer} from "./objects/ChannelForbiddenPeer";
 
 class PeerFactory {
+
     static fromRaw(rawPeer) {
         let type
 

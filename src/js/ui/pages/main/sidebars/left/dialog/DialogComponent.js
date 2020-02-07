@@ -1,76 +1,13 @@
-import {UserPeer} from "../../../../../../api/peers/objects/UserPeer"
-import {DialogTextFragment} from "./Fragments/DialogTextFragment"
 import VF from "../../../../../v/VFramework"
-import {DialogAvatarFragment} from "./Fragments/DialogAvatarFragment"
-import {tsNow} from "../../../../../../mtproto/timeManager"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {dialogContextMenu} from "./ContextMenu/dialogContextMenu"
 import {Dialog} from "../../../../../../api/dialogs/Dialog"
 import VComponent from "../../../../../v/vrdom/component/VComponent"
-import ArchivedDialogListComponent from "./Archived/ArchivedDialogListComponent"
+import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
 import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent"
 import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
+import {DialogFragment} from "./Fragments/DialogFragment"
 
-const DATE_FORMAT_TIME = {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-}
-
-const DATE_FORMAT = {
-    year: '2-digit',
-    month: '2-digit',
-    day: '2-digit',
-}
-
-const BadgeFragment = ({id, show = false, slot}) => {
-    if (!show) {
-        return (
-            <div id={id} css-display="none" className="badge tgico"/>
-        )
-    }
-
-    return (
-        <div id={id} css-display="" className="badge tgico">
-            {slot}
-        </div>
-    )
-}
-
-const UnreadCountBadge = ({dialog}) => {
-    return (
-        <BadgeFragment id={`dialog-${dialog.peer.id}-unreadCount`}
-                       show={dialog.peer.messages.unreadCount > 0}>
-
-            {dialog.peer.messages.unreadCount}
-        </BadgeFragment>
-    )
-}
-
-const UnreadMentionsCountBadge = ({dialog}) => {
-    return (
-        <BadgeFragment id={`dialog-${dialog.peer.id}-mentionCount`}
-                       show={dialog.peer.messages.unreadMentionsCount > 0}>
-            @
-        </BadgeFragment>
-    )
-}
-
-const UnreadMarkBadge = ({dialog}) => {
-    return (
-        <BadgeFragment id={`dialog-${dialog.peer.id}-unreadMark`} show={dialog.unreadMark}> </BadgeFragment>
-    )
-}
-
-const TimeFragment = ({id, dialog}) => {
-    return (
-        <div id={id} className="time">
-            {dialog.peer.messages.last.getDate("en", tsNow(true) - dialog.peer.messages.last.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)}
-        </div>
-    )
-}
-
-// NEVER CREATE THIS COMPONENT WITH THE SAME DIALOG
 export class DialogComponent extends VComponent {
 
     dialog: Dialog
@@ -123,60 +60,17 @@ export class DialogComponent extends VComponent {
     }
 
     h() {
-        const dialog = this.dialog
-        const peer = dialog.peer
-
-        const personClasses = {
-            "person": true,
-            "rp": true,
-            "online": peer instanceof UserPeer && peer.onlineStatus.online,
-            "active": AppSelectedPeer.check(dialog.peer),
-            "unread": dialog.peer.messages.unreadMentionsCount > 0 || dialog.peer.messages.unreadCount > 0 || dialog.unreadMark,
-            "muted": dialog.isMuted,
-        }
-
-        if (dialog.peer.messages.last && dialog.peer.messages.last.isOut && !dialog.peer.isSelf) {
-            personClasses["sent"] = true
-
-            if (dialog.peer.messages.last.isRead) {
-                personClasses["read"] = true
-            }
-        }
-
         return (
-            <div data-message-id={dialog.peer.messages.last.id}
-                 className={personClasses}
-
-                 onClick={this._handleClick}
-                 onContextMenu={this._contextMenuListener}>
-
-                <DialogAvatarFragment ref={this.avatarFragmentRef}
-                                      id={`dialog-${dialog.peer.id}-avatar`}
-                                      peer={dialog.peer}/>
-
-                <div className="content">
-
-                    <div className="top">
-                        <div className="title">
-                            {peer.isSelf ? "Saved Messages" : peer.name}
-                        </div>
-
-                        <div className="status tgico"/>
-
-                        <TimeFragment ref={this.timeFragmentRef} id={`dialog-${dialog.peer.id}-time`} dialog={dialog}/>
-                    </div>
-
-                    <div className="bottom">
-                        <DialogTextFragment ref={this.textFragmentRef} id={`dialog-${dialog.peer.id}-text`}
-                                            dialog={dialog}/>
-
-                        <UnreadMentionsCountBadge ref={this.unreadMentionsCountFragmentRef} dialog={dialog}/>
-                        <UnreadCountBadge ref={this.unreadCountFragmentRef} dialog={dialog}/>
-
-                        <UnreadMarkBadge ref={this.unreadMarkFragmentRef} dialog={dialog}/>
-                    </div>
-                </div>
-            </div>
+            <DialogFragment dialog={this.dialog}
+                            click={this._handleClick}
+                            contextMenu={this._contextMenuListener}
+                            timeFragmentRef={this.timeFragmentRef}
+                            textFragmentRef={this.textFragmentRef}
+                            avatarFragmentRef={this.avatarFragmentRef}
+                            unreadCountFragmentRef={this.unreadCountFragmentRef}
+                            unreadMentionsCountFragmentRef={this.unreadMentionsCountFragmentRef}
+                            unreadMarkFragmentRef={this.unreadMarkFragmentRef}
+            />
         )
     }
 

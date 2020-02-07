@@ -232,24 +232,14 @@ class BubblesComponent extends Component {
 
     _onScrollBubbles(event) {
         const $element = event.target
-        const $bi = this.elements.$bubblesInner
 
         if ($element.scrollTop < 300 && !this.state.isFetchingNextPage) {
             this.state.isFetchingNextPage = true
 
-            // this._toggleMessagesLoader(false)
-
             this.reactive.peer.api.fetchNextPage().then(() => {
                 this.state.isFetchingNextPage = false
-                // this._toggleMessagesLoader(true)
             })
 
-        } else if ($bi) {
-            const minel = $bi.childNodes.length > 10 ? 10 : $bi.childNodes.length
-
-            // if (isElementInViewport($bi.childNodes[minel])) {
-            //     this._markAllAsRead()
-            // }
         }
     }
 

@@ -1,8 +1,8 @@
 import VComponent from "../../../../../../v/vrdom/component/VComponent"
 import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 import {DialogComponent} from "../DialogComponent"
-import {Sortable} from "sortablejs"
 import VF from "../../../../../../v/VFramework"
+import DialogsManager from "../../../../../../../api/dialogs/DialogsManager"
 
 export default class ArchivedDialogListComponent extends VComponent {
 
@@ -11,12 +11,17 @@ export default class ArchivedDialogListComponent extends VComponent {
     appEvents(E) {
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.onDialogsGotMany)
+            .on("gotArchived", this.onDialogsGotMany)
     }
 
     h() {
         return (
             <div id="dialogsArchived" className="list"/>
         )
+    }
+
+    mounted() {
+        DialogsManager.fetchArchivedDialogs().then(dialogs => console.log("archived fetched", dialogs))
     }
 
     onDialogsGotMany = event => {

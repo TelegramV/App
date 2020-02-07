@@ -98,16 +98,10 @@ export class Peer extends ReactiveObject {
         return this._accessHash
     }
 
-    /**
-     * @return {boolean}
-     */
     get isDeleted() {
         return this.raw.pFlags && this.raw.pFlags.deleted
     }
 
-    /**
-     * @return {*|string|T|boolean}
-     */
     get username() {
         return this.raw.username
     }
@@ -119,43 +113,28 @@ export class Peer extends ReactiveObject {
         }
     }
 
-    /**
-     * @return {boolean}
-     */
-    get verified() {
+    get isVerified() {
         return this.raw.pFlags && this.raw.pFlags.verified === true
     }
 
-    /**
-     * @return {string}
-     */
     get name() {
         return this.raw.first_name + (this.raw.last_name ? " " + this.raw.last_name : "")
     }
 
-    /**
-     * @return {boolean}
-     */
     get isMin() {
         return this.raw.pFlags && this.raw.pFlags.min === true
     }
 
-    /**
-     * @return {boolean}
-     */
     get isSelf() {
         return this.raw.pFlags && this.raw.pFlags.self === true
     }
 
-    /**
-     * @return {{_: string, chat_id: *}|{user_id: *, access_hash: string, _: string}|{access_hash: string, channel_id: *, _: string}|{_: string}}
-     */
     get inputPeer() {
         return this.isMin ? this.inputPeerFromMessage : getInputPeerFromPeer(this.type, this.id, this.accessHash)
     }
 
     get input() {
-        return getInputFromPeer(this.type, this.id, this.accessHash)
+        return this.isMin ? this.inputFromMessage : getInputFromPeer(this.type, this.id, this.accessHash)
     }
 
     get inputPeerFromMessage() {
@@ -178,6 +157,33 @@ export class Peer extends ReactiveObject {
 
             return {
                 _: "inputPeerChannelFromMessage",
+                peer: this._min_inputPeer,
+                msg_id: this._min_messageId,
+                channel_id: this.id
+            }
+        }
+    }
+
+    get inputFromMessage() {
+        if (this.type === "user") {
+            return {
+                _: "inputUserFromMessage",
+                peer: this._min_inputPeer,
+                msg_id: this._min_messageId,
+                user_id: this.id
+            }
+        } else if (this.type === "channel") {
+            return {
+                _: "inputFromMessage",
+                peer: this._min_inputPeer,
+                msg_id: this._min_messageId,
+                channel_id: this.id
+            }
+        } else {
+            console.warn("Potential BUG: cannot get inputPeerFromMessage, returning channel")
+
+            return {
+                _: "inputChannelFromMessage",
                 peer: this._min_inputPeer,
                 msg_id: this._min_messageId,
                 channel_id: this.id
@@ -213,7 +219,7 @@ export class Peer extends ReactiveObject {
      */
     fetchFull() {
         return MTProto.invokeMethod("users.getFullUser", {
-            id: this.inputPeer
+            id: this.input
         }).then(userFull => {
             this.full = userFull
 
@@ -236,8 +242,8 @@ export class Peer extends ReactiveObject {
         }
 
         // When receiving said (min) constructors, the client must first check if user or chat object without min flag is already present in local cache. If it is present, then the client should just ignore constructors with min flag and use local one instead.
-        if (rawPeer.pFlags && rawPeer.pFlags.min === true && this._filled) {
-            return
+        if (rawPeer.pFlags && rawPeer.pFlags.min && this._filledNonMin) {
+            return this
         }
 
         this.raw = rawPeer
@@ -249,13 +255,13 @@ export class Peer extends ReactiveObject {
             this._accessHash = this.raw.access_hash
         }
 
-        if (this.isMin) {
-            this._photo.fillRaw(false)
-        } else {
-            this._photo.fillRaw(rawPeer.photo)
+        this._photo.fillRaw(rawPeer.photo)
+
+        if (!this.isMin) {
+            this._filledNonMin = true
         }
 
-        this._filled = true
+        return this
     }
 
     /**
@@ -269,5 +275,7 @@ export class Peer extends ReactiveObject {
         AppEvents.Peers.fire("updateSingle", {
             peer: this
         })
+
+        return this
     }
 }

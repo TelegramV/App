@@ -135,6 +135,20 @@ class PeersMapStore extends MappedStore {
     }
 
     /**
+     * @return {Array<Peer>}
+     */
+    toArray() {
+        const array = []
+        for (const [_, data] of this.data.entries()) {
+            for (const [_, peer] of data.entries()) {
+                array.push(peer)
+            }
+        }
+        return array
+    }
+
+
+    /**
      * @param {string} type
      * @param {number} id
      * @return {boolean}
