@@ -34,7 +34,7 @@ figure.photo, figure.video, figure.round-video {
     transform: translate(-50%, -50%);
 
     >.pause-button {
-      background: rgba(0, 0, 0, 0.3);
+      background: $semiblack;
       width: 64px;
       height: 64px;
       line-height: 62px;

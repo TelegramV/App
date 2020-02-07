@@ -14,13 +14,13 @@ function LoaderComponent({big = true, white = false, full = false, show = true, 
     return (
         <div id={id} css-display={!show ? "none" : ""} className={classes}>
             {
-                background ?
+                background ? (
                     <div className="progress-background">
                         <progress className={progressClasses}/>
                     </div>
-                    :
+                    ):(
                     <progress className={progressClasses}/>
-
+                )
             }
         </div>
     )

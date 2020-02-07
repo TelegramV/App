@@ -24,7 +24,7 @@ class ChatComponent extends Component {
             <div class="chat-wrapper">
                 <div id="wallpaper" class="wallpaper blur"></div>
                 <div id="noChat">
-                    <LoaderComponent id="chat-wrapper-loader" full={true} show={true}/>
+                    <LoaderComponent id="chat-wrapper-loader" full={true} show={true} background={true} white={true}/>
                 </div>
                 <div id="chat" css-display="none">
                     <div id="topbar">
