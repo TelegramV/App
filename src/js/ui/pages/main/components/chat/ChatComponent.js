@@ -34,7 +34,7 @@ class ChatComponent extends Component {
                         <div className="btn-icon rp rps tgico-more"/>
                     </div>
 
-                    <LoaderComponent id="messages-wrapper-messages-loader" full={true} show={true}/>
+                    <LoaderComponent id="messages-wrapper-messages-loader" full={true} white={true} show={true} background={true}/>
 
                     <BubblesComponent/>
                     <ChatInputComponent ref="chatInput"/>

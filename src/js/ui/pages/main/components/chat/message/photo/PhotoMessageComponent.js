@@ -10,8 +10,10 @@ const MessagePhotoFigureFragment = ({message, clickLoader}) => {
         <PhotoFigureFragment id={`msg-photo-figure-${message.id}`}
                              srcUrl={message.srcUrl}
                              thumbnail={message.thumbnail}
-                             width={message.width}
-                             height={message.height}
+                             width={message.maxWidth}
+                             height={message.maxHeight}
+                             maxWidth={message.text.length === 0 ? 480 : 470}
+                             maxHeight={512}
                              loading={message.loading}
                              loaded={message.loaded}
                              clickLoader={clickLoader}/>
