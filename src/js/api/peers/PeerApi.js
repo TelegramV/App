@@ -78,7 +78,7 @@ export class PeerApi {
         let oldest = this._peer.messages.oldest
 
         if (!oldest) {
-            return
+            return Promise.resolve()
         }
 
         return this.getHistory({offset_id: oldest.id}).then(messages => {
