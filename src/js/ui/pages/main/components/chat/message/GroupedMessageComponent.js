@@ -6,6 +6,7 @@ import {PhotoMessage} from "../../../../../../api/messages/objects/PhotoMessage"
 import {VideoMessage} from "../../../../../../api/messages/objects/VideoMessage";
 import {VideoComponent} from "../../basic/videoComponent";
 import type {BusEvent} from "../../../../../../api/eventBus/EventBus";
+import {Layouter} from "../../../../../utils/layout";
 
 class GroupedMessageComponent extends GeneralMessageComponent {
 
@@ -22,7 +23,7 @@ class GroupedMessageComponent extends GeneralMessageComponent {
         return (
             <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message} noPad showUsername={false}
                                     outerPad={text !== ""}>
-                <div className="grouped">
+                <div className={["grouped", this.message.group ? Layouter.getClass(this.message.group.length) : ""]}>
                     {this.message.group && this.message.group.map(l => {
                         if (l instanceof PhotoMessage) {
                             return <PhotoComponent photo={l.raw.media.photo}/>

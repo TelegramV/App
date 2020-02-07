@@ -1,4 +1,5 @@
 import SettingsPane from "../SettingsPane"
+import {InputComponent} from "../../../../components/input/inputComponent"
 
 export default class BackgroundColorComponent extends SettingsPane {
 	barName = "background-color";
@@ -29,7 +30,10 @@ export default class BackgroundColorComponent extends SettingsPane {
 			<div class="sidebar sub-settings background-color scrollable">
 				{this.makeHeader()}
 				<div class="pallete">
-					Pallete goes here...
+				</div>
+				<div class="inputs">
+					<InputComponent type="text" label="HEX" value="#"/>
+					<InputComponent label="RGB"/>
 				</div>
 				<div class="gallery color-list">
 					{this.generateColorList()}
@@ -38,7 +42,7 @@ export default class BackgroundColorComponent extends SettingsPane {
 			)
 	}
 
-	generateColorList() {
+	generateColorList = () => {
 		let elements = [];
 		for(const color of this.defaultColors) {
 			elements.push(<ColorSquareFragment color={color} click={this._fragmentClick}/>);

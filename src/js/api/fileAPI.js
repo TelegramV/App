@@ -3,6 +3,9 @@ import Bytes from "../mtproto/utils/bytes"
 import Random from "../mtproto/utils/random"
 import AppCache from "./cache"
 import {getInputPeerFromPeer} from "./dialogs/util"
+import {Peer} from "./peers/objects/Peer";
+import TimeManager from "../mtproto/timeManager";
+import AppConfiguration from "../configuration";
 
 export class FileAPI {
     static getInputName(file) {
@@ -27,11 +30,60 @@ export class FileAPI {
         }
     }
 
+    static uploadMediaToPeer(peer: Peer, media) {
+        return MTProto.invokeMethod("messages.uploadMedia", {
+            peer: peer.inputPeer,
+            media: media
+        })
+    }
+
+    static async uploadPhoto(bytes, name = "") {
+        return {
+            _: "inputMediaUploadedPhoto",
+            file: await this.uploadFile(bytes, name)
+        }
+    }
+
+    static async uploadFile(bytes: ArrayBuffer, name = "") {
+        const size = bytes.byteLength
+        const splitSize = 1024 * 256
+        const bigFileLimit = 1024 * 1024 * 10
+        const parts = Math.ceil(size / splitSize)
+        const isBig = size >= bigFileLimit
+        const id = TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+        const inputFile = {
+            _: isBig ? "inputFileBig" : "inputFile",
+            parts: parts,
+            name: name,
+            id: id
+        }
+
+        const b = new Uint8Array(bytes)
+
+        let offset = 0
+        let i = 0
+        while (offset !== size) {
+            let end = Math.min(size, offset + splitSize)
+            let splitted = b.buffer.slice(offset, end)
+            const response = await MTProto.invokeMethod(isBig ? "upload.saveBigFilePart" : "upload.saveFilePart", {
+                file_id: id,
+                file_part: i,
+                file_total_parts: parts,
+                bytes: splitted
+            })
+            offset = end
+            i++
+        }
+        return inputFile
+    }
+
     static saveFilePart(id, bytes) {
         return MTProto.invokeMethod("upload.saveFilePart", {
             file_id: id,
             file_part: 0,
             bytes
+        }).then(_ => {
+            return id
         })
     }
 

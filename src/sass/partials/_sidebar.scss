@@ -261,6 +261,16 @@
             }
         }
 
+        .background-color {
+            .inputs {
+                display: flex;
+                margin: 10px;
+                .input-field {
+                    margin: 5px;
+                }
+            }
+        }
+
         .background-image {
             .button-with-icon {
                 .checkbox-input {

@@ -687,6 +687,11 @@
                 }
             }
 
+            .grouped {
+                border-radius: 0;
+                grid-gap: 2px;
+            }
+
 
             .time {
                 float: right;

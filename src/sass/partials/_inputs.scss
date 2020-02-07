@@ -43,6 +43,8 @@ input[type="password"] {
     width: 360px;
     height: $input-height;
     box-sizing: border-box;
+    margin-top: 12px;
+    margin-bottom: 12px;
 
     label {
         position: absolute;
@@ -141,6 +143,9 @@ input[type="password"] {
     user-select: none;
 
     padding-top: 3px;
+
+    margin-top: 12px;
+    margin-bottom: 12px;
 
     font-size: 16px;
 

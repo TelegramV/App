@@ -74,12 +74,32 @@
                 }
             }
 
+            hr {
+                border-style: solid;
+                border-width: 0.5px;
+                border-color: $lightblue;
+            }
+
+            h5 {
+                color: $darkgrey;
+                font-size: 0.9em;
+                margin-bottom: 16px;
+            }
+
+            .input-field {
+                width: 100%;
+            }
+
             .padded {
                 padding-left: 18px;
                 padding-right: 18px;
 
                 &.bottom {
-                    padding-bottom: 18px;
+                    padding-bottom: 16px;
+                }
+
+                &.top {
+                    padding-top: 16px;
                 }
             }
             //.content {
