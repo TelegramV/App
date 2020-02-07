@@ -269,6 +269,24 @@ class DialogManager extends Manager {
         })
     }
 
+    fetchArchivedDialogs() {
+        return API.messages.getDialogs({
+            flags: 1,
+            folder_id: 1,
+            limit: 100
+        }).then(Dialogs => {
+            const dialogs = Dialogs.dialogs.map(rawDialog => {
+                return this.createDialogFromDialogs(rawDialog, Dialogs)
+            })
+
+            AppEvents.Dialogs.fire("gotArchived", {
+                dialogs,
+            })
+
+            return dialogs
+        })
+    }
+
     fetchNextPage({limit = 40}) {
         if (this.allWasFetched || DialogsStore.count >= this.count) {
             console.warn("all dialogs were fetched")

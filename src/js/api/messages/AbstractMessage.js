@@ -110,7 +110,11 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
         if (!this._from) {
             console.warn("no from peer")
-        } else if (this._from.isMin) {
+        } else if (this._from.isMin && !this._from._min_messageId) {
+            this._from.minData = {
+                message: this,
+                dialog: this.dialog
+            }
             this._from._min_messageId = this.id
             this._from._min_inputPeer = this.to.inputPeer
         }

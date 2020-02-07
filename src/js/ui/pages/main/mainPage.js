@@ -13,7 +13,7 @@ import {SettingsComponent} from "./sidebars/left/settings/SettingsComponent"
 import {SearchPanelComponent} from "./sidebars/left/search/SearchPanelComponent"
 import MessagesSearchComponent from "./sidebars/right/search/MessagesSearchComponent"
 import {DialogInfoComponent} from "./sidebars/right/dialogInfo/DialogInfoComponent"
-import {ArchivedDialogsBar} from "./sidebars/left/dialog/Archived/ArchivedDialogsBar"
+import {ArchivedDialogsBar} from "./sidebars/left/dialog/ArchivedDialogsBar"
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {

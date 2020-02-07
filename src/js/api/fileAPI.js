@@ -2,6 +2,7 @@ import {MTProto} from "../mtproto/external";
 import Bytes from "../mtproto/utils/bytes"
 import Random from "../mtproto/utils/random"
 import AppCache from "./cache"
+import {getInputPeerFromPeer} from "./dialogs/util"
 import {Peer} from "./peers/objects/Peer";
 import TimeManager from "../mtproto/timeManager";
 import AppConfiguration from "../configuration";
@@ -21,7 +22,7 @@ export class FileAPI {
             _: "inputPeerPhotoFileLocation",
             volume_id: file.volume_id,
             local_id: file.local_id,
-            peer: peer.inputPeer,
+            peer: getInputPeerFromPeer(peer.type, peer.id, peer.accessHash),
             pFlags: {
                 big: big
             },
@@ -61,7 +62,7 @@ export class FileAPI {
 
         let offset = 0
         let i = 0
-        while(offset !== size) {
+        while (offset !== size) {
             let end = Math.min(size, offset + splitSize)
             let splitted = b.buffer.slice(offset, end)
             const response = await MTProto.invokeMethod(isBig ? "upload.saveBigFilePart" : "upload.saveFilePart", {
@@ -155,7 +156,7 @@ export class FileAPI {
             return URL.createObjectURL(blob)
         }).catch(error => {
             return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
-                if(!response) {
+                if (!response) {
                     return ""
                 }
                 const blob = new Blob(new Array(response.bytes), {type: 'application/jpeg'})
@@ -196,15 +197,15 @@ export class FileAPI {
     }
 
     static getThumbSize(file) {
-        if(!file.thumbs) return undefined;
-        for(const thumb of file.thumbs) {
-            if(thumb._ !== "photoSize") continue;
+        if (!file.thumbs) return undefined;
+        for (const thumb of file.thumbs) {
+            if (thumb._ !== "photoSize") continue;
             return {
                 w: thumb.w,
                 h: thumb.h
             }
         }
-        
+
         return undefined;
     }
 
@@ -264,7 +265,7 @@ export class FileAPI {
                     thumb_size: thumb_size
                 }, file.dc_id, offset)
 
-                if(!response.bytes) {
+                if (!response.bytes) {
                     console.error("Fatal error while loading part", response, file, offset, size)
                 }
 
@@ -288,10 +289,10 @@ export class FileAPI {
     }
 
     static parseThumbSize(file, thumb_size) {
-        if(thumb_size === "max") {
+        if (thumb_size === "max") {
             return FileAPI.getMaxSize(file).type
         }
-        if(thumb_size === "min") {
+        if (thumb_size === "min") {
             return FileAPI.getMinSize(file).type
         }
         return thumb_size
@@ -299,7 +300,7 @@ export class FileAPI {
 
     static getThumb(file, thumb_size = "", onProgress = undefined) {
         return this.tryCache(file).catch(async _ => {
-            if(!file.thumbs) throw new Error("No thumbs specified for file", file)
+            if (!file.thumbs) throw new Error("No thumbs specified for file", file)
 
             thumb_size = this.parseThumbSize(file, thumb_size)
             const size = file.thumbs.find(l => l.type === thumb_size).size
@@ -320,7 +321,7 @@ export class FileAPI {
 
     static getFull(file, onProgress = undefined) {
         return this.tryCache(file).catch(async _ => {
-            if(!file.size) throw new Error("No size specified for file", file)
+            if (!file.size) throw new Error("No size specified for file", file)
 
             const size = file.size
             return this.createBlobFromParts(file, file.mime_type, await this.getAllParts(file, size, "", onProgress))
@@ -334,9 +335,9 @@ export class FileAPI {
      * @param onProgress
      */
     static getFile(file, thumb_size = "", onProgress) {
-        if(thumb_size === "") {
+        if (thumb_size === "") {
             return this.getFull(file, onProgress)
-        } else if(file._ === "photo") {
+        } else if (file._ === "photo") {
             return this.getPhoto(file, thumb_size, onProgress)
         } else {
             return this.getThumb(file, thumb_size, onProgress)

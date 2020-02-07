@@ -10,7 +10,7 @@ import {LeftBarComponent} from "../LeftBarComponent"
 import UIEvents from "../../../../../eventBus/UIEvents"
 import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent"
 import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
-import ArchivedDialogListComponent from "./Archived/ArchivedDialogListComponent"
+import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
 
 export class DialogListComponent extends LeftBarComponent {
 

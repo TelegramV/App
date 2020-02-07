@@ -1,5 +1,5 @@
-import {LeftBarComponent} from "../../LeftBarComponent"
-import ArchivedDialogListComponent from "./ArchivedDialogListComponent"
+import {LeftBarComponent} from "../LeftBarComponent"
+import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
 
 export class ArchivedDialogsBar extends LeftBarComponent {
 
