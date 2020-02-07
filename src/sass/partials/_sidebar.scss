@@ -72,9 +72,11 @@
 
     &.search {
         margin-top: 60px;
+        height: -webkit-fill-available;
         padding: 0 10px;
         transition: anim(opacity), anim(transform);
         transform: scale(1,1);
+        transform-origin: top;
         opacity: 1;
         pointer-events: auto;
 
@@ -155,8 +157,28 @@
         }
     }
 
+    &.messages-search {
+        position: relative;
+
+        &.hidden {
+            display: block;
+        }
+        
+        .toolbar {
+            position: relative;
+        }
+    }
+
     &.settings {
         overflow-x: hidden;
+        transform: translateX(0);
+        transition: anim(transform);
+
+        &.hidden {
+            display: block;
+            width: 100%;
+            transform: translateX(-100%);
+        }
 
         .settings-header {
             display: flex;

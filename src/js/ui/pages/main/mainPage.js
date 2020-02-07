@@ -11,6 +11,7 @@ import {DialogListComponent} from "./sidebars/left/dialog/DialogListComponent"
 import ChatComponent from "./components/chat/ChatComponent"
 import {SettingsComponent} from "./sidebars/left/settings/SettingsComponent"
 import {SearchPanelComponent} from "./sidebars/left/search/SearchPanelComponent"
+import MessagesSearchComponent from "./sidebars/right/search/MessagesSearchComponent"
 import WallpaperManager from "../../wallpaperManager"
 import {DialogInfoComponent} from "./sidebars/right/dialogInfo/DialogInfoComponent"
 
@@ -38,16 +39,13 @@ export function MainPage() {
             <MediaViewerComponent/>
             <InstantViewComponent/>
             <SettingsComponent/>
-            {/*TODO move all settings inside it's component*/}
             
-
-
             <SearchPanelComponent/>
-
             <DialogListComponent/>
             <ChatComponent/>
-            {/*<DialogInfoComponent/>*/}
+
             <DialogInfoComponent/>
+            <MessagesSearchComponent/>
         </div>
     )
 }

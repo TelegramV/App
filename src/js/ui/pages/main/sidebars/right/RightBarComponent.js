@@ -1,11 +1,11 @@
 import UIEvents from "../../../../eventBus/UIEvents"
 import {AbstractBarComponent} from "../AbstractBarComponent"
 
-export class LeftBarComponent extends AbstractBarComponent {
+export class RightBarComponent extends AbstractBarComponent {
 
     // CRITICAL: always call super
     appEvents(E) {
-        E.bus(UIEvents.LeftSidebar)
+        E.bus(UIEvents.RightSidebar)
             .on("show", this.sidebarOnShow)
     }
 }

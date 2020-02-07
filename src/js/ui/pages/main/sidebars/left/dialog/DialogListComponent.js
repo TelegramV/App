@@ -103,6 +103,7 @@ export class DialogListComponent extends LeftBarComponent {
                     <div ref={this.pinnedDialogsRef} id="dialogsPinned" className="list pinned hidden"/>
                     <div ref={this.generalDialogsRef} id="dialogs" className="list hidden"/>
                 </div>
+                <div class="new-chat"><i class="tgico tgico-newchat_filled"/></div>
             </div>
         )
     }

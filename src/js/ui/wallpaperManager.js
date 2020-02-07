@@ -7,7 +7,7 @@ export class WallpaperManagerClass {
 		this.wallpapersDocumentCache = {};
 
 		this._receiveWallpaperList().then(q => {
-			this.setLegendaryCamomileWallpaper();
+			//this.setLegendaryCamomileWallpaper();
 			this.cacheWallpaperImages();
 		})
 	}

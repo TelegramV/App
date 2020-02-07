@@ -4,9 +4,9 @@ import {VUI} from "../../../v/VUI"
 export class AbstractBarComponent extends VComponent {
 
     barName = undefined
-    barVisible: false
+    barVisible = false
 
-    leftSidebarOnShow = event => {
+    sidebarOnShow = event => {
         if (event.barName === this.barName) {
             if (!this.barVisible) {
                 this.barVisible = true
