@@ -11,8 +11,9 @@ import {DialogListComponent} from "./sidebars/left/dialog/DialogListComponent"
 import ChatComponent from "./components/chat/ChatComponent"
 import {SettingsComponent} from "./sidebars/left/settings/SettingsComponent"
 import {SearchPanelComponent} from "./sidebars/left/search/SearchPanelComponent"
-import WallpaperManager from "../../wallpaperManager"
+import MessagesSearchComponent from "./sidebars/right/search/MessagesSearchComponent"
 import {DialogInfoComponent} from "./sidebars/right/dialogInfo/DialogInfoComponent"
+import {ArchivedDialogsBar} from "./sidebars/left/dialog/Archived/ArchivedDialogsBar"
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {
@@ -25,7 +26,7 @@ function initHighLevelManagers() {
     })
     LocaleController.init()
     StickerManager.getAnimatedEmojiSet()
-    WallpaperManager.init();
+    // WallpaperManager.init();
 }
 
 export function MainPage() {
@@ -39,15 +40,17 @@ export function MainPage() {
             <InstantViewComponent/>
             <SettingsComponent/>
             {/*TODO move all settings inside it's component*/}
-            
 
 
             <SearchPanelComponent/>
 
+            <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
+            <SearchPanelComponent/>
             <DialogListComponent/>
             <ChatComponent/>
-            {/*<DialogInfoComponent/>*/}
+
             <DialogInfoComponent/>
+            <MessagesSearchComponent/>
         </div>
     )
 }

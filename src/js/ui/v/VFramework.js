@@ -53,11 +53,11 @@ class VFramework {
 }
 
 
-const V = new VFramework({
+const VF = new VFramework({
     router: new VFrameworkRouter()
 })
 
 global.VRDOM = VRDOM
-global.VIX = V
+global.VIX = VF
 
-export default V
+export default VF

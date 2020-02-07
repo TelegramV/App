@@ -1,7 +1,7 @@
 import VRNode from "../VRNode"
 import type {VRRenderProps} from "../types/types"
 import vrdom_append from "../append"
-import V from "../../VFramework"
+import VF from "../../VFramework"
 
 const _XML_NAMESPACES = new Map([
     ["svg", "http://www.w3.org/2000/svg"]
@@ -76,7 +76,7 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
         }
     }
 
-    V.plugins.forEach(plugin => plugin.elementCreated($el))
+    VF.plugins.forEach(plugin => plugin.elementCreated($el))
 
     return $el
 }

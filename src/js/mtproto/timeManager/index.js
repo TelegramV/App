@@ -43,7 +43,7 @@ export class MtpTimeManager {
             this.timeOffset[dcId] = 0
         }
 
-        const newTimeOffset = serverTime - Math.floor((localTime || tsNow()) / 1000)
+        const newTimeOffset = serverTime - Math.floor((localTime || tsNow(false, dcId)) / 1000)
         const changed = Math.abs(this.timeOffset[dcId] - newTimeOffset) > 10
 
         // Logger.warn("newTimeOffset = ", newTimeOffset)

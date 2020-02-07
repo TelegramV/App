@@ -21,7 +21,7 @@
         bottom: 0;
         z-index: 1001;
 
-        background-color: rgba(0, 0, 0, 0.3);
+        background-color: $semiblack;
         transition: anim(background-color);
         display: flex;
         align-items: center;

@@ -12,6 +12,8 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     type = MessageType.UNSUPPORTED
 
+    _dialog
+
     _to: Peer
     _from: Peer
     prefix: string
@@ -26,7 +28,19 @@ export class AbstractMessage extends ReactiveObject implements Message {
     constructor(dialog: Dialog) {
         super()
 
-        this.dialog = dialog
+        this._dialog = dialog
+    }
+
+    get dialog() {
+        if (!this._dialog) {
+            this._dialog = MessagesManager.getToPeerMessage(this.raw).dialog
+        }
+
+        return this._dialog
+    }
+
+    set dialog(dialog) {
+        this._dialog = dialog
     }
 
     get id(): number {
@@ -96,6 +110,9 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
         if (!this._from) {
             console.warn("no from peer")
+        } else if (this._from.isMin) {
+            this._from._min_messageId = this.id
+            this._from._min_inputPeer = this.to.inputPeer
         }
 
         return this._from

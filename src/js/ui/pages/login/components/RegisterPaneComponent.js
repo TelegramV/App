@@ -118,7 +118,7 @@ export default class RegisterPaneComponent extends PaneComponent {
                         this.props.finished(authorization)
                     }, error => {
                         console.log(error)
-                        V.router.push("/")
+                        VF.router.push("/")
                     });
                 } else {
                     this.props.finished(authorization)

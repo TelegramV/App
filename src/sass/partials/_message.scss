@@ -20,7 +20,7 @@
 
         .service-msg {
             color: #fff;
-            background-color: rgba(#000, 0.22);
+            background-color: $semiblack;
             font-weight: 500;
             padding: 0 8px;
             line-height: 24px;
@@ -621,7 +621,7 @@
                         transform: translate(-50%, -50%);
 
                         .pause-button {
-                            background: rgba(0, 0, 0, 0.3);
+                            background: $semiblack;
                             width: 64px;
                             height: 64px;
                             line-height: 62px;
@@ -718,7 +718,7 @@
 
                     .inner {
                         color: white;
-                        background-color: rgba(0, 0, 0, 0.3);
+                        background-color: $semiblack;
                         border-radius: 40px;
                         text-align: center;
                         padding: 4px 6px;
@@ -740,7 +740,18 @@
     .out {
         flex-direction: row;
         align-items: flex-end;
-
+        .bubble {
+            .reply {
+                .quote {
+                    .text {
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        max-width: 400px;
+                    }
+                }
+            }
+        }
         .bubble.transparent {
             background-color: transparent;
             box-shadow: none;
@@ -761,9 +772,6 @@
 
                 .quote {
                     .text {
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                        overflow: hidden;
                         max-width: 250px;
                     }
                 }

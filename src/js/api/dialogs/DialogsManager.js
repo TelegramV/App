@@ -1,7 +1,6 @@
 import {MTProto} from "../../mtproto/external"
 import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash, getPeerTypeFromType} from "./util"
 import TimeManager from "../../mtproto/timeManager"
-import PeersManager from "../peers/objects/PeersManager"
 import {Dialog} from "./Dialog";
 import {Manager} from "../manager";
 import {Peer} from "../peers/objects/Peer";
@@ -11,10 +10,13 @@ import AppEvents from "../eventBus/AppEvents"
 import PeersStore from "../store/PeersStore"
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import {MessageFactory} from "../messages/MessageFactory"
+import API from "../telegram/API"
 
 class DialogManager extends Manager {
     constructor() {
         super()
+
+        this.allWasFetched = false
 
         this.latestDialog = undefined
         this.dialogsOffsetDate = 0 // TODO
@@ -23,7 +25,6 @@ class DialogManager extends Manager {
 
         this.isFetched = false
     }
-
 
     init() {
         if (this._inited) {
@@ -47,7 +48,26 @@ class DialogManager extends Manager {
 
 
         MTProto.UpdatesManager.subscribe("updateChannel", async update => {
-            await this.findOrFetch("channel", update.channel_id)
+            // await this.findOrFetch("channel", update.channel_id)
+            console.warn("updateChannel", update)
+        })
+
+        MTProto.UpdatesManager.subscribe("updateChannelNoPeer", async update => {
+            console.warn("updateChannelNoPeer NO WAY AAAAAAAAAAAAAAA", update)
+        })
+
+        MTProto.UpdatesManager.subscribe("updateChannelNoDialog", async update => {
+            console.warn("updateChannelNoDialog", update)
+            // await this.findOrFetch("channel", update.channel_id)
+        })
+
+        MTProto.UpdatesManager.subscribe("updateNewChannelMessageNoPeer", async update => {
+            console.warn("updateNewChannelMessageNoPeer NO WAY AAAAAAAAAAAAAAA", update)
+        })
+
+        MTProto.UpdatesManager.subscribe("updateNewChannelMessageNoDialog", async update => {
+            console.warn("updateNewChannelMessageNoDialog", update)
+            // await this.findOrFetch("channel", update.channel_id)
         })
 
         MTProto.UpdatesManager.subscribe("updateReadHistoryInbox", update => {
@@ -99,34 +119,19 @@ class DialogManager extends Manager {
             }
         })
 
-        this._inited = true
-    }
+        MTProto.UpdatesManager.subscribe("updateFolderPeers", update => {
+            update.folder_peers.forEach(FolderPeer => {
+                const dialog = this.findByPeer(FolderPeer.peer)
 
-    fetchNextPage({limit = 40}) {
-        if (DialogsStore.count >= this.count) {
-            console.warn("all dialogs were fetched")
-            return Promise.reject()
-        }
-
-        const latestDialog = this.latestDialog
-        const peer = latestDialog.peer
-
-        const offsetPeer = peer.inputPeer
-
-        const data = {
-            limit: limit,
-            offset_peer: offsetPeer,
-            exclude_pinned: true
-        }
-
-        return this.getDialogs(data).then(dialogs => {
-            AppEvents.Dialogs.fire("nextPage", {
-                dialogs: dialogs.filter(dialog => !dialog.isPinned),
-                pinnedDialogs: dialogs.filter(dialog => dialog.isPinned)
+                if (dialog) {
+                    dialog.folderId = FolderPeer.folder_id
+                } else {
+                    console.error("BUG: whoa!!! this thing is not implemented yet")
+                }
             })
-
-            return dialogs
         })
+
+        this._inited = true
     }
 
     /**
@@ -144,6 +149,8 @@ class DialogManager extends Manager {
      * @return {Promise<Dialog|null>}
      */
     async findOrFetch(type, id) {
+        console.log("fetch or find")
+
         let dialog = DialogsStore.get(type, id)
 
         if (!dialog) {
@@ -151,6 +158,11 @@ class DialogManager extends Manager {
 
             if (peer) {
                 dialog = peer.dialog
+
+                if (!dialog) {
+                    dialog = await this.getPeerDialogs(peer)
+                }
+
                 DialogsStore.set(dialog)
             } else {
                 dialog = await this.getPeerDialogs({_: type, id})
@@ -166,123 +178,56 @@ class DialogManager extends Manager {
      * @return {Dialog}
      */
     findByPeer(peer) {
-        if (peer instanceof Peer) return DialogsStore.get(peer.type, peer.id)
-
-        const keys = {
-            peerUser: "user",
-            peerChannel: "channel",
-            peerChat: "chat"
+        if (peer instanceof Peer) {
+            return DialogsStore.getByPeer(peer)
         }
 
-        const key = keys[peer._]
-        const keysId = {
-            peerUser: "user_id",
-            peerChannel: "channel_id",
-            peerChat: "chat_id"
-        }
-        const keyId = keysId[peer._]
-        return DialogsStore.get(key, peer[keyId])
-    }
+        const plain = PeerAPI.getPlain(peer, false)
 
-    fetchFromMessage(rawMessage, peer = null) {
-        const peerData = {
-            _: "inputDialogPeer",
-            peer: {
-                _: "inputPeerUserFromMessage",
-                peer: {
-                    _: "inputPeerEmpty"
-                },
-                msg_id: rawMessage.id,
-                user_id: rawMessage.user_id
-            }
-        }
-
-        return MTProto.invokeMethod("messages.getPeerDialogs", {
-            peers: [peerData]
-        }).then(_dialogsSlice => {
-            _dialogsSlice.users.forEach(l => {
-                PeersManager.setFromRawAndFire(l)
-            })
-            _dialogsSlice.chats.forEach(l => {
-                PeersManager.setFromRawAndFire(l)
-            })
-
-            const dialogs = _dialogsSlice.dialogs.map(_dialog => {
-                return this.resolveDialogWithSlice(_dialog, _dialogsSlice)
-            })
-
-            dialogs[0].fire("updateSingle")
-        })
+        return DialogsStore.get(plain._, plain.id)
     }
 
     getPeerDialogs(peer) {
-        console.log("fetching new dialog")
+        console.log(peer)
 
         const peerData = {
             _: "inputDialogPeer",
-            peer: !peer.access_hash ? getInputPeerFromPeerWithoutAccessHash(peer._, peer.id) : getInputPeerFromPeer(peer._, peer.id, peer.access_hash)
+            peer: peer.inputPeer ? peer.inputPeer : !peer.access_hash ? getInputPeerFromPeerWithoutAccessHash(peer._, peer.id) : getInputPeerFromPeer(peer._, peer.id, peer.access_hash)
         }
 
-        return MTProto.invokeMethod("messages.getPeerDialogs", {
+        return API.messages.getPeerDialogs({
             peers: [peerData]
-        }).then(rawDialogs => {
-            console.log("dialog fetched", rawDialogs)
-
-            rawDialogs.users.forEach(l => {
-                PeersManager.setFromRawAndFire(l)
-            })
-            rawDialogs.chats.forEach(l => {
-                PeersManager.setFromRawAndFire(l)
-            })
-
-            return rawDialogs.dialogs.map(_dialog => {
-                return this.resolveDialogWithSlice(_dialog, rawDialogs)
-            })[0]
+        }).then(Dialogs => {
+            return Dialogs.dialogs.map(Dialog => this.createDialogFromDialogs(Dialog, Dialogs))[0]
         })
     }
 
     /**
-     * @param {Object} rawDialog
-     * @param {Object} rawSlice
-     * @param config
+     * @param {Object} Dialog
+     * @param {Object} Dialogs
      * @return {Dialog|undefined}
      */
-    resolveDialogWithSlice(rawDialog, rawSlice, config = {}) {
-        const plainPeer = PeerAPI.getPlain(rawDialog.peer, false)
-
-        const rawPeer = (plainPeer._ === "user" ? rawSlice.users : rawSlice.chats).find(l => l.id === plainPeer.id)
-        const rawTopMessage = rawSlice.messages.find(l => l.id === rawDialog.top_message)
-
-        const peer = PeersManager.setFromRaw(rawPeer)
-
-        const dialog = this.setFromRaw(rawDialog, peer)
+    createDialogFromDialogs(Dialog, Dialogs) {
+        const dialog = this.setFromRaw(Dialog)
+        const rawTopMessage = Dialogs.messages.find(message => message.id === Dialog.top_message)
         dialog.peer.messages.last = MessageFactory.fromRaw(dialog, rawTopMessage)
         return dialog
     }
 
     /**
-     * @param limit
-     * @param flags
-     * @param exclude_pinned
-     * @param folder_id
-     * @param offset_date
-     * @param offset_id
-     * @param offset_peer
-     * @param hash
-     * @return {Promise<*>}
+     * @param params.limit
+     * @param params.flags
+     * @param params.exclude_pinned
+     * @param params.folder_id
+     * @param params.offset_date
+     * @param params.offset_id
+     * @param params.offset_peer
+     * @param params.hash
+     * @return {Promise<Dialog>}
      */
-    getDialogs({
-                   limit = 20,
-                   flags = 0,
-                   exclude_pinned = false,
-                   folder_id = -1,
-                   offset_date = this.offsetDate,
-                   offset_id = -1,
-                   offset_peer = {
-                       _: "inputPeerEmpty",
-                   },
-                   hash = ""
-               }) {
+    getDialogs(params = {}) {
+
+        params.offset_date = params.offset_date || this.offsetDate
 
         if (DialogsStore.count >= this.count) {
             console.warn("all dialogs were fetched")
@@ -292,41 +237,18 @@ class DialogManager extends Manager {
             this.offsetDate = this.dialogsOffsetDate + TimeManager.timeOffset
         }
 
-        return MTProto.invokeMethod("messages.getDialogs", {
-            flags: flags,
-            pFlags: {
-                exclude_pinned: exclude_pinned
-            },
-            folder_id: folder_id,
-            offset_date: offset_date,
-            offset_id: offset_id,
-            offset_peer: offset_peer,
-            limit: limit,
-            hash: hash
-        }).then(rawDialogs => {
-            if (rawDialogs.count === 0) {
-                this.count = 0
-                console.warn("there is no dialogs")
-                return
+        return API.messages.getDialogs(params).then(Dialogs => {
+
+            if (Dialogs.count < Dialogs.__limit) {
+                this.allWasFetched = true
             }
 
-            if (rawDialogs.count) {
-                this.count = rawDialogs.count
+            if (Dialogs.count) {
+                this.count = Dialogs.count
             }
 
-            if (parseInt(rawDialogs.count) === 0) {
-                return
-            }
-
-            rawDialogs.users.forEach(rawUser => {
-                PeersManager.setFromRaw(rawUser)
-            })
-            rawDialogs.chats.forEach(rawChat => {
-                PeersManager.setFromRaw(rawChat)
-            })
-
-            const dialogs = rawDialogs.dialogs.map(rawDialog => {
-                const dialog = this.resolveDialogWithSlice(rawDialog, rawDialogs)
+            const dialogs = Dialogs.dialogs.map(rawDialog => {
+                const dialog = this.createDialogFromDialogs(rawDialog, Dialogs)
 
                 if (dialog.peer.messages.last) {
                     this.offsetDate = dialog.peer.messages.last.date
@@ -334,7 +256,7 @@ class DialogManager extends Manager {
                     console.error("BUG: no last message!")
                 }
 
-                if (this.offsetDate && !dialog.isPinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
+                if (this.offsetDate && !dialog.pinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
                     this.dialogsOffsetDate = this.offsetDate
                 }
 
@@ -347,20 +269,47 @@ class DialogManager extends Manager {
         })
     }
 
-    fetchFirstPage() {
-        return this.getDialogs({}).then(dialogs => {
-            this.isFetched = true
+    fetchNextPage({limit = 40}) {
+        if (this.allWasFetched || DialogsStore.count >= this.count) {
+            console.warn("all dialogs were fetched")
+            return Promise.reject()
+        }
 
-            AppEvents.Dialogs.fire("firstPage", {
-                dialogs: dialogs.filter(dialog => !dialog.isPinned),
-                pinnedDialogs: dialogs.filter(dialog => dialog.isPinned)
+        return this.getDialogs({
+            limit: limit,
+            offset_peer: this.latestDialog.peer.inputPeer,
+            exclude_pinned: true
+        }).then(dialogs => {
+
+            AppEvents.Dialogs.fire("gotMany", {
+                dialogs,
             })
 
             return dialogs
         })
     }
 
-    setFromRaw(rawDialog, peer, topMessage) {
+    fetchFirstPage() {
+        if (this.isFetched) {
+            AppEvents.Dialogs.fire("gotMany", {
+                dialogs: DialogsStore.toSortedArray(),
+            })
+
+            return Promise.resolve(DialogsStore.toSortedArray())
+        }
+
+        return this.getDialogs().then(dialogs => {
+            this.isFetched = true
+
+            AppEvents.Dialogs.fire("gotMany", {
+                dialogs: dialogs,
+            })
+
+            return dialogs
+        })
+    }
+
+    setFromRaw(rawDialog) {
         const plainPeer = PeerAPI.getPlain(rawDialog.peer, false)
 
         if (DialogsStore.has(plainPeer._, plainPeer.id)) {
@@ -368,13 +317,13 @@ class DialogManager extends Manager {
             dialog.fillRaw(rawDialog)
             return dialog
         } else {
-            const dialog = new Dialog(rawDialog, peer, topMessage)
+            const dialog = new Dialog(rawDialog)
             DialogsStore.set(dialog)
             return dialog
         }
     }
 
-    setFromRawAndFire(rawDialog, peer, topMessage) {
+    setFromRawAndFire(rawDialog) {
         const plainPeer = PeerAPI.getPlain(rawDialog.peer, false)
 
         if (DialogsStore.has(plainPeer._, plainPeer.id)) {
@@ -382,7 +331,7 @@ class DialogManager extends Manager {
             dialog.fillRawAndFire(rawDialog)
             return dialog
         } else {
-            const dialog = new Dialog(rawDialog, peer, topMessage)
+            const dialog = new Dialog(rawDialog)
             DialogsStore.set(dialog)
 
             dialog.fire("updateSingle")

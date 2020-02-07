@@ -1,7 +1,7 @@
 import LoginPage from "../pages/login/nextlogin"
 import {MainPage} from "../pages/main/mainPage"
 import MTProto from "../../mtproto/external"
-import V from "../v/VFramework"
+import VF from "../v/VFramework"
 import {NewComponentPage} from "../pages/tests/NewComponentTestPage"
 
 /**
@@ -32,7 +32,7 @@ function AppRoutes(router) {
                 return {
                     next: false,
                     doNext: () => {
-                        V.router.replace("/login")
+                        VF.router.replace("/login")
                     },
                 }
             }
@@ -41,7 +41,7 @@ function AppRoutes(router) {
                 return {
                     next: false,
                     doNext: () => {
-                        V.router.replace("/")
+                        VF.router.replace("/")
                     }
                 }
             }

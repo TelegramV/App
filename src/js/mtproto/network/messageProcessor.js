@@ -93,11 +93,23 @@ export class MessageProcessor {
             const error = this.networker.processError(message.result)
 
             console.error("error = ", error, " request = ", this.sentMessagesDebug.get(message.req_msg_id))
-            this.sentMessagesDebug.delete(message.req_msg_id)
 
             this.rpcErrorHandlers.get(message.req_msg_id)(error)
 
-            this.rpcErrorHandlers.delete(message.req_msg_id)
+            if (error.type && error.type.startsWith("FLOOD_WAIT_")) {
+                const fwTime = parseInt(error.type.substring(error.type.length - 1))
+
+                console.warn("fw", fwTime)
+                if (fwTime <= 5) {
+                    setTimeout(() => this.networker.resendMessage(message.req_msg_id), (fwTime * 1000) + 1000)
+                } else {
+                    this.sentMessagesDebug.delete(message.req_msg_id)
+                    this.rpcErrorHandlers.delete(message.req_msg_id)
+                }
+            } else {
+                this.sentMessagesDebug.delete(message.req_msg_id)
+                this.rpcErrorHandlers.delete(message.req_msg_id)
+            }
         } else {
             this.rpcResultHandlers.get(message.req_msg_id)(message.result)
 

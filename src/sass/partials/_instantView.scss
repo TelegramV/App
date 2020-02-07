@@ -2,7 +2,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.3);
+  background: $semiblack;
   opacity: 1;
   z-index: 9999;
 
@@ -250,7 +250,7 @@
             transform: translate(-50%, -50%);
 
             .pause-button {
-              background: rgba(0, 0, 0, 0.3);
+              background: $semiblack;
               width: 64px;
               height: 64px;
               line-height: 62px;

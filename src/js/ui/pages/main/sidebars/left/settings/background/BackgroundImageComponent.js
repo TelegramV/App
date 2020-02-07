@@ -4,6 +4,7 @@ import WallpaperManager from "../../../../../../wallpaperManager"
 import VRDOM from "../../../../../../v/vrdom/VRDOM"
 import {VComponent} from "../../../../../../v/vrdom/component/VComponent"
 import CheckboxComponent from "../../../../components/input/checkboxComponent"
+import {askForFile} from "../../../../../../utils"
 
 export default class BackgroundImageComponent extends SettingsPane {
 	barName = "background-image";
@@ -17,14 +18,14 @@ export default class BackgroundImageComponent extends SettingsPane {
 	}
 
 	mounted() {
-		this.withTimeout(_=>this._fillImages(WallpaperManager.wallpapersDocumentCache),30000);
+		// this.withTimeout(_=>this._fillImages(WallpaperManager.wallpapersDocumentCache),30000);
 	}
 
 	h() {
 		return (
 			<div class="sidebar sub-settings background-image scrollable">
 				{this.makeHeader()}
-				<ButtonWithIconFragment icon="cameraadd" name="Upload Wallpaper" click={_ => {/*nothing*/}}/>
+				<ButtonWithIconFragment icon="cameraadd" name="Upload Wallpaper" click={this._uploadBackground}/>
 				<ButtonWithIconFragment icon="colorize" name="Set a Color" click={_ =>this.openPane("background-color")}/>
 				<ButtonWithIconFragment name="Blur Wallpaper Image" click={this._blurCheckClick}>
 					<CheckboxComponent checked={true}/>
@@ -33,6 +34,12 @@ export default class BackgroundImageComponent extends SettingsPane {
 				</div>
 			</div>
 			)
+	}
+
+	_uploadBackground = () => {
+		askForFile("image/*", url => {
+			window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
+		})
 	}
 
 	_fillImages = (cache) => {

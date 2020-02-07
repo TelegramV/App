@@ -1,5 +1,5 @@
 import type {ComponentProps, ComponentState, VComponentMeta, VRAttrs, VRSlot} from "../types/types"
-import V from "../../VFramework"
+import VF from "../../VFramework"
 import vrdom_delete from "../delete"
 import VRDOM from "../VRDOM"
 import VRNode from "../VRNode"
@@ -90,7 +90,7 @@ export class VComponent {
     patchingStrategy: number = VRDOM.COMPONENT_PATCH_DEFAULT
 
     /**
-     * If `true` than state will be replaced by Proxy.
+     * If `true` then state will be replaced by Proxy.
      *
      * Note that `setState` will call patch event if `false`.
      *
@@ -101,7 +101,7 @@ export class VComponent {
     /**
      * Component state.
      *
-     * Note only that the proxy will be created only for top this object and not for inner.
+     * Note that the proxy will be created only for `state` object and not for inner.
      *
      * @type {{}}
      */
@@ -261,7 +261,7 @@ export class VComponent {
         this.$el = $el
         this.__.mounted = true
         this.mounted()
-        V.plugins.forEach(plugin => plugin.componentMounted(this))
+        VF.plugins.forEach(plugin => plugin.componentMounted(this))
     }
 
     /**
@@ -284,7 +284,7 @@ export class VComponent {
         this.__.destroyed = true
         this.__.mounted = false
         this.__.isDeletingItself = false
-        V.mountedComponents.delete(this.identifier)
+        VF.mountedComponents.delete(this.identifier)
     }
 
     /**

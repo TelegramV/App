@@ -1,18 +1,27 @@
-import {ContextMenuManager} from "../../../../../contextMenuManager"
-import {ChannelPeer} from "../../../../../../api/peers/objects/ChannelPeer"
-import {GroupPeer} from "../../../../../../api/peers/objects/GroupPeer"
-import {SupergroupPeer} from "../../../../../../api/peers/objects/SupergroupPeer"
-import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer"
-import {ModalManager} from "../../../../../modalManager"
-import {DialogAvatarFragment} from "./DialogAvatarFragment"
-import {FlatButtonComponent} from "../../../components/input/flatButtonComponent"
-import {Dialog} from "../../../../../../api/dialogs/Dialog"
+import {ContextMenuManager} from "../../../../../../contextMenuManager"
+import {ChannelPeer} from "../../../../../../../api/peers/objects/ChannelPeer"
+import {GroupPeer} from "../../../../../../../api/peers/objects/GroupPeer"
+import {SupergroupPeer} from "../../../../../../../api/peers/objects/SupergroupPeer"
+import AppSelectedInfoPeer from "../../../../../../reactive/SelectedInfoPeer"
+import {ModalManager} from "../../../../../../modalManager"
+import {DialogAvatarFragment} from "../Fragments/DialogAvatarFragment"
+import {FlatButtonComponent} from "../../../../components/input/flatButtonComponent"
+import {Dialog} from "../../../../../../../api/dialogs/Dialog"
 
 export const dialogContextMenu = (dialog: Dialog) => {
     return ContextMenuManager.listener([
-        {
-            icon: "archive",
-            title: "Archive chat"
+        () => {
+            return {
+                icon: dialog.folderId === 1 ? "unarchive" : "archive",
+                title: dialog.folderId === 1 ? "Unarchive chat" : "Archive chat",
+                onClick: _ => {
+                    if (dialog.folderId === 1) {
+                        dialog.api.setArchived(false)
+                    } else {
+                        dialog.api.setArchived(true)
+                    }
+                }
+            }
         },
         () => {
             return {
@@ -38,13 +47,19 @@ export const dialogContextMenu = (dialog: Dialog) => {
             icon: dialog.isMuted ? "unmute" : "mute",
             title: dialog.isMuted ? "Enable notifications" : "Disable notifications"
         },
-        // {
-        //     icon: unread !== "" ? "message" : "unread",
-        //     title: unread !== "" ? "Mark as read" : "Mark as unread",
-        //     onClick: _ => {
-        //         dialog.api.markDialogUnread(unread === "")
-        //     }
-        // },
+        () => {
+            return {
+                icon: dialog.unreadMark ? "message" : "unread",
+                title: dialog.unreadMark ? "Mark as read" : "Mark as unread",
+                onClick: _ => {
+                    if (dialog.unreadMark) {
+                        dialog.api.markDialogUnread(false)
+                    } else {
+                        dialog.api.markDialogUnread(true)
+                    }
+                }
+            }
+        },
         {
             icon: "delete",
             title: "Delete chat",
