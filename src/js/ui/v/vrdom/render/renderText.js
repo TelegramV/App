@@ -1,8 +1,8 @@
-import V from "../../VFramework"
+import VF from "../../VFramework"
 
 const renderText = text => {
     const $node = document.createTextNode(text)
-    V.plugins.forEach(plugin => plugin.textCreated($node))
+    VF.plugins.forEach(plugin => plugin.textCreated($node))
     return $node
 }
 

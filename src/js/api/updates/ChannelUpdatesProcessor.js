@@ -53,7 +53,8 @@ export class ChannelUpdatesProcessor {
         this.updatesManager = updatesManager
 
         this.customUpdateTypeProcessors = new Map([
-            ["updateNewChannelMessage", this.processNewChannelMessageUpdate]
+            ["updateNewChannelMessage", this.processNewChannelMessageUpdate],
+            ["updateChannel", this.processUpdateChannelUpdate],
         ])
 
         this.updateTypes = [
@@ -144,6 +145,10 @@ export class ChannelUpdatesProcessor {
 
             const rawUpdate = queue.shift()
 
+            if (!rawUpdate) {
+                channelQueue.isProcessing = false
+            }
+
             if (this.customUpdateTypeProcessors.has(rawUpdate._)) {
                 this.customUpdateTypeProcessors.get(rawUpdate._)(channelId, channelQueue, rawUpdate)
                 channelQueue.isProcessing = false
@@ -174,7 +179,7 @@ export class ChannelUpdatesProcessor {
             }
 
             if (peer.dialog.pts === -1) {
-                console.warn("BUG: found dialog created manually", peer, rawUpdate)
+                console.warn("Very BAD BUG: found dialog created manually", peer, rawUpdate)
                 channelQueue.isProcessing = false
                 this.processQueue(channelId)
                 return
@@ -194,23 +199,62 @@ export class ChannelUpdatesProcessor {
 
         const peer = PeersStore.get("channel", channelId)
 
-        // ignore if no peer found
+        // ignore and pass to higher level if no peer found
         if (!peer) {
-            channelQueue.isProcessing = false
+            console.log("no peer new channel message", rawUpdate)
 
-            this.applyUpdate(Object.assign(rawUpdate, {
-                _: "updateNewChannelMessageNoPeer"
-            }))
+            channelQueue.isProcessing = false
+            rawUpdate._ = "updateNewChannelMessageNoPeer"
+
+            this.applyUpdate(rawUpdate)
 
             this.processQueue(channelId)
+            return
         }
 
+        // ignore and pass to higher level if no dialog found
         if (!peer.dialog) {
-            channelQueue.isProcessing = false
+            console.log("no dialog new channel message", rawUpdate, peer)
 
-            this.applyUpdate(Object.assign(rawUpdate, {
-                _: "updateNewChannelMessageNoDialog"
-            }))
+            channelQueue.isProcessing = false
+            rawUpdate._ = "updateNewChannelMessageNoDialog"
+
+            this.applyUpdate(rawUpdate)
+
+            this.processQueue(channelId)
+            return
+        }
+
+        this.checkChannelUpdate(peer, channelId, channelQueue, rawUpdate)
+    }
+
+    processUpdateChannelUpdate = (channelId, channelQueue, rawUpdate) => {
+
+        if (!channelQueue) {
+            console.error("BUG: invalid channelQueue was passed")
+            return
+        }
+
+        const peer = PeersStore.get("channel", channelId)
+
+        // ignore and pass to higher level if no peer found
+        if (!peer) {
+            channelQueue.isProcessing = false
+            rawUpdate._ = "updateChannelNoPeer"
+
+            this.applyUpdate(rawUpdate)
+
+            this.processQueue(channelId)
+            return
+        }
+
+        // ignore and pass to higher level if no dialog found
+        if (!peer.dialog) {
+            console.log("peer", peer)
+            channelQueue.isProcessing = false
+            rawUpdate._ = "updateChannelNoDialog"
+
+            this.applyUpdate(rawUpdate)
 
             this.processQueue(channelId)
             return

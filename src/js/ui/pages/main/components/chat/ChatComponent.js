@@ -5,7 +5,7 @@ import Component from "../../../../v/vrdom/Component"
 import BubblesComponent from "./BubblesComponent"
 import {ChatInputComponent} from "./chatInput/ChatInputComponent";
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
-import V from "../../../../v/VFramework"
+import VF from "../../../../v/VFramework"
 import UIEvents from "../../../../eventBus/UIEvents"
 
 /**
@@ -28,13 +28,14 @@ class ChatComponent extends Component {
                 </div>
                 <div id="chat" css-display="none">
                     <div id="topbar">
-                        <ChatInfoComponent/>    
+                        <ChatInfoComponent/>
                         <PinnedComponent/>
                         <div className="btn-icon rp rps tgico-search" onClick={this._openSearch}/>
                         <div className="btn-icon rp rps tgico-more"/>
                     </div>
 
-                    <LoaderComponent id="messages-wrapper-messages-loader" full={true} white={true} show={true} background={true}/>
+                    <LoaderComponent id="messages-wrapper-messages-loader" full={true} white={true} show={true}
+                                     background={true}/>
 
                     <BubblesComponent/>
                     <ChatInputComponent ref="chatInput"/>
@@ -48,7 +49,7 @@ class ChatComponent extends Component {
         this.$chat = this.$el.querySelector("#chat")
         this.$wrapperLoader = this.$el.querySelector("#chat-wrapper-loader")
 
-        if (!V.router.activeRoute.queryParams.p) {
+        if (!VF.router.activeRoute.queryParams.p) {
             this.$noChat.style.display = ""
             this.$wrapperLoader.style.display = "none"
         }

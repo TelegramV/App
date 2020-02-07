@@ -1,6 +1,6 @@
 import VRDOM from "../vrdom/VRDOM"
 import VRNode from "../vrdom/VRNode"
-import V from "../VFramework"
+import VF from "../VFramework"
 
 /**
  * WARNING: legacy code
@@ -75,7 +75,7 @@ export class VFrameworkRouter {
             } else {
                 // console.log("[router] triggering replace")
                 // todo: patch tree not delete it
-                V.mountedComponents.forEach(c => {
+                VF.mountedComponents.forEach(c => {
                     c.__delete()
                 })
 
@@ -86,13 +86,13 @@ export class VFrameworkRouter {
         this.renderActive()
     }
 
-    push(path, options = {}) {
+    push = (path, options = {}) => {
         let hash = this.buildHash(path, options)
         history.pushState({}, null, `${this.mode === "hash" ? "#" : ""}${hash}`)
         window.dispatchEvent(new Event("popstate"))
     }
 
-    replace(path, options = {}) {
+    replace = (path, options = {}) => {
         let hash = this.buildHash(path, options)
         history.replaceState({}, null, `${this.mode === "hash" ? "#" : ""}${hash}`)
         window.dispatchEvent(new Event("popstate"))

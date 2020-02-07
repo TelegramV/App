@@ -1,21 +1,23 @@
 import DialogsManager from "../../../../../../api/dialogs/DialogsManager"
-import {DialogComponent} from "./DialogComponent"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
-import VRDOM from "../../../../../v/vrdom/VRDOM"
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 import MTProto from "../../../../../../mtproto/external";
-import V from "../../../../../v/VFramework";
+import VF from "../../../../../v/VFramework";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {ConnectionStatusComponent} from "./ConnectionStatusComponent"
-import Sortable from "sortablejs"
 import {VComponent} from "../../../../../v/vrdom/component/VComponent"
 import {LeftBarComponent} from "../LeftBarComponent"
 import UIEvents from "../../../../../eventBus/UIEvents"
+import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent"
+import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
+import ArchivedDialogListComponent from "./Archived/ArchivedDialogListComponent"
 
 export class DialogListComponent extends LeftBarComponent {
 
     barName = "dialogs"
     barVisible = true
+
+    Archived: ArchivedDialogListComponent
 
     useProxyState = false
 
@@ -23,8 +25,6 @@ export class DialogListComponent extends LeftBarComponent {
 
     loaderRef = VComponent.createRef()
     dialogsWrapperRef = VComponent.createRef()
-    pinnedDialogsRef = VComponent.createRef()
-    generalDialogsRef = VComponent.createRef()
 
     constructor(props) {
         super(props)
@@ -51,10 +51,17 @@ export class DialogListComponent extends LeftBarComponent {
                                 icon: "newprivate",
                                 title: "Contacts"
                             },
-                            {
-                                icon: "archive",
-                                title: "Archived",
-                                counter: 3
+                            () => {
+                                return {
+                                    icon: "archive",
+                                    title: "Archived",
+                                    counter: this.Archived && this.Archived.$el.childElementCount,
+                                    onClick: _ => {
+                                        UIEvents.LeftSidebar.fire("show", {
+                                            barName: "archived"
+                                        })
+                                    }
+                                }
                             },
                             {
                                 icon: "savedmessages",
@@ -62,7 +69,7 @@ export class DialogListComponent extends LeftBarComponent {
                                 onClick: _ => {
                                     const p = MTProto.getAuthorizedUser().user.username ? `@${MTProto.getAuthorizedUser().user.username}` : `user.${MTProto.getAuthorizedUser().user.id}`
 
-                                    V.router.push("/", {
+                                    VF.router.push("/", {
                                         queryParams: {
                                             p
                                         }
@@ -100,8 +107,8 @@ export class DialogListComponent extends LeftBarComponent {
                         <progress className="progress-circular big"/>
                     </div>
 
-                    <div ref={this.pinnedDialogsRef} id="dialogsPinned" className="list pinned hidden"/>
-                    <div ref={this.generalDialogsRef} id="dialogs" className="list hidden"/>
+                    <PinnedDialogListComponent/>
+                    <GeneralDialogListComponent/>
                 </div>
                 <div class="new-chat"><i class="tgico tgico-newchat_filled"/></div>
             </div>
@@ -109,68 +116,19 @@ export class DialogListComponent extends LeftBarComponent {
     }
 
     mounted() {
-        function onIntersection(entries) {
-            entries.forEach(entry => {
-                entry.target.style.opacity = entry.intersectionRatio > 0 ? 1 : 0
-            })
-        }
-
-        this.intersectionObserver = new IntersectionObserver(onIntersection, {
-            root: this.dialogsWrapperRef.$el,
-            rootMargin: "250px",
-            threshold: 1.0
-        })
-
+        this.Archived = VF.mountedComponents.get(`dialogs-archived-list`)
         this.dialogsWrapperRef.$el.addEventListener("scroll", this._scrollHandler, {passive: true})
-
-        Sortable.create(this.pinnedDialogsRef.$el)
-
-        // this._registerResizer()
     }
 
     appEvents(E) {
         super.appEvents(E)
 
         E.bus(AppEvents.Dialogs)
-            .on("firstPage", this.onFirstPageUpdate)
-            .on("nextPage", this.onNextPageUpdate)
-            .on("newFetched", this.onNewFetchedUpdate)
-            .on("newMessage", this.onNewMessageUpdate)
+            .on("gotMany", this.onDialogsGotMany)
     }
 
-    onFirstPageUpdate = event => {
+    onDialogsGotMany = _ => {
         this.loaderRef.hide()
-        this.pinnedDialogsRef.show()
-        this.generalDialogsRef.show()
-
-        event.pinnedDialogs.forEach(dialog => {
-            this._renderDialog(dialog, "append")
-        })
-
-        event.dialogs.forEach(dialog => {
-            this._renderDialog(dialog, "append")
-        })
-    }
-
-    onNextPageUpdate = event => {
-        event.pinnedDialogs.forEach(dialog => {
-            this._renderDialog(dialog, "append")
-        })
-
-        event.dialogs.forEach(dialog => {
-            this._renderDialog(dialog, "append")
-        })
-    }
-
-    onNewFetchedUpdate = event => {
-        this._renderDialog(event.dialog, "prepend") // fixme: this should insert in proper place
-    }
-
-    onNewMessageUpdate = event => {
-        // dirty check, we must rewrite this
-        if (!V.mountedComponents.has(`dialog-${event.dialog.peer.type}-${event.dialog.peer.id}`)) {
-            this._renderDialog(event.dialog, "prepend")
-        }
     }
 
     callbackChanged(key: string, value: *) {
@@ -210,49 +168,6 @@ export class DialogListComponent extends LeftBarComponent {
     barOnShow = () => {
     }
     barOnHide = () => {
-    }
-
-    /**
-     * CRITICAL: this method must be called only once per unique dialog.
-     *
-     * @param {Dialog} dialog
-     * @param {boolean|string} appendOrPrepend if `false` then it will try to find dialog to insert before
-     * @private
-     */
-    _renderDialog = (dialog, appendOrPrepend = false) => {
-        // if (dialog.folderId === 1) {
-        //     return // put it to archived
-        // }
-
-        if (!this.pinnedDialogsRef.$el || !this.generalDialogsRef.$el) {
-            console.error("$pinnedDialogs or $generalDialogs wasn't found on the page.")
-            return
-        }
-
-        const newVDialog = <DialogComponent $pinned={this.pinnedDialogsRef.$el}
-                                            $general={this.generalDialogsRef.$el}
-                                            dialog={dialog}
-                                            ref={`dialog-${dialog.peer.type}-${dialog.peer.id}`}/>
-
-        if (appendOrPrepend === "append") {
-            if (dialog.isPinned) {
-                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.pinnedDialogsRef.$el))
-            } else {
-                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.generalDialogsRef.$el))
-            }
-        } else if (appendOrPrepend === "prepend") {
-            if (dialog.isPinned) {
-                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.pinnedDialogsRef.$el))
-            } else {
-                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.generalDialogsRef.$el))
-            }
-        } else {
-            if (dialog.isPinned) {
-                this.intersectionObserver.observe(VRDOM.prepend(newVDialog, this.pinnedDialogsRef.$el))
-            } else {
-                this.intersectionObserver.observe(VRDOM.append(newVDialog, this.generalDialogsRef.$el))
-            }
-        }
     }
 
     /**

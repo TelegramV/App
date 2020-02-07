@@ -4,7 +4,7 @@ import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer";
 import {VComponent} from "../../../../../v/vrdom/component/VComponent"
 import ChatInfoAvatarComponent from "./ChatInfoAvatarComponent"
-import V from "../../../../../v/VFramework"
+import VF from "../../../../../v/VFramework"
 
 class ChatInfoComponent extends VComponent {
 
@@ -37,7 +37,7 @@ class ChatInfoComponent extends VComponent {
     }
 
     _backToMainPage = () => {
-        V.router.replace("/")
+        VF.router.replace("/")
     }
 }
 

@@ -1,42 +1,22 @@
 import {tsNow} from "../../mtproto/timeManager";
-import AppEvents from "../eventBus/AppEvents"
 import {DraftMessage} from "./DraftMessage"
 import {DialogApi} from "./DialogApi"
 import {ReactiveObject} from "../../ui/v/reactive/ReactiveObject"
-import type {Message} from "../messages/Message"
 import {Peer} from "../peers/objects/Peer"
+import PeersStore from "../store/PeersStore"
+import DialogEvents from "./DialogEvents"
 
 export class Dialog extends ReactiveObject {
-
-    pts: number = -1
 
     _peer: Peer = undefined
 
     _rawDialog: Object = {}
-    _pinned: boolean = false
-    _unreadMark: boolean = false
     _draft: DraftMessage = DraftMessage.createEmpty(this)
-    _folderId: number = undefined
 
-    constructor(rawDialog: Object, peer: Peer, topMessage: Message) {
+    constructor(rawDialog: Object) {
         super()
 
         this._rawDialog = rawDialog
-
-        this._pinned = false
-        this._unreadMark = false
-
-        if (peer) {
-            this._peer = peer
-            this._peer.dialog = this
-
-            if (topMessage) {
-                topMessage.dialog = this
-                this._peer.messages.appendSingle(topMessage)
-            }
-        } else {
-            console.error("BUG: peer was not provided.")
-        }
 
         this._api = new DialogApi(this)
 
@@ -48,6 +28,14 @@ export class Dialog extends ReactiveObject {
     }
 
     get peer(): Peer {
+        if (!this._peer) {
+            this._peer = PeersStore.getFromDialogRawPeer(this.raw.peer)
+
+            if (this._peer) {
+                this._peer.dialog = this
+            }
+        }
+
         return this._peer
     }
 
@@ -63,12 +51,25 @@ export class Dialog extends ReactiveObject {
         return this._rawDialog
     }
 
-    get isPinned() {
-        return this._pinned
+    get pts() {
+        return this.raw.pts || -1
     }
 
-    set pinned(pinned) {
-        this._pinned = pinned || false
+    set pts(pts: number) {
+        this.raw.pts = pts
+    }
+
+    get pinned(): boolean {
+        return this.raw.pFlags.pinned || false
+    }
+
+    // alias for pinned
+    get isPinned(): boolean {
+        return this.pinned
+    }
+
+    set pinned(pinned: boolean) {
+        this.raw.pFlags.pinned = pinned || false
 
         this.fire("updatePinned")
     }
@@ -86,7 +87,27 @@ export class Dialog extends ReactiveObject {
     }
 
     get unreadMark(): boolean {
-        return this._unreadMark
+        return this.raw.pFlags.unread_mark || false
+    }
+
+    set unreadMark(unreadMark: boolean) {
+        this.raw.pFlags.unread_mark = unreadMark || false
+
+        this.fire("updateUnreadMark")
+    }
+
+    get folderId() {
+        return this.raw.folder_id || false
+    }
+
+    set folderId(folderId: boolean) {
+        this.raw.folder_id = folderId || false
+
+        this.fire("updateFolderId")
+    }
+
+    get isArchived() {
+        return this.folderId === 1
     }
 
     get input() {
@@ -96,40 +117,10 @@ export class Dialog extends ReactiveObject {
         }
     }
 
-    get folderId() {
-        return this._folderId
-    }
-
-    static createEmpty(peer: Peer, lastMessage: Message = undefined) {
-        return new Dialog({
-            pFlags: {
-                pinned: false,
-                unread_mark: false,
-            },
-            pts: -1,
-            unread_count: 0,
-            read_inbox_max_id: 0,
-            read_outbox_max_id: 0,
-            unread_mentions_count: 0,
-            notify_settings: {
-                _: "peerNotifySettings",
-                pFlags: {},
-                flags: 0,
-                show_previews: true,
-                silent: false,
-                mute_until: 0,
-                sound: "default"
-            },
-        }, peer, lastMessage)
-    }
-
     fillRaw(rawDialog: Object): Dialog {
         this._rawDialog = rawDialog
-        this._pinned = rawDialog.pFlags && rawDialog.pFlags.pinned || false
-        this._unreadMark = rawDialog.pFlags && rawDialog.pFlags.unread_mark || false
-        this._folderId = rawDialog.folder_id || false
 
-        if (!this._peer) {
+        if (!this.peer) {
             console.error("BUG: there is no peer connected to this dialog.", this)
         }
 
@@ -154,7 +145,7 @@ export class Dialog extends ReactiveObject {
 
         this.fire("filled")
 
-        AppEvents.Dialogs.fire("updateSingle", {
+        DialogEvents.fire("updateSingle", {
             dialog: this
         })
 

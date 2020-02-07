@@ -22,6 +22,9 @@ export class AbstractBarComponent extends VComponent {
         }
     }
 
+    openBar = barName => {
+    }
+
     // you can override methods below
 
     // show

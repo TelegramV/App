@@ -1,4 +1,4 @@
-import V from "../VFramework"
+import VF from "../VFramework"
 import type VRNode from "./VRNode"
 import type {VRRenderProps} from "./types/types"
 import vrdom_render from "./render/render"
@@ -17,9 +17,9 @@ function vrdom_prepend<T: Element>(node: VRNode, $el: T, props?: VRRenderProps):
     $el.prepend($node)
 
     if ($node.nodeType === Node.TEXT_NODE) {
-        V.plugins.forEach(plugin => plugin.textMounted($node))
+        VF.plugins.forEach(plugin => plugin.textMounted($node))
     } else {
-        V.plugins.forEach(plugin => plugin.elementMounted($node))
+        VF.plugins.forEach(plugin => plugin.elementMounted($node))
     }
 
     vrdom_resolveMount($node)

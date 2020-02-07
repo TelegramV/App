@@ -17,7 +17,7 @@ export default class BackgroundImageComponent extends SettingsPane {
 	}
 
 	mounted() {
-		this.withTimeout(_=>this._fillImages(WallpaperManager.wallpapersDocumentCache),30000);
+		// this.withTimeout(_=>this._fillImages(WallpaperManager.wallpapersDocumentCache),30000);
 	}
 
 	h() {

@@ -313,12 +313,10 @@ export class TLDeserialization {
             let condType, fieldBit
             let value
             let len = constructorData.params.length
+            result.pFlags = Object.create(null)
             for (i = 0; i < len; i++) {
                 param = constructorData.params[i]
                 type = param.type
-                if (type === "#" && result.pFlags === undefined) {
-                    result.pFlags = Object.create(null)
-                }
 
                 isCond = type.indexOf("?") !== -1
                 if (isCond) {

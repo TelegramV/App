@@ -107,7 +107,7 @@ class NewComponent extends VComponent {
                 }} ref={this.dateFragmentRef} date={"no date"}/>
 
 
-                {/*<h1>V Component {this.state.someValue}</h1>*/}
+                {/*<h1>VF Component {this.state.someValue}</h1>*/}
                 {/*<input type="text" value={this.state.someValue}*/}
                 {/*       onInput={event => this.state.someValue = event.target.value}/>*/}
                 {/*<textarea onInput={event => this.state.someValue = event.target.value} value={this.state.someValue}/>*/}

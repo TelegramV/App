@@ -26,6 +26,25 @@ export class DialogApi {
         })
     }
 
+    setArchived(set: boolean) {
+        return MTProto.invokeMethod("folders.editPeerFolders",  {
+            folder_peers: [
+                {
+                    _: "inputFolderPeer",
+                    peer: this._dialog.peer.inputPeer,
+                    folder_id: set ? 1 : 0
+                }
+            ]
+        }).then(updates => {
+            console.log(updates)
+            MTProto.UpdatesManager.process(updates)
+        })
+    }
+
+    mute(muted: boolean) {
+        //
+    }
+
     markDialogUnread(unread) {
         MTProto.invokeMethod("messages.markDialogUnread", {
             flags: 0,
@@ -34,8 +53,10 @@ export class DialogApi {
             },
             unread: unread,
             peer: this._dialog.peer.inputPeer
-        }).then(response => {
-            console.log(response)
+        }).then(Bool => {
+            if (Bool._ === "boolTrue") {
+                this._dialog.unreadMark = unread
+            }
         })
     }
 }
