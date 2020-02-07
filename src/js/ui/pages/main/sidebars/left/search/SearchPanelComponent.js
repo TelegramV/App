@@ -14,42 +14,42 @@ export class SearchPanelComponent extends LeftBarComponent {
             <div class="sidebar scrollable search hidden">
 				<div class="suggestions">
 					<div class="people">
-						<div class="title">People</div>
+						<div class="section-title">People</div>
 						<div class="people-list">
-							<PeopleListItemFragment url="https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w" name="Doggo"/>
-							<PeopleListItemFragment url="https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w" name="Doggo"/>
-							<PeopleListItemFragment url="https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w" name="Doggo"/>
-							<PeopleListItemFragment url="https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w" name="Doggo"/>
-							<PeopleListItemFragment url="https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w" name="Doggo"/>
+							<PeopleListItemFragment url="./static/images/logo.svg" name="Doggo"/>
+							<PeopleListItemFragment url="./static/images/logo.svg" name="Doggo"/>
+							<PeopleListItemFragment url="./static/images/logo.svg" name="Doggo"/>
+							<PeopleListItemFragment url="./static/images/logo.svg" name="Doggo"/>
+							<PeopleListItemFragment url="./static/images/logo.svg" name="Doggo"/>
 						</div>
 					</div>
 					<div class="recent">
-						<div class="title">Recent</div>
+						<div class="section-title">Recent</div>
 						<div class="column-list">
-							<ContactFragment url={"https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w"} name={"Doggo"} status={"online"}/>
-							<ContactFragment url={"https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w"} name={"Doggo"} status={"online"}/>
-							<ContactFragment url={"https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w"} name={"Doggo"} status={"online"}/>
-							<ContactFragment url={"https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w"} name={"Doggo"} status={"online"}/>
-							<ContactFragment url={"https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w"} name={"Doggo"} status={"online"}/>
+							<ContactFragment url={"./static/images/logo.svg"} name={"Doggo"} status={"online"}/>
+							<ContactFragment url={"./static/images/logo.svg"} name={"Doggo"} status={"online"}/>
+							<ContactFragment url={"./static/images/logo.svg"} name={"Doggo"} status={"online"}/>
+							<ContactFragment url={"./static/images/logo.svg"} name={"Doggo"} status={"online"}/>
+							<ContactFragment url={"./static/images/logo.svg"} name={"Doggo"} status={"online"}/>
 						</div>
 					</div>
 				</div>
 				<div class="search-results hidden">
 					<div class="contacts-and-chats">
-						<div class="title">Contacts and Chats</div>
+						<div class="section-title">Contacts and Chats</div>
 						<div class="column-list">
-							<ContactFragment url={"https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w"} name={"Party"} status={"1337 members"}/>
-							<ContactFragment url={"https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w"} name={"Party"} status={"1337 members"}/>
+							<ContactFragment url={"./static/images/logo.svg"} name={"Party"} status={"1337 members"}/>
+							<ContactFragment url={"./static/images/logo.svg"} name={"Party"} status={"1337 members"}/>
 						</div>
 					</div>
 					<div class="global-chats">
-						<div class="title">Global search</div>
+						<div class="section-title">Global search</div>
 						<div class="column-list">
-							<ContactFragment url={"https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w"} name={"Party"} status={"@party"}/>
+							<ContactFragment url={"./static/images/logo.svg"} name={"Party"} status={"@party"}/>
 						</div>
 					</div>
 					<div class="global-messages">
-						<div class="title">Global search</div>
+						<div class="section-title">Global search</div>
 					</div>
 				</div>
 			</div>
@@ -69,7 +69,7 @@ export class SearchPanelComponent extends LeftBarComponent {
         return (
             <div class="people-list-item">
 			<div class="photo-container">
-				<img src="https://lh3.googleusercontent.com/proxy/uzAVzUD1l-ULTELrFMXRVmeeROWnuQhxI6q5cKZooG8ZsgjzAuCi-VogGBe7mr5COIANMMVCh11mPQW_1w"/>
+				<img src={url}/>
 			</div>
 			<div class="name">Doggo</div>
 		</div>

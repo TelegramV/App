@@ -72,14 +72,14 @@ export class ContextMenuComponent extends Component {
 
     }
 
-    openXY(data, x, y) {
+    openXY(data, x, y, origin = "left-top") {
         // TODO replace that with not hardcoded values
         const width = 220
         const height = data.length * 64
         const windowWidth = window.innerWidth
         const windowHeight = window.innerHeight
 
-        this.state.animation = "left-top"
+        this.state.animation = origin
         if (x + width >= windowWidth) {
             x = x - width
             this.state.animation = "right-top"
@@ -103,15 +103,20 @@ export class ContextMenuComponent extends Component {
         this.openXY(data, rect.x + rect.width / 2, rect.y + rect.height / 2)
     }
 
-    openBelow(data = [], elem) {
+    openBelow(data = [], elem, origin) {
         let rect = elem.getBoundingClientRect()
-        this.openXY(data, rect.x, rect.y + rect.height + 10)
+        let x = rect.x;
+        let y = rect.y;
+        if(origin && origin.includes("right")) {
+            x = x - 220+ rect.width; //Макс, винеси довжину в змінну
+        }
+        this.openXY(data, x, y + rect.height + 10, origin)
     }
 
 
-    openAbove(data = [], elem) {
+    openAbove(data = [], elem, origin) {
         let rect = elem.getBoundingClientRect()
-        this.openXY(data, rect.x, rect.y - 10)
+        this.openXY(data, rect.x, rect.y - 10, origin)
     }
 
     listener(data = []) {
