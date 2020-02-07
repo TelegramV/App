@@ -169,7 +169,7 @@ class BubblesComponent extends Component {
      * @private
      */
     _prependMessages(messages) {
-        let reset = true
+        let reset = false
 
         if (this.elements.$bubblesInner.clientHeight - (this.$el.scrollTop + this.$el.clientHeight) < 50) {
             reset = true
