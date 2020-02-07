@@ -1,11 +1,11 @@
-import {Publisher} from "../eventBus/Publisher"
+import {TypedPublisher} from "../eventBus/TypedPublisher"
 
 /**
  * Simple Store class
  *
  * @property {Map} _data
  */
-export default class MappedStore extends Publisher {
+export default class MappedStore extends TypedPublisher {
     constructor(props) {
         super()
 
@@ -13,7 +13,8 @@ export default class MappedStore extends Publisher {
             if (props.initialData instanceof Map) {
                 this._data = props.initialData
             } else {
-                throw new Error("initialData must be of Map type")
+                this._data = new Map()
+                console.error("initialData must be of Map type")
             }
         } else {
             this._data = new Map()
@@ -65,6 +66,13 @@ export default class MappedStore extends Publisher {
      * @param subscription
      */
     onSet(subscription) {
-        this.subscribe(subscription)
+        this.subscribe("set", subscription)
+    }
+
+    /**
+     * @param subscription
+     */
+    onDelete(subscription) {
+        this.subscribe("delete", subscription)
     }
 }

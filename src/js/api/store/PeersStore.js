@@ -71,7 +71,7 @@ class PeersMapStore extends MappedStore {
     set(peer) {
         if (this.data.has(peer.type)) {
             this.data.get(peer.type).set(peer.id, peer)
-            this.fire(peer)
+            this.fire("set", {peer})
             return this
         } else {
             console.error("invalid peer type", peer)

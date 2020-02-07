@@ -1,4 +1,5 @@
 import {MTProto} from "../../mtproto/external"
+import PeersManager from "../peers/objects/PeersManager"
 
 type getDialogs_Params_105 = {
     limit: number,
@@ -48,14 +49,28 @@ const getDialogs = (params: getDialogs_Params_105): Promise<Dialogs> => MTProto.
     },
     limit: params.limit || 20,
     hash: params.hash || ""
+}).then(Dialogs => {
+    PeersManager.fillPeersFromUpdate(Dialogs)
+
+    Dialogs.count = Dialogs.count || Dialogs.dialogs.length
+    Dialogs.__limit = params.limit || 20
+
+    return Dialogs
 })
 
 const getPeerDialogs = (params: getPeerDialogs_Params_105): Promise<Object> => MTProto.invokeMethod("messages.getPeerDialogs", {
     peers: params.peers
+}).then(Dialogs => {
+    PeersManager.fillPeersFromUpdate(Dialogs)
+
+    Dialogs.count = Dialogs.count || Dialogs.dialogs.length
+
+    return Dialogs
 })
 
 const messages = {
-    getDialogs: getDialogs
+    getDialogs: getDialogs,
+    getPeerDialogs: getPeerDialogs,
 }
 
 export default messages

@@ -25,7 +25,7 @@ function initHighLevelManagers() {
     })
     LocaleController.init()
     StickerManager.getAnimatedEmojiSet()
-    WallpaperManager.init();
+    // WallpaperManager.init();
 }
 
 export function MainPage() {

@@ -85,11 +85,7 @@ class MessageManager extends Manager {
                 })
 
                 if (!dialog.peer.messages.last) {
-                    DialogsManager.getPeerDialogs({
-                        _: dialog.peer.type,
-                        id: dialog.peer.id,
-                        access_hash: dialog.peer.accessHash
-                    }).then(dialog => {
+                    DialogsManager.getPeerDialogs(dialog.peer).then(dialog => {
                         dialog.fire("updateSingle", {
                             dialog: dialog
                         })
@@ -116,10 +112,7 @@ class MessageManager extends Manager {
                     })
 
                     if (!dialog.peer.messages.last) {
-                        DialogsManager.getPeerDialogs({
-                            _: dialog.peer.type,
-                            id: dialog.peer.id
-                        }).then(dialog => {
+                        DialogsManager.getPeerDialogs(dialog.peer).then(dialog => {
                             dialog.fire("updateSingle", {
                                 dialog,
                             })

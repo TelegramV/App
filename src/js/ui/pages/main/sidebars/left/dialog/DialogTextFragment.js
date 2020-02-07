@@ -37,7 +37,7 @@ function Text({id, user, text, entities}) {
  * @return {*}
  * @constructor
  */
-export const DialogTextComponent = ({id, dialog}) => {
+export const DialogTextFragment = ({id, dialog}) => {
     if (dialog.draft.isPresent) {
         return (
             <Draft id={id} text={dialog.draft.message} entities={dialog.draft.entities}/>

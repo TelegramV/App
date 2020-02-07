@@ -26,6 +26,14 @@ export class DialogApi {
         })
     }
 
+    archive(archived: boolean) {
+        //
+    }
+
+    mute(muted: boolean) {
+        //
+    }
+
     markDialogUnread(unread) {
         MTProto.invokeMethod("messages.markDialogUnread", {
             flags: 0,
@@ -34,8 +42,10 @@ export class DialogApi {
             },
             unread: unread,
             peer: this._dialog.peer.inputPeer
-        }).then(response => {
-            console.log(response)
+        }).then(Bool => {
+            if (Bool._ === "boolTrue") {
+                this._dialog.unreadMark = unread
+            }
         })
     }
 }

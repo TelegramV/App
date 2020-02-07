@@ -10,6 +10,9 @@ class DialogsMapStore extends MappedStore {
                 ["user", new Map()],
             ])
         })
+
+        this._sortedArray = []
+        this._alreadySorted = false
     }
 
     /**
@@ -17,6 +20,40 @@ class DialogsMapStore extends MappedStore {
      */
     get data() {
         return super.data
+    }
+
+    /**
+     * @return {Array<Dialog>}
+     */
+    toSortedArray() {
+        if (!this._alreadySorted) {
+            this._sortedArray = this._sortDialogsArray(this.toArray())
+
+            this._alreadySorted = true
+        }
+
+        return this._sortedArray
+    }
+
+    /**
+     * @param {Dialog[]} dialogs
+     * @private
+     * @return {Dialog[]}
+     */
+    _sortDialogsArray(dialogs) {
+        return dialogs.sort((a, b) => {
+            if (!a.messages.last) {
+                return 1
+            } else if (!b.messages.last) {
+                return -1
+            } else if (a.messages.last.date > b.messages.last.date) {
+                return -1
+            } else if (a.messages.last.date < b.messages.last.date) {
+                return 1
+            } else {
+                return 0
+            }
+        })
     }
 
     /**
@@ -46,6 +83,19 @@ class DialogsMapStore extends MappedStore {
     }
 
     /**
+     * @return {Array<Dialog>}
+     */
+    toArray() {
+        const array = []
+        for (const [_, data] of this.data.entries()) {
+            for (const [_, dialog] of data.entries()) {
+                array.push(dialog)
+            }
+        }
+        return array
+    }
+
+    /**
      * @param folderId
      * @return {Array<Dialog>}
      */
@@ -72,8 +122,25 @@ class DialogsMapStore extends MappedStore {
         }
 
         if (this.data.has(dialog.peer.type)) {
+            this._alreadySorted = false
             this.data.get(dialog.peer.type).set(dialog.peer.id, dialog)
-            this.fire(dialog)
+            this.fire("set", {dialog})
+            return this
+        } else {
+            console.error("invalid dialog type")
+            return this
+        }
+    }
+
+    deleteDialog(dialog) {
+        if (this.data.has(dialog.peer.type)) {
+            this.data.get(dialog.peer.type).delete(dialog.peer.id)
+            this.fire("delete", {
+                dialog: {
+                    type: dialog.peer.type,
+                    id: dialog.peer.id,
+                }
+            })
             return this
         } else {
             console.error("invalid dialog type")
@@ -99,6 +166,13 @@ class DialogsMapStore extends MappedStore {
      */
     getByUsername(username) {
         return this.find(dialog => dialog.peer.username === username)
+    }
+
+    /**
+     * @param peer
+     */
+    getByPeer(peer) {
+        return this.get(peer.type, peer.id)
     }
 
     /**

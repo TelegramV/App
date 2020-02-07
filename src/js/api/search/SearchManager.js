@@ -20,8 +20,7 @@ class SearchManagerSingleton extends Manager {
 
             Messages._peer = peer
 
-            Messages.users.forEach(rawUser => PeersManager.setFromRawAndFire(rawUser))
-            Messages.chats.forEach(rawChat => PeersManager.setFromRawAndFire(rawChat))
+            PeersManager.fillPeersFromUpdate(Messages)
 
             Messages.count = Messages.count === undefined ? Messages.messages.length : Messages.count
 

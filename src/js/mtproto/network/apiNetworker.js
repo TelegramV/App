@@ -226,9 +226,18 @@ export class ApiNetworker extends Networker {
     }
 
     resendMessage(messageId) {
-        if (!this.messageProcessor.sentMessages.has(messageId))
-            throw new Error("Message to resend does not exist")
-        this.sendMessage(this.messageProcessor.sentMessages.get(messageId))
+        console.warn("resending is not implemented")
+        return
+
+        if (!this.messageProcessor.sentMessagesDebug.has(messageId)) {
+            console.error("Message to resend does not exist")
+        } else {
+            const m = this.messageProcessor.sentMessagesDebug.get(messageId)
+            console.log('resending', m)
+            this.invokeMethod(m._, m.params)
+                .then(this.messageProcessor.rpcResultHandlers.get(messageId))
+                .catch(this.messageProcessor.rpcErrorHandlers.get(messageId))
+        }
     }
 
     addHeader(message) {
@@ -323,6 +332,20 @@ export class ApiNetworker extends Networker {
             this.messageProcessor.listenRpc(message.msg_id, resolve, reject)
             this.sendMessage(message, options)
         })
+    }
+
+    // todo: doto
+    resendReq(msg_ids = []) {
+        if (msg_ids.length > 0) {
+            console.warn("resending", msg_ids)
+            this.invokeMethod("msg_resend_req", {
+                msg_ids
+            }, {mtproto: true}).then(MsgResendReq => {
+                console.log("resent", MsgResendReq)
+            })
+            // if (this.messageProcessor.sentMessages.has(msg_id)) {
+            // }
+        }
     }
 
 

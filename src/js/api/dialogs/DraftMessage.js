@@ -1,40 +1,28 @@
-import AppEvents from "../eventBus/AppEvents"
-
 export class DraftMessage {
-    
-    #dialog
-    #rawDraftMessage
-    #type = "draftMessageEmpty"
-    #noWebpage = true
-    #replyToMsgId = -1
-    #message = ""
-    #entities = []
-    #date = 0
-    
-    constructor(dialog, rawDraftMessage) {
-        this.#dialog = dialog
-        this.#rawDraftMessage = rawDraftMessage
 
-        this.#type = "draftMessageEmpty"
-        this.#noWebpage = true
-        this.#replyToMsgId = -1
-        this.#message = ""
-        this.#entities = []
-        this.#date = 0
+    _type = "draftMessageEmpty"
+    _rawDraftMessage
+
+    _dialog
+
+    constructor(dialog, rawDraftMessage) {
+        this._dialog = dialog
+
+        this._type = "draftMessageEmpty"
 
         this.fillRaw(rawDraftMessage)
     }
 
     get raw() {
-        return this.#rawDraftMessage
+        return this._rawDraftMessage
     }
 
     get dialog() {
-        return this.#dialog
+        return this._dialog
     }
 
     get isEmpty() {
-        return this.#type === "draftMessageEmpty" || this.message === ""
+        return this._type === "draftMessageEmpty" || this.message === ""
     }
 
     get isPresent() {
@@ -42,23 +30,23 @@ export class DraftMessage {
     }
 
     get noWebpage() {
-        return this.#noWebpage
+        return this.raw.no_webpage || true
     }
 
     get replyToMsgId() {
-        return this.#replyToMsgId
+        return this.raw.reply_to_msg_id || -1
     }
 
     get message() {
-        return this.#message
+        return this.raw.message || ""
     }
 
     get entities() {
-        return this.#entities
+        return this.raw.entities || []
     }
 
     get date() {
-        return this.#date
+        return this.raw.date || 0
     }
 
     /**
@@ -72,15 +60,12 @@ export class DraftMessage {
     }
 
     fillRaw(rawDraftMessage) {
+        this._rawDraftMessage = rawDraftMessage
+
         if (!rawDraftMessage || rawDraftMessage._ === "draftMessageEmpty") {
-            this.#type = "draftMessageEmpty"
+            this._type = "draftMessageEmpty"
         } else {
-            this.#type = rawDraftMessage._ || true
-            this.#noWebpage = rawDraftMessage.no_webpage || true
-            this.#replyToMsgId = rawDraftMessage.reply_to_msg_id || -1
-            this.#message = rawDraftMessage.message || ""
-            this.#entities = rawDraftMessage.entities || []
-            this.#date = rawDraftMessage.date || 0
+            this._type = rawDraftMessage._ || true
         }
     }
 

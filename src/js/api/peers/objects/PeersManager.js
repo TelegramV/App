@@ -41,6 +41,20 @@ class PeerManager extends Manager {
         this._inited = true
     }
 
+    fillPeersFromUpdate(rawUpdate) {
+        if (rawUpdate.users) {
+            rawUpdate.users.forEach(rawUser => {
+                PeersManager.setFromRaw(rawUser)
+            })
+        }
+
+        if (rawUpdate.chats) {
+            rawUpdate.chats.forEach(rawUser => {
+                PeersManager.setFromRaw(rawUser)
+            })
+        }
+    }
+
     setFromRaw(rawPeer) {
         if (PeersStore.has(rawPeer._, rawPeer.id)) {
             const peer = PeersStore.get(rawPeer._, rawPeer.id)

@@ -82,7 +82,7 @@ class SelectedPeer {
             }
         })
 
-        PeersStore.onSet(peer => {
+        PeersStore.onSet(({peer}) => {
             const p = parseHashQuery()
 
             if (p.invalid) {

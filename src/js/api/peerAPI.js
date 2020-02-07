@@ -48,9 +48,7 @@ export class PeerAPI {
                     ...(idNames ? {channel_id: peer.channel_id} : {id: peer.channel_id})
                 }
             default:
-                return {
-
-                }
+                return {}
         }
     }
 }

@@ -142,20 +142,12 @@ export class DialogListComponent extends LeftBarComponent {
         this.pinnedDialogsRef.show()
         this.generalDialogsRef.show()
 
-        event.pinnedDialogs.forEach(dialog => {
-            this._renderDialog(dialog, "append")
-        })
-
         event.dialogs.forEach(dialog => {
             this._renderDialog(dialog, "append")
         })
     }
 
     onNextPageUpdate = event => {
-        event.pinnedDialogs.forEach(dialog => {
-            this._renderDialog(dialog, "append")
-        })
-
         event.dialogs.forEach(dialog => {
             this._renderDialog(dialog, "append")
         })
@@ -230,8 +222,7 @@ export class DialogListComponent extends LeftBarComponent {
 
         const newVDialog = <DialogComponent $pinned={this.pinnedDialogsRef.$el}
                                             $general={this.generalDialogsRef.$el}
-                                            dialog={dialog}
-                                            ref={`dialog-${dialog.peer.type}-${dialog.peer.id}`}/>
+                                            dialog={dialog}/>
 
         if (appendOrPrepend === "append") {
             if (dialog.isPinned) {

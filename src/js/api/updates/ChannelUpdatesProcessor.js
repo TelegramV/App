@@ -53,7 +53,8 @@ export class ChannelUpdatesProcessor {
         this.updatesManager = updatesManager
 
         this.customUpdateTypeProcessors = new Map([
-            ["updateNewChannelMessage", this.processNewChannelMessageUpdate]
+            ["updateNewChannelMessage", this.processNewChannelMessageUpdate],
+            ["updateChannel", this.processUpdateChannelUpdate],
         ])
 
         this.updateTypes = [
@@ -200,6 +201,8 @@ export class ChannelUpdatesProcessor {
 
         // ignore and pass to higher level if no peer found
         if (!peer) {
+            console.log("no peer new channel message", rawUpdate)
+
             channelQueue.isProcessing = false
             rawUpdate._ = "updateNewChannelMessageNoPeer"
 
@@ -211,8 +214,45 @@ export class ChannelUpdatesProcessor {
 
         // ignore and pass to higher level if no dialog found
         if (!peer.dialog) {
+            console.log("no dialog new channel message", rawUpdate, peer)
+
             channelQueue.isProcessing = false
             rawUpdate._ = "updateNewChannelMessageNoDialog"
+
+            this.applyUpdate(rawUpdate)
+
+            this.processQueue(channelId)
+            return
+        }
+
+        this.checkChannelUpdate(peer, channelId, channelQueue, rawUpdate)
+    }
+
+    processUpdateChannelUpdate = (channelId, channelQueue, rawUpdate) => {
+
+        if (!channelQueue) {
+            console.error("BUG: invalid channelQueue was passed")
+            return
+        }
+
+        const peer = PeersStore.get("channel", channelId)
+
+        // ignore and pass to higher level if no peer found
+        if (!peer) {
+            channelQueue.isProcessing = false
+            rawUpdate._ = "updateChannelNoPeer"
+
+            this.applyUpdate(rawUpdate)
+
+            this.processQueue(channelId)
+            return
+        }
+
+        // ignore and pass to higher level if no dialog found
+        if (!peer.dialog) {
+            console.log("peer", peer)
+            channelQueue.isProcessing = false
+            rawUpdate._ = "updateChannelNoDialog"
 
             this.applyUpdate(rawUpdate)
 

@@ -6,6 +6,7 @@ import {Dialog} from "../../dialogs/Dialog"
 import {PeerApi} from "../PeerApi"
 import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 import {PeerMessages} from "../PeerMessages"
+import DialogsStore from "../../store/DialogsStore"
 
 export class Peer extends ReactiveObject {
 
@@ -75,6 +76,14 @@ export class Peer extends ReactiveObject {
      * @return {Dialog|undefined}
      */
     get dialog() {
+        if (!this._dialog) {
+            this._dialog = DialogsStore.get(this.type, this.id)
+
+            if (this._dialog) {
+                this._dialog.peer = this
+            }
+        }
+
         return this._dialog
     }
 
