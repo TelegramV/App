@@ -6,6 +6,7 @@ import BubblesComponent from "./BubblesComponent"
 import {ChatInputComponent} from "./chatInput/ChatInputComponent";
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import VF from "../../../../v/VFramework"
+import UIEvents from "../../../../eventBus/UIEvents"
 
 /**
  * CRITICAL: never rerender this component!
@@ -27,13 +28,14 @@ class ChatComponent extends Component {
                 </div>
                 <div id="chat" css-display="none">
                     <div id="topbar">
-                        <ChatInfoComponent/>    
+                        <ChatInfoComponent/>
                         <PinnedComponent/>
-                        <div className="btn-icon rp rps tgico-search"/>
+                        <div className="btn-icon rp rps tgico-search" onClick={this._openSearch}/>
                         <div className="btn-icon rp rps tgico-more"/>
                     </div>
 
-                    <LoaderComponent id="messages-wrapper-messages-loader" full={true} white={true} show={true} background={true}/>
+                    <LoaderComponent id="messages-wrapper-messages-loader" full={true} white={true} show={true}
+                                     background={true}/>
 
                     <BubblesComponent/>
                     <ChatInputComponent ref="chatInput"/>
@@ -69,6 +71,12 @@ class ChatComponent extends Component {
 
             this.$wrapperLoader.style.display = "none"
         }
+    }
+
+    _openSearch = () => {
+        UIEvents.RightSidebar.fire("show", {
+            barName: "messages-search"
+        })
     }
 }
 

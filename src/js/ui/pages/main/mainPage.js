@@ -11,6 +11,7 @@ import {DialogListComponent} from "./sidebars/left/dialog/DialogListComponent"
 import ChatComponent from "./components/chat/ChatComponent"
 import {SettingsComponent} from "./sidebars/left/settings/SettingsComponent"
 import {SearchPanelComponent} from "./sidebars/left/search/SearchPanelComponent"
+import MessagesSearchComponent from "./sidebars/right/search/MessagesSearchComponent"
 import {DialogInfoComponent} from "./sidebars/right/dialogInfo/DialogInfoComponent"
 import {ArchivedDialogsBar} from "./sidebars/left/dialog/Archived/ArchivedDialogsBar"
 
@@ -44,10 +45,12 @@ export function MainPage() {
             <SearchPanelComponent/>
 
             <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
+            <SearchPanelComponent/>
             <DialogListComponent/>
             <ChatComponent/>
-            {/*<DialogInfoComponent/>*/}
+
             <DialogInfoComponent/>
+            <MessagesSearchComponent/>
         </div>
     )
 }

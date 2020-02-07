@@ -110,6 +110,7 @@ export class DialogListComponent extends LeftBarComponent {
                     <PinnedDialogListComponent/>
                     <GeneralDialogListComponent/>
                 </div>
+                <div class="new-chat"><i class="tgico tgico-newchat_filled"/></div>
             </div>
         )
     }
