@@ -67,7 +67,7 @@ export class ApiNetworker extends Networker {
 
         this.sendMessage(pingMessage)
 
-        setTimeout(this.checkConnection.bind(this), 2000)
+        setTimeout(this.checkConnection.bind(this), 1000)
 
     }
 
