@@ -1,4 +1,4 @@
-function LoaderComponent({big = true, full = false, show = true, id = ""}) {
+function LoaderComponent({big = true, white = false, full = false, show = true, id = "", background = false}) {
 
     const classes = {
         "full-size-loader": true,
@@ -7,12 +7,21 @@ function LoaderComponent({big = true, full = false, show = true, id = ""}) {
 
     const progressClasses = {
         "progress-circular": true,
-        "big": big
+        "big": big,
+        "white": white
     }
 
     return (
         <div id={id} css-display={!show ? "none" : ""} className={classes}>
-            <progress className={progressClasses}/>
+            {
+                background ?
+                    <div className="progress-background">
+                        <progress className={progressClasses}/>
+                    </div>
+                    :
+                    <progress className={progressClasses}/>
+
+            }
         </div>
     )
 }

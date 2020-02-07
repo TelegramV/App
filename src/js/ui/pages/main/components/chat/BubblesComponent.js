@@ -46,16 +46,24 @@ class BubblesComponent extends Component {
 
         function onIntersection(entries) {
             entries.forEach(entry => {
-                entry.target.style.opacity = entry.intersectionRatio > 0 && entry.target.style.opacity !== 1 ? 1 : 0
+                if (entry.isIntersecting) {
+                    entry.target.style.visibility = "visible"
+
+                } else {
+                    entry.target.style.visibility = "hidden"
+
+                }
+                // entry.target.style.visibility = entry.intersectionRatio > 0 ? "visible" : "hidden"
+                // console.log(entry.intersectionRatio > 0 ? "visible" : "hidden", entry.target.id)
+                // entry.target.style.display = entry.target.style.display === "none" ? "block" : "none"
             })
         }
 
         this.intersectionObserver = new IntersectionObserver(onIntersection, {
             root: this.$el,
-            rootMargin: "1000px",
+            rootMargin: "1500px",
             threshold: 1.0
         })
-
 
         AppEvents.Dialogs.subscribeAny(event => {
             const dialog = event.dialog
@@ -127,6 +135,10 @@ class BubblesComponent extends Component {
         $message = $mount(<MessageComponent intersectionObserver={this.intersectionObserver}
                                             message={message}/>, this.elements.$bubblesInner)
 
+        // const prev = $message.clientHeight
+        // setTimeout(l => {
+        //     if(prev !== $message.clientHeight) console.info("message height changed!", prev, $message.clientHeight, $message)
+        // }, 25000);
         return $message
     }
 
@@ -137,6 +149,8 @@ class BubblesComponent extends Component {
      * @private
      */
     _appendMessages(messages) {
+        const z = this.$el.scrollTop
+        const k = this.elements.$bubblesInner.clientHeight
         for (const message of messages) {
             const $rendered = this._renderMessage(message)
 
@@ -146,9 +160,8 @@ class BubblesComponent extends Component {
                     this.state.renderedGroups.set(message.groupedId, message)
                 }
             }
-            // z += this.elements.$bubblesInner.clientHeight - k
         }
-        // this.$el.scrollTop += z
+        this.$el.scrollTop = z + this.elements.$bubblesInner.clientHeight - k
     }
 
     /**
@@ -156,7 +169,7 @@ class BubblesComponent extends Component {
      * @private
      */
     _prependMessages(messages) {
-        let reset = false
+        let reset = true
 
         if (this.elements.$bubblesInner.clientHeight - (this.$el.scrollTop + this.$el.clientHeight) < 50) {
             reset = true
@@ -196,6 +209,7 @@ class BubblesComponent extends Component {
                 this._prependMessages([message])
             })
             this.state.messagesWaitingForRendering.clear()
+            this.$el.scrollTop = this.elements.$bubblesInner.clientHeight
         })
     }
 
@@ -212,11 +226,15 @@ class BubblesComponent extends Component {
         // }
     }
 
+    _scrollToMessage(message) {
+        this.$el.scrollTo({top: message.offsetTop, behavior: "smooth"})
+    }
+
     _onScrollBubbles(event) {
         const $element = event.target
         const $bi = this.elements.$bubblesInner
 
-        if ($element.scrollTop === 0 && !this.state.isFetchingNextPage) {
+        if ($element.scrollTop < 300 && !this.state.isFetchingNextPage) {
             this.state.isFetchingNextPage = true
 
             // this._toggleMessagesLoader(false)
@@ -239,8 +257,10 @@ class BubblesComponent extends Component {
         if (this.elements.$loader) {
             if (hide) {
                 this.elements.$loader.style.display = "none"
+                this.$el.style.height = "100%"
             } else {
                 this.elements.$loader.style.display = ""
+                this.$el.style.height = "0"
             }
         }
     }

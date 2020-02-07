@@ -35,6 +35,15 @@
   }
 }
 
+.progress-background {
+  background-color: black;
+  border-radius: 100%;
+  width: 64px;
+  height: 64px;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.3);
+}
+
 .full-size-loader {
   width: 100%;
   height: 100%;

@@ -1,0 +1,11 @@
+.fab {
+  width: 54px;
+  height: 54px;
+  box-shadow: 0 2px 3px 0 rgba(16, 35, 47, .15);
+  background-color: $blue;
+  border-radius: 100%;
+
+  &.white {
+    background-color: white;
+  }
+}

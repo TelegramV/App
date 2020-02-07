@@ -14,14 +14,16 @@ export const LoadingFragment = ({id, loading = true, click = undefined, show = t
     )
 }
 
-export const PhotoFigureFragment = ({type = "photo", id, srcUrl, thumbnail, width, height, loading, loaded, clickLoader}) => {
+export const PhotoFigureFragment = ({type = "photo", id, srcUrl, thumbnail, width, height, maxWidth, maxHeight, loading, loaded, clickLoader}) => {
     return (
         <figure id={id} className={[type, thumbnail ? "thumbnail" : ""]}>
 
             <PhotoFragment url={srcUrl}
                            thumb={thumbnail}
                            width={width}
-                           height={height}/>
+                           height={height}
+                           maxWidth={maxWidth}
+                           maxHeight={maxHeight}/>
 
             <LoadingFragment loading={loading} show={!loaded} click={clickLoader}/>
 

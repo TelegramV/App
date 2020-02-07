@@ -116,6 +116,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
                  data-peer={`${message.from.type}-${message.from.id}`}>
 
 
+
                 <div className={wrapOuter}>
                     <MessageAvatarComponent id={`message-${message.id}-avatar`} show={showAvatar}
                                             message={message}/>
