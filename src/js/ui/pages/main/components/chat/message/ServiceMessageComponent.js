@@ -38,7 +38,8 @@ function textByAction(message) {
         */
         let user = message.from.name;
         let text = "TODO"
-        return L("lng_action_pinned_message", {from: user, text: text})
+        //return L("lng_action_pinned_message", {from: user, text: text})
+        return `${user} pinned a message`
     }
     return msg || "unsupported";
 }
