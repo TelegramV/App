@@ -1,4 +1,6 @@
 import {VComponent} from "../../../../../v/vrdom/component/VComponent"
+import {RightBarComponent} from "../RightBarComponent"
+import UIEvents from "../../../../../eventBus/UIEvents"
 import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer"
 import {DialogInfoAvatarComponent} from "./DialogInfoAvatarComponent"
 import {DialogInfoDescriptionComponent} from "./DialogInfoDescriptionComponent"
@@ -12,9 +14,9 @@ import {DialogInfoLinkComponent} from "./fragments/DialogInfoLinkComponent"
 import {DialogInfoDocumentComponent} from "./fragments/DialogInfoDocumentComponent"
 import SearchManager from "../../../../../../api/search/SearchManager"
 
-export class DialogInfoComponent extends VComponent {
-
-    hidden = true
+export class DialogInfoComponent extends RightBarComponent {
+    barName = "dialog-info"
+    barVisible = false;
 
     contentRefs = {
         media: VComponent.createRef(),
@@ -79,15 +81,21 @@ export class DialogInfoComponent extends VComponent {
                 this.callbacks.peer.fetchFull()
             }
 
-            this.open()
+            UIEvents.RightSidebar.fire("show", {
+                barName: "dialog-info"
+            })
         }
     }
 
     h() {
         return (
-            <div className={["dialog-info sidebar right", this.hidden ? "hidden" : ""]}>
+            <div className="dialog-info sidebar right hidden">
                 <div class="header toolbar">
-                    <span class="btn-icon tgico tgico-close rp rps" onClick={this.close}/>
+                    <span class="btn-icon tgico tgico-close rp rps" onClick={_=> {
+                        UIEvents.RightSidebar.fire("show", {
+                            barName: "nothing"
+                        })
+                    }}/>
                     <div class="title">Info</div>
                     <span class="btn-icon tgico tgico-more rp rps"/>
                 </div>
@@ -121,14 +129,8 @@ export class DialogInfoComponent extends VComponent {
         )
     }
 
-    close = () => {
-        this.$el.classList.add("hidden")
-        this.hidden = true
-    }
-
-    open = () => {
+    barOnShow = () => {
         this.$el.classList.remove("hidden")
-        this.hidden = false
 
         if (!AppSelectedInfoPeer.check(AppSelectedInfoPeer.Previous) && AppSelectedInfoPeer.Current !== undefined) {
             this.refreshContent()
