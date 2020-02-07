@@ -1,4 +1,129 @@
 .grouped {
   display: grid;
+  width: 380px;
+  height: 320px;
+  overflow: hidden;
   grid-gap: 5px;
+  border-radius: 12px;
+
+  figure {
+    display: flex;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+
+    img {
+      object-fit: cover;
+      width: 100%;
+      display: block;
+    }
+  }
+
+  &.two {
+    &.left {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &.top {
+      grid-template-rows: repeat(2, 1fr);
+    }
+  }
+
+  &.three {
+    grid-template-columns: repeat(2, 1fr);
+
+    &.left {
+      grid-template-rows: 1fr 1fr;
+
+      figure:nth-child(1) {
+        grid-column: 1;
+        grid-row: 1 / span 2;
+      }
+    }
+
+    &.top {
+      grid-template-rows: 1fr 1fr;
+
+      figure:nth-child(1) {
+        grid-column: 1 / span 2;
+      }
+    }
+  }
+
+  &.four {
+    &.left {
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+
+      figure:nth-child(1) {
+        grid-row: 1 / span 3;
+      }
+    }
+
+    &.top {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+
+      figure:nth-child(4) {
+        grid-column: 1 / span 3;
+      }
+    }
+  }
+
+  &.five {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+
+    figure:nth-child(1) {
+      grid-column: 1 / span 2;
+      grid-row: 1 / span 2;
+    }
+  }
+
+  &.six {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+
+  &.seven {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+
+    figure {
+      &:nth-child(-n+4) {
+        grid-column: span 3;
+        grid-row: span 3;
+      }
+
+      &:nth-child(n+5) {
+        grid-column: span 2;
+      }
+    }
+  }
+
+  &.eight {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &.nine {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &.ten {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+
+    figure {
+      &:nth-child(-n+4) {
+        grid-column: span 3;
+        grid-row: span 3;
+      }
+
+      &:nth-child(n+5) {
+        grid-column: span 2;
+      }
+    }
+  }
 }

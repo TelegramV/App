@@ -15,6 +15,7 @@ import {ModalManager} from "../../../../../modalManager";
 import {AttachFilesModal} from "../../../modals/AttachFilesModal";
 import {AttachPollModal} from "../../../modals/AttachPollModal";
 import {TextareaFragment} from "./TextareaFragment";
+import {AttachPhotosModal} from "../../../modals/AttachPhotosModal";
 
 export let ChatInputManager
 
@@ -150,15 +151,11 @@ export class ChatInputComponent extends Component {
     initDragArea() {
         // TODO should create separate drag area!
         document.querySelector("body").addEventListener("drop", ev => {
-            console.log(ev)
             for (let i = 0; i < ev.dataTransfer.items.length; i++) {
                 const k = ev.dataTransfer.items[i]
                 console.log(k)
                 if (k.type.indexOf("image") === -1) continue
-                this.state.attachments.push({
-                    src: URL.createObjectURL(k.getAsFile())
-                })
-                this.__patch()
+                this.pickPhoto(URL.createObjectURL(k.getAsFile()))
             }
             ev.preventDefault()
         })
@@ -256,33 +253,38 @@ export class ChatInputComponent extends Component {
         ModalManager.open(<AttachPollModal/>)
     }
 
+    pickPhoto(blob) {
+        // TODO wtf?
+        if(ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachPhotosModal) {
+            ModalManager.$el.querySelector(".dialog").childNodes[0].__component.addPhoto(blob)
+            return
+        }
+        ModalManager.open(<AttachPhotosModal media={[blob]}/>)
+    }
+
     pickFile(document) {
         askForFile("image/*", function (bytes, file) {
             const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
 
-            this.state.attachments.push({
-                src: URL.createObjectURL(blob)
-            })
-            this.__patch()
-            return
-            const id = [Random.nextInteger(0xffffffff), Random.nextInteger(0xffffffff)]
-            AppSelectedPeer.Current.api.sendMedia("test message", bytes, {
-                _: document ? "inputMediaUploadedDocument" : "inputMediaUploadedPhoto",
-                flags: 0,
-                file: {
-                    _: "inputFile",
-                    id: id,
-                    parts: 1,
-                    name: file.name
-                },
-                mime_type: "octec/stream",
-                attributes: [
-                    {
-                        _: "documentAttributeFilename",
-                        file_name: file.name
-                    }
-                ]
-            })
+            this.pickPhoto(URL.createObjectURL(blob))
+            // const id = [Random.nextInteger(0xffffffff), Random.nextInteger(0xffffffff)]
+            // AppSelectedPeer.Current.api.sendMedia("test message", bytes, {
+            //     _: document ? "inputMediaUploadedDocument" : "inputMediaUploadedPhoto",
+            //     flags: 0,
+            //     file: {
+            //         _: "inputFile",
+            //         id: id,
+            //         parts: 1,
+            //         name: file.name
+            //     },
+            //     mime_type: "octec/stream",
+            //     attributes: [
+            //         {
+            //             _: "documentAttributeFilename",
+            //             file_name: file.name
+            //         }
+            //     ]
+            // })
         }.bind(this), true)
     }
 
@@ -456,7 +458,6 @@ export class ChatInputComponent extends Component {
 
         this.textarea.innerHTML = ""
         this.closeReply()
-        this.state.attachments = []
         this.textarea.innerHTML = ""
         this.updateSendButton()
     }

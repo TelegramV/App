@@ -11,13 +11,18 @@ export class TextareaFragment extends Component {
         return <div className="textarea empty"
              placeholder="Message"
              contentEditable onInput={this.onInput} onKeyPress={this.onKeyPress} onKeyDown={this.onKeyDown}
-             onContextMenu={this.contextMenu} onPaste={this.onPaste}>
+             onContextMenu={this.contextMenu}>
         </div>
     }
 
     mounted() {
         super.mounted();
         this.parent = this.refs.get("chatInput")
+    }
+
+    init() {
+        super.init()
+        window.addEventListener("paste", this.onPaste)
     }
 
     onKeyDown(ev) {
@@ -120,6 +125,7 @@ export class TextareaFragment extends Component {
 
     onPaste(ev) {
         ev.preventDefault()
+        this.$el.focus()
 
         const text = (ev.originalEvent || ev).clipboardData.getData('text/plain')
 
@@ -128,7 +134,7 @@ export class TextareaFragment extends Component {
         for (let i = 0; i < ev.clipboardData.items.length; i++) {
             const k = ev.clipboardData.items[i]
             if (k.type.indexOf("image") === -1) continue
-            // TODO add URL.createObjectURL(k.getAsFile())
+            this.parent.pickPhoto(URL.createObjectURL(k.getAsFile()))
         }
     }
 

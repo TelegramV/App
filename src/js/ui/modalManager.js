@@ -26,6 +26,7 @@ export class ModalComponent extends Component {
 
     close() {
         this.state.hidden = true
+        this.state.body = ""
         this.__patch()
     }
 

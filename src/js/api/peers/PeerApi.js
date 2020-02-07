@@ -125,28 +125,69 @@ export class PeerApi {
 
     sendMessage({
                     text,
+                    media = null,
                     messageEntities = [],
                     replyTo = null,
                     silent = false,
-                    clearDraft = true
+                    clearDraft = true,
+                    noWebpage = false,
+                    background = false,
+                    scheduleDate = null
                 }) {
-        MTProto.invokeMethod("messages.sendMessage", {
-            pFlags: {
-                clear_draft: clearDraft,
-                silent: silent,
-                reply_to_msg_id: replyTo,
-                entities: messageEntities
-            },
+        if(Array.isArray(media) && media.length === 1) {
+            media = media[0]
+        }
+        const multi = Array.isArray(media)
+        let p = Promise.resolve()
+        if(multi) {
+            p = Promise.all(media.map(l => {
+                return FileAPI.uploadMediaToPeer(this._peer, l).then(q => {
+                    return q
+                })
+            }))
+        }
+        p.then(q => {
+            MTProto.invokeMethod(media ? (multi ? "messages.sendMultiMedia" : "messages.sendMedia") : "messages.sendMessage", {
+                pFlags: {
+                    clear_draft: clearDraft,
+                    silent: silent,
+                    reply_to_msg_id: replyTo,
+                    entities: messageEntities,
+                    no_webpage: noWebpage,
+                    background: background,
+                    schedule_date: scheduleDate
+                },
 
-            peer: this._peer.inputPeer,
-            message: text,
-            random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
-        }).then(response => {
-            response.dialog = this._peer.dialog
-            response.message = text
-            response.reply_to_msg_id = replyTo
-            response.silent = silent
-            MTProto.UpdatesManager.process(response)
+                peer: this._peer.inputPeer,
+                message: text,
+                media: media,
+                multi_media: q && q.map((l, i) => {
+                    return {
+                        _: "inputSingleMedia",
+                        media: {
+                            _: "inputMediaPhoto",
+                            id: {
+                                _: "inputPhoto",
+                                id: l.photo.id,
+                                access_hash: l.photo.access_hash,
+                                file_reference: l.photo.file_reference
+                            }
+                        },
+                        message: i === 0 ? text : null,
+                        pFlags: {
+                            entities: i === 0 ? messageEntities : null
+                        },
+                        random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+                    }
+                }),
+                random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+            }).then(response => {
+                response.dialog = this._peer.dialog
+                response.message = text
+                response.reply_to_msg_id = replyTo
+                response.silent = silent
+                MTProto.UpdatesManager.process(response)
+            })
         })
     }
 
