@@ -5,7 +5,7 @@
 
 import type {BusEvent} from "../../../api/eventBus/EventBus"
 import {EventBus} from "../../../api/eventBus/EventBus"
-import V from "../VFramework"
+import VF from "../VFramework"
 import {ReactiveObject} from "../reactive/ReactiveObject"
 import type {
     ComponentMeta,
@@ -97,7 +97,7 @@ class Component {
     /**
      * List of mounted components.
      */
-    refs: Map<string, Component> = V.mountedComponents
+    refs: Map<string, Component> = VF.mountedComponents
 
     constructor(props: ComponentProps) {
         this.name = props.name || this.constructor.name
@@ -107,7 +107,7 @@ class Component {
         this.appEvents = props.appEvents || new Set()
         this.props = props.props || {}
         this.slot = props.slot
-        this.refs = V.mountedComponents
+        this.refs = VF.mountedComponents
     }
 
 
@@ -219,7 +219,7 @@ class Component {
         vrdom_delete(this.$el)
         this.$el = undefined
         this.__.isDeletingItself = false
-        V.mountedComponents.delete(this.identifier)
+        VF.mountedComponents.delete(this.identifier)
     }
 
     patchRequest(node: VRNode) {

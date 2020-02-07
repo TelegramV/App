@@ -77,7 +77,9 @@ export class PeerApi {
     fetchNextPage() {
         let oldest = this._peer.messages.oldest
 
-        console.log(oldest)
+        if (!oldest) {
+            return
+        }
 
         return this.getHistory({offset_id: oldest.id}).then(messages => {
             if (messages.length > 0) {

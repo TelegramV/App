@@ -119,6 +119,18 @@ class DialogManager extends Manager {
             }
         })
 
+        MTProto.UpdatesManager.subscribe("updateFolderPeers", update => {
+            update.folder_peers.forEach(FolderPeer => {
+                const dialog = this.findByPeer(FolderPeer.peer)
+
+                if (dialog) {
+                    dialog.folderId = FolderPeer.folder_id
+                } else {
+                    console.error("BUG: whoa!!! this thing is not implemented yet")
+                }
+            })
+        })
+
         this._inited = true
     }
 
@@ -269,7 +281,7 @@ class DialogManager extends Manager {
             exclude_pinned: true
         }).then(dialogs => {
 
-            AppEvents.Dialogs.fire("nextPage", {
+            AppEvents.Dialogs.fire("gotMany", {
                 dialogs,
             })
 
@@ -279,7 +291,7 @@ class DialogManager extends Manager {
 
     fetchFirstPage() {
         if (this.isFetched) {
-            AppEvents.Dialogs.fire("firstPage", {
+            AppEvents.Dialogs.fire("gotMany", {
                 dialogs: DialogsStore.toSortedArray(),
             })
 
@@ -289,7 +301,7 @@ class DialogManager extends Manager {
         return this.getDialogs().then(dialogs => {
             this.isFetched = true
 
-            AppEvents.Dialogs.fire("firstPage", {
+            AppEvents.Dialogs.fire("gotMany", {
                 dialogs: dialogs,
             })
 

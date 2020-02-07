@@ -26,8 +26,19 @@ export class DialogApi {
         })
     }
 
-    archive(archived: boolean) {
-        //
+    setArchived(set: boolean) {
+        return MTProto.invokeMethod("folders.editPeerFolders",  {
+            folder_peers: [
+                {
+                    _: "inputFolderPeer",
+                    peer: this._dialog.peer.inputPeer,
+                    folder_id: set ? 1 : 0
+                }
+            ]
+        }).then(updates => {
+            console.log(updates)
+            MTProto.UpdatesManager.process(updates)
+        })
     }
 
     mute(muted: boolean) {

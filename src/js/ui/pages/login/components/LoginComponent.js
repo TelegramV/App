@@ -6,7 +6,7 @@ import QRLoginPaneComponent from "./QRLoginPaneComponent"
 import RegisterPaneComponent from "./RegisterPaneComponent"
 
 import {AppPermanentStorage} from "../../../../common/storage"
-import V from "../../../v/VFramework"
+import VF from "../../../v/VFramework"
 
 export default class LoginComponent extends Component {
     constructor(props) {
@@ -39,7 +39,7 @@ export default class LoginComponent extends Component {
 
     loginSuccess(response) {
         AppPermanentStorage.setItem("authorizationData", response)
-        V.router.push("/")
+        VF.router.push("/")
         console.log("login success!")
     }
 

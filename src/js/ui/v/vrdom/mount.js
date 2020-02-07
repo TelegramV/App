@@ -1,7 +1,7 @@
 import vrdom_render from "./render/render"
 import type VRNode from "./VRNode"
 import type {VRRenderProps} from "./types/types"
-import V from "../VFramework"
+import VF from "../VFramework"
 import Component from "./Component"
 import {VComponent} from "./component/VComponent"
 
@@ -17,7 +17,7 @@ export function vrdom_resolveMount($mounted: Element) {
                     component.__.mounted = true
                     component.__mounted()
                     component.mounted()
-                    V.plugins.forEach(plugin => plugin.componentMounted(component))
+                    VF.plugins.forEach(plugin => plugin.componentMounted(component))
                 }
             } else if (component instanceof VComponent) {
                 component.__mount($mounted)
@@ -41,9 +41,9 @@ function vrdom_mount(node: VRNode, $el: Element | Node | Text, props?: VRRenderP
     const $mounted = vrdom_realMount(vrdom_render(node, props), $el)
 
     if ($mounted.nodeType === Node.TEXT_NODE) {
-        V.plugins.forEach(plugin => plugin.textMounted($mounted))
+        VF.plugins.forEach(plugin => plugin.textMounted($mounted))
     } else {
-        V.plugins.forEach(plugin => plugin.elementMounted($mounted))
+        VF.plugins.forEach(plugin => plugin.elementMounted($mounted))
     }
 
     vrdom_resolveMount($mounted)

@@ -6,7 +6,7 @@ export class AbstractBarComponent extends VComponent {
     barName = undefined
     barVisible: false
 
-    leftSidebarOnShow = event => {
+    sidebarOnShow = event => {
         if (event.barName === this.barName) {
             if (!this.barVisible) {
                 this.barVisible = true
@@ -20,6 +20,9 @@ export class AbstractBarComponent extends VComponent {
             this.barOnHide(event)
             this.barAfterHide(event)
         }
+    }
+
+    openBar = barName => {
     }
 
     // you can override methods below

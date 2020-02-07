@@ -106,6 +106,10 @@ export class Dialog extends ReactiveObject {
         this.fire("updateFolderId")
     }
 
+    get isArchived() {
+        return this.folderId === 1
+    }
+
     get input() {
         return {
             _: "inputDialogPeer",

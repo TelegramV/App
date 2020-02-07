@@ -1,12 +1,12 @@
-import {ContextMenuManager} from "../../../../../contextMenuManager"
-import {ChannelPeer} from "../../../../../../api/peers/objects/ChannelPeer"
-import {GroupPeer} from "../../../../../../api/peers/objects/GroupPeer"
-import {SupergroupPeer} from "../../../../../../api/peers/objects/SupergroupPeer"
-import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer"
-import {ModalManager} from "../../../../../modalManager"
-import {DialogAvatarFragment} from "./DialogAvatarFragment"
-import {FlatButtonComponent} from "../../../components/input/flatButtonComponent"
-import {Dialog} from "../../../../../../api/dialogs/Dialog"
+import {ContextMenuManager} from "../../../../../../contextMenuManager"
+import {ChannelPeer} from "../../../../../../../api/peers/objects/ChannelPeer"
+import {GroupPeer} from "../../../../../../../api/peers/objects/GroupPeer"
+import {SupergroupPeer} from "../../../../../../../api/peers/objects/SupergroupPeer"
+import AppSelectedInfoPeer from "../../../../../../reactive/SelectedInfoPeer"
+import {ModalManager} from "../../../../../../modalManager"
+import {DialogAvatarFragment} from "../Fragments/DialogAvatarFragment"
+import {FlatButtonComponent} from "../../../../components/input/flatButtonComponent"
+import {Dialog} from "../../../../../../../api/dialogs/Dialog"
 
 export const dialogContextMenu = (dialog: Dialog) => {
     return ContextMenuManager.listener([
@@ -16,9 +16,9 @@ export const dialogContextMenu = (dialog: Dialog) => {
                 title: dialog.folderId === 1 ? "Unarchive chat" : "Archive chat",
                 onClick: _ => {
                     if (dialog.folderId === 1) {
-                        dialog.api.archive(false)
+                        dialog.api.setArchived(false)
                     } else {
-                        dialog.api.archive(true)
+                        dialog.api.setArchived(true)
                     }
                 }
             }

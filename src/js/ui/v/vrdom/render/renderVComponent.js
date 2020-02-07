@@ -1,5 +1,5 @@
 import vrdom_render from "./render"
-import V from "../../VFramework"
+import VF from "../../VFramework"
 import ComponentVRNode from "../ComponentVRNode"
 import {VComponent} from "../component/VComponent"
 import VComponentVRNode from "../component/VComponentVRNode"
@@ -25,7 +25,7 @@ function vrdom_renderVComponentVNode(vComponentVNode: VComponentVRNode) {
         identifier = String(vComponentVNode.identifier)
         componentInstance.identifier = identifier
     } else {
-        identifier = String(V.latestInstantiatedComponent++)
+        identifier = String(VF.latestInstantiatedComponent++)
         componentInstance.identifier = identifier
     }
 
@@ -39,9 +39,9 @@ function vrdom_renderVComponentVNode(vComponentVNode: VComponentVRNode) {
 
     vNode.attrs["data-component-id"] = identifier
 
-    V.mountedComponents.set(identifier, componentInstance)
+    VF.mountedComponents.set(identifier, componentInstance)
 
-    V.plugins.forEach(plugin => plugin.componentCreated(componentInstance))
+    VF.plugins.forEach(plugin => plugin.componentCreated(componentInstance))
 
     const $node = vrdom_render(vNode)
 

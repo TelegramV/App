@@ -1,10 +1,10 @@
-import V from "../v/VFramework"
+import VF from "../v/VFramework"
 import ReactiveCallback from "../v/reactive/ReactiveCallback"
 import PeersStore from "../../api/store/PeersStore"
 import {Peer} from "../../api/peers/objects/Peer"
 
 function parseHashQuery(queryParams = undefined) {
-    const p = queryParams ? queryParams.p : V.router.activeRoute.queryParams.p
+    const p = queryParams ? queryParams.p : VF.router.activeRoute.queryParams.p
 
     if (!p) {
         return {
@@ -69,7 +69,7 @@ class SelectedPeer {
         })
 
         // listen query changes
-        V.router.onQueryChange(queryParams => {
+        VF.router.onQueryChange(queryParams => {
             const peer = this.findFromQueryParams(parseHashQuery(queryParams))
 
             if (peer !== this._peer) {

@@ -4,7 +4,7 @@ import patchAttrs from "./patchAttrs"
 import patchEvents from "./patchEvents"
 import patchDangerouslySetInnerHTML from "./patchDangerouslySetInnerHTML"
 import patchChildren from "./patchChildren"
-import V from "../../VFramework"
+import VF from "../../VFramework"
 import patchUndefined from "./patchUndefined"
 import patchText from "./patchText"
 import patchTextArea from "./patchTextArea"
@@ -47,7 +47,7 @@ const vrdom_fastpatch = <T: Element | Node | Text>($node: T, newNode: VRNode | m
             patchChildren($node, $node.childNodes, newNode.children, true)
         }
 
-        V.plugins.forEach(plugin => plugin.elementPatched($node))
+        VF.plugins.forEach(plugin => plugin.elementPatched($node))
 
         return $node
 

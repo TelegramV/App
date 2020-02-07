@@ -5,7 +5,7 @@ import Component from "../../../../v/vrdom/Component"
 import BubblesComponent from "./BubblesComponent"
 import {ChatInputComponent} from "./chatInput/ChatInputComponent";
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
-import V from "../../../../v/VFramework"
+import VF from "../../../../v/VFramework"
 
 /**
  * CRITICAL: never rerender this component!
@@ -47,7 +47,7 @@ class ChatComponent extends Component {
         this.$chat = this.$el.querySelector("#chat")
         this.$wrapperLoader = this.$el.querySelector("#chat-wrapper-loader")
 
-        if (!V.router.activeRoute.queryParams.p) {
+        if (!VF.router.activeRoute.queryParams.p) {
             this.$noChat.style.display = ""
             this.$wrapperLoader.style.display = "none"
         }

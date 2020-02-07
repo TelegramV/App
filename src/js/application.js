@@ -1,7 +1,7 @@
 import "../sass/application.scss"
 
 import "./ui/vendor/tgs-player.js";
-import V from "./ui/v/VFramework"
+import VF from "./ui/v/VFramework"
 import MTProto from "./mtproto/external"
 import AppCache from "./api/cache"
 import PeersStore from "./api/store/PeersStore"
@@ -43,12 +43,12 @@ function start() {
 }
 
 function startUI() {
-    V.registerPlugin(RipplePlugin)
-    V.registerPlugin(EmojiPlugin)
+    VF.registerPlugin(RipplePlugin)
+    VF.registerPlugin(EmojiPlugin)
 
-    V.useRoutes(AppRoutes)
+    VF.useRoutes(AppRoutes)
 
-    V.mount("#app")
+    VF.mount("#app")
 }
 
 global.Peers = PeersStore

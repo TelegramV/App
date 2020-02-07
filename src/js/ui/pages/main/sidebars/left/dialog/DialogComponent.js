@@ -1,12 +1,15 @@
 import {UserPeer} from "../../../../../../api/peers/objects/UserPeer"
-import {DialogTextFragment} from "./DialogTextFragment"
-import V from "../../../../../v/VFramework"
-import {DialogAvatarFragment} from "./DialogAvatarFragment"
+import {DialogTextFragment} from "./Fragments/DialogTextFragment"
+import VF from "../../../../../v/VFramework"
+import {DialogAvatarFragment} from "./Fragments/DialogAvatarFragment"
 import {tsNow} from "../../../../../../mtproto/timeManager"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
-import {dialogContextMenu} from "./dialogContextMenu"
+import {dialogContextMenu} from "./ContextMenu/dialogContextMenu"
 import {Dialog} from "../../../../../../api/dialogs/Dialog"
 import VComponent from "../../../../../v/vrdom/component/VComponent"
+import ArchivedDialogListComponent from "./Archived/ArchivedDialogListComponent"
+import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent"
+import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
 
 const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -68,10 +71,13 @@ const TimeFragment = ({id, dialog}) => {
 }
 
 // NEVER CREATE THIS COMPONENT WITH THE SAME DIALOG
-// legacy thing, we should rewrite it later
 export class DialogComponent extends VComponent {
 
     dialog: Dialog
+
+    Archived: ArchivedDialogListComponent
+    Pinned: PinnedDialogListComponent
+    General: GeneralDialogListComponent
 
     timeFragmentRef = VComponent.createFragmentRef()
     textFragmentRef = VComponent.createFragmentRef()
@@ -108,6 +114,7 @@ export class DialogComponent extends VComponent {
             .on("newMessage", this.onDialogNewMessage)
             .on("updateSingle", this.onDialogUpdateSingle)
             .on("updatePinned", this.onDialogUpdatePinned)
+            .on("updateFolderId", this.onDialogUpdateFolderId)
 
         R.object(this.dialog.peer)
             .on("updatePhoto", this.onPeerUpdatePhoto)
@@ -174,8 +181,13 @@ export class DialogComponent extends VComponent {
     }
 
     mounted() {
+        this.Archived = VF.mountedComponents.get(`dialogs-archived-list`)
+        this.Pinned = VF.mountedComponents.get(`dialogs-pinned-list`)
+        this.General = VF.mountedComponents.get(`dialogs-general-list`)
+
         this.$el.__message = this.dialog.peer.messages.last
         this.$el.__pinned = this.dialog.pinned
+        this.$el.__archived = this.dialog.isArchived
     }
 
     callbackChanged(key: string, value: *) {
@@ -204,6 +216,10 @@ export class DialogComponent extends VComponent {
     }
 
     onDialogUpdatePinned = _ => {
+        this._patchMessageAndResort()
+    }
+
+    onDialogUpdateFolderId = _ => {
         this._patchMessageAndResort()
     }
 
@@ -278,26 +294,50 @@ export class DialogComponent extends VComponent {
     _patchMessageAndResort = () => {
         if (this.dialog.pinned !== this.$el.__pinned) {
 
-            if (this.dialog.pinned) {
-                this.props.$pinned.prepend(this.$el)
+            if (this.dialog.isPinned) {
+                this.Pinned.$el.prepend(this.$el)
             } else {
-                const $foundRendered = this._findRenderedDialogToInsertBefore()
+                const AppendList = this.dialog.isArchived ? this.Archived : this.General
+
+                const $foundRendered = this._findRenderedDialogToInsertBefore(AppendList.$el)
 
                 if ($foundRendered) {
-                    this.props.$general.insertBefore(this.$el, $foundRendered)
+                    AppendList.$el.insertBefore(this.$el, $foundRendered)
                 } else {
                     this.__delete() // ...
                 }
             }
 
-            this.$el.__pinned = this.dialog.isPinned === undefined ? false : this.dialog.isPinned
+            this.$el.__pinned = this.dialog.isPinned
+
+        } else if (this.dialog.isArchived !== this.$el.__archived) {
+
+            if (this.dialog.isArchived) {
+                this.Archived.$el.prepend(this.$el)
+            } else {
+                const AppendList = this.dialog.isPinned ? this.Pinned : this.General
+
+                const $foundRendered = this._findRenderedDialogToInsertBefore(AppendList.$el)
+
+                if ($foundRendered) {
+                    AppendList.$el.insertBefore(this.$el, $foundRendered)
+                } else {
+                    this.__delete() // ...
+                }
+            }
+
+            this.$el.__archived = this.dialog.isArchived
 
         } else if (!this.dialog.peer.messages.last) {
             // todo: handle no last message
         } else if (this.$el.__message.date !== this.dialog.peer.messages.last.date) {
-            if (!this.dialog.pinned) {
+            if (!this.dialog.isPinned) {
                 if (this.$el.previousSibling) {
-                    this.props.$general.prepend(this.$el)
+                    if (this.dialog.isArchived) {
+                        this.Archived.$el.prepend(this.$el)
+                    } else {
+                        this.General.$el.prepend(this.$el)
+                    }
                 }
             }
         }
@@ -309,9 +349,9 @@ export class DialogComponent extends VComponent {
      * @return {ChildNode|Element|Node|undefined}
      * @private
      */
-    _findRenderedDialogToInsertBefore = () => {
+    _findRenderedDialogToInsertBefore = $dialogs => {
         const dialog = this.dialog
-        const renderedDialogs = this.props.$general.childNodes
+        const renderedDialogs = $dialogs.childNodes
 
         if (renderedDialogs.size === 0) {
             return undefined
@@ -333,7 +373,9 @@ export class DialogComponent extends VComponent {
     _handleClick = () => {
         const p = this.dialog.peer.username ? `@${this.dialog.peer.username}` : `${this.dialog.peer.type}.${this.dialog.peer.id}`
 
-        V.router.push("/", {
+        const act = this.$el.classList.contains("responsive-selected-chatlist") ? VF.router.replace : VF.router.push
+
+        act("/", {
             queryParams: {
                 p
             }

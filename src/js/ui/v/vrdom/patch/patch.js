@@ -5,7 +5,7 @@ import patchDangerouslySetInnerHTML from "./patchDangerouslySetInnerHTML"
 import VRNode from "../VRNode"
 import ComponentVRNode from "../ComponentVRNode"
 import patchChildren from "./patchChildren"
-import V from "../../VFramework"
+import VF from "../../VFramework"
 import patchComponentVRNode from "./patchComponent"
 import patchUndefined from "./patchUndefined"
 import patchText from "./patchText"
@@ -52,7 +52,7 @@ const vrdom_patch = <T: Element | Node | Text>($node: T, newNode: VRNode | VComp
             patchChildren($node, $node.childNodes, newNode.children)
         }
 
-        V.plugins.forEach(plugin => plugin.elementPatched($node))
+        VF.plugins.forEach(plugin => plugin.elementPatched($node))
 
         return $node
 
