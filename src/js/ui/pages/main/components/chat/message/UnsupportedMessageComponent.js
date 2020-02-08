@@ -5,7 +5,7 @@ class UnsupportedMessageComponent extends GeneralMessageComponent {
 
     h() {
         return (
-            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message}>
+            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message} bubbleRef={this.bubbleRef}>
                 <i>Unsupported Message</i>
             </MessageWrapperFragment>
         )

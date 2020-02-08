@@ -7,7 +7,7 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
 
     h() {
         return (
-            <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false}>
+            <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false} bubbleRef={this.bubbleRef}>
                 <VideoComponent video={this.message.raw.media.document} round/>
                 <MessageTimeComponent message={this.message} bg={true}/>
             </MessageWrapperFragment>

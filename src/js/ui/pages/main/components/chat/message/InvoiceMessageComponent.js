@@ -5,7 +5,7 @@ class InvoiceMessageComponent extends GeneralMessageComponent {
 
     h() {
         return (
-            <MessageWrapperFragment message={this.message} showUsername={false}>
+            <MessageWrapperFragment message={this.message} showUsername={false} bubbleRef={this.bubbleRef}>
                 This app currently is not supporting <b>Invoices</b>. Try using another app.
             </MessageWrapperFragment>
         )

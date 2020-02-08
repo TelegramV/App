@@ -750,10 +750,28 @@
         margin-top: 5px;
     }
 
-    .in,
-    .out {
-        flex-direction: row;
-        align-items: flex-end;
+    #bubbles-inner > .in,
+    #bubbles-inner > .out {
+
+        .in, .out {
+            flex-direction: row;
+            align-items: flex-end;
+        }
+
+
+        &.hide-tail + :not(.hide-tail) {
+            margin-bottom: 6px !important;
+        }
+        &:not(.hide-tail) {
+            margin-bottom: 8px !important;
+            margin-top: 0 !important;
+
+            & + .hide-tail {
+                margin-top: 2px !important;
+                margin-bottom: 4px !important;
+            }
+        }
+
         .bubble {
             .reply {
                 .quote {
@@ -872,6 +890,14 @@
     .in {
         //align-items: flex-start;
 
+        &.hide-tail .bubble {
+            margin-left: 10px;
+            -webkit-mask-image: none !important;
+            padding-left: 0 !important;
+            border-bottom-left-radius: 6px !important;
+        }
+
+
         .box:hover {
             background-color: $light;
         }
@@ -980,6 +1006,13 @@
     .out {
         align-items: flex-end;
         flex-direction: column;
+
+        &.hide-tail .bubble {
+            margin-right: 10px;
+            -webkit-mask-image: none !important;
+            padding-right: 0 !important;
+            border-bottom-right-radius: 6px !important;
+        }
 
         .bubble.transparent {
             .reply {
