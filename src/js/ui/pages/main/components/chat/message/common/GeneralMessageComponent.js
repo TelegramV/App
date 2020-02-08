@@ -31,7 +31,11 @@ class GeneralMessageComponent extends VComponent {
         const threshold = 60 * 5
 
         if (!this.$el.previousElementSibling || this.$el.previousElementSibling.__message.from !== this.message.from) {
-            this.bubbleRef.$el.parentNode.parentNode.classList.add("upper")
+            if(this.$el.nextElementSibling && this.$el.nextElementSibling.__message.from === this.message.from) {
+
+            } else {
+                this.bubbleRef.$el.parentNode.parentNode.classList.add("upper")
+            }
         }
 
         if (this.$el.previousElementSibling) {
