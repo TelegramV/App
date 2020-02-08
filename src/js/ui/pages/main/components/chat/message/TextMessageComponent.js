@@ -6,7 +6,7 @@ class TextMessageComponent extends GeneralMessageComponent {
 
     h() {
         return (
-            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message} showAvatar={this.showAvatar}>
+            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message} showAvatar={this.showAvatar} avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
                 <TextWrapperComponent message={this.message}/>
             </MessageWrapperFragment>
         )

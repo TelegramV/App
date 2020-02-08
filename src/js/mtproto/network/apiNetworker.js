@@ -226,18 +226,25 @@ export class ApiNetworker extends Networker {
     }
 
     resendMessage(messageId) {
-        console.warn("resending is not implemented")
-        return
 
-        if (!this.messageProcessor.sentMessagesDebug.has(messageId)) {
-            console.error("Message to resend does not exist")
-        } else {
-            const m = this.messageProcessor.sentMessagesDebug.get(messageId)
-            console.log('resending', m)
-            this.invokeMethod(m._, m.params)
-                .then(this.messageProcessor.rpcResultHandlers.get(messageId))
-                .catch(this.messageProcessor.rpcErrorHandlers.get(messageId))
-        }
+        if (!this.messageProcessor.sentMessages.has(messageId))
+            throw new Error("Message to resend does not exist")
+        this.sendMessage(this.messageProcessor.sentMessages.get(messageId))
+
+        // idk, we should rewrite whole mtproto layer
+
+        // console.warn("resending is not implemented")
+        // return
+        //
+        // if (!this.messageProcessor.sentMessagesDebug.has(messageId)) {
+        //     console.error("Message to resend does not exist")
+        // } else {
+        //     const m = this.messageProcessor.sentMessagesDebug.get(messageId)
+        //     console.log('resending', m)
+        //     this.invokeMethod(m._, m.params)
+        //         .then(this.messageProcessor.rpcResultHandlers.get(messageId))
+        //         .catch(this.messageProcessor.rpcErrorHandlers.get(messageId))
+        // }
     }
 
     addHeader(message) {

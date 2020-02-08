@@ -7,7 +7,7 @@ import {ContextMenuComponent} from "../../contextMenuManager"
 import {ModalComponent} from "../../modalManager"
 import {MediaViewerComponent} from "../../mediaViewerManager"
 import {InstantViewComponent} from "../../instantViewManager"
-import {DialogListComponent} from "./sidebars/left/dialog/DialogListComponent"
+import {DialogsBar} from "./sidebars/left/dialog/DialogsBar"
 import ChatComponent from "./components/chat/ChatComponent"
 import {SettingsComponent} from "./sidebars/left/settings/SettingsComponent"
 import {SearchPanelComponent} from "./sidebars/left/search/SearchPanelComponent"
@@ -46,7 +46,7 @@ export function MainPage() {
 
             <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
             <SearchPanelComponent/>
-            <DialogListComponent/>
+            <DialogsBar/>
             <ChatComponent/>
 
             <DialogInfoComponent/>

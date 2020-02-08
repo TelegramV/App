@@ -12,6 +12,7 @@ export default class ArchivedDialogListComponent extends VComponent {
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.onDialogsGotMany)
             .on("gotArchived", this.onDialogsGotMany)
+            .on("gotNewMany", this.onDialogsGotNewMany)
     }
 
     h() {
@@ -28,6 +29,12 @@ export default class ArchivedDialogListComponent extends VComponent {
         event.dialogs
             .filter(dialog => dialog.isArchived)
             .forEach(this.appendDialog)
+    }
+
+    onDialogsGotNewMany = event => {
+        event.dialogs
+            .filter(dialog => dialog.isArchived)
+            .forEach(this.prependDialog)
     }
 
     prependDialog = dialog => {

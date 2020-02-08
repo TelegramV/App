@@ -11,6 +11,7 @@ export default class GeneralDialogListComponent extends VComponent {
     appEvents(E) {
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.onDialogsGotMany)
+            .on("gotNewMany", this.onDialogsGotNewMany)
     }
 
     h() {
@@ -25,6 +26,12 @@ export default class GeneralDialogListComponent extends VComponent {
         event.dialogs
             .filter(dialog => !dialog.isPinned && !dialog.folderId)
             .forEach(this.appendDialog)
+    }
+
+    onDialogsGotNewMany = event => {
+        event.dialogs
+            .filter(dialog => !dialog.isPinned && !dialog.folderId)
+            .forEach(this.prependDialog)
     }
 
     prependDialog = dialog => {

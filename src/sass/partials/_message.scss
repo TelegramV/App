@@ -61,6 +61,11 @@
 
             // let total_wasted_hours = 16
 
+            &.no-mask {
+                -webkit-mask-image: none;
+                mask-image: none;
+            }
+
             &.in {
                 -webkit-mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left.svg");
                 mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left.svg");
@@ -104,7 +109,7 @@
                 padding-right: 0;
             }
 
-            
+
 
             .sticker {
                 width: 250px;
