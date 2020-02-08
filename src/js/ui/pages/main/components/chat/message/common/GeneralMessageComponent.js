@@ -40,7 +40,7 @@ class GeneralMessageComponent extends VComponent {
                 }
             }
         } else if (this.$el.nextElementSibling) {
-            if (this.$el.nextElementSibling.__message && this.$el.nextElementSibling.__message.from === this.message.from && this.$el.nextElementSibling.__component && Math.abs(tthis.$el.nextElementSibling.__message.date - this.message.date) <= threshold) {
+            if (this.$el.nextElementSibling.__message && this.$el.nextElementSibling.__message.from === this.message.from && this.$el.nextElementSibling.__component && Math.abs(this.$el.nextElementSibling.__message.date - this.message.date) <= threshold) {
                 if(this.$el.nextElementSibling.__component.avatarRef.component) {
                     this.$el.nextElementSibling.__component.avatarRef.component.hide()
                 }
