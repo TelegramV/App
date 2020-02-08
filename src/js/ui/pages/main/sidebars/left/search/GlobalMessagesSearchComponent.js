@@ -69,7 +69,8 @@ export class GlobalMessagesSearchComponent extends VComponent {
 
             SearchManager.globalSearch(this.currentQuery, {limit: 20, offsetRate: this.offsetRate}).then(Messages => {
                 if (Messages.__q === this.currentQuery) {
-                    console.log(Messages)
+                    Messages.messages.shift()
+
                     this.state.messages.push(...Messages.messages)
                     this.offsetRate = Messages.next_rate
 
@@ -90,26 +91,28 @@ export class GlobalMessagesSearchComponent extends VComponent {
     onSearchInputUpdated = event => {
         const q = event.string.trim()
 
-        if (q !== "" && q !== this.currentQuery && !this.allFetched) {
+        if (q !== "" && q !== this.currentQuery) {
             this.currentQuery = q
             this.offsetRate = 0
             this.allFetched = false
             this.isFetching = true
 
-            SearchManager.globalSearch(q, {limit: 20, offsetRate: this.offsetRate}).then(Messages => {
-                if (Messages.__q === this.currentQuery) {
-                    this.peers = []
-                    this.state.messages = Messages.messages
-                    this.offsetRate = Messages.next_rate
+            if (!this.allFetched) {
+                SearchManager.globalSearch(q, {limit: 20, offsetRate: this.offsetRate}).then(Messages => {
+                    if (Messages.__q === this.currentQuery) {
+                        this.peers = []
+                        this.state.messages = Messages.messages
+                        this.offsetRate = Messages.next_rate
 
-                    this.isFetching = false
+                        this.isFetching = false
 
-                    if (Messages._ === "messages" || Messages.count < 20) {
-                        this.offsetRate = 0
-                        this.allFetched = true
+                        if (Messages._ === "messages" || Messages.count < 20) {
+                            this.offsetRate = 0
+                            this.allFetched = true
+                        }
                     }
-                }
-            })
+                })
+            }
         }
     }
 }
