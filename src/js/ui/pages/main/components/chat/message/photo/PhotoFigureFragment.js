@@ -4,7 +4,7 @@ export const LoadingFragment = ({id, loading = true, click = undefined, show = t
     return (
         <div css-display={show ? "" : "none"} id={id} className="progress" onClick={click}>
 
-            <div css-display={show ? "" : "none"} className="pause-button">
+            <div css-display={showPause ? "" : "none"} className="pause-button">
                 <i className={["tgico", loading ? "tgico-close" : "tgico-download"]}/>
             </div>
 
