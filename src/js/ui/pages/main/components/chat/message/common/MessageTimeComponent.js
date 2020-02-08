@@ -15,8 +15,9 @@ const MessageTimeComponent = ({message, bg = false}) => {
 
     return (
         <span class={classes}>
-            {views}
+            {!bg ? views : ""}
             <div class="inner status tgico">
+            	{bg ? views : ""}
                 {edited}
                 {message.getDate('en', {
                     hour: '2-digit',
