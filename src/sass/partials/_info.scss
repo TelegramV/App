@@ -1,4 +1,5 @@
 .sidebar.dialog-info {
+<<<<<<< HEAD
   position: relative;
   padding-top: 60px;
   min-width: 250px;
@@ -45,6 +46,11 @@
         max-width: 120px;
       }
     }
+=======
+    position: relative;
+    padding-top: 60px;
+    transition: anim(width);
+>>>>>>> 0e4d9762b87aab75040d4e10827b78eb2b9c9ea7
 
     > .description {
       text-align: center;
