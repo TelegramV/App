@@ -1,7 +1,7 @@
 #bubbles {
     height: 100%;
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) calc(100% - 16px), rgba(0,0,0,0));
-    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) calc(100% - 16px), rgba(0,0,0,0));
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) calc(100% - 16px), rgba(0, 0, 0, 0));
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) calc(100% - 16px), rgba(0, 0, 0, 0));
 
     .service {
         justify-content: center;
@@ -33,8 +33,8 @@
     .bubble-outer {
         display: grid;
         grid-template-areas:
-                "avatar bubble"
-                "_ keyboard";
+            "avatar bubble"
+            "_ keyboard";
         filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
 
 
@@ -104,6 +104,7 @@
                 border-radius: 12px;
                 -webkit-mask-image: none;
                 mask-image: none;
+
                 &.in {
                     padding-left: 0;
                     margin-left: 10px;
@@ -115,6 +116,7 @@
                     margin-right: 10px;
                 }
             }
+
             -webkit-mask-repeat: no-repeat;
             mask-repeat: no-repeat;
 
@@ -231,6 +233,7 @@
                 .name {
                     font-weight: 500;
                     margin-top: 5px;
+
                     &:first-child {
                         margin-top: 0px;
                     }
@@ -365,6 +368,7 @@
                         justify-content: center;
                         align-items: flex-start;
                         flex-grow: 1;
+
                         .answer-text {
                             line-height: 1.5em;
                         }
@@ -617,7 +621,7 @@
                     }
                 }
 
-                .grouped ~ .time.bg {
+                .grouped~.time.bg {
                     right: 15px;
                     bottom: 5px;
                 }
@@ -753,6 +757,7 @@
 
                         .views {
                             margin-right: 5px;
+
                             .tgico-channelviews {
                                 line-height: 12px;
                             }
@@ -771,23 +776,25 @@
         margin-top: 5px;
     }
 
-    #bubbles-inner > .in,
-    #bubbles-inner > .out {
+    #bubbles-inner>.in,
+    #bubbles-inner>.out {
 
-        .in, .out {
+        .in,
+        .out {
             flex-direction: row;
             align-items: flex-end;
         }
 
 
-        &.hide-tail + :not(.hide-tail) {
+        &.hide-tail+ :not(.hide-tail) {
             margin-bottom: 6px !important;
         }
+
         &:not(.hide-tail) {
             margin-bottom: 8px !important;
             margin-top: 0 !important;
 
-            & + .hide-tail {
+            &+.hide-tail {
                 margin-top: 2px !important;
                 margin-bottom: 4px !important;
             }
@@ -805,16 +812,19 @@
                 }
             }
         }
+
         .bubble.transparent {
             background-color: transparent;
             box-shadow: none;
             border-radius: 0 !important;
             position: relative;
             overflow: visible;
+
             .fwd,
             .username {
                 display: none;
             }
+
             .reply {
                 position: absolute;
                 right: 0;
@@ -1035,6 +1045,14 @@
             -webkit-mask-image: none !important;
             padding-right: 0 !important;
             border-bottom-right-radius: 6px !important;
+
+            figure.photo,
+            figure.video,
+            .grouped {
+                ~.time.bg:not(.use-me) {
+                    right: 15px;
+                }
+            }
         }
 
         .bubble.transparent {
@@ -1105,6 +1123,7 @@
                     padding-left: 5px;
                 }
             }
+
             .username,
             .fwd {
                 color: $darkgreen;
