@@ -16,7 +16,12 @@ export default class QRLoginPaneComponent extends PaneComponent {
                 this.props.finished(l.authorization)
                 return
             }
-            this.open();
+            this.requestLoginToken().then(q => {
+                if(q._ === "auth.loginTokenSuccess") {
+                    this.props.finished(q.authorization)
+                    return
+                }
+            })
             /*MTProto.invokeMethod("auth.exportLoginToken", {
                 api_id: AppConfiguration.mtproto.api.api_id,
                 api_hash: AppConfiguration.mtproto.api.api_hash,
@@ -57,7 +62,6 @@ export default class QRLoginPaneComponent extends PaneComponent {
 
 
     open() {
-        // TODO recreate QR when expired
         // TODO multiple DCs
         this.requestLoginToken().then(l => {
             /*if(l._ === "auth.loginTokenSuccess") { //idk where it goes, Maks, fix pls
@@ -74,7 +78,13 @@ export default class QRLoginPaneComponent extends PaneComponent {
 
             setTimeout(this.open, 1000 * (l.expires - tsNow(true)));
         }).catch(reject => {
-            if(reject.reason == "authorized") return; //ignore
+            if(reject.reason === "authorized") return; //ignore
+            if(reject.type === "SESSION_PASSWORD_NEEDED") {
+                MTProto.invokeMethod("account.getPassword", {}).then(response => {
+                    console.log(response)
+                    this.props.password(response)
+                })
+            }
         })
     }
 
@@ -82,18 +92,14 @@ export default class QRLoginPaneComponent extends PaneComponent {
         Returns Promise
     **/
     requestLoginToken() {
-        return new Promise(async (resolve, reject) => {
-            if(MTProto.isUserAuthorized()) {
-                reject({reason: "authorized"});
-                return;
-            }
+        if(MTProto.isUserAuthorized()) {
+            return Promise.reject({reason: "authorized"})
+        }
 
-            let l = await MTProto.invokeMethod("auth.exportLoginToken", {
-                api_id: AppConfiguration.mtproto.api.api_id,
-                api_hash: AppConfiguration.mtproto.api.api_hash,
-                except_ids: []
-            })
-            resolve(l);
+        return MTProto.invokeMethod("auth.exportLoginToken", {
+            api_id: AppConfiguration.mtproto.api.api_id,
+            api_hash: AppConfiguration.mtproto.api.api_hash,
+            except_ids: []
         })
     }
 

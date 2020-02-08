@@ -99,7 +99,7 @@ export class PeerApi {
                 max_id: maxId
             }).then(response => {
                 if (response._ === "boolTrue") {
-                    this._peer.dialog.peer.messages.deleteUnreadBy(maxId)
+                    this._peer.messages.deleteUnreadBy(maxId)
                     // this.dialog.peer.messages.clearUnread()
                     AppEvents.Dialogs.fire("readHistory", {
                         dialog: this._peer.dialog
@@ -111,7 +111,7 @@ export class PeerApi {
                 peer: getInputPeerFromPeer(this._peer.type, this._peer.id, this._peer.accessHash),
                 max_id: maxId
             }).then(response => {
-                this._peer.dialog.peer.messages.deleteUnreadBy(maxId)
+                this._peer.messages.deleteUnreadBy(maxId)
                 // this.dialog.peer.messages.clearUnread()
                 AppEvents.Dialogs.fire("readHistory", {
                     dialog: this._peer.dialog
@@ -210,7 +210,7 @@ export class PeerApi {
                         if(l._ === "updateMessageID") l.dialog = this._peer.dialog
                     })
                 } else {
-                    this._peer.dialog.peer.messages._sendingMessages.set(response.id, randomId)
+                    this._peer.messages._sendingMessages.set(response.id, randomId)
                     response.random_id = randomId
                 }
                 response.dialog = this._peer.dialog

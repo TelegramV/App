@@ -38,7 +38,7 @@ export class Dialog extends ReactiveObject {
 
     get peer(): Peer {
         if (!this._peer) {
-            this._peer = PeersStore.getFromDialogRawPeer(this.raw.peer)
+            this._peer = PeersStore.getByPeerType(this.raw.peer)
 
             if (this._peer) {
                 this._peer.dialog = this

@@ -11,6 +11,7 @@ import UIEvents from "../../../../../eventBus/UIEvents"
 import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent"
 import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
 import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
+import {LazyInput} from "../../../../../components/LazyInput"
 
 export class DialogsBar extends LeftBarComponent {
 
@@ -93,7 +94,10 @@ export class DialogsBar extends LeftBarComponent {
                     }}/>
                     <div className="search">
                         <div className="input-search">
-                            <input type="text" placeholder="Search" onFocus={this.openSearch}/>
+                            <LazyInput type="text" placeholder="Search"
+                                       onFocus={this.openSearch}
+                                       onInput={this.onSearchInputCapture}
+                                       lazyLevel={500}/>
                             <span className="tgico tgico-search"/>
                         </div>
                     </div>
@@ -260,5 +264,12 @@ export class DialogsBar extends LeftBarComponent {
                 this.isLoadingMore = false
             })
         }
+    }
+
+    onSearchInputCapture = event => {
+        console.log("onSearchInputCapture")
+        UIEvents.LeftSidebar.fire("searchInputUpdated", {
+            string: event.target.value.trim()
+        })
     }
 }

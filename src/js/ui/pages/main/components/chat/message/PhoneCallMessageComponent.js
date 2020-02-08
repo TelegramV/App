@@ -1,4 +1,4 @@
-import CardMessageWrapperComponent from "./common/CardMessageWrapperComponent";
+import CardMessageWrapperFragment from "./common/CardMessageWrapperFragment";
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 
 class PhoneCallMessageComponent extends GeneralMessageComponent {
@@ -20,9 +20,10 @@ class PhoneCallMessageComponent extends GeneralMessageComponent {
         }
         let icon = <i className="tgico tgico-phone" css-font-size="32px"/>
         return (
-            <CardMessageWrapperComponent icon={icon} title={title}
-                                         description={this.message.raw.action.duration + " seconds"}
-                                         message={this.message} bubbleRef={this.bubbleRef}/>
+            <CardMessageWrapperFragment icon={icon} title={title}
+                                        description={this.message.raw.action.duration + " seconds"}
+                                        message={this.message}
+                                        bubbleRef={this.bubbleRef}/>
         )
     }
 }

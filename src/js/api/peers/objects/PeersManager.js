@@ -42,17 +42,24 @@ class PeerManager extends Manager {
     }
 
     fillPeersFromUpdate(rawUpdate) {
+        const data = {
+            users: [],
+            chats: [],
+        }
+
         if (rawUpdate.users) {
-            rawUpdate.users.forEach(rawUser => {
-                PeersManager.setFromRaw(rawUser)
+            data.users = rawUpdate.users.map(rawUser => {
+                return PeersManager.setFromRaw(rawUser)
             })
         }
 
         if (rawUpdate.chats) {
-            rawUpdate.chats.forEach(rawUser => {
-                PeersManager.setFromRaw(rawUser)
+            data.chats = rawUpdate.chats.map(rawUser => {
+                return PeersManager.setFromRaw(rawUser)
             })
         }
+
+        return data
     }
 
     setFromRaw(rawPeer) {

@@ -37,12 +37,6 @@ const LoginPage = () => {
         <div>
             <ModalComponent/>
             <LoginComponent/>
-            <div style="position: absolute; bottom: 0; right: 0;">
-                <button onClick={l => {
-                    AppPermanentStorage.clear() + window.location.reload()
-                }}>clear auth
-                </button>
-            </div>
         </div>
     )
 }

@@ -181,6 +181,19 @@ class SelectedPeer {
     }
 
     /**
+     * @param {Peer} peer
+     */
+    select(peer) {
+        const p = peer.username ? `@${peer.username}` : `${peer.type}.${peer.id}`
+
+        VF.router.push("/", {
+            queryParams: {
+                p
+            }
+        })
+    }
+
+    /**
      * Checks whether the given peer is selected.
      *
      * Warning: it checks directly by `===`!

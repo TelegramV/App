@@ -74,15 +74,6 @@ export default class CodeInputPaneComponent extends PaneComponent {
                 MTProto.invokeMethod("account.getPassword", {}).then(response => {
                     console.log(response)
                     this.props.password(response)
-                    /*if (response._ !== "passwordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow") {
-                        throw new Error("Unknown 2FA algo")
-                    }*/
-                    //console.log(response)
-                    //setCode2FAForm()
-
-                    //fadeOut(document.getElementById("subCodePane"));
-                    //fadeIn(document.getElementById("passwordPane"));
-                    //_formData.passwordData = response
                 })
             } else {
                 this.refs.get("codeInput").error = "Invalid code"

@@ -593,7 +593,7 @@ export class VComponent {
         resolve.bind(this)(this.state)
         this.__.stateInTransactionMode = false
         if (callStateChanged) {
-            this.stateChanged()
+            this.stateChanged({})
         }
     }
 
@@ -613,7 +613,7 @@ export class VComponent {
         }
         this.__.stateInTransactionMode = false
         if (stateWasChanged) {
-            this.stateChanged()
+            this.stateChanged({})
         }
     }
 
@@ -679,6 +679,7 @@ export class VComponent {
      */
     clearIntervals() {
         this.__.intervals.forEach(handle => clearInterval(handle))
+        this.__.intervals.clear()
     }
 
     /**
@@ -686,6 +687,7 @@ export class VComponent {
      */
     clearTimeouts() {
         this.__.timeouts.forEach(handle => clearTimeout(handle))
+        this.__.timeouts.clear()
     }
 
     // ref

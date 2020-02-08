@@ -54,7 +54,7 @@ class PeersMapStore extends MappedStore {
      * @param {Object} dialogRawPeer
      * @return {Peer|boolean}
      */
-    getFromDialogRawPeer(dialogRawPeer) {
+    getByPeerType(dialogRawPeer) {
         const plain = PeerAPI.getPlain(dialogRawPeer, false)
 
         if (this.data.has(plain._)) {

@@ -1,5 +1,5 @@
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
-import CardMessageWrapperComponent from "./common/CardMessageWrapperComponent"
+import CardMessageWrapperFragment from "./common/CardMessageWrapperFragment"
 import {DocumentMessagesTool} from "../../file/DocumentMessageTool"
 
 class DocumentMessageComponent extends GeneralMessageComponent {
@@ -20,7 +20,8 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         )
 
         return (
-            <CardMessageWrapperComponent message={this.message} icon={icon} title={title} description={size} bubbleRef={this.bubbleRef}/>
+            <CardMessageWrapperFragment message={this.message} icon={icon} title={title} description={size}
+                                        bubbleRef={this.bubbleRef}/>
         )
     }
 }

@@ -1,10 +1,11 @@
 import {MTProto} from "../../mtproto/external"
 import PeersManager from "../peers/objects/PeersManager"
 import {Manager} from "../manager"
+import API from "../telegram/API"
+import PeersStore from "../store/PeersStore"
+import {SearchMessage} from "../messages/SearchMessage"
 
 class SearchManagerSingleton extends Manager {
-
-    cachedRecent = new Set()
 
     searchMessages(peer, {offsetId, filter, limit = 33, q = ""}) {
         return MTProto.invokeMethod("messages.search", {
@@ -28,12 +29,33 @@ class SearchManagerSingleton extends Manager {
         })
     }
 
-    globalSearch(q, {offsetId, filter, limit = 33}) {
-        // todo: implement
+    globalSearch(q: string, {offsetId, offsetRate, limit = 33}) {
+        return API.messages.searchGlobal({
+            q,
+            limit,
+            offsetId,
+            offsetRate
+        }).then(Messages => {
+            Messages.__q = q
+
+            Messages.messages = Messages.messages.map(Message => (new SearchMessage(undefined)).fillRaw(Message))
+            Messages.count = Messages.count === undefined ? Messages.messages.length : Messages.count
+
+            return Messages
+        })
     }
 
-    loadRecent() {
-        // todo: implement
+    searchContactsByUsername(q, limit = 20) {
+        return MTProto.invokeMethod("contacts.search", {
+            q,
+            limit
+        }).then(Found => {
+            Found.__q = q
+            PeersManager.fillPeersFromUpdate(Found)
+            Found.peers = Found.results.map(Peer => PeersStore.getByPeerType(Peer))
+            Found.myPeers = Found.my_results.map(Peer => PeersStore.getByPeerType(Peer))
+            return Found
+        })
     }
 }
 
