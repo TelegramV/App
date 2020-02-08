@@ -9,7 +9,7 @@ class WebpageMessageComponent extends GeneralMessageComponent {
     h() {
         let webpage = this.message.raw.media.webpage;
         return (
-            <MessageWrapperFragment message={this.message} showUsername={false}>
+            <MessageWrapperFragment message={this.message} showUsername={false} bubbleRef={this.bubbleRef}>
                 <TextWrapperComponent message={this.message}>
                     <a href={webpage.url} target="_blank" className="box web rp">
                         <div className="quote">

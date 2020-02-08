@@ -5,7 +5,7 @@ import TextWrapperComponent from "./TextWrapperComponent";
 const CardMessageWrapperComponent = ({message, icon, title, description}) => {
     let text = message.text;
     return (
-        <MessageWrapperFragment message={message} showUsername={false}>
+        <MessageWrapperFragment message={message} showUsername={false}  bubbleRef={this.bubbleRef}>
             <div class="card">
                 <div class="card-icon">
                     {icon}

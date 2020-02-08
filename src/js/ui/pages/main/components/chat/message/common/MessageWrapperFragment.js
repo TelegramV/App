@@ -33,7 +33,7 @@ const ReplyToMessageFragment = ({message}) => {
  * @return {*}
  * @constructor
  */
-const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, outerPad = true, contextActions, showUsername = true, showAvatar = true, avatarRef}) => {
+const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, outerPad = true, contextActions, showUsername = true, showAvatar = true, avatarRef, bubbleRef}) => {
     const defaultContextActions = [
         {
             icon: "reply",
@@ -125,7 +125,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
                                             ref={avatarRef}
                                             message={message}/>
 
-                    <div className={wrapClasses}>
+                    <div className={wrapClasses} ref={bubbleRef}>
 
                         <ReplyToMessageFragment message={message}/>
 
@@ -150,7 +150,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
              onDblClick={doubleClickHandler}>
 
             <div className="bubble-outer">
-                <div className={wrapClasses}>
+                <div className={wrapClasses} ref={bubbleRef}>
 
                     <ReplyToMessageFragment message={message}/>
 

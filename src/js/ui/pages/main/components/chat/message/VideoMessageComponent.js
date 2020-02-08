@@ -8,7 +8,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
     h() {
         const text = this.message.text.length > 0 ? <TextWrapperComponent message={this.message}/> : ""
         return (
-            <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""}>
+            <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""}  bubbleRef={this.bubbleRef}>
                 <VideoComponent video={this.message.raw.media.document}/>
                 {text}
             </MessageWrapperFragment>

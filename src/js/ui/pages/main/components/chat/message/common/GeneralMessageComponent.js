@@ -28,15 +28,24 @@ class GeneralMessageComponent extends VComponent {
     mounted() {
         this.$el.__message = this.message
         this.message.show()
+        const threshold = 60 * 5
 
-        if (this.avatarRef.component) {
-            if (this.$el.previousElementSibling) {
-                if (this.$el.previousElementSibling.__message && this.$el.previousElementSibling.__message.from === this.message.from) {
+        if (this.$el.previousElementSibling) {
+            if (this.$el.previousElementSibling.__message && this.$el.previousElementSibling.__message.from === this.message.from && Math.abs(this.$el.previousElementSibling.__message.date - this.message.date) <= threshold) {
+                if(this.avatarRef.component) {
                     this.avatarRef.component.hide()
                 }
-            } else if (this.$el.nextElementSibling) {
-                if (this.$el.nextElementSibling.__message && this.$el.nextElementSibling.__message.from === this.message.from && this.$el.nextElementSibling.__component) {
+                if(this.bubbleRef.$el) {
+                    this.bubbleRef.$el.parentNode.parentNode.classList.add("hide-tail")
+                }
+            }
+        } else if (this.$el.nextElementSibling) {
+            if (this.$el.nextElementSibling.__message && this.$el.nextElementSibling.__message.from === this.message.from && this.$el.nextElementSibling.__component && Math.abs(tthis.$el.nextElementSibling.__message.date - this.message.date) <= threshold) {
+                if(this.$el.nextElementSibling.__component.avatarRef.component) {
                     this.$el.nextElementSibling.__component.avatarRef.component.hide()
+                }
+                if(this.$el.nextElementSibling.__component.bubbleRef.$el) {
+                    this.$el.nextElementSibling.__component.bubbleRef.$el.parentNode.parentNode.classList.add("hide-tail")
                 }
             }
         }

@@ -18,7 +18,7 @@ class LocationMessageComponent extends GeneralMessageComponent {
         }
 
         return (
-            <MessageWrapperFragment message={this.message} noPad showUsername={false}>
+            <MessageWrapperFragment message={this.message} noPad showUsername={false} bubbleRef={this.bubbleRef}>
                 {venue}
                 <MapComponent map={geo}/>
             </MessageWrapperFragment>
