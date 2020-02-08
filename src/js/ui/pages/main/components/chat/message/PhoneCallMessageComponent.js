@@ -22,7 +22,7 @@ class PhoneCallMessageComponent extends GeneralMessageComponent {
         return (
             <CardMessageWrapperComponent icon={icon} title={title}
                                          description={this.message.raw.action.duration + " seconds"}
-                                         message={this.message}/>
+                                         message={this.message} bubbleRef={this.bubbleRef}/>
         )
     }
 }

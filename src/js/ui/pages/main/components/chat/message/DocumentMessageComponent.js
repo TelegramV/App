@@ -20,7 +20,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         )
 
         return (
-            <CardMessageWrapperComponent message={this.message} icon={icon} title={title} description={size}/>
+            <CardMessageWrapperComponent message={this.message} icon={icon} title={title} description={size} bubbleRef={this.bubbleRef}/>
         )
     }
 }
