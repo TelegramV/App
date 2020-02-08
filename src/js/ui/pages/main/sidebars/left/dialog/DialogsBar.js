@@ -12,7 +12,7 @@ import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent"
 import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
 import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
 
-export class DialogListComponent extends LeftBarComponent {
+export class DialogsBar extends LeftBarComponent {
 
     barName = "dialogs"
     barVisible = true
@@ -83,7 +83,6 @@ export class DialogListComponent extends LeftBarComponent {
                                     UIEvents.LeftSidebar.fire("show", {
                                         barName: "settings"
                                     })
-                                    // Settings.open();
                                 }
                             },
                             {
@@ -261,7 +260,5 @@ export class DialogListComponent extends LeftBarComponent {
                 this.isLoadingMore = false
             })
         }
-
-
     }
 }

@@ -1,5 +1,6 @@
 import MessageWrapperFragment from "../common/MessageWrapperFragment"
 import TextWrapperComponent from "../common/TextWrapperComponent";
+import MessageTimeComponent from "../common/MessageTimeComponent";
 import GeneralMessageComponent from "../common/GeneralMessageComponent"
 import {PhotoMessage} from "../../../../../../../api/messages/objects/PhotoMessage"
 import {PhotoFigureFragment} from "./PhotoFigureFragment"
@@ -34,13 +35,13 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     }
 
     h() {
-        const text = this.message.text.length > 0 ? <TextWrapperComponent message={this.message}/> : ""
+        const text = (this.message.text.length > 0) ? <TextWrapperComponent message={this.message}/> : ""
         return (
-            <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""}>
+            <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""} avatarRef={this.avatarRef}>
                 <MessagePhotoFigureFragment ref={this.photoFigureRef}
                                             message={this.message}
                                             clickLoader={this.toggleLoading}/>
-
+                {!text ? <MessageTimeComponent message={this.message} bg={true}/> : ""}
                 {text}
             </MessageWrapperFragment>
         )

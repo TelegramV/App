@@ -61,6 +61,11 @@
 
             // let total_wasted_hours = 16
 
+            &.no-mask {
+                -webkit-mask-image: none;
+                mask-image: none;
+            }
+
             &.in {
                 -webkit-mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left.svg");
                 mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left.svg");
@@ -104,7 +109,7 @@
                 padding-right: 0;
             }
 
-            
+
 
             .sticker {
                 width: 250px;
@@ -588,12 +593,21 @@
                         //min-height: 100px;
                         max-height: 512px;
 
+                        ~.time.bg {
+                            right: 15px;
+                            bottom: 5px;
+                        }
 
                         img,
                         video {
                             max-height: 512px;
                         }
                     }
+                }
+
+                .grouped ~ .time.bg {
+                    right: 15px;
+                    bottom: 5px;
                 }
 
                 .media-wrapper {
@@ -713,7 +727,7 @@
                 &.bg {
                     position: absolute;
                     bottom: 10px;
-                    right: 10px;
+                    right: 15px;
                     line-height: 14px;
 
                     .inner {
@@ -1029,15 +1043,6 @@
             }
         }
 
-        .time {
-            color: $darkgreen;
-            display: flex;
-
-            .inner {
-                padding: 0px 5px;
-            }
-        }
-
         .bubble {
             .message.no-pad {
                 .fwd {
@@ -1047,6 +1052,22 @@
             .username,
             .fwd {
                 color: $darkgreen;
+            }
+
+            figure.photo,
+            figure.video,
+            .grouped {
+                ~.time.bg:not(.use-me) {
+                    right: 25px;
+                }
+            }
+
+            .time {
+                color: $darkgreen;
+
+                .inner {
+                    padding: 0px 5px;
+                }
             }
 
             .time .tgico.status:after {

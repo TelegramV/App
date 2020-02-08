@@ -15,47 +15,60 @@ class MessageManager extends Manager {
         }
 
         /**
-         * @param {Dialog} dialog
+         * @param {Peer} peer
          * @param {Object} lastMessage
          */
-        const updateDialogLastMessage = (dialog, lastMessage) => {
-            if (!dialog) {
-                console.error("BUG: dialog was not found", lastMessage)
+        const updatePeerLastMessage = (peer, lastMessage) => {
+            if (!peer) {
+                console.error("BUG: peer was not found", lastMessage)
                 return
             }
 
 
-            if(dialog.peer.messages._sendingMessages.has(lastMessage.id)) {
-                const randomId = dialog.peer.messages._sendingMessages.get(lastMessage.id)
-                dialog.peer.messages._sendingMessages.delete(lastMessage.id)
+
+            if (!peer.dialog) {
+                console.log("no dialog", peer, peer.dialog)
+
+                DialogsManager.getPeerDialogs(peer).then(dialogs => {
+                    AppEvents.Dialogs.fire("gotNewMany", {
+                        dialogs
+                    })
+                })
+
+                return
+            }
+
+            if(peer.messages._sendingMessages.has(lastMessage.id)) {
+                const randomId = peer.messages._sendingMessages.get(lastMessage.id)
+                peer.messages._sendingMessages.delete(lastMessage.id)
                 lastMessage.random_id = randomId
                 AppEvents.Dialogs.fire("messageSent", {
                     rawMessage: lastMessage,
-                    dialog
+                    dialog: peer.dialog
                 })
 
                 return
             }
-            const message = MessageFactory.fromRaw(dialog, lastMessage)
 
-            if(dialog.peer.messages.appendSingle(message)) {
-                message.init()
+            const message = MessageFactory.fromRaw(peer.dialog, lastMessage)
+
+            peer.messages.appendSingle(message)
+            message.init()
 
                 if (!message.isOut) {
-                    dialog.peer.messages.addUnread(message.id)
+                    peer.messages.addUnread(message.id)
                 } else {
-                    dialog.peer.messages.clearUnread()
+                    peer.messages.clearUnread()
                 }
 
-                dialog.fire("newMessage", {
+                peer.dialog.fire("newMessage", {
                     message
                 })
 
-                AppEvents.Dialogs.fire("newMessage", {
-                    message,
-                    dialog
-                })
-            }
+            AppEvents.Dialogs.fire("newMessage", {
+                message,
+                dialog: peer.dialog
+            })
         }
 
         MTProto.UpdatesManager.subscribe("updateMessageID", update => {
@@ -63,31 +76,31 @@ class MessageManager extends Manager {
         })
 
         MTProto.UpdatesManager.subscribe("updateShortSentMessage", async update => {
-            updateDialogLastMessage(update.dialog, update)
+            updatePeerLastMessage(update.dialog.peer, update)
         })
 
-        MTProto.UpdatesManager.subscribe("updateShortMessage", async update => {
-            updateDialogLastMessage(await DialogsManager.findOrFetch("user", update.user_id), update)
+        MTProto.UpdatesManager.subscribe("updateShortMessage", update => {
+            updatePeerLastMessage(PeersStore.get("user", update.user_id), update)
         })
 
-        MTProto.UpdatesManager.subscribe("updateShortChatMessage", async update => {
-            updateDialogLastMessage(await DialogsManager.findOrFetch("chat", update.chat_id), update)
+        MTProto.UpdatesManager.subscribe("updateShortChatMessage", update => {
+            updatePeerLastMessage(PeersStore.get("chat", update.chat_id), update)
         })
 
-        MTProto.UpdatesManager.subscribe("updateNewMessage", async update => {
-            let dialog = undefined
+        MTProto.UpdatesManager.subscribe("updateNewMessage", update => {
+            let peer = undefined
 
             if (update.message.pFlags.out) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
-                dialog = await DialogsManager.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
+                peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
             } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUser().user.id) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
-                dialog = await DialogsManager.findOrFetch(peerType, update.message.to_id[`${peerType}_id`])
+                peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
             } else {
-                dialog = await DialogsManager.findOrFetch("user", update.message.from_id)
+                peer = PeersStore.get("user", update.message.from_id)
             }
 
-            updateDialogLastMessage(dialog, update.message)
+            updatePeerLastMessage(peer, update.message)
         })
 
 
@@ -102,9 +115,9 @@ class MessageManager extends Manager {
                 })
 
                 if (!dialog.peer.messages.last) {
-                    DialogsManager.getPeerDialogs(dialog.peer).then(dialog => {
-                        dialog.fire("updateSingle", {
-                            dialog: dialog
+                    DialogsManager.getPeerDialogs(dialog.peer).then(dialogs => {
+                        dialogs[0].fire("updateSingle", {
+                            dialog: dialogs[0]
                         })
                     })
                 }
@@ -129,9 +142,9 @@ class MessageManager extends Manager {
                     })
 
                     if (!dialog.peer.messages.last) {
-                        DialogsManager.getPeerDialogs(dialog.peer).then(dialog => {
-                            dialog.fire("updateSingle", {
-                                dialog,
+                        DialogsManager.getPeerDialogs(dialog.peer).then(dialogs => {
+                            dialogs[0].fire("updateSingle", {
+                                dialog: dialogs[0],
                             })
                         })
                     }
@@ -191,9 +204,9 @@ class MessageManager extends Manager {
         })
 
         MTProto.UpdatesManager.subscribe("updateNewChannelMessage", async update => {
-            const dialog = await DialogsManager.findOrFetch("channel", update.message.to_id.channel_id)
+            const peer = PeersStore.get("channel", update.message.to_id.channel_id)
 
-            updateDialogLastMessage(dialog, update.message)
+            updatePeerLastMessage(peer, update.message)
         })
 
         MTProto.UpdatesManager.subscribe("updateDraftMessage", update => {

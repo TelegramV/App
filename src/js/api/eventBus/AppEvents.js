@@ -5,8 +5,6 @@ import {MessagesEventBus} from "./MessagesEventBus"
 
 class AppEventBus {
 
-    Dialogs
-
     constructor() {
         this.Dialogs = new DialogsEventBus()
         this.Peers = new PeersEventBus()

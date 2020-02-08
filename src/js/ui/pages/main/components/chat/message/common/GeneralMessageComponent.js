@@ -15,6 +15,9 @@ class GeneralMessageComponent extends VComponent {
 
     showAvatar: boolean = true
 
+    avatarRef = VComponent.createComponentRef()
+    bubbleRef = VComponent.createRef()
+
     init() {
         this.intersectionObserver = this.props.intersectionObserver
         this.message = this.props.message
@@ -23,7 +26,20 @@ class GeneralMessageComponent extends VComponent {
     }
 
     mounted() {
+        this.$el.__message = this.message
         this.message.show()
+
+        if (this.avatarRef.component) {
+            if (this.$el.previousElementSibling) {
+                if (this.$el.previousElementSibling.__message && this.$el.previousElementSibling.__message.from === this.message.from) {
+                    this.avatarRef.component.hide()
+                }
+            } else if (this.$el.nextElementSibling) {
+                if (this.$el.nextElementSibling.__message && this.$el.nextElementSibling.__message.from === this.message.from && this.$el.nextElementSibling.__component) {
+                    this.$el.nextElementSibling.__component.avatarRef.component.hide()
+                }
+            }
+        }
 
         if (this.intersectionObserver) {
             this.intersectionObserver.observe(this.$el)

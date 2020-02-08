@@ -218,6 +218,7 @@ export class ChannelUpdatesProcessor {
 
             channelQueue.isProcessing = false
             rawUpdate._ = "updateNewChannelMessageNoDialog"
+            rawUpdate.__peer = peer
 
             this.applyUpdate(rawUpdate)
 
@@ -253,6 +254,7 @@ export class ChannelUpdatesProcessor {
             console.log("peer", peer)
             channelQueue.isProcessing = false
             rawUpdate._ = "updateChannelNoDialog"
+            rawUpdate.__peer = peer
 
             this.applyUpdate(rawUpdate)
 
@@ -265,6 +267,10 @@ export class ChannelUpdatesProcessor {
 
     checkChannelUpdate(peer, channelId, channelQueue, rawUpdate) {
         const self = this
+
+        if (peer) {
+            rawUpdate.__peer = peer
+        }
 
         checkChannelUpdatePts(peer, rawUpdate, {
             onSuccess: (type) => {
@@ -356,6 +362,10 @@ export class ChannelUpdatesProcessor {
 
             AppEvents.Dialogs.fire("ChannelRefreshCausedByDifferenceTooLong", {
                 rawDifference: rawDifferenceWithPeer
+            })
+
+            AppEvents.General.fire("gotDifference", {
+                diffType: 0 // channel
             })
 
             channelQueue.isWaitingForDifference = false

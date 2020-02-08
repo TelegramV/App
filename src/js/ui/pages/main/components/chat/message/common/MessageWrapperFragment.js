@@ -29,10 +29,11 @@ const ReplyToMessageFragment = ({message}) => {
  * @param contextActions
  * @param showUsername
  * @param showAvatar
+ * @param avatarRef
  * @return {*}
  * @constructor
  */
-const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, outerPad = true, contextActions, showUsername = true, showAvatar = true}) => {
+const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, outerPad = true, contextActions, showUsername = true, showAvatar = true, avatarRef}) => {
     const defaultContextActions = [
         {
             icon: "reply",
@@ -119,7 +120,9 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
 
 
                 <div className={wrapOuter}>
-                    <MessageAvatarComponent id={`message-${message.id}-avatar`} show={showAvatar}
+                    <MessageAvatarComponent id={`message-${message.id}-avatar`}
+                                            show={showAvatar}
+                                            ref={avatarRef}
                                             message={message}/>
 
                     <div className={wrapClasses}>

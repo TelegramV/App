@@ -153,7 +153,9 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     init() {
-        this.findGrouped()
+        if (this.dialog.peer) {
+            this.findGrouped()
+        }
     }
 
     findGrouped(fire = true) {
@@ -264,13 +266,15 @@ export class AbstractMessage extends ReactiveObject implements Message {
         this.prefix = MessageParser.getDialogPrefix(this)
 
         // reply
-        const replyToMessage = this.dialog.peer.messages.get(this.raw.reply_to_msg_id)
-        if (replyToMessage) {
-            this.replyToMessage = replyToMessage
-        }
+        if (this.dialog.peer) {
+            const replyToMessage = this.dialog.peer.messages.get(this.raw.reply_to_msg_id)
+            if (replyToMessage) {
+                this.replyToMessage = replyToMessage
+            }
 
-        // forwarded
-        this.findForwarded(false)
+            // forwarded
+            this.findForwarded(false)
+        }
 
         // ...
 

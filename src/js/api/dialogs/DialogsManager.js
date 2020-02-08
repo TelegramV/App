@@ -39,35 +39,75 @@ class DialogManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateDialogPinned", async update => {
             const peerType = getPeerTypeFromType(update.peer.peer._)
-            const dialog = await this.findOrFetch(peerType, update.peer.peer[`${peerType}_id`])
+            const peer = PeersStore.get(peerType, update.peer.peer[`${peerType}_id`])
 
-            if (!dialog) return
+            if (!peer) {
+                console.error("BUG: no way telegram, no way")
+            }
 
-            dialog.pinned = update.pFlags.pinned || false
+            if (!peer.dialog) {
+                this.getPeerDialogs(peer).then(dialogs => {
+                    AppEvents.Dialogs.fire("gotNewMany", {
+                        dialogs
+                    })
+                })
+
+                return
+            }
+
+            peer.dialog.pinned = update.pFlags.pinned || false
         })
 
-
-        MTProto.UpdatesManager.subscribe("updateChannel", async update => {
-            // await this.findOrFetch("channel", update.channel_id)
-            console.warn("updateChannel", update)
-        })
 
         MTProto.UpdatesManager.subscribe("updateChannelNoPeer", async update => {
             console.warn("updateChannelNoPeer NO WAY AAAAAAAAAAAAAAA", update)
-        })
-
-        MTProto.UpdatesManager.subscribe("updateChannelNoDialog", async update => {
-            console.warn("updateChannelNoDialog", update)
-            // await this.findOrFetch("channel", update.channel_id)
         })
 
         MTProto.UpdatesManager.subscribe("updateNewChannelMessageNoPeer", async update => {
             console.warn("updateNewChannelMessageNoPeer NO WAY AAAAAAAAAAAAAAA", update)
         })
 
-        MTProto.UpdatesManager.subscribe("updateNewChannelMessageNoDialog", async update => {
-            console.warn("updateNewChannelMessageNoDialog", update)
+
+        MTProto.UpdatesManager.subscribe("updateChannel", async update => {
             // await this.findOrFetch("channel", update.channel_id)
+            console.warn("updateChannel", update)
+
+            this.getPeerDialogs(update.__peer).then(dialogs => {
+                AppEvents.Dialogs.fire("gotNewMany", {
+                    dialogs
+                })
+            })
+        })
+
+        MTProto.UpdatesManager.subscribe("updateChannelNoDialog", async update => {
+            console.warn("updateChannelNoDialog", update)
+
+            this.getPeerDialogs(update.__peer).then(dialogs => {
+                AppEvents.Dialogs.fire("gotNewMany", {
+                    dialogs
+                })
+            })
+            // await this.findOrFetch("channel", update.channel_id)
+        })
+
+        MTProto.UpdatesManager.subscribe("updateNewChannelMessageNoDialog", update => {
+            console.warn("updateNewChannelMessageNoDialog", update)
+
+            this.getPeerDialogs(update.__peer).then(dialogs => {
+                AppEvents.Dialogs.fire("gotNewMany", {
+                    dialogs
+                })
+            })
+        })
+
+        MTProto.UpdatesManager.subscribe("ChannelRefreshCausedByDifferenceTooLong", update => {
+            console.warn("ChannelRefreshCausedByDifferenceTooLong", update)
+
+            this.getPeerDialogs(update.__peer).then(dialogs => {
+                AppEvents.Dialogs.fire("gotRefreshed", {
+                    dialogs
+                })
+            })
         })
 
         MTProto.UpdatesManager.subscribe("updateReadHistoryInbox", update => {
@@ -160,12 +200,12 @@ class DialogManager extends Manager {
                 dialog = peer.dialog
 
                 if (!dialog) {
-                    dialog = await this.getPeerDialogs(peer)
+                    dialog = await this.getPeerDialogs(peer)[0]
                 }
 
                 DialogsStore.set(dialog)
             } else {
-                dialog = await this.getPeerDialogs({_: type, id})
+                dialog = await this.getPeerDialogs({_: type, id})[0]
                 DialogsStore.set(dialog)
             }
         }
@@ -198,7 +238,7 @@ class DialogManager extends Manager {
         return API.messages.getPeerDialogs({
             peers: [peerData]
         }).then(Dialogs => {
-            return Dialogs.dialogs.map(Dialog => this.createDialogFromDialogs(Dialog, Dialogs))[0]
+            return Dialogs.dialogs.map(Dialog => this.createDialogFromDialogs(Dialog, Dialogs))
         })
     }
 

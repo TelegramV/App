@@ -3,6 +3,7 @@ import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 import AppSelectedInfoPeer from "../../../../../../reactive/SelectedInfoPeer";
 import type {Message} from "../../../../../../../api/messages/Message"
 import AppSelectedPeer from "../../../../../../reactive/SelectedPeer"
+import {VUI} from "../../../../../../v/VUI"
 
 export class MessageAvatarComponent extends Component {
 
@@ -44,6 +45,10 @@ export class MessageAvatarComponent extends Component {
                 {letterText}
             </div>
         )
+    }
+
+    hide() {
+        this.$el.style.visibility = "hidden"
     }
 
     openPeerInfo() {

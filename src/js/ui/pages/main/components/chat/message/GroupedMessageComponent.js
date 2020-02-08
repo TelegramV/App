@@ -1,5 +1,6 @@
 import MessageWrapperFragment from "./common/MessageWrapperFragment"
 import TextWrapperComponent from "./common/TextWrapperComponent";
+import MessageTimeComponent from "./common/MessageTimeComponent";
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 import {PhotoComponent} from "../../basic/photoComponent";
 import {PhotoMessage} from "../../../../../../api/messages/objects/PhotoMessage";
@@ -35,6 +36,7 @@ class GroupedMessageComponent extends GeneralMessageComponent {
                         }
                     })}
                 </div>
+                {!text ? <MessageTimeComponent message={this.message} bg={true}/> : ""}
                 {text}
             </MessageWrapperFragment>
         )

@@ -65,12 +65,4 @@ const MessageComponent = ({message, intersectionObserver}) => {
     }
 }
 
-function isBigMedia(message) {
-    if (!message.media) return false;
-    let media = message.media;
-    if (media.photo) return true;
-    return false;
-}
-
-
 export default MessageComponent

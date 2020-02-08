@@ -96,7 +96,7 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
 class AnimatedStickerMessageComponent extends GeneralMessageComponent {
     h() {
         return (
-            <MessageWrapperFragment message={this.message} transparent={true} noPad>
+            <MessageWrapperFragment message={this.message} transparent={true} noPad avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
 
                 <StickerComponent width={200} sticker={this.message.raw.media.document}/>
 
