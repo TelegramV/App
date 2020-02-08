@@ -736,6 +736,13 @@
                         border-radius: 40px;
                         text-align: center;
                         padding: 4px 6px;
+
+                        .views {
+                            margin-right: 8px;
+                            .tgico-channelviews {
+                                line-height: 12px;
+                            }
+                        }
                     }
 
                     .tgico.status:after {
@@ -965,7 +972,7 @@
             }
 
             .inner {
-                padding: 0px 8px;
+                padding: 0px 12px 0px 5px;
             }
         }
 
