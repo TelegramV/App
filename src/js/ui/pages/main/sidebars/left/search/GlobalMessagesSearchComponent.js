@@ -79,6 +79,7 @@ export class GlobalMessagesSearchComponent extends VComponent {
                     this.isFetching = false
 
                     if (Messages._ === "messages" || Messages.count < 20) {
+                        this.offsetRate = 0
                         this.allFetched = true
                     }
                 }
@@ -104,6 +105,7 @@ export class GlobalMessagesSearchComponent extends VComponent {
                     this.isFetching = false
 
                     if (Messages._ === "messages" || Messages.count < 20) {
+                        this.offsetRate = 0
                         this.allFetched = true
                     }
                 }
