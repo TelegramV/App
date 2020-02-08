@@ -174,10 +174,12 @@ export class FileAPI {
         return (file.sizes || file.thumbs).some(l => l.type === "i")
     }
 
-    static getMaxSize(file) {
-        const video = this.getAttribute(file, "documentAttributeVideo")
-        if (video) {
-            return video
+    static getMaxSize(file, onlyThumb = false) {
+        if(!onlyThumb) {
+            const video = this.getAttribute(file, "documentAttributeVideo")
+            if (video) {
+                return video
+            }
         }
 
         return (file.sizes || file.thumbs).filter(l => l.type !== "i").reduce(function (prev, current) {
@@ -185,10 +187,12 @@ export class FileAPI {
         })
     }
 
-    static getMinSize(file) {
-        const video = this.getAttribute(file, "documentAttributeVideo")
-        if (video) {
-            return video
+    static getMinSize(file, onlyThumb = false) {
+        if(!onlyThumb) {
+            const video = this.getAttribute(file, "documentAttributeVideo")
+            if (video) {
+                return video
+            }
         }
 
         return (file.sizes || file.thumbs).filter(l => l.type !== "i").reduce(function (prev, current) {
