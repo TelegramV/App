@@ -738,7 +738,7 @@
                         padding: 4px 6px;
 
                         .views {
-                            margin-right: 8px;
+                            margin-right: 5px;
                             .tgico-channelviews {
                                 line-height: 12px;
                             }
@@ -966,12 +966,14 @@
                 display: flex;
 
                 .tgico-channelviews {
+                    margin: 0 2px;
                     font-size: 18px;
                     line-height: 12px;
                 }
             }
 
             .inner {
+                display: flex;
                 padding: 0px 12px 0px 5px;
             }
         }
