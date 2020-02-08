@@ -129,13 +129,17 @@ export class MonkeyController {
 
     peek(start) {
         let that = this;
-        this.peeking = true;
+        this.peeking = !this.peeking;
         if (this.closed) {
             this.load(this.states.peek, false).then(function () {
                 if (start) {
                     that.animation.seek(seek);
                 }
-                that.animation.play();
+                if(that.peeking) {
+                    that.animation.playSegments([0, 20], true)
+                } else {
+                    that.animation.playSegments([20, 33], true)
+                }
                 that.nextPauseFrame = 50;
             });
         } else {
@@ -150,6 +154,7 @@ export class MonkeyController {
     }
 
     open() {
+        console.log("open")
         let that = this;
         if (this.peeking) {
             this.load(this.states.closeAndPeekToIdle).then(function () {

@@ -9,6 +9,7 @@ import CountryDropdownItemComponent from "./common/countryDropdownItemComponent"
 import {MTProto} from "../../../../mtproto/external"
 import {countries} from "../../../utils"
 import {defaultDcID} from "../../../../application";
+import {AppPermanentStorage} from "../../../../common/storage";
 
 export default class PhoneInputComponent extends PaneComponent {
     constructor(props) {
@@ -31,8 +32,7 @@ export default class PhoneInputComponent extends PaneComponent {
         }
         return (
             <div id="phonePane" className={classList.join(" ")}>
-                <img className="object" src="./static/images/loginlogo.svg" alt=""
-                     onClick={this.props.finished}/>
+                <img className="object" src="./static/images/loginlogo.svg" alt=""/>
                 <InfoComponent header="Sign in to Telegram"
                                description="Please confirm your country and enter your phone number"/>
                 <DropdownComponent label="Country" data={this.generateFullDropdown()}
@@ -68,20 +68,6 @@ export default class PhoneInputComponent extends PaneComponent {
                 phone: phoneNumber,
                 sentCode: sentCode
             })
-
-
-            // fadeOut(document.getElementById("phonePane"));
-            // fadeIn(document.getElementById("codePane"));
-            //
-            // let phone = document.getElementById("phonePreview");
-            // if (phone.firstChild.tagName.toLowerCase() === "span") {
-            //     phone.removeChild(phone.firstChild);
-            // }
-            // let text = document.createElement("span");
-            // text.textContent = $phoneInput.value;
-            // phone.prepend(text);
-            // _formData.phoneNumber = phoneNumber
-            // _formData.sentCode = sentCode
         }, error => {
             if (error.type === "AUTH_RESTART") {
                 AppPermanentStorage.clear()
@@ -124,7 +110,7 @@ export default class PhoneInputComponent extends PaneComponent {
         }
         if (this.state.country) {
             // length without +380
-            const numberLength = ev.target.value.replace(" ", "").length - countries[this.state.country][0].replace(" ", "").length
+            const numberLength = ev.target.value.replace(/\s/g, "").length - countries[this.state.country][0].replace(/\s/g, "").length
             if (numberLength >= 9) {
                 this.state.nextDisabled = false
                 this.refs.get("next").setDisabled(false)

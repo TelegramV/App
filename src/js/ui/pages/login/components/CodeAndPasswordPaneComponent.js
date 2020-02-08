@@ -34,11 +34,7 @@ export default class CodeAndPasswordPaneComponent extends PaneComponent {
     }
 
     monkeyPeek(e) {
-        if (e) {
             this.state.monkey.peek()
-        } else {
-            this.state.monkey.open()
-        }
     }
 
     open() {
