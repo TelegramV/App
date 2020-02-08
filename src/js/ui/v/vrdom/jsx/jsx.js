@@ -30,7 +30,7 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
         for (const [k, v] of Object.entries(attributes)) {
             let key = typeof tagName === "function" ? k : k.toLowerCase()
 
-            if (key.startsWith("on")) {
+            if (key.startsWith("on") && typeof tagName !== "function") {
                 events.set(key.substring(2).toLowerCase(), v)
             } else if (key === "dangerouslySetInnerHTML" || key === "dangerouslysetinnerhtml") {
                 // $ignore

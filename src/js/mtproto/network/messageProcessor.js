@@ -28,8 +28,7 @@ export class MessageProcessor {
     }
 
     processNewSessionCreated(message, messageID, sessionID) {
-        this.networker.updateServerSalt(longToBytes(message.server_salt))
-        console.error("BUG: new session created! We should handle this!", message)
+        MTProtoInternal.processUpdate({_: "new_session_created", message})
     }
 
     listenPong(messageId, handler) {
@@ -43,6 +42,11 @@ export class MessageProcessor {
 
     process(message, messageID, sessionID) {
         try {
+            if (!message._) {
+                console.error("no type message", message)
+                return
+            }
+
             if (this.handlers[message._]) {
                 this.handlers[message._](message, messageID, sessionID)
             } else {
@@ -108,8 +112,8 @@ export class MessageProcessor {
             //         this.rpcErrorHandlers.delete(message.req_msg_id)
             //     }
             // } else {
-                this.sentMessagesDebug.delete(message.req_msg_id)
-                this.rpcErrorHandlers.delete(message.req_msg_id)
+            this.sentMessagesDebug.delete(message.req_msg_id)
+            this.rpcErrorHandlers.delete(message.req_msg_id)
             // }
         } else {
             this.rpcResultHandlers.get(message.req_msg_id)(message.result)

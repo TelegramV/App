@@ -3,6 +3,7 @@ import {MainPage} from "../pages/main/mainPage"
 import MTProto from "../../mtproto/external"
 import VF from "../v/VFramework"
 import {NewComponentPage} from "../pages/tests/NewComponentTestPage"
+import {ReactListPage} from "../pages/tests/ReactiveListPage"
 
 /**
  * @param {VFrameworkRouter} router
@@ -23,6 +24,11 @@ function AppRoutes(router) {
     router.route("/test", "test", {
         h() {
             return NewComponentPage()
+        }
+    })
+    router.route("/reactlist", "test", {
+        h() {
+            return ReactListPage()
         }
     })
 

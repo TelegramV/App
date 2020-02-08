@@ -14,6 +14,7 @@ import {SearchPanelComponent} from "./sidebars/left/search/SearchPanelComponent"
 import MessagesSearchComponent from "./sidebars/right/search/MessagesSearchComponent"
 import {DialogInfoComponent} from "./sidebars/right/dialogInfo/DialogInfoComponent"
 import {ArchivedDialogsBar} from "./sidebars/left/dialog/ArchivedDialogsBar"
+import TopPeers from "../../../api/peers/TopPeers"
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {
@@ -22,6 +23,7 @@ function initHighLevelManagers() {
             DialogsManager.init()
             PeersManager.init()
             MessagesManager.init()
+            TopPeers.init()
         })
     })
     LocaleController.init()
@@ -45,7 +47,6 @@ export function MainPage() {
             <SearchPanelComponent/>
 
             <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
-            <SearchPanelComponent/>
             <DialogsBar/>
             <ChatComponent/>
 

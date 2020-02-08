@@ -33,7 +33,7 @@ class DialogManager extends Manager {
 
         AppSelectedPeer.subscribe(_ => {
             if (AppSelectedPeer.Previous) {
-                AppSelectedPeer.Previous.dialog.peer.messages.clear()
+                AppSelectedPeer.Previous.messages.clear()
             }
         })
 

@@ -12,6 +12,7 @@ import {arrayDelete} from "../../common/utils/utils"
 import {tsNow} from "../../mtproto/timeManager"
 import AppConnectionStatus from "../../ui/reactive/ConnectionStatus"
 import AppEvents from "../eventBus/AppEvents"
+import process_new_session_created from "./process_new_session_created"
 
 class UpdateManager extends Manager {
     constructor() {
@@ -40,6 +41,7 @@ class UpdateManager extends Manager {
             ["updatesCombined", processUpdatesCombined],
             ["updates", processUpdates],
             ["updateShortSentMessage", processShortSentMessage],
+            ["new_session_created", process_new_session_created],
         ])
     }
 

@@ -1,7 +1,9 @@
 import messages from "./messages"
+import contacts from "./contacts"
 
 const API = {
-    messages
+    messages,
+    contacts,
 }
 
 export default API

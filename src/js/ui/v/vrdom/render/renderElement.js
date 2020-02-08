@@ -2,6 +2,7 @@ import VRNode from "../VRNode"
 import type {VRRenderProps} from "../types/types"
 import vrdom_append from "../append"
 import VF from "../../VFramework"
+import {VListVRNode} from "../VListVRNode"
 
 const _XML_NAMESPACES = new Map([
     ["svg", "http://www.w3.org/2000/svg"]
@@ -72,7 +73,14 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
         return $el
     } else {
         for (let child of node.children) {
-            vrdom_append(child, $el, {xmlns})
+            if (child instanceof VListVRNode) {
+                const list = new (child.list)({list: child.items, template: child.template})
+                list.$parent = $el
+                const items = list.render()
+                items.forEach(item => vrdom_append(item, $el, {xmlns}))
+            } else {
+                vrdom_append(child, $el, {xmlns})
+            }
         }
     }
 

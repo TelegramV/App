@@ -71,9 +71,25 @@ const getPeerDialogs = (params: getPeerDialogs_Params_105 = {}): Promise<Object>
     return Dialogs
 })
 
+const searchGlobal = (params) => {
+    return MTProto.invokeMethod("messages.searchGlobal", {
+        q: params.q,
+        offset_rate: params.offsetRate || 0,
+        offset_peer: params.offsetPeer || {
+            _: "inputPeerEmpty",
+        },
+        offset_id: params.offsetId,
+        limit: params.limit
+    }).then(Messages => {
+        PeersManager.fillPeersFromUpdate(Messages)
+        return Messages
+    })
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
+    searchGlobal: searchGlobal,
 }
 
 export default messages
