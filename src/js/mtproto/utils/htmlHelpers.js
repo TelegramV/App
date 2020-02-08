@@ -142,16 +142,16 @@ const handlersText = {
 }
 
 const handlersLinks = {
-    messageEntityMention: (l, a) => <a href={`/#/?p=${a}`}>{a}</a>,
+    messageEntityMention: (l, a, q) => <a href={`/#/?p=${q}`}>{a}</a>,
     messageEntityHashtag: (l, a) => <a>{a}</a>,
     messageEntityBotCommand: (l, a) => <a>{a}</a>,
     // TODO can be problems when protocol is not specified
-    messageEntityUrl: (l, a) => <a target="_blank" href={a}>{a}</a>,
-    messageEntityEmail: (l, a) => <a href={`mailto:${a}`}>{a}</a>,
+    messageEntityUrl: (l, a, q) => <a target="_blank" href={q}>{a}</a>,
+    messageEntityEmail: (l, a, q) => <a href={`mailto:${q}`}>{a}</a>,
     messageEntityTextUrl: (l, a) => <a target="_blank" href={l.url}>{a}</a>,
     messageEntityMentionName: (l, a) => <a>{a}</a>,
     inputMessageEntityMentionName: (l, a) => <a>{a}</a>,
-    messageEntityPhone: (l, a) => <a href={`tel:${a}`}>{a}</a>,
+    messageEntityPhone: (l, a, q) => <a href={`tel:${q}`}>{a}</a>,
     messageEntityCashtag: (l, a) => <a href="#">{a}</a>,
 }
 
@@ -169,7 +169,7 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
         const length = l.length
         const handler = handlers[l._]
         if (!handler) return
-        const component = handler(l, getNewlines(text.substr(offset, length), noLinks))
+        const component = handler(l, getNewlines(text.substr(offset, length), noLinks), text.substr(offset, length))
 
 
         if (offset + length > prevOffset) {

@@ -129,6 +129,7 @@
                 height: auto;
                 max-height: 512px;
                 cursor: pointer;
+                display: block;
 
                 &.loading {}
 
@@ -808,9 +809,9 @@
         .bubble.transparent {
             background-color: transparent;
             box-shadow: none;
-            border-radius: 0 !important;
+            //border-radius: 0 !important;
             position: relative;
-            overflow: visible;
+            //overflow: visible;
             .fwd,
             .username {
                 display: none;
@@ -908,7 +909,7 @@
         }
     }
 
-    .in {
+    #bubbles-inner > .in {
         //align-items: flex-start;
 
         &.hide-tail .bubble {
@@ -916,6 +917,20 @@
             -webkit-mask-image: none !important;
             padding-left: 0 !important;
             border-bottom-left-radius: 6px !important;
+            border-top-left-radius: 6px !important;
+        }
+
+        &.upper.hide-tail .bubble {
+            border-top-left-radius: 12px !important;
+        }
+
+        &:not(.hide-tail):not(.upper) .bubble {
+            -webkit-mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left-6px.svg");
+            mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left-6px.svg");
+            border-top-left-radius: 6px !important;
+        }
+        &:not(.hide-tail) .bubble {
+            border-bottom-left-radius: 0 !important;
         }
 
 
@@ -992,36 +1007,20 @@
 
         .bubble {
             background-color: #ffffff;
-            border-radius: 6px 12px 12px 6px;
-
-            .media-wrapper {
-                border-radius: 6px 12px 12px 6px;
-            }
+            //border-radius: 6px 12px 12px 6px;
         }
 
-        .bubble:first-child {
-            border-radius: 12px 12px 12px 6px;
-
-            .media-wrapper {
-                border-radius: 12px 12px 12px 6px;
-            }
-        }
-
-        .bubble:last-child {
-            border-radius: 6px 12px 12px 0px;
-
-            .media-wrapper {
-                border-radius: 6px 12px 12px 0px;
-            }
-        }
-
-        .bubble:first-child:last-child {
-            border-radius: 12px 12px 12px 0px;
-
-            .media-wrapper {
-                border-radius: 12px 12px 12px 0px;
-            }
-        }
+        //.bubble:first-child {
+        //    border-radius: 12px 12px 12px 6px;
+        //}
+        //
+        //.bubble:last-child {
+        //    border-radius: 6px 12px 12px 0px;
+        //}
+        //
+        //.bubble:first-child:last-child {
+        //    border-radius: 12px 12px 12px 0px;
+        //}
     }
 
     .out {
@@ -1158,35 +1157,19 @@
 
         .bubble {
             background-color: #eeffde;
-            border-radius: 12px 6px 6px 12px;
-
-            .media-wrapper {
-                border-radius: 12px 6px 6px 12px;
-            }
+            //border-radius: 12px 6px 6px 12px;
         }
 
-        .bubble:first-child {
-            border-radius: 12px 12px 6px 12px;
-
-            .media-wrapper {
-                border-radius: 12px 12px 6px 12px;
-            }
-        }
-
-        .bubble:last-child {
-            border-radius: 12px 6px 0px 12px;
-
-            .media-wrapper {
-                border-radius: 12px 6px 0px 12px;
-            }
-        }
-
-        .bubble:first-child:last-child {
-            border-radius: 12px 12px 0px 12px;
-
-            .media-wrapper {
-                border-radius: 12px 12px 0px 12px;
-            }
-        }
+        //.bubble:first-child {
+        //    border-radius: 12px 12px 6px 12px;
+        //}
+        //
+        //.bubble:last-child {
+        //    border-radius: 12px 6px 0px 12px;
+        //}
+        //
+        //.bubble:first-child:last-child {
+        //    border-radius: 12px 12px 0px 12px;
+        //}
     }
 }

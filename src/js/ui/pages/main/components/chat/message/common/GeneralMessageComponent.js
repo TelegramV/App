@@ -30,6 +30,10 @@ class GeneralMessageComponent extends VComponent {
         this.message.show()
         const threshold = 60 * 5
 
+        if (!this.$el.previousElementSibling || this.$el.previousElementSibling.__message.from !== this.message.from) {
+            this.bubbleRef.$el.parentNode.parentNode.classList.add("upper")
+        }
+
         if (this.$el.previousElementSibling) {
             if (this.$el.previousElementSibling.__message && this.$el.previousElementSibling.__message.from === this.message.from && Math.abs(this.$el.previousElementSibling.__message.date - this.message.date) <= threshold) {
                 if(this.avatarRef.component) {
@@ -37,6 +41,8 @@ class GeneralMessageComponent extends VComponent {
                 }
                 if(this.bubbleRef.$el) {
                     this.bubbleRef.$el.parentNode.parentNode.classList.add("hide-tail")
+                    this.bubbleRef.$el.parentNode.parentNode.classList.add("upper")
+                    this.$el.previousElementSibling.classList.remove("upper")
                 }
             }
         } else if (this.$el.nextElementSibling) {
@@ -46,6 +52,10 @@ class GeneralMessageComponent extends VComponent {
                 }
                 if(this.$el.nextElementSibling.__component.bubbleRef.$el) {
                     this.$el.nextElementSibling.__component.bubbleRef.$el.parentNode.parentNode.classList.add("hide-tail")
+                    if(!this.$el.nextElementSibling.nextElementSibling || this.$el.nextElementSibling.nextElementSibling.__message.from !== this.message.from) {
+                        this.$el.nextElementSibling.__component.bubbleRef.$el.parentNode.parentNode.classList.add("upper")
+                        this.bubbleRef.$el.parentNode.parentNode.classList.remove("upper")
+                    }
                 }
             }
         }

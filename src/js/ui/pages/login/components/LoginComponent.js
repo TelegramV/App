@@ -19,7 +19,7 @@ export default class LoginComponent extends Component {
                 <PhoneInputPaneComponent finished={this.handleSendCode} ref="phonePane" qrLoginInit={this.qrLoginInit}/>
                 <CodeAndPasswordPaneComponent ref="codeAndPassword" cancelCode={this.cancelCode}
                                               password={this.password} finished={this.loginSuccess} signUp={this.signUp}/>
-                <QRLoginPaneComponent ref="qrLoginPane" finished={this.loginSuccess} backToPhone={this.backToPhone}/>
+                <QRLoginPaneComponent ref="qrLoginPane" finished={this.loginSuccess} backToPhone={this.backToPhone} password={this.passwordQr}/>
                 <RegisterPaneComponent ref="registerPane" finished={this.loginSuccess}/>
             </div>
         )
@@ -51,6 +51,19 @@ export default class LoginComponent extends Component {
     }
 
     password() {
+        this.fadeOut(this.refs.get("codeAndPassword").refs.get("code"));
+        this.fadeIn(this.refs.get("codeAndPassword").refs.get("password"));
+    }
+
+    passwordQr(data) {
+        console.log(data)
+        this.refs.get("codeAndPassword").open()
+
+        this.refs.get("codeAndPassword").refs.get("password").setData(data)
+
+        this.fadeOut(this.refs.get("qrLoginPane"));
+        this.fadeIn(this.refs.get("codeAndPassword"));
+
         this.fadeOut(this.refs.get("codeAndPassword").refs.get("code"));
         this.fadeIn(this.refs.get("codeAndPassword").refs.get("password"));
     }
