@@ -4,6 +4,7 @@ import {MessageAvatarComponent} from "./MessageAvatarComponent"
 import {InlineKeyboardComponent} from "./InlineKeyboardComponent";
 import {ReplyFragment} from "./ReplyFragment"
 import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
+import {MessageParser} from "../../../../../../../api/messages/MessageParser";
 
 const ReplyToMessageFragment = ({message}) => {
     if (!message.raw.reply_to_msg_id) {
@@ -15,7 +16,7 @@ const ReplyToMessageFragment = ({message}) => {
     return (
         <ReplyFragment id={`message-${message.id}-rpl`}
                        name={message.replyToMessage.from.name}
-                       text={message.replyToMessage.text}
+                       text={MessageParser.getPrefixNoSender(message.replyToMessage)}
                        show={true}/>
     )
 }

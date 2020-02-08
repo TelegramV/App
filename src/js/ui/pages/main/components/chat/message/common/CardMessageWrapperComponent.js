@@ -2,10 +2,10 @@ import MessageWrapperFragment from "./MessageWrapperFragment";
 import MessageTimeComponent from "./MessageTimeComponent";
 import TextWrapperComponent from "./TextWrapperComponent";
 
-const CardMessageWrapperComponent = ({message, icon, title, description}) => {
+const CardMessageWrapperComponent = ({message, icon, title, description, bubbleRef}) => {
     let text = message.text;
     return (
-        <MessageWrapperFragment message={message} showUsername={false}  bubbleRef={this.bubbleRef}>
+        <MessageWrapperFragment message={message} showUsername={false}  bubbleRef={bubbleRef}>
             <div class="card">
                 <div class="card-icon">
                     {icon}

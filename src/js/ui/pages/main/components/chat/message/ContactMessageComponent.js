@@ -9,7 +9,7 @@ class ContactMessageComponent extends GeneralMessageComponent {
         return (
             <CardMessageWrapperComponent message={this.message} icon={<img class="contact-image" src=" "/>}
                                          title={this.message.raw.media.first_name + (this.message.raw.media.last_name ? (" " + this.message.raw.media.last_name) : "")}
-                                         description={this.message.raw.media.phone_number}/>
+                                         description={this.message.raw.media.phone_number} bubbleRef={this.bubbleRef}/>
         )
     }
 }

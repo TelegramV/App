@@ -74,6 +74,13 @@
                 -webkit-mask-position: 0% 100%;
                 mask-position: 0% 100%;
                 //-webkit-mask-composite: xor, source-over;
+
+                &.no-pad {
+                    .reply {
+                        margin-bottom: 0;
+                        padding-left: 13px;
+                    }
+                }
             }
 
             &.out {
@@ -84,6 +91,13 @@
                 -webkit-mask-position: 100% 100%;
                 mask-position: 100% 100%;
                 //-webkit-mask-composite: xor, source-over;
+
+                &.no-pad {
+                    .reply {
+                        margin-bottom: 0;
+                        padding-right: 13px;
+                    }
+                }
             }
 
             &.transparent {
@@ -108,8 +122,6 @@
                 padding-left: 0;
                 padding-right: 0;
             }
-
-
 
             .sticker {
                 width: 250px;
@@ -704,6 +716,8 @@
             .grouped {
                 border-radius: 0;
                 grid-gap: 2px;
+                height: auto;
+                max-height: 512px;
             }
 
 
