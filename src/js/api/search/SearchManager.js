@@ -37,7 +37,9 @@ class SearchManagerSingleton extends Manager {
             offsetRate
         }).then(Messages => {
             Messages.__q = q
+
             Messages.messages = Messages.messages.map(Message => (new SearchMessage(undefined)).fillRaw(Message))
+            Messages.count = Messages.count === undefined ? Messages.messages.length : Messages.count
 
             return Messages
         })

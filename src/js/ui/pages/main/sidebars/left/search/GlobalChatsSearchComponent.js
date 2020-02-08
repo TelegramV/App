@@ -32,6 +32,9 @@ export class GlobalChatsSearchComponent extends VComponent {
                     <div className="section-title">Contacts and Chats</div>
                     <div className="column-list"> {
                         this.state.myPeers.map(p => {
+                            if (p.type !== "user" && !p.full) {
+                                p.fetchFull()
+                            }
                             return <ContactFragment url={p.photo.smallUrl}
                                              name={p.name}
                                              status={p.statusString.text}
