@@ -72,7 +72,7 @@ class MessageManager extends Manager {
         }
 
         MTProto.UpdatesManager.subscribe("updateMessageID", update => {
-            update.dialog.handleUpdateMessageID(update.id, update.random_id)
+            update.dialog && update.dialog.handleUpdateMessageID(update.id, update.random_id)
         })
 
         MTProto.UpdatesManager.subscribe("updateShortSentMessage", async update => {
