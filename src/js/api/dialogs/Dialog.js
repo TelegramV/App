@@ -27,6 +27,15 @@ export class Dialog extends ReactiveObject {
         return this.peer.messages
     }
 
+    handleUpdateMessageID(id, randomId): void {
+        const msg = this.messages.get(id)
+        if(msg) {
+            msg.raw.random_id = randomId
+        } else {
+            this.peer.messages._sendingMessages.set(id, randomId)
+        }
+    }
+
     get peer(): Peer {
         if (!this._peer) {
             this._peer = PeersStore.getFromDialogRawPeer(this.raw.peer)

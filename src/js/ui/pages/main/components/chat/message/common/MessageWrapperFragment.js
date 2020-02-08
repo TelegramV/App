@@ -72,9 +72,10 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         "out": !message.isPost && message.isOut,
         "in": message.isPost || !message.isOut,
         "transparent": transparent,
-        "read": message.isRead,
+        "read": !message.isSending && message.isRead,
+        "sending": message.isSending,
         "no-pad": !outerPad,
-        "sent": !message.isRead //TODO more convenient method to do this
+        "sent": !message.isSending && !message.isRead //TODO more convenient method to do this
     }
 
     let messageClasses = {

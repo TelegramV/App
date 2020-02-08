@@ -24,26 +24,43 @@ class MessageManager extends Manager {
                 return
             }
 
+
+            if(dialog.peer.messages._sendingMessages.has(lastMessage.id)) {
+                const randomId = dialog.peer.messages._sendingMessages.get(lastMessage.id)
+                dialog.peer.messages._sendingMessages.delete(lastMessage.id)
+                lastMessage.random_id = randomId
+                AppEvents.Dialogs.fire("messageSent", {
+                    rawMessage: lastMessage,
+                    dialog
+                })
+
+                return
+            }
             const message = MessageFactory.fromRaw(dialog, lastMessage)
 
-            dialog.peer.messages.appendSingle(message)
-            message.init()
+            if(dialog.peer.messages.appendSingle(message)) {
+                message.init()
 
-            if (!message.isOut) {
-                dialog.peer.messages.addUnread(message.id)
-            } else {
-                dialog.peer.messages.clearUnread()
+                if (!message.isOut) {
+                    dialog.peer.messages.addUnread(message.id)
+                } else {
+                    dialog.peer.messages.clearUnread()
+                }
+
+                dialog.fire("newMessage", {
+                    message
+                })
+
+                AppEvents.Dialogs.fire("newMessage", {
+                    message,
+                    dialog
+                })
             }
-
-            dialog.fire("newMessage", {
-                message
-            })
-
-            AppEvents.Dialogs.fire("newMessage", {
-                message,
-                dialog
-            })
         }
+
+        MTProto.UpdatesManager.subscribe("updateMessageID", update => {
+            update.dialog.handleUpdateMessageID(update.id, update.random_id)
+        })
 
         MTProto.UpdatesManager.subscribe("updateShortSentMessage", async update => {
             updateDialogLastMessage(update.dialog, update)

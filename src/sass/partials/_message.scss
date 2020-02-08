@@ -1062,6 +1062,13 @@
             }
         }
 
+
+        .bubble.sending {
+            .time .tgico.status:after {
+                content: $tgico-sending;
+            }
+        }
+
         .bubble.read {
             .time .tgico.status:after {
                 content: $tgico-checks;

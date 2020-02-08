@@ -16,6 +16,7 @@ class BubblesComponent extends Component {
 
     state: [string, any] = {
         renderedMessages: new Map(),
+        sendingMessages: new Map(),
         renderedGroups: new Map(),
         isFetchingNextPage: false,
         isFetching: false,
@@ -85,6 +86,10 @@ class BubblesComponent extends Component {
                     } else {
                         this.state.messagesWaitingForRendering.add(event.message)
                     }
+                } else if (event.type === "sendMessage") {
+                    this._prependMessages([event.message], true)
+                } else if(event.type === "messageSent") {
+                    this._patchSentMessage(event.rawMessage)
                 }
             }
         })
@@ -135,11 +140,21 @@ class BubblesComponent extends Component {
         $message = $mount(<MessageComponent intersectionObserver={this.intersectionObserver}
                                             message={message}/>, this.elements.$bubblesInner)
 
-        // const prev = $message.clientHeight
-        // setTimeout(l => {
-        //     if(prev !== $message.clientHeight) console.info("message height changed!", prev, $message.clientHeight, $message)
-        // }, 25000);
         return $message
+    }
+
+    _patchSentMessage(rawMessage) {
+        if (!this.state.sendingMessages.has(rawMessage.random_id)) {
+            return false
+        }
+        const $rendered = this.state.sendingMessages.get(rawMessage.random_id)
+
+        this.state.sendingMessages.delete(rawMessage.random_id)
+        this.state.renderedMessages.set(rawMessage.id, $rendered)
+        $rendered.__component.message.fillRawAndFire(rawMessage)
+        $rendered.__component.__patch()
+        // VRDOM.patch($rendered, <MessageComponent intersectionObserver={this.intersectionObserver}
+        //                                          message={message}/>)
     }
 
     /**
@@ -166,9 +181,10 @@ class BubblesComponent extends Component {
 
     /**
      * @param {Array<Message>} messages
+     * @param {boolean} isSending
      * @private
      */
-    _prependMessages(messages) {
+    _prependMessages(messages, isSending = false) {
         let reset = false
 
         if (this.elements.$bubblesInner.clientHeight - (this.$el.scrollTop + this.$el.clientHeight) < 50) {
@@ -181,9 +197,13 @@ class BubblesComponent extends Component {
             const $rendered = this._renderMessage(message, true)
 
             if ($rendered) {
-                this.state.renderedMessages.set(message.id, $rendered)
-                if (message.groupedId) {
-                    this.state.renderedGroups.set(message.groupedId, message)
+                if(isSending) {
+                    this.state.sendingMessages.set(message.raw.random_id, $rendered)
+                } else {
+                    this.state.renderedMessages.set(message.id, $rendered)
+                    if (message.groupedId) {
+                        this.state.renderedGroups.set(message.groupedId, message)
+                    }
                 }
             }
 
@@ -214,6 +234,7 @@ class BubblesComponent extends Component {
     }
 
     _clearBubbles() {
+        this.state.sendingMessages.clear()
         this.state.renderedMessages.clear()
         this.state.renderedGroups.clear()
 

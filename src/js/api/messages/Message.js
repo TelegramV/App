@@ -43,6 +43,7 @@ export interface Message {
 
     +isOut: boolean;
     +isRead: boolean;
+    +isSending: boolean;
     +isMentioned?: boolean;
     +isMediaUnread?: boolean; // todo: implement this thing
     +isSilent?: boolean;

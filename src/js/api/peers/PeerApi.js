@@ -2,10 +2,11 @@ import MTProto from "../../mtproto/external"
 import PeersManager from "./objects/PeersManager"
 import AppEvents from "../eventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../dialogs/util"
-import TimeManager from "../../mtproto/timeManager"
+import TimeManager, {tsNow} from "../../mtproto/timeManager"
 import {FileAPI} from "../fileAPI"
 import {MessageFactory} from "../messages/MessageFactory"
 import AppConfiguration from "../../configuration"
+import {TextMessage} from "../messages/objects/TextMessage";
 
 export class PeerApi {
 
@@ -148,6 +149,26 @@ export class PeerApi {
                 })
             }))
         }
+
+        // TODO fix albums
+        let randomId = TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+        let message = new TextMessage(this._peer.dialog)
+        message.fillRaw({
+            pFlags: {
+                out: true,
+                sending: true
+            },
+            date: Math.floor(+new Date() / 1000),
+            message: text,
+            entities: messageEntities,
+            random_id: randomId,
+            reply_to_msg_id: replyTo
+        })
+        AppEvents.Dialogs.fire("sendMessage", {
+            dialog: this._peer.dialog,
+            message: message
+        })
+
         p.then(q => {
             MTProto.invokeMethod(media ? (multi ? "messages.sendMultiMedia" : "messages.sendMedia") : "messages.sendMessage", {
                 pFlags: {
@@ -182,8 +203,16 @@ export class PeerApi {
                         random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
                     }
                 }),
-                random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+                random_id: randomId
             }).then(response => {
+                if(response.updates) {
+                    response.updates.forEach(l => {
+                        if(l._ === "updateMessageID") l.dialog = this._peer.dialog
+                    })
+                } else {
+                    this._peer.dialog.peer.messages._sendingMessages.set(response.id, randomId)
+                    response.random_id = randomId
+                }
                 response.dialog = this._peer.dialog
                 response.message = text
                 response.reply_to_msg_id = replyTo

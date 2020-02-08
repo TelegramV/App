@@ -11,6 +11,8 @@ export class PeerMessages {
     _peer: Peer = undefined
 
     _messages: Map<number, Message> = new Map
+    // id -> randomId
+    _sendingMessages: Map<number, number> = new Map
     _otherMessages: Map<number, Message> = new Map // replies etc.
     _sortedArray: Array<Message> = []
     _alreadySorted: boolean = false
@@ -207,10 +209,12 @@ export class PeerMessages {
 
     /**
      * @param {Message} message
+     * @return boolean
      */
     appendSingle(message: Message) {
         if (AppSelectedPeer.check(this._peer)) {
             this._messages.set(message.id, message)
+
             this._alreadySorted = false
 
             this.last = message

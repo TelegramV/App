@@ -228,6 +228,7 @@ export class ChatInputComponent extends Component {
         } else {
             this.$el.querySelector(".reply .message .image").classList.add("hidden")
         }
+        this.textarea.focus()
     }
 
     closeReply() {
