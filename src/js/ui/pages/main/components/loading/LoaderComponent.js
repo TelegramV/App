@@ -1,4 +1,4 @@
-function LoaderComponent({big = true, white = false, full = false, show = true, id = "", background = false}) {
+function LoaderComponent({big = true, white = false, full = false, show = true, id = "", background = false, loaderRef}) {
 
     const classes = {
         "full-size-loader": true,
@@ -12,7 +12,7 @@ function LoaderComponent({big = true, white = false, full = false, show = true, 
     }
 
     return (
-        <div id={id} css-display={!show ? "none" : ""} className={classes}>
+        <div ref={loaderRef} id={id} css-display={!show ? "none" : ""} className={classes}>
             {
                 background ? (
                     <div className="progress-background">

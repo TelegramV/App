@@ -3,6 +3,7 @@ import VComponent from "../../../../../v/vrdom/component/VComponent"
 import UIEvents from "../../../../../eventBus/UIEvents"
 import SearchManager from "../../../../../../api/search/SearchManager"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
+import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 
 export class GlobalChatsSearchComponent extends VComponent {
 
@@ -36,9 +37,10 @@ export class GlobalChatsSearchComponent extends VComponent {
                                 p.fetchFull()
                             }
                             return <ContactFragment url={p.photo.smallUrl}
-                                             name={p.name}
-                                             status={p.statusString.text}
-                                             peer={p}/>
+                                                    name={p.name}
+                                                    status={p.statusString.text}
+                                                    peer={p}
+                                                    onClick={() => AppSelectedPeer.select(p)}/>
                         })
                     }
                     </div>
@@ -50,7 +52,8 @@ export class GlobalChatsSearchComponent extends VComponent {
                             this.state.peers.map(p => <ContactFragment url={p.photo.smallUrl}
                                                                        name={p.name}
                                                                        status={p.username ? `@${p.username}` : ``}
-                                                                       peer={p}/>)
+                                                                       peer={p}
+                                                                       onClick={() => AppSelectedPeer.select(p)}/>)
                         }
                     </div>
                 </div>

@@ -4,6 +4,7 @@ import SearchManager from "../../../../../../api/search/SearchManager"
 import {ContactFragment} from "./ContactFragment"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import PeersStore from "../../../../../../api/store/PeersStore"
+import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 
 const MessageFragment = ({m, peers}) => {
     const peer = m.to === PeersStore.self() ? m.from : m.to
@@ -13,7 +14,8 @@ const MessageFragment = ({m, peers}) => {
     return <ContactFragment url={peer.photo.smallUrl}
                             name={peer.name}
                             status={m.prefix + m.text}
-                            peer={peer}/>
+                            peer={peer}
+                            onClick={() => AppSelectedPeer.select(peer)}/>
 }
 
 export class GlobalMessagesSearchComponent extends VComponent {

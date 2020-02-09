@@ -1,20 +1,25 @@
 import {PinnedComponent} from "../../../../pinnedController"
 import LoaderComponent from "../loading/LoaderComponent"
 import ChatInfoComponent from "./chatInfo/ChatInfoComponent"
-import Component from "../../../../v/vrdom/Component"
 import BubblesComponent from "./BubblesComponent"
 import {ChatInputComponent} from "./chatInput/ChatInputComponent";
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import VF from "../../../../v/VFramework"
 import UIEvents from "../../../../eventBus/UIEvents"
+import VComponent from "../../../../v/vrdom/component/VComponent"
 
 /**
  * CRITICAL: never rerender this component!
  */
-class ChatComponent extends Component {
-    constructor(props) {
-        super(props)
-        this.reactive = {
+class ChatComponent extends VComponent {
+
+    noChatRef = VComponent.createRef()
+    chatRef = VComponent.createRef()
+    chatLoaderRef = VComponent.createRef()
+    messagesLoaderRef = VComponent.createRef()
+
+    init() {
+        this.callbacks = {
             peer: AppSelectedPeer.Reactive.FireOnly,
         }
     }
@@ -22,22 +27,32 @@ class ChatComponent extends Component {
     h() {
         return (
             <div class="chat-wrapper">
-                <div id="wallpaper" class="wallpaper blur"></div>
-                <div id="noChat">
-                    <LoaderComponent id="chat-wrapper-loader" full={true} show={true} background={true} white={true}/>
+                <div id="wallpaper" class="wallpaper blur"/>
+
+                <div ref={this.noChatRef} id="noChat">
+                    <LoaderComponent loaderRef={this.chatLoaderRef}
+                                     id="chat-wrapper-loader"
+                                     full={true}
+                                     show={true}
+                                     background={true}
+                                     white={true}/>
                 </div>
-                <div id="chat" css-display="none">
+
+                <div ref={this.chatRef} id="chat" css-display="none">
                     <div id="topbar">
                         <ChatInfoComponent/>
                         <PinnedComponent/>
-                        <div className="btn-icon rp rps tgico-search" onClick={this._openSearch}/>
+                        <div className="btn-icon rp rps tgico-search" onClick={this.openSearch}/>
                         <div className="btn-icon rp rps tgico-more"/>
                     </div>
 
-                    <LoaderComponent id="messages-wrapper-messages-loader" full={true} white={true} show={true}
+                    <LoaderComponent loaderRef={this.messagesLoaderRef}
+                                     id="messages-wrapper-messages-loader"
+                                     full={true} white={true}
+                                     show={true}
                                      background={true}/>
 
-                    <BubblesComponent/>
+                    <BubblesComponent loaderRef={this.messagesLoaderRef}/>
                     <ChatInputComponent ref="chatInput"/>
                 </div>
             </div>
@@ -45,35 +60,31 @@ class ChatComponent extends Component {
     }
 
     mounted() {
-        this.$noChat = this.$el.querySelector("#noChat")
-        this.$chat = this.$el.querySelector("#chat")
-        this.$wrapperLoader = this.$el.querySelector("#chat-wrapper-loader")
-
         if (!VF.router.activeRoute.queryParams.p) {
-            this.$noChat.style.display = ""
-            this.$wrapperLoader.style.display = "none"
+            this.noChatRef.$el.style.display = ""
+            this.chatLoaderRef.$el.style.display = "none"
         }
     }
 
-    reactiveChanged(key, value, event) {
+    callbackChanged(key: string, value) {
         if (key === "peer") {
-            this.$wrapperLoader.style.display = "none"
+            this.chatLoaderRef.$el.style.display = "none"
 
             if (value) {
-                this.$noChat.style.display = "none"
-                this.$chat.style.display = ""
-                this.$chat.classList.add("responsive-selected-chat")
+                this.noChatRef.$el.style.display = "none"
+                this.chatRef.$el.style.display = ""
+                this.chatRef.$el.classList.add("responsive-selected-chat")
             } else {
-                this.$noChat.style.display = ""
-                this.$chat.style.display = "none"
-                this.$chat.classList.remove("responsive-selected-chat")
+                this.noChatRef.$el.style.display = ""
+                this.chatRef.$el.style.display = "none"
+                this.chatRef.$el.classList.remove("responsive-selected-chat")
             }
 
-            this.$wrapperLoader.style.display = "none"
+            this.chatLoaderRef.$el.style.display = "none"
         }
     }
 
-    _openSearch = () => {
+    openSearch = () => {
         UIEvents.RightSidebar.fire("show", {
             barName: "messages-search"
         })

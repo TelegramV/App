@@ -1,4 +1,4 @@
-import {ApiNetworker} from "./apiNetworker";
+import {ApiNetworker} from "./ApiNetworker";
 
 export class FileNetworker extends ApiNetworker {
     constructor(authContext) {

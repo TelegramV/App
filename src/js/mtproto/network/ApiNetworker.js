@@ -5,7 +5,7 @@ import {TLDeserialization} from "../language/deserialization"
 import {MessageProcessor} from "./messageProcessor"
 
 import AppConfiguration from "../../configuration"
-import {Networker} from "./networker";
+import {Networker} from "./Networker";
 import {schema} from "../language/schema";
 import Bytes from "../utils/bytes"
 import Random from "../utils/random"
@@ -15,6 +15,7 @@ import MTProtoInternal from "../internal"
 export class ApiNetworker extends Networker {
     constructor(auth) {
         super(auth)
+
         this.messageProcessor = new MessageProcessor({
             networker: this
         })
@@ -61,14 +62,13 @@ export class ApiNetworker extends Networker {
             if (this.connected === false) {
                 MTProtoInternal.connectionRestored()
             }
-            this.pings.delete(pingMessage.msg_id)
 
+            this.pings.delete(pingMessage.msg_id)
         })
 
-        this.sendMessage(pingMessage)
-
-        setTimeout(this.checkConnection.bind(this), 1000)
-
+        this.sendMessage(pingMessage).then(_ => {
+            setTimeout(this.checkConnection.bind(this), 1000)
+        })
     }
 
     processResponse(data) {
@@ -174,8 +174,6 @@ export class ApiNetworker extends Networker {
 
     onDisconnect() {
         MTProtoInternal.connectionLost()
-        // TODO reconnect
-        // ALSO if there"s no internet it doesn"t disconnect ws, should ping prob
         this.connected = false
     }
 
