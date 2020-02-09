@@ -11,10 +11,14 @@ class SearchManagerSingleton extends Manager {
         return MTProto.invokeMethod("messages.search", {
             peer: peer.inputPeer,
             q: q,
-            filter: filter,
+            filter: filter || {
+                _: "inputMessagesFilterEmpty"
+            },
             limit: limit,
             offset_id: offsetId
         }).then(Messages => {
+            Messages.__q = q
+
             if (Messages._ === "messages.channelMessages") {
                 peer.dialog.pts = Messages.pts
             }

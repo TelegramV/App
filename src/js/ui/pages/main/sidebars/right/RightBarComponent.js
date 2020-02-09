@@ -8,4 +8,10 @@ export class RightBarComponent extends AbstractBarComponent {
         E.bus(UIEvents.RightSidebar)
             .on("show", this.sidebarOnShow)
     }
+
+    openBar = barName => {
+        UIEvents.RightSidebar.fire("show", {
+            barName
+        })
+    }
 }
