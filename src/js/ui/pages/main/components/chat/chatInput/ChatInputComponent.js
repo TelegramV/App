@@ -72,16 +72,12 @@ export class ChatInputComponent extends Component {
                                            {
                                                icon: "photo",
                                                title: "Photo or Video",
-                                               onClick: _ => {
-                                                   this.pickFile(false)
-                                               }
+                                               onClick: this.attachPhoto
                                            },
                                            {
                                                icon: "document",
                                                title: "Document",
-                                               onClick: _ => {
-                                                   this.pickFile(true)
-                                               }
+                                               onClick: this.attachFile
                                            },
                                        ], l.target)}/>
                                 </div>
@@ -263,30 +259,32 @@ export class ChatInputComponent extends Component {
         ModalManager.open(<AttachPhotosModal media={[blob]}/>)
     }
 
-    pickFile(document) {
-        askForFile("image/*", function (bytes, file) {
+    pickFile(blob, file) {
+        // TODO wtf?
+        if(ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachFilesModal) {
+            ModalManager.$el.querySelector(".dialog").childNodes[0].__component.addFile(blob, file)
+            return
+        }
+        ModalManager.open(<AttachFilesModal media={[{
+            blob: blob,
+            file: file
+        }]}/>)
+    }
+
+    attachFile() {
+        askForFile("", function (bytes, file) {
+            const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
+
+            this.pickFile(URL.createObjectURL(blob), file)
+        }.bind(this), true, true)
+    }
+
+    attachPhoto() {
+        askForFile("image/*,video/*", function (bytes, file) {
             const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
 
             this.pickPhoto(URL.createObjectURL(blob))
-            // const id = [Random.nextInteger(0xffffffff), Random.nextInteger(0xffffffff)]
-            // AppSelectedPeer.Current.api.sendMedia("test message", bytes, {
-            //     _: document ? "inputMediaUploadedDocument" : "inputMediaUploadedPhoto",
-            //     flags: 0,
-            //     file: {
-            //         _: "inputFile",
-            //         id: id,
-            //         parts: 1,
-            //         name: file.name
-            //     },
-            //     mime_type: "octec/stream",
-            //     attributes: [
-            //         {
-            //             _: "documentAttributeFilename",
-            //             file_name: file.name
-            //         }
-            //     ]
-            // })
-        }.bind(this), true)
+        }.bind(this), true, true)
     }
 
     tickTimer() {

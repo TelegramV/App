@@ -1,21 +1,22 @@
-export function askForFile(accept, callback, asBuffer = false) {
+export function askForFile(accept, callback, asBuffer = false, multiple = false) {
     var input = document.createElement('input');
     input.type = 'file';
     input.accept = accept;
+    input.multiple = multiple
 
     input.onchange = e => {
-        var file = e.target.files[0];
+        Array.from(e.target.files).forEach(file => {
+            var reader = new FileReader();
+            if (asBuffer) {
+                reader.readAsArrayBuffer(file)
+            } else {
+                reader.readAsDataURL(file);
+            }
 
-        var reader = new FileReader();
-        if (asBuffer) {
-            reader.readAsArrayBuffer(file)
-        } else {
-            reader.readAsDataURL(file);
-        }
-
-        reader.onload = readerEvent => {
-            callback(reader.result, file);
-        }
+            reader.onload = readerEvent => {
+                callback(reader.result, file);
+            }
+        })
 
     }
     input.click();

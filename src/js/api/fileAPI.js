@@ -37,6 +37,19 @@ export class FileAPI {
         })
     }
 
+    static async uploadDocument(bytes, name = "") {
+        return {
+            _: "inputMediaUploadedDocument",
+            file: await this.uploadFile(bytes, name),
+            attributes: [
+                {
+                    _: "documentAttributeFilename",
+                    file_name: name
+                }
+            ]
+        }
+    }
+
     static async uploadPhoto(bytes, name = "") {
         return {
             _: "inputMediaUploadedPhoto",
