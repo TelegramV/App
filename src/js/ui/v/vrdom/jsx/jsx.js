@@ -17,7 +17,6 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
         throw new Error("fragments are not implemented")
     }
 
-    // $ignore
     children = children.flat(Infinity)
 
     const attrs: VRAttrs = Object.create(null)
