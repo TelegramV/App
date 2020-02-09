@@ -1,4 +1,4 @@
-import Component from "../../../../../v/vrdom/Component";
+import VComponent from "../../../../../v/vrdom/component/VComponent";
 import VRDOM from "../../../../../v/vrdom/VRDOM";
 import TabSelectorComponent from "../../basic/TabSelectorComponent"
 import StickerComponent from "../message/common/StickerComponent"
@@ -11,9 +11,10 @@ import MTProto from "../../../../../../mtproto/external"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import lottie from "lottie-web"
 
-export default class ComposerComponent extends Component {
+export default class ComposerComponent extends VComponent {
 	constructor(props) {
 		super(props);
+		this.identifier = "composer"
 
 		this.tabItems = [
 			{
@@ -30,6 +31,8 @@ export default class ComposerComponent extends Component {
 				click: this.openGIF.bind(this),
 			}
 		]
+
+
 	}
 
 	h() {
@@ -83,14 +86,17 @@ export default class ComposerComponent extends Component {
 		this.emojiPanel = this.$el.querySelector(".emoji-wrapper");
 		this.stickerPanel = this.$el.querySelector(".sticker-wrapper");
 		this.gifPanel = this.$el.querySelector(".gif-wrapper");
-		this.$el.querySelector(".emoji-types").childNodes.forEach(el => {
-			if(el.classList.contains("selected")) {
-				el.click() //TODO rewrite this to not imitate click
-			}
-		})
+		
+		//load start emoji page
+		let selected = this.emojiPanel.querySelector(".emoji-table").querySelector(".people");
+		selected.classList.add("selected");
+		while(selected.firstChild) selected.removeChild(selected.firstChild)
+		selected.innerText = emojiCategories["people"];
+		replaceEmoji(selected);
+		this._bindEmojiClickEvents();
 	}
 
-	onHide() {
+	onHide = () => {
 		this.stickerPanel.querySelector(".selected").childNodes.forEach(node => {
 			if(node.id) lottie.pause(node.id);
 		})
@@ -100,7 +106,7 @@ export default class ComposerComponent extends Component {
 		this.paused = true;
 	}
 
-	onShow() {
+	onShow = () => {
 		if(!this.paused) return;
 		this.stickerPanel.querySelector(".selected").childNodes.forEach(node => {
 			if(node.id) lottie.play(node.id);

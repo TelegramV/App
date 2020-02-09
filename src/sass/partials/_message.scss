@@ -210,6 +210,7 @@
                     .title {
                         line-height: 1.4;
                         font-weight: 500;
+                        color: black;
 
                         &:hover {
                             text-decoration: underline;
@@ -224,6 +225,7 @@
                         text-align: justify;
                         margin-right: -1em;
                         padding-right: 1em;
+                        color: black;
                     }
                 }
 
@@ -732,12 +734,14 @@
                 font-size: $time-size;
                 user-select: none;
                 height: 20px;
-                //line-height: 20px;
+                align-items: center;
                 margin-top: 5px;
                 margin-right: -10px;
                 margin-left: 5px;
 
                 .inner {
+                	display: flex;
+                	align-items: center;
                     .edited {
                         margin-right: 5px;
                     }
@@ -754,7 +758,7 @@
                         background-color: $semiblack;
                         border-radius: 40px;
                         text-align: center;
-                        padding: 4px 6px;
+                        padding: 2px 6px !important;
 
                         .views {
                             margin-right: 5px;
@@ -1153,7 +1157,7 @@
                 color: $darkgreen;
 
                 .inner {
-                    padding: 0px 5px;
+                    padding: 2px 5px;
                 }
             }
 
