@@ -52,6 +52,7 @@ export class DialogComponent extends VComponent {
             .on("updateSingle", this.onDialogUpdateSingle)
             .on("updatePinned", this.onDialogUpdatePinned)
             .on("updateFolderId", this.onDialogUpdateFolderId)
+            .on("updateActions", this.onDialogUpdateActions)
 
         R.object(this.dialog.peer)
             .on("updatePhoto", this.onPeerUpdatePhoto)
@@ -99,6 +100,10 @@ export class DialogComponent extends VComponent {
                 }
             }
         }
+    }
+
+    onDialogUpdateActions = _ => {
+        this.textFragmentRef.patch()
     }
 
     onDialogNewMessage = _ => {

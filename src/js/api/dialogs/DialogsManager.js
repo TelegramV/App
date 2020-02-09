@@ -1,6 +1,6 @@
 import {MTProto} from "../../mtproto/external"
-import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash, getPeerTypeFromType} from "./util"
-import TimeManager from "../../mtproto/timeManager"
+import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash} from "./util"
+import TimeManager, {tsNow} from "../../mtproto/timeManager"
 import {Dialog} from "./Dialog";
 import {Manager} from "../manager";
 import {Peer} from "../peers/objects/Peer";
@@ -31,15 +31,36 @@ class DialogManager extends Manager {
             return Promise.resolve()
         }
 
+        // actions checking interval
+        setInterval(() => {
+            DialogsStore.toArray().forEach(dialog => {
+                dialog.actions.forEach(rawUpdate => {
+                    if (rawUpdate.time + 6 < tsNow(true)) {
+                        dialog.removeAction(rawUpdate)
+                    }
+                })
+            })
+        }, 2000)
+
         AppSelectedPeer.subscribe(_ => {
             if (AppSelectedPeer.Previous) {
                 AppSelectedPeer.Previous.messages.clear()
             }
         })
 
+        MTProto.UpdatesManager.subscribe("updateChatUserTyping", update => {
+            let peer = PeersStore.get("chat", update.chat_id) || PeersStore.get("channel", update.chat_id)
+
+            if (!peer || !peer.dialog) {
+                console.log("good game telegram, good game")
+            } else {
+                update.time = tsNow(true)
+                peer.dialog.addAction(update)
+            }
+        })
+
         MTProto.UpdatesManager.subscribe("updateDialogPinned", async update => {
-            const peerType = getPeerTypeFromType(update.peer.peer._)
-            const peer = PeersStore.get(peerType, update.peer.peer[`${peerType}_id`])
+            const peer = PeersStore.getByPeerType(update.peer.peer)
 
             if (!peer) {
                 console.error("BUG: no way telegram, no way")
