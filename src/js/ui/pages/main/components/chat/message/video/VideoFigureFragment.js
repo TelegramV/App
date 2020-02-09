@@ -31,7 +31,7 @@ export const LoadingFragment = ({id, loading = false, click = undefined, show = 
     )
 }
 
-export const VideoFigureFragment = ({type = "video", id, srcUrl, round=false, width, height, maxHeight, maxWidth, loop=false, autoplay=true, controls=true}) => {
+export const VideoFigureFragment = ({type = "video", id, srcUrl, round=false, width, height, maxHeight, maxWidth, loop=false, muted, autoplay=true, controls=true, click}) => {
     width = height < maxHeight ? width : maxHeight/height*width;
     height = height < maxHeight ? height : maxHeight;
 
@@ -46,6 +46,8 @@ export const VideoFigureFragment = ({type = "video", id, srcUrl, round=false, wi
                    height={height}
                    loop={loop === false ? undefined : true}
                    autoplay={autoplay}
+                   onCanPlay={l => l.target.volume=0}
+                   onClick={click}
                    />
         </figure>
     )

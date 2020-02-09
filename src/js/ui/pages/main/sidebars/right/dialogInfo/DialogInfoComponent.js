@@ -13,6 +13,7 @@ import {DialogInfoPhotoComponent} from "./fragments/DialogInfoPhotoComponent"
 import {DialogInfoLinkComponent} from "./fragments/DialogInfoLinkComponent"
 import {DialogInfoDocumentComponent} from "./fragments/DialogInfoDocumentComponent"
 import SearchManager from "../../../../../../api/search/SearchManager"
+import {VUI} from "../../../../../v/VUI"
 
 export class DialogInfoComponent extends RightBarComponent {
     barName = "dialog-info"
@@ -81,9 +82,7 @@ export class DialogInfoComponent extends RightBarComponent {
                 this.callbacks.peer.fetchFull()
             }
 
-            UIEvents.RightSidebar.fire("show", {
-                barName: "dialog-info"
-            })
+            this.barOnShow()
         }
     }
 
@@ -91,11 +90,7 @@ export class DialogInfoComponent extends RightBarComponent {
         return (
             <div className="dialog-info sidebar right hidden">
                 <div class="header toolbar">
-                    <span class="btn-icon tgico tgico-close rp rps" onClick={_=> {
-                        UIEvents.RightSidebar.fire("show", {
-                            barName: "nothing"
-                        })
-                    }}/>
+                    <span class="btn-icon tgico tgico-close rp rps" onClick={_ => this.openBar("nothing")}/>
                     <div class="title">Info</div>
                     <span class="btn-icon tgico tgico-more rp rps"/>
                 </div>
@@ -130,7 +125,7 @@ export class DialogInfoComponent extends RightBarComponent {
     }
 
     barOnShow = () => {
-        this.$el.classList.remove("hidden")
+        VUI.showElement(this.$el)
 
         if (!AppSelectedInfoPeer.check(AppSelectedInfoPeer.Previous) && AppSelectedInfoPeer.Current !== undefined) {
             this.refreshContent()

@@ -8,8 +8,8 @@ class EmojiVRDOMPlugin extends VRDOMPlugin {
     }
 
     elementMounted($el) {
-        if ($el.nodeType !== Node.TEXT_NODE && $el.textContent) {
-            replaceEmoji($el);
+        if ($el.textContent) {
+            replaceEmoji($el)
         }
     }
 }

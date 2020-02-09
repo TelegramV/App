@@ -5,6 +5,7 @@ import {ReactiveObject} from "../../ui/v/reactive/ReactiveObject"
 import {Peer} from "../peers/objects/Peer"
 import PeersStore from "../store/PeersStore"
 import DialogEvents from "./DialogEvents"
+import AppEvents from "../eventBus/AppEvents"
 
 export class Dialog extends ReactiveObject {
 
@@ -12,6 +13,8 @@ export class Dialog extends ReactiveObject {
 
     _rawDialog: Object = {}
     _draft: DraftMessage = DraftMessage.createEmpty(this)
+
+    _actions: Set<Object> = new Set()
 
     constructor(rawDialog: Object) {
         super()
@@ -27,9 +30,41 @@ export class Dialog extends ReactiveObject {
         return this.peer.messages
     }
 
+    get actions() {
+        return this._actions
+    }
+
+    addAction(rawUpdate) {
+        if (rawUpdate.action._ === "sendMessageCancelAction") {
+            this.clearActions()
+        } else {
+            this._actions.add(rawUpdate)
+            this.fire("updateActions")
+            AppEvents.Dialogs.fire("updateActions", {
+                dialog: this
+            })
+        }
+    }
+
+    removeAction(rawUpdate) {
+        this._actions.delete(rawUpdate)
+        this.fire("updateActions")
+        AppEvents.Dialogs.fire("updateActions", {
+            dialog: this
+        })
+    }
+
+    clearActions() {
+        this._actions.clear()
+        this.fire("updateActions")
+        AppEvents.Dialogs.fire("updateActions", {
+            dialog: this
+        })
+    }
+
     handleUpdateMessageID(id, randomId): void {
         const msg = this.messages.get(id)
-        if(msg) {
+        if (msg) {
             msg.raw.random_id = randomId
         } else {
             this.peer.messages._sendingMessages.set(id, randomId)

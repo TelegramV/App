@@ -5,7 +5,7 @@ import {AppConfiguration} from "../configuration"
 import {createNonce} from "./utils/bin"
 import TimeManager from "./timeManager"
 import {AuthAPI} from "./auth"
-import {MTProtoNetworker} from "./network/mtprotoNetworker"
+import {MtprotoNetworker} from "./network/MtprotoNetworker"
 import Bytes from "./utils/bytes"
 import authKeyCreation from "./connect/authKeyCreation"
 import {FileNetworker} from "./network/FileNetworker"
@@ -114,7 +114,7 @@ class MobileProtocol {
         this.authContext = authContext
 
         if (!this.PermanentStorage.exists("authKey" + this.authContext.dcID)) {
-            const mtprotoNetworker = new MTProtoNetworker(authContext)
+            const mtprotoNetworker = new MtprotoNetworker(authContext)
 
             return authKeyCreation(mtprotoNetworker).then(_ => {
                 authContext.authKey = new Uint8Array(authContext.authKey)
@@ -166,7 +166,7 @@ class MobileProtocol {
             updates: false
         }
 
-        const mtprotoNetworker = new MTProtoNetworker(authContext)
+        const mtprotoNetworker = new MtprotoNetworker(authContext)
         return authKeyCreation(mtprotoNetworker).then(response => {
             const networker = new FileNetworker(authContext)
 

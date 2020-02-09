@@ -12,6 +12,8 @@ class VideoComponent extends VComponent {
         if (this.props.autodownload) {
             this.message.fetchFullVideo()
         }
+
+        this.figureRef = undefined;
     }
 
     reactive(R) {
@@ -26,7 +28,9 @@ class VideoComponent extends VComponent {
         if (this.message.videoUrl) {
             return (
                 <VideoFigureFragment id={`msg-video-figure-${this.message.id}`}
+                                 ref={this.figureRef}
                                  type={this.props.type || "video"}
+                                 round={this.props.round}
                                  srcUrl={this.message.videoUrl}
                                  width={this.message.videoInfo.w}
                                  height={this.message.videoInfo.h}
@@ -35,12 +39,16 @@ class VideoComponent extends VComponent {
                                  loop={this.props.loop}
                                  autoplay={this.props.autoplay}
                                  controls={this.props.controls}
+                                 muted={this.props.muted}
+                                 click={this.props.click}
                                  />
             )
         } else {
             return (
                 <VideoPreviewFragment id={`msg-video-figure-${this.message.id}`}
+                                     ref={this.figureRef}
                                      type={this.props.type || "video"}
+                                     round={this.props.round}
                                      thumbSrc={this.message.thumbnail ? this.message.thumbnail : this.message.smallThumb}
                                      width={this.message.videoInfo.w}
                                      height={this.message.videoInfo.h}
@@ -56,6 +64,7 @@ class VideoComponent extends VComponent {
 
     onVideoDownloaded = event => {
         this.__patch();
+        this.message.fire("videoAppended")
     }
 
     onThumbnailDownloaded = event => {
