@@ -71,7 +71,7 @@ class BubblesComponent extends VComponent {
 
         this.intersectionObserver = new IntersectionObserver(this.onIntersection, {
             root: this.$el,
-            rootMargin: "2000px",
+            rootMargin: "2000px 100px",
             threshold: 1.0
         })
     }

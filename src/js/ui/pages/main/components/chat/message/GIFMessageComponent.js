@@ -8,7 +8,7 @@ class GIFMessageComponent extends GeneralMessageComponent {
     h() {
         return (
             <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false} bubbleRef={this.bubbleRef}>
-                <VideoComponent message={this.message} autodownload={true} autoplay={true} controls={false} loop={true}/>
+                <VideoComponent message={this.message} autodownload autoplay controls={false} loop muted/>
                 <MessageTimeComponent message={this.message} bg={true}/>
             </MessageWrapperFragment>
         )

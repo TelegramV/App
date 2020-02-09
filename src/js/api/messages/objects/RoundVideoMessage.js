@@ -1,13 +1,10 @@
 // @flow
 
-import {AbstractMessage} from "../AbstractMessage"
+import {VideoMessage} from "./VideoMessage"
 import {MessageType} from "../Message"
 
-export class RoundVideoMessage extends AbstractMessage {
+export class RoundVideoMessage extends VideoMessage {
 
     type = MessageType.ROUND
-
-    show() {
-        super.show()
-    }
+    
 }
