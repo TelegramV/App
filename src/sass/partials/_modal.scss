@@ -135,6 +135,14 @@
     }
 }
 
+.attach-files-modal {
+    min-width: 420px;
+    .file-list {
+        >* {
+            margin-bottom: 24px;
+        }
+    }
+}
 .attach-modal {
     width: 350px;
     .input-field {

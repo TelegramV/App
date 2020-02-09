@@ -52,11 +52,11 @@ export class AttachPhotosModal extends VComponent {
     }
 
     async send() {
+        ModalManager.close()
         const media = await this.galleryRef.component.getMedia()
         AppSelectedPeer.Current.api.sendMessage({
             text: this.captionRef.component.getValue(),
             media: media
         })
-        ModalManager.close()
     }
 }
