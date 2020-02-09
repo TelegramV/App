@@ -7,11 +7,19 @@ import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import type {Message} from "../../../../../api/messages/Message"
 import VComponent from "../../../../v/vrdom/component/VComponent"
 
+const DATA_FORMAT_MONTH_DAY = {
+    month: 'long',
+    day: 'numeric',
+}
+
 // needs rewrite
 class BubblesComponent extends VComponent {
 
     loaderRef = this.props.loaderRef
     bubblesInnerRef = VComponent.createRef()
+
+
+
 
     messages = {
         rendered: new Map(),
@@ -29,6 +37,7 @@ class BubblesComponent extends VComponent {
         this.callbacks = {
             peer: AppSelectedPeer.Reactive.FireOnly,
         }
+
     }
 
     appEvents(E) {
@@ -166,6 +175,14 @@ class BubblesComponent extends VComponent {
         $rendered.__component.__patch()
     }
 
+    sameDay(d1n: number, d2n: number) {
+        const d1 = new Date(d1n * 1000)
+        const d2 = new Date(d2n * 1000)
+        return d1.getFullYear() === d2.getFullYear() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getDate() === d2.getDate()
+    }
+
     /**
      * todo: rewrite this thing
      *
@@ -176,7 +193,19 @@ class BubblesComponent extends VComponent {
         const z = this.$el.scrollTop
         const k = this.bubblesInnerRef.$el.clientHeight
         for (const message of messages) {
+            const all = [...this.messages.rendered.values()]
+            const last = all.length > 0 ? all.reduce((l, q) => {
+                return l.id < q.id ? l : q
+            }) : null
+
             const $rendered = this.renderMessage(message)
+
+            if(last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
+                const $time = VRDOM.render(<div className="service">
+                    <div className="service-msg">{last.__component.message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
+                </div>)
+                this.bubblesInnerRef.$el.insertBefore($time, $rendered)
+            }
 
             if ($rendered) {
                 this.messages.rendered.set(message.id, $rendered)
@@ -203,7 +232,20 @@ class BubblesComponent extends VComponent {
         const pushed = []
 
         for (const message of messages) {
+            const all = [...this.messages.rendered.values()]
+            const first = all.length > 0 ? all.reduce((l, q) => {
+                return l.id > q.id ? l : q
+            }) : null
+
             const $rendered = this.renderMessage(message, true)
+
+            if(first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
+                console.log("www", first.__component.message.text, message.text)
+                const $time = VRDOM.render(<div className="service">
+                    <div className="service-msg">{message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
+                </div>)
+                this.bubblesInnerRef.$el.insertBefore($time, first)
+            }
 
             if ($rendered) {
                 if (isSending) {
