@@ -5,7 +5,7 @@ import {createLogger} from "../../common/logger";
 
 const Logger = createLogger("MTProtoNetworker")
 
-export class MTProtoNetworker extends Networker {
+export class MtprotoNetworker extends Networker {
     constructor(authContext) {
         super(authContext)
     }

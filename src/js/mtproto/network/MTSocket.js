@@ -18,6 +18,21 @@ export class MTSocket {
         this.obfuscation_init = undefined
     }
 
+    refreshSocket() {
+        this.inob_clear()
+        this.transportationSocket = new WebSocket(this.networker.dcUrl, "binary")
+        this.transportationSocket.binaryType = "arraybuffer"
+        this.transportationInit = false
+        this.transportationEstablishing = false
+    }
+
+    inob_clear() {
+        this.obfuscation_init = undefined
+        this.aes_decryptor = undefined
+        this.aes_encryptor = undefined
+    }
+
+
     transport(buffer) {
         if (!this.transportationInit) {
             if (!this.transportationEstablishing) {
@@ -68,18 +83,10 @@ export class MTSocket {
                 console.log("CRASHED")
             }
 
-            this.onDisconnect()
-
             console.log('code: ' + ev.code + ' reason: ' + ev.reason)
 
-            this.inob_clear()
+            this.onDisconnect()
         }
-    }
-
-    inob_clear() {
-        this.obfuscation_init = undefined
-        this.aes_decryptor = undefined
-        this.aes_encryptor = undefined
     }
 
     init_obfuscation(out_buffer_view) {
@@ -186,5 +193,6 @@ export class MTSocket {
 
     onDisconnect() {
         this.networker.onDisconnect()
+        this.refreshSocket()
     }
 }

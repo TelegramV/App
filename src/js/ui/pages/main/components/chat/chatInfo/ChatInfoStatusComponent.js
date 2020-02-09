@@ -2,6 +2,8 @@ import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {VComponent} from "../../../../../v/vrdom/component/VComponent"
 import type {BusEvent} from "../../../../../../api/eventBus/EventBus"
+import PeersStore from "../../../../../../api/store/PeersStore"
+import {actionTypesMapping} from "../../../sidebars/left/dialog/Fragments/DialogTextFragment"
 
 class ChatInfoStatusComponent extends VComponent {
 
@@ -12,6 +14,9 @@ class ChatInfoStatusComponent extends VComponent {
     }
 
     appEvents(E) {
+        E.bus(AppEvents.Dialogs)
+            .on("updateActions", this.onDialogsUpdateActions)
+
         E.bus(AppEvents.Peers)
             .on("updateUserStatus", this.peersBusFired)
             .on("fullLoaded", this.peersBusFired)
@@ -26,9 +31,45 @@ class ChatInfoStatusComponent extends VComponent {
         )
     }
 
+    onDialogsUpdateActions = event => {
+        if (AppSelectedPeer.check(event.dialog.peer)) {
+            this.__patch()
+        }
+    }
+
+    get action() {
+        if (this.callbacks.peer && this.callbacks.peer.dialog && this.callbacks.peer.dialog.actions.size > 0) {
+            const action = Array.from(this.callbacks.peer.dialog.actions).map(rawUpdate => {
+                const peer = PeersStore.get("user", rawUpdate.user_id)
+
+                if (peer && actionTypesMapping[rawUpdate.action._]) {
+                    return {
+                        user: peer.name,
+                        action: actionTypesMapping[rawUpdate.action._]
+                    }
+                }
+
+                return false
+            })[0]
+
+            if (action) {
+                return action.user + " " + action.action
+            }
+        }
+
+        return false
+    }
+
+
     get statusLine() {
         if (AppSelectedPeer.isNotSelected) {
             return "..."
+        }
+
+        const action = this.action
+
+        if (action) {
+            return {text: action}
         }
 
         const peer = AppSelectedPeer.Current

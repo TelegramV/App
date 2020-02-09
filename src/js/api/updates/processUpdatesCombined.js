@@ -7,8 +7,7 @@ import PeersManager from "../peers/objects/PeersManager"
 function processUpdatesCombined(manager, rawUpdate) {
     console.warn("processing updatesCombined is not properly implement now")
 
-    rawUpdate.users.forEach(rawUser => PeersManager.setFromRawAndFire(rawUser))
-    rawUpdate.chats.forEach(rawChat => PeersManager.setFromRawAndFire(rawChat))
+    PeersManager.fillPeersFromUpdate(rawUpdate)
 
     manager.State.date = rawUpdate.date
 

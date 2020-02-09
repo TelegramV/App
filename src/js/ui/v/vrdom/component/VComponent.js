@@ -720,7 +720,7 @@ export class VComponent {
             slot: undefined,
 
             // warning: fastpatch by default
-            patch(props, fast = true) {
+            patch(props, fast = false) {
                 if (this.$el) {
 
                     Object.assign(this.props, props)

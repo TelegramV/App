@@ -1,6 +1,7 @@
 import CryptoJS from "../vendor/crypto"
 import {bytesFromWords, bytesToWords} from "../utils/bin"
 import Bytes from "../utils/bytes"
+import aesjs from "../utils/aes"
 
 export function aesEncryptSync(bytes, keyBytes, ivBytes) {
     bytes = Bytes.addPadding(bytes)
@@ -12,6 +13,13 @@ export function aesEncryptSync(bytes, keyBytes, ivBytes) {
     }).ciphertext
 
     return bytesFromWords(encryptedWords)
+}
+
+export function aesjsDecrypt(encryptedBytes, keyBytes, ivBytes) {
+    const counter = new aesjs.Counter(32)
+    counter.setBytes(ivBytes)
+    const aes_decryptor = new aesjs.AES(keyBytes).decrypt()
+    return aes_decryptor.decrypt(encryptedBytes)
 }
 
 export function aesDecryptSync(encryptedBytes, keyBytes, ivBytes) {
