@@ -83,7 +83,7 @@ const vrdom_patch = <T: Element | Node | Text>($node: T, newNode: VRNode | VComp
             return vrdom_mount(newNode, $node)
         }
 
-        return $node
+        return vrdom_mount(newNode, $node)
 
     }
 }

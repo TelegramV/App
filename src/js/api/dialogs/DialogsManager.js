@@ -32,15 +32,23 @@ class DialogManager extends Manager {
         }
 
         // actions checking interval
+        // very dirty thing, but fuck, no time left
         setInterval(() => {
             DialogsStore.toArray().forEach(dialog => {
                 dialog.actions.forEach(rawUpdate => {
-                    if (rawUpdate.time + 6 < tsNow(true)) {
+                    if (rawUpdate.time + 5 <= tsNow(true)) {
                         dialog.removeAction(rawUpdate)
                     }
                 })
+                // if (dialog.peer.raw.status && dialog.peer.raw.status._ === "userStatusOnline" && dialog.peer.raw.status.expires < tsNow(true)) {
+                //     dialog.peer.fire("updateUserStatus")
+                //
+                //     AppEvents.Peers.fire("updateUserStatus", {
+                //         peer: dialog.peer
+                //     })
+                // }
             })
-        }, 2000)
+        }, 1000)
 
         AppSelectedPeer.subscribe(_ => {
             if (AppSelectedPeer.Previous) {
@@ -50,6 +58,18 @@ class DialogManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateChatUserTyping", update => {
             let peer = PeersStore.get("chat", update.chat_id) || PeersStore.get("channel", update.chat_id)
+
+            if (!peer || !peer.dialog) {
+                console.log("good game telegram, good game")
+            } else {
+                update.time = tsNow(true)
+                peer.dialog.addAction(update)
+            }
+        })
+
+
+        MTProto.UpdatesManager.subscribe("updateUserTyping", update => {
+            let peer = PeersStore.get("user", update.user_id)
 
             if (!peer || !peer.dialog) {
                 console.log("good game telegram, good game")

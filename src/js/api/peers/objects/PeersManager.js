@@ -4,6 +4,7 @@ import AppEvents from "../../eventBus/AppEvents"
 import {MTProto} from "../../../mtproto/external"
 import {UserPeer} from "./UserPeer"
 import PeerFactory from "../PeerFactory"
+import {tsNow} from "../../../mtproto/timeManager"
 
 class PeerManager extends Manager {
 
@@ -21,6 +22,7 @@ class PeerManager extends Manager {
 
             if (peer instanceof UserPeer) {
                 peer.raw.status = update.status
+                // peer.raw.status.expires = tsNow(true) + 2
 
                 peer.fire("updateUserStatus")
 

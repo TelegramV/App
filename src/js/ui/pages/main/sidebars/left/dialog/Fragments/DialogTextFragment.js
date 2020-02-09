@@ -2,17 +2,17 @@ import {parseMessageEntities} from "../../../../../../../mtproto/utils/htmlHelpe
 import PeersStore from "../../../../../../../api/store/PeersStore"
 
 export const actionTypesMapping = {
-    sendMessageTypingAction: "is typing",
-    sendMessageRecordVideoAction: "is recording a video",
-    sendMessageUploadVideoAction: "is uploading a video",
-    sendMessageRecordAudioAction: "is recording a voice message",
-    sendMessageUploadAudioAction: "is uploading a voice message",
-    sendMessageUploadPhotoAction: "is uploading a photo",
-    sendMessageUploadDocumentAction: "is uploading a file",
-    sendMessageGeoLocationAction: "is selecting a location to share",
-    sendMessageChooseContactAction: "is selecting a contact to share",
-    sendMessageGamePlayAction: "is playing a game",
-    sendMessageRecordRoundAction: "is recording a round video to share",
+    sendMessageTypingAction: "is typing..",
+    sendMessageRecordVideoAction: "is recording a video..",
+    sendMessageUploadVideoAction: "is uploading a video..",
+    sendMessageRecordAudioAction: "is recording a voice message..",
+    sendMessageUploadAudioAction: "is uploading a voice message..",
+    sendMessageUploadPhotoAction: "is uploading a photo..",
+    sendMessageUploadDocumentAction: "is uploading a file..",
+    sendMessageGeoLocationAction: "is selecting a location to share..",
+    sendMessageChooseContactAction: "is selecting a contact to share..",
+    sendMessageGamePlayAction: "is playing a game..",
+    sendMessageRecordRoundAction: "is recording a round video to share..",
     sendMessageUploadRoundAction: "is uploading a round video",
 }
 

@@ -22,7 +22,19 @@ export class AbstractBarComponent extends VComponent {
         }
     }
 
+    sidebarOnHide = event => {
+        if (event.barName === this.barName) {
+            this.barVisible = false
+            this.barBeforeHide(event)
+            this.barOnHide(event)
+            this.barAfterHide(event)
+        }
+    }
+
     openBar = barName => {
+    }
+
+    hideBar = barName => {
     }
 
     // you can override methods below

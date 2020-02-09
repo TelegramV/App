@@ -55,7 +55,7 @@ export class UserPeer extends Peer {
             case "userStatusOnline":
 
                 return {
-                    online: true
+                    online: this.raw.status.expires > now,
                 }
 
             case "userStatusLastWeek":
