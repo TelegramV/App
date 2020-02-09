@@ -73,6 +73,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         "channel": message.isPost,
         "out": !message.isPost && message.isOut,
         "in": message.isPost || !message.isOut,
+        "hide-tail": transparent,
     }
 
     let wrapClasses = {

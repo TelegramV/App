@@ -39,6 +39,7 @@
         .bubble {
             grid-area: bubble;
             max-width: 480px;
+            min-height: 34px;
             border-radius: 12px;
             //box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.15);
             position: relative;
@@ -583,7 +584,7 @@
                 color: $blueonline;
                 font-weight: 500;
                 font-size: 14px;
-                padding: 3px 0;
+                padding-bottom: 3px;
 
                 .no-bold {
                     font-weight: 400;
@@ -597,7 +598,7 @@
             .message {
                 line-height: 1.2;
                 word-wrap: break-word;
-                padding: 5px 9px;
+                padding: 7.5px 9px;
 
                 .text-wrapper {
                     word-break: break-word;

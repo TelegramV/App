@@ -215,11 +215,63 @@ class BubblesComponent extends VComponent {
         if (message.groupedId && this.messages.renderedGroups.has(message.groupedId)) {
             return null
         }
+
         $message = $mount(<MessageComponent intersectionObserver={this.intersectionObserver}
                                             message={message}/>, this.bubblesInnerRef.$el)
 
-
         return $message
+    }
+
+    changeTails($message, message) {
+        const threshold = 60 * 5
+        const avatar = $message.__component.avatarRef
+
+        if($message.previousSibling && $message.previousSibling.__component) {
+            const prev = $message.previousSibling.__component
+            const $prev = $message.previousSibling
+            const from = prev.message.from
+            if(from === message.from && Math.abs(prev.message.date - message.date) <= threshold) {
+                $prev.classList.remove("upper")
+                const username = $prev.querySelector(".username")
+
+                if(username) {
+                    username.parentNode.removeChild(username)
+                }
+                $message.classList.add("hide-tail")
+                $message.classList.add("upper")
+                avatar.component && avatar.component.hide()
+            } else {
+                $message.classList.add("upper")
+            }
+
+        } else {
+            $message.classList.add("upper")
+            if($message.nextSibling && $message.nextSibling.__component) {
+                const next = $message.nextSibling.__component
+                const $next = $message.nextSibling
+                const from = next.message.from
+                if(from === message.from && Math.abs(next.message.date - message.date) <= threshold) {
+                    $next.classList.add("hide-tail")
+                    $message.classList.remove("hide-tail")
+                    $message.classList.remove("upper")
+                    const username = $message.querySelector(".username")
+
+                    if(username) {
+                        username.parentNode.removeChild(username)
+                    }
+
+                    const avatarNext = $next.__component.avatarRef
+
+                    avatarNext.component && avatarNext.component.hide()
+                } else {
+                    $next.classList.add("upper")
+                }
+            } else {
+                $message.classList.add("upper")
+            }
+        }
+
+
     }
 
     patchSentMessage = (rawMessage) => {
@@ -261,6 +313,7 @@ class BubblesComponent extends VComponent {
     appendMessages = (messages, scrollToWaited = true) => {
         const z = this.$el.scrollTop
         const k = this.bubblesInnerRef.$el.clientHeight
+        const pushed = []
         for (const message of messages) {
             const all = [...this.messages.rendered.values()]
             const last = all.length > 0 ? all.reduce((l, q) => {
@@ -277,12 +330,16 @@ class BubblesComponent extends VComponent {
             }
 
             if ($rendered) {
+                pushed.push($rendered)
                 this.messages.rendered.set(message.id, $rendered)
                 if (message.groupedId) {
                     this.messages.renderedGroups.set(message.groupedId, message)
                 }
             }
         }
+        pushed.forEach(l => {
+            this.changeTails(l, l.__component.message)
+        })
         this.$el.scrollTop = z + this.bubblesInnerRef.$el.clientHeight - k
         if(scrollToWaited) {
             this.scrollToWaitedMessage()
@@ -327,10 +384,14 @@ class BubblesComponent extends VComponent {
                         this.messages.renderedGroups.set(message.groupedId, message)
                     }
                 }
+                pushed.push($rendered)
             }
 
-            pushed.push($rendered)
         }
+
+        pushed.forEach(l => {
+            this.changeTails(l, l.__component.message)
+        })
 
         if (reset) {
             this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight
@@ -388,10 +449,11 @@ class BubblesComponent extends VComponent {
         if(this.loadedTop && !this.messages.isFetchingPrevPage) {
             if($element.scrollTop > this.bubblesInnerRef.$el.clientHeight - this.$el.clientHeight - 300) {
                 this.messages.isFetchingPrevPage = true
+                const all = [...this.messages.rendered.keys()]
 
-                this.callbacks.peer.api.fetchPrevPage([...this.messages.rendered.keys()].reduce((l, q) => {
+                this.callbacks.peer.api.fetchPrevPage(all.length > 0 ? all.reduce((l, q) => {
                     return l > q ? l : q
-                })).then(() => {
+                }) : null).then(() => {
                     this.messages.isFetchingPrevPage = false
                 })
             }
@@ -399,9 +461,11 @@ class BubblesComponent extends VComponent {
         if ($element.scrollTop < 300 && !this.messages.isFetchingNextPage) {
             this.messages.isFetchingNextPage = true
 
-            this.callbacks.peer.api.fetchNextPage([...this.messages.rendered.keys()].reduce((l, q) => {
+            const all = [...this.messages.rendered.keys()]
+
+            this.callbacks.peer.api.fetchNextPage(all.length > 0 ? all.reduce((l, q) => {
                 return l < q ? l : q
-            })).then(() => {
+            }) : null).then(() => {
                 this.messages.isFetchingNextPage = false
             })
 

@@ -49,6 +49,7 @@ export class MessageAvatarComponent extends Component {
 
     hide() {
         this.$el.style.visibility = "hidden"
+        this.show = false
     }
 
     openPeerInfo() {
