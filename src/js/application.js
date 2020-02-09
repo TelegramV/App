@@ -1,6 +1,5 @@
 import "../sass/application.scss"
 
-import "./ui/vendor/tgs-player.js";
 import VF from "./ui/v/VFramework"
 import MTProto from "./mtproto/external"
 import AppCache from "./api/cache"

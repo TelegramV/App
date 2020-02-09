@@ -5,17 +5,13 @@
 
     .service {
         justify-content: center;
+        margin-bottom: 10px !important;
 
         &.date {
             z-index: 100;
             top: 10px;
             //position: sticky; //TODO fix stacking
             transition: anim(opacity);
-            opacity: 1;
-
-            &.hidden {
-                opacity: 0;
-            }
         }
 
         .service-msg {

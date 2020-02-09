@@ -1,4 +1,4 @@
-export const VideoPreviewFragment = ({type="video",round=false, id, thumbSrc, width, height, maxHeight, maxWidth, loading, loaded, clickLoader}) => {
+export const VideoPreviewFragment = ({type="video", round=false, id, thumbSrc, width, height, maxHeight, maxWidth, loading, loaded, clickLoader}) => {
   width = height < maxHeight ? width : maxHeight/height*width;
   height = height < maxHeight ? height : maxHeight;
 
@@ -31,7 +31,7 @@ export const LoadingFragment = ({id, loading = false, click = undefined, show = 
     )
 }
 
-export const VideoFigureFragment = ({type = "video", id, srcUrl, round=false, width, height, maxHeight, maxWidth, loop, autoplay}) => {
+export const VideoFigureFragment = ({type = "video", id, srcUrl, round=false, width, height, maxHeight, maxWidth, loop=false, autoplay=true, controls=true}) => {
     width = height < maxHeight ? width : maxHeight/height*width;
     height = height < maxHeight ? height : maxHeight;
 
@@ -40,13 +40,11 @@ export const VideoFigureFragment = ({type = "video", id, srcUrl, round=false, wi
     
     return (
         <figure id={id} className={[type, round ? "round" : ""]}>
-
-            <video controls
-                   autoplay
+            <video controls={controls === false ? undefined : true}
                    src={srcUrl}
                    width={width}
                    height={height}
-                   loop={loop}
+                   loop={loop === false ? undefined : true}
                    autoplay={autoplay}
                    />
         </figure>

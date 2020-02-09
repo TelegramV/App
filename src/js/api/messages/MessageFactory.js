@@ -15,6 +15,7 @@ import {WebpageMessage} from "./objects/WebpageMessage"
 import {ContactMessage} from "./objects/ContactMessage"
 import {DocumentMessage} from "./objects/DocumentMessage"
 import {VideoMessage} from "./objects/VideoMessage"
+import {GIFMessage} from "./objects/GIFMessage"
 import {StickerMessage} from "./objects/StickerMessage"
 import {VoiceMessage} from "./objects/VoiceMessage"
 import {AudioMessage} from "./objects/AudioMessage"
@@ -35,7 +36,7 @@ const messageObjects = new Map([
     [MessageType.WEB_PAGE, WebpageMessage],
     [MessageType.CONTACT, ContactMessage],
     [MessageType.DOCUMENT, DocumentMessage],
-    [MessageType.GIF, VideoMessage], //TODO own gif component
+    [MessageType.GIF, GIFMessage],
     [MessageType.STICKER, StickerMessage],
     [MessageType.ANIMATED_STICKER, AnimatedStickerMessage],
     [MessageType.ANIMATED_EMOJI, AnimatedStickerMessage],

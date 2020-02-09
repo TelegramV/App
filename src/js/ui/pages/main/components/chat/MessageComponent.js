@@ -10,6 +10,7 @@ import WebpageMessageComponent from "./message/WebpageMessageComponent"
 import ContactMessageComponent from "./message/ContactMessageComponent"
 import DocumentMessageComponent from "./message/DocumentMessageComponent"
 import VideoMessageComponent from "./message/video/VideoMessageComponent"
+import GIFMessageComponent from "./message/GIFMessageComponent"
 import StickerMessageComponent from "./message/StickerMessageComponent"
 import VoiceMessageComponent from "./message/VoiceMessageComponent"
 import AudioMessageComponent from "./message/AudioMessageComponent"
@@ -34,7 +35,7 @@ const handlers = new Map([
     [MessageType.WEB_PAGE, WebpageMessageComponent],
     [MessageType.CONTACT, ContactMessageComponent],
     [MessageType.DOCUMENT, DocumentMessageComponent],
-    [MessageType.GIF, VideoMessageComponent], //TODO own gif component
+    [MessageType.GIF, GIFMessageComponent],
     [MessageType.ANIMATED_STICKER, AnimatedStickerMessageComponent],
     [MessageType.STICKER, StickerMessageComponent],
     [MessageType.VOICE, VoiceMessageComponent],

@@ -1,4 +1,5 @@
 import VComponent from "../../../../../v/vrdom/component/VComponent";
+import VF from "../../../../../v/VFramework";
 import VRDOM from "../../../../../v/vrdom/VRDOM";
 import TabSelectorComponent from "../../basic/TabSelectorComponent"
 import StickerComponent from "../message/common/StickerComponent"
@@ -232,7 +233,7 @@ export default class ComposerComponent extends VComponent {
 	_stickerClick = (ev) => {
 		let ref = ev.currentTarget.getAttribute("data-component-id");
 		if(!ref) return;
-		let sticker = this.refs.get(ref).sticker;
+		let sticker = VF.mountedComponents.get(ref).sticker;
 		AppSelectedPeer.Current.api.sendExistingMedia(sticker);
 	}
 
@@ -258,7 +259,7 @@ export default class ComposerComponent extends VComponent {
 	_gifClick = (ev) => {
 		let ref = ev.currentTarget.getAttribute("data-component-id");
 		if(!ref) return;
-		let gif = this.refs.get(ref).props.object;
+		let gif = VF.mountedComponents.get(ref).props.object;
 		AppSelectedPeer.Current.api.sendExistingMedia(gif);
 	}
 }
