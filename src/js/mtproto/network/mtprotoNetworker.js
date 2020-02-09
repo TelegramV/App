@@ -1,4 +1,4 @@
-import {Networker} from "./networker";
+import {Networker} from "./Networker";
 import {TLSerialization} from "../language/serialization";
 import {TLDeserialization} from "../language/deserialization";
 import {createLogger} from "../../common/logger";

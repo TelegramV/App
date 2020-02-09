@@ -1,6 +1,6 @@
 // NEVER USE THIS THING OUTSIDE mtproto FOLDER
 
-import {ApiNetworker} from "./network/apiNetworker"
+import {ApiNetworker} from "./network/ApiNetworker"
 import {AppConfiguration} from "../configuration"
 import {createNonce} from "./utils/bin"
 import TimeManager from "./timeManager"
@@ -8,7 +8,7 @@ import {AuthAPI} from "./auth"
 import {MTProtoNetworker} from "./network/mtprotoNetworker"
 import Bytes from "./utils/bytes"
 import authKeyCreation from "./connect/authKeyCreation"
-import {FileNetworker} from "./network/fileNetworker"
+import {FileNetworker} from "./network/FileNetworker"
 
 // NEVER USE THIS THING OUTSIDE mtproto FOLDER
 
@@ -60,6 +60,16 @@ class MobileProtocolPermanentStorage {
         return this.storage.has(key)
     }
 }
+
+const fileNetworkerMethods = [
+    "upload.getFile",
+    "upload.getFileHashes",
+    "upload.getWebFile",
+    "messages.getDocumentByHash",
+    "photos.uploadProfilePhoto",
+    "upload.saveFilePart",
+    "upload.saveBigFilePart",
+]
 
 class MobileProtocol {
     constructor(options = {}) {
@@ -117,6 +127,7 @@ class MobileProtocol {
                         this.onConnected()
                     })
             })
+
         } else {
             authContext.authKey = new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("authKey" + this.authContext.dcID)))
             authContext.serverSalt = Bytes.fromHex(this.PermanentStorage.getItem("serverSalt" + this.authContext.dcID))
@@ -139,7 +150,7 @@ class MobileProtocol {
                 authKey: new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("authKey" + dcID))),
                 serverSalt: new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("serverSalt" + dcID)))
             })
-            // console.log("created file networker", this.networker, this)
+
             const list = this.fileNetworkers[dcID]
             this.fileNetworkers[dcID] = networker
             list.forEach(l => {
@@ -178,7 +189,11 @@ class MobileProtocol {
         })
     }
 
-    invokeMethod(method, parameters = {}, dcID = null) {
+    invokeMethod(method, parameters = {}, dcID = null, file) {
+        if (fileNetworkerMethods.includes(method)) {
+            file = true
+        }
+
         if (!this.connected) {
             console.info("Not connected, putting in queue")
             return new Promise(resolve => {
@@ -190,15 +205,22 @@ class MobileProtocol {
             })
         }
 
-        if (dcID !== null && dcID !== this.authContext.dcID) {
+        if (file) {
+            if (dcID === null) {
+                dcID = this.authContext.dcID
+            }
+
             let networker = this.fileNetworkers[dcID]
+
             if (Array.isArray(networker)) {
                 return new Promise(resolve => {
                     networker.push({method, parameters, resolve})
                 })
             }
+
             if (!networker) {
                 this.fileNetworkers[dcID] = []
+
                 return this.createFileNetworker(dcID).then(networker => {
                     networker.invokeMethod(method, parameters)
                 })
