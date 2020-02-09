@@ -1,10 +1,12 @@
 .sidebar.dialog-info {
   position: relative;
   padding-top: 60px;
+  width: 100%;
   transition: anim(width);
 
   &.hidden {
     display: block;
+    border-left: none;
   }
 
   >.header {

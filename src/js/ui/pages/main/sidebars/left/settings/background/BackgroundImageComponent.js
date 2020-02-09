@@ -37,9 +37,11 @@ export default class BackgroundImageComponent extends SettingsPane {
 	}
 
 	_uploadBackground = () => {
-		askForFile("image/*", url => {
+		askForFile("image/*", buffer => {
+			let blob = new Blob([buffer]);
+			let url = URL.createObjectURL(blob);
 			window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
-		})
+		}, true)
 	}
 
 	_fillImages = (cache) => {
