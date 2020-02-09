@@ -1,5 +1,3 @@
-import Bytes from "../utils/bytes"
-
 export let schema = null
 
 export function loadSchema() {

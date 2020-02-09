@@ -15,6 +15,7 @@ import MessagesSearchComponent from "./sidebars/right/search/MessagesSearchCompo
 import {DialogInfoComponent} from "./sidebars/right/dialogInfo/DialogInfoComponent"
 import {ArchivedDialogsBar} from "./sidebars/left/dialog/ArchivedDialogsBar"
 import TopPeers from "../../../api/peers/TopPeers"
+import {StickerManager} from "../../../api/stickersManager";
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {

@@ -16,6 +16,7 @@ class Cache {
             "images",
             "files",
             "languages",
+            "schema"
         ])
     }
 

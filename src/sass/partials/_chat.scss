@@ -21,6 +21,8 @@
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center center;
+        transition: anim(filter);
+
         &.blur {
             filter: blur(5px) brightness(90%);
         }

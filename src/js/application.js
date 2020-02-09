@@ -15,16 +15,9 @@ import VBigInt from "./mtproto/bigint/VBigInt"
 import type {BusEvent} from "./api/eventBus/EventBus"
 import {VComponent} from "./ui/v/vrdom/component/VComponent"
 import AppSelectedPeer from "./ui/reactive/SelectedPeer"
+import {loadSchema} from "./mtproto/language/schema";
 
-const isProduction = false
-
-export const defaultDcID = 2
-
-const authContext = {
-    dcID: defaultDcID,
-    nonce: createNonce(16),
-    sessionID: createNonce(8)
-}
+const isProduction = true
 
 function start() {
     MTProto.invokeMethod("help.getNearestDc", {}).then(response => {
@@ -69,5 +62,4 @@ if (isProduction) {
 }
 
 startUI()
-MTProto.connect(authContext)
-    .then(start)
+MTProto.connect().then(start)

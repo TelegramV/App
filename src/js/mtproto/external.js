@@ -4,6 +4,7 @@ import MobileProtoWorker from "./workers/mtproto.worker"
 import {AppPermanentStorage} from "../common/storage"
 import UpdatesManager from "../api/updates/updatesManager"
 import AppEvents from "../api/eventBus/AppEvents"
+import AppCache from "../api/cache";
 
 let lastTaskId = 0
 let waitingTasks = new Map()

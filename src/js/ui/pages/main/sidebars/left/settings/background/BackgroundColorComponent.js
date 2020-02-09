@@ -1,8 +1,10 @@
 import SettingsPane from "../SettingsPane"
 import {InputComponent} from "../../../../components/input/inputComponent"
+import VComponent from "../../../../../../v/vrdom/component/VComponent";
 
 export default class BackgroundColorComponent extends SettingsPane {
 	barName = "background-color";
+	palette = VComponent.createRef()
 
 	constructor(props) {
 		super(props);
@@ -30,6 +32,13 @@ export default class BackgroundColorComponent extends SettingsPane {
 			<div class="sidebar sub-settings background-color scrollable">
 				{this.makeHeader()}
 				<div class="pallete">
+					<div className="grad" style="background: rgb(0, 255, 35);">
+						<div className="bg1"/>
+						<div className="bg2"/>
+					</div>
+					<div className="grad-bottom">
+						<div className="bg"/>
+					</div>
 				</div>
 				<div class="inputs">
 					<InputComponent type="text" label="HEX" value="#"/>
@@ -40,6 +49,11 @@ export default class BackgroundColorComponent extends SettingsPane {
 				</div>
 			</div>
 			)
+	}
+
+	mounted() {
+		super.mounted()
+
 	}
 
 	generateColorList = () => {

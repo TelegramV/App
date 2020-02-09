@@ -1,5 +1,6 @@
 import type {Message} from "./Message"
 import {MessageType} from "./Message"
+import {StickerManager} from "../stickersManager";
 
 export class MessageParser {
 
