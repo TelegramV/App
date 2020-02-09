@@ -32,7 +32,7 @@ export class ChatInputComponent extends Component {
     h() {
         return <div className="chat-input-wrapper">
             <div className="chat-input">
-            <ComposerComponent mouseEnter={this.mouseEnterComposer} mouseLeave={this.mouseLeaveComposer} ref="composer"/>
+            <ComposerComponent mouseEnter={this.mouseEnterComposer} mouseLeave={this.mouseLeaveComposer}/>
                 <div className="input-and-keyboard-wrapper">
                     <div className="input-field-wrapper">
                         <div className="reply hidden">
