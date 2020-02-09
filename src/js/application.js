@@ -17,7 +17,7 @@ import {VComponent} from "./ui/v/vrdom/component/VComponent"
 import AppSelectedPeer from "./ui/reactive/SelectedPeer"
 import {loadSchema} from "./mtproto/language/schema";
 
-const isProduction = true
+const isProduction = false
 
 function start() {
     MTProto.invokeMethod("help.getNearestDc", {}).then(response => {

@@ -5,6 +5,7 @@ import {InlineKeyboardComponent} from "./InlineKeyboardComponent";
 import {ReplyFragment} from "./ReplyFragment"
 import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 import {MessageParser} from "../../../../../../../api/messages/MessageParser";
+import {UserPeer} from "../../../../../../../api/peers/objects/UserPeer";
 
 const ReplyToMessageFragment = ({message}) => {
     if (!message.raw.reply_to_msg_id) {
@@ -34,7 +35,7 @@ const ReplyToMessageFragment = ({message}) => {
  * @return {*}
  * @constructor
  */
-const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, outerPad = true, contextActions, showUsername = true, showAvatar = true, avatarRef, bubbleRef}) => {
+const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, outerPad = true, contextActions, showUsername = true, avatarRef, bubbleRef}) => {
     const defaultContextActions = [
         {
             icon: "reply",
@@ -107,42 +108,9 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         ChatInputManager.setKeyboardMarkup(message.replyMarkup)
     }
 
-    const username = showUsername && message.from.name && !message.isPost && !message.isOut && !message.raw.reply_to_msg_id && !message.raw.fwd_from
-
-    if (!message.isPost && topLevelClasses.in) {
-
-        return (
-            <div className={topLevelClasses}
-                 id={`message-${message.id}`}
-                 onContextMenu={contextMenuHandler}
-                 onDblClick={doubleClickHandler}
-                 data-peer={`${message.from.type}-${message.from.id}`}>
-
-
-
-                <div className={wrapOuter}>
-                    <MessageAvatarComponent id={`message-${message.id}-avatar`}
-                                            show={showAvatar}
-                                            ref={avatarRef}
-                                            message={message}/>
-
-                    <div className={wrapClasses} ref={bubbleRef}>
-
-                        <ReplyToMessageFragment message={message}/>
-
-                        <div className={messageClasses}>
-                            <ForwardedHeaderFragment message={message}/>
-                            {username ? <div className="username">{message.from.name}</div> : ""}
-                            {slot}
-                        </div>
-                    </div>
-
-                    {inlineKeyboard}
-                </div>
-
-            </div>
-        )
-    }
+    const isPrivateMessages = message.to instanceof UserPeer
+    const username = showUsername && message.from.name && !message.isPost && !message.isOut && !message.raw.reply_to_msg_id && !message.raw.fwd_from && !isPrivateMessages
+    const hideAvatar = topLevelClasses.out || message.isPost || isPrivateMessages
 
     return (
         <div className={topLevelClasses}
@@ -150,7 +118,13 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
              onContextMenu={contextMenuHandler}
              onDblClick={doubleClickHandler}>
 
-            <div className="bubble-outer">
+            <div className={wrapOuter}>
+                {
+                    !hideAvatar ? <MessageAvatarComponent id={`message-${message.id}-avatar`}
+                                                         show={!hideAvatar}
+                                                         ref={avatarRef}
+                                                         message={message}/> : ""
+                }
                 <div className={wrapClasses} ref={bubbleRef}>
 
                     <ReplyToMessageFragment message={message}/>
