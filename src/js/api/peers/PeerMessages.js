@@ -98,6 +98,10 @@ export class PeerMessages {
         return this.sortedArray[0]
     }
 
+    get newest(): Message | undefined {
+        return this.sortedArray[this.sortedArray.length - 1]
+    }
+
     get sortedArray(): Array<Message> {
         if (!this._alreadySorted) {
             this._sortedArray = this._sortMessagesArray(Array.from(this._messages.values()))

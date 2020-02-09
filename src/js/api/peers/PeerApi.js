@@ -7,6 +7,7 @@ import {FileAPI} from "../fileAPI"
 import {MessageFactory} from "../messages/MessageFactory"
 import AppConfiguration from "../../configuration"
 import {TextMessage} from "../messages/objects/TextMessage";
+import UIEvents from "../../ui/eventBus/UIEvents";
 
 export class PeerApi {
 
@@ -75,20 +76,60 @@ export class PeerApi {
         })
     }
 
-    fetchNextPage() {
-        let oldest = this._peer.messages.oldest
+    fetchByOffsetId({offset_id, limit, add_offset}) {
+        return this.getHistory({offset_id, limit, add_offset: -1 + add_offset}).then(messages => {
+            // console.log("fetchByOffsetId returned", messages.length)
+            if (messages.length > 0) {
+                AppEvents.Dialogs.fire("fetchedMessagesAnyPage", {
+                    dialog: this._peer.dialog,
+                    messages: messages
+                })
+            }
+        })
+    }
 
-        if (!oldest) {
-            return Promise.resolve()
+    fetchNextPage(id = null) {
+        if(!id) {
+            let oldest = this._peer.messages.oldest
+            // console.log("fetchNextPage", oldest)
+
+            if (!oldest) {
+                return Promise.resolve()
+            }
+            id = oldest.id
         }
 
-        return this.getHistory({offset_id: oldest.id}).then(messages => {
+        return this.getHistory({offset_id: id}).then(messages => {
+            // console.log("fetchNextPage returned", messages.length)
             if (messages.length > 0) {
                 AppEvents.Dialogs.fire("fetchedMessagesNextPage", {
                     dialog: this._peer.dialog,
                     messages: messages
                 })
             }
+        })
+    }
+
+
+    fetchPrevPage(id = null) {
+        if(!id) {
+            let newest = this._peer.messages.newest
+            // console.log("fetchNextPage", newest)
+
+            if (!newest) {
+                return Promise.resolve()
+            }
+            id = newest.id
+        }
+
+        return this.getHistory({offset_id: id, add_offset: -50}).then(messages => {
+            // console.log("fetchPrevPage returned", messages.length)
+            // if (messages.length > 0) {
+                AppEvents.Dialogs.fire("fetchedMessagesPrevPage", {
+                    dialog: this._peer.dialog,
+                    messages: messages.reverse()
+                })
+            // }
         })
     }
 
@@ -168,6 +209,7 @@ export class PeerApi {
             dialog: this._peer.dialog,
             message: message
         })
+        UIEvents.Bubbles.fire("scrollToBottom")
 
         p.then(q => {
             MTProto.invokeMethod(media ? (multi ? "messages.sendMultiMedia" : "messages.sendMedia") : "messages.sendMessage", {

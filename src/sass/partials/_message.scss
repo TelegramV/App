@@ -588,6 +588,14 @@
                 font-weight: 500;
                 font-size: 14px;
                 padding: 3px 0;
+
+                .no-bold {
+                    font-weight: 400;
+                }
+
+                .clickable-name {
+                    cursor: pointer;
+                }
             }
 
             .message {

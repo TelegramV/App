@@ -6,19 +6,24 @@ import {ReplyFragment} from "./ReplyFragment"
 import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 import {MessageParser} from "../../../../../../../api/messages/MessageParser";
 import {UserPeer} from "../../../../../../../api/peers/objects/UserPeer";
+import UIEvents from "../../../../../../eventBus/UIEvents";
 
 const ReplyToMessageFragment = ({message}) => {
     if (!message.raw.reply_to_msg_id) {
         return ""
     } else if (!message.replyToMessage) {
-        return <ReplyFragment id={`message-${message.id}-rpl`} show={true}/>
+        return <ReplyFragment id={`message-${message.id}-rpl`} show={true} onClick={l => {
+            UIEvents.Bubbles.fire("showMessage", message.replyToMessage)
+        }}/>
     }
 
     return (
         <ReplyFragment id={`message-${message.id}-rpl`}
                        name={message.replyToMessage.from.name}
                        text={MessageParser.getPrefixNoSender(message.replyToMessage)}
-                       show={true}/>
+                       show={true} onClick={l => {
+            UIEvents.Bubbles.fire("showMessage", message.replyToMessage)
+        }}/>
     )
 }
 

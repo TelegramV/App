@@ -14,10 +14,11 @@ class AudioManager0 {
     }
 
     playNotification(sound) {
+        return // MUTE!
         //TODO no notifications setting
-        if (!this.sounds[sound]) throw new Error("No such sound: " + sound)
-        let audio = new Audio(sounds[sound]);
-        audio.play();
+        if (!this.notifications[sound]) throw new Error("No such sound: " + sound)
+        let audio = new Audio(this.notifications[sound])
+        audio.play()
     }
 
     /**
