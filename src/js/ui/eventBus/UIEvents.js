@@ -4,6 +4,7 @@ class UIEventBuses {
     constructor() {
         this.LeftSidebar = new EventBus()
         this.RightSidebar = new EventBus()
+        this.Bubbles = new EventBus()
     }
 }
 

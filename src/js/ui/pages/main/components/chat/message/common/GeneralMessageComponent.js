@@ -4,6 +4,8 @@ import type {Message} from "../../../../../../../api/messages/Message"
 import {ReplyFragment} from "./ReplyFragment"
 import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 import {VComponent} from "../../../../../../v/vrdom/component/VComponent"
+import UIEvents from "../../../../../../eventBus/UIEvents";
+import {MessageParser} from "../../../../../../../api/messages/MessageParser";
 
 class GeneralMessageComponent extends VComponent {
 
@@ -30,7 +32,8 @@ class GeneralMessageComponent extends VComponent {
         this.message.show()
         const threshold = 60 * 5
 
-        if(false) {
+        // TODO move to bubble component!!!!
+        if (false) {
             if (!this.$el.previousElementSibling || this.$el.previousElementSibling.__message.from !== this.message.from) {
                 if (this.$el.nextElementSibling && this.$el.nextElementSibling.__message.from === this.message.from) {
 
@@ -113,7 +116,8 @@ class GeneralMessageComponent extends VComponent {
                     messageId={this.message.id}
                     show={true}
                     name={this.message.replyToMessage.from.name}
-                    text={this.message.replyToMessage.text}/>
+                    text={MessageParser.getPrefixNoSender(this.message.replyToMessage)}
+                    onClick={l => UIEvents.Bubbles.fire("showMessage", this.message.replyToMessage)}/>
             )
         }
     }

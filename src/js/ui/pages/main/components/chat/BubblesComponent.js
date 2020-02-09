@@ -6,6 +6,8 @@ import VRDOM from "../../../../v/vrdom/VRDOM"
 import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import type {Message} from "../../../../../api/messages/Message"
 import VComponent from "../../../../v/vrdom/component/VComponent"
+import UIEvents from "../../../../eventBus/UIEvents";
+import AudioManager from "../../../../audioManager";
 
 const DATA_FORMAT_MONTH_DAY = {
     month: 'long',
@@ -44,9 +46,14 @@ class BubblesComponent extends VComponent {
         E.bus(AppEvents.Dialogs)
             .on("fetchedInitialMessages", this.onFetchedInitialMessages)
             .on("fetchedMessagesNextPage", this.onFetchedMessagesNextPage)
+            .on("fetchedMessagesPrevPage", this.onFetchedMessagesPrevPage)
+            .on("fetchedMessagesAnyPage", this.onFetchedMessagesAnyPage)
             .on("newMessage", this.onNewMessage)
             .on("sendMessage", this.onSendMessage)
             .on("messageSent", this.onMessageSent)
+        E.bus(UIEvents.Bubbles)
+            .on("showMessage", this.onShowMessage)
+            .on("scrollToBottom", this.onScrollToBottom)
     }
 
     h() {
@@ -64,7 +71,7 @@ class BubblesComponent extends VComponent {
 
         this.intersectionObserver = new IntersectionObserver(this.onIntersection, {
             root: this.$el,
-            rootMargin: "1500px",
+            rootMargin: "2000px",
             threshold: 1.0
         })
     }
@@ -84,9 +91,45 @@ class BubblesComponent extends VComponent {
         }
     }
 
+    onScrollToBottom = message => {
+        this.$el.scrollTo({top: this.bubblesInnerRef.$el.clientHeight})
+    }
+
+    onShowMessage = message => {
+        if(this.messages.rendered.has(message.id)) {
+            const $rendered = this.messages.rendered.get(message.id)
+            this.scrollToMessage($rendered)
+        } else if(!this.messages.isFetchingNextPage && !this.messages.isFetchingPrevPage) {
+            this.toggleMessagesLoader(false)
+            AppSelectedPeer.Current.messages.clear()
+            this.clearBubbles()
+            this.messages.isFetchingNextPage = true
+            this.messages.isFetchingPrevPage = true
+            this.waitingScrollToMessage = message
+            this.callbacks.peer.api.fetchByOffsetId({
+                offset_id: message.id,
+                add_offset: -25,
+                limit: 50
+            }).then(() => {
+                this.messages.isFetchingNextPage = false
+                this.messages.isFetchingPrevPage = false
+            })
+        }
+    }
+
     onFetchedInitialMessages = event => {
         if (AppSelectedPeer.check(event.dialog.peer)) {
             this.appendMessages(event.messages)
+        }
+    }
+
+    onFetchedMessagesPrevPage = event => {
+        if (AppSelectedPeer.check(event.dialog.peer)) {
+            if(event.messages.length === 0) {
+                this.loadedTop = false
+                return
+            }
+            this.prependMessages(event.messages, false, true)
         }
     }
 
@@ -96,26 +139,41 @@ class BubblesComponent extends VComponent {
         }
     }
 
+    onFetchedMessagesAnyPage = event => {
+        if (AppSelectedPeer.check(event.dialog.peer)) {
+            this.clearAndAppend(event.messages)
+        }
+    }
+
     onNewMessage = event => {
         if (AppSelectedPeer.check(event.dialog.peer)) {
-            if (!this.messages.isFetching) {
-                if (isElementInViewport(this.prependMessages([event.message])[0])) {
-                    this.markAllAsRead()
+            if(!this.loadedTop) {
+                if (!this.messages.isFetching) {
+                    if (isElementInViewport(this.prependMessages([event.message])[0])) {
+                        this.markAllAsRead()
+                    } else {
+                        if (document.hasFocus()) AudioManager.playNotification("in")
+                    }
+                } else {
+                    this.messages.messagesWaitingForRendering.add(event.message)
+                    if (document.hasFocus()) AudioManager.playNotification("in")
                 }
-            } else {
-                this.messages.messagesWaitingForRendering.add(event.message)
             }
         }
     }
 
     onSendMessage = event => {
         if (AppSelectedPeer.check(event.dialog.peer)) {
-            this.prependMessages([event.message], true)
+            // TODO load first page
+            if(!this.loadedTop) {
+                this.prependMessages([event.message], true)
+            }
         }
     }
 
     onMessageSent = event => {
         if (AppSelectedPeer.check(event.dialog.peer)) {
+            AudioManager.playNotification("out")
             this.patchSentMessage(event.rawMessage)
         }
     }
@@ -160,6 +218,7 @@ class BubblesComponent extends VComponent {
         $message = $mount(<MessageComponent intersectionObserver={this.intersectionObserver}
                                             message={message}/>, this.bubblesInnerRef.$el)
 
+
         return $message
     }
 
@@ -183,13 +242,23 @@ class BubblesComponent extends VComponent {
             d1.getDate() === d2.getDate()
     }
 
+    clearAndAppend(messages: Message[]) {
+
+
+        this.appendMessages(messages, false)
+
+        this.toggleMessagesLoader(true)
+        this.scrollToWaitedMessage(false)
+        this.loadedTop = true
+    }
+
     /**
      * todo: rewrite this thing
      *
      * @param {Array<Message>} messages
      * @private
      */
-    appendMessages = (messages) => {
+    appendMessages = (messages, scrollToWaited = true) => {
         const z = this.$el.scrollTop
         const k = this.bubblesInnerRef.$el.clientHeight
         for (const message of messages) {
@@ -215,6 +284,9 @@ class BubblesComponent extends VComponent {
             }
         }
         this.$el.scrollTop = z + this.bubblesInnerRef.$el.clientHeight - k
+        if(scrollToWaited) {
+            this.scrollToWaitedMessage()
+        }
     }
 
     /**
@@ -222,10 +294,10 @@ class BubblesComponent extends VComponent {
      * @param {boolean} isSending
      * @private
      */
-    prependMessages = (messages, isSending = false) => {
+    prependMessages = (messages, isSending = false, forceNoReset = false) => {
         let reset = false
 
-        if (this.bubblesInnerRef.$el.clientHeight - (this.$el.scrollTop + this.$el.clientHeight) < 50) {
+        if (!forceNoReset && this.bubblesInnerRef.$el.clientHeight - (this.$el.scrollTop + this.$el.clientHeight) < 50) {
             reset = true
         }
 
@@ -240,7 +312,6 @@ class BubblesComponent extends VComponent {
             const $rendered = this.renderMessage(message, true)
 
             if(first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
-                console.log("www", first.__component.message.text, message.text)
                 const $time = VRDOM.render(<div className="service">
                     <div className="service-msg">{message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
                 </div>)
@@ -264,6 +335,7 @@ class BubblesComponent extends VComponent {
         if (reset) {
             this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight
         }
+        this.scrollToWaitedMessage()
 
         return pushed
     }
@@ -284,6 +356,13 @@ class BubblesComponent extends VComponent {
         })
     }
 
+    scrollToWaitedMessage(smooth = true) {
+        if(this.waitingScrollToMessage && this.messages.rendered.has(this.waitingScrollToMessage.id)) {
+            this.scrollToMessage(this.messages.rendered.get(this.waitingScrollToMessage.id), smooth)
+            this.waitingScrollToMessage = null
+        }
+    }
+
     clearBubbles = () => {
         this.messages.sending.clear()
         this.messages.rendered.clear()
@@ -298,17 +377,31 @@ class BubblesComponent extends VComponent {
         // }
     }
 
-    scrollToMessage = (message) => {
-        this.$el.scrollTo({top: message.offsetTop, behavior: "smooth"})
+    scrollToMessage = (message, smooth = true) => {
+        // todo hightlight
+        this.$el.scrollTo({top: message.offsetTop+message.clientHeight/2 - this.$el.clientHeight/2, behavior: smooth ? "smooth" : "auto"})
     }
 
     onScroll = (event) => {
         const $element = event.target
 
+        if(this.loadedTop && !this.messages.isFetchingPrevPage) {
+            if($element.scrollTop > this.bubblesInnerRef.$el.clientHeight - this.$el.clientHeight - 300) {
+                this.messages.isFetchingPrevPage = true
+
+                this.callbacks.peer.api.fetchPrevPage([...this.messages.rendered.keys()].reduce((l, q) => {
+                    return l > q ? l : q
+                })).then(() => {
+                    this.messages.isFetchingPrevPage = false
+                })
+            }
+        }
         if ($element.scrollTop < 300 && !this.messages.isFetchingNextPage) {
             this.messages.isFetchingNextPage = true
 
-            this.callbacks.peer.api.fetchNextPage().then(() => {
+            this.callbacks.peer.api.fetchNextPage([...this.messages.rendered.keys()].reduce((l, q) => {
+                return l < q ? l : q
+            })).then(() => {
                 this.messages.isFetchingNextPage = false
             })
 
