@@ -217,10 +217,10 @@ export class PeerApi {
             random_id: randomId,
             reply_to_msg_id: replyTo
         })
-        AppEvents.Dialogs.fire("sendMessage", {
-            dialog: this._peer.dialog,
-            message: message
-        })
+        // AppEvents.Dialogs.fire("sendMessage", {
+        //     dialog: this._peer.dialog,
+        //     message: message
+        // })
         UIEvents.Bubbles.fire("scrollToBottom")
 
         p.then(q => {
@@ -264,8 +264,9 @@ export class PeerApi {
                         if (l._ === "updateMessageID") l.dialog = this._peer.dialog
                     })
                 } else {
-                    this._peer.messages._sendingMessages.set(response.id, randomId)
-                    response.random_id = randomId
+
+                    // this._peer.messages._sendingMessages.set(response.id, randomId)
+                    // response.random_id = randomId
                 }
                 response.dialog = this._peer.dialog
                 response.message = text
