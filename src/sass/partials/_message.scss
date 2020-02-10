@@ -72,6 +72,10 @@
                 mask-position: 0% 100%;
                 //-webkit-mask-composite: xor, source-over;
 
+                &.has-inline-keyboard {
+                    border-bottom-right-radius: 6px;
+                }
+
                 &.no-pad {
                     .reply {
                         margin-bottom: 0;
@@ -88,6 +92,10 @@
                 -webkit-mask-position: 100% 100%;
                 mask-position: 100% 100%;
                 //-webkit-mask-composite: xor, source-over;
+
+                &.has-inline-keyboard {
+                    border-bottom-left-radius: 6px;
+                }
 
                 &.no-pad {
                     .reply {
