@@ -8,6 +8,7 @@ import type {Message} from "../../../../../api/messages/Message"
 import VComponent from "../../../../v/vrdom/component/VComponent"
 import UIEvents from "../../../../eventBus/UIEvents";
 import AudioManager from "../../../../audioManager";
+import {ChannelPeer} from "../../../../../api/peers/objects/ChannelPeer";
 
 const DATA_FORMAT_MONTH_DAY = {
     month: 'long',
@@ -19,6 +20,7 @@ class BubblesComponent extends VComponent {
 
     loaderRef = this.props.loaderRef
     bubblesInnerRef = VComponent.createRef()
+    chatInputRef = this.props.chatInputRef
 
     messages = {
         rendered: new Map(),
@@ -118,6 +120,11 @@ class BubblesComponent extends VComponent {
     onFetchedInitialMessages = event => {
         if (AppSelectedPeer.check(event.peer)) {
             this.appendMessages(event.messages)
+            if(event.peer instanceof ChannelPeer && !event.peer.canPostMessages) {
+                this.chatInputRef.component.hide()
+            } else {
+                this.chatInputRef.component.show()
+            }
         }
     }
 

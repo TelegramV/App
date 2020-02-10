@@ -72,7 +72,6 @@
   }
 }
 
-
 @keyframes loading-text {
   0% {
     content: ".";
@@ -85,7 +84,8 @@
   }
 }
 
-.loading-text::after {
-  content: "";
-  animation: loading-text 1s linear infinite;
+@keyframes roll {
+  100% {
+    transform: rotate(360deg);
+  }
 }

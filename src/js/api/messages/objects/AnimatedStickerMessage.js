@@ -12,13 +12,7 @@ export class AnimatedStickerMessage extends StickerMessage {
         super.fillRaw(raw)
 
         if (this.raw.media.document.mime_type !== "application/x-tgsticker") {
-            const emoji = StickerManager.getAnimatedEmoji(this.text)
-
-            this.raw.media = {
-                _: "messageMediaDocument",
-                isAnimatedEmoji: true,
-                document: emoji
-            }
+            this.raw.media.isAnimatedEmoji = true
 
             const size = this.raw.media.document.attributes.find(a => a._ === "documentAttributeImageSize")
             this.w = size ? size.w : null

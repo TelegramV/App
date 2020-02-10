@@ -15,7 +15,10 @@ const MessageFragment = ({m, peers}) => {
                             name={peer.name}
                             status={m.prefix + m.text}
                             peer={peer}
-                            onClick={() => AppSelectedPeer.select(peer)}/>
+                            onClick={() => {
+                                AppSelectedPeer.select(peer)
+                                UIEvents.Bubbles.fire("showMessage", m)
+                            }}/>
 }
 
 export class GlobalMessagesSearchComponent extends VComponent {

@@ -1,12 +1,11 @@
 import Component from "../../../../../v/vrdom/Component";
 import {ContextMenuManager} from "../../../../../contextMenuManager";
-import {askForFile} from "../../../../../utils";
+import {askForFile, convertBits, formatAudioTime} from "../../../../../utils";
 import Random from "../../../../../../mtproto/utils/random";
 import TimeManager from "../../../../../../mtproto/timeManager";
 import {createNonce} from "../../../../../../mtproto/utils/bin";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {InlineKeyboardComponent} from "../message/common/InlineKeyboardComponent";
-import {formatAudioTime, convertBits} from "../../../../../utils"
 import {replaceEmoji} from "../../../../../utils/emoji"
 import ComposerComponent from "./ComposerComponent"
 import {MessageParser} from "../../../../../../api/messages/MessageParser";
@@ -16,28 +15,31 @@ import {AttachFilesModal} from "../../../modals/AttachFilesModal";
 import {AttachPollModal} from "../../../modals/AttachPollModal";
 import {TextareaFragment} from "./TextareaFragment";
 import {AttachPhotosModal} from "../../../modals/AttachPhotosModal";
+import UIEvents from "../../../../../eventBus/UIEvents";
+import VComponent from "../../../../../v/vrdom/component/VComponent";
+import VF from "../../../../../v/VFramework";
+import AppConfiguration from "../../../../../../configuration";
 
 export let ChatInputManager
 
-export class ChatInputComponent extends Component {
+export class ChatInputComponent extends VComponent {
+    chatInputTextareaRef = VComponent.createComponentRef()
+
     constructor(props) {
         super(props);
         ChatInputManager = this
-        this.state = {
-            reply: null,
-            attachments: []
-        }
+        this.reply = null
     }
 
     h() {
         return <div className="chat-input-wrapper">
             <div className="chat-input">
-            <ComposerComponent mouseEnter={this.mouseEnterComposer} mouseLeave={this.mouseLeaveComposer}/>
+            <ComposerComponent mouseEnter={this.mouseEnterComposer.bind(this)} mouseLeave={this.mouseLeaveComposer.bind(this)}/>
                 <div className="input-and-keyboard-wrapper">
                     <div className="input-field-wrapper">
                         <div className="reply hidden">
-                            <i className="tgico tgico-close btn-icon" onClick={this.closeReply}/>
-                            <div className="message">
+                            <i className="tgico tgico-close btn-icon" onClick={this.closeReply.bind(this)}/>
+                            <div className="message" onClick={this.navigateToReplied.bind(this)}>
                                 <img src="" className="image hidden"/>
                                 <div className="reply-wrapper">
                                     <div className="title"/>
@@ -50,9 +52,9 @@ export class ChatInputComponent extends Component {
                             <div className="another-fucking-wrapper">
                                 <div className="ico-wrapper">
                                     <i className="tgico tgico-smile btn-icon rp rps"
-                                       onMouseEnter={this.mouseEnterEmoji} onMouseLeave={this.mouseLeaveEmoji}/>
+                                       onMouseEnter={this.mouseEnterEmoji.bind(this)} onMouseLeave={this.mouseLeaveEmoji.bind(this)}/>
                                 </div>
-                                <TextareaFragment ref="chatInputTextarea" />
+                                <TextareaFragment ref={this.chatInputTextareaRef} parent={this} />
 
                                 <div className="ico-wrapper">
 
@@ -90,7 +92,7 @@ export class ChatInputComponent extends Component {
                     </div>
 
                             <div className="keyboard-markup">
-                                {/*{this.state.keyboardMarkup.rows.map(l => {*/}
+                                {/*{this.keyboardMarkup.rows.map(l => {*/}
                                 {/*    return <div className="row">*/}
                                 {/*        {l.buttons.map(q => {*/}
                                 {/*            return InlineKeyboardComponent.parseButton(null, q)*/}
@@ -102,13 +104,13 @@ export class ChatInputComponent extends Component {
 
 
                 <div className="round-button-wrapper">
-                    <div className="round-button delete-button rp rps" onClick={this.onSend}
-                         onMouseEnter={this.mouseEnterRemoveVoice} onMouseLeave={this.mouseLeaveRemoveVoice}>
+                    <div className="round-button delete-button rp rps" onClick={l => this.onSend(l)}
+                         onMouseEnter={l => this.mouseEnterRemoveVoice(l)} onMouseLeave={l => this.mouseLeaveRemoveVoice(l)}>
                         <i className="tgico tgico-delete"/>
                     </div>
 
-                    <div className="round-button send-button rp rps" onClick={this.onSend}
-                         onMouseDown={this.onMouseDown} onContextMenu={l => ContextMenuManager.openAbove([
+                    <div className="round-button send-button rp rps" onClick={l => this.onSend(l)}
+                         onMouseDown={l => this.onMouseDown(l)} onContextMenu={l => ContextMenuManager.openAbove([
                         {
                             icon: "mute",
                             title: "Send without sound",
@@ -137,7 +139,7 @@ export class ChatInputComponent extends Component {
 
     appendText(text) {
         this.textarea.innerHTML += text
-        this.refs.get("chatInputTextarea").onInput();
+        this.chatInputTextareaRef.component.onInput();
     }
 
     get isVoiceMode() {
@@ -179,8 +181,8 @@ export class ChatInputComponent extends Component {
     }
 
     mouseEnterEmoji() {
-        this.refs.get("composer").onShow();
-        this.composer.classList.add("visible");
+        VF.mountedComponents.get("composer").onShow();
+        VF.mountedComponents.get("composer").$el.classList.add("visible");
         this.hideComposer = false;
     }
 
@@ -190,37 +192,49 @@ export class ChatInputComponent extends Component {
     }
 
     planComposerClose() {
-        setTimeout(() => {
+        this.withTimeout(() => {
             if (this.hideComposer) {
-                this.composer.classList.remove("visible");
-                this.refs.get("composer").onHide();
+                VF.mountedComponents.get("composer").$el.classList.remove("visible");
+                VF.mountedComponents.get("composer").onHide();
             }
         }, 250);
     }
 
     mouseEnterRemoveVoice() {
-        this.state.isRemoveVoice = true
+        this.isRemoveVoice = true
     }
 
     mouseLeaveRemoveVoice() {
-        this.state.isRemoveVoice = false
+        this.isRemoveVoice = false
     }
 
+    hide() {
+        this.$el.style.display = "none"
+    }
 
+    show() {
+        this.$el.style.display = "block"
+    }
+
+    navigateToReplied() {
+        if(this.reply) {
+            UIEvents.Bubbles.fire("showMessage", this.reply.message)
+        }
+    }
 
     replyTo(message) {
-        this.state.reply = {
+        this.reply = {
             title: message.from.name,
             description: MessageParser.getPrefixNoSender(message),
             message: message,
             image: message.smallPreviewImage
         }
         this.$el.querySelector(".reply").classList.remove("hidden")
-        this.$el.querySelector(".reply .message .title").innerHTML = this.state.reply.title
-        this.$el.querySelector(".reply .message .description").innerHTML = this.state.reply.description
-        if (this.state.reply.image !== null) {
+        this.$el.querySelector(".reply .message .title").innerHTML = this.reply.title
+        this.$el.querySelector(".reply .message .description").innerHTML = this.reply.description
+        if (this.reply.image !== null) {
             this.$el.querySelector(".reply .message .image").classList.remove("hidden")
-            this.$el.querySelector(".reply .message .image").src = this.state.reply.image
+            this.$el.querySelector(".reply .message .image").src = this.reply.image
         } else {
             this.$el.querySelector(".reply .message .image").classList.add("hidden")
         }
@@ -228,18 +242,18 @@ export class ChatInputComponent extends Component {
     }
 
     closeReply() {
-        this.state.reply = null
+        this.reply = null
         this.$el.querySelector(".reply").classList.add("hidden")
     }
 
     setKeyboardMarkup(markup) {
         // TODO selective
         if (markup._ === "replyKeyboardMarkup") {
-            this.state.keyboardMarkup = markup
+            this.keyboardMarkup = markup
         } else if (markup._ === "replyKeyboardForceReply") {
 
         } else if (markup._ === "replyKeyboardHide") {
-            this.state.keyboardMarkup = null
+            this.keyboardMarkup = null
         } else {
             return
         }
@@ -292,13 +306,12 @@ export class ChatInputComponent extends Component {
         this.$el.querySelector(".voice-seconds").innerHTML = time
         this.i++
         if (this.isRecording)
-            setTimeout(this.tickTimer, 10)
+            this.withTimeout(l => this.tickTimer(), 10)
     }
 
     mounted() {
         super.mounted();
         this.textarea = this.$el.querySelector(".textarea")
-        this.composer = this.$el.querySelector(".composer")
         this.initDragArea()
     }
 
@@ -314,6 +327,11 @@ export class ChatInputComponent extends Component {
     onMouseUp(ev) {
         if (!this.isVoiceMode) return
 
+        this.$el.querySelector(".delete-button").classList.remove("open")
+        this.$el.querySelector(".voice-seconds").classList.add("hidden")
+        this.$el.querySelector(".tgico-attach").classList.remove("hidden")
+        this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
+
         this.recorder.stop()
         this.microphone.getTracks().forEach(function (track) {
             track.stop();
@@ -323,19 +341,16 @@ export class ChatInputComponent extends Component {
         this.audioContext.close()
         this.audioContext = null
 
-        this.$el.querySelector(".delete-button").classList.remove("open")
-        this.$el.querySelector(".voice-seconds").classList.add("hidden")
-        this.$el.querySelector(".tgico-attach").classList.remove("hidden")
-        this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
     }
 
     onRecordingReady(ev) {
 
-        if (this.state.isRemoveVoice) {
-            this.state.isRemoveVoice = false
+        if (this.isRemoveVoice) {
+            this.isRemoveVoice = false
             return
         }
-        const id = TimeManager.generateMessageID(this.auth.dcID)
+        // TODO refactor sending
+        const id = TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
         var reader = new FileReader();
         reader.readAsArrayBuffer(ev.data);
         reader.onloadend = (event) => {
@@ -358,7 +373,7 @@ export class ChatInputComponent extends Component {
                         _: "documentAttributeAudio",
                         pFlags: {
                             voice: true,
-                            waveform: this.convertBits(this.waveform, 8, 5)
+                            waveform: convertBits(this.waveform, 8, 5)
                         },
                     },
                     {
@@ -377,7 +392,7 @@ export class ChatInputComponent extends Component {
             navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
                 this.waveform = []
                 const processInput = audioProcessingEvent => {
-                    console.log(this.waveform)
+                    // console.log(this.waveform)
                     const tempArray = new Uint8Array(analyser.frequencyBinCount);
 
                     analyser.getByteFrequencyData(tempArray);
@@ -417,11 +432,11 @@ export class ChatInputComponent extends Component {
                     mimeType: "audio/webm;codecs=opus"
                 });
 
-                this.recorder.addEventListener('dataavailable', this.onRecordingReady);
+                this.recorder.addEventListener('dataavailable', l => this.onRecordingReady(l));
                 this.recorder.start()
                 this.microphone = l
 
-                document.addEventListener("mouseup", this.onMouseUp)
+                document.addEventListener("mouseup", l => this.onMouseUp(l))
                 this.$el.querySelector(".delete-button").classList.add("open")
                 this.$el.querySelector(".voice-seconds").classList.remove("hidden")
                 this.$el.querySelector(".tgico-attach").classList.add("hidden")
@@ -449,7 +464,7 @@ export class ChatInputComponent extends Component {
 
     send(silent = false) {
         this.convertEmojiToText(this.textarea)
-        let reply = this.state.reply ? this.state.reply.message.id : null
+        let reply = this.reply ? this.reply.message.id : null
 
         const {text, messageEntities} = domToMessageEntities(this.textarea)
 

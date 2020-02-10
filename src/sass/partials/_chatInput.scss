@@ -191,11 +191,16 @@
           width: 100%;
           align-self: start;
           display: inline;
+
+          &.monospace-hack sub {
+            vertical-align: sub;
+          }
           
           sub {
             font-size: initial;
             font-family: monospace;
             white-space: pre;
+            vertical-align: inherit;
           }
           * {
             word-break: break-word !important;
@@ -313,7 +318,7 @@
         transform: scale(0);
 
         &:hover {
-          background: rgba($red, 0.8);
+          filter: brightness(0.9);
         }
 
         &.open {
