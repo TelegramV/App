@@ -11,6 +11,7 @@ import PeersStore from "../store/PeersStore"
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import {MessageFactory} from "../messages/MessageFactory"
 import API from "../telegram/API"
+import PeersManager from "../peers/objects/PeersManager"
 
 class DialogManager extends Manager {
     constructor() {
@@ -54,6 +55,19 @@ class DialogManager extends Manager {
             if (AppSelectedPeer.Previous) {
                 AppSelectedPeer.Previous.messages.clear()
             }
+        })
+
+        MTProto.UpdatesManager.subscribe("updates.channelDifferenceTooLong", rawDifferenceWithPeer => {
+            PeersManager.fillPeersFromUpdate(rawDifferenceWithPeer)
+
+            rawDifferenceWithPeer.__peer.dialog.fillRaw(rawDifferenceWithPeer.dialog)
+
+            rawDifferenceWithPeer.messages = rawDifferenceWithPeer.messages.map(m => MessageFactory.fromRaw(rawDifferenceWithPeer.dialog, m))
+            rawDifferenceWithPeer.__peer.messages.appendMany(rawDifferenceWithPeer.messages)
+
+            AppEvents.Dialogs.fire("ChannelRefreshCausedByDifferenceTooLong", {
+                dialog: rawDifferenceWithPeer.__peer.dialog
+            })
         })
 
         MTProto.UpdatesManager.subscribe("updateChatUserTyping", update => {
@@ -136,16 +150,6 @@ class DialogManager extends Manager {
 
             this.getPeerDialogs(update.__peer).then(dialogs => {
                 AppEvents.Dialogs.fire("gotNewMany", {
-                    dialogs
-                })
-            })
-        })
-
-        MTProto.UpdatesManager.subscribe("ChannelRefreshCausedByDifferenceTooLong", update => {
-            console.warn("ChannelRefreshCausedByDifferenceTooLong", update)
-
-            this.getPeerDialogs(update.__peer).then(dialogs => {
-                AppEvents.Dialogs.fire("gotRefreshed", {
                     dialogs
                 })
             })

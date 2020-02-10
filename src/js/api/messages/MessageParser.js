@@ -181,8 +181,8 @@ export class MessageParser {
 
     static getDialogPrefix(message: Message) {
         const from = message.from
-        const showSender = (message.isOut || message.from !== message.dialog.peer) && !message.isPost
-        const peerName = message.isOut ? "You" : from.name
+        const showSender = (message.isOut || message.from !== message.to) && !message.isPost
+        const peerName = message.isOut ? "You" : from.firstName
 
         let text = ""
 

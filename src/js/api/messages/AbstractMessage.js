@@ -92,10 +92,6 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get to(): Peer {
-        if (this.dialog) {
-            return this.dialog.peer
-        }
-
         if (this._to) {
             return this._to
         }
@@ -113,11 +109,11 @@ export class AbstractMessage extends ReactiveObject implements Message {
         this._from = MessagesManager.getFromPeerMessage(this.raw)
 
         if (!this._from) {
-            console.warn("no from peer")
+            console.warn("no from peer", this)
         } else if (this._from.isMin && !this._from._min_messageId) {
             this._from.minData = {
                 message: this,
-                dialog: this.dialog
+                dialog: this.to
             }
             this._from._min_messageId = this.id
             this._from._min_inputPeer = this.to.inputPeer
@@ -153,7 +149,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     init() {
-        if (this.dialog.peer) {
+        if (this.to) {
             this.findGrouped()
         }
     }
@@ -266,7 +262,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         this.prefix = MessageParser.getDialogPrefix(this)
 
         // reply
-        if (this.dialog.peer) {
+        if (this.to) {
             const replyToMessage = this.to.messages.get(this.raw.reply_to_msg_id)
             if (replyToMessage) {
                 this.replyToMessage = replyToMessage

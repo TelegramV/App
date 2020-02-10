@@ -20,15 +20,15 @@ export class MTSocket {
 
     refreshSocket() {
         console.log("refreshing socket..")
+
         this.inob_clear()
+
         this.transportationSocket = new WebSocket(this.networker.dcUrl, "binary")
         this.transportationSocket.binaryType = "arraybuffer"
         this.transportationInit = false
         this.transportationEstablishing = false
 
-        // may be bugs
-        this.transportationQueue = []
-        this.transportationQueueLen = 0
+        this.init_transportation()
     }
 
     inob_clear() {
@@ -37,13 +37,12 @@ export class MTSocket {
         this.aes_encryptor = undefined
     }
 
-
     transport(buffer) {
         if (!this.transportationInit) {
             if (!this.transportationEstablishing) {
-                this.init_transportation()
                 this.transportationQueue[this.transportationQueueLen] = buffer;
                 ++(this.transportationQueueLen);
+                this.init_transportation()
                 this.transportationEstablishing = true;
             } else {
                 this.transportationQueue[this.transportationQueueLen] = buffer;
@@ -177,10 +176,13 @@ export class MTSocket {
 
         //console.log(buffer_len);
         mt_write_uint32(0, buffer_len, out_buffer_view);
-        mt_write_bytes(4, buffer_len, new Uint8Array(buffer), out_buffer_view);
+        mt_write_bytes(4, buffer_len, new Uint8Array(buffer), out_buffer_view)
 
         const encrypted_buffer = this.aes_encryptor.encrypt(new Uint8Array(out_buffer))
-        this.transportationSocket.send(encrypted_buffer);
+
+        this.transportationSocket.send(encrypted_buffer)
+
+        delete this.transportationQueue[this.transportationQueueLen]
     }
 
     inob_recv(ev) {

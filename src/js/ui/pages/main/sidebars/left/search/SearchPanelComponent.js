@@ -3,18 +3,21 @@ import {CorrespondentsComponent} from "./CorrespondentsComponent"
 import {RecentComponent} from "./RecentComponent"
 import {SearchResultsComponent} from "./SearchResultsComponent"
 import UIEvents from "../../../../../eventBus/UIEvents"
+import VComponent from "../../../../../v/vrdom/component/VComponent"
 
 export class SearchPanelComponent extends LeftBarComponent {
 
     barName = "search"
     barVisible = false
 
+    recentComponentRef = VComponent.createComponentRef()
+
     h() {
         return (
             <div class="sidebar scrollable search hidden" onScroll={this.onScroll}>
                 <div class="suggestions">
                     <CorrespondentsComponent/>
-                    <RecentComponent/>
+                    <RecentComponent ref={this.recentComponentRef}/>
                 </div>
                 <SearchResultsComponent/>
             </div>
@@ -30,7 +33,11 @@ export class SearchPanelComponent extends LeftBarComponent {
     }
 
     barOnShow = () => {
-        this.$el.classList.remove("hidden");
+        if (this.recentComponentRef.component) {
+            this.recentComponentRef.component.refreshRecent()
+        }
+
+        this.$el.classList.remove("hidden")
     }
 
     barOnHide = () => {

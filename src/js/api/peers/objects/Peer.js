@@ -120,8 +120,16 @@ export class Peer extends ReactiveObject {
         return this.raw.pFlags && this.raw.pFlags.verified === true
     }
 
+    get firstName() {
+        return this.raw.first_name
+    }
+
+    get lastName() {
+        return this.raw.last_name
+    }
+
     get name() {
-        return this.raw.first_name + (this.raw.last_name ? " " + this.raw.last_name : "")
+        return this.firstName + (this.lastName ? " " + this.lastName : "")
     }
 
     get isMin() {

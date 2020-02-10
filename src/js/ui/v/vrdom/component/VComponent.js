@@ -746,6 +746,14 @@ export class VComponent {
             component: undefined
         }
     }
+
+    /**
+     * @param identifier
+     * @return {Component | VComponent}
+     */
+    static getComponentById(identifier) {
+        return VF.mountedComponents.get(identifier)
+    }
 }
 
 export default VComponent

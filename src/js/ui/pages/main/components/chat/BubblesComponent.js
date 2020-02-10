@@ -44,6 +44,7 @@ class BubblesComponent extends VComponent {
             .on("fetchedMessagesNextPage", this.onFetchedMessagesNextPage)
             .on("fetchedMessagesPrevPage", this.onFetchedMessagesPrevPage)
             .on("fetchedMessagesAnyPage", this.onFetchedMessagesAnyPage)
+
         E.bus(AppEvents.Dialogs)
             .on("newMessage", this.onNewMessage)
             .on("sendMessage", this.onSendMessage)

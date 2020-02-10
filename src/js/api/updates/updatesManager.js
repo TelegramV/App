@@ -162,7 +162,14 @@ class UpdateManager extends Manager {
         if (this.customUpdatesProcessors.has(rawUpdate._)) {
             this.customUpdatesProcessors.get(rawUpdate._)(this, rawUpdate)
         } else {
-            this.processUpdate(rawUpdate.update._, rawUpdate.update)
+            if (rawUpdate.update) {
+                this.processUpdate(rawUpdate.update._, rawUpdate.update)
+            } else if (rawUpdate._) {
+                console.warn("unexpected update = ", rawUpdate)
+                this.processUpdate(rawUpdate._, rawUpdate)
+            } else {
+                console.warn("unexpected update = ", rawUpdate)
+            }
         }
     }
 }
