@@ -44,14 +44,10 @@ export class MessageParser {
                     const attrs = media.document.attributes;
                     for (const attr of attrs) {
                         if (attr._ === "documentAttributeSticker") {
-                            if (media.isAnimatedEmoji) {
-                                type = MessageType.ANIMATED_EMOJI
+                            if (media.document.mime_type === "application/x-tgsticker") {
+                                type = MessageType.ANIMATED_STICKER
                             } else {
-                                if (media.document.mime_type === "application/x-tgsticker") {
-                                    type = MessageType.ANIMATED_STICKER
-                                } else {
-                                    type = MessageType.STICKER
-                                }
+                                type = MessageType.STICKER
                             }
                             break;
                         }
@@ -91,11 +87,11 @@ export class MessageParser {
             const emoji = StickerManager.getAnimatedEmoji(message.message)
 
             if (emoji) {
-                return MessageParser.getType({
+                type = MessageType.ANIMATED_EMOJI
+                message.media = {
                     _: "messageMediaDocument",
-                    isAnimatedEmoji: true,
                     document: emoji
-                })
+                }
             }
         }
 
