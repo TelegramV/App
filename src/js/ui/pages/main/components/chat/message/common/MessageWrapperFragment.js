@@ -76,6 +76,9 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         "hide-tail": transparent,
     }
 
+    const inlineKeyboard = message.replyMarkup && message.replyMarkup._ === "replyInlineMarkup" ?
+        <InlineKeyboardComponent message={message}/> : ""
+
     let wrapClasses = {
         "bubble": true,
         "out": !message.isPost && message.isOut,
@@ -84,7 +87,8 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         "read": !message.isSending && message.isRead,
         "sending": message.isSending,
         "no-pad": !outerPad,
-        "sent": !message.isSending && !message.isRead //TODO more convenient method to do this
+        "sent": !message.isSending && !message.isRead, //TODO more convenient method to do this
+        "has-inline-keyboard": !!inlineKeyboard
     }
 
     let messageClasses = {
@@ -107,8 +111,6 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
         wrapOuter["in"] = true
     }
 
-    const inlineKeyboard = message.replyMarkup && message.replyMarkup._ === "replyInlineMarkup" ?
-        <InlineKeyboardComponent message={message}/> : ""
     // FIXME this should be called upon message receiving
     if (message.replyMarkup && (message.replyMarkup._ === "replyKeyboardHide" || message.replyMarkup._ === "replyKeyboardForceReply" || message.replyMarkup._ === "replyKeyboardMarkup")) {
         ChatInputManager.setKeyboardMarkup(message.replyMarkup)
