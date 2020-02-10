@@ -25,7 +25,6 @@ class MessageManager extends Manager {
             }
 
 
-
             if (!peer.dialog) {
                 console.log("no dialog", peer, peer.dialog)
 
@@ -38,7 +37,7 @@ class MessageManager extends Manager {
                 return
             }
 
-            if(peer.messages._sendingMessages.has(lastMessage.id)) {
+            if (peer.messages._sendingMessages.has(lastMessage.id)) {
                 const randomId = peer.messages._sendingMessages.get(lastMessage.id)
                 peer.messages._sendingMessages.delete(lastMessage.id)
                 lastMessage.random_id = randomId
@@ -55,15 +54,9 @@ class MessageManager extends Manager {
             peer.messages.appendSingle(message)
             message.init()
 
-                if (!message.isOut) {
-                    peer.messages.addUnread(message.id)
-                } else {
-                    peer.messages.clearUnread()
-                }
-
-                peer.dialog.fire("newMessage", {
-                    message
-                })
+            peer.dialog.fire("newMessage", {
+                message
+            })
 
             AppEvents.Dialogs.fire("newMessage", {
                 message,
@@ -176,7 +169,7 @@ class MessageManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateMessagePoll", update => {
             if (AppSelectedPeer.isSelected) {
-                const messages = AppSelectedPeer.Current.dialog.peer.messages.getPollsById(update.poll_id)
+                const messages = AppSelectedPeer.Current.messages.getPollsById(update.poll_id)
                 for (const message of messages) {
                     message.fillPoll(update.poll, update.results)
 

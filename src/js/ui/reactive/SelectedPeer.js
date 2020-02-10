@@ -2,9 +2,11 @@ import VF from "../v/VFramework"
 import ReactiveCallback from "../v/reactive/ReactiveCallback"
 import PeersStore from "../../api/store/PeersStore"
 import {Peer} from "../../api/peers/objects/Peer"
+import MTProto from "../../mtproto/external"
+import PeersManager from "../../api/peers/objects/PeersManager"
 
 function parseHashQuery(queryParams = undefined) {
-    const p = queryParams ? queryParams.p : VF.router.activeRoute.queryParams.p
+    const p = queryParams ? queryParams.p : VF.router.activeRoute.queryParams ? VF.router.activeRoute.queryParams.p : undefined
 
     if (!p) {
         return {
@@ -72,6 +74,11 @@ class SelectedPeer {
         VF.router.onQueryChange(queryParams => {
             const peer = this.findFromQueryParams(parseHashQuery(queryParams))
 
+            if (!peer) {
+                this.resolveUsername()
+                return
+            }
+
             if (peer !== this._peer) {
                 this._previousPeer = this._peer
                 this._peer = peer
@@ -80,6 +87,10 @@ class SelectedPeer {
                     listener(this._peer)
                 })
             }
+        })
+
+        VF.router.onRouteChange(route => {
+            this.resolveUsername()
         })
 
         PeersStore.onSet(({peer}) => {
@@ -109,6 +120,24 @@ class SelectedPeer {
                 }
             }
         })
+    }
+
+    resolveUsername() {
+        const p = parseHashQuery()
+
+        if (!p.invalid) {
+            if (p.username) {
+                const peer = this.findFromQueryParams(p)
+
+                if (peer !== this._peer) {
+                    MTProto.invokeMethod("contacts.resolveUsername", {
+                        username: p.username
+                    }).then(ResolvedPeer => {
+                        PeersManager.fillPeersFromUpdate(ResolvedPeer)
+                    })
+                }
+            }
+        }
     }
 
     /**

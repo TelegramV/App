@@ -172,7 +172,6 @@ export class Dialog extends ReactiveObject {
 
         this.peer.messages.startTransaction()
 
-        this.peer.messages.unreadCount = rawDialog.unread_count || 0
         this.peer.messages.readInboxMaxId = rawDialog.read_inbox_max_id || 0
         this.peer.messages.readOutboxMaxId = rawDialog.read_outbox_max_id || 0
         this.peer.messages.unreadMentionsCount = rawDialog.unread_mentions_count || 0
