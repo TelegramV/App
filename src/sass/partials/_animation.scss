@@ -71,3 +71,21 @@
     transform: rotate(360deg);
   }
 }
+
+
+@keyframes loading-text {
+  0% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  100% {
+    content: "...";
+  }
+}
+
+.loading-text::after {
+  content: "";
+  animation: loading-text 1s linear infinite;
+}

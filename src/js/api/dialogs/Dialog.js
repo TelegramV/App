@@ -4,8 +4,8 @@ import {DialogApi} from "./DialogApi"
 import {ReactiveObject} from "../../ui/v/reactive/ReactiveObject"
 import {Peer} from "../peers/objects/Peer"
 import PeersStore from "../store/PeersStore"
-import DialogEvents from "./DialogEvents"
 import AppEvents from "../eventBus/AppEvents"
+import {actionTypesMapping} from "../../ui/pages/main/sidebars/left/dialog/Fragments/DialogTextFragment"
 
 export class Dialog extends ReactiveObject {
 
@@ -41,9 +41,30 @@ export class Dialog extends ReactiveObject {
         if (rawUpdate.action._ === "sendMessageCancelAction") {
             this.clearActions()
         } else {
-            this._actions.add(rawUpdate)
+            const peer = PeersStore.get("user", rawUpdate.user_id)
+
+            if (peer) {
+                rawUpdate._showUsername = peer !== this.peer
+                this._actions.add(rawUpdate)
+            }
+
             this.fire("updateActions")
         }
+    }
+
+    get actionText() {
+        return Array.from(this.actions).map(rawUpdate => {
+            const peer = PeersStore.get("user", rawUpdate.user_id)
+
+            if (peer && actionTypesMapping[rawUpdate.action._]) {
+                return {
+                    user: rawUpdate._showUsername ? peer.name : "",
+                    action: actionTypesMapping[rawUpdate.action._]
+                }
+            }
+
+            return false
+        })[0]
     }
 
     removeAction(rawUpdate) {
