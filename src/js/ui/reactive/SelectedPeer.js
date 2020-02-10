@@ -72,9 +72,10 @@ class SelectedPeer {
 
         // listen query changes
         VF.router.onQueryChange(queryParams => {
-            const peer = this.findFromQueryParams(parseHashQuery(queryParams))
+            const p = parseHashQuery(queryParams)
+            const peer = this.findFromQueryParams(p)
 
-            if (!peer) {
+            if (!peer && !p.invalid) {
                 this.resolveUsername()
                 return
             }
