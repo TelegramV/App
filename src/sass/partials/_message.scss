@@ -26,6 +26,12 @@
         }
     }
 
+    .channel {
+        .bubble {
+            max-width: 100% !important;
+        }
+    }
+
     .bubble-outer {
         display: grid;
         grid-template-areas:
