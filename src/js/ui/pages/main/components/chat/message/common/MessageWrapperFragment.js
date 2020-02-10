@@ -7,6 +7,7 @@ import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 import {MessageParser} from "../../../../../../../api/messages/MessageParser";
 import {UserPeer} from "../../../../../../../api/peers/objects/UserPeer";
 import UIEvents from "../../../../../../eventBus/UIEvents";
+import AppSelectedInfoPeer from "../../../../../../reactive/SelectedInfoPeer"
 
 const ReplyToMessageFragment = ({message}) => {
     if (!message.raw.reply_to_msg_id) {
@@ -137,7 +138,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
 
                     <div className={messageClasses}>
                         <ForwardedHeaderFragment message={message}/>
-                        {username ? <div className="username">{message.from.name}</div> : ""}
+                        {username ? <div css-cursor="pointer" className="username" onClick={() => AppSelectedInfoPeer.select(message.from)}>{message.from.name}</div> : ""}
                         {slot}
                     </div>
                 </div>

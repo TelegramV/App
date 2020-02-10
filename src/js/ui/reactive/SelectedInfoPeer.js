@@ -72,6 +72,10 @@ class SelectedInfoPeer {
      * @param {Peer} peer
      */
     select(peer) {
+        if (!peer) {
+            return
+        }
+
         this._previous = this._peer
         this._peer = peer
         this._subscribers.forEach(listener => {

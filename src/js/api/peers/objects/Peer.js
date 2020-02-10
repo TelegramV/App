@@ -10,6 +10,9 @@ import DialogsStore from "../../store/DialogsStore"
 
 export class Peer extends ReactiveObject {
 
+    eventBus = AppEvents.Peers
+    eventObjectName = "peer"
+
     _rawPeer
     _filled = false
     _dialog
@@ -224,11 +227,6 @@ export class Peer extends ReactiveObject {
             this.full = userFull
 
             this.fire("fullLoaded")
-
-            // todo: delete this thing
-            AppEvents.Peers.fire("fullLoaded", {
-                peer: this
-            })
         })
     }
 
@@ -271,10 +269,6 @@ export class Peer extends ReactiveObject {
         this.fillRaw(rawPeer)
 
         this.fire("updateSingle")
-
-        AppEvents.Peers.fire("updateSingle", {
-            peer: this
-        })
 
         return this
     }

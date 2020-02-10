@@ -9,6 +9,9 @@ import AppEvents from "../eventBus/AppEvents"
 
 export class Dialog extends ReactiveObject {
 
+    eventBus = AppEvents.Dialogs
+    eventObjectName = "dialog"
+
     _peer: Peer = undefined
 
     _rawDialog: Object = {}
@@ -40,26 +43,17 @@ export class Dialog extends ReactiveObject {
         } else {
             this._actions.add(rawUpdate)
             this.fire("updateActions")
-            AppEvents.Dialogs.fire("updateActions", {
-                dialog: this
-            })
         }
     }
 
     removeAction(rawUpdate) {
         this._actions.delete(rawUpdate)
         this.fire("updateActions")
-        AppEvents.Dialogs.fire("updateActions", {
-            dialog: this
-        })
     }
 
     clearActions() {
         this._actions.clear()
         this.fire("updateActions")
-        AppEvents.Dialogs.fire("updateActions", {
-            dialog: this
-        })
     }
 
     handleUpdateMessageID(id, randomId): void {
@@ -187,10 +181,6 @@ export class Dialog extends ReactiveObject {
         this.fillRaw(rawDialog)
 
         this.fire("filled")
-
-        DialogEvents.fire("updateSingle", {
-            dialog: this
-        })
 
         return this
     }

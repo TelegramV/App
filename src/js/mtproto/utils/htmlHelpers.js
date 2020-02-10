@@ -1,3 +1,6 @@
+import AppSelectedInfoPeer from "../../ui/reactive/SelectedInfoPeer"
+import PeersStore from "../../api/store/PeersStore"
+
 function insertAt(str, position, length, b) {
     return [str.slice(0, position), b, str.slice(position + length)].join('')
 }
@@ -149,7 +152,10 @@ const handlersLinks = {
     messageEntityUrl: (l, a, q) => <a target="_blank" href={q}>{a}</a>,
     messageEntityEmail: (l, a, q) => <a href={`mailto:${q}`}>{a}</a>,
     messageEntityTextUrl: (l, a) => <a target="_blank" href={l.url}>{a}</a>,
-    messageEntityMentionName: (l, a) => <a>{a}</a>,
+    messageEntityMentionName: (l, a) => <a onClick={e => {
+        e.preventDefault()
+        AppSelectedInfoPeer.select(PeersStore.get("user", l.user_id))
+    }} href={`/#/?p=user.${l.user_id}`}>{a}</a>,
     inputMessageEntityMentionName: (l, a) => <a>{a}</a>,
     messageEntityPhone: (l, a, q) => <a href={`tel:${q}`}>{a}</a>,
     messageEntityCashtag: (l, a) => <a href="#">{a}</a>,
