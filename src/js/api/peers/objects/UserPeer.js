@@ -1,15 +1,11 @@
 import {tsNow} from "../../../mtproto/timeManager";
 import {getLastSeenMessage} from "../../dataObjects/utils";
 import {Peer} from "./Peer";
+import {GroupPeer} from "./GroupPeer"
 
 export class UserPeer extends Peer {
-    get name() {
-        if (this.isDeleted) {
-            return "Deleted Account"
-        }
 
-        return this.firstName + (this.lastName.length > 0 ? " " + this.lastName : "")
-    }
+    participateIn: Set<GroupPeer> = new Set()
 
     get firstName() {
         return this.raw.first_name || ""
@@ -19,11 +15,25 @@ export class UserPeer extends Peer {
         return this.raw.last_name || ""
     }
 
+    get name() {
+        if (this.isDeleted) {
+            return "Deleted Account"
+        }
+
+        return this.firstName + (this.lastName.length > 0 ? " " + this.lastName : "")
+    }
+
     /**
      * @return {*|string|T|boolean}
      */
     get phone() {
         return this.raw.phone
+    }
+
+    set status(status) {
+        this.raw.status = status
+        this.fire("updateUserStatus")
+        this.participateIn.forEach(groupPeer => groupPeer.refreshOnlineCount())
     }
 
     get statusString() {

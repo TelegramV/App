@@ -1,10 +1,8 @@
 import {Manager} from "../../manager";
 import PeersStore from "../../store/PeersStore"
-import AppEvents from "../../eventBus/AppEvents"
 import {MTProto} from "../../../mtproto/external"
 import {UserPeer} from "./UserPeer"
 import PeerFactory from "../PeerFactory"
-import {tsNow} from "../../../mtproto/timeManager"
 
 class PeerManager extends Manager {
 
@@ -21,14 +19,9 @@ class PeerManager extends Manager {
             const peer = PeersStore.get("user", update.user_id)
 
             if (peer instanceof UserPeer) {
-                peer.raw.status = update.status
+                peer.status = update.status
                 // peer.raw.status.expires = tsNow(true) + 2
 
-                peer.fire("updateUserStatus")
-
-                AppEvents.Peers.fire("updateUserStatus", {
-                    peer
-                })
             }
         })
 
@@ -85,7 +78,7 @@ class PeerManager extends Manager {
             const peer = PeerFactory.fromRaw(rawPeer)
             PeersStore.set(peer)
 
-            AppEvents.Peers.fire("updateSingle", {
+            peer.fire("updateSingle", {
                 peer
             })
 

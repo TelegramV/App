@@ -2,6 +2,7 @@
 import {GroupPeer} from "./GroupPeer";
 import MTProto from "../../../mtproto/external"
 import AppEvents from "../../eventBus/AppEvents"
+import PeersManager from "./PeersManager"
 
 // It should actually extend from channel but who cares
 export class SupergroupPeer extends GroupPeer {
@@ -23,7 +24,13 @@ export class SupergroupPeer extends GroupPeer {
         let status = ""
         if (this.full) {
             const user = this.full.participants_count === 1 ? "member" : "members"
-            status = `${this.full.participants_count} ${user}, ${this.full.online_count} online`
+
+            // if (this.full.online_count > 0) { // implement online later
+            //     status = `${this.full.participants_count} ${user}, ${this.full.online_count} online`
+            // } else {
+                status = `${this.full.participants_count} ${user}`
+            // }
+
         } else {
             status = "loading info..."
         }
@@ -41,6 +48,7 @@ export class SupergroupPeer extends GroupPeer {
         return MTProto.invokeMethod("channels.getFullChannel", {
             channel: this.input
         }).then(channelFull => {
+            PeersManager.fillPeersFromUpdate(channelFull)
             this.full = channelFull.full_chat
 
             AppEvents.Peers.fire("fullLoaded", {

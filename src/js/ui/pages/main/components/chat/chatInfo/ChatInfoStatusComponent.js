@@ -2,6 +2,7 @@ import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {VComponent} from "../../../../../v/vrdom/component/VComponent"
 import type {BusEvent} from "../../../../../../api/eventBus/EventBus"
+import {GroupPeer} from "../../../../../../api/peers/objects/GroupPeer"
 
 class ChatInfoStatusComponent extends VComponent {
 
@@ -17,6 +18,7 @@ class ChatInfoStatusComponent extends VComponent {
 
         E.bus(AppEvents.Peers)
             .on("updateUserStatus", this.peersBusFired)
+            .on("updateChatOnlineCount", this.peersBusFired)
             .on("fullLoaded", this.peersBusFired)
     }
 
@@ -66,6 +68,8 @@ class ChatInfoStatusComponent extends VComponent {
 
     peersBusFired = (event: BusEvent) => {
         if (AppSelectedPeer.check(event.peer)) {
+            this.__patch()
+        } else if (this.callbacks.peer instanceof GroupPeer && this.callbacks.peer.participants.indexOf(event.peer) > 1) {
             this.__patch()
         }
     }

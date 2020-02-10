@@ -7,6 +7,7 @@ import {PeerApi} from "../PeerApi"
 import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 import {PeerMessages} from "../PeerMessages"
 import DialogsStore from "../../store/DialogsStore"
+import PeersManager from "./PeersManager"
 
 export class Peer extends ReactiveObject {
 
