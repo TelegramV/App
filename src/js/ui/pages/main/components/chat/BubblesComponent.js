@@ -20,9 +20,6 @@ class BubblesComponent extends VComponent {
     loaderRef = this.props.loaderRef
     bubblesInnerRef = VComponent.createRef()
 
-
-
-
     messages = {
         rendered: new Map(),
         sending: new Map(),
@@ -39,15 +36,15 @@ class BubblesComponent extends VComponent {
         this.callbacks = {
             peer: AppSelectedPeer.Reactive.FireOnly,
         }
-
     }
 
     appEvents(E) {
-        E.bus(AppEvents.Dialogs)
+        E.bus(AppEvents.Peers)
             .on("fetchedInitialMessages", this.onFetchedInitialMessages)
             .on("fetchedMessagesNextPage", this.onFetchedMessagesNextPage)
             .on("fetchedMessagesPrevPage", this.onFetchedMessagesPrevPage)
             .on("fetchedMessagesAnyPage", this.onFetchedMessagesAnyPage)
+        E.bus(AppEvents.Dialogs)
             .on("newMessage", this.onNewMessage)
             .on("sendMessage", this.onSendMessage)
             .on("messageSent", this.onMessageSent)
@@ -96,10 +93,10 @@ class BubblesComponent extends VComponent {
     }
 
     onShowMessage = message => {
-        if(this.messages.rendered.has(message.id)) {
+        if (this.messages.rendered.has(message.id)) {
             const $rendered = this.messages.rendered.get(message.id)
             this.scrollToMessage($rendered)
-        } else if(!this.messages.isFetchingNextPage && !this.messages.isFetchingPrevPage) {
+        } else if (!this.messages.isFetchingNextPage && !this.messages.isFetchingPrevPage) {
             this.toggleMessagesLoader(false)
             AppSelectedPeer.Current.messages.clear()
             this.clearBubbles()
@@ -118,14 +115,14 @@ class BubblesComponent extends VComponent {
     }
 
     onFetchedInitialMessages = event => {
-        if (AppSelectedPeer.check(event.dialog.peer)) {
+        if (AppSelectedPeer.check(event.peer)) {
             this.appendMessages(event.messages)
         }
     }
 
     onFetchedMessagesPrevPage = event => {
-        if (AppSelectedPeer.check(event.dialog.peer)) {
-            if(event.messages.length === 0) {
+        if (AppSelectedPeer.check(event.peer)) {
+            if (event.messages.length === 0) {
                 this.loadedTop = false
                 return
             }
@@ -134,20 +131,20 @@ class BubblesComponent extends VComponent {
     }
 
     onFetchedMessagesNextPage = event => {
-        if (AppSelectedPeer.check(event.dialog.peer)) {
+        if (AppSelectedPeer.check(event.peer)) {
             this.appendMessages(event.messages)
         }
     }
 
     onFetchedMessagesAnyPage = event => {
-        if (AppSelectedPeer.check(event.dialog.peer)) {
+        if (AppSelectedPeer.check(event.peer)) {
             this.clearAndAppend(event.messages)
         }
     }
 
     onNewMessage = event => {
         if (AppSelectedPeer.check(event.dialog.peer)) {
-            if(!this.loadedTop) {
+            if (!this.loadedTop) {
                 if (!this.messages.isFetching) {
                     if (isElementInViewport(this.prependMessages([event.message])[0])) {
                         this.markAllAsRead()
@@ -165,7 +162,7 @@ class BubblesComponent extends VComponent {
     onSendMessage = event => {
         if (AppSelectedPeer.check(event.dialog.peer)) {
             // TODO load first page
-            if(!this.loadedTop) {
+            if (!this.loadedTop) {
                 this.prependMessages([event.message], true)
             }
         }
@@ -199,7 +196,7 @@ class BubblesComponent extends VComponent {
      */
     renderMessage = (message, prepend = false) => {
 
-        if (!this.__.mounted || !AppSelectedPeer.check(message.dialog.peer)) {
+        if (!this.__.mounted || !AppSelectedPeer.check(message.to)) {
             return
         }
 
@@ -226,15 +223,15 @@ class BubblesComponent extends VComponent {
         const threshold = 60 * 5
         const avatar = $message.__component.avatarRef
 
-        if($message.previousSibling && $message.previousSibling.__component) {
+        if ($message.previousSibling && $message.previousSibling.__component) {
             const prev = $message.previousSibling.__component
             const $prev = $message.previousSibling
             const from = prev.message.from
-            if(from === message.from && Math.abs(prev.message.date - message.date) <= threshold) {
+            if (from === message.from && Math.abs(prev.message.date - message.date) <= threshold) {
                 $prev.classList.remove("upper")
                 const username = $prev.querySelector(".username")
 
-                if(username) {
+                if (username) {
                     username.parentNode.removeChild(username)
                 }
                 $message.classList.add("hide-tail")
@@ -246,17 +243,17 @@ class BubblesComponent extends VComponent {
 
         } else {
             $message.classList.add("upper")
-            if($message.nextSibling && $message.nextSibling.__component) {
+            if ($message.nextSibling && $message.nextSibling.__component) {
                 const next = $message.nextSibling.__component
                 const $next = $message.nextSibling
                 const from = next.message.from
-                if(from === message.from && Math.abs(next.message.date - message.date) <= threshold) {
+                if (from === message.from && Math.abs(next.message.date - message.date) <= threshold) {
                     $next.classList.add("hide-tail")
                     $message.classList.remove("hide-tail")
                     $message.classList.remove("upper")
                     const username = $message.querySelector(".username")
 
-                    if(username) {
+                    if (username) {
                         username.parentNode.removeChild(username)
                     }
 
@@ -308,6 +305,7 @@ class BubblesComponent extends VComponent {
      * todo: rewrite this thing
      *
      * @param {Array<Message>} messages
+     * @param scrollToWaited
      * @private
      */
     appendMessages = (messages, scrollToWaited = true) => {
@@ -322,7 +320,7 @@ class BubblesComponent extends VComponent {
 
             const $rendered = this.renderMessage(message)
 
-            if(last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
+            if (last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
                 const $time = VRDOM.render(<div className="service">
                     <div className="service-msg">{last.__component.message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
                 </div>)
@@ -341,7 +339,7 @@ class BubblesComponent extends VComponent {
             this.changeTails(l, l.__component.message)
         })
         this.$el.scrollTop = z + this.bubblesInnerRef.$el.clientHeight - k
-        if(scrollToWaited) {
+        if (scrollToWaited) {
             this.scrollToWaitedMessage()
         }
     }
@@ -349,6 +347,7 @@ class BubblesComponent extends VComponent {
     /**
      * @param {Array<Message>} messages
      * @param {boolean} isSending
+     * @param forceNoReset
      * @private
      */
     prependMessages = (messages, isSending = false, forceNoReset = false) => {
@@ -368,7 +367,7 @@ class BubblesComponent extends VComponent {
 
             const $rendered = this.renderMessage(message, true)
 
-            if(first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
+            if (first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
                 const $time = VRDOM.render(<div className="service">
                     <div className="service-msg">{message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
                 </div>)
@@ -418,7 +417,7 @@ class BubblesComponent extends VComponent {
     }
 
     scrollToWaitedMessage(smooth = true) {
-        if(this.waitingScrollToMessage && this.messages.rendered.has(this.waitingScrollToMessage.id)) {
+        if (this.waitingScrollToMessage && this.messages.rendered.has(this.waitingScrollToMessage.id)) {
             this.scrollToMessage(this.messages.rendered.get(this.waitingScrollToMessage.id), smooth)
             this.waitingScrollToMessage = null
         }
@@ -440,14 +439,17 @@ class BubblesComponent extends VComponent {
 
     scrollToMessage = (message, smooth = true) => {
         // todo hightlight
-        this.$el.scrollTo({top: message.offsetTop+message.clientHeight/2 - this.$el.clientHeight/2, behavior: smooth ? "smooth" : "auto"})
+        this.$el.scrollTo({
+            top: message.offsetTop + message.clientHeight / 2 - this.$el.clientHeight / 2,
+            behavior: smooth ? "smooth" : "auto"
+        })
     }
 
     onScroll = (event) => {
         const $element = event.target
 
-        if(this.loadedTop && !this.messages.isFetchingPrevPage) {
-            if($element.scrollTop > this.bubblesInnerRef.$el.clientHeight - this.$el.clientHeight - 300) {
+        if (this.loadedTop && !this.messages.isFetchingPrevPage) {
+            if ($element.scrollTop > this.bubblesInnerRef.$el.clientHeight - this.$el.clientHeight - 300) {
                 this.messages.isFetchingPrevPage = true
                 const all = [...this.messages.rendered.keys()]
 

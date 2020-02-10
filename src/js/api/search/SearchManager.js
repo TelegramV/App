@@ -19,7 +19,7 @@ class SearchManagerSingleton extends Manager {
         }).then(Messages => {
             Messages.__q = q
 
-            if (Messages._ === "messages.channelMessages") {
+            if (Messages._ === "messages.channelMessages" && peer.dialog) {
                 peer.dialog.pts = Messages.pts
             }
 

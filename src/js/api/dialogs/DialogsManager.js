@@ -156,13 +156,6 @@ class DialogManager extends Manager {
 
             if (dialog) {
                 dialog.peer.messages.readInboxMaxId = update.max_id
-
-                if (update.still_unread_count === 0) {
-                    dialog.peer.messages.clearUnread()
-                } else {
-                    dialog.peer.messages.unreadCount = update.still_unread_count
-                    dialog.peer.messages.clearUnreadIds()
-                }
             }
         })
 
@@ -177,25 +170,16 @@ class DialogManager extends Manager {
             const dialog = this.find("channel", update.channel_id)
 
             if (dialog) {
-                dialog.peer.messages.startTransaction()
                 dialog.peer.messages.readInboxMaxId = update.max_id
-                if (update.still_unread_count === 0) {
-                    dialog.peer.messages.clearUnread()
-                } else {
-                    dialog.peer.messages.unreadCount = update.still_unread_count
-                    dialog.peer.messages.clearUnreadIds()
-                }
-                dialog.peer.messages.stopTransaction()
-
                 dialog.fire("updateReadChannelInbox")
             }
         })
 
         MTProto.UpdatesManager.subscribe("updateReadChannelOutbox", update => {
             const dialog = this.find("channel", update.channel_id)
+
             if (dialog) {
                 dialog.peer.messages.readOutboxMaxId = update.max_id
-
                 dialog.fire("updateReadChannelOutbox")
             }
         })

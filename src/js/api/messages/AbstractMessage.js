@@ -84,7 +84,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get isRead(): boolean {
-        return this.dialog.peer.messages.readOutboxMaxId >= this.id || this.dialog.peer.messages.readInboxMaxId >= this.id
+        return this.to.messages.readOutboxMaxId >= this.id
     }
 
     get text(): string {
@@ -162,7 +162,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         if (!this.groupedId) return
         if (this.groupedId && !this.group) {
             let hasInit = false
-            this.group = this.dialog.peer.messages.getByGroupedId(this.groupedId)
+            this.group = this.to.messages.getByGroupedId(this.groupedId)
             this.group.forEach(l => {
                 l.group = this.group
                 hasInit |= l.groupInitializer
@@ -179,7 +179,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         }
 
         if (this.raw.reply_to_msg_id) {
-            const replyToMessage = this.dialog.peer.messages.get(this.raw.reply_to_msg_id)
+            const replyToMessage = this.to.messages.get(this.raw.reply_to_msg_id)
 
             if (replyToMessage) {
                 this.replyToMessage = replyToMessage
@@ -189,13 +189,13 @@ export class AbstractMessage extends ReactiveObject implements Message {
                     this.fire("replyToMessageFound")
                 }
             } else {
-                this.dialog.peer.api.getHistory({
+                this.to.api.getHistory({
                     offset_id: this.raw.reply_to_msg_id, // ???
                     add_offset: -1,
                     limit: 1
                 }).then(messages => {
                     if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
-                        this.dialog.peer.messages.appendOtherSingle(messages[0])
+                        this.to.messages.appendOtherSingle(messages[0])
                         this.replyToMessage = messages[0]
                         this.replyToMessageType = "replyToMessageFound"
 
@@ -267,7 +267,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
         // reply
         if (this.dialog.peer) {
-            const replyToMessage = this.dialog.peer.messages.get(this.raw.reply_to_msg_id)
+            const replyToMessage = this.to.messages.get(this.raw.reply_to_msg_id)
             if (replyToMessage) {
                 this.replyToMessage = replyToMessage
             }

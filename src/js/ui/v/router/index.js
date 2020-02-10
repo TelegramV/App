@@ -23,6 +23,7 @@ export class VFrameworkRouter {
         this.activeRoute = {}
         this.middlewares = []
         this.queryChangeHandlers = []
+        this.routeChangeHandlers = new Set()
     }
 
     middleware(handler) {
@@ -46,6 +47,10 @@ export class VFrameworkRouter {
 
     onQueryChange(handler) {
         this.queryChangeHandlers.push(handler)
+    }
+
+    onRouteChange(handler) {
+        this.routeChangeHandlers.add(handler)
     }
 
     run($mountElement) {
@@ -190,6 +195,8 @@ export class VFrameworkRouter {
         }
 
         this.activeRoute = routeToActivate
+
+        this.routeChangeHandlers.forEach(h => h(this.activeRoute))
 
         this.renderRoute(foundRoute)
     }
