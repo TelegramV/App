@@ -4,8 +4,8 @@ import {DialogApi} from "./DialogApi"
 import {ReactiveObject} from "../../ui/v/reactive/ReactiveObject"
 import {Peer} from "../peers/objects/Peer"
 import PeersStore from "../store/PeersStore"
-import DialogEvents from "./DialogEvents"
 import AppEvents from "../eventBus/AppEvents"
+import {actionTypesMapping} from "../../ui/pages/main/sidebars/left/dialog/Fragments/DialogTextFragment"
 
 export class Dialog extends ReactiveObject {
 
@@ -41,14 +41,66 @@ export class Dialog extends ReactiveObject {
         if (rawUpdate.action._ === "sendMessageCancelAction") {
             this.clearActions()
         } else {
-            this._actions.add(rawUpdate)
+            const peer = PeersStore.get("user", rawUpdate.user_id)
+
+            if (peer) {
+                rawUpdate._showUsername = peer !== this.peer
+                this._actions.add(rawUpdate)
+            }
+
             this.fire("updateActions")
         }
+    }
+
+    get actionText() {
+        let typing = []
+
+        const mapped = Array.from(this.actions).map(rawUpdate => {
+            const peer = PeersStore.get("user", rawUpdate.user_id)
+
+            const actionString = actionTypesMapping[rawUpdate.action._]
+
+            if (peer && actionString) {
+                if (actionString === actionTypesMapping.sendMessageTypingAction) {
+                    if (rawUpdate._showUsername) {
+                        typing.push(peer.firstName)
+                    }
+                }
+
+                return {
+                    user: rawUpdate._showUsername ? peer.firstName : "",
+                    action: actionString
+                }
+            }
+
+            return false
+        })
+
+        if (typing.length === 2) {
+            return {
+                user: `${typing[0]} and ${typing[1]} are typing`,
+                action: ""
+            }
+        }
+
+        if (typing.length > 2) {
+            return {
+                user: `${typing.length} members are typing`,
+                action: ""
+            }
+        }
+
+        return mapped[0] || false
     }
 
     removeAction(rawUpdate) {
         this._actions.delete(rawUpdate)
         this.fire("updateActions")
+    }
+
+    removeActionByUserId(userId) {
+        const rawUpdate = Array.from(this._actions).find(rawUpdate => rawUpdate.user_id === userId)
+        this.removeAction(rawUpdate)
     }
 
     clearActions() {

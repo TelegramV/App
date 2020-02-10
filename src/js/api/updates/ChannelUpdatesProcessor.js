@@ -360,9 +360,7 @@ export class ChannelUpdatesProcessor {
         } else if (rawDifferenceWithPeer._ === "updates.channelDifferenceTooLong") {
             console.error("difference too long", rawDifferenceWithPeer)
 
-            AppEvents.Dialogs.fire("ChannelRefreshCausedByDifferenceTooLong", {
-                rawDifference: rawDifferenceWithPeer
-            })
+            this.applyUpdate(rawDifferenceWithPeer)
 
             AppEvents.General.fire("gotDifference", {
                 diffType: 0 // channel

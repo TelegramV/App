@@ -2,8 +2,6 @@ import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {VComponent} from "../../../../../v/vrdom/component/VComponent"
 import type {BusEvent} from "../../../../../../api/eventBus/EventBus"
-import PeersStore from "../../../../../../api/store/PeersStore"
-import {actionTypesMapping} from "../../../sidebars/left/dialog/Fragments/DialogTextFragment"
 
 class ChatInfoStatusComponent extends VComponent {
 
@@ -26,7 +24,7 @@ class ChatInfoStatusComponent extends VComponent {
         return (
             <div className="bottom">
                 <div css-display={AppSelectedPeer.isSelected && AppSelectedPeer.Current.isSelf ? "none" : ""}
-                     className={["info", this.statusLine.online ? "online" : ""]}>{this.statusLine.text}</div>
+                     className={["info", this.statusLine.online ? "online" : "", this.statusLine.isAction ? "loading-text" : ""]}>{this.statusLine.text}</div>
             </div>
         )
     }
@@ -39,18 +37,7 @@ class ChatInfoStatusComponent extends VComponent {
 
     get action() {
         if (this.callbacks.peer && this.callbacks.peer.dialog && this.callbacks.peer.dialog.actions.size > 0) {
-            const action = Array.from(this.callbacks.peer.dialog.actions).map(rawUpdate => {
-                const peer = PeersStore.get("user", rawUpdate.user_id)
-
-                if (peer && actionTypesMapping[rawUpdate.action._]) {
-                    return {
-                        user: peer.name,
-                        action: actionTypesMapping[rawUpdate.action._]
-                    }
-                }
-
-                return false
-            })[0]
+            const action = this.callbacks.peer.dialog.actionText
 
             if (action) {
                 return action.user + " " + action.action
@@ -69,7 +56,7 @@ class ChatInfoStatusComponent extends VComponent {
         const action = this.action
 
         if (action) {
-            return {text: action}
+            return {text: action, isAction: true}
         }
 
         const peer = AppSelectedPeer.Current

@@ -23,12 +23,22 @@ export class MessageProcessor {
             "msgs_ack": this.processMessagesAck.bind(this),
             "bad_server_salt": this.processBadServerSalt.bind(this),
             "new_session_created": this.processNewSessionCreated.bind(this),
-            "msg_new_detailed_info": this.processMessageNewDetailedInfo.bind(this)
+            "msg_new_detailed_info": this.processMessageNewDetailedInfo.bind(this),
+            "msg_detailed_info": this.processMsgDetailedInfo.bind(this),
+            "bad_msg_notification": this.processBadMsgNotification.bind(this),
         }
     }
 
     processNewSessionCreated(message, messageID, sessionID) {
         MTProtoInternal.processUpdate({_: "new_session_created", message})
+    }
+
+    processMsgDetailedInfo(message, messageID, sessionID) {
+        // ignoring??
+    }
+
+    processBadMsgNotification(message, messageID, sessionID) {
+        // ignoring??
     }
 
     listenPong(messageId, handler) {

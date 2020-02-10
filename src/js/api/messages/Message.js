@@ -33,7 +33,7 @@ export interface Message {
 
     +type: number,
     +raw: Object;
-    +dialog: Dialog;
+    +dialog: Dialog; // we should not use this thing but use `to`
 
     +id: number;
     +to: Peer;

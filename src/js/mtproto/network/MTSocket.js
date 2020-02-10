@@ -19,11 +19,16 @@ export class MTSocket {
     }
 
     refreshSocket() {
+        console.log("refreshing socket..")
+
         this.inob_clear()
+
         this.transportationSocket = new WebSocket(this.networker.dcUrl, "binary")
         this.transportationSocket.binaryType = "arraybuffer"
         this.transportationInit = false
         this.transportationEstablishing = false
+
+        this.init_transportation()
     }
 
     inob_clear() {
@@ -32,13 +37,12 @@ export class MTSocket {
         this.aes_encryptor = undefined
     }
 
-
     transport(buffer) {
         if (!this.transportationInit) {
             if (!this.transportationEstablishing) {
-                this.init_transportation()
                 this.transportationQueue[this.transportationQueueLen] = buffer;
                 ++(this.transportationQueueLen);
+                this.init_transportation()
                 this.transportationEstablishing = true;
             } else {
                 this.transportationQueue[this.transportationQueueLen] = buffer;
@@ -47,13 +51,13 @@ export class MTSocket {
             return;
         }
 
-        this.inob_send(this.transportationSocket, buffer, buffer.byteLength);
+        this.inob_send(buffer, buffer.byteLength);
     }
 
     init_transportation() {
         this.transportationSocket.onopen = (ev) => {
             for (let i = 0; i < this.transportationQueueLen; i++) {
-                this.inob_send(this.transportationSocket, this.transportationQueue[i], this.transportationQueue[i].byteLength)
+                this.inob_send(this.transportationQueue[i], this.transportationQueue[i].byteLength)
             }
 
             this.onConnect()
@@ -162,7 +166,7 @@ export class MTSocket {
         this.obfuscation_init = true
     }
 
-    inob_send(socket, buffer, buffer_len) {
+    inob_send(buffer, buffer_len) {
         if (!this.obfuscation_init) {
             this.inob_send_init()
         }
@@ -172,10 +176,13 @@ export class MTSocket {
 
         //console.log(buffer_len);
         mt_write_uint32(0, buffer_len, out_buffer_view);
-        mt_write_bytes(4, buffer_len, new Uint8Array(buffer), out_buffer_view);
+        mt_write_bytes(4, buffer_len, new Uint8Array(buffer), out_buffer_view)
 
         const encrypted_buffer = this.aes_encryptor.encrypt(new Uint8Array(out_buffer))
-        socket.send(encrypted_buffer);
+
+        this.transportationSocket.send(encrypted_buffer)
+
+        delete this.transportationQueue[this.transportationQueueLen]
     }
 
     inob_recv(ev) {
@@ -192,7 +199,7 @@ export class MTSocket {
     }
 
     onDisconnect() {
-        this.networker.onDisconnect()
         this.refreshSocket()
+        this.networker.onDisconnect()
     }
 }
