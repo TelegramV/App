@@ -84,6 +84,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get isRead(): boolean {
+        if (!this.to) {
+            return false
+        }
+
         return this.to.messages.readOutboxMaxId >= this.id
     }
 
@@ -155,6 +159,9 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     findGrouped(fire = true) {
+        if (!this.to) {
+            return false
+        }
         if (!this.groupedId) return
         if (this.groupedId && !this.group) {
             let hasInit = false
@@ -170,6 +177,9 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     findReplyTo(fire = true) {
+        if (!this.to) {
+            return false
+        }
         if (this.replyToMessage && this.replyToMessageType && fire) {
             this.fire(this.replyToMessageType)
         }

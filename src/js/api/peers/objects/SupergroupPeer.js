@@ -51,6 +51,8 @@ export class SupergroupPeer extends GroupPeer {
             PeersManager.fillPeersFromUpdate(channelFull)
             this.full = channelFull.full_chat
 
+            console.log(channelFull)
+
             AppEvents.Peers.fire("fullLoaded", {
                 peer: this
             })
