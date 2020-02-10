@@ -17,6 +17,7 @@ class ChatComponent extends VComponent {
     chatRef = VComponent.createRef()
     chatLoaderRef = VComponent.createRef()
     messagesLoaderRef = VComponent.createRef()
+    chatInputRef = VComponent.createComponentRef()
 
     init() {
         this.callbacks = {
@@ -52,8 +53,8 @@ class ChatComponent extends VComponent {
                                      show={true}
                                      background={true}/>
 
-                    <BubblesComponent loaderRef={this.messagesLoaderRef}/>
-                    <ChatInputComponent ref="chatInput"/>
+                    <BubblesComponent loaderRef={this.messagesLoaderRef} chatInputRef={this.chatInputRef}/>
+                    <ChatInputComponent ref={this.chatInputRef}/>
                 </div>
             </div>
         )

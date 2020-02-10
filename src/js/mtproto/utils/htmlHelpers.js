@@ -92,8 +92,8 @@ function getMessageEntities(elem, offset) {
     let from = offset
     elem.childNodes.forEach(l => {
         if (l.nodeType === Node.TEXT_NODE) {
-            // console.log("add text!", l.wholeText, l.wholeText.length)
-            offset += l.wholeText.length
+            // console.log("add text!", l.textContent, l.textContent.length)
+            offset += l.textContent.length
             return
         }
         let r = getMessageEntities(l, offset)
@@ -105,13 +105,28 @@ function getMessageEntities(elem, offset) {
     })
     let length = offset - from
     entities.push(elemToEntity(elem, from, length))
+    // console.log(entities)
     return {
         offset: offset,
         entities: entities
     }
 }
 
+function addNewlines(elem) {
+    elem.childNodes.forEach(l => {
+        if(l.tagName && l.tagName.toUpperCase() === "BR") {
+            l.parentNode.insertBefore(document.createTextNode("\n"), l)
+            l.parentNode.removeChild(l)
+            return
+        }
+        if(l.nodeType !== Node.TEXT_NODE) {
+            addNewlines(l)
+        }
+    })
+}
+
 export function domToMessageEntities(elem) {
+    addNewlines(elem)
     return {
         messageEntities: getMessageEntities(elem, 0).entities.filter(l => l !== undefined),
         text: elem.textContent

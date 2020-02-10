@@ -53,7 +53,7 @@ export class Peer extends ReactiveObject {
     }
 
     /**
-     * @private
+     * @protected
      * @return {*}
      */
     get raw() {

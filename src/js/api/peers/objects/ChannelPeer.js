@@ -38,6 +38,45 @@ export class ChannelPeer extends Peer {
         }
     }
 
+    get adminRights() {
+        return (this.raw.admin_rights && this.raw.admin_rights.pFlags) || {}
+    }
+
+    get isCreator(): boolean {
+        return !!this.raw.pFlags.creator
+    }
+
+    get canPostMessages(): boolean {
+        return this.isCreator || !!this.adminRights.post_messages
+    }
+
+    get canChangeInfo(): boolean {
+        return this.isCreator || !!this.adminRights.change_info
+    }
+
+    get canEditMessages(): boolean {
+        return this.isCreator || !!this.adminRights.edit_messages
+    }
+
+    get canDeleteMessages(): boolean {
+        return this.isCreator || !!this.adminRights.delete_messages
+    }
+
+    get canPinMessages(): boolean {
+        return this.isCreator || !!this.adminRights.pin_messages
+    }
+
+    get canBanUsers(): boolean {
+        return this.isCreator || !!this.adminRights.ban_users
+    }
+
+    get canInviteUsers(): boolean {
+        return this.isCreator || !!this.adminRights.invite_users
+    }
+
+    get canAddAdmins(): boolean {
+        return this.isCreator || !!this.adminRights.add_admins
+    }
     /**
      * @return {Promise<*>}
      */

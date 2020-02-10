@@ -4,25 +4,26 @@ import {replaceEmoji} from "../../../../../utils/emoji";
 import {ModalManager} from "../../../../../modalManager";
 import {AttachPollModal} from "../../../modals/AttachPollModal";
 import {AttachLinkModal} from "../../../modals/AttackLinkModal";
+import {VComponent} from "../../../../../v/vrdom/component/VComponent";
 
-export class TextareaFragment extends Component {
+export class TextareaFragment extends VComponent {
 
     h() {
         return <div className="textarea empty"
              placeholder="Message"
-             contentEditable onInput={this.onInput} onKeyPress={this.onKeyPress} onKeyDown={this.onKeyDown}
+             contentEditable onInput={this.onInput.bind(this)} onKeyPress={this.onKeyPress.bind(this)} onKeyDown={this.onKeyDown.bind(this)}
              onContextMenu={this.contextMenu}>
         </div>
     }
 
     mounted() {
         super.mounted();
-        this.parent = this.refs.get("chatInput")
+        this.parent = this.props.parent
     }
 
     init() {
         super.init()
-        window.addEventListener("paste", this.onPaste)
+        window.addEventListener("paste", l => this.onPaste(l))
     }
 
     onKeyDown(ev) {
@@ -60,7 +61,7 @@ export class TextareaFragment extends Component {
         }
         // todo move this blur & focus to modalmanager
         this.$el.blur()
-        ModalManager.open(<AttachLinkModal text={text} close={this.linkCreated}/>)
+        ModalManager.open(<AttachLinkModal text={text} close={this.linkCreated.bind(this)}/>)
     }
 
     saveSelection() {
@@ -108,7 +109,9 @@ export class TextareaFragment extends Component {
         // Unfortunately execCommand has no way to insert <code> directly.
         // Well, screw it, I ain't no worried about hacks anymore!
         // Let it be something else right?
+        this.$el.classList.add("monospace-hack")
         this.formatBlock("subscript")
+        this.$el.classList.remove("monospace-hack")
     }
 
     clear() {
