@@ -3,6 +3,8 @@ import InfoComponent from "./common/infoComponent"
 import {ButtonWithProgressBarComponent} from "../../main/components/input/buttonComponent";
 import {InputComponent} from "../../main/components/input/inputComponent";
 
+import MTProto from "../../../../mtproto/external"
+
 export default class PasswordInputPaneComponent extends PaneComponent {
     constructor(props) {
         super(props);
