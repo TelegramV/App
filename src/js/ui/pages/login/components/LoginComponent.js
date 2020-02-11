@@ -1,5 +1,4 @@
 import Component from "../../../v/vrdom/Component";
-import {ModalComponent} from "../../../modalManager";
 import PhoneInputPaneComponent from "./PhoneInputPaneComponent";
 import CodeAndPasswordPaneComponent from "./CodeAndPasswordPaneComponent"
 import QRLoginPaneComponent from "./QRLoginPaneComponent"
@@ -18,8 +17,10 @@ export default class LoginComponent extends Component {
             <div id="login">
                 <PhoneInputPaneComponent finished={this.handleSendCode} ref="phonePane" qrLoginInit={this.qrLoginInit}/>
                 <CodeAndPasswordPaneComponent ref="codeAndPassword" cancelCode={this.cancelCode}
-                                              password={this.password} finished={this.loginSuccess} signUp={this.signUp}/>
-                <QRLoginPaneComponent ref="qrLoginPane" finished={this.loginSuccess} backToPhone={this.backToPhone} password={this.passwordQr}/>
+                                              password={this.password} finished={this.loginSuccess}
+                                              signUp={this.signUp}/>
+                <QRLoginPaneComponent ref="qrLoginPane" finished={this.loginSuccess} backToPhone={this.backToPhone}
+                                      password={this.passwordQr}/>
                 <RegisterPaneComponent ref="registerPane" finished={this.loginSuccess}/>
             </div>
         )

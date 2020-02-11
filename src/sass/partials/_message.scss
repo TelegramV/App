@@ -45,7 +45,7 @@
         .bubble {
             grid-area: bubble;
             max-width: 480px;
-            min-height: 34px;
+            min-height: 33px;
             border-radius: 12px;
             //box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.15);
             position: relative;
@@ -621,28 +621,32 @@
 
                 figure {
                     &.round {
-                        width: 240px;
-                        height: 240px;
+                        width: 200px;
+                        height: 200px;
                         border-radius: 50%;
+                        &~.time.bg {
+                            bottom: 22px !important;
+                            right: 12px !important;
+                        }
 
                         &~.round-overlay {
                             position: absolute;
                             left: 50%;
-                            top: 50%;
+                            top: calc(50% - 10px); //requires position relative on message, but it breaks time
                             transform: translate(-50%, -50%);
                             width: 95%;
-                            height: 95%;
+                            height: calc((100% - 20px)*0.95);
 
                             .playback {
                                 position: absolute;
-                                top: 0;
+                                top: -2px;
                                 left: 0;
                                 line-height: 15px;
                                 background-color: $semiblack;
                                 border-radius: 10px;
                                 color: white;
-                                font-size: 14px;
-                                padding: 2px 5px;
+                                font-size: 12px;
+                                padding: 2px 6px;
 
                                 .pl-time.nosound:after {
                                     content: $tgico-nosound;
@@ -816,7 +820,7 @@
                         background-color: $semiblack;
                         border-radius: 40px;
                         text-align: center;
-                        padding: 2px 6px !important;
+                        padding: 1px 6px !important;
 
                         .views {
                             margin-right: 5px;
@@ -929,8 +933,8 @@
             grid-area: avatar;
             filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
 
-            height: 34px;
-            width: 34px;
+            height: 40px;
+            width: 40px;
             flex-shrink: 0;
             border-radius: 100%;
 
@@ -945,6 +949,11 @@
             background-repeat: no-repeat;
             background-size: contain;
             transition: anim(background-image);
+
+            &.hidden {
+                visibility: hidden;
+                height: 0;
+            }
 
             &.placeholder-0 {
                 background-color: #cc90e2;
@@ -984,7 +993,7 @@
         //align-items: flex-start;
 
         &.hide-tail .bubble, .bubble.transparent {
-            margin-left: 10px;
+            margin-left: 5px;
             -webkit-mask-image: none !important;
             padding-left: 0 !important;
             border-bottom-left-radius: 6px !important;
@@ -1000,8 +1009,14 @@
             mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left-6px.svg");
             border-top-left-radius: 6px !important;
         }
-        &:not(.hide-tail) .bubble {
-            border-bottom-left-radius: 0 !important;
+
+        &:not(.hide-tail) {
+            .bubble {
+                border-bottom-left-radius: 0px;
+            }
+            &+.hide-tail {
+                margin-bottom: -2px !important;
+            }
         }
 
 
@@ -1080,20 +1095,8 @@
 
         .bubble {
             background-color: #ffffff;
-            //border-radius: 6px 12px 12px 6px;
+            margin-left: -6px;
         }
-
-        //.bubble:first-child {
-        //    border-radius: 12px 12px 12px 6px;
-        //}
-        //
-        //.bubble:last-child {
-        //    border-radius: 6px 12px 12px 0px;
-        //}
-        //
-        //.bubble:first-child:last-child {
-        //    border-radius: 12px 12px 12px 0px;
-        //}
     }
 
     #bubbles-inner > .out {

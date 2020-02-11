@@ -49,9 +49,9 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
     }
 
     _onTimeUpdate =(ev) => {
-        this.progressRef.component.setProgress(this.video.currentTime/this.video.duration);
         if(!this.muted) {
             this.playbackTime.textContent=formatAudioTime(this.video.currentTime);
+            this.progressRef.component.setProgress(this.video.currentTime/this.video.duration);
         }
     }
 

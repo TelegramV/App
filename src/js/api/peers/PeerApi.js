@@ -2,7 +2,6 @@ import MTProto from "../../mtproto/external"
 import PeersManager from "./objects/PeersManager"
 import AppEvents from "../eventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../dialogs/util"
-import TimeManager from "../../mtproto/timeManager"
 import {FileAPI} from "../fileAPI"
 import {MessageFactory} from "../messages/MessageFactory"
 import AppConfiguration from "../../configuration"
@@ -51,7 +50,7 @@ export class PeerApi {
         PeersManager.fillPeersFromUpdate(Messages)
 
         const messages = Messages.messages.map(rawMessage => {
-            return MessageFactory.fromRaw(this._peer.dialog, rawMessage)
+            return MessageFactory.fromRaw(this._peer, rawMessage)
         })
 
         this._peer.messages.appendMany(messages)

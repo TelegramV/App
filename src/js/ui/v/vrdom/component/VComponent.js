@@ -627,12 +627,12 @@ export class VComponent {
      * @return {boolean}
      */
     proxyStatePropertyChanged(target, key, value) {
-        if (target[key] !== value) {
-            target[key] = value
-            if (!this.__.stateInTransactionMode) {
+        if (!this.__.stateInTransactionMode) {
+            if (target[key] !== value) {
+                target[key] = value
                 this.stateChanged({target, key, value})
+                return true
             }
-            return true
         }
 
         return true
@@ -646,6 +646,7 @@ export class VComponent {
      * @param value
      */
     stateChanged({target, key, value}) {
+        console.log(this.state)
         this.__patch()
     }
 

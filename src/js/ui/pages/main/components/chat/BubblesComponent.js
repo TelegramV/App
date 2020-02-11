@@ -122,7 +122,7 @@ class BubblesComponent extends VComponent {
     onFetchedInitialMessages = event => {
         if (AppSelectedPeer.check(event.peer)) {
             this.appendMessages(event.messages)
-            if((event.peer instanceof ChannelPeer && !(event.peer instanceof SupergroupPeer)) && !event.peer.canPostMessages) {
+            if ((event.peer instanceof ChannelPeer && !(event.peer instanceof SupergroupPeer)) && !event.peer.canPostMessages) {
                 this.chatInputRef.component.hide()
             } else {
                 this.chatInputRef.component.show()
@@ -373,7 +373,7 @@ class BubblesComponent extends VComponent {
             const all = [...this.messages.rendered.keys()]
             const first = all.length > 0 ? this.messages.rendered.get(all.reduce((l, q) => {
                 return l > q ? l : q
-           })) : null
+            })) : null
 
             const $rendered = this.renderMessage(message, true)
 
