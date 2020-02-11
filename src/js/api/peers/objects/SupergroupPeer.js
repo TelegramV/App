@@ -1,4 +1,3 @@
-
 import {GroupPeer} from "./GroupPeer";
 import MTProto from "../../../mtproto/external"
 import AppEvents from "../../eventBus/AppEvents"
@@ -28,7 +27,7 @@ export class SupergroupPeer extends GroupPeer {
             // if (this.full.online_count > 0) { // implement online later
             //     status = `${this.full.participants_count} ${user}, ${this.full.online_count} online`
             // } else {
-                status = `${this.full.participants_count} ${user}`
+            status = `${this.full.participants_count} ${user}`
             // }
 
         } else {
@@ -49,7 +48,8 @@ export class SupergroupPeer extends GroupPeer {
             channel: this.input
         }).then(channelFull => {
             PeersManager.fillPeersFromUpdate(channelFull)
-            this.full = channelFull.full_chat
+
+            this._full = channelFull.full_chat
 
             console.log(channelFull)
 

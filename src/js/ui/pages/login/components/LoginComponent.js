@@ -5,7 +5,7 @@ import CodeAndPasswordPaneComponent from "./CodeAndPasswordPaneComponent"
 import QRLoginPaneComponent from "./QRLoginPaneComponent"
 import RegisterPaneComponent from "./RegisterPaneComponent"
 
-import {AppPermanentStorage} from "../../../../common/storage"
+import {AppPermanentStorage} from "../../../../api/common/storage"
 import VF from "../../../v/VFramework"
 
 export default class LoginComponent extends Component {

@@ -1,10 +1,9 @@
 import {AppConfiguration} from "../configuration"
 
 import MobileProtoWorker from "./workers/mtproto.worker"
-import {AppPermanentStorage} from "../common/storage"
+import {AppPermanentStorage} from "../api/common/storage"
 import UpdatesManager from "../api/updates/updatesManager"
 import AppEvents from "../api/eventBus/AppEvents"
-import AppCache from "../api/cache";
 
 let lastTaskId = 0
 let waitingTasks = new Map()
@@ -15,7 +14,7 @@ MTProtoWorker.addEventListener("message", event => {
     if (event.data.type === "update") {
         MTProto.UpdatesManager.process(event.data.update)
     } else if (event.data.type === "readStorage") {
-
+        console.warn("readStorage is not implemented")
     } else if (event.data.type === "setLocalStorage") {
         AppPermanentStorage.setItem(event.data.key, event.data.value)
     } else if (event.data.type === "removeLocalStorage") {
@@ -189,6 +188,18 @@ class MTProtoBridge {
         }
 
         return this.authorizedUser
+    }
+
+    performWorkerTask(taskName, data) {
+        return performTask(taskName, data)
+    }
+
+    /**
+     * do not use it now, there can be consequences
+     * @param {function(MTProtoInternal)} callback
+     */
+    withInternalContext(callback) {
+        return performTask("internalContext", callback)
     }
 }
 

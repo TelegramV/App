@@ -33,7 +33,11 @@ export interface Message {
 
     +type: number,
     +raw: Object;
-    +dialog: Dialog; // we should not use this thing but use `to`
+
+    /**
+     * @deprecated
+     */
+    +dialog: Dialog; // we should not use this thing but use `to`, should be deprecated
 
     +id: number;
     +to: Peer;

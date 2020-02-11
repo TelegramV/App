@@ -3,6 +3,9 @@ import Random from "../utils/random"
 import {MTProtoTempStorage} from "../MTProtoTempStorage"
 import AppConfiguration from "../../configuration"
 
+/**
+ * There is a very critical bug with this thing: DIFFERENT INSTANCES IN THE WORKER AND OUT OF IT
+ */
 export class MtpTimeManager {
     constructor() {
         this.lastMessageID = {}

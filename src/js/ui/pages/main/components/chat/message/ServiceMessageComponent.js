@@ -1,4 +1,4 @@
-import L from "../../../../../../common/locale/localization"
+import L from "../../../../../../api/common/locale/localization"
 import GeneralMessageComponent from "./common/GeneralMessageComponent"
 
 class ServiceMessageComponent extends GeneralMessageComponent {

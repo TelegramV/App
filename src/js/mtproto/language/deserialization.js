@@ -1,12 +1,9 @@
 import {gzipUncompress} from "../utils/bin"
-import {createLogger} from "../../common/logger"
 import {schema} from "./schema";
 import Bytes from "../utils/bytes"
 import VBigInt from "../bigint/VBigInt"
 
-const Logger = createLogger("TLDeserialization", {
-    level: "log"
-})
+// (c) webogram
 
 export class TLDeserialization {
     constructor(buffer, options = {
@@ -30,8 +27,6 @@ export class TLDeserialization {
         }
 
         const i = this.intView[this.offset / 4]
-
-        // Logger.debug(_ => _("<<<", i.toString(16), i, field))
 
         this.offset += 4
 
@@ -254,9 +249,8 @@ export class TLDeserialization {
             }
         } else {
             const constructor = this.readInt(field + "[id]")
-            const constructorCmp = constructor
 
-            if (constructorCmp === 0x3072cfa1) { // Gzip packed
+            if (constructor === 0x3072cfa1) { // Gzip packed
                 const compressed = this.fetchBytes(field + "[packed_string]")
                 const uncompressed = gzipUncompress(compressed)
                 const buffer = Bytes.asUint8Buffer(uncompressed)
@@ -272,7 +266,7 @@ export class TLDeserialization {
                     index[this.schema.constructors[i].id] = i
                 }
             }
-            let i = index[constructorCmp]
+            let i = index[constructor]
             if (i) {
                 constructorData = this.schema.constructors[i]
             }
@@ -281,7 +275,7 @@ export class TLDeserialization {
             if (!constructorData) {
                 let schemaFallback = this.schema
                 for (i = 0; i < schemaFallback.constructors.length; i++) {
-                    if (this.schema.constructors[i].id == constructorCmp) {
+                    if (this.schema.constructors[i].id === constructor) {
                         constructorData = schemaFallback.constructors[i]
 
                         fallback = true
@@ -290,13 +284,13 @@ export class TLDeserialization {
                 }
             }
             if (!constructorData) {
-                throw new Error("Constructor not found: " + constructorCmp + " " + this.fetchInt() + " " + this.fetchInt())
+                throw new Error("Constructor not found: " + constructor + " " + this.fetchInt() + " " + this.fetchInt())
             }
         }
 
         predicate = constructorData.predicate
 
-        if (predicate == "vector") {
+        if (predicate === "vector") {
             return this.fetchObject("vector<T>", "vector"); //special case for Vector at root
         }
 

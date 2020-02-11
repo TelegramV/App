@@ -1,5 +1,5 @@
-import { MTProto } from "../../mtproto/external";
-import AppCache from "../../api/cache"
+import { MTProto } from "../../../mtproto/external";
+import AppCache from "../../cache"
 
 const PACK_NAME = "tdesktop";
 const FILE_SECTION = "languages";

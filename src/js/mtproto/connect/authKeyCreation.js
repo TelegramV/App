@@ -1,4 +1,3 @@
-import {bytesToArrayBuffer} from "../utils/bin"
 import Bytes from "../utils/bytes"
 import {rsaKeyByFingerprints} from "./rsaKeys"
 import {TLSerialization} from "../language/serialization"
@@ -6,7 +5,7 @@ import {rsaEncrypt} from "../crypto/rsa"
 import {sha1BytesSync, sha1HashSync} from "../crypto/sha"
 import {TLDeserialization} from "../language/deserialization"
 import {tsNow} from "../timeManager"
-import {createLogger} from "../../common/logger"
+import {createLogger} from "../../api/common/logger"
 import {SecureRandomSingleton} from "../utils/singleton"
 import VBigInt from "../bigint/VBigInt"
 import PQ from "../utils/pq"
@@ -122,7 +121,7 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
 
     const hash = answer_with_hash.slice(0, 20)
     const answerWithPadding = answer_with_hash.slice(20)
-    const answerWithPaddingBuffer = bytesToArrayBuffer(answerWithPadding)
+    const answerWithPaddingBuffer = Bytes.asUint8Buffer(answerWithPadding)
 
     const deserializer = new TLDeserialization(answerWithPaddingBuffer, {mtproto: true})
     const Server_DH_inner_data = deserializer.fetchObject("Server_DH_inner_data")

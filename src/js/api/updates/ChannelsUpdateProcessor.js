@@ -45,7 +45,7 @@ function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
     }
 }
 
-export class ChannelUpdatesProcessor {
+export class ChannelsUpdateProcessor {
     /**
      * @param {UpdateManager} updatesManager
      */

@@ -1,7 +1,7 @@
 import {Networker} from "./Networker";
 import {TLSerialization} from "../language/serialization";
 import {TLDeserialization} from "../language/deserialization";
-import {createLogger} from "../../common/logger";
+import {createLogger} from "../../api/common/logger";
 
 const Logger = createLogger("MTProtoNetworker")
 

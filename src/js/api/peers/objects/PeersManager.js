@@ -36,6 +36,32 @@ class PeerManager extends Manager {
         this._inited = true
     }
 
+    _findMessageByUser(messages, peer) {
+        return messages.find(Message => {
+            return (
+                Message.user_id === peer.id ||
+                Message.from_id === peer.id || (
+                    Message.to_id && (
+                        Message.user_id === peer.id
+                    )
+                )
+            )
+        })
+    }
+
+    _findMessageByChat(messages, peer) {
+        return messages.find(Message => {
+            return (
+                Message.chat_id === peer.id ||
+                Message.from_id === peer.id || (
+                    Message.to_id && (
+                        Message.chat_id === peer.id
+                    )
+                )
+            )
+        })
+    }
+
     fillPeersFromUpdate(rawUpdate) {
         const data = {
             users: [],
@@ -44,13 +70,21 @@ class PeerManager extends Manager {
 
         if (rawUpdate.users) {
             data.users = rawUpdate.users.map(rawUser => {
-                return PeersManager.setFromRaw(rawUser)
+                const peer = PeersManager.setFromRaw(rawUser)
+                if (peer.isMin && rawUpdate.messages) {
+                    const Message = this._findMessageByUser(rawUser.messages, peer)
+                    peer._min_inputPeer = Message.to_id
+                }
             })
         }
 
         if (rawUpdate.chats) {
-            data.chats = rawUpdate.chats.map(rawUser => {
-                return PeersManager.setFromRaw(rawUser)
+            data.chats = rawUpdate.chats.map(rawChat => {
+                const peer = PeersManager.setFromRaw(rawChat)
+                if (peer.isMin && rawUpdate.messages) {
+                    const Message = this._findMessageByChat(rawChat.messages, peer)
+                    peer._min_inputPeer = Message.to_id
+                }
             })
         }
 

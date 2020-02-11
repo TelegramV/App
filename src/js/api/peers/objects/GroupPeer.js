@@ -50,7 +50,7 @@ export class GroupPeer extends Peer {
         }).then(chatFull => {
             PeersManager.fillPeersFromUpdate(chatFull)
 
-            this.full = chatFull.full_chat
+            this._full = chatFull.full_chat
 
             if (this.full.participants._ !== "chatParticipantsForbidden") {
                 this.participants = this.full.participants.participants.map(ChatParticipant => {
