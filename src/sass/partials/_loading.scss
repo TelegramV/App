@@ -159,55 +159,21 @@
   }
 }
 
-.radial-progress {
-  display: block;
-  $circle-size: 64px;
-  $circle-background: $semiblack;
-  $circle-color: white;
-  $inset-size: 58px;
-  $inset-color: black;
-  $transition-length: 1s;
-  $percentage-color: #97a71d;
-  $percentage-font-size: 22px;
-  $percentage-text-width: 57px;
+.progress-ring {
+  width: 64px;
+  height: 64px;
+  .progress-ring__circle{
+    $stroke: 4px;
+    cx: 50%;
+    cy: 50%;
+    r: calc(50% - #{$stroke}/2);
 
-  margin: 50px;
-  width:  $circle-size;
-  height: $circle-size;
-
-  background-color: $circle-background;
-  border-radius: 50%;
-
-  .circle {
-    .mask, .fill, .shadow {
-      width:    $circle-size;
-      height:   $circle-size;
-      position: absolute;
-      border-radius: 50%;
-    }
-    .mask, .fill {
-      -webkit-backface-visibility: hidden;
-      transition: -webkit-transform $transition-length;
-      transition: -ms-transform $transition-length;
-      transition: transform $transition-length;
-      border-radius: 50%;
-    }
-    .mask {
-      clip: rect(0px, $circle-size, $circle-size, $circle-size/2);
-      .fill {
-        clip: rect(0px, $circle-size/2, $circle-size, 0px);
-        background-color: $circle-color;
-      }
-    }
-  }
-  .inset {
-    width:       $inset-size;
-    height:      $inset-size;
-    position:    absolute;
-    margin-left: ($circle-size - $inset-size)/2;
-    margin-top:  ($circle-size - $inset-size)/2;
-
-    background-color: $inset-color;
-    border-radius: 50%;
+    stroke: white;
+    fill: transparent;
+    stroke-width: $stroke;
+    stroke-linecap: round;
+    transform-origin: center;
+    transform: rotate(-90deg);
+    transition: stroke-dashoffset 0.25s;
   }
 }

@@ -61,6 +61,7 @@ export class GroupPeer extends Peer {
             AppEvents.Peers.fire("fullLoaded", {
                 peer: this
             })
+            this.findPinnedMessage()
         })
     }
 

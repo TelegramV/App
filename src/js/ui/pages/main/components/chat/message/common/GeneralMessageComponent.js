@@ -101,9 +101,11 @@ class GeneralMessageComponent extends VComponent {
         }
     }
 
-    messageOnEdit = () => {
-        this.message.show()
-        this.__patch()
+    messageOnEdit = event => {
+        if (event.message === this.message) {
+            this.message.show()
+            this.__patch()
+        }
     }
 
     messageOnDelete = () => {

@@ -9,6 +9,7 @@ import VComponent from "../../../../v/vrdom/component/VComponent"
 import UIEvents from "../../../../eventBus/UIEvents";
 import AudioManager from "../../../../audioManager";
 import {ChannelPeer} from "../../../../../api/peers/objects/ChannelPeer";
+import {SupergroupPeer} from "../../../../../api/peers/objects/SupergroupPeer";
 
 const DATA_FORMAT_MONTH_DAY = {
     month: 'long',
@@ -121,7 +122,7 @@ class BubblesComponent extends VComponent {
     onFetchedInitialMessages = event => {
         if (AppSelectedPeer.check(event.peer)) {
             this.appendMessages(event.messages)
-            if(event.peer instanceof ChannelPeer && !event.peer.canPostMessages) {
+            if((event.peer instanceof ChannelPeer && !(event.peer instanceof SupergroupPeer)) && !event.peer.canPostMessages) {
                 this.chatInputRef.component.hide()
             } else {
                 this.chatInputRef.component.show()
@@ -322,14 +323,14 @@ class BubblesComponent extends VComponent {
         const k = this.bubblesInnerRef.$el.clientHeight
         const pushed = []
         for (const message of messages) {
-            const all = [...this.messages.rendered.values()]
-            const last = all.length > 0 ? all.reduce((l, q) => {
-                return l.id < q.id ? l : q
-            }) : null
+            const all = [...this.messages.rendered.keys()]
+            const last = all.length > 0 ? this.messages.rendered.get(all.reduce((l, q) => {
+                return l < q ? l : q
+            })) : null
 
             const $rendered = this.renderMessage(message)
 
-            if (last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
+            if ($rendered && last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
                 const $time = VRDOM.render(<div className="service">
                     <div className="service-msg">{last.__component.message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
                 </div>)
@@ -369,14 +370,14 @@ class BubblesComponent extends VComponent {
         const pushed = []
 
         for (const message of messages) {
-            const all = [...this.messages.rendered.values()]
-            const first = all.length > 0 ? all.reduce((l, q) => {
-                return l.id > q.id ? l : q
-            }) : null
+            const all = [...this.messages.rendered.keys()]
+            const first = all.length > 0 ? this.messages.rendered.get(all.reduce((l, q) => {
+                return l > q ? l : q
+           })) : null
 
             const $rendered = this.renderMessage(message, true)
 
-            if (first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
+            if ($rendered && first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
                 const $time = VRDOM.render(<div className="service">
                     <div className="service-msg">{message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
                 </div>)
@@ -436,6 +437,7 @@ class BubblesComponent extends VComponent {
         this.messages.sending.clear()
         this.messages.rendered.clear()
         this.messages.renderedGroups.clear()
+        this.chatInputRef.component.clear()
 
         VRDOM.deleteInner(this.bubblesInnerRef.$el)
     }

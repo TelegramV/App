@@ -144,6 +144,7 @@ export class MessageParser {
                 return "GIF"
             case MessageType.STICKER:
             case MessageType.ANIMATED_STICKER:
+            case MessageType.ANIMATED_EMOJI:
                 return MessageParser.getStickerEmoji(message.raw.media.document) + " Sticker"
             case MessageType.VOICE:
                 return "Voice"
@@ -169,6 +170,8 @@ export class MessageParser {
         if (message.raw.media) {
             if(p.length > 0) {
                 return p + (message.text.length > 0 ? ", " + message.text : "")
+            } else {
+                return message.text
             }
         } else {
             return message.text
@@ -187,6 +190,8 @@ export class MessageParser {
 
             if (p.length > 0) {
                 text = (showSender ? peerName + ": " : "") + p + (message.text.length > 0 ? ", " : "")
+            } else {
+                text = (showSender ? peerName + ": " : "")
             }
         } else if (message.text.length > 0 && showSender) {
             text += peerName + ": "

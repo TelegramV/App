@@ -5,24 +5,37 @@ class ProgressLoaderComponent extends VComponent {
 	h() {
 		let progress = Number.isInteger(this.props.progress)?this.props.progress : 0;
 		return (
-			<div class="radial-progress" data-progress={progress}>
-				<div class="circle">
-					<div class="mask full">
-						<div class="fill" css-transform={`rotate(${1.8 * progress+"deg"})`}></div>
-					</div>
-					<div class="mask half">
-						<div class="fill"></div>
-						<div class="fill fix" css-transform={`rotate(${1.8 * 2 * progress+"deg"})`}></div>
-					</div>
-				</div>
-				<div class="inset">
-				</div>
-			</div>
+			<svg class="progress-ring">
+			  <circle class="progress-ring__circle"/>
+			</svg>
 			)
 	}
 
-	updateProgress(value) {
-		this.$el.setAttribute("data-progress", Number.isInteger(value)? value : 0);
+	mounted() {
+		this.circle = this.$el.querySelector('.progress-ring__circle');
+		this.withTimeout(this._calculateSize, 0);
+	}
+
+	_calculateSize = () => {
+		const radius = this.circle.getBBox().width / 2;
+		this.circumference = 2 * Math.PI * radius;
+
+		this.circle.style.strokeDasharray = `${this.circumference} ${this.circumference}`;
+		this.circle.style.strokeDashoffset = this.circumference;
+
+		if(this.props.progress) {
+			this.setProgress(this.props.progress/100);
+		}
+	}
+
+	/**
+		0.0 - 1.0 percent
+	**/
+
+	setProgress = (percent) => {
+		if(!percent) percent = 0;
+		const offset = this.circumference - percent * this.circumference;
+		this.circle.style.strokeDashoffset = offset;
 	}
 }
 

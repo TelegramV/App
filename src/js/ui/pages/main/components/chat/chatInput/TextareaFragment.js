@@ -55,13 +55,19 @@ export class TextareaFragment extends VComponent {
     createLink() {
         this.restoreSelection()
         this.saveSelection()
-        let text = ""
+        let text = null
         if(document.activeElement === this.$el) {
             text = window.getSelection().toString()
         }
         // todo move this blur & focus to modalmanager
         this.$el.blur()
         ModalManager.open(<AttachLinkModal text={text} close={this.linkCreated.bind(this)}/>)
+    }
+
+    clearInput() {
+        this.$el.innerHTML = ""
+        this.onInput()
+        this.clear()
     }
 
     saveSelection() {
@@ -80,6 +86,7 @@ export class TextareaFragment extends VComponent {
 
     linkCreated(text, url) {
         this.formatBlock("createLink", url)
+        if(text) document.execCommand("insertText", false, text)
     }
 
     formatBlock(tag, param) {
@@ -127,15 +134,21 @@ export class TextareaFragment extends VComponent {
 
 
     onPaste(ev) {
-        ev.preventDefault()
-        this.$el.focus()
 
-        const text = (ev.originalEvent || ev).clipboardData.getData('text/plain')
 
-        document.execCommand("insertText", false, text)
+        // this.$el.focus()
+
+        if(this.$el === document.activeElement) {
+            ev.preventDefault()
+
+            const text = (ev.originalEvent || ev).clipboardData.getData('text/plain')
+
+            document.execCommand("insertText", false, text)
+        }
 
         for (let i = 0; i < ev.clipboardData.items.length; i++) {
             const k = ev.clipboardData.items[i]
+            console.log(k.type)
             if (k.type.indexOf("image") === -1) continue
             this.parent.pickPhoto(URL.createObjectURL(k.getAsFile()))
         }

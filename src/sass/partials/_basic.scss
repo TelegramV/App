@@ -16,6 +16,8 @@ a {
   text-decoration: none;
 }
 
+img[src=""], img:not([src]) { content:url("data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="); }
+
 .app {
   display: flex;
   background-color: $lightblue;

@@ -55,6 +55,7 @@ export interface Message {
     +isFromScheduled?: boolean;
     +isLegacy?: boolean;
     +isEditHide?: boolean;
+    +isPinned: boolean;
     +replyToMessage?: Message;
     +replyMarkup?: any;
     +forwarded?: any;

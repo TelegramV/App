@@ -1,33 +1,32 @@
-import Component from "./v/vrdom/Component";
+import AppEvents from "../api/eventBus/AppEvents";
+import UIEvents from "./eventBus/UIEvents";
+import {MessageParser} from "../api/messages/MessageParser";
+import {VComponent} from "./v/vrdom/component/VComponent";
+import AppSelectedPeer from "./reactive/SelectedPeer";
 
-export let PinManager
+export class PinnedComponent extends VComponent {
 
-export class PinnedComponent extends Component {
-    constructor(props) {
-        super(props);
-
-        PinManager = this;
+    state = {
+        audio: undefined,
+        voice: undefined,
+        message: undefined,
     }
 
     pinAudio(audio) {
-        this.audio = audio;
-        this.updatePin();
+        this.state.audio = audio;
     }
 
     pinVoice(voice) {
-        this.voice = voice;
-        this.updatePin();
+        this.state.voice = voice;
     }
 
     pinMessage(message) {
-        this.message = message;
-        this.updatePin();
+        this.state.message = message;
     }
 
     unpinMedia() {
-        this.audio = null;
-        this.voice = null;
-        this.updatePin();
+        this.state.audio = null;
+        this.state.voice = null;
     }
 
     getDisplayedPin() {
@@ -36,12 +35,8 @@ export class PinnedComponent extends Component {
         } else return this.message;
     }
 
-    updatePin() {
-        this.__patch();
-    }
-
     h() {
-        if (this.audio || this.voice) {
+        if (this.state.audio || this.state.voice) {
             return (
                 <div className="pin active-audio">
                     <div className="play">
@@ -53,15 +48,40 @@ export class PinnedComponent extends Component {
                     </div>
                 </div>
             )
-        } else if(this.message) {
+        } else if (this.state.message) {
             return (
-                <div className="pin pinned-message">
+                <div className="pin pinned-message" onClick={l => UIEvents.Bubbles.fire("showMessage", this.state.message)}>
                     <div className="title">Pinned message</div>
-                    <div className="description">See you tomorrow at 18:00 at the park</div>
+                    <div className="description">{MessageParser.getPrefixNoSender(this.state.message)}</div>
                 </div>
             )
         } else {
             return <div className="pin"/>;
+        }
+    }
+
+    init() {
+        this.callbacks = {
+            peer: AppSelectedPeer.Reactive.FireOnly
+        }
+    }
+
+    callbackChanged(key: string, value) {
+        if (key === "peer") {
+            this.state.message = value._pinnedMessage
+        }
+    }
+
+    appEvents(E) {
+        E.bus(AppEvents.Peers)
+            .on("pinnedMessageFound", this.onPinnedMessageFound)
+    }
+
+    onPinnedMessageFound = event => {
+        if (event.message && AppSelectedPeer.check(event.message.to)) {
+            this.state.message = event.message
+        } else {
+            this.state.message = undefined
         }
     }
 }

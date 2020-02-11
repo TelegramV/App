@@ -7,6 +7,7 @@ import {PeerApi} from "../PeerApi"
 import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 import {PeerMessages} from "../PeerMessages"
 import DialogsStore from "../../store/DialogsStore"
+import type {Message} from "../../messages/Message";
 
 export class Peer extends ReactiveObject {
 
@@ -21,6 +22,7 @@ export class Peer extends ReactiveObject {
     _photo: PeerPhoto
     _dialog: Dialog
     _api: PeerApi
+    _pinnedMessage: Message
 
     _min_messageId: number
     _min_inputPeer: Object
@@ -221,6 +223,16 @@ export class Peer extends ReactiveObject {
         }
     }
 
+    get pinnedMessageId() {
+        return this._pinnedMessageId || (this.full && this.full.pinned_msg_id)
+    }
+
+    set pinnedMessageId(value) {
+        this._pinnedMessage = null
+        this._pinnedMessageId = value
+        this.findPinnedMessage()
+    }
+
     /**
      * @return {PeerPhoto}
      */
@@ -254,7 +266,54 @@ export class Peer extends ReactiveObject {
             this._full = userFull
 
             this.fire("fullLoaded")
+            this.findPinnedMessage()
         })
+    }
+
+    findPinnedMessage(fire = true) {
+        if (this.pinnedMessageId) {
+            if (this._pinnedMessage && fire) {
+                this.fire("pinnedMessageFound", {
+                    message: this._pinnedMessage
+                })
+                return
+            }
+
+            const message = this.messages.get(this.pinnedMessageId)
+
+            if (message) {
+                this._pinnedMessage = message
+
+                if (fire) {
+                    this.fire("pinnedMessageFound", {
+                        message: this._pinnedMessage
+                    })
+                }
+            } else {
+                this.api.getHistory({
+                    offset_id: this.pinnedMessageId, // ???
+                    add_offset: -1,
+                    limit: 1
+                }).then(messages => {
+                    if (messages.length && messages[0].id === this.pinnedMessageId) {
+                        this.messages.appendOtherSingle(messages[0])
+                        this._pinnedMessage = messages[0]
+
+                        if (fire) {
+                            this.fire("pinnedMessageFound", {
+                                message: this._pinnedMessage
+                            })
+                        }
+                    } else {
+                        console.log("no pinned!")
+                    }
+                })
+            }
+        } else {
+            this.fire("pinnedMessageFound", {
+                message: null
+            })
+        }
     }
 
     /**
