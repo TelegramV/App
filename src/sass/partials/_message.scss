@@ -945,7 +945,7 @@
     #bubbles-inner > .in {
         //align-items: flex-start;
 
-        &.hide-tail .bubble {
+        &.hide-tail .bubble, .bubble.transparent {
             margin-left: 10px;
             -webkit-mask-image: none !important;
             padding-left: 0 !important;
@@ -1062,7 +1062,7 @@
         align-items: flex-end;
         flex-direction: column;
 
-        &.hide-tail .bubble {
+        &.hide-tail .bubble, .bubble.transparent {
             margin-right: 10px;
             -webkit-mask-image: none !important;
             padding-right: 0 !important;
