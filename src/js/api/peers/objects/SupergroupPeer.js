@@ -3,9 +3,9 @@ import {GroupPeer} from "./GroupPeer";
 import MTProto from "../../../mtproto/external"
 import AppEvents from "../../eventBus/AppEvents"
 import PeersManager from "./PeersManager"
+import {ChannelPeer} from "./ChannelPeer";
 
-// It should actually extend from channel but who cares
-export class SupergroupPeer extends GroupPeer {
+export class SupergroupPeer extends ChannelPeer {
 
     constructor(rawPeer) {
         super(rawPeer)
@@ -56,6 +56,7 @@ export class SupergroupPeer extends GroupPeer {
             AppEvents.Peers.fire("fullLoaded", {
                 peer: this
             })
+            this.findPinnedMessage()
         })
     }
 }

@@ -1,14 +1,11 @@
 import Component from "./v/vrdom/Component";
+import AppEvents from "../api/eventBus/AppEvents";
+import UIEvents from "./eventBus/UIEvents";
+import {MessageParser} from "../api/messages/MessageParser";
+import {VComponent} from "./v/vrdom/component/VComponent";
+import AppSelectedPeer from "./reactive/SelectedPeer";
 
-export let PinManager
-
-export class PinnedComponent extends Component {
-    constructor(props) {
-        super(props);
-
-        PinManager = this;
-    }
-
+export class PinnedComponent extends VComponent {
     pinAudio(audio) {
         this.audio = audio;
         this.updatePin();
@@ -55,13 +52,35 @@ export class PinnedComponent extends Component {
             )
         } else if(this.message) {
             return (
-                <div className="pin pinned-message">
+                <div className="pin pinned-message" onClick={l => UIEvents.Bubbles.fire("showMessage", this.message)}>
                     <div className="title">Pinned message</div>
-                    <div className="description">See you tomorrow at 18:00 at the park</div>
+                    <div className="description">{MessageParser.getPrefixNoSender(this.message)}</div>
                 </div>
             )
         } else {
             return <div className="pin"/>;
         }
+    }
+
+    init() {
+        this.callbacks = {
+            peer: AppSelectedPeer.Reactive.FireOnly
+        }
+    }
+
+    callbackChanged(key: string, value) {
+        if (key === "peer") {
+            this.message = value._pinnedMessage
+            this.updatePin()
+        }
+    }
+
+    appEvents(E) {
+        E.bus(AppEvents.Peers)
+            .on("pinnedMessageFound", this.onPinnedMessageFound)
+    }
+
+    onPinnedMessageFound = event => {
+        this.pinMessage(event.message)
     }
 }

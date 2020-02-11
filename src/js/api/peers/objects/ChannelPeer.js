@@ -89,6 +89,7 @@ export class ChannelPeer extends Peer {
             AppEvents.Peers.fire("fullLoaded", {
                 peer: this
             })
+            this.findPinnedMessage()
         })
     }
 }

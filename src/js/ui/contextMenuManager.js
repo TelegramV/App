@@ -31,9 +31,9 @@ export class ContextMenuComponent extends Component {
                         return <div className={["element", "rp", "rps", l.red ? "red" : ""]}
                                     onClick={q => this.select(l, q)}>
                             {l.icon ?
-                                <i className={["tgico", "tgico-" + l.icon]}/>
+                                <i className={["tgico", "tgico-" + (typeof(l.icon) === "function" ? l.icon() : l.icon)]}/>
                                 : ""}
-                            <span>{l.title}</span>
+                            <span>{(typeof(l.title) === "function" ? l.title() : l.title)}</span>
 
                             {l.counter ?
                                 <div className="badge">{l.counter}</div>

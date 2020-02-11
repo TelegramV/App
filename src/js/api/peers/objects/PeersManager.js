@@ -3,6 +3,9 @@ import PeersStore from "../../store/PeersStore"
 import {MTProto} from "../../../mtproto/external"
 import {UserPeer} from "./UserPeer"
 import PeerFactory from "../PeerFactory"
+import {GroupPeer} from "./GroupPeer";
+import {ChannelPeer} from "./ChannelPeer";
+import {SupergroupPeer} from "./SupergroupPeer";
 
 class PeerManager extends Manager {
 
@@ -30,6 +33,30 @@ class PeerManager extends Manager {
 
             if (peer instanceof UserPeer) {
                 peer.photo.fillRaw(update.photo)
+            }
+        })
+
+        MTProto.UpdatesManager.subscribe("updateUserPinnedMessage", update => {
+            const peer = PeersStore.get("user", update.user_id)
+
+            if (peer instanceof UserPeer) {
+                peer.pinnedMessageId = update.id
+            }
+        })
+
+        MTProto.UpdatesManager.subscribe("updateChatPinnedMessage", update => {
+            const peer = PeersStore.get("chat", update.chat_id)
+
+            if (peer instanceof GroupPeer) {
+                peer.pinnedMessageId = update.id
+            }
+        })
+
+        MTProto.UpdatesManager.subscribe("updateChannelPinnedMessage", update => {
+            const peer = PeersStore.get("channel", update.channel_id)
+
+            if (peer instanceof ChannelPeer || peer instanceof SupergroupPeer) {
+                peer.pinnedMessageId = update.id
             }
         })
 

@@ -8,6 +8,8 @@ import {MessageParser} from "../../../../../../../api/messages/MessageParser";
 import {UserPeer} from "../../../../../../../api/peers/objects/UserPeer";
 import UIEvents from "../../../../../../eventBus/UIEvents";
 import AppSelectedInfoPeer from "../../../../../../reactive/SelectedInfoPeer"
+import MTProto from "../../../../../../../mtproto/external";
+import UpdatesManager from "../../../../../../../api/updates/updatesManager";
 
 const ReplyToMessageFragment = ({message}) => {
     if (!message.raw.reply_to_msg_id) {
@@ -53,8 +55,16 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
             title: "Copy"
         },
         {
-            icon: "pin",
-            title: "Pin"
+            icon: _ => message.isPinned ? "unpin" : "pin",
+            title: _ => message.isPinned ? "Unpin" : "Pin",
+            onClick: _ => {
+                MTProto.invokeMethod("messages.updatePinnedMessage", {
+                    peer: message.to.inputPeer,
+                    id: message.isPinned ? -1 : message.id
+                }).then(l => {
+                    UpdatesManager.process(l)
+                })
+            }
         },
         {
             icon: "forward",

@@ -83,6 +83,14 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.raw.pFlags.post || false
     }
 
+    get isPinned(): boolean {
+        return this.to.pinnedMessageId === this.id
+    }
+
+    set isPinned(value) {
+        this.to.pinnedMessageId = value ? this.id : 0
+    }
+
     get isRead(): boolean {
         if (!this.to) {
             return false

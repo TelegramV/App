@@ -9,6 +9,7 @@ import VComponent from "../../../../v/vrdom/component/VComponent"
 import UIEvents from "../../../../eventBus/UIEvents";
 import AudioManager from "../../../../audioManager";
 import {ChannelPeer} from "../../../../../api/peers/objects/ChannelPeer";
+import {SupergroupPeer} from "../../../../../api/peers/objects/SupergroupPeer";
 
 const DATA_FORMAT_MONTH_DAY = {
     month: 'long',
@@ -120,7 +121,7 @@ class BubblesComponent extends VComponent {
     onFetchedInitialMessages = event => {
         if (AppSelectedPeer.check(event.peer)) {
             this.appendMessages(event.messages)
-            if(event.peer instanceof ChannelPeer && !event.peer.canPostMessages) {
+            if((event.peer instanceof ChannelPeer && !(event.peer instanceof SupergroupPeer)) && !event.peer.canPostMessages) {
                 this.chatInputRef.component.hide()
             } else {
                 this.chatInputRef.component.show()
