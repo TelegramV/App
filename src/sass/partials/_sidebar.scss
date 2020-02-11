@@ -124,36 +124,6 @@
         .column-list {
             display: flex;
             flex-direction: column;
-
-            .contact {
-                display: flex;
-                padding: 2px;
-                margin-bottom: 5px;
-
-                .photo-container {
-                    img {
-                        height: 50px;
-                        width: 50px;
-                        border-radius: 50%;
-                    }
-                }
-
-                .info-container {
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    margin-left: 10px;
-
-                    .name {
-                        font-weight: bold;
-                    }
-
-                    .status {
-                        color: $darkgrey;
-                        font-size: 14px;
-                    }
-                }
-            }
         }
     }
 
@@ -167,6 +137,10 @@
         
         .toolbar {
             position: relative;
+        }
+
+        .global-messages {
+            padding: 0 5px;
         }
     }
 

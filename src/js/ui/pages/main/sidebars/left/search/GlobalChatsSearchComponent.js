@@ -1,4 +1,4 @@
-import {ContactFragment} from "./ContactFragment"
+import {ContactFragment} from "../../../components/basic/ContactFragment"
 import VComponent from "../../../../../v/vrdom/component/VComponent"
 import UIEvents from "../../../../../eventBus/UIEvents"
 import SearchManager from "../../../../../../api/search/SearchManager"
@@ -39,7 +39,6 @@ export class GlobalChatsSearchComponent extends VComponent {
                             return <ContactFragment url={p.photo.smallUrl}
                                                     name={p.name}
                                                     status={p.statusString.text}
-                                                    peer={p}
                                                     onClick={() => AppSelectedPeer.select(p)}/>
                         })
                     }
@@ -52,7 +51,6 @@ export class GlobalChatsSearchComponent extends VComponent {
                             this.state.peers.map(p => <ContactFragment url={p.photo.smallUrl}
                                                                        name={p.name}
                                                                        status={p.username ? `@${p.username}` : ``}
-                                                                       peer={p}
                                                                        onClick={() => AppSelectedPeer.select(p)}/>)
                         }
                     </div>

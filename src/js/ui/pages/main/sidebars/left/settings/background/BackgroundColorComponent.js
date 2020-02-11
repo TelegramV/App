@@ -65,7 +65,7 @@ export default class BackgroundColorComponent extends SettingsPane {
 	}
 
 	applyColor = (color) => {
-		window.document.documentElement.style.setProperty("--chat-bg-image", "");
+		window.document.documentElement.style.setProperty("--chat-bg-image", "none");
 		window.document.documentElement.style.setProperty("--chat-bg-color", color);
 	}
 

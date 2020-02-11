@@ -1,5 +1,5 @@
 import VComponent from "../../../../../v/vrdom/component/VComponent"
-import {ContactFragment} from "./ContactFragment"
+import {ContactFragment} from "../../../components/basic/ContactFragment"
 import UIEvents from "../../../../../eventBus/UIEvents"
 import {VUI} from "../../../../../v/VUI"
 import DialogsStore from "../../../../../../api/store/DialogsStore"
