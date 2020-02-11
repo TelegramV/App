@@ -322,10 +322,10 @@ class BubblesComponent extends VComponent {
         const k = this.bubblesInnerRef.$el.clientHeight
         const pushed = []
         for (const message of messages) {
-            const all = [...this.messages.rendered.values()]
-            const last = all.length > 0 ? all.reduce((l, q) => {
-                return l.id < q.id ? l : q
-            }) : null
+            const all = [...this.messages.rendered.keys()]
+            const last = all.length > 0 ? this.messages.rendered.get(all.reduce((l, q) => {
+                return l < q ? l : q
+            })) : null
 
             const $rendered = this.renderMessage(message)
 
@@ -369,10 +369,10 @@ class BubblesComponent extends VComponent {
         const pushed = []
 
         for (const message of messages) {
-            const all = [...this.messages.rendered.values()]
-            const first = all.length > 0 ? all.reduce((l, q) => {
-                return l.id > q.id ? l : q
-            }) : null
+            const all = [...this.messages.rendered.keys()]
+            const first = all.length > 0 ? this.messages.rendered.get(all.reduce((l, q) => {
+                return l > q ? l : q
+           })) : null
 
             const $rendered = this.renderMessage(message, true)
 
