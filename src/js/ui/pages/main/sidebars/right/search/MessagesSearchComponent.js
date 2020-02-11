@@ -6,6 +6,7 @@ import SearchManager from "../../../../../../api/search/SearchManager"
 import {LazyInput} from "../../../../../components/LazyInput"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {SearchMessage} from "../../../../../../api/messages/SearchMessage"
+import UIEvents from "../../../../../eventBus/UIEvents"
 
 const MessageFragment = ({m, peers}) => {
     const peer = m.from
@@ -47,11 +48,22 @@ export default class MessageSearchComponent extends RightBarComponent {
     isFetching = false
 
     state = {
-        messages: []
+        messages: [],
     }
 
     callbacks = {
         peer: AppSelectedPeer.Reactive.FireOnly
+    }
+
+    appEvents(E) {
+        super.appEvents(E)
+
+        E.bus(UIEvents.RightSidebar)
+            .on("setSearchQuery", this.onSetSearchQuery)
+
+        E.bus(AppEvents.Peers)
+            .on("updatePhotoSmall", this.onPeersPhoto)
+            .on("updatePhoto", this.onPeersPhoto)
     }
 
     h() {
@@ -76,14 +88,6 @@ export default class MessageSearchComponent extends RightBarComponent {
                 </div>
             </div>
         )
-    }
-
-    appEvents(E) {
-        super.appEvents(E)
-
-        E.bus(AppEvents.Peers)
-            .on("updatePhotoSmall", this.onPeersPhoto)
-            .on("updatePhoto", this.onPeersPhoto)
     }
 
     onPeersPhoto = event => {
@@ -180,6 +184,18 @@ export default class MessageSearchComponent extends RightBarComponent {
                 peers: this.peers
             })
         }
+    }
+
+    onSetSearchQuery = event => {
+        this.inputRef.component.$el.value = event.q
+
+        this.onSearchInputUpdated({
+            target: {
+                value: event.q
+            }
+        })
+
+        this.openBar()
     }
 
     onScroll = event => {

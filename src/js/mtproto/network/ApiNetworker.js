@@ -31,8 +31,6 @@ export class ApiNetworker extends Networker {
 
         this.pings = new Map()
 
-        this.self = this
-
         this.initPings.bind(this)()
     }
 

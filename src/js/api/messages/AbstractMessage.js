@@ -12,7 +12,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     type = MessageType.UNSUPPORTED
 
-    _dialog
+    _dialog: Dialog
 
     _to: Peer
     _from: Peer
@@ -22,13 +22,15 @@ export class AbstractMessage extends ReactiveObject implements Message {
     forwarded: any
     forwardedType: string
     forwardedMessageId: number
+
     _group: Array<Message> | undefined
     _groupInitializer: boolean
 
-    constructor(dialog: Dialog) {
+    constructor(dialogPeer: Peer) {
         super()
 
-        this._dialog = dialog
+        this._to = dialogPeer
+        this._dialog = dialogPeer.dialog
     }
 
     get dialog() {

@@ -169,12 +169,13 @@ class MTProtoBridge {
     }
 
 
-    invokeMethod(method, params, dcID = null, isFile = false) {
+    invokeMethod(method, params, dcID = null, isFile = false, useOneTimeNetworker = false) {
         return performTask("invokeMethod", {
             method,
             params,
             dcID,
-            isFile
+            isFile,
+            useOneTimeNetworker
         })
     }
 
@@ -200,6 +201,13 @@ class MTProtoBridge {
      */
     withInternalContext(callback) {
         return performTask("internalContext", callback)
+    }
+
+    changeDefaultDC(dcID) {
+        this.performWorkerTask({
+            type: "changeDefaultDc",
+            dcID
+        })
     }
 }
 

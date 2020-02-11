@@ -25,7 +25,7 @@ class MessageManager extends Manager {
             }
 
 
-            if (!peer.dialog) {
+            if (peer.isAbleToHandleUpdates && !peer.dialog) {
                 console.log("no dialog", peer, peer.dialog)
 
                 DialogsManager.getPeerDialogs(peer).then(dialogs => {
@@ -49,7 +49,7 @@ class MessageManager extends Manager {
                 return
             }
 
-            const message = MessageFactory.fromRaw(peer.dialog, lastMessage)
+            const message = MessageFactory.fromRaw(peer, lastMessage)
 
             peer.messages.appendSingle(message)
             message.init()
