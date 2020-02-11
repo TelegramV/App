@@ -53,6 +53,8 @@ self.addEventListener("message", event => {
                 taskId: taskId,
                 taskResult: taskData(MTProtoInternal)
             })
+        } else if (task === "changeDefaultDc") {
+            MTProtoInternal.changeDefaultDC(taskData.dcID)
         }
     } catch (e) {
         postMessage({taskId: taskId, taskResult: e, failed: true})

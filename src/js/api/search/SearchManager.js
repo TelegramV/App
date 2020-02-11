@@ -27,7 +27,7 @@ class SearchManagerSingleton extends Manager {
 
             PeersManager.fillPeersFromUpdate(Messages)
 
-            Messages.count = Messages.count === undefined ? Messages.messages.length : Messages.count
+            Messages.current_count = Messages.messages.length
 
             return Messages
         })

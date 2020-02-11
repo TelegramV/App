@@ -1,6 +1,5 @@
 // @flow
 
-import {Dialog} from "../dialogs/Dialog"
 import {MessageParser} from "./MessageParser"
 import {TextMessage} from "./objects/TextMessage"
 import {UnsupportedMessage} from "./UnsupportedMessage"
@@ -23,6 +22,7 @@ import {RoundVideoMessage} from "./objects/RoundVideoMessage"
 import {PhoneCallMessage} from "./objects/PhoneCallMessage"
 import {ServiceMessage} from "./objects/ServiceMessage"
 import {AnimatedStickerMessage} from "./objects/AnimatedStickerMessage"
+import {Peer} from "../peers/objects/Peer"
 
 const messageObjects = new Map([
     [MessageType.TEXT, TextMessage],
@@ -50,14 +50,13 @@ const messageObjects = new Map([
 
 export class MessageFactory {
 
-    static fromRaw(dialog: Dialog, raw: Object): Message {
+    static fromRaw(dialogPeer: Peer, raw: Object): Message {
         const type = MessageParser.getType(raw)
 
         if (messageObjects.has(type)) {
-            // $ignore
-            return new (messageObjects.get(type))(dialog, raw).fillRaw(raw)
+            return new (messageObjects.get(type))(dialogPeer, raw).fillRaw(raw)
         } else {
-            return new UnsupportedMessage(dialog).fillRaw(raw)
+            return new UnsupportedMessage(dialogPeer).fillRaw(raw)
         }
     }
 }

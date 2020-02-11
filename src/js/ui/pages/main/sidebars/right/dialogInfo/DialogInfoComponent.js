@@ -206,13 +206,13 @@ export class DialogInfoComponent extends RightBarComponent {
                 if (Messages._peer === AppSelectedInfoPeer.Current) {
                     this.toggleContentLoading(false)
 
-                    if (Messages.count > 0) {
+                    if (Messages.current_count > 0) {
                         this.contentPages[refName].offsetId = Messages.messages[0].id
                     }
 
                     Messages.messages.forEach(message => appender(message))
 
-                    if (Messages.count < this.defaultLimit) {
+                    if (Messages.current_count < this.defaultLimit) {
                         this.contentPages[refName].offsetId = -1
                     }
 
