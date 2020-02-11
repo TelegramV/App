@@ -1,5 +1,5 @@
 import {RightBarComponent} from "../RightBarComponent"
-import {ContactFragment} from "../../left/search/ContactFragment"
+import {ContactFragment} from "../../../components/basic/ContactFragment"
 import VComponent from "../../../../../v/vrdom/component/VComponent"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import SearchManager from "../../../../../../api/search/SearchManager"
@@ -17,6 +17,11 @@ const MessageFragment = ({m, peers}) => {
                             name={peer.name}
                             status={m.text}
                             peer={peer}
+                            time={m.getDate('en', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            })}
                             onClick={() => console.log("not implemented")}/>
 }
 
@@ -83,7 +88,7 @@ export default class MessageSearchComponent extends RightBarComponent {
                     </div>
                 </div>
                 <div class="global-messages">
-                    <div class="section-title">2 messages found</div>
+                    <div class="section-title"> messages found</div>
                     <MessagesListFragment ref={this.messagesListRef} messages={this.state.messages} peers={this.peers}/>
                 </div>
             </div>
