@@ -1,10 +1,6 @@
 import { VComponent } from "../../../../../../v/vrdom/component/VComponent"
 import { VideoFigureFragment, VideoPreviewFragment } from "./VideoFigureFragment"
 
-export const MessageVideoFigureFragment = ({ message, clickLoader, autoplay = false, loop = false, controls = true }) => {
-
-}
-
 class VideoComponent extends VComponent {
 
     init() {

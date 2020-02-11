@@ -24,13 +24,17 @@ class ProgressLoaderComponent extends VComponent {
 		this.circle.style.strokeDashoffset = this.circumference;
 
 		if(this.props.progress) {
-			this.setProgress(this.props.progress);
+			this.setProgress(this.props.progress/100);
 		}
 	}
 
+	/**
+		0.0 - 1.0 percent
+	**/
+
 	setProgress = (percent) => {
 		if(!percent) percent = 0;
-		const offset = this.circumference - percent/100 * this.circumference;
+		const offset = this.circumference - percent * this.circumference;
 		this.circle.style.strokeDashoffset = offset;
 	}
 }

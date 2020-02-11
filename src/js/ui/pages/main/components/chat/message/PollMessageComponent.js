@@ -8,7 +8,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     constructor(props) {
         super(props);
         let message = this.props.message;
-        console.log(message);
+        
         this.poll = message.raw.media.poll;
         this.results = message.raw.media.results;
 
