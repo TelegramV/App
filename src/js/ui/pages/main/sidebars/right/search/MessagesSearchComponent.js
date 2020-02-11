@@ -8,7 +8,7 @@ import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 import {SearchMessage} from "../../../../../../api/messages/SearchMessage"
 import UIEvents from "../../../../../eventBus/UIEvents"
 
-const MessageFragment = ({m, peers}) => {
+const MessageFragment = ({m, peers, onClick}) => {
     const peer = m.from
 
     peers.push(peer)
@@ -22,7 +22,7 @@ const MessageFragment = ({m, peers}) => {
                                 minute: '2-digit',
                                 hour12: false
                             })}
-                            onClick={() => console.log("not implemented")}/>
+                            onClick={onClick}/>
 }
 
 const MessagesListFragment = ({messages, peers}) => {
@@ -31,10 +31,17 @@ const MessagesListFragment = ({messages, peers}) => {
             {
                 messages
                     .filter(m => m.to && m.from)
-                    .map(m => <MessageFragment m={m} peers={peers}/>)
+                    .map(m => <MessageFragment m={m} peers={peers} onClick={() => {
+                        AppSelectedPeer.select(m.to)
+                        UIEvents.Bubbles.fire("showMessage", m)
+                    }}/>)
             }
         </div>
     )
+}
+
+const MessagesCountFragment = ({count}) => {
+    return <div className="section-title">{count} messages found</div>
 }
 
 export default class MessageSearchComponent extends RightBarComponent {
@@ -45,6 +52,7 @@ export default class MessageSearchComponent extends RightBarComponent {
     barVisible = false
 
     messagesListRef = VComponent.createFragmentRef()
+    messagesCountRef = VComponent.createFragmentRef()
     inputRef = VComponent.createComponentRef()
 
     currentQuery = undefined
@@ -54,6 +62,7 @@ export default class MessageSearchComponent extends RightBarComponent {
 
     state = {
         messages: [],
+        messagesCount: 0
     }
 
     callbacks = {
@@ -88,7 +97,7 @@ export default class MessageSearchComponent extends RightBarComponent {
                     </div>
                 </div>
                 <div class="global-messages">
-                    <div class="section-title"> messages found</div>
+                    <MessagesCountFragment ref={this.messagesCountRef} count={this.state.messagesCount}/>
                     <MessagesListFragment ref={this.messagesListRef} messages={this.state.messages} peers={this.peers}/>
                 </div>
             </div>
@@ -113,7 +122,7 @@ export default class MessageSearchComponent extends RightBarComponent {
                 if (Messages.__q === this.currentQuery) {
                     this.state.messages.push(...Messages.messages)
 
-                    if (Messages.count > 0) {
+                    if (Messages.current_count > 0) {
                         this.offsetId = Messages.messages[Messages.messages.length - 1].id
                     }
 
@@ -124,7 +133,7 @@ export default class MessageSearchComponent extends RightBarComponent {
 
                     this.isFetching = false
 
-                    if (Messages._ === "messages" || Messages.count < 20) {
+                    if (Messages._ === "messages" || Messages.current_count < 20) {
                         this.offsetId = 0
                         this.allFetched = true
                     }
@@ -136,7 +145,14 @@ export default class MessageSearchComponent extends RightBarComponent {
     onSearchInputUpdated = event => {
         const q = event.target.value.trim()
 
-        if (q !== "" && q !== this.currentQuery) {
+        if (q === "") {
+            this.state.messagesCount = 0
+            this.state.messages = []
+            this.__patch()
+            return
+        }
+
+        if (q !== this.currentQuery) {
             this.currentQuery = q
             this.offsetId = 0
             this.allFetched = false
@@ -151,17 +167,23 @@ export default class MessageSearchComponent extends RightBarComponent {
                     if (Messages.__q === this.currentQuery) {
                         this.peers = []
 
-                        this.state.messages = Messages.messages.map(m => new SearchMessage(AppSelectedPeer.Current.dialog).fillRaw(m))
+                        this.state.messages = Messages.messages.map(m => new SearchMessage(AppSelectedPeer.Current).fillRaw(m))
+                        this.state.messagesCount = Messages.count || Messages.current_count
+
                         this.messagesListRef.patch({
                             messages: this.state.messages,
                             peers: this.peers
                         })
 
-                        if (Messages.count > 0) {
+                        this.messagesCountRef.patch({
+                            count: this.state.messagesCount
+                        })
+
+                        if (Messages.current_count > 0) {
                             this.offsetId = Messages.messages[Messages.messages.length - 1].id
                         }
 
-                        if (Messages._ === "messages" || Messages.count < 20) {
+                        if (Messages._ === "messages" || Messages.current_count < 20) {
                             this.offsetId = 0
                             this.allFetched = true
                         }

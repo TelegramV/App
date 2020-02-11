@@ -2,13 +2,13 @@ export let schema = null
 
 export function loadSchema() {
     return new Promise(resolve => {
-        console.time("schema")
+        // console.time("schema")
         const xhr = new XMLHttpRequest()
         xhr.responseType = "arraybuffer";
 
         xhr.open("GET", "static/schema.dat")
         xhr.onload = function (oEvent) {
-            console.timeLog("schema")
+            // console.timeLog("schema")
             const arrayBuffer = xhr.response; // Note: not oReq.responseText
             if (arrayBuffer) {
                 let byteOffset = 0
@@ -72,7 +72,7 @@ export function loadSchema() {
                 }
 
                 schema = k
-                console.timeEnd("schema")
+                // console.timeEnd("schema")
                 resolve(schema)
             }
         };
