@@ -3,6 +3,7 @@ import AppSelectedInfoPeer from "../../../../../reactive/SelectedInfoPeer"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import type {BusEvent} from "../../../../../../api/eventBus/EventBus"
 import {DialogInfoDescriptionFragment} from "./fragments/DialogInfoDescriptionFragment"
+import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 
 export class DialogInfoDescriptionComponent extends VComponent {
 
@@ -16,6 +17,7 @@ export class DialogInfoDescriptionComponent extends VComponent {
         E.bus(AppEvents.Peers)
             .on("updateStatus", this.defaultPeersUpdateHandler)
             .on("updateUserStatus", this.defaultPeersUpdateHandler)
+            .on("updateChatOnlineCount", this.defaultPeersUpdateHandler)
             .on("fullLoaded", this.defaultPeersUpdateHandler)
     }
 
