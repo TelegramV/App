@@ -2,7 +2,7 @@ import {createNonce, longToBytes, uintToInt} from "../utils/bin"
 import {sha1BytesSync, sha256HashSync} from "../crypto/sha"
 import {TLSerialization} from "../language/serialization"
 import {TLDeserialization} from "../language/deserialization"
-import {MessageProcessor} from "./messageProcessor"
+import {MessageProcessor} from "./MessageProcessor"
 
 import AppConfiguration from "../../configuration"
 import {Networker} from "./Networker";

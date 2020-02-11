@@ -52,6 +52,7 @@ class BubblesComponent extends VComponent {
             .on("newMessage", this.onNewMessage)
             .on("sendMessage", this.onSendMessage)
             .on("messageSent", this.onMessageSent)
+
         E.bus(UIEvents.Bubbles)
             .on("showMessage", this.onShowMessage)
             .on("scrollToBottom", this.onScrollToBottom)

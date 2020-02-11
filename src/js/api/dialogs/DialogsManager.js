@@ -41,13 +41,6 @@ class DialogManager extends Manager {
                         dialog.removeAction(rawUpdate)
                     }
                 })
-                // if (dialog.peer.raw.status && dialog.peer.raw.status._ === "userStatusOnline" && dialog.peer.raw.status.expires < tsNow(true)) {
-                //     dialog.peer.fire("updateUserStatus")
-                //
-                //     AppEvents.Peers.fire("updateUserStatus", {
-                //         peer: dialog.peer
-                //     })
-                // }
             })
         }, 1000)
 

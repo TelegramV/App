@@ -5,10 +5,10 @@ import processShortMessage from "./processShortMessage"
 import processShort from "./processShort"
 import processUpdatesCombined from "./processUpdatesCombined"
 import processUpdates from "./processUpdates"
-import {ChannelUpdatesProcessor} from "./ChannelUpdatesProcessor"
+import {ChannelsUpdateProcessor} from "./ChannelsUpdateProcessor"
 import {DefaultUpdatesProcessor} from "./DefaultUpdatesProcessor"
 import processShortSentMessage from "./processShortSentMessage"
-import {arrayDelete} from "../../common/utils/utils"
+import {arrayDelete} from "../common/utils/utils"
 import {tsNow} from "../../mtproto/timeManager"
 import AppConnectionStatus from "../../ui/reactive/ConnectionStatus"
 import AppEvents from "../eventBus/AppEvents"
@@ -25,7 +25,7 @@ class UpdateManager extends Manager {
         this.UPDATE_CANNOT_BE_APPLIED = -1
         this.UPDATE_HAS_NO_PTS = 2
 
-        this.channelUpdatesProcessor = new ChannelUpdatesProcessor(this)
+        this.channelUpdatesProcessor = new ChannelsUpdateProcessor(this)
         this.defaultUpdatesProcessor = new DefaultUpdatesProcessor(this)
 
         /**

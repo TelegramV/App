@@ -15,8 +15,6 @@ class GeneralMessageComponent extends VComponent {
     prevReadStatus: boolean = false
     intersectionObserver: IntersectionObserver
 
-    showAvatar: boolean = true
-
     avatarRef = VComponent.createComponentRef()
     bubbleRef = VComponent.createRef()
 
@@ -44,9 +42,6 @@ class GeneralMessageComponent extends VComponent {
             .on("updateReadOutboxMaxId", this.onReadOutboxMaxId)
     }
 
-    /**
-     * @param {RORC} R
-     */
     reactive(R) {
         R.object(this.message)
             .on("edit", this.messageOnEdit)
@@ -106,8 +101,11 @@ class GeneralMessageComponent extends VComponent {
         }
     }
 
-    messageOnEdit = () => {
-        this.__patch()
+    messageOnEdit = event => {
+        if (event.message === this.message) {
+            this.message.show()
+            this.__patch()
+        }
     }
 
     messageOnDelete = () => {

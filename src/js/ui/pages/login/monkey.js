@@ -1,5 +1,22 @@
 import lottie from "lottie-web";
-import {convertToByteArray, gzipUncompress} from "../../../mtproto/utils/bin";
+import Bytes from "../../../mtproto/utils/bytes"
+import MTProto from "../../../mtproto/external"
+
+function convertToByteArray(bytes) {
+    if (Array.isArray(bytes)) {
+        return bytes
+    }
+
+    bytes = Bytes.asUint8Array(bytes)
+
+    const newBytes = []
+
+    for (let i = 0, len = bytes.length; i < len; i++) {
+        newBytes.push(bytes[i])
+    }
+
+    return newBytes
+}
 
 export class MonkeyController {
     constructor() {
@@ -68,9 +85,10 @@ export class MonkeyController {
         if (this.animation) {
             this.animation.loop = false;
         }
+
         return fetch(path).then(l => {
-            return l.arrayBuffer().then(q => {
-                return gzipUncompress(convertToByteArray(q))
+            return l.arrayBuffer().then(async q => {
+                return await MTProto.performWorkerTask("gzipUncompress", convertToByteArray(q))
             })
         }).then(l => {
             if (this.animation) {
@@ -135,7 +153,7 @@ export class MonkeyController {
                 if (start) {
                     that.animation.seek(seek);
                 }
-                if(that.peeking) {
+                if (that.peeking) {
                     that.animation.playSegments([0, 20], true)
                 } else {
                     that.animation.playSegments([20, 33], true)

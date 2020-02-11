@@ -9,6 +9,8 @@ import AppConfiguration from "../../configuration"
 import {TextMessage} from "../messages/objects/TextMessage";
 import UIEvents from "../../ui/eventBus/UIEvents";
 
+const genMsgId = () => (new Date).getTime()
+
 export class PeerApi {
 
     /**
@@ -204,7 +206,7 @@ export class PeerApi {
         }
 
         // TODO fix albums
-        let randomId = TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+        let randomId = genMsgId(AppConfiguration.mtproto.dataCenter.default)
         let message = new TextMessage(this._peer.dialog)
         message.fillRaw({
             pFlags: {
@@ -254,7 +256,7 @@ export class PeerApi {
                         pFlags: {
                             entities: i === 0 ? messageEntities : null
                         },
-                        random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+                        random_id: genMsgId(AppConfiguration.mtproto.dataCenter.default)
                     }
                 }),
                 random_id: randomId
@@ -283,7 +285,7 @@ export class PeerApi {
                 peer: this._peer.inputPeer,
                 message: text,
                 media: f,
-                random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+                random_id: genMsgId(AppConfiguration.mtproto.dataCenter.default)
             }).then(response => {
                 MTProto.UpdatesManager.process(response)
             })
@@ -304,7 +306,7 @@ export class PeerApi {
                     file_reference: document.file_reference,
                 }
             },
-            random_id: TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+            random_id: genMsgId(AppConfiguration.mtproto.dataCenter.default)
         }).then(response => {
             MTProto.UpdatesManager.process(response)
         })

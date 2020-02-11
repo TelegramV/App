@@ -6,6 +6,7 @@ import {Peer} from "../peers/objects/Peer"
 import PeersStore from "../store/PeersStore"
 import AppEvents from "../eventBus/AppEvents"
 import {actionTypesMapping} from "../../ui/pages/main/sidebars/left/dialog/Fragments/DialogTextFragment"
+import DialogsManager from "./DialogsManager"
 
 export class Dialog extends ReactiveObject {
 
@@ -206,6 +207,12 @@ export class Dialog extends ReactiveObject {
             _: "inputDialogPeer",
             peer: this.peer.inputPeer
         }
+    }
+
+    refresh() {
+        return DialogsManager.getPeerDialogs(this.peer).then(() => {
+            this.fire("refreshed")
+        })
     }
 
     fillRaw(rawDialog: Object): Dialog {

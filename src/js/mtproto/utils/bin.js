@@ -3,14 +3,11 @@ import {Zlib} from "../vendor/zlib"
 import crypto from "crypto"
 import Bytes from "./bytes"
 import VBigInt from "../bigint/VBigInt"
-// import {str2bigInt} from "BigInt"
 
-// Create a random Buffer
 export function createRandomBuffer(bytesLength) {
     return new Buffer(crypto.randomBytes(bytesLength));
 }
 
-// Create a new nonce
 export function createNonce(bytesLength) {
     return createRandomBuffer(bytesLength);
 }
@@ -56,96 +53,6 @@ export function uint6ToBase64(nUint6) {
                         : 65
 }
 
-export function base64ToBlob(base64str, mimeType) {
-    const sliceSize = 1024
-    const byteCharacters = atob(base64str)
-    const bytesLength = byteCharacters.length
-    const slicesCount = Math.ceil(bytesLength / sliceSize)
-    const byteArrays = new Array(slicesCount)
-
-    for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-        const begin = sliceIndex * sliceSize
-        const end = Math.min(begin + sliceSize, bytesLength)
-
-        const bytes = new Array(end - begin)
-
-        for (let offset = begin, i = 0; offset < end; ++i, ++offset) {
-            bytes[i] = byteCharacters[offset].charCodeAt(0)
-        }
-
-        byteArrays[sliceIndex] = new Uint8Array(bytes)
-    }
-
-    return blobConstruct(byteArrays, mimeType)
-}
-
-export function dataUrlToBlob(url) {
-    const urlParts = url.split(',')
-    const base64str = urlParts[1]
-    const mimeType = urlParts[0].split(':')[1].split(';')[0]
-    const blob = base64ToBlob(base64str, mimeType)
-    return blob
-}
-
-export function blobConstruct(blobParts, mimeType) {
-    const safeMimeType = blobSafeMimeType(mimeType)
-    let blob
-
-    try {
-        blob = new Blob(blobParts, {type: safeMimeType})
-    } catch (e) {
-        const bb = new BlobBuilder()
-        Array.forEach(blobParts, function (blobPart) {
-            bb.appendToReal(blobPart)
-        })
-        blob = bb.getBlob(safeMimeType)
-    }
-    return blob
-}
-
-export function blobSafeMimeType(mimeType) {
-    if ([
-        'image/jpeg',
-        'image/png',
-        'image/gif',
-        'image/webp',
-        'image/bmp',
-        'video/mp4',
-        'video/webm',
-        'video/quicktime',
-        'audio/ogg',
-        'audio/mpeg',
-        'audio/mp4',
-    ].indexOf(mimeType) === -1) {
-        return 'application/octet-stream'
-    }
-    return mimeType
-}
-
-export function bytesToArrayBuffer(b) {
-    return (new Uint8Array(b)).buffer
-}
-
-export function convertToArrayBuffer(bytes) {
-    // Be careful with converting subarrays!!
-    if (bytes instanceof ArrayBuffer) {
-        return bytes
-    }
-    if (bytes.buffer !== undefined &&
-        bytes.buffer.byteLength === bytes.length * bytes.BYTES_PER_ELEMENT) {
-        return bytes.buffer
-    }
-    return Bytes.asUint8Buffer(bytes)
-}
-
-export function convertToUint8Array(bytes) {
-    if (bytes.buffer !== undefined) {
-        return bytes
-    }
-
-    return new Uint8Array(bytes)
-}
-
 export function convertToByteArray(bytes) {
     if (Array.isArray(bytes)) {
         return bytes
@@ -176,12 +83,6 @@ export function longFromInts(high, low) {
     return VBigInt.create(high).leftShift(32).add(low).toString(10)
 }
 
-export function intToBytes(int) {
-    const arr = new Int8Array(1)
-    arr[0] = int
-    return Bytes.fromArrayBuffer(arr.buffer)
-}
-
 export function intToUint(val) {
     val = parseInt(val)
     if (val < 0) {
@@ -199,23 +100,4 @@ export function uintToInt(val) {
 
 export function gzipUncompress(bytes) {
     return (new Zlib.Gunzip(bytes)).decompress()
-}
-
-export function dHexDump(bytes) {
-    const arr = []
-
-    for (let i = 0; i < bytes.length; i++) {
-        if (i && !(i % 2)) {
-            if (!(i % 16)) {
-                arr.push('\n')
-            } else if (!(i % 4)) {
-                arr.push('  ')
-            } else {
-                arr.push(' ')
-            }
-        }
-        arr.push((bytes[i] < 16 ? '0' : '') + bytes[i].toString(16))
-    }
-
-    console.log(arr.join(''))
 }

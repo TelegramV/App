@@ -635,7 +635,7 @@ export class VComponent {
             return true
         }
 
-        return false
+        return true
     }
 
     /**

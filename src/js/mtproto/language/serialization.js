@@ -1,11 +1,8 @@
 import {intToUint} from "../utils/bin"
-import {createLogger} from "../../common/logger";
 import {schema} from "./schema";
 import VBigInt from "../bigint/VBigInt"
 
-const Logger = createLogger("TLSerialization", {
-    level: "log"
-})
+// (c) webogram
 
 export class TLSerialization {
     constructor(options = {
@@ -88,8 +85,6 @@ export class TLSerialization {
      * @param field
      */
     writeInt(value, field = "") {
-        // Logger.debug(_ => _(">>>", value.toString(16), value, field))
-
         this.checkLength(4)
         this.intView[this.offset / 4] = value
         this.offset += 4

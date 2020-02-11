@@ -1,6 +1,7 @@
 import {Peer} from "./Peer";
 import MTProto from "../../../mtproto/external";
 import AppEvents from "../../eventBus/AppEvents";
+import PeersManager from "./PeersManager"
 
 export class ChannelPeer extends Peer {
 
@@ -77,6 +78,7 @@ export class ChannelPeer extends Peer {
     get canAddAdmins(): boolean {
         return this.isCreator || !!this.adminRights.add_admins
     }
+
     /**
      * @return {Promise<*>}
      */
@@ -84,7 +86,9 @@ export class ChannelPeer extends Peer {
         return MTProto.invokeMethod("channels.getFullChannel", {
             channel: this.input
         }).then(channelFull => {
-            this.full = channelFull.full_chat
+            PeersManager.fillPeersFromUpdate(channelFull)
+
+            this._full = channelFull.full_chat
 
             AppEvents.Peers.fire("fullLoaded", {
                 peer: this

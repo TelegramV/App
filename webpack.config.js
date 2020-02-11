@@ -86,11 +86,6 @@ const config = {
             },
         ]
     },
-    optimization: {
-        splitChunks: {
-            chunks: "all"
-        }
-    },
 }
 
 module.exports = config

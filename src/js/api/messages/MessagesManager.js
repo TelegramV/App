@@ -130,7 +130,7 @@ class MessageManager extends Manager {
         })
 
         MTProto.UpdatesManager.subscribe("updateDeleteMessages", update => {
-            DialogsStore.data.forEach((data, type) => data.forEach(/** @param {Dialog} dialog */(dialog, id) => {
+            DialogsStore.toArray().forEach(dialog => {
                 if (dialog.peer.type !== "channel") {
                     dialog.peer.messages.startTransaction()
 
@@ -139,18 +139,14 @@ class MessageManager extends Manager {
                     })
 
                     if (!dialog.peer.messages.last) {
-                        DialogsManager.getPeerDialogs(dialog.peer).then(dialogs => {
-                            dialogs[0].fire("updateSingle", {
-                                dialog: dialogs[0],
-                            })
-                        })
+                        dialog.refresh()
                     }
 
                     dialog.peer.messages.fireTransaction("deleteMessages", {
                         messages: update.messages
                     })
                 }
-            }))
+            })
         })
 
         MTProto.UpdatesManager.subscribe("updateEditMessage", update => {

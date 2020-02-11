@@ -62,8 +62,15 @@ export default class PasswordInputPaneComponent extends PaneComponent {
         const srp_id = response.srp_id
         const srp_B = response.srp_B
 
-        // todo: remove this from worker
-        const srp_ret = await AppCryptoManager.srpCheckPassword(g, p, salt1, salt2, srp_id, srp_B, password);
+        const srp_ret = await MTProto.performWorkerTask("mt_srp_check_password", {
+            g,
+            p,
+            salt1,
+            salt2,
+            srp_id,
+            srp_B,
+            password
+        })
 
         MTProto.invokeMethod("auth.checkPassword", {
             password: {

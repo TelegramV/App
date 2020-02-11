@@ -7,7 +7,6 @@ import {PeerApi} from "../PeerApi"
 import {ReactiveObject} from "../../../ui/v/reactive/ReactiveObject"
 import {PeerMessages} from "../PeerMessages"
 import DialogsStore from "../../store/DialogsStore"
-import PeersManager from "./PeersManager"
 import type {Message} from "../../messages/Message";
 
 export class Peer extends ReactiveObject {
@@ -15,23 +14,29 @@ export class Peer extends ReactiveObject {
     eventBus = AppEvents.Peers
     eventObjectName = "peer"
 
-    _rawPeer
-    _filled = false
-    _dialog
-    _photo
-    _accessHash
-    _min_messageId
-    _min_inputPeer
-    full
-    _api
+    _filledNonMin: boolean
+
+    _raw: Object
+    _accessHash: string
+
+    _photo: PeerPhoto
+    _dialog: Dialog
+    _api: PeerApi
     _pinnedMessage: Message
 
+    _min_messageId: number
+    _min_inputPeer: Object
+
+    _full: Object
+
     _messages: PeerMessages
+
+    _isAbleToHandleUpdates: boolean = undefined
 
     constructor(rawPeer, dialog = undefined) {
         super()
 
-        this._rawPeer = rawPeer
+        this._raw = rawPeer
         this._dialog = dialog
 
         this._photo = PeerPhoto.createEmpty(this)
@@ -39,6 +44,15 @@ export class Peer extends ReactiveObject {
         this._messages = new PeerMessages(this)
 
         this.fillRaw(rawPeer)
+    }
+
+    // if not, then dialog shouldn't be fetched for new messages
+    get isAbleToHandleUpdates(): boolean {
+        if (this._isAbleToHandleUpdates === undefined) {
+            this._isAbleToHandleUpdates = this.type === "user"
+        }
+
+        return this._isAbleToHandleUpdates
     }
 
     /**
@@ -60,7 +74,7 @@ export class Peer extends ReactiveObject {
      * @return {*}
      */
     get raw() {
-        return this._rawPeer
+        return this._raw
     }
 
     /**
@@ -68,7 +82,7 @@ export class Peer extends ReactiveObject {
      * @param rawPeer
      */
     set raw(rawPeer) {
-        this._rawPeer = rawPeer
+        this._raw = rawPeer
     }
 
     /**
@@ -91,6 +105,10 @@ export class Peer extends ReactiveObject {
         }
 
         return this._dialog
+    }
+
+    get full() {
+        return this._full
     }
 
     /**
@@ -245,7 +263,7 @@ export class Peer extends ReactiveObject {
         return MTProto.invokeMethod("users.getFullUser", {
             id: this.input
         }).then(userFull => {
-            this.full = userFull
+            this._full = userFull
 
             this.fire("fullLoaded")
             this.findPinnedMessage()
@@ -253,8 +271,8 @@ export class Peer extends ReactiveObject {
     }
 
     findPinnedMessage(fire = true) {
-        if(this.pinnedMessageId) {
-            if(this._pinnedMessage && fire) {
+        if (this.pinnedMessageId) {
+            if (this._pinnedMessage && fire) {
                 this.fire("pinnedMessageFound", {
                     message: this._pinnedMessage
                 })
