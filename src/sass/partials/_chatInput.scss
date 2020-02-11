@@ -192,6 +192,10 @@
           align-self: start;
           display: inline;
 
+          a {
+            color: $darkblue;
+          }
+
           &.monospace-hack sub {
             vertical-align: sub;
           }

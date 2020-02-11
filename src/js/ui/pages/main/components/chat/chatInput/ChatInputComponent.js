@@ -216,6 +216,12 @@ export class ChatInputComponent extends VComponent {
         this.$el.style.display = "block"
     }
 
+    clear() {
+        this.closeReply()
+        this.textarea.focus()
+        this.chatInputTextareaRef.component.clearInput()
+    }
+
     navigateToReplied() {
         if(this.reply) {
             UIEvents.Bubbles.fire("showMessage", this.reply.message)

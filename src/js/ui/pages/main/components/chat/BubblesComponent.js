@@ -435,6 +435,7 @@ class BubblesComponent extends VComponent {
         this.messages.sending.clear()
         this.messages.rendered.clear()
         this.messages.renderedGroups.clear()
+        this.chatInputRef.component.clear()
 
         VRDOM.deleteInner(this.bubblesInnerRef.$el)
     }
