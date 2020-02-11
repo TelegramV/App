@@ -329,7 +329,7 @@ class BubblesComponent extends VComponent {
 
             const $rendered = this.renderMessage(message)
 
-            if (last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
+            if ($rendered && last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
                 const $time = VRDOM.render(<div className="service">
                     <div className="service-msg">{last.__component.message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
                 </div>)
@@ -376,7 +376,7 @@ class BubblesComponent extends VComponent {
 
             const $rendered = this.renderMessage(message, true)
 
-            if (first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
+            if ($rendered && first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
                 const $time = VRDOM.render(<div className="service">
                     <div className="service-msg">{message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
                 </div>)
