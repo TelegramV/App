@@ -166,7 +166,7 @@
     $stroke: 4px;
     cx: 50%;
     cy: 50%;
-    r: calc(50% - #{$stroke}/2);
+    r: calc(50% - #{$stroke});
 
     stroke: white;
     fill: transparent;
