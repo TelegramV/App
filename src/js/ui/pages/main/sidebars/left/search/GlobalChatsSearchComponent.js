@@ -7,6 +7,8 @@ import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 
 export class GlobalChatsSearchComponent extends VComponent {
 
+    useProxyState = false
+
     currentQuery = undefined
 
     state = {
@@ -73,7 +75,6 @@ export class GlobalChatsSearchComponent extends VComponent {
             this.currentQuery = q
 
             SearchManager.searchContactsByUsername(q, 100).then(Found => {
-                console.log(Found)
                 if (Found.__q === this.currentQuery) {
                     this.setState({
                         peers: Found.peers,
