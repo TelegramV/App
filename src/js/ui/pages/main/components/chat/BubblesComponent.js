@@ -12,6 +12,8 @@ import {ChannelPeer} from "../../../../../api/peers/objects/ChannelPeer";
 import {SupergroupPeer} from "../../../../../api/peers/objects/SupergroupPeer";
 import {MessageAvatarComponent} from "./message/common/MessageAvatarComponent";
 import {UserPeer} from "../../../../../api/peers/objects/UserPeer";
+import {ServiceMessage} from "../../../../../api/messages/objects/ServiceMessage";
+import {MessageType} from "../../../../../api/messages/Message";
 
 const DATA_FORMAT_MONTH_DAY = {
     month: 'long',
@@ -245,19 +247,22 @@ class BubblesComponent extends VComponent {
             return null
         }
 
-        let $group = this.bubblesInnerRef.$el.childNodes[!prepend ? this.bubblesInnerRef.$el.childNodes.length - 1 : 0]
+        let $group = message instanceof ServiceMessage ? null : this.bubblesInnerRef.$el.childNodes[!prepend ? this.bubblesInnerRef.$el.childNodes.length - 1 : 0]
         if ($group) {
             const $bubblesList = $group.querySelector(".bubbles-list")
             let $otherMessage = $bubblesList.childNodes[!prepend ? $bubblesList.childNodes.length - 1 : 0]
             let prev = $otherMessage.__component
-            console.log(prev)
-            const from = prev.message.from
-            const threshold = 60 * 5
-
-            if (from === message.from && Math.abs(prev.message.date - message.date) <= threshold) {
-
-            } else {
+            if(prev.message instanceof ServiceMessage) {
                 $group = null
+            } else {
+                const from = prev.message.from
+                const threshold = 60 * 5
+
+                if (from === message.from && Math.abs(prev.message.date - message.date) <= threshold) {
+
+                } else {
+                    $group = null
+                }
             }
         }
         if ($group) {
@@ -328,12 +333,12 @@ class BubblesComponent extends VComponent {
 
             const $rendered = this.renderMessage(message)
 
-            // if ($rendered && last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
-            //     const $time = VRDOM.render(<div className="service">
-            //         <div className="service-msg">{last.__component.message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
-            //     </div>)
-            //     this.bubblesInnerRef.$el.insertBefore($time, $rendered)
-            // }
+            if ($rendered && last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
+                const $time = VRDOM.render(<div className="service">
+                    <div className="service-msg">{last.__component.message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
+                </div>)
+                this.bubblesInnerRef.$el.insertBefore($time, $rendered.parentNode.parentNode)
+            }
 
             if ($rendered) {
                 pushed.push($rendered)
@@ -373,12 +378,12 @@ class BubblesComponent extends VComponent {
 
             const $rendered = this.renderMessage(message, true)
 
-            // if ($rendered && first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
-            //     const $time = VRDOM.render(<div className="service">
-            //         <div className="service-msg">{message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
-            //     </div>)
-            //     this.bubblesInnerRef.$el.insertBefore($time, first)
-            // }
+            if ($rendered && first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
+                const $time = VRDOM.render(<div className="service">
+                    <div className="service-msg">{message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
+                </div>)
+                this.bubblesInnerRef.$el.insertBefore($time, first.parentNode.parentNode)
+            }
 
             if ($rendered) {
                 if (isSending) {
