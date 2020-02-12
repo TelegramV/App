@@ -133,22 +133,88 @@ const handlersLinks = {
     messageEntityCashtag: (l, a) => <a href="#">{a}</a>,
 }
 
+function splitMessageEntities(messageEntities) {
+    const ranges = []
+
+    messageEntities.forEach(l => {
+        const offset = l.offset
+        const length = l.length
+
+        const overlapping = ranges.find(q => {
+            const lto = l.offset + l.length
+            const qto = q.offset + q.length
+            const lfrom = l.offset
+            const qfrom = q.offset
+            return (lto >= qfrom && lto <= qto) || (lto >= qfrom && lto <= qto)
+        })
+        if(overlapping) {
+            overlapping.entities.push(l)
+
+            overlapping.offset = Math.min(overlapping.offset, l.offset)
+            const k = overlapping.entities.reduce((z, q) => {
+                return z.length + z.offset > q.length + q.offset ? z : q
+            })
+            overlapping.length = k.offset + k.length - overlapping.offset
+            return
+        }
+        ranges.push({
+            offset: offset,
+            length: length,
+            entities: [l]
+        })
+    })
+    return ranges
+}
 // TODO fix multiple entities overlap
 export function parseMessageEntities(text, messageEntities, noLinks = false) {
     messageEntities = messageEntities || []
 
     let elements = []
+    const s = splitMessageEntities(messageEntities)
 
     const handlers = noLinks ? handlersText : Object.assign({}, handlersText, handlersLinks)
     let prevOffset = 0
 
-    messageEntities.forEach(l => {
-        const offset = l.offset
-        const length = l.length
-        const handler = handlers[l._]
-        if (!handler) return
-        const component = handler(l, getNewlines(text.substr(offset, length), noLinks), text.substr(offset, length))
+    s.forEach(q => {
+        const offset = q.offset
+        const length = q.length
+        const textCut = text.substr(offset, length)
+        let callers = null
+        q.entities.sort((l, q) => {
+            return l.length - q.length
+        }).forEach(l => {
+            const localOffset = l.offset - offset
+            const localLength = l.length
+            const textCutSmall = text.substr(l.offset, l.length)
 
+            const handler = handlers[l._]
+            if (!handler) return
+
+            if(callers === null) {
+
+                callers = _ => {
+                    return {
+                        offset: localOffset,
+                        length: localLength,
+                        component: handler(l, getNewlines(textCutSmall, noLinks), textCutSmall)
+                    }
+                }
+            } else {
+                let cc = callers()
+                let c = <span>{textCut.substr(localOffset, cc.offset - localOffset)}{cc.component}{textCut.substr(localOffset + cc.offset + cc.length, localLength - cc.length - cc.offset)}</span>
+                callers = _ => {
+                    return {
+                        offset: localOffset,
+                        length: localLength,
+                        component: handler(l, c, textCutSmall)
+                    }
+                }
+            }
+            // const component = handler(l, getNewlines(textCut, noLinks), textCut)
+
+
+            // elements.push(component)
+        })
 
         if (offset + length > prevOffset) {
             if (noLinks) {
@@ -164,8 +230,12 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
             }
         }
 
-        elements.push(component)
+        if(callers) {
+            elements.push(callers().component)
+        }
+
         prevOffset = offset + length
+
     })
     if (prevOffset < text.length) {
         if (noLinks) {

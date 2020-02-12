@@ -90,11 +90,12 @@ export default class PhoneInputComponent extends PaneComponent {
 
     phoneInput(ev) {
         // Add + if entering a number
-        // if(defaultDcID === 0) { // test dc
-        //     this.state.nextDisabled = false
-        //     this.refs.get("next").setDisabled(false)
-        //     return true
-        // }
+        console.log(localStorage.getItem("testMode"))
+        if(localStorage.getItem("testMode")) { // test dc
+            this.state.nextDisabled = false
+            this.refs.get("next").setDisabled(false)
+            return true
+        }
         if (!ev.target.value.startsWith("+") && ev.target.value.length > 0) {
             ev.target.value = "+" + ev.target.value
         }
