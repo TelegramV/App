@@ -55,6 +55,7 @@ class BubblesComponent extends VComponent {
 
         E.bus(UIEvents.Bubbles)
             .on("showMessage", this.onShowMessage)
+            .on("showMessageInstant", this.onShowMessageInstant)
             .on("scrollToBottom", this.onScrollToBottom)
     }
 
@@ -97,6 +98,13 @@ class BubblesComponent extends VComponent {
         this.$el.scrollTo({top: this.bubblesInnerRef.$el.clientHeight})
     }
 
+    onShowMessageInstant = message => {
+        this.showInstant = true
+        AppSelectedPeer.select(message.to)
+        console.log("show instant")
+        this.onShowMessage(message)
+    }
+
     onShowMessage = message => {
         if (this.messages.rendered.has(message.id)) {
             const $rendered = this.messages.rendered.get(message.id)
@@ -121,7 +129,10 @@ class BubblesComponent extends VComponent {
 
     onFetchedInitialMessages = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            this.appendMessages(event.messages)
+            if(this.showInstant) {
+            } else {
+                this.appendMessages(event.messages)
+            }
             if ((event.peer instanceof ChannelPeer && !(event.peer instanceof SupergroupPeer)) && !event.peer.canPostMessages) {
                 this.chatInputRef.component.hide()
             } else {
@@ -132,23 +143,38 @@ class BubblesComponent extends VComponent {
 
     onFetchedMessagesPrevPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
+            console.log("fetch prev", this.showInstant)
             if (event.messages.length === 0) {
                 this.loadedTop = false
                 return
             }
-            this.prependMessages(event.messages, false, true)
+            if(!this.showInstant) {
+                this.prependMessages(event.messages, false, true)
+            }
         }
     }
 
     onFetchedMessagesNextPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            this.appendMessages(event.messages)
+            console.log("fetch next", this.showInstant)
+
+            if(!this.showInstant) {
+                this.appendMessages(event.messages)
+            }
         }
     }
 
     onFetchedMessagesAnyPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
+            console.log("fetch any", this.showInstant)
+
             this.clearAndAppend(event.messages)
+            // TODO hack
+            if(this.showInstant) {
+                this.withTimeout(l => {
+                    this.showInstant = false
+                }, 300)
+            }
         }
     }
 

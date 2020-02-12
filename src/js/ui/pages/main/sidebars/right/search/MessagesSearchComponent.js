@@ -32,8 +32,7 @@ const MessagesListFragment = ({messages, peers}) => {
                 messages
                     .filter(m => m.to && m.from)
                     .map(m => <MessageFragment m={m} peers={peers} onClick={() => {
-                        AppSelectedPeer.select(m.to)
-                        UIEvents.Bubbles.fire("showMessage", m)
+                        UIEvents.Bubbles.fire("showMessageInstant", m)
                     }}/>)
             }
         </div>

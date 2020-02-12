@@ -20,8 +20,8 @@ const MessageFragment = ({m, peers}) => {
                                 hour12: false
                             })}
                             onClick={() => {
-                                AppSelectedPeer.select(peer)
-                                UIEvents.Bubbles.fire("showMessage", m)
+                                UIEvents.Bubbles.fire("showMessageInstant", m)
+
                             }}/>
 }
 
