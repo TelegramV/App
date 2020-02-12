@@ -29,8 +29,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
     constructor(dialogPeer: Peer) {
         super()
 
-        this._to = dialogPeer
-        this._dialog = dialogPeer.dialog
+        if (dialogPeer) {
+            this._to = dialogPeer
+            this._dialog = dialogPeer.dialog
+        }
     }
 
     get dialog() {
