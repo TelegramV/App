@@ -86,7 +86,7 @@ class BubblesComponent extends VComponent {
                     this.callbacks.peer.fetchFull()
                 }
 
-                this.markAllAsRead()
+                // this.markAllAsRead()
                 this.refreshMessages()
             } else {
                 this.clearBubbles()
@@ -101,7 +101,6 @@ class BubblesComponent extends VComponent {
     onShowMessageInstant = message => {
         this.showInstant = true
         AppSelectedPeer.select(message.to)
-        console.log("show instant")
         this.onShowMessage(message)
     }
 
@@ -115,7 +114,7 @@ class BubblesComponent extends VComponent {
             this.clearBubbles()
             this.messages.isFetchingNextPage = true
             this.messages.isFetchingPrevPage = true
-            this.waitingScrollToMessage = message
+            this.waitingScrollToMessage = message.id
             this.callbacks.peer.api.fetchByOffsetId({
                 offset_id: message.id,
                 add_offset: -25,
@@ -143,7 +142,6 @@ class BubblesComponent extends VComponent {
 
     onFetchedMessagesPrevPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            console.log("fetch prev", this.showInstant)
             if (event.messages.length === 0) {
                 this.loadedTop = false
                 return
@@ -156,8 +154,6 @@ class BubblesComponent extends VComponent {
 
     onFetchedMessagesNextPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            console.log("fetch next", this.showInstant)
-
             if(!this.showInstant) {
                 this.appendMessages(event.messages)
             }
@@ -166,8 +162,6 @@ class BubblesComponent extends VComponent {
 
     onFetchedMessagesAnyPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            console.log("fetch any", this.showInstant)
-
             this.clearAndAppend(event.messages)
             // TODO hack
             if(this.showInstant) {
@@ -437,6 +431,31 @@ class BubblesComponent extends VComponent {
     }
 
     refreshMessages = () => {
+        if(AppSelectedPeer.Current.messages.unreadCount > 0) {
+            const maxUnread = AppSelectedPeer.Current.messages.readInboxMaxId
+            if (this.messages.rendered.has(maxUnread)) {
+                const $rendered = this.messages.rendered.get(maxUnread)
+                this.scrollToMessage($rendered)
+            } else if (!this.messages.isFetchingNextPage && !this.messages.isFetchingPrevPage) {
+                this.toggleMessagesLoader(false)
+                AppSelectedPeer.Current.messages.clear()
+                this.clearBubbles()
+                this.messages.isFetchingNextPage = true
+                this.messages.isFetchingPrevPage = true
+                this.waitingScrollToMessage = maxUnread
+                this.waitingScrollTop = true
+                this.callbacks.peer.api.fetchByOffsetId({
+                    offset_id: maxUnread,
+                    add_offset: -25,
+                    limit: 50
+                }).then(() => {
+                    this.messages.isFetchingNextPage = false
+                    this.messages.isFetchingPrevPage = false
+                })
+            }
+            // this.onShowMessageInstant(AppSelectedPeer.Current.messages.get(AppSelectedPeer.Current.))
+            return
+        }
         this.messages.isFetching = true
         this.toggleMessagesLoader(false)
         this.clearBubbles()
@@ -453,9 +472,18 @@ class BubblesComponent extends VComponent {
     }
 
     scrollToWaitedMessage(smooth = true) {
-        if (this.waitingScrollToMessage && this.messages.rendered.has(this.waitingScrollToMessage.id)) {
-            this.scrollToMessage(this.messages.rendered.get(this.waitingScrollToMessage.id), smooth)
+        if (this.waitingScrollToMessage && this.messages.rendered.has(this.waitingScrollToMessage)) {
+            let id = this.waitingScrollToMessage
+            if(this.waitingScrollTop) {
+                id = [...this.messages.rendered.keys()].filter(l => {
+                    return l > this.waitingScrollToMessage
+                }).reduce((l, q) => {
+                    return l < q ? l : q
+                })
+            }
+            this.scrollToMessage(this.messages.rendered.get(id), smooth, !!this.waitingScrollTop)
             this.waitingScrollToMessage = null
+            this.waitingScrollTop = null
         }
     }
 
@@ -474,10 +502,10 @@ class BubblesComponent extends VComponent {
         // }
     }
 
-    scrollToMessage = (message, smooth = true) => {
+    scrollToMessage = (message, smooth = true, top = false) => {
         // todo hightlight
         this.$el.scrollTo({
-            top: message.offsetTop + message.clientHeight / 2 - this.$el.clientHeight / 2,
+            top: message.offsetTop + (top ? 0 : message.clientHeight / 2 - this.$el.clientHeight / 2),
             behavior: smooth ? "smooth" : "auto"
         })
     }

@@ -275,14 +275,10 @@ export class DialogComponent extends VComponent {
     }
 
     _handleClick = () => {
-        const p = this.dialog.peer.username ? `@${this.dialog.peer.username}` : `${this.dialog.peer.type}.${this.dialog.peer.id}`
+        AppSelectedPeer.select(this.dialog.peer)
 
-        const act = this.$el.classList.contains("responsive-selected-chatlist") ? VF.router.replace : VF.router.push
+        // TODO this should be fixed!
+        // const act = this.$el.classList.contains("responsive-selected-chatlist") ? VF.router.replace : VF.router.push
 
-        act("/", {
-            queryParams: {
-                p
-            }
-        })
     }
 }
