@@ -61,6 +61,7 @@ export default class MessageSearchComponent extends RightBarComponent {
 
     state = {
         messages: [],
+        peers: [],
         messagesCount: 0
     }
 
@@ -105,8 +106,13 @@ export default class MessageSearchComponent extends RightBarComponent {
 
     onPeersPhoto = event => {
         if (this.peers && this.peers.indexOf(event.peer) > -1) {
-            this.messagesListRef.patch()
+            this.patchResult({})
         }
+    }
+
+    patchResult = ({messages, peers, count}) => {
+        this.messagesCountRef.patch({count: count || this.state.messagesCount})
+        this.messagesListRef.patch({messages: messages || this.state.messages, peers: peers || this.state.peers})
     }
 
     onSearchNextPage = _ => {
@@ -128,7 +134,7 @@ export default class MessageSearchComponent extends RightBarComponent {
                     Messages.messages
                         .map(m => new SearchMessage(AppSelectedPeer.Current.dialog).fillRaw(m))
                         .forEach(m => VRDOM.append(<MessageFragment m={m}
-                                                                    peers={this.peers}/>, this.messagesListRef.$el))
+                                                                    peers={this.state.peers}/>, this.messagesListRef.$el))
 
                     this.isFetching = false
 
@@ -147,7 +153,7 @@ export default class MessageSearchComponent extends RightBarComponent {
         if (q === "") {
             this.state.messagesCount = 0
             this.state.messages = []
-            this.__patch()
+            this.patchResult({})
             return
         }
 
@@ -169,12 +175,9 @@ export default class MessageSearchComponent extends RightBarComponent {
                         this.state.messages = Messages.messages.map(m => new SearchMessage(AppSelectedPeer.Current).fillRaw(m))
                         this.state.messagesCount = Messages.count || Messages.current_count
 
-                        this.messagesListRef.patch({
+                        this.patchResult({
                             messages: this.state.messages,
-                            peers: this.peers
-                        })
-
-                        this.messagesCountRef.patch({
+                            peers: this.peers,
                             count: this.state.messagesCount
                         })
 
