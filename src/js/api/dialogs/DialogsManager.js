@@ -42,7 +42,7 @@ class DialogManager extends Manager {
                     }
                 })
             })
-        }, 1000)
+        }, 3000)
 
         AppSelectedPeer.subscribe(_ => {
             if (AppSelectedPeer.Previous) {

@@ -36,7 +36,6 @@ export class DialogApi {
                 }
             ]
         }).then(updates => {
-            console.log(updates)
             MTProto.UpdatesManager.process(updates)
         })
     }

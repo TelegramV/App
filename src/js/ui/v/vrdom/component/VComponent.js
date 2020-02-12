@@ -646,7 +646,6 @@ export class VComponent {
      * @param value
      */
     stateChanged({target, key, value}) {
-        console.log(this.state)
         this.__patch()
     }
 
