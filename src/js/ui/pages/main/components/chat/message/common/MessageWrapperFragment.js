@@ -129,7 +129,6 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
 
     const isPrivateMessages = message.to instanceof UserPeer
     const username = showUsername && message.from.name && !message.isPost && !message.isOut && !message.raw.reply_to_msg_id && !message.raw.fwd_from && !isPrivateMessages
-    const hideAvatar = topLevelClasses.out || message.isPost || isPrivateMessages
 
     return (
         <div className={topLevelClasses}
@@ -138,12 +137,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
              onDblClick={doubleClickHandler}>
 
             <div className={wrapOuter}>
-                {
-                    !hideAvatar ? <MessageAvatarComponent id={`message-${message.id}-avatar`}
-                                                         show={!hideAvatar}
-                                                         ref={avatarRef}
-                                                         message={message}/> : ""
-                }
+
                 <div className={wrapClasses} ref={bubbleRef}>
 
                     <ReplyToMessageFragment message={message}/>

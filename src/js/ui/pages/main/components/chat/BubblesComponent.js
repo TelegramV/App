@@ -10,6 +10,8 @@ import UIEvents from "../../../../eventBus/UIEvents";
 import AudioManager from "../../../../audioManager";
 import {ChannelPeer} from "../../../../../api/peers/objects/ChannelPeer";
 import {SupergroupPeer} from "../../../../../api/peers/objects/SupergroupPeer";
+import {MessageAvatarComponent} from "./message/common/MessageAvatarComponent";
+import {UserPeer} from "../../../../../api/peers/objects/UserPeer";
 
 const DATA_FORMAT_MONTH_DAY = {
     month: 'long',
@@ -128,7 +130,7 @@ class BubblesComponent extends VComponent {
 
     onFetchedInitialMessages = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            if(this.showInstant) {
+            if (this.showInstant) {
             } else {
                 this.appendMessages(event.messages)
             }
@@ -146,7 +148,7 @@ class BubblesComponent extends VComponent {
                 this.loadedTop = false
                 return
             }
-            if(!this.showInstant) {
+            if (!this.showInstant) {
                 this.prependMessages(event.messages, false, true)
             }
         }
@@ -154,7 +156,7 @@ class BubblesComponent extends VComponent {
 
     onFetchedMessagesNextPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            if(!this.showInstant) {
+            if (!this.showInstant) {
                 this.appendMessages(event.messages)
             }
         }
@@ -164,7 +166,7 @@ class BubblesComponent extends VComponent {
         if (AppSelectedPeer.check(event.peer)) {
             this.clearAndAppend(event.messages)
             // TODO hack
-            if(this.showInstant) {
+            if (this.showInstant) {
                 this.withTimeout(l => {
                     this.showInstant = false
                 }, 300)
@@ -243,61 +245,37 @@ class BubblesComponent extends VComponent {
             return null
         }
 
-        $message = $mount(<MessageComponent intersectionObserver={this.intersectionObserver}
-                                            message={message}/>, this.bubblesInnerRef.$el)
-
-        return $message
-    }
-
-    changeTails($message, message) {
-        const threshold = 60 * 5
-        const avatar = $message.__component.avatarRef
-
-        if ($message.previousSibling && $message.previousSibling.__component) {
-            const prev = $message.previousSibling.__component
-            const $prev = $message.previousSibling
+        let $group = this.bubblesInnerRef.$el.childNodes[!prepend ? this.bubblesInnerRef.$el.childNodes.length - 1 : 0]
+        if ($group) {
+            const $bubblesList = $group.querySelector(".bubbles-list")
+            let $otherMessage = $bubblesList.childNodes[!prepend ? $bubblesList.childNodes.length - 1 : 0]
+            let prev = $otherMessage.__component
+            console.log(prev)
             const from = prev.message.from
+            const threshold = 60 * 5
+
             if (from === message.from && Math.abs(prev.message.date - message.date) <= threshold) {
-                $prev.classList.remove("upper")
-                const username = $prev.querySelector(".username")
 
-                if (username) {
-                    username.parentNode.removeChild(username)
-                }
-                $message.classList.add("hide-tail")
-                $message.classList.add("upper")
-                avatar.component && avatar.component.hide()
             } else {
-                $message.classList.add("upper")
-            }
-
-        } else {
-            $message.classList.add("upper")
-            if ($message.nextSibling && $message.nextSibling.__component) {
-                const next = $message.nextSibling.__component
-                const $next = $message.nextSibling
-                const from = next.message.from
-                if (from === message.from && Math.abs(next.message.date - message.date) <= threshold) {
-                    $next.classList.add("hide-tail")
-                    $message.classList.remove("hide-tail")
-                    $message.classList.remove("upper")
-                    const username = $message.querySelector(".username")
-
-                    if (username) {
-                        username.parentNode.removeChild(username)
-                    }
-
-                    const avatarNext = $next.__component.avatarRef
-
-                    avatarNext.component && avatarNext.component.hide()
-                } else {
-                    $next.classList.add("upper")
-                }
-            } else {
-                $message.classList.add("upper")
+                $group = null
             }
         }
-
+        if ($group) {
+            return (!prepend ? VRDOM.prepend : VRDOM.append)(<MessageComponent
+                intersectionObserver={this.intersectionObserver}
+                message={message}/>, $group.querySelector(".bubbles-list"))
+        } else {
+            // TODO fix saved messages
+            const hideAvatar = message.isOut || message.isPost || message.to instanceof UserPeer
+            const avatar = !hideAvatar ? <MessageAvatarComponent id={`message-${message.id}-avatar`}
+                                                      show={!hideAvatar}
+                                                      message={message}/> : ""
+            $message = $mount(<div className={["bubble-group", message.isOut ? "out" : "in"]}>{avatar}<div className="bubbles-list"><MessageComponent
+                intersectionObserver={this.intersectionObserver}
+                message={message}/></div></div>, this.bubblesInnerRef.$el)
+            const $bubblesList = $message.querySelector(".bubbles-list")
+            return $bubblesList.childNodes[!prepend ? $bubblesList.childNodes.length - 1 : 0]
+        }
 
     }
 
@@ -350,12 +328,12 @@ class BubblesComponent extends VComponent {
 
             const $rendered = this.renderMessage(message)
 
-            if ($rendered && last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
-                const $time = VRDOM.render(<div className="service">
-                    <div className="service-msg">{last.__component.message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
-                </div>)
-                this.bubblesInnerRef.$el.insertBefore($time, $rendered)
-            }
+            // if ($rendered && last && last.__component && !this.sameDay(message.date, last.__component.message.date)) {
+            //     const $time = VRDOM.render(<div className="service">
+            //         <div className="service-msg">{last.__component.message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
+            //     </div>)
+            //     this.bubblesInnerRef.$el.insertBefore($time, $rendered)
+            // }
 
             if ($rendered) {
                 pushed.push($rendered)
@@ -365,9 +343,7 @@ class BubblesComponent extends VComponent {
                 }
             }
         }
-        pushed.forEach(l => {
-            this.changeTails(l, l.__component.message)
-        })
+
         this.$el.scrollTop = z + this.bubblesInnerRef.$el.clientHeight - k
         if (scrollToWaited) {
             this.scrollToWaitedMessage()
@@ -397,12 +373,12 @@ class BubblesComponent extends VComponent {
 
             const $rendered = this.renderMessage(message, true)
 
-            if ($rendered && first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
-                const $time = VRDOM.render(<div className="service">
-                    <div className="service-msg">{message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
-                </div>)
-                this.bubblesInnerRef.$el.insertBefore($time, first)
-            }
+            // if ($rendered && first && first.__component && !this.sameDay(message.date, first.__component.message.date)) {
+            //     const $time = VRDOM.render(<div className="service">
+            //         <div className="service-msg">{message.getDate("en", DATA_FORMAT_MONTH_DAY)}</div>
+            //     </div>)
+            //     this.bubblesInnerRef.$el.insertBefore($time, first)
+            // }
 
             if ($rendered) {
                 if (isSending) {
@@ -418,10 +394,6 @@ class BubblesComponent extends VComponent {
 
         }
 
-        pushed.forEach(l => {
-            this.changeTails(l, l.__component.message)
-        })
-
         if (reset) {
             this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight
         }
@@ -431,7 +403,7 @@ class BubblesComponent extends VComponent {
     }
 
     refreshMessages = () => {
-        if(AppSelectedPeer.Current.messages.unreadCount > 0) {
+        if (AppSelectedPeer.Current.messages.unreadCount > 0) {
             const maxUnread = AppSelectedPeer.Current.messages.readInboxMaxId
             if (this.messages.rendered.has(maxUnread)) {
                 const $rendered = this.messages.rendered.get(maxUnread)
@@ -474,7 +446,7 @@ class BubblesComponent extends VComponent {
     scrollToWaitedMessage(smooth = true) {
         if (this.waitingScrollToMessage && this.messages.rendered.has(this.waitingScrollToMessage)) {
             let id = this.waitingScrollToMessage
-            if(this.waitingScrollTop) {
+            if (this.waitingScrollTop) {
                 id = [...this.messages.rendered.keys()].filter(l => {
                     return l > this.waitingScrollToMessage
                 }).reduce((l, q) => {
