@@ -2,9 +2,9 @@ import {ApiNetworker} from "./ApiNetworker";
 
 export class OneTimeNetworker extends ApiNetworker {
 
-    constructor(authContext) {
+    constructor(authContext, mtproto = false) {
         authContext.updates = false
-        super(authContext)
+        super(authContext, mtproto)
     }
 
     onDisconnect() {

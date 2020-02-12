@@ -73,7 +73,7 @@ export class MTSocket {
                 throw new Error("404?? " + this.networker.auth.dcID)
             }
 
-            this.networker.processResponse(data_buffer)
+            this.networker.processResponse.bind(this.networker)(data_buffer)
         }
 
         this.transportationSocket.onerror = (ev) => {
@@ -191,15 +191,15 @@ export class MTSocket {
         }
 
         const decrypted_buffer = (this.aes_decryptor.decrypt(new Uint8Array(ev.data))).buffer
-        return (decrypted_buffer.slice(4));
+        return (decrypted_buffer.slice(4))
     }
 
     onConnect() {
-        this.networker.onConnect()
+        this.networker.onConnect.bind(this.networker)()
     }
 
     onDisconnect() {
         this.refreshSocket()
-        this.networker.onDisconnect()
+        this.networker.onDisconnect.bind(this.networker)()
     }
 }

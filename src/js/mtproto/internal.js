@@ -5,11 +5,9 @@ import {AppConfiguration} from "../configuration"
 import {createNonce} from "./utils/bin"
 import TimeManager from "./timeManager"
 import {AuthAPI} from "./auth"
-import {MtprotoNetworker} from "./network/MtprotoNetworker"
 import Bytes from "./utils/bytes"
 import authKeyCreation from "./connect/authKeyCreation"
 import {FileNetworker} from "./network/FileNetworker"
-import {OneTimeNetworker} from "./network/OneTimeNetworker"
 
 // NEVER USE THIS THING OUTSIDE mtproto FOLDER
 
@@ -98,8 +96,9 @@ class MobileProtocol {
         this.UpdatesHandler(update)
     }
 
-    createApiNetworker(authContext) {
-        this.networker = new ApiNetworker(authContext)
+    createApiNetworker(apiNetworker) {
+        this.networker = apiNetworker
+        this.networker.mtproto = false
         this.connected = true
     }
 
@@ -115,16 +114,17 @@ class MobileProtocol {
         this.authContext = authContext
 
         if (!this.PermanentStorage.exists("authKey" + this.authContext.dcID)) {
-            const mtprotoNetworker = new MtprotoNetworker(authContext)
+            const mtprotoNetworker = new ApiNetworker(authContext, true)
 
             return authKeyCreation(mtprotoNetworker).then(_ => {
+                mtprotoNetworker.init()
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
                 this.PermanentStorage.setItem("authKey" + this.authContext.dcID, Bytes.asHex(authContext.authKey))
                     .then(() => this.PermanentStorage.setItem("serverSalt" + this.authContext.dcID, Bytes.asHex(authContext.serverSalt)))
                     .then(() => {
-                        this.createApiNetworker(authContext)
+                        this.createApiNetworker(mtprotoNetworker)
                         this.onConnected()
                     })
             })
@@ -133,7 +133,7 @@ class MobileProtocol {
             authContext.authKey = new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("authKey" + this.authContext.dcID)))
             authContext.serverSalt = Bytes.fromHex(this.PermanentStorage.getItem("serverSalt" + this.authContext.dcID))
 
-            this.createApiNetworker(authContext)
+            this.createApiNetworker(new ApiNetworker(authContext))
 
             this.onConnected()
 
@@ -159,6 +159,7 @@ class MobileProtocol {
             })
             return networker
         }
+
         const authContext = {
             dcID: dcID,
             nonce: createNonce(16),
@@ -167,73 +168,42 @@ class MobileProtocol {
             updates: false
         }
 
-        const mtprotoNetworker = new MtprotoNetworker(authContext)
+        const mtprotoNetworker = new FileNetworker(authContext, true)
+
         return authKeyCreation(mtprotoNetworker).then(response => {
-            const networker = new FileNetworker(authContext)
+            const networker = mtprotoNetworker
+            mtprotoNetworker.mtproto = false
+            networker.init()
 
             const list = this.fileNetworkers[dcID]
             this.fileNetworkers[dcID] = networker
+
             authContext.authKey = new Uint8Array(authContext.authKey)
             authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
-            return AuthAPI.importAuth(authContext.exportedAuth, dcID).then(response => {
-                list.forEach(async l => {
-                    l.resolve(networker.invokeMethod(l.method, l.parameters))
-                })
+            return AuthAPI.importAuth(authContext.exportedAuth, dcID, true).then(response => {
                 authContext.authKey = new Uint8Array(authContext.authKey)
                 authContext.serverSalt = new Uint8Array(authContext.serverSalt)
 
                 return this.PermanentStorage.setItem("authKey" + authContext.dcID, Bytes.asHex(authContext.authKey))
                     .then(() => this.PermanentStorage.setItem("serverSalt" + authContext.dcID, Bytes.asHex(authContext.serverSalt)))
+                    .then(() => {
+                        list.forEach(async l => {
+                            l.resolve(networker.invokeMethod(l.method, l.parameters))
+                        })
+                    })
                     .then(() => networker)
             })
         })
     }
 
-    async createOneTimeNetworker(dcID) {
-        if (this.PermanentStorage.exists("authKey" + dcID)) {
-            return new OneTimeNetworker({
-                dcID: dcID,
-                nonce: createNonce(16),
-                sessionID: createNonce(8), // TODO check if secure?
-                updates: false,
-                authKey: new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("authKey" + dcID))),
-                serverSalt: new Uint8Array(Bytes.fromHex(this.PermanentStorage.getItem("serverSalt" + dcID)))
-            })
-        }
-        const authContext = {
-            dcID: dcID,
-            nonce: createNonce(16),
-            sessionID: createNonce(8), // TODO check if secure?
-            exportedAuth: await AuthAPI.exportAuth(dcID),
-            updates: false
-        }
-
-        const mtprotoNetworker = new MtprotoNetworker(authContext)
-        return authKeyCreation(mtprotoNetworker).then(response => {
-            const networker = new OneTimeNetworker(authContext)
-
-            authContext.authKey = new Uint8Array(authContext.authKey)
-            authContext.serverSalt = new Uint8Array(authContext.serverSalt)
-
-            return AuthAPI.importAuth(authContext.exportedAuth, dcID).then(response => {
-                authContext.authKey = new Uint8Array(authContext.authKey)
-                authContext.serverSalt = new Uint8Array(authContext.serverSalt)
-
-                return this.PermanentStorage.setItem("authKey" + authContext.dcID, Bytes.asHex(authContext.authKey))
-                    .then(() => this.PermanentStorage.setItem("serverSalt" + authContext.dcID, Bytes.asHex(authContext.serverSalt)))
-                    .then(() => networker)
-            })
-        })
-    }
-
-    invokeMethod(method, parameters = {}, dcID = null, file = false, useOneTimeNetworker = false) {
+    invokeMethod(method, parameters = {}, dcID = null, file) {
         if (fileNetworkerMethods.includes(method)) {
             file = true
         }
 
         if (!this.connected) {
-            console.info("Not connected, putting in queue")
+            console.info("Not connected, putting in queue", method)
             return new Promise(resolve => {
                 this.queue.push({
                     method: method,
@@ -243,17 +213,13 @@ class MobileProtocol {
             })
         }
 
-        if (dcID === null) {
-            dcID = this.authContext.dcID
-        }
 
-        if (useOneTimeNetworker) {
-            return this.createOneTimeNetworker(dcID).then(networker => {
-                networker.invokeMethod(method, parameters)
-            })
-        }
+        // if (dcID !== null && dcID !== this.authContext.dcID) {
 
         if (file) {
+            if (dcID === null) {
+                dcID = this.authContext.dcID
+            }
 
             let networker = this.fileNetworkers[dcID]
 
@@ -284,7 +250,7 @@ class MobileProtocol {
     }
 
     changeDefaultDC(dcID) {
-        this.authContext.dcID = dcID
+
     }
 
     connectionRestored() {

@@ -1,8 +1,8 @@
 import {ApiNetworker} from "./ApiNetworker";
 
 export class FileNetworker extends ApiNetworker {
-    constructor(authContext) {
-        super(authContext)
+    constructor(authContext, mtproto = false) {
+        super(authContext, mtproto)
     }
 
     onDisconnect() {

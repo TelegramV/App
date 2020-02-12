@@ -13,18 +13,24 @@ import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
 import MTProtoInternal from "../internal"
 
 export class ApiNetworker extends Networker {
-    constructor(auth) {
-        super(auth)
+    constructor(auth, mtproto = false) {
+        super(auth, mtproto)
+        this.updates = this.auth.updates
+        if (!mtproto) {
+            this.init()
+        }
+    }
 
+    init() {
         this.messageProcessor = new MessageProcessor({
             networker: this
         })
 
-        auth.authKeyHash = sha1BytesSync(auth.authKey)
-        auth.authKeyAux = auth.authKeyHash.slice(0, 8)
-        auth.authKeyID = auth.authKeyHash.slice(-8)
+        this.auth.authKeyHash = sha1BytesSync(this.auth.authKey)
+        this.auth.authKeyAux = this.auth.authKeyHash.slice(0, 8)
+        this.auth.authKeyID = this.auth.authKeyHash.slice(-8)
 
-        this.updates = auth.updates
+        this.updates = this.auth.updates
 
         this.seqNo = 0
         this.connectionInited = false
@@ -39,6 +45,10 @@ export class ApiNetworker extends Networker {
     }
 
     checkConnection() {
+        if (this.mtproto) {
+            return
+        }
+
         if (this.pings.size > 1) { // Probably disconnected
             // TODO Show disconnection badge
         }
@@ -70,6 +80,10 @@ export class ApiNetworker extends Networker {
     }
 
     processResponse(data) {
+        if (this.mtproto) {
+            return this.mtproto_processResponse(data)
+        }
+
         let deserializer = new TLDeserialization(data)
 
         const authKeyID = deserializer.fetchIntBytes(64, false, "auth_key_id")
@@ -244,6 +258,10 @@ export class ApiNetworker extends Networker {
     }
 
     addHeader(message) {
+        if (this.mtproto) {
+            return this.mtproto_addHeader(message)
+        }
+
         const data = new TLSerialization({startMaxLength: message.body.length + 2048})
 
         data.storeIntBytes(this.auth.serverSalt, 64, "salt")
@@ -266,6 +284,10 @@ export class ApiNetworker extends Networker {
     }
 
     sendMessage(message) {
+        if (this.mtproto) {
+            return super.sendMessage(message)
+        }
+
         this.messageProcessor.sentMessages.set(message.msg_id, message)
 
         const dataWithPadding = this.addHeader(message)
@@ -286,6 +308,10 @@ export class ApiNetworker extends Networker {
     }
 
     invokeMethod(method, params, options = {}) {
+        if (this.mtproto) {
+            return this.mtproto_invokeMethod(method, params, options)
+        }
+
         const serializer = new TLSerialization(options)
 
         if (!this.connectionInited) {

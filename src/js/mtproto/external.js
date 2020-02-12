@@ -16,6 +16,7 @@ MTProtoWorker.addEventListener("message", event => {
     } else if (event.data.type === "readStorage") {
         console.warn("readStorage is not implemented")
     } else if (event.data.type === "setLocalStorage") {
+        console.warn("SETTING", event.data)
         AppPermanentStorage.setItem(event.data.key, event.data.value)
     } else if (event.data.type === "removeLocalStorage") {
         AppPermanentStorage.removeItem(event.data.key)
