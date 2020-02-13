@@ -42,6 +42,10 @@ function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
     }
 }
 
+
+/**
+ * TODO: `updateTooLong` need to be implemented
+ */
 export class DefaultUpdatesProcessor {
     /**
      * @param {UpdateManager} updatesManager
@@ -101,6 +105,13 @@ export class DefaultUpdatesProcessor {
             this.queueIsProcessing = true
 
             const rawUpdate = next ? next : this.dequeue()
+
+            if (rawUpdate._ === "updatePtsChanged") {
+                MTProto.invokeMethod("updates.getState", {}).then(state => {
+                    this.updatesManager.State = state
+                })
+                return
+            }
 
             const self = this
 

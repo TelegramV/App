@@ -1,5 +1,5 @@
 import MappedStore from "./MappedStore"
-import {PeerAPI} from "../peerAPI"
+import {PeerParser} from "../peerParser"
 import MTProto from "../../mtproto/external"
 
 /**
@@ -55,7 +55,7 @@ class PeersMapStore extends MappedStore {
      * @return {Peer|boolean}
      */
     getByPeerType(dialogRawPeer) {
-        const plain = PeerAPI.getPlain(dialogRawPeer, false)
+        const plain = PeerParser.getPlain(dialogRawPeer, false)
 
         if (this.data.has(plain._)) {
             return this.data.get(plain._).get(plain.id)

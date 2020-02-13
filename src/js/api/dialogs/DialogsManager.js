@@ -2,7 +2,7 @@ import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash} from "./uti
 import {Dialog} from "./Dialog";
 import {Manager} from "../manager";
 import {Peer} from "../peers/objects/Peer";
-import {PeerAPI} from "../peerAPI"
+import {PeerParser} from "../peerParser"
 import DialogsStore from "../store/DialogsStore"
 import AppEvents from "../eventBus/AppEvents"
 import PeersStore from "../store/PeersStore"
@@ -265,7 +265,7 @@ class DialogManager extends Manager {
             return DialogsStore.getByPeer(peer)
         }
 
-        const plain = PeerAPI.getPlain(peer, false)
+        const plain = PeerParser.getPlain(peer, false)
 
         return DialogsStore.get(plain._, plain.id)
     }
@@ -411,7 +411,7 @@ class DialogManager extends Manager {
     }
 
     setFromRaw(rawDialog) {
-        const plainPeer = PeerAPI.getPlain(rawDialog.peer, false)
+        const plainPeer = PeerParser.getPlain(rawDialog.peer, false)
 
         if (DialogsStore.has(plainPeer._, plainPeer.id)) {
             const dialog = DialogsStore.get(plainPeer._, plainPeer.id)
@@ -425,7 +425,7 @@ class DialogManager extends Manager {
     }
 
     setFromRawAndFire(rawDialog) {
-        const plainPeer = PeerAPI.getPlain(rawDialog.peer, false)
+        const plainPeer = PeerParser.getPlain(rawDialog.peer, false)
 
         if (DialogsStore.has(plainPeer._, plainPeer.id)) {
             const dialog = DialogsStore.get(plainPeer._, plainPeer.id)

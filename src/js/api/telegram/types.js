@@ -1,3 +1,5 @@
+// bad idea
+
 export type getDialogs_Params_105 = {
     limit: number,
     flags: number,

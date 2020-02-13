@@ -135,7 +135,7 @@ export class ChatInputComponent extends VComponent {
     }
 
 
-    appendText(text) {
+    appendText = (text) => {
         this.textarea.innerHTML += text
         this.chatInputTextareaRef.component.onInput();
     }
@@ -144,7 +144,7 @@ export class ChatInputComponent extends VComponent {
         return this.textarea && this.textarea.childNodes.length === 0
     }
 
-    initDragArea() {
+    initDragArea = () => {
         // TODO should create separate drag area!
         document.querySelector("body").addEventListener("drop", ev => {
             for (let i = 0; i < ev.dataTransfer.items.length; i++) {
@@ -169,27 +169,27 @@ export class ChatInputComponent extends VComponent {
         })
     }
 
-    mouseEnterComposer() {
+    mouseEnterComposer = () => {
         this.hideComposer = false;
     }
 
-    mouseLeaveComposer() {
+    mouseLeaveComposer = () => {
         this.hideComposer = true;
         this.planComposerClose()
     }
 
-    mouseEnterEmoji() {
+    mouseEnterEmoji = () => {
         VF.mountedComponents.get("composer").onShow();
         VF.mountedComponents.get("composer").$el.classList.add("visible");
         this.hideComposer = false;
     }
 
-    mouseLeaveEmoji() {
+    mouseLeaveEmoji = () => {
         this.hideComposer = true;
         this.planComposerClose()
     }
 
-    planComposerClose() {
+    planComposerClose = () => {
         this.withTimeout(() => {
             if (this.hideComposer) {
                 VF.mountedComponents.get("composer").$el.classList.remove("visible");
@@ -198,35 +198,35 @@ export class ChatInputComponent extends VComponent {
         }, 250);
     }
 
-    mouseEnterRemoveVoice() {
+    mouseEnterRemoveVoice = () => {
         this.isRemoveVoice = true
     }
 
-    mouseLeaveRemoveVoice() {
+    mouseLeaveRemoveVoice = () => {
         this.isRemoveVoice = false
     }
 
-    hide() {
+    hide = () => {
         this.$el.style.display = "none"
     }
 
-    show() {
+    show = () => {
         this.$el.style.display = "block"
     }
 
-    clear() {
+    clear = () => {
         this.closeReply()
         this.textarea.focus()
         this.chatInputTextareaRef.component.clearInput()
     }
 
-    navigateToReplied() {
+    navigateToReplied = () => {
         if (this.reply) {
             UIEvents.Bubbles.fire("showMessage", this.reply.message)
         }
     }
 
-    replyTo(message) {
+    replyTo = (message) => {
         this.reply = {
             title: message.from.name,
             description: MessageParser.getPrefixNoSender(message),
@@ -245,12 +245,12 @@ export class ChatInputComponent extends VComponent {
         this.textarea.focus()
     }
 
-    closeReply() {
+    closeReply = () => {
         this.reply = null
         this.$el.querySelector(".reply").classList.add("hidden")
     }
 
-    setKeyboardMarkup(markup) {
+    setKeyboardMarkup = (markup) => {
         // TODO selective
         if (markup._ === "replyKeyboardMarkup") {
             this.keyboardMarkup = markup
@@ -264,11 +264,11 @@ export class ChatInputComponent extends VComponent {
         this.__patch()
     }
 
-    pickPoll() {
+    pickPoll = () => {
         ModalManager.open(<AttachPollModal/>)
     }
 
-    pickPhoto(blob) {
+    pickPhoto = (blob) => {
         // TODO wtf?
         if (ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachPhotosModal) {
             ModalManager.$el.querySelector(".dialog").childNodes[0].__component.addPhoto(blob)
@@ -277,7 +277,7 @@ export class ChatInputComponent extends VComponent {
         ModalManager.open(<AttachPhotosModal media={[blob]}/>)
     }
 
-    pickFile(blob, file) {
+    pickFile = (blob, file) => {
         // TODO wtf?
         if (ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachFilesModal) {
             ModalManager.$el.querySelector(".dialog").childNodes[0].__component.addFile(blob, file)
@@ -289,23 +289,23 @@ export class ChatInputComponent extends VComponent {
         }]}/>)
     }
 
-    attachFile() {
-        askForFile("", function (bytes, file) {
+    attachFile = () => {
+        askForFile("", (bytes, file) => {
             const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
 
             this.pickFile(URL.createObjectURL(blob), file)
-        }.bind(this), true, true)
+        }, true, true)
     }
 
-    attachPhoto() {
-        askForFile("image/*,video/*", function (bytes, file) {
+    attachPhoto = () => {
+        askForFile("image/*,video/*", (bytes, file) => {
             const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
 
             this.pickPhoto(URL.createObjectURL(blob))
-        }.bind(this), true, true)
+        }, true, true)
     }
 
-    tickTimer() {
+    tickTimer = () => {
         const time = formatAudioTime(this.i / 100) + "," + this.i % 100;
         this.$el.querySelector(".voice-seconds").innerHTML = time
         this.i++
@@ -319,7 +319,7 @@ export class ChatInputComponent extends VComponent {
         this.initDragArea()
     }
 
-    onSend(ev) {
+    onSend = (ev) => {
         if (this.isVoiceMode) return
         this.send()
     }
@@ -328,7 +328,7 @@ export class ChatInputComponent extends VComponent {
         return !!this.recorder
     }
 
-    onMouseUp(ev) {
+    onMouseUp = (ev) => {
         if (!this.isVoiceMode) return
 
         this.$el.querySelector(".delete-button").classList.remove("open")
@@ -347,7 +347,7 @@ export class ChatInputComponent extends VComponent {
 
     }
 
-    onRecordingReady(ev) {
+    onRecordingReady = (ev) => {
 
         if (this.isRemoveVoice) {
             this.isRemoveVoice = false
@@ -391,7 +391,7 @@ export class ChatInputComponent extends VComponent {
         })
     }
 
-    onMouseDown(ev) {
+    onMouseDown = (ev) => {
         if (!this.isVoiceMode) return
         if (!this.microphone) {
             navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
@@ -456,7 +456,7 @@ export class ChatInputComponent extends VComponent {
     }
 
 
-    convertEmojiToText(ee) {
+    convertEmojiToText = (ee) => {
         if (ee.nodeType === Node.TEXT_NODE) return
         for (const elem of ee.childNodes) {
             if (elem.alt) {
@@ -466,7 +466,7 @@ export class ChatInputComponent extends VComponent {
         }
     }
 
-    send(silent = false) {
+    send = (silent = false) => {
         this.convertEmojiToText(this.textarea)
         let reply = this.reply ? this.reply.message.id : null
 
@@ -485,7 +485,7 @@ export class ChatInputComponent extends VComponent {
         this.updateSendButton()
     }
 
-    updateSendButton() {
+    updateSendButton = () => {
         if (this.textarea.childNodes.length === 0) {
             this.$el.querySelector(".send-button>.tgico-send").classList.add("hidden")
             this.$el.querySelector(".send-button>.tgico-microphone2").classList.remove("hidden")

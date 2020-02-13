@@ -8,7 +8,7 @@ import {Peer} from "./objects/Peer"
  */
 export class PeerMessages {
 
-    _peer: Peer = undefined
+    peer: Peer = undefined
 
     _messages: Map<number, Message> = new Map
     // id -> randomId
@@ -44,7 +44,7 @@ export class PeerMessages {
         readOutboxMaxId = 0,
         readInboxMaxId = 0,
     } = {}) {
-        this._peer = peer
+        this.peer = peer
 
         this.appendMany(messages)
 
@@ -125,8 +125,8 @@ export class PeerMessages {
         this.clearUnreadIds()
 
         if (!this.isTransaction) {
-            if (this._peer.dialog) {
-                this._peer.dialog.fire("updateUnread")
+            if (this.peer.dialog) {
+                this.peer.dialog.fire("updateUnread")
             }
         }
     }
@@ -139,9 +139,9 @@ export class PeerMessages {
         this._unreadMentionsCount = unreadMentionsCount || this._unreadMentionsCount
 
         if (!this.isTransaction) {
-            if (this._peer.dialog) {
-                if (this._peer.dialog) {
-                    this._peer.dialog.fire("updateUnreadMentionsCount")
+            if (this.peer.dialog) {
+                if (this.peer.dialog) {
+                    this.peer.dialog.fire("updateUnreadMentionsCount")
                 }
             }
         }
@@ -159,8 +159,8 @@ export class PeerMessages {
             this._readOutboxMaxId = readOutboxMaxId || this._readOutboxMaxId
 
             if (!this.isTransaction) {
-                if (this._peer.dialog) {
-                    this._peer.dialog.fire("updateReadOutboxMaxId")
+                if (this.peer.dialog) {
+                    this.peer.dialog.fire("updateReadOutboxMaxId")
                 }
             }
         }
@@ -183,8 +183,8 @@ export class PeerMessages {
             this.deleteUnreadBy(this._readInboxMaxId)
 
             if (!this.isTransaction) {
-                if (this._peer.dialog) {
-                    this._peer.dialog.fire("updateReadInboxMaxId")
+                if (this.peer.dialog) {
+                    this.peer.dialog.fire("updateReadInboxMaxId")
                 }
             }
         }
@@ -209,7 +209,7 @@ export class PeerMessages {
             return
         }
 
-        if (AppSelectedPeer.check(this._peer)) {
+        if (AppSelectedPeer.check(this.peer)) {
             for (const message of messages) {
                 this.appendSingle(message)
             }
@@ -237,7 +237,7 @@ export class PeerMessages {
      * @return boolean
      */
     appendSingle(message: Message) {
-        if (AppSelectedPeer.check(this._peer)) {
+        if (AppSelectedPeer.check(this.peer)) {
             this._messages.set(message.id, message)
 
             this._alreadySorted = false
@@ -278,7 +278,7 @@ export class PeerMessages {
         }
 
         if (!this.isTransaction) {
-            this._peer.dialog.fire("deleteMessage", {
+            this.peer.dialog.fire("deleteMessage", {
                 messageId
             })
         }
@@ -295,8 +295,8 @@ export class PeerMessages {
         }
 
         if (!this.isTransaction) {
-            if (this._peer.dialog) {
-                this._peer.dialog.fire("updateUnread")
+            if (this.peer.dialog) {
+                this.peer.dialog.fire("updateUnread")
             }
         }
     }
@@ -319,8 +319,8 @@ export class PeerMessages {
 
         this.stopTransaction()
 
-        if (this._peer.dialog) {
-            this._peer.dialog.fire("updateUnread")
+        if (this.peer.dialog) {
+            this.peer.dialog.fire("updateUnread")
         }
     }
 
@@ -330,8 +330,8 @@ export class PeerMessages {
 
         if (!this.isTransaction) {
 
-            if (this._peer.dialog) {
-                this._peer.dialog.fire("updateUnread")
+            if (this.peer.dialog) {
+                this.peer.dialog.fire("updateUnread")
             }
         }
     }
@@ -373,7 +373,7 @@ export class PeerMessages {
     fireTransaction(eventName = "updateSingle", data = {}) {
         this.stopTransaction()
 
-        this._peer.dialog.fire(eventName, data)
+        this.peer.dialog.fire(eventName, data)
 
     }
 

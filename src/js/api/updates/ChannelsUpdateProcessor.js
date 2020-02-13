@@ -44,6 +44,9 @@ function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
     }
 }
 
+/**
+ * TODO: `updateChannelTooLong` need to be implemented
+ */
 export class ChannelsUpdateProcessor {
     /**
      * @param {UpdateManager} updatesManager

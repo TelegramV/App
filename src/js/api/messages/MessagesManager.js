@@ -100,6 +100,22 @@ class MessageManager extends Manager {
             updatePeerLastMessage(peer, update.message)
         })
 
+        MTProto.UpdatesManager.subscribe("updateNewScheduledMessage", update => {
+            let peer = undefined
+
+            if (update.message.pFlags.out) {
+                const peerType = getPeerTypeFromType(update.message.to_id._)
+                peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
+            } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUser().user.id) {
+                const peerType = getPeerTypeFromType(update.message.to_id._)
+                peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
+            } else {
+                peer = PeersStore.get("user", update.message.from_id)
+            }
+
+            updatePeerLastMessage(peer, update.message)
+        })
+
 
         MTProto.UpdatesManager.subscribe("updateDeleteChannelMessages", update => {
             const dialog = DialogsStore.get("channel", update.channel_id)

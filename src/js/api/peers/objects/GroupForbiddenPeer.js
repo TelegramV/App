@@ -1,5 +1,6 @@
 import {Peer} from "./Peer";
 
+// todo: make chat migration
 export class GroupForbiddenPeer extends Peer {
 
     constructor(rawPeer, dialog = undefined) {

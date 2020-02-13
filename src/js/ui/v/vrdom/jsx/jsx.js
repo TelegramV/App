@@ -14,7 +14,7 @@ import VRDOM from "../VRDOM"
  */
 function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<VRNode | VRNodeProps>) {
     if (tagName === VRDOM.Fragment) {
-        throw new Error("fragments are not implemented")
+        console.warn("fragments are not fully implemented: patch is not working")
     }
 
     children = children.flat(Infinity)

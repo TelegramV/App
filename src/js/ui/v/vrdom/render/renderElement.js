@@ -73,7 +73,11 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
         return $el
     } else {
         for (let child of node.children) {
-            if (child instanceof VListVRNode) {
+            if (child !== undefined && child.tagName === VRDOM.Fragment) {
+                for (let c of child.children) {
+                    vrdom_append(c, $el, {xmlns})
+                }
+            } else if (child instanceof VListVRNode) {
                 const list = new (child.list)({list: child.items, template: child.template})
                 list.$parent = $el
                 const items = list.render()

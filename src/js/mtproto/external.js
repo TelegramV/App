@@ -16,8 +16,6 @@ const TimeManager = {
         return MTProto.performWorkerTask("time_generateMessageID", {
             dcID
         }).then(data => {
-            TimeManager.lastMessageID = data.time.lastMessageID
-            TimeManager.timeOffset = data.time.timeOffset
             return data.messageId
         })
     }
