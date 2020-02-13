@@ -1,12 +1,6 @@
-import Component from "../../../../../v/vrdom/Component";
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 import {askForFile, convertBits, formatAudioTime} from "../../../../../utils";
-import Random from "../../../../../../mtproto/utils/random";
-import TimeManager from "../../../../../../mtproto/timeManager";
-import {createNonce} from "../../../../../../mtproto/utils/bin";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
-import {InlineKeyboardComponent} from "../message/common/InlineKeyboardComponent";
-import {replaceEmoji} from "../../../../../utils/emoji"
 import ComposerComponent from "./ComposerComponent"
 import {MessageParser} from "../../../../../../api/messages/MessageParser";
 import {domToMessageEntities} from "../../../../../../mtproto/utils/htmlHelpers";
@@ -19,6 +13,7 @@ import UIEvents from "../../../../../eventBus/UIEvents";
 import VComponent from "../../../../../v/vrdom/component/VComponent";
 import VF from "../../../../../v/VFramework";
 import AppConfiguration from "../../../../../../configuration";
+import MTProto from "../../../../../../mtproto/external"
 
 export let ChatInputManager
 
@@ -34,7 +29,8 @@ export class ChatInputComponent extends VComponent {
     h() {
         return <div className="chat-input-wrapper">
             <div className="chat-input">
-            <ComposerComponent mouseEnter={this.mouseEnterComposer.bind(this)} mouseLeave={this.mouseLeaveComposer.bind(this)}/>
+                <ComposerComponent mouseEnter={this.mouseEnterComposer.bind(this)}
+                                   mouseLeave={this.mouseLeaveComposer.bind(this)}/>
                 <div className="input-and-keyboard-wrapper">
                     <div className="input-field-wrapper">
                         <div className="reply hidden">
@@ -52,9 +48,10 @@ export class ChatInputComponent extends VComponent {
                             <div className="another-fucking-wrapper">
                                 <div className="ico-wrapper">
                                     <i className="tgico tgico-smile btn-icon rp rps"
-                                       onMouseEnter={this.mouseEnterEmoji.bind(this)} onMouseLeave={this.mouseLeaveEmoji.bind(this)}/>
+                                       onMouseEnter={this.mouseEnterEmoji.bind(this)}
+                                       onMouseLeave={this.mouseLeaveEmoji.bind(this)}/>
                                 </div>
-                                <TextareaFragment ref={this.chatInputTextareaRef} parent={this} />
+                                <TextareaFragment ref={this.chatInputTextareaRef} parent={this}/>
 
                                 <div className="ico-wrapper">
 
@@ -91,21 +88,22 @@ export class ChatInputComponent extends VComponent {
 
                     </div>
 
-                            <div className="keyboard-markup">
-                                {/*{this.keyboardMarkup.rows.map(l => {*/}
-                                {/*    return <div className="row">*/}
-                                {/*        {l.buttons.map(q => {*/}
-                                {/*            return InlineKeyboardComponent.parseButton(null, q)*/}
-                                {/*        })}*/}
-                                {/*    </div>*/}
-                                {/*})}*/}
-                            </div>
+                    <div className="keyboard-markup">
+                        {/*{this.keyboardMarkup.rows.map(l => {*/}
+                        {/*    return <div className="row">*/}
+                        {/*        {l.buttons.map(q => {*/}
+                        {/*            return InlineKeyboardComponent.parseButton(null, q)*/}
+                        {/*        })}*/}
+                        {/*    </div>*/}
+                        {/*})}*/}
+                    </div>
                 </div>
 
 
                 <div className="round-button-wrapper">
                     <div className="round-button delete-button rp rps" onClick={l => this.onSend(l)}
-                         onMouseEnter={l => this.mouseEnterRemoveVoice(l)} onMouseLeave={l => this.mouseLeaveRemoveVoice(l)}>
+                         onMouseEnter={l => this.mouseEnterRemoveVoice(l)}
+                         onMouseLeave={l => this.mouseLeaveRemoveVoice(l)}>
                         <i className="tgico tgico-delete"/>
                     </div>
 
@@ -223,7 +221,7 @@ export class ChatInputComponent extends VComponent {
     }
 
     navigateToReplied() {
-        if(this.reply) {
+        if (this.reply) {
             UIEvents.Bubbles.fire("showMessage", this.reply.message)
         }
     }
@@ -272,7 +270,7 @@ export class ChatInputComponent extends VComponent {
 
     pickPhoto(blob) {
         // TODO wtf?
-        if(ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachPhotosModal) {
+        if (ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachPhotosModal) {
             ModalManager.$el.querySelector(".dialog").childNodes[0].__component.addPhoto(blob)
             return
         }
@@ -281,7 +279,7 @@ export class ChatInputComponent extends VComponent {
 
     pickFile(blob, file) {
         // TODO wtf?
-        if(ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachFilesModal) {
+        if (ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachFilesModal) {
             ModalManager.$el.querySelector(".dialog").childNodes[0].__component.addFile(blob, file)
             return
         }
@@ -356,40 +354,41 @@ export class ChatInputComponent extends VComponent {
             return
         }
         // TODO refactor sending
-        const id = TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
-        var reader = new FileReader();
-        reader.readAsArrayBuffer(ev.data);
-        reader.onloadend = (event) => {
-            // The contents of the BLOB are in reader.result:
+        MTProto.TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default).then(id => {
+            var reader = new FileReader();
+            reader.readAsArrayBuffer(ev.data);
+            reader.onloadend = (event) => {
+                // The contents of the BLOB are in reader.result:
 
-            AppSelectedPeer.Current.api.sendMedia("", reader.result, {
-                _: "inputMediaUploadedDocument",
-                flags: 0,
-                file: {
-                    _: "inputFile",
-                    id: id,
-                    parts: 1,
-                    name: "audio.ogg"
-                },
-                mime_type: "audio/ogg",
-                attributes: [
-                    {
-                        //flags: 1024,
-                        // duration: 100,
-                        _: "documentAttributeAudio",
-                        pFlags: {
-                            voice: true,
-                            waveform: convertBits(this.waveform, 8, 5)
-                        },
+                AppSelectedPeer.Current.api.sendMedia("", reader.result, {
+                    _: "inputMediaUploadedDocument",
+                    flags: 0,
+                    file: {
+                        _: "inputFile",
+                        id: id,
+                        parts: 1,
+                        name: "audio.ogg"
                     },
-                    {
-                        _: "documentAttributeFilename",
-                        file_name: ""
-                    }
-                ]
-            })
-        }
-        console.log("onRecordingReady", ev)
+                    mime_type: "audio/ogg",
+                    attributes: [
+                        {
+                            //flags: 1024,
+                            // duration: 100,
+                            _: "documentAttributeAudio",
+                            pFlags: {
+                                voice: true,
+                                waveform: convertBits(this.waveform, 8, 5)
+                            },
+                        },
+                        {
+                            _: "documentAttributeFilename",
+                            file_name: ""
+                        }
+                    ]
+                })
+            }
+            console.log("onRecordingReady", ev)
+        })
     }
 
     onMouseDown(ev) {
@@ -457,11 +456,10 @@ export class ChatInputComponent extends VComponent {
     }
 
 
-
     convertEmojiToText(ee) {
-        if(ee.nodeType === Node.TEXT_NODE) return
-        for(const elem of ee.childNodes) {
-            if(elem.alt) {
+        if (ee.nodeType === Node.TEXT_NODE) return
+        for (const elem of ee.childNodes) {
+            if (elem.alt) {
                 ee.replaceChild(document.createTextNode(elem.alt), elem)
             }
             this.convertEmojiToText(elem)
@@ -474,7 +472,12 @@ export class ChatInputComponent extends VComponent {
 
         const {text, messageEntities} = domToMessageEntities(this.textarea)
 
-        AppSelectedPeer.Current.api.sendMessage({text: text, messageEntities: messageEntities, replyTo: reply, silent: silent})
+        AppSelectedPeer.Current.api.sendMessage({
+            text: text,
+            messageEntities: messageEntities,
+            replyTo: reply,
+            silent: silent
+        })
 
         this.textarea.innerHTML = ""
         this.closeReply()

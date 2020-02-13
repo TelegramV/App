@@ -1,7 +1,7 @@
-import {tsNow} from "../../../mtproto/timeManager";
 import {getLastSeenMessage} from "../../dataObjects/utils";
 import {Peer} from "./Peer";
 import {GroupPeer} from "./GroupPeer"
+import MTProto from "../../../mtproto/external"
 
 export class UserPeer extends Peer {
 
@@ -59,7 +59,7 @@ export class UserPeer extends Peer {
             }
         }
 
-        const now = tsNow(true)
+        const now = MTProto.TimeManager.now(true)
 
         switch (this.raw.status._) {
             case "userStatusOnline":

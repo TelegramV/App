@@ -3,7 +3,7 @@ import AppEvents from "../../../../../../../api/eventBus/AppEvents"
 import {DialogComponent} from "../DialogComponent"
 import VF from "../../../../../../v/VFramework"
 import {VUI} from "../../../../../../v/VUI"
-import {Sortable} from "sortablejs"
+// import {Sortable} from "sortablejs"
 
 export default class PinnedDialogListComponent extends VComponent {
 
@@ -22,7 +22,7 @@ export default class PinnedDialogListComponent extends VComponent {
     }
 
     mounted() {
-        Sortable.create(this.$el)
+        // Sortable.create(this.$el)
     }
 
     onDialogsGotMany = event => {

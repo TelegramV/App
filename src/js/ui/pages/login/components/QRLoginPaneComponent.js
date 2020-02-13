@@ -3,8 +3,6 @@ import InfoComponent from "./common/infoComponent"
 
 import AppConfiguration from "../../../../configuration";
 import {MTProto} from "../../../../mtproto/external"
-import UpdatesManager from "../../../../api/updates/updatesManager";
-import {tsNow} from "../../../../mtproto/timeManager";
 
 const QRCodeStyling = require("qr-code-styling")
 
@@ -12,12 +10,12 @@ export default class QRLoginPaneComponent extends PaneComponent {
     constructor(props) {
         super(props);
         MTProto.UpdatesManager.subscribe("updateLoginToken", l => {
-            if(l._ === "auth.loginTokenSuccess") {
+            if (l._ === "auth.loginTokenSuccess") {
                 this.props.finished(l.authorization)
                 return
             }
             this.requestLoginToken().then(q => {
-                if(q._ === "auth.loginTokenSuccess") {
+                if (q._ === "auth.loginTokenSuccess") {
                     this.props.finished(q.authorization)
                     return
                 }
@@ -52,13 +50,13 @@ export default class QRLoginPaneComponent extends PaneComponent {
                                    <li>Go to Settings -> Devices -> Scan QR Code</li>
                                    <li>Scan this image to Log In</li>
                                </ol>}/>
-                <div className="qr-login-button" onClick={this.props.backToPhone}>Or log in using your phone number</div>
+                <div className="qr-login-button" onClick={this.props.backToPhone}>Or log in using your phone number
+                </div>
 
 
             </div>
         )
     }
-
 
 
     open() {
@@ -72,14 +70,14 @@ export default class QRLoginPaneComponent extends PaneComponent {
             const string = "tg://login?token=" + b64encoded
             const obj = this.$el.querySelector(".object")
 
-            if(obj.firstChild) obj.removeChild(obj.firstChild);
+            if (obj.firstChild) obj.removeChild(obj.firstChild);
             let qr = this.makeQR(string);
             obj.appendChild(qr)
 
-            setTimeout(this.open, 1000 * (l.expires - tsNow(true)));
+            setTimeout(this.open, 1000 * (l.expires - MTProto.TimeManager.now(true)));
         }).catch(reject => {
-            if(reject.reason === "authorized") return; //ignore
-            if(reject.type === "SESSION_PASSWORD_NEEDED") {
+            if (reject.reason === "authorized") return; //ignore
+            if (reject.type === "SESSION_PASSWORD_NEEDED") {
                 MTProto.invokeMethod("account.getPassword", {}).then(response => {
                     console.log(response)
                     this.props.password(response)
@@ -89,10 +87,10 @@ export default class QRLoginPaneComponent extends PaneComponent {
     }
 
     /**
-        Returns Promise
-    **/
+     Returns Promise
+     **/
     requestLoginToken() {
-        if(MTProto.isUserAuthorized()) {
+        if (MTProto.isUserAuthorized()) {
             return Promise.reject({reason: "authorized"})
         }
 
@@ -104,8 +102,8 @@ export default class QRLoginPaneComponent extends PaneComponent {
     }
 
     /**
-        Returns canvas element to insert
-    **/
+     Returns canvas element to insert
+     **/
     makeQR(data) {
         return new QRCodeStyling({
             width: 240,

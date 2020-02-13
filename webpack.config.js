@@ -4,8 +4,9 @@ const path = require("path")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const {CleanWebpackPlugin} = require("clean-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
-const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
+const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 const CopyWebpackPlugin = require("copy-webpack-plugin")
+const TerserPlugin = require('terser-webpack-plugin')
 
 require("@babel/polyfill")
 
@@ -85,6 +86,10 @@ const config = {
                 },
             },
         ]
+    },
+    optimization: {
+        // minimize: true,
+        // minimizer: [new TerserPlugin()],
     },
 }
 

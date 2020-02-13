@@ -1,6 +1,4 @@
-import {MTProto} from "../../mtproto/external"
 import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash} from "./util"
-import TimeManager, {tsNow} from "../../mtproto/timeManager"
 import {Dialog} from "./Dialog";
 import {Manager} from "../manager";
 import {Peer} from "../peers/objects/Peer";
@@ -12,6 +10,7 @@ import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import {MessageFactory} from "../messages/MessageFactory"
 import API from "../telegram/API"
 import PeersManager from "../peers/objects/PeersManager"
+import MTProto from "../../mtproto/external"
 
 class DialogManager extends Manager {
     constructor() {
@@ -37,7 +36,7 @@ class DialogManager extends Manager {
         setInterval(() => {
             DialogsStore.toArray().forEach(dialog => {
                 dialog.actions.forEach(rawUpdate => {
-                    if (rawUpdate.time + 5 <= tsNow(true)) {
+                    if (rawUpdate.time + 5 <= MTProto.TimeManager.now(true)) {
                         dialog.removeAction(rawUpdate)
                     }
                 })
@@ -69,7 +68,7 @@ class DialogManager extends Manager {
             if (!peer || !peer.dialog) {
                 console.log("good game telegram, good game")
             } else {
-                update.time = tsNow(true)
+                update.time = MTProto.TimeManager.now(true)
                 peer.dialog.addAction(update)
             }
         })
@@ -81,7 +80,7 @@ class DialogManager extends Manager {
             if (!peer || !peer.dialog) {
                 console.log("good game telegram, good game")
             } else {
-                update.time = tsNow(true)
+                update.time = MTProto.TimeManager.now(true)
                 peer.dialog.addAction(update)
             }
         })
@@ -296,7 +295,7 @@ class DialogManager extends Manager {
         }
 
         if (this.dialogsOffsetDate) {
-            this.offsetDate = this.dialogsOffsetDate + TimeManager.timeOffset
+            this.offsetDate = this.dialogsOffsetDate
         }
 
         return API.messages.getDialogs(params).then(Dialogs => {

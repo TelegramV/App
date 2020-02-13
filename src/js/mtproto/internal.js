@@ -264,6 +264,12 @@ class MobileProtocol {
             type: "connectionLost"
         })
     }
+
+    syncTimeWithFrontend() {
+        this.workerPostMessage({
+            type: "syncTime"
+        })
+    }
 }
 
 // NEVER USE THIS THING OUTSIDE mtproto FOLDER

@@ -5,12 +5,36 @@ import {AppPermanentStorage} from "../api/common/storage"
 import UpdatesManager from "../api/updates/updatesManager"
 import AppEvents from "../api/eventBus/AppEvents"
 
+const TimeManager = {
+    lastMessageID: {},
+    timeOffset: {},
+    now(seconds, dcId) {
+        let t = +new Date() + (this.timeOffset[dcId !== undefined ? dcId : AppConfiguration.mtproto.dataCenter.default] || 0)
+        return seconds ? Math.floor(t / 1000) : t
+    },
+    generateMessageID(dcID) {
+        return MTProto.performWorkerTask("time_generateMessageID", {
+            dcID
+        }).then(data => {
+            TimeManager.lastMessageID = data.time.lastMessageID
+            TimeManager.timeOffset = data.time.timeOffset
+            return data.messageId
+        })
+    }
+
+}
+
 let lastTaskId = 0
 let waitingTasks = new Map()
 
 const MTProtoWorker = new MobileProtoWorker()
 
 MTProtoWorker.addEventListener("message", event => {
+    if (event.data.time) {
+        TimeManager.lastMessageID = event.data.time.lastMessageID
+        TimeManager.timeOffset = event.data.time.timeOffset
+    }
+
     if (event.data.type === "update") {
         MTProto.UpdatesManager.process(event.data.update)
     } else if (event.data.type === "readStorage") {
@@ -26,6 +50,9 @@ MTProtoWorker.addEventListener("message", event => {
         AppEvents.General.fire("connectionLost")
     } else if (event.data.type === "connectionRestored") {
         AppEvents.General.fire("connectionRestored")
+    } else if (event.data.type === "syncTime") {
+        TimeManager.lastMessageID = event.data.time.lastMessageID
+        TimeManager.timeOffset = event.data.time.timeOffset
     }
 
     if (event.data.taskId) {
@@ -68,7 +95,6 @@ function performTask(task, data) {
         })
     })
 }
-
 
 // USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 
@@ -149,6 +175,7 @@ class MTProtoBridge {
             MTProto: this
         })
         this.UpdatesManager = UpdatesManager
+        this.TimeManager = TimeManager
     }
 
     connect() {

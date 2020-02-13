@@ -3,7 +3,6 @@ import PeersStore from "../store/PeersStore"
 import PeersManager from "../peers/objects/PeersManager"
 import {Peer} from "../peers/objects/Peer"
 import AppEvents from "../eventBus/AppEvents"
-import {tsNow} from "../../mtproto/timeManager"
 
 /**
  * @param rawUpdate
@@ -285,7 +284,7 @@ export class ChannelsUpdateProcessor {
                 self.processQueue(channelId)
             },
             onFail: (type) => {
-                self.latestDifferenceTime = tsNow(true)
+                self.latestDifferenceTime = MTProto.TimeManager.now(true)
                 channelQueue.isWaitingForDifference = true
                 channelQueue.isProcessing = false
 
@@ -399,7 +398,7 @@ export class ChannelsUpdateProcessor {
         }
 
         this.latestDifferencePeer = peer
-        this.latestDifferenceTime = tsNow(true)
+        this.latestDifferenceTime = MTProto.TimeManager.now(true)
 
         console.warn("[channel] fetching difference")
 

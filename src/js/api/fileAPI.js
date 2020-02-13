@@ -3,7 +3,6 @@ import Random from "../mtproto/utils/random"
 import AppCache from "./cache"
 import {getInputPeerFromPeer} from "./dialogs/util"
 import {Peer} from "./peers/objects/Peer";
-import TimeManager from "../mtproto/timeManager";
 import AppConfiguration from "../configuration";
 import {bytesAsHex, bytesConcatBuffer, bytesFromHex} from "./Bytes"
 
@@ -63,7 +62,7 @@ export class FileAPI {
         const bigFileLimit = 1024 * 1024 * 10
         const parts = Math.ceil(size / splitSize)
         const isBig = size >= bigFileLimit
-        const id = TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
+        const id = await MTProto.TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
         const inputFile = {
             _: isBig ? "inputFileBig" : "inputFile",
             parts: parts,

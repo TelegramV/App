@@ -1,4 +1,3 @@
-import {tsNow} from "../../mtproto/timeManager";
 import {DraftMessage} from "./DraftMessage"
 import {DialogApi} from "./DialogApi"
 import {ReactiveObject} from "../../ui/v/reactive/ReactiveObject"
@@ -7,6 +6,7 @@ import PeersStore from "../store/PeersStore"
 import AppEvents from "../eventBus/AppEvents"
 import {actionTypesMapping} from "../../ui/pages/main/sidebars/left/dialog/Fragments/DialogTextFragment"
 import DialogsManager from "./DialogsManager"
+import MTProto from "../../mtproto/external"
 
 export class Dialog extends ReactiveObject {
 
@@ -175,7 +175,7 @@ export class Dialog extends ReactiveObject {
     }
 
     get isMuted(): boolean {
-        return this.notifySettings.mute_until >= tsNow(true)
+        return this.notifySettings.mute_until >= MTProto.TimeManager.now(true)
     }
 
     get unreadMark(): boolean {

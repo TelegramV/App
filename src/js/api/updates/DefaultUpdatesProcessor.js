@@ -1,7 +1,6 @@
 import MTProto from "../../mtproto/external"
 import PeersManager from "../peers/objects/PeersManager"
 import AppEvents from "../eventBus/AppEvents"
-import {tsNow} from "../../mtproto/timeManager"
 
 /**
  * @param rawUpdate
@@ -118,7 +117,7 @@ export class DefaultUpdatesProcessor {
                     self.processQueue()
                 },
                 onFail(type) {
-                    self.latestDifferenceTime = tsNow(true)
+                    self.latestDifferenceTime = MTProto.TimeManager.now(true)
                     self.isWaitingForDifference = true
                     self.queueIsProcessing = false
 
@@ -252,7 +251,7 @@ export class DefaultUpdatesProcessor {
             debugger
         }
 
-        this.latestDifferenceTime = tsNow(true)
+        this.latestDifferenceTime = MTProto.TimeManager.now(true)
 
         return MTProto.invokeMethod("updates.getDifference", {
             pts: State.pts || this.updatesManager.State.pts,
