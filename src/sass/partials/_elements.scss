@@ -45,6 +45,7 @@
 
     .card-icon {
         overflow: hidden;
+        flex-shrink: 0;
     }
 
     .card-info {

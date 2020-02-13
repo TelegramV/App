@@ -273,7 +273,7 @@ class BubblesComponent extends VComponent {
                 message={message}/>, $group.querySelector(".bubbles-list"))
         } else {
             // TODO fix saved messages
-            const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer
+            const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage
             const avatar = !hideAvatar ? <MessageAvatarComponent id={`message-${message.id}-avatar`}
                                                       show={!hideAvatar}
                                                       message={message}/> : ""

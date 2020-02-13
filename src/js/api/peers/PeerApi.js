@@ -146,6 +146,34 @@ export class PeerApi {
         })
     }
 
+    fetchParticipants(offset, limit = 33) {
+        if (this._peer.type === "channel") {
+            return MTProto.invokeMethod("channels.getParticipants", {
+                channel: this._peer.inputPeer,
+                filter: {
+                    _: "channelParticipantsRecent"
+                },
+                offset: offset,
+                limit: limit
+            }).then(l => {
+                console.log(l)
+                PeersManager.fillPeersFromUpdate(l)
+                return l.participants
+            })
+        } else if(this._peer.type === "chat") {
+            if(this._peer.full && this._peer.full.participants) {
+                return Promise.resolve(this._peer.full.participants.participants)
+            }
+
+            return this._peer.fetchFull().then(l =>{
+                return this._peer.full.participants.participants
+            })
+        } else
+        {
+            return Promise.resolve()
+        }
+    }
+
     readHistory(maxId) {
         if (this._peer.type === "channel") {
             return MTProto.invokeMethod("channels.readHistory", {

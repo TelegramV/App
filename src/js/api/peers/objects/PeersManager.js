@@ -62,7 +62,6 @@ class PeerManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateNotifySettings", update => {
             if(update.peer._ === "notifyPeer") {
-                console.log(update)
                 let peer
                 if(update.peer.peer._ === "peerUser") {
                     peer = PeersStore.get("user", update.peer.peer.user_id)

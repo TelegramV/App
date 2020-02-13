@@ -4,13 +4,19 @@ export default class TabSelectorComponent extends Component {
     constructor(props) {
         super(props);
         let items = this.props.items;
+        this.updateFragments(this.props.items)
+
+    }
+
+    updateFragments(items) {
+        this.props.items = items
         this.fragments = [];
         for(let i = 0; i<items.length; i++) {
             let item = items[i];
             if(item.selected) this.state.selected = i;
             this.fragments.push(<TabSelectorItemFragment tabIndex={i} text={item.text} click={this._itemClick.bind(this)} hidden={!!item.hidden} selected={!!item.selected}/>)
         }
-
+        this.__patch()
     }
 
     h() {

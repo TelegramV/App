@@ -162,6 +162,140 @@
           &:hover {
             background-color: $light;
           }
+        }
+
+        &.member-list {
+          padding: 10px;
+        }
+
+        &.audio-list {
+          padding: 10px;
+
+          >* {
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: row;
+            text-align: left;
+            width: 100%;
+            transition: anim(background-color);
+            border-radius: 6px;
+            overflow: hidden;
+
+            &:hover {
+              background-color: $light;
+            }
+
+            .play {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+              cursor: pointer;
+              background-size: cover;
+              color: white;
+
+              &:before {
+                font-size: 1.8em;
+              }
+              width: 48px;
+              height: 48px;
+              border-radius: 100%;
+              background-color: $blue;
+            }
+
+            .details {
+              display: flex;
+              flex-direction: column;
+              margin-left: 11px;
+              margin-top: 5px;
+              word-break: break-word;
+
+              .title {
+                margin-bottom: 3px;
+              }
+
+              .description {
+                color: $darkgrey;
+                font-size: 0.8em;
+              }
+
+              .time {
+                color: $darkgrey;
+                font-size: 0.8em;
+              }
+            }
+          }
+        }
+
+        &.docs-list {
+          padding: 10px;
+
+          >* {
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: row;
+            text-align: left;
+            width: 100%;
+            transition: anim(background-color);
+            border-radius: 6px;
+            overflow: hidden;
+
+            &:hover {
+              background-color: $light;
+            }
+
+
+            .card-info {
+              margin-left: 11px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              // TODO js polyfill
+              -webkit-line-clamp: 2;
+              -webkit-box-orient: vertical;
+            }
+          }
+        }
+
+        >.member {
+          padding: 10px;
+          display: flex;
+          flex-direction: row;
+          text-align: left;
+          width: 100%;
+          transition: anim(background-color);
+          border-radius: 6px;
+
+          &:hover {
+            background-color: $light;
+          }
+
+          .avatar {
+            --avatar-size: 48px;
+          }
+
+          .details {
+            display: flex;
+            flex-direction: column;
+            margin-left: 11px;
+            margin-top: 5px;
+            word-break: break-word;
+
+            .name {
+              margin-bottom: 3px;
+            }
+
+            .status {
+              color: $darkgrey;
+              &.online {
+                color: $blue;
+              }
+            }
+          }
+        }
+
+        >.link {
 
           .photo {
             max-width: 48px;
