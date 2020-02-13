@@ -54,10 +54,20 @@ const searchGlobal = (params) => {
     })
 }
 
+const getChats = id => {
+    return MTProto.invokeMethod("messages.getChats", {
+        id
+    }).then(Chats => {
+        console.log(Chats)
+        return PeersManager.fillPeersFromUpdate(Chats).chats
+    })
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
     searchGlobal: searchGlobal,
+    getChats: getChats,
 }
 
 export default messages

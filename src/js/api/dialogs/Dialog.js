@@ -58,14 +58,17 @@ export class Dialog extends ReactiveObject {
 
     get actionText() {
         let typing = []
+        let other = []
 
         const mapped = Array.from(this.actions.entries()).map(([peer, action]) => {
             const actionString = action.text
 
             if (peer && actionString) {
-                if (actionString === actionTypesMapping.sendMessageTypingAction) {
-                    if (action.showUsername) {
+                if (action.showUsername) {
+                    if (actionString === actionTypesMapping.sendMessageTypingAction) {
                         typing.push(peer.firstName)
+                    } else {
+                        other.push(peer.firstName)
                     }
                 }
 
@@ -78,16 +81,16 @@ export class Dialog extends ReactiveObject {
             return false
         })
 
-        if (typing.length === 2) {
+        if (typing.length === 2 && other.length === 0) {
             return {
                 user: `${typing[0]} and ${typing[1]} are typing`,
                 action: ""
             }
         }
 
-        if (typing.length > 2) {
+        if ((typing.length + other.length) >= 2) {
             return {
-                user: `${typing.length} members are typing`,
+                user: `${typing.length + other.length} members are typing`,
                 action: ""
             }
         }
@@ -206,8 +209,12 @@ export class Dialog extends ReactiveObject {
     }
 
     refresh() {
-        return DialogsManager.getPeerDialogs(this.peer).then(() => {
-            this.fire("refreshed")
+        return DialogsManager.getPeerDialogs(this.peer).then(dialogs => {
+            if (dialogs.length === 0) {
+                this.fire("deleted")
+            } else {
+                this.fire("refreshed")
+            }
         })
     }
 

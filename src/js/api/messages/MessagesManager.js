@@ -7,6 +7,7 @@ import {getPeerTypeFromType} from "../dialogs/util"
 import {MessageFactory} from "./MessageFactory"
 import AppEvents from "../eventBus/AppEvents"
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
+import API from "../telegram/API"
 
 class MessageManager extends Manager {
     init() {
@@ -19,6 +20,10 @@ class MessageManager extends Manager {
          * @param {Object} lastMessage
          */
         const updatePeerLastMessage = (peer, lastMessage) => {
+            if (lastMessage._ === "messageEmpty") {
+                return
+            }
+
             if (!peer) {
                 console.error("BUG: peer was not found", lastMessage)
                 return
@@ -73,7 +78,7 @@ class MessageManager extends Manager {
         })
 
         MTProto.UpdatesManager.subscribe("updateShortSentMessage", async update => {
-            updatePeerLastMessage(update.dialog.peer, update)
+            updatePeerLastMessage(update.peer, update)
         })
 
         MTProto.UpdatesManager.subscribe("updateShortMessage", update => {
@@ -81,7 +86,16 @@ class MessageManager extends Manager {
         })
 
         MTProto.UpdatesManager.subscribe("updateShortChatMessage", update => {
-            updatePeerLastMessage(PeersStore.get("chat", update.chat_id), update)
+            const chat = PeersStore.get("chat", update.chat_id)
+
+            if (!chat) {
+                API.messages.getChats([update.chat_id]).then(chats => {
+                    console.log(chats)
+                    updatePeerLastMessage(chats[0], update)
+                })
+            } else {
+                updatePeerLastMessage(chat, update)
+            }
         })
 
         MTProto.UpdatesManager.subscribe("updateNewMessage", update => {
@@ -152,8 +166,6 @@ class MessageManager extends Manager {
 
                     if (!dialog.peer.messages.last) {
                         dialog.refresh()
-                    } else {
-                        console.log(dialog.peer.messages.last)
                     }
 
                     dialog.peer.messages.fireTransaction("deleteMessages", {

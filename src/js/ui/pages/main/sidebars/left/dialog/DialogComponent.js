@@ -8,6 +8,7 @@ import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent"
 import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
 import {DialogFragment} from "./Fragments/DialogFragment"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
+import {VUI} from "../../../../../v/VUI"
 
 export class DialogComponent extends VComponent {
 
@@ -55,11 +56,13 @@ export class DialogComponent extends VComponent {
             .on("updateReadInboxMaxId", this.onDialogReadHistory)
             .on("updateReadOutboxMaxId", this.onDialogReadHistory)
             .on("newMessage", this.onDialogNewMessage)
+            .on("editMessage", this.onDialogEditMessage)
             .on("updateSingle", this.onDialogUpdateSingle)
             .on("updatePinned", this.onDialogUpdatePinned)
             .on("updateFolderId", this.onDialogUpdateFolderId)
             .on("updateActions", this.onDialogUpdateActions)
             .on("refreshed", this.onDialogRefreshed)
+            .on("deleted", this.onDialogDeleted)
             .on("deleteMessage", this.onDialogDeleteMessage)
             .on("deleteMessages", this.onDialogDeleteMessage)
 
@@ -112,9 +115,7 @@ export class DialogComponent extends VComponent {
     }
 
     onDialogDeleteMessage = _ => {
-        if (this.dialog.messages.last) {
-            this._patchMessageAndResort()
-        }
+        this._patchMessageAndResort()
     }
 
     onDialogUpdateActions = _ => {
@@ -125,8 +126,19 @@ export class DialogComponent extends VComponent {
         this._patchMessageAndResort()
     }
 
+    onDialogEditMessage = event => {
+        console.log("edited", event)
+        if (event.message === this.dialog.messages.last) {
+            this._patchMessage()
+        }
+    }
+
     onDialogRefreshed = _ => {
         this._patchMessageAndResort()
+    }
+
+    onDialogDeleted = _ => {
+        this.__delete()
     }
 
     onDialogUpdateSingle = _ => {
@@ -189,6 +201,13 @@ export class DialogComponent extends VComponent {
     }
 
     _patchMessage = () => {
+        if (!this.dialog.messages.last) {
+            VUI.hideElement(this.$el)
+            return
+        } else {
+            VUI.showElement(this.$el)
+        }
+
         if (this.__.mounted) {
             this.$el.__message = this.dialog.peer.messages.last
             this.$el.setAttribute("data-message-id", this.dialog.peer.messages.last.id)
@@ -202,6 +221,14 @@ export class DialogComponent extends VComponent {
     }
 
     _patchReadStatus = () => {
+        if (!this.dialog.messages.last) {
+            VUI.hideElement(this.$el)
+            return
+        } else {
+            VUI.showElement(this.$el)
+        }
+
+
         if (this.dialog.peer.messages.last.isOut && !this.dialog.peer.isSelf) {
             this.$el.classList.add("sent")
 
@@ -217,6 +244,13 @@ export class DialogComponent extends VComponent {
     }
 
     _patchMessageAndResort = () => {
+        if (!this.dialog.messages.last) {
+            VUI.hideElement(this.$el)
+            return
+        } else {
+            VUI.showElement(this.$el)
+        }
+
         if (this.dialog.pinned !== this.$el.__pinned) {
 
             if (this.dialog.isPinned) {
@@ -275,6 +309,11 @@ export class DialogComponent extends VComponent {
      * @private
      */
     _findRenderedDialogToInsertBefore = $dialogs => {
+        if (!this.dialog.messages.last) {
+            return undefined
+        }
+
+
         const dialog = this.dialog
         const renderedDialogs = $dialogs.childNodes
 

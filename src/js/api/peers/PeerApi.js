@@ -49,7 +49,7 @@ export class PeerApi {
 
         PeersManager.fillPeersFromUpdate(Messages)
 
-        const messages = Messages.messages.map(rawMessage => {
+        const messages = Messages.messages.filter(m => m._ !== "messageEmpty").map(rawMessage => {
             return MessageFactory.fromRaw(this.peer, rawMessage)
         })
 
@@ -159,16 +159,15 @@ export class PeerApi {
                 PeersManager.fillPeersFromUpdate(l)
                 return l.participants
             })
-        } else if(this.peer && this.peer.type === "chat") {
-            if(this.peer.full && this.peer.full.participants) {
+        } else if (this.peer && this.peer.type === "chat") {
+            if (this.peer.full && this.peer.full.participants) {
                 return Promise.resolve(this.peer.full.participants.participants)
             }
 
-            return this.peer.fetchFull().then(l =>{
+            return this.peer.fetchFull().then(l => {
                 return this.peer.full.participants.participants
             })
-        } else
-        {
+        } else {
             return Promise.resolve()
         }
     }
@@ -260,7 +259,7 @@ export class PeerApi {
 
         // TODO fix albums
         let randomId = genMsgId(AppConfiguration.mtproto.dataCenter.default)
-        let message = new TextMessage(this.peer.dialog)
+        let message = new TextMessage(this.peer)
         message.fillRaw({
             pFlags: {
                 out: true,
@@ -316,14 +315,14 @@ export class PeerApi {
             }).then(response => {
                 if (response.updates) {
                     response.updates.forEach(l => {
-                        if (l._ === "updateMessageID") l.dialog = this.peer.dialog
+                        if (l._ === "updateMessageID") l.peer = this.peer
                     })
                 } else {
 
                     // this.peer.messages._sendingMessages.set(response.id, randomId)
                     // response.random_id = randomId
                 }
-                response.dialog = this.peer.dialog
+                response.peer = this.peer
                 response.message = text
                 response.reply_to_msg_id = replyTo
                 response.silent = silent

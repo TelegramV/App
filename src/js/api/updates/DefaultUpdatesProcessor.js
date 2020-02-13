@@ -37,6 +37,7 @@ export class DefaultUpdatesProcessor extends UpdatesProcessor {
         if (queue.length > 0 && !queue.isProcessing) {
             if (queue.isWaitingForDifference) {
                 console.error("[default] BUG: processing queue while waiting for difference")
+                return
             }
 
             queue.isProcessing = true

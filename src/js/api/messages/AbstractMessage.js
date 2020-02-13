@@ -100,7 +100,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
             return false
         }
 
-        return this.to.messages.readOutboxMaxId >= this.id
+        return this.to.messages.readOutboxMaxId >= this.id || (this.isOut && this.isPost)
     }
 
     get text(): string {
