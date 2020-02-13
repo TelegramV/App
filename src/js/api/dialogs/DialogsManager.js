@@ -35,9 +35,9 @@ class DialogManager extends Manager {
         // very dirty thing, but fuck, no time left
         setInterval(() => {
             DialogsStore.toArray().forEach(dialog => {
-                dialog.actions.forEach(rawUpdate => {
-                    if (rawUpdate.time + 5 <= MTProto.TimeManager.now(true)) {
-                        dialog.removeAction(rawUpdate)
+                dialog.actions.forEach((action, peer) => {
+                    if (action.time + 5 <= MTProto.TimeManager.now(true)) {
+                        dialog.removeAction(peer)
                     }
                 })
             })
@@ -68,7 +68,6 @@ class DialogManager extends Manager {
             if (!peer || !peer.dialog) {
                 console.log("good game telegram, good game")
             } else {
-                update.time = MTProto.TimeManager.now(true)
                 peer.dialog.addAction(update)
             }
         })
@@ -80,7 +79,6 @@ class DialogManager extends Manager {
             if (!peer || !peer.dialog) {
                 console.log("good game telegram, good game")
             } else {
-                update.time = MTProto.TimeManager.now(true)
                 peer.dialog.addAction(update)
             }
         })
@@ -120,9 +118,21 @@ class DialogManager extends Manager {
             console.warn("updateChannel", update)
 
             this.getPeerDialogs(update.__peer).then(dialogs => {
-                AppEvents.Dialogs.fire("gotNewMany", {
-                    dialogs
-                })
+                if (dialogs.length === 0) {
+                    AppEvents.Dialogs.fire("hideDialogByPeer", {
+                        peer: update.__peer
+                    })
+                } else {
+                    if (dialogs[0].peer.isLeft) {
+                        AppEvents.Dialogs.fire("hideDialogByPeer", {
+                            peer: update.__peer
+                        })
+                    } else {
+                        AppEvents.Dialogs.fire("gotNewMany", {
+                            dialogs
+                        })
+                    }
+                }
             })
         })
 
@@ -130,9 +140,21 @@ class DialogManager extends Manager {
             console.warn("updateChannelNoDialog", update)
 
             this.getPeerDialogs(update.__peer).then(dialogs => {
-                AppEvents.Dialogs.fire("gotNewMany", {
-                    dialogs
-                })
+                if (dialogs.length === 0) {
+                    AppEvents.Dialogs.fire("hideDialogByPeer", {
+                        peer: update.__peer
+                    })
+                } else {
+                    if (dialogs[0].peer.isLeft) {
+                        AppEvents.Dialogs.fire("hideDialogByPeer", {
+                            peer: update.__peer
+                        })
+                    } else {
+                        AppEvents.Dialogs.fire("gotNewMany", {
+                            dialogs
+                        })
+                    }
+                }
             })
             // await this.findOrFetch("channel", update.channel_id)
         })
@@ -417,6 +439,17 @@ class DialogManager extends Manager {
 
             return dialog
         }
+    }
+
+    onLogout() {
+        this.allWasFetched = false
+
+        this.latestDialog = undefined
+        this.dialogsOffsetDate = 0 // TODO
+        this.offsetDate = 0
+        this.count = undefined
+
+        this.isFetched = false
     }
 }
 

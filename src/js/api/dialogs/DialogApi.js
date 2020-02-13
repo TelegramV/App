@@ -18,8 +18,11 @@ export class DialogApi {
     setPinned(pinned: boolean) {
         return MTProto.invokeMethod("messages.toggleDialogPin", {
             peer: this._dialog.input,
-            pinned
+            pFlags: {
+                pinned
+            }
         }).then(Bool => {
+            console.log(Bool, pinned)
             if (Bool._ === "boolTrue") {
                 this._dialog.pinned = pinned
             }
@@ -27,7 +30,7 @@ export class DialogApi {
     }
 
     setArchived(set: boolean) {
-        return MTProto.invokeMethod("folders.editPeerFolders",  {
+        return MTProto.invokeMethod("folders.editPeerFolders", {
             folder_peers: [
                 {
                     _: "inputFolderPeer",

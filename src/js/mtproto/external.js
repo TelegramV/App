@@ -237,6 +237,12 @@ class MTProtoBridge {
             dcID
         })
     }
+
+    logout() {
+        return this.performWorkerTask("logout").then(() => {
+            AppPermanentStorage.removeItem("authorizationData")
+        })
+    }
 }
 
 // USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER

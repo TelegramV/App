@@ -70,6 +70,13 @@ self.addEventListener("message", event => {
             })
         } else if (task === "changeDefaultDc") {
             MTProtoInternal.changeDefaultDC(taskData.dcID)
+            postMessageWithTime({taskId: taskId})
+        } else if (task === "logout") {
+            MTProtoInternal.logout().then(() => {
+                postMessageWithTime({
+                    taskId: taskId,
+                })
+            })
         }
     } catch (e) {
         postMessageWithTime({taskId: taskId, taskResult: e, failed: true})

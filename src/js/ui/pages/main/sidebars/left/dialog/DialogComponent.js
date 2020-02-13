@@ -7,6 +7,7 @@ import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
 import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent"
 import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
 import {DialogFragment} from "./Fragments/DialogFragment"
+import AppEvents from "../../../../../../api/eventBus/AppEvents"
 
 export class DialogComponent extends VComponent {
 
@@ -37,6 +38,11 @@ export class DialogComponent extends VComponent {
         }
 
         this._contextMenuListener = dialogContextMenu(this.dialog)
+    }
+
+    appEvents(E) {
+        E.bus(AppEvents.Dialogs)
+            .on("hideDialogByPeer", this.onHideDialogByPeer)
     }
 
     reactive(R) {
@@ -147,6 +153,13 @@ export class DialogComponent extends VComponent {
 
     onPeerUpdateUserStatus = _ => {
         this._patchStatus()
+    }
+
+    onHideDialogByPeer = event => {
+        if (event.peer === this.dialog.peer) {
+            this.dialog.peer.dialog = undefined
+            this.__delete()
+        }
     }
 
     _patchActive = () => {

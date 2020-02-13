@@ -55,7 +55,7 @@ class MessageManager extends Manager {
             message.init()
 
             if (message.from && message.from.type === "user") {
-                peer.dialog.removeActionByUserId(message.from.id)
+                peer.dialog.removeAction(message.from)
             }
 
             peer.dialog.fire("newMessage", {

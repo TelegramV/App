@@ -161,6 +161,10 @@ export class Peer extends ReactiveObject {
         return this.raw.pFlags && this.raw.pFlags.self === true
     }
 
+    get isLeft() {
+        return this.raw.pFlags && this.raw.pFlags.left === true
+    }
+
     get inputPeer() {
         return this.isMin ? this.inputPeerFromMessage : getInputPeerFromPeer(this.type, this.id, this.accessHash)
     }
