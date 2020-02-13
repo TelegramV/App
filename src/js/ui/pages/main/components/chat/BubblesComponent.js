@@ -267,19 +267,18 @@ class BubblesComponent extends VComponent {
                 }
             }
         }
+        const msg = <MessageComponent
+            intersectionObserver={this.intersectionObserver}
+            message={message}/>
         if ($group) {
-            return (!prepend ? VRDOM.prepend : VRDOM.append)(<MessageComponent
-                intersectionObserver={this.intersectionObserver}
-                message={message}/>, $group.querySelector(".bubbles-list"))
+            return (!prepend ? VRDOM.prepend : VRDOM.append)(msg, $group.querySelector(".bubbles-list"))
         } else {
             // TODO fix saved messages
             const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage
             const avatar = !hideAvatar ? <MessageAvatarComponent id={`message-${message.id}-avatar`}
                                                       show={!hideAvatar}
                                                       message={message}/> : ""
-            $message = $mount(<div className={["bubble-group", isOut ? "out" : "in"]}>{avatar}<div className="bubbles-list"><MessageComponent
-                intersectionObserver={this.intersectionObserver}
-                message={message}/></div></div>, this.bubblesInnerRef.$el)
+            $message = $mount(<div className={["bubble-group", isOut ? "out" : "in"]}>{avatar}<div className="bubbles-list">{msg}</div></div>, this.bubblesInnerRef.$el)
             const $bubblesList = $message.querySelector(".bubbles-list")
             return $bubblesList.childNodes[!prepend ? $bubblesList.childNodes.length - 1 : 0]
         }

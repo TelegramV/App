@@ -125,7 +125,7 @@
                     }
 
                     .inline-keyboard {
-                        margin-left: -6px;
+                        //margin-left: -6px;
                     }
                 }
 
@@ -140,7 +140,7 @@
                     }
 
                     .inline-keyboard {
-                        margin-right: -6px;
+                        //margin-right: -6px;
                     }
                 }
             }
@@ -158,38 +158,50 @@
                 &.in {
                     margin-left: 0;
                     .inline-keyboard {
-                        margin-left: 5px !important;
+                        margin-left: 11px !important;
                     }
                 }
 
                 &.out {
                     margin-right: 0;
                     .inline-keyboard {
-                        margin-right: 5px !important;
+                        margin-right: 11px !important;
                     }
                 }
 
                 .bubble {
 
                     &.in {
-                        padding-left: 10px;
+                        padding-left: 10px !important;
                         &.no-pad {
                             padding-left: 0;
                         }
                         border-bottom-right-radius: 12px;
-                        border-bottom-left-radius: 0;
+                        &:not(.transparent) {
+                            border-bottom-left-radius: 0;
+                        }
+
+                        &.transparent {
+                            border-bottom-left-radius: 12px;
+                        }
 
                         -webkit-mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left-6px.svg");
                         mask-image: url("../../public/static/images/tail-left.svg"), url("../../public/static/images/rect-left-6px.svg");
                     }
 
                     &.out {
-                        padding-right: 10px;
+                        padding-right: 10px !important;
                         &.no-pad {
                             padding-right: 0;
                         }
                         border-bottom-left-radius: 12px;
-                        border-bottom-right-radius: 0;
+                        &:not(.transparent) {
+                            border-bottom-right-radius: 0;
+                        }
+
+                        .transparent {
+                            border-bottom-right-radius: 12px;
+                        }
 
                         -webkit-mask-image: url("../../public/static/images/tail-right.svg"), url("../../public/static/images/rect-right-6px.svg");
                         mask-image: url("../../public/static/images/tail-right.svg"), url("../../public/static/images/rect-right-6px.svg");
@@ -287,18 +299,18 @@
 
             &.transparent {
                 border-radius: 12px;
-                -webkit-mask-image: none;
-                mask-image: none;
+                -webkit-mask-image: none !important;
+                mask-image: none !important;
 
                 &.in {
-                    padding-left: 0;
-                    margin-left: 10px;
+                    padding-left: 0 !important;
+                    //margin-left: 10px;
 
                 }
 
                 &.out {
-                    padding-right: 0;
-                    margin-right: 10px;
+                    padding-right: 0 !important;
+                    //margin-right: 10px;
                 }
             }
 
@@ -1150,7 +1162,6 @@
 
         .bubble {
             background-color: #ffffff;
-            margin-left: -6px;
         }
     }
 

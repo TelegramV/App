@@ -83,8 +83,7 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
     const topLevelClasses = {
         "channel": message.isPost,
         "out": !message.isPost && message.isOut,
-        "in": message.isPost || !message.isOut,
-        "hide-tail": transparent,
+        "in": message.isPost || !message.isOut
     }
 
     const inlineKeyboard = message.replyMarkup && message.replyMarkup._ === "replyInlineMarkup" ?

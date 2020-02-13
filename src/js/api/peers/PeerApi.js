@@ -147,26 +147,25 @@ export class PeerApi {
     }
 
     fetchParticipants(offset, limit = 33) {
-        if (this._peer.type === "channel") {
+        if (this.peer.type === "channel") {
             return MTProto.invokeMethod("channels.getParticipants", {
-                channel: this._peer.inputPeer,
+                channel: this.peer.inputPeer,
                 filter: {
                     _: "channelParticipantsRecent"
                 },
                 offset: offset,
                 limit: limit
             }).then(l => {
-                console.log(l)
                 PeersManager.fillPeersFromUpdate(l)
                 return l.participants
             })
-        } else if(this._peer.type === "chat") {
-            if(this._peer.full && this._peer.full.participants) {
-                return Promise.resolve(this._peer.full.participants.participants)
+        } else if(this.peer && this.peer.type === "chat") {
+            if(this.peer.full && this.peer.full.participants) {
+                return Promise.resolve(this.peer.full.participants.participants)
             }
 
-            return this._peer.fetchFull().then(l =>{
-                return this._peer.full.participants.participants
+            return this.peer.fetchFull().then(l =>{
+                return this.peer.full.participants.participants
             })
         } else
         {
@@ -215,7 +214,7 @@ export class PeerApi {
                              sound
                          }) {
         return MTProto.invokeMethod("account.updateNotifySettings", {
-            peer: {_: "inputNotifyPeer", peer: this._peer.inputPeer},
+            peer: {_: "inputNotifyPeer", peer: this.peer.inputPeer},
             settings: {
                 _: "inputPeerNotifySettings",
                 pFlags: {
@@ -226,11 +225,11 @@ export class PeerApi {
                 }
             }
         }).then(l => {
-            if (l._ === "boolTrue" && this._peer.full) {
-                if (mute_until !== undefined) this._peer.full.notify_settings.mute_until = mute_until
-                if (silent !== undefined) this._peer.full.notify_settings.silent = silent
-                if (sound !== undefined) this._peer.full.notify_settings.sound = sound
-                if (show_previews !== undefined) this._peer.full.notify_settings.show_previews = show_previews
+            if (l._ === "boolTrue" && this.peer.full) {
+                if (mute_until !== undefined) this.peer.full.notify_settings.mute_until = mute_until
+                if (silent !== undefined) this.peer.full.notify_settings.silent = silent
+                if (sound !== undefined) this.peer.full.notify_settings.sound = sound
+                if (show_previews !== undefined) this.peer.full.notify_settings.show_previews = show_previews
             }
         })
     }
