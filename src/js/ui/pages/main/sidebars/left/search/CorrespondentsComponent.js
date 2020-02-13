@@ -2,25 +2,22 @@ import VComponent from "../../../../../v/vrdom/component/VComponent"
 import {PeopleListItemFragment} from "./PeopleListItemFragment"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import TopPeers from "../../../../../../api/peers/TopPeers"
-import {VUI} from "../../../../../v/VUI"
-import UIEvents from "../../../../../eventBus/UIEvents"
 
 export class CorrespondentsComponent extends VComponent {
+
+    hidden = false
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
             .on("gotCorrespondents", this.onGotCorrespondents)
             .on("updatePhotoSmall", this.onPeersUpdatePhotoSmall)
             .on("updatePhotoSmall", this.onPeersUpdatePhotoSmall)
-
-        E.bus(UIEvents.LeftSidebar)
-            .on("searchInputUpdated", this.onSearchInputUpdated)
     }
 
     h() {
         if (TopPeers.correspondents.size === 0) {
             return (
-                <div className="people hidden">
+                <div className="people hidden section">
                     <div className="section-title">People</div>
                     <div className="people-list"/>
                 </div>
@@ -28,7 +25,7 @@ export class CorrespondentsComponent extends VComponent {
         }
 
         return (
-            <div className="people">
+            <div className="people section">
                 <div className="section-title">People</div>
                 <div className="people-list">
                     {
@@ -48,13 +45,5 @@ export class CorrespondentsComponent extends VComponent {
 
     onGotCorrespondents = event => {
         this.__patch()
-    }
-
-    onSearchInputUpdated = (event) => {
-        if (event.string.trim() === "") {
-            VUI.showElement(this.$el)
-        } else {
-            VUI.hideElement(this.$el)
-        }
     }
 }

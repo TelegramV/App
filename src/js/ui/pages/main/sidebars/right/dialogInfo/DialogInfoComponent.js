@@ -14,7 +14,6 @@ import {DialogInfoDocumentComponent} from "./fragments/DialogInfoDocumentCompone
 import SearchManager from "../../../../../../api/search/SearchManager"
 import {GroupPeer} from "../../../../../../api/peers/objects/GroupPeer";
 import {SupergroupPeer} from "../../../../../../api/peers/objects/SupergroupPeer";
-import PeersManager from "../../../../../../api/peers/objects/PeersManager";
 import {DialogInfoMemberComponent} from "./fragments/DialogInfoMemberComponent";
 import {DialogInfoAudioComponent} from "./fragments/DialogInfoAudioComponent";
 import {FileAPI} from "../../../../../../api/fileAPI";
@@ -194,11 +193,11 @@ export class DialogInfoComponent extends RightBarComponent {
                 this.toggleContentLoading(false)
                 this.contentPages.members.isFetching = false
 
-                if(!l) return
+                if (!l) return
 
                 this.contentPages.members.offsetId += l.length
 
-                if(l.length < this.defaultLimit) {
+                if (l.length < this.defaultLimit) {
                     this.contentPages.members.offsetId = -1
                 }
                 l.forEach(member => this.appendMember(member))
@@ -269,15 +268,15 @@ export class DialogInfoComponent extends RightBarComponent {
         const time = formatAudioTime(audio.duration)
         const title = audio.title
         const performer = audio.performer
-        const date =  new Date(rawMessage.date * 1000).toLocaleString("en", {
+        const date = new Date(rawMessage.date * 1000).toLocaleString("en", {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false
         })
 
         VRDOM.append(<DialogInfoAudioComponent title={title}
-                                              description={`${performer} · ${date}`}
-                                              time={time}/>, this.contentRefs.audio.$el)
+                                               description={`${performer} · ${date}`}
+                                               time={time}/>, this.contentRefs.audio.$el)
     }
 
     appendLinkMessage = rawMessage => {
@@ -292,7 +291,7 @@ export class DialogInfoComponent extends RightBarComponent {
         let url = null
         let displayUrl = null
         let letter = rawMessage.message[0]
-        if(!empty) {
+        if (!empty) {
             const link = rawMessage.media.webpage
             photo = link.photo
             title = link.title
@@ -329,7 +328,7 @@ export class DialogInfoComponent extends RightBarComponent {
     }
 
     fetchContentNextPage = (refName, filter, appender) => {
-        if(refName === "members") {
+        if (refName === "members") {
             return this.fetchMembersNextPage()
         }
         if (!this.contentPages[refName].isFetching && AppSelectedInfoPeer.Current && this.contentPages[refName].offsetId !== -1) {
@@ -361,7 +360,6 @@ export class DialogInfoComponent extends RightBarComponent {
             })
         }
     }
-
 
 
     appendDocumentMessage = rawMessage => {
@@ -425,11 +423,11 @@ export class DialogInfoComponent extends RightBarComponent {
                 this.fetchMediaNextPage()
             } else if (this.showing === "links") {
                 this.fetchLinksNextPage()
-            } else if(this.showing === "members") {
+            } else if (this.showing === "members") {
                 this.fetchMembersNextPage()
-            } else if(this.showing === "docs") {
+            } else if (this.showing === "docs") {
                 this.fetchDocsNextPage()
-            } else if(this.showing === "audio") {
+            } else if (this.showing === "audio") {
                 this.fetchAudioNextPage()
             }
         }

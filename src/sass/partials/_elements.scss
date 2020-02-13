@@ -95,8 +95,14 @@
 
 .contact-card {
     display: flex;
-    padding: 2px;
+    padding: 5px 10px;
     margin-bottom: 5px;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: $light;
+    }
 
     .photo-container {
         img {
@@ -118,8 +124,8 @@
 
         .top {
             display: flex;
+
             .name {
-                font-weight: bold;
                 flex-grow: 1;
                 text-overflow: ellipsis;
                 overflow: hidden;

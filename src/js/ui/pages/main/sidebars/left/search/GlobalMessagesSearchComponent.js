@@ -54,7 +54,7 @@ export class GlobalMessagesSearchComponent extends VComponent {
         let list = this.state.messages.filter(m => m.to && m.from).map(m => <MessageFragment m={m}
                                                                                              peers={this.peers}/>);
         return (
-            <div className="global-messages">
+            <div className="global-messages section">
                 <div className="section-title">Global search</div>
                 <div className="column-list" ref={this.messagesListRef}>
                     {list}

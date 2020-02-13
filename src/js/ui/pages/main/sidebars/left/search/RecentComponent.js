@@ -1,7 +1,5 @@
 import VComponent from "../../../../../v/vrdom/component/VComponent"
 import {ContactFragment} from "../../../components/basic/ContactFragment"
-import UIEvents from "../../../../../eventBus/UIEvents"
-import {VUI} from "../../../../../v/VUI"
 import DialogsStore from "../../../../../../api/store/DialogsStore"
 import {UserPeer} from "../../../../../../api/peers/objects/UserPeer"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
@@ -19,14 +17,11 @@ export class RecentComponent extends VComponent {
             .on("updateUserStatus", this.onPeersUpdate)
             .on("updatePhoto", this.onPeersUpdate)
             .on("updatePhotoSmall", this.onPeersUpdate)
-
-        E.bus(UIEvents.LeftSidebar)
-            .on("searchInputUpdated", this.onSearchInputUpdated)
     }
 
     h() {
         return (
-            <div className="recent">
+            <div className="recent section">
                 <div className="section-title">Recent</div>
                 <div className="column-list">
                     {
@@ -61,15 +56,6 @@ export class RecentComponent extends VComponent {
     onPeersUpdate = event => {
         if (this.state.peers.indexOf(event.peer) > -1) {
             this.__patch()
-        }
-    }
-
-    onSearchInputUpdated = (event) => {
-        if (event.string.trim() === "") {
-            this.refreshRecent()
-            VUI.showElement(this.$el)
-        } else {
-            VUI.hideElement(this.$el)
         }
     }
 }

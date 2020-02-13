@@ -49,9 +49,14 @@
         }
     }
 
+    .section {
+        border-bottom: 1px solid $verylightgrey;
+        padding-bottom: 10px;
+    }
+
     .section-title {
         color: $darkgrey;
-        margin-bottom: 20px;
+        margin: 20px;
         font-weight: bold;
     }
 
@@ -142,13 +147,22 @@
             //display: block;
             border-left: none;
         }
-        
+
         .toolbar {
             position: relative;
         }
 
         .global-messages {
             padding: 0 5px;
+
+
+            .top {
+                margin-bottom: 5px;
+
+                .name {
+                    font-weight: bold;
+                }
+            }
         }
     }
 

@@ -10,18 +10,33 @@ export class SearchPanelComponent extends LeftBarComponent {
     barName = "search"
     barVisible = false
 
+    suggestionsRef = VComponent.createRef()
     recentComponentRef = VComponent.createComponentRef()
+
+    appEvents(E) {
+        super.appEvents(E)
+        E.bus(UIEvents.LeftSidebar)
+            .on("searchInputUpdated", this.onSearchInputUpdated)
+    }
 
     h() {
         return (
             <div class="sidebar scrollable search hidden" onScroll={this.onScroll}>
-                <div class="suggestions">
+                <div ref={this.suggestionsRef} class="suggestions">
                     <CorrespondentsComponent/>
                     <RecentComponent ref={this.recentComponentRef}/>
                 </div>
                 <SearchResultsComponent/>
             </div>
         )
+    }
+
+    onSearchInputUpdated = event => {
+        if (event.string.trim() === "") {
+            this.suggestionsRef.show()
+        } else {
+            this.suggestionsRef.hide()
+        }
     }
 
     onScroll = event => {

@@ -31,7 +31,7 @@ export class GlobalChatsSearchComponent extends VComponent {
     h() {
         return (
             <div>
-                <div className="contacts-and-chats">
+                <div className="contacts-and-chats section">
                     <div className="section-title">Contacts and Chats</div>
                     <div className="column-list"> {
                         this.state.myPeers.map(p => {
@@ -47,7 +47,7 @@ export class GlobalChatsSearchComponent extends VComponent {
                     }
                     </div>
                 </div>
-                <div className="global-chats">
+                <div className="global-chats section">
                     <div className="section-title">Global search</div>
                     <div className="column-list">
                         {
