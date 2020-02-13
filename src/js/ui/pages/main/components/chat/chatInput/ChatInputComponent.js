@@ -263,7 +263,7 @@ export class ChatInputComponent extends VComponent {
         } else {
             return
         }
-        this.__patch()
+        // this.__patch()
     }
 
     pickPoll() {
