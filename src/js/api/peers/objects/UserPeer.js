@@ -83,7 +83,7 @@ export class UserPeer extends Peer {
                     online: false,
                     status: "last month"
                 }
-            case "userStatusOffline":
+                case "userStatusOffline":
                 return {
                     online: false,
                     status: getLastSeenMessage(this.raw.status.was_online, now)

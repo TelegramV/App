@@ -98,9 +98,14 @@ class PeerManager extends Manager {
         if (rawUpdate.users) {
             data.users = rawUpdate.users.map(rawUser => {
                 const peer = PeersManager.setFromRaw(rawUser)
-                if (peer.isMin && rawUpdate.messages) {
-                    const Message = this._findMessageByUser(rawUser.messages, peer)
-                    peer._min_inputPeer = Message.to_id
+
+                if (peer.isMin) {
+                    const messages = rawUpdate.messages || rawUpdate.new_messages
+
+                    if (messages) {
+                        const Message = this._findMessageByUser(messages, peer)
+                        peer._min_inputPeer = Message.to_id
+                    }
                 }
             })
         }
@@ -108,9 +113,14 @@ class PeerManager extends Manager {
         if (rawUpdate.chats) {
             data.chats = rawUpdate.chats.map(rawChat => {
                 const peer = PeersManager.setFromRaw(rawChat)
-                if (peer.isMin && rawUpdate.messages) {
-                    const Message = this._findMessageByChat(rawChat.messages, peer)
-                    peer._min_inputPeer = Message.to_id
+
+                if (peer.isMin) {
+                    const messages = rawUpdate.messages || rawUpdate.new_messages
+
+                    if (messages) {
+                        const Message = this._findMessageByChat(messages, peer)
+                        peer._min_inputPeer = Message.to_id
+                    }
                 }
             })
         }

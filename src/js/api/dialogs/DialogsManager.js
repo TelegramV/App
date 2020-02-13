@@ -11,6 +11,7 @@ import {MessageFactory} from "../messages/MessageFactory"
 import API from "../telegram/API"
 import PeersManager from "../peers/objects/PeersManager"
 import MTProto from "../../mtproto/external"
+import {UserPeer} from "../peers/objects/UserPeer"
 
 class DialogManager extends Manager {
     constructor() {
@@ -34,12 +35,32 @@ class DialogManager extends Manager {
         // actions checking interval
         // very dirty thing, but fuck, no time left
         setInterval(() => {
+            const now = MTProto.TimeManager.now(true)
+
             DialogsStore.toArray().forEach(dialog => {
+
                 dialog.actions.forEach((action, peer) => {
-                    if (action.time + 5 <= MTProto.TimeManager.now(true)) {
+                    if (action.time + 5 <= now) {
                         dialog.removeAction(peer)
                     }
                 })
+
+                if (dialog.peer instanceof UserPeer) {
+                    if (dialog.peer.raw.status._ === "userStatusOnline" && dialog.peer.raw.status.expires < now) {
+                        dialog.peer.status = {
+                            _: "userStatusOffline",
+                            was_online: this.raw.status.expires
+                        }
+                    } else if (dialog.peer.raw.status._ === "userStatusOffline") {
+                        if (!dialog.peer.raw.status._last_checked) {
+                            dialog.peer.raw.status._last_checked = now
+                            dialog.peer.fire("updateUserStatus")
+                        } else if (dialog.peer.raw.status._last_checked + 59 < now) {
+                            dialog.peer.raw.status._last_checked = now
+                            dialog.peer.fire("updateUserStatus")
+                        }
+                    }
+                }
             })
         }, 3000)
 

@@ -13,7 +13,7 @@ import AppConnectionStatus from "../../ui/reactive/ConnectionStatus"
 import AppEvents from "../eventBus/AppEvents"
 import process_new_session_created from "./process_new_session_created"
 
-class UpdateManager extends Manager {
+export class UpdateManager extends Manager {
     constructor() {
         super()
 

@@ -46,6 +46,7 @@ function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
 
 /**
  * TODO: `updateChannelTooLong` need to be implemented
+ * TODO: rewrite using `UpdatesProcessor`
  */
 export class ChannelsUpdateProcessor {
     /**
@@ -315,8 +316,7 @@ export class ChannelsUpdateProcessor {
 
         if (rawDifferenceWithPeer._ === "updates.channelDifference") {
 
-            rawDifferenceWithPeer.users.forEach(user => PeersManager.setFromRawAndFire(user))
-            rawDifferenceWithPeer.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
+            PeersManager.fillPeersFromUpdate(rawDifferenceWithPeer)
 
             rawDifferenceWithPeer.new_messages.forEach(message => {
                 this.updatesManager.processUpdate("updateNewChannelMessage", {

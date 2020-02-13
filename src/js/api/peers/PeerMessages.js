@@ -122,6 +122,10 @@ export class PeerMessages {
     }
 
     set unreadCount(unreadCount) {
+        if (unreadCount < 0) {
+            //
+        }
+
         this._unreadCount = unreadCount
         this.clearUnreadIds()
 
@@ -179,9 +183,9 @@ export class PeerMessages {
      */
     set readInboxMaxId(readInboxMaxId) {
         if (this.readInboxMaxId < readInboxMaxId) {
-            this._readInboxMaxId = readInboxMaxId || this._readInboxMaxId
+            this.deleteUnreadBy(readInboxMaxId)
 
-            this.deleteUnreadBy(this._readInboxMaxId)
+            this._readInboxMaxId = readInboxMaxId || this._readInboxMaxId
 
             if (!this.isTransaction) {
                 if (this.peer.dialog) {
@@ -324,6 +328,10 @@ export class PeerMessages {
                     this.deleteUnread(messageId)
                 }
             })
+
+            if (this.last && this.unreadCount !== this.last.id - maxMessageId) {
+                this.unreadCount = this.unreadCount - Math.abs(this.last.id - maxMessageId - this.unreadCount)
+            }
         }
 
         this.stopTransaction()

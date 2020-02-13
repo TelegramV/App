@@ -1,150 +1,94 @@
+import {checkUpdatePts, UpdatesProcessor, UpdatesQueue} from "./UpdatesProcessor"
+import {UpdateManager} from "./updatesManager"
 import MTProto from "../../mtproto/external"
-import PeersManager from "../peers/objects/PeersManager"
 import AppEvents from "../eventBus/AppEvents"
+import PeersManager from "../peers/objects/PeersManager"
 
-/**
- * @param rawUpdate
- * @return {boolean}
- */
-function hasUpdatePts(rawUpdate) {
-    return rawUpdate.pts !== undefined
-}
+export class DefaultUpdatesProcessor extends UpdatesProcessor {
 
-/**
- * @param rawUpdate
- * @return {boolean}
- */
-function hasUpdatePtsCount(rawUpdate) {
-    return rawUpdate.pts_count !== undefined
-}
+    differenceUpdateTypes = [
+        "updates.differenceEmpty",
+        "updates.differenceTooLong",
+        "updates.difference",
+        "updates.differenceSlice",
+    ]
 
+    queue = new UpdatesQueue()
 
-/**
- * @param state state
- * @param rawUpdate
- * @param onSuccess
- * @param onFail
- */
-function checkUpdatePts(state, rawUpdate, {onSuccess, onFail}) {
-    if (hasUpdatePts(rawUpdate) && hasUpdatePtsCount(rawUpdate)) {
-        if ((state.pts + rawUpdate.pts_count) === rawUpdate.pts) {
-            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
-        } else if ((state.pts + rawUpdate.pts_count) > rawUpdate.pts) {
-            // console.debug("[default] update already processed  (it is actually bug, but should work anyway)")
-            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
-        } else {
-            // console.warn("[default] update cannot be processed", rawUpdate._, state.pts, rawUpdate.pts_count, rawUpdate.pts)
-            onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
-        }
-    } else {
-        // console.debug("[default] update has no pts")
-        onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
-    }
-}
+    constructor(updatesManager: UpdateManager) {
+        super(updatesManager)
 
-
-/**
- * TODO: `updateTooLong` need to be implemented
- */
-export class DefaultUpdatesProcessor {
-    /**
-     * @param {UpdateManager} updatesManager
-     */
-    constructor(updatesManager) {
-        this.updatesManager = updatesManager
-
-        this.differenceUpdateTypes = [
-            "updates.differenceEmpty",
-            "updates.differenceTooLong",
-            "updates.difference",
-            "updates.differenceSlice",
-        ]
-
-        this.queueIsProcessing = false
-        this.isWaitingForDifference = false
-
-        /**
-         * @private
-         */
-        this.queue = []
-
-        this.latestDifferenceTime = Number.MAX_VALUE
-    }
-
-    applyUpdate(rawUpdate) {
-        this.updatesManager.fire(rawUpdate)
+        this.customUpdateTypeProcessors = new Map([
+            ["updatePtsChanged", this.processPtsChanged],
+        ])
     }
 
     enqueue(rawUpdate) {
         if (!this.isWaitingForDifference) {
-            // should never be true, but who knows
-            if (this.differenceUpdateTypes.includes(rawUpdate._)) {
-                console.error("BUG: difference was passed to enqueue")
-            } else {
-                this.queue.push(rawUpdate)
+            this.queue.push(rawUpdate)
 
-                this.processQueue()
-            }
+            this.processQueue(this.queue)
         } else {
             this.queue.push(rawUpdate)
-            // console.warn("[default] waiting for diff")
         }
     }
 
-    dequeue() {
-        return this.queue.shift()
-    }
-
-
-    processQueue(next) {
-        if ((next || this.queue.length > 0) && !this.queueIsProcessing) {
-            if (this.isWaitingForDifference) {
+    processQueue(queue: UpdatesQueue = this.queue) {
+        if (queue.length > 0 && !queue.isProcessing) {
+            if (queue.isWaitingForDifference) {
                 console.error("[default] BUG: processing queue while waiting for difference")
             }
 
-            this.queueIsProcessing = true
+            queue.isProcessing = true
 
-            const rawUpdate = next ? next : this.dequeue()
+            const rawUpdate = queue.shift()
 
-            if (rawUpdate._ === "updatePtsChanged") {
-                MTProto.invokeMethod("updates.getState", {}).then(state => {
-                    this.updatesManager.State = state
-                })
+            if (this.customUpdateTypeProcessors.has(rawUpdate._)) {
+                this.customUpdateTypeProcessors.get(rawUpdate._)(rawUpdate)
                 return
             }
 
-            const self = this
-
-            checkUpdatePts(self.updatesManager.State, rawUpdate, {
-                onSuccess(type) {
-                    if (type === MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED) {
-                        self.updatesManager.State.pts = rawUpdate.pts
-                        self.applyUpdate(rawUpdate)
-                    } else if (type === MTProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
-                        self.applyUpdate(rawUpdate)
-                    }
-
-                    self.queueIsProcessing = false
-                    self.processQueue()
-                },
-                onFail(type) {
-                    self.latestDifferenceTime = MTProto.TimeManager.now(true)
-                    self.isWaitingForDifference = true
-                    self.queueIsProcessing = false
-
-                    self.getDifference(self.updatesManager.State).then(rawDifference => {
-                        self.processDifference(rawDifference)
-                    }).catch(e => {
-                        console.error("[default] BUG: difference obtaining failed", e)
-                        self.isWaitingForDifference = false
-                        self.queueIsProcessing = false
-                        self.processQueue()
-                    })
-                }
-            })
-        } else {
-            // console.warn("queue is already processing or there are no updates to process", this.queue, this.queue[this.queue.length - 1])
+            this.processWithValidation(queue, rawUpdate, this.updatesManager.State.pts)
         }
+    }
+
+    processPtsChanged = rawUpdate => {
+        this.queue.isProcessing = true
+
+        MTProto.invokeMethod("updates.getState").then(state => {
+            this.updatesManager.State = state
+            this.queue.isProcessing = false
+        })
+    }
+
+    processWithValidation(queue: UpdatesQueue, rawUpdate, pts) {
+        checkUpdatePts(this.updatesManager.State.pts, rawUpdate, {
+            onSuccess: (type) => {
+                if (type === this.updatesManager.UPDATE_CAN_BE_APPLIED) {
+                    this.updatesManager.State.pts = rawUpdate.pts
+                    this.applyUpdate(rawUpdate)
+                } else if (type === this.updatesManager.UPDATE_HAS_NO_PTS) {
+                    this.applyUpdate(rawUpdate)
+                }
+
+                this.queue.isProcessing = false
+                this.processQueue(this.queue)
+            },
+            onFail: (type) => {
+                this.latestDifferenceTime = MTProto.TimeManager.now(true)
+                this.queue.isWaitingForDifference = true
+                this.queue.isProcessing = false
+
+                this.getDifference(this.updatesManager.State).then(rawDifference => {
+                    this.processDifference(rawDifference)
+                }).catch(e => {
+                    console.error("[default] BUG: difference obtaining failed", e)
+                    this.queue.isWaitingForDifference = false
+                    this.queue.isProcessing = false
+                    this.processQueue(this.queue)
+                })
+            }
+        })
     }
 
     processDifference(rawDifference) {
@@ -156,8 +100,7 @@ export class DefaultUpdatesProcessor {
                 diffType: 1 // channel
             })
 
-            rawDifference.users.forEach(user => PeersManager.setFromRawAndFire(user))
-            rawDifference.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
+            PeersManager.fillPeersFromUpdate(rawDifference)
 
             rawDifference.new_messages.forEach(message => {
                 this.updatesManager.processUpdate("updateNewMessage", {
@@ -177,15 +120,15 @@ export class DefaultUpdatesProcessor {
                 this.updatesManager.processUpdate(ou._, ou)
             })
 
-            this.isWaitingForDifference = false
-            this.queueIsProcessing = false
+            this.queue.isWaitingForDifference = false
+            this.queue.isProcessing = false
             this.updatesManager.State = rawDifference.state
-            this.processQueue()
+            this.processQueue(this.queue)
 
         } else if (rawDifference._ === "updates.differenceTooLong") {
             console.warn("[default] difference too long", rawDifference)
 
-            this.isWaitingForDifference = true
+            this.queue.isWaitingForDifference = true
 
             // The difference is too long, and the specified state must be used to refetch updates.
 
@@ -196,9 +139,9 @@ export class DefaultUpdatesProcessor {
             }).catch(e => {
                 console.error("BUG: difference obtaining failed", e)
 
-                this.isWaitingForDifference = false
-                this.queueIsProcessing = false
-                this.processQueue()
+                this.queue.isWaitingForDifference = false
+                this.queue.isProcessing = false
+                this.processQueue(this.queue)
             })
 
         } else if (rawDifference._ === "updates.differenceEmpty") {
@@ -211,17 +154,16 @@ export class DefaultUpdatesProcessor {
             this.updatesManager.State.date = rawDifference.date
             this.updatesManager.State.qts = rawDifference.qts
 
-            this.isWaitingForDifference = false
-            this.queueIsProcessing = false
+            this.queue.isWaitingForDifference = false
+            this.queue.isProcessing = false
 
-            this.processQueue()
+            this.processQueue(this.queue)
 
         } else if (rawDifference._ === "updates.differenceSlice") {
 
             // Incomplete list of occurred events.
 
-            rawDifference.users.forEach(user => PeersManager.setFromRawAndFire(user))
-            rawDifference.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
+            PeersManager.fillPeersFromUpdate(rawDifference)
 
             rawDifference.new_messages.forEach(message => {
                 this.updatesManager.processUpdate("updateNewMessage", {
@@ -248,16 +190,16 @@ export class DefaultUpdatesProcessor {
             }).catch(e => {
                 console.error("BUG: difference obtaining failed", e)
 
-                this.isWaitingForDifference = false
-                this.queueIsProcessing = false
-                this.processQueue()
+                this.queue.isWaitingForDifference = false
+                this.queue.isProcessing = false
+                this.processQueue(this.queue)
             })
         } else {
             console.error("BUG: invalid difference constructor")
         }
     }
 
-    getDifference(State = this.updatesManager.State, onTooLong = undefined) {
+    getDifference(State = this.updatesManager.State) {
         if (State.pts === undefined || this.updatesManager.State.pts === undefined) {
             debugger
         }
@@ -270,8 +212,6 @@ export class DefaultUpdatesProcessor {
             qts: State.qts || this.updatesManager.State.qts,
             pts_total_limit: 100,
             flags: 0
-        }).then(rawDifference => {
-            return rawDifference
         })
     }
 }

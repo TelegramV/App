@@ -195,7 +195,7 @@ class MTProtoBridge {
     }
 
 
-    invokeMethod(method, params, dcID = null, isFile = false, useOneTimeNetworker = false) {
+    invokeMethod(method, params = {}, dcID = null, isFile = false, useOneTimeNetworker = false) {
         return performTask("invokeMethod", {
             method,
             params,
