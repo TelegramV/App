@@ -247,6 +247,8 @@ class BubblesComponent extends VComponent {
             return null
         }
 
+        const isOut = !message.isPost && message.isOut
+
         let $group = message instanceof ServiceMessage ? null : this.bubblesInnerRef.$el.childNodes[!prepend ? this.bubblesInnerRef.$el.childNodes.length - 1 : 0]
         if ($group) {
             const $bubblesList = $group.querySelector(".bubbles-list")
@@ -271,11 +273,11 @@ class BubblesComponent extends VComponent {
                 message={message}/>, $group.querySelector(".bubbles-list"))
         } else {
             // TODO fix saved messages
-            const hideAvatar = message.isOut || message.isPost || message.to instanceof UserPeer
+            const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage
             const avatar = !hideAvatar ? <MessageAvatarComponent id={`message-${message.id}-avatar`}
                                                       show={!hideAvatar}
                                                       message={message}/> : ""
-            $message = $mount(<div className={["bubble-group", message.isOut ? "out" : "in"]}>{avatar}<div className="bubbles-list"><MessageComponent
+            $message = $mount(<div className={["bubble-group", isOut ? "out" : "in"]}>{avatar}<div className="bubbles-list"><MessageComponent
                 intersectionObserver={this.intersectionObserver}
                 message={message}/></div></div>, this.bubblesInnerRef.$el)
             const $bubblesList = $message.querySelector(".bubbles-list")

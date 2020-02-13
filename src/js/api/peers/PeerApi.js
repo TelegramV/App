@@ -146,6 +146,34 @@ export class PeerApi {
         })
     }
 
+    fetchParticipants(offset, limit = 33) {
+        if (this._peer.type === "channel") {
+            return MTProto.invokeMethod("channels.getParticipants", {
+                channel: this._peer.inputPeer,
+                filter: {
+                    _: "channelParticipantsRecent"
+                },
+                offset: offset,
+                limit: limit
+            }).then(l => {
+                console.log(l)
+                PeersManager.fillPeersFromUpdate(l)
+                return l.participants
+            })
+        } else if(this._peer.type === "chat") {
+            if(this._peer.full && this._peer.full.participants) {
+                return Promise.resolve(this._peer.full.participants.participants)
+            }
+
+            return this._peer.fetchFull().then(l =>{
+                return this._peer.full.participants.participants
+            })
+        } else
+        {
+            return Promise.resolve()
+        }
+    }
+
     readHistory(maxId) {
         if (this.peer.type === "channel") {
             return MTProto.invokeMethod("channels.readHistory", {
@@ -178,6 +206,33 @@ export class PeerApi {
         if (this.peer.messages.last) {
             this.readHistory(this.peer.messages.last.id)
         }
+    }
+
+    updateNotifySettings({
+                             show_previews,
+                             silent,
+                             mute_until,
+                             sound
+                         }) {
+        return MTProto.invokeMethod("account.updateNotifySettings", {
+            peer: {_: "inputNotifyPeer", peer: this._peer.inputPeer},
+            settings: {
+                _: "inputPeerNotifySettings",
+                pFlags: {
+                    silent: silent,
+                    show_previews: show_previews,
+                    mute_until: mute_until,
+                    sound: sound
+                }
+            }
+        }).then(l => {
+            if (l._ === "boolTrue" && this._peer.full) {
+                if (mute_until !== undefined) this._peer.full.notify_settings.mute_until = mute_until
+                if (silent !== undefined) this._peer.full.notify_settings.silent = silent
+                if (sound !== undefined) this._peer.full.notify_settings.sound = sound
+                if (show_previews !== undefined) this._peer.full.notify_settings.show_previews = show_previews
+            }
+        })
     }
 
     sendMessage({

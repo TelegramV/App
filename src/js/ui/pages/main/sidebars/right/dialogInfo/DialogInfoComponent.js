@@ -12,6 +12,13 @@ import {DialogInfoPhotoComponent} from "./fragments/DialogInfoPhotoComponent"
 import {DialogInfoLinkComponent} from "./fragments/DialogInfoLinkComponent"
 import {DialogInfoDocumentComponent} from "./fragments/DialogInfoDocumentComponent"
 import SearchManager from "../../../../../../api/search/SearchManager"
+import {GroupPeer} from "../../../../../../api/peers/objects/GroupPeer";
+import {SupergroupPeer} from "../../../../../../api/peers/objects/SupergroupPeer";
+import PeersManager from "../../../../../../api/peers/objects/PeersManager";
+import {DialogInfoMemberComponent} from "./fragments/DialogInfoMemberComponent";
+import {DialogInfoAudioComponent} from "./fragments/DialogInfoAudioComponent";
+import {FileAPI} from "../../../../../../api/fileAPI";
+import {formatAudioTime} from "../../../../../utils";
 
 export class DialogInfoComponent extends RightBarComponent {
 
@@ -20,11 +27,17 @@ export class DialogInfoComponent extends RightBarComponent {
 
     contentRefs = {
         media: VComponent.createRef(),
+        members: VComponent.createRef(),
         links: VComponent.createRef(),
         docs: VComponent.createRef(),
+        audio: VComponent.createRef(),
     }
 
     contentPages = {
+        members: {
+            offsetId: 0,
+            isFetching: false
+        },
         media: {
             offsetId: 0,
             isFetching: false,
@@ -34,6 +47,10 @@ export class DialogInfoComponent extends RightBarComponent {
             isFetching: false,
         },
         docs: {
+            offsetId: 0,
+            isFetching: false,
+        },
+        audio: {
             offsetId: 0,
             isFetching: false,
         },
@@ -81,6 +98,34 @@ export class DialogInfoComponent extends RightBarComponent {
                 this.callbacks.peer.fetchFull()
             }
 
+            const showMembers = this.callbacks.peer instanceof GroupPeer || this.callbacks.peer instanceof SupergroupPeer
+            this.tabItems = [
+                {
+                    text: "Members",
+                    hidden: !showMembers,
+                    selected: showMembers,
+                    click: this.openMembers,
+                },
+                {
+                    text: "Media",
+                    click: this.openMedia,
+                    selected: !showMembers
+                },
+                {
+                    text: "Docs",
+                    click: this.openDocs,
+                },
+                {
+                    text: "Links",
+                    click: this.openLinks,
+                },
+                {
+                    text: "Audio",
+                    click: this.openAudio,
+                }
+            ]
+            this.tabSelectorRef.component.updateFragments(this.tabItems)
+
             if (!AppSelectedInfoPeer.check(AppSelectedInfoPeer.Previous) && AppSelectedInfoPeer.Current !== undefined) {
                 this.refreshContent()
             }
@@ -115,9 +160,11 @@ export class DialogInfoComponent extends RightBarComponent {
 
                         <TabSelectorComponent ref={this.tabSelectorRef} items={this.tabItems}/>
 
+                        <div ref={this.contentRefs.members} className="content hidden member-list"/>
                         <div ref={this.contentRefs.media} className="content"/>
                         <div ref={this.contentRefs.links} className="content hidden"/>
-                        <div ref={this.contentRefs.docs} className="content hidden"/>
+                        <div ref={this.contentRefs.docs} className="content hidden docs-list"/>
+                        <div ref={this.contentRefs.audio} className="content hidden audio-list"/>
 
                         <div ref={this.loadingRef} className="content-loading">
                             <progress className="progress-circular big"/>
@@ -127,6 +174,47 @@ export class DialogInfoComponent extends RightBarComponent {
                 </div>
             </div>
         )
+    }
+
+    openMembers = () => {
+        this.showRef("members")
+
+        if (this.contentPages.members.offsetId === 0) {
+            this.fetchMembersNextPage()
+        }
+    }
+
+    fetchMembersNextPage = _ => {
+        console.log(this.contentPages.members.offsetId)
+        if (!this.contentPages.members.isFetching && AppSelectedInfoPeer.Current && this.contentPages.members.offsetId !== -1) {
+            this.contentPages.members.isFetching = true
+
+            this.toggleContentLoading(true)
+
+            AppSelectedInfoPeer.Current.api.fetchParticipants(this.contentPages.members.offsetId, this.defaultLimit).then(l => {
+                this.toggleContentLoading(false)
+                this.contentPages.members.isFetching = false
+
+                if(!l) return
+
+                this.contentPages.members.offsetId += l.length
+
+                if(l.length < this.defaultLimit) {
+                    this.contentPages.members.offsetId = -1
+                }
+                l.forEach(member => this.appendMember(member))
+
+            })
+        }
+    }
+
+    appendMember = participant => {
+        const peer = Peers.get("user", participant.user_id)
+        // if (rawMessage.id < this.contentPages.media.offsetId) {
+        //     this.contentPages.media.offsetId = rawMessage.id
+        // }
+
+        VRDOM.append(<DialogInfoMemberComponent peer={peer}/>, this.contentRefs.members.$el)
     }
 
     openMedia = () => {
@@ -161,22 +249,72 @@ export class DialogInfoComponent extends RightBarComponent {
         this.fetchContentNextPage("links", "inputMessagesFilterUrl", this.appendLinkMessage)
     }
 
+    openAudio = () => {
+        this.showRef("audio")
+
+        if (this.contentPages.audio.offsetId === 0) {
+            this.fetchAudioNextPage()
+        }
+    }
+
+    fetchAudioNextPage = () => {
+        this.fetchContentNextPage("audio", "inputMessagesFilterMusic", this.appendAudioMessage)
+    }
+
+    appendAudioMessage = rawMessage => {
+        if (rawMessage.id < this.contentPages.audio.offsetId) {
+            this.contentPages.audio.offsetId = rawMessage.id
+        }
+        console.log(rawMessage)
+        const audio = FileAPI.getAttribute(rawMessage.media.document, "documentAttributeAudio")
+        const time = formatAudioTime(audio.duration)
+        const title = audio.title
+        const performer = audio.performer
+        const date =  new Date(rawMessage.date * 1000).toLocaleString("en", {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        })
+
+        VRDOM.append(<DialogInfoAudioComponent title={title}
+                                              description={`${performer} · ${date}`}
+                                              time={time}/>, this.contentRefs.audio.$el)
+    }
+
     appendLinkMessage = rawMessage => {
         if (rawMessage.id < this.contentPages.links.offsetId) {
             this.contentPages.links.offsetId = rawMessage.id
         }
 
-        if (rawMessage.media && rawMessage.media.webpage) {
+        const empty = !rawMessage.media || !rawMessage.media.webpage || rawMessage.media.webpage._ === "webPageEmpty"
+        let photo = null
+        let title = null
+        let description = null
+        let url = null
+        let displayUrl = null
+        let letter = rawMessage.message[0]
+        if(!empty) {
             const link = rawMessage.media.webpage
-            const letter = link.site_name ? link.site_name[0] : ""
-
-            VRDOM.append(<DialogInfoLinkComponent letter={letter}
-                                                  photo={link.photo}
-                                                  title={link.title}
-                                                  description={link.description}
-                                                  url={link.url}
-                                                  displayUrl={link.display_url}/>, this.contentRefs.links.$el)
+            photo = link.photo
+            title = link.title
+            description = link.description
+            url = link.url
+            displayUrl = link.display_url
+            letter = link.site_name ? link.site_name[0] : ""
+        } else {
+            return
         }
+
+        description = description || rawMessage.message
+        title = title || "No title"
+        displayUrl = displayUrl || url
+
+        VRDOM.append(<DialogInfoLinkComponent letter={letter}
+                                              photo={photo}
+                                              title={title}
+                                              description={description}
+                                              url={url}
+                                              displayUrl={displayUrl}/>, this.contentRefs.links.$el)
     }
 
     openDocs = () => {
@@ -192,6 +330,9 @@ export class DialogInfoComponent extends RightBarComponent {
     }
 
     fetchContentNextPage = (refName, filter, appender) => {
+        if(refName === "members") {
+            return this.fetchMembersNextPage()
+        }
         if (!this.contentPages[refName].isFetching && AppSelectedInfoPeer.Current && this.contentPages[refName].offsetId !== -1) {
             this.contentPages[refName].isFetching = true
 
@@ -222,6 +363,8 @@ export class DialogInfoComponent extends RightBarComponent {
         }
     }
 
+
+
     appendDocumentMessage = rawMessage => {
         if (rawMessage.id < this.contentPages.docs.offsetId) {
             this.contentPages.docs.offsetId = rawMessage.id
@@ -236,7 +379,7 @@ export class DialogInfoComponent extends RightBarComponent {
         this.nullContentPages()
         this.clearContent()
         this.toggleContentLoading(true)
-        this.openMedia()
+        this.tabItems.find(l => !l.hidden).click()
         this.toggleContentLoading(false)
     }
 
@@ -283,6 +426,12 @@ export class DialogInfoComponent extends RightBarComponent {
                 this.fetchMediaNextPage()
             } else if (this.showing === "links") {
                 this.fetchLinksNextPage()
+            } else if(this.showing === "members") {
+                this.fetchMembersNextPage()
+            } else if(this.showing === "docs") {
+                this.fetchDocsNextPage()
+            } else if(this.showing === "audio") {
+                this.fetchAudioNextPage()
             }
         }
     }
