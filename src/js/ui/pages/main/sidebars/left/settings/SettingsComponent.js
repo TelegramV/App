@@ -6,6 +6,7 @@ import BackgroundColorComponent from "./background/BackgroundColorComponent"
 import BackgroundImageComponent from "./background/BackgroundImageComponent"
 import { ContextMenuManager } from "../../../../../contextMenuManager";
 import GeneralSettingsComponent from "./GeneralSettingsComponent"
+import {logout} from "../../../../../../api/logout"
 
 export class SettingsComponent extends LeftBarComponent {
     barName = "settings";
@@ -25,7 +26,9 @@ export class SettingsComponent extends LeftBarComponent {
 							{
 								icon: "logout",
 	                            title: "Log out",
-	                            onClick: _ => {}
+	                            onClick: _ => {
+                                    logout()
+                                }
 							}
 							], ev.currentTarget, "right-top")}}/>
 					</div>

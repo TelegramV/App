@@ -2,6 +2,7 @@ import {longFromInts} from "../utils/bin"
 import Random from "../utils/random"
 import {MTProtoTempStorage} from "../MTProtoTempStorage"
 import AppConfiguration from "../../configuration"
+import MTProtoInternal from "../internal"
 
 /**
  * There is a very critical bug with this thing: DIFFERENT INSTANCES IN THE WORKER AND OUT OF IT
@@ -34,14 +35,12 @@ export class MtpTimeManager {
 
         this.lastMessageID[dcId] = messageID
 
+        MTProtoInternal.syncTimeWithFrontend()
+
         return longFromInts(messageID[0], messageID[1])
     }
 
     applyServerTime(dcId, serverTime, localTime) {
-        // Logger.warn("serverTime = ", serverTime)
-        // Logger.warn("localTime = ", localTime)
-
-
         if (!this.timeOffset[dcId]) {
             this.timeOffset[dcId] = 0
         }
@@ -49,14 +48,12 @@ export class MtpTimeManager {
         const newTimeOffset = serverTime - Math.floor((localTime || tsNow(false, dcId)) / 1000)
         const changed = Math.abs(this.timeOffset[dcId] - newTimeOffset) > 10
 
-        // Logger.warn("newTimeOffset = ", newTimeOffset)
-
         MTProtoTempStorage.setItem("server_time_offset_dc" + dcId, newTimeOffset)
 
         this.lastMessageID[dcId] = [0, 0]
         this.timeOffset[dcId] = newTimeOffset
 
-        // Logger.debug("Apply server timeManager", serverTime, localTime, newTimeOffset, changed)
+        MTProtoInternal.syncTimeWithFrontend()
 
         return changed
     }

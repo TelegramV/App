@@ -1,4 +1,4 @@
-export class PeerAPI {
+export class PeerParser {
     static getInput(peer) {
         switch (peer._) {
             case "channel":

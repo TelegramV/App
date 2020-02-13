@@ -1,4 +1,3 @@
-import {tsNow} from "../../mtproto/timeManager";
 import {DraftMessage} from "./DraftMessage"
 import {DialogApi} from "./DialogApi"
 import {ReactiveObject} from "../../ui/v/reactive/ReactiveObject"
@@ -7,6 +6,7 @@ import PeersStore from "../store/PeersStore"
 import AppEvents from "../eventBus/AppEvents"
 import {actionTypesMapping} from "../../ui/pages/main/sidebars/left/dialog/Fragments/DialogTextFragment"
 import DialogsManager from "./DialogsManager"
+import MTProto from "../../mtproto/external"
 
 export class Dialog extends ReactiveObject {
 
@@ -18,7 +18,7 @@ export class Dialog extends ReactiveObject {
     _rawDialog: Object = {}
     _draft: DraftMessage = DraftMessage.createEmpty(this)
 
-    _actions: Set<Object> = new Set()
+    _actions: Map<Peer, Object> = new Map()
 
     constructor(rawDialog: Object) {
         super()
@@ -45,8 +45,11 @@ export class Dialog extends ReactiveObject {
             const peer = PeersStore.get("user", rawUpdate.user_id)
 
             if (peer) {
-                rawUpdate._showUsername = peer !== this.peer
-                this._actions.add(rawUpdate)
+                this._actions.set(peer, {
+                    showUsername: peer !== this.peer,
+                    text: actionTypesMapping[rawUpdate.action._],
+                    time: MTProto.TimeManager.now(true)
+                })
             }
 
             this.fire("updateActions")
@@ -56,20 +59,18 @@ export class Dialog extends ReactiveObject {
     get actionText() {
         let typing = []
 
-        const mapped = Array.from(this.actions).map(rawUpdate => {
-            const peer = PeersStore.get("user", rawUpdate.user_id)
-
-            const actionString = actionTypesMapping[rawUpdate.action._]
+        const mapped = Array.from(this.actions.entries()).map(([peer, action]) => {
+            const actionString = action.text
 
             if (peer && actionString) {
                 if (actionString === actionTypesMapping.sendMessageTypingAction) {
-                    if (rawUpdate._showUsername) {
+                    if (action.showUsername) {
                         typing.push(peer.firstName)
                     }
                 }
 
                 return {
-                    user: rawUpdate._showUsername ? peer.firstName : "",
+                    user: action.showUsername ? peer.firstName : "",
                     action: actionString
                 }
             }
@@ -94,14 +95,9 @@ export class Dialog extends ReactiveObject {
         return mapped[0] || false
     }
 
-    removeAction(rawUpdate) {
-        this._actions.delete(rawUpdate)
+    removeAction(peer) {
+        this._actions.delete(peer)
         this.fire("updateActions")
-    }
-
-    removeActionByUserId(userId) {
-        const rawUpdate = Array.from(this._actions).find(rawUpdate => rawUpdate.user_id === userId)
-        this.removeAction(rawUpdate)
     }
 
     clearActions() {
@@ -175,7 +171,7 @@ export class Dialog extends ReactiveObject {
     }
 
     get isMuted(): boolean {
-        return this.notifySettings.mute_until >= tsNow(true)
+        return this.notifySettings.mute_until >= MTProto.TimeManager.now(true)
     }
 
     get unreadMark(): boolean {

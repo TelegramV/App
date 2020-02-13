@@ -1,4 +1,4 @@
-import {tsNow} from "../../../../../../../mtproto/timeManager"
+import MTProto from "../../../../../../../mtproto/external"
 
 const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -15,7 +15,7 @@ const DATE_FORMAT = {
 export const DialogTimeFragment = ({id, dialog}) => {
     return (
         <div id={id} className="time">
-            {dialog.peer.messages.last.getDate("en", tsNow(true) - dialog.peer.messages.last.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)}
+            {dialog.peer.messages.last.getDate("en", MTProto.TimeManager.now(true) - dialog.peer.messages.last.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)}
         </div>
     )
 }

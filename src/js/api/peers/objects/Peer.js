@@ -48,6 +48,8 @@ export class Peer extends ReactiveObject {
 
     // if not, then dialog shouldn't be fetched for new messages
     get isAbleToHandleUpdates(): boolean {
+        return true
+        
         if (this._isAbleToHandleUpdates === undefined) {
             this._isAbleToHandleUpdates = this.type === "user"
         }
@@ -159,6 +161,10 @@ export class Peer extends ReactiveObject {
 
     get isSelf() {
         return this.raw.pFlags && this.raw.pFlags.self === true
+    }
+
+    get isLeft() {
+        return this.raw.pFlags && this.raw.pFlags.left === true
     }
 
     get inputPeer() {

@@ -1,10 +1,8 @@
-import {MTProto} from "../../mtproto/external"
 import {getInputPeerFromPeer, getInputPeerFromPeerWithoutAccessHash} from "./util"
-import TimeManager, {tsNow} from "../../mtproto/timeManager"
 import {Dialog} from "./Dialog";
 import {Manager} from "../manager";
 import {Peer} from "../peers/objects/Peer";
-import {PeerAPI} from "../peerAPI"
+import {PeerParser} from "../peerParser"
 import DialogsStore from "../store/DialogsStore"
 import AppEvents from "../eventBus/AppEvents"
 import PeersStore from "../store/PeersStore"
@@ -12,6 +10,8 @@ import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import {MessageFactory} from "../messages/MessageFactory"
 import API from "../telegram/API"
 import PeersManager from "../peers/objects/PeersManager"
+import MTProto from "../../mtproto/external"
+import {UserPeer} from "../peers/objects/UserPeer"
 
 class DialogManager extends Manager {
     constructor() {
@@ -35,12 +35,32 @@ class DialogManager extends Manager {
         // actions checking interval
         // very dirty thing, but fuck, no time left
         setInterval(() => {
+            const now = MTProto.TimeManager.now(true)
+
             DialogsStore.toArray().forEach(dialog => {
-                dialog.actions.forEach(rawUpdate => {
-                    if (rawUpdate.time + 5 <= tsNow(true)) {
-                        dialog.removeAction(rawUpdate)
+
+                dialog.actions.forEach((action, peer) => {
+                    if (action.time + 5 <= now) {
+                        dialog.removeAction(peer)
                     }
                 })
+
+                if (dialog.peer instanceof UserPeer) {
+                    if (dialog.peer.raw.status._ === "userStatusOnline" && dialog.peer.raw.status.expires < now) {
+                        dialog.peer.status = {
+                            _: "userStatusOffline",
+                            was_online: this.raw.status.expires
+                        }
+                    } else if (dialog.peer.raw.status._ === "userStatusOffline") {
+                        if (!dialog.peer.raw.status._last_checked) {
+                            dialog.peer.raw.status._last_checked = now
+                            dialog.peer.fire("updateUserStatus")
+                        } else if (dialog.peer.raw.status._last_checked + 59 < now) {
+                            dialog.peer.raw.status._last_checked = now
+                            dialog.peer.fire("updateUserStatus")
+                        }
+                    }
+                }
             })
         }, 3000)
 
@@ -69,7 +89,6 @@ class DialogManager extends Manager {
             if (!peer || !peer.dialog) {
                 console.log("good game telegram, good game")
             } else {
-                update.time = tsNow(true)
                 peer.dialog.addAction(update)
             }
         })
@@ -81,7 +100,6 @@ class DialogManager extends Manager {
             if (!peer || !peer.dialog) {
                 console.log("good game telegram, good game")
             } else {
-                update.time = tsNow(true)
                 peer.dialog.addAction(update)
             }
         })
@@ -121,9 +139,21 @@ class DialogManager extends Manager {
             console.warn("updateChannel", update)
 
             this.getPeerDialogs(update.__peer).then(dialogs => {
-                AppEvents.Dialogs.fire("gotNewMany", {
-                    dialogs
-                })
+                if (dialogs.length === 0) {
+                    AppEvents.Dialogs.fire("hideDialogByPeer", {
+                        peer: update.__peer
+                    })
+                } else {
+                    if (dialogs[0].peer.isLeft) {
+                        AppEvents.Dialogs.fire("hideDialogByPeer", {
+                            peer: update.__peer
+                        })
+                    } else {
+                        AppEvents.Dialogs.fire("gotNewMany", {
+                            dialogs
+                        })
+                    }
+                }
             })
         })
 
@@ -131,9 +161,21 @@ class DialogManager extends Manager {
             console.warn("updateChannelNoDialog", update)
 
             this.getPeerDialogs(update.__peer).then(dialogs => {
-                AppEvents.Dialogs.fire("gotNewMany", {
-                    dialogs
-                })
+                if (dialogs.length === 0) {
+                    AppEvents.Dialogs.fire("hideDialogByPeer", {
+                        peer: update.__peer
+                    })
+                } else {
+                    if (dialogs[0].peer.isLeft) {
+                        AppEvents.Dialogs.fire("hideDialogByPeer", {
+                            peer: update.__peer
+                        })
+                    } else {
+                        AppEvents.Dialogs.fire("gotNewMany", {
+                            dialogs
+                        })
+                    }
+                }
             })
             // await this.findOrFetch("channel", update.channel_id)
         })
@@ -244,7 +286,7 @@ class DialogManager extends Manager {
             return DialogsStore.getByPeer(peer)
         }
 
-        const plain = PeerAPI.getPlain(peer, false)
+        const plain = PeerParser.getPlain(peer, false)
 
         return DialogsStore.get(plain._, plain.id)
     }
@@ -296,7 +338,7 @@ class DialogManager extends Manager {
         }
 
         if (this.dialogsOffsetDate) {
-            this.offsetDate = this.dialogsOffsetDate + TimeManager.timeOffset
+            this.offsetDate = this.dialogsOffsetDate
         }
 
         return API.messages.getDialogs(params).then(Dialogs => {
@@ -390,7 +432,7 @@ class DialogManager extends Manager {
     }
 
     setFromRaw(rawDialog) {
-        const plainPeer = PeerAPI.getPlain(rawDialog.peer, false)
+        const plainPeer = PeerParser.getPlain(rawDialog.peer, false)
 
         if (DialogsStore.has(plainPeer._, plainPeer.id)) {
             const dialog = DialogsStore.get(plainPeer._, plainPeer.id)
@@ -404,7 +446,7 @@ class DialogManager extends Manager {
     }
 
     setFromRawAndFire(rawDialog) {
-        const plainPeer = PeerAPI.getPlain(rawDialog.peer, false)
+        const plainPeer = PeerParser.getPlain(rawDialog.peer, false)
 
         if (DialogsStore.has(plainPeer._, plainPeer.id)) {
             const dialog = DialogsStore.get(plainPeer._, plainPeer.id)
@@ -418,6 +460,17 @@ class DialogManager extends Manager {
 
             return dialog
         }
+    }
+
+    onLogout() {
+        this.allWasFetched = false
+
+        this.latestDialog = undefined
+        this.dialogsOffsetDate = 0 // TODO
+        this.offsetDate = 0
+        this.count = undefined
+
+        this.isFetched = false
     }
 }
 

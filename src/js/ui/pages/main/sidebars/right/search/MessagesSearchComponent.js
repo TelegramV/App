@@ -153,7 +153,9 @@ export default class MessageSearchComponent extends RightBarComponent {
         if (q === "") {
             this.state.messagesCount = 0
             this.state.messages = []
-            this.patchResult({})
+            this.patchResult({
+                count: 0
+            })
             return
         }
 
@@ -203,15 +205,14 @@ export default class MessageSearchComponent extends RightBarComponent {
             this.offsetId = 0
             this.allFetched = false
             this.isFetching = true
-            this.peers = []
 
             this.inputRef.component.$el.value = ""
 
             this.state.messages = []
-            this.messagesListRef.patch({
-                messages: this.state.messages,
-                peers: this.peers
-            })
+            this.peers = []
+            this.state.messagesCount = 0
+            this.patchResult({})
+            this.hideBar()
         }
     }
 

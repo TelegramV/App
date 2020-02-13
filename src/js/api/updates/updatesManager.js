@@ -9,12 +9,11 @@ import {ChannelsUpdateProcessor} from "./ChannelsUpdateProcessor"
 import {DefaultUpdatesProcessor} from "./DefaultUpdatesProcessor"
 import processShortSentMessage from "./processShortSentMessage"
 import {arrayDelete} from "../common/utils/utils"
-import {tsNow} from "../../mtproto/timeManager"
 import AppConnectionStatus from "../../ui/reactive/ConnectionStatus"
 import AppEvents from "../eventBus/AppEvents"
 import process_new_session_created from "./process_new_session_created"
 
-class UpdateManager extends Manager {
+export class UpdateManager extends Manager {
     constructor() {
         super()
 
@@ -66,22 +65,22 @@ class UpdateManager extends Manager {
 
             if (this.updateStatusCheckingIntervalId === undefined) {
                 this.updateStatusCheckingIntervalId = setInterval(() => {
-                    if (this.channelUpdatesProcessor.isWaitingForDifference && (this.channelUpdatesProcessor.latestDifferenceTime + 2) <= tsNow(true)) {
+                    if (this.channelUpdatesProcessor.isWaitingForDifference && (this.channelUpdatesProcessor.latestDifferenceTime + 2) <= MTProto.TimeManager.now(true)) {
                         AppEvents.General.fire("waitingForDifference", {
                             diffType: 0 // channel
                         })
                     }
 
-                    if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.defaultUpdatesProcessor.latestDifferenceTime + 2) <= tsNow(true)) {
+                    if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.defaultUpdatesProcessor.latestDifferenceTime + 2) <= MTProto.TimeManager.now(true)) {
                         AppEvents.General.fire("waitingForDifference", {
                             diffType: 1 // default
                         })
                     }
 
-                    // if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.channelUpdatesProcessor.latestDifferenceTime + 5) <= tsNow(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
+                    // if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.channelUpdatesProcessor.latestDifferenceTime + 5) <= MTProto.TimeManager.now(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
                     //     this.channelUpdatesProcessor.isWaitingForDifference = true
                     //     this.channelUpdatesProcessor.queueIsProcessing = false
-                    //     this.channelUpdatesProcessor.latestDifferenceTime = tsNow(true)
+                    //     this.channelUpdatesProcessor.latestDifferenceTime = MTProto.TimeManager.now(true)
                     //     console.warn("refetching difference")
                     //
                     //     AppEvents.General.fire("waitingForDifference", {
@@ -98,10 +97,10 @@ class UpdateManager extends Manager {
                     //     })
                     // }
 
-                    if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.defaultUpdatesProcessor.latestDifferenceTime + 5) <= tsNow(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
+                    if (this.defaultUpdatesProcessor.isWaitingForDifference && (this.defaultUpdatesProcessor.latestDifferenceTime + 5) <= MTProto.TimeManager.now(true) && AppConnectionStatus.Status !== AppConnectionStatus.WAITING_FOR_NETTWORK) {
                         this.defaultUpdatesProcessor.isWaitingForDifference = true
                         this.defaultUpdatesProcessor.queueIsProcessing = false
-                        this.defaultUpdatesProcessor.latestDifferenceTime = tsNow(true)
+                        this.defaultUpdatesProcessor.latestDifferenceTime = MTProto.TimeManager.now(true)
                         console.warn("refetching difference")
 
                         AppEvents.General.fire("waitingForDifference", {

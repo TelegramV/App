@@ -3,7 +3,6 @@ import PeersStore from "../store/PeersStore"
 import PeersManager from "../peers/objects/PeersManager"
 import {Peer} from "../peers/objects/Peer"
 import AppEvents from "../eventBus/AppEvents"
-import {tsNow} from "../../mtproto/timeManager"
 
 /**
  * @param rawUpdate
@@ -45,6 +44,10 @@ function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
     }
 }
 
+/**
+ * TODO: `updateChannelTooLong` need to be implemented
+ * TODO: rewrite using `UpdatesProcessor`
+ */
 export class ChannelsUpdateProcessor {
     /**
      * @param {UpdateManager} updatesManager
@@ -285,7 +288,7 @@ export class ChannelsUpdateProcessor {
                 self.processQueue(channelId)
             },
             onFail: (type) => {
-                self.latestDifferenceTime = tsNow(true)
+                self.latestDifferenceTime = MTProto.TimeManager.now(true)
                 channelQueue.isWaitingForDifference = true
                 channelQueue.isProcessing = false
 
@@ -313,8 +316,7 @@ export class ChannelsUpdateProcessor {
 
         if (rawDifferenceWithPeer._ === "updates.channelDifference") {
 
-            rawDifferenceWithPeer.users.forEach(user => PeersManager.setFromRawAndFire(user))
-            rawDifferenceWithPeer.chats.forEach(chat => PeersManager.setFromRawAndFire(chat))
+            PeersManager.fillPeersFromUpdate(rawDifferenceWithPeer)
 
             rawDifferenceWithPeer.new_messages.forEach(message => {
                 this.updatesManager.processUpdate("updateNewChannelMessage", {
@@ -399,7 +401,7 @@ export class ChannelsUpdateProcessor {
         }
 
         this.latestDifferencePeer = peer
-        this.latestDifferenceTime = tsNow(true)
+        this.latestDifferenceTime = MTProto.TimeManager.now(true)
 
         console.warn("[channel] fetching difference")
 

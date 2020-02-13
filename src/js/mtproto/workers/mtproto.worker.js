@@ -11,8 +11,18 @@ const authContext = {
     sessionID: createNonce(8)
 }
 
-MTProtoInternal.UpdatesHandler = update => postMessage({type: "update", update: update})
-MTProtoInternal.workerPostMessage = data => postMessage(data)
+const postMessageWithTime = (data) => {
+    Object.assign(data, {
+        time: {
+            lastMessageID: MTProtoInternal.timeManager.lastMessageID,
+            timeOffset: MTProtoInternal.timeManager.timeOffset,
+        }
+    })
+    postMessage(data)
+}
+
+MTProtoInternal.UpdatesHandler = update => postMessageWithTime({type: "update", update: update})
+MTProtoInternal.workerPostMessage = data => postMessageWithTime(data)
 
 self.addEventListener("message", event => {
     const eventData = event.data
@@ -24,40 +34,52 @@ self.addEventListener("message", event => {
     try {
         if (task === "invokeMethod") {
             MTProtoInternal.invokeMethod(taskData.method, taskData.params, taskData.dcID).then(r => {
-                postMessage({taskId: taskId, taskResult: r, failed: false})
+                postMessageWithTime({taskId: taskId, taskResult: r, failed: false})
             }).catch(r => {
                 console.log("ERR", r)
-                postMessage({taskId: taskId, taskResult: r, failed: true})
+                postMessageWithTime({taskId: taskId, taskResult: r, failed: true})
             })
         } else if (task === "connect") {
             loadSchema().then(() => {
                 MTProtoInternal.connect(authContext, taskData.storage).then(() => {
-                    postMessage({taskId: taskId, taskResult: authContext, failed: false})
+                    postMessageWithTime({taskId: taskId, taskResult: authContext, failed: false})
                 }).catch(r => {
-                    postMessage({taskId: taskId, taskResult: r, failed: true})
+                    postMessageWithTime({taskId: taskId, taskResult: r, failed: true})
                 })
             })
         } else if (task === "mt_srp_check_password") {
-            postMessage({
+            postMessageWithTime({
                 taskId: taskId,
                 taskResult: mt_srp_check_password(taskData.g, taskData.p, taskData.salt1, taskData.salt2, taskData.srp_id, taskData.srp_B, taskData.password)
             })
         } else if (task === "gzipUncompress") {
-            postMessage({
+            postMessageWithTime({
                 taskId: taskId,
                 taskResult: gzipUncompress(taskData)
             })
         } else if (task === "internalContext") {
             // BE VERY CAREFUL WITH THIS
-            postMessage({
+            postMessageWithTime({
                 taskId: taskId,
                 taskResult: taskData(MTProtoInternal)
             })
+        } else if (task === "time_generateMessageID") {
+            postMessageWithTime({
+                taskId: taskId,
+                taskResult: MTProtoInternal.timeManager.generateMessageID(taskData.dcID)
+            })
         } else if (task === "changeDefaultDc") {
             MTProtoInternal.changeDefaultDC(taskData.dcID)
+            postMessageWithTime({taskId: taskId})
+        } else if (task === "logout") {
+            MTProtoInternal.logout().then(() => {
+                postMessageWithTime({
+                    taskId: taskId,
+                })
+            })
         }
     } catch (e) {
-        postMessage({taskId: taskId, taskResult: e, failed: true})
+        postMessageWithTime({taskId: taskId, taskResult: e, failed: true})
     }
 
 

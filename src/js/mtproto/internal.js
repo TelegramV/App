@@ -244,9 +244,8 @@ class MobileProtocol {
     }
 
     logout() {
-        this.PermanentStorage.clear().then(() => {
-            //
-        })
+        return this.invokeMethod("auth.logOut")
+            .then(() => this.PermanentStorage.removeItem("authorizationData"))
     }
 
     changeDefaultDC(dcID) {
@@ -262,6 +261,12 @@ class MobileProtocol {
     connectionLost() {
         this.workerPostMessage({
             type: "connectionLost"
+        })
+    }
+
+    syncTimeWithFrontend() {
+        this.workerPostMessage({
+            type: "syncTime"
         })
     }
 }

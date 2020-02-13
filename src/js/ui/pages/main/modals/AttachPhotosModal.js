@@ -2,11 +2,7 @@ import VComponent from "../../../v/vrdom/component/VComponent";
 import {ModalHeaderFragment} from "./ModalHeaderFragment";
 import {InputComponent} from "../components/input/inputComponent";
 import AppSelectedPeer from "../../../reactive/SelectedPeer";
-import {PhotoFragment} from "../components/chat/message/photo/PhotoFragment";
-import TimeManager from "../../../../mtproto/timeManager";
-import AppConfiguration from "../../../../configuration";
 import {FileAPI} from "../../../../api/fileAPI";
-import {PhotoFigureFragment} from "../components/chat/message/photo/PhotoFigureFragment";
 import {Layouter} from "../../../utils/layout";
 import {ModalManager} from "../../../modalManager";
 
@@ -22,7 +18,7 @@ class GalleryFragment extends VComponent {
     }
 
     addPhoto(blob) {
-        if(this.props.blobs.length >= 10) return
+        if (this.props.blobs.length >= 10) return
         this.props.blobs.push(blob)
         this.__patch()
     }
@@ -33,6 +29,7 @@ class GalleryFragment extends VComponent {
         }))
     }
 }
+
 export class AttachPhotosModal extends VComponent {
     captionRef = VComponent.createComponentRef()
     galleryRef = VComponent.createComponentRef()

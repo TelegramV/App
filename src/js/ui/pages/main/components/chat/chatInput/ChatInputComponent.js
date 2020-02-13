@@ -1,12 +1,6 @@
-import Component from "../../../../../v/vrdom/Component";
 import {ContextMenuManager} from "../../../../../contextMenuManager";
 import {askForFile, convertBits, formatAudioTime} from "../../../../../utils";
-import Random from "../../../../../../mtproto/utils/random";
-import TimeManager from "../../../../../../mtproto/timeManager";
-import {createNonce} from "../../../../../../mtproto/utils/bin";
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
-import {InlineKeyboardComponent} from "../message/common/InlineKeyboardComponent";
-import {replaceEmoji} from "../../../../../utils/emoji"
 import ComposerComponent from "./ComposerComponent"
 import {MessageParser} from "../../../../../../api/messages/MessageParser";
 import {domToMessageEntities} from "../../../../../../mtproto/utils/htmlHelpers";
@@ -19,6 +13,7 @@ import UIEvents from "../../../../../eventBus/UIEvents";
 import VComponent from "../../../../../v/vrdom/component/VComponent";
 import VF from "../../../../../v/VFramework";
 import AppConfiguration from "../../../../../../configuration";
+import MTProto from "../../../../../../mtproto/external"
 
 export let ChatInputManager
 
@@ -34,7 +29,8 @@ export class ChatInputComponent extends VComponent {
     h() {
         return <div className="chat-input-wrapper">
             <div className="chat-input">
-            <ComposerComponent mouseEnter={this.mouseEnterComposer.bind(this)} mouseLeave={this.mouseLeaveComposer.bind(this)}/>
+                <ComposerComponent mouseEnter={this.mouseEnterComposer.bind(this)}
+                                   mouseLeave={this.mouseLeaveComposer.bind(this)}/>
                 <div className="input-and-keyboard-wrapper">
                     <div className="input-field-wrapper">
                         <div className="reply hidden">
@@ -52,9 +48,10 @@ export class ChatInputComponent extends VComponent {
                             <div className="another-fucking-wrapper">
                                 <div className="ico-wrapper">
                                     <i className="tgico tgico-smile btn-icon rp rps"
-                                       onMouseEnter={this.mouseEnterEmoji.bind(this)} onMouseLeave={this.mouseLeaveEmoji.bind(this)}/>
+                                       onMouseEnter={this.mouseEnterEmoji.bind(this)}
+                                       onMouseLeave={this.mouseLeaveEmoji.bind(this)}/>
                                 </div>
-                                <TextareaFragment ref={this.chatInputTextareaRef} parent={this} />
+                                <TextareaFragment ref={this.chatInputTextareaRef} parent={this}/>
 
                                 <div className="ico-wrapper">
 
@@ -91,21 +88,22 @@ export class ChatInputComponent extends VComponent {
 
                     </div>
 
-                            <div className="keyboard-markup">
-                                {/*{this.keyboardMarkup.rows.map(l => {*/}
-                                {/*    return <div className="row">*/}
-                                {/*        {l.buttons.map(q => {*/}
-                                {/*            return InlineKeyboardComponent.parseButton(null, q)*/}
-                                {/*        })}*/}
-                                {/*    </div>*/}
-                                {/*})}*/}
-                            </div>
+                    <div className="keyboard-markup">
+                        {/*{this.keyboardMarkup.rows.map(l => {*/}
+                        {/*    return <div className="row">*/}
+                        {/*        {l.buttons.map(q => {*/}
+                        {/*            return InlineKeyboardComponent.parseButton(null, q)*/}
+                        {/*        })}*/}
+                        {/*    </div>*/}
+                        {/*})}*/}
+                    </div>
                 </div>
 
 
                 <div className="round-button-wrapper">
                     <div className="round-button delete-button rp rps" onClick={l => this.onSend(l)}
-                         onMouseEnter={l => this.mouseEnterRemoveVoice(l)} onMouseLeave={l => this.mouseLeaveRemoveVoice(l)}>
+                         onMouseEnter={l => this.mouseEnterRemoveVoice(l)}
+                         onMouseLeave={l => this.mouseLeaveRemoveVoice(l)}>
                         <i className="tgico tgico-delete"/>
                     </div>
 
@@ -137,7 +135,7 @@ export class ChatInputComponent extends VComponent {
     }
 
 
-    appendText(text) {
+    appendText = (text) => {
         this.textarea.innerHTML += text
         this.chatInputTextareaRef.component.onInput();
     }
@@ -146,7 +144,7 @@ export class ChatInputComponent extends VComponent {
         return this.textarea && this.textarea.childNodes.length === 0
     }
 
-    initDragArea() {
+    initDragArea = () => {
         // TODO should create separate drag area!
         document.querySelector("body").addEventListener("drop", ev => {
             for (let i = 0; i < ev.dataTransfer.items.length; i++) {
@@ -171,27 +169,27 @@ export class ChatInputComponent extends VComponent {
         })
     }
 
-    mouseEnterComposer() {
+    mouseEnterComposer = () => {
         this.hideComposer = false;
     }
 
-    mouseLeaveComposer() {
+    mouseLeaveComposer = () => {
         this.hideComposer = true;
         this.planComposerClose()
     }
 
-    mouseEnterEmoji() {
+    mouseEnterEmoji = () => {
         VF.mountedComponents.get("composer").onShow();
         VF.mountedComponents.get("composer").$el.classList.add("visible");
         this.hideComposer = false;
     }
 
-    mouseLeaveEmoji() {
+    mouseLeaveEmoji = () => {
         this.hideComposer = true;
         this.planComposerClose()
     }
 
-    planComposerClose() {
+    planComposerClose = () => {
         this.withTimeout(() => {
             if (this.hideComposer) {
                 VF.mountedComponents.get("composer").$el.classList.remove("visible");
@@ -200,35 +198,35 @@ export class ChatInputComponent extends VComponent {
         }, 250);
     }
 
-    mouseEnterRemoveVoice() {
+    mouseEnterRemoveVoice = () => {
         this.isRemoveVoice = true
     }
 
-    mouseLeaveRemoveVoice() {
+    mouseLeaveRemoveVoice = () => {
         this.isRemoveVoice = false
     }
 
-    hide() {
+    hide = () => {
         this.$el.style.display = "none"
     }
 
-    show() {
+    show = () => {
         this.$el.style.display = "block"
     }
 
-    clear() {
+    clear = () => {
         this.closeReply()
         this.textarea.focus()
         this.chatInputTextareaRef.component.clearInput()
     }
 
-    navigateToReplied() {
-        if(this.reply) {
+    navigateToReplied = () => {
+        if (this.reply) {
             UIEvents.Bubbles.fire("showMessage", this.reply.message)
         }
     }
 
-    replyTo(message) {
+    replyTo = (message) => {
         this.reply = {
             title: message.from.name,
             description: MessageParser.getPrefixNoSender(message),
@@ -247,12 +245,12 @@ export class ChatInputComponent extends VComponent {
         this.textarea.focus()
     }
 
-    closeReply() {
+    closeReply = () => {
         this.reply = null
         this.$el.querySelector(".reply").classList.add("hidden")
     }
 
-    setKeyboardMarkup(markup) {
+    setKeyboardMarkup = (markup) => {
         // TODO selective
         if (markup._ === "replyKeyboardMarkup") {
             this.keyboardMarkup = markup
@@ -266,22 +264,22 @@ export class ChatInputComponent extends VComponent {
         // this.__patch()
     }
 
-    pickPoll() {
+    pickPoll = () => {
         ModalManager.open(<AttachPollModal/>)
     }
 
-    pickPhoto(blob) {
+    pickPhoto = (blob) => {
         // TODO wtf?
-        if(ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachPhotosModal) {
+        if (ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachPhotosModal) {
             ModalManager.$el.querySelector(".dialog").childNodes[0].__component.addPhoto(blob)
             return
         }
         ModalManager.open(<AttachPhotosModal media={[blob]}/>)
     }
 
-    pickFile(blob, file) {
+    pickFile = (blob, file) => {
         // TODO wtf?
-        if(ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachFilesModal) {
+        if (ModalManager.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachFilesModal) {
             ModalManager.$el.querySelector(".dialog").childNodes[0].__component.addFile(blob, file)
             return
         }
@@ -291,23 +289,23 @@ export class ChatInputComponent extends VComponent {
         }]}/>)
     }
 
-    attachFile() {
-        askForFile("", function (bytes, file) {
+    attachFile = () => {
+        askForFile("", (bytes, file) => {
             const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
 
             this.pickFile(URL.createObjectURL(blob), file)
-        }.bind(this), true, true)
+        }, true, true)
     }
 
-    attachPhoto() {
-        askForFile("image/*,video/*", function (bytes, file) {
+    attachPhoto = () => {
+        askForFile("image/*,video/*", (bytes, file) => {
             const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
 
             this.pickPhoto(URL.createObjectURL(blob))
-        }.bind(this), true, true)
+        }, true, true)
     }
 
-    tickTimer() {
+    tickTimer = () => {
         const time = formatAudioTime(this.i / 100) + "," + this.i % 100;
         this.$el.querySelector(".voice-seconds").innerHTML = time
         this.i++
@@ -321,7 +319,7 @@ export class ChatInputComponent extends VComponent {
         this.initDragArea()
     }
 
-    onSend(ev) {
+    onSend = (ev) => {
         if (this.isVoiceMode) return
         this.send()
     }
@@ -330,7 +328,7 @@ export class ChatInputComponent extends VComponent {
         return !!this.recorder
     }
 
-    onMouseUp(ev) {
+    onMouseUp = (ev) => {
         if (!this.isVoiceMode) return
 
         this.$el.querySelector(".delete-button").classList.remove("open")
@@ -349,50 +347,51 @@ export class ChatInputComponent extends VComponent {
 
     }
 
-    onRecordingReady(ev) {
+    onRecordingReady = (ev) => {
 
         if (this.isRemoveVoice) {
             this.isRemoveVoice = false
             return
         }
         // TODO refactor sending
-        const id = TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default)
-        var reader = new FileReader();
-        reader.readAsArrayBuffer(ev.data);
-        reader.onloadend = (event) => {
-            // The contents of the BLOB are in reader.result:
+        MTProto.TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default).then(id => {
+            var reader = new FileReader();
+            reader.readAsArrayBuffer(ev.data);
+            reader.onloadend = (event) => {
+                // The contents of the BLOB are in reader.result:
 
-            AppSelectedPeer.Current.api.sendMedia("", reader.result, {
-                _: "inputMediaUploadedDocument",
-                flags: 0,
-                file: {
-                    _: "inputFile",
-                    id: id,
-                    parts: 1,
-                    name: "audio.ogg"
-                },
-                mime_type: "audio/ogg",
-                attributes: [
-                    {
-                        //flags: 1024,
-                        // duration: 100,
-                        _: "documentAttributeAudio",
-                        pFlags: {
-                            voice: true,
-                            waveform: convertBits(this.waveform, 8, 5)
-                        },
+                AppSelectedPeer.Current.api.sendMedia("", reader.result, {
+                    _: "inputMediaUploadedDocument",
+                    flags: 0,
+                    file: {
+                        _: "inputFile",
+                        id: id,
+                        parts: 1,
+                        name: "audio.ogg"
                     },
-                    {
-                        _: "documentAttributeFilename",
-                        file_name: ""
-                    }
-                ]
-            })
-        }
-        console.log("onRecordingReady", ev)
+                    mime_type: "audio/ogg",
+                    attributes: [
+                        {
+                            //flags: 1024,
+                            // duration: 100,
+                            _: "documentAttributeAudio",
+                            pFlags: {
+                                voice: true,
+                                waveform: convertBits(this.waveform, 8, 5)
+                            },
+                        },
+                        {
+                            _: "documentAttributeFilename",
+                            file_name: ""
+                        }
+                    ]
+                })
+            }
+            console.log("onRecordingReady", ev)
+        })
     }
 
-    onMouseDown(ev) {
+    onMouseDown = (ev) => {
         if (!this.isVoiceMode) return
         if (!this.microphone) {
             navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
@@ -457,24 +456,28 @@ export class ChatInputComponent extends VComponent {
     }
 
 
-
-    convertEmojiToText(ee) {
-        if(ee.nodeType === Node.TEXT_NODE) return
-        for(const elem of ee.childNodes) {
-            if(elem.alt) {
+    convertEmojiToText = (ee) => {
+        if (ee.nodeType === Node.TEXT_NODE) return
+        for (const elem of ee.childNodes) {
+            if (elem.alt) {
                 ee.replaceChild(document.createTextNode(elem.alt), elem)
             }
             this.convertEmojiToText(elem)
         }
     }
 
-    send(silent = false) {
+    send = (silent = false) => {
         this.convertEmojiToText(this.textarea)
         let reply = this.reply ? this.reply.message.id : null
 
         const {text, messageEntities} = domToMessageEntities(this.textarea)
 
-        AppSelectedPeer.Current.api.sendMessage({text: text, messageEntities: messageEntities, replyTo: reply, silent: silent})
+        AppSelectedPeer.Current.api.sendMessage({
+            text: text,
+            messageEntities: messageEntities,
+            replyTo: reply,
+            silent: silent
+        })
 
         this.textarea.innerHTML = ""
         this.closeReply()
@@ -482,7 +485,7 @@ export class ChatInputComponent extends VComponent {
         this.updateSendButton()
     }
 
-    updateSendButton() {
+    updateSendButton = () => {
         if (this.textarea.childNodes.length === 0) {
             this.$el.querySelector(".send-button>.tgico-send").classList.add("hidden")
             this.$el.querySelector(".send-button>.tgico-microphone2").classList.remove("hidden")

@@ -1,6 +1,7 @@
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import type {Message} from "../messages/Message"
 import {Peer} from "./objects/Peer"
+import {arrayDeleteCallback} from "../common/utils/utils"
 
 /**
  * @property {Message} _lastMessage
@@ -8,7 +9,7 @@ import {Peer} from "./objects/Peer"
  */
 export class PeerMessages {
 
-    _peer: Peer = undefined
+    peer: Peer = undefined
 
     _messages: Map<number, Message> = new Map
     // id -> randomId
@@ -44,7 +45,7 @@ export class PeerMessages {
         readOutboxMaxId = 0,
         readInboxMaxId = 0,
     } = {}) {
-        this._peer = peer
+        this.peer = peer
 
         this.appendMany(messages)
 
@@ -121,12 +122,16 @@ export class PeerMessages {
     }
 
     set unreadCount(unreadCount) {
+        if (unreadCount < 0) {
+            //
+        }
+
         this._unreadCount = unreadCount
         this.clearUnreadIds()
 
         if (!this.isTransaction) {
-            if (this._peer.dialog) {
-                this._peer.dialog.fire("updateUnread")
+            if (this.peer.dialog) {
+                this.peer.dialog.fire("updateUnread")
             }
         }
     }
@@ -139,9 +144,9 @@ export class PeerMessages {
         this._unreadMentionsCount = unreadMentionsCount || this._unreadMentionsCount
 
         if (!this.isTransaction) {
-            if (this._peer.dialog) {
-                if (this._peer.dialog) {
-                    this._peer.dialog.fire("updateUnreadMentionsCount")
+            if (this.peer.dialog) {
+                if (this.peer.dialog) {
+                    this.peer.dialog.fire("updateUnreadMentionsCount")
                 }
             }
         }
@@ -159,8 +164,8 @@ export class PeerMessages {
             this._readOutboxMaxId = readOutboxMaxId || this._readOutboxMaxId
 
             if (!this.isTransaction) {
-                if (this._peer.dialog) {
-                    this._peer.dialog.fire("updateReadOutboxMaxId")
+                if (this.peer.dialog) {
+                    this.peer.dialog.fire("updateReadOutboxMaxId")
                 }
             }
         }
@@ -178,13 +183,13 @@ export class PeerMessages {
      */
     set readInboxMaxId(readInboxMaxId) {
         if (this.readInboxMaxId < readInboxMaxId) {
+            this.deleteUnreadBy(readInboxMaxId)
+
             this._readInboxMaxId = readInboxMaxId || this._readInboxMaxId
 
-            this.deleteUnreadBy(this._readInboxMaxId)
-
             if (!this.isTransaction) {
-                if (this._peer.dialog) {
-                    this._peer.dialog.fire("updateReadInboxMaxId")
+                if (this.peer.dialog) {
+                    this.peer.dialog.fire("updateReadInboxMaxId")
                 }
             }
         }
@@ -209,7 +214,7 @@ export class PeerMessages {
             return
         }
 
-        if (AppSelectedPeer.check(this._peer)) {
+        if (AppSelectedPeer.check(this.peer)) {
             for (const message of messages) {
                 this.appendSingle(message)
             }
@@ -237,7 +242,7 @@ export class PeerMessages {
      * @return boolean
      */
     appendSingle(message: Message) {
-        if (AppSelectedPeer.check(this._peer)) {
+        if (AppSelectedPeer.check(this.peer)) {
             this._messages.set(message.id, message)
 
             this._alreadySorted = false
@@ -264,7 +269,14 @@ export class PeerMessages {
      * @param {number} messageId
      */
     deleteSingle(messageId) {
-        this._messages.delete(messageId)
+
+        if (this._messages.has(messageId)) {
+            if (arrayDeleteCallback(this._sortedArray, message => message.id === messageId)) {
+                this._alreadySorted = false
+            }
+            this._messages.delete(messageId)
+        }
+
         this._otherMessages.delete(messageId)
         this.deleteUnread(messageId)
 
@@ -275,10 +287,11 @@ export class PeerMessages {
 
         if (this._prevLastMessage && messageId === this._prevLastMessage.id) {
             this._lastMessage = undefined
+            this._prevLastMessage = undefined
         }
 
         if (!this.isTransaction) {
-            this._peer.dialog.fire("deleteMessage", {
+            this.peer.dialog.fire("deleteMessage", {
                 messageId
             })
         }
@@ -295,8 +308,8 @@ export class PeerMessages {
         }
 
         if (!this.isTransaction) {
-            if (this._peer.dialog) {
-                this._peer.dialog.fire("updateUnread")
+            if (this.peer.dialog) {
+                this.peer.dialog.fire("updateUnread")
             }
         }
     }
@@ -315,12 +328,16 @@ export class PeerMessages {
                     this.deleteUnread(messageId)
                 }
             })
+
+            if (this.last && this.unreadCount !== this.last.id - maxMessageId) {
+                this.unreadCount = this.unreadCount - Math.abs(this.last.id - maxMessageId - this.unreadCount)
+            }
         }
 
         this.stopTransaction()
 
-        if (this._peer.dialog) {
-            this._peer.dialog.fire("updateUnread")
+        if (this.peer.dialog) {
+            this.peer.dialog.fire("updateUnread")
         }
     }
 
@@ -330,8 +347,8 @@ export class PeerMessages {
 
         if (!this.isTransaction) {
 
-            if (this._peer.dialog) {
-                this._peer.dialog.fire("updateUnread")
+            if (this.peer.dialog) {
+                this.peer.dialog.fire("updateUnread")
             }
         }
     }
@@ -343,6 +360,8 @@ export class PeerMessages {
     clear() {
         this._messages.clear()
         this._otherMessages.clear()
+        this._sortedArray = []
+        this._alreadySorted = false
     }
 
     /**
@@ -373,7 +392,7 @@ export class PeerMessages {
     fireTransaction(eventName = "updateSingle", data = {}) {
         this.stopTransaction()
 
-        this._peer.dialog.fire(eventName, data)
+        this.peer.dialog.fire(eventName, data)
 
     }
 

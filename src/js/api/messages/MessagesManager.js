@@ -55,7 +55,7 @@ class MessageManager extends Manager {
             message.init()
 
             if (message.from && message.from.type === "user") {
-                peer.dialog.removeActionByUserId(message.from.id)
+                peer.dialog.removeAction(message.from)
             }
 
             peer.dialog.fire("newMessage", {
@@ -100,6 +100,22 @@ class MessageManager extends Manager {
             updatePeerLastMessage(peer, update.message)
         })
 
+        MTProto.UpdatesManager.subscribe("updateNewScheduledMessage", update => {
+            let peer = undefined
+
+            if (update.message.pFlags.out) {
+                const peerType = getPeerTypeFromType(update.message.to_id._)
+                peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
+            } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUser().user.id) {
+                const peerType = getPeerTypeFromType(update.message.to_id._)
+                peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
+            } else {
+                peer = PeersStore.get("user", update.message.from_id)
+            }
+
+            updatePeerLastMessage(peer, update.message)
+        })
+
 
         MTProto.UpdatesManager.subscribe("updateDeleteChannelMessages", update => {
             const dialog = DialogsStore.get("channel", update.channel_id)
@@ -112,11 +128,7 @@ class MessageManager extends Manager {
                 })
 
                 if (!dialog.peer.messages.last) {
-                    DialogsManager.getPeerDialogs(dialog.peer).then(dialogs => {
-                        dialogs[0].fire("updateSingle", {
-                            dialog: dialogs[0]
-                        })
-                    })
+                    dialog.refresh()
                 }
 
                 dialog.peer.messages.fireTransaction("deleteChannelMessages", {
@@ -140,6 +152,8 @@ class MessageManager extends Manager {
 
                     if (!dialog.peer.messages.last) {
                         dialog.refresh()
+                    } else {
+                        console.log(dialog.peer.messages.last)
                     }
 
                     dialog.peer.messages.fireTransaction("deleteMessages", {
