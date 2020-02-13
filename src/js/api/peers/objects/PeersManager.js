@@ -61,17 +61,17 @@ class PeerManager extends Manager {
         })
 
         MTProto.UpdatesManager.subscribe("updateNotifySettings", update => {
-            if(update.peer._ === "notifyPeer") {
+            if (update.peer._ === "notifyPeer") {
                 let peer
-                if(update.peer.peer._ === "peerUser") {
+                if (update.peer.peer._ === "peerUser") {
                     peer = PeersStore.get("user", update.peer.peer.user_id)
-                } else if(update.peer.peer._ === "peerChat") {
+                } else if (update.peer.peer._ === "peerChat") {
                     peer = PeersStore.get("chat", update.peer.peer.chat_id)
-                } else if(update.peer.peer._ === "peerChannel") {
+                } else if (update.peer.peer._ === "peerChannel") {
                     peer = PeersStore.get("channel", update.peer.peer.channel_id)
                 }
 
-                if(peer && peer.full) {
+                if (peer && peer.full) {
                     peer.full.notify_settings = update.notify_settings
                     peer.fire("updateNotificationStatus", {
                         notifySettings: update.notify_settings
@@ -132,6 +132,8 @@ class PeerManager extends Manager {
                         peer._min_inputPeer = Message.to_id
                     }
                 }
+
+                return peer
             })
         }
 
@@ -147,6 +149,8 @@ class PeerManager extends Manager {
                         peer._min_inputPeer = Message.to_id
                     }
                 }
+
+                return peer
             })
         }
 

@@ -49,7 +49,7 @@ class DialogManager extends Manager {
                     if (dialog.peer.raw.status._ === "userStatusOnline" && dialog.peer.raw.status.expires < now) {
                         dialog.peer.status = {
                             _: "userStatusOffline",
-                            was_online: this.raw.status.expires
+                            was_online: dialog.peer.raw.status.expires
                         }
                     } else if (dialog.peer.raw.status._ === "userStatusOffline") {
                         if (!dialog.peer.raw.status._last_checked) {

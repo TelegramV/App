@@ -160,16 +160,15 @@ export class PeerApi {
                 PeersManager.fillPeersFromUpdate(l)
                 return l.participants
             })
-        } else if(this._peer.type === "chat") {
-            if(this._peer.full && this._peer.full.participants) {
+        } else if (this._peer.type === "chat") {
+            if (this._peer.full && this._peer.full.participants) {
                 return Promise.resolve(this._peer.full.participants.participants)
             }
 
-            return this._peer.fetchFull().then(l =>{
+            return this._peer.fetchFull().then(l => {
                 return this._peer.full.participants.participants
             })
-        } else
-        {
+        } else {
             return Promise.resolve()
         }
     }
@@ -261,7 +260,7 @@ export class PeerApi {
 
         // TODO fix albums
         let randomId = genMsgId(AppConfiguration.mtproto.dataCenter.default)
-        let message = new TextMessage(this.peer.dialog)
+        let message = new TextMessage(this.peer)
         message.fillRaw({
             pFlags: {
                 out: true,
@@ -317,14 +316,14 @@ export class PeerApi {
             }).then(response => {
                 if (response.updates) {
                     response.updates.forEach(l => {
-                        if (l._ === "updateMessageID") l.dialog = this.peer.dialog
+                        if (l._ === "updateMessageID") l.peer = this.peer
                     })
                 } else {
 
                     // this.peer.messages._sendingMessages.set(response.id, randomId)
                     // response.random_id = randomId
                 }
-                response.dialog = this.peer.dialog
+                response.peer = this.peer
                 response.message = text
                 response.reply_to_msg_id = replyTo
                 response.silent = silent
