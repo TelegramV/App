@@ -1,10 +1,13 @@
-export const DialogInfoDetailsCheckboxFragment = ({text, label}) => {
+export const DialogInfoDetailsCheckboxFragment = ({text, label, checked = false, onChange}) => {
     return (
         <div className="details">
             <div className="notifications-checkbox">
                 <div className="checkbox-input">
                     <label>
-                        <input type="checkbox"/>
+                        {checked ?
+                            <input type="checkbox" checked onChange={l => onChange(l)}/>
+                        : <input type="checkbox" onChange={l => onChange(l)}/>
+                        }
                         <span className="checkmark">
                         <div className="tgico tgico-check"/>
                     </span>

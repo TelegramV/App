@@ -180,6 +180,33 @@ export class PeerApi {
         }
     }
 
+    updateNotifySettings({
+                             show_previews,
+                             silent,
+                             mute_until,
+                             sound
+                         }) {
+        return MTProto.invokeMethod("account.updateNotifySettings", {
+            peer: {_: "inputNotifyPeer", peer: this._peer.inputPeer},
+            settings: {
+                _: "inputPeerNotifySettings",
+                pFlags: {
+                    silent: silent,
+                    show_previews: show_previews,
+                    mute_until: mute_until,
+                    sound: sound
+                }
+            }
+        }).then(l => {
+            if (l._ === "boolTrue" && this._peer.full) {
+                if (mute_until !== undefined) this._peer.full.notify_settings.mute_until = mute_until
+                if (silent !== undefined) this._peer.full.notify_settings.silent = silent
+                if (sound !== undefined) this._peer.full.notify_settings.sound = sound
+                if (show_previews !== undefined) this._peer.full.notify_settings.show_previews = show_previews
+            }
+        })
+    }
+
     sendMessage({
                     text,
                     media = null,
