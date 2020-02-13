@@ -4,6 +4,7 @@ import PeersStore from "../store/PeersStore"
 import AppEvents from "../eventBus/AppEvents"
 import {AppPermanentStorage} from "../common/storage"
 
+// todo: implement https://core.telegram.org/api/top-rating
 class TopPeersManager extends Manager {
 
     correspondents = new Set()

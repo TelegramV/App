@@ -14,11 +14,7 @@ const MessageFragment = ({m, peers, q}) => {
     return <ContactFragment url={peer.photo.smallUrl}
                             name={peer.name}
                             status={<span>{m.prefix}{highlightVRNodeWord(m.text, q)}</span>}
-                            time={m.getDate('en', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                            })}
+                            time={m.getFormattedDate()}
                             peer={peer}
                             onClick={() => {
                                 UIEvents.Bubbles.fire("showMessageInstant", m)

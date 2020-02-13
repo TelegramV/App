@@ -20,11 +20,7 @@ const MessageFragment = ({m, peers, onClick, q}) => {
                             name={peer.name}
                             status={highlightVRNodeWord(m.text, q)}
                             peer={peer}
-                            time={m.getDate('en', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                            })}
+                            time={m.getFormattedDate()}
                             onClick={onClick}/>
 }
 
