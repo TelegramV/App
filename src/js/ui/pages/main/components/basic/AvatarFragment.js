@@ -5,7 +5,7 @@ const AvatarFragment = ({peerPhoto, saved, deleted}) => {
 
     if (saved) {
         return (
-            <div onClick={this.openPeerInfo} className="avatar placeholder-saved placeholder-icon">
+            <div onClick={() => AppSelectedInfoPeer.select(peerPhoto.peer)} className="avatar placeholder-saved placeholder-icon">
                 <i className="tgico tgico-avatar_savedmessages"/>
             </div>
         )
@@ -21,7 +21,7 @@ const AvatarFragment = ({peerPhoto, saved, deleted}) => {
 
     if (hasAvatar) {
         return (
-            <div onClick={() => AppSelectedInfoPeer.select(this.props.peer)}
+            <div onClick={() => AppSelectedInfoPeer.select(peerPhoto.peer)}
                  id="messages-photo"
                  className="avatar"
                  style={`background-image: url(${peerPhoto.smallUrl});`}>
@@ -29,7 +29,7 @@ const AvatarFragment = ({peerPhoto, saved, deleted}) => {
         )
     } else {
         return (
-            <div onClick={() => AppSelectedInfoPeer.select(this.props.peer)}
+            <div onClick={() => AppSelectedInfoPeer.select(peerPhoto.peer)}
                  className={`avatar placeholder-${peerPhoto.letter.num}`}>
                 <span>{peerPhoto.letter.text}</span>
 
