@@ -1,54 +1,83 @@
-import Component from "../../../../../v/vrdom/Component"
 import PeersStore from "../../../../../../api/store/PeersStore"
-import { LeftBarComponent } from "../LeftBarComponent"
+import {LeftBarComponent} from "../LeftBarComponent"
 import UIEvents from "../../../../../eventBus/UIEvents"
 import BackgroundColorComponent from "./background/BackgroundColorComponent"
 import BackgroundImageComponent from "./background/BackgroundImageComponent"
-import { ContextMenuManager } from "../../../../../contextMenuManager";
+import {ContextMenuManager} from "../../../../../contextMenuManager";
 import GeneralSettingsComponent from "./GeneralSettingsComponent"
 import {logout} from "../../../../../../api/logout"
+import VComponent from "../../../../../v/vrdom/component/VComponent"
+
+const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
+    return (
+        <div className="settings-main">
+            <div className="sidebar-header">
+                <i className="btn-icon tgico tgico-back" onClick={_ => openPane("dialogs")}/>
+                <div className="sidebar-title">Settings</div>
+                <span className="btn-icon tgico tgico-more rp rps" onClick={ev => {
+                    ContextMenuManager.openBelow([
+                        {
+                            icon: "logout",
+                            title: "Log out",
+                            onClick: _ => {
+                                logout()
+                            }
+                        }
+                    ], ev.currentTarget, "right-top")
+                }}/>
+            </div>
+            <div class="photo-container ">
+
+                {me ? <img ref={selfAvatarFragmentRef} className="photo" src={me.photo.smallUrl} alt="avatar"/> : <div/>}
+            </div>
+            <div className="username">{me ? me.name : ""}</div>
+            <div className="phone-number">+{me ? me.phone : ""}</div>
+            <div className="list-menu">
+                <ButtonWithIconFragment icon="edit" name="Edit Profile"/>
+                <ButtonWithIconFragment icon="settings" name="General settings"
+                                        click={_ => openPane("general-settings")}/>
+                <ButtonWithIconFragment icon="unmute" name="Notifications"/>
+                <ButtonWithIconFragment icon="lock" name="Privacy and Security"/>
+                <ButtonWithIconFragment icon="language" name="Language"/>
+            </div>
+        </div>
+    )
+}
 
 export class SettingsComponent extends LeftBarComponent {
-    barName = "settings";
-    constructor(props) {
-        super(props);
+
+    barName = "settings"
+
+    selfAvatarFragmentRef = VComponent.createFragmentRef()
+    settingsMainRef = VComponent.createFragmentRef()
+
+    reactive(R) {
+        PeersStore.onSet(({peer}) => {
+            if (peer.isSelf) {
+                R.object(peer)
+                    .on("updatePhotoSmall", this.onSelfPhotoUpdate)
+                    .on("updatePhoto", this.onSelfPhotoUpdate)
+
+                this.settingsMainRef.patch({
+                    me: peer
+                })
+            }
+        })
     }
 
     h() {
+        const me = PeersStore.self()
+
         return (
             <div class="settings sidebar scrollable hidden">
-				<div class="settings-main">
-					<div class="sidebar-header">
-						<i class="btn-icon tgico tgico-back" onClick={_ => this.openPane("dialogs")}/>
-						<div class="sidebar-title">Settings</div>
-						<span class="btn-icon tgico tgico-more rp rps" onClick={ev => {
-							ContextMenuManager.openBelow([
-							{
-								icon: "logout",
-	                            title: "Log out",
-	                            onClick: _ => {
-                                    logout()
-                                }
-							}
-							], ev.currentTarget, "right-top")}}/>
-					</div>
-					<div class="photo-container">
-	                    <img class="photo" src=""/>
-	                </div>
-	                <div class="username"></div>
-	                <div class="phone-number"></div>
-	                <div class="list-menu">
-	                	<ButtonWithIconFragment icon="edit" name="Edit Profile"/>
-	                	<ButtonWithIconFragment icon="settings" name="General settings" click={_=>this.openPane("general-settings")}/>
-	                	<ButtonWithIconFragment icon="unmute" name="Notifications"/>
-	                	<ButtonWithIconFragment icon="lock" name="Privacy and Security"/>
-	                	<ButtonWithIconFragment icon="language" name="Language"/>
-	                </div>
-				</div>
-				<GeneralSettingsComponent previous="settings"/>
-				<BackgroundImageComponent previous="general-settings"/>
-				<BackgroundColorComponent previous="background-image"/>
-			</div>
+                <SettingsMainFragment me={me}
+                                      ref={this.settingsMainRef}
+                                      selfAvatarFragmentRef={this.selfAvatarFragmentRef}
+                                      openPane={this.openPane}/>
+                <GeneralSettingsComponent previous="settings"/>
+                <BackgroundImageComponent previous="general-settings"/>
+                <BackgroundColorComponent previous="background-image"/>
+            </div>
         )
     }
 
@@ -67,6 +96,12 @@ export class SettingsComponent extends LeftBarComponent {
         })
     }
 
+    onSelfPhotoUpdate = _ => {
+        // this.selfAvatarFragmentRef.patch({
+        //     photo: PeersStore.self().photo
+        // })
+    }
+
     fill = () => {
         if (this.filled) return;
 
@@ -75,14 +110,6 @@ export class SettingsComponent extends LeftBarComponent {
             this.openPane("dialogs") //cancelling opening, no info loaded yet
             return;
         }
-        if (peer.photo.bigUrl) {
-            this.$el.querySelector(".photo-container > .photo").src = peer.photo.bigUrl;
-        } else {
-            peer.photo.fetchBig().then(url => this.$el.querySelector(".photo-container > .photo").src = url);
-        }
-
-        this.$el.querySelector(".username").innerText = peer.name;
-        this.$el.querySelector(".phone-number").innerText = peer.phone;
 
         this.filled = true;
     }
@@ -107,12 +134,12 @@ export class SettingsComponent extends LeftBarComponent {
     }
 }
 
-export const ButtonWithIconFragment = ({ icon, name, click, slot }) => {
+export const ButtonWithIconFragment = ({icon, name, click, slot}) => {
     let iconClasses = ["button-icon", "tgico", "tgico-" + icon]
     return (
         <div class="button-with-icon rp" onClick={click}>
-			{icon? <i class={iconClasses.join(" ")}/> : slot}
-			<div class="button-title">{name}</div>
-		</div>
+            {icon ? <i class={iconClasses.join(" ")}/> : slot}
+            <div class="button-title">{name}</div>
+        </div>
     )
 }
