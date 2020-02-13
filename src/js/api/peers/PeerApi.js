@@ -363,4 +363,16 @@ export class PeerApi {
             MTProto.UpdatesManager.process(response)
         })
     }
+
+    deleteMessages(id) {
+        if (this.peer.type === "channel") {
+            return MTProto.invokeMethod("channels.deleteMessages", {
+                channel: this.peer.inputChannel,
+                id: id
+            })
+        } else {
+
+        }
+
+    }
 }

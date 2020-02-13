@@ -185,7 +185,6 @@ export class DialogInfoComponent extends RightBarComponent {
     }
 
     fetchMembersNextPage = _ => {
-        console.log(this.contentPages.members.offsetId)
         if (!this.contentPages.members.isFetching && AppSelectedInfoPeer.Current && this.contentPages.members.offsetId !== -1) {
             this.contentPages.members.isFetching = true
 

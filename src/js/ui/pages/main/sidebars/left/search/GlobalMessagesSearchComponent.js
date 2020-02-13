@@ -4,7 +4,6 @@ import SearchManager from "../../../../../../api/search/SearchManager"
 import {ContactFragment} from "../../../components/basic/ContactFragment"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import PeersStore from "../../../../../../api/store/PeersStore"
-import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
 
 const MessageFragment = ({m, peers}) => {
     const peer = m.to === PeersStore.self() ? m.from : m.to
@@ -19,6 +18,7 @@ const MessageFragment = ({m, peers}) => {
                                 minute: '2-digit',
                                 hour12: false
                             })}
+                            peer={peer}
                             onClick={() => {
                                 UIEvents.Bubbles.fire("showMessageInstant", m)
 
@@ -51,7 +51,8 @@ export class GlobalMessagesSearchComponent extends VComponent {
     }
 
     h() {
-        let list = this.state.messages.filter(m => m.to && m.from).map(m => <MessageFragment m={m} peers={this.peers}/>);
+        let list = this.state.messages.filter(m => m.to && m.from).map(m => <MessageFragment m={m}
+                                                                                             peers={this.peers}/>);
         return (
             <div className="global-messages">
                 <div className="section-title">Global search</div>

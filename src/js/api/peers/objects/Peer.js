@@ -175,6 +175,14 @@ export class Peer extends ReactiveObject {
         return this.isMin ? this.inputFromMessage : getInputFromPeer(this.type, this.id, this.accessHash)
     }
 
+    get inputChannel() {
+        return {
+            _: "inputChannel",
+            channel_id: this.id,
+            access_hash: this.accessHash,
+        }
+    }
+
     get inputPeerFromMessage() {
         if (this.type === "user") {
             return {

@@ -41,7 +41,8 @@ export class GlobalChatsSearchComponent extends VComponent {
                             return <ContactFragment url={p.photo.smallUrl}
                                                     name={p.name}
                                                     status={p.statusString.text}
-                                                    onClick={() => AppSelectedPeer.select(p)}/>
+                                                    onClick={() => AppSelectedPeer.select(p)}
+                                                    peer={p}/>
                         })
                     }
                     </div>
@@ -53,7 +54,8 @@ export class GlobalChatsSearchComponent extends VComponent {
                             this.state.peers.map(p => <ContactFragment url={p.photo.smallUrl}
                                                                        name={p.name}
                                                                        status={p.username ? `@${p.username}` : ``}
-                                                                       onClick={() => AppSelectedPeer.select(p)}/>)
+                                                                       onClick={() => AppSelectedPeer.select(p)}
+                                                                       peer={p}/>)
                         }
                     </div>
                 </div>

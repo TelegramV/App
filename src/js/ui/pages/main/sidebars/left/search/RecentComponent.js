@@ -34,6 +34,7 @@ export class RecentComponent extends VComponent {
                             return <ContactFragment url={peer.photo.smallUrl}
                                                     name={peer.name}
                                                     status={peer.statusString.text}
+                                                    peer={peer}
                                                     onClick={() => AppSelectedPeer.select(peer)}/>
                         })
                     }

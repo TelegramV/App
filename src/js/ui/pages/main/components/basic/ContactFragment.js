@@ -1,9 +1,9 @@
-export const ContactFragment = ({url, name = " ", status, time, onClick}) => {
+import AvatarFragment from "./AvatarFragment"
+
+export const ContactFragment = ({url, name = " ", status, time, onClick, peer}) => {
     return (
         <div class="contact-card" onClick={onClick}>
-            <div class="photo-container">
-                <img src={url}/>
-            </div>
+            <AvatarFragment peerPhoto={peer.photo} deleted={peer.isDeleted}/>
             <div class="info-container">
                 <div class="top">
                     <div class="name">{name}</div>

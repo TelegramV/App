@@ -67,7 +67,7 @@ export class PinnedComponent extends VComponent {
     }
 
     callbackChanged(key: string, value) {
-        if (key === "peer") {
+        if (key === "peer" && value) {
             this.state.message = value._pinnedMessage
         }
     }

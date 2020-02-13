@@ -1,6 +1,7 @@
 import AppSelectedInfoPeer from "../../../../reactive/SelectedInfoPeer";
 import {VComponent} from "../../../../v/vrdom/component/VComponent";
 import AppEvents from "../../../../../api/eventBus/AppEvents";
+import type {BusEvent} from "../../../../../api/eventBus/EventBus"
 
 class AvatarComponent extends VComponent {
 

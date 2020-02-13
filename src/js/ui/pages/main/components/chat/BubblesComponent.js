@@ -265,17 +265,20 @@ class BubblesComponent extends VComponent {
         if ($group) {
             const $bubblesList = $group.querySelector(".bubbles-list")
             let $otherMessage = $bubblesList.childNodes[!prepend ? $bubblesList.childNodes.length - 1 : 0]
-            let prev = $otherMessage.__component
-            if(prev.message instanceof ServiceMessage) {
-                $group = null
-            } else {
-                const from = prev.message.from
-                const threshold = 60 * 5
 
-                if (from === message.from && Math.abs(prev.message.date - message.date) <= threshold) {
-
-                } else {
+            if ($otherMessage) {
+                let prev = $otherMessage.__component
+                if (prev.message instanceof ServiceMessage) {
                     $group = null
+                } else {
+                    const from = prev.message.from
+                    const threshold = 60 * 5
+
+                    if (from === message.from && Math.abs(prev.message.date - message.date) <= threshold) {
+
+                    } else {
+                        $group = null
+                    }
                 }
             }
         }

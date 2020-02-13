@@ -1,11 +1,10 @@
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
+import AvatarFragment from "../../../components/basic/AvatarFragment"
 
 export const PeopleListItemFragment = ({url, name, peer}) => {
     return (
         <div class="people-list-item" onClick={() => selectPeer(peer)}>
-            <div class="photo-container">
-                <img src={url}/>
-            </div>
+            <AvatarFragment peerPhoto={peer.photo} deleted={peer.isDeleted}/>
             <div class="name">{name}</div>
         </div>
     )
