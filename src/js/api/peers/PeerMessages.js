@@ -1,6 +1,7 @@
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import type {Message} from "../messages/Message"
 import {Peer} from "./objects/Peer"
+import {arrayDeleteCallback} from "../common/utils/utils"
 
 /**
  * @property {Message} _lastMessage
@@ -264,7 +265,14 @@ export class PeerMessages {
      * @param {number} messageId
      */
     deleteSingle(messageId) {
-        this._messages.delete(messageId)
+
+        if (this._messages.has(messageId)) {
+            if (arrayDeleteCallback(this._sortedArray, message => message.id === messageId)) {
+                this._alreadySorted = false
+            }
+            this._messages.delete(messageId)
+        }
+
         this._otherMessages.delete(messageId)
         this.deleteUnread(messageId)
 
@@ -275,6 +283,7 @@ export class PeerMessages {
 
         if (this._prevLastMessage && messageId === this._prevLastMessage.id) {
             this._lastMessage = undefined
+            this._prevLastMessage = undefined
         }
 
         if (!this.isTransaction) {
@@ -343,6 +352,8 @@ export class PeerMessages {
     clear() {
         this._messages.clear()
         this._otherMessages.clear()
+        this._sortedArray = []
+        this._alreadySorted = false
     }
 
     /**

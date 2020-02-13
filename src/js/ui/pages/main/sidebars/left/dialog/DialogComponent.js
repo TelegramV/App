@@ -60,6 +60,8 @@ export class DialogComponent extends VComponent {
             .on("updateFolderId", this.onDialogUpdateFolderId)
             .on("updateActions", this.onDialogUpdateActions)
             .on("refreshed", this.onDialogRefreshed)
+            .on("deleteMessage", this.onDialogDeleteMessage)
+            .on("deleteMessages", this.onDialogDeleteMessage)
 
         R.object(this.dialog.peer)
             .on("updatePhoto", this.onPeerUpdatePhoto)
@@ -106,6 +108,12 @@ export class DialogComponent extends VComponent {
                     this._patchActive()
                 }
             }
+        }
+    }
+
+    onDialogDeleteMessage = _ => {
+        if (this.dialog.messages.last) {
+            this._patchMessageAndResort()
         }
     }
 

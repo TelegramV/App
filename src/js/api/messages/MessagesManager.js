@@ -128,11 +128,7 @@ class MessageManager extends Manager {
                 })
 
                 if (!dialog.peer.messages.last) {
-                    DialogsManager.getPeerDialogs(dialog.peer).then(dialogs => {
-                        dialogs[0].fire("updateSingle", {
-                            dialog: dialogs[0]
-                        })
-                    })
+                    dialog.refresh()
                 }
 
                 dialog.peer.messages.fireTransaction("deleteChannelMessages", {
@@ -156,6 +152,8 @@ class MessageManager extends Manager {
 
                     if (!dialog.peer.messages.last) {
                         dialog.refresh()
+                    } else {
+                        console.log(dialog.peer.messages.last)
                     }
 
                     dialog.peer.messages.fireTransaction("deleteMessages", {
