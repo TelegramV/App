@@ -2,7 +2,7 @@
   position: relative;
   padding-top: 60px;
   width: 100%;
-  transition: anim(width);
+  transition: anim(transform);
 
   &.hidden {
     display: block;

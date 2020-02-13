@@ -61,6 +61,18 @@ class BubblesComponent extends VComponent {
             .on("showMessage", this.onShowMessage)
             .on("showMessageInstant", this.onShowMessageInstant)
             .on("scrollToBottom", this.onScrollToBottom)
+
+        E.bus(UIEvents.RightSidebar)
+            .on("show", this.onRightSidebarShow)
+            .on("hide", this.onRightSidebarHide)
+    }
+
+    onRightSidebarShow = l => {
+        this.$el.parentNode.classList.add("right-bar-open")
+    }
+
+    onRightSidebarHide = l => {
+        this.$el.parentNode.classList.remove("right-bar-open")
     }
 
     h() {

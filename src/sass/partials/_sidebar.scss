@@ -8,13 +8,12 @@
     z-index: 2;
     position: absolute;
     box-sizing: border-box;
-    transition: anim(width);
 
     &.fade-in {
         left: 0 !important;
     }
 
-    &.hidden,
+    &.hidden:not(.right),
     .hidden {
         width: 0;
         display: none;
@@ -23,6 +22,12 @@
     &.right {
         border-right: none;
         border-left: $border;
+        position: absolute;
+        right: 0;
+
+        &.hidden {
+            transform: translateX(100%);
+        }
     }
 
     .sidebar-header {
@@ -128,10 +133,13 @@
     }
 
     &.messages-search {
-        position: relative;
+        //position: relative;
+        overflow-x: hidden;
+        transform: translateX(0);
+        transition: anim(transform);
 
         &.hidden {
-            display: block;
+            //display: block;
             border-left: none;
         }
         

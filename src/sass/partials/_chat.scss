@@ -44,6 +44,11 @@
         overflow: hidden;
         flex-direction: column;
         position: relative;
+        transition: anim(width);
+
+        &.right-bar-open {
+            width: calc(100% - 422px);
+        }
 
         #topbar {
             width: 100%;
