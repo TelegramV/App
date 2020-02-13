@@ -97,6 +97,10 @@ class PeerManager extends Manager {
 
         if (rawUpdate.users) {
             data.users = rawUpdate.users.map(rawUser => {
+                if (rawUser._ === "userEmpty") {
+                    console.warn("empty", rawUser)
+                }
+
                 const peer = PeersManager.setFromRaw(rawUser)
 
                 if (peer.isMin) {

@@ -49,7 +49,7 @@ export class PeerApi {
 
         PeersManager.fillPeersFromUpdate(Messages)
 
-        const messages = Messages.messages.map(rawMessage => {
+        const messages = Messages.messages.filter(m => m._ !== "messageEmpty").map(rawMessage => {
             return MessageFactory.fromRaw(this.peer, rawMessage)
         })
 

@@ -21,8 +21,6 @@ class GeneralMessageComponent extends VComponent {
     init() {
         this.intersectionObserver = this.props.intersectionObserver
         this.message = this.props.message
-
-        this.prevReadStatus = this.message.isRead
     }
 
     mounted() {
@@ -58,8 +56,7 @@ class GeneralMessageComponent extends VComponent {
     }
 
     onReadOutboxMaxId = (event: BusEvent) => {
-        if (this.message.isRead !== this.prevReadStatus && this.message.isOut) {
-            this.prevReadStatus = this.message.isRead
+        if (this.message.id <= this.message.to.messages.readOutboxMaxId && this.message.isOut) {
             this.messageOnRead()
         }
     }
@@ -113,7 +110,12 @@ class GeneralMessageComponent extends VComponent {
     }
 
     messageOnRead = () => {
-        this.$el.classList.add("read")
+        if (this.bubbleRef.$el) {
+            if (this.message.isRead && !this.bubbleRef.$el.classList.contains("read")) {
+                this.bubbleRef.$el.classList.add("read")
+                this.bubbleRef.$el.classList.remove("sent")
+            }
+        }
     }
 
     destroy() {

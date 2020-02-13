@@ -244,8 +244,16 @@ class MobileProtocol {
     }
 
     logout() {
-        return this.invokeMethod("auth.logOut")
-            .then(() => this.PermanentStorage.removeItem("authorizationData"))
+
+        try {
+            return this.invokeMethod("auth.logOut")
+                .then(() => {
+                    this.networker.socket.refreshSocket()
+                    this.PermanentStorage.removeItem("authorizationData")
+                })
+        } catch (e) {
+            return Promise.resolve()
+        }
     }
 
     changeDefaultDC(dcID) {

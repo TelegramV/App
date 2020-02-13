@@ -19,6 +19,10 @@ class MessageManager extends Manager {
          * @param {Object} lastMessage
          */
         const updatePeerLastMessage = (peer, lastMessage) => {
+            if (lastMessage._ === "messageEmpty") {
+                return
+            }
+
             if (!peer) {
                 console.error("BUG: peer was not found", lastMessage)
                 return
@@ -152,8 +156,6 @@ class MessageManager extends Manager {
 
                     if (!dialog.peer.messages.last) {
                         dialog.refresh()
-                    } else {
-                        console.log(dialog.peer.messages.last)
                     }
 
                     dialog.peer.messages.fireTransaction("deleteMessages", {

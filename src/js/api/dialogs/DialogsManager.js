@@ -45,7 +45,7 @@ class DialogManager extends Manager {
                     }
                 })
 
-                if (dialog.peer instanceof UserPeer) {
+                if (dialog.peer instanceof UserPeer && dialog.peer.raw.status) {
                     if (dialog.peer.raw.status._ === "userStatusOnline" && dialog.peer.raw.status.expires < now) {
                         dialog.peer.status = {
                             _: "userStatusOffline",
@@ -75,7 +75,7 @@ class DialogManager extends Manager {
 
             rawDifferenceWithPeer.__peer.dialog.fillRaw(rawDifferenceWithPeer.dialog)
 
-            rawDifferenceWithPeer.messages = rawDifferenceWithPeer.messages.map(m => MessageFactory.fromRaw(rawDifferenceWithPeer.__peer, m))
+            rawDifferenceWithPeer.messages = rawDifferenceWithPeer.messages.filter(m => m._ !== "messageEmpty").map(m => MessageFactory.fromRaw(rawDifferenceWithPeer.__peer, m))
             rawDifferenceWithPeer.__peer.messages.appendMany(rawDifferenceWithPeer.messages)
 
             AppEvents.Dialogs.fire("ChannelRefreshCausedByDifferenceTooLong", {
