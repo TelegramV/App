@@ -1,7 +1,6 @@
 import {VComponent} from "../../../../v/vrdom/component/VComponent"
 
 export class ObjectWithThumbnailComponent extends VComponent {
-
     init() {
         this.state = {
             object: this.props.object,
@@ -14,6 +13,7 @@ export class ObjectWithThumbnailComponent extends VComponent {
     h() {
         const object = this.state.object.real
         const thumb = object.thumbnail
+        console.log(this)
         return <figure className={[this.props.type, thumb ? "thumbnail" : ""]}>
             {
                 !thumb ?

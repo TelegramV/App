@@ -186,6 +186,7 @@ class BubblesComponent extends VComponent {
 
     onFetchedMessagesNextPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
+            console.log("next page!", event.messages)
             this.appendMessages(event.messages)
         }
     }
@@ -361,11 +362,23 @@ class BubblesComponent extends VComponent {
         const k = this.bubblesInnerRef.$el.clientHeight
         console.log("append! before, scrollTop=", z, "height=", k)
         const pushed = []
+        let i = 0
         for (const message of messages) {
             const all = [...this.messages.rendered.keys()]
             const last = all.length > 0 ? this.messages.rendered.get(all.reduce((l, q) => {
                 return l < q ? l : q
             })) : null
+
+            if(message.groupedId) {
+                const isNotReady = messages.slice(i, messages.length).every(l => {
+                    return l.groupedId === message.groupedId
+                })
+                console.log(message.groupedId, "readyStatus", isNotReady)
+                if(isNotReady) {
+                    break
+                }
+            }
+
 
             // if (showNewBadge && message.to && message.id === message.to.messages.readInboxMaxId) {
             //     VRDOM.append(<div className="service" css-padding-top="100px">
@@ -389,11 +402,12 @@ class BubblesComponent extends VComponent {
                     this.messages.renderedGroups.set(message.groupedId, message)
                 }
             }
+            i++
         }
 
         // console.log("append! after, scrollTop=", this.$el.scrollTop, "height=", this.bubblesInnerRef.$el.clientHeight, "scrollToWaited=", scrollToWaited, this.waitingScrollToMessage)
 
-        if(this.$el.scrollTop === z) {
+        if(this.$el.scrollTop === 0) {
             this.$el.scrollTop = z + this.bubblesInnerRef.$el.clientHeight - k
         }
         if (scrollToWaited) {
