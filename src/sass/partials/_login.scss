@@ -333,8 +333,9 @@ body,
 #cropperModal {
     .done-button {
         z-index: 1;
-        position: absolute;
-        right: 20px;
+        position: relative;
+        right: 10px;
+        margin-left: auto;
         bottom: 10px;
         width: 55px;
         height: 55px;

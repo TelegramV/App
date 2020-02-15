@@ -77,7 +77,7 @@ export default class RegisterPaneComponent extends PaneComponent {
 
     addPicture() {
         askForFile("image/*", function (file) {
-            ModalManager.open("Drag to Reposition",
+            ModalManager.open(
                 <div id="cropperModal" className="body">
                     <div id="cropper">
                     </div>

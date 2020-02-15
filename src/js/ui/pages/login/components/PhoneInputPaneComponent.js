@@ -8,7 +8,6 @@ import CountryDropdownItemComponent from "./common/countryDropdownItemComponent"
 
 import {MTProto} from "../../../../mtproto/external"
 import {countries} from "../../../utils"
-import defaultDcID from "../../../../application";
 import {AppPermanentStorage} from "../../../../api/common/storage";
 
 export default class PhoneInputComponent extends PaneComponent {

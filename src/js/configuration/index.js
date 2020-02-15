@@ -19,7 +19,7 @@ export const AppConfiguration = {
             initConnection: 0xc7481da6,
             api_id: 1147988,
             api_hash: "4acddf30a6113bfe220f7fd67ab7f468",
-            app_version: "0.1.0"
+            app_version: "0.2.0"
         }
     },
     get useNativeBigInt() {
