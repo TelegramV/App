@@ -31,7 +31,7 @@ const slotLoadingHeight = (photo, real) => {
     return <div css-background-image={`url(${real.src})`}/>
 }
 
-export const DialogInfoPhotoComponent = ({photo}) => {
+export const DialogInfoPhotoComponent = ({photo, click}) => {
     return <ObjectWithThumbnailComponent type="photo" loadObject={loadObject} object={photo} slotLoaded={slotLoaded}
-                                         slotLoadingWidth={slotLoadingWidth} slotLoadingHeight={slotLoadingHeight}/>
+                                         slotLoadingWidth={slotLoadingWidth} slotLoadingHeight={slotLoadingHeight} click={click}/>
 }

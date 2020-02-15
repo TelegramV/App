@@ -46,7 +46,7 @@ export class PhotoMessage extends AbstractMessage {
         this.loaded = false
         this.loading = true
 
-        FileAPI.getFile(this.raw.media.photo, this.maxSizeType).then(srcUrl => {
+        return FileAPI.getFile(this.raw.media.photo, this.maxSizeType).then(srcUrl => {
             this.srcUrl = srcUrl
 
             this.thumbnail = false

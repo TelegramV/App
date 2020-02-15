@@ -5,8 +5,9 @@ import GeneralMessageComponent from "../common/GeneralMessageComponent"
 import {PhotoMessage} from "../../../../../../../api/messages/objects/PhotoMessage"
 import {PhotoFigureFragment} from "./PhotoFigureFragment"
 import {VComponent} from "../../../../../../v/vrdom/component/VComponent"
+import {MediaViewerManager} from "../../../../../../mediaViewerManager";
 
-const MessagePhotoFigureFragment = ({message, clickLoader}) => {
+const MessagePhotoFigureFragment = ({message, clickLoader, click}) => {
     return (
         <PhotoFigureFragment id={`msg-photo-figure-${message.id}`}
                              srcUrl={message.srcUrl}
@@ -17,7 +18,8 @@ const MessagePhotoFigureFragment = ({message, clickLoader}) => {
                              maxHeight={512}
                              loading={message.loading}
                              loaded={message.loaded}
-                             clickLoader={clickLoader}/>
+                             clickLoader={clickLoader}
+                                click={click}/>
     )
 }
 
@@ -40,11 +42,15 @@ class PhotoMessageComponent extends GeneralMessageComponent {
             <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""} avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
                 <MessagePhotoFigureFragment ref={this.photoFigureRef}
                                             message={this.message}
-                                            clickLoader={this.toggleLoading}/>
+                                            clickLoader={this.toggleLoading} click={this.openMediaViewer}/>
                 {!text ? <MessageTimeComponent message={this.message} bg={true}/> : ""}
                 {text}
             </MessageWrapperFragment>
         )
+    }
+
+    openMediaViewer = event => {
+        MediaViewerManager.open(this.message)
     }
 
 
@@ -59,7 +65,8 @@ class PhotoMessageComponent extends GeneralMessageComponent {
         })
     }
 
-    toggleLoading = () => {
+    toggleLoading = (ev) => {
+        ev.stopPropagation()
         if (this.message.loading) {
             this.message.loading = false
             this.message.interrupted = true
