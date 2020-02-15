@@ -28,9 +28,9 @@ export const concat = (...uint8Arrays: Uint8Array[]) => {
     return uint8Array
 }
 
-const compute_auth_key_and_iv = async (auth_key: Uint8Array, msg_key: Uint8Array, x) => {
-    const sha256_a = await SHA256(concat(msg_key, substr(auth_key, x, 36)))
-    const sha256_b = await SHA256(concat(substr(auth_key, 40 + x, 36), msg_key))
+const compute_auth_key_and_iv = (auth_key: Uint8Array, msg_key: Uint8Array, x) => {
+    const sha256_a = SHA256(concat(msg_key, substr(auth_key, x, 36)))
+    const sha256_b = SHA256(concat(substr(auth_key, 40 + x, 36), msg_key))
     const aes_key = concat(substr(sha256_a, 0, 8), substr(sha256_b, 8, 16), substr(sha256_a, 24, 8))
     const aes_iv = concat(substr(sha256_b, 0, 8), substr(sha256_a, 8, 16), substr(sha256_b, 24, 8))
 
@@ -46,20 +46,20 @@ const compute_auth_key_and_iv = async (auth_key: Uint8Array, msg_key: Uint8Array
  * @param {Uint8Array} msg_key
  * @param {number} x
  */
-const decrypt = async (data: Uint8Array, auth_key: Uint8Array, msg_key: Uint8Array, x = 0) => {
+const decrypt = (data: Uint8Array, auth_key: Uint8Array, msg_key: Uint8Array, x = 0) => {
     if (data instanceof ArrayBuffer) {
         data = new Uint8Array(data)
     }
     if (auth_key instanceof ArrayBuffer) {
         auth_key = new Uint8Array(auth_key)
     }
-    if (data instanceof ArrayBuffer) {
+    if (msg_key instanceof ArrayBuffer) {
         msg_key = new Uint8Array(msg_key)
     }
 
-    const computed = await compute_auth_key_and_iv(auth_key, msg_key, x)
+    const computed = compute_auth_key_and_iv(auth_key, msg_key, x)
 
-    return await AES_IGE_DECRYPT(data, computed.aes_key, computed.aes_iv)
+    return AES_IGE_DECRYPT(data, computed.aes_key, computed.aes_iv)
 }
 
 /**
@@ -67,7 +67,7 @@ const decrypt = async (data: Uint8Array, auth_key: Uint8Array, msg_key: Uint8Arr
  * @param aes_key
  * @param aes_iv
  */
-const encrypt = async (data: Uint8Array, aes_key: Uint8Array, aes_iv: Uint8Array) => {
+const encrypt = (data: Uint8Array, aes_key: Uint8Array, aes_iv: Uint8Array) => {
     if (data instanceof ArrayBuffer) {
         data = new Uint8Array(data)
     }
@@ -77,7 +77,8 @@ const encrypt = async (data: Uint8Array, aes_key: Uint8Array, aes_iv: Uint8Array
     if (aes_iv instanceof ArrayBuffer) {
         aes_iv = new Uint8Array(aes_iv)
     }
-    return await AES_IGE_ENCRYPT(data, aes_key, aes_iv)
+
+    return AES_IGE_ENCRYPT(data, aes_key, aes_iv)
 }
 
 

@@ -6,16 +6,16 @@
 import Bytes from "../utils/bytes"
 import {rsaKeyByFingerprints} from "./rsaKeys"
 import {TLSerialization} from "../language/serialization"
-import {rsaEncrypt} from "../crypto/rsa"
-import {sha1BytesSync, sha1HashSync} from "../crypto/sha"
+import {RSA_ENCRYPT} from "../crypto/rsa"
+import {SHA1, SHA1_ArrayBuffer} from "../crypto/sha"
 import {TLDeserialization} from "../language/deserialization"
 import {tsNow} from "../timeManager"
 import {createLogger} from "../../api/common/logger"
 import {SecureRandomSingleton} from "../utils/singleton"
 import VBigInt from "../bigint/VBigInt"
 import PQ from "../utils/pq"
-import {aesEncryptSync} from "../crypto/aes"
 import TELEGRAM_CRYPTO from "../crypto/TELEGRAM_CRYPTO"
+import {AES_IGE_DECRYPT} from "../crypto/aes"
 
 const Logger = createLogger("authKeyCreation")
 
@@ -71,7 +71,7 @@ async function step4_req_DH_params(pAndQ, networker) {
         new_nonce: authContext.newNonce
     }, "P_Q_inner_data", "DECRYPTED_DATA") // todo: DECRYPTED_DATA???
 
-    let dataWithHash = sha1BytesSync(data_serializer.getBuffer())
+    let dataWithHash = SHA1(data_serializer.getBuffer())
     dataWithHash = dataWithHash.concat(data_serializer.getBytes())
 
     // const randPadding  = dataWithHash instanceof ArrayBuffer || dataWithHash instanceof Buffer || dataWithHash instanceof Uint8Array ? crypto.randomBytes(255 - dataWithHash.length) : new Array(crypto.randomBytes(255 - dataWithHash.length))
@@ -79,9 +79,7 @@ async function step4_req_DH_params(pAndQ, networker) {
     //
     // console.warn("x", dataWithHash)
 
-    let encryptedData = rsaEncrypt(authContext.publicKey, dataWithHash)
-
-    console.log(encryptedData)
+    let encryptedData = RSA_ENCRYPT(authContext.publicKey, dataWithHash)
 
     const deserializer = await networker.invokeMethod("req_DH_params", {
         nonce: authContext.nonce,
@@ -113,17 +111,17 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
         throw new Error("Server_DH_Params invalid server_nonce")
     }
 
-    authContext.tmpAesKey = sha1BytesSync(authContext.newNonce.concat(authContext.serverNonce))
-        .concat(sha1BytesSync(authContext.serverNonce.concat(authContext.newNonce))
+    authContext.tmpAesKey = SHA1(authContext.newNonce.concat(authContext.serverNonce))
+        .concat(SHA1(authContext.serverNonce.concat(authContext.newNonce))
             .slice(0, 12))
 
-    authContext.tmpAesIv = sha1BytesSync(authContext.serverNonce.concat(authContext.newNonce))
+    authContext.tmpAesIv = SHA1(authContext.serverNonce.concat(authContext.newNonce))
         .slice(12)
-        .concat(sha1BytesSync([].concat(authContext.newNonce, authContext.newNonce)), authContext.newNonce
+        .concat(SHA1([].concat(authContext.newNonce, authContext.newNonce)), authContext.newNonce
             .slice(0, 4))
 
 
-    const answer_with_hash = await TELEGRAM_CRYPTO.decrypt(ServerDHParams.encrypted_answer, authContext.tmpAesKey, authContext.tmpAesIv, 8)
+    const answer_with_hash = AES_IGE_DECRYPT(ServerDHParams.encrypted_answer, authContext.tmpAesKey, authContext.tmpAesIv)
 
     const hash = answer_with_hash.slice(0, 20)
     const answerWithPadding = answer_with_hash.slice(20)
@@ -183,8 +181,8 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
 
     const offset = deserializer.getOffset()
 
-    if (!Bytes.compare(hash, sha1BytesSync(answerWithPadding.slice(0, offset)))) {
-        throw new Error("server_DH_inner_data SHA1-hash mismatch")
+    if (!Bytes.compare(hash, SHA1(answerWithPadding.slice(0, offset)))) {
+        throw new Error("server_DH_inner_data SHA1_ArrayBuffer-hash mismatch")
     }
 
     networker.timeManager.applyServerTime(authContext.dcID, authContext.serverTime, authContext.localTime)
@@ -210,10 +208,10 @@ async function step6_set_client_DH_params(networker, processor, proc_context) {
         g_b: gB
     }, "Client_DH_Inner_Data")
 
-    const dataWithHash = sha1BytesSync(Client_DH_Inner_Data_serialization.getBuffer()).concat(Client_DH_Inner_Data_serialization.getBytes())
+    const dataWithHash = SHA1(Client_DH_Inner_Data_serialization.getBuffer()).concat(Client_DH_Inner_Data_serialization.getBytes())
     Logger.debug("mtpSendSetClientDhParams", dataWithHash, authContext)
 
-    const encryptedData = await TELEGRAM_CRYPTO.encrypt(dataWithHash, authContext.tmpAesKey, authContext.tmpAesIv)
+    const encryptedData = TELEGRAM_CRYPTO.encrypt(dataWithHash, authContext.tmpAesKey, authContext.tmpAesIv)
     let Set_client_DH_params_answer_response = await networker.invokeMethod("set_client_DH_params", {
         nonce: authContext.nonce,
         server_nonce: authContext.serverNonce,
@@ -238,13 +236,13 @@ async function step6_set_client_DH_params(networker, processor, proc_context) {
 
     Logger.debug("GOT auth key!", authKey)
 
-    const authKeyHash = sha1BytesSync(authKey)
+    const authKeyHash = SHA1(authKey)
     const authKeyAux = authKeyHash.slice(0, 8)
     const authKeyID = authKeyHash.slice(-8)
 
     switch (Set_client_DH_params_answer._) {
         case "dh_gen_ok":
-            const newNonceHash1 = Bytes.fromArrayBuffer(sha1HashSync(authContext.newNonce.concat([1], authKeyAux))).slice(-16)
+            const newNonceHash1 = Bytes.fromArrayBuffer(SHA1_ArrayBuffer(authContext.newNonce.concat([1], authKeyAux))).slice(-16)
 
             /**
              * FIXME: ...
@@ -265,7 +263,7 @@ async function step6_set_client_DH_params(networker, processor, proc_context) {
 
         case "dh_gen_retry":
             Logger.debug("RETRY!!!")
-            const newNonceHash2 = sha1BytesSync(authContext.newNonce.concat([2], authKeyAux)).slice(-16)
+            const newNonceHash2 = SHA1(authContext.newNonce.concat([2], authKeyAux)).slice(-16)
             if (!Bytes.compare(newNonceHash2, Set_client_DH_params_answer.new_nonce_hash2)) {
                 throw new Error("Set_client_DH_params_answer bad new_nonce_hash2")
             }
@@ -276,7 +274,7 @@ async function step6_set_client_DH_params(networker, processor, proc_context) {
             }, this)
 
         case "dh_gen_fail":
-            const newNonceHash3 = sha1BytesSync(authContext.newNonce.concat([3], authKeyAux)).slice(-16)
+            const newNonceHash3 = SHA1(authContext.newNonce.concat([3], authKeyAux)).slice(-16)
             if (!Bytes.compare(newNonceHash3, Set_client_DH_params_answer.new_nonce_hash3)) {
                 throw new Error("Set_client_DH_params_answer bad new_nonce_hash3")
             }

@@ -4,7 +4,7 @@
  */
 
 import {createNonce, longToBytes, uintToInt} from "../utils/bin"
-import {sha1BytesSync, SHA256, sha256HashSync} from "../crypto/sha"
+import {SHA1, SHA256} from "../crypto/sha"
 import {TLSerialization} from "../language/serialization"
 import {TLDeserialization} from "../language/deserialization"
 import {MessageProcessor} from "./MessageProcessor"
@@ -33,7 +33,7 @@ export class ApiNetworker extends Networker {
 
         console.log(this.auth)
 
-        this.auth.authKeyHash = sha1BytesSync(this.auth.authKey)
+        this.auth.authKeyHash = SHA1(this.auth.authKey)
         this.auth.authKeyAux = this.auth.authKeyHash.slice(0, 8)
         this.auth.authKeyID = this.auth.authKeyHash.slice(-8)
 
@@ -104,75 +104,76 @@ export class ApiNetworker extends Networker {
 
         // console.log(this.auth, msgKey, encryptedData)
 
-        TELEGRAM_CRYPTO.decrypt(encryptedData, this.auth.authKey, msgKey, 8).then(async dataWithPadding => {
-            const calcMsgKey = await this.getMsgKey(dataWithPadding, false)
-            if (!Bytes.compare(msgKey, calcMsgKey)) {
-                console.error(msgKey, calcMsgKey)
+        const dataWithPadding = TELEGRAM_CRYPTO.decrypt(encryptedData, this.auth.authKey, msgKey, 8)
 
-                throw new Error("bad server msgKey")
-            }
+        const calcMsgKey = this.getMsgKey(dataWithPadding, false)
 
-            deserializer = new TLDeserialization(dataWithPadding.buffer, {mtproto: true})
+        if (!Bytes.compare(msgKey, calcMsgKey)) {
+            console.error(msgKey, calcMsgKey)
 
-            const salt = deserializer.fetchIntBytes(64, false, "salt") // ??
-            const sessionID = deserializer.fetchIntBytes(64, false, "session_id")
-            const messageID = deserializer.fetchLong("message_id")
+            throw new Error("bad server msgKey")
+        }
 
-            const seqNo = deserializer.fetchInt("seq_no")
+        deserializer = new TLDeserialization(dataWithPadding.buffer, {mtproto: true})
 
-            const totalLength = dataWithPadding.byteLength
+        const salt = deserializer.fetchIntBytes(64, false, "salt") // ??
+        const sessionID = deserializer.fetchIntBytes(64, false, "session_id")
+        const messageID = deserializer.fetchLong("message_id")
 
-            const messageBodyLength = deserializer.fetchInt("message_data[length]")
-            let offset = deserializer.getOffset()
+        const seqNo = deserializer.fetchInt("seq_no")
 
-            if ((messageBodyLength % 4) ||
-                messageBodyLength > totalLength - offset) {
-                throw new Error("bad body length: " + messageBodyLength)
-            }
+        const totalLength = dataWithPadding.byteLength
 
-            const messageBody = deserializer.fetchRawBytes(messageBodyLength, true, "message_data")
+        const messageBodyLength = deserializer.fetchInt("message_data[length]")
+        let offset = deserializer.getOffset()
 
-            offset = deserializer.getOffset()
-            const paddingLength = totalLength - offset
-            if (paddingLength < 12 || paddingLength > 1024) {
-                throw new Error("bad padding length: " + paddingLength)
-            }
+        if ((messageBodyLength % 4) ||
+            messageBodyLength > totalLength - offset) {
+            throw new Error("bad body length: " + messageBodyLength)
+        }
 
-            const buffer = Bytes.asUint8Buffer(messageBody)
+        const messageBody = deserializer.fetchRawBytes(messageBodyLength, true, "message_data")
 
-            const self = this
+        offset = deserializer.getOffset()
+        const paddingLength = totalLength - offset
+        if (paddingLength < 12 || paddingLength > 1024) {
+            throw new Error("bad padding length: " + paddingLength)
+        }
 
-            const deserializerOptions = {
-                mtproto: true,
-                schema: schema,
-                override: {
-                    mt_rpc_result: function (result, field) {
-                        result.req_msg_id = this.fetchLong(`${field}[req_msg_id]`)
+        const buffer = Bytes.asUint8Buffer(messageBody)
 
-                        const sentMessage = self.messageProcessor.sentMessages.get(result.req_msg_id)
-                        const type = sentMessage && sentMessage.resultType || "Object"
+        const self = this
 
-                        if (result.req_msg_id && !sentMessage) {
-                            return
-                        }
+        const deserializerOptions = {
+            mtproto: true,
+            schema: schema,
+            override: {
+                mt_rpc_result: function (result, field) {
+                    result.req_msg_id = this.fetchLong(`${field}[req_msg_id]`)
 
-                        result.result = this.fetchObject(type, `${field}[result]`)
+                    const sentMessage = self.messageProcessor.sentMessages.get(result.req_msg_id)
+                    const type = sentMessage && sentMessage.resultType || "Object"
+
+                    if (result.req_msg_id && !sentMessage) {
+                        return
                     }
+
+                    result.result = this.fetchObject(type, `${field}[result]`)
                 }
             }
+        }
 
-            deserializer = new TLDeserialization(buffer, deserializerOptions)
+        deserializer = new TLDeserialization(buffer, deserializerOptions)
 
-            let response = {}
+        let response = {}
 
-            try {
-                response = deserializer.fetchObject("", "INPUT")
-            } catch (e) {
-                throw e
-            }
+        try {
+            response = deserializer.fetchObject("", "INPUT")
+        } catch (e) {
+            throw e
+        }
 
-            this.messageProcessor.process(response, messageID, sessionID)
-        })
+        this.messageProcessor.process(response, messageID, sessionID)
     }
 
 
@@ -183,14 +184,15 @@ export class ApiNetworker extends Networker {
         })
     }
 
-    async getMsgKey(plaintext, isOut) {
+    getMsgKey(plaintext, isOut) {
         if (plaintext instanceof ArrayBuffer) {
             plaintext = new Uint8Array(plaintext)
         }
 
         const auth_key = this.auth.authKey
         const x = isOut ? 0 : 8
-        const msg_key_large = await SHA256(concat(substr(auth_key, 88 + x, 32), plaintext))
+        const msg_key_large = SHA256(concat(substr(auth_key, 88 + x, 32), plaintext))
+
         return substr(msg_key_large, 8, 16);
     }
 
@@ -204,42 +206,14 @@ export class ApiNetworker extends Networker {
         this.connected = true
     }
 
-    getAesKeyIv(msgKey, isOut) {
-        const authKey = this.auth.authKey
-        const x = isOut ? 0 : 8
-        const sha2aText = new Uint8Array(52)
-        const sha2bText = new Uint8Array(52)
+    encryptMessage(data) {
+        const msgKey = this.getMsgKey(data, true)
+        const computed = TELEGRAM_CRYPTO.compute_key_and_iv(this.auth.authKey, msgKey, 0)
 
-        sha2aText.set(msgKey, 0)
-        sha2aText.set(authKey.subarray(x, x + 36), 16)
-        const sha2a = new Uint8Array(sha256HashSync(sha2aText))
-
-        sha2bText.set(authKey.subarray(40 + x, 40 + x + 36), 0)
-        sha2bText.set(msgKey, 36)
-        const sha2b = new Uint8Array(sha256HashSync(sha2bText))
-
-        const aesKey = new Uint8Array(32)
-        const aesIv = new Uint8Array(32)
-
-        aesKey.set(sha2a.subarray(0, 8))
-        aesKey.set(sha2b.subarray(8, 24), 8)
-        aesKey.set(sha2a.subarray(24, 32), 24)
-
-        aesIv.set(sha2b.subarray(0, 8))
-        aesIv.set(sha2a.subarray(8, 24), 8)
-        aesIv.set(sha2b.subarray(24, 32), 24)
-
-        return [aesKey, aesIv]
-    }
-
-    async getEncryptedMessage(dataWithPadding) {
-        const msgKey = await this.getMsgKey(dataWithPadding, true)
-        const keyIv = await TELEGRAM_CRYPTO.compute_key_and_iv(this.auth.authKey, msgKey, 0)
-
-        const encryptedBytes = await TELEGRAM_CRYPTO.encrypt(dataWithPadding, keyIv.aes_key, keyIv.aes_iv)
+        const encrypted = TELEGRAM_CRYPTO.encrypt(data, computed.aes_key, computed.aes_iv)
 
         return {
-            bytes: encryptedBytes,
+            bytes: encrypted,
             msgKey: msgKey
         }
     }
@@ -301,14 +275,14 @@ export class ApiNetworker extends Networker {
 
         const dataWithPadding = this.addHeader(message)
 
-        return this.getEncryptedMessage(dataWithPadding).then(encryptedResult => {
-            const request = new TLSerialization({startMaxLength: encryptedResult.bytes.byteLength + 256})
-            request.storeIntBytes(this.auth.authKeyID, 64, "auth_key_id")
-            request.storeIntBytes(encryptedResult.msgKey, 128, "msg_key")
-            request.storeRawBytes(encryptedResult.bytes, "encrypted_data")
+        const encryptedResult = this.encryptMessage(dataWithPadding)
 
-            super.sendMessage(request.getBuffer())
-        })
+        const request = new TLSerialization({startMaxLength: encryptedResult.bytes.byteLength + 256})
+        request.storeIntBytes(this.auth.authKeyID, 64, "auth_key_id")
+        request.storeIntBytes(encryptedResult.msgKey, 128, "msg_key")
+        request.storeRawBytes(encryptedResult.bytes, "encrypted_data")
+
+        super.sendMessage(request.getBuffer())
     }
 
     invokeMethod(method, params, options = {}) {

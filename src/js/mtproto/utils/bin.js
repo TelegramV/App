@@ -1,4 +1,3 @@
-import CryptoJS from "../vendor/crypto"
 import {Zlib} from "../vendor/zlib"
 import crypto from "crypto"
 import Bytes from "./bytes"
@@ -10,33 +9,6 @@ export function createRandomBuffer(bytesLength) {
 
 export function createNonce(bytesLength) {
     return createRandomBuffer(bytesLength);
-}
-
-export function bytesToWords(bytes) {
-    if (bytes instanceof ArrayBuffer) {
-        bytes = new Uint8Array(bytes)
-    }
-
-    const len = bytes.length
-    const words = []
-
-    for (let i = 0; i < len; i++) {
-        words[i >>> 2] |= bytes[i] << (24 - (i % 4) * 8)
-    }
-
-    return new CryptoJS.lib.WordArray.init(words, len)
-}
-
-export function bytesFromWords(wordArray) {
-    const words = wordArray.words
-    const sigBytes = wordArray.sigBytes
-    const bytes = []
-
-    for (let i = 0; i < sigBytes; i++) {
-        bytes.push((words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff)
-    }
-
-    return bytes
 }
 
 export function uint6ToBase64(nUint6) {
@@ -53,22 +25,6 @@ export function uint6ToBase64(nUint6) {
                         : 65
 }
 
-export function convertToByteArray(bytes) {
-    if (Array.isArray(bytes)) {
-        return bytes
-    }
-
-    bytes = Bytes.asUint8Array(bytes)
-
-    const newBytes = []
-
-    for (let i = 0, len = bytes.length; i < len; i++) {
-        newBytes.push(bytes[i])
-    }
-
-    return newBytes
-}
-
 export function longToInts(sLong) {
     const divRem = VBigInt.create(sLong).divideAndRemainder(VBigInt.create(0x100000000))
 
@@ -76,7 +32,7 @@ export function longToInts(sLong) {
 }
 
 export function longToBytes(sLong) {
-    return bytesFromWords({words: longToInts(sLong), sigBytes: 8}).reverse()
+    return Bytes.fromWords({words: longToInts(sLong), sigBytes: 8}).reverse()
 }
 
 export function longFromInts(high, low) {

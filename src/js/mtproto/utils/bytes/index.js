@@ -3,6 +3,7 @@ import {SecureRandomSingleton} from "../singleton"
 import crypto from "crypto"
 import VBigInt from "../../bigint/VBigInt"
 import {BigInteger} from "../../vendor/jsbn/jsbn"
+import CryptoJS from "../../vendor/crypto"
 
 /**
  * @param {Array|ArrayLike|ArrayBufferLike} a
@@ -290,6 +291,33 @@ function randomArray(length = 32) {
     return bytesArray
 }
 
+function fromWords(wordArray) {
+    const words = wordArray.words
+    const sigBytes = wordArray.sigBytes
+    const bytes = []
+
+    for (let i = 0; i < sigBytes; i++) {
+        bytes.push((words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff)
+    }
+
+    return bytes
+}
+
+function toWords(bytes) {
+    if (bytes instanceof ArrayBuffer) {
+        bytes = new Uint8Array(bytes)
+    }
+
+    const len = bytes.length
+    const words = []
+
+    for (let i = 0; i < len; i++) {
+        words[i >>> 2] |= bytes[i] << (24 - (i % 4) * 8)
+    }
+
+    return new CryptoJS.lib.WordArray.init(words, len)
+}
+
 /**
  * @param {number} length
  * @return {ArrayBufferLike|ArrayBuffer|Buffer}
@@ -313,6 +341,8 @@ const Bytes = {
     modPow: modPow,
     addPadding: addPadding,
     concat,
+    fromWords,
+    toWords,
     concatBuffer: concatBuffer,
 }
 

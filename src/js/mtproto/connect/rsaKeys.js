@@ -1,5 +1,5 @@
 import {TLSerialization} from "../language/serialization"
-import {sha1BytesSync} from "../crypto/sha"
+import {SHA1} from "../crypto/sha"
 import Bytes from "../utils/bytes"
 import VBigInt from "../bigint/VBigInt"
 
@@ -39,7 +39,7 @@ function prepare() {
 
         let buffer = rsaPublicKeySerializer.getBuffer()
 
-        let fingerprintBytes = sha1BytesSync(buffer).slice(-8)
+        let fingerprintBytes = SHA1(buffer).slice(-8)
         fingerprintBytes.reverse()
 
         parsedKeys[Bytes.asHex(fingerprintBytes)] = {
