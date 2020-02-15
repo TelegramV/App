@@ -355,7 +355,7 @@
     background-color: white;
     border-radius: 10px;
     flex-direction: column;
-    bottom: 70px;
+    bottom: 64px;
     left: 0;
     z-index: 900;
 
@@ -445,8 +445,19 @@
         .selected {
           grid-template-columns: repeat(5, 1fr);
           align-items: flex-start;
+          grid-gap: 5px;
+          overflow-x: hidden;
+
           .sticker {
             cursor: pointer;
+            border-radius: 5px;
+            margin-top: auto;
+            margin-bottom: auto;
+
+            &:hover {
+              // TODO replace with proper one
+              background-color: #F4F4F5;
+            }
           }
         }
       }
