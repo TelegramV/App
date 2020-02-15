@@ -43,7 +43,7 @@ export class UpdatesQueue {
     isWaitingForDifference = false
 
     constructor(queue = []) {
-        this.queue = []
+        this.queue = queue
     }
 
     shift = () => {

@@ -3,57 +3,27 @@ import PeersStore from "../store/PeersStore"
 import PeersManager from "../peers/objects/PeersManager"
 import {Peer} from "../peers/objects/Peer"
 import AppEvents from "../eventBus/AppEvents"
+import {checkUpdatePts, UpdatesProcessor, UpdatesQueue} from "./UpdatesProcessor"
 
-/**
- * @param rawUpdate
- * @return {boolean}
- */
-function hasUpdatePts(rawUpdate) {
-    return rawUpdate.pts !== undefined
-}
+class ChannelUpdatesQueue extends UpdatesQueue {
 
-/**
- * @param rawUpdate
- * @return {boolean}
- */
-function hasUpdatePtsCount(rawUpdate) {
-    return rawUpdate.pts_count !== undefined
-}
+    channelId: number
 
-
-/**
- * @param {Peer} peer
- * @param rawUpdate
- * @param onSuccess
- * @param onFail
- */
-function checkChannelUpdatePts(peer, rawUpdate, {onSuccess, onFail}) {
-    if (hasUpdatePts(rawUpdate) && hasUpdatePtsCount(rawUpdate)) {
-        if ((peer.dialog.pts + rawUpdate.pts_count) === rawUpdate.pts) {
-            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
-        } else if ((peer.dialog.pts + rawUpdate.pts_count) > rawUpdate.pts) {
-            // console.debug("[channel] update already processed (it is actually bug, but should work anyway)")
-            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
-        } else {
-            // console.warn("[channel] channel update cannot be processed", rawUpdate._, peer.dialog.pts, rawUpdate.pts_count, rawUpdate.pts)
-            onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
-        }
-    } else {
-        // console.debug("[channel] channel update has no pts")
-        onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
+    constructor(channelId, queue = []) {
+        super(queue)
+        this.channelId = channelId
     }
 }
 
 /**
  * TODO: `updateChannelTooLong` need to be implemented
- * TODO: rewrite using `UpdatesProcessor`
  */
-export class ChannelsUpdateProcessor {
+export class ChannelsUpdateProcessor extends UpdatesProcessor {
     /**
      * @param {UpdateManager} updatesManager
      */
     constructor(updatesManager) {
-        this.updatesManager = updatesManager
+        super(updatesManager)
 
         this.customUpdateTypeProcessors = new Map([
             ["updateNewChannelMessage", this.processNewChannelMessageUpdate],
@@ -81,17 +51,13 @@ export class ChannelsUpdateProcessor {
         ]
 
         /**
-         * @type {Map<number, {isProcessing: boolean, isWaitingForDifference: boolean, queue: Array}>}
+         * @type {Map<number, UpdatesQueue>}
          */
         this.queues = new Map()
 
         this.latestDifferenceTime = Number.MAX_VALUE
 
         this.latestDifferencePeer = undefined
-    }
-
-    applyUpdate(rawUpdate) {
-        this.updatesManager.fire(rawUpdate)
     }
 
     enqueue(rawUpdate) {
@@ -103,40 +69,34 @@ export class ChannelsUpdateProcessor {
         }
 
         if (!this.queues.has(channelId)) {
-            this.queues.set(channelId, {
-                isProcessing: false,
-                isWaitingForDifference: false,
-                queue: [],
-            })
+            this.queues.set(channelId, new ChannelUpdatesQueue(channelId))
         }
 
         const channelQueue = this.queues.get(channelId)
 
         if (!channelQueue.isWaitingForDifference) {
             if (this.updateTypes.includes(rawUpdate._)) {
-                channelQueue.queue.push(rawUpdate)
+                channelQueue.push(rawUpdate)
 
-                this.processQueue(channelId)
+                this.processQueue(channelQueue)
             } else
                 // should never be true, but who knows
             if (this.differenceUpdateTypes.includes(rawUpdate._)) {
                 console.error("BUG: difference was passed to enqueue")
             }
         } else {
-            channelQueue.queue.push(rawUpdate)
+            channelQueue.push(rawUpdate)
 
             // console.warn("[channel] waiting for diff")
         }
     }
 
-    processQueue(channelId) {
-        const channelQueue = this.queues.get(channelId)
-
+    processQueue(channelQueue: ChannelUpdatesQueue) {
         if (!channelQueue) {
             return
         }
 
-        const queue = channelQueue.queue
+        const queue = channelQueue
 
         if ((queue.length > 0) && !channelQueue.isProcessing) {
             if (channelQueue.isWaitingForDifference) {
@@ -153,23 +113,17 @@ export class ChannelsUpdateProcessor {
             }
 
             if (this.customUpdateTypeProcessors.has(rawUpdate._)) {
-                this.customUpdateTypeProcessors.get(rawUpdate._)(channelId, channelQueue, rawUpdate)
+                this.customUpdateTypeProcessors.get(rawUpdate._)(channelQueue, rawUpdate)
                 channelQueue.isProcessing = false
                 return
             }
 
-            if (!channelId) {
-                channelQueue.isProcessing = false
-                this.processQueue(channelId)
-                return
-            }
-
-            const peer = PeersStore.get("channel", channelId)
+            const peer = PeersStore.get("channel", channelQueue.channelId)
 
             // ignore if no peer found
             if (!peer) {
                 channelQueue.isProcessing = false
-                this.processQueue(channelId)
+                this.processQueue(channelQueue)
                 return
             }
 
@@ -177,30 +131,74 @@ export class ChannelsUpdateProcessor {
             if (!peer.dialog) {
                 console.error("BUG: dialog was not found! we should fetch new!", peer, rawUpdate)
                 channelQueue.isProcessing = false
-                this.processQueue(channelId)
+                this.processQueue(channelQueue)
                 return
             }
 
             if (peer.dialog.pts === -1) {
                 console.warn("Very BAD BUG: found dialog created manually", peer, rawUpdate)
                 channelQueue.isProcessing = false
-                this.processQueue(channelId)
+                this.processQueue(channelQueue)
                 return
             }
 
-            this.checkChannelUpdate(peer, channelId, channelQueue, rawUpdate)
+            this.processWithValidation(channelQueue, rawUpdate, peer)
 
         }
     }
 
-    processNewChannelMessageUpdate = (channelId, channelQueue, rawUpdate) => {
+    processWithValidation(queue: UpdatesQueue, rawUpdate, peer: Peer) {
+        if (peer) {
+            rawUpdate.__peer = peer
+        } else {
+            return
+        }
+
+        checkUpdatePts(peer.dialog.pts, rawUpdate, {
+            onSuccess: (type) => {
+                if (type === MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED) {
+                    peer.dialog.pts = rawUpdate.pts
+                    this.applyUpdate(rawUpdate)
+                } else if (type === MTProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
+                    this.applyUpdate(rawUpdate)
+                }
+
+                queue.isProcessing = false
+                this.processQueue(queue)
+            },
+            onFail: (type) => {
+                this.latestDifferenceTime = MTProto.TimeManager.now(true)
+                queue.isWaitingForDifference = true
+                queue.isProcessing = false
+
+                if (peer.isMin) {
+                    console.error("BUG: peer is min, processing next update", peer)
+                    queue.isWaitingForDifference = false
+                    peer.dialog.pts = rawUpdate.pts
+                    this.processQueue(queue)
+                    return
+                }
+
+                this.getChannelDifference(peer).then(rawDifference => {
+                    this.processDifference(queue, rawDifference)
+                }).catch(e => {
+                    console.error("BUG: channel difference obtaining failed", e)
+                    queue.isWaitingForDifference = false
+                    this.processQueue(queue)
+                })
+            }
+        })
+    }
+
+
+    processNewChannelMessageUpdate = (channelQueue, rawUpdate) => {
 
         if (!channelQueue) {
             console.error("BUG: invalid channelQueue was passed")
             return
         }
 
-        const peer = PeersStore.get("channel", channelId)
+        const peer = PeersStore.get("channel", channelQueue.channelId)
 
         // ignore and pass to higher level if no peer found
         if (!peer) {
@@ -211,7 +209,7 @@ export class ChannelsUpdateProcessor {
 
             this.applyUpdate(rawUpdate)
 
-            this.processQueue(channelId)
+            this.processQueue(channelQueue)
             return
         }
 
@@ -225,21 +223,21 @@ export class ChannelsUpdateProcessor {
 
             this.applyUpdate(rawUpdate)
 
-            this.processQueue(channelId)
+            this.processQueue(channelQueue)
             return
         }
 
-        this.checkChannelUpdate(peer, channelId, channelQueue, rawUpdate)
+        this.processWithValidation(channelQueue, rawUpdate, peer)
     }
 
-    processUpdateChannelUpdate = (channelId, channelQueue, rawUpdate) => {
+    processUpdateChannelUpdate = (channelQueue, rawUpdate) => {
 
         if (!channelQueue) {
             console.error("BUG: invalid channelQueue was passed")
             return
         }
 
-        const peer = PeersStore.get("channel", channelId)
+        const peer = PeersStore.get("channel", channelQueue.channelId)
 
         // ignore and pass to higher level if no peer found
         if (!peer) {
@@ -248,7 +246,7 @@ export class ChannelsUpdateProcessor {
 
             this.applyUpdate(rawUpdate)
 
-            this.processQueue(channelId)
+            this.processQueue(channelQueue)
             return
         }
 
@@ -261,54 +259,11 @@ export class ChannelsUpdateProcessor {
 
             this.applyUpdate(rawUpdate)
 
-            this.processQueue(channelId)
+            this.processQueue(channelQueue)
             return
         }
 
-        this.checkChannelUpdate(peer, channelId, channelQueue, rawUpdate)
-    }
-
-    checkChannelUpdate(peer, channelId, channelQueue, rawUpdate) {
-        const self = this
-
-        if (peer) {
-            rawUpdate.__peer = peer
-        }
-
-        checkChannelUpdatePts(peer, rawUpdate, {
-            onSuccess: (type) => {
-                if (type === MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED) {
-                    peer.dialog.pts = rawUpdate.pts
-                    self.applyUpdate(rawUpdate)
-                } else if (type === MTProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
-                    self.applyUpdate(rawUpdate)
-                }
-
-                channelQueue.isProcessing = false
-                self.processQueue(channelId)
-            },
-            onFail: (type) => {
-                self.latestDifferenceTime = MTProto.TimeManager.now(true)
-                channelQueue.isWaitingForDifference = true
-                channelQueue.isProcessing = false
-
-                if (peer.isMin) {
-                    console.error("BUG: peer is min, processing next update", peer)
-                    channelQueue.isWaitingForDifference = false
-                    peer.dialog.pts = rawUpdate.pts
-                    self.processQueue(channelId)
-                    return
-                }
-
-                self.getChannelDifference(peer).then(rawDifference => {
-                    self.processDifference(channelQueue, rawDifference)
-                }).catch(e => {
-                    console.error("BUG: channel difference obtaining failed", e)
-                    channelQueue.isWaitingForDifference = false
-                    self.processQueue(channelId)
-                })
-            }
-        })
+        this.processWithValidation(channelQueue, rawUpdate, peer)
     }
 
     processDifference(channelQueue, rawDifferenceWithPeer) {
@@ -340,7 +295,7 @@ export class ChannelsUpdateProcessor {
 
                 rawDifferenceWithPeer.__peer.dialog.pts = rawDifferenceWithPeer.pts
                 channelQueue.isWaitingForDifference = false
-                this.processQueue()
+                this.processQueue(channelQueue)
 
             } else {
                 // console.warn("[channel] difference is not final", rawDifferenceWithPeer)
@@ -356,7 +311,7 @@ export class ChannelsUpdateProcessor {
                     console.error("BUG: channel difference obtaining failed", e)
 
                     channelQueue.isWaitingForDifference = false
-                    this.processQueue()
+                    this.processQueue(channelQueue)
                 })
             }
         } else if (rawDifferenceWithPeer._ === "updates.channelDifferenceTooLong") {
@@ -370,7 +325,7 @@ export class ChannelsUpdateProcessor {
 
             channelQueue.isWaitingForDifference = false
 
-            this.processQueue()
+            this.processQueue(channelQueue)
 
         } else if (rawDifferenceWithPeer._ === "updates.channelDifferenceEmpty") {
             // console.warn("difference empty")
@@ -383,11 +338,11 @@ export class ChannelsUpdateProcessor {
             channelQueue.isWaitingForDifference = false
             rawDifferenceWithPeer.__peer.dialog.pts = rawDifferenceWithPeer.pts
 
-            this.processQueue()
+            this.processQueue(channelQueue)
         } else {
             channelQueue.isWaitingForDifference = false
             console.error("BUG: invalid difference constructor")
-            this.processQueue()
+            this.processQueue(channelQueue)
         }
     }
 

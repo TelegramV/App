@@ -248,8 +248,8 @@ class MobileProtocol {
         try {
             return this.invokeMethod("auth.logOut")
                 .then(() => {
-                    this.networker.socket.refreshSocket()
                     this.PermanentStorage.removeItem("authorizationData")
+                    this.networker.socket.refreshSocket()
                 })
         } catch (e) {
             return Promise.resolve()

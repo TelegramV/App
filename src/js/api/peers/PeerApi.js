@@ -28,7 +28,7 @@ export class PeerApi {
      * @param props
      * @return {Promise<Message[]>}
      */
-    async getHistory(props = {offset_id: 0, limit: 20}) {
+    async getHistory(props = {offset_id: 0, limit: 20}, addUnread = false) {
         const Messages = await MTProto.invokeMethod("messages.getHistory", {
             peer: this.peer.inputPeer,
             offset_id: props.offset_id,
@@ -53,7 +53,7 @@ export class PeerApi {
             return MessageFactory.fromRaw(this.peer, rawMessage)
         })
 
-        this.peer.messages.appendMany(messages)
+        this.peer.messages.appendMany(messages, addUnread)
 
         messages.forEach(message => {
             message.init()

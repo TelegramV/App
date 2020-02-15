@@ -13,7 +13,6 @@ import {SupergroupPeer} from "../../../../../api/peers/objects/SupergroupPeer";
 import {MessageAvatarComponent} from "./message/common/MessageAvatarComponent";
 import {UserPeer} from "../../../../../api/peers/objects/UserPeer";
 import {ServiceMessage} from "../../../../../api/messages/objects/ServiceMessage";
-import {MessageType} from "../../../../../api/messages/Message";
 import MTProto from "../../../../../mtproto/external";
 
 const DATA_FORMAT_MONTH_DAY = {
@@ -103,7 +102,6 @@ class BubblesComponent extends VComponent {
                     this.callbacks.peer.fetchFull()
                 }
 
-                // this.markAllAsRead()
                 this.refreshMessages()
             } else {
                 this.clearBubbles()
@@ -118,8 +116,8 @@ class BubblesComponent extends VComponent {
     onShowMessageInstant = message => {
         this.showInstant = true
         let to = message.to
-        if(message.to instanceof UserPeer) {
-            if(message.to.id === MTProto.getAuthorizedUser().user.id) {
+        if (message.to instanceof UserPeer) {
+            if (message.to.id === MTProto.getAuthorizedUser().user.id) {
                 to = message.from
             }
         }
@@ -285,19 +283,29 @@ class BubblesComponent extends VComponent {
         const msg = <MessageComponent
             intersectionObserver={this.intersectionObserver}
             message={message}/>
+
+        if (message.to && message.to.messages.last && message.id === message.to.messages.last.id) {
+            message.to.api.readAllHistory()
+        } else {
+            if (message === this.bubblesInnerRef.$el.firstChild && !message.isInRead) {
+                message.read()
+            }
+        }
+
         if ($group) {
             return (!prepend ? VRDOM.prepend : VRDOM.append)(msg, $group.querySelector(".bubbles-list"))
         } else {
             // TODO fix saved messages
             const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage
             const avatar = !hideAvatar ? <MessageAvatarComponent id={`message-${message.id}-avatar`}
-                                                      show={!hideAvatar}
-                                                      message={message}/> : ""
-            $message = $mount(<div className={["bubble-group", isOut ? "out" : "in"]}>{avatar}<div className="bubbles-list">{msg}</div></div>, this.bubblesInnerRef.$el)
+                                                                 show={!hideAvatar}
+                                                                 message={message}/> : ""
+            $message = $mount(<div className={["bubble-group", isOut ? "out" : "in"]}>{avatar}
+                <div className="bubbles-list">{msg}</div>
+            </div>, this.bubblesInnerRef.$el)
             const $bubblesList = $message.querySelector(".bubbles-list")
             return $bubblesList.childNodes[!prepend ? $bubblesList.childNodes.length - 1 : 0]
         }
-
     }
 
     patchSentMessage = (rawMessage) => {
@@ -323,7 +331,7 @@ class BubblesComponent extends VComponent {
     clearAndAppend(messages: Message[]) {
 
 
-        this.appendMessages(messages, false)
+        this.appendMessages(messages, false, true)
 
         this.toggleMessagesLoader(true)
         this.scrollToWaitedMessage(false)
@@ -337,7 +345,7 @@ class BubblesComponent extends VComponent {
      * @param scrollToWaited
      * @private
      */
-    appendMessages = (messages, scrollToWaited = true) => {
+    appendMessages = (messages, scrollToWaited = true, showNewBadge = false) => {
         const z = this.$el.scrollTop
         const k = this.bubblesInnerRef.$el.clientHeight
         const pushed = []
@@ -346,6 +354,12 @@ class BubblesComponent extends VComponent {
             const last = all.length > 0 ? this.messages.rendered.get(all.reduce((l, q) => {
                 return l < q ? l : q
             })) : null
+
+            // if (showNewBadge && message.to && message.id === message.to.messages.readInboxMaxId) {
+            //     VRDOM.append(<div className="service" css-padding-top="100px">
+            //         <div className="service-msg">New Messages</div>
+            //     </div>, this.bubblesInnerRef.$el)
+            // }
 
             const $rendered = this.renderMessage(message)
 
@@ -430,7 +444,7 @@ class BubblesComponent extends VComponent {
         } else {
             this.chatInputRef.component.show()
         }
-        if(this.showInstant) return
+        if (this.showInstant) return
         if (AppSelectedPeer.Current.messages.unreadCount > 0) {
             const maxUnread = AppSelectedPeer.Current.messages.readInboxMaxId
             if (this.messages.rendered.has(maxUnread)) {

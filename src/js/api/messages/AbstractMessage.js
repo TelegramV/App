@@ -105,6 +105,14 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.to.messages.readOutboxMaxId >= this.id || (this.isOut && this.isPost)
     }
 
+    get isInRead(): boolean {
+        if (!this.to) {
+            return false
+        }
+
+        return this.isOut || this.to.messages.readInboxMaxId >= this.id
+    }
+
     get text(): string {
         return this.raw.message || ""
     }
@@ -282,6 +290,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
                 }
             }
         }
+    }
+
+    read() {
+        return this.to.api.readHistory(this.id)
     }
 
     // WARNING: always call super

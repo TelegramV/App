@@ -2,6 +2,7 @@ import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import type {Message} from "../messages/Message"
 import {Peer} from "./objects/Peer"
 import {arrayDeleteCallback} from "../common/utils/utils"
+import {MessageFactory} from "../messages/MessageFactory"
 
 /**
  * @property {Message} _lastMessage
@@ -22,6 +23,7 @@ export class PeerMessages {
     _lastMessage: Message = undefined
 
     _unreadIds: Set<number> = new Set()
+    _deletedIds: Set<number> = new Set()
     _unreadCount: number = 0
 
     _readOutboxMaxId: number = 0
@@ -123,7 +125,8 @@ export class PeerMessages {
 
     set unreadCount(unreadCount) {
         if (unreadCount < 0) {
-            //
+            this._unreadCount = 0
+            return
         }
 
         this._unreadCount = unreadCount
@@ -209,14 +212,14 @@ export class PeerMessages {
     /**
      * @param {Message[]} messages
      */
-    appendMany(messages) {
+    appendMany(messages, addUnread) {
         if (messages.length === 0) {
             return
         }
 
         if (AppSelectedPeer.check(this.peer)) {
             for (const message of messages) {
-                this.appendSingle(message)
+                this.appendSingle(message, addUnread)
             }
         } else {
             const sorted = this._sortMessagesArray(messages)
@@ -239,9 +242,10 @@ export class PeerMessages {
 
     /**
      * @param {Message} message
+     * @param addUnread
      * @return boolean
      */
-    appendSingle(message: Message) {
+    appendSingle(message: Message, addUnread = false) {
         if (AppSelectedPeer.check(this.peer)) {
             this._messages.set(message.id, message)
 
@@ -253,8 +257,23 @@ export class PeerMessages {
             this.last = message
         }
 
-        if (!message.isOut) {
+        if (addUnread && !message.isOut) {
             this.addUnread(message.id)
+        }
+    }
+
+    /**
+     * @param {Object} rawMessage
+     * @param addUnread
+     * @return boolean
+     */
+    appendSingleFromRaw(rawMessage: Object, addUnread) {
+        if (this.messages.has(rawMessage.id)) {
+            return this.messages.get(rawMessage.id).fillRaw(rawMessage)
+        } else {
+            const message = MessageFactory.fromRaw(this.peer, rawMessage)
+            this.appendSingle(message, addUnread)
+            return message
         }
     }
 
@@ -329,8 +348,8 @@ export class PeerMessages {
                 }
             })
 
-            if (this.last && this.unreadCount !== this.last.id - maxMessageId) {
-                this.unreadCount = this.unreadCount - Math.abs(this.last.id - maxMessageId - this.unreadCount)
+            if (this.last && this.unreadCount > this.last.id - maxMessageId) {
+                this.unreadCount = this.unreadCount - Math.abs(this.unreadCount - this.last.id - maxMessageId)
             }
         }
 

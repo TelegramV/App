@@ -314,7 +314,7 @@ class DialogManager extends Manager {
     createDialogFromDialogs(Dialog, Dialogs) {
         const dialog = this.setFromRaw(Dialog)
         const rawTopMessage = Dialogs.messages.find(message => message.id === Dialog.top_message)
-        dialog.peer.messages.last = MessageFactory.fromRaw(dialog.peer, rawTopMessage)
+        dialog.peer.messages.appendSingleFromRaw(rawTopMessage, false)
         return dialog
     }
 

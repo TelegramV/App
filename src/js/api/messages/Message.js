@@ -47,6 +47,7 @@ export interface Message {
 
     +isOut: boolean;
     +isRead: boolean;
+    +isInRead: boolean;
     +isSending: boolean;
     +isMentioned?: boolean;
     +isMediaUnread?: boolean; // todo: implement this thing
@@ -70,6 +71,7 @@ export interface Message {
 
     show(): void;
     init(): void;
+    read(): Promise;
 
     fillRaw(raw: Object): Message;
 

@@ -698,6 +698,9 @@ export class VComponent {
     static createRef() {
         return {
             __ref: true,
+            /**
+             * @type {HTMLElement}
+             */
             $el: undefined,
             show() {
                 VUI.showElement(this.$el)

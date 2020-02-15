@@ -4,7 +4,6 @@ import PeersStore from "../store/PeersStore"
 import DialogsManager from "../dialogs/DialogsManager"
 import DialogsStore from "../store/DialogsStore"
 import {getPeerTypeFromType} from "../dialogs/util"
-import {MessageFactory} from "./MessageFactory"
 import AppEvents from "../eventBus/AppEvents"
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import API from "../telegram/API"
@@ -54,9 +53,7 @@ class MessageManager extends Manager {
                 return
             }
 
-            const message = MessageFactory.fromRaw(peer, lastMessage)
-
-            peer.messages.appendSingle(message)
+            const message = peer.messages.appendSingleFromRaw(lastMessage, true)
             message.init()
 
             if (message.from && message.from.type === "user") {
