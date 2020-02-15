@@ -85,7 +85,7 @@ class BubblesComponent extends VComponent {
 
     mounted() {
         this.$el.addEventListener("scroll", this.onScroll, {
-            passive: true
+            passive: false
         })
 
         this.intersectionObserver = new IntersectionObserver(this.onIntersection, {
@@ -159,7 +159,6 @@ class BubblesComponent extends VComponent {
                 add_offset: -25,
                 limit: 50
             }).then(() => {
-                console.log("messages found!!!")
                 this.messages.isFetchingNextPage = false
                 this.messages.isFetchingPrevPage = false
                 this.showInstant = false
@@ -360,6 +359,7 @@ class BubblesComponent extends VComponent {
     appendMessages = (messages, scrollToWaited = true, showNewBadge = false) => {
         const z = this.$el.scrollTop
         const k = this.bubblesInnerRef.$el.clientHeight
+        console.log("append! before, scrollTop=", z, "height=", k)
         const pushed = []
         for (const message of messages) {
             const all = [...this.messages.rendered.keys()]
@@ -391,7 +391,11 @@ class BubblesComponent extends VComponent {
             }
         }
 
-        this.$el.scrollTop = z + this.bubblesInnerRef.$el.clientHeight - k
+        // console.log("append! after, scrollTop=", this.$el.scrollTop, "height=", this.bubblesInnerRef.$el.clientHeight, "scrollToWaited=", scrollToWaited, this.waitingScrollToMessage)
+
+        if(this.$el.scrollTop === z) {
+            this.$el.scrollTop = z + this.bubblesInnerRef.$el.clientHeight - k
+        }
         if (scrollToWaited) {
             this.scrollToWaitedMessage()
         }
