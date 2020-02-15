@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import type {VRNodeProps, VRTagName} from "./types/types"
 import Component from "./Component"
 import ComponentVRNode from "./ComponentVRNode"

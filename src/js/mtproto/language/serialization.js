@@ -4,6 +4,7 @@ import VBigInt from "../bigint/VBigInt"
 
 // (c) webogram
 
+// todo: rewrite from scratch
 export class TLSerialization {
     constructor(options = {
         startMaxLength: 2048,

@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 const patchText = ($node: Text, text: string) => {
     const vString = String(text)
 

@@ -1,10 +1,11 @@
-import {gzipUncompress} from "../utils/bin"
 import {schema} from "./schema";
 import Bytes from "../utils/bytes"
 import VBigInt from "../bigint/VBigInt"
+import {GZIP_UNCOMPRESS} from "../crypto/gzip"
 
 // (c) webogram
 
+// todo: rewrite from scratch
 export class TLDeserialization {
     constructor(buffer, options = {
         schema: schema
@@ -201,7 +202,7 @@ export class TLDeserialization {
 
                 if (constructorCmp === 0x3072cfa1) { // Gzip packed
                     const compressed = this.fetchBytes(field + "[packed_string]")
-                    const uncompressed = gzipUncompress(compressed)
+                    const uncompressed = GZIP_UNCOMPRESS(compressed)
                     const buffer = Bytes.asUint8Buffer(uncompressed)
                     const newDeserializer = (new TLDeserialization(buffer))
 
@@ -252,7 +253,7 @@ export class TLDeserialization {
 
             if (constructor === 0x3072cfa1) { // Gzip packed
                 const compressed = this.fetchBytes(field + "[packed_string]")
-                const uncompressed = gzipUncompress(compressed)
+                const uncompressed = GZIP_UNCOMPRESS(compressed)
                 const buffer = Bytes.asUint8Buffer(uncompressed)
                 const newDeserializer = (new TLDeserialization(buffer))
 

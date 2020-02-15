@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 //
 // WARNING: Flow JS supports only React.
 //          DO NOT USE FlOW JS WITH COMPONENTS

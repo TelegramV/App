@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 const attrAliases = new Map([
     ["className", "class"],
     ["htmlFor", "for"],

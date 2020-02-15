@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import {EventBus} from "../../../../api/eventBus/EventBus"
 import {VComponent} from "./VComponent"
 

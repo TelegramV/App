@@ -1,9 +1,14 @@
+/**
+ * (c) Telegram V
+ */
+
 import '@babel/polyfill'
-import {createNonce, gzipUncompress} from "../utils/bin"
+import {createNonce} from "../utils/bin"
 import {loadSchema} from "../language/schema"
 import MTProtoInternal from "../internal"
 import AppConfiguration from "../../configuration"
 import mt_srp_check_password from "../crypto/mt_srp/mt_srp"
+import {GZIP_UNCOMPRESS} from "../crypto/gzip"
 
 const authContext = {
     dcID: AppConfiguration.mtproto.dataCenter.default,
@@ -55,7 +60,7 @@ self.addEventListener("message", event => {
         } else if (task === "gzipUncompress") {
             postMessageWithTime({
                 taskId: taskId,
-                taskResult: gzipUncompress(taskData)
+                taskResult: GZIP_UNCOMPRESS(taskData)
             })
         } else if (task === "internalContext") {
             // BE VERY CAREFUL WITH THIS

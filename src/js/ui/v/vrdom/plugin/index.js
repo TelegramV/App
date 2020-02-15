@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import {VComponent} from "../component/VComponent"
 
 export class VRDOMPlugin {

@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import VF from "../VFramework"
 import type VRNode from "./VRNode"
 import type {VRRenderProps} from "./types/types"

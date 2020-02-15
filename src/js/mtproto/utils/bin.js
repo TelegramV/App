@@ -97,7 +97,3 @@ export function uintToInt(val) {
     }
     return val
 }
-
-export function gzipUncompress(bytes) {
-    return (new Zlib.Gunzip(bytes)).decompress()
-}

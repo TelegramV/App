@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import {TypedPublisher} from "../../../api/eventBus/TypedPublisher"
 import type {BusEvent} from "../../../api/eventBus/EventBus"
 import {EventBus} from "../../../api/eventBus/EventBus"

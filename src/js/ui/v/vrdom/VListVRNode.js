@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import {List} from "./List"
 
 export class VListVRNode {

@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 class VCollection {
 
     changeSubscribers: Set = new Set()

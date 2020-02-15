@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import {BigInteger} from "../vendor/jsbn/jsbn"
 import Bytes from "../utils/bytes"
 import AppConfiguration from "../../configuration"

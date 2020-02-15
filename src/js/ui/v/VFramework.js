@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import {VFrameworkRouter} from "./router"
 import VRDOM from "./vrdom/VRDOM"
 

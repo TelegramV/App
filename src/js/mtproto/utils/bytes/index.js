@@ -3,6 +3,7 @@ import {SecureRandomSingleton} from "../singleton"
 import crypto from "crypto"
 import VBigInt from "../../bigint/VBigInt"
 import {BigInteger} from "../../vendor/jsbn/jsbn"
+import CryptoJS from "../../vendor/crypto"
 
 /**
  * @param {Array|ArrayLike|ArrayBufferLike} a
@@ -38,6 +39,25 @@ function xor(a, b) {
     return c
 }
 
+function xorBuffer(a, b) {
+    var length = Math.min(a.length, b.length)
+
+
+    for (let i = 0; i < length; ++i) {
+        a[i] = a[i] ^ b[i]
+    }
+
+    return a
+}
+
+function xorA(a, b) {
+    for (let i = 0; i < Math.min(a.length, b.length); ++i) {
+        a[i] = a[i] ^ b[i]
+    }
+
+    return a
+}
+
 /**
  * @param {Array|ArrayLike|ArrayBufferLike} bytes
  * @return {Array|ArrayLike|ArrayBufferLike}
@@ -51,7 +71,7 @@ function asUint8Buffer(bytes) {
  * @return {Array|ArrayLike|ArrayBufferLike}
  */
 function asUint8Array(bytes) {
-    if (bytes.buffer !== undefined) {
+    if (bytes instanceof Uint8Array) {
         return bytes
     }
 
@@ -222,6 +242,8 @@ function addPadding(bytes, blockSize = 16, zeroes = false) {
             SecureRandomSingleton.nextBytes(padding)
         }
 
+        console.error("padding",padding)
+
         if (bytes instanceof ArrayBuffer) {
             bytes = Bytes.concatBuffer(bytes, padding)
         } else {
@@ -269,6 +291,33 @@ function randomArray(length = 32) {
     return bytesArray
 }
 
+function fromWords(wordArray) {
+    const words = wordArray.words
+    const sigBytes = wordArray.sigBytes
+    const bytes = []
+
+    for (let i = 0; i < sigBytes; i++) {
+        bytes.push((words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff)
+    }
+
+    return bytes
+}
+
+function toWords(bytes) {
+    if (bytes instanceof ArrayBuffer) {
+        bytes = new Uint8Array(bytes)
+    }
+
+    const len = bytes.length
+    const words = []
+
+    for (let i = 0; i < len; i++) {
+        words[i >>> 2] |= bytes[i] << (24 - (i % 4) * 8)
+    }
+
+    return new CryptoJS.lib.WordArray.init(words, len)
+}
+
 /**
  * @param {number} length
  * @return {ArrayBufferLike|ArrayBuffer|Buffer}
@@ -280,6 +329,8 @@ function randomBuffer(length = 32) {
 const Bytes = {
     compare,
     xor,
+    xorBuffer,
+    xorA,
     asUint8Buffer,
     asUint8Array,
     asBase64,
@@ -290,7 +341,9 @@ const Bytes = {
     modPow: modPow,
     addPadding: addPadding,
     concat,
-    concatBuffer,
+    fromWords,
+    toWords,
+    concatBuffer: concatBuffer,
 }
 
 export default Bytes

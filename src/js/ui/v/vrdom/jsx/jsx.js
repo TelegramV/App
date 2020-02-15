@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import type {VRAttrs, VREvents, VRNodeProps, VRTagName} from "../types/types"
 import VRNode from "../VRNode"
 import attrAliases from "./attrAliases"

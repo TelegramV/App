@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 const patchUndefined = ($node: Element) => {
     if ($node.nodeType === Node.TEXT_NODE) {
         $node.remove()

@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import type {VRAttrs} from "../types/types"
 
 const patchAttrs = ($el: Element, newAttrs: VRAttrs) => {
