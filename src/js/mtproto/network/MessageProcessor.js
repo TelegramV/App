@@ -1,3 +1,8 @@
+/**
+ * (c) Telegram V
+ * (c) webogram
+ */
+
 import {longToBytes} from "../utils/bin";
 import MTProtoInternal from "../internal"
 

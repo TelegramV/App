@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import vrdom_render from "./render/render"
 import type VRNode from "./VRNode"
 import type {VRRenderProps} from "./types/types"

@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import vrdom_mount from "../mount"
 import patchAttrs from "./patchAttrs"
 import patchEvents from "./patchEvents"

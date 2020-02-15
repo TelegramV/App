@@ -1,3 +1,8 @@
+/**
+ * (c) Telegram V
+ * (c) webogram
+ */
+
 import {TimeManager} from "../timeManager";
 import DataCenter from "../dataCenter";
 import {MTSocket} from "./MTSocket"

@@ -4,6 +4,8 @@ import AppConfiguration from "../../configuration"
 
 /**
  * Native BigInt wrapper
+ *
+ * (c) Telegram V
  */
 class VBigInt {
 

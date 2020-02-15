@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import type {ComponentVRNodeProps, VRAttrs, VRSlot} from "./types/types"
 import Component from "./Component"
 

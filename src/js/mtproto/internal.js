@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 // NEVER USE THIS THING OUTSIDE mtproto FOLDER
 
 import {ApiNetworker} from "./network/ApiNetworker"

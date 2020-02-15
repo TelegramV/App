@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 const classAttrProcessor = value => {
     if (Array.isArray(value)) {
         return value.join(" ")

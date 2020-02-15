@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import '@babel/polyfill'
 import {createNonce, gzipUncompress} from "../utils/bin"
 import {loadSchema} from "../language/schema"

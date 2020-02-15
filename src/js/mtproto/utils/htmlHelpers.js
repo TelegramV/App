@@ -1,7 +1,13 @@
+/**
+ * (c) Telegram V
+ */
+
 import AppSelectedInfoPeer from "../../ui/reactive/SelectedInfoPeer"
 import PeersStore from "../../api/store/PeersStore"
 import UIEvents from "../../ui/eventBus/UIEvents"
 
+
+// whaaaat? why this is here???
 function elemToEntity(elem, offset, length) {
     const handlers = {
         b: "messageEntityBold",

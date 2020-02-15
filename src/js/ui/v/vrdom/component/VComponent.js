@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import type {ComponentProps, ComponentState, VComponentMeta, VRAttrs, VRSlot} from "../types/types"
 import VF from "../../VFramework"
 import vrdom_delete from "../delete"

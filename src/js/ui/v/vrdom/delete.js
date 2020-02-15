@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import vrdom_deleteInner from "./deleteInner"
 
 const vrdom_delete = ($el: Element) => {

@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 // //MTProto Intermediate Obfuscated Codec W.I.P.
 // //Copyright 2019 Oleg Tsenilov
 // //https://github.com/OTsenilov

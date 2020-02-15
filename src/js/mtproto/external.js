@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import {AppConfiguration} from "../configuration"
 
 import MobileProtoWorker from "./workers/mtproto.worker"

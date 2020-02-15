@@ -768,7 +768,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
          *
          * @example
          *
-         *     var cipher = CryptoJS.algo.AES.createEncryptor(keyWordArray, { iv: ivWordArray });
+         *     var cipher = CryptoJS.algo.TELEGRAM_CRYPTO.createEncryptor(keyWordArray, { iv: ivWordArray });
          */
         createEncryptor: function (key, cfg) {
             return this.create(this._ENC_XFORM_MODE, key, cfg);
@@ -786,7 +786,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
          *
          * @example
          *
-         *     var cipher = CryptoJS.algo.AES.createDecryptor(keyWordArray, { iv: ivWordArray });
+         *     var cipher = CryptoJS.algo.TELEGRAM_CRYPTO.createDecryptor(keyWordArray, { iv: ivWordArray });
          */
         createDecryptor: function (key, cfg) {
             return this.create(this._DEC_XFORM_MODE, key, cfg);
@@ -801,7 +801,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
          *
          * @example
          *
-         *     var cipher = CryptoJS.algo.AES.create(CryptoJS.algo.AES._ENC_XFORM_MODE, keyWordArray, { iv: ivWordArray });
+         *     var cipher = CryptoJS.algo.TELEGRAM_CRYPTO.create(CryptoJS.algo.TELEGRAM_CRYPTO._ENC_XFORM_MODE, keyWordArray, { iv: ivWordArray });
          */
         init: function (xformMode, key, cfg) {
             // Apply config defaults
@@ -895,7 +895,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
          *
          * @example
          *
-         *     var AES = CryptoJS.lib.Cipher._createHelper(CryptoJS.algo.AES);
+         *     var TELEGRAM_CRYPTO = CryptoJS.lib.Cipher._createHelper(CryptoJS.algo.TELEGRAM_CRYPTO);
          */
         _createHelper: (function () {
             function selectCipherStrategy(key) {
@@ -1350,7 +1350,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
          *         key: keyWordArray,
          *         iv: ivWordArray,
          *         salt: saltWordArray,
-         *         algorithm: CryptoJS.algo.AES,
+         *         algorithm: CryptoJS.algo.TELEGRAM_CRYPTO,
          *         mode: CryptoJS.mode.CBC,
          *         padding: CryptoJS.pad.PKCS7,
          *         blockSize: 4,
@@ -1479,9 +1479,9 @@ CryptoJS.lib.Cipher || (function (undefined) {
          *
          * @example
          *
-         *     var ciphertextParams = CryptoJS.lib.SerializableCipher.encrypt(CryptoJS.algo.AES, message, key);
-         *     var ciphertextParams = CryptoJS.lib.SerializableCipher.encrypt(CryptoJS.algo.AES, message, key, { iv: iv });
-         *     var ciphertextParams = CryptoJS.lib.SerializableCipher.encrypt(CryptoJS.algo.AES, message, key, { iv: iv, format: CryptoJS.format.OpenSSL });
+         *     var ciphertextParams = CryptoJS.lib.SerializableCipher.encrypt(CryptoJS.algo.TELEGRAM_CRYPTO, message, key);
+         *     var ciphertextParams = CryptoJS.lib.SerializableCipher.encrypt(CryptoJS.algo.TELEGRAM_CRYPTO, message, key, { iv: iv });
+         *     var ciphertextParams = CryptoJS.lib.SerializableCipher.encrypt(CryptoJS.algo.TELEGRAM_CRYPTO, message, key, { iv: iv, format: CryptoJS.format.OpenSSL });
          */
         encrypt: function (cipher, message, key, cfg) {
             // Apply config defaults
@@ -1521,8 +1521,8 @@ CryptoJS.lib.Cipher || (function (undefined) {
          *
          * @example
          *
-         *     var plaintext = CryptoJS.lib.SerializableCipher.decrypt(CryptoJS.algo.AES, formattedCiphertext, key, { iv: iv, format: CryptoJS.format.OpenSSL });
-         *     var plaintext = CryptoJS.lib.SerializableCipher.decrypt(CryptoJS.algo.AES, ciphertextParams, key, { iv: iv, format: CryptoJS.format.OpenSSL });
+         *     var plaintext = CryptoJS.lib.SerializableCipher.decrypt(CryptoJS.algo.TELEGRAM_CRYPTO, formattedCiphertext, key, { iv: iv, format: CryptoJS.format.OpenSSL });
+         *     var plaintext = CryptoJS.lib.SerializableCipher.decrypt(CryptoJS.algo.TELEGRAM_CRYPTO, ciphertextParams, key, { iv: iv, format: CryptoJS.format.OpenSSL });
          */
         decrypt: function (cipher, ciphertext, key, cfg) {
             // Apply config defaults
@@ -1633,8 +1633,8 @@ CryptoJS.lib.Cipher || (function (undefined) {
          *
          * @example
          *
-         *     var ciphertextParams = CryptoJS.lib.PasswordBasedCipher.encrypt(CryptoJS.algo.AES, message, 'password');
-         *     var ciphertextParams = CryptoJS.lib.PasswordBasedCipher.encrypt(CryptoJS.algo.AES, message, 'password', { format: CryptoJS.format.OpenSSL });
+         *     var ciphertextParams = CryptoJS.lib.PasswordBasedCipher.encrypt(CryptoJS.algo.TELEGRAM_CRYPTO, message, 'password');
+         *     var ciphertextParams = CryptoJS.lib.PasswordBasedCipher.encrypt(CryptoJS.algo.TELEGRAM_CRYPTO, message, 'password', { format: CryptoJS.format.OpenSSL });
          */
         encrypt: function (cipher, message, password, cfg) {
             // Apply config defaults
@@ -1669,8 +1669,8 @@ CryptoJS.lib.Cipher || (function (undefined) {
          *
          * @example
          *
-         *     var plaintext = CryptoJS.lib.PasswordBasedCipher.decrypt(CryptoJS.algo.AES, formattedCiphertext, 'password', { format: CryptoJS.format.OpenSSL });
-         *     var plaintext = CryptoJS.lib.PasswordBasedCipher.decrypt(CryptoJS.algo.AES, ciphertextParams, 'password', { format: CryptoJS.format.OpenSSL });
+         *     var plaintext = CryptoJS.lib.PasswordBasedCipher.decrypt(CryptoJS.algo.TELEGRAM_CRYPTO, formattedCiphertext, 'password', { format: CryptoJS.format.OpenSSL });
+         *     var plaintext = CryptoJS.lib.PasswordBasedCipher.decrypt(CryptoJS.algo.TELEGRAM_CRYPTO, ciphertextParams, 'password', { format: CryptoJS.format.OpenSSL });
          */
         decrypt: function (cipher, ciphertext, password, cfg) {
             // Apply config defaults
@@ -1776,7 +1776,7 @@ code.google.com/p/crypto-js/wiki/License
     var RCON = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36];
 
     /**
-     * AES block cipher algorithm.
+     * TELEGRAM_CRYPTO block cipher algorithm.
      */
     var AES = C_algo.AES = BlockCipher.extend({
         _doReset: function () {
@@ -1904,8 +1904,8 @@ code.google.com/p/crypto-js/wiki/License
      *
      * @example
      *
-     *     var ciphertext = CryptoJS.AES.encrypt(message, key, cfg);
-     *     var plaintext  = CryptoJS.AES.decrypt(ciphertext, key, cfg);
+     *     var ciphertext = CryptoJS.TELEGRAM_CRYPTO.encrypt(message, key, cfg);
+     *     var plaintext  = CryptoJS.TELEGRAM_CRYPTO.decrypt(ciphertext, key, cfg);
      */
     C.AES = BlockCipher._createHelper(AES);
 }());

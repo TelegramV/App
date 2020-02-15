@@ -1,3 +1,8 @@
+/**
+ * (c) Telegram V
+ * (c) webogram
+ */
+
 import {Networker} from "./Networker";
 import {TLSerialization} from "../language/serialization";
 import {TLDeserialization} from "../language/deserialization";

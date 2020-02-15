@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import type {VREvents} from "../types/types"
 
 const patchEvents = ($node: Element | Node, newEvents: VREvents) => {

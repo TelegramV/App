@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import vrdom_createElement from "./createElement"
 import vrdom_jsx from "./jsx/jsx"
 import vrdom_render from "./render/render"

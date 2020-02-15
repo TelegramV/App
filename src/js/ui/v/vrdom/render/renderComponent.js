@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import vrdom_render from "./render"
 import VF from "../../VFramework"
 import ComponentVRNode from "../ComponentVRNode"

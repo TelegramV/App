@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import vrdom_patch from "./patch"
 import vrdom_delete from "../delete"
 import VRNode from "../VRNode"

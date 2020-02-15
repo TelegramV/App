@@ -1,3 +1,8 @@
+/**
+ * (c) Telegram V
+ * (c) webogram
+ */
+
 import Bytes from "../utils/bytes"
 import {rsaKeyByFingerprints} from "./rsaKeys"
 import {TLSerialization} from "../language/serialization"
@@ -9,7 +14,8 @@ import {createLogger} from "../../api/common/logger"
 import {SecureRandomSingleton} from "../utils/singleton"
 import VBigInt from "../bigint/VBigInt"
 import PQ from "../utils/pq"
-import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
+import {aesEncryptSync} from "../crypto/aes"
+import TELEGRAM_CRYPTO from "../crypto/TELEGRAM_CRYPTO"
 
 const Logger = createLogger("authKeyCreation")
 
@@ -117,7 +123,7 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
             .slice(0, 4))
 
 
-    const answer_with_hash = aesDecryptSync(ServerDHParams.encrypted_answer, authContext.tmpAesKey, authContext.tmpAesIv)
+    const answer_with_hash = await TELEGRAM_CRYPTO.decrypt(ServerDHParams.encrypted_answer, authContext.tmpAesKey, authContext.tmpAesIv, 8)
 
     const hash = answer_with_hash.slice(0, 20)
     const answerWithPadding = answer_with_hash.slice(20)
@@ -207,7 +213,7 @@ async function step6_set_client_DH_params(networker, processor, proc_context) {
     const dataWithHash = sha1BytesSync(Client_DH_Inner_Data_serialization.getBuffer()).concat(Client_DH_Inner_Data_serialization.getBytes())
     Logger.debug("mtpSendSetClientDhParams", dataWithHash, authContext)
 
-    const encryptedData = aesEncryptSync(dataWithHash, authContext.tmpAesKey, authContext.tmpAesIv)
+    const encryptedData = await TELEGRAM_CRYPTO.encrypt(dataWithHash, authContext.tmpAesKey, authContext.tmpAesIv)
     let Set_client_DH_params_answer_response = await networker.invokeMethod("set_client_DH_params", {
         nonce: authContext.nonce,
         server_nonce: authContext.serverNonce,

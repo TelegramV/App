@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import {ReactiveObject} from "../../reactive/ReactiveObject"
 import {VComponent} from "./VComponent"
 

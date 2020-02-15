@@ -1,5 +1,10 @@
+/**
+ * (c) Telegram V
+ * (c) webogram
+ */
+
 import {createNonce, longToBytes, uintToInt} from "../utils/bin"
-import {sha1BytesSync, sha256HashSync} from "../crypto/sha"
+import {sha1BytesSync, SHA256, sha256HashSync} from "../crypto/sha"
 import {TLSerialization} from "../language/serialization"
 import {TLDeserialization} from "../language/deserialization"
 import {MessageProcessor} from "./MessageProcessor"
@@ -9,8 +14,8 @@ import {Networker} from "./Networker";
 import {schema} from "../language/schema";
 import Bytes from "../utils/bytes"
 import Random from "../utils/random"
-import {aesDecryptSync, aesEncryptSync} from "../crypto/aes"
 import MTProtoInternal from "../internal"
+import TELEGRAM_CRYPTO, {concat, substr} from "../crypto/TELEGRAM_CRYPTO"
 
 export class ApiNetworker extends Networker {
     constructor(auth, mtproto = false) {
@@ -25,6 +30,8 @@ export class ApiNetworker extends Networker {
         this.messageProcessor = new MessageProcessor({
             networker: this
         })
+
+        console.log(this.auth)
 
         this.auth.authKeyHash = sha1BytesSync(this.auth.authKey)
         this.auth.authKeyAux = this.auth.authKeyHash.slice(0, 8)
@@ -95,11 +102,13 @@ export class ApiNetworker extends Networker {
         const msgKey = deserializer.fetchIntBytes(128, true, "msg_key")
         const encryptedData = deserializer.fetchRawBytes(data.byteLength - deserializer.getOffset(), true, "encrypted_data")
 
-        this.getDecryptedMessage(msgKey, encryptedData).then(async dataWithPadding => {
-            dataWithPadding = new Uint8Array(dataWithPadding)
+        // console.log(this.auth, msgKey, encryptedData)
 
-            const calcMsgKey = this.getMsgKey(dataWithPadding, false)
+        TELEGRAM_CRYPTO.decrypt(encryptedData, this.auth.authKey, msgKey, 8).then(async dataWithPadding => {
+            const calcMsgKey = await this.getMsgKey(dataWithPadding, false)
             if (!Bytes.compare(msgKey, calcMsgKey)) {
+                console.error(msgKey, calcMsgKey)
+
                 throw new Error("bad server msgKey")
             }
 
@@ -174,14 +183,15 @@ export class ApiNetworker extends Networker {
         })
     }
 
-    getMsgKey(dataWithPadding, isOut) {
-        const authKey = this.auth.authKey
+    async getMsgKey(plaintext, isOut) {
+        if (plaintext instanceof ArrayBuffer) {
+            plaintext = new Uint8Array(plaintext)
+        }
+
+        const auth_key = this.auth.authKey
         const x = isOut ? 0 : 8
-        const msgKeyLargePlain = Bytes.concatBuffer(authKey.subarray(88 + x, 88 + x + 32), dataWithPadding)
-
-        const msgKeyLarge = sha256HashSync(msgKeyLargePlain)
-
-        return new Uint8Array(msgKeyLarge).subarray(8, 24)
+        const msg_key_large = await SHA256(concat(substr(auth_key, 88 + x, 32), plaintext))
+        return substr(msg_key_large, 8, 16);
     }
 
     onDisconnect() {
@@ -222,17 +232,16 @@ export class ApiNetworker extends Networker {
         return [aesKey, aesIv]
     }
 
-    getEncryptedMessage(dataWithPadding) {
-        const msgKey = this.getMsgKey(dataWithPadding, true)
-        const keyIv = this.getAesKeyIv(msgKey, true)
+    async getEncryptedMessage(dataWithPadding) {
+        const msgKey = await this.getMsgKey(dataWithPadding, true)
+        const keyIv = await TELEGRAM_CRYPTO.compute_key_and_iv(this.auth.authKey, msgKey, 0)
 
-        const encryptedBytes = aesEncryptSync(dataWithPadding, keyIv[0], keyIv[1])
+        const encryptedBytes = await TELEGRAM_CRYPTO.encrypt(dataWithPadding, keyIv.aes_key, keyIv.aes_iv)
 
-
-        return Promise.resolve({
+        return {
             bytes: encryptedBytes,
             msgKey: msgKey
-        })
+        }
     }
 
     resendMessage(messageId) {
@@ -300,11 +309,6 @@ export class ApiNetworker extends Networker {
 
             super.sendMessage(request.getBuffer())
         })
-    }
-
-    getDecryptedMessage(msgKey, encryptedData) {
-        const keyIv = this.getAesKeyIv(msgKey, false)
-        return Promise.resolve(new Uint8Array(aesDecryptSync(encryptedData, keyIv[0], keyIv[1])))
     }
 
     invokeMethod(method, params, options = {}) {

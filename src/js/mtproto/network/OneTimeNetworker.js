@@ -1,3 +1,8 @@
+/**
+ * (c) Telegram V
+ * (c) webogram
+ */
+
 import {ApiNetworker} from "./ApiNetworker";
 
 export class OneTimeNetworker extends ApiNetworker {

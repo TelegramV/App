@@ -38,6 +38,25 @@ function xor(a, b) {
     return c
 }
 
+function xorBuffer(a, b) {
+    var length = Math.min(a.length, b.length)
+
+
+    for (let i = 0; i < length; ++i) {
+        a[i] = a[i] ^ b[i]
+    }
+
+    return a
+}
+
+function xorA(a, b) {
+    for (let i = 0; i < Math.min(a.length, b.length); ++i) {
+        a[i] = a[i] ^ b[i]
+    }
+
+    return a
+}
+
 /**
  * @param {Array|ArrayLike|ArrayBufferLike} bytes
  * @return {Array|ArrayLike|ArrayBufferLike}
@@ -222,6 +241,8 @@ function addPadding(bytes, blockSize = 16, zeroes = false) {
             SecureRandomSingleton.nextBytes(padding)
         }
 
+        console.error("padding",padding)
+
         if (bytes instanceof ArrayBuffer) {
             bytes = Bytes.concatBuffer(bytes, padding)
         } else {
@@ -280,6 +301,8 @@ function randomBuffer(length = 32) {
 const Bytes = {
     compare,
     xor,
+    xorBuffer,
+    xorA,
     asUint8Buffer,
     asUint8Array,
     asBase64,
@@ -290,7 +313,7 @@ const Bytes = {
     modPow: modPow,
     addPadding: addPadding,
     concat,
-    concatBuffer,
+    concatBuffer: concatBuffer,
 }
 
 export default Bytes

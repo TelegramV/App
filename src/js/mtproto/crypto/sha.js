@@ -15,8 +15,16 @@ export function sha1BytesSync(bytes) {
     return Bytes.fromArrayBuffer(sha1HashSync(bytes))
 }
 
+/**
+ * @param bytes
+ * @return {Uint8Array}
+ */
 export function sha256HashSync(bytes) {
     const hashWords = CryptoJS.SHA256(bytesToWords(bytes))
 
-    return bytesFromWords(hashWords)
+    return new Uint8Array(bytesFromWords(hashWords))
+}
+
+export const SHA256 = (bytes: Uint8Array) => {
+    return crypto.subtle.digest({name: "SHA-256"}, bytes).then(hash => new Uint8Array(hash))
 }

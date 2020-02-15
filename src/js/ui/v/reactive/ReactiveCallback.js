@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import type {ReactiveSubscription} from "../../../api/eventBus/ReactivePublisher"
 
 type Subscribe = (subscription: ReactiveSubscription) => any

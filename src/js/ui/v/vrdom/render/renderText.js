@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import VF from "../../VFramework"
 
 const renderText = text => {

@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import {ApiNetworker} from "./ApiNetworker";
 
 export class FileNetworker extends ApiNetworker {

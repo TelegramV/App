@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import ComponentVRNode from "../ComponentVRNode"
 import vrdom_mount from "../mount"
 import Component from "../Component"

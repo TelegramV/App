@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import VRNode from "../VRNode"
 import vrdom_mount from "../mount"
 import patchAttrs from "./patchAttrs"

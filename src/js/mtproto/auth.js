@@ -1,3 +1,7 @@
+/**
+ * (c) Telegram V
+ */
+
 import {MTProtoInternal} from "./internal";
 
 export class AuthAPI {
