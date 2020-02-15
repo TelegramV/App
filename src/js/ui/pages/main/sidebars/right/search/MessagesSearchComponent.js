@@ -81,7 +81,7 @@ export default class MessageSearchComponent extends RightBarComponent {
         return (
             <div class="sidebar right scrollable hidden messages-search search-results" onScroll={this.onScroll}>
                 <div class="toolbar">
-                    <span class="btn-icon tgico tgico-close rp rps" onClick={_ => this.hideBar()}/>
+                    <span class="btn-icon tgico tgico-close rp rps" onClick={_ => this.openBar("no")}/>
                     <div class="search">
                         <div class="input-search">
                             <LazyInput ref={this.inputRef}
