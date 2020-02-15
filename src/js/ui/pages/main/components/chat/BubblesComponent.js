@@ -68,11 +68,16 @@ class BubblesComponent extends VComponent {
     }
 
     onRightSidebarShow = l => {
+        console.log("onRightSidebarShow")
         this.$el.parentNode.classList.add("right-bar-open")
+        this.rightSidebarOpen = true
     }
 
     onRightSidebarHide = l => {
+        console.log("onRightSidebarHide")
+
         this.$el.parentNode.classList.remove("right-bar-open")
+        this.rightSidebarOpen = false
     }
 
     h() {
@@ -360,7 +365,6 @@ class BubblesComponent extends VComponent {
     appendMessages = (messages, scrollToWaited = true, showNewBadge = false) => {
         const z = this.$el.scrollTop
         const k = this.bubblesInnerRef.$el.clientHeight
-        console.log("append! before, scrollTop=", z, "height=", k)
         const pushed = []
         let i = 0
         for (const message of messages) {

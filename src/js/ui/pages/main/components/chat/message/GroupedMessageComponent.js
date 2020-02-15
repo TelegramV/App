@@ -43,7 +43,6 @@ class GroupedMessageComponent extends GeneralMessageComponent {
     }
 
     onUpdateGrouped = (event: BusEvent) => {
-        console.log("update grouped!!!", this.message.group)
         this.__patch()
     }
 
