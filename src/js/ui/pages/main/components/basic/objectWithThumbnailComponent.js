@@ -13,7 +13,7 @@ export class ObjectWithThumbnailComponent extends VComponent {
     h() {
         const object = this.state.object.real
         const thumb = object.thumbnail
-        return <figure className={[this.props.type, thumb ? "thumbnail" : ""]}>
+        return <figure className={[this.props.type, thumb ? "thumbnail" : ""]} onClick={this.props.click}>
             {
                 !thumb ?
                     this.props.slotLoaded(this.state.object, object)

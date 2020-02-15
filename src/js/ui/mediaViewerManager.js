@@ -1,11 +1,14 @@
 import Component from "./v/vrdom/Component";
 import ChatInfoAvatarComponent from "./pages/main/components/chat/chatInfo/ChatInfoAvatarComponent";
+import {PhotoMessage} from "../api/messages/objects/PhotoMessage";
+import {VComponent} from "./v/vrdom/component/VComponent";
 
 export let MediaViewerManager
 
 export class MediaViewerComponent extends Component {
     constructor(props) {
         super(props)
+        this.useProxyState = false
         MediaViewerManager = this
         this.state = {
             hidden: true,
@@ -30,14 +33,14 @@ export class MediaViewerComponent extends Component {
                                 </div>
                             </div>
                             <div className="right">
-                                <i className="tgico tgico-delete"></i>
-                                <i className="tgico tgico-forward"></i>
-                                <i className="tgico tgico-download"></i>
-                                <i className="tgico tgico-close"></i>
+                                <i className="tgico tgico-delete rp rps"></i>
+                                <i className="tgico tgico-forward rp rps"></i>
+                                <i className="tgico tgico-download rp rps"></i>
+                                <i className="tgico tgico-close rp rps"></i>
                             </div>
                         </div>
                         <div className="media">
-                            <img src={this.state.message.media.photo.real.src} alt=""/>
+                            <img src={this.state.message.srcUrl} alt=""/>
                         </div>
                         <div className="caption">{this.state.message.text}</div>
                     </div>
@@ -52,6 +55,9 @@ export class MediaViewerComponent extends Component {
     }
 
     open(message) {
+        if(message instanceof PhotoMessage && !message.loaded) {
+            message.fetchMax().then(l => this.__patch())
+        }
         this.state.hidden = false
         this.state.message = message
         this.__patch()

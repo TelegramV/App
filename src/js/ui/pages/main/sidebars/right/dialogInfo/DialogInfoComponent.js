@@ -18,6 +18,9 @@ import {DialogInfoMemberComponent} from "./fragments/DialogInfoMemberComponent";
 import {DialogInfoAudioComponent} from "./fragments/DialogInfoAudioComponent";
 import {FileAPI} from "../../../../../../api/fileAPI";
 import {formatAudioTime} from "../../../../../utils";
+import {SearchMessage} from "../../../../../../api/messages/SearchMessage";
+import {MediaViewerManager} from "../../../../../mediaViewerManager";
+import {PhotoMessage} from "../../../../../../api/messages/objects/PhotoMessage";
 
 export class DialogInfoComponent extends RightBarComponent {
 
@@ -231,8 +234,9 @@ export class DialogInfoComponent extends RightBarComponent {
         if (rawMessage.id < this.contentPages.media.offsetId) {
             this.contentPages.media.offsetId = rawMessage.id
         }
-
-        VRDOM.append(<DialogInfoPhotoComponent photo={rawMessage.media.photo}/>, this.contentRefs.media.$el)
+        const msg = new PhotoMessage(AppSelectedInfoPeer.Current)
+        msg.fillRaw(rawMessage)
+        VRDOM.append(<DialogInfoPhotoComponent photo={rawMessage.media.photo} click={l => MediaViewerManager.open(msg)}/>, this.contentRefs.media.$el)
     }
 
     openLinks = () => {
