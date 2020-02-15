@@ -68,14 +68,11 @@ class BubblesComponent extends VComponent {
     }
 
     onRightSidebarShow = l => {
-        console.log("onRightSidebarShow")
         this.$el.parentNode.classList.add("right-bar-open")
         this.rightSidebarOpen = true
     }
 
     onRightSidebarHide = l => {
-        console.log("onRightSidebarHide")
-
         this.$el.parentNode.classList.remove("right-bar-open")
         this.rightSidebarOpen = false
     }
@@ -107,8 +104,6 @@ class BubblesComponent extends VComponent {
                     this.callbacks.peer.fetchFull()
                 }
 
-                console.log("Callback change!", this.showInstant)
-
                 if(!this.showInstant) {
 
                     this.refreshMessages()
@@ -135,7 +130,6 @@ class BubblesComponent extends VComponent {
     }
 
     onShowMessageInstant = message => {
-        console.log("onShowMessageInstant")
         this.showInstant = true
         let to = message.to
         if (message.to instanceof UserPeer) {
@@ -173,7 +167,6 @@ class BubblesComponent extends VComponent {
 
     onFetchedInitialMessages = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            console.log("isEnd = true")
             this.isEnd = true
             this.appendMessages(event.messages)
         }
@@ -183,7 +176,6 @@ class BubblesComponent extends VComponent {
         if (AppSelectedPeer.check(event.peer)) {
             if (event.isEnd) {
                 this.isEnd = true
-                console.log("isEnd = true")
             }
             this.prependMessages(event.messages, false, true)
         }
@@ -191,7 +183,6 @@ class BubblesComponent extends VComponent {
 
     onFetchedMessagesNextPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            console.log("next page!", event.messages)
             this.appendMessages(event.messages)
         }
     }
@@ -377,7 +368,6 @@ class BubblesComponent extends VComponent {
                 const isNotReady = messages.slice(i, messages.length).every(l => {
                     return l.groupedId === message.groupedId
                 })
-                console.log(message.groupedId, "readyStatus", isNotReady)
                 if(isNotReady) {
                     break
                 }
@@ -434,11 +424,21 @@ class BubblesComponent extends VComponent {
 
         const pushed = []
 
+        let i = 0
         for (const message of messages) {
             const all = [...this.messages.rendered.keys()]
             const first = all.length > 0 ? this.messages.rendered.get(all.reduce((l, q) => {
                 return l > q ? l : q
             })) : null
+
+            if(message.groupedId) {
+                const isNotReady = messages.slice(i, messages.length).every(l => {
+                    return l.groupedId === message.groupedId
+                })
+                if(isNotReady) {
+                    break
+                }
+            }
 
             const $rendered = this.renderMessage(message, true)
 
@@ -461,6 +461,7 @@ class BubblesComponent extends VComponent {
                 pushed.push($rendered)
             }
 
+            i++
         }
 
         if (reset) {
