@@ -174,7 +174,7 @@
                     &.in {
                         padding-left: 10px !important;
                         &.no-pad {
-                            padding-left: 0;
+                            padding-left: 0 !important;
                         }
                         border-bottom-right-radius: 12px;
                         &:not(.transparent) {
@@ -192,7 +192,7 @@
                     &.out {
                         padding-right: 10px !important;
                         &.no-pad {
-                            padding-right: 0;
+                            padding-right: 0 !important;
                         }
                         border-bottom-left-radius: 12px;
                         &:not(.transparent) {

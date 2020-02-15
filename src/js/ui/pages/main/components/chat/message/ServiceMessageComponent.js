@@ -30,18 +30,7 @@ class ServiceMessageComponent extends GeneralMessageComponent {
 }
 
 function textByAction(message) {
-    let action = message.raw.action;
-    let msg = action._;
-    if (msg == "messageActionPinMessage") {
-        /*
-            TODO: get replied message, test for media or text, select needed data
-        */
-        let user = message.from.name;
-        let text = "TODO"
-        //return L("lng_action_pinned_message", {from: user, text: text})
-        return `${user} pinned a message`
-    }
-    return msg || "unsupported";
+    return message.text
 }
 
 export default ServiceMessageComponent

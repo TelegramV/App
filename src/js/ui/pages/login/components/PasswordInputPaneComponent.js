@@ -27,7 +27,7 @@ export default class PasswordInputPaneComponent extends PaneComponent {
             <InfoComponent header="Enter a Password"
                            description="Your account is protected with an additional password."/>
 
-            <InputComponent label={"Hint: " + (this.state.response ? this.state.response.hint : "")} type="password"
+            <InputComponent label={(this.state.response && this.state.response.hint ? "Hint: " + this.state.response.hint : "Password")} type="password"
                             hide ref="passwordInput" peekChange={this.onPeekChange}/>
 
 

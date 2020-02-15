@@ -12,8 +12,6 @@ import {highlightVRNodeWord} from "../../../../../utils/highlightVRNodeText"
 const MessageFragment = ({m, peers, onClick, q}) => {
     const peer = m.from
 
-    console.warn("q", q)
-
     peers.push(peer)
 
     return <ContactFragment url={peer.photo.smallUrl}
@@ -136,10 +134,12 @@ export default class MessageSearchComponent extends RightBarComponent {
                     }
 
                     Messages.messages
-                        .map(m => new SearchMessage(AppSelectedPeer.Current.dialog).fillRaw(m))
+                        .map(m => new SearchMessage(AppSelectedPeer.Current).fillRaw(m))
                         .forEach(m => VRDOM.append(<MessageFragment m={m}
                                                                     peers={this.state.peers}
-                                                                    q={this.currentQuery}/>, this.messagesListRef.$el))
+                                                                    q={this.currentQuery} onClick={() => {
+                            UIEvents.Bubbles.fire("showMessageInstant", m)
+                        }}/>, this.messagesListRef.$el))
 
                     this.isFetching = false
 

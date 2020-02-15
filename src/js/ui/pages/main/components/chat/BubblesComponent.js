@@ -14,6 +14,7 @@ import {MessageAvatarComponent} from "./message/common/MessageAvatarComponent";
 import {UserPeer} from "../../../../../api/peers/objects/UserPeer";
 import {ServiceMessage} from "../../../../../api/messages/objects/ServiceMessage";
 import {MessageType} from "../../../../../api/messages/Message";
+import MTProto from "../../../../../mtproto/external";
 
 const DATA_FORMAT_MONTH_DAY = {
     month: 'long',
@@ -116,7 +117,13 @@ class BubblesComponent extends VComponent {
 
     onShowMessageInstant = message => {
         this.showInstant = true
-        AppSelectedPeer.select(message.to)
+        let to = message.to
+        if(message.to instanceof UserPeer) {
+            if(message.to.id === MTProto.getAuthorizedUser().user.id) {
+                to = message.from
+            }
+        }
+        AppSelectedPeer.select(to)
         this.onShowMessage(message)
     }
 
@@ -148,11 +155,6 @@ class BubblesComponent extends VComponent {
             } else {
                 this.appendMessages(event.messages)
             }
-            if ((event.peer instanceof ChannelPeer && !(event.peer instanceof SupergroupPeer)) && !event.peer.canPostMessages) {
-                this.chatInputRef.component.hide()
-            } else {
-                this.chatInputRef.component.show()
-            }
         }
     }
 
@@ -181,9 +183,7 @@ class BubblesComponent extends VComponent {
             this.clearAndAppend(event.messages)
             // TODO hack
             if (this.showInstant) {
-                this.withTimeout(l => {
-                    this.showInstant = false
-                }, 300)
+                this.showInstant = false
             }
         }
     }
@@ -424,6 +424,13 @@ class BubblesComponent extends VComponent {
     }
 
     refreshMessages = () => {
+
+        if ((AppSelectedPeer.Current instanceof ChannelPeer && !(AppSelectedPeer.Current instanceof SupergroupPeer)) && !AppSelectedPeer.Current.canPostMessages) {
+            this.chatInputRef.component.hide()
+        } else {
+            this.chatInputRef.component.show()
+        }
+        if(this.showInstant) return
         if (AppSelectedPeer.Current.messages.unreadCount > 0) {
             const maxUnread = AppSelectedPeer.Current.messages.readInboxMaxId
             if (this.messages.rendered.has(maxUnread)) {
