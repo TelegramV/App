@@ -7,6 +7,7 @@ import {getPeerTypeFromType} from "../dialogs/util"
 import AppEvents from "../eventBus/AppEvents"
 import AppSelectedPeer from "../../ui/reactive/SelectedPeer"
 import API from "../telegram/API"
+import UpdatesManager from "../updates/updatesManager"
 
 class MessageManager extends Manager {
     init() {
@@ -79,7 +80,20 @@ class MessageManager extends Manager {
         })
 
         MTProto.UpdatesManager.subscribe("updateShortMessage", update => {
-            updatePeerLastMessage(PeersStore.get("user", update.user_id), update)
+            const user = PeersStore.get("user", update.user_id)
+
+            if (!user) {
+                UpdatesManager.defaultUpdatesProcessor.getDifference({
+                    pts: UpdatesManager.State.pts - 1
+                }).then(diff => {
+                    UpdatesManager.defaultUpdatesProcessor.processDifference(diff)
+                })
+                // API.messages.getUsers([InputUser]).then(users => {
+                //     updatePeerLastMessage(users[0], update)
+                // })
+            } else {
+                updatePeerLastMessage(user, update)
+            }
         })
 
         MTProto.UpdatesManager.subscribe("updateShortChatMessage", update => {
