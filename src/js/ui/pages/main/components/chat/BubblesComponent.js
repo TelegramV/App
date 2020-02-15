@@ -102,6 +102,8 @@ class BubblesComponent extends VComponent {
                     this.callbacks.peer.fetchFull()
                 }
 
+                console.log("Callback change!", this.showInstant)
+
                 if(!this.showInstant) {
 
                     this.refreshMessages()
@@ -160,6 +162,7 @@ class BubblesComponent extends VComponent {
                 console.log("messages found!!!")
                 this.messages.isFetchingNextPage = false
                 this.messages.isFetchingPrevPage = false
+                this.showInstant = false
             })
         }
     }
