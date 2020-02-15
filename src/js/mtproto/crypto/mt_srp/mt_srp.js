@@ -367,7 +367,7 @@ export default function mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B,
     ///console.log(g_a.toString(16).slice((257 - 256) * 2));
     
     //console.log(g_a.toByteArray());
-    console.log(g_a.toString(16));
+    //console.log(g_a.toString(16));
     var g_a_bits = sjcl.codec.hex.toBits(g_a.toString(16));
     var u = H(sjcl.bitArray.concat(g_a_bits, srp_B_bits));
 
@@ -375,7 +375,7 @@ export default function mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B,
     var aux = big_a.add((big_u.multiply(big_x))); //TODO: RE-CHECK
     var s_a = t.modPow(aux, big_p);
 
-    console.log(s_a.toString(16));
+    //console.log(s_a.toString(16));
     //console.log(s_a.toString(16).slice((257 - 256) * 2));
     var k_a = H(sjcl.codec.hex.toBits(s_a.toString(16)));
 
@@ -386,7 +386,7 @@ export default function mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B,
     var H_p = new BigInteger(sjcl.codec.hex.fromBits(H(p_bits)), 16);
     var H_g = new BigInteger(sjcl.codec.hex.fromBits(H(g_padded_bits)), 16);
 
-    console.log((H_p.xor(H_g)).toString(16));
+    //console.log((H_p.xor(H_g)).toString(16));
     //console.log((H_p.xor(H_g)).toString(16).slice((257 - 256) * 2));
     var H_pg_xor_bits = sjcl.codec.hex.toBits((H_p.xor(H_g)).toString(16));
     var H2_salt1 = H(sjcl.codec.bytes.toBits(salt1));
