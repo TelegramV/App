@@ -69,10 +69,12 @@ class BubblesComponent extends VComponent {
 
     onRightSidebarShow = l => {
         this.$el.parentNode.classList.add("right-bar-open")
+        this.rightSidebarOpen = true
     }
 
     onRightSidebarHide = l => {
         this.$el.parentNode.classList.remove("right-bar-open")
+        this.rightSidebarOpen = false
     }
 
     h() {
@@ -85,7 +87,7 @@ class BubblesComponent extends VComponent {
 
     mounted() {
         this.$el.addEventListener("scroll", this.onScroll, {
-            passive: true
+            passive: false
         })
 
         this.intersectionObserver = new IntersectionObserver(this.onIntersection, {
@@ -101,8 +103,6 @@ class BubblesComponent extends VComponent {
                 if (!this.callbacks.peer.full) {
                     this.callbacks.peer.fetchFull()
                 }
-
-                console.log("Callback change!", this.showInstant)
 
                 if(!this.showInstant) {
 
@@ -130,7 +130,6 @@ class BubblesComponent extends VComponent {
     }
 
     onShowMessageInstant = message => {
-        console.log("onShowMessageInstant")
         this.showInstant = true
         let to = message.to
         if (message.to instanceof UserPeer) {
@@ -159,7 +158,6 @@ class BubblesComponent extends VComponent {
                 add_offset: -25,
                 limit: 50
             }).then(() => {
-                console.log("messages found!!!")
                 this.messages.isFetchingNextPage = false
                 this.messages.isFetchingPrevPage = false
                 this.showInstant = false
@@ -169,7 +167,6 @@ class BubblesComponent extends VComponent {
 
     onFetchedInitialMessages = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            console.log("isEnd = true")
             this.isEnd = true
             this.appendMessages(event.messages)
         }
@@ -179,7 +176,6 @@ class BubblesComponent extends VComponent {
         if (AppSelectedPeer.check(event.peer)) {
             if (event.isEnd) {
                 this.isEnd = true
-                console.log("isEnd = true")
             }
             this.prependMessages(event.messages, false, true)
         }
@@ -361,11 +357,22 @@ class BubblesComponent extends VComponent {
         const z = this.$el.scrollTop
         const k = this.bubblesInnerRef.$el.clientHeight
         const pushed = []
+        let i = 0
         for (const message of messages) {
             const all = [...this.messages.rendered.keys()]
             const last = all.length > 0 ? this.messages.rendered.get(all.reduce((l, q) => {
                 return l < q ? l : q
             })) : null
+
+            if(message.groupedId) {
+                const isNotReady = messages.slice(i, messages.length).every(l => {
+                    return l.groupedId === message.groupedId
+                })
+                if(isNotReady) {
+                    break
+                }
+            }
+
 
             // if (showNewBadge && message.to && message.id === message.to.messages.readInboxMaxId) {
             //     VRDOM.append(<div className="service" css-padding-top="100px">
@@ -389,9 +396,14 @@ class BubblesComponent extends VComponent {
                     this.messages.renderedGroups.set(message.groupedId, message)
                 }
             }
+            i++
         }
 
-        this.$el.scrollTop = z + this.bubblesInnerRef.$el.clientHeight - k
+        // console.log("append! after, scrollTop=", this.$el.scrollTop, "height=", this.bubblesInnerRef.$el.clientHeight, "scrollToWaited=", scrollToWaited, this.waitingScrollToMessage)
+
+        if(this.$el.scrollTop === 0) {
+            this.$el.scrollTop = z + this.bubblesInnerRef.$el.clientHeight - k
+        }
         if (scrollToWaited) {
             this.scrollToWaitedMessage()
         }
@@ -412,11 +424,21 @@ class BubblesComponent extends VComponent {
 
         const pushed = []
 
+        let i = 0
         for (const message of messages) {
             const all = [...this.messages.rendered.keys()]
             const first = all.length > 0 ? this.messages.rendered.get(all.reduce((l, q) => {
                 return l > q ? l : q
             })) : null
+
+            if(message.groupedId) {
+                const isNotReady = messages.slice(i, messages.length).every(l => {
+                    return l.groupedId === message.groupedId
+                })
+                if(isNotReady) {
+                    break
+                }
+            }
 
             const $rendered = this.renderMessage(message, true)
 
@@ -439,6 +461,7 @@ class BubblesComponent extends VComponent {
                 pushed.push($rendered)
             }
 
+            i++
         }
 
         if (reset) {

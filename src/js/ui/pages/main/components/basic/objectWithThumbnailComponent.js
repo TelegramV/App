@@ -1,7 +1,6 @@
 import {VComponent} from "../../../../v/vrdom/component/VComponent"
 
 export class ObjectWithThumbnailComponent extends VComponent {
-
     init() {
         this.state = {
             object: this.props.object,
