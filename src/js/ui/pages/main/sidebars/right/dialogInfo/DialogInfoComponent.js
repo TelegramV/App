@@ -18,9 +18,11 @@ import {DialogInfoMemberComponent} from "./fragments/DialogInfoMemberComponent";
 import {DialogInfoAudioComponent} from "./fragments/DialogInfoAudioComponent";
 import {FileAPI} from "../../../../../../api/fileAPI";
 import {formatAudioTime} from "../../../../../utils";
-import {SearchMessage} from "../../../../../../api/messages/SearchMessage";
 import {MediaViewerManager} from "../../../../../mediaViewerManager";
 import {PhotoMessage} from "../../../../../../api/messages/objects/PhotoMessage";
+import AppEvents from "../../../../../../api/eventBus/AppEvents"
+import FileManager from "../../../../../../api/files/FileManager"
+import {DocumentMessagesTool} from "../../../components/file/DocumentMessageTool"
 
 export class DialogInfoComponent extends RightBarComponent {
 
@@ -34,6 +36,8 @@ export class DialogInfoComponent extends RightBarComponent {
         docs: VComponent.createRef(),
         audio: VComponent.createRef(),
     }
+
+    downloadingDocuments = new Map()
 
     contentPages = {
         members: {
@@ -92,6 +96,13 @@ export class DialogInfoComponent extends RightBarComponent {
         this.callbacks = {
             peer: AppSelectedInfoPeer.Reactive.FireOnly
         }
+    }
+
+    appEvents(E) {
+        super.appEvents(E)
+        E.bus(AppEvents.General)
+            .on("fileDownloaded", this.onFileDownloaded)
+            .on("fileDownloading", this.onFileDownloading)
     }
 
     callbackChanged(key: string, value) {
@@ -236,7 +247,8 @@ export class DialogInfoComponent extends RightBarComponent {
         }
         const msg = new PhotoMessage(AppSelectedInfoPeer.Current)
         msg.fillRaw(rawMessage)
-        VRDOM.append(<DialogInfoPhotoComponent photo={rawMessage.media.photo} click={l => MediaViewerManager.open(msg)}/>, this.contentRefs.media.$el)
+        VRDOM.append(<DialogInfoPhotoComponent photo={rawMessage.media.photo}
+                                               click={l => MediaViewerManager.open(msg)}/>, this.contentRefs.media.$el)
     }
 
     openLinks = () => {
@@ -372,7 +384,15 @@ export class DialogInfoComponent extends RightBarComponent {
         }
 
         if (rawMessage.media && rawMessage.media.document) {
-            VRDOM.append(<DialogInfoDocumentComponent document={rawMessage.media.document}/>, this.contentRefs.docs.$el)
+            this.downloadingDocuments.set(rawMessage.media.document.id, {
+                isDownloaded: false,
+                downloadedFile: false,
+                isDownloading: false,
+            })
+
+            VRDOM.append(<DialogInfoDocumentComponent document={rawMessage.media.document}
+                                                      onClick={() => this.downloadDocument(rawMessage.media.document)}
+                                                      isDownloading={FileManager.pending.has(rawMessage.media.document.id)}/>, this.contentRefs.docs.$el)
         }
     }
 
@@ -406,6 +426,7 @@ export class DialogInfoComponent extends RightBarComponent {
     }
 
     clearContent = () => {
+        this.downloadingDocuments.clear()
         for (const v of Object.values(this.contentRefs)) {
             VRDOM.deleteInner(v.$el)
         }
@@ -433,6 +454,61 @@ export class DialogInfoComponent extends RightBarComponent {
                 this.fetchDocsNextPage()
             } else if (this.showing === "audio") {
                 this.fetchAudioNextPage()
+            }
+        }
+    }
+
+    downloadDocument = document => {
+        let dowdoc = this.downloadingDocuments.get(document.id)
+
+        if (!dowdoc) {
+            dowdoc = this.downloadingDocuments.set(document.id, {
+                isDownloaded: false,
+                downloadedFile: false,
+                isDownloading: false,
+            }).get(document.id)
+        }
+
+        if (dowdoc.isDownloaded && dowdoc.downloadedFile) {
+            FileManager.saveOnPc(dowdoc.downloadedFile, DocumentMessagesTool.getFilename(document.attributes))
+        } else if (!dowdoc.isDownloading) {
+            FileManager.downloadDocument(document)
+        }
+    }
+
+    onFileDownloading = event => {
+        let dowdoc = this.downloadingDocuments.get(event.fileId)
+
+        if (dowdoc && !dowdoc.isDownloaded) {
+            dowdoc.isDownloading = true
+
+            const $el = document.getElementById(`medidoc-${event.fileId}`)
+
+            if ($el) {
+                VRDOM.patch($el, <DialogInfoDocumentComponent document={event.raw}
+                                                              isDownloading={dowdoc.isDownloading}
+                                                              isDownloaded={dowdoc.isDownloaded}
+                                                              onClick={() => this.downloadDocument(event.raw)}/>)
+            }
+        }
+    }
+
+    onFileDownloaded = event => {
+        let dowdoc = this.downloadingDocuments.get(event.fileId)
+
+        if (dowdoc) {
+            dowdoc.isDownloaded = true
+            dowdoc.isDownloading = false
+            dowdoc.downloadedFile = event.file
+
+
+            const $el = document.getElementById(`medidoc-${event.fileId}`)
+
+            if ($el) {
+                VRDOM.patch($el, <DialogInfoDocumentComponent document={event.raw}
+                                                              isDownloading={dowdoc.isDownloading}
+                                                              isDownloaded={dowdoc.isDownloaded}
+                                                              onClick={() => this.downloadDocument(event.raw)}/>)
             }
         }
     }

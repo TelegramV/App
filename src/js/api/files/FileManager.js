@@ -1,17 +1,30 @@
-import {TypedPublisher} from "../eventBus/TypedPublisher"
 import {FileAPI} from "../fileAPI"
 import AppEvents from "../eventBus/AppEvents"
 
-class FilesManager extends TypedPublisher {
+class FilesManager {
 
     pending = new Set()
-    downloaded = new Set()
+    downloaded = new Map()
 
     downloadDocument = file => {
+        if (this.pending.has(file.id)) {
+            return Promise.reject()
+        }
+
+        this.pending.add(file.id)
+
+        AppEvents.General.fire("fileDownloading", {
+            fileId: file.id,
+            raw: file
+        })
+
         FileAPI.getAllParts(file, file.size).then(x => {
+            this.pending.delete(file.id)
+
             AppEvents.General.fire("fileDownloaded", {
                 fileId: file.id,
-                file: x
+                file: x,
+                raw: file
             })
         })
     }

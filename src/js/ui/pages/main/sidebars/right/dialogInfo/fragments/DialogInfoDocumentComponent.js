@@ -1,6 +1,6 @@
 import {DocumentMessagesTool} from "../../../../components/file/DocumentMessageTool"
 
-export const DialogInfoDocumentComponent = ({document}) => {
+export const DialogInfoDocumentComponent = ({document, isDownloading, isDownloaded, onClick}) => {
     let doc = document;
 
     let title = DocumentMessagesTool.getFilename(doc.attributes);
@@ -9,14 +9,23 @@ export const DialogInfoDocumentComponent = ({document}) => {
 
     let color = DocumentMessagesTool.getColor(ext);
     let icon = (
-        <div class="svg-wrapper">
+        <div className="svg-wrapper">
             {DocumentMessagesTool.createIcon(color)}
-            <div class="extension">{ext}</div>
+            {
+                isDownloaded ?
+                    <div className="extension">{ext}</div> :
+                    <div className="progress extension">
+                        {!isDownloading ? <div className="pause-button">
+                                <i className={["tgico tgico-download"]}/>
+                            </div> :
+                            <progress className={["progress-circular", "white"]}/>}
+                    </div>
+            }
         </div>
     )
 
     return (
-        <div className="card details">
+        <div className="card details" id={`medidoc-${document.id}`} onClick={onClick} css-cursor="pointer">
             <div className="card-icon">
                 {icon}
             </div>

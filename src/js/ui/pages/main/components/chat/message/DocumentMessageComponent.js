@@ -35,6 +35,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         super.appEvents(E)
         E.bus(AppEvents.General)
             .on("fileDownloaded", this.onFileDownloaded)
+            .on("fileDownloading", this.onFileDownloading)
     }
 
     h() {
@@ -50,7 +51,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
                                  ext={ext}
                                  color={color}
                                  isDownloaded={this.isDownloaded}
-                                 isDownloading={this.isDownloading}/>
+                                 isDownloading={FileManager.pending.has(doc.id)}/>
 
 
         return (
@@ -67,13 +68,17 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         if (this.isDownloaded && this.downloadedFile) {
             FileManager.saveOnPc(this.downloadedFile, DocumentMessagesTool.getFilename(this.doc.attributes))
         } else if (!this.isDownloading) {
+            FileManager.downloadDocument(this.doc)
+        }
+    }
+
+    onFileDownloading = event => {
+        if (this.doc.id === event.fileId && !this.isDownloaded) {
             this.isDownloading = true
 
             this.iconFragmentRef.patch({
-                isDownloading: true
+                isDownloading: true,
             })
-
-            FileManager.downloadDocument(this.doc)
         }
     }
 
@@ -86,7 +91,6 @@ class DocumentMessageComponent extends GeneralMessageComponent {
             this.iconFragmentRef.patch({
                 isDownloading: false,
                 isDownloaded: true,
-                downloadedFile: true
             })
         }
     }
