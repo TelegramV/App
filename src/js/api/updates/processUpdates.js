@@ -5,7 +5,7 @@ import PeersManager from "../peers/objects/PeersManager"
  * @param rawUpdate
  */
 function processUpdates(manager, rawUpdate) {
-    // console.log("got updates", rawUpdate)
+    console.log("got updates", rawUpdate)
     PeersManager.fillPeersFromUpdate(rawUpdate)
 
     manager.State.date = rawUpdate.date
