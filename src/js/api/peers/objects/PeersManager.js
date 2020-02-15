@@ -87,6 +87,7 @@ class PeerManager extends Manager {
     _findMessageByUser(messages, peer) {
         return messages.find(Message => {
             return (
+                Message.chat_id === peer.id ||
                 Message.user_id === peer.id ||
                 Message.from_id === peer.id || (
                     Message.to_id && (
@@ -100,6 +101,7 @@ class PeerManager extends Manager {
     _findMessageByChat(messages, peer) {
         return messages.find(Message => {
             return (
+                Message.user_id === peer.id ||
                 Message.chat_id === peer.id ||
                 Message.from_id === peer.id || (
                     Message.to_id && (
@@ -129,7 +131,9 @@ class PeerManager extends Manager {
 
                     if (messages) {
                         const Message = this._findMessageByUser(messages, peer)
-                        peer._min_inputPeer = Message.to_id
+                        if (Message) {
+                            peer._min_inputPeer = Message.to_id
+                        }
                     }
                 }
 
@@ -146,7 +150,9 @@ class PeerManager extends Manager {
 
                     if (messages) {
                         const Message = this._findMessageByChat(messages, peer)
-                        peer._min_inputPeer = Message.to_id
+                        if (Message) {
+                            peer._min_inputPeer = Message.to_id
+                        }
                     }
                 }
 
