@@ -70,7 +70,6 @@ class ChatComponent extends VComponent {
     callbackChanged(key: string, value) {
         if (key === "peer") {
             this.chatLoaderRef.$el.style.display = "none"
-
             if (value) {
                 this.noChatRef.$el.style.display = "none"
                 this.chatRef.$el.style.display = ""

@@ -28,7 +28,7 @@ export class PeerApi {
      * @param props
      * @return {Promise<Message[]>}
      */
-    async getHistory(props = {offset_id: 0, limit: 20}, addUnread = false) {
+    async getHistory(props = {offset_id: 0, limit: 50}, addUnread = false) {
         const Messages = await MTProto.invokeMethod("messages.getHistory", {
             peer: this.peer.inputPeer,
             offset_id: props.offset_id,
@@ -80,7 +80,6 @@ export class PeerApi {
     fetchByOffsetId({offset_id, limit, add_offset}) {
         return this.getHistory({offset_id, limit, add_offset: -1 + add_offset}).then(messages => {
             // console.log("fetchByOffsetId returned", messages.length)
-            if (messages.length > 0) {
                 // AppEvents.Dialogs.fire("fetchedMessagesAnyPage", {
                 //     dialog: this.peer.dialog,
                 //     messages: messages
@@ -89,7 +88,6 @@ export class PeerApi {
                     peer: this.peer,
                     messages: messages
                 })
-            }
         })
     }
 
@@ -140,6 +138,7 @@ export class PeerApi {
             // })
             AppEvents.Peers.fire("fetchedMessagesPrevPage", {
                 peer: this.peer,
+                isEnd: messages.length < 50,
                 messages: messages.reverse()
             })
             // }

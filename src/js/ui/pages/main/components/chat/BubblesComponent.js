@@ -102,7 +102,17 @@ class BubblesComponent extends VComponent {
                     this.callbacks.peer.fetchFull()
                 }
 
-                this.refreshMessages()
+                if(!this.showInstant) {
+
+                    this.refreshMessages()
+                } else {
+                    if ((AppSelectedPeer.Current instanceof ChannelPeer && !(AppSelectedPeer.Current instanceof SupergroupPeer)) && !AppSelectedPeer.Current.canPostMessages) {
+                        this.chatInputRef.component.hide()
+                    } else {
+                        this.chatInputRef.component.show()
+                    }
+                    this.showInstant = false
+                }
             } else {
                 this.clearBubbles()
             }
@@ -110,10 +120,15 @@ class BubblesComponent extends VComponent {
     }
 
     onScrollToBottom = message => {
-        this.$el.scrollTo({top: this.bubblesInnerRef.$el.clientHeight})
+        if(this.isEnd) {
+            this.$el.scrollTo({top: this.bubblesInnerRef.$el.clientHeight})
+        } else {
+            // TODO load end messages and scroll to bottom
+        }
     }
 
     onShowMessageInstant = message => {
+        console.log("onShowMessageInstant")
         this.showInstant = true
         let to = message.to
         if (message.to instanceof UserPeer) {
@@ -133,6 +148,7 @@ class BubblesComponent extends VComponent {
             this.toggleMessagesLoader(false)
             AppSelectedPeer.Current.messages.clear()
             this.clearBubbles()
+            this.isEnd = false
             this.messages.isFetchingNextPage = true
             this.messages.isFetchingPrevPage = true
             this.waitingScrollToMessage = message.id
@@ -141,6 +157,7 @@ class BubblesComponent extends VComponent {
                 add_offset: -25,
                 limit: 50
             }).then(() => {
+                console.log("messages found!!!")
                 this.messages.isFetchingNextPage = false
                 this.messages.isFetchingPrevPage = false
             })
@@ -149,46 +166,38 @@ class BubblesComponent extends VComponent {
 
     onFetchedInitialMessages = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            if (this.showInstant) {
-            } else {
-                this.appendMessages(event.messages)
-            }
+            console.log("isEnd = true")
+            this.isEnd = true
+            this.appendMessages(event.messages)
         }
     }
 
     onFetchedMessagesPrevPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            if (event.messages.length === 0) {
-                this.loadedTop = false
-                return
+            if (event.isEnd) {
+                this.isEnd = true
+                console.log("isEnd = true")
             }
-            if (!this.showInstant) {
-                this.prependMessages(event.messages, false, true)
-            }
+            this.prependMessages(event.messages, false, true)
         }
     }
 
     onFetchedMessagesNextPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
-            if (!this.showInstant) {
-                this.appendMessages(event.messages)
-            }
+            this.appendMessages(event.messages)
         }
     }
 
     onFetchedMessagesAnyPage = event => {
         if (AppSelectedPeer.check(event.peer)) {
+            this.isEnd = false
             this.clearAndAppend(event.messages)
-            // TODO hack
-            if (this.showInstant) {
-                this.showInstant = false
-            }
         }
     }
 
     onNewMessage = event => {
         if (AppSelectedPeer.check(event.dialog.peer)) {
-            if (!this.loadedTop) {
+            if (this.isEnd) {
                 if (!this.messages.isFetching) {
                     if (isElementInViewport(this.prependMessages([event.message])[0])) {
                         this.markAllAsRead()
@@ -438,13 +447,14 @@ class BubblesComponent extends VComponent {
     }
 
     refreshMessages = () => {
+        console.log("refreshMessages")
 
         if ((AppSelectedPeer.Current instanceof ChannelPeer && !(AppSelectedPeer.Current instanceof SupergroupPeer)) && !AppSelectedPeer.Current.canPostMessages) {
             this.chatInputRef.component.hide()
         } else {
             this.chatInputRef.component.show()
         }
-        if (this.showInstant) return
+
         if (AppSelectedPeer.Current.messages.unreadCount > 0) {
             const maxUnread = AppSelectedPeer.Current.messages.readInboxMaxId
             if (this.messages.rendered.has(maxUnread)) {
@@ -454,6 +464,7 @@ class BubblesComponent extends VComponent {
                 this.toggleMessagesLoader(false)
                 AppSelectedPeer.Current.messages.clear()
                 this.clearBubbles()
+                this.isEnd = false
                 this.messages.isFetchingNextPage = true
                 this.messages.isFetchingPrevPage = true
                 this.waitingScrollToMessage = maxUnread
