@@ -9,6 +9,7 @@
 import {mt_write_uint32, mt_write_bytes} from "./../../network/mt_inob_codec"
 import {BigInteger} from "../../vendor/jsbn/jsbn"
 import * as sjcl from "./sjcl"
+import sha512 from "./sha512_n"
 
 function H(data)
 {
@@ -43,10 +44,172 @@ var hmacSHA512 = function(key) {
     return derivedKey;
   };
 
+export function strToInt32(str: string, pos: number) 
+{
+    return (
+      str.charCodeAt(pos) << 24
+      ^ str.charCodeAt(pos + 1) << 16
+      ^ str.charCodeAt(pos + 2) << 8
+      ^ str.charCodeAt(pos + 3)
+    );
+}
+
+function int32ToStr(data: number) 
+{
+    return (
+      String.fromCharCode((data >> 24) & 0xFF)
+      + String.fromCharCode((data >> 16) & 0xFF)
+      + String.fromCharCode((data >> 8) & 0xFF)
+      + String.fromCharCode(data & 0xFF)
+    );
+}
+  
+interface StreamInterface 
+{
+    data: string;
+    length: number;
+    state: Uint32Array;
+    update(data: string | Uint32Array): StreamInterface;
+    digest(): string;
+    digest(format: 'array'): Uint32Array;
+}
+  
+export interface Digest 
+{
+    blockLength: number,
+    digestLength: number,
+    (data: string, fmt: 'array'): Uint32Array,
+    stream(): StreamInterface,
+}
+
+export function hmac(message: string | Uint32Array, _key: string | Uint8Array, digest: Digest): string 
+{
+    const intlen = digest.blockLength / 4;
+    const ipad = new Uint32Array(intlen);
+    const opad = new Uint32Array(intlen);
+    const key = new Uint32Array(intlen);
+  
+    // if key is longer than blocksize, hash it
+    if (typeof _key === 'string') {
+      if (_key.length > digest.blockLength) {
+        key.set(digest(_key, 'array'), 0);
+      } else {
+        for (let i = 0; i < _key.length; i += 4) {
+          key[i / 4] = strToInt32(_key, i);
+        }
+      }
+    } else {
+      key.set(_key, 0);
+    }
+  
+    // mix key into inner and outer padding
+    // ipadding = [0x36 * blocksize] ^ key
+    // opadding = [0x5C * blocksize] ^ key
+    for (let i = 0; i < intlen; i += 1) {
+      ipad[i] = 0x36363636 ^ key[i];
+      opad[i] = 0x5C5C5C5C ^ key[i];
+    }
+  
+    // digest is done like so: hash(opadding | hash(ipadding | message))
+    const inner = digest.stream().update(ipad).update(message).digest();
+    return digest.stream().update(opad).update(inner).digest();
+}
+
+export function xorStr(left: string, right: string, n: number) 
+{
+    let s3 = '';
+    let b = 0;
+    let t = '';
+    let i = 0;
+    let c = 0;
+    for (let j = n; j > 0; j -= 1, i += 1) {
+      b = left.charCodeAt(i) ^ right.charCodeAt(i);
+      if (c >= 10) {
+        s3 += t;
+        t = '';
+        c = 0;
+      }
+      t += String.fromCharCode(b);
+      c += 1;
+    }
+    s3 += t;
+    return s3;
+}
+export function pbkdf2(pwd: string | Uint8Array, salt: string, iter: number, dklen: number = 64, digest: Digest): string 
+{
+    const hlen = digest.digestLength;
+    /* 1. If dkLen > (2^32 - 1) * hLen, output "derived key too long" and stop. */
+    if (dklen > (0xFFFFFFFF * hlen)) {
+      throw new Error('Derived key is too long.');
+    }
+  
+    /* 2. Let len be the number of hLen-octet blocks in the derived key,
+      rounding up, and let r be the number of octets in the last
+      block:
+      len = CEIL(dkLen / hLen),
+      r = dkLen - (len - 1) * hLen. */
+    const len = Math.ceil(dklen / hlen);
+    const r = dklen - (len - 1) * hlen;
+  
+    /* 3. For each block of the derived key apply the function F defined
+      below to the password P, the salt S, the iteration count c, and
+      the block index to compute the block:
+      T_1 = F(P, S, c, 1),
+      T_2 = F(P, S, c, 2),
+      ...
+      T_len = F(P, S, c, len),
+      where the function F is defined as the exclusive-or sum of the
+      first c iterates of the underlying pseudorandom function PRF
+      applied to the password P and the concatenation of the salt S
+      and the block index i:
+      F(P, S, c, i) = u_1 XOR u_2 XOR ... XOR u_c
+      where
+      u_1 = PRF(P, S || INT(i)),
+      u_2 = PRF(P, u_1),
+      ...
+      u_c = PRF(P, u_{c-1}).
+      Here, INT(i) is a four-octet encoding of the integer i, most
+      significant octet first. */
+    let dk = '';
+    let xor; let uc; let uc1;
+  
+    for (let i = 1; i <= len; i += 1) {
+      // PRF(P, S || INT(i)) (first iteration)
+      xor = uc1 = hmac(salt + int32ToStr(i), pwd, digest); // eslint-disable-line no-multi-assign
+  
+      // PRF(P, u_{c-1}) (other iterations)
+      for (let j = 2; j <= iter; j += 1) {
+        uc = hmac(uc1, pwd, digest);
+        // F(p, s, c, i)
+        xor = xorStr(xor, uc, hlen);
+        uc1 = uc;
+      }
+  
+      /* 4. Concatenate the blocks and extract the first dkLen octets to
+        produce a derived key DK:
+        DK = T_1 || T_2 ||  ...  || T_len<0..r-1> */
+      dk += (i < len) ? xor : xor.substr(0, r);
+    }
+  
+    return dk;
+}
+
 function PH2(password, salt1, salt2)
 {
     var ph1 = PH1(password, salt1, salt2);
     var der_key = SH(pbkdf2Sync_sha512(ph1, salt1, 100000, 512), salt2);
+
+    //BufferSlice buf(32);
+    //hash_sha256(password, client_salt, buf.as_slice());
+    //hash_sha256(buf.as_slice(), server_salt, buf.as_slice());
+
+    /*var ph1 = PH1(password, salt1, salt2);
+    var der_key = SH(
+
+        sjcl.codec.bytes.toBits(pbkdf2(new Uint8Array(sjcl.codec.bytes.fromBits(ph1)), sjcl.codec.bytes.fromBits(salt1), 100000, 512, sha512))
+        
+        , salt2);*/
+    
     return der_key;
 }
 
@@ -238,6 +401,8 @@ export default function mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B,
 
     var M1_bytes = sjcl.codec.bytes.fromBits(M1);
     var g_a_bytes = sjcl.codec.bytes.fromBits(g_a_bits);
+    console.log("M1:" + new Uint8Array(M1_bytes));
+    console.log("A: " + new Uint8Array(g_a_bytes));
 
     return {
         srp_id: srp_id,
