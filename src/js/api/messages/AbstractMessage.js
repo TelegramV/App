@@ -7,6 +7,8 @@ import {MessageParser} from "./MessageParser"
 import {Peer} from "../peers/objects/Peer"
 import MessagesManager from "./MessagesManager"
 import PeersStore from "../store/PeersStore"
+import {DATE_FORMAT, DATE_FORMAT_TIME} from "../../ui/pages/main/sidebars/left/dialog/Fragments/DialogTimeFragment"
+import MTProto from "../../mtproto/external"
 
 export class AbstractMessage extends ReactiveObject implements Message {
 
@@ -148,6 +150,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     getDate(locale: any, format: any) {
         return new Date(this.date * 1000).toLocaleString(locale, format)
+    }
+
+    getFormattedDate() {
+        return this.getDate("en", MTProto.TimeManager.now(true) - this.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)
     }
 
     // always call super

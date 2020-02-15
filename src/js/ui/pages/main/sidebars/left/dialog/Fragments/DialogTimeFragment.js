@@ -1,12 +1,12 @@
 import MTProto from "../../../../../../../mtproto/external"
 
-const DATE_FORMAT_TIME = {
+export const DATE_FORMAT_TIME = {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
 }
 
-const DATE_FORMAT = {
+export const DATE_FORMAT = {
     year: '2-digit',
     month: '2-digit',
     day: '2-digit',

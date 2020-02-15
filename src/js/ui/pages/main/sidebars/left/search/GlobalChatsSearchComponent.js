@@ -4,6 +4,7 @@ import UIEvents from "../../../../../eventBus/UIEvents"
 import SearchManager from "../../../../../../api/search/SearchManager"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import AppSelectedPeer from "../../../../../reactive/SelectedPeer"
+import {highlightVRNodeWord} from "../../../../../utils/highlightVRNodeText"
 
 export class GlobalChatsSearchComponent extends VComponent {
 
@@ -39,7 +40,7 @@ export class GlobalChatsSearchComponent extends VComponent {
                                 p.fetchFull()
                             }
                             return <ContactFragment url={p.photo.smallUrl}
-                                                    name={p.name}
+                                                    name={highlightVRNodeWord(p.name, this.currentQuery)}
                                                     status={p.statusString.text}
                                                     onClick={() => AppSelectedPeer.select(p)}
                                                     peer={p}/>
@@ -52,8 +53,8 @@ export class GlobalChatsSearchComponent extends VComponent {
                     <div className="column-list">
                         {
                             this.state.peers.map(p => <ContactFragment url={p.photo.smallUrl}
-                                                                       name={p.name}
-                                                                       status={p.username ? `@${p.username}` : ``}
+                                                                       name={highlightVRNodeWord(p.name, this.currentQuery)}
+                                                                       status={highlightVRNodeWord(p.username ? `@${p.username}` : ``, this.currentQuery)}
                                                                        onClick={() => AppSelectedPeer.select(p)}
                                                                        peer={p}/>)
                         }

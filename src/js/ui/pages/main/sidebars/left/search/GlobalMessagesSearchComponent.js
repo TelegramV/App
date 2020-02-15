@@ -4,20 +4,17 @@ import SearchManager from "../../../../../../api/search/SearchManager"
 import {ContactFragment} from "../../../components/basic/ContactFragment"
 import AppEvents from "../../../../../../api/eventBus/AppEvents"
 import PeersStore from "../../../../../../api/store/PeersStore"
+import {highlightVRNodeWord} from "../../../../../utils/highlightVRNodeText"
 
-const MessageFragment = ({m, peers}) => {
+const MessageFragment = ({m, peers, q}) => {
     const peer = m.to === PeersStore.self() ? m.from : m.to
 
     peers.push(peer)
 
     return <ContactFragment url={peer.photo.smallUrl}
                             name={peer.name}
-                            status={m.prefix + m.text}
-                            time={m.getDate('en', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                hour12: false
-                            })}
+                            status={<span>{m.prefix}{highlightVRNodeWord(m.text, q)}</span>}
+                            time={m.getFormattedDate()}
                             peer={peer}
                             onClick={() => {
                                 UIEvents.Bubbles.fire("showMessageInstant", m)
@@ -52,7 +49,8 @@ export class GlobalMessagesSearchComponent extends VComponent {
 
     h() {
         let list = this.state.messages.filter(m => m.to && m.from).map(m => <MessageFragment m={m}
-                                                                                             peers={this.peers}/>);
+                                                                                             peers={this.peers}
+                                                                                             q={this.currentQuery}/>);
         return (
             <div className="global-messages section">
                 <div className="section-title">Global search</div>
@@ -83,7 +81,8 @@ export class GlobalMessagesSearchComponent extends VComponent {
                     this.offsetRate = Messages.next_rate
 
                     Messages.messages.forEach(m => VRDOM.append(<MessageFragment m={m}
-                                                                                 peers={this.peers}/>, this.messagesListRef.$el))
+                                                                                 peers={this.peers}
+                                                                                 q={this.currentQuery}/>, this.messagesListRef.$el))
 
                     this.isFetching = false
 
