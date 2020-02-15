@@ -11,7 +11,7 @@ import AppRoutes from "./ui/routing"
 import {StickerManager} from "./api/stickersManager";
 import VBigInt from "./mtproto/bigint/VBigInt"
 
-const isProduction = false
+const isProduction = true
 
 function start() {
     MTProto.invokeMethod("help.getNearestDc", {}).then(response => {

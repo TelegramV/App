@@ -75,14 +75,6 @@ export default class QRLoginPaneComponent extends PaneComponent {
             obj.appendChild(qr)
 
             setTimeout(this.open, 1000 * (l.expires - MTProto.TimeManager.now(true)));
-        }).catch(reject => {
-            if (reject.reason === "authorized") return; //ignore
-            if (reject.type === "SESSION_PASSWORD_NEEDED") {
-                MTProto.invokeMethod("account.getPassword", {}).then(response => {
-                    console.log(response)
-                    this.props.password(response)
-                })
-            }
         })
     }
 
@@ -98,6 +90,14 @@ export default class QRLoginPaneComponent extends PaneComponent {
             api_id: AppConfiguration.mtproto.api.api_id,
             api_hash: AppConfiguration.mtproto.api.api_hash,
             except_ids: []
+        }).catch(reject => {
+            if (reject.reason === "authorized") return; //ignore
+            if (reject.type === "SESSION_PASSWORD_NEEDED") {
+                MTProto.invokeMethod("account.getPassword", {}).then(response => {
+                    console.log(response)
+                    this.props.password(response)
+                })
+            }
         })
     }
 
