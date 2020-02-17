@@ -1,15 +1,15 @@
 import "../sass/application.scss"
 
-import VF from "./ui/v/VFramework"
-import MTProto from "./mtproto/external"
-import AppCache from "./api/cache"
-import PeersStore from "./api/store/PeersStore"
-import AppEvents from "./api/eventBus/AppEvents"
-import RipplePlugin from "./ui/plugins/RipplePlugin"
-import EmojiPlugin from "./ui/plugins/EmojiPlugin"
-import AppRoutes from "./ui/routing"
-import {StickerManager} from "./api/stickersManager";
-import VBigInt from "./mtproto/bigint/VBigInt"
+import VF from "./V/VFramework"
+import MTProto from "./MTProto/external"
+import AppCache from "./Api/Cache/AppCache"
+import PeersStore from "./Api/Store/PeersStore"
+import AppEvents from "./Api/EventBus/AppEvents"
+import RipplePlugin from "./Ui/plugins/RipplePlugin"
+import EmojiPlugin from "./Ui/plugins/EmojiPlugin"
+import AppRoutes from "./Ui/routing"
+import {StickerManager} from "./Api/Stickers/StickersManager";
+import VBigInt from "./MTProto/bigint/VBigInt"
 
 const isProduction = true
 

@@ -1,7 +1,7 @@
-import {EventBus} from "../../src/js/api/eventBus/EventBus"
-import VComponent from "../../src/js/ui/v/vrdom/component/VComponent"
-import type {AE} from "../../src/js/ui/v/vrdom/component/appEvents"
-import vrdom_renderVComponentVNode from "../../src/js/ui/v/vrdom/render/renderVComponent"
+import {EventBus} from "../../src/js/Api/EventBus/EventBus"
+import VComponent from "../../src/js/V/VRDOM/component/VComponent"
+import type {AE} from "../../src/js/V/VRDOM/component/appEvents"
+import vrdom_renderVComponentVNode from "../../src/js/V/VRDOM/render/renderVComponent"
 import {sum} from "../sum"
 
 const MockEventBus = new EventBus()
