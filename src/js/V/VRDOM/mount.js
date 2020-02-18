@@ -8,6 +8,7 @@ import type {VRRenderProps} from "./types/types"
 import VF from "../VFramework"
 import Component from "./Component"
 import {VComponent} from "./component/VComponent"
+import XVComponent from "../X/Component/XVComponent"
 
 export function vrdom_resolveMount($mounted: Element) {
     if ($mounted.nodeType !== Node.TEXT_NODE) {
@@ -25,6 +26,8 @@ export function vrdom_resolveMount($mounted: Element) {
                 }
             } else if (component instanceof VComponent) {
                 component.__mount($mounted)
+            } else if (component instanceof XVComponent) {
+                component.__mount.call(component, $mounted)
             } else {
                 console.error("component was not found. it means that there is a potential bug in the vrdom")
             }

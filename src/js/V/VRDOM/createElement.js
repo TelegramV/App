@@ -10,6 +10,8 @@ import {VComponent} from "./component/VComponent"
 import VComponentVRNode from "./component/VComponentVRNode"
 import {List} from "./List"
 import {VListVRNode} from "./VListVRNode"
+import XVComponent from "../X/Component/XVComponent"
+import XVComponentVRNode from "../X/XVComponentVRNode"
 
 /**
  * Creates VRNode
@@ -23,6 +25,8 @@ function vrdom_createElement(tagName: VRTagName, props: VRNodeProps): VRNode | C
             return new ComponentVRNode(tagName, props.attrs, props.children)
         } else if (tagName.prototype instanceof VComponent) {
             return new VComponentVRNode(tagName, {attrs: props.attrs, ref: props.attrs.ref}, props.children)
+        } else if (tagName.prototype instanceof XVComponent) {
+            return new XVComponentVRNode(tagName, {attrs: props.attrs, ref: props.attrs.ref}, props.children)
         } else if (tagName === List) {
             return new VListVRNode(tagName, props.attrs)
         } else {

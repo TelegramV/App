@@ -2,11 +2,12 @@
  * (c) Telegram V
  */
 
-import vrdom_patch from "./patch"
 import vrdom_delete from "../delete"
 import VRNode from "../VRNode"
 import vrdom_append from "../append"
 import vrdom_fastpatch from "./fastpatch"
+import xvrdom_patch from "../../X/patch"
+import vrdom_patch from "./patch"
 
 /**
  * @param {Element} $parent
@@ -14,11 +15,15 @@ import vrdom_fastpatch from "./fastpatch"
  * @param {Array<VRNode | any>} newChildren
  * @param fast
  */
-const patchChildren = ($parent: Element, $children: NodeListOf<ChildNode>, newChildren: Array<VRNode | mixed>, fast: boolean = false) => {
+const patchChildren = ($parent: Element, $children: NodeListOf<ChildNode>, newChildren: Array<VRNode | mixed>, fast: boolean = false, xpatch = false) => {
 
     if (fast) {
         $children.forEach(($oldChild, i) => {
             vrdom_fastpatch($oldChild, newChildren[i])
+        })
+    } else if (xpatch) {
+        $children.forEach(($oldChild, i) => {
+            xvrdom_patch($oldChild, newChildren[i])
         })
     } else {
         $children.forEach(($oldChild, i) => {

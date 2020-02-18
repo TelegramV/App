@@ -77,7 +77,9 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
         return $el
     } else {
         for (let child of node.children) {
-            if (child !== undefined && child.tagName === VRDOM.Fragment) {
+            if (child === null) {
+                vrdom_append("", $el, {xmlns})
+            } else if (child !== undefined && child.tagName === VRDOM.Fragment) {
                 for (let c of child.children) {
                     vrdom_append(c, $el, {xmlns})
                 }

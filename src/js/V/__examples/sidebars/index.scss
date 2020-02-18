@@ -1,0 +1,85 @@
+div {
+  outline: 1px solid red;
+}
+
+:root {
+  --landscape-width: 25; // % OR vw for responsive window resizing!
+  --portrait-width: 80vw;
+  --header-height: 4rem;
+  --secs: 0.4s;
+  --bg-left: springgreen;
+  --bg-right: cyan;
+  --bg-main: lemonchiffon;
+}
+
+body {
+  min-height: 100vh;
+  max-width: 100vw;
+  margin: 0;
+  overflow: hidden; // Disable scrolling on body
+}
+
+#layout {
+  display: flex; // Flexbox definition
+  overflow: hidden; // Disable scrolling on layout
+
+  // Style in common for sidebars and main area:
+  .header {
+    position: relative;
+    height: var(--header-height);
+    text-align: center; // Horizontal center
+    .title { position: absolute; left: 0; right: 0; }
+  }
+  .content {
+    overflow: auto;
+    box-sizing: border-box;
+    height: calc(100vh - var(--header-height));
+    padding: 1rem;
+  }
+}
+
+// Main area specific style:
+#main { background: var(--bg-main); flex-grow: 1;
+  .header { background: linear-gradient(to right, var(--bg-left), var(--bg-right));
+    @media (orientation: landscape) {
+      .title { transition: left var(--secs), right var(--secs);
+        &.left-closed { left: var(--header-height); }
+        &.right-closed { right: var(--header-height); }
+      }
+    }
+  }
+}
+
+// Style in common for both sidebars:
+#left, #right { transition: width var(--secs); width: 0;
+  @media (orientation: landscape) {
+    &.open { width: calc(1% * var(--landscape-width)); }
+  } // <-- Landscape ONLY sidebars
+  .icon { position: fixed; z-index: 10;
+    width: var(--header-height); height: var(--header-height);
+    line-height: var(--header-height); font-size: var(--header-height);
+    text-align: center; user-select: none; cursor: pointer;
+  }
+  .sidebar { transition: transform var(--secs); // <-- Portrait AND landscape!
+    @media (orientation: portrait) { width: var(--portrait-width); }
+    @media (orientation: landscape) { width: calc(1vw * var(--landscape-width)); }
+    .header { width: calc(100% - var(--header-height)); }
+  }
+}
+
+// Left sidebar specific style:
+#left { z-index: 5;
+  .sidebar { background: var(--bg-left);
+    &.closed { transform: translateX(-100%); } // <-- Left portrait AND landscape!
+    .header { left: var(--header-height); }
+  }
+}
+
+// Right sidebar specific style:
+#right { .icon { right: 0; }
+  .sidebar { background: var(--bg-right);
+    @media (orientation: portrait) {
+      &.open { transform: translateX(-100%); }
+    } // <-- Right portrait sidebar ONLY!
+  }
+}

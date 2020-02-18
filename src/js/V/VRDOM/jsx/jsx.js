@@ -71,7 +71,6 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
     return vrdom_createElement(tagName, {
         attrs,
         events,
-        // $ignore
         children,
         ref,
 
