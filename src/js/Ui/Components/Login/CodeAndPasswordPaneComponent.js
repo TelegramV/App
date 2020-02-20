@@ -30,16 +30,17 @@ export default class CodeAndPasswordPaneComponent extends PaneComponent {
         return <div className={classList.join(" ")}>
             <div id="monkey" className="object"/>
             <CodeInputPaneComponent ref={this.codeRef} cancel={this.props.cancelCode} finished={this.props.finished}
-                                password={this.onPassword}
-                                monkeyLook={this.state.monkey.monkeyLook.bind(this.state.monkey)} signUp={this.props.signUp}/>
+                                    password={this.onPassword}
+                                    monkeyLook={this.state.monkey.monkeyLook.bind(this.state.monkey)}
+                                    signUp={this.props.signUp}/>
             <PasswordInputPaneComponent ref={this.passwordRef} finished={this.props.finished}
-                                    monkeyClose={this.state.monkey.close.bind(this.state.monkey)}
-                                    monkeyPeek={this.monkeyPeek}/>
+                                        monkeyClose={this.state.monkey.close.bind(this.state.monkey)}
+                                        monkeyPeek={this.monkeyPeek}/>
         </div>
     }
 
     monkeyPeek = (e) => {
-            this.state.monkey.peek()
+        this.state.monkey.peek()
     }
 
     open = () => {

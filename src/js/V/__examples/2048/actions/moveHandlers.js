@@ -1,7 +1,7 @@
 function processMove(state, accessors) {
 
     if (!canMove(state.squares, accessors)) {
-        return { squares : state.squares, isMoved : false, isStarted : state.isStarted, score : state.score };
+        return {squares: state.squares, isMoved: false, isStarted: state.isStarted, score: state.score};
     }
 
     const squares = state.squares.map(arr => arr.map(square => square ? square.copy() : null));
@@ -24,8 +24,7 @@ function processMove(state, accessors) {
                 if (row.canMerge(item)) {
                     row.merge();
                     score = score + row.mergedSum;
-                }
-                else {
+                } else {
                     row.occupied++;
                     row.items[index] = item;
                 }
@@ -37,12 +36,12 @@ function processMove(state, accessors) {
         }
     }
 
-    return { squares : squares, isMoved : true, isStarted : true, score : score };
+    return {squares: squares, isMoved: true, isStarted: true, score: score};
 }
 
 function canMove(squares, accessors) {
     const length = squares.length;
-    const { get } = accessors;
+    const {get} = accessors;
 
     for (let i = 0; i !== length; i++) {
         let j = 0;
@@ -72,16 +71,18 @@ function canMove(squares, accessors) {
 
 function getRowObject(length) {
     const row = {
-        length : length,
-        items : new Array(length),
-        occupied : 0,
-        mergedSum : 0,
-        mergedTiles : new Set()
+        length: length,
+        items: new Array(length),
+        occupied: 0,
+        mergedSum: 0,
+        mergedTiles: new Set()
     };
 
-    row.getLastNonOccupiedIndex = function() { return row.length - row.occupied - 1 };
+    row.getLastNonOccupiedIndex = function () {
+        return row.length - row.occupied - 1
+    };
 
-    row.canMerge = function(item) {
+    row.canMerge = function (item) {
         if (row.occupied > 0) {
             const nextIndex = row.getLastNonOccupiedIndex() + 1;
 
@@ -96,7 +97,7 @@ function getRowObject(length) {
         return false;
     }
 
-    row.merge = function() {
+    row.merge = function () {
         const index = row.getLastNonOccupiedIndex() + 1;
         const item = row.items[index];
         item.number = item.number * 2;
@@ -115,9 +116,9 @@ function leftGet(squares, i, j) {
     return squares[i][squares.length - j - 1];
 }
 
-function leftSet (squares, i, j, item) {
+function leftSet(squares, i, j, item) {
     squares[i][squares.length - j - 1] = item;
-};
+}
 
 function upGet(squares, i, j) {
     const length = squares.length;
@@ -127,7 +128,7 @@ function upGet(squares, i, j) {
 function upSet(squares, i, j, item) {
     const length = squares.length;
     squares[length - j - 1][i] = item;
-};
+}
 
 function rightGet(squares, i, j) {
     return squares[i][j];
@@ -135,7 +136,7 @@ function rightGet(squares, i, j) {
 
 function rightSet(squares, i, j, item) {
     squares[i][j] = item;
-};
+}
 
 function downGet(squares, i, j) {
     return squares[j][i];
@@ -143,28 +144,28 @@ function downGet(squares, i, j) {
 
 function downSet(squares, i, j, item) {
     squares[j][i] = item;
-};
+}
 
 export function handleLeft(state) {
-    const accessors = { get : leftGet, set: leftSet };
+    const accessors = {get: leftGet, set: leftSet};
     return processMove(state, accessors);
 }
 
 export function handleRight(state) {
-    const accessors = { get : rightGet, set: rightSet };
+    const accessors = {get: rightGet, set: rightSet};
     return processMove(state, accessors);
 }
 
 export function handleUp(state) {
-    const accessors = { get : upGet, set: upSet };
+    const accessors = {get: upGet, set: upSet};
     return processMove(state, accessors);
 }
 
 export function handleDown(state) {
-    const accessors = { get : downGet, set: downSet };
+    const accessors = {get: downGet, set: downSet};
     return processMove(state, accessors);
 }
 
 export function handleNone(state) {
-    return { squares : state.squares, isMoved : false, isStarted : state.isStarted, score : state.score };
+    return {squares: state.squares, isMoved: false, isStarted: state.isStarted, score: state.score};
 }

@@ -37,7 +37,7 @@ class ChatInfoNameComponent extends VComponent {
 
     peersUpdateName = (event: BusEvent) => {
         if (AppSelectedPeer.check(event.peer)) {
-                this.forceUpdate()
+            this.forceUpdate()
         }
     }
 

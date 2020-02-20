@@ -2,7 +2,6 @@
 
 import {MessageType} from "../Message"
 import {StickerMessage} from "./StickerMessage"
-import {FileAPI} from "../../Files/FileAPI"
 
 export class AnimatedStickerMessage extends StickerMessage {
 

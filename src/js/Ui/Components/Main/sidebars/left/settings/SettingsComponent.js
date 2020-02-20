@@ -28,7 +28,8 @@ const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
             </div>
             <div class="photo-container ">
 
-                {me ? <img ref={selfAvatarFragmentRef} className="photo" src={me.photo.smallUrl} alt="avatar"/> : <div/>}
+                {me ? <img ref={selfAvatarFragmentRef} className="photo" src={me.photo.smallUrl} alt="avatar"/> :
+                    <div/>}
             </div>
             <div className="username">{me ? me.name : ""}</div>
             <div className="phone-number">+{me ? me.phone : ""}</div>

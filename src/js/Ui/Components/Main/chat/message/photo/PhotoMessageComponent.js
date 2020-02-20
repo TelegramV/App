@@ -19,7 +19,7 @@ const MessagePhotoFigureFragment = ({message, clickLoader, click}) => {
                              loading={message.loading}
                              loaded={message.loaded}
                              clickLoader={clickLoader}
-                                click={click}/>
+                             click={click}/>
     )
 }
 
@@ -39,7 +39,8 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     render() {
         const text = (this.message.text.length > 0) ? <TextWrapperComponent message={this.message}/> : ""
         return (
-            <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""} avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
+            <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""}
+                                    avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
                 <MessagePhotoFigureFragment ref={this.photoFigureRef}
                                             message={this.message}
                                             clickLoader={this.toggleLoading} click={this.openMediaViewer}/>

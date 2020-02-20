@@ -7,7 +7,8 @@ class GIFMessageComponent extends GeneralMessageComponent {
 
     render() {
         return (
-            <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false} bubbleRef={this.bubbleRef}>
+            <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false}
+                                    bubbleRef={this.bubbleRef}>
                 <VideoComponent message={this.message} autodownload autoplay controls={false} loop muted/>
                 <MessageTimeComponent message={this.message} bg={true}/>
             </MessageWrapperFragment>

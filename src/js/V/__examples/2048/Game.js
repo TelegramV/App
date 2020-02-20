@@ -87,8 +87,8 @@ class Game extends VComponent {
         const className = event.target.className;
         if (className.includes('square')) {
             event.preventDefault();
-            ;
-            return;
+
+
         }
     }
 

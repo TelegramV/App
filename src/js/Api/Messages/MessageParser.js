@@ -119,7 +119,7 @@ export class MessageParser {
     }
 
     static getMediaPreviewName(message: Message) {
-        if(message.groupedId) {
+        if (message.groupedId) {
             return "Album"
         }
         switch (message.type) {
@@ -168,7 +168,7 @@ export class MessageParser {
     static getPrefixNoSender(message) {
         const p = MessageParser.getMediaPreviewName(message)
         if (message.raw.media) {
-            if(p.length > 0) {
+            if (p.length > 0) {
                 return p + (message.text.length > 0 ? ", " + message.text : "")
             } else {
                 return message.text

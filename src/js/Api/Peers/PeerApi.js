@@ -80,14 +80,14 @@ export class PeerApi {
     fetchByOffsetId({offset_id, limit, add_offset}) {
         return this.getHistory({offset_id, limit, add_offset: -1 + add_offset}).then(messages => {
             // console.log("fetchByOffsetId returned", messages.length)
-                // AppEvents.Dialogs.fire("fetchedMessagesAnyPage", {
-                //     dialog: this.peer.dialog,
-                //     messages: messages
-                // })
-                AppEvents.Peers.fire("fetchedMessagesAnyPage", {
-                    peer: this.peer,
-                    messages: messages
-                })
+            // AppEvents.Dialogs.fire("fetchedMessagesAnyPage", {
+            //     dialog: this.peer.dialog,
+            //     messages: messages
+            // })
+            AppEvents.Peers.fire("fetchedMessagesAnyPage", {
+                peer: this.peer,
+                messages: messages
+            })
         })
     }
 

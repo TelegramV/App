@@ -8,54 +8,29 @@ const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const TerserPlugin = require('terser-webpack-plugin')
 
-require("@babel/polyfill")
-
 const config = {
     node: {
         fs: "empty"
     },
-    devServer: {
-        contentBase: path.join(__dirname, "dist"),
-        compress: true,
-        port: 8090
-    },
-    entry: ["@babel/polyfill", "./src/js/application.js"],
+    entry: "./src/js/application.js",
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "bundle.[hash].js"
     },
-
-    plugins: [
-        new CopyWebpackPlugin([{
-            from: "public"
-        }]),
-        // new FlowWebpackPlugin(),
-        new MiniCssExtractPlugin({
-            filename: "bundle.[hash].css",
-            chunkFilename: "./src/sass/application.scss",
-            ignoreOrder: false,
-        }),
-        new HtmlWebpackPlugin({template: "./src/index.html"}),
-        new CleanWebpackPlugin(),
-        new FilterWarningsPlugin({
-            exclude: /Critical dependency: the request of a dependency is an expression/,
-        }),
-    ],
     module: {
         rules: [
-            {
-                test: /\.worker\.js$/,
-                use: {
-                    loader: "worker-loader",
-                    options: {
-                        // inline: true
-                    }
-                }
-            },
             {
                 test: /\.js$/,
                 use: "babel-loader",
                 exclude: /node_modules/
+            },
+            {
+                test: /\.worker\.js$/,
+                use: [
+                    "worker-loader",
+                    "babel-loader"
+                ],
+                exclude: /node_modules/,
             },
             {
                 test: /\.s?css/i,
@@ -87,9 +62,30 @@ const config = {
             },
         ]
     },
+    plugins: [
+        new CopyWebpackPlugin([{
+            from: "public"
+        }]),
+        // new FlowWebpackPlugin(),
+        new MiniCssExtractPlugin({
+            filename: "bundle.[hash].css",
+            chunkFilename: "./src/sass/application.scss",
+            ignoreOrder: false,
+        }),
+        new HtmlWebpackPlugin({template: "./src/index.html"}),
+        new CleanWebpackPlugin(),
+        new FilterWarningsPlugin({
+            exclude: /Critical dependency: the request of a dependency is an expression/,
+        }),
+    ],
     optimization: {
         // minimize: true,
         // minimizer: [new TerserPlugin()],
+    },
+    devServer: {
+        contentBase: path.join(__dirname, "dist"),
+        compress: true,
+        port: 8090
     },
 }
 

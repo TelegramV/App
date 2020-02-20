@@ -4,6 +4,7 @@ import {AbstractBarComponent} from "../AbstractBarComponent"
 export class RightBarComponent extends AbstractBarComponent {
 
     hidden = true
+
     // CRITICAL: always call super
     appEvents(E) {
         E.bus(UIEvents.RightSidebar)
@@ -12,7 +13,7 @@ export class RightBarComponent extends AbstractBarComponent {
     }
 
     openBar = barName => {
-        if(!this.barVisible) {
+        if (!this.barVisible) {
             UIEvents.RightSidebar.fire("show", {
                 barName: barName || this.barName,
             })
@@ -20,7 +21,7 @@ export class RightBarComponent extends AbstractBarComponent {
     }
 
     hideBar = barName => {
-        if(this.barVisible) {
+        if (this.barVisible) {
             UIEvents.RightSidebar.fire("hide", {
                 barName: barName || this.barName,
             })

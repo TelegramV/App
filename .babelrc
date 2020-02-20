@@ -12,8 +12,7 @@
     "@babel/preset-flow"
   ],
   "plugins": [
-    "@babel/syntax-dynamic-import",
-    "@babel/plugin-transform-regenerator",
+    "@babel/plugin-transform-runtime",
     "@babel/plugin-proposal-class-properties",
     [
       "@babel/plugin-transform-react-jsx",
@@ -23,12 +22,4 @@
       }
     ]
   ],
-  "env": {
-    "test": {
-      "plugins": [
-        "transform-es2015-modules-commonjs",
-        "dynamic-import-node"
-      ]
-    }
-  }
 }

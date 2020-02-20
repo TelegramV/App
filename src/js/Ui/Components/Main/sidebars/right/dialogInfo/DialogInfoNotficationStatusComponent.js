@@ -3,7 +3,6 @@ import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import type {BusEvent} from "../../../../../../Api/EventBus/EventBus"
 import {DialogInfoDetailsCheckboxFragment} from "./fragments/DialogInfoDetailsCheckboxFragment"
-import MTProto from "../../../../../../MTProto/external";
 
 export class DialogInfoNotficationStatusComponent extends VComponent {
 
@@ -25,7 +24,8 @@ export class DialogInfoNotficationStatusComponent extends VComponent {
         const muted = !peer || !peer.full || !peer.full.notify_settings || peer.full.notify_settings.mute_until > 0 || peer.full.notify_settings.pFlags.silent
 
         return (
-            <DialogInfoDetailsCheckboxFragment text="Notifications" label={!muted ? "Enabled" : "Disabled"} checked={!muted} onChange={l => this.onChange(l)}/>
+            <DialogInfoDetailsCheckboxFragment text="Notifications" label={!muted ? "Enabled" : "Disabled"}
+                                               checked={!muted} onChange={l => this.onChange(l)}/>
         )
     }
 

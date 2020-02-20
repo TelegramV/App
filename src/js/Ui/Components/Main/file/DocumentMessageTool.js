@@ -1,4 +1,3 @@
-
 function getColor(extension) {
     extension = extension.toLowerCase();
     let colors = [

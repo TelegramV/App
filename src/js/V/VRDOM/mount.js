@@ -5,7 +5,6 @@
 import vrdom_render from "./render/render"
 import type VRNode from "./VRNode"
 import type {VRRenderProps} from "./types/types"
-import VF from "../VFramework"
 import VComponent from "./component/VComponent"
 
 export function vrdom_resolveMount($mounted: Element) {

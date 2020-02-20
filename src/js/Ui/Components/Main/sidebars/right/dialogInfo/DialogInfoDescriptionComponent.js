@@ -3,7 +3,6 @@ import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import type {BusEvent} from "../../../../../../Api/EventBus/EventBus"
 import {DialogInfoDescriptionFragment} from "./fragments/DialogInfoDescriptionFragment"
-import AppSelectedPeer from "../../../../../Reactive/SelectedPeer"
 
 export class DialogInfoDescriptionComponent extends VComponent {
 

@@ -1,4 +1,3 @@
-import VF from "../../../../../../V/VFramework"
 import AppSelectedPeer from "../../../../../Reactive/SelectedPeer"
 import {dialogContextMenu} from "./ContextMenu/dialogContextMenu"
 import {Dialog} from "../../../../../../Api/Dialogs/Dialog"

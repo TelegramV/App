@@ -8,7 +8,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     constructor(props) {
         super(props);
         let message = this.props.message;
-        
+
         this.poll = message.raw.media.poll;
         this.results = message.raw.media.results;
 
@@ -46,7 +46,8 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         let classes = "poll" + (this.isVoted() ? " voted" : "");
         let type = this.quiz ? "Quiz" : this.public ? "Public poll" : "Anonymous poll";
         return (
-            <MessageWrapperFragment message={this.props.message} contextActions={this.contextActions} showUsername={false} bubbleRef={this.bubbleRef}>
+            <MessageWrapperFragment message={this.props.message} contextActions={this.contextActions}
+                                    showUsername={false} bubbleRef={this.bubbleRef}>
                 <div class={classes}>
                     <div class="question">{this.poll.question}</div>
                     <div class="poll-type">{type}</div>
@@ -58,14 +59,14 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     _prepareFooter = () => {
-        if(this.isVoted) {
-            if(this.public) {
+        if (this.isVoted) {
+            if (this.public) {
                 return <div class="action-button" onClick={this._actionClick}>Results</div>;
             } else {
                 return <div class="stats">{this.results.total_voters + " voted"}</div>
             }
         } else {
-            if(this.multiple) {
+            if (this.multiple) {
                 return <div class="action-button disabled" onClick={this._actionClick}>Vote</div>;
             } else {
                 return <div class="stats">{this.results.total_voters + " voted"}</div>;
@@ -136,16 +137,16 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     _patchAnswers = () => {
         this.forceUpdate();
-        setTimeout(this._applyPercents,0);
+        setTimeout(this._applyPercents, 0);
     }
 
     _applyPercents = () => {
-        if(!this.isVoted()) return;
+        if (!this.isVoted()) return;
         let answers = this.$el.querySelectorAll(".answer");
         let most_voters = this.getWinningAnswer().voters;
-        for(let i = 0; i< this.poll.answers.length; i++) {
+        for (let i = 0; i < this.poll.answers.length; i++) {
             let result = this.results.results[i];
-            if(this.poll.answers[i].option[0] !== result.option[0]) {
+            if (this.poll.answers[i].option[0] !== result.option[0]) {
                 console.log("POLL ANSWERS ORDER IS BROKEN!")
                 return;
             }

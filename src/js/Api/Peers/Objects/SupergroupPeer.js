@@ -1,4 +1,3 @@
-import {GroupPeer} from "./GroupPeer";
 import MTProto from "../../../MTProto/external"
 import AppEvents from "../../EventBus/AppEvents"
 import PeersManager from "./PeersManager"

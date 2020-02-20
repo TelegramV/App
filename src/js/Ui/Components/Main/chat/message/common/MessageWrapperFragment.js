@@ -1,6 +1,5 @@
 import {ContextMenuManager} from "../../../../../Fuck/contextMenuManager";
 import {ChatInputManager} from "../../chatInput/ChatInputComponent";
-import {MessageAvatarComponent} from "./MessageAvatarComponent"
 import {InlineKeyboardComponent} from "./InlineKeyboardComponent";
 import {ReplyFragment} from "./ReplyFragment"
 import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
@@ -143,7 +142,8 @@ const MessageWrapperFragment = ({message, transparent = false, slot, noPad = fal
 
                     <div className={messageClasses}>
                         <ForwardedHeaderFragment message={message}/>
-                        {username ? <div css-cursor="pointer" className="username" onClick={() => AppSelectedInfoPeer.select(message.from)}>{message.from.name}</div> : ""}
+                        {username ? <div css-cursor="pointer" className="username"
+                                         onClick={() => AppSelectedInfoPeer.select(message.from)}>{message.from.name}</div> : ""}
                         {slot}
                     </div>
                 </div>

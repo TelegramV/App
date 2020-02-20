@@ -15,7 +15,6 @@ import patchNodeText from "./patchText"
 import patchVComponentVRNode from "./patchVComponentNRNode"
 import patchStyle from "./patchStyle"
 import vrdom_deleteInner from "../deleteInner"
-import patchClass from "./patchClass"
 import VF from "../../VFramework"
 
 const recreateNodeOnlyTagName = ($node, tagName) => {

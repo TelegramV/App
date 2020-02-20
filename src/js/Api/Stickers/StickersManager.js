@@ -1,4 +1,4 @@
-import { Manager } from "../Manager";
+import {Manager} from "../Manager";
 import MTProto from "../../MTProto/external";
 
 class StickersManager extends Manager {
@@ -12,11 +12,11 @@ class StickersManager extends Manager {
         return new Promise(async (resolve, reject) => {
             MTProto.invokeMethod("messages.getAllStickers", {
                 hash: 0
-            }).then(async function(response) {
+            }).then(async function (response) {
                 let sets = response.sets;
                 let parsed = [];
                 for (const set of sets) {
-                    if(set.archived) continue; //currently ignoring archived
+                    if (set.archived) continue; //currently ignoring archived
                     let st = await that.getStickerSet({
                         _: "inputStickerSetID",
                         id: set.id,
@@ -51,7 +51,7 @@ class StickersManager extends Manager {
     }
 
     getAnimatedEmojiSet() {
-        return this.getStickerSet({ _: "inputStickerSetAnimatedEmoji" })
+        return this.getStickerSet({_: "inputStickerSetAnimatedEmoji"})
     }
 
     getAnimatedEmoji(text) {

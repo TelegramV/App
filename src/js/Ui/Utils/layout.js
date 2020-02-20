@@ -2,7 +2,7 @@
 
 // TODO should parse this properly
 export class Layouter {
-    constructor(sizes: Array<{width: number, height: number}>, maxWidth: number, maxHeight: number, minWidth: number, spacing: number) {
+    constructor(sizes: Array<{ width: number, height: number }>, maxWidth: number, maxHeight: number, minWidth: number, spacing: number) {
         this.sizes = sizes
 
         this.ratios = this.sizes.map(q => {
@@ -58,21 +58,21 @@ export class Layouter {
     createLayout() {
 
         return
-        if(this.count === 0) {
+        if (this.count === 0) {
             return null
         }
-        if(this.count === 1) {
+        if (this.count === 1) {
             return this.layoutOne()
         }
 
-        if(this.count >= 5) {
+        if (this.count >= 5) {
             return 0
         }
 
-        if(this.count === 2) {
+        if (this.count === 2) {
             return this.layoutTwo()
         }
-        if(this.count === 3) {
+        if (this.count === 3) {
             return this.layoutThree()
         }
         return this.layoutFour()
@@ -83,7 +83,7 @@ export class Layouter {
     }
 
     layoutTwo() {
-        if(this.proportions === "ww" && this.averageRatio > 1.4 * this.maxSizeRatio
+        if (this.proportions === "ww" && this.averageRatio > 1.4 * this.maxSizeRatio
             && (this.ratios[1] - this.ratios[0] < 0.2)) {
             return this.layoutTwoTopBottom()
         } else if (this.proportions === "ww" || this.proportions === "qq") {

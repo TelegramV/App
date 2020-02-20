@@ -33,5 +33,6 @@ const slotLoadingHeight = (photo, real) => {
 
 export const DialogInfoPhotoComponent = ({photo, click}) => {
     return <ObjectWithThumbnailComponent type="photo" loadObject={loadObject} object={photo} slotLoaded={slotLoaded}
-                                         slotLoadingWidth={slotLoadingWidth} slotLoadingHeight={slotLoadingHeight} click={click}/>
+                                         slotLoadingWidth={slotLoadingWidth} slotLoadingHeight={slotLoadingHeight}
+                                         click={click}/>
 }

@@ -263,7 +263,7 @@ export class ChatInputComponent extends VComponent {
         } else if (markup._ === "replyKeyboardHide") {
             this.keyboardMarkup = null
         } else {
-            return
+
         }
         // this.forceUpdate()
     }

@@ -18,7 +18,7 @@ function LoaderFragment({big = true, white = false, full = false, show = true, i
                     <div className="progress-background">
                         <progress className={progressClasses}/>
                     </div>
-                    ):(
+                ) : (
                     <progress className={progressClasses}/>
                 )
             }

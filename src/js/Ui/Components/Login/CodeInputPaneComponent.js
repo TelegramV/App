@@ -64,10 +64,10 @@ export default class CodeInputPaneComponent extends PaneComponent {
                     phoneCodeHash: phoneCodeHash,
                     phone: this.state.phone
                 })
-                return
+
             } else {
                 this.props.finished(authorization)
-                return
+
             }
         }, reject => {
             if (reject.type === "SESSION_PASSWORD_NEEDED") {
@@ -76,7 +76,7 @@ export default class CodeInputPaneComponent extends PaneComponent {
                     this.props.password(response)
                 })
             } else {
-                this.refs.get("codeInput").error = "Invalid code"
+                this.refs.get("codeInput").error = "Invalid code" // todo: fix
             }
         }).finally(l => {
             this.isLoading = false

@@ -242,7 +242,7 @@ function addPadding(bytes, blockSize = 16, zeroes = false) {
             SecureRandomSingleton.nextBytes(padding)
         }
 
-        console.error("padding",padding)
+        console.error("padding", padding)
 
         if (bytes instanceof ArrayBuffer) {
             bytes = Bytes.concatBuffer(bytes, padding)

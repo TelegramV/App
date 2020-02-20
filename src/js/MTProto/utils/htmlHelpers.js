@@ -66,12 +66,12 @@ function getMessageEntities(elem, offset) {
 
 function addNewlines(elem) {
     elem.childNodes.forEach(l => {
-        if(l.tagName && l.tagName.toUpperCase() === "BR") {
+        if (l.tagName && l.tagName.toUpperCase() === "BR") {
             l.parentNode.insertBefore(document.createTextNode("\n"), l)
             l.parentNode.removeChild(l)
             return
         }
-        if(l.nodeType !== Node.TEXT_NODE) {
+        if (l.nodeType !== Node.TEXT_NODE) {
             addNewlines(l)
         }
     })
@@ -147,7 +147,7 @@ function splitMessageEntities(messageEntities) {
             const qfrom = q.offset
             return (lto >= qfrom && lto <= qto) || (lto >= qfrom && lto <= qto)
         })
-        if(overlapping) {
+        if (overlapping) {
             overlapping.entities.push(l)
 
             overlapping.offset = Math.min(overlapping.offset, l.offset)
@@ -165,6 +165,7 @@ function splitMessageEntities(messageEntities) {
     })
     return ranges
 }
+
 // TODO fix multiple entities overlap
 export function parseMessageEntities(text, messageEntities, noLinks = false) {
     messageEntities = messageEntities || []
@@ -190,7 +191,7 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
             const handler = handlers[l._]
             if (!handler) return
 
-            if(callers === null) {
+            if (callers === null) {
 
                 callers = _ => {
                     return {
@@ -201,7 +202,8 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
                 }
             } else {
                 let cc = callers()
-                let c = <span>{textCut.substr(localOffset, cc.offset - localOffset)}{cc.component}{textCut.substr(localOffset + cc.offset + cc.length, localLength - cc.length - cc.offset)}</span>
+                let c =
+                    <span>{textCut.substr(localOffset, cc.offset - localOffset)}{cc.component}{textCut.substr(localOffset + cc.offset + cc.length, localLength - cc.length - cc.offset)}</span>
                 callers = _ => {
                     return {
                         offset: localOffset,
@@ -230,7 +232,7 @@ export function parseMessageEntities(text, messageEntities, noLinks = false) {
             }
         }
 
-        if(callers) {
+        if (callers) {
             elements.push(callers().component)
         }
 

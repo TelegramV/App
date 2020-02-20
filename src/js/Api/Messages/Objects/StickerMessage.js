@@ -2,7 +2,6 @@
 
 import {AbstractMessage} from "../AbstractMessage"
 import {MessageType} from "../Message"
-import {FileAPI} from "../../Files/FileAPI"
 
 export class StickerMessage extends AbstractMessage {
 

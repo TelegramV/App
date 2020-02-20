@@ -2,7 +2,6 @@
  * (c) Telegram V
  */
 
-import '@babel/polyfill'
 import {createNonce} from "../utils/bin"
 import {loadSchema} from "../language/schema"
 import MTProtoInternal from "../internal"

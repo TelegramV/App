@@ -1,6 +1,5 @@
 import {FileAPI} from "../../../../Api/Files/FileAPI";
 import {ObjectWithThumbnailComponent} from "./objectWithThumbnailComponent";
-import VRDOM from "../../../../V/VRDOM/VRDOM";
 
 const loadObject = (video, onProgress) => {
     // FileAPI.getFile(message.media.document, "").then(data => {
@@ -21,9 +20,9 @@ const loadObject = (video, onProgress) => {
 }
 
 const slotLoaded = (video, real) => {
-    const gif = FileAPI.getAttribute(video,"documentAttributeAnimated");
+    const gif = FileAPI.getAttribute(video, "documentAttributeAnimated");
     const attribute = FileAPI.getAttribute(video, "documentAttributeVideo")
-    if(attribute.pFlags.round_message || gif) {
+    if (attribute.pFlags.round_message || gif) {
         return <video autoPlay muted loop onCanPlay={l => l.target.muted = true} src={real.src} type={video.mime_type}/>
     } else {
         return <video controls src={real.src} type={video.mime_type}/>
@@ -39,6 +38,7 @@ const slotLoadingHeight = (video, real) => {
 }
 
 export const VideoComponent = ({video, round = false}) => {
-    return <ObjectWithThumbnailComponent type={round ? "round-video" : "video"} loadObject={loadObject} object={video} slotLoaded={slotLoaded}
+    return <ObjectWithThumbnailComponent type={round ? "round-video" : "video"} loadObject={loadObject} object={video}
+                                         slotLoaded={slotLoaded}
                                          slotLoadingWidth={slotLoadingWidth} slotLoadingHeight={slotLoadingHeight}/>
 }

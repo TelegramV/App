@@ -1,8 +1,8 @@
 // @flow
 
-import { AbstractMessage } from "../AbstractMessage"
-import { MessageType } from "../Message"
-import { FileAPI } from "../../Files/FileAPI"
+import {AbstractMessage} from "../AbstractMessage"
+import {MessageType} from "../Message"
+import {FileAPI} from "../../Files/FileAPI"
 
 export class VideoMessage extends AbstractMessage {
 
@@ -74,7 +74,7 @@ export class VideoMessage extends AbstractMessage {
 
     fillRaw(raw: Object) {
         super.fillRaw(raw);
-        this.videoInfo= FileAPI.getMaxSize(this.raw.media.document);
+        this.videoInfo = FileAPI.getMaxSize(this.raw.media.document);
         return this;
     }
 }

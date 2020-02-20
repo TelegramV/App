@@ -17,7 +17,7 @@ export default class QRLoginPaneComponent extends PaneComponent {
             this.requestLoginToken().then(q => {
                 if (q._ === "auth.loginTokenSuccess") {
                     this.props.finished(q.authorization)
-                    return
+
                 }
             })
             /*MTProto.invokeMethod("auth.exportLoginToken", {

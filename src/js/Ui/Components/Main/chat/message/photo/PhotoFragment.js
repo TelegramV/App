@@ -3,17 +3,21 @@ export const PhotoFragment = ({id, url = "", thumb = true, width = 0, height = 0
     const calculatedHeight = Math.min(1, maxWidth / width) * height
 
     if (width >= height) {
-        if(width >= 470) {
-            return <img id={id} src={url} alt="Image" css-width={width ? `${width}px` : undefined} css-height={calculatedHeight ? `${calculatedHeight}px` : undefined}/>
+        if (width >= 470) {
+            return <img id={id} src={url} alt="Image" css-width={width ? `${width}px` : undefined}
+                        css-height={calculatedHeight ? `${calculatedHeight}px` : undefined}/>
         } else {
-            return <img id={id} src={url} alt="Image" css-width={width ? `${width}px` : undefined} css-height={height ? `${height}px` : undefined}/>
+            return <img id={id} src={url} alt="Image" css-width={width ? `${width}px` : undefined}
+                        css-height={height ? `${height}px` : undefined}/>
         }
     } else { // height={height ? `${height}px` : undefined}
         // TODO calculate height?
-        if(height > 512) {
-            return <img id={id} src={url} alt="Image" css-width={calculatedWidth ? `${calculatedWidth}px` : undefined} css-height={height ? `${height}px` : undefined}/>
+        if (height > 512) {
+            return <img id={id} src={url} alt="Image" css-width={calculatedWidth ? `${calculatedWidth}px` : undefined}
+                        css-height={height ? `${height}px` : undefined}/>
         } else {
-            return <img id={id} src={url} alt="Image" css-width={width ? `${width}px` : undefined} css-height={height ? `${height}px` : undefined}/>
+            return <img id={id} src={url} alt="Image" css-width={width ? `${width}px` : undefined}
+                        css-height={height ? `${height}px` : undefined}/>
 
         }
     }

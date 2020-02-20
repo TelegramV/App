@@ -14,7 +14,7 @@ export class SearchList extends VComponent {
         // The render method on this PureComponent is called only if
         // props.list or state.filterText has changed.
         const filteredList = this.props.list.filter(
-            item =>item.includes(this.state.filterText)
+            item => item.includes(this.state.filterText)
         )
 
         return (

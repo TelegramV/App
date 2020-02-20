@@ -1,5 +1,4 @@
 import {parseMessageEntities} from "../../../../../../../MTProto/utils/htmlHelpers";
-import PeersStore from "../../../../../../../Api/Store/PeersStore"
 
 export const actionTypesMapping = {
     sendMessageTypingAction: "is typing",
