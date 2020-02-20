@@ -8,6 +8,7 @@ import attrAliases from "./attrAliases"
 import attrProcessors from "./attrProcessors/attrProcessors"
 import vrdom_createElement from "../createElement"
 import VRDOM from "../VRDOM"
+import postAttrProcessor from "./attrProcessors/postAttrProcessor"
 
 /**
  * JSX Translator
@@ -21,6 +22,7 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
         console.warn("fragments are not fully implemented: patch is not working")
     }
 
+
     children = children.flat(Infinity)
 
     const attrs: VRAttrs = Object.create(null)
@@ -28,6 +30,7 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
 
     let ref = undefined
     let dangerouslySetInnerHTML: boolean = false
+    let style: Object = {}
 
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
@@ -36,23 +39,14 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
             if (key.startsWith("on") && typeof tagName !== "function") {
                 events.set(key.substring(2).toLowerCase(), v)
             } else if (key === "dangerouslySetInnerHTML" || key === "dangerouslysetinnerhtml") {
-                // $ignore
                 dangerouslySetInnerHTML = v
-                attrs["f-dsil"] = true
-            } else if (key === "ref") {
-                ref = v
-                attrs["ref"] = v // legacy components support
+                attrs["vr-dangerouslySetInnerHTML"] = true
             } else if (key.startsWith("css-")) {
                 const styleKey = key.substring(4)
 
-                if (attrs.style) {
-                    attrs.style += `;${styleKey}: ${v};`
-                } else if (attributes.style) {
-                    attrs.style = `${attributes.style};${styleKey}: ${v};`
-                    delete attributes["style"]
-                } else {
-                    attrs.style = `${styleKey}: ${v};`
-                }
+                style[styleKey] = v
+            } else if (key === "ref") {
+                ref = v
             } else {
                 if (attrAliases.has(k)) {
                     key = attrAliases.get(k)
@@ -65,6 +59,8 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
             if (attrProcessors.has(key)) {
                 attrs[key] = attrProcessors.get(key)(v)
             }
+
+            attrs[key] = postAttrProcessor(key, attrs[key])
         }
     }
 
@@ -73,6 +69,7 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
         events,
         children,
         ref,
+        style,
 
         dangerouslySetInnerHTML
     })

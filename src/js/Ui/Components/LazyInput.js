@@ -2,9 +2,7 @@ import VComponent from "../../V/VRDOM/component/VComponent"
 
 // райтс https://github.com/HurricaneJames/lazy-input/blob/master/src/LazyInput.jsx
 
-export class LazyInput extends VComponent {
-
-    useProxyState = false
+class LazyInput extends VComponent {
 
     procrastinating = false
 
@@ -15,9 +13,9 @@ export class LazyInput extends VComponent {
         requestedValue: undefined
     }
 
-    h() {
+    render() {
         return (
-            <input type={this.props.type || "text"}
+            <input type={this.props.type}
                    onInput={this.onInput}
                    onFocus={this.props.onFocus}
                    placeholder={this.props.placeholder}/>
@@ -54,3 +52,9 @@ export class LazyInput extends VComponent {
         this.state.value = event.target.value
     }
 }
+
+LazyInput.defaultProps = {
+    type: "text"
+}
+
+export default LazyInput

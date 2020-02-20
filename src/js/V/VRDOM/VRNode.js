@@ -11,22 +11,25 @@ class VRNode {
     tagName: VRTagName
 
     attrs: VRAttrs = {}
-
     events: VREvents = new Map()
+    children: Array<VRNode> = []
+    style: Object
+    ref: Object
 
     dangerouslySetInnerHTML: any | boolean = false
-
-    children: Array<VRNode> = []
+    isComponentRoot: boolean = false
 
     constructor(tagName: VRTagName, props: VRNodeProps) {
         this.tagName = tagName
 
         this.attrs = props.attrs || {}
         this.events = props.events || new Map()
+        this.children = props.children || []
+        this.style = props.style || {}
+        this.ref = props.ref
 
         this.dangerouslySetInnerHTML = props.dangerouslySetInnerHTML || false
-
-        this.children = props.children || []
+        this.isComponentRoot = props.isComponentRoot || false
     }
 }
 

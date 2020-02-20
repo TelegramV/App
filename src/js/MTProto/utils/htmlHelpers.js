@@ -1,6 +1,6 @@
-import AppSelectedInfoPeer from "../../Ui/reactive/SelectedInfoPeer"
+import AppSelectedInfoPeer from "../../Ui/Reactive/SelectedInfoPeer"
 import PeersStore from "../../Api/Store/PeersStore"
-import UIEvents from "../../Ui/eventBus/UIEvents"
+import UIEvents from "../../Ui/EventBus/UIEvents"
 
 function elemToEntity(elem, offset, length) {
     const handlers = {

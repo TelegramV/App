@@ -5,40 +5,29 @@
 import vrdom_delete from "../delete"
 import VRNode from "../VRNode"
 import vrdom_append from "../append"
-import vrdom_fastpatch from "./fastpatch"
-import xvrdom_patch from "../../X/patch"
 import vrdom_patch from "./patch"
 
 /**
- * @param {Element} $parent
- * @param {NodeListOf<ChildNode>} $children
- * @param {Array<VRNode | any>} newChildren
- * @param fast
+ * @param {Element} $node
+ * @param {Array<VRNode | any>} vRNode
  */
-const patchChildren = ($parent: Element, $children: NodeListOf<ChildNode>, newChildren: Array<VRNode | mixed>, fast: boolean = false, xpatch = false) => {
+const patchChildren = ($node: Element, vRNode: VRNode) => {
+    const $children = $node.childNodes
+    const children = vRNode.children
 
-    if (fast) {
-        $children.forEach(($oldChild, i) => {
-            vrdom_fastpatch($oldChild, newChildren[i])
-        })
-    } else if (xpatch) {
-        $children.forEach(($oldChild, i) => {
-            xvrdom_patch($oldChild, newChildren[i])
-        })
-    } else {
-        $children.forEach(($oldChild, i) => {
-            vrdom_patch($oldChild, newChildren[i])
-        })
-    }
+    $children.forEach(($oldChild, i) => {
+        vrdom_patch($oldChild, children[i])
+    })
 
-    if (newChildren.length > $children.length) {
-        for (let i = $children.length; i < newChildren.length; i++) {
-            vrdom_append(newChildren[i], $parent)
+    if (children.length > $children.length) {
+        for (let i = $children.length; i < children.length; i++) {
+            vrdom_append(children[i], $node)
         }
-    } else if (newChildren.length < $children.length)
-        Array.from($children.values()).slice(newChildren.length).forEach($node => {
+    } else if (children.length < $children.length) {
+        Array.from($children.values()).slice(children.length).forEach($node => {
             vrdom_delete($node)
         })
+    }
 }
 
 export default patchChildren

@@ -6,9 +6,7 @@ import vrdom_delete from "./delete"
 
 const vrdom_deleteInner = ($el: Element) => {
     while ($el.firstChild) {
-
         vrdom_delete($el.firstChild)
-
     }
 }
 

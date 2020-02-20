@@ -1,8 +1,8 @@
 import './index.scss';
-import XVComponent from "../../V/X/Component/XVComponent"
+import VComponent from "../../VRDOM/component/VComponent"
 
 
-class Layout extends XVComponent {
+class Layout extends VComponent {
     constructor(props) {
         super(props);
 

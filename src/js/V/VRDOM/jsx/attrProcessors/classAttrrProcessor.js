@@ -2,17 +2,10 @@
  * (c) Telegram V
  */
 
+import _attr_arrayOrObjectJoin from "./_attr_arrayOrObjectJoin"
+
 const classAttrProcessor = value => {
-    if (Array.isArray(value)) {
-        return value.join(" ")
-    } else if (typeof value === "object") {
-        return Object.entries(value)
-            .filter(attr => attr[1])
-            .map(attr => attr[0])
-            .join(" ")
-    } else {
-        return value
-    }
+    return _attr_arrayOrObjectJoin(value)
 }
 
 export default classAttrProcessor

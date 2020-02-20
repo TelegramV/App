@@ -3,9 +3,9 @@ import {getNewGameState} from './actions/getNewGameState';
 import {generateNewTile} from './actions/generateTileHandler';
 import {getKeyHandler} from './inputHandlers/keyboard';
 import {getTouchHandler} from './inputHandlers/touch';
-import XVComponent from "../../X/Component/XVComponent"
+import VComponent from "../../VRDOM/component/VComponent"
 
-class Game extends XVComponent {
+class Game extends VComponent {
     constructor(props) {
         super(props);
 

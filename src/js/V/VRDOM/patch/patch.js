@@ -7,87 +7,106 @@ import patchAttrs from "./patchAttrs"
 import patchEvents from "./patchEvents"
 import patchDangerouslySetInnerHTML from "./patchDangerouslySetInnerHTML"
 import VRNode from "../VRNode"
-import ComponentVRNode from "../ComponentVRNode"
 import patchChildren from "./patchChildren"
-import VF from "../../VFramework"
-import patchComponentVRNode from "./patchComponent"
-import patchUndefined from "./patchUndefined"
-import patchText from "./patchText"
+import patchVRNodeUndefined from "./patchVRNodeUndefined"
 import VComponentVRNode from "../component/VComponentVRNode"
-import patchTextArea from "./patchTextArea"
+import patchVRNodeNull from "./patchNull"
+import patchNodeText from "./patchText"
+import patchVComponentVRNode from "./patchVComponentNRNode"
+import patchStyle from "./patchStyle"
+import vrdom_deleteInner from "../deleteInner"
+import patchClass from "./patchClass"
+import VF from "../../VFramework"
+
+const recreateNodeOnlyTagName = ($node, tagName) => {
+    const $newNode = document.createElement(tagName)
+
+    while ($node.childNodes.length > 0) {
+        $newNode.appendChild($node.childNodes[0])
+    }
+
+    $newNode.__component = $node.__component
+    $node.__component = undefined
+
+    return $newNode
+}
 
 /**
  * Patches VRNode to Real DOM Element
  *
  * @param $node
- * @param newNode
+ * @param vRNode
  */
-const vrdom_patch = <T: Element | Node | Text>($node: T, newNode: VRNode | VComponentVRNode | ComponentVRNode | mixed): T => {
+const vrdom_patch = <T: Element | Node | Text>($node: T, vRNode: VRNode | VComponentVRNode): T => {
     if ($node === undefined) {
         console.error("BUG: `undefined` was passed as $node ")
         return $node
     }
 
-    if (newNode instanceof VRNode) {
-        // console.log("[patch] node patch")
+    const $oldNode = $node
 
+    if (vRNode instanceof VRNode) {
         if ($node.nodeType === Node.TEXT_NODE) {
-            return vrdom_mount(newNode, $node)
+            return vrdom_mount(vRNode, $node)
         }
 
         if ($node.__component) {
-            if (!$node.__component.__.isPatchingItself) {
-                return $node.__component.__delete()
+            if (!$node.__component.__.isUpdatingItSelf) {
+                $node.__component.__unmount()
             }
         }
 
-        if ($node.tagName.toLowerCase() !== newNode.tagName) {
-            return vrdom_mount(newNode, $node)
+        if ($node.tagName.toLowerCase() !== vRNode.tagName) {
+            $node = recreateNodeOnlyTagName($node, vRNode.tagName)
         }
 
-        patchAttrs($node, newNode.attrs)
-        patchEvents($node, newNode.events)
+        patchAttrs($node, vRNode.attrs)
+        // patchClass($node, vRNode.attrs["class"])
+        patchEvents($node, vRNode.events)
+        patchStyle($node, vRNode.style)
 
-        if (newNode.dangerouslySetInnerHTML !== false) {
-            patchDangerouslySetInnerHTML($node, newNode.dangerouslySetInnerHTML)
-        } else if ($node instanceof HTMLTextAreaElement) {
-            patchTextArea($node, newNode)
+        if (vRNode.dangerouslySetInnerHTML !== false) {
+            patchDangerouslySetInnerHTML($node, vRNode.dangerouslySetInnerHTML)
         } else {
-            patchChildren($node, $node.childNodes, newNode.children)
+            patchChildren($node, vRNode)
+        }
+
+        if ($oldNode !== $node) {
+            $oldNode.__component = undefined
+            $oldNode.replaceWith($node)
         }
 
         VF.plugins.forEach(plugin => plugin.elementPatched($node))
 
         return $node
+    } else if (vRNode instanceof VComponentVRNode) {
+        // console.log("[patch] VComponent")
 
-    } else if (newNode instanceof ComponentVRNode || newNode instanceof VComponentVRNode) {
-        // console.log("[patch] component patch")
-
-        return patchComponentVRNode($node, newNode)
-
-
-    } else if (newNode === undefined) {
+        return patchVComponentVRNode($node, vRNode)
+    } else if (vRNode === undefined) {
         // console.log("[patch] undefined")
 
-        return patchUndefined($node)
+        return patchVRNodeUndefined($node)
+
+    } else if (vRNode === null) {
+        // console.log("[patch] undefined")
+
+        return patchVRNodeNull($node)
 
     } else {
-
-
-        if ($node.nodeType === Node.TEXT_NODE) {
-            return patchText($node, newNode)
-        }
+        // console.log("[patch] unexpected", $node, vRNode)
 
         if ($node.__component) {
-            // console.log("[patch undefined] $node unexpected")
-
-            $node.__component.__delete()
-
-        } else {
-            return vrdom_mount(newNode, $node)
+            $node.__component.__unmount()
         }
 
-        return vrdom_mount(newNode, $node)
+        if ($node.nodeType === Node.TEXT_NODE) {
+            return patchNodeText($node, vRNode)
+        }
+
+        vrdom_deleteInner($node)
+
+        return vrdom_mount(vRNode, $node)
 
     }
 }

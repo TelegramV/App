@@ -2,11 +2,9 @@
  * (c) Telegram V
  */
 
-import type {ComponentProps, ComponentState, VComponentMeta, VRAttrs, VRSlot} from "../types/types"
+import type {ComponentState, VComponentMeta, VComponentProps, VRAttrs, VRSlot} from "../types/types"
 import VF from "../../VFramework"
-import vrdom_delete from "../delete"
 import VRDOM from "../VRDOM"
-import VRNode from "../VRNode"
 import type {BusEvent} from "../../../Api/EventBus/EventBus"
 import {EventBus} from "../../../Api/EventBus/EventBus"
 import {ReactiveObject} from "../../Reactive/ReactiveObject"
@@ -14,12 +12,15 @@ import type {AE} from "./appEvents"
 import {registerAppEvents} from "./appEvents"
 import type {RORC} from "./reactive"
 import {registerReactive} from "./reactive"
-import {VUI} from "../../../Ui/VUI"
+import VUI from "../../../Ui/VUI"
+import __update from "./__update"
+import __unmount from "./__unmount"
+import __mount from "./__mount"
+import __init from "./__init"
+import __withDefaultProps from "./__withDefaultProps"
 
 
 /**
- * Please use this instead of {@link Component}
- *
  * Features:
  * - reactive state
  * - app events
@@ -30,14 +31,14 @@ import {VUI} from "../../../Ui/VUI"
  * - intervals
  * - different patching strategies
  */
-export class VComponent {
+class VComponent {
 
     __: VComponentMeta = {
         inited: false,
         mounted: false,
         destroyed: false,
         created: false,
-        isPatchingItself: false,
+        isUpdatingItSelf: false,
         isDeletingItself: false,
 
         /**
@@ -76,31 +77,25 @@ export class VComponent {
          * @type {Set<number>}
          */
         timeouts: new Set(),
-
-        /**
-         * @type {boolean}
-         */
-        stateInTransactionMode: false,
     }
 
     /**
-     * Set patching strategy.
+     * Default component props:
      *
-     * @see vrdom_patch
-     * @see vrdom_fastpatch
+     * Example:
+     * class SomeComponent extends VComponent {
+     *     render() {
+     *         return <h1>{this.props.header}</h1>
+     *     }
+     * }
      *
-     * @type {number}
+     * SomeComponent.defaultProps = {
+     *     header: "Wow!"
+     * }
+     *
+     * @type {undefined}
      */
-    patchingStrategy: number = VRDOM.COMPONENT_PATCH_DEFAULT
-
-    /**
-     * If `true` then state will be replaced by Proxy.
-     *
-     * Note that `setState` will call patch event if `false`.
-     *
-     * @type {boolean}
-     */
-    useProxyState = true
+    static defaultProps = undefined
 
     /**
      * Component state.
@@ -117,13 +112,21 @@ export class VComponent {
      * @see ReactiveCallback
      *
      * @type {{}}
+     * @deprecated
      */
     callbacks = {}
 
     /**
      * Name of the component.
+     *
+     * @deprecated
      */
     name: string
+
+    /**
+     * Name of the component.
+     */
+    displayName: string
 
     /**
      * Unique identifier of the component.
@@ -148,10 +151,12 @@ export class VComponent {
      */
     _$el: HTMLElement
 
-    constructor(props: ComponentProps) {
-        this.name = props.name || this.constructor.name
-        this.props = props.props || {}
+    constructor(props: VComponentProps) {
+        this.displayName = props.displayName || this.constructor.name
         this.slot = props.slot
+        this.props = __withDefaultProps(this, props.props)
+        this.v = props.v
+        this.identifier = props.identifier
     }
 
     set $el($el) {
@@ -159,20 +164,13 @@ export class VComponent {
     }
 
     get $el() {
-        if (this.__.destroyed || !this.__.mounted) {
-            console.error("component is already destroyed or yet not mounted!")
-
-            return undefined
+        if (this.__.destroyed) {
+            console.error("component is already destroyed!", this.displayName)
+        } else if (!this.__.mounted) {
+            console.error("component is not mounted!", this.displayName)
         }
 
         return this._$el
-    }
-
-    /**
-     * @return {VRNode}
-     */
-    h() {
-
     }
 
     /**
@@ -181,23 +179,23 @@ export class VComponent {
     init() {
     }
 
-    /**
-     * Component was mounted.
-     */
-    mounted() {
+
+    render() {
     }
 
-    /**
-     * Component will be deleted.
-     */
-    destroy() {
+    componentDidMount() {
 
     }
 
-    /**
-     * Component was patched.
-     */
-    patched() {
+    componentWillUnmount() {
+
+    }
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return undefined
+    }
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
 
     }
 
@@ -234,171 +232,43 @@ export class VComponent {
     }
 
     /**
-     * Component will be patched.
-     *
-     * Return `false` to prevent.
-     *
-     * @param node
-     * @return {VRNode}
-     */
-    patchRequest(node: VRNode): VRNode | boolean {
-        return node
-    }
-
-    /**
      * Internal use only.
      */
     __render() {
-        this.__init()
-
-        return this.h()
+        const renderedVRNode = this.render()
+        renderedVRNode.isComponentRoot = true
+        return renderedVRNode
     }
 
     /**
      * Internal use only.
      */
     __mount($el: HTMLElement) {
-        if (this.__.mounted) {
-            console.warn("BUG: component was already mounted")
-        }
+        return __mount(this, $el)
+    }
 
-        this.$el = $el
-        this.__.mounted = true
-        this.mounted()
-        VF.plugins.forEach(plugin => plugin.componentMounted(this))
+    /**
+     * Internal use only.
+     */
+    __unmount() {
+        return __unmount(this)
     }
 
     /**
      * Internal use only.
      */
     __delete() {
-        this.__.isDeletingItself = true
-        this.destroy()
-
-        this.clearIntervals()
-        this.clearTimeouts()
-
-        this.__unregisterReactiveCallbacks()
-        this.__unregisterAppEventResolves()
-        this.__unregisterReactiveObjectResolves()
-
-        delete this.$el["__component"]
-        vrdom_delete(this.$el, this.patchingStrategy === VRDOM.COMPONENT_PATCH_FAST)
-        this.$el = undefined
-        this.__.destroyed = true
-        this.__.mounted = false
-        this.__.isDeletingItself = false
-        VF.mountedComponents.delete(this.identifier)
-    }
-
-    /**
-     * Internal use only.
-     */
-    __patch() {
-
-        if (this.__.mounted) {
-            this.__.isPatchingItself = true
-            this.__init()
-
-            // todo: recreate props reactiveObjects subscribers (it can still be done manually by using `patchRequest`)
-
-            const rendered = this.__render()
-
-            if (this.patchRequest(rendered)) {
-                if (this.patchingStrategy === VRDOM.COMPONENT_PATCH_FAST) {
-                    this.$el = VRDOM.fastpatch(this.$el, rendered)
-                } else {
-                    this.$el = VRDOM.patch(this.$el, rendered)
-                }
-
-                this.$el.__component = this
-
-                this.patched()
-            }
-
-            this.__.isPatchingItself = false
-        } else {
-            console.warn("BUG: Component is not mounted")
-        }
-
-        return this.$el
+        return VRDOM.delete(this.$el)
     }
 
     /**
      * Internal use only.
      */
     __init() {
-
-        if (!this.__.inited) {
-
-            this.init = this.init.bind(this)
-            this.h = this.h.bind(this)
-            this.mounted = this.mounted.bind(this)
-            this.destroy = this.destroy.bind(this)
-            this.appEvents = this.appEvents.bind(this)
-            this.reactive = this.reactive.bind(this)
-
-            this.__render = this.__render.bind(this)
-            this.__patch = this.__patch.bind(this)
-            this.__mount = this.__mount.bind(this)
-            this.__delete = this.__delete.bind(this)
-
-            this.__registerAppEventResolve = this.__registerAppEventResolve.bind(this)
-            this.__unregisterAppEventResolves = this.__unregisterAppEventResolves.bind(this)
-            this.__unregisterAppEventResolve = this.__unregisterAppEventResolve.bind(this)
-            this.__recreateAppEventsResolves = this.__recreateAppEventsResolves.bind(this)
-
-            this.__registerReactiveObjectResolve = this.__registerReactiveObjectResolve.bind(this)
-            this.__unregisterReactiveObjectResolves = this.__unregisterReactiveObjectResolves.bind(this)
-            this.__unregisterReactiveObjectResolve = this.__unregisterReactiveObjectResolve.bind(this)
-            this.__recreateReactiveObjects = this.__recreateReactiveObjects.bind(this)
-
-            this.__registerReactiveCallbacks = this.__registerReactiveCallbacks.bind(this)
-            this.__registerReactiveObjectCallbackResolve = this.__registerReactiveObjectCallbackResolve.bind(this)
-            this.__unregisterReactiveCallbacks = this.__unregisterReactiveCallbacks.bind(this)
-
-            this.__initState = this.__initState.bind(this)
-            this.stateTransaction = this.stateTransaction.bind(this)
-
-            this.withInterval = this.withInterval.bind(this)
-            this.withTimeout = this.withTimeout.bind(this)
-            this.clearIntervals = this.clearIntervals.bind(this)
-            this.clearTimeouts = this.clearTimeouts.bind(this)
-
-            this.init()
-
-            this.__registerReactiveCallbacks()
-            this.appEvents(registerAppEvents(this))
-            this.reactive(registerReactive(this))
-
-            this.__initState()
-
-            this.__.inited = true
-        }
+        return __init(this)
     }
-
 
     // AppEvents
-
-    /**
-     * Internal use only.
-     */
-    __registerAppEventResolve(bus: EventBus, type: string, resolve: (event: BusEvent) => any, condition: any) {
-        let busContext = this.__.appEventContexts.get(bus)
-
-        if (!busContext) {
-            busContext = this.__.appEventContexts.set(bus, new Map()).get(bus)
-            busContext.set(type, resolve)
-        } else {
-            busContext.set(type, resolve)
-        }
-
-        if (condition === null) {
-            bus.subscribe(type, resolve)
-        } else {
-            bus.condition(condition, type, resolve)
-        }
-    }
 
     /**
      * Internal use only.
@@ -535,14 +405,14 @@ export class VComponent {
 
         if (context.patchOnly) {
             this.callbacks[key] = value
-            this.__patch()
+            this.forceUpdate()
         } else if (context.fireOnly) {
             this.callbacks[key] = value
             this.callbackChanged(key, value)
         } else {
             this.callbacks[key] = value
             this.callbackChanged(key, value)
-            this.__patch()
+            this.forceUpdate()
         }
     }
 
@@ -550,20 +420,7 @@ export class VComponent {
      * Internal use only.
      */
     __registerAppEventCallbackResolve(bus: EventBus, type: string, resolve: (event: BusEvent) => any, callbackName: any) {
-        let callbackContext = this.__.reactiveCallbackAppEventContexts.get(callbackName)
 
-        if (!callbackContext) {
-            callbackContext = this.__.reactiveCallbackContexts.set(bus, new Map()).get(bus)
-            callbackContext.set(type, resolve)
-        } else {
-            callbackContext.set(type, resolve)
-        }
-
-        if (condition === null) {
-            bus.subscribe(type, resolve)
-        } else {
-            bus.condition(condition, type, resolve)
-        }
     }
 
     /**
@@ -573,84 +430,31 @@ export class VComponent {
         //
     }
 
-
-    // State
-
     /**
-     * Internal use only.
+     * Set state data.
+     *
+     * @param nextState
      */
-    __initState() {
-        if (this.useProxyState) {
-            this.state = new Proxy(this.state, {
-                set: (target: ComponentState, p: string | number, value: any): boolean => {
-                    return this.proxyStatePropertyChanged(target, p, value)
-                }
+    setState(nextState) {
+        if (typeof nextState === "function") {
+            this.__update({
+                nextState: nextState(this.state)
+            })
+        } else {
+            this.__update({
+                nextState
             })
         }
     }
 
-    /**
-     * Internal use only.
-     */
-    stateTransaction(resolve, callStateChanged = true) {
-        this.__.stateInTransactionMode = true
-        resolve.bind(this)(this.state)
-        this.__.stateInTransactionMode = false
-        if (callStateChanged) {
-            this.stateChanged({})
-        }
+    forceUpdate() {
+        this.__update({
+            isForce: true
+        })
     }
 
-    /**
-     * Set state data.
-     *
-     * @param data
-     */
-    setState(data) {
-        let stateWasChanged = false
-        this.__.stateInTransactionMode = true
-        for (const [k, v] of Object.entries(data)) {
-            if (this.state[k] !== v) {
-                this.state[k] = v
-                stateWasChanged = true
-            }
-        }
-        this.__.stateInTransactionMode = false
-        if (stateWasChanged) {
-            this.stateChanged({})
-        }
-    }
-
-    /**
-     * State was changed by proxy.
-     * Internal use only. But if there is a need you can override this.
-     *
-     * @param target
-     * @param key
-     * @param value
-     * @return {boolean}
-     */
-    proxyStatePropertyChanged(target, key, value) {
-        if (!this.__.stateInTransactionMode) {
-            if (target[key] !== value) {
-                target[key] = value
-                this.stateChanged({target, key, value})
-                return true
-            }
-        }
-
-        return true
-    }
-
-    /**
-     * State was changed.
-     *
-     * @param target
-     * @param key
-     * @param value
-     */
-    stateChanged({target, key, value}) {
-        this.__patch()
+    __update(props) {
+        return __update(this, props)
     }
 
 
@@ -711,6 +515,10 @@ export class VComponent {
             },
             hide() {
                 VUI.hideElement(this.$el)
+            },
+            unmount() {
+                this.$el && (this.$el.__ref = undefined)
+                this.$el = undefined
             }
         }
     }
@@ -726,20 +534,28 @@ export class VComponent {
             props: {},
             slot: undefined,
 
-            // warning: fastpatch by default
-            patch(props, fast = false) {
-                if (this.$el) {
+            /**
+             * @deprecated
+             */
+            patch(props) {
+                this.update(props)
+            },
 
+            update(props) {
+                if (this.$el) {
                     Object.assign(this.props, props)
 
-                    if (fast) {
-                        this.$el = VRDOM.fastpatch(this.$el, this.fragment({...this.props, slot: this.slot}))
-                    } else {
-                        this.$el = VRDOM.patch(this.$el, this.fragment({...this.props, slot: this.slot}))
-                    }
+                    this.$el = VRDOM.patch(this.$el, this.fragment({...this.props, slot: this.slot}))
                 } else {
-                    console.log("el not found", this)
+                    console.warn("el not found", this)
                 }
+            },
+            unmount() {
+                this.fragment = undefined
+                this.slot = undefined
+                this.props = undefined
+                this.$el && (this.$el.__ref = undefined)
+                this.$el = undefined
             }
         }
     }
@@ -750,13 +566,20 @@ export class VComponent {
     static createComponentRef() {
         return {
             __component_ref: true,
-            component: undefined
+            /**
+             * @type {VComponent}
+             */
+            component: undefined,
+            unmount() {
+                this.component && this.component.__unmount()
+                this.component = undefined
+            }
         }
     }
 
     /**
      * @param identifier
-     * @return {Component | VComponent}
+     * @return {VComponent}
      */
     static getComponentById(identifier) {
         return VF.mountedComponents.get(identifier)

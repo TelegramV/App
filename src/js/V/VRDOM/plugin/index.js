@@ -2,9 +2,9 @@
  * (c) Telegram V
  */
 
-import {VComponent} from "../component/VComponent"
+import VComponent from "../component/VComponent"
 
-export class VRDOMPlugin {
+class VRDOMPlugin {
     constructor() {
     }
 
@@ -66,3 +66,5 @@ export class VRDOMPlugin {
 
     }
 }
+
+export default VRDOMPlugin

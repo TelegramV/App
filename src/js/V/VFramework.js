@@ -2,7 +2,7 @@
  * (c) Telegram V
  */
 
-import {VFrameworkRouter} from "./Router/Router"
+import VFrameworkRouter from "./Router/VRouter"
 import VRDOM from "./VRDOM/VRDOM"
 
 /**
@@ -18,7 +18,7 @@ class VFramework {
     plugins = new Set()
 
     /**
-     * @type {Map<string, Component | VComponent>}
+     * @type {Map<string, VComponent>}
      */
     mountedComponents = new Map()
 

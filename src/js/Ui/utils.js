@@ -23,35 +23,35 @@ export function askForFile(accept, callback, asBuffer = false, multiple = false)
 }
 
 export function formatAudioTime(time) {
-    if(!time) return "0:00";
+    if (!time) return "0:00";
     time = Math.floor(time);
-    let hours   = Math.floor(time / 3600)
+    let hours = Math.floor(time / 3600)
     let minutes = Math.floor(time / 60) % 60
     let seconds = time % 60
 
-    let formatted= [hours,minutes,seconds]
+    let formatted = [hours, minutes, seconds]
         .map(v => v < 10 ? "0" + v : v)
-        .filter((v,i) => v !== "00" || i > 0)
+        .filter((v, i) => v !== "00" || i > 0)
         .join(":");
-    if(formatted.startsWith("0")) formatted = formatted.substr(1);
+    if (formatted.startsWith("0")) formatted = formatted.substr(1);
     return formatted;
 }
 
 export function convertBits(array, fromBits, toBits) {
-        let buf = "";
-        let arr = [];
+    let buf = "";
+    let arr = [];
 
-        for (var i of array) {
-            var n = (i >>> 0).toString(2).substr(-fromBits);
-            n = "0".repeat(fromBits).substr(n.length) + n;
-            buf += n;
-            while (buf.length >= toBits) {
-                arr.push(parseInt(buf.substr(0, toBits), 2));
-                buf = buf.substr(toBits);
-            }
+    for (var i of array) {
+        var n = (i >>> 0).toString(2).substr(-fromBits);
+        n = "0".repeat(fromBits).substr(n.length) + n;
+        buf += n;
+        while (buf.length >= toBits) {
+            arr.push(parseInt(buf.substr(0, toBits), 2));
+            buf = buf.substr(toBits);
         }
-        return arr;
     }
+    return arr;
+}
 
 export const countries = [
     ["+93", "Afghanistan", "AF", "🇦🇫"],

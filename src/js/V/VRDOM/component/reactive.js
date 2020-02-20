@@ -3,7 +3,7 @@
  */
 
 import {ReactiveObject} from "../../Reactive/ReactiveObject"
-import {VComponent} from "./VComponent"
+import VComponent from "./VComponent"
 
 
 // types

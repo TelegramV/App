@@ -13,7 +13,7 @@ class TestComponent extends VComponent {
             .on("testUpdate", this.onTestUpdate)
     }
 
-    h() {
+    render() {
         return <div>TEST</div>
     }
 

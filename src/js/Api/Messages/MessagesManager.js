@@ -5,7 +5,7 @@ import DialogsManager from "../Dialogs/DialogsManager"
 import DialogsStore from "../Store/DialogsStore"
 import {getPeerTypeFromType} from "../Dialogs/util"
 import AppEvents from "../EventBus/AppEvents"
-import AppSelectedPeer from "../../Ui/reactive/SelectedPeer"
+import AppSelectedPeer from "../../Ui/Reactive/SelectedPeer"
 import API from "../Telegram/API"
 import UpdatesManager from "../Updates/updatesManager"
 

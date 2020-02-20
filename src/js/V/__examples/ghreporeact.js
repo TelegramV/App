@@ -1,8 +1,8 @@
-import XVComponent from "../X/Component/XVComponent"
+import VComponent from "../VRDOM/component/VComponent"
 
 const SEARCH = 'https://api.github.com/search/repositories';
 
-export class PreactGHExample extends XVComponent {
+export class PreactGHExample extends VComponent {
     state = {
         items: []
     }

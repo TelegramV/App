@@ -24,7 +24,6 @@ const vrdom_append = (node: VRNode, $el: Element, props?: VRRenderProps) => {
         VF.plugins.forEach(plugin => plugin.elementMounted($mounted))
     }
 
-    // $ignore
     vrdom_resolveMount($mounted)
 
     return $mounted

@@ -6,7 +6,7 @@ import {FileAPI} from "../Files/FileAPI"
 import {MessageFactory} from "../Messages/MessageFactory"
 import AppConfiguration from "../../Config"
 import {TextMessage} from "../Messages/Objects/TextMessage";
-import UIEvents from "../../Ui/eventBus/UIEvents";
+import UIEvents from "../../Ui/EventBus/UIEvents";
 
 const genMsgId = () => (new Date).getTime()
 
