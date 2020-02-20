@@ -1,7 +1,7 @@
 import twemoji from "twemoji"
 
 export const replaceEmoji = (element) => {
-    return twemoji.default.parse(element, {
+    return twemoji.parse(element, {
         base: "./emoji-data/",
         ext: ".png",
         folder: "img-apple-64",
