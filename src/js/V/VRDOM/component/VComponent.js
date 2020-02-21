@@ -192,7 +192,6 @@ class VComponent {
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return undefined
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
@@ -257,7 +256,7 @@ class VComponent {
     /**
      * Internal use only.
      */
-    __delete() {
+    __destroy() {
         return VRDOM.delete(this.$el)
     }
 

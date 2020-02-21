@@ -6,6 +6,8 @@ import type {VRNodeProps, VRTagName} from "./types/types"
 import VRNode from "./VRNode"
 import VComponent from "./component/VComponent"
 import VComponentVRNode from "./component/VComponentVRNode"
+import {List} from "./list/List"
+import {VListVRNode} from "./list/VListVRNode"
 
 /**
  * Creates VRNode
@@ -17,6 +19,8 @@ function vrdom_createElement(tagName: VRTagName, props: VRNodeProps): VRNode | V
     if (typeof tagName === "function") {
         if (tagName.prototype instanceof VComponent) {
             return new VComponentVRNode(tagName, {attrs: props.attrs, ref: props.ref}, props.children)
+        } else if (tagName === List || tagName.constructor === List || tagName.prototype instanceof List) {
+            return new VListVRNode(tagName, props.attrs)
         } else {
             if (props.ref && props.ref.__fragment_ref) {
                 props.ref.slot = props.children.length > 0 ? props.children : undefined

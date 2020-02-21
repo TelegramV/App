@@ -20,7 +20,8 @@ export type VREvents =
     Map<string, (event: Event) => void>
 
 export type VRRenderProps = {
-    xmlns: string | void
+    xmlns?: string | void;
+    $parent?: HTMLElement;
 }
 
 export type VRNodeProps = {

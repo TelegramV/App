@@ -11,7 +11,7 @@ import vrdom_patch from "./patch"
  * @param {Element} $node
  * @param {Array<VRNode | any>} vRNode
  */
-const patchChildren = ($node: Element, vRNode: VRNode) => {
+const vrdom_patchChildren = ($node: Element, vRNode: VRNode) => {
     const $children = $node.childNodes
     const children = vRNode.children
 
@@ -21,7 +21,7 @@ const patchChildren = ($node: Element, vRNode: VRNode) => {
 
     if (children.length > $children.length) {
         for (let i = $children.length; i < children.length; i++) {
-            vrdom_append(children[i], $node)
+            vrdom_append(children[i], $node, {$parent: $node})
         }
     } else if (children.length < $children.length) {
         Array.from($children.values()).slice(children.length).forEach($node => {
@@ -30,4 +30,4 @@ const patchChildren = ($node: Element, vRNode: VRNode) => {
     }
 }
 
-export default patchChildren
+export default vrdom_patchChildren

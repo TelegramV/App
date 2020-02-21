@@ -58,6 +58,7 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
     }
 
     $el.style.__patched = new Set()
+    $el.__events = new Set()
 
     for (let [k, v] of Object.entries(node.style)) {
         if (v !== undefined) {
@@ -68,13 +69,14 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
 
     for (const [k, v] of node.events.entries()) {
         $el[`on${k}`] = v
+        $el.__events.add(k)
     }
 
     for (let child of node.children) {
         if (child === null) {
             vrdom_append("", $el, {xmlns})
         } else {
-            vrdom_append(child, $el, {xmlns})
+            vrdom_append(child, $el, {xmlns, $parent: $el})
         }
     }
 

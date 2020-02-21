@@ -106,7 +106,7 @@ class GeneralMessageComponent extends VComponent {
     }
 
     messageOnDelete = () => {
-        this.__delete()
+        this.__destroy()
     }
 
     messageOnRead = () => {

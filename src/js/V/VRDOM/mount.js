@@ -19,6 +19,8 @@ export function vrdom_resolveMount($mounted: Element) {
             }
         } else if ($mounted.__ref && !$mounted.__ref.__component_ref) {
             $mounted.__ref.$el = $mounted
+        } else if ($mounted.__list) {
+            $mounted.__list.__mount($mounted)
         }
     }
 }

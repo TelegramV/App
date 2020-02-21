@@ -84,9 +84,9 @@ class VFrameworkRouter {
             } else {
                 // console.log("[router] triggering replace")
                 // todo: patch tree not delete it
-                VF.mountedComponents.forEach(c => {
-                    VRDOM.delete(c.$el)
-                })
+                // VF.mountedComponents.forEach(c => {
+                //     VRDOM.delete(c.$el)
+                // })
 
                 this.renderActive()
             }

@@ -1,3 +1,5 @@
+import VPage from "./VPage"
+
 type VRouteOptions = any
 
 class VRoute {
@@ -12,3 +14,5 @@ class VRoute {
         this.options = options
     }
 }
+
+export default VRoute

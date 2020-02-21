@@ -1,9 +1,10 @@
 import VComponent from "../../../V/VRDOM/component/VComponent"
-import {List, VSet} from "../../../V/VRDOM/List"
+import {List} from "../../../V/VRDOM/list/List"
+import VArray from "../../../V/VRDOM/list/VArray"
 
-const IF = item => {
+const IF = (item, array: VArray, index) => {
     return <div>
-        <a href="">{item}</a>
+        <a onClick={() => array.delete(index)}>{item}</a>
     </div>
 }
 
@@ -11,25 +12,34 @@ const IF = item => {
 
 class ReactiveListComponent extends VComponent {
 
-    useProxyState = false
-
     state = {
-        data: new VSet([
+        data: new VArray([
             "a",
             "b",
             "c"
         ])
     }
 
+    c = 0
+
     render() {
         return (
             <div>
-                <div class="list">
-                    <List list={this.state.data} template={IF}/>
-                </div>
+                <List list={this.state.data} template={IF} wrapper={<div class="list"/>}/>
 
-                <button onClick={() => this.state.data.push("lol")}>Push</button>
-                <button onClick={() => this.state.data.prepend("kek")}>Prepend</button>
+                <List list={this.state.data} template={IF} wrapper={<div/>}/>
+
+                <div>
+                    <button onClick={() => this.state.data.add(++this.c)}>Push</button>
+                    <button onClick={() => this.state.data.addBack(++this.c)}>Prepend</button>
+                    <button onClick={() => this.state.data.set([
+                        "no",
+                        "way",
+                        "need",
+                        "die"
+                    ])}>Set
+                    </button>
+                </div>
             </div>
         )
     }

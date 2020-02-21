@@ -1,14 +1,11 @@
 /**
  * (c) Telegram V
  */
+import vrdom_delete from "../delete"
 
 const patchVRNodeUndefined = ($node: Element) => {
 
-    if ($node.__component) {
-        $node.__component.__unmount()
-    }
-
-    $node.remove()
+    vrdom_delete($node)
 
     return undefined
 }

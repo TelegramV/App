@@ -176,7 +176,7 @@ export class DialogComponent extends VComponent {
     onHideDialogByPeer = event => {
         if (event.peer === this.dialog.peer) {
             this.dialog.peer.dialog = undefined
-            this.__delete()
+            this.__destroy()
         }
     }
 
@@ -261,7 +261,7 @@ export class DialogComponent extends VComponent {
                 if ($foundRendered) {
                     AppendList.$el.insertBefore(this.$el, $foundRendered)
                 } else {
-                    this.__delete() // ...
+                    this.__destroy() // ...
                 }
             }
 
@@ -279,7 +279,7 @@ export class DialogComponent extends VComponent {
                 if ($foundRendered) {
                     AppendList.$el.insertBefore(this.$el, $foundRendered)
                 } else {
-                    this.__delete() // ...
+                    this.__destroy() // ...
                 }
             }
 

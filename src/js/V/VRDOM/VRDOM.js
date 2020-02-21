@@ -11,6 +11,7 @@ import vrdom_patch from "./patch/patch"
 import vrdom_append from "./append"
 import vrdom_prepend from "./prepend"
 import vrdom_deleteInner from "./deleteInner"
+import vrdom_patchChildren from "./patch/vrdom_patchChildren"
 
 /**
  * Virtual DOM that operates on Real DOM and does not save previous rendered state. Written specially for Telegram V.
@@ -21,6 +22,7 @@ const VRDOM = {
     render: vrdom_render,
     mount: vrdom_mount,
     patch: vrdom_patch,
+    patchChildren: vrdom_patchChildren,
     append: vrdom_append,
     prepend: vrdom_prepend,
 
