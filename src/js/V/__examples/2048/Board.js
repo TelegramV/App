@@ -1,7 +1,7 @@
 import Tile from './Tile';
-import XVComponent from "../../X/Component/XVComponent"
+import VComponent from "../../VRDOM/component/VComponent"
 
-class Board extends XVComponent {
+class Board extends VComponent {
     renderSquare(i, j) {
         let item = this.props.squares[i][j];
         return (

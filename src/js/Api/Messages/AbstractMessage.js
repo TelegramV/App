@@ -7,7 +7,7 @@ import {MessageParser} from "./MessageParser"
 import {Peer} from "../Peers/Objects/Peer"
 import MessagesManager from "./MessagesManager"
 import PeersStore from "../Store/PeersStore"
-import {DATE_FORMAT, DATE_FORMAT_TIME} from "../../Ui/pages/main/sidebars/left/dialog/Fragments/DialogTimeFragment"
+import {DATE_FORMAT, DATE_FORMAT_TIME} from "../../Ui/Components/Main/sidebars/left/dialog/Fragments/DialogTimeFragment"
 import MTProto from "../../MTProto/external"
 
 export class AbstractMessage extends ReactiveObject implements Message {

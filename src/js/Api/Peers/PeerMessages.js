@@ -1,4 +1,4 @@
-import AppSelectedPeer from "../../Ui/reactive/SelectedPeer"
+import AppSelectedPeer from "../../Ui/Reactive/SelectedPeer"
 import type {Message} from "../Messages/Message"
 import {Peer} from "./Objects/Peer"
 import {arrayDeleteCallback} from "../../Utils/array"

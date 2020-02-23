@@ -28,8 +28,13 @@ body {
     position: relative;
     height: var(--header-height);
     text-align: center; // Horizontal center
-    .title { position: absolute; left: 0; right: 0; }
+    .title {
+      position: absolute;
+      left: 0;
+      right: 0;
+    }
   }
+
   .content {
     overflow: auto;
     box-sizing: border-box;
@@ -39,47 +44,96 @@ body {
 }
 
 // Main area specific style:
-#main { background: var(--bg-main); flex-grow: 1;
-  .header { background: linear-gradient(to right, var(--bg-left), var(--bg-right));
+#main {
+  background: var(--bg-main);
+  flex-grow: 1;
+
+  .header {
+    background: linear-gradient(to right, var(--bg-left), var(--bg-right));
     @media (orientation: landscape) {
-      .title { transition: left var(--secs), right var(--secs);
-        &.left-closed { left: var(--header-height); }
-        &.right-closed { right: var(--header-height); }
+      .title {
+        transition: left var(--secs), right var(--secs);
+
+        &.left-closed {
+          left: var(--header-height);
+        }
+
+        &.right-closed {
+          right: var(--header-height);
+        }
       }
     }
   }
 }
 
 // Style in common for both sidebars:
-#left, #right { transition: width var(--secs); width: 0;
+#left, #right {
+  transition: width var(--secs);
+  width: 0;
   @media (orientation: landscape) {
-    &.open { width: calc(1% * var(--landscape-width)); }
-  } // <-- Landscape ONLY sidebars
-  .icon { position: fixed; z-index: 10;
-    width: var(--header-height); height: var(--header-height);
-    line-height: var(--header-height); font-size: var(--header-height);
-    text-align: center; user-select: none; cursor: pointer;
+    &.open {
+      width: calc(1% * var(--landscape-width));
+    }
   }
-  .sidebar { transition: transform var(--secs); // <-- Portrait AND landscape!
-    @media (orientation: portrait) { width: var(--portrait-width); }
-    @media (orientation: landscape) { width: calc(1vw * var(--landscape-width)); }
-    .header { width: calc(100% - var(--header-height)); }
+  // <-- Landscape ONLY sidebars
+  .icon {
+    position: fixed;
+    z-index: 10;
+    width: var(--header-height);
+    height: var(--header-height);
+    line-height: var(--header-height);
+    font-size: var(--header-height);
+    text-align: center;
+    user-select: none;
+    cursor: pointer;
+  }
+
+  .sidebar {
+    transition: transform var(--secs); // <-- Portrait AND landscape!
+    @media (orientation: portrait) {
+      width: var(--portrait-width);
+    }
+    @media (orientation: landscape) {
+      width: calc(1vw * var(--landscape-width));
+    }
+
+    .header {
+      width: calc(100% - var(--header-height));
+    }
   }
 }
 
 // Left sidebar specific style:
-#left { z-index: 5;
-  .sidebar { background: var(--bg-left);
-    &.closed { transform: translateX(-100%); } // <-- Left portrait AND landscape!
-    .header { left: var(--header-height); }
+#left {
+  z-index: 5;
+
+  .sidebar {
+    background: var(--bg-left);
+
+    &.closed {
+      transform: translateX(-100%);
+    }
+
+    // <-- Left portrait AND landscape!
+    .header {
+      left: var(--header-height);
+    }
   }
 }
 
 // Right sidebar specific style:
-#right { .icon { right: 0; }
-  .sidebar { background: var(--bg-right);
+#right {
+  .icon {
+    right: 0;
+  }
+
+  .sidebar {
+    background: var(--bg-right);
     @media (orientation: portrait) {
-      &.open { transform: translateX(-100%); }
-    } // <-- Right portrait sidebar ONLY!
+      &.open {
+        transform: translateX(-100%);
+      }
+    }
+    // <-- Right portrait sidebar ONLY!
   }
 }

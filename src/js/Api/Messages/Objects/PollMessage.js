@@ -12,9 +12,9 @@ export class PollMessage extends AbstractMessage {
     }
 
     fillPoll(poll, results) {
-    	if(poll) {
-	        this.raw.media.poll = poll;
-	    }
+        if (poll) {
+            this.raw.media.poll = poll;
+        }
         this.raw.media.results = results;
     }
 }

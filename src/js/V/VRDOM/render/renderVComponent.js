@@ -4,50 +4,48 @@
 
 import vrdom_render from "./render"
 import VF from "../../VFramework"
-import ComponentVRNode from "../ComponentVRNode"
-import {VComponent} from "../component/VComponent"
+import VComponent from "../component/VComponent"
 import VComponentVRNode from "../component/VComponentVRNode"
 
-/**
- * @param {ComponentVRNode} vComponentVNode
- */
-function vrdom_renderVComponentVNode(vComponentVNode: VComponentVRNode) {
-    const componentInstance: VComponent = new (vComponentVNode.component)({
-        props: vComponentVNode.attrs,
-        slot: vComponentVNode.slot,
+export function vrdom_instantiateVComponentVNode(node: VComponentVRNode) {
+    const componentInstance: VComponent = new (node.component)({
+        props: node.attrs,
+        slot: node.slot,
     })
 
-    if (vComponentVNode.attrs.ref && vComponentVNode.attrs.ref.__component_ref) {
-        vComponentVNode.attrs.ref.component = componentInstance
+    if (node.ref && node.ref.__component_ref) {
+        node.ref.component = componentInstance
     }
-
-    let identifier
 
     if (componentInstance.identifier) {
-        identifier = String(componentInstance.identifier)
-    } else if (vComponentVNode.identifier) {
-        identifier = String(vComponentVNode.identifier)
-        componentInstance.identifier = identifier
+        componentInstance.identifier = String(componentInstance.identifier)
+    } else if (node.identifier) {
+        componentInstance.identifier = String(node.identifier)
     } else {
-        identifier = String(VF.latestInstantiatedComponent++)
-        componentInstance.identifier = identifier
+        componentInstance.identifier = String(VF.latestInstantiatedComponent++)
     }
 
-    componentInstance.__init.bind(componentInstance)()
+    componentInstance.__init.call(componentInstance)
 
-    const vNode = componentInstance.__render()
+    return componentInstance
+}
 
-    if (vNode instanceof ComponentVRNode || vNode instanceof VComponentVRNode) {
-        throw new Error("Components on top level are forbidden.")
+/**
+ * @param {VComponentVRNode} node
+ * @param $node
+ */
+function vrdom_renderVComponentVNode(node: VComponentVRNode, $node: HTMLElement = undefined) {
+    const componentInstance = vrdom_instantiateVComponentVNode(node)
+
+    if ($node === undefined) {
+        const renderedVRNode = componentInstance.__render()
+
+        if (renderedVRNode instanceof VComponentVRNode) {
+            throw new Error("Components on top level are forbidden.")
+        }
+
+        $node = vrdom_render(renderedVRNode)
     }
-
-    vNode.attrs["data-component-id"] = identifier
-
-    VF.mountedComponents.set(identifier, componentInstance)
-
-    VF.plugins.forEach(plugin => plugin.componentCreated(componentInstance))
-
-    const $node = vrdom_render(vNode)
 
     $node.__component = componentInstance
     componentInstance.$el = $node

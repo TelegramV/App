@@ -25,6 +25,7 @@ export function mt_get_random_num_secure(max) {
     max = Math.floor(max);
     return Math.floor(isaac.random() * (max + 1));
 }
+
 //
 // function mt_init_obfuscation(out_buffer_view, url) {
 //     var out_buffer_offset = 0;

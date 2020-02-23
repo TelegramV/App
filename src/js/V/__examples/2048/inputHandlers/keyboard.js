@@ -1,4 +1,4 @@
-import { handleDown, handleLeft, handleUp, handleRight, handleNone } from '../actions/moveHandlers';
+import {handleDown, handleLeft, handleNone, handleRight, handleUp} from '../actions/moveHandlers';
 
 export function getKeyHandler(event) {
     switch (event.keyCode) {

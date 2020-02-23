@@ -2,7 +2,7 @@
  * (c) Telegram V
  */
 
-const patchTextArea = ($node, newNode) => {
+const patchTextArea = ($node, vRNode) => {
     return $node
 }
 

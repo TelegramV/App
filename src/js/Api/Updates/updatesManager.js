@@ -9,7 +9,7 @@ import {ChannelsUpdateProcessor} from "./ChannelsUpdateProcessor"
 import {DefaultUpdatesProcessor} from "./DefaultUpdatesProcessor"
 import processShortSentMessage from "./processShortSentMessage"
 import {arrayDelete} from "../../Utils/array"
-import AppConnectionStatus from "../../Ui/reactive/ConnectionStatus"
+import AppConnectionStatus from "../../Ui/Reactive/ConnectionStatus"
 import AppEvents from "../EventBus/AppEvents"
 import process_new_session_created from "./process_new_session_created"
 

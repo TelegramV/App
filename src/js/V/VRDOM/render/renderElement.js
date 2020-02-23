@@ -6,7 +6,6 @@ import VRNode from "../VRNode"
 import type {VRRenderProps} from "../types/types"
 import vrdom_append from "../append"
 import VF from "../../VFramework"
-import {VListVRNode} from "../VListVRNode"
 
 const _XML_NAMESPACES = new Map([
     ["svg", "http://www.w3.org/2000/svg"]
@@ -46,51 +45,38 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
         }
 
         $el.innerHTML = node.dangerouslySetInnerHTML
-
     }
 
-    if ($el instanceof HTMLInputElement || $el instanceof HTMLTextAreaElement) {
-        for (let [k, v] of Object.entries(node.attrs)) {
-            if (k === "value") {
-                $el.value = v
-            } else if (k === "ref" && !v.__component_ref) {
-                $el.__ref = v
-            } else if (v !== undefined) {
-                $el.setAttribute(k, v)
-            }
+    if (node.ref) {
+        $el.__ref = node.ref
+    }
+
+    for (let [k, v] of Object.entries(node.attrs)) {
+        if (v !== undefined) {
+            $el.setAttribute(k, v)
         }
-    } else {
-        for (let [k, v] of Object.entries(node.attrs)) {
-            if (k === "ref" && !v.__component_ref) {
-                $el.__ref = v
-            } else if (v !== undefined) {
-                $el.setAttribute(k, v)
-            }
+    }
+
+    $el.style.__patched = new Set()
+    $el.__events = new Set()
+
+    for (let [k, v] of Object.entries(node.style)) {
+        if (v !== undefined) {
+            $el.style.setProperty(k, v)
+            $el.style.__patched.add(k)
         }
     }
 
     for (const [k, v] of node.events.entries()) {
         $el[`on${k}`] = v
+        $el.__events.add(k)
     }
 
-    if ($el instanceof HTMLTextAreaElement) {
-        return $el
-    } else {
-        for (let child of node.children) {
-            if (child === null) {
-                vrdom_append("", $el, {xmlns})
-            } else if (child !== undefined && child.tagName === VRDOM.Fragment) {
-                for (let c of child.children) {
-                    vrdom_append(c, $el, {xmlns})
-                }
-            } else if (child instanceof VListVRNode) {
-                const list = new (child.list)({list: child.items, template: child.template})
-                list.$parent = $el
-                const items = list.render()
-                items.forEach(item => vrdom_append(item, $el, {xmlns}))
-            } else {
-                vrdom_append(child, $el, {xmlns})
-            }
+    for (let child of node.children) {
+        if (child === null) {
+            vrdom_append("", $el, {xmlns})
+        } else {
+            vrdom_append(child, $el, {xmlns, $parent: $el})
         }
     }
 

@@ -12,7 +12,7 @@ import OpusToPCM from 'opus-to-pcm';
 import {PCMPlayer} from "../../Utils/PCMPlayer"
 import PeersManager from "../Peers/Objects/PeersManager";
 import UpdatesManager from "../Updates/updatesManager";
-import {computeEmojiFingerprint} from "../../Ui/utils/emoji";
+import {computeEmojiFingerprint} from "../../Ui/utils/replaceEmoji";
 import CallNetworker from "./CallNetworker";
 
 class CallManager extends ReactiveObject {

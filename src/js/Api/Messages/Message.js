@@ -70,7 +70,9 @@ export interface Message {
     +prefix: string; // why this is here??
 
     show(): void;
+
     init(): void;
+
     read(): Promise;
 
     fillRaw(raw: Object): Message;

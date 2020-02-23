@@ -1,4 +1,4 @@
-import { handleDown, handleLeft, handleUp, handleRight, handleNone } from '../actions/moveHandlers';
+import {handleDown, handleLeft, handleNone, handleRight, handleUp} from '../actions/moveHandlers';
 
 export function getTouchHandler(event, touchStartCoordinates) {
     let touch = event.changedTouches[0];
@@ -17,8 +17,7 @@ export function getTouchHandler(event, touchStartCoordinates) {
         if (xDiff < 0) {
             return handleLeft;
         }
-    }
-    else {
+    } else {
 
         if (yDiff > 0) {
             return handleDown;

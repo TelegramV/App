@@ -4,7 +4,7 @@ export function arrayDelete(array, value) {
     if (index > -1) {
         array.splice(index, 1)
 
-        return true
+        return index
     }
 
     return false
@@ -16,7 +16,7 @@ export function arrayDeleteCallback(array, callback) {
     if (index > -1) {
         array.splice(index, 1)
 
-        return true
+        return index
     }
 
     return false

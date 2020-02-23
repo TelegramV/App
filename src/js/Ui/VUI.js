@@ -2,7 +2,7 @@
  * (c) Telegram V
  */
 
-export class VUI {
+class VUI {
     static showElement($el) {
         if ($el && $el.classList.contains("hidden")) {
             $el.classList.remove("hidden")
@@ -15,3 +15,5 @@ export class VUI {
         }
     }
 }
+
+export default VUI
