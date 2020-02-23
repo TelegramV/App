@@ -7,6 +7,7 @@ import AppSelectedPeer from "../../../../reactive/SelectedPeer"
 import VF from "../../../../../V/VFramework"
 import UIEvents from "../../../../eventBus/UIEvents"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
+import {CallsManager} from "../../../../../Api/Calls/CallManager";
 
 /**
  * CRITICAL: never rerender this component!
@@ -43,6 +44,7 @@ class ChatComponent extends VComponent {
                     <div id="topbar">
                         <ChatInfoComponent/>
                         <PinnedComponent/>
+                        <div className="btn-icon rp rps tgico-phone" onClick={this.callContact}/>
                         <div className="btn-icon rp rps tgico-search" onClick={this.openSearch}/>
                         <div className="btn-icon rp rps tgico-more"/>
                     </div>
@@ -88,6 +90,10 @@ class ChatComponent extends VComponent {
         UIEvents.RightSidebar.fire("show", {
             barName: "messages-search"
         })
+    }
+
+    callContact = () => {
+        CallsManager.startCall(this.callbacks.peer)
     }
 }
 

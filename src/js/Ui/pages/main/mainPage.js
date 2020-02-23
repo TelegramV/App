@@ -16,6 +16,7 @@ import {DialogInfoComponent} from "./sidebars/right/dialogInfo/DialogInfoCompone
 import {ArchivedDialogsBar} from "./sidebars/left/dialog/ArchivedDialogsBar"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
+import {PhoneCallComponent} from "./components/calls/PhoneCallComponent";
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {
@@ -42,6 +43,7 @@ export function MainPage() {
             <MediaViewerComponent/>
             <InstantViewComponent/>
             <SettingsComponent/>
+            <PhoneCallComponent/>
             {/*TODO move all settings inside it's component*/}
 
 

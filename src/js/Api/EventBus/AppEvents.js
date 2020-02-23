@@ -12,6 +12,7 @@ class AppEventBus {
         this.Peers = new PeersEventBus()
         this.Messages = new EventBus()
         this.General = new MessagesEventBus()
+        this.Calls = new EventBus()
     }
 }
 

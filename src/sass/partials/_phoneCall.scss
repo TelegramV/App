@@ -1,0 +1,88 @@
+.phone-call-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  @include flexcenter;
+
+  &.hidden {
+    display: none;
+  }
+}
+
+.phone-call-wrapper > .phone-call {
+  display: grid;
+  grid-template-areas:
+          "avatar avatar avatar avatar"
+          "name name name name"
+          "call-status call-status call-status call-status"
+          ". hang-up accept microphone";
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+
+  border-radius: 12px;
+  width: 300px;
+  height: 470px;
+  overflow: hidden;
+  background-color: rgba(#2C2F31, 0.9);
+  backdrop-filter: blur(5px);
+  z-index: 100;
+  color: white;
+
+  >.avatar {
+    grid-area: avatar;
+
+    --avatar-size: 300px;
+    border-radius: 0;
+  }
+
+  >.name {
+    grid-area: name;
+
+    margin-top: 16px;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  >.call-status {
+    grid-area: call-status;
+
+    text-align: center;
+    color: $darkgrey;
+    font-size: 0.9em;
+  }
+
+  >.phone-call-button {
+    width: 48px;
+    height: 48px;
+    border-radius: 100%;
+    @include flexcenter;
+
+    >.tgico {
+      font-size: 1.5em;
+    }
+  }
+
+  >.accept-button {
+    grid-area: accept;
+
+    margin: 24px auto;
+    background-color: $green;
+  }
+
+  >.hang-up-button {
+    grid-area: hang-up;
+
+    margin: 24px auto;
+    background-color: $red;
+
+    >.tgico {
+      transform: rotate(135deg);
+    }
+  }
+
+  >.microphone-button {
+    grid-area: microphone;
+    margin: auto;
+  }
+}

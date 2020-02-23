@@ -22,6 +22,12 @@ export const AppConfiguration = {
             app_version: "0.2.0"
         }
     },
+    calls: {
+        protocolVersion: 9,
+        minProtocolVersion: 9,
+        protocolName: 0x50567247,
+
+    },
     get useNativeBigInt() {
         // return BigInt || false
         return false

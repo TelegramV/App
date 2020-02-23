@@ -6,6 +6,7 @@ import PeerFactory from "../PeerFactory"
 import {GroupPeer} from "./GroupPeer";
 import {ChannelPeer} from "./ChannelPeer";
 import {SupergroupPeer} from "./SupergroupPeer";
+import {CallsManager} from "../../Calls/CallManager";
 
 class PeerManager extends Manager {
 
@@ -79,6 +80,10 @@ class PeerManager extends Manager {
                 }
             }
 
+        })
+
+        MTProto.UpdatesManager.subscribe("updatePhoneCall",  update => {
+            CallsManager.handleUpdate(update)
         })
 
         this._inited = true

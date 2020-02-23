@@ -8,6 +8,11 @@ class AudioManager0 {
             "notification": "/static/notification.mp3",
             "out": "/static/sound_out.mp3",
             "in": "/static/sound_in.mp3",
+            "call_busy": "/static/call_busy.mp3",
+            "call_connect": "/static/call_connect.mp3",
+            "call_end": "/static/call_end.mp3",
+            "call_incoming": "/static/call_incoming.mp3",
+            "call_outgoing": "/static/call_outgoing.mp3",
         }
 
         this._bindNavigatorEvents();

@@ -43,6 +43,12 @@ $instantview-link-background: #ECF2FF;
 $instantview-link-foreground: #348AE1;
 $instantview-light-blue: #F3F8FC;
 
+@mixin flexcenter {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 @function anim($elem) {
 	@return 150ms ease-in-out $elem;
 }
