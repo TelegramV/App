@@ -103,8 +103,10 @@ class MobileProtocol {
     }
 
     onConnected() {
-        this.queue.forEach(l => {
-            this.invokeMethod(l.method, l.parameters).then(l.resolve)
+        this.queue.forEach(item => {
+            this.invokeMethod(item.method, item.parameters)
+                .then(item.resolve)
+                .catch(item.reject)
         })
         this.queue = []
     }
@@ -154,8 +156,10 @@ class MobileProtocol {
 
             const list = this.fileNetworkers[dcID]
             this.fileNetworkers[dcID] = networker
-            list.forEach(l => {
-                l.resolve(networker.invokeMethod(l.method, l.parameters))
+            list.forEach(item => {
+                networker.invokeMethod(item.method, item.parameters)
+                    .then(item.resolve)
+                    .catch(item.reject)
             })
             return networker
         }
@@ -188,8 +192,10 @@ class MobileProtocol {
                 return this.PermanentStorage.setItem("authKey" + authContext.dcID, Bytes.asHex(authContext.authKey))
                     .then(() => this.PermanentStorage.setItem("serverSalt" + authContext.dcID, Bytes.asHex(authContext.serverSalt)))
                     .then(() => {
-                        list.forEach(async l => {
-                            l.resolve(networker.invokeMethod(l.method, l.parameters))
+                        list.forEach(async item => {
+                            networker.invokeMethod(item.method, item.parameters)
+                                .then(item.resolve)
+                                .catch(item.reject)
                         })
                     })
                     .then(() => networker)
@@ -204,17 +210,15 @@ class MobileProtocol {
 
         if (!this.connected) {
             console.info("Not connected, putting in queue", method)
-            return new Promise(resolve => {
+            return new Promise((resolve, reject) => {
                 this.queue.push({
                     method: method,
                     parameters: parameters,
-                    resolve: resolve
+                    resolve: resolve,
+                    reject
                 })
             })
         }
-
-
-        // if (dcID !== null && dcID !== this.authContext.dcID) {
 
         if (file) {
             if (dcID === null) {
@@ -224,17 +228,16 @@ class MobileProtocol {
             let networker = this.fileNetworkers[dcID]
 
             if (Array.isArray(networker)) {
-                return new Promise(resolve => {
-                    networker.push({method, parameters, resolve})
+                return new Promise((resolve, reject) => {
+                    networker.push({method, parameters, resolve, reject})
                 })
             }
 
             if (!networker) {
                 this.fileNetworkers[dcID] = []
 
-                return this.createFileNetworker(dcID).then(networker => {
-                    networker.invokeMethod(method, parameters)
-                })
+                return this.createFileNetworker(dcID)
+                    .then(networker => networker.invokeMethod(method, parameters))
             }
 
             return networker.invokeMethod(method, parameters)

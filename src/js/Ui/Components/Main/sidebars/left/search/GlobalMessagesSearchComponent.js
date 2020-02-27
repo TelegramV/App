@@ -99,7 +99,12 @@ export class GlobalMessagesSearchComponent extends VComponent {
     onSearchInputUpdated = event => {
         const q = event.string.trim()
 
-        if (q !== "" && q !== this.currentQuery) {
+        if (q === "") {
+            this.setState({
+                messages: []
+            })
+            this.peers = []
+        } else if (q !== this.currentQuery) {
             this.currentQuery = q
             this.offsetRate = 0
             this.allFetched = false

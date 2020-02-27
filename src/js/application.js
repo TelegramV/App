@@ -10,11 +10,21 @@ import EmojiPlugin from "./Ui/Plugins/EmojiPlugin"
 import AppRoutes from "./Ui/Routing"
 import {StickerManager} from "./Api/Stickers/StickersManager";
 import VBigInt from "./MTProto/bigint/VBigInt"
-import VRoute from "./V/Router/VRoute"
-import RouterView from "./V/Router/RouterView"
 
 const isProduction = false
 
+// HTMLElement.prototype.vComponent = function (): VComponent | undefined | null | false {
+//     return VF.mountedComponents.get(this.dataset.componentId)
+// }
+
+// Object.defineProperty(HTMLElement.prototype, "__component", {
+//     get(): VComponent | undefined | null | false {
+//         return VF.mountedComponents.get(this.dataset.v)
+//     },
+//     set() {
+//
+//     }
+// })
 
 // future version should have ability to do things in the such way:
 // const router = new VFrameworkRouter([

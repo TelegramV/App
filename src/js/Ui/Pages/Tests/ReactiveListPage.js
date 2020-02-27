@@ -1,23 +1,33 @@
 import VComponent from "../../../V/VRDOM/component/VComponent"
-import {List} from "../../../V/VRDOM/list/List"
+import List from "../../../V/VRDOM/list/List"
 import VArray from "../../../V/VRDOM/list/VArray"
 
-const IF = (item, array: VArray, index) => {
-    return <div>
-        <a onClick={() => array.delete(index)}>{item}</a>
-    </div>
+import "./ReactiveListPage.scss"
+
+class IFComponent extends VComponent {
+    render() {
+        return <div>
+            <a onClick={() => this.props.array.delete(this.props.index)}>{this.props.item}</a>
+        </div>
+    }
 }
 
-// this thing is workable but it takes a time to migrate...
+const IF = (item, array: VArray, index) => {
+    return <IFComponent item={item} array={array} index={index}/>
+}
+
+const array = new VArray([
+    "a",
+    "b",
+    "c"
+])
 
 class ReactiveListComponent extends VComponent {
 
+    identifier = `kekcomponent`
+
     state = {
-        data: new VArray([
-            "a",
-            "b",
-            "c"
-        ])
+        data: array
     }
 
     c = 0
@@ -25,7 +35,7 @@ class ReactiveListComponent extends VComponent {
     render() {
         return (
             <div>
-                <List list={this.state.data} template={IF} wrapper={<div class="list"/>}/>
+                <List list={this.state.data} template={IF} wrapper={<div class="reactive-list"/>}/>
 
                 <List list={this.state.data} template={IF} wrapper={<div/>}/>
 
@@ -38,6 +48,15 @@ class ReactiveListComponent extends VComponent {
                         "need",
                         "die"
                     ])}>Set
+                    </button>
+                    <button onClick={() => this.setState({
+                        data: new VArray([
+                            "oh",
+                            "man",
+                            "goodbye",
+                            "and die"
+                        ])
+                    })}>Set data
                     </button>
                 </div>
             </div>

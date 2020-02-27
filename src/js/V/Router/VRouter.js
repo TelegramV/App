@@ -143,8 +143,6 @@ class VFrameworkRouter {
             return true
         }
 
-        console.log("q", this.activeRoute.queryParams, queryParams)
-
         for (const [k, v] of Object.entries(queryParams)) {
             console.log(k, v, this.activeRoute.queryParams[k])
             if (this.activeRoute.queryParams[k] !== v) {

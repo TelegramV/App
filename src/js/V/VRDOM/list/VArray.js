@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Telegram V.
+ * Copyright 2020 Telegram V authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ class VArray extends VCollection {
     }
 
     get items() {
-        return this.array
+        return this.back.concat(this.array)
     }
 }
 

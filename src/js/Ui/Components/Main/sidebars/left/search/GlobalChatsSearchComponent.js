@@ -110,12 +110,12 @@ export class GlobalChatsSearchComponent extends VComponent {
 
             SearchManager.searchContactsByUsername(q, 100).then(Found => {
                 if (Found.__q === currentQuery) {
-                    // this.state.myPeers.set(Found.myPeers)
-                    // this.state.peers.set(Found.peers)
-                    this.setState({
-                        peers: new VArray(Found.peers),
-                        myPeers: new VArray(Found.myPeers),
-                    })
+                    this.state.myPeers.set(Found.myPeers)
+                    this.state.peers.set(Found.peers)
+                    // this.setState({
+                    //     peers: new VArray(Found.peers),
+                    //     myPeers: new VArray(Found.myPeers),
+                    // })
                 }
             })
         }

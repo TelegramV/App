@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Telegram V.
+ * Copyright 2020 Telegram V authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,15 @@
 
 import VCollection from "./VCollection"
 import VF from "../../VFramework"
+import vrdom_delete from "../delete"
 
-export class List {
+class List {
 
     __ = {
         isRefreshingItSelf: false
     }
+
+    identifier: string
 
     list: VCollection
     template: Function
@@ -61,12 +64,12 @@ export class List {
             if (props.key < 0) {
                 props.key = props.key * -1 - 1
                 if (this.backChildNodes[props.key]) {
-                    this.backChildNodes[props.key].remove()
+                    vrdom_delete(this.backChildNodes[props.key])
                     delete this.backChildNodes[props.key]
                 }
             } else {
                 if (this.childNodes[props.key]) {
-                    this.childNodes[props.key].remove()
+                    vrdom_delete(this.childNodes[props.key])
                     delete this.childNodes[props.key]
                 }
             }
@@ -96,7 +99,7 @@ export class List {
 
     __unmount = () => {
         this.list.mutationSubscribers.delete(this.onArrayChange)
-        this.$el.__list = undefined
+        this.$el.__v.list = undefined
         this.$el = undefined
         this.childNodes = undefined
         this.backChildNodes = undefined

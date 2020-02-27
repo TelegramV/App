@@ -1,36 +1,62 @@
-/**
- * (c) Telegram V
+/*
+ * Copyright 2020 Telegram V authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
 import VRNode from "../VRNode"
-import type {VRRenderProps} from "../types/types"
+import type {VRenderProps} from "../types/types"
 import vrdom_append from "../append"
-import VF from "../../VFramework"
 
-const _XML_NAMESPACES = new Map([
+const XML_NAMESPACES = new Map([
     ["svg", "http://www.w3.org/2000/svg"]
 ])
 
-const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
+export function initElement($el: HTMLElement) {
+    if (!$el.__v) {
+        $el.__v = Object.create(null)
+        $el.__v.patched_styles = new Set()
+        $el.__v.patched_events = new Set()
+    } else {
+        if (!($el.__v.patched_styles instanceof Set)) {
+            $el.__v.patched_styles = new Set()
+        }
+
+        if (!($el.__v.patched_events instanceof Set)) {
+            $el.__v.patched_events = new Set()
+        }
+    }
+}
+
+const renderElement = (node: VRNode, props: VRenderProps = {}): HTMLElement => {
     let $el: HTMLElement
 
-    let xmlns = undefined
-
-    if (props) {
-        xmlns = props.xmlns
-    }
+    let xmlns = props.xmlns
 
     if (node.attrs.xmlns) {
         xmlns = node.attrs.xmlns
         $el = document.createElementNS(xmlns, node.tagName)
-    } else if (_XML_NAMESPACES.has(node.tagName)) {
-        xmlns = _XML_NAMESPACES.get(node.tagName)
+    } else if (XML_NAMESPACES.has(node.tagName)) {
+        xmlns = XML_NAMESPACES.get(node.tagName)
         $el = document.createElementNS(xmlns || "http://www.w3.org/2000/html", node.tagName)
     } else if (xmlns) {
         $el = document.createElementNS(xmlns, node.tagName)
     } else {
         $el = document.createElement(node.tagName)
     }
+
+    initElement($el)
 
     if (node.dangerouslySetInnerHTML !== false) {
 
@@ -48,7 +74,9 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
     }
 
     if (node.ref) {
-        $el.__ref = node.ref
+        if (node.ref.__ref || node.ref.__fragment_ref) {
+            node.ref.$el = $el
+        }
     }
 
     for (let [k, v] of Object.entries(node.attrs)) {
@@ -57,19 +85,16 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
         }
     }
 
-    $el.style.__patched = new Set()
-    $el.__events = new Set()
-
     for (let [k, v] of Object.entries(node.style)) {
         if (v !== undefined) {
             $el.style.setProperty(k, v)
-            $el.style.__patched.add(k)
+            $el.__v.patched_styles.add(k)
         }
     }
 
-    for (const [k, v] of node.events.entries()) {
+    for (const [k, v] of Object.entries(node.events)) {
         $el[`on${k}`] = v
-        $el.__events.add(k)
+        $el.__v.patched_events.add(k)
     }
 
     for (let child of node.children) {
@@ -79,8 +104,6 @@ const renderElement = (node: VRNode, props?: VRRenderProps): HTMLElement => {
             vrdom_append(child, $el, {xmlns, $parent: $el})
         }
     }
-
-    VF.plugins.forEach(plugin => plugin.elementCreated($el))
 
     return $el
 }

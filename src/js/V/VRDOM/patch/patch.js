@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Telegram V.
+ * Copyright 2020 Telegram V authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,89 +16,41 @@
  */
 
 import vrdom_mount from "../mount"
-import patchAttrs from "./patchAttrs"
-import patchEvents from "./patchEvents"
-import patchDangerouslySetInnerHTML from "./patchDangerouslySetInnerHTML"
 import VRNode from "../VRNode"
-import vrdom_patchChildren from "./vrdom_patchChildren"
 import patchVRNodeUndefined from "./patchVRNodeUndefined"
 import VComponentVRNode from "../component/VComponentVRNode"
 import patchVRNodeNull from "./patchNull"
 import patchNodeText from "./patchText"
 import patchVComponentVRNode from "./patchVComponentNRNode"
-import patchStyle from "./patchStyle"
-import VF from "../../VFramework"
-import {VListVRNode} from "../list/VListVRNode"
+import VListVRNode from "../list/VListVRNode"
 import patchList from "./patchList"
 import vrdom_deleteInner from "../deleteInner"
-
-const recreateNodeOnlyTagName = ($node, tagName) => {
-    const $newNode = document.createElement(tagName)
-
-    while ($node.childNodes.length > 0) {
-        $newNode.appendChild($node.childNodes[0])
-    }
-
-    $newNode.__component = $node.__component
-    $node.__component = undefined
-
-    return $newNode
-}
+import patch_Text_VRNode from "./patch_Text_VRNode"
+import patch_Node_VRNode from "./patch_Node_VRNode"
+import {initElement} from "../render/renderElement"
+import cleanElement from "../cleanElement"
 
 /**
  * Patches VRNode to Real DOM Element
  *
  * @param $node
  * @param vRNode
+ * @param options
  */
-const vrdom_patch = ($node, vRNode: VRNode | VComponentVRNode) => {
+const vrdom_patch = ($node, vRNode: VRNode | VComponentVRNode, options = {}): Node => {
     if ($node === undefined) {
         console.error("BUG: `undefined` was passed as $node ")
         return $node
     }
 
-    const $oldNode = $node
+    initElement($node)
 
     if (vRNode instanceof VRNode) {
-        if ($node.nodeType === Node.TEXT_NODE) {
-            return vrdom_mount(vRNode, $node)
+        if ($node instanceof Text) {
+            return patch_Text_VRNode($node, vRNode)
         }
 
-        if ($node.__component) {
-            if (!$node.__component.__.isUpdatingItSelf) {
-                $node.__component.__unmount()
-                $node.__component = undefined
-            }
-        }
-
-        if ($node.__list) {
-            $node.__list.__unmount()
-            $node.__list = undefined
-        }
-
-        if ($node.tagName.toLowerCase() !== vRNode.tagName) {
-            $node = recreateNodeOnlyTagName($node, vRNode.tagName)
-        }
-
-        patchAttrs($node, vRNode.attrs)
-        // patchClass($node, vRNode.attrs["class"])
-        patchEvents($node, vRNode.events)
-        patchStyle($node, vRNode.style)
-
-        if (vRNode.dangerouslySetInnerHTML !== false) {
-            patchDangerouslySetInnerHTML($node, vRNode.dangerouslySetInnerHTML)
-        } else {
-            vrdom_patchChildren($node, vRNode)
-        }
-
-        if ($oldNode !== $node) {
-            $oldNode.__component = undefined
-            $oldNode.replaceWith($node)
-        }
-
-        VF.plugins.forEach(plugin => plugin.elementPatched($node))
-
-        return $node
+        return patch_Node_VRNode($node, vRNode)
 
     } else if (vRNode instanceof VComponentVRNode) {
         // console.log("[patch] VComponent")
@@ -116,22 +68,23 @@ const vrdom_patch = ($node, vRNode: VRNode | VComponentVRNode) => {
         return patchVRNodeUndefined($node)
 
     } else if (vRNode === null) {
-        // console.log("[patch] undefined")
+        // console.log("[patch] null")
 
         return patchVRNodeNull($node)
 
     } else {
         // console.log("[patch] unexpected", $node, vRNode)
 
-        if ($node.__component) {
-            $node.__component.__unmount()
+        if ($node.__v && $node.__v.component) {
+            $node.__v.component.__unmount()
         }
 
-        if ($node.nodeType === Node.TEXT_NODE) {
+        if ($node instanceof Text) {
             return patchNodeText($node, vRNode)
         }
 
         vrdom_deleteInner($node)
+        cleanElement($node, true)
 
         return vrdom_mount(vRNode, $node)
 

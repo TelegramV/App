@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Telegram V.
+ * Copyright 2020 Telegram V authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,16 @@
  *
  */
 
-import {List} from "./List"
+import List from "./List"
+import type {VListVRNodeAttrs} from "../types/types"
 
-export class VListVRNode {
-    constructor(tag: List, attrs) {
+class VListVRNode {
+    constructor(tag: Class<List>, attrs: VListVRNodeAttrs) {
         this.tag = tag
         this.list = attrs.list
         this.template = attrs.template
         this.wrapper = attrs.wrapper
     }
 }
+
+export default VListVRNode

@@ -1,7 +1,3 @@
-/**
- * (c) Telegram V
- */
-
 import VFrameworkRouter from "./Router/VRouter"
 import VRDOM from "./VRDOM/VRDOM"
 
@@ -11,6 +7,7 @@ import VRDOM from "./VRDOM/VRDOM"
 class VFramework {
 
     latestInstantiatedComponent = 0
+    latestInstantiatedRef = 0
 
     /**
      * @type {Set<VRDOMPlugin>}
@@ -21,6 +18,11 @@ class VFramework {
      * @type {Map<string, VComponent>}
      */
     mountedComponents = new Map()
+
+    /**
+     * @type {Map<string, Ref | FragmentRef | ComponentRef>}
+     */
+    mountedRefs = new Map()
 
     /**
      * @type {VFrameworkRouter}
@@ -53,6 +55,10 @@ class VFramework {
      */
     useRoutes(routesRegister) {
         routesRegister(this.router)
+    }
+
+    uniqueComponentId() {
+        return ++(this.latestInstantiatedComponent)
     }
 }
 
