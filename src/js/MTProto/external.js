@@ -208,15 +208,17 @@ class MTProtoBridge {
                 if (error.type === "SESSION_REVOKED") {
                     logout()
                     window.location.reload()
-                } else if (error.type === "AUTH_KEY_UNREGISTERED") {
-                    logout().then(() => {
-                        localStorage.clear()
-                        window.location.reload()
-                    }).catch(() => {
-                        localStorage.clear()
-                        window.location.reload()
-                    })
                 }
+
+                // else if (error.type === "AUTH_KEY_UNREGISTERED") {
+                //     logout().then(() => {
+                //         localStorage.clear()
+                //         window.location.reload()
+                //     }).catch(() => {
+                //         localStorage.clear()
+                //         window.location.reload()
+                //     })
+                // }
             }
         })
     }
