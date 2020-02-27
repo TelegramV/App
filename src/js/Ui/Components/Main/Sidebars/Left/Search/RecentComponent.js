@@ -25,7 +25,7 @@ export class RecentComponent extends VComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .condition(event => this.state.peers.items.indexOf(event.peer) > -1)
+            .constraint(event => this.state.peers.items.indexOf(event.peer) > -1)
             .on("updateUserStatus")
             .on("updatePhoto")
             .on("updatePhotoSmall")

@@ -2,7 +2,7 @@ import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import type {BusEvent} from "../../../../../../Api/EventBus/EventBus"
-import {DialogInfoDescriptionFragment} from "./fragments/DialogInfoDescriptionFragment"
+import {DialogInfoDescriptionFragment} from "./Fragments/DialogInfoDescriptionFragment"
 
 export class DialogInfoDescriptionComponent extends VComponent {
 

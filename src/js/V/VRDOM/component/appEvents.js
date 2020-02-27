@@ -26,7 +26,11 @@ export type AESubscribe = {
 }
 
 export type AECondition = AESubscribe | {
+    /**
+     * @deprecated use `constraint` instead
+     */
     condition(condition: any): AESubscribe,
+    constraint(constraint: any): AESubscribe,
 }
 
 export type AE = {
@@ -44,18 +48,21 @@ export function registerAppEvents(component: VComponent): AE {
 
 function registerAppEvents_bus(component: VComponent, bus: EventBus) {
     return {
-        condition: (condition: any) => registerAppEvents_bus_condition(component, bus, condition),
+        condition: (condition: any) => registerAppEvents_bus_constraint(component, bus, condition),
+        constraint: (constraint: any) => registerAppEvents_bus_constraint(component, bus, constraint),
         on: (type: string, resolve: any) => registerAppEvents_bus_condition_subscribe(component, bus, null, type, resolve)
     }
 }
 
-function registerAppEvents_bus_condition(component: VComponent, bus: EventBus, condition: any) {
+function registerAppEvents_bus_constraint(component: VComponent, bus: EventBus, condition: any) {
+    console.warn("Deprecated usage: use `constraint` instead of `condition`")
+
     return {
         on: (type: string, resolve: any) => registerAppEvents_bus_condition_subscribe(component, bus, condition, type, resolve)
     }
 }
 
-function registerAppEvents_bus_condition_subscribe(component: VComponent, bus: EventBus, condition: any, type: string, resolve: any) {
+function registerAppEvents_bus_condition_subscribe(component: VComponent, bus: EventBus, constraint: any, type: string, resolve: any) {
 
     let busContext = component.__.appEventContexts.get(bus)
 
@@ -70,44 +77,13 @@ function registerAppEvents_bus_condition_subscribe(component: VComponent, bus: E
         resolve = component.forceUpdate
     }
 
-    if (condition === null) {
+    if (constraint === null) {
         bus.subscribe(type, resolve)
     } else {
-        bus.condition(condition, type, resolve)
+        bus.constraint(constraint, type, resolve)
     }
 
     return {
-        on: (type: string, resolve: any) => registerAppEvents_bus_condition_subscribe(component, bus, condition, type, resolve)
-    }
-}
-
-
-// callbackCondition
-
-function registerAppEvents_bus_callbackCondition(component: VComponent, bus: EventBus, condition: any) {
-    return {
-        on: (type: string, resolve: any) => registerAppEvents_bus_callbackCondition_subscribe(component, bus, condition, type, resolve)
-    }
-}
-
-function registerAppEvents_bus_callbackCondition_subscribe(component: VComponent, bus: EventBus, condition: any, type: string, resolve: any) {
-
-    let callbackContext = this.__.reactiveCallbackAppEventContexts.get(bus)
-
-    if (!callbackContext) {
-        callbackContext = this.__.reactiveCallbackContexts.set(bus, new Map()).get(bus)
-        callbackContext.set(type, resolve)
-    } else {
-        callbackContext.set(type, resolve)
-    }
-
-    if (condition === null) {
-        bus.subscribe(type, resolve)
-    } else {
-        bus.condition(condition, type, resolve)
-    }
-
-    return {
-        on: (type: string, resolve: any) => registerAppEvents_bus_callbackCondition_subscribe(component, bus, condition, type, resolve)
+        on: (type: string, resolve: any) => registerAppEvents_bus_condition_subscribe(component, bus, constraint, type, resolve)
     }
 }

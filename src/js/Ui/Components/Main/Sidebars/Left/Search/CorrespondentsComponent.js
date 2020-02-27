@@ -12,7 +12,7 @@ export class CorrespondentsComponent extends VComponent {
             .on("gotCorrespondents")
 
         E.bus(AppEvents.Peers)
-            .condition(event => TopPeers.correspondents.has(event.peer))
+            .constraint(event => TopPeers.correspondents.has(event.peer))
             .on("updatePhotoSmall")
     }
 

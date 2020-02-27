@@ -6,7 +6,7 @@ class AvatarComponent extends VComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .condition(event => event.peer === this.props.peer)
+            .constraint(event => event.peer === this.props.peer)
             .on("updatePhoto")
             .on("updatePhotoSmall")
     }
