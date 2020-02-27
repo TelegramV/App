@@ -19,7 +19,7 @@ import type {VRAttrs, VRSlot} from "../types/types"
 import VRDOM from "../VRDOM"
 import VF from "../../VFramework"
 
-const __fragment_ref_update = (ref: FragmentRef, props) => {
+const __fragment_ref_update = (ref: FragmentRef, props = {}) => {
     if (ref.$el) {
         Object.assign(ref.props, props)
 

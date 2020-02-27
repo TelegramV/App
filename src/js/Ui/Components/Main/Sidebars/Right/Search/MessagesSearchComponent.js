@@ -1,65 +1,58 @@
 import {RightBarComponent} from "../RightBarComponent"
-import {ContactFragment} from "../../../basic/ContactFragment"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
-import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import SearchManager from "../../../../../../Api/Search/SearchManager"
 import LazyInput from "../../../../LazyInput"
 import AppSelectedPeer from "../../../../../Reactive/SelectedPeer"
 import {SearchMessage} from "../../../../../../Api/Messages/SearchMessage"
 import UIEvents from "../../../../../EventBus/UIEvents"
 import {highlightVRNodeWord} from "../../../../../Utils/highlightVRNodeText"
+import ContactComponent from "../../../basic/ContactComponent"
+import List from "../../../../../../V/VRDOM/list/List"
+import VArray from "../../../../../../V/VRDOM/list/VArray"
+import PeersStore from "../../../../../../Api/Store/PeersStore"
 
-const MessageFragment = ({m, peers, onClick, q}) => {
-    const peer = m.from
+let CURRENT_QUERY = undefined
 
-    peers.push(peer)
+const MessageFragmentItemTemplate = (message) => {
+    const peer = message.to === PeersStore.self() ? message.from : message.to
 
-    return <ContactFragment url={peer.photo.smallUrl}
-                            name={peer.name}
-                            status={highlightVRNodeWord(m.text, q)}
-                            peer={peer}
-                            time={m.getFormattedDate()}
-                            onClick={onClick}/>
-}
-
-const MessagesListFragment = ({messages, peers, q}) => {
-    return (
-        <div className="column-list">
-            {
-                messages
-                    .filter(m => m.to && m.from)
-                    .map(m => <MessageFragment m={m} peers={peers} onClick={() => {
-                        UIEvents.Bubbles.fire("showMessageInstant", m)
-                    }} q={q}/>)
-            }
-        </div>
-    )
+    return <ContactComponent peer={peer}
+                             fetchFull={false}
+                             name={peer.name}
+                             status={<span>{message.prefix}{highlightVRNodeWord(message.text, CURRENT_QUERY)}</span>}
+                             time={message.getFormattedDate()}
+                             onClick={() => UIEvents.Bubbles.fire("showMessageInstant", message)}/>
 }
 
 const MessagesCountFragment = ({count}) => {
-    return <div className="section-title">{count} messages found</div>
+    let slot = undefined
+
+    if (count === -2) {
+        slot = <span>Type to search</span>
+    } else if (count === -1) {
+        slot = <span className="loading-text">Searching...</span>
+    } else {
+        slot = <span>{count} messages found</span>
+    }
+
+    return <div className="section-title">{slot}</div>
 }
 
 export default class MessageSearchComponent extends RightBarComponent {
 
-    useProxyState = false
-
     barName = "messages-search"
     barVisible = false
 
-    messagesListRef = VComponent.createFragmentRef()
     messagesCountRef = VComponent.createFragmentRef()
     inputRef = VComponent.createComponentRef()
 
-    currentQuery = undefined
     offsetId = 0
     allFetched = false
     isFetching = false
 
     state = {
-        messages: [],
-        peers: [],
-        messagesCount: 0
+        messages: new VArray(),
+        messagesCount: -2
     }
 
     callbacks = {
@@ -71,10 +64,6 @@ export default class MessageSearchComponent extends RightBarComponent {
 
         E.bus(UIEvents.RightSidebar)
             .on("setSearchQuery", this.onSetSearchQuery)
-
-        E.bus(AppEvents.Peers)
-            .on("updatePhotoSmall", this.onPeersPhoto)
-            .on("updatePhoto", this.onPeersPhoto)
     }
 
     render() {
@@ -94,52 +83,34 @@ export default class MessageSearchComponent extends RightBarComponent {
                     </div>
                 </div>
                 <div class="global-messages">
-                    <MessagesCountFragment ref={this.messagesCountRef} count={this.state.messagesCount}/>
-                    <MessagesListFragment ref={this.messagesListRef} messages={this.state.messages} peers={this.peers}
-                                          q={this.currentQuery}/>
+                    <MessagesCountFragment ref={this.messagesCountRef}
+                                           count={this.state.messagesCount}/>
+
+                    <List list={this.state.messages}
+                          template={MessageFragmentItemTemplate}
+                          wrapper={<div className="column-list"/>}/>
                 </div>
             </div>
         )
     }
 
-    onPeersPhoto = event => {
-        if (this.peers && this.peers.indexOf(event.peer) > -1) {
-            this.patchResult({})
-        }
-    }
-
-    patchResult = ({messages, peers, count}) => {
-        this.messagesCountRef.patch({count: count || this.state.messagesCount})
-        this.messagesListRef.patch({
-            messages: messages || this.state.messages,
-            peers: peers || this.state.peers,
-            q: this.currentQuery
-        })
-    }
-
     onSearchNextPage = _ => {
-        if (!this.isFetching && this.currentQuery !== "" && !this.allFetched && this.offsetId) {
+        if (!this.isFetching && CURRENT_QUERY !== "" && !this.allFetched && this.offsetId) {
             this.isFetching = true
 
             SearchManager.searchMessages(AppSelectedPeer.Current, {
-                q: this.currentQuery,
+                q: CURRENT_QUERY,
                 limit: 20,
                 offsetId: this.offsetId
             }).then(Messages => {
-                if (Messages.__q === this.currentQuery) {
-                    this.state.messages.push(...Messages.messages)
-
+                if (Messages.__q === CURRENT_QUERY) {
                     if (Messages.current_count > 0) {
                         this.offsetId = Messages.messages[Messages.messages.length - 1].id
                     }
 
                     Messages.messages
                         .map(m => new SearchMessage(AppSelectedPeer.Current).fillRaw(m))
-                        .forEach(m => VRDOM.append(<MessageFragment m={m}
-                                                                    peers={this.state.peers}
-                                                                    q={this.currentQuery} onClick={() => {
-                            UIEvents.Bubbles.fire("showMessageInstant", m)
-                        }}/>, this.messagesListRef.$el))
+                        .forEach(m => this.state.messages.add(m))
 
                     this.isFetching = false
 
@@ -156,35 +127,34 @@ export default class MessageSearchComponent extends RightBarComponent {
         const q = event.target.value.trim()
 
         if (q === "") {
-            this.state.messagesCount = 0
-            this.state.messages = []
-            this.patchResult({
-                count: 0
+            CURRENT_QUERY = undefined
+            this.state.messagesCount = -2
+            this.messagesCountRef.patch({
+                count: this.state.messagesCount
             })
-            return
-        }
-
-        if (q !== this.currentQuery) {
-            this.currentQuery = q
+            this.state.messages.clear()
+        } else if (q !== CURRENT_QUERY) {
+            CURRENT_QUERY = q
             this.offsetId = 0
             this.allFetched = false
             this.isFetching = true
 
             if (!this.allFetched) {
+                this.messagesCountRef.patch({
+                    count: -1
+                })
+
                 SearchManager.searchMessages(AppSelectedPeer.Current, {
                     q,
                     limit: 20,
                     offsetId: this.offsetId
                 }).then(Messages => {
-                    if (Messages.__q === this.currentQuery) {
+                    if (Messages.__q === CURRENT_QUERY) {
                         this.peers = []
 
-                        this.state.messages = Messages.messages.map(m => new SearchMessage(AppSelectedPeer.Current).fillRaw(m))
+                        this.state.messages.set(Messages.messages.map(m => new SearchMessage(AppSelectedPeer.Current).fillRaw(m)))
                         this.state.messagesCount = Messages.count || Messages.current_count
-
-                        this.patchResult({
-                            messages: this.state.messages,
-                            peers: this.peers,
+                        this.messagesCountRef.patch({
                             count: this.state.messagesCount
                         })
 
@@ -206,17 +176,18 @@ export default class MessageSearchComponent extends RightBarComponent {
 
     callbackChanged(key: string, value: *) {
         if (key === "peer") {
-            this.currentQuery = undefined
+            CURRENT_QUERY = undefined
             this.offsetId = 0
             this.allFetched = false
             this.isFetching = true
 
             this.inputRef.component.$el.value = ""
 
-            this.state.messages = []
-            this.peers = []
-            this.state.messagesCount = 0
-            this.patchResult({})
+            this.state.messages.set([])
+            this.state.messagesCount = -2
+            this.messagesCountRef.patch({
+                count: this.state.messagesCount
+            })
             this.hideBar()
         }
     }

@@ -38,10 +38,10 @@ export function vrdom_resolveMount($mounted: Element) {
         }
     }
 
-    if ($mounted.nodeType === Node.TEXT_NODE) {
-        VF.plugins.forEach(plugin => plugin.textMounted($mounted))
+    if ($mounted instanceof Text) {
+        VF.plugins.forEach(plugin => plugin.textDidMount($mounted))
     } else {
-        VF.plugins.forEach(plugin => plugin.elementMounted($mounted))
+        VF.plugins.forEach(plugin => plugin.elementDidMount($mounted))
     }
 }
 

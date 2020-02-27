@@ -1,6 +1,8 @@
 import AppSelectedInfoPeer from "../../../Reactive/SelectedInfoPeer"
 
-const AvatarFragment = ({peerPhoto, saved, deleted}) => {
+const AvatarFragment = ({peer, saved}) => {
+    let peerPhoto = peer.photo
+    let deleted = peer.isDeleted
     let hasAvatar = !peerPhoto.isEmpty && !peerPhoto._isFetchingSmall
 
     if (saved) {

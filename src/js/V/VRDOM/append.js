@@ -19,21 +19,21 @@ import VRNode from "./VRNode"
 import type {VRenderProps} from "./types/types"
 import {vrdom_resolveMount} from "./mount"
 import vrdom_render from "./render/render"
-import VF from "../VFramework"
 
 /**
  * Appends VRNode to Real DOM Element children
  *
  * @param node
- * @param $el
+ * @param $parent
  * @param props
  */
-const vrdom_append = (node: VRNode, $el: Element, props?: VRenderProps) => {
-    const $mounted = $el.appendChild(vrdom_render(node, props))
+const vrdom_append = (node: VRNode, $parent: HTMLElement, props?: VRenderProps) => {
+    const $node = vrdom_render(node, props)
 
-    vrdom_resolveMount($mounted)
+    $parent.appendChild($node)
+    vrdom_resolveMount($node)
 
-    return $mounted
+    return $node
 }
 
 export default vrdom_append

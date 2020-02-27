@@ -206,8 +206,9 @@ class MTProtoBridge {
         }).catch(error => {
             if (error) {
                 if (error.type === "SESSION_REVOKED") {
-                    logout()
-                    window.location.reload()
+                    logout().then(() => {
+                        window.location.reload()
+                    })
                 }
 
                 // else if (error.type === "AUTH_KEY_UNREGISTERED") {

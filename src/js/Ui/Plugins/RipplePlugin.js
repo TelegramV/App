@@ -1,7 +1,7 @@
 import VRDOMPlugin from "../../V/VRDOM/plugin/VRDOMPlugin"
 
 class RippleVRDOMPlugin extends VRDOMPlugin {
-    elementMounted($el) {
+    elementDidMount($el) {
         if ($el.nodeType !== Node.TEXT_NODE && $el.classList.contains("rp")) {
             $el.addEventListener("mousedown", function (e) {
                 let rect = this.getBoundingClientRect()
@@ -28,6 +28,4 @@ class RippleVRDOMPlugin extends VRDOMPlugin {
     }
 }
 
-const RipplePlugin = new RippleVRDOMPlugin()
-
-export default RipplePlugin
+export default RippleVRDOMPlugin

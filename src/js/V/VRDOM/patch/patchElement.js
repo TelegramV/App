@@ -68,7 +68,7 @@ const patchElement = ($node: HTMLElement, vRNode: VRNode) => {
         vrdom_patchChildren($node, vRNode)
     }
 
-    VF.plugins.forEach(plugin => plugin.elementPatched($node))
+    VF.plugins.forEach(plugin => plugin.elementDidUpdate($node))
 
     return $node
 }

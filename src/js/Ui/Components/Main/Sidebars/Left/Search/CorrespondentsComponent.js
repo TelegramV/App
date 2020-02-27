@@ -9,9 +9,11 @@ export class CorrespondentsComponent extends VComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .on("gotCorrespondents", this.onGotCorrespondents)
-            .on("updatePhotoSmall", this.onPeersUpdatePhotoSmall)
-            .on("updatePhotoSmall", this.onPeersUpdatePhotoSmall)
+            .on("gotCorrespondents")
+
+        E.bus(AppEvents.Peers)
+            .condition(event => TopPeers.correspondents.has(event.peer))
+            .on("updatePhotoSmall")
     }
 
     render() {
@@ -35,15 +37,5 @@ export class CorrespondentsComponent extends VComponent {
                 </div>
             </div>
         )
-    }
-
-    onPeersUpdatePhotoSmall = event => {
-        if (TopPeers.correspondents.has(event.peer)) {
-            this.forceUpdate()
-        }
-    }
-
-    onGotCorrespondents = event => {
-        this.forceUpdate()
     }
 }

@@ -5,11 +5,11 @@ import MTProto from "./MTProto/external"
 import AppCache from "./Api/Cache/AppCache"
 import PeersStore from "./Api/Store/PeersStore"
 import AppEvents from "./Api/EventBus/AppEvents"
-import RipplePlugin from "./Ui/Plugins/RipplePlugin"
-import EmojiPlugin from "./Ui/Plugins/EmojiPlugin"
 import AppRoutes from "./Ui/Routing"
 import {StickerManager} from "./Api/Stickers/StickersManager";
 import VBigInt from "./MTProto/bigint/VBigInt"
+import RippleVRDOMPlugin from "./Ui/Plugins/RipplePlugin"
+import EmojiVRDOMPlugin from "./Ui/Plugins/EmojiPlugin"
 
 const isProduction = false
 
@@ -54,8 +54,8 @@ function start() {
 }
 
 function startUI() {
-    VF.registerPlugin(RipplePlugin)
-    VF.registerPlugin(EmojiPlugin)
+    VF.registerPlugin(RippleVRDOMPlugin)
+    VF.registerPlugin(EmojiVRDOMPlugin)
 
     VF.useRoutes(AppRoutes)
 
@@ -194,3 +194,12 @@ MTProto.connect().then(start)
 // // const $el = VRDOM.mount(<div>
 // //     <SearchList list={new Array(10000).fill(``).map(() => `${Math.random()}`)}/>
 // // </div>, "#app")
+
+// import vrdom_render from "./V/VRDOM/render/render"
+// import {replaceEmoji} from "./Ui/Utils/replaceEmoji"
+//
+// const rendered = vrdom_render(<div>a❤️b</div>)
+//
+// replaceEmoji(rendered)
+//
+// console.log(rendered)

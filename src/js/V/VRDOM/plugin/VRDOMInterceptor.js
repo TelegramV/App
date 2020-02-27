@@ -15,42 +15,26 @@
  *
  */
 
-class VRDOMPlugin {
+import VRNode from "../VRNode"
+import type {VRenderProps} from "../types/types"
+
+class VRDOMInterceptor {
     constructor() {
     }
 
     /**
-     * Be careful with this: `$el` can be component's created $element.
+     * @return {HTMLElement | undefined} undefined to do nothing
      */
-    elementDidCreate($el: HTMLElement) {
+    elementInterceptCreate(node: VRNode, props: VRenderProps): HTMLElement | undefined {
 
     }
 
     /**
-     * Be careful with this: `$el` can be component's mounted $element.
+     * @return {Node | undefined} undefined to do nothing
      */
-    elementDidMount($el: HTMLElement) {
-
-    }
-
-    /**
-     * Be careful with this: `$el` can be component's mounted $element.
-     */
-    elementDidUpdate($el: HTMLElement) {
-
-    }
-
-    textDidCreate($text: Text) {
-
-    }
-
-    textDidMount($text: Text) {
-
-    }
-
-    elementPatched($el: Element) {
+    textInterceptCreate(text: string): Node | undefined {
 
     }
 }
 
-export default VRDOMPlugin
+export default VRDOMInterceptor

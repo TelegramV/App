@@ -1,15 +1,14 @@
 import AppSelectedInfoPeer from "../../../Reactive/SelectedInfoPeer";
 import VComponent from "../../../../V/VRDOM/component/VComponent";
 import AppEvents from "../../../../Api/EventBus/AppEvents";
-import type {BusEvent} from "../../../../Api/EventBus/EventBus"
 
 class AvatarComponent extends VComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            // .callbackCondition("peer")
-            .on("updatePhoto", this.peersUpdatePhoto)
-            .on("updatePhotoSmall", this.peersUpdatePhoto)
+            .condition(event => event.peer === this.props.peer)
+            .on("updatePhoto")
+            .on("updatePhotoSmall")
     }
 
     render() {
@@ -53,10 +52,6 @@ class AvatarComponent extends VComponent {
 
     openPeerInfo = () => {
         AppSelectedInfoPeer.select(this.props.peer)
-    }
-
-    peersUpdatePhoto = (event: BusEvent) => {
-        this.forceUpdate()
     }
 }
 

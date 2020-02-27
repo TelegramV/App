@@ -5,41 +5,45 @@ import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import AppSelectedPeer from "../../../../../Reactive/SelectedPeer"
 import {BotPeer} from "../../../../../../Api/Peers/Objects/BotPeer"
+import ContactComponent from "../../../basic/ContactComponent"
+import List from "../../../../../../V/VRDOM/list/List"
+import VArray from "../../../../../../V/VRDOM/list/VArray"
+
+const ContactFragmentItemTemplate = (peer) => {
+    return <ContactComponent peer={peer}
+                             fetchFull={true}
+                             name={peer.name}
+                             status={() => peer.statusString.text}
+                             onClick={() => AppSelectedPeer.select(peer)}/>
+}
 
 export class RecentComponent extends VComponent {
 
     state = {
-        peers: []
+        peers: new VArray()
     }
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .on("updateUserStatus", this.onPeersUpdate)
-            .on("updatePhoto", this.onPeersUpdate)
-            .on("updatePhotoSmall", this.onPeersUpdate)
+            .condition(event => this.state.peers.items.indexOf(event.peer) > -1)
+            .on("updateUserStatus")
+            .on("updatePhoto")
+            .on("updatePhotoSmall")
+    }
+
+    componentDidMount() {
+        this.refreshRecent()
     }
 
     render() {
         return (
             <div className="recent section">
                 <div className="section-title">Recent</div>
-                <div className="column-list">
-                    {
-                        this.state.peers.map(peer => {
-                            return <ContactFragment url={peer.photo.smallUrl}
-                                                    name={peer.name}
-                                                    status={peer.statusString.text}
-                                                    peer={peer}
-                                                    onClick={() => AppSelectedPeer.select(peer)}/>
-                        })
-                    }
-                </div>
+                <List list={this.state.peers}
+                      template={ContactFragmentItemTemplate}
+                      wrapper={<div className="column-list"/>}/>
             </div>
         )
-    }
-
-    componentDidMount() {
-        this.refreshRecent()
     }
 
     getRecent = () => {
@@ -50,14 +54,6 @@ export class RecentComponent extends VComponent {
     }
 
     refreshRecent = () => {
-        this.setState({
-            peers: this.getRecent()
-        })
-    }
-
-    onPeersUpdate = event => {
-        if (this.state.peers.indexOf(event.peer) > -1) {
-            this.forceUpdate()
-        }
+        this.state.peers.set(this.getRecent())
     }
 }

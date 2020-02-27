@@ -15,22 +15,10 @@
  *
  */
 
-import VF from "../../VFramework"
-
-const renderText = text => {
-    if (VF.interceptor) {
-        const intercepted = VF.interceptor.textInterceptCreate(text)
-
-        if (intercepted === undefined) {
-            return document.createTextNode(text)
-        } else if (intercepted instanceof Node) {
-            return intercepted
-        } else if (intercepted instanceof NodeList || Array.isArray(intercepted) || intercepted[Symbol.iterator]) {
-            return intercepted
-        }
+export const callOrReturn = (value: function) => {
+    if (typeof value === "function") {
+        return value()
+    } else {
+        return value
     }
-
-    return document.createTextNode(text)
 }
-
-export default renderText

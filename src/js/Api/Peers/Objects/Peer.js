@@ -280,6 +280,7 @@ export class Peer extends ReactiveObject {
             this._full = userFull
 
             this.fire("fullLoaded")
+
             this.findPinnedMessage()
         })
     }

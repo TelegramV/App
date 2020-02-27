@@ -27,7 +27,6 @@ export type AESubscribe = {
 
 export type AECondition = AESubscribe | {
     condition(condition: any): AESubscribe,
-    callbackCondition(callbackName: string): AESubscribe,
 }
 
 export type AE = {
@@ -46,7 +45,6 @@ export function registerAppEvents(component: VComponent): AE {
 function registerAppEvents_bus(component: VComponent, bus: EventBus) {
     return {
         condition: (condition: any) => registerAppEvents_bus_condition(component, bus, condition),
-        callbackCondition: (callbackName: any) => registerAppEvents_bus_callbackCondition(component, bus, callbackName),
         on: (type: string, resolve: any) => registerAppEvents_bus_condition_subscribe(component, bus, null, type, resolve)
     }
 }
@@ -66,6 +64,10 @@ function registerAppEvents_bus_condition_subscribe(component: VComponent, bus: E
         busContext.set(type, resolve)
     } else {
         busContext.set(type, resolve)
+    }
+
+    if (!resolve) {
+        resolve = component.forceUpdate
     }
 
     if (condition === null) {

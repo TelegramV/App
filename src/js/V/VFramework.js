@@ -1,5 +1,6 @@
 import VFrameworkRouter from "./Router/VRouter"
 import VRDOM from "./VRDOM/VRDOM"
+import VRDOMPlugin from "./VRDOM/plugin/VRDOMPlugin"
 
 /**
  * V Framework - tool for building SPA-like application. Written specially for Telegram V.
@@ -13,6 +14,11 @@ class VFramework {
      * @type {Set<VRDOMPlugin>}
      */
     plugins = new Set()
+
+    /**
+     * @type {VRDOMInterceptor}
+     */
+    interceptor = undefined
 
     /**
      * @type {Map<string, VComponent>}
@@ -46,8 +52,12 @@ class VFramework {
         }
     }
 
-    registerPlugin(vRDOMPlugin) {
-        this.plugins.add(vRDOMPlugin)
+    registerPlugin(plugin: Class<VRDOMPlugin>) {
+        this.plugins.add(new plugin)
+    }
+
+    setInterceptor(interceptor: Class<VRDOMPlugin>) {
+        this.interceptor = new interceptor
     }
 
     /**

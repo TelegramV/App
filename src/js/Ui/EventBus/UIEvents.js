@@ -1,13 +1,10 @@
 import {EventBus} from "../../Api/EventBus/EventBus"
 
-class UIEventBuses {
-    constructor() {
-        this.LeftSidebar = new EventBus()
-        this.RightSidebar = new EventBus()
-        this.Bubbles = new EventBus()
-    }
+const UIEvents = {
+    General: new EventBus(),
+    LeftSidebar: new EventBus(),
+    RightSidebar: new EventBus(),
+    Bubbles: new EventBus(),
 }
-
-const UIEvents = new UIEventBuses()
 
 export default UIEvents

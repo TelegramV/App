@@ -6,7 +6,7 @@ import DialogsManager from "../Dialogs/DialogsManager"
 import {AppPermanentStorage} from "../Common/storage"
 
 export function logout() {
-    MTProto.logout().then(() => {
+    return MTProto.logout().then(() => {
         for (const k of PeersStore.data.keys()) {
             PeersStore.data.get(k).clear()
         }

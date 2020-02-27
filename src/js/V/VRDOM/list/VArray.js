@@ -43,6 +43,10 @@ class VArray extends VCollection {
         this.mutationSubscribers.forEach(s => s(VCollection.ADD, {item, key: this.arrayLen}))
     }
 
+    addMany(items) {
+        items.forEach(item => this.add(item))
+    }
+
     addBack(item) {
         this.back.push(item)
         ++(this.backLen)
@@ -50,7 +54,11 @@ class VArray extends VCollection {
     }
 
     clear() {
+        this.back = []
         this.array = []
+        this.backLen = 0
+        this.arrayLen = 0
+
         this.mutationSubscribers.forEach(s => s(VCollection.CLEAR, {}))
     }
 
@@ -72,11 +80,13 @@ class VArray extends VCollection {
     }
 
     set(items) {
-        this.array = items
-        this.back = []
-        this.arrayLen = items.length - 1
-        this.backLen = 0
-        this.mutationSubscribers.forEach(s => s(VCollection.SET))
+        if (items !== this.array) {
+            this.array = items
+            this.back = []
+            this.arrayLen = items.length - 1
+            this.backLen = 0
+            this.mutationSubscribers.forEach(s => s(VCollection.SET))
+        }
     }
 
     get items() {
