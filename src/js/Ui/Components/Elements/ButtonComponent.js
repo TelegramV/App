@@ -26,13 +26,14 @@ export class ButtonWithProgressBarComponent extends VComponent {
     }
 
     render() {
-        const className = className(
+        const classes = className(
+            "btn", "rp",
             classIf(this.props.disabled, "disabled"),
             classIf(this.state.isLoading, "loading"),
         )
 
         return (
-            <button className={className} onClick={this.onClick}>
+            <button className={classes} onClick={this.onClick}>
                 <span className="button-text">{this.props.label}</span>
                 <progress className="progress-circular white"/>
             </button>
@@ -60,8 +61,7 @@ export class ButtonWithProgressBarComponent extends VComponent {
     }
 
     setDisabled = (disabled = true) => {
-        this.setState({
-            disabled
-        })
+        this.props.disabled = disabled
+        this.forceUpdate()
     }
 }
