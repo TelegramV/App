@@ -2,14 +2,14 @@ import AppEvents from "../../../../Api/EventBus/AppEvents"
 import AppSelectedChat from "../../../Reactive/SelectedChat"
 import AppSelectedInfoPeer from "../../../Reactive/SelectedInfoPeer";
 import VComponent from "../../../../V/VRDOM/component/VComponent"
-import type {BusEvent} from "../../../../Api/EventBus/EventBus"
 import UIEvents from "../../../EventBus/UIEvents"
 
 class ChatInfoNameComponent extends VComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .on("updateName", this.peersUpdateName)
+            .only(event => AppSelectedChat.check(event.peer))
+            .on("updateName")
 
         E.bus(UIEvents.General)
             .on("chat.select")
@@ -17,26 +17,14 @@ class ChatInfoNameComponent extends VComponent {
 
     render() {
         if (AppSelectedChat.isNotSelected) {
-            return (
-                <div id="messages-title" className="title">
-                    ...
-                </div>
-            )
+            return <div className="title">...</div>
         }
-
-        const peer = AppSelectedChat.Current
 
         return (
-            <div id="messages-title" className="title" onClick={this.openPeerInfo}>
-                {peer.isSelf ? "Saved Messages" : peer.name}
+            <div className="title" onClick={this.openPeerInfo}>
+                {AppSelectedChat.Current.isSelf ? "Saved Messages" : AppSelectedChat.Current.name}
             </div>
         )
-    }
-
-    peersUpdateName = (event: BusEvent) => {
-        if (AppSelectedChat.check(event.peer)) {
-            this.forceUpdate()
-        }
     }
 
     openPeerInfo = () => {

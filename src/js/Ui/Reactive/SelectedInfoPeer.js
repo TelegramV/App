@@ -37,6 +37,8 @@ class SelectedInfoPeer {
             return
         }
 
+        console.log("waat", peer)
+
         this._previous = this._peer
         this._peer = peer
 

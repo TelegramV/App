@@ -40,10 +40,9 @@ import VApp from "../../../vapp"
  * - app events
  * - reactive objects
  * - reactive callbacks
- * - refs for nodes, fragments and components
+ * - refs for $elements, fragments and components
  * - timeouts
  * - intervals
- * - different patching strategies
  */
 class VComponent {
 

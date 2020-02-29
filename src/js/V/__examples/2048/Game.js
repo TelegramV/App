@@ -84,7 +84,7 @@ class Game extends VComponent {
 
     // just a hack for iOS bouncing effect
     handleTouchMove(event) {
-        const className = event.target.className;
+        const classNames = event.target.className;
         if (className.includes('square')) {
             event.preventDefault();
 

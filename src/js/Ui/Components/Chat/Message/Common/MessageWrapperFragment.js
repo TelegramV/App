@@ -7,7 +7,7 @@ import {UserPeer} from "../../../../../Api/Peers/Objects/UserPeer";
 import UIEvents from "../../../../EventBus/UIEvents";
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer"
 import MTProto from "../../../../../MTProto/external";
-import UpdatesManager from "../../../../../Api/Updates/updatesManager";
+import UpdatesManager from "../../../../../Api/Updates/UpdatesManager";
 import VUI from "../../../../VUI"
 
 const ReplyToMessageFragment = ({message}) => {

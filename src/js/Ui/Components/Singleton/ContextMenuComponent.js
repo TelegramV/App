@@ -19,7 +19,7 @@ import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"
 import VUI from "../../VUI"
 import {callOrReturn} from "../../../Utils/func"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
-import className from "../../../V/VRDOM/jsx/helpers/className"
+import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 
 class ContextMenuComponent extends SingletonComponent {
@@ -38,11 +38,11 @@ class ContextMenuComponent extends SingletonComponent {
 
     render() {
         return (
-            <div className={className("context-menu-wrapper", classIf(this.state.hidden, "hidden"))}
+            <div className={classNames("context-menu-wrapper", classIf(this.state.hidden, "hidden"))}
                  onClick={this.close}
                  onContextMenu={this.close}>
 
-                <div className={className("context-menu", this.state.animation)}
+                <div className={classNames("context-menu", this.state.animation)}
                      css-top={this.state.y + "px"}
                      css-left={this.state.x + "px"}>
 
@@ -53,10 +53,10 @@ class ContextMenuComponent extends SingletonComponent {
                                 item.title = callOrReturn(item.title)
 
                                 return (
-                                    <div className={className("element", "rp", "rps", classIf(item.red, "red"))}
+                                    <div className={classNames("element", "rp", "rps", classIf(item.red, "red"))}
                                          onClick={event => this.select(item, event)}>
 
-                                        {nodeIf(() => <i className={className("tgico", `tgico-${item.icon}`)}/>, item.icon)}
+                                        {nodeIf(() => <i className={classNames("tgico", `tgico-${item.icon}`)}/>, item.icon)}
 
                                         <span>{item.title}</span>
 

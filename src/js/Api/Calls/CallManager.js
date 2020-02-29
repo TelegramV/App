@@ -11,7 +11,7 @@ import TELEGRAM_CRYPTO, {substr} from "../../MTProto/crypto/TELEGRAM_CRYPTO";
 import OpusToPCM from 'opus-to-pcm';
 import {PCMPlayer} from "../../Utils/PCMPlayer"
 import PeersManager from "../Peers/Objects/PeersManager";
-import UpdatesManager from "../Updates/updatesManager";
+import UpdatesManager from "../Updates/UpdatesManager";
 import {computeEmojiFingerprint} from "../../Ui/Utils/replaceEmoji";
 import CallNetworker from "./CallNetworker";
 

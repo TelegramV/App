@@ -13,7 +13,7 @@ class ChatInfoComponent extends VComponent {
             <div id="messages-wrapper-chat-info" className="chat-info">
                 <div className="person">
 
-                    <button class="responsive-only-mobile" onClick={this._backToMainPage}>
+                    <button class="responsive-only-mobile btn btn-flat" onClick={this.backToMainPage}>
                         {"<-"}
                     </button>
 
@@ -36,7 +36,7 @@ class ChatInfoComponent extends VComponent {
         AppSelectedInfoPeer.select(AppSelectedChat.Current)
     }
 
-    _backToMainPage = () => {
+    backToMainPage = () => {
         VApp.router.replace("/")
     }
 }

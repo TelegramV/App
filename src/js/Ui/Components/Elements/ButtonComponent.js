@@ -16,7 +16,7 @@
  */
 
 import VComponent from "../../../V/VRDOM/component/VComponent"
-import className from "../../../V/VRDOM/jsx/helpers/className"
+import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 
 export class ButtonWithProgressBarComponent extends VComponent {
@@ -26,7 +26,7 @@ export class ButtonWithProgressBarComponent extends VComponent {
     }
 
     render() {
-        const classes = className(
+        const classes = classNames(
             "btn", "rp",
             classIf(this.props.disabled, "disabled"),
             classIf(this.state.isLoading, "loading"),

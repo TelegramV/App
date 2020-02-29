@@ -1,5 +1,5 @@
 import {checkUpdatePts, UpdatesProcessor, UpdatesQueue} from "./UpdatesProcessor"
-import {UpdateManager} from "./updatesManager"
+import {UpdateManager} from "./UpdatesManager"
 import MTProto from "../../MTProto/external"
 import AppEvents from "../EventBus/AppEvents"
 import PeersManager from "../Peers/Objects/PeersManager"

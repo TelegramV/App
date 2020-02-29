@@ -52,12 +52,16 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
 
             if (key.startsWith("on") && !isComponentOrFragment) {
                 events[key.substring(2).toLowerCase()] = v
-            } else if (key === "dangerouslySetInnerHTML" || key === "dangerouslysetinnerhtml") {
+            } else if (k === "dangerouslySetInnerHTML") {
                 dangerouslySetInnerHTML = v
                 attrs["vr-dangerouslySetInnerHTML"] = true
             } else if (key.startsWith("css-")) {
                 const styleKey = key.substring(4)
                 style[styleKey] = v
+            } else if (k === "showIf") {
+                style.display = v ? undefined : "none"
+            } else if (k === "hideIf") {
+                style.display = v ? "none" : undefined
             } else if (key === "ref") {
                 ref = v
             } else {

@@ -1,4 +1,4 @@
-import {UpdateManager} from "./updatesManager"
+import {UpdateManager} from "./UpdatesManager"
 import MTProto from "../../MTProto/external"
 
 /**

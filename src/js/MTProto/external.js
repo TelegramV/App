@@ -2,7 +2,7 @@ import {AppConfiguration} from "../Config/AppConfiguration"
 
 import MobileProtoWorker from "./workers/mtproto.worker"
 import {AppPermanentStorage} from "../Api/Common/Storage"
-import UpdatesManager from "../Api/Updates/updatesManager"
+import UpdatesManager from "../Api/Updates/UpdatesManager"
 import AppEvents from "../Api/EventBus/AppEvents"
 import {logout} from "../Api/General/logout"
 

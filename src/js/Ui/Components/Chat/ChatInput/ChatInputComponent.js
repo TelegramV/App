@@ -93,7 +93,7 @@ export class ChatInputComponent extends VComponent {
 
                     <div className="keyboard-markup">
                         {/*{this.keyboardMarkup.rows.map(l => {*/}
-                        {/*    return <div className="row">*/}
+                        {/*    return <div classNames="row">*/}
                         {/*        {l.buttons.map(q => {*/}
                         {/*            return InlineKeyboardComponent.parseButton(null, q)*/}
                         {/*        })}*/}

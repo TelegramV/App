@@ -15,7 +15,7 @@
  *
  */
 
-const $ = ($el) => {
+const $ = ($el: HTMLElement) => {
     return {
         show: () => {
             if ($el && $el.classList.contains("hidden")) {

@@ -84,78 +84,12 @@ class DialogManager extends Manager {
             })
         })
 
-        MTProto.UpdatesManager.subscribe("updateChatUserTyping", update => {
-            let peer = PeersStore.get("chat", update.chat_id) || PeersStore.get("channel", update.chat_id)
-
-            if (!peer || !peer.dialog) {
-                console.log("good game telegram, good game")
-            } else {
-                peer.dialog.addAction(update)
-            }
-        })
-
-
-        MTProto.UpdatesManager.subscribe("updateUserTyping", update => {
-            let peer = PeersStore.get("user", update.user_id)
-
-            if (!peer || !peer.dialog) {
-                console.log("good game telegram, good game")
-            } else {
-                peer.dialog.addAction(update)
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateDialogPinned", async update => {
-            const peer = PeersStore.getByPeerType(update.peer.peer)
-
-            if (!peer) {
-                console.error("BUG: no way telegram, no way")
-            }
-
-            if (!peer.dialog) {
-                this.getPeerDialogs(peer).then(dialogs => {
-                    AppEvents.Dialogs.fire("gotNewMany", {
-                        dialogs
-                    })
-                })
-
-                return
-            }
-
-            peer.dialog.pinned = update.pFlags.pinned || false
-        })
-
-
         MTProto.UpdatesManager.subscribe("updateChannelNoPeer", async update => {
             console.warn("updateChannelNoPeer NO WAY AAAAAAAAAAAAAAA", update)
         })
 
         MTProto.UpdatesManager.subscribe("updateNewChannelMessageNoPeer", async update => {
             console.warn("updateNewChannelMessageNoPeer NO WAY AAAAAAAAAAAAAAA", update)
-        })
-
-
-        MTProto.UpdatesManager.subscribe("updateChannel", async update => {
-            // await this.findOrFetch("channel", update.channel_id)
-            console.warn("updateChannel", update)
-
-            this.getPeerDialogs(update.__peer).then(dialogs => {
-                if (dialogs.length === 0) {
-                    AppEvents.Dialogs.fire("hideDialogByPeer", {
-                        peer: update.__peer
-                    })
-                } else {
-                    if (dialogs[0].peer.isLeft) {
-                        AppEvents.Dialogs.fire("hideDialogByPeer", {
-                            peer: update.__peer
-                        })
-                    } else {
-                        AppEvents.Dialogs.fire("gotNewMany", {
-                            dialogs
-                        })
-                    }
-                }
-            })
         })
 
         MTProto.UpdatesManager.subscribe("updateChannelNoDialog", async update => {
@@ -188,51 +122,6 @@ class DialogManager extends Manager {
                 AppEvents.Dialogs.fire("gotNewMany", {
                     dialogs
                 })
-            })
-        })
-
-        MTProto.UpdatesManager.subscribe("updateReadHistoryInbox", update => {
-            const dialog = this.findByPeer(update.peer)
-
-            if (dialog) {
-                dialog.peer.messages.readInboxMaxId = update.max_id
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateReadHistoryOutbox", update => {
-            const dialog = this.findByPeer(update.peer)
-            if (dialog) {
-                dialog.peer.messages.readOutboxMaxId = update.max_id
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateReadChannelInbox", update => {
-            const dialog = this.find("channel", update.channel_id)
-
-            if (dialog) {
-                dialog.peer.messages.readInboxMaxId = update.max_id
-                dialog.fire("updateReadChannelInbox")
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateReadChannelOutbox", update => {
-            const dialog = this.find("channel", update.channel_id)
-
-            if (dialog) {
-                dialog.peer.messages.readOutboxMaxId = update.max_id
-                dialog.fire("updateReadChannelOutbox")
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateFolderPeers", update => {
-            update.folder_peers.forEach(FolderPeer => {
-                const dialog = this.findByPeer(FolderPeer.peer)
-
-                if (dialog) {
-                    dialog.folderId = FolderPeer.folder_id
-                } else {
-                    console.error("BUG: whoa!!! this thing is not implemented yet")
-                }
             })
         })
 

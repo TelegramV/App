@@ -2,12 +2,13 @@ import AppEvents from "../../Api/EventBus/AppEvents"
 import UIEvents from "../EventBus/UIEvents"
 
 class ConnectionStatus {
-    constructor() {
-        this.OK = 0
-        this.WAITING_FOR_NETTWORK = 1
-        this.FETCHING_DIFFERENCE = 2
 
-        this._nettworkOk = true
+    OK = 0
+    WAITING_FOR_NETWORK = 1
+    FETCHING_DIFFERENCE = 2
+
+    constructor() {
+        this._networkOk = true
         this._differenceOk = true
 
         AppEvents.General.subscribe("connectionRestored", event => {
@@ -41,8 +42,8 @@ class ConnectionStatus {
      * @return {number}
      */
     get Status() {
-        if (!this._nettworkOk) {
-            return this.WAITING_FOR_NETTWORK
+        if (!this._networkOk) {
+            return this.WAITING_FOR_NETWORK
         }
 
         if (!this._differenceOk) {

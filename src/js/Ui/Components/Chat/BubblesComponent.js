@@ -397,8 +397,8 @@ class BubblesComponent extends VComponent {
 
 
             // if (showNewBadge && message.to && message.id === message.to.messages.readInboxMaxId) {
-            //     VRDOM.append(<div className="service" css-padding-top="100px">
-            //         <div className="service-msg">New Messages</div>
+            //     VRDOM.append(<div classNames="service" css-padding-top="100px">
+            //         <div classNames="service-msg">New Messages</div>
             //     </div>, this.bubblesInnerRef.$el)
             // }
 

@@ -9,12 +9,12 @@ import VRDOM from "../../../../../v/vrdom/VRDOM"*/
 /*const StickerFragment = ({id, url, w, h}) => {
     if (url === "") {
         return <div id={id}
-                    className="sticker loading"
+                    classNames="sticker loading"
                     css-width={`${w}px`}
                     css-height={`${h}px`}/>
     } else {
         return <img id={id}
-                    className="sticker"
+                    classNames="sticker"
                     src={url} css-width={`${w}px`}
                     css-height={`${h}px`}
                     alt="Sticker"/>

@@ -1,42 +1,45 @@
 import AppEvents from "../../../../Api/EventBus/AppEvents"
 import AppSelectedChat from "../../../Reactive/SelectedChat"
 import VComponent from "../../../../V/VRDOM/component/VComponent"
-import type {BusEvent} from "../../../../Api/EventBus/EventBus"
 import UIEvents from "../../../EventBus/UIEvents"
+import classNames from "../../../../V/VRDOM/jsx/helpers/classNames"
+import classIf from "../../../../V/VRDOM/jsx/helpers/classIf"
 
 class ChatInfoStatusComponent extends VComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Dialogs)
-            .on("updateActions", this.onDialogsUpdateActions)
+            .only(event => AppSelectedChat.check(event.dialog.peer))
+            .on("updateActions")
 
         E.bus(AppEvents.Peers)
-            .on("updateUserStatus", this.peersBusFired)
-            .on("updateChatOnlineCount", this.peersBusFired)
-            .on("fullLoaded", this.peersBusFired)
+            .only(event => AppSelectedChat.check(event.peer))
+            .on("updateUserStatus")
+            .on("updateChatOnlineCount")
+            .on("fullLoaded")
 
         E.bus(UIEvents.General)
             .on("chat.select")
     }
 
     render() {
+        const classes = classNames(
+            "info",
+            classIf(this.statusLine.online, "online"),
+            classIf(this.statusLine.isAction, "loading-text"),
+        )
+
         return (
             <div className="bottom">
-                <div css-display={AppSelectedChat.isSelected && AppSelectedChat.Current.isSelf ? "none" : ""}
-                     className={["info", this.statusLine.online ? "online" : "", this.statusLine.isAction ? "loading-text" : ""]}>{this.statusLine.text}</div>
+                <div hideIf={AppSelectedChat.isSelected && AppSelectedChat.Current.isSelf}
+                     className={classes}>{this.statusLine.text}</div>
             </div>
         )
     }
 
-    onDialogsUpdateActions = event => {
-        if (AppSelectedChat.check(event.dialog.peer)) {
-            this.forceUpdate()
-        }
-    }
-
     get action() {
-        if (this.callbacks.peer && this.callbacks.peer.dialog && this.callbacks.peer.dialog.actions.size > 0) {
-            const action = this.callbacks.peer.dialog.actionText
+        if (AppSelectedChat.Current && AppSelectedChat.Current.dialog && AppSelectedChat.Current.dialog.actions.size > 0) {
+            const action = AppSelectedChat.Current.dialog.actionText
 
             if (action) {
                 return action.user + " " + action.action
@@ -61,12 +64,6 @@ class ChatInfoStatusComponent extends VComponent {
         const peer = AppSelectedChat.Current
 
         return peer.statusString
-    }
-
-    peersBusFired = (event: BusEvent) => {
-        if (AppSelectedChat.check(event.peer)) {
-            this.forceUpdate()
-        }
     }
 }
 

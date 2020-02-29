@@ -1,5 +1,3 @@
-// @flow
-
 import {Dialog} from "../Dialogs/Dialog"
 import {Message, MessageType} from "./Message"
 import {ReactiveObject} from "../../V/Reactive/ReactiveObject"
@@ -7,7 +5,10 @@ import {MessageParser} from "./MessageParser"
 import {Peer} from "../Peers/Objects/Peer"
 import MessagesManager from "./MessagesManager"
 import PeersStore from "../Store/PeersStore"
-import {DATE_FORMAT, DATE_FORMAT_TIME} from "../../Ui/Components/Other/Sidebars/Left/Dialogs/Fragments/DialogTimeFragment"
+import {
+    DATE_FORMAT,
+    DATE_FORMAT_TIME
+} from "../../Ui/Components/Sidebars/Left/Dialogs/Fragments/DialogTimeFragment"
 import MTProto from "../../MTProto/external"
 
 export class AbstractMessage extends ReactiveObject implements Message {
@@ -313,7 +314,6 @@ export class AbstractMessage extends ReactiveObject implements Message {
         }
 
         // ...
-
 
         return this
     }

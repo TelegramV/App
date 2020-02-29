@@ -1,13 +1,24 @@
 import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"
 
 const AvatarFragment = ({peer, saved}) => {
-    let peerPhoto = peer.photo
+    let photo = peer.photo
     let deleted = peer.isDeleted
-    let hasAvatar = !peerPhoto.isEmpty && !peerPhoto._isFetchingSmall
+    let hasAvatar = !photo.isEmpty && !photo._isFetchingSmall
 
-    if (saved) {
+    const onClick = () => AppSelectedInfoPeer.select(peer)
+
+    if (!peer) {
         return (
-            <div onClick={() => AppSelectedInfoPeer.select(peerPhoto.peer)}
+            <div className={`avatar placeholder-0`}>
+                <span>BUG</span>
+                <div className="avatar-outer" css-opacity="0"/>
+            </div>
+        )
+    }
+
+    if (saved && peer.isSelf) {
+        return (
+            <div onClick={onClick}
                  className="avatar placeholder-saved placeholder-icon">
                 <i className="tgico tgico-avatar_savedmessages"/>
             </div>
@@ -16,7 +27,7 @@ const AvatarFragment = ({peer, saved}) => {
 
     if (deleted) {
         return (
-            <div className={`avatar placeholder-${peerPhoto.letter.num} placeholder-icon`}>
+            <div className={`avatar placeholder-${photo.letter.num} placeholder-icon`}>
                 <i className="tgico tgico-avatar_deletedaccount"/>
             </div>
         )
@@ -24,21 +35,17 @@ const AvatarFragment = ({peer, saved}) => {
 
     if (hasAvatar) {
         return (
-            <div onClick={() => AppSelectedInfoPeer.select(peerPhoto.peer)}
-                 id="messages-photo"
+            <div onClick={onClick}
                  className="avatar"
-                 css-background-image={`url(${peerPhoto.smallUrl})`}>
+                 css-background-image={`url(${photo.smallUrl})`}>
             </div>
         )
     } else {
         return (
-            <div onClick={() => AppSelectedInfoPeer.select(peerPhoto.peer)}
-                 className={`avatar placeholder-${peerPhoto.letter.num}`}>
-
-                <span>{peerPhoto.letter.text}</span>
-
+            <div onClick={onClick}
+                 className={`avatar placeholder-${photo.letter.num}`}>
+                <span>{photo.letter.text}</span>
                 <div className="avatar-outer" css-opacity="0"/>
-
             </div>
         )
     }

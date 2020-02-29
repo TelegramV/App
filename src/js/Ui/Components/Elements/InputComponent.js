@@ -18,7 +18,7 @@
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
-import className from "../../../V/VRDOM/jsx/helpers/className"
+import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 
 export class InputComponent extends VComponent {
 
@@ -29,12 +29,12 @@ export class InputComponent extends VComponent {
     }
 
     render() {
-        const classes = className(
+        const classes = classNames(
             "input-field",
             classIf(this.props.type === "password", "peekable", "password-input")
         )
 
-        const peekClasses = className(
+        const peekClasses = classNames(
             "btn-icon", "rp", "rps", "tgico",
             classIf(!this.props.hide, "peek")
         )

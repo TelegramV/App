@@ -16,10 +16,10 @@
  */
 
 import {callOrReturn} from "../../../../Utils/func"
-import className from "./className"
+import classNames from "./classNames"
 
 const classIf = (is, ...names) => {
-    return callOrReturn(is) ? className(...names) : undefined
+    return callOrReturn(is) ? classNames(...names) : undefined
 }
 
 export default classIf

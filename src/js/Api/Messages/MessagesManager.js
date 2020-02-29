@@ -7,7 +7,7 @@ import {getPeerTypeFromType} from "../Dialogs/util"
 import AppEvents from "../EventBus/AppEvents"
 import AppSelectedChat from "../../Ui/Reactive/SelectedChat"
 import API from "../Telegram/API"
-import UpdatesManager from "../Updates/updatesManager"
+import UpdatesManager from "../Updates/UpdatesManager"
 
 class MessageManager extends Manager {
     init() {

@@ -22,7 +22,8 @@ import VComponent from "./VComponent"
 // types
 
 export type AESubscribe = {
-    on(type: string, resolve: any): AESubscribe
+    // if no resolve, then forceUpdate will be used instead
+    on(type: string, resolve?: any): AESubscribe
 }
 
 export type AECondition = AESubscribe | {

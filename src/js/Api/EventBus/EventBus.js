@@ -7,7 +7,7 @@ export type BusEvent = {
 }
 
 /**
- * Simple BusEvent Bus class
+ * Simple Event Bus class
  */
 export class EventBus extends TypedPublisher {
 

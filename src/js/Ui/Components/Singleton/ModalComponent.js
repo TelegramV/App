@@ -16,7 +16,7 @@
  */
 
 import VUI from "../../VUI"
-import className from "../../../V/VRDOM/jsx/helpers/className"
+import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"
 
@@ -35,7 +35,7 @@ export class ModalComponent extends SingletonComponent {
 
     render() {
         return (
-            <div className={className("modal-wrapper", classIf(this.state.hidden, "hidden"))}>
+            <div className={classNames("modal-wrapper", classIf(this.state.hidden, "hidden"))}>
                 <div className="modal" onClick={this.close}>
                     <div className="dialog" onClick={event => event.stopPropagation()}>
                         {this.state.body}

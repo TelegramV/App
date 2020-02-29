@@ -16,7 +16,7 @@
  */
 
 import VComponent from "../../../V/VRDOM/component/VComponent"
-import className from "../../../V/VRDOM/jsx/helpers/className"
+import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 
 export default class TabSelectorComponent extends VComponent {
@@ -72,7 +72,7 @@ export default class TabSelectorComponent extends VComponent {
 }
 
 const TabSelectorItemFragment = ({selected = false, text, hidden = false, tabIndex = -1, click}) => {
-    const classes = className(
+    const classes = classNames(
         "item", "rp",
         classIf(selected, "selected"),
         classIf(hidden, "hidden")

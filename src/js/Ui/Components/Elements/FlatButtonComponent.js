@@ -17,12 +17,12 @@
 
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
-import className from "../../../V/VRDOM/jsx/helpers/className"
+import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 
 export class FlatButtonComponent extends VComponent {
 
     render() {
-        const className = className(
+        const classNames = classNames(
             "btn-flat",
             "rp",
             classIf(this.props.disabled, "disabled"),
@@ -30,7 +30,7 @@ export class FlatButtonComponent extends VComponent {
         )
 
         return (
-            <button className={className} onClick={this.onClick}>
+            <button className={classNames} onClick={this.onClick}>
                 <span className="button-text">{this.props.label}</span>
             </button>
         )
