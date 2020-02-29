@@ -3,9 +3,9 @@ import {convertToByteArray, createRandomBuffer} from "../../MTProto/utils/bin";
 import AppConfiguration from "../../Config";
 import TELEGRAM_CRYPTO from "../../MTProto/crypto/TELEGRAM_CRYPTO";
 import {bytesAsHex} from "../../Utils/byte";
-import OpusToPCM from "opus-to-pcm";
-import {PCMPlayer} from "../../Utils/PCMPlayer";
 import CallMessageHandler from "./CallMessageHandler";
+
+
 
 export default class CallNetworker {
     constructor(connections, authKey, isOutgoing) {
@@ -13,6 +13,13 @@ export default class CallNetworker {
         this.isOutgoing = isOutgoing
         this.authKey = authKey
         this.messageHandler = new CallMessageHandler(this)
+        this.recentIncomingPackets = new Set()
+        this.lastRemoteSeq = 0
+        this.audioTimestampOut = 0
+        this.options = {
+            maxRecentPackets: 128,
+            unackNopThreshold: 10
+        }
     }
 
     get peerTag() {
@@ -84,20 +91,31 @@ export default class CallNetworker {
         buf.storeInt(0) // flags
 
         buf.storeByte(1)
-        buf.storeInt(1330664787)
+        buf.storeInt(1330664787) // OPUS, no other protocol is currently supported in libtgvoip so magic number
         buf.storeByte(0)
         buf.storeByte(0)
+
+        console.log("sendInit")
 
         this.sendPacket(1, buf.getBytes())
     }
 
     writePacketHeader(buf, id, packet) {
+        let acks = 0
+        for(let i = 0; i < 32; i++){
+            if(this.recentIncomingPackets.has(this.lastRemoteSeq - (i + 1))){
+                acks |= (1 << (31-i));
+            }
+        }
+        // console.log("acks!", acks)
+
         buf.storeByte(id)
-        buf.storeInt(0) // last remote seq
-        buf.storeInt(this.mainConnection.seq++) // seq
-        buf.storeInt(0) // acks
+        buf.storeInt(this.lastRemoteSeq)
+        buf.storeInt(this.mainConnection.seq++)
+        buf.storeInt(acks)
         buf.storeByte(0) // flags
 
+        this.unacknowledgedIncomingPacketCount = 0
     }
 
     wrapPacket(id, packet) {
@@ -134,6 +152,10 @@ export default class CallNetworker {
     }
 
     sendPacket(id, packet) {
+        if(!this.mainConnection) {
+            // TODO add to resend queue
+            return
+        }
         const wrapped = this.encryptPacket(id, packet)
         const buf = new BufferWriter()
         buf.storeBytes(this.peerTag)
@@ -161,7 +183,7 @@ export default class CallNetworker {
 
             // console.log("< " + bytesAsHex(convertToByteArray(data)))
 
-            console.log("relay request", bytesAsHex(convertToByteArray(tlid)))
+            // console.log("relay request", bytesAsHex(convertToByteArray(tlid)))
             if(tlid === 0xc01572c7) {
 
             }
@@ -173,6 +195,7 @@ export default class CallNetworker {
         // }
         const msgKey = buf.getBytes(16)
         const d = buf.getBytes(data.byteLength - 16)
+        // TODO move crypto to worker
         const decrypted = TELEGRAM_CRYPTO.decrypt_message(d, this.authKey, msgKey, this.isOutgoing ? 8 : 0).bytes
         if(decrypted.byteLength === 0) {
             throw new Error("Failed to decrypt packet")
@@ -194,6 +217,14 @@ export default class CallNetworker {
         const body = buf.getBytes(length - 14)
         buf.offset -= length - 14
 
+        this.lastRemoteSeq = pseq
+        this.recentIncomingPackets.add(pseq)
+        // console.log("added packet " + pseq + " to ack list", this.lastRemoteSeq, this.recentIncomingPackets)
+
+        if(this.unacknowledgedIncomingPacketCount++ >= this.options.unackNopThreshold) {
+            this.sendNop()
+        }
+
         const handler = this.messageHandler.packetHandlers[type]
         if(!handler) {
             throw new Error("No message handler for type " + type + ", " + bytesAsHex(convertToByteArray(body)))
@@ -204,8 +235,23 @@ export default class CallNetworker {
         // console.log(`< type=${type}, ackId=${ackId}, pseq=${pseq}, acks=${acks}, flags=${flags}, body=`, bytesAsHex(convertToByteArray(body)))
     }
 
-    sendStreamData(streamData) {
+    sendStreamData(streamData: Uint8Array) {
+        const buf = new BufferWriter()
+        let flags = streamData.byteLength > 255 ? 0x40 : 0
+        buf.storeByte(1 | flags)
+        if(streamData.byteLength > 255) {
+            buf.storeShort(streamData.byteLength)
+        } else {
+            buf.storeByte(streamData.byteLength)
+        }
+        buf.storeInt(this.audioTimestampOut)
+        buf.storeBytes(streamData)
+        this.sendPacket(4, buf.getBytes(true))
+        this.audioTimestampOut += 60
+    }
 
+    sendNop() {
+        this.sendPacket(14, new Uint8Array(0))
     }
 
     close() {

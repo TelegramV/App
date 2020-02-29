@@ -19,6 +19,16 @@ const config = {
     },
     module: {
         rules: [
+            // wasm files should not be processed but just be emitted and we want
+            // to have their public URL.
+            {
+                test: /\.wasm$/,
+                type: "javascript/auto",
+                loader: "file-loader",
+                options: {
+                    publicPath: "dist/"
+                }
+            },
             {
                 test: /\.js$/,
                 use: "babel-loader",
@@ -86,7 +96,7 @@ const config = {
         contentBase: path.join(__dirname, "dist"),
         compress: true,
         port: 8090
-    },
+    }
 }
 
 module.exports = config
