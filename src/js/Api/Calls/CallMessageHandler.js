@@ -1,6 +1,7 @@
 import CallNetworker from "./CallNetworker";
 import {BufferReader, BufferWriter} from "../../Utils/buffer";
 import AppConfiguration from "../../Config/AppConfiguration";
+import {CallsManager} from "./CallManager";
 
 export default class CallMessageHandler {
     constructor(networker: CallNetworker) {
@@ -12,12 +13,19 @@ export default class CallMessageHandler {
             4: this.handleStreamData,
             // 5: this.handleUpdateStreams,
             6: this.handlePing,
-            7: this.handlePong
+            7: this.handlePong,
+            14: this.handleNop,
         }
+    }
+
+    handleNop = (buf: BufferReader, pseq: number) => {
+        // NOP
     }
 
     handleInit = (buf: BufferReader, pseq: number) => {
         console.log("got Init!")
+        this.sendInitAck()
+
     }
 
     handleInitAck = (buf: BufferReader, pseq: number) => {
@@ -35,20 +43,10 @@ export default class CallMessageHandler {
             console.log(`stream #${i}`, {streamId, type, codec, frameDuration, enabled})
         }
 
-        // this.decoder = new OpusToPCM({
-        //     channels: 1,
-        //     fallback: false,
-        // })
-        // this.PCMPlayer = new PCMPlayer(1, this.decoder.getSampleRate())
-        // this.decoder.on("decode", l => this.onDecode(l))
-
-
         this.sendInitAck()
     }
 
     handleStreamData = (buf: BufferReader, pseq: number) => {
-        console.log("got StreamData!")
-
         let streamId = buf.getByte()
         const flags = streamId & 0xC0;
         streamId &= 0x3F;
@@ -63,6 +61,7 @@ export default class CallMessageHandler {
         }
         sdlen &= 0x7FF
         const actualData = buf.getBytes(sdlen)
+        CallsManager.decodeOpus(actualData)
         // handle input
         // try {
         //     this.decoder.decode(actualData)
@@ -70,6 +69,7 @@ export default class CallMessageHandler {
         //     console.error(ex)
         // }
 
+        // TODO handle FEC properly
         if(extraFEC) {
             const fecCount = buf.getByte()
             for(let i = 0; i < fecCount; i++) {
@@ -99,6 +99,8 @@ export default class CallMessageHandler {
 
 
     sendInitAck() {
+        console.log("send init ACK")
+
         const buf = new BufferWriter()
         buf.storeInt(AppConfiguration.calls.protocolVersion)
         buf.storeInt(AppConfiguration.calls.minProtocolVersion)

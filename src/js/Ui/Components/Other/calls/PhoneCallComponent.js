@@ -2,34 +2,54 @@ import VComponent from "../../../../V/VRDOM/component/VComponent";
 import AppEvents from "../../../../Api/EventBus/AppEvents";
 import type {AE} from "../../../../V/VRDOM/component/__component_registerAppEvents";
 import AvatarComponent from "../../Basic/AvatarComponent";
-import {CallsManager} from "../../../../Api/Calls/CallManager";
-import AudioManager from "../../../Managers/AudioManager"
+import {CallsManager, CallState} from "../../../../Api/Calls/CallManager";
+import AudioManager from "../../../Managers/AudioManager";
+import {formatAudioTime} from "../../../Utils/utils";
 
 export class PhoneCallComponent extends VComponent {
     init() {
         super.init();
         this.state = {
             hidden: true,
-            peer: null
+            peer: null,
+            acceptedCall: false,
+            callState: CallState.Waiting
         }
     }
 
     render() {
         const classes = {"phone-call-wrapper": true, "hidden": this.state.hidden}
+        const classesInner = {"phone-call": true, "accepted-call": this.state.acceptedCall}
         return <div className={classes}>
-            <div className="phone-call">
+            <div className={classesInner}>
                 {this.state.peer ? <AvatarComponent peer={this.state.peer || null}/> : ""}
-                <div className="fingerprint">{this.state.fingerprint || ""}</div>
+                <div className={{fingerprint: true, shown: !!this.state.fingerprint}}>{this.state.fingerprint || ""}</div>
                 <div className="name">{this.state.peer && this.state.peer.name}</div>
-                <div className="call-status">ringing...</div>
+                <div className="call-status">{this.callState}</div>
                 <div className="phone-call-button hang-up-button rp rps" onClick={this.hangUp}><i
                     className="tgico tgico-phone"/></div>
                 <div className="phone-call-button accept-button rp rps" onClick={this.acceptCall}><i
                     className="tgico tgico-phone"/></div>
-                <div className="phone-call-button microphone-button rp rps"><i className="tgico tgico-microphone"/>
+                <div className="phone-call-button microphone-button rp rps" onClick={this.mute}><i className="tgico tgico-microphone"/>
                 </div>
             </div>
         </div>
+    }
+
+    get callState() {
+        // console.log("get state", this.state.callState)
+        switch (this.state.callState) {
+            case CallState.Ringing: return "ringing..."
+            case CallState.Busy: return "line busy"
+            case CallState.Connecting: return "connecting..."
+            case CallState.Waiting: return "waiting..."
+            case CallState.FailedToConnect: return "failed to connect"
+            case CallState.HangingUp: return "hanging up..."
+            case CallState.ExchangingEncryption: return "exchanging encryption keys..."
+            case CallState.IncomingCall: return "is calling you"
+            case CallState.Requesting: return "requesting..."
+            default: return formatAudioTime(this.state.seconds)
+        }
     }
 
     appEvents(E: AE) {
@@ -38,6 +58,7 @@ export class PhoneCallComponent extends VComponent {
             .on("startedCall", this.startedCall)
             .on("declinedCall", this.declinedCall)
             .on("fingerprintCreated", this.fingerprintCreated)
+            .on("changeState", this.changeState)
     }
 
     incomingCall = event => {
@@ -46,7 +67,10 @@ export class PhoneCallComponent extends VComponent {
         this.setState({
             hidden: false,
             incoming: true,
-            peer: peer
+            peer: peer,
+            acceptedCall: false,
+            fingerprint: null,
+            callState: CallState.IncomingCall
         })
     }
 
@@ -56,26 +80,48 @@ export class PhoneCallComponent extends VComponent {
         this.setState({
             hidden: false,
             incoming: false,
-            peer: peer
+            peer: peer,
+            acceptedCall: true,
+            fingerprint: null,
+            callState: CallState.Requesting
         })
     }
 
     declinedCall = event => {
         this.setState({
             hidden: true,
-            peer: null,
-            fingerprint: null
+            // peer: null,
+            // fingerprint: null
+        })
+    }
+
+    changeState = event => {
+        this.setState({
+            callState: event.state,
+            seconds: event.seconds
         })
     }
 
     hangUp = event => {
         AudioManager.playNotification("call_end")
         CallsManager.hangUp(this.state.peer)
+        this.setState({
+            callState: CallState.HangingUp
+        })
     }
 
     acceptCall = event => {
         AudioManager.playNotification("call_connect")
         CallsManager.acceptCall(this.state.peer)
+        this.setState({
+            acceptedCall: true
+        })
+    }
+
+    mute = event => {
+        this.setState({
+            muted: !this.state.muted
+        })
     }
 
     fingerprintCreated = event => {

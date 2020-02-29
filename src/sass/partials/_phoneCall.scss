@@ -7,7 +7,9 @@
   @include flexcenter;
 
   &.hidden {
-    display: none;
+    .phone-call {
+      transform: scale(0);
+    }
   }
 }
 
@@ -19,6 +21,8 @@
           "call-status call-status call-status call-status"
           ". hang-up accept microphone";
   grid-template-columns: 1fr 1fr 1fr 1fr;
+  transition: anim(transform);
+  transform: scale(1);
 
   border-radius: 12px;
   width: 300px;
@@ -29,11 +33,33 @@
   z-index: 100;
   color: white;
 
+  &.accepted-call {
+    grid-template-areas:
+            "avatar avatar avatar avatar"
+            "name name name name"
+            "call-status call-status call-status call-status"
+            ". hang-up hang-up microphone";
+    >.accept-button {
+      display: none;
+    }
+  }
+
   >.avatar {
     grid-area: avatar;
 
     --avatar-size: 300px;
     border-radius: 0;
+  }
+
+  >.fingerprint.shown {
+    position: absolute;
+    background-color: rgba(#2C2F31, 0.3);
+    border-radius: 6px;
+    font-size: 1.2em;
+    padding: 5px;
+    top: 255px;
+    left: 50%;
+    transform: translate(-50%, 0);
   }
 
   >.name {

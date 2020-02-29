@@ -3,17 +3,28 @@ import Bytes from "../../MTProto/utils/bytes";
 import {bytesAsHex, bytesConcatBuffer} from "../../Utils/byte";
 import {SHA1, SHA256} from "../../MTProto/crypto/sha";
 import VBigInt from "../../MTProto/bigint/VBigInt";
-import {convertToByteArray, createRandomBuffer, longToBytes} from "../../MTProto/utils/bin";
 import AppEvents from "../EventBus/AppEvents";
 import {ReactiveObject} from "../../V/Reactive/ReactiveObject";
-import AppConfiguration from "../../Config/AppConfiguration";
-import TELEGRAM_CRYPTO, {substr} from "../../MTProto/crypto/TELEGRAM_CRYPTO";
-import OpusToPCM from 'opus-to-pcm';
 import {PCMPlayer} from "../../Utils/PCMPlayer"
 import PeersManager from "../Peers/Objects/PeersManager";
 import UpdatesManager from "../Updates/UpdatesManager";
 import {computeEmojiFingerprint} from "../../Ui/Utils/replaceEmoji";
 import CallNetworker from "./CallNetworker";
+import Opus from "./Opus";
+
+
+export const CallState = {
+    CallStarted: -1,
+    Ringing: 0,
+    Busy: 1,
+    FailedToConnect: 2,
+    Waiting: 3,
+    HangingUp: 4,
+    IncomingCall: 5,
+    Connecting: 6,
+    Requesting: 7,
+    ExchangingEncryption: 8,
+}
 
 class CallManager extends ReactiveObject {
     eventBus = AppEvents.Calls
@@ -21,6 +32,16 @@ class CallManager extends ReactiveObject {
     currentPhoneCall = null
     crypto = null
     connections = null
+    opus = new Opus({})
+
+    constructor(props) {
+        super(props);
+        this.opus.init().then(l => {
+            this.opus.printVersion()
+            this.opus.createDecoder()
+            this.opus.createEncoder()
+        })
+    }
 
     // TODO move elsewhere
     get dhConfig() {
@@ -58,6 +79,9 @@ class CallManager extends ReactiveObject {
     }
 
     async phoneCallAccepted(phoneCall) {
+        this.fire("changeState", {
+            state: CallState.ExchangingEncryption
+        })
         const authKey = Bytes.modPow(phoneCall.g_b, this.crypto.random, this.crypto.p)
         const fingerprint = SHA1(authKey)
 
@@ -74,7 +98,9 @@ class CallManager extends ReactiveObject {
     }
 
     phoneCallWaiting(phoneCall) {
-
+        // this.fire("changeState", {
+        //     state: CallState.Waiting
+        // })
     }
 
     phoneCallDiscarded(phoneCall) {
@@ -105,6 +131,9 @@ class CallManager extends ReactiveObject {
         this.fire("fingerprintCreated", {
             fingerprint: emojis
         })
+        this.fire("changeState", {
+            state: CallState.Connecting
+        })
 
         this.initAudio().then(_ => {
             // console.log("Sucess got audio!")
@@ -121,6 +150,11 @@ class CallManager extends ReactiveObject {
     async startCall(peer) {
         const dhConfig = await this.dhConfig
         const gA = VBigInt.create(dhConfig.g).modPow(dhConfig.random, dhConfig.p).toByteArray()
+
+        this.fire("startedCall", {
+            peer: peer
+        })
+
         const response = await MTProto.invokeMethod("phone.requestCall", {
             g_a_hash: SHA256(gA),
             user_id: {
@@ -139,13 +173,17 @@ class CallManager extends ReactiveObject {
             random: dhConfig.random,
             p: dhConfig.p
         }
-        this.fire("startedCall", {
-            peer: peer
+        this.fire("changeState", {
+            state: CallState.Ringing
         })
         this.handleUpdate(response)
     }
 
     async acceptCall(peer) {
+        this.fire("changeState", {
+            state: CallState.ExchangingEncryption
+        })
+
         const dhConfig = await this.dhConfig
         const g = dhConfig.g
         const p = dhConfig.p
@@ -185,23 +223,58 @@ class CallManager extends ReactiveObject {
         if(this.audio) {
             return Promise.resolve()
         }
-        return navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-            const mediaRecorder = new MediaRecorder(stream, {
+        return navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
+
+            const audioContext = new AudioContext({
+                sampleRate: 48000,
+            })
+            const input = audioContext.createMediaStreamSource(stream)
+            // TODO buffer size should be analysisFrameSize
+            // unfortunately createScriptProcessor only supports 2^n buffer sizes
+            // so some hacks with temp buffers and setTimeouts should be done
+            // to both keep up with the sample rate AND to send correct data
+            // ffs js!
+            const captureNode = audioContext.createScriptProcessor(256, 1, 1)
+
+            captureNode.addEventListener('audioprocess', this.dataavailable)
+            input.connect(captureNode)
+            captureNode.connect(audioContext.destination)
+
+            /*const mediaRecorder = new MediaRecorder(stream, {
                 mimeType: "audio/webm;codecs=opus"
             })
             mediaRecorder.onstop = l => this.stop(l)
             mediaRecorder.ondataavailable = l => this.dataavailable(l)
-            mediaRecorder.start(60)
+            mediaRecorder.start(50)
 
             this.audio = {
                 stream: stream,
-                mediaRecorder: mediaRecorder
+                mediaRecorder: mediaRecorder,
+                pcm: new PCMPlayer(1, 48000),
+                opusDecoder: new OpusToPCM({
+                    channels: 1
+                })
+            }
+            this.audio.opusDecoder.on("decode", l => this.onDecode(l))*/
+            this.audio = {
+                stream: stream,
+                audioContext,
+                input,
+                captureNode,
+                started: false,
+                pcm: new PCMPlayer(1, 48000),
+                // opusDecoder: new OpusToPCM({
+                //     channels: 1
+                // })
             }
         })
     }
 
     stopAudio() {
-        if(!this.audio) {
+        // console.log("stop", this.audioLoop)
+        // clearInterval(this.audioLoop)
+
+        if(!this.audio || !this.audio.mediaRecorder || !this.audio.stream) {
             return
         }
         this.audio.mediaRecorder.stop()
@@ -220,6 +293,32 @@ class CallManager extends ReactiveObject {
         this.networker = new CallNetworker(connections, this.crypto.authKey, this.crypto.isOutgoing)
         this.networker.start().then(l => {
             this.networker.init()
+            this.callStartTime = +new Date()
+            setTimeout(l => {
+                this.audio.started = true
+                // fetch("/static/test1.pcm").then(l => l.arrayBuffer()).then(l => {
+                //     const data = new Uint8Array(l)
+                //     let dataOffset = 0
+                //     this.audioLoop = setInterval(_ => {
+                //         const kk = 48000 * 60 / 1000
+                //         const sizeof = 2
+                //         const splitted = new Uint8Array(data.buffer.slice(dataOffset, Math.min(dataOffset + kk * sizeof, data.byteLength)))
+                //         dataOffset += kk * sizeof
+                //         if(dataOffset >= data.byteLength) {
+                //             dataOffset = 0;
+                //         }
+                //
+                //         const toSend = this.opus.encodeUint8(splitted)
+                //         this.networker.sendStreamData(toSend)
+                //
+                //     }, 60)
+                // })
+
+                this.fire("changeState", {
+                    state: CallState.CallStarted,
+                    seconds: 0
+                })
+            }, 2000)
         })
     }
 
@@ -227,18 +326,22 @@ class CallManager extends ReactiveObject {
         console.log("stop", ev)
     }
 
-    async dataavailable(ev) {
-        if(!this.networker) return
-        const data = new Uint8Array(await ev.data.arrayBuffer())
-        // console.log(String.fromCharCode(...data))
+
+    dataavailable = async (ev) => {
+        if(!this.networker || !this.audio || !this.audio.started) return
+        this.fire("changeState", {
+            state: CallState.CallStarted,
+            seconds: Math.floor((+new Date() - this.callStartTime)/1000)
+        })
+
+        const pcm = ev.inputBuffer.getChannelData(0)
+
+        const data = this.opus.encodeFloat32(pcm)
         this.networker.sendStreamData(data)
-            // bytesAsHex(convertToByteArray(arrayBuffer))
-        // console.log("dataavaliable", ev)
     }
 
-    onDecode(pcmData) {
-        // console.log(this.decoder.getSampleRate())
-        // this.PCMPlayer.feed(pcmData)
+    decodeOpus(opusData) {
+        this.audio.pcm.feed(new Float32Array(this.opus.decode(opusData).buffer))
     }
 }
 
