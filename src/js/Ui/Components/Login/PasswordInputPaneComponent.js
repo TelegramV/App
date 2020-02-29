@@ -1,7 +1,7 @@
 import PaneComponent from "./PaneComponent"
 import InfoComponent from "./InfoComponent"
-import {ButtonWithProgressBarComponent} from "../Main/input/buttonComponent";
-import {InputComponent} from "../Main/input/inputComponent";
+import {ButtonWithProgressBarComponent} from "../Elements/ButtonComponent";
+import {InputComponent} from "../Elements/InputComponent";
 
 import MTProto from "../../../MTProto/external"
 import VComponent from "../../../V/VRDOM/component/VComponent"

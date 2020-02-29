@@ -12,6 +12,36 @@ export type BusEvent = {
 export class EventBus extends TypedPublisher {
 
     /**
+     * @type {Map<string, Map<function, function>>}
+     * @private
+     */
+    _conditionalSubscriptions = new Map()
+
+    fire(type: any, event: BusEvent = {}) {
+        super.fire(type, event)
+
+        if (this._conditionalSubscriptions.has(type)) {
+            this._conditionalSubscriptions.get(type).forEach((v, k) => {
+                if (v(event)) {
+                    k(event)
+                }
+            })
+        }
+    }
+
+    /**
+     * @param type
+     * @param {function(event: BusEvent)} subscription
+     */
+    unsubscribe(type: any, subscription) {
+        super.unsubscribe(type, subscription)
+
+        if (this._conditionalSubscriptions.has(type)) {
+            this._conditionalSubscriptions.get(type).delete(subscription)
+        }
+    }
+
+    /**
      * @param {function({
      *     type: string,
      *     peer: Peer,
@@ -24,7 +54,11 @@ export class EventBus extends TypedPublisher {
         super.subscribeAny(subscription)
     }
 
-    condition(condition, type: string, callback: BusEvent => any) {
-        console.error(this, `[${type}] -> [${condition}] conditions are not implemented`)
+    only(condition, type: string, subscription: BusEvent => any) {
+        if (!this._conditionalSubscriptions.has(type)) {
+            this._conditionalSubscriptions.set(type, new Map())
+        }
+
+        this._conditionalSubscriptions.get(type).set(subscription, condition)
     }
 }

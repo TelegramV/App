@@ -1,5 +1,18 @@
-/**
- * (c) Telegram V
+/*
+ * Copyright 2020 Telegram V authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
 import VRNode from "../VRNode"
@@ -9,28 +22,48 @@ import type {ReactiveCallbackContext} from "../../Reactive/ReactiveCallback"
 import {ReactivePublisher} from "../../../Api/EventBus/ReactivePublisher"
 import {ReactiveObject} from "../../Reactive/ReactiveObject"
 import VComponent from "../component/VComponent"
+import ElementRef from "../ref/ElementRef"
+import ComponentRef from "../ref/ComponentRef"
+import FragmentRef from "../ref/FragmentRef"
+import VCollection from "../list/VCollection"
+import List from "../list/List"
 
-export type VRTagName = string | number | ({ ...VRAttrs, slot?: VRSlot }) => VRNode | Class<VComponent>
+export type VRTagName = string | number | function | Class<VComponent>
 
 export type VRAttrs = {
     [string]: any
 }
 
-export type VREvents =
-    Map<string, (event: Event) => void>
+export type VListVRNodeAttrs = {
+    tag: function,
+    list: VCollection,
+    template: function,
+    wrapper: VRNode
+}
 
-export type VRRenderProps = {
+export type VRStyle = {
+    [string]: string
+}
+
+export type VREvents = {
+    [string]: (event: Event) => void
+}
+
+export type VRenderProps = {
     xmlns?: string | void;
     $parent?: HTMLElement;
 }
 
+export type Ref = ElementRef | FragmentRef | ComponentRef
+
 export type VRNodeProps = {
-    ref: Object,
+    ref: Ref,
     attrs: VRAttrs,
     events: VREvents,
     dangerouslySetInnerHTML: any | boolean,
     children: Array<VRNodeProps | VRNode>,
-    isComponentRoot: boolean,
+    component?: VComponent,
+    list?: List,
     style: any,
 }
 

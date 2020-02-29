@@ -1,14 +1,28 @@
-/**
- * (c) Telegram V
+/*
+ * Copyright 2020 Telegram V authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
-import type {VRAttrs, VREvents, VRNodeProps, VRTagName} from "../types/types"
+import type {VRAttrs, VREvents, VRStyle, VRTagName} from "../types/types"
 import VRNode from "../VRNode"
 import attrAliases from "./attrAliases"
 import attrProcessors from "./attrProcessors/attrProcessors"
 import vrdom_createElement from "../createElement"
 import VRDOM from "../VRDOM"
 import postAttrProcessor from "./attrProcessors/postAttrProcessor"
+import vrdom_isTagNameComponentOrFragment from "../is/isTagNameComponentOrFragment"
 
 /**
  * JSX Translator
@@ -17,33 +31,32 @@ import postAttrProcessor from "./attrProcessors/postAttrProcessor"
  * @param attributes
  * @param children
  */
-function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<VRNode | VRNodeProps>) {
+function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<VRNode>) {
     if (tagName === VRDOM.Fragment) {
         console.warn("fragments are not fully implemented: patch is not working")
     }
 
-
     children = children.flat(Infinity)
 
     const attrs: VRAttrs = Object.create(null)
-    const events: VREvents = new Map()
+    const events: VREvents = Object.create(null)
+    const style: VRStyle = Object.create(null)
 
     let ref = undefined
     let dangerouslySetInnerHTML: boolean = false
-    let style: Object = {}
 
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
-            let key = typeof tagName === "function" ? k : k.toLowerCase()
+            const isComponentOrFragment = vrdom_isTagNameComponentOrFragment(tagName)
+            let key = isComponentOrFragment ? k : k.toLowerCase()
 
-            if (key.startsWith("on") && typeof tagName !== "function") {
-                events.set(key.substring(2).toLowerCase(), v)
+            if (key.startsWith("on") && !isComponentOrFragment) {
+                events[key.substring(2).toLowerCase()] = v
             } else if (key === "dangerouslySetInnerHTML" || key === "dangerouslysetinnerhtml") {
                 dangerouslySetInnerHTML = v
                 attrs["vr-dangerouslySetInnerHTML"] = true
             } else if (key.startsWith("css-")) {
                 const styleKey = key.substring(4)
-
                 style[styleKey] = v
             } else if (key === "ref") {
                 ref = v

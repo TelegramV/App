@@ -1,6 +1,5 @@
 import {Peer} from "./Peer";
 import MTProto from "../../../MTProto/external";
-import AppEvents from "../../EventBus/AppEvents";
 import PeersStore from "../../Store/PeersStore"
 import {UserPeer} from "./UserPeer"
 import PeersManager from "./PeersManager"
@@ -58,9 +57,8 @@ export class GroupPeer extends Peer {
                 })
             }
 
-            AppEvents.Peers.fire("fullLoaded", {
-                peer: this
-            })
+            this.fire("fullLoaded")
+
             this.findPinnedMessage()
         })
     }

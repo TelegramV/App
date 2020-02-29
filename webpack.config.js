@@ -4,9 +4,11 @@ const path = require("path")
 const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 const {CleanWebpackPlugin} = require("clean-webpack-plugin")
 const HtmlWebpackPlugin = require("html-webpack-plugin")
-const FilterWarningsPlugin = require('webpack-filter-warnings-plugin')
+const FilterWarningsPlugin = require("webpack-filter-warnings-plugin")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
-const TerserPlugin = require('terser-webpack-plugin')
+const TerserPlugin = require("terser-webpack-plugin")
+
+const prod = process.env.NODE_ENV === "production"
 
 const config = {
     node: {
@@ -15,7 +17,7 @@ const config = {
     entry: "./src/js/application.js",
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: "bundle.[hash].js"
+        filename: "bundle.[hash].js",
     },
     module: {
         rules: [
@@ -31,8 +33,10 @@ const config = {
             },
             {
                 test: /\.js$/,
-                use: "babel-loader",
-                exclude: /node_modules/
+                use: {
+                    loader: "babel-loader",
+                },
+                exclude: /node_modules/,
             },
             {
                 test: /\.worker\.js$/,
@@ -46,8 +50,20 @@ const config = {
                 test: /\.s?css/i,
                 use: [
                     MiniCssExtractPlugin.loader,
-                    "css-loader",
-                    "sass-loader"
+                    {
+                        loader: "css-loader",
+                        query: {
+                            modules: {
+                                mode: "global",
+                                localIdentName: prod ? "[hash:base64]" : "[name]__[local]",
+                                context: path.resolve(__dirname, "src/sass"),
+                            },
+                            localsConvention: "camelCase",
+                        },
+                    },
+                    {
+                        loader: "sass-loader",
+                    },
                 ]
             },
             {
@@ -76,6 +92,9 @@ const config = {
         new CopyWebpackPlugin([{
             from: "public"
         }]),
+        new webpack.DefinePlugin({
+            __IS_PRODUCTION__: prod
+        }),
         // new FlowWebpackPlugin(),
         new MiniCssExtractPlugin({
             filename: "bundle.[hash].css",

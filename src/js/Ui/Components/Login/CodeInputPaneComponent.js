@@ -1,5 +1,5 @@
 import PaneComponent from "./PaneComponent"
-import {InputComponent} from "../Main/input/inputComponent";
+import {InputComponent} from "../Elements/InputComponent";
 
 import {MTProto} from "../../../MTProto/external"
 

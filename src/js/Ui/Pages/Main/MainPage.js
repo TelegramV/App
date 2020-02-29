@@ -3,20 +3,20 @@ import UpdatesManager from "../../../Api/Updates/updatesManager"
 import PeersManager from "../../../Api/Peers/Objects/PeersManager"
 import {LocaleController} from "../../../Api/Localization/Localization"
 import MessagesManager from "../../../Api/Messages/MessagesManager"
-import {ContextMenuComponent} from "../../Fuck/contextMenuManager"
-import {ModalComponent} from "../../Fuck/modalManager"
-import {MediaViewerComponent} from "../../Fuck/mediaViewerManager"
-import {InstantViewComponent} from "../../Fuck/instantViewManager"
-import {DialogsBar} from "../../Components/Main/sidebars/left/dialog/DialogsBar"
-import ChatComponent from "../../Components/Main/chat/ChatComponent"
-import {SettingsComponent} from "../../Components/Main/sidebars/left/settings/SettingsComponent"
-import {SearchPanelComponent} from "../../Components/Main/sidebars/left/search/SearchPanelComponent"
-import MessagesSearchComponent from "../../Components/Main/sidebars/right/search/MessagesSearchComponent"
-import {DialogInfoComponent} from "../../Components/Main/sidebars/right/dialogInfo/DialogInfoComponent"
-import {ArchivedDialogsBar} from "../../Components/Main/sidebars/left/dialog/ArchivedDialogsBar"
+import ContextMenuComponent from "../../Components/Singleton/ContextMenuComponent"
+import {ModalComponent} from "../../Components/Singleton/ModalComponent"
+import {MediaViewerComponent} from "../../Components/Singleton/MediaViewerComponent"
+import {InstantViewComponent} from "../../Components/Singleton/InstantViewComponent"
+import {DialogsBar} from "../../Components/Other/Sidebars/Left/Dialogs/DialogsBar"
+import ChatComponent from "../../Components/Chat/ChatComponent"
+import {SettingsComponent} from "../../Components/Other/Sidebars/Left/Settings/SettingsComponent"
+import {SearchPanelComponent} from "../../Components/Other/Sidebars/Left/Search/SearchPanelComponent"
+import MessagesSearchComponent from "../../Components/Other/Sidebars/Right/Search/MessagesSearchComponent"
+import {DialogInfoComponent} from "../../Components/Other/Sidebars/Right/DialogInfo/DialogInfoComponent"
+import {ArchivedDialogsBar} from "../../Components/Other/Sidebars/Left/Dialogs/ArchivedDialogsBar"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
-import {PhoneCallComponent} from "../../Components/Main/calls/PhoneCallComponent";
+import {PhoneCallComponent} from "../../Components/Other/calls/PhoneCallComponent";
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {

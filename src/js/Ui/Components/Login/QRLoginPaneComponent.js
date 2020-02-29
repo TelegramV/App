@@ -1,7 +1,7 @@
 import PaneComponent from "./PaneComponent"
 import InfoComponent from "./InfoComponent"
 
-import AppConfiguration from "../../../Config";
+import AppConfiguration from "../../../Config/AppConfiguration";
 import {MTProto} from "../../../MTProto/external"
 
 const QRCodeStyling = require("qr-code-styling")

@@ -1,14 +1,14 @@
 import PaneComponent from "./PaneComponent"
 import {DropdownComponent} from "./DropdownComponent";
-import {InputComponent} from "../Main/input/inputComponent";
-import CheckboxComponent from "../Main/input/checkboxComponent";
-import {ButtonWithProgressBarComponent} from "../Main/input/buttonComponent";
+import {InputComponent} from "../Elements/InputComponent";
+import CheckboxFragment from "../Elements/CheckboxFragment";
+import {ButtonWithProgressBarComponent} from "../Elements/ButtonComponent";
 import InfoComponent from "./InfoComponent"
 import CountryDropdownItemFragment from "./CountryDropdownItemFragment"
 
 import {MTProto} from "../../../MTProto/external"
-import {countries} from "../../utils"
-import {AppPermanentStorage} from "../../../Api/Common/storage";
+import {countries} from "../../Utils/utils"
+import {AppPermanentStorage} from "../../../Api/Common/Storage";
 import VComponent from "../../../V/VRDOM/component/VComponent"
 
 export default class PhoneInputComponent extends PaneComponent {
@@ -46,7 +46,7 @@ export default class PhoneInputComponent extends PaneComponent {
                 <InputComponent label="Phone Number" type="tel"
                                 filter={value => /^\+?[\d ]*$/.test(value)} input={this.phoneInput}
                                 ref={this.phoneRef}/>
-                <CheckboxComponent label="Keep me signed in" checked input={this.checkboxInput}/>
+                <CheckboxFragment label="Keep me signed in" checked input={this.checkboxInput}/>
                 <ButtonWithProgressBarComponent label="Next" disabled={this.state.nextDisabled}
                                                 click={this.handlePhoneSend} ref={this.nextRef}/>
                 <div className="qr-login-button" onClick={this.qrLogin}>Quick log in using QR code

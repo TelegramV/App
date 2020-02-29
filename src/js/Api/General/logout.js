@@ -1,12 +1,12 @@
 import MTProto from "../../MTProto/external"
 import PeersStore from "../Store/PeersStore"
 import DialogsStore from "../Store/DialogsStore"
-import VF from "../../V/VFramework"
 import DialogsManager from "../Dialogs/DialogsManager"
-import {AppPermanentStorage} from "../Common/storage"
+import {AppPermanentStorage} from "../Common/Storage"
+import VApp from "../../vapp"
 
 export function logout() {
-    MTProto.logout().then(() => {
+    return MTProto.logout().then(() => {
         for (const k of PeersStore.data.keys()) {
             PeersStore.data.get(k).clear()
         }
@@ -20,6 +20,6 @@ export function logout() {
         AppPermanentStorage.removeItem("authorizationData")
         AppPermanentStorage.removeItem("topPeers")
 
-        VF.router.replace("/login")
+        VApp.router.replace("/login")
     })
 }

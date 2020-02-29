@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Telegram V.
+ * Copyright 2020 Telegram V authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,16 @@
  */
 
 import VCollection from "./VCollection"
-import VF from "../../VFramework"
+import vrdom_delete from "../delete"
+import VApp from "../../../vapp"
 
-export class List {
+class List {
 
     __ = {
         isRefreshingItSelf: false
     }
+
+    identifier: string
 
     list: VCollection
     template: Function
@@ -61,16 +64,17 @@ export class List {
             if (props.key < 0) {
                 props.key = props.key * -1 - 1
                 if (this.backChildNodes[props.key]) {
-                    this.backChildNodes[props.key].remove()
+                    vrdom_delete(this.backChildNodes[props.key])
                     delete this.backChildNodes[props.key]
                 }
             } else {
                 if (this.childNodes[props.key]) {
-                    this.childNodes[props.key].remove()
+                    vrdom_delete(this.childNodes[props.key])
                     delete this.childNodes[props.key]
                 }
             }
         } else if (type === VCollection.SET) {
+            // console.warn("set", this)
             this.__refresh()
         }
     }
@@ -80,7 +84,10 @@ export class List {
     }
 
     __update = ({list}) => {
+        // console.warn("updating")
         if (list !== this.list) {
+            // console.warn("updating in")
+
             this.list.mutationSubscribers.delete(this.onArrayChange)
             this.list = list
             this.list.mutationSubscribers.add(this.onArrayChange)
@@ -91,21 +98,22 @@ export class List {
     __mount = ($parent) => {
         this.$el = $parent
         this.$el.__list = this
-        VF.mountedComponents.set(this.identifier, this)
+        VApp.mountedComponents.set(this.identifier, this)
     }
 
     __unmount = () => {
         this.list.mutationSubscribers.delete(this.onArrayChange)
-        this.$el.__list = undefined
+        this.$el.__v.list = undefined
         this.$el = undefined
         this.childNodes = undefined
         this.backChildNodes = undefined
         this.list = undefined
         this.template = undefined
-        VF.mountedComponents.delete(this.identifier)
+        VApp.mountedComponents.delete(this.identifier)
     }
 
     __refresh = () => {
+        // console.warn("refreshing")
         this.__.isRefreshingItSelf = true
         this.childNodes = []
         this.backChildNodes = []

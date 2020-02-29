@@ -1,9 +1,10 @@
-import {AppConfiguration} from "../Config"
+import {AppConfiguration} from "../Config/AppConfiguration"
 
 import MobileProtoWorker from "./workers/mtproto.worker"
-import {AppPermanentStorage} from "../Api/Common/storage"
+import {AppPermanentStorage} from "../Api/Common/Storage"
 import UpdatesManager from "../Api/Updates/updatesManager"
 import AppEvents from "../Api/EventBus/AppEvents"
+import {logout} from "../Api/General/logout"
 
 const TimeManager = {
     lastMessageID: {},
@@ -59,17 +60,17 @@ MTProtoWorker.addEventListener("message", event => {
 })
 
 function resolveTask(taskId, taskResult, failed = false) {
-    let resolve = waitingTasks.get(taskId)
+    let resolve: Function = waitingTasks.get(taskId)
 
     if (resolve) {
 
         if (failed) {
-            resolve = resolve[1]
+            resolve = resolve[2]
         } else {
-            resolve = resolve[0]
+            resolve = resolve[1]
         }
 
-        resolve(taskResult)
+        resolve.apply(resolve[0], [taskResult])
         waitingTasks.delete(taskId)
     } else {
         console.error("BUG: task does not exist")
@@ -77,14 +78,14 @@ function resolveTask(taskId, taskResult, failed = false) {
 }
 
 function performTask(task, data) {
-    return new Promise((resolve, reject) => {
+    return new Promise(function (resolve, reject) {
         if (lastTaskId === Number.MAX_VALUE) {
             lastTaskId = 0
         } else {
             lastTaskId++
         }
 
-        waitingTasks.set(lastTaskId, [resolve, reject])
+        waitingTasks.set(lastTaskId, [this, resolve, reject])
 
         MTProtoWorker.postMessage({
             task: task,
@@ -191,6 +192,18 @@ class MTProtoBridge {
 
         return performTask("connect", {
             storage
+        }).then(async _ => {
+            await MTProto.invokeMethod("help.getNearestDc", {}).then(response => {
+                if (response.this_dc !== response.nearest_dc) {
+                    MTProto.changeDefaultDC(response.nearest_dc)
+
+                    AppEvents.General.fire("nearestDc", {
+                        dcResponse: response
+                    })
+                }
+            })
+
+            return _
         })
     }
 
@@ -203,6 +216,26 @@ class MTProtoBridge {
             isFile,
             useOneTimeNetworker
         })
+        //     .catch(error => {
+        //     if (error) {
+        //         // if (error.type === "SESSION_REVOKED") {
+        //         //     logout().then(() => {
+        //         //         window.location.reload()
+        //         //     })
+        //         // }
+        //
+        //         // else if (error.type === "AUTH_KEY_UNREGISTERED") {
+        //         //     logout().then(() => {
+        //         //         localStorage.clear()
+        //         //         window.location.reload()
+        //         //     }).catch(() => {
+        //         //         localStorage.clear()
+        //         //         window.location.reload()
+        //         //     })
+        //         // }
+        //     }
+        //     throw(error)
+        // })
     }
 
     isUserAuthorized() {

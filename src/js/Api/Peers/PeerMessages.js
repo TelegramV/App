@@ -1,4 +1,4 @@
-import AppSelectedPeer from "../../Ui/Reactive/SelectedPeer"
+import AppSelectedChat from "../../Ui/Reactive/SelectedChat"
 import type {Message} from "../Messages/Message"
 import {Peer} from "./Objects/Peer"
 import {arrayDeleteCallback} from "../../Utils/array"
@@ -217,7 +217,7 @@ export class PeerMessages {
             return
         }
 
-        if (AppSelectedPeer.check(this.peer)) {
+        if (AppSelectedChat.check(this.peer)) {
             for (const message of messages) {
                 this.appendSingle(message, addUnread)
             }
@@ -246,7 +246,7 @@ export class PeerMessages {
      * @return boolean
      */
     appendSingle(message: Message, addUnread = false) {
-        if (AppSelectedPeer.check(this.peer)) {
+        if (AppSelectedChat.check(this.peer)) {
             this._messages.set(message.id, message)
 
             this._alreadySorted = false

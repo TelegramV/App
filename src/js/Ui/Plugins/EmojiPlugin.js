@@ -2,18 +2,15 @@ import VRDOMPlugin from "../../V/VRDOM/plugin/VRDOMPlugin"
 import {replaceEmoji} from "../Utils/replaceEmoji"
 
 class EmojiVRDOMPlugin extends VRDOMPlugin {
-
-    elementPatched($el) {
-        this.elementMounted($el)
+    elementDidUpdate($el) {
+        this.elementDidMount($el)
     }
 
-    elementMounted($el) {
+    elementDidMount($el) {
         if ($el.nodeType !== Node.TEXT_NODE && $el.textContent) {
             replaceEmoji($el)
         }
     }
 }
 
-const EmojiPlugin = new EmojiVRDOMPlugin()
-
-export default EmojiPlugin
+export default EmojiVRDOMPlugin

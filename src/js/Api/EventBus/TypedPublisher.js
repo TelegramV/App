@@ -8,13 +8,12 @@ export type TypedSubscription = (event: BusEvent) => void
 export class TypedPublisher<T: TypedSubscription | Function> {
 
     /**
-     * @type {Set<function(event: BusEvent)>}
-     * @protected
+     * @type {Map<string, Set<T>>}
+     * @private
      */
     _subscriptions: Map<any, Set<T>> = new Map([
         ["*", new Set()]
     ])
-
 
     /**
      * @param type

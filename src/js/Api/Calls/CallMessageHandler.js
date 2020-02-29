@@ -1,6 +1,6 @@
 import CallNetworker from "./CallNetworker";
 import {BufferReader, BufferWriter} from "../../Utils/buffer";
-import AppConfiguration from "../../Config";
+import AppConfiguration from "../../Config/AppConfiguration";
 import {CallsManager} from "./CallManager";
 
 export default class CallMessageHandler {

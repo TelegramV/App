@@ -1,5 +1,5 @@
 import LoginComponent from "../../Components/Login/LoginComponent"
-import {ModalComponent} from "../../Fuck/modalManager";
+import {ModalComponent} from "../../Components/Singleton/ModalComponent";
 import VPage from "../../../V/Router/VPage"
 
 class VLoginPage extends VPage {

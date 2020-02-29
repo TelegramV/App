@@ -1,6 +1,6 @@
 import {EventBus} from "../../src/js/Api/EventBus/EventBus"
 import VComponent from "../../src/js/V/VRDOM/component/VComponent"
-import type {AE} from "../../src/js/V/VRDOM/component/appEvents"
+import type {AE} from "../../src/js/V/VRDOM/component/__component_registerAppEvents"
 import vrdom_renderVComponentVNode from "../../src/js/V/VRDOM/render/renderVComponent"
 import {sum} from "../sum"
 

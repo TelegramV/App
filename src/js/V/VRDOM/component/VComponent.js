@@ -1,24 +1,38 @@
-/**
- * (c) Telegram V
+/*
+ * Copyright 2020 Telegram V authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
  */
 
 import type {ComponentState, VComponentMeta, VComponentProps, VRAttrs, VRSlot} from "../types/types"
-import VF from "../../VFramework"
 import VRDOM from "../VRDOM"
 import type {BusEvent} from "../../../Api/EventBus/EventBus"
 import {EventBus} from "../../../Api/EventBus/EventBus"
 import {ReactiveObject} from "../../Reactive/ReactiveObject"
-import type {AE} from "./appEvents"
-import {registerAppEvents} from "./appEvents"
-import type {RORC} from "./reactive"
-import {registerReactive} from "./reactive"
-import VUI from "../../../Ui/VUI"
-import __update from "./__update"
-import __unmount from "./__unmount"
-import __mount from "./__mount"
-import __init from "./__init"
-import __withDefaultProps from "./__withDefaultProps"
-
+import type {AE} from "./__component_registerAppEvents"
+import {__component_registerAppEvents} from "./__component_registerAppEvents"
+import type {RORC} from "./__component_registerReactive"
+import {__component_registerReactive} from "./__component_registerReactive"
+import __component_update from "./__component_update"
+import __component_unmount from "./__component_unmount"
+import __component_mount from "./__component_mount"
+import __component_init from "./__component_init"
+import __component_withDefaultProps from "./__component_withDefaultProps"
+import FragmentRef from "../ref/FragmentRef"
+import ComponentRef from "../ref/ComponentRef"
+import ElementRef from "../ref/ElementRef"
+import VApp from "../../../vapp"
 
 /**
  * Features:
@@ -78,6 +92,8 @@ class VComponent {
          */
         timeouts: new Set(),
     }
+
+    singleton: boolean = false
 
     /**
      * Default component props:
@@ -154,9 +170,13 @@ class VComponent {
     constructor(props: VComponentProps) {
         this.displayName = props.displayName || this.constructor.name
         this.slot = props.slot
-        this.props = __withDefaultProps(this, props.props)
+        this.props = __component_withDefaultProps(this, props.props)
         this.v = props.v
         this.identifier = props.identifier
+
+        if (this.singleton) {
+            this.identifier = this.displayName
+        }
     }
 
     set $el($el) {
@@ -179,7 +199,9 @@ class VComponent {
     init() {
     }
 
-
+    /**
+     * WARNING: if you need to manually render a component, then DO NOT USE THIS METHOD, use {@link __render} instead.
+     */
     render() {
     }
 
@@ -235,7 +257,7 @@ class VComponent {
      */
     __render() {
         const renderedVRNode = this.render()
-        renderedVRNode.isComponentRoot = true
+        renderedVRNode.component = this
         return renderedVRNode
     }
 
@@ -243,14 +265,14 @@ class VComponent {
      * Internal use only.
      */
     __mount($el: HTMLElement) {
-        return __mount(this, $el)
+        return __component_mount(this, $el)
     }
 
     /**
      * Internal use only.
      */
     __unmount() {
-        return __unmount(this)
+        return __component_unmount(this)
     }
 
     /**
@@ -264,7 +286,7 @@ class VComponent {
      * Internal use only.
      */
     __init() {
-        return __init(this)
+        return __component_init(this)
     }
 
     // AppEvents
@@ -301,27 +323,11 @@ class VComponent {
     __recreateAppEventsResolves() {
         this.__unregisterAppEventResolves()
 
-        this.appEvents(registerAppEvents(this))
+        this.appEvents(__component_registerAppEvents(this))
     }
 
 
     // ReactiveObjects
-
-    /**
-     * Internal use only.
-     */
-    __registerReactiveObjectResolve(object: ReactiveObject, type: string, resolve: (event: BusEvent) => any) {
-        let reactiveObjectContext = this.__.reactiveObjectContexts.get(object)
-
-        if (!reactiveObjectContext) {
-            reactiveObjectContext = this.__.reactiveObjectContexts.set(object, new Map()).get(object)
-            reactiveObjectContext.set(type, resolve)
-        } else {
-            reactiveObjectContext.set(type, resolve)
-        }
-
-        object.subscribe(type, resolve)
-    }
 
     /**
      * Internal use only.
@@ -355,7 +361,7 @@ class VComponent {
     __recreateReactiveObjects() {
         this.__unregisterReactiveObjectResolves()
 
-        this.reactive(registerReactive(this))
+        this.reactive(__component_registerReactive(this))
     }
 
 
@@ -453,7 +459,7 @@ class VComponent {
     }
 
     __update(props) {
-        return __update(this, props)
+        return __component_update(this, props)
     }
 
 
@@ -497,83 +503,34 @@ class VComponent {
         this.__.timeouts.clear()
     }
 
+    // other
+
+    toString() {
+        return this.identifier
+    }
+
     // ref
 
     /**
      * Create ref for a simple node.
      */
     static createRef() {
-        return {
-            __ref: true,
-            /**
-             * @type {HTMLElement}
-             */
-            $el: undefined,
-            show() {
-                VUI.showElement(this.$el)
-            },
-            hide() {
-                VUI.hideElement(this.$el)
-            },
-            unmount() {
-                this.$el && (this.$el.__ref = undefined)
-                this.$el = undefined
-            }
-        }
+        return new ElementRef()
     }
 
     /**
      * Create ref for a fragment.
+     * @return {FragmentRef}
      */
     static createFragmentRef() {
-        return {
-            __fragment_ref: true,
-            $el: undefined,
-            fragment: undefined,
-            props: {},
-            slot: undefined,
-
-            /**
-             * @deprecated
-             */
-            patch(props) {
-                this.update(props)
-            },
-
-            update(props) {
-                if (this.$el) {
-                    Object.assign(this.props, props)
-
-                    this.$el = VRDOM.patch(this.$el, this.fragment({...this.props, slot: this.slot}))
-                } else {
-                    console.warn("el not found", this)
-                }
-            },
-            unmount() {
-                this.fragment = undefined
-                this.slot = undefined
-                this.props = undefined
-                this.$el && (this.$el.__ref = undefined)
-                this.$el = undefined
-            }
-        }
+        return new FragmentRef()
     }
 
     /**
      * Create ref for a component.
      */
     static createComponentRef() {
-        return {
-            __component_ref: true,
-            /**
-             * @type {VComponent}
-             */
-            component: undefined,
-            unmount() {
-                this.component && this.component.__unmount()
-                this.component = undefined
-            }
-        }
+        return new ComponentRef()
     }
 
     /**
@@ -581,7 +538,7 @@ class VComponent {
      * @return {VComponent}
      */
     static getComponentById(identifier) {
-        return VF.mountedComponents.get(identifier)
+        return VApp.mountedComponents.get(identifier)
     }
 }
 

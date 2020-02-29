@@ -3,7 +3,7 @@ import Random from "../../MTProto/utils/random"
 import AppCache from "../Cache/AppCache"
 import {getInputPeerFromPeer} from "../Dialogs/util"
 import {Peer} from "../Peers/Objects/Peer";
-import AppConfiguration from "../../Config";
+import AppConfiguration from "../../Config/AppConfiguration";
 import {bytesAsHex, bytesConcatBuffer, bytesFromHex} from "../../Utils/byte"
 
 export class FileAPI {

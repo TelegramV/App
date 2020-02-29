@@ -5,7 +5,7 @@
 import {createNonce} from "../utils/bin"
 import {loadSchema} from "../language/schema"
 import MTProtoInternal from "../internal"
-import AppConfiguration from "../../Config"
+import AppConfiguration from "../../Config/AppConfiguration"
 import mt_srp_check_password from "../crypto/mt_srp/mt_srp"
 import {GZIP_UNCOMPRESS} from "../crypto/gzip"
 

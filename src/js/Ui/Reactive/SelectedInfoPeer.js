@@ -1,4 +1,4 @@
-import ReactiveCallback from "../../V/Reactive/ReactiveCallback";
+import UIEvents from "../EventBus/UIEvents"
 
 class SelectedInfoPeer {
     constructor() {
@@ -13,23 +13,6 @@ class SelectedInfoPeer {
          * @private
          */
         this._previous = undefined
-
-        /**
-         * @type {Set<function(Peer)>}
-         * @private
-         */
-        this._subscribers = new Set()
-
-        /**
-         * @type {{Default: Peer, FireOnly: Peer, PatchOnly: Peer}}
-         * @private
-         */
-        this._Reactive = ReactiveCallback(resolve => {
-            this.subscribe(resolve)
-            return this._peer
-        }, resolve => {
-            this.unsubscribe(resolve)
-        })
     }
 
     /**
@@ -47,28 +30,6 @@ class SelectedInfoPeer {
     }
 
     /**
-     * @return {{Default: Peer, FireOnly: Peer, PatchOnly: Peer}}
-     * @constructor
-     */
-    get Reactive() {
-        return this._Reactive
-    }
-
-    /**
-     * @param {function(peer: Peer)} resolve
-     */
-    subscribe(resolve) {
-        this._subscribers.add(resolve)
-    }
-
-    /**
-     * @param {function(peer: Peer)} resolve
-     */
-    unsubscribe(resolve) {
-        this._subscribers.delete(resolve)
-    }
-
-    /**
      * @param {Peer} peer
      */
     select(peer) {
@@ -78,8 +39,9 @@ class SelectedInfoPeer {
 
         this._previous = this._peer
         this._peer = peer
-        this._subscribers.forEach(listener => {
-            listener(this._peer)
+
+        UIEvents.General.fire("info.select", {
+            peer
         })
     }
 

@@ -4,7 +4,7 @@ import AppEvents from "../EventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../Dialogs/util"
 import {FileAPI} from "../Files/FileAPI"
 import {MessageFactory} from "../Messages/MessageFactory"
-import AppConfiguration from "../../Config"
+import AppConfiguration from "../../Config/AppConfiguration"
 import {TextMessage} from "../Messages/Objects/TextMessage";
 import UIEvents from "../../Ui/EventBus/UIEvents";
 

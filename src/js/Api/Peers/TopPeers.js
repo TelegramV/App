@@ -2,7 +2,7 @@ import {Manager} from "../Manager"
 import API from "../Telegram/API"
 import PeersStore from "../Store/PeersStore"
 import AppEvents from "../EventBus/AppEvents"
-import {AppPermanentStorage} from "../Common/storage"
+import {AppPermanentStorage} from "../Common/Storage"
 
 // todo: implement https://core.telegram.org/api/top-rating
 class TopPeersManager extends Manager {

@@ -1,4 +1,3 @@
-import lottie from "lottie-web";
 import Bytes from "../../../MTProto/utils/bytes"
 import MTProto from "../../../MTProto/external"
 

@@ -1,6 +1,5 @@
 import {Peer} from "./Peer";
 import MTProto from "../../../MTProto/external";
-import AppEvents from "../../EventBus/AppEvents";
 import PeersManager from "./PeersManager"
 
 export class ChannelPeer extends Peer {
@@ -90,9 +89,8 @@ export class ChannelPeer extends Peer {
 
             this._full = channelFull.full_chat
 
-            AppEvents.Peers.fire("fullLoaded", {
-                peer: this
-            })
+            this.fire("fullLoaded")
+
             this.findPinnedMessage()
         })
     }

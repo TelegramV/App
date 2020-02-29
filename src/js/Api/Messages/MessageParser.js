@@ -145,7 +145,11 @@ export class MessageParser {
             case MessageType.STICKER:
             case MessageType.ANIMATED_STICKER:
             case MessageType.ANIMATED_EMOJI:
-                return MessageParser.getStickerEmoji(message.raw.media.document) + " Sticker"
+                if (message.raw.media && message.raw.media.document) {
+                    return MessageParser.getStickerEmoji(message.raw.media.document) + " Sticker"
+                } else {
+                    return `${message.text} Sticker`
+                }
             case MessageType.VOICE:
                 return "Voice"
             case MessageType.AUDIO:
@@ -186,6 +190,7 @@ export class MessageParser {
         let text = ""
 
         const p = MessageParser.getMediaPreviewName(message)
+
         if (message.raw.media) {
 
             if (p.length > 0) {

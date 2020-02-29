@@ -1,26 +1,14 @@
 import AppEvents from "../../Api/EventBus/AppEvents"
-import ReactiveCallback from "../../V/Reactive/ReactiveCallback"
-import type {Subscription} from "../../Api/EventBus/Publisher"
-import {Publisher} from "../../Api/EventBus/Publisher"
+import UIEvents from "../EventBus/UIEvents"
 
-class ConnectionStatus extends Publisher<Subscription, number> {
+class ConnectionStatus {
     constructor() {
-        super()
-
         this.OK = 0
         this.WAITING_FOR_NETTWORK = 1
         this.FETCHING_DIFFERENCE = 2
 
         this._nettworkOk = true
         this._differenceOk = true
-
-        this._reactive = ReactiveCallback(subscription => {
-            this.subscribe(subscription)
-            return this.Status
-        }, subscription => {
-            this.unsubscribe(subscription)
-        })
-
 
         AppEvents.General.subscribe("connectionRestored", event => {
             console.log("connectionRestored")
@@ -64,8 +52,10 @@ class ConnectionStatus extends Publisher<Subscription, number> {
         return this.OK
     }
 
-    get Reactive() {
-        return this._reactive
+    fire(Status) {
+        UIEvents.General.fire("connection", {
+            Status
+        })
     }
 }
 
