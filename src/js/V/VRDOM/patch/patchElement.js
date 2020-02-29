@@ -20,10 +20,10 @@ import patchEvents from "./patchEvents"
 import patchStyle from "./patchStyle"
 import patchDangerouslySetInnerHTML from "./patchDangerouslySetInnerHTML"
 import vrdom_patchChildren from "./patchChildren"
-import VF from "../../VFramework"
 import VRNode from "../VRNode"
 import patch_Text_VRNode from "./patch_Text_VRNode"
 import {initElement} from "../render/renderElement"
+import VApp from "../../../vapp"
 
 const recreateElementByTagName = ($node: HTMLElement, tagName: string) => {
     const $newNode = document.createElement(tagName)
@@ -68,7 +68,7 @@ const patchElement = ($node: HTMLElement, vRNode: VRNode) => {
         vrdom_patchChildren($node, vRNode)
     }
 
-    VF.plugins.forEach(plugin => plugin.elementDidUpdate($node))
+    VApp.plugins.forEach(plugin => plugin.elementDidUpdate($node))
 
     return $node
 }

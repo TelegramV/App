@@ -100,7 +100,7 @@ const renderElement = (node: VRNode, props: VRenderProps = {}): HTMLElement => {
     for (let child of node.children) {
         if (child === null) {
             vrdom_append("", $el, {xmlns})
-        } else {
+        } else if (child !== undefined) {
             vrdom_append(child, $el, {xmlns, $parent: $el})
         }
     }

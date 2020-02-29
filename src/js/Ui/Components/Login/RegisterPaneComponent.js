@@ -1,12 +1,12 @@
 import PaneComponent from "./PaneComponent"
 import InfoComponent from "./InfoComponent"
-import {InputComponent} from "../Main/input/inputComponent";
-import {ButtonWithProgressBarComponent} from "../Main/input/buttonComponent";
+import {InputComponent} from "../Elements/InputComponent";
+import {ButtonWithProgressBarComponent} from "../Elements/ButtonComponent";
 
-import {askForFile} from "../../utils"
+import {askForFile} from "../../Utils/utils"
 import {MTProto} from "../../../MTProto/external"
-import {ModalManager} from "../../Fuck/modalManager";
 import {FileAPI} from "../../../Api/Files/FileAPI"
+import VApp from "../../../vapp"
 
 const Croppie = require("croppie")
 export default class RegisterPaneComponent extends PaneComponent {
@@ -71,13 +71,13 @@ export default class RegisterPaneComponent extends PaneComponent {
             picture.style.backgroundImage = 'url("' + url + '")';
             picture.querySelector(".tint").classList.remove("hidden");
 
-            ModalManager.close()
+            VUI.Modal.close()
         }.bind(this));
     }
 
     addPicture = () => {
         askForFile("image/*", function (file) {
-            ModalManager.open(
+            VUI.Modal.open(
                 <div id="cropperModal" className="body">
                     <div id="cropper">
                     </div>
@@ -119,7 +119,7 @@ export default class RegisterPaneComponent extends PaneComponent {
                         this.props.finished(authorization)
                     }, error => {
                         console.log(error)
-                        VF.router.push("/")
+                        VApp.router.push("/")
                     });
                 } else {
                     this.props.finished(authorization)

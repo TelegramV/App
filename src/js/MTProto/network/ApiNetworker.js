@@ -4,7 +4,7 @@ import {TLSerialization} from "../language/serialization"
 import {TLDeserialization} from "../language/deserialization"
 import {MessageProcessor} from "./MessageProcessor"
 
-import AppConfiguration from "../../Config"
+import AppConfiguration from "../../Config/AppConfiguration"
 import {Networker} from "./Networker";
 import {schema} from "../language/schema";
 import Bytes from "../utils/bytes"

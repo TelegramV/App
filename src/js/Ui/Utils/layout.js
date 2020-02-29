@@ -1,6 +1,7 @@
 // https://github.com/telegramdesktop/tdesktop/blob/d506f10e9f976e23fdea9e666e32ce4ef809d371/Telegram/SourceFiles/ui/grouped_layout.cpp
 
 // TODO should parse this properly
+// шо за прикол
 export class Layouter {
     constructor(sizes: Array<{ width: number, height: number }>, maxWidth: number, maxHeight: number, minWidth: number, spacing: number) {
         this.sizes = sizes

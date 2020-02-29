@@ -18,13 +18,13 @@
 import VListVRNode from "../list/VListVRNode"
 import vrdom_append from "../append"
 import type {VRenderProps} from "../types/types"
-import VF from "../../VFramework"
 import vrdom_render from "./render"
+import VApp from "../../../vapp"
 
 function vrdom_renderVListVRNode(node: VListVRNode, props: VRenderProps) {
     const listInstance = new (node.tag)({list: node.list, template: node.template})
 
-    listInstance.identifier = String(++(VF.latestInstantiatedComponent))
+    listInstance.identifier = String(++(VApp.latestInstantiatedComponent))
     listInstance.$el = vrdom_render(node.wrapper)
     listInstance.$el.__v.list = listInstance
 

@@ -54,7 +54,7 @@ export class EventBus extends TypedPublisher {
         super.subscribeAny(subscription)
     }
 
-    constraint(condition, type: string, subscription: BusEvent => any) {
+    only(condition, type: string, subscription: BusEvent => any) {
         if (!this._conditionalSubscriptions.has(type)) {
             this._conditionalSubscriptions.set(type, new Map())
         }

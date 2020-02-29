@@ -16,15 +16,14 @@
  */
 
 import type {ComponentState, VComponentMeta, VComponentProps, VRAttrs, VRSlot} from "../types/types"
-import VF from "../../VFramework"
 import VRDOM from "../VRDOM"
 import type {BusEvent} from "../../../Api/EventBus/EventBus"
 import {EventBus} from "../../../Api/EventBus/EventBus"
 import {ReactiveObject} from "../../Reactive/ReactiveObject"
-import type {AE} from "./appEvents"
-import {registerAppEvents} from "./appEvents"
-import type {RORC} from "./reactive"
-import {registerReactive} from "./reactive"
+import type {AE} from "./__component_registerAppEvents"
+import {__component_registerAppEvents} from "./__component_registerAppEvents"
+import type {RORC} from "./__component_registerReactive"
+import {__component_registerReactive} from "./__component_registerReactive"
 import __component_update from "./__component_update"
 import __component_unmount from "./__component_unmount"
 import __component_mount from "./__component_mount"
@@ -33,6 +32,7 @@ import __component_withDefaultProps from "./__component_withDefaultProps"
 import FragmentRef from "../ref/FragmentRef"
 import ComponentRef from "../ref/ComponentRef"
 import ElementRef from "../ref/ElementRef"
+import VApp from "../../../vapp"
 
 /**
  * Features:
@@ -323,27 +323,11 @@ class VComponent {
     __recreateAppEventsResolves() {
         this.__unregisterAppEventResolves()
 
-        this.appEvents(registerAppEvents(this))
+        this.appEvents(__component_registerAppEvents(this))
     }
 
 
     // ReactiveObjects
-
-    /**
-     * Internal use only.
-     */
-    __registerReactiveObjectResolve(object: ReactiveObject, type: string, resolve: (event: BusEvent) => any) {
-        let reactiveObjectContext = this.__.reactiveObjectContexts.get(object)
-
-        if (!reactiveObjectContext) {
-            reactiveObjectContext = this.__.reactiveObjectContexts.set(object, new Map()).get(object)
-            reactiveObjectContext.set(type, resolve)
-        } else {
-            reactiveObjectContext.set(type, resolve)
-        }
-
-        object.subscribe(type, resolve)
-    }
 
     /**
      * Internal use only.
@@ -377,7 +361,7 @@ class VComponent {
     __recreateReactiveObjects() {
         this.__unregisterReactiveObjectResolves()
 
-        this.reactive(registerReactive(this))
+        this.reactive(__component_registerReactive(this))
     }
 
 
@@ -554,7 +538,7 @@ class VComponent {
      * @return {VComponent}
      */
     static getComponentById(identifier) {
-        return VF.mountedComponents.get(identifier)
+        return VApp.mountedComponents.get(identifier)
     }
 }
 

@@ -16,7 +16,6 @@
  */
 
 import type {VRTagName} from "../types/types"
-import VComponent from "../component/VComponent"
 
 const vrdom_isTagNameComponentOrFragment = (tagName: VRTagName) => {
     return typeof tagName === "function"

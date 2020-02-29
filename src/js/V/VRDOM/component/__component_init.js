@@ -16,8 +16,8 @@
  */
 
 import VComponent from "./VComponent"
-import {registerAppEvents} from "./appEvents"
-import {registerReactive} from "./reactive"
+import {__component_registerAppEvents} from "./__component_registerAppEvents"
+import {__component_registerReactive} from "./__component_registerReactive"
 
 const __component_init = (context: VComponent) => {
     if (!context.__.inited) {
@@ -41,7 +41,6 @@ const __component_init = (context: VComponent) => {
         context.__unregisterAppEventResolve = context.__unregisterAppEventResolve.bind(context)
         context.__recreateAppEventsResolves = context.__recreateAppEventsResolves.bind(context)
 
-        context.__registerReactiveObjectResolve = context.__registerReactiveObjectResolve.bind(context)
         context.__unregisterReactiveObjectResolves = context.__unregisterReactiveObjectResolves.bind(context)
         context.__unregisterReactiveObjectResolve = context.__unregisterReactiveObjectResolve.bind(context)
         context.__recreateReactiveObjects = context.__recreateReactiveObjects.bind(context)
@@ -59,8 +58,8 @@ const __component_init = (context: VComponent) => {
 
         context.__registerReactiveCallbacks()
 
-        context.appEvents(registerAppEvents(context))
-        context.reactive(registerReactive(context))
+        context.appEvents(__component_registerAppEvents(context))
+        context.reactive(__component_registerReactive(context))
 
         context.__.inited = true
     } else {

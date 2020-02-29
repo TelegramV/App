@@ -6,7 +6,7 @@ import VBigInt from "../../MTProto/bigint/VBigInt";
 import {convertToByteArray, createRandomBuffer, longToBytes} from "../../MTProto/utils/bin";
 import AppEvents from "../EventBus/AppEvents";
 import {ReactiveObject} from "../../V/Reactive/ReactiveObject";
-import AppConfiguration from "../../Config";
+import AppConfiguration from "../../Config/AppConfiguration";
 import TELEGRAM_CRYPTO, {substr} from "../../MTProto/crypto/TELEGRAM_CRYPTO";
 import OpusToPCM from 'opus-to-pcm';
 import {PCMPlayer} from "../../Utils/PCMPlayer"

@@ -16,7 +16,7 @@
  */
 
 import VComponent from "../component/VComponent"
-import VF from "../../VFramework"
+import VApp from "../../../vapp"
 
 class ComponentRef {
     __component_ref = true
@@ -25,7 +25,7 @@ class ComponentRef {
     component: VComponent
 
     constructor() {
-        this.identifier = ++(VF.latestInstantiatedRef)
+        this.identifier = ++(VApp.latestInstantiatedRef)
     }
 
     unmount() {

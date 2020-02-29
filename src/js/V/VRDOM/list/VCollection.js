@@ -49,6 +49,10 @@ class VCollection {
     get items() {
         return null
     }
+
+    size() {
+        return this.items.length
+    }
 }
 
 VCollection.ADD = 0

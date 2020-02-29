@@ -1,6 +1,6 @@
 import {BufferReader, BufferWriter} from "../../Utils/buffer";
 import {convertToByteArray, createRandomBuffer} from "../../MTProto/utils/bin";
-import AppConfiguration from "../../Config";
+import AppConfiguration from "../../Config/AppConfiguration";
 import TELEGRAM_CRYPTO from "../../MTProto/crypto/TELEGRAM_CRYPTO";
 import {bytesAsHex} from "../../Utils/byte";
 import OpusToPCM from "opus-to-pcm";

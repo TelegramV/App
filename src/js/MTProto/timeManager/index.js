@@ -1,7 +1,7 @@
 import {longFromInts} from "../utils/bin"
 import Random from "../utils/random"
 import {MTProtoTempStorage} from "../MTProtoTempStorage"
-import AppConfiguration from "../../Config"
+import AppConfiguration from "../../Config/AppConfiguration"
 import MTProtoInternal from "../internal"
 
 /**

@@ -1,4 +1,4 @@
-import AppConfiguration from "../../Config"
+import AppConfiguration from "../../Config/AppConfiguration"
 import MTProtoInternal from "../internal"
 
 const names = ["pluto", "venus", "aurora", "vesta", "flora"]

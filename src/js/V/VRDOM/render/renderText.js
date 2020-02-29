@@ -15,11 +15,11 @@
  *
  */
 
-import VF from "../../VFramework"
+import VApp from "../../../vapp"
 
 const renderText = text => {
-    if (VF.interceptor) {
-        const intercepted = VF.interceptor.textInterceptCreate(text)
+    if (VApp.interceptor) {
+        const intercepted = VApp.interceptor.textInterceptCreate(text)
 
         if (intercepted === undefined) {
             return document.createTextNode(text)

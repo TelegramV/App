@@ -16,9 +16,9 @@
  */
 
 import VListVRNode from "../list/VListVRNode"
-import VF from "../../VFramework"
 import vrdom_render from "../render/render"
 import {initElement} from "../render/renderElement"
+import VApp from "../../../vapp"
 
 const patchList = ($node, node: VListVRNode) => {
     initElement($node)
@@ -40,7 +40,7 @@ const patchList = ($node, node: VListVRNode) => {
         return $node
     } else {
         const list = new (node.tag)({list: node.list, template: node.template})
-        list.identifier = VF.uniqueComponentId()
+        list.identifier = VApp.uniqueComponentId()
 
         list.$el = vrdom_render(node.wrapper)
         list.$el.__v.list = list

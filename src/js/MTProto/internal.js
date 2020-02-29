@@ -1,7 +1,7 @@
 // NEVER USE THIS THING OUTSIDE mtproto FOLDER
 
 import {ApiNetworker} from "./network/ApiNetworker"
-import {AppConfiguration} from "../Config"
+import {AppConfiguration} from "../Config/AppConfiguration"
 import {createNonce} from "./utils/bin"
 import TimeManager from "./timeManager"
 import {AuthAPI} from "./auth"

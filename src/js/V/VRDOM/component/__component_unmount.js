@@ -15,8 +15,8 @@
  *
  */
 
-import VF from "../../VFramework"
 import VComponent from "./VComponent"
+import VApp from "../../../vapp"
 
 const __component_unmount = (context: VComponent) => {
     // console.debug("unmounting", context.identifier, context.displayName)
@@ -34,7 +34,7 @@ const __component_unmount = (context: VComponent) => {
     context.__.destroyed = true
     context.__.mounted = false
 
-    VF.mountedComponents.delete(context.identifier)
+    VApp.mountedComponents.delete(context.identifier)
 }
 
 export default __component_unmount

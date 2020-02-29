@@ -15,7 +15,11 @@
  *
  */
 
-export const callOrReturn = (value: function) => {
+/**
+ * @param {function|*} value
+ * @return {*}
+ */
+export const callOrReturn = (value: any): any => {
     if (typeof value === "function") {
         return value()
     } else {

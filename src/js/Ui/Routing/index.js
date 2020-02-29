@@ -1,9 +1,9 @@
 import LoginPage from "../Pages/Login/LoginPage"
 import {MainPage} from "../Pages/Main/MainPage"
 import MTProto from "../../MTProto/external"
-import VF from "../../V/VFramework"
 import {NewComponentPage} from "../Pages/Tests/NewComponentTestPage"
 import {ReactListPage} from "../Pages/Tests/ReactiveListPage"
+import VApp from "../../vapp"
 
 /**
  * @param {VFrameworkRouter} router
@@ -38,7 +38,7 @@ function AppRoutes(router) {
                 return {
                     next: false,
                     doNext: () => {
-                        VF.router.replace("/login")
+                        VApp.router.replace("/login")
                     },
                 }
             }
@@ -47,7 +47,7 @@ function AppRoutes(router) {
                 return {
                     next: false,
                     doNext: () => {
-                        VF.router.replace("/")
+                        VApp.router.replace("/")
                     }
                 }
             }

@@ -1,7 +1,7 @@
 import VRDOMPlugin from "../../V/VRDOM/plugin/VRDOMPlugin"
 import {replaceEmoji} from "../Utils/replaceEmoji"
 
-class EmojiVRDOMInterceptor extends VRDOMPlugin {
+class EmojiVRDOMPlugin extends VRDOMPlugin {
     elementDidUpdate($el) {
         this.elementDidMount($el)
     }
@@ -13,4 +13,4 @@ class EmojiVRDOMInterceptor extends VRDOMPlugin {
     }
 }
 
-export default EmojiVRDOMInterceptor
+export default EmojiVRDOMPlugin

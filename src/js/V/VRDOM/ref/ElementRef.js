@@ -15,8 +15,7 @@
  *
  */
 
-import VUI from "../../../Ui/VUI"
-import VF from "../../VFramework"
+import VApp from "../../../vapp"
 
 class ElementRef {
     __ref = true
@@ -25,15 +24,15 @@ class ElementRef {
     $el: HTMLElement
 
     constructor() {
-        this.identifier = ++(VF.latestInstantiatedRef)
+        this.identifier = ++(VApp.latestInstantiatedRef)
     }
 
     show = () => {
-        VUI.showElement(this.$el)
+        $(this.$el).show()
     }
 
     hide = () => {
-        VUI.hideElement(this.$el)
+        $(this.$el).hide()
     }
 
     unmount = () => {

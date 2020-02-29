@@ -16,8 +16,8 @@
  */
 
 import VCollection from "./VCollection"
-import VF from "../../VFramework"
 import vrdom_delete from "../delete"
+import VApp from "../../../vapp"
 
 class List {
 
@@ -74,6 +74,7 @@ class List {
                 }
             }
         } else if (type === VCollection.SET) {
+            // console.warn("set", this)
             this.__refresh()
         }
     }
@@ -83,7 +84,10 @@ class List {
     }
 
     __update = ({list}) => {
+        // console.warn("updating")
         if (list !== this.list) {
+            // console.warn("updating in")
+
             this.list.mutationSubscribers.delete(this.onArrayChange)
             this.list = list
             this.list.mutationSubscribers.add(this.onArrayChange)
@@ -94,7 +98,7 @@ class List {
     __mount = ($parent) => {
         this.$el = $parent
         this.$el.__list = this
-        VF.mountedComponents.set(this.identifier, this)
+        VApp.mountedComponents.set(this.identifier, this)
     }
 
     __unmount = () => {
@@ -105,10 +109,11 @@ class List {
         this.backChildNodes = undefined
         this.list = undefined
         this.template = undefined
-        VF.mountedComponents.delete(this.identifier)
+        VApp.mountedComponents.delete(this.identifier)
     }
 
     __refresh = () => {
+        // console.warn("refreshing")
         this.__.isRefreshingItSelf = true
         this.childNodes = []
         this.backChildNodes = []

@@ -6,12 +6,13 @@ import {PeerParser} from "../Peers/PeerParser"
 import DialogsStore from "../Store/DialogsStore"
 import AppEvents from "../EventBus/AppEvents"
 import PeersStore from "../Store/PeersStore"
-import AppSelectedPeer from "../../Ui/Reactive/SelectedPeer"
+import AppSelectedChat from "../../Ui/Reactive/SelectedChat"
 import {MessageFactory} from "../Messages/MessageFactory"
 import API from "../Telegram/API"
 import PeersManager from "../Peers/Objects/PeersManager"
 import MTProto from "../../MTProto/external"
 import {UserPeer} from "../Peers/Objects/UserPeer"
+import UIEvents from "../../Ui/EventBus/UIEvents"
 
 class DialogManager extends Manager {
     constructor() {
@@ -64,9 +65,9 @@ class DialogManager extends Manager {
             })
         }, 3000)
 
-        AppSelectedPeer.subscribe(_ => {
-            if (AppSelectedPeer.Previous) {
-                AppSelectedPeer.Previous.messages.clear()
+        UIEvents.General.subscribe("chat.select", _ => {
+            if (AppSelectedChat.Previous) {
+                AppSelectedChat.Previous.messages.clear()
             }
         })
 

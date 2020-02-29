@@ -17,7 +17,7 @@
 
 import {BigInteger} from "../../../../vendor/jsbn"
 import Bytes from "../utils/bytes"
-import AppConfiguration from "../../Config"
+import AppConfiguration from "../../Config/AppConfiguration"
 
 /**
  * Native BigInt wrapper

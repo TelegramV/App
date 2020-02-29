@@ -15,9 +15,9 @@
  *
  */
 
-import VF from "../../VFramework"
 import VComponent from "./VComponent"
 import {initElement} from "../render/renderElement"
+import VApp from "../../../vapp"
 
 const __component_mount = (context: VComponent, $el: HTMLElement) => {
     // context.__.destroyed = false
@@ -30,9 +30,9 @@ const __component_mount = (context: VComponent, $el: HTMLElement) => {
         context.$el.__v.component = context
         context.forceUpdate()
 
-        if (!VF.mountedComponents.has(context.identifier)) {
+        if (!VApp.mountedComponents.has(context.identifier)) {
             console.error("BUG: component with such id was not found!", context)
-            VF.mountedComponents.set(context.identifier, context)
+            VApp.mountedComponents.set(context.identifier, context)
         }
     } else {
         // console.warn("mounting component", context.displayName)
@@ -42,10 +42,10 @@ const __component_mount = (context: VComponent, $el: HTMLElement) => {
         context.$el.__v.component = context
         context.componentDidMount()
 
-        if (VF.mountedComponents.has(context.identifier)) {
+        if (VApp.mountedComponents.has(context.identifier)) {
             console.error("BUG: component with such id already mounted!", context)
         } else {
-            VF.mountedComponents.set(context.identifier, context)
+            VApp.mountedComponents.set(context.identifier, context)
         }
     }
 }

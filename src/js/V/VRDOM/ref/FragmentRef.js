@@ -17,7 +17,7 @@
 
 import type {VRAttrs, VRSlot} from "../types/types"
 import VRDOM from "../VRDOM"
-import VF from "../../VFramework"
+import VApp from "../../../vapp"
 
 const __fragment_ref_update = (ref: FragmentRef, props = {}) => {
     if (ref.$el) {
@@ -47,7 +47,7 @@ class FragmentRef {
     slot: VRSlot
 
     constructor() {
-        this.identifier = ++(VF.latestInstantiatedRef)
+        this.identifier = ++(VApp.latestInstantiatedRef)
     }
 
     patch = (props) => {

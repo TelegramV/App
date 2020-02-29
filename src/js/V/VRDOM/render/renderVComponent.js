@@ -16,10 +16,10 @@
  */
 
 import vrdom_render from "./render"
-import VF from "../../VFramework"
 import VComponent from "../component/VComponent"
 import VComponentVRNode from "../component/VComponentVRNode"
 import {initElement} from "./renderElement"
+import VApp from "../../../vapp"
 
 export function vrdom_instantiateVComponentVNode(node: VComponentVRNode) {
     const componentInstance: VComponent = new (node.component)({
@@ -36,7 +36,7 @@ export function vrdom_instantiateVComponentVNode(node: VComponentVRNode) {
     } else if (node.identifier) {
         componentInstance.identifier = String(node.identifier)
     } else {
-        componentInstance.identifier = String(VF.uniqueComponentId())
+        componentInstance.identifier = String(VApp.uniqueComponentId())
     }
 
     componentInstance.__init.call(componentInstance)

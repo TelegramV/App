@@ -19,7 +19,7 @@ import vrdom_render from "./render/render"
 import type VRNode from "./VRNode"
 import type {VRenderProps} from "./types/types"
 import VComponent from "./component/VComponent"
-import VF from "../VFramework"
+import VApp from "../../vapp"
 
 export function vrdom_resolveMount($mounted: Element) {
     if ($mounted.__v) {
@@ -39,9 +39,9 @@ export function vrdom_resolveMount($mounted: Element) {
     }
 
     if ($mounted instanceof Text) {
-        VF.plugins.forEach(plugin => plugin.textDidMount($mounted))
+        VApp.plugins.forEach(plugin => plugin.textDidMount($mounted))
     } else {
-        VF.plugins.forEach(plugin => plugin.elementDidMount($mounted))
+        VApp.plugins.forEach(plugin => plugin.elementDidMount($mounted))
     }
 }
 
