@@ -1,4 +1,4 @@
-import {DocumentMessagesTool} from "../../../../Other/file/DocumentMessageTool"
+import {DocumentMessagesTool} from "../../../../../Utils/document"
 
 export const DialogInfoDocumentComponent = ({document, isDownloading, isDownloaded, onClick}) => {
     let doc = document;

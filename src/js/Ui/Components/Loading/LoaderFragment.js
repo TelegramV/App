@@ -15,8 +15,6 @@
  *
  */
 
-import valIf from "../../../V/VRDOM/jsx/helpers/valIf"
-
 function LoaderFragment({big = true, white = false, full = false, show = true, id = "", background = false, loaderRef}) {
 
     const classes = {
@@ -31,7 +29,7 @@ function LoaderFragment({big = true, white = false, full = false, show = true, i
     }
 
     return (
-        <div ref={loaderRef} id={id} css-display={valIf(!show, "none")} className={classes}>
+        <div showIf={show} ref={loaderRef} id={id} className={classes}>
             {
                 background ? (
                     <div className="progress-background">

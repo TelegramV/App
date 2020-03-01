@@ -3,10 +3,10 @@ import AppSelectedChat from "../../../Reactive/SelectedChat"
 import ComposerComponent from "./ComposerComponent"
 import {MessageParser} from "../../../../Api/Messages/MessageParser";
 import {domToMessageEntities} from "../../../../Utils/htmlHelpers";
-import {AttachFilesModal} from "../../Other/modals/AttachFilesModal";
-import {AttachPollModal} from "../../Other/modals/AttachPollModal";
+import {AttachFilesModal} from "../../Modals/AttachFilesModal";
+import {AttachPollModal} from "../../Modals/AttachPollModal";
 import {TextareaFragment} from "./TextareaFragment";
-import {AttachPhotosModal} from "../../Other/modals/AttachPhotosModal";
+import {AttachPhotosModal} from "../../Modals/AttachPhotosModal";
 import UIEvents from "../../../EventBus/UIEvents";
 import VComponent from "../../../../V/VRDOM/component/VComponent";
 import AppConfiguration from "../../../../Config/AppConfiguration";

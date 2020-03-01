@@ -21,7 +21,7 @@ import {formatAudioTime} from "../../../../Utils/utils";
 import {PhotoMessage} from "../../../../../Api/Messages/Objects/PhotoMessage";
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import FileManager from "../../../../../Api/Files/FileManager"
-import {DocumentMessagesTool} from "../../../Other/file/DocumentMessageTool"
+import {DocumentMessagesTool} from "../../../../Utils/document"
 import VUI from "../../../../VUI"
 import PeersStore from "../../../../../Api/Store/PeersStore"
 import UIEvents from "../../../../EventBus/UIEvents"

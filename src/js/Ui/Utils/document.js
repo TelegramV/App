@@ -1,11 +1,13 @@
+let colors = [
+    "#E93A3A", //red
+    "#4FAE4E", //green
+    "#4BA8FD", //blue
+    "#F58505", //yellow
+]
+
 function getColor(extension) {
     extension = extension.toLowerCase();
-    let colors = [
-        "#E93A3A", //red
-        "#4FAE4E", //green
-        "#4BA8FD", //blue
-        "#F58505", //yellow
-    ]
+
     switch (extension) {
         case "pdf": //red
         case "ppt":
@@ -63,11 +65,13 @@ function createIcon(color) {
 }
 
 function adjust(color, amount) {
-    return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+    return '#' + color
+        .replace(/^#/, '')
+        .replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
 }
 
 function formatSize(size) {
-    var i = Math.floor(Math.log(size) / Math.log(1024));
+    const i = Math.floor(Math.log(size) / Math.log(1024))
     return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
 }
 

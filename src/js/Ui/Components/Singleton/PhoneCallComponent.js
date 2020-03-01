@@ -1,12 +1,29 @@
-import VComponent from "../../../../V/VRDOM/component/VComponent";
-import AppEvents from "../../../../Api/EventBus/AppEvents";
-import type {AE} from "../../../../V/VRDOM/component/__component_registerAppEvents";
-import AvatarComponent from "../../Basic/AvatarComponent";
-import {CallsManager, CallState} from "../../../../Api/Calls/CallManager";
-import AudioManager from "../../../Managers/AudioManager";
-import {formatAudioTime} from "../../../Utils/utils";
+/*
+ * Copyright 2020 Telegram V authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
-export class PhoneCallComponent extends VComponent {
+import AppEvents from "../../../Api/EventBus/AppEvents";
+import type {AE} from "../../../V/VRDOM/component/__component_registerAppEvents";
+import AvatarComponent from "../Basic/AvatarComponent";
+import {CallsManager, CallState} from "../../../Api/Calls/CallManager";
+import AudioManager from "../../Managers/AudioManager";
+import {formatAudioTime} from "../../Utils/utils";
+import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"
+
+export class PhoneCallComponent extends SingletonComponent {
     init() {
         super.init();
         this.state = {
@@ -23,14 +40,18 @@ export class PhoneCallComponent extends VComponent {
         return <div className={classes}>
             <div className={classesInner}>
                 {this.state.peer ? <AvatarComponent peer={this.state.peer || null}/> : ""}
-                <div className={{fingerprint: true, shown: !!this.state.fingerprint}}>{this.state.fingerprint || ""}</div>
+                <div className={{
+                    fingerprint: true,
+                    shown: !!this.state.fingerprint
+                }}>{this.state.fingerprint || ""}</div>
                 <div className="name">{this.state.peer && this.state.peer.name}</div>
                 <div className="call-status">{this.callState}</div>
                 <div className="phone-call-button hang-up-button rp rps" onClick={this.hangUp}><i
                     className="tgico tgico-phone"/></div>
                 <div className="phone-call-button accept-button rp rps" onClick={this.acceptCall}><i
                     className="tgico tgico-phone"/></div>
-                <div className="phone-call-button microphone-button rp rps" onClick={this.mute}><i className="tgico tgico-microphone"/>
+                <div className="phone-call-button microphone-button rp rps" onClick={this.mute}><i
+                    className="tgico tgico-microphone"/>
                 </div>
             </div>
         </div>
@@ -39,16 +60,26 @@ export class PhoneCallComponent extends VComponent {
     get callState() {
         // console.log("get state", this.state.callState)
         switch (this.state.callState) {
-            case CallState.Ringing: return "ringing..."
-            case CallState.Busy: return "line busy"
-            case CallState.Connecting: return "connecting..."
-            case CallState.Waiting: return "waiting..."
-            case CallState.FailedToConnect: return "failed to connect"
-            case CallState.HangingUp: return "hanging up..."
-            case CallState.ExchangingEncryption: return "exchanging encryption keys..."
-            case CallState.IncomingCall: return "is calling you"
-            case CallState.Requesting: return "requesting..."
-            default: return formatAudioTime(this.state.seconds)
+            case CallState.Ringing:
+                return "ringing..."
+            case CallState.Busy:
+                return "line busy"
+            case CallState.Connecting:
+                return "connecting..."
+            case CallState.Waiting:
+                return "waiting..."
+            case CallState.FailedToConnect:
+                return "failed to connect"
+            case CallState.HangingUp:
+                return "hanging up..."
+            case CallState.ExchangingEncryption:
+                return "exchanging encryption keys..."
+            case CallState.IncomingCall:
+                return "is calling you"
+            case CallState.Requesting:
+                return "requesting..."
+            default:
+                return formatAudioTime(this.state.seconds)
         }
     }
 

@@ -1,5 +1,5 @@
 import {replaceEmoji} from "../../../Utils/replaceEmoji";
-import {AttachLinkModal} from "../../Other/modals/AttackLinkModal";
+import {AttachLinkModal} from "../../Modals/AttackLinkModal";
 import VComponent from "../../../../V/VRDOM/component/VComponent";
 import VUI from "../../../VUI"
 

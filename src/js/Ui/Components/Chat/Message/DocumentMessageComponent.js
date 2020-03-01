@@ -1,5 +1,5 @@
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import {DocumentMessagesTool} from "../../Other/file/DocumentMessageTool"
+import {DocumentMessagesTool} from "../../../Utils/document"
 import FileManager from "../../../../Api/Files/FileManager"
 import CardMessageWrapperFragment from "./Common/CardMessageWrapperFragment"
 import VComponent from "../../../../V/VRDOM/component/VComponent"

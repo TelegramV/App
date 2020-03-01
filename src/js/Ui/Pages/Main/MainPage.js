@@ -16,7 +16,7 @@ import {DialogInfoComponent} from "../../Components/Sidebars/Right/DialogInfo/Di
 import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/ArchivedDialogsBar"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
-import {PhoneCallComponent} from "../../Components/Other/calls/PhoneCallComponent";
+import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {
