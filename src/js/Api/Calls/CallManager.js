@@ -1,6 +1,6 @@
 import {MTProto} from "../../MTProto/external";
 import Bytes from "../../MTProto/utils/bytes";
-import {bytesAsHex, bytesConcatBuffer} from "../../Utils/byte";
+import {bytesConcatBuffer} from "../../Utils/byte";
 import {SHA1, SHA256} from "../../MTProto/crypto/sha";
 import VBigInt from "../../MTProto/bigint/VBigInt";
 import AppEvents from "../EventBus/AppEvents";
@@ -59,10 +59,8 @@ class CallManager extends ReactiveObject {
     get phoneCallProtocol() {
         return {
             _: "phoneCallProtocol",
-            pFlags: {
-                udp_p2p: false,
-                udp_reflector: true
-            },
+            udp_p2p: false,
+            udp_reflector: true,
             min_layer: 92,
             max_layer: 92
         }
@@ -88,7 +86,7 @@ class CallManager extends ReactiveObject {
         this.crypto.authKey = authKey
 
         const response = await MTProto.invokeMethod("phone.confirmCall", {
-            peer:  this.inputPhoneCall,
+            peer: this.inputPhoneCall,
             g_a: this.crypto.gA,
             key_fingerprint: fingerprint.slice(fingerprint.length - 8, fingerprint.length),
             protocol: this.phoneCallProtocol
@@ -109,16 +107,16 @@ class CallManager extends ReactiveObject {
 
         this.currentPhoneCall = null
         this.crypto = null
-        if(this.networker) {
+        if (this.networker) {
             this.networker.close()
             this.networker = null
         }
-            // this.websockets.forEach(l => l.close(3000, "phoneCallDiscarded"))
-            // this.initSent = false
+        // this.websockets.forEach(l => l.close(3000, "phoneCallDiscarded"))
+        // this.initSent = false
     }
 
     phoneCall(phoneCall) {
-        if(!this.crypto.authKey) {
+        if (!this.crypto.authKey) {
             this.crypto.authKey = Bytes.modPow(phoneCall.g_a_or_b, this.crypto.random, this.crypto.p)
             this.crypto.gA = phoneCall.g_a_or_b
             this.crypto.isOutgoing = false
@@ -220,7 +218,7 @@ class CallManager extends ReactiveObject {
     }
 
     initAudio() {
-        if(this.audio) {
+        if (this.audio) {
             return Promise.resolve()
         }
         return navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
@@ -274,7 +272,7 @@ class CallManager extends ReactiveObject {
         // console.log("stop", this.audioLoop)
         // clearInterval(this.audioLoop)
 
-        if(!this.audio || !this.audio.mediaRecorder || !this.audio.stream) {
+        if (!this.audio || !this.audio.mediaRecorder || !this.audio.stream) {
             return
         }
         this.audio.mediaRecorder.stop()
@@ -328,10 +326,10 @@ class CallManager extends ReactiveObject {
 
 
     dataavailable = async (ev) => {
-        if(!this.networker || !this.audio || !this.audio.started) return
+        if (!this.networker || !this.audio || !this.audio.started) return
         this.fire("changeState", {
             state: CallState.CallStarted,
-            seconds: Math.floor((+new Date() - this.callStartTime)/1000)
+            seconds: Math.floor((+new Date() - this.callStartTime) / 1000)
         })
 
         const pcm = ev.inputBuffer.getChannelData(0)

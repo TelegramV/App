@@ -12,7 +12,7 @@ const prod = process.env.NODE_ENV === "production"
 
 const config = {
     node: {
-        fs: "empty"
+        fs: "empty",
     },
     entry: "./src/js/application.js",
     output: {
@@ -28,21 +28,22 @@ const config = {
                 type: "javascript/auto",
                 loader: "file-loader",
                 options: {
-                    publicPath: "dist/"
-                }
+                    publicPath: "dist/",
+                },
             },
             {
                 test: /\.js$/,
-                use: {
-                    loader: "babel-loader",
-                },
-                exclude: /node_modules/,
+                use: [
+                    "babel-loader",
+                    // "eslint-loader",
+                ],
+                exclude: [/node_modules/, /vendor/],
             },
             {
                 test: /\.worker\.js$/,
                 use: [
                     "worker-loader",
-                    "babel-loader"
+                    "babel-loader",
                 ],
                 exclude: /node_modules/,
             },
@@ -64,7 +65,7 @@ const config = {
                     {
                         loader: "sass-loader",
                     },
-                ]
+                ],
             },
             {
                 test: /\.(png|svg|jpg|gif)$/,
@@ -72,9 +73,9 @@ const config = {
                     loader: "file-loader",
                     options: {
                         outputPath: "images",
-                        name: "[name].[ext]"
-                    }
-                }
+                        name: "[name].[ext]",
+                    },
+                },
             },
             {
 
@@ -82,18 +83,18 @@ const config = {
                 use: {
                     loader: "file-loader",
                     options: {
-                        outputPath: "fonts"
-                    }
+                        outputPath: "fonts",
+                    },
                 },
             },
-        ]
+        ],
     },
     plugins: [
         new CopyWebpackPlugin([{
-            from: "public"
+            from: "public",
         }]),
         new webpack.DefinePlugin({
-            __IS_PRODUCTION__: prod
+            __IS_PRODUCTION__: prod,
         }),
         // new FlowWebpackPlugin(),
         new MiniCssExtractPlugin({
@@ -108,14 +109,14 @@ const config = {
         }),
     ],
     optimization: {
-        // minimize: true,
-        // minimizer: [new TerserPlugin()],
+        minimize: prod,
+        minimizer: [new TerserPlugin()],
     },
     devServer: {
         contentBase: path.join(__dirname, "dist"),
         compress: true,
-        port: 8090
-    }
+        port: 8090,
+    },
 }
 
 module.exports = config

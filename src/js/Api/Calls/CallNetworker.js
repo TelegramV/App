@@ -91,7 +91,7 @@ export default class CallNetworker {
         buf.storeInt(0) // flags
 
         buf.storeByte(1)
-        buf.storeInt(1330664787) // OPUS, no other protocol is currently supported in libtgvoip so magic number
+        buf.storeInt(1330664787) // OPUS, no other protocol is currently supported in libtgvoip so magic integer
         buf.storeByte(0)
         buf.storeByte(0)
 

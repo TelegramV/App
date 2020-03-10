@@ -1,14 +1,14 @@
 import Bytes from "../utils/bytes"
 import {rsaKeyByFingerprints} from "./rsaKeys"
-import {TLSerialization} from "../language/serialization"
 import {RSA_ENCRYPT} from "../crypto/rsa"
 import {SHA1, SHA1_ArrayBuffer} from "../crypto/sha"
-import {TLDeserialization} from "../language/deserialization"
 import {tsNow} from "../timeManager"
 import {SecureRandomSingleton} from "../utils/singleton"
 import VBigInt from "../bigint/VBigInt"
 import PQ from "../utils/pq"
 import {AES_IGE_DECRYPT, AES_IGE_ENCRYPT} from "../crypto/aes"
+import TL from "../language/TL"
+import {concat} from "../crypto/TELEGRAM_CRYPTO"
 
 async function step1_req_pq_multi(networker) {
     const authContext = networker.auth
@@ -19,7 +19,7 @@ async function step1_req_pq_multi(networker) {
         nonce: authContext.nonce
     })
 
-    return deserializer.fetchObject("ResPQ")
+    return deserializer.object("ResPQ")
 }
 
 function step2_handle_resPQ(resPQ, authContext) {
@@ -49,10 +49,9 @@ async function step4_req_DH_params(pAndQ, networker) {
     console.debug("step4 authContext = ", authContext)
 
     authContext.newNonce = new Array(32)
-    SecureRandomSingleton.nextBytes(authContext.newNonce) // fuck we have to use this because we need array in new_nonce
+    SecureRandomSingleton.nextBytes(authContext.newNonce)
 
-    const data_serializer = new TLSerialization()
-    data_serializer.storeObject({
+    const data_serializer = TL.pack({
         _: "p_q_inner_data",
         pq: authContext.pq,
         p: authContext.p,
@@ -60,19 +59,12 @@ async function step4_req_DH_params(pAndQ, networker) {
         nonce: authContext.nonce,
         server_nonce: authContext.serverNonce,
         new_nonce: authContext.newNonce
-    }, "P_Q_inner_data", "DECRYPTED_DATA") // todo: DECRYPTED_DATA???
+    }, "P_Q_inner_data")
 
-    let dataWithHash = SHA1(data_serializer.getBuffer())
-    dataWithHash = dataWithHash.concat(data_serializer.getBytes())
-
-    // const randPadding  = dataWithHash instanceof ArrayBuffer || dataWithHash instanceof Buffer || dataWithHash instanceof Uint8Array ? crypto.randomBytes(255 - dataWithHash.length) : new Array(crypto.randomBytes(255 - dataWithHash.length))
-    // dataWithHash = dataWithHash.concat(randPadding)
-    //
-    // console.warn("x", dataWithHash)
+    let dataWithHash = new Uint8Array(SHA1(data_serializer.toBuffer()))
+    dataWithHash = concat(dataWithHash, data_serializer.toUint8Array())
 
     let encryptedData = RSA_ENCRYPT(authContext.publicKey, dataWithHash)
-
-    console.log(encryptedData)
 
     const deserializer = await networker.invokeMethod("req_DH_params", {
         nonce: authContext.nonce,
@@ -83,7 +75,7 @@ async function step4_req_DH_params(pAndQ, networker) {
         encrypted_data: encryptedData
     })
 
-    return deserializer.fetchObject("Server_DH_Params")
+    return deserializer.object("Server_DH_Params")
 }
 
 async function step5_Server_DH_Params(ServerDHParams, networker) {
@@ -104,11 +96,11 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
         throw new Error("Server_DH_Params invalid server_nonce")
     }
 
-    authContext.tmpAesKey = SHA1(authContext.newNonce.concat(authContext.serverNonce))
-        .concat(SHA1(authContext.serverNonce.concat(authContext.newNonce))
+    authContext.tmpAesKey = SHA1(concat(authContext.newNonce, authContext.serverNonce))
+        .concat(SHA1(concat(authContext.serverNonce, authContext.newNonce))
             .slice(0, 12))
 
-    authContext.tmpAesIv = SHA1(authContext.serverNonce.concat(authContext.newNonce))
+    authContext.tmpAesIv = SHA1(concat(authContext.serverNonce, authContext.newNonce))
         .slice(12)
         .concat(SHA1([].concat(authContext.newNonce, authContext.newNonce)), authContext.newNonce
             .slice(0, 4))
@@ -120,8 +112,8 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
     const answerWithPadding = answer_with_hash.slice(20)
     const answerWithPaddingBuffer = Bytes.asUint8Buffer(answerWithPadding)
 
-    const deserializer = new TLDeserialization(answerWithPaddingBuffer, {mtproto: true})
-    const Server_DH_inner_data = deserializer.fetchObject("Server_DH_inner_data")
+    const deserializer = TL.unpacker(answerWithPaddingBuffer)
+    const Server_DH_inner_data = deserializer.object("Server_DH_inner_data")
 
     if (Server_DH_inner_data._ !== "server_DH_inner_data") {
         throw new Error("server_DH_inner_data bad response: " + constructor)
@@ -172,7 +164,7 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
         throw new Error("gA > dhPrime - 2^{2048-64}")
     }
 
-    const offset = deserializer.getOffset()
+    const offset = deserializer.offset
 
     if (!Bytes.compare(hash, SHA1(answerWithPadding.slice(0, offset)))) {
         throw new Error("server_DH_inner_data SHA1-hash mismatch")
@@ -192,17 +184,16 @@ async function step6_set_client_DH_params(networker, processor, proc_context) {
     SecureRandomSingleton.nextBytes(authContext.b)
     const gB = Bytes.modPow(gBytes, authContext.b, authContext.dhPrime)
 
-    const Client_DH_Inner_Data_serialization = new TLSerialization()
-    Client_DH_Inner_Data_serialization.storeObject({
+    const Client_DH_Inner_Data_serialization = TL.pack({
         _: "client_DH_inner_data",
         nonce: authContext.nonce,
         server_nonce: authContext.serverNonce,
-        retry_id: [0, authContext.retry++],
+        retry_id: new Uint8Array([0, authContext.retry++]),
         g_b: gB
     }, "Client_DH_Inner_Data")
 
-    const dataWithHash = SHA1(Client_DH_Inner_Data_serialization.getBuffer()).concat(Client_DH_Inner_Data_serialization.getBytes())
-    console.debug("mtpSendSetClientDhParams", dataWithHash, authContext)
+    const dataWithHash = concat(new Uint8Array(SHA1(Client_DH_Inner_Data_serialization.toBuffer())), Client_DH_Inner_Data_serialization.toUint8Array())
+    console.debug("SendSetClientDhParams", dataWithHash, authContext)
 
     const encryptedData = AES_IGE_ENCRYPT(dataWithHash, authContext.tmpAesKey, authContext.tmpAesIv)
     let Set_client_DH_params_answer_response = await networker.invokeMethod("set_client_DH_params", {
@@ -211,7 +202,7 @@ async function step6_set_client_DH_params(networker, processor, proc_context) {
         encrypted_data: encryptedData
     })
 
-    const Set_client_DH_params_answer = Set_client_DH_params_answer_response.fetchObject("Set_client_DH_params_answer")
+    const Set_client_DH_params_answer = Set_client_DH_params_answer_response.object("Set_client_DH_params_answer")
 
     if (Set_client_DH_params_answer._ !== "dh_gen_ok" && Set_client_DH_params_answer._ !== "dh_gen_retry" && Set_client_DH_params_answer._ !== "dh_gen_fail") {
         throw new Error("Set_client_DH_params_answer bad response: " + Set_client_DH_params_answer._)

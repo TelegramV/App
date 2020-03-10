@@ -22,7 +22,7 @@ const loadObject = (video, onProgress) => {
 const slotLoaded = (video, real) => {
     const gif = FileAPI.getAttribute(video, "documentAttributeAnimated");
     const attribute = FileAPI.getAttribute(video, "documentAttributeVideo")
-    if (attribute.pFlags.round_message || gif) {
+    if (attribute.round_message || gif) {
         return <video autoPlay muted loop onCanPlay={l => l.target.muted = true} src={real.src} type={video.mime_type}/>
     } else {
         return <video controls src={real.src} type={video.mime_type}/>

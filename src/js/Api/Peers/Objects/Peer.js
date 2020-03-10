@@ -125,7 +125,7 @@ export class Peer extends ReactiveObject {
     }
 
     get isDeleted() {
-        return this.raw.pFlags && this.raw.pFlags.deleted
+        return this.raw.deleted
     }
 
     get username() {
@@ -140,7 +140,7 @@ export class Peer extends ReactiveObject {
     }
 
     get isVerified() {
-        return this.raw.pFlags && this.raw.pFlags.verified === true
+        return this.raw.verified === true
     }
 
     get firstName() {
@@ -156,15 +156,15 @@ export class Peer extends ReactiveObject {
     }
 
     get isMin() {
-        return this.raw.pFlags && this.raw.pFlags.min === true
+        return this.raw.min === true
     }
 
     get isSelf() {
-        return this.raw.pFlags && this.raw.pFlags.self === true
+        return this.raw.self === true
     }
 
     get isLeft() {
-        return this.raw.pFlags && this.raw.pFlags.left === true
+        return this.raw.left === true
     }
 
     get inputPeer() {
@@ -341,7 +341,7 @@ export class Peer extends ReactiveObject {
         }
 
         // When receiving said (min) constructors, the client must first check if user or chat object without min flag is already present in local cache. If it is present, then the client should just ignore constructors with min flag and use local one instead.
-        if (rawPeer.pFlags && rawPeer.pFlags.min && this._filledNonMin) {
+        if (rawPeer.min && this._filledNonMin) {
             return this
         }
 
@@ -350,7 +350,7 @@ export class Peer extends ReactiveObject {
         // НЕ РУХАЙ
         if (this.accessHash === undefined) {
             this._accessHash = this.raw.access_hash
-        } else if (rawPeer.pFlags && !rawPeer.pFlags.min) {
+        } else if (!rawPeer.min) {
             this._accessHash = this.raw.access_hash
         }
 

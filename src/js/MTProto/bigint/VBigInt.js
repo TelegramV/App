@@ -24,12 +24,12 @@ import AppConfiguration from "../../Config/AppConfiguration"
  */
 class VBigInt {
 
-    /**
-     * @type {BigInteger|BigInt}
-     */
-    value = undefined
-
-    isNative = false
+    // /**
+    //  * @type {BigInteger|BigInt}
+    //  */
+    // value = undefined
+    //
+    // isNative = false
 
     constructor(value, native = false) {
         this.value = value

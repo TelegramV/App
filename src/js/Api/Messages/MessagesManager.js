@@ -112,7 +112,7 @@ class MessageManager extends Manager {
         MTProto.UpdatesManager.subscribe("updateNewMessage", update => {
             let peer = undefined
 
-            if (update.message.pFlags.out) {
+            if (update.message.out) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
             } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUser().user.id) {
@@ -128,7 +128,7 @@ class MessageManager extends Manager {
         MTProto.UpdatesManager.subscribe("updateNewScheduledMessage", update => {
             let peer = undefined
 
-            if (update.message.pFlags.out) {
+            if (update.message.out) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
             } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUser().user.id) {
@@ -251,7 +251,7 @@ class MessageManager extends Manager {
     }
 
     getFromPeerMessage(rawMessage) {
-        if (rawMessage.pFlags && rawMessage.pFlags.out) {
+        if (rawMessage.out) {
             return PeersStore.self()
         }
 

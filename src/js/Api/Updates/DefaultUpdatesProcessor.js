@@ -212,7 +212,6 @@ export class DefaultUpdatesProcessor extends UpdatesProcessor {
             date: State.date || this.updatesManager.State.date,
             qts: State.qts || this.updatesManager.State.qts,
             pts_total_limit: 100,
-            flags: 0
         })
     }
 }

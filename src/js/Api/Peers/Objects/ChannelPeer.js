@@ -39,11 +39,11 @@ export class ChannelPeer extends Peer {
     }
 
     get adminRights() {
-        return (this.raw.admin_rights && this.raw.admin_rights.pFlags) || {}
+        return (this.raw.admin_rights && this.raw.admin_rights) || {}
     }
 
     get isCreator(): boolean {
-        return !!this.raw.pFlags.creator
+        return !!this.raw.creator
     }
 
     get canPostMessages(): boolean {

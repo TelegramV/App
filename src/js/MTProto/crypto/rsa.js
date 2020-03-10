@@ -1,7 +1,7 @@
 import Bytes from "../utils/bytes"
 import VBigInt from "../bigint/VBigInt"
 
-export function RSA_ENCRYPT(publicKey, bytes) {
+export function RSA_ENCRYPT(publicKey, bytes: Uint8Array) {
     bytes = Bytes.addPadding(bytes, 255)
 
     const N = VBigInt.create(publicKey.modulus, 16)

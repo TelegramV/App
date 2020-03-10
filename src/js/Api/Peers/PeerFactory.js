@@ -12,13 +12,13 @@ class PeerFactory {
         let type
 
         if (rawPeer._ === "user") {
-            if (rawPeer.pFlags.bot) {
+            if (rawPeer.bot) {
                 type = BotPeer
             } else {
                 type = UserPeer
             }
         } else if (rawPeer._ === "channel") {
-            if (rawPeer.pFlags.megagroup) {
+            if (rawPeer.megagroup) {
                 type = SupergroupPeer
             } else {
                 type = ChannelPeer

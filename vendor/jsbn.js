@@ -229,7 +229,7 @@ function nbits(x) {
     return r;
 }
 
-// (public) return the number of bits in "this"
+// (public) return the integer of bits in "this"
 function bnBitLength() {
     if(this.t <= 0) return 0;
     return this.DB*(this.t-1)+nbits(this[this.t-1]^(this.s&this.DM));
@@ -775,14 +775,14 @@ function bnGetLowestSetBit() {
     return -1;
 }
 
-// return number of 1 bits in x
+// return integer of 1 bits in x
 function cbit(x) {
     var r = 0;
     while(x != 0) { x &= x-1; ++r; }
     return r;
 }
 
-// (public) return number of set bits
+// (public) return integer of set bits
 function bnBitCount() {
     var r = 0, x = this.s&this.DM;
     for(var i = 0; i < this.t; ++i) r += cbit(this[i]^x);
@@ -1222,7 +1222,7 @@ BigInteger.prototype.square = bnSquare;
 
 
 
-// Random number generator - requires a PRNG backend, e.g. prng4.js
+// Random integer generator - requires a PRNG backend, e.g. prng4.js
 
 // For best results, put code like
 // <body onClick='rng_seed_time();' onKeyPress='rng_seed_time();'>

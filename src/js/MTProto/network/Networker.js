@@ -1,8 +1,7 @@
 import {TimeManager} from "../timeManager";
 import DataCenter from "../dataCenter";
 import {MTSocket} from "./MTSocket"
-import {TLSerialization} from "../language/serialization"
-import {TLDeserialization} from "../language/deserialization"
+import TL from "../language/TL"
 
 export class Networker {
     constructor(auth, mtproto = false) {
@@ -24,15 +23,16 @@ export class Networker {
             console.error("fuck")
             return
         }
-        const requestLength = message.body.byteLength
+        const request_length = message.body.byteLength
 
-        const serializer = new TLSerialization()
-        serializer.storeLongP(0, 0, "auth_key_id")
-        serializer.storeLong(message.msg_id, "msg_id")
-        serializer.storeInt(requestLength, "request_length")
-        serializer.storeRawBytes(message.body, "request_body")
+        const serializer = TL.packer()
+        serializer.int(0)
+        serializer.int(0)
+        serializer.long(message.msg_id)
+        serializer.int(request_length)
+        serializer.rawBytes(message.body)
 
-        return serializer.getBuffer()
+        return serializer.toBuffer()
     }
 
 
@@ -41,18 +41,19 @@ export class Networker {
             console.error("fuck")
             return
         }
-        const serializer = new TLSerialization(options)
 
-        options.resultType = serializer.storeMethod(method, params)
+        console.debug("invoking", method, params)
+
+        const serializer = TL.packer()
+
+        options.resultType = serializer.method(method, params)
 
         const messageID = this.timeManager.generateMessageID(this.auth.dcID)
         const message = {
             msg_id: messageID,
-            body: serializer.getBuffer(),
+            body: serializer.toBuffer(),
             isAPI: false
         }
-
-        console.debug("MTProto call", method, params)
 
         this.sendMessage(message)
 
@@ -66,11 +67,10 @@ export class Networker {
             console.error("fuck")
             return
         }
-        const deserializer = new TLDeserialization(data, {mtproto: true})
-        const auth_key_id = deserializer.fetchLong("auth_key_id")
-        const msg_id = deserializer.fetchLong("msg_id")
-        const msg_len = deserializer.fetchInt("msg_len")
-        console.debug("Response")
+        const deserializer = TL.unpacker(data)
+        const auth_key_id = deserializer.long()
+        const msg_id = deserializer.long()
+        const msg_len = deserializer.int()
 
         this.handler(deserializer)
     }

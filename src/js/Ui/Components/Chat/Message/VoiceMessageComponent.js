@@ -7,7 +7,7 @@ export default class VoiceMessageComponent extends AudioComponent {
         super(props);
         let doc = this.message.raw.media.document;
         for (const attr of doc.attributes) {
-            if (attr._ == "documentAttributeAudio" && attr.pFlags.voice) {
+            if (attr._ == "documentAttributeAudio" && attr.voice) {
                 this.waveform = attr.waveform;
             }
         }
@@ -51,7 +51,7 @@ export default class VoiceMessageComponent extends AudioComponent {
 
     getControls() {
         return (
-            <div class="controls">
+            <div class="controls rp rps">
                 <svg css-width={`${this.width}px`} css-transform="scaleY(-1)"
                      onMouseEnter={this._handleEnter.bind(this)} onMouseLeave={this._handleLeave.bind(this)}
                      onMouseDown={this._handleMove.bind(this)}>

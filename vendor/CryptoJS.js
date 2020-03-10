@@ -146,14 +146,14 @@ var CryptoJS = CryptoJS || (function (Math, undefined) {
      * An array of 32-bit words.
      *
      * @property {Array} words The array of 32-bit words.
-     * @property {number} sigBytes The number of significant bytes in this word array.
+     * @property {number} sigBytes The integer of significant bytes in this word array.
      */
     var WordArray = C_lib.WordArray = Base.extend({
         /**
          * Initializes a newly created word array.
          *
          * @param {Array} words (Optional) An array of 32-bit words.
-         * @param {number} sigBytes (Optional) The number of significant bytes in the words.
+         * @param {number} sigBytes (Optional) The integer of significant bytes in the words.
          *
          * @example
          *
@@ -272,7 +272,7 @@ var CryptoJS = CryptoJS || (function (Math, undefined) {
         /**
          * Creates a word array filled with random bytes.
          *
-         * @param {number} nBytes The number of random bytes to generate.
+         * @param {number} nBytes The integer of random bytes to generate.
          *
          * @return {WordArray} The random word array.
          *
@@ -464,7 +464,7 @@ var CryptoJS = CryptoJS || (function (Math, undefined) {
      *
      * The property blockSize must be implemented in a concrete subtype.
      *
-     * @property {number} _minBufferSize The number of blocks that should be kept unprocessed in the buffer. Default: 0
+     * @property {number} _minBufferSize The integer of blocks that should be kept unprocessed in the buffer. Default: 0
      */
     var BufferedBlockAlgorithm = C_lib.BufferedBlockAlgorithm = Base.extend({
         /**
@@ -530,7 +530,7 @@ var CryptoJS = CryptoJS || (function (Math, undefined) {
                 nBlocksReady = Math.ceil(nBlocksReady);
             } else {
                 // Round down to include only full blocks,
-                // less the number of blocks that must remain in the buffer
+                // less the integer of blocks that must remain in the buffer
                 nBlocksReady = Math.max((nBlocksReady | 0) - this._minBufferSize, 0);
             }
 
@@ -578,7 +578,7 @@ var CryptoJS = CryptoJS || (function (Math, undefined) {
     /**
      * Abstract hasher template.
      *
-     * @property {number} blockSize The number of 32-bit words this hasher operates on. Default: 16 (512 bits)
+     * @property {number} blockSize The integer of 32-bit words this hasher operates on. Default: 16 (512 bits)
      */
     var Hasher = C_lib.Hasher = BufferedBlockAlgorithm.extend({
         /**
@@ -923,7 +923,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
     /**
      * Abstract base stream cipher template.
      *
-     * @property {number} blockSize The number of 32-bit words this cipher operates on. Default: 1 (32 bits)
+     * @property {number} blockSize The integer of 32-bit words this cipher operates on. Default: 1 (32 bits)
      */
     var StreamCipher = C_lib.StreamCipher = Cipher.extend({
         _doFinalize: function () {
@@ -1240,7 +1240,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
          *     CryptoJS.pad.Pkcs7.unpad(wordArray);
          */
         unpad: function (data) {
-            // Get number of padding bytes from last byte
+            // Get integer of padding bytes from last byte
             var nPaddingBytes = data.words[(data.sigBytes - 1) >>> 2] & 0xff;
 
             // Remove padding
@@ -1260,7 +1260,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
     /**
      * Abstract base block cipher template.
      *
-     * @property {number} blockSize The number of 32-bit words this cipher operates on. Default: 4 (128 bits)
+     * @property {number} blockSize The integer of 32-bit words this cipher operates on. Default: 4 (128 bits)
      */
     var BlockCipher = C_lib.BlockCipher = Cipher.extend({
         /**
@@ -1785,10 +1785,10 @@ code.google.com/p/crypto-js/wiki/License
             var keyWords = key.words;
             var keySize = key.sigBytes / 4;
 
-            // Compute number of rounds
+            // Compute integer of rounds
             var nRounds = this._nRounds = keySize + 6
 
-            // Compute number of key schedule rows
+            // Compute integer of key schedule rows
             var ksRows = (nRounds + 1) * 4;
 
             // Compute key schedule

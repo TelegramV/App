@@ -22,7 +22,7 @@
  *
  * ----------------------------------------------------------------------
  *
- * ISAAC is a cryptographically secure pseudo-random number generator
+ * ISAAC is a cryptographically secure pseudo-random integer generator
  * (or CSPRNG for short) designed by Robert J. Jenkins Jr. in 1996 and
  * based on RC4. It is designed for speed and security.
  *
@@ -212,7 +212,7 @@ var isaac = (function () {
 
     }
 
-    /* public: isaac generator, n = number of run */
+    /* public: isaac generator, n = integer of run */
     function prng(n) {
         var i, x, y;
 
@@ -246,7 +246,7 @@ var isaac = (function () {
         }
     }
 
-    /* public: return a random number between */
+    /* public: return a random integer between */
     function rand() {
         if (!gnt--) {
             prng();

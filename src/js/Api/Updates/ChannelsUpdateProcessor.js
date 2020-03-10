@@ -285,7 +285,7 @@ export class ChannelsUpdateProcessor extends UpdatesProcessor {
             })
 
             // if not final then fetch next diff with provided pts
-            if (rawDifferenceWithPeer.pFlags.final === true) {
+            if (rawDifferenceWithPeer.final === true) {
                 // console.warn("difference is final", rawDifferenceWithPeer)
 
 
@@ -361,7 +361,6 @@ export class ChannelsUpdateProcessor extends UpdatesProcessor {
         console.warn("[channel] fetching difference")
 
         return MTProto.invokeMethod("updates.getChannelDifference", {
-            flags: 0,
             force: false,
             channel: peer.input,
             filter: {

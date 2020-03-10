@@ -18,9 +18,7 @@ export class DialogApi {
     setPinned(pinned: boolean) {
         return MTProto.invokeMethod("messages.toggleDialogPin", {
             peer: this._dialog.input,
-            pFlags: {
-                pinned
-            }
+            pinned
         }).then(Bool => {
             console.log(Bool, pinned)
             if (Bool._ === "boolTrue") {
@@ -49,10 +47,6 @@ export class DialogApi {
 
     markDialogUnread(unread) {
         MTProto.invokeMethod("messages.markDialogUnread", {
-            flags: 0,
-            pFlags: {
-                unread: unread
-            },
             unread: unread,
             peer: this._dialog.peer.inputPeer
         }).then(Bool => {

@@ -36,10 +36,7 @@ class TopPeersManager extends Manager {
         // }
 
         return API.contacts.getTopPeers({
-            flags: 0,
-            pFlags: {
-                correspondents: true
-            },
+            correspondents: true,
             limit: 5
         }).then(TopPeers => {
             TopPeers.categories.forEach(TopPeerCategoryPeers => {
