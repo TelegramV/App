@@ -215,12 +215,10 @@ export class PeerApi {
             peer: {_: "inputNotifyPeer", peer: this.peer.inputPeer},
             settings: {
                 _: "inputPeerNotifySettings",
-                pFlags: {
-                    silent: silent,
-                    show_previews: show_previews,
-                    mute_until: mute_until,
-                    sound: sound
-                }
+                silent: silent,
+                show_previews: show_previews,
+                mute_until: mute_until,
+                sound: sound
             }
         }).then(l => {
             if (l._ === "boolTrue" && this.peer.full) {
@@ -260,10 +258,8 @@ export class PeerApi {
         let randomId = genMsgId(AppConfiguration.mtproto.dataCenter.default)
         let message = new TextMessage(this.peer)
         message.fillRaw({
-            pFlags: {
-                out: true,
-                sending: true
-            },
+            out: true,
+            sending: true,
             date: Math.floor(+new Date() / 1000),
             message: text,
             entities: messageEntities,
@@ -278,16 +274,13 @@ export class PeerApi {
 
         p.then(q => {
             MTProto.invokeMethod(media ? (multi ? "messages.sendMultiMedia" : "messages.sendMedia") : "messages.sendMessage", {
-                pFlags: {
-                    clear_draft: clearDraft,
-                    silent: silent,
-                    reply_to_msg_id: replyTo,
-                    entities: messageEntities,
-                    no_webpage: noWebpage,
-                    background: background,
-                    schedule_date: scheduleDate
-                },
-
+                clear_draft: clearDraft,
+                silent: silent,
+                reply_to_msg_id: replyTo,
+                entities: messageEntities,
+                no_webpage: noWebpage,
+                background: background,
+                schedule_date: scheduleDate,
                 peer: this.peer.inputPeer,
                 message: text,
                 media: media,
@@ -304,9 +297,7 @@ export class PeerApi {
                             }
                         },
                         message: i === 0 ? text : null,
-                        pFlags: {
-                            entities: i === 0 ? messageEntities : null
-                        },
+                        entities: i === 0 ? messageEntities : null,
                         random_id: genMsgId(AppConfiguration.mtproto.dataCenter.default)
                     }
                 }),
@@ -349,7 +340,6 @@ export class PeerApi {
             message: "",
             media: {
                 _: "inputMediaDocument",
-                flags: 0,
                 id: {
                     _: "inputDocument",
                     id: document.id,

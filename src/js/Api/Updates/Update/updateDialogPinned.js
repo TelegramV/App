@@ -36,7 +36,7 @@ const updateDialogPinned = update => {
         return
     }
 
-    peer.dialog.pinned = update.pFlags.pinned || false
+    peer.dialog.pinned = update.pinned || false
 }
 
 export default updateDialogPinned

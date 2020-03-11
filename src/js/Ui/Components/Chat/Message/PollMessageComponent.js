@@ -12,9 +12,9 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         this.poll = message.raw.media.poll;
         this.results = message.raw.media.results;
 
-        this.multiple = this.poll.pFlags.multiple_choice;
-        this.public = this.poll.pFlags.public_voters;
-        this.quiz = this.poll.pFlags.quiz;
+        this.multiple = this.poll.multiple_choice;
+        this.public = this.poll.public_voters;
+        this.quiz = this.poll.quiz;
 
         this.answers = [];
 
@@ -82,7 +82,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     isVoted = () => {
         if (!this.results.results) return false;
         for (const result of this.results.results) {
-            if (result.pFlags.chosen) return true;
+            if (result.chosen) return true;
         }
         return false;
     }
@@ -215,8 +215,8 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 const AnswerComponent = ({answer, result, message, click}) => {
     let name = message.id;
     let total_voters = message.raw.media.results.total_voters;
-    let multiple = message.raw.media.poll.pFlags.multiple_choice;
-    let quiz = message.raw.media.poll.pFlags.quiz;
+    let multiple = message.raw.media.poll.multiple_choice;
+    let quiz = message.raw.media.poll.quiz;
 
     if (!result) {
         return (
@@ -235,19 +235,19 @@ const AnswerComponent = ({answer, result, message, click}) => {
 
         let votedClass = "tgico tgico-";
         if (!quiz) {
-            if (result.pFlags.chosen) {
+            if (result.chosen) {
                 votedClass += "check";
             } else {
                 votedClass = undefined;
             }
         } else {
-            if (result.pFlags.correct) {
+            if (result.correct) {
                 votedClass += "check";
             } else {
                 votedClass += "close";
             }
         }
-        let wrong = (quiz && !result.pFlags.correct);
+        let wrong = (quiz && !result.correct);
         let answerClasses = "answer" + (wrong ? " wrong" : "");
         return (
             <div class={answerClasses} option={answer.option}>

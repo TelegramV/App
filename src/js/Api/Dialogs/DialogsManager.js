@@ -265,7 +265,6 @@ class DialogManager extends Manager {
 
     fetchArchivedDialogs() {
         return API.messages.getDialogs({
-            flags: 1,
             folder_id: 1,
             limit: 100
         }).then(Dialogs => {

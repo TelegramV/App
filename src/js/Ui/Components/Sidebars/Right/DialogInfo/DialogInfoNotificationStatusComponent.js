@@ -20,7 +20,7 @@ export class DialogInfoNotificationStatusComponent extends VComponent {
     render() {
         const peer = AppSelectedInfoPeer.Current
 
-        const muted = !peer || !peer.full || !peer.full.notify_settings || peer.full.notify_settings.mute_until > 0 || peer.full.notify_settings.pFlags.silent
+        const muted = !peer || !peer.full || !peer.full.notify_settings || peer.full.notify_settings.mute_until > 0 || peer.full.notify_settings.silent
 
         return (
             <DialogInfoDetailsCheckboxFragment text="Notifications"

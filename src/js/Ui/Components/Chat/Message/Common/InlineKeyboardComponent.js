@@ -3,24 +3,6 @@ import VComponent from "../../../../../V/VRDOM/component/VComponent"
 
 
 export class InlineKeyboardComponent extends VComponent {
-    constructor(props) {
-        super(props);
-
-    }
-
-    render() {
-        const message = this.props.message
-        return <div className="inline-keyboard">
-            {message.replyMarkup.rows.map(l => {
-                return <div className="row">
-                    {l.buttons.map(q => {
-                        return InlineKeyboardComponent.parseButton(message, q)
-                    })}
-                </div>
-            })}
-        </div>
-    }
-
     static parseButton(message, button) {
         const loader = <progress className="progress-circular white disabled"/>
         const handlers = {
@@ -49,10 +31,8 @@ export class InlineKeyboardComponent extends VComponent {
         const progress = target.querySelector("progress")
         progress.classList.remove("disabled")
         return MTProto.invokeMethod("messages.getBotCallbackAnswer", {
-            pFlags: {
-                data: isGame ? undefined : bytes,
-                game: isGame
-            },
+            data: isGame ? undefined : bytes,
+            game: isGame,
             peer: message.to.inputPeer,
             msg_id: message.id,
         }).then(l => {
@@ -79,7 +59,7 @@ export class InlineKeyboardComponent extends VComponent {
 
     static startGame(message, target) {
         this.callbackButton(message, target, undefined, true).then(l => {
-            if (l.pFlags.has_url) {
+            if (l.has_url) {
                 window.open(l.url)
             }
         })
@@ -91,5 +71,18 @@ export class InlineKeyboardComponent extends VComponent {
 
     static auth(l) {
 
+    }
+
+    render() {
+        const message = this.props.message
+        return <div className="inline-keyboard">
+            {message.replyMarkup.rows.map(l => {
+                return <div className="row">
+                    {l.buttons.map(q => {
+                        return InlineKeyboardComponent.parseButton(message, q)
+                    })}
+                </div>
+            })}
+        </div>
     }
 }

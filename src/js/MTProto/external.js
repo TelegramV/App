@@ -4,7 +4,6 @@ import MobileProtoWorker from "./workers/mtproto.worker"
 import {AppPermanentStorage} from "../Api/Common/Storage"
 import UpdatesManager from "../Api/Updates/UpdatesManager"
 import AppEvents from "../Api/EventBus/AppEvents"
-import {logout} from "../Api/General/logout"
 
 const TimeManager = {
     lastMessageID: {},
@@ -108,18 +107,14 @@ class MobileProtocolAPIAuth {
 
     sendCode(phoneNumber, options = {}) {
         return this.MTProto.invokeMethod("auth.sendCode", Object.assign({
-            flags: 0,
             phone_number: phoneNumber,
             api_id: AppConfiguration.mtproto.api.api_id,
             api_hash: AppConfiguration.mtproto.api.api_hash,
             settings: {
                 _: "codeSettings",
-                flags: 0,
-                pFlags: {
-                    current_number: false,
-                    allow_app_hash: false,
-                    allow_flashcall: false
-                }
+                current_number: false,
+                allow_app_hash: false,
+                allow_flashcall: false
             },
             lang_code: navigator.language || 'en'
         }, options))

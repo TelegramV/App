@@ -60,7 +60,7 @@ export class WallpaperManagerSingleton {
         this.getWallpapers().then(wallpapers => {
             let i = 0;
             for (const wallpaper of wallpapers) {
-                if (wallpaper.pFlags.pattern) continue;
+                if (wallpaper.pattern) continue;
                 i++;
                 setTimeout(_ => {
                     const id = wallpaper.id;

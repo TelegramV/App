@@ -6,11 +6,8 @@ import type {DialogsType, getDialogs_Params_105, getPeerDialogs_Params_105} from
 
 const getDialogs = (params: getDialogs_Params_105 = {}): Promise<DialogsType> => {
     return MTProto.invokeMethod("messages.getDialogs", {
-        flags: params.flags || 0,
-        pFlags: {
-            exclude_pinned: params.exclude_pinned || false,
-            folder_id: params.folder_id || 0,
-        },
+        exclude_pinned: params.exclude_pinned || false,
+        folder_id: params.folder_id || 0,
         offset_date: params.offset_date || 0,
         offset_id: params.offset_id || -1,
         offset_peer: params.offset_peer || {
@@ -20,6 +17,7 @@ const getDialogs = (params: getDialogs_Params_105 = {}): Promise<DialogsType> =>
         hash: params.hash || ""
     }).then(Dialogs => {
         console.warn("params.folder_id", params.folder_id)
+        console.warn("xxx", Dialogs)
         PeersManager.fillPeersFromUpdate(Dialogs)
 
         Dialogs.count = Dialogs.count || Dialogs.dialogs.length

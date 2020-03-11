@@ -221,7 +221,6 @@ export default class ComposerComponent extends VComponent {
 
     loadRecentStickers = () => {
         return MTProto.invokeMethod("messages.getRecentStickers", {
-            flags: 0,
             hash: 0
         }).then(response => {
             let packs = response.packs;

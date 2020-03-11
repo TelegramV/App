@@ -56,7 +56,7 @@ export class MessageParser {
                             break;
                         }
                         if (attr._ === "documentAttributeAudio") {
-                            if (attr.pFlags.voice) {
+                            if (attr.voice) {
                                 type = MessageType.VOICE
                                 break;
                             } else {
@@ -65,7 +65,7 @@ export class MessageParser {
                             }
                         }
                         if (attr._ === "documentAttributeVideo") { //tl;dr do not add break here, of GIF's will be broken
-                            if (attr.pFlags.round_message) {
+                            if (attr.round_message) {
                                 type = MessageType.ROUND
                             } else {
                                 type = MessageType.VIDEO

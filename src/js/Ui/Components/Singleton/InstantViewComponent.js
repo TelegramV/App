@@ -163,8 +163,8 @@ export class InstantViewComponent extends SingletonComponent {
 
             case "pageBlockTable":
                 const classes = {
-                    bordered: block.pFlags.bordered,
-                    striped: block.pFlags.striped
+                    bordered: block.bordered,
+                    striped: block.striped
                 }
                 console.log(classes)
                 return <figure>
@@ -172,14 +172,14 @@ export class InstantViewComponent extends SingletonComponent {
                         {block.rows.map(row => {
                             return <tr>{row.cells.map(cell => {
                                 const classList = {
-                                    left: !block.pFlags.align_center && !block.pFlags.align_right,
-                                    center: block.pFlags.align_center,
-                                    right: block.pFlags.align_right,
-                                    "valign-top": !block.pFlags.valign_bottom && !block.pFlags.valign_middle,
-                                    "valign-center": block.pFlags.valign_middle,
-                                    "valign-bottom": block.pFlags.valign_bottom
+                                    left: !block.align_center && !block.align_right,
+                                    center: block.align_center,
+                                    right: block.align_right,
+                                    "valign-top": !block.valign_bottom && !block.valign_middle,
+                                    "valign-center": block.valign_middle,
+                                    "valign-bottom": block.valign_bottom
                                 }
-                                if (cell.pFlags.header) {
+                                if (cell.header) {
                                     return <th colSpan={cell.colspan} rowSpan={cell.rowspan}
                                                className={classList}>{this.parseRichText(cell.text)}</th>
                                 } else {
@@ -193,7 +193,7 @@ export class InstantViewComponent extends SingletonComponent {
 
                 </figure>
             case "pageBlockDetails":
-                if (block.pFlags.open) {
+                if (block.open) {
                     return <details open>
                         <summary>{this.parseRichText(block.title)}</summary>
                         {block.blocks.map(b => this.parseBlock(b))}

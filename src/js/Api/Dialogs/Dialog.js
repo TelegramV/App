@@ -151,7 +151,7 @@ export class Dialog extends ReactiveObject {
     }
 
     get pinned(): boolean {
-        return this.raw.pFlags.pinned || false
+        return this.raw.pinned || false
     }
 
     // alias for pinned
@@ -160,7 +160,7 @@ export class Dialog extends ReactiveObject {
     }
 
     set pinned(pinned: boolean) {
-        this.raw.pFlags.pinned = pinned || false
+        this.raw.pinned = pinned || false
 
         this.fire("updatePinned")
     }
@@ -178,11 +178,11 @@ export class Dialog extends ReactiveObject {
     }
 
     get unreadMark(): boolean {
-        return this.raw.pFlags.unread_mark || false
+        return this.raw.unread_mark || false
     }
 
     set unreadMark(unreadMark: boolean) {
-        this.raw.pFlags.unread_mark = unreadMark || false
+        this.raw.unread_mark = unreadMark || false
 
         this.fire("updateUnreadMark")
     }

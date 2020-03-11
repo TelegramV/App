@@ -71,7 +71,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get isOut(): boolean {
-        if (this.raw.pFlags.out) {
+        if (this.raw.out) {
             return true
         }
 
@@ -79,7 +79,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get isSending(): boolean {
-        return !!this.raw.pFlags.sending
+        return !!this.raw.sending
     }
 
     get replyMarkup(): any {
@@ -87,7 +87,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get isPost(): boolean {
-        return this.raw.pFlags.post || false
+        return this.raw.post || false
     }
 
     get isPinned(): boolean {

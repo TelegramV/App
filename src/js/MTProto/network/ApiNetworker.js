@@ -1,16 +1,15 @@
 import {createNonce, uintToInt} from "../utils/bin"
 import {SHA1} from "../crypto/sha"
-import {TLSerialization} from "../language/serialization"
-import {TLDeserialization} from "../language/deserialization"
 import {MessageProcessor} from "./MessageProcessor"
 
 import AppConfiguration from "../../Config/AppConfiguration"
 import {Networker} from "./Networker";
-import {schema} from "../language/schema";
 import Bytes from "../utils/bytes"
 import Random from "../utils/random"
 import MTProtoInternal from "../internal"
 import TELEGRAM_CRYPTO from "../crypto/TELEGRAM_CRYPTO"
+import TL from "../language/TL"
+import Packer from "../language/Packer"
 
 export class ApiNetworker extends Networker {
     constructor(auth, mtproto = false) {
@@ -53,15 +52,17 @@ export class ApiNetworker extends Networker {
             // TODO Show disconnection badge
         }
 
-        const serializer = new TLSerialization();
+        const serializer = TL.packer()
         const pingID = [Random.nextInteger(0xFFFFFFFF), Random.nextInteger(0xFFFFFFFF)];
 
-        serializer.storeMethod("ping", {ping_id: pingID})
+        serializer.method("ping", {
+            ping_id: new Uint8Array(pingID)
+        })
 
         const pingMessage = {
             msg_id: this.timeManager.generateMessageID(this.auth.dcID),
             seq_no: this.generateSeqNo(true),
-            body: serializer.getBytes()
+            body: serializer.toUint8Array()
         };
 
         this.pings.set(pingMessage.msg_id, pingID)
@@ -83,83 +84,61 @@ export class ApiNetworker extends Networker {
             return this.mtproto_processResponse(data)
         }
 
-        let deserializer = new TLDeserialization(data)
+        let unpacker = TL.unpacker(data)
 
-        const authKeyID = deserializer.fetchIntBytes(64, false, "auth_key_id")
+        const auth_key_id = unpacker.integer(64)
 
-        if (!Bytes.compare(authKeyID, this.auth.authKeyID)) {
-            throw new Error(`bad server auth_key_id: ${Bytes.asHex(authKeyID)}, dc id ${this.auth.dcID}`)
+        if (!Bytes.compare(auth_key_id, this.auth.authKeyID)) {
+            throw new Error(`bad server auth_key_id: ${Bytes.asHex(auth_key_id)}, dc id ${this.auth.dcID}`)
         }
 
-        const msgKey = deserializer.fetchIntBytes(128, true, "msg_key")
-        const encryptedData = deserializer.fetchRawBytes(data.byteLength - deserializer.getOffset(), true, "encrypted_data")
+        const msg_key = unpacker.integer(128)
+        const encrypted_data = unpacker.rawBytes(data.byteLength - unpacker.offset)
 
-        const decrypted = TELEGRAM_CRYPTO.decrypt_message(encryptedData, this.auth.authKey, msgKey, 8)
+        const decrypted = TELEGRAM_CRYPTO.decrypt_message(encrypted_data, this.auth.authKey, msg_key, 8)
 
-        if (!Bytes.compare(msgKey, decrypted.msg_key)) {
+        if (!Bytes.compare(msg_key, decrypted.msg_key)) {
             throw new Error("bad server msgKey")
         }
 
-        deserializer = new TLDeserialization(decrypted.bytes.buffer, {mtproto: true})
+        unpacker = TL.unpacker(decrypted.bytes.buffer)
 
-        const salt = deserializer.fetchIntBytes(64, false, "salt") // ??
-        const sessionID = deserializer.fetchIntBytes(64, false, "session_id")
-        const messageID = deserializer.fetchLong("message_id")
+        const salt = unpacker.integer(64)
+        const session_id = unpacker.integer(64)
+        const message_id = unpacker.long()
 
-        const seqNo = deserializer.fetchInt("seq_no")
+        const seq_no = unpacker.int()
 
         const totalLength = decrypted.bytes.byteLength
 
-        const messageBodyLength = deserializer.fetchInt("message_data[length]")
-        let offset = deserializer.getOffset()
+        const message_data_length = unpacker.int()
+        let offset = unpacker.offset
 
-        if ((messageBodyLength % 4) ||
-            messageBodyLength > totalLength - offset) {
-            throw new Error("bad body length: " + messageBodyLength)
+        if ((message_data_length % 4) || message_data_length > totalLength - offset) {
+            throw new Error("bad body length: " + message_data_length)
         }
 
-        const messageBody = deserializer.fetchRawBytes(messageBodyLength, true, "message_data")
+        const message_data = unpacker.rawBytes(message_data_length)
 
-        offset = deserializer.getOffset()
+        offset = unpacker.offset
         const paddingLength = totalLength - offset
         if (paddingLength < 12 || paddingLength > 1024) {
             throw new Error("bad padding length: " + paddingLength)
         }
 
-        const buffer = Bytes.asUint8Buffer(messageBody)
+        const buffer = Bytes.asUint8Buffer(message_data)
 
-        const self = this
-
-        const deserializerOptions = {
-            mtproto: true,
-            schema: schema,
-            override: {
-                mt_rpc_result: function (result, field) {
-                    result.req_msg_id = this.fetchLong(`${field}[req_msg_id]`)
-
-                    const sentMessage = self.messageProcessor.sentMessages.get(result.req_msg_id)
-                    const type = sentMessage && sentMessage.resultType || "Object"
-
-                    if (result.req_msg_id && !sentMessage) {
-                        return
-                    }
-
-                    result.result = this.fetchObject(type, `${field}[result]`)
-                }
-            }
-        }
-
-        deserializer = new TLDeserialization(buffer, deserializerOptions)
+        unpacker = TL.unpacker(buffer)
 
         let response = {}
 
         try {
-            response = deserializer.fetchObject("", "INPUT")
+            response = unpacker.object()
         } catch (e) {
             throw e
         }
 
-        this.messageProcessor.process(response, messageID, sessionID)
+        this.messageProcessor.process(response, message_id, session_id)
     }
 
 
@@ -207,25 +186,24 @@ export class ApiNetworker extends Networker {
             return this.mtproto_addHeader(message)
         }
 
-        const data = new TLSerialization({startMaxLength: message.body.length + 2048})
+        const data = new Packer({maxLength: message.body.length + 2048})
 
-        data.storeIntBytes(this.auth.serverSalt, 64, "salt")
-        data.storeIntBytes(this.auth.sessionID, 64, "session_id")
+        data.integer(this.auth.serverSalt, 64, "salt")
+        data.integer(this.auth.sessionID, 64, "session_id")
 
-        data.storeLong(message.msg_id, "message_id")
-        data.storeInt(message.seq_no, "seq_no")
+        data.long(message.msg_id, "message_id")
+        data.int(message.seq_no, "seq_no")
 
-        data.storeInt(message.body.length, "message_data_length")
-        data.storeRawBytes(message.body, "message_data")
+        data.int(message.body.length, "message_data_length")
+        data.rawBytes(message.body, "message_data")
 
-        const dataBuffer = data.getBuffer()
+        const dataBuffer = data.toBuffer()
 
         const paddingLength = (16 - (data.offset % 16)) + 16 * (1 + Random.nextInteger(5))
-        const padding = createNonce(paddingLength) // TODO check if secure
+        const padding = createNonce(paddingLength)
 
-        // console.log(dT(), "Adding padding", dataBuffer, padding, dataWithPadding)
-        // console.log(dT(), "auth_key_id", Bytes.asHex(self.authKeyID))
         return Bytes.concatBuffer(dataBuffer, padding)
+
     }
 
     sendMessage(message) {
@@ -239,12 +217,13 @@ export class ApiNetworker extends Networker {
 
         const encryptedResult = TELEGRAM_CRYPTO.encrypt_message(plaintext, this.auth.authKey)
 
-        const request = new TLSerialization({startMaxLength: encryptedResult.bytes.byteLength + 256})
-        request.storeIntBytes(this.auth.authKeyID, 64, "auth_key_id")
-        request.storeIntBytes(encryptedResult.msg_key, 128, "msg_key")
-        request.storeRawBytes(encryptedResult.bytes, "encrypted_data")
+        const request = new Packer({maxLength: encryptedResult.bytes.byteLength + 256})
+        request.integer(this.auth.authKeyID, 64, "auth_key_id")
+        request.integer(encryptedResult.msg_key, 128, "msg_key")
+        request.rawBytes(encryptedResult.bytes, "encrypted_data")
 
-        return super.sendMessage(request.getBuffer())
+        return super.sendMessage(request.toBuffer())
+
     }
 
     invokeMethod(method, params, options = {}) {
@@ -252,24 +231,36 @@ export class ApiNetworker extends Networker {
             return this.mtproto_invokeMethod(method, params, options)
         }
 
-        const serializer = new TLSerialization(options)
+        // const serializer = new TLSerialization(options)
+        const packer = new Packer(options)
 
         if (!this.connectionInited) {
             // TODO replace with const values
 
-            serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, "invokeWithLayer")
-            serializer.storeInt(AppConfiguration.mtproto.api.layer, "layer")
+            // serializer.storeInt(AppConfiguration.mtproto.api.invokeWithLayer, "invokeWithLayer")
+            packer.int(AppConfiguration.mtproto.api.invokeWithLayer, "invokeWithLayer")
+            // serializer.storeInt(AppConfiguration.mtproto.api.layer, "layer")
+            packer.int(AppConfiguration.mtproto.api.layer, "layer")
             if (this.updates === false) {
-                serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, "invokeWithoutUpdates")
+                // serializer.storeInt(AppConfiguration.mtproto.api.invokeWithoutUpdates, "invokeWithoutUpdates")
+                packer.int(AppConfiguration.mtproto.api.invokeWithoutUpdates, "invokeWithoutUpdates")
             }
-            serializer.storeInt(AppConfiguration.mtproto.api.initConnection, "initConnection")
-            serializer.storeInt(AppConfiguration.mtproto.api.api_id, "api_id")
-            serializer.storeString(navigator.userAgent || "Unknown UserAgent", "device_model")
-            serializer.storeString(navigator.platform || "Unknown Platform", "system_version")
-            serializer.storeString(AppConfiguration.mtproto.api.app_version, "app_version")
-            serializer.storeString(navigator.language || "en", "system_lang_code")
-            serializer.storeString("", "lang_pack")
-            serializer.storeString(navigator.language || "en", "lang_code")
+            // serializer.storeInt(AppConfiguration.mtproto.api.initConnection, "initConnection")
+            packer.int(AppConfiguration.mtproto.api.initConnection, "initConnection")
+            // serializer.storeInt(AppConfiguration.mtproto.api.api_id, "api_id")
+            packer.int(AppConfiguration.mtproto.api.api_id, "api_id")
+            // serializer.storeString(navigator.userAgent || "Unknown UserAgent", "device_model")
+            packer.string(navigator.userAgent || "Unknown UserAgent", "device_model")
+            // serializer.storeString(navigator.platform || "Unknown Platform", "system_version")
+            packer.string(navigator.platform || "Unknown Platform", "system_version")
+            // serializer.storeString(AppConfiguration.mtproto.api.app_version, "app_version")
+            packer.string(AppConfiguration.mtproto.api.app_version, "app_version")
+            // serializer.storeString(navigator.language || "en", "system_lang_code")
+            packer.string(navigator.language || "en", "system_lang_code")
+            // serializer.storeString("", "lang_pack")
+            packer.string("", "lang_pack")
+            // serializer.storeString(navigator.language || "en", "lang_code")
+            packer.string(navigator.language || "en", "lang_code")
             // TODO init connection
         }
 
@@ -278,24 +269,23 @@ export class ApiNetworker extends Networker {
         //     serializer.storeLong(options.afterMessageID, "msg_id")
         // }
 
-        options.resultType = serializer.storeMethod(method, params)
+        // options.resultType = serializer.storeMethod(method, params)
+        options.resultType = packer.method(method, params)
 
         const messageID = this.timeManager.generateMessageID(this.auth.dcID)
         const seqNo = this.generateSeqNo()
         const message = {
             msg_id: messageID,
             seq_no: seqNo,
-            body: serializer.getBytes(true),
+            body: packer.toUint8Array(),
             isAPI: true
         }
+
+
         this.messageProcessor.sentMessagesDebug.set(messageID, {
             _: method,
             params: params
         })
-
-
-        //// Logger.debug("Api call", method, params, messageID, seqNo, options)
-        // Logger.debug("Api call", method, params)
 
         return new Promise((resolve, reject) => {
             this.messageProcessor.listenRpc(message.msg_id, resolve, reject)
@@ -346,8 +336,8 @@ export class ApiNetworker extends Networker {
     }
 
     wrapMtpMessage(object) {
-        const serializer = new TLSerialization({mtproto: true})
-        serializer.storeObject(object, "Object")
+        const serializer = TL.packer()
+        serializer.object(object, "Object")
 
         const messageID = this.timeManager.generateMessageID(this.auth.dcID)
         const seqNo = this.generateSeqNo(true)
@@ -357,9 +347,7 @@ export class ApiNetworker extends Networker {
         return {
             msg_id: messageID,
             seq_no: seqNo,
-            body: serializer.getBytes()
+            body: serializer.toUint8Array()
         }
     }
-
-
 }

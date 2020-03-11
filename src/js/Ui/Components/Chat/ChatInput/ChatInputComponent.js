@@ -27,6 +27,14 @@ export class ChatInputComponent extends VComponent {
         this.reply = null
     }
 
+    get isVoiceMode() {
+        return this.textarea && this.textarea.childNodes.length === 0
+    }
+
+    get isRecording() {
+        return !!this.recorder
+    }
+
     render() {
         return <div className="chat-input-wrapper">
             <div className="chat-input">
@@ -137,14 +145,9 @@ export class ChatInputComponent extends VComponent {
         </div>
     }
 
-
     appendText = (text) => {
         this.textarea.innerHTML += text
         this.chatInputTextareaRef.component.onInput();
-    }
-
-    get isVoiceMode() {
-        return this.textarea && this.textarea.childNodes.length === 0
     }
 
     initDragArea = () => {
@@ -326,10 +329,6 @@ export class ChatInputComponent extends VComponent {
         this.send()
     }
 
-    get isRecording() {
-        return !!this.recorder
-    }
-
     onMouseUp = (ev) => {
         if (!this.isVoiceMode) return
 
@@ -364,7 +363,6 @@ export class ChatInputComponent extends VComponent {
 
                 AppSelectedChat.Current.api.sendMedia("", reader.result, {
                     _: "inputMediaUploadedDocument",
-                    flags: 0,
                     file: {
                         _: "inputFile",
                         id: id,
@@ -377,10 +375,8 @@ export class ChatInputComponent extends VComponent {
                             //flags: 1024,
                             // duration: 100,
                             _: "documentAttributeAudio",
-                            pFlags: {
-                                voice: true,
-                                waveform: convertBits(this.waveform, 8, 5)
-                            },
+                            voice: true,
+                            waveform: convertBits(this.waveform, 8, 5)
                         },
                         {
                             _: "documentAttributeFilename",

@@ -137,8 +137,8 @@ export function pbkdf2(pwd: string | Uint8Array, salt: string, iter: number, dkl
         throw new Error('Derived key is too long.');
     }
 
-    /* 2. Let len be the number of hLen-octet blocks in the derived key,
-      rounding up, and let r be the number of octets in the last
+    /* 2. Let len be the integer of hLen-octet blocks in the derived key,
+      rounding up, and let r be the integer of octets in the last
       block:
       len = CEIL(dkLen / hLen),
       r = dkLen - (len - 1) * hLen. */

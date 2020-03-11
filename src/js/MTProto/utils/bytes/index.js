@@ -247,7 +247,11 @@ function addPadding(bytes, blockSize = 16, zeroes = false) {
         if (bytes instanceof ArrayBuffer) {
             bytes = Bytes.concatBuffer(bytes, padding)
         } else {
-            bytes = bytes.concat(padding)
+            if (bytes instanceof Uint8Array) {
+                bytes = concat(bytes, padding)
+            } else {
+                bytes = bytes.concat(padding)
+            }
         }
     }
 
@@ -326,12 +330,59 @@ function randomBuffer(length = 32) {
     return crypto.randomBytes(length)
 }
 
+// https://ourcodeworld.com/articles/read/164/how-to-convert-an-uint8array-to-string-in-javascript
+function uInt8ArrayToString(uInt8Array: Uint8Array) {
+    let out, i, len, c
+    let char2, char3
+
+    out = "";
+    len = uInt8Array.byteLength
+    i = 0;
+
+    while (i < len) {
+        c = uInt8Array[i++]
+        switch (c >> 4) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+                // 0xxxxxxx
+                out += String.fromCharCode(c)
+                break
+            case 12:
+            case 13:
+                // 110x xxxx   10xx xxxx
+                char2 = uInt8Array[i++]
+                out += String.fromCharCode(((c & 0x1F) << 6) | (char2 & 0x3F))
+                break
+            case 14:
+                // 1110 xxxx  10xx xxxx  10xx xxxx
+                char2 = uInt8Array[i++]
+                char3 = uInt8Array[i++]
+                out += String.fromCharCode(((c & 0x0F) << 12) |
+                    ((char2 & 0x3F) << 6) |
+                    ((char3 & 0x3F) << 0))
+                break;
+
+            default:
+                out += String.fromCharCode(c)
+                break
+        }
+    }
+
+    return out;
+}
+
 const Bytes = {
     compare,
     xor,
     xorBuffer,
     xorA,
-    asUint8Buffer,
+    asUint8Buffer: asUint8Buffer,
     asUint8Array,
     asBase64,
     fromHex,
@@ -344,6 +395,7 @@ const Bytes = {
     fromWords,
     toWords,
     concatBuffer: concatBuffer,
+    uInt8ArrayToString: uInt8ArrayToString,
 }
 
 export default Bytes

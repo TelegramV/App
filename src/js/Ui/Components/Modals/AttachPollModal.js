@@ -111,11 +111,9 @@ export class AttachPollModal extends VComponent {
             poll: {
                 _: "poll",
                 id: [1, 2], // TODO generate random
-                pFlags: {
-                    public_voters: !this.anonymousRef.$el.querySelector("input").checked,
-                    multiple_choice: this.multipleRef.$el.querySelector("input").checked,
-                    quiz: this.quizRef.$el.querySelector("input").checked
-                },
+                public_voters: !this.anonymousRef.$el.querySelector("input").checked,
+                multiple_choice: this.multipleRef.$el.querySelector("input").checked,
+                quiz: this.quizRef.$el.querySelector("input").checked,
                 question: this.askQuestionRef.component.getValue(),
                 answers: this.optionsRef.component.getAnswersInput()
             }

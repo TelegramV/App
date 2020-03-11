@@ -28,7 +28,7 @@ export default class CodeInputPaneComponent extends PaneComponent {
                 </div>
                 <div className="description">We have sent you an SMS with the code.</div>
             </div>
-            <InputComponent label="Code" type="number" filter={value => /^[\d]{0,5}$/.test(value)} input={this.onInput}
+            <InputComponent label="Code" type="integer" filter={value => /^[\d]{0,5}$/.test(value)} input={this.onInput}
                             ref="codeInput"/>
         </div>
     }
