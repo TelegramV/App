@@ -29,8 +29,6 @@ class Unpacker {
     uInt8Array: Uint8Array
     uInt32Array: Uint32Array
 
-    utf8TextDecoder: TextDecoder
-
     overriders: Map<string, function>
 
     constructor(buffer: ArrayBuffer) {
