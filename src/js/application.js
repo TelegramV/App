@@ -22,5 +22,9 @@ import("lottie-web").then(Module => {
     VApp.useRoutes(AppRoutes)
     VApp.mount("#app")
     
-    MTProto.connect()
+    MTProto.connect().then(_ => {
+        if(!__IS_PRODUCTION__) {
+            window.invokeMethod = MTProto.invokeMethod
+        }
+    })
 })

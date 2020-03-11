@@ -18,6 +18,7 @@
 import AppSelectedInfoPeer from "../Ui/Reactive/SelectedInfoPeer"
 import PeersStore from "../Api/Store/PeersStore"
 import UIEvents from "../Ui/EventBus/UIEvents"
+import MTProto from "../MTProto/external";
 
 function elemToEntity(elem, offset, length) {
     const handlers = {
@@ -148,6 +149,13 @@ const handlersLinks = {
     inputMessageEntityMentionName: (l, a) => <a>{a}</a>,
     messageEntityPhone: (l, a, q) => <a href={`tel:${q}`}>{a}</a>,
     messageEntityCashtag: (l, a) => <a href="#">{a}</a>,
+    messageEntityBankCard: (l, a, q) => <a onClick={e => {
+        MTProto.invokeMethod("payments.getBankCardData", {
+            number: q
+        }, 4, true).then(l => {
+            console.log(l)
+        })
+    }}>{a}</a>
 }
 
 function splitMessageEntities(messageEntities) {

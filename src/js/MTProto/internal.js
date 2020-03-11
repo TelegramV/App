@@ -208,6 +208,10 @@ class MobileProtocol {
             file = true
         }
 
+        if(dcID !== null && dcID !== this.authContext.dcID) {
+            file = true
+        }
+
         if (!this.connected) {
             console.info("Not connected, putting in queue", method)
             return new Promise((resolve, reject) => {
