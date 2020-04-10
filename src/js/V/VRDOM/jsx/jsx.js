@@ -64,6 +64,8 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
                 style.display = v ? "none" : undefined
             } else if (key === "ref") {
                 ref = v
+            } else if (key === "style" && typeof v === "object") {
+                Object.assign(style, v)
             } else {
                 if (attrAliases.has(k)) {
                     key = attrAliases.get(k)

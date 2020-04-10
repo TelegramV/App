@@ -117,9 +117,10 @@ const config = {
     },
     devServer: {
         contentBase: path.join(__dirname, "dist"),
-        compress: true,
+        hot: false, // doesn't work
         port: 8090,
     },
+    devtool: "inline-source-map",
 }
 
 module.exports = config
