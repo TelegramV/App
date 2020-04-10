@@ -14,6 +14,7 @@ if (__IS_PRODUCTION__) {
     AppCache.open()
 } else {
     document.title = "[dev] Telegram V"
+    window.invokeMethod = MTProto.invokeMethod
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)
@@ -21,4 +22,6 @@ VApp.registerPlugin(EmojiVRDOMPlugin)
 VApp.useRoutes(AppRoutes)
 VApp.mount("#app")
 
-MTProto.connect()
+MTProto.connect().then(_ => {
+    console.log("connected")
+})

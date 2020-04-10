@@ -14316,6 +14316,17 @@
             "type": "ChannelLocation"
         },
         {
+            "id": -118740917,
+            "predicate": "peerSelfLocated",
+            "params": [
+                {
+                    "name": "expires",
+                    "type": "int"
+                }
+            ],
+            "type": "PeerLocated"
+        },
+        {
             "id": -901375139,
             "predicate": "peerLocated",
             "params": [
@@ -14690,7 +14701,144 @@
                 }
             ],
             "type": "WebPageAttribute"
-        }
+        },
+				{
+					"id": 1042605427,
+					"predicate": "payments.bankCardData",
+					"params": [
+						{
+							"name": "title",
+							"type": "string"
+						},
+						{
+							"name": "open_urls",
+							"type": "Vector<BankCardOpenUrl>"
+						}
+					],
+					"type": "BankCardData"
+				},
+				{
+					"id": -177732982,
+					"predicate": "bankCardOpenUrl",
+					"params": [
+						{
+							"name": "url",
+							"type": "string"
+						},
+						{
+							"name": "name",
+							"type": "string"
+						}
+					],
+					"type": "BankCardOpenUrl"
+				},
+				{
+					"id": 1981704948,
+					"predicate": "messageEntityBankCard",
+					"params": [
+							{
+									"name": "offset",
+									"type": "int"
+							},
+							{
+									"name": "length",
+									"type": "int"
+							}
+					],
+					"type": "MessageEntity"
+				},
+				{
+					"id": 739703060,
+					"predicate": "dialogFilter",
+					"params": [
+						{
+								"name": "flags",
+								"type": "#"
+						},
+						{
+								"name": "pm",
+								"type": "flags.0?true"
+						},
+						{
+								"name": "secret_chats",
+								"type": "flags.1?true"
+						},
+						{
+								"name": "private_groups",
+								"type": "flags.2?true"
+						},
+						{
+								"name": "public_groups",
+								"type": "flags.3?true"
+						},
+						{
+								"name": "broadcasts",
+								"type": "flags.4?true"
+						},
+						{
+								"name": "bots",
+								"type": "flags.5?true"
+						},
+						{
+								"name": "exclude_muted",
+								"type": "flags.6?true"
+						},
+						{
+								"name": "exclude_read",
+								"type": "flags.7?true"
+						},
+						{
+								"name": "id",
+								"type": "int"
+						},
+						{
+								"name": "title",
+								"type": "string"
+						},
+						{
+								"name": "include_peers",
+								"type": "Vector<InputPeer>"
+						}
+					],
+					"type": "DialogFilter"
+				},
+				{
+					"id": 654302845,
+					"predicate": "updateDialogFilter",
+					"params": [
+							{
+									"name": "flags",
+									"type": "#"
+							},
+							{
+									"name": "id",
+									"type": "int"
+							},
+							{
+									"name": "filter",
+									"type": "flags.0?DialogFilter"
+							}
+					],
+					"type": "Update"
+				},
+				{
+					"id": -1512627963,
+					"predicate": "updateDialogFilterOrder",
+					"params": [
+							{
+									"name": "order",
+									"type": "Vector<int>"
+							}
+					],
+					"type": "Update"
+				},
+				{
+					"id": 889491791,
+					"predicate": "updateDialogFilters",
+					"params": [
+					],
+					"type": "Update"
+				}
     ],
     "methods": [
         {
@@ -16402,13 +16550,25 @@
             "type": "Updates"
         },
         {
-            "id": 171270230,
+            "id": -750207932,
             "method": "contacts.getLocated",
             "params": [
+								{
+									"name": "flags",
+									"type": "#"
+								},
+								{
+									"name": "background",
+									"type": "flags.1?true"
+								},
                 {
                     "name": "geo_point",
                     "type": "InputGeoPoint"
-                }
+                },
+								{
+									"name": "self_expires",
+									"type": "flags.0?int"
+								}
             ],
             "type": "Updates"
         },
@@ -20352,6 +20512,55 @@
                 }
             ],
             "type": "messages.VotesList"
-        }
+        },
+				{
+					"id": 779736953,
+					"method": "payments.getBankCardData",
+					"params": [
+						{
+							"name": "number",
+							"type": "string"
+						}
+					],
+					"type": "BankCardData"
+				},
+				{
+					"id": -241247891,
+					"method": "messages.getDialogFilters",
+					"params": [
+					],
+					"type": "Vector<DialogFilter>"
+				},
+				{
+					"id": 450142282,
+					"method": "messages.updateDialogFilter",
+					"params": [
+						{
+							"name": "flags",
+							"type": "#"
+						},
+						{
+							"name": "id",
+							"type": "int"
+						},
+						{
+							"name": "filter",
+							"type": "flags.0?DialogFilter"
+						}
+					],
+					"type": "Bool"
+				},
+
+				{
+					"id": -983318044,
+					"method": "messages.updateDialogFiltersOrder",
+					"params": [
+						{
+							"name": "order",
+							"type": "Vector<int>"
+						}
+					],
+					"type": "Bool"
+				}
     ]
 }

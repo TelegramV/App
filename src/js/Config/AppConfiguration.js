@@ -15,7 +15,7 @@ export const AppConfiguration = {
         api: {
             invokeWithoutUpdates: 0xbf9459b7,
             invokeWithLayer: 0xda9b0d0d,
-            layer: 109,
+            layer: 110,
             initConnection: 0xc7481da6,
             api_id: 1147988,
             api_hash: "4acddf30a6113bfe220f7fd67ab7f468",
