@@ -3,12 +3,12 @@ import {rsaKeyByFingerprints} from "./rsaKeys"
 import {RSA_ENCRYPT} from "../crypto/rsa"
 import {SHA1, SHA1_ArrayBuffer} from "../crypto/sha"
 import {tsNow} from "../timeManager"
-import {SecureRandomSingleton} from "../utils/singleton"
-import VBigInt from "../bigint/VBigInt"
 import PQ from "../utils/pq"
 import {AES_IGE_DECRYPT, AES_IGE_ENCRYPT} from "../crypto/aes"
 import TL from "../language/TL"
 import {concat} from "../crypto/TELEGRAM_CRYPTO"
+import BigInteger from "big-integer"
+import crypto from "crypto"
 
 async function step1_req_pq_multi(networker) {
     const authContext = networker.auth
@@ -48,8 +48,7 @@ async function step4_req_DH_params(pAndQ, networker) {
 
     console.debug("step4 authContext = ", authContext)
 
-    authContext.newNonce = new Array(32)
-    SecureRandomSingleton.nextBytes(authContext.newNonce)
+    authContext.newNonce = Array.from(crypto.randomBytes(32))
 
     const data_serializer = TL.pack({
         _: "p_q_inner_data",
@@ -143,24 +142,25 @@ async function step5_Server_DH_Params(ServerDHParams, networker) {
         throw new Error("DH params are not verified: unknown dhPrime")
     }
 
-    const gABigInt = VBigInt.create("0x" + Bytes.asHex(authContext.gA))
-    const dhPrimeBigInt = VBigInt.create("0x" + dhPrimeHex)
+    const gABigInt = BigInteger(Bytes.asHex(authContext.gA), 16)
+    const dhPrimeBigInt = BigInteger(dhPrimeHex, 16)
 
-    if (gABigInt.lessThanOrEqual(VBigInt.create(1))) {
+    if (gABigInt.compareTo(BigInteger.one) <= 0) {
         throw new Error("gA <= 1")
     }
 
-    if (gABigInt.greaterThanOrEqual(dhPrimeBigInt.subtract(VBigInt.create(1)))) {
+    if (gABigInt.compareTo(dhPrimeBigInt.subtract(BigInteger.one)) >= 0) {
         throw new Error("gA >= dhPrime - 1")
     }
 
-    const two = VBigInt.create(2)
-    const twoPow = two.pow(VBigInt.create(2048 - 64))
+    const two = BigInteger(2)
+    const twoPow = two.pow(BigInteger(2048 - 64))
 
-    if (gABigInt.lessThan(twoPow)) {
+    if (gABigInt.compareTo(twoPow) === -1) {
         throw new Error("gA < 2^{2048-64}")
     }
-    if (gABigInt.greaterThanOrEqual(dhPrimeBigInt.subtract(twoPow))) {
+
+    if (gABigInt.compareTo(dhPrimeBigInt.subtract(twoPow)) > 0) {
         throw new Error("gA > dhPrime - 2^{2048-64}")
     }
 
@@ -180,8 +180,7 @@ async function step6_set_client_DH_params(networker, processor, proc_context) {
     console.debug("step6 authContext = ", authContext)
 
     const gBytes = Bytes.fromHex(authContext.g.toString(16))
-    authContext.b = new Array(256)
-    SecureRandomSingleton.nextBytes(authContext.b)
+    authContext.b = Array.from(crypto.randomBytes(256))
     const gB = Bytes.modPow(gBytes, authContext.b, authContext.dhPrime)
 
     const Client_DH_Inner_Data_serialization = TL.pack({

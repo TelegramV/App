@@ -8,7 +8,7 @@ import {ModalComponent} from "../../Components/Singleton/ModalComponent"
 import {MediaViewerComponent} from "../../Components/Singleton/MediaViewerComponent"
 import {InstantViewComponent} from "../../Components/Singleton/InstantViewComponent"
 import {DialogsBar} from "../../Components/Sidebars/Left/Dialogs/DialogsBar"
-import ChatComponent from "../../Components/Chat/ChatComponent"
+import ChatComponent from "../../Components/Columns/Chat/ChatComponent"
 import {SettingsComponent} from "../../Components/Sidebars/Left/Settings/SettingsComponent"
 import {SearchPanelComponent} from "../../Components/Sidebars/Left/Search/SearchPanelComponent"
 import MessagesSearchComponent from "../../Components/Sidebars/Right/Search/MessagesSearchComponent"
@@ -16,7 +16,6 @@ import {DialogInfoComponent} from "../../Components/Sidebars/Right/DialogInfo/Di
 import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/ArchivedDialogsBar"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
-import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {
@@ -43,7 +42,7 @@ export function MainPage() {
             <MediaViewerComponent/>
             <InstantViewComponent/>
             <SettingsComponent/>
-            <PhoneCallComponent/>
+            {/*<PhoneCallComponent/>*/}
             {/*TODO move all settings inside it's component*/}
 
 

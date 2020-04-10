@@ -3,7 +3,7 @@ import PeersStore from "../Store/PeersStore"
 import DialogsStore from "../Store/DialogsStore"
 import DialogsManager from "../Dialogs/DialogsManager"
 import {AppPermanentStorage} from "../Common/Storage"
-import VApp from "../../vapp"
+import VApp from "../../V/vapp"
 
 export function logout() {
     return MTProto.logout().then(() => {

@@ -17,7 +17,7 @@
 
 import VCollection from "./VCollection"
 import vrdom_delete from "../delete"
-import VApp from "../../../vapp"
+import VApp from "../../vapp"
 
 class List {
 

@@ -20,6 +20,9 @@ import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 
+/**
+ * @deprecated
+ */
 export class InputComponent extends VComponent {
 
     inputRef = VComponent.createRef()

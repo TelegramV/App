@@ -16,7 +16,7 @@
  */
 
 import VComponent from "../component/VComponent"
-import VApp from "../../../vapp"
+import VApp from "../../vapp"
 
 class ComponentRef {
     __component_ref = true

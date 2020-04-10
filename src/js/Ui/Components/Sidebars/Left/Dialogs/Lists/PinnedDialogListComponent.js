@@ -1,7 +1,7 @@
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import {DialogComponent} from "../DialogComponent"
-import VApp from "../../../../../../vapp"
+import VApp from "../../../../../../V/vapp"
 
 export default class PinnedDialogListComponent extends VComponent {
 

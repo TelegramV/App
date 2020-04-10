@@ -1,9 +1,7 @@
 import {uint6ToBase64} from "../bin"
-import {SecureRandomSingleton} from "../singleton"
 import crypto from "crypto"
-import VBigInt from "../../bigint/VBigInt"
-import {BigInteger} from "../../../../../vendor/jsbn"
 import CryptoJS from "../../../../../vendor/CryptoJS"
+import BigInteger from "big-integer"
 
 /**
  * @param {Array|ArrayLike|ArrayBufferLike} a
@@ -139,73 +137,6 @@ function fromArrayBuffer(buffer) {
     return bytes
 }
 
-/**
- * @param {BigInteger} bigInteger
- * @param {number} length
- * @return {Array|ArrayLike|ArrayBufferLike}
- */
-function fromBigInteger(bigInteger, length = undefined) {
-    let bytes = new Uint8Array(bigInteger.toByteArray())
-
-    if (length && bytes.length < length) {
-        const padding = []
-        for (let i = 0, needPadding = length - bytes.length; i < needPadding; i++) {
-            padding[i] = 0
-        }
-        if (bytes instanceof ArrayBuffer) {
-            bytes = Bytes.concatBuffer(padding, bytes)
-        } else {
-            bytes = padding.concat(bytes)
-        }
-    } else {
-        while (!bytes[0] && (!length || bytes.length > length)) {
-            bytes = bytes.slice(1)
-        }
-    }
-
-    return bytes
-}
-
-
-/**
- * @param {Array|ArrayLike|ArrayBufferLike} x
- * @param {Array|ArrayLike|ArrayBufferLike} y
- * @param {Array|ArrayLike|ArrayBufferLike} m
- * @return {number|ArrayLike|ArrayBufferLike}
- */
-function modPow(x, y, m) {
-    try {
-        const xBigInt = VBigInt.create(asHex(x), 16)
-        const yBigInt = VBigInt.create(asHex(y), 16)
-        const mBigInt = VBigInt.create(asHex(m), 16)
-        let res = xBigInt.modPow(yBigInt, mBigInt).toByteArray()
-        if (res.length > 256) {
-            res = res.splice(res.length - 256)
-        } else if (res.length < 256) {
-            return res.unshift(0)
-        }
-
-        return res
-        /*
-        const xBigInt = new BigInteger(asHex(x), 16)
-        const yBigInt = new BigInteger(asHex(y), 16)
-        const mBigInt = new BigInteger(asHex(m), 16)
-        let resBigInt = xBigInt.modPow(yBigInt, mBigInt).toByteArray()
-        if (resBigInt.length > 256) {
-            resBigInt = resBigInt.splice(resBigInt.length - 256)
-        } else if (resBigInt.length < 256) {
-            return resBigInt.unshift(0)
-        }
-
-        return resBigInt
-         */
-    } catch (e) {
-        console.error("mod pow error", e)
-    }
-
-    return VBigInt.create(x).modPow(y, m).getBytes(256)
-}
-
 
 /**
  * @param {Array|ArrayLike|ArrayBufferLike} bytes
@@ -232,14 +163,12 @@ function addPadding(bytes, blockSize = 16, zeroes = false) {
     const needPadding = blockSize - (len % blockSize)
 
     if (needPadding > 0 && needPadding < blockSize) {
-        const padding = new Array(needPadding)
+        const padding = Array.from(crypto.randomBytes(needPadding))
 
         if (zeroes) {
             for (let i = 0; i < needPadding; i++) {
                 padding[i] = 0
             }
-        } else {
-            SecureRandomSingleton.nextBytes(padding)
         }
 
         console.error("padding", padding)
@@ -283,16 +212,6 @@ function concat(a, b) {
  */
 function concatBuffer(a, b) {
     return concat(a, b).buffer
-}
-
-/**
- * @param {number} length
- * @return {Array}
- */
-function randomArray(length = 32) {
-    const bytesArray = new Array(length)
-    SecureRandomSingleton.nextBytes(bytesArray)
-    return bytesArray
 }
 
 function fromWords(wordArray) {
@@ -377,6 +296,34 @@ function uInt8ArrayToString(uInt8Array: Uint8Array) {
     return out;
 }
 
+const fromBigInteger = (bigInt) => {
+    return new Uint8Array(bigInt.toArray(256).value)
+}
+
+const toBigInteger = (bytes: Uint8Array) => {
+    return BigInteger.fromArray(Array.isArray(bytes) ? bytes : Array.from(bytes), 256, false)
+}
+
+function modPow(x, y, m) {
+    console.log(x, y, m)
+
+    const xBigInt = BigInteger(asHex(x), 16)
+    const yBigInt = BigInteger(asHex(y), 16)
+    const mBigInt = BigInteger(asHex(m), 16)
+
+    console.log(xBigInt, yBigInt, mBigInt)
+
+    let res = fromBigInteger(xBigInt.modPow(yBigInt, mBigInt))
+
+    if (res.length > 256) {
+        res = res.splice(res.length - 256)
+    } else if (res.length < 256) {
+        return res.unshift(0)
+    }
+
+    return res
+}
+
 const Bytes = {
     compare,
     xor,
@@ -389,13 +336,14 @@ const Bytes = {
     asHex: asHex,
     fromArrayBuffer: fromArrayBuffer,
     fromBigInteger: fromBigInteger,
-    modPow: modPow,
+    toBigInteger: toBigInteger,
     addPadding: addPadding,
     concat,
     fromWords,
     toWords,
     concatBuffer: concatBuffer,
     uInt8ArrayToString: uInt8ArrayToString,
+    modPow: modPow
 }
 
 export default Bytes

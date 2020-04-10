@@ -25,14 +25,14 @@ class VRDOMInterceptor {
     /**
      * @return {HTMLElement | undefined} undefined to do nothing
      */
-    elementInterceptCreate(node: VRNode, props: VRenderProps): HTMLElement | undefined {
+    elementCreateIntercept(node: VRNode, props: VRenderProps): HTMLElement | undefined {
 
     }
 
     /**
      * @return {Node | undefined} undefined to do nothing
      */
-    textInterceptCreate(text: string): Node | undefined {
+    textCreateIntercept(text: string): Node | undefined {
 
     }
 }

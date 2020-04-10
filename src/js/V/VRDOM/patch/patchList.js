@@ -18,7 +18,7 @@
 import VListVRNode from "../list/VListVRNode"
 import vrdom_render from "../render/render"
 import {initElement} from "../render/renderElement"
-import VApp from "../../../vapp"
+import VApp from "../../vapp"
 
 const patchList = ($node, node: VListVRNode) => {
     initElement($node)

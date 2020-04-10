@@ -19,6 +19,9 @@ import VComponent from "../../../V/VRDOM/component/VComponent"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 
+/**
+ * @deprecated
+ */
 export class ButtonWithProgressBarComponent extends VComponent {
 
     state = {

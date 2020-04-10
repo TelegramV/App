@@ -7,10 +7,10 @@
  * Copyright 2020 Telegram V authors.
  */
 
-import VBigInt from "../bigint/VBigInt"
 import {getConstructorById, getConstructorByPredicate, schema} from "./schema"
 import {GZIP_UNCOMPRESS} from "../crypto/gzip"
 import Bytes from "../utils/bytes"
+import BigInteger from "big-integer"
 
 function isGzipped(constructor: number) {
     return constructor === 0x3072cfa1 || constructor.predicate === "gzip_packed"
@@ -57,7 +57,7 @@ class Unpacker {
         const low = this.int()
         const high = this.int()
 
-        return VBigInt.create(high).leftShift(32).add(low).toString()
+        return BigInteger(high).shiftLeft(32).add(low).toString()
     }
 
     double(): number {

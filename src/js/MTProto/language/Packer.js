@@ -8,8 +8,8 @@
  */
 
 import {intToUint} from "../utils/bin"
-import VBigInt from "../bigint/VBigInt"
 import {getConstructorByPredicate, getMethodByName} from "./schema"
+import BigInteger from "big-integer"
 
 class Packer {
 
@@ -96,10 +96,11 @@ class Packer {
     }
 
     long(value: string | Array) {
-        if (value instanceof Array) {
+        if (value instanceof Array || value instanceof Uint8Array) {
             if (value.length === 2) {
                 this.int(value[1])
                 this.int(value[0])
+                return
             } else {
                 return this.integer(value, 64)
             }
@@ -109,10 +110,10 @@ class Packer {
             value = value ? value.toString() : "0"
         }
 
-        const divRem = VBigInt.create(value).divideAndRemainder(VBigInt.create(0x100000000))
+        const divRem = BigInteger(value).divmod(0x100000000)
 
-        this.int(intToUint(divRem[1].toNumber()))
-        this.int(intToUint(divRem[0].toNumber()))
+        this.int(intToUint(divRem.remainder.toJSNumber()))
+        this.int(intToUint(divRem.quotient.toJSNumber()))
     }
 
     double(value: number) {

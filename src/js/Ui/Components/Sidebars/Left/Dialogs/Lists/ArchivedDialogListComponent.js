@@ -2,7 +2,7 @@ import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import {DialogComponent} from "../DialogComponent"
 import DialogsManager from "../../../../../../Api/Dialogs/DialogsManager"
-import VApp from "../../../../../../vapp"
+import VApp from "../../../../../../V/vapp"
 
 export default class ArchivedDialogListComponent extends VComponent {
 

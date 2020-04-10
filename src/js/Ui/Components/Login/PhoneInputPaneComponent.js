@@ -1,15 +1,14 @@
 import PaneComponent from "./PaneComponent"
 import {DropdownComponent} from "./DropdownComponent";
 import {InputComponent} from "../Elements/InputComponent";
-import CheckboxFragment from "../Elements/CheckboxFragment";
+import VCheckbox from "../Elements/VCheckbox";
 import {ButtonWithProgressBarComponent} from "../Elements/ButtonComponent";
 import InfoComponent from "./InfoComponent"
 import CountryDropdownItemFragment from "./CountryDropdownItemFragment"
-
-import {MTProto} from "../../../MTProto/external"
 import {countries} from "../../Utils/utils"
 import {AppPermanentStorage} from "../../../Api/Common/Storage";
 import VComponent from "../../../V/VRDOM/component/VComponent"
+import API from "../../../Api/Telegram/API"
 
 export default class PhoneInputComponent extends PaneComponent {
 
@@ -46,7 +45,7 @@ export default class PhoneInputComponent extends PaneComponent {
                 <InputComponent label="Phone Number" type="tel"
                                 filter={value => /^\+?[\d ]*$/.test(value)} input={this.phoneInput}
                                 ref={this.phoneRef}/>
-                <CheckboxFragment label="Keep me signed in" checked input={this.checkboxInput}/>
+                <VCheckbox label="Keep me signed in" checked input={this.checkboxInput}/>
                 <ButtonWithProgressBarComponent label="Next" disabled={this.state.nextDisabled}
                                                 click={this.handlePhoneSend} ref={this.nextRef}/>
                 <div className="qr-login-button" onClick={this.qrLogin}>Quick log in using QR code
@@ -71,12 +70,12 @@ export default class PhoneInputComponent extends PaneComponent {
         next.isLoading = true
         next.label = "Please wait..."
 
-        MTProto.Auth.sendCode(phoneNumber).then(sentCode => {
+        API.auth.sendCode(phoneNumber).then(sentCode => {
             this.props.finished({
                 phone: phoneNumber,
                 sentCode: sentCode
             })
-        }, error => {
+        }).catch(error => {
             if (error.type === "AUTH_RESTART") {
                 AppPermanentStorage.clear()
                 this.handlePhoneSend()
@@ -88,6 +87,7 @@ export default class PhoneInputComponent extends PaneComponent {
                 PHONE_NUMBER_FLOOD: "Too many attempts",
                 AUTH_RESTART: "Auth restarting"
             }[error.type] || "Error occured"
+
             phone.error = msg
         }).finally(l => {
             this.state.isLoading = false

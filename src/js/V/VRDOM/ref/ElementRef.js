@@ -15,7 +15,7 @@
  *
  */
 
-import VApp from "../../../vapp"
+import VApp from "../../vapp"
 
 class ElementRef {
     __ref = true

@@ -2,6 +2,7 @@ import PaneComponent from "./PaneComponent"
 import {InputComponent} from "../Elements/InputComponent";
 
 import {MTProto} from "../../../MTProto/external"
+import API from "../../../Api/Telegram/API"
 
 export default class CodeInputPaneComponent extends PaneComponent {
     constructor(props) {
@@ -55,7 +56,7 @@ export default class CodeInputPaneComponent extends PaneComponent {
         //this.state.phoneCode = phoneCode
         //this.state.phoneCodeHash = phoneCodeHash
 
-        MTProto.Auth.signIn(this.state.phone, phoneCodeHash, phoneCode).then(authorization => {
+        API.auth.signIn(this.state.phone, phoneCodeHash, phoneCode).then(authorization => {
             if (authorization._ === "auth.authorizationSignUpRequired") {
                 // show sign up
                 //fadeOut(document.getElementById("codePane"));
@@ -69,7 +70,7 @@ export default class CodeInputPaneComponent extends PaneComponent {
                 this.props.finished(authorization)
 
             }
-        }, reject => {
+        }).catch(reject => {
             if (reject.type === "SESSION_PASSWORD_NEEDED") {
                 MTProto.invokeMethod("account.getPassword", {}).then(response => {
                     console.log(response)

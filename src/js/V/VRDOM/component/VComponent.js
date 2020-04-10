@@ -32,7 +32,7 @@ import __component_withDefaultProps from "./__component_withDefaultProps"
 import FragmentRef from "../ref/FragmentRef"
 import ComponentRef from "../ref/ComponentRef"
 import ElementRef from "../ref/ElementRef"
-import VApp from "../../../vapp"
+import VApp from "../../vapp"
 
 /**
  * Features:

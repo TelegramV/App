@@ -19,7 +19,7 @@ import {ModalHeaderFragment} from "./ModalHeaderFragment";
 import {InputComponent} from "../Elements/InputComponent";
 import VComponent from "../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../Reactive/SelectedChat";
-import CheckboxFragment from "../Elements/CheckboxFragment";
+import VCheckbox from "../Elements/VCheckbox";
 import VUI from "../../VUI"
 
 class OptionsFragment extends VComponent {
@@ -85,10 +85,10 @@ export class AttachPollModal extends VComponent {
             </div>
             <hr/>
             <div className="padded">
-                <CheckboxFragment ref={this.anonymousRef} label="Anonymous Voting" checked
-                                  input={this.checkboxUpdate.bind(this)}/>
-                <CheckboxFragment ref={this.multipleRef} label="Multiple Answers"/>
-                <CheckboxFragment ref={this.quizRef} label="Quiz Mode" input={this.checkboxUpdate.bind(this)}/>
+                <VCheckbox ref={this.anonymousRef} label="Anonymous Voting" checked
+                           input={this.checkboxUpdate.bind(this)}/>
+                <VCheckbox ref={this.multipleRef} label="Multiple Answers"/>
+                <VCheckbox ref={this.quizRef} label="Quiz Mode" input={this.checkboxUpdate.bind(this)}/>
             </div>
         </div>
     }

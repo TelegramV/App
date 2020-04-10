@@ -3,7 +3,7 @@ import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import {DialogComponent} from "../DialogComponent"
 import {GroupForbiddenPeer} from "../../../../../../Api/Peers/Objects/GroupForbiddenPeer"
 import {ChannelForbiddenPeer} from "../../../../../../Api/Peers/Objects/ChannelForbiddenPeer"
-import VApp from "../../../../../../vapp"
+import VApp from "../../../../../../V/vapp"
 
 export default class GeneralDialogListComponent extends VComponent {
 

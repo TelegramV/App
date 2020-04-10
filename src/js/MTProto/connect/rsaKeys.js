@@ -1,7 +1,7 @@
 import {SHA1} from "../crypto/sha"
 import Bytes from "../utils/bytes"
-import VBigInt from "../bigint/VBigInt"
 import TL from "../language/TL"
+import BigInteger from "big-integer"
 
 const keys = [
     {
@@ -53,7 +53,8 @@ function prepare() {
 
 export function rsaKeyByFingerprints(fingerprints) {
     for (let i = 0; i < fingerprints.length; i++) {
-        let fingerprintHex = VBigInt.create(fingerprints[i]).toString(16)
+        console.log(fingerprints)
+        let fingerprintHex = BigInteger(fingerprints[i]).toString(16)
         let foundKey = publicRsaKeys()[fingerprintHex]
 
         if (foundKey) {

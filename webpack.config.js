@@ -7,8 +7,9 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 const FilterWarningsPlugin = require("webpack-filter-warnings-plugin")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const TerserPlugin = require("terser-webpack-plugin")
+const CompressionPlugin = require("compression-webpack-plugin")
 
-const prod = process.env.NODE_ENV === "production"
+const isProduction = process.argv.mode === "production" || process.argv.includes("production")
 
 const config = {
     node: {
@@ -56,7 +57,7 @@ const config = {
                         query: {
                             modules: {
                                 mode: "global",
-                                localIdentName: prod ? "[hash:base64]" : "[name]__[local]",
+                                localIdentName: isProduction ? "[hash:base64]" : "[name]__[local]",
                                 context: path.resolve(__dirname, "src/sass"),
                             },
                             localsConvention: "camelCase",
@@ -94,7 +95,7 @@ const config = {
             from: "public",
         }]),
         new webpack.DefinePlugin({
-            __IS_PRODUCTION__: prod,
+            __IS_PRODUCTION__: isProduction,
         }),
         // new FlowWebpackPlugin(),
         new MiniCssExtractPlugin({
@@ -107,9 +108,11 @@ const config = {
         new FilterWarningsPlugin({
             exclude: /Critical dependency: the request of a dependency is an expression/,
         }),
+        isProduction ? new CompressionPlugin() : () => {
+        },
     ],
     optimization: {
-        minimize: prod,
+        minimize: isProduction,
         minimizer: [new TerserPlugin()],
     },
     devServer: {

@@ -1,7 +1,7 @@
 import CryptoJS from "../../../../vendor/CryptoJS"
 import crypto from "crypto"
 import Bytes from "./bytes"
-import VBigInt from "../bigint/VBigInt"
+import BigInteger from "big-integer"
 
 export function createRandomBuffer(bytesLength) {
     return new Buffer(crypto.randomBytes(bytesLength));
@@ -69,9 +69,9 @@ export function convertToByteArray(bytes) {
 }
 
 export function longToInts(sLong) {
-    const divRem = VBigInt.create(sLong).divideAndRemainder(VBigInt.create(0x100000000))
+    const divRem = BigInteger(sLong).divmod(0x100000000)
 
-    return [divRem[0].toNumber(), divRem[1].toNumber()]
+    return [divRem.quotient.toJSNumber(), divRem.remainder.toJSNumber()]
 }
 
 export function longToBytes(sLong) {
@@ -79,7 +79,7 @@ export function longToBytes(sLong) {
 }
 
 export function longFromInts(high, low) {
-    return VBigInt.create(high).leftShift(32).add(low).toString(10)
+    return BigInteger(high).shiftLeft(32).add(low).toString(10)
 }
 
 export function intToUint(val) {

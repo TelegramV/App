@@ -19,7 +19,7 @@ import vrdom_render from "./render"
 import VComponent from "../component/VComponent"
 import VComponentVRNode from "../component/VComponentVRNode"
 import {initElement} from "./renderElement"
-import VApp from "../../../vapp"
+import VApp from "../../vapp"
 
 export function vrdom_instantiateVComponentVNode(node: VComponentVRNode) {
     const componentInstance: VComponent = new (node.component)({

@@ -2,7 +2,6 @@ import {MTProto} from "../../MTProto/external";
 import Bytes from "../../MTProto/utils/bytes";
 import {bytesConcatBuffer} from "../../Utils/byte";
 import {SHA1, SHA256} from "../../MTProto/crypto/sha";
-import VBigInt from "../../MTProto/bigint/VBigInt";
 import AppEvents from "../EventBus/AppEvents";
 import {ReactiveObject} from "../../V/Reactive/ReactiveObject";
 import {PCMPlayer} from "../../Utils/PCMPlayer"
@@ -11,7 +10,7 @@ import UpdatesManager from "../Updates/UpdatesManager";
 import {computeEmojiFingerprint} from "../../Ui/Utils/replaceEmoji";
 import CallNetworker from "./CallNetworker";
 import Opus from "./Opus";
-
+import BigInteger from "big-integer"
 
 export const CallState = {
     CallStarted: -1,
@@ -147,7 +146,7 @@ class CallManager extends ReactiveObject {
 
     async startCall(peer) {
         const dhConfig = await this.dhConfig
-        const gA = VBigInt.create(dhConfig.g).modPow(dhConfig.random, dhConfig.p).toByteArray()
+        const gA = BigInteger(dhConfig.g).modPow(dhConfig.random, dhConfig.p).toArray()
 
         this.fire("startedCall", {
             peer: peer
@@ -188,7 +187,7 @@ class CallManager extends ReactiveObject {
 
         // TODO generate own random
         const b = dhConfig.random
-        const gB = VBigInt.create(g).modPow(b, p)
+        const gB = BigInteger(g).modPow(b, p)
 
         const response = await MTProto.invokeMethod("phone.acceptCall", {
             g_b: gB.toByteArray(),

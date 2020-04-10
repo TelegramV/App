@@ -6,7 +6,8 @@ import {ButtonWithProgressBarComponent} from "../Elements/ButtonComponent";
 import {askForFile} from "../../Utils/utils"
 import {MTProto} from "../../../MTProto/external"
 import {FileAPI} from "../../../Api/Files/FileAPI"
-import VApp from "../../../vapp"
+import VApp from "../../../V/vapp"
+import API from "../../../Api/Telegram/API"
 
 const Croppie = require("croppie")
 export default class RegisterPaneComponent extends PaneComponent {
@@ -111,7 +112,7 @@ export default class RegisterPaneComponent extends PaneComponent {
         next.isLoading = true
         next.label = "Please wait..."
 
-        MTProto.Auth.signUp(this.state.phone, this.state.phoneCodeHash, firstName, lastName).then(async authorization => {
+        API.auth.signUp(this.state.phone, this.state.phoneCodeHash, firstName, lastName).then(async authorization => {
             if (authorization._ === "auth.authorization") {
                 if (this.state.pictureBlob) {
                     FileAPI.uploadProfilePhoto("avatar.jpg", this.state.pictureBlob).then(l => {

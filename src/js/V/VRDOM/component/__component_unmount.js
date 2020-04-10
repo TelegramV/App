@@ -16,7 +16,7 @@
  */
 
 import VComponent from "./VComponent"
-import VApp from "../../../vapp"
+import VApp from "../../vapp"
 
 const __component_unmount = (context: VComponent) => {
     // console.debug("unmounting", context.identifier, context.displayName)

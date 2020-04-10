@@ -1,4 +1,3 @@
-import Bytes from "../../../MTProto/utils/bytes"
 import MTProto from "../../../MTProto/external"
 
 function convertToByteArray(bytes) {
@@ -6,7 +5,7 @@ function convertToByteArray(bytes) {
         return bytes
     }
 
-    bytes = Bytes.asUint8Array(bytes)
+    bytes = new Uint8Array(bytes)
 
     const newBytes = []
 

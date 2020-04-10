@@ -5,7 +5,7 @@ import RegisterPaneComponent from "./RegisterPaneComponent"
 
 import {AppPermanentStorage} from "../../../Api/Common/Storage"
 import VComponent from "../../../V/VRDOM/component/VComponent"
-import VApp from "../../../vapp"
+import VApp from "../../../V/vapp"
 
 export default class LoginComponent extends VComponent {
 

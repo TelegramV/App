@@ -15,11 +15,11 @@
  *
  */
 
-import VApp from "../../../vapp"
+import VApp from "../../vapp"
 
 const renderText = text => {
     if (VApp.interceptor) {
-        const intercepted = VApp.interceptor.textInterceptCreate(text)
+        const intercepted = VApp.interceptor.textCreateIntercept(text)
 
         if (intercepted === undefined) {
             return document.createTextNode(text)

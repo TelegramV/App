@@ -17,7 +17,7 @@
 
 import VComponent from "./VComponent"
 import {initElement} from "../render/renderElement"
-import VApp from "../../../vapp"
+import VApp from "../../vapp"
 
 const __component_mount = (context: VComponent, $el: HTMLElement) => {
     // context.__.destroyed = false

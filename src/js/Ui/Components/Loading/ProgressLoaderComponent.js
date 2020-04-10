@@ -17,6 +17,7 @@
 
 import VComponent from "../../../V/VRDOM/component/VComponent"
 
+// я спочатку не зрозумів для чого воно, може краще перейменуй і перемісти кудась інакше, бо цю папку варто би видалити
 class ProgressLoaderComponent extends VComponent {
 
     render() {

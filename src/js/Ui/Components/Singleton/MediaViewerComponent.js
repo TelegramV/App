@@ -15,7 +15,7 @@
  *
  */
 
-import ChatInfoAvatarComponent from "../Chat/ChatInfo/ChatInfoAvatarComponent";
+import ChatInfoAvatarComponent from "../Columns/Chat/ChatInfo/ChatInfoAvatarComponent";
 import {PhotoMessage} from "../../../Api/Messages/Objects/PhotoMessage";
 import VUI from "../../VUI"
 import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"

@@ -1,4 +1,10 @@
-import VBigInt from "../../MTProto/bigint/VBigInt";
+// import VBigInt from "../../MTProto/bigint/VBigInt";
+// макс не юзай більше VBigInt, я прикрутив новий бігінт, який є поліфілом для нативного
+// і ще, воно в головний бандл крутиться коли ти імпортуєш тут,
+// то краще винеси таку логіку в воркер
+// import BigInteger from "big-integer"
+// const two = BigInteger(2)
+// const fa = BigInteger(Array.from(new Uint8Array(8)), 256)
 
 import twemoji from "twemoji"
 
@@ -35,14 +41,14 @@ export const replaceEmoji = (element) => {
 }
 
 const computeEmojiIndex = (bytes) => {
-    return ((VBigInt.create(bytes[0]).bitwiseAnd(0x7F)).leftShift(56))
-        .bitwiseOr((VBigInt.create(bytes[1]).leftShift(48)))
-        .bitwiseOr((VBigInt.create(bytes[2]).leftShift(40)))
-        .bitwiseOr((VBigInt.create(bytes[3]).leftShift(32)))
-        .bitwiseOr((VBigInt.create(bytes[4]).leftShift(24)))
-        .bitwiseOr((VBigInt.create(bytes[5]).leftShift(16)))
-        .bitwiseOr((VBigInt.create(bytes[6]).leftShift(8)))
-        .bitwiseOr((VBigInt.create(bytes[7])))
+    // return ((VBigInt.create(bytes[0]).bitwiseAnd(0x7F)).leftShift(56))
+    //     .bitwiseOr((VBigInt.create(bytes[1]).leftShift(48)))
+    //     .bitwiseOr((VBigInt.create(bytes[2]).leftShift(40)))
+    //     .bitwiseOr((VBigInt.create(bytes[3]).leftShift(32)))
+    //     .bitwiseOr((VBigInt.create(bytes[4]).leftShift(24)))
+    //     .bitwiseOr((VBigInt.create(bytes[5]).leftShift(16)))
+    //     .bitwiseOr((VBigInt.create(bytes[6]).leftShift(8)))
+    //     .bitwiseOr((VBigInt.create(bytes[7])))
 }
 
 export const computeEmojiFingerprint = (h) => {

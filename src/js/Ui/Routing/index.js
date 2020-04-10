@@ -3,7 +3,7 @@ import {MainPage} from "../Pages/Main/MainPage"
 import MTProto from "../../MTProto/external"
 import {NewComponentPage} from "../Pages/Tests/NewComponentTestPage"
 import {ReactListPage} from "../Pages/Tests/ReactiveListPage"
-import VApp from "../../vapp"
+import VApp from "../../V/vapp"
 
 /**
  * @param {VFrameworkRouter} router

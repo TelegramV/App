@@ -2,8 +2,6 @@ import {MTProto} from "../../MTProto/external"
 import PeersManager from "../Peers/Objects/PeersManager"
 import type {DialogsType, getDialogs_Params_105, getPeerDialogs_Params_105} from "./types"
 
-// methods
-
 const getDialogs = (params: getDialogs_Params_105 = {}): Promise<DialogsType> => {
     return MTProto.invokeMethod("messages.getDialogs", {
         exclude_pinned: params.exclude_pinned || false,

@@ -3,7 +3,7 @@ import {ButtonWithIconFragment} from "../SettingsComponent"
 import WallpaperManager from "../../../../../Managers/WallpaperManager"
 import VRDOM from "../../../../../../V/VRDOM/VRDOM"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
-import CheckboxFragment from "../../../../Elements/CheckboxFragment"
+import VCheckbox from "../../../../Elements/VCheckbox"
 import {askForFile} from "../../../../../Utils/utils"
 
 export default class BackgroundImageComponent extends SettingsPane {
@@ -29,7 +29,7 @@ export default class BackgroundImageComponent extends SettingsPane {
                 <ButtonWithIconFragment icon="colorize" name="Set a Color"
                                         click={_ => this.openPane("background-color")}/>
                 <ButtonWithIconFragment name="Blur Wallpaper Image" click={this._blurCheckClick}>
-                    <CheckboxFragment checked={true}/>
+                    <VCheckbox checked={true}/>
                 </ButtonWithIconFragment>
                 <div ref={this.galleryRef} class="gallery background-list">
                 </div>

@@ -19,6 +19,9 @@ import VComponent from "../../../V/VRDOM/component/VComponent"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 
+/**
+ * @deprecated
+ */
 export class FlatButtonComponent extends VComponent {
 
     render() {

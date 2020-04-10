@@ -23,7 +23,7 @@ import vrdom_patchChildren from "./patchChildren"
 import VRNode from "../VRNode"
 import patch_Text_VRNode from "./patch_Text_VRNode"
 import {initElement} from "../render/renderElement"
-import VApp from "../../../vapp"
+import VApp from "../../vapp"
 
 const recreateElementByTagName = ($node: HTMLElement, tagName: string) => {
     const $newNode = document.createElement(tagName)

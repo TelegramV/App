@@ -1,13 +1,14 @@
 import Random from "../random"
-import VBigInt from "../../bigint/VBigInt"
+import Bytes from "../bytes"
+import BigInteger from "big-integer"
 
 /**
- * @param {VBigInt} a
- * @param {VBigInt} b
- * @return {VBigInt}
+ * @param {BigInteger} a
+ * @param {BigInteger} b
+ * @return {BigInteger}
  */
 const min = (a, b) => {
-    if (a.lessThan(b)) {
+    if (a.compareTo(b) < 0) {
         return a
     }
 
@@ -15,12 +16,12 @@ const min = (a, b) => {
 }
 
 /**
- * @param {VBigInt} a
- * @param {VBigInt} b
- * @return {VBigInt}
+ * @param {BigInteger} a
+ * @param {BigInteger} b
+ * @return {BigInteger}
  */
 const abs = (a, b) => {
-    if (a.greaterThan(b)) {
+    if (a.compareTo(b) > 0) {
         return a.subtract(b)
     }
 
@@ -28,25 +29,25 @@ const abs = (a, b) => {
 }
 
 /**
- * @param {*} pq
+ * @param {Uint8Array | BigInteger} pq
  */
 function decompose(pq) {
-    pq = VBigInt.create(pq)
+    pq = Bytes.toBigInteger(pq)
 
-    const big0 = VBigInt.create(0)
-    const big1 = VBigInt.create(1)
-    const big2 = VBigInt.create(2)
+    const big0 = BigInteger(0)
+    const big1 = BigInteger(1)
+    const big2 = BigInteger(2)
 
-    if (pq.remainder(big2).equal(big0)) {
+    if (pq.remainder(big2).equals(big0)) {
         return {
-            p: big2.getBytes(4),
-            q: pq.divide(big2).getBytes(4)
+            p: Bytes.fromBigInteger(big2),
+            q: Bytes.fromBigInteger(pq.divide(big2))
         }
     }
 
-    let y = big1.add(VBigInt.create(Random.nextInteger(64)).remainder(pq.subtract(big1))),
-        c = big1.add(VBigInt.create(Random.nextInteger(64)).remainder(pq.subtract(big1))),
-        m = big1.add(VBigInt.create(Random.nextInteger(64)).remainder(pq.subtract(big1)))
+    let y = big1.add(BigInteger(Random.nextInteger(64)).mod(pq.subtract(big1))),
+        c = big1.add(BigInteger(Random.nextInteger(64)).mod(pq.subtract(big1))),
+        m = big1.add(BigInteger(Random.nextInteger(64)).mod(pq.subtract(big1)))
 
     let g = big1,
         r = big1,
@@ -55,34 +56,34 @@ function decompose(pq) {
     let x = big0,
         ys = big0
 
-    while (g.equal(big1)) {
+    while (g.equals(big1)) {
         x = y
 
-        for (let i = big0; i.lessThan(r); i = i.add(big1)) {
-            y = y.pow(big2).remainder(pq).add(c).remainder(pq)
+        for (let i = big0; i.compareTo(r) < 0; i = i.add(big1)) {
+            y = y.pow(big2).mod(pq).add(c).remainder(pq)
         }
 
         let k = big0
 
-        while (k.lessThan(r) && g.equal(big1)) {
+        while (k.compareTo(r) < 0 && g.equals(big1)) {
             ys = y
             for (let i = big0; i < min(m, r.subtract(k)); i = i.add(big1)) {
-                y = y.pow(big2).remainder(pq).add(c).remainder(pq)
-                q = q.multiply(abs(x, y)).remainder(pq)
+                y = y.pow(big2).mod(pq).add(c).mod(pq)
+                q = q.multiply(abs(x, y)).mod(pq)
             }
-            g = q.gcd(pq)
+            g = BigInteger.gcd(q, pq)
             k = k.add(m)
         }
 
         r = r.multiply(big2)
     }
 
-    if (g.equal(pq)) {
+    if (g.equals(pq)) {
         while (true) {
-            ys = ys.pow(big2).remainder(pq).add(c).remainder(pq)
+            ys = ys.pow(big2).mod(pq).add(c).remainder(pq)
             g = abs(x, ys).gcd(pq)
 
-            if (g.greaterThan(big1)) {
+            if (g.compareTo(big1) > 0) {
                 break
             }
         }
@@ -91,12 +92,12 @@ function decompose(pq) {
     const p = g
     q = pq.divide(p)
 
-    return (p.lessThan(q)) ? {
-        p: p.getBytes(4),
-        q: q.getBytes(4)
+    return (p.compareTo(q) < 0) ? {
+        p: Bytes.fromBigInteger(p),
+        q: Bytes.fromBigInteger(q)
     } : {
-        p: q.getBytes(4),
-        q: p.getBytes(4)
+        p: Bytes.fromBigInteger(q),
+        q: Bytes.fromBigInteger(p)
     }
 }
 
