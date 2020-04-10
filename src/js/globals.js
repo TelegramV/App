@@ -17,4 +17,4 @@
 
 global.$ = require("./Ui/Utils/$").default
 global.VRDOM = require("./V/VRDOM/VRDOM").default
-global.lottie = require("lottie-web").default
+global.lottie = require("lottie-web")
