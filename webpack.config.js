@@ -9,7 +9,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin")
 const TerserPlugin = require("terser-webpack-plugin")
 const CompressionPlugin = require("compression-webpack-plugin")
 
-const isProduction = process.argv.mode === "production" || process.argv.includes("production")
+const __IS_PRODUCTION__ = process.argv.mode === "production" || process.argv.includes("production")
 
 const config = {
     node: {
@@ -57,7 +57,7 @@ const config = {
                         query: {
                             modules: {
                                 mode: "global",
-                                localIdentName: isProduction ? "[hash:base64]" : "[name]__[local]",
+                                localIdentName: __IS_PRODUCTION__ ? "[hash:base64]" : "[name]__[local]",
                                 context: path.resolve(__dirname, "src/sass"),
                             },
                             localsConvention: "camelCase",
@@ -95,7 +95,7 @@ const config = {
             from: "public",
         }]),
         new webpack.DefinePlugin({
-            __IS_PRODUCTION__: isProduction,
+            __IS_PRODUCTION__: __IS_PRODUCTION__,
         }),
         // new FlowWebpackPlugin(),
         new MiniCssExtractPlugin({
@@ -108,11 +108,10 @@ const config = {
         new FilterWarningsPlugin({
             exclude: /Critical dependency: the request of a dependency is an expression/,
         }),
-        isProduction ? new CompressionPlugin() : () => {
-        },
+        __IS_PRODUCTION__ ? new CompressionPlugin() : () => null,
     ],
     optimization: {
-        minimize: isProduction,
+        minimize: __IS_PRODUCTION__,
         minimizer: [new TerserPlugin()],
     },
     devServer: {

@@ -33,7 +33,7 @@ MTProtoWorker.addEventListener("message", event => {
     }
 
     switch (event.data.type) {
-        case "event.data.type":
+        case "update":
             MTProto.UpdatesManager.process(event.data.update)
             break
 

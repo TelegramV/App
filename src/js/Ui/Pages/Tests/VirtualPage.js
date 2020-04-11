@@ -18,6 +18,7 @@
 import CountryDropdownItemFragment from "../../Components/Login/CountryDropdownItemFragment"
 import SimpleVirtualList from "../../../V/VRDOM/list/SimpleVirtualList"
 import {countries} from "../../Utils/utils"
+import "./Virtual.scss"
 
 const ITEMS = []
 

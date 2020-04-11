@@ -31,6 +31,9 @@ function postFail(id: number, error: any) {
     postMessageWithTime({taskId: id, taskResult: error, failed: true})
 }
 
+MTProtoInternal.UpdatesHandler = update => postMessageWithTime({type: "update", update: update})
+MTProtoInternal.workerPostMessage = data => postMessageWithTime(data)
+
 const TASKS: Map<string, Task => any> = new Map()
 
 TASKS.set("invokeMethod", task_invokeMethod)
@@ -38,9 +41,6 @@ TASKS.set("connect", task_connect)
 TASKS.set("mt_srp_check_password", task_mt_srp_check_password)
 TASKS.set("gzipUncompress", task_gzipUncompress)
 TASKS.set("time_generateMessageID", task_time_generateMessageID)
-
-MTProtoInternal.UpdatesHandler = update => postMessageWithTime({type: "update", update: update})
-MTProtoInternal.workerPostMessage = data => postMessageWithTime(data)
 
 self.addEventListener("message", event => {
     const data = event.data

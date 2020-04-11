@@ -59,6 +59,7 @@
     "node-sass": "^4.13.0",
     "path": "^0.12.7",
     "postcss-loader": "^3.0.0",
+    "querystring": "^0.2.0",
     "sass-loader": "^8.0.0",
     "stream": "^0.0.2",
     "style-loader": "^1.0.0",
