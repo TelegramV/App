@@ -1,6 +1,6 @@
 import {AppConfiguration} from "../Config/AppConfiguration"
 
-import MobileProtoWorker from "./workers/MTProto.worker"
+import MobileProtoWorker from "./Workers/MTProto.worker"
 import {AppPermanentStorage} from "../Api/Common/Storage"
 import UpdatesManager from "../Api/Updates/UpdatesManager"
 import AppEvents from "../Api/EventBus/AppEvents"
@@ -143,6 +143,7 @@ class MTProtoBridge {
 
     connect() {
         const storage = new Map()
+
         dataToReadFromLocalStorage.forEach(k => {
             const v = localStorage.getItem(k)
             if (v) {
@@ -156,19 +157,15 @@ class MTProtoBridge {
 
         return performTask("connect", {
             storage
-        }).then(async _ => {
-            await MTProto.invokeMethod("help.getNearestDc", {}).then(response => {
-                if (response.this_dc !== response.nearest_dc) {
-                    MTProto.changeDefaultDC(response.nearest_dc)
+        }).then(() => MTProto.invokeMethod("help.getNearestDc", {}).then(response => {
+            if (response.this_dc !== response.nearest_dc) {
+                MTProto.changeDefaultDC(response.nearest_dc)
 
-                    AppEvents.General.fire("nearestDc", {
-                        dcResponse: response
-                    })
-                }
-            })
-
-            return _
-        })
+                AppEvents.General.fire("nearestDc", {
+                    dcResponse: response
+                })
+            }
+        }))
     }
 
     invokeMethod(method, params = {}, dcID = null, isFile = false, useOneTimeNetworker = false) {
@@ -195,14 +192,6 @@ class MTProtoBridge {
 
     performWorkerTask(taskName, data) {
         return performTask(taskName, data)
-    }
-
-    /**
-     * do not use it now, there can be consequences
-     * @param {function(MTProtoInternal)} callback
-     */
-    withInternalContext(callback) {
-        return performTask("internalContext", callback)
     }
 
     changeDefaultDC(dcID) {

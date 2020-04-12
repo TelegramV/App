@@ -19,11 +19,13 @@ import CountryDropdownItemFragment from "../../Components/Login/CountryDropdownI
 import SimpleVirtualList from "../../../V/VRDOM/list/SimpleVirtualList"
 import {countries} from "../../Utils/utils"
 import "./Virtual.scss"
+import HardVirtualList from "../../../V/VRDOM/list/HardVirtualList"
+import Random from "../../../MTProto/utils/random"
 
-const ITEMS = []
+const flags = []
 
 for (let i = 0; i < 10; i++) {
-    ITEMS.push(...countries.map(l => {
+    flags.push(...countries.map(l => {
         return {
             flag: l[3],
             name: l[1],
@@ -32,14 +34,30 @@ for (let i = 0; i < 10; i++) {
     }))
 }
 
+const numbers = new Array(1000000).fill(null).map((value, index) => index)
+
 function VirtualPage() {
+
     return (
         <div>
-            {ITEMS.length} items
-            <SimpleVirtualList items={ITEMS}
-                               containerHeight={300}
+            {flags.length} flags
+            <SimpleVirtualList items={flags}
+                               containerHeight={200}
                                itemHeight={50}
                                template={CountryDropdownItemFragment}/>
+            <hr/>
+            <HardVirtualList items={flags}
+                             containerHeight={200}
+                             template={CountryDropdownItemFragment}/>
+            {numbers.length} numbers
+            <hr/>
+            <HardVirtualList items={numbers}
+                             containerHeight={300}
+                             template={(i) => <div style={{
+                                 height: `${Random.nextInteger(100) + 20}px`,
+                                 display: "flex",
+                                 border: "1px solid #ccc"
+                             }}>item {i}</div>}/>
         </div>
     )
 }

@@ -20,6 +20,7 @@
     "@babel/runtime": "^7.8.4",
     "big-integer": "^1.6.48",
     "croppie": "^2.6.4",
+    "idb-keyval": "^3.2.0",
     "lottie-web": "^5.6.2",
     "qr-code-styling": "^1.0.1",
     "rusha": "^0.8.13",

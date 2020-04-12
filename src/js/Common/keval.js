@@ -15,26 +15,16 @@
  *
  */
 
-import type VRNode from "./VRNode"
-import type {VRenderProps} from "./types/types"
-import vrdom_render from "./render/render"
-import {vrdom_resolveMount} from "./mount"
+import {clear, del, get, keys, set, Store} from "idb-keyval"
 
-/**
- * Prepends VRNode to Real DOM Element children
- *
- * @param node
- * @param $el
- * @param props
- */
-function vrdom_prepend(node: VRNode, $el: Element, props?: VRenderProps): Element | HTMLElement {
-    const $node = vrdom_render(node, props)
+const store = new Store("telegram-v", "keval")
 
-    $el.prepend($node)
-
-    vrdom_resolveMount($node)
-
-    return $node
+const keval = {
+    keys: () => keys(store),
+    deleteItem: (key) => del(key, store),
+    getItem: (key) => get(key, store),
+    clear: () => clear(store),
+    setItem: (key, value) => set(key, value, store),
 }
 
-export default vrdom_prepend
+export default keval

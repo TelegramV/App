@@ -27,11 +27,11 @@ const authContext = {
 }
 
 function task_connect({data, success, fail}) {
-    loadSchema().then(() => {
+    loadSchema().then(() =>
         MTProtoInternal.connect(authContext, data.storage)
             .then(() => success(authContext))
             .catch(error => fail(error))
-    }).catch(error => {
+    ).catch(error => {
         fail(error)
     })
 }
