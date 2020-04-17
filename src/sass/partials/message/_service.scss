@@ -1,0 +1,25 @@
+@mixin service {
+    & .service {
+        align-self: center;
+        justify-content: center;
+        margin-bottom: 10px !important;
+
+        &.date {
+            z-index: 100;
+            top: 10px;
+            //position: sticky; //TODO fix stacking
+            transition: anim(opacity);
+        }
+
+        .service-msg {
+            color: #fff;
+            background-color: $semiblack;
+            font-weight: 500;
+            padding: 0 8px;
+            line-height: 24px;
+            font-size: 15px;
+            border-radius: 12px;
+            user-select: none;
+        }
+    }
+}

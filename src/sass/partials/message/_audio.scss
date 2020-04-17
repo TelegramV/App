@@ -1,0 +1,223 @@
+@mixin audio($in: false, $transparent: false) {
+
+    & .audio {
+        display: flex;
+        width: 100%;
+        //height: 60px;
+        flex-direction: row;
+        align-items: center;
+        position: relative;
+
+        .play {
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            background-size: cover;
+
+            &:before {
+                font-size: 2em;
+            }
+
+            &.tgico-play:before {
+                margin-left: 5px;
+            }
+
+            &.has-background {
+                background-position: center;
+                background-size: cover;
+            }
+        }
+
+        .progress-circular {
+            display: none;
+
+            &.visible {
+                display: block;
+                position: absolute;
+                width: 50px;
+                height: 50px;
+                color: white;
+            }
+        }
+
+        .audio-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 10px;
+            height: 100%;
+            flex-grow: 1;
+            min-width: 200px;
+
+            .controls {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+
+                &>* {
+                    margin: 1px 0; //small margin between children
+                }
+
+                .audio-name {
+                    font-weight: bold;
+                    text-overflow: ellipsis;
+                    margin-top: 10px;
+                }
+
+                .audio-artist {
+                    font-size: 14px;
+
+                    &.hidden {
+                        display: none;
+                    }
+                }
+
+                .progress-wrapper {
+                    position: relative;
+                    height: 15px;
+
+                    &.hidden {
+                        display: none;
+                    }
+
+                    .progress-line {
+                        width: 100%;
+                        height: 3px;
+                        margin: 5px 0;
+                        border-radius: 1.5px;
+                    }
+
+                    .listened-wrapper {
+                        display: flex;
+                        width: 100%;
+                        height: 13px;
+                        position: absolute;
+                        top: 0;
+                        align-items: center;
+                        cursor: pointer;
+
+                        .listened {
+                            width: 1%;
+                            height: 3px;
+                            border-radius: 1.5px;
+                            transition: width 0.25s linear;
+                        }
+
+                        .control-ball {
+                            width: 10px;
+                            height: 10px;
+                            border-radius: 5px;
+                            cursor: pointer;
+
+                            margin-left: -5px;
+
+                        }
+                    }
+                }
+
+                svg {
+                    height: 30px;
+                    cursor: pointer;
+
+                    rect {
+                        transition: width 0.25s linear;
+                    }
+                }
+
+                .timer {
+                    &.short .played-wrapper {
+                        display: none;
+                    }
+
+                    font-size: 14px;
+                }
+            }
+
+            .inside {
+                margin-left: 15px;
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+
+                .bars {
+                    height: 27px;
+                    width: 100%;
+                    display: flex;
+                    flex-direction: row;
+                    align-items: flex-end;
+
+                    .bar {
+                        width: 2px;
+                        height: 100%;
+                        margin-right: 2px;
+                        background-color: $blue;
+                    }
+                }
+            }
+        }
+    }
+
+    //colors
+    & .audio {
+        .audio-wrapper {
+            .back {
+                @if $in {
+                    fill: #c4c9cc;
+                } @else {
+                    fill: lighten($darkgreen, 25%);
+                }
+            }
+
+            .progress {
+                @if $in {
+                    fill: $blue;
+                } @else {
+                    fill: $darkgreen;
+                }
+            }
+
+            .controls {
+
+                .audio-artist,
+                .timer {
+                    @if $in {
+                        color: $darkgrey;
+                    } @else {
+                        color: $darkgreen;
+                    }
+                }
+
+                .progress-line {
+                    @if $in {
+                        background-color: $grey
+                    } @else {
+                        background-color: lighten($darkgreen, 25%);
+                    }
+                }
+
+                .control-ball,
+                .listened {
+                    @if $in {
+                        background-color: $blue
+                    } @else {
+                        background-color: $darkgreen
+                    }
+                }
+            }
+        }
+    }
+
+    .play {
+        @if $in {
+            background-color: $blue;
+        } @else {
+            background-color: $darkgreen;
+        }
+    }
+}

@@ -1,7 +1,7 @@
 body {
   font-family: Roboto, sans-serif !important;
   background-color: #fff;
-  overflow: hidden; //broken login scroll TODO check
+  overflow: hidden; //broken login scroll
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -62,13 +62,19 @@ img[src=""], img:not([src]) { content:url("data:image/gif;base64,R0lGODlhAQABAPA
   }
 }
 
+.grabbable {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
 .emoji {
   height: 1.3em;
   width: 1.3em;
   margin: 0 .05em 0 .1em;
   vertical-align: -0.3em;
 }
-
 
 ::-webkit-scrollbar {
   width: 5px;

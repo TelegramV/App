@@ -1,0 +1,87 @@
+@mixin box($in: false, $transparent: false) {
+    & .box {
+        font-size: 14px;
+        margin: 5px;
+        padding: 5px;
+        margin-bottom: -5px;
+        border-radius: 4px;
+        transition: anim(background-color);
+        user-select: none;
+
+        &:hover {
+            cursor: pointer;
+            @if $in {
+                background-color: $light;
+            } @else {
+                background-color: rgba($green, 0.12);
+            }
+        }
+
+        &.web {
+            display: block;
+            margin: 0;
+            padding: 5px 0;
+
+            &:link {
+                color: black;
+            }
+
+            &:visited {
+                color: black;
+            }
+
+            &:hover {
+                color: black;
+                text-decoration: none;
+            }
+
+            &:active {
+                color: black;
+            }
+
+            .preview {
+                max-height: 300px;
+                width: auto;
+                max-width: 100%;
+                border-radius: 4px;
+                background-size: cover;
+                background-position: center;
+                margin-bottom: 6px;
+            }
+
+            .title {
+                line-height: 1.4;
+                font-weight: 500;
+                color: black;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            .text {
+                line-height: 1.2;
+                overflow: hidden;
+                position: relative;
+                max-height: 6.9em;
+                text-align: justify;
+                margin-right: -1em;
+                padding-right: 1em;
+                color: black;
+            }
+        }
+
+        .quote {
+            padding-left: 8px;
+        }
+
+        .name {
+            font-weight: 500;
+            margin-top: 5px;
+
+            &:first-child {
+                margin-top: 0px;
+            }
+        }
+    }
+}

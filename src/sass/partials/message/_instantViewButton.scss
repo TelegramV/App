@@ -1,0 +1,40 @@
+@mixin iv-button($in: false, $transparent: false) {
+    & .instant-view-button {
+        height: 32px;
+        margin-top: 8px;
+        border-radius: 8px;
+        border-width: 2px;
+        border-style: solid;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+            cursor: pointer;
+        }
+
+        transition: anim(background-color);
+
+        @if $in {
+            border-color: $darkblue;
+            color: $darkblue;
+
+            &:hover {
+                background-color: $light;
+            }
+        }
+
+        @if $in==false {
+            border-color: $darkgreen;
+            color: $darkgreen;
+
+            &:hover {
+                background-color: rgba($green, 0.12);
+            }
+        }
+
+    }
+
+
+}
