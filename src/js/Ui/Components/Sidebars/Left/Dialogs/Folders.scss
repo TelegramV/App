@@ -1,0 +1,46 @@
+.folder-list {
+  height: 100vw;
+  width: 72px;
+  background-color: #293A4C;
+  display: flex;
+  flex-direction: column;
+
+  .folder {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 10px 5px;
+    box-sizing: border-box;
+    color: #8393A3;
+    cursor: pointer;
+
+    &.selected {
+      background: #17212B;
+      color: #5EB5F6;
+    }
+
+    .icon {
+
+    }
+
+    .title {
+      font-size: 0.7em;
+      text-align: center;
+      word-break: break-all;
+    }
+
+    .badge {
+      position: absolute;
+      z-index: 10000000;
+      margin-left: 16px;
+      margin-top: -5px;
+      background: #5EB5F6;
+      border-radius: 12px;
+      padding: 0 5px;
+      border: 2px solid #293A4C;
+      font-size: 0.8em;
+      color: white;
+    }
+  }
+}

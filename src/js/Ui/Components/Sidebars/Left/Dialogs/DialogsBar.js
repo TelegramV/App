@@ -12,6 +12,7 @@ import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
 import LazyInput from "../../../Elements/LazyInput"
 import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
+import {Folders} from "./Folders";
 
 const contextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([

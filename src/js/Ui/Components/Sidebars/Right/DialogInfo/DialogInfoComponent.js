@@ -25,6 +25,7 @@ import {DocumentMessagesTool} from "../../../../Utils/document"
 import VUI from "../../../../VUI"
 import PeersStore from "../../../../../Api/Store/PeersStore"
 import UIEvents from "../../../../EventBus/UIEvents"
+import MTProto from "../../../../../MTProto/external";
 
 export class DialogInfoComponent extends RightBarComponent {
 
@@ -150,13 +151,25 @@ export class DialogInfoComponent extends RightBarComponent {
         }
     }
 
+    showStats = () => {
+        MTProto.invokeMethod("stats.getBroadcastStats", {
+            channel: {
+                _: "inputChannel",
+                channel_id: AppSelectedInfoPeer.Current.id,
+                access_hash: AppSelectedInfoPeer.Current.accessHash
+            }
+        }).then(l => {
+            console.log(l)
+        })
+    }
+
     render() {
         return (
             <div className="dialog-info sidebar right hidden">
                 <div class="header toolbar">
                     <span class="btn-icon tgico tgico-close rp rps" onClick={_ => this.hideBar()}/>
                     <div class="title">Info</div>
-                    <span class="btn-icon tgico tgico-more rp rps"/>
+                    <span class="btn-icon tgico tgico-more rp rps" onClick={this.showStats}/>
                 </div>
 
                 <div class="content scrollable" onScroll={this.onScroll}>

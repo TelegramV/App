@@ -207,6 +207,8 @@ class Unpacker {
                 return true
         }
 
+
+
         if (type === "vector") {
             return this.vector("vector<T>")
         }
@@ -241,11 +243,21 @@ class Unpacker {
             constructor = getConstructorById(int)
         }
 
+
         if (!constructor) {
             throw new Error("Constructor not found: " + type)
         }
 
         const predicate = constructor.predicate
+
+        // HACK!
+        // For some reason it finds vector in constructors
+        // I check if predicate of the constructor is "vector" and decrease 4 from offset
+        // cause this.vector needs to check the constructor of the vector too
+        if(predicate === "vector") {
+            this.offset -= 4
+            return this.vector("Vector<T>");
+        }
 
         const result = Object.create(null)
         result._ = predicate

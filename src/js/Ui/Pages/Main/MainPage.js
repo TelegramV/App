@@ -16,6 +16,7 @@ import {DialogInfoComponent} from "../../Components/Sidebars/Right/DialogInfo/Di
 import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/ArchivedDialogsBar"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
+import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
 
 function initHighLevelManagers() {
     UpdatesManager.init().then(() => {
@@ -49,6 +50,8 @@ export function MainPage() {
             <SearchPanelComponent/>
 
             <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
+
+            {/*<Folders/>*/}
             <DialogsBar/>
             <ChatComponent/>
 
