@@ -75,7 +75,7 @@ export class PhotoMessage extends AbstractMessage {
     }
 
     fetchMax() {
-        this.photo.fetchMax()
+        return this.photo.fetchMax()
     }
 
     fetchMaxSize() {

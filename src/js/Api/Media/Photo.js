@@ -17,7 +17,7 @@ export class Photo extends ReactiveObject {
         if (this.interrupted && this.loaded) {
             this.interrupted = false
             this.fire("photoLoaded")
-            return
+            return Promise.resolve()
         }
 
         this.thumbnail = true
