@@ -50,7 +50,7 @@ export class DialogInfoAvatarComponent extends VComponent {
 
         if (hasAvatar) {
             return (
-                <div className={`photo-container avatar`}>
+                <div className={`photo-container avatar`} onClick={() => UIEvents.MediaViewer.fire("showAvatar", {peer})}>
                     <span/>
 
                     <div className="avatar-outer" css-opacity="1">

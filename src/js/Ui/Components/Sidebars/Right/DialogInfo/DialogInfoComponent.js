@@ -262,7 +262,7 @@ export class DialogInfoComponent extends RightBarComponent {
         const msg = new PhotoMessage(AppSelectedInfoPeer.Current)
         msg.fillRaw(rawMessage)
         VRDOM.append(<DialogInfoPhotoComponent photo={rawMessage.media.photo}
-                                               click={l => VUI.MediaViewer.open(msg)}/>, this.contentRefs.media.$el)
+                                               click={l => UIEvents.MediaViewer.fire("showMessage", msg)}/>, this.contentRefs.media.$el)
     }
 
     openLinks = () => {

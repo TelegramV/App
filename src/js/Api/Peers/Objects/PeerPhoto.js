@@ -34,6 +34,10 @@ export class PeerPhoto {
         return this._rawPhoto
     }
 
+    get peer() {
+        return this._peer
+    }
+
     /**
      * @return {string}
      */

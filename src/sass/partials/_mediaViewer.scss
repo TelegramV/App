@@ -79,6 +79,43 @@
       justify-content: center;
       align-items: center;
 
+      .navigation {
+        color: white;
+        height: 100%;
+        width: 120px;
+        position: absolute;
+        filter: drop-shadow(0px 0px 3px rgba(16, 35, 47, 0.35));
+        font-size: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: anim(opacity);
+
+        &.hidden {
+          display: none;
+        }
+
+        &:hover {
+          opacity: 1;
+        }
+
+        &.next {
+          right: 0;
+
+          &::before {
+            transform: rotateZ(90deg);
+          }
+        }
+
+        &.prev {
+          left: 0;
+
+          &::before {
+            transform: rotateZ(-90deg);
+          }
+        }
+      }
       img {
         max-width: 100%;
         max-height: 100%;

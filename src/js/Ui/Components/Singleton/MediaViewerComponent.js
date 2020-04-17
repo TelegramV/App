@@ -19,54 +19,224 @@ import ChatInfoAvatarComponent from "../Columns/Chat/ChatInfo/ChatInfoAvatarComp
 import {PhotoMessage} from "../../../Api/Messages/Objects/PhotoMessage";
 import VUI from "../../VUI"
 import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"
+import VComponent from "../../../V/VRDOM/component/VComponent";
+import UIEvents from "../../EventBus/UIEvents";
+import type {AE} from "../../../V/VRDOM/component/__component_registerAppEvents";
+import {AbstractMessage} from "../../../Api/Messages/AbstractMessage";
+import {PeerPhoto} from "../../../Api/Peers/Objects/PeerPhoto";
+import {VideoMessage} from "../../../Api/Messages/Objects/VideoMessage";
+import {VideoComponent} from "../Basic/videoComponent";
+import AppSelectedChat from "../../Reactive/SelectedChat";
+import AvatarFragment from "../Basic/AvatarFragment";
+import {Photo} from "../../../Api/Media/Photo";
 
-export class MediaViewerComponent extends SingletonComponent {
+const MediaFragment = ({media}) => {
+    if (media instanceof PhotoMessage) {
+        return <img src={media.srcUrl} alt=""/>
+    }
+    if(media instanceof VideoMessage) {
+        return <video controls src={media.videoUrl}/>
+    }
+    if(media instanceof Photo) {
+        return <img src={media.srcUrl} alt=""/>
+    }
+    return <div/>
+}
+
+const NavigationButtonFragment = ({isNext, hidden, onClick}) => {
+    return <div className={{
+        "navigation": true,
+        "prev": !isNext,
+        "next": isNext,
+        "tgico-up": true,
+        "rp": true,
+        "hidden": hidden
+    }} onClick={onClick}/>
+
+}
+
+export class MediaViewerComponent extends VComponent {
 
     state = {
         hidden: true,
     }
 
-    init() {
-        VUI.MediaViewer = this
+    appEvents(E: AE) {
+        E.bus(UIEvents.MediaViewer)
+            .on("showMessage", this.showMessage)
+            .on("showAvatar", this.showAvatar)
+    }
+
+    showMessage = (message) => {
+        if (message instanceof PhotoMessage && !message.loaded) {
+            message.fetchMax().then(l => this.forceUpdate())
+        }
+        this.setState({
+            hidden: false,
+            media: message,
+            from: message.from,
+            date: message.date,
+            caption: message.text
+        })
+    }
+
+    showAvatar = (event) => {
+        const peer = event.peer
+        // peer.photo.fetchBig().then(l => this.forceUpdate())
+
+        if(!peer._photos) {
+            peer.fetchPeerPhotos().then(l => {
+                console.log(l)
+                peer._photos[0].fetchMax().then(_ => {
+                    this.forceUpdate()
+                })
+                this.setState({
+                    hidden: false,
+                    media: peer._photos[0],
+                    from: peer,
+                    date: peer._photos[0].date,
+                    caption: "",
+                    currentPhoto: 0
+                })
+            })
+        } else {
+            this.setState({
+                hidden: false,
+                media: peer._photos[0],
+                from: peer,
+                date: peer._photos[0].date,
+                caption: "",
+                currentPhoto: 0
+            })
+        }
+        // console.log(peer.full)
+        // this.setState({
+        //     hidden: false,
+        //     // media: peer.photo,
+        //     // from: peer,
+        //     // date: peer.full?.profile_photo.date,
+        //     // caption: ""
+        // })
+    }
+
+    getNextOrPrev(next = true) {
+        if(this.state.media instanceof AbstractMessage) {
+            const peer = this.state.media.to
+            const filtered = Array.from(peer.messages.messages, ([key, value]) => value).filter(l => {
+                return (next ? (l.id > this.state.media.id) : (l.id < this.state.media.id)) && l.isDisplayedInMediaViewer
+            })
+            if(filtered.length === 0) return null
+
+            return filtered.reduce((l, q) => {
+                return (next ? l.id < q.id : l.id > q.id) ? l : q
+            })
+        } else if(this.state.media instanceof Photo) {
+            const peer = this.state.media.peer
+            if(!peer._photos) {
+                return null
+            }
+            const q = (next ? this.state.currentPhoto + 1 : this.state.currentPhoto - 1)
+            if(q >= peer._photos.length || q < 0) return null
+            return peer._photos[q]
+        } else {
+            return null
+        }
+    }
+
+    hasNext = () => {
+        return !!this.getNextOrPrev(true)
+    }
+
+    hasPrev = () => {
+        return !!this.getNextOrPrev(false)
+    }
+
+    next = (ev) => {
+        ev.stopPropagation()
+        const n = this.getNextOrPrev(true)
+        if(n) {
+            if(n instanceof Photo) {
+                if(!n.loaded) n.fetchMax().then(_ => this.forceUpdate())
+                this.setState({
+                    hidden: false,
+                    media: n,
+                    from: n.peer,
+                    date: n.date,
+                    caption: "",
+                    currentPhoto: this.state.currentPhoto + 1
+                })
+            } else {
+                this.showMessage(n)
+            }
+        }
+    }
+
+    prev = (ev) => {
+        ev.stopPropagation()
+        const n = this.getNextOrPrev(false)
+        if(n) {
+
+            if(n instanceof Photo) {
+                if(!n.loaded) n.fetchMax().then(_ => this.forceUpdate())
+                this.setState({
+                    hidden: false,
+                    media: n,
+                    from: n.peer,
+                    date: n.date,
+                    caption: "",
+                    currentPhoto: this.state.currentPhoto - 1
+                })
+            } else {
+                this.showMessage(n)
+            }
+        }
+    }
+
+    formatDate() {
+        return new Date(this.state.date * 1000).toLocaleString("en", {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        })
     }
 
     render() {
         return (
             <div className={["media-viewer-wrapper", this.state.hidden ? "hidden" : ""]}>
-                {this.state.message ?
-                    <div className="media-viewer" onClick={this.close}>
-                        <div className="header">
-                            <div className="left">
-                                <ChatInfoAvatarComponent/>
-                                <div className="text">
-                                    <div className="name">{this.state.message.from.name}</div>
-                                    <div className="time">{this.state.message.getDate("en", {
-                                        hour: '2-digit',
-                                        minute: '2-digit',
-                                        hour12: false
-                                    })}</div>
-                                </div>
-                            </div>
-                            <div className="right">
-                                <i className="tgico tgico-delete rp rps"></i>
-                                <i className="tgico tgico-forward rp rps"></i>
-                                <i className="tgico tgico-download rp rps"></i>
-                                <i className="tgico tgico-close rp rps"></i>
+                <div className="media-viewer" onClick={this.close}>
+                    <div className="header">
+                        <div className="left">
+                            <AvatarFragment peer={this.state.from}/>
+                            <div className="text">
+                                <div className="name">{this.state.from?.name}</div>
+                                <div className="time">{this.formatDate()}</div>
                             </div>
                         </div>
-                        <div className="media">
-                            <img src={this.state.message.srcUrl} alt=""/>
+                        <div className="right">
+                            <i className="tgico tgico-delete rp rps"></i>
+                            <i className="tgico tgico-forward rp rps"></i>
+                            <i className="tgico tgico-download rp rps"></i>
+                            <i className="tgico tgico-close rp rps"></i>
                         </div>
-                        <div className="caption">{this.state.message.text}</div>
                     </div>
-                    : null}
+                    <div className="media">
+                        <NavigationButtonFragment onClick={this.prev} hidden={!this.hasPrev()}/>
+                        <MediaFragment media={this.state.media}/>
+                        <NavigationButtonFragment onClick={this.next} isNext hidden={!this.hasNext()}/>
+                    </div>
+                    <div className="caption">{this.state.caption}</div>
+                </div>
             </div>
         )
     }
 
     close = () => {
         this.setState({
-            hidden: true
+            hidden: true,
+            media: null,
+            from: null,
+            date: null,
+            caption: null
         })
     }
 

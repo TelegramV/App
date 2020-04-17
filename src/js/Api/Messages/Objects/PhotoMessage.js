@@ -3,28 +3,63 @@
 import {AbstractMessage} from "../AbstractMessage"
 import {MessageType} from "../Message"
 import {FileAPI} from "../../Files/FileAPI"
+import {Photo} from "../../Media/Photo";
 
 export class PhotoMessage extends AbstractMessage {
 
     type = MessageType.PHOTO
 
-    srcUrl = ""
-    srcMaxSizeUrl = ""
+    photo: Photo
 
-    width = 0
-    height = 0
+    get srcUrl() {
+        return this.photo.srcUrl
+    }
 
-    maxWidth = 0
-    maxHeight = 0
+    get srcMaxSizeUrl() {
+        return this.photo.srcMaxSizeUrl
+    }
 
-    thumbnail = true
-    loaded = false
-    loading = true
+    get minSizeType() {
+        return this.photo.minSizeType
+    }
 
-    interrupted: false
+    get maxSizeType() {
+        return this.photo.maxSizeType
+    }
 
-    minSizeType = "" // why?
-    maxSizeType = "" // why?
+    get thumbnail() {
+        return this.photo.thumbnail
+    }
+
+    get loaded() {
+        return this.photo.loaded
+    }
+
+    get loading() {
+        return this.photo.loading
+    }
+
+    get interrupted() {
+        return this.photo.interrupted
+    }
+
+    get maxWidth() {
+        return this.photo.maxWidth
+    }
+
+    get maxHeight() {
+        return this.photo.maxHeight
+    }
+
+    get width() {
+        return this.photo.width
+    }
+
+    get height() {
+        return this.photo.height
+    }
+
+
 
     show() {
         super.show()
@@ -35,57 +70,22 @@ export class PhotoMessage extends AbstractMessage {
         return this.srcUrl
     }
 
+    get isDisplayedInMediaViewer(): boolean {
+        return true
+    }
+
     fetchMax() {
-        if (this.interrupted && this.loaded) {
-            this.interrupted = false
-            this.fire("photoLoaded")
-            return
-        }
-
-        this.thumbnail = true
-        this.loaded = false
-        this.loading = true
-
-        return FileAPI.getFile(this.raw.media.photo, this.maxSizeType).then(srcUrl => {
-            this.srcUrl = srcUrl
-
-            this.thumbnail = false
-            this.loaded = true
-            this.loading = false
-
-            if (!this.interrupted) {
-                this.interrupted = false
-                this.fire("photoLoaded")
-            }
-        })
+        this.photo.fetchMax()
     }
 
     fetchMaxSize() {
-        return FileAPI.getFile(this.raw.media.photo, this.minSizeType).then(srcMaxUrl => {
-            this.srcMaxSizeUrl = srcMaxUrl
-
-            if (!this.interrupted) {
-                this.interrupted = false
-                this.fire("maxSizeLoaded")
-            }
-        })
+        return this.photo.fetchMaxSize()
     }
 
     fillRaw(raw: Object): PhotoMessage {
         super.fillRaw(raw)
 
-        this.srcUrl = FileAPI.hasThumbnail(this.raw.media.photo) ? FileAPI.getThumbnail(this.raw.media.photo) : ""
-
-        const minSize = FileAPI.getMinSize(this.raw.media.photo)
-        const maxSize = FileAPI.getMaxSize(this.raw.media.photo)
-
-        this.width = minSize.w
-        this.height = minSize.h
-        this.minSizeType = minSize.type
-
-        this.maxWidth = maxSize.w
-        this.maxHeight = maxSize.h
-        this.maxSizeType = maxSize.type
+        this.photo = new Photo(raw.media.photo)
 
         return this
     }

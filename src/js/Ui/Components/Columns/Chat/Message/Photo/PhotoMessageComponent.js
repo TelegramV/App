@@ -6,6 +6,7 @@ import {PhotoMessage} from "../../../../../../Api/Messages/Objects/PhotoMessage"
 import {PhotoFigureFragment} from "./PhotoFigureFragment"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import VUI from "../../../../../VUI"
+import UIEvents from "../../../../../EventBus/UIEvents";
 
 const MessagePhotoFigureFragment = ({message, clickLoader, click}) => {
     return (
@@ -32,7 +33,7 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     reactive(R) {
         super.reactive(R)
 
-        R.object(this.message)
+        R.object(this.message.photo)
             .on("photoLoaded", this.onPhotoLoaded)
     }
 
@@ -51,7 +52,8 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     }
 
     openMediaViewer = event => {
-        VUI.MediaViewer.open(this.message)
+        UIEvents.MediaViewer.fire("showMessage", this.message)
+        // VUI.MediaViewer.open(this.message)
     }
 
 

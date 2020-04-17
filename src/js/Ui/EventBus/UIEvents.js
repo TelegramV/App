@@ -22,6 +22,7 @@ const UIEvents = {
     LeftSidebar: new EventBus(),
     RightSidebar: new EventBus(),
     Bubbles: new EventBus(),
+    MediaViewer: new EventBus()
 }
 
 export default UIEvents

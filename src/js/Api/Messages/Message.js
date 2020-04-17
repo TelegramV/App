@@ -62,6 +62,7 @@ export interface Message {
     +forwarded?: any;
     +forwardedMessageId?: number;
     +editDate?: number;
+    +isDisplayedInMediaViewer: boolean;
     // It's actually long?
     +groupedId?: string;
     +group: Array<Message> | undefined;

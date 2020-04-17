@@ -78,6 +78,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.raw.from_id === PeersStore.self().id || this.raw.user_id === PeersStore.self().id
     }
 
+    get isDisplayedInMediaViewer(): boolean {
+        return false
+    }
+
     get isSending(): boolean {
         return !!this.raw.sending
     }

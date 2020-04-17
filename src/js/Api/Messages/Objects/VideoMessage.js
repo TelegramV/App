@@ -23,6 +23,10 @@ export class VideoMessage extends AbstractMessage {
         this.fetchThumb();
     }
 
+    get isDisplayedInMediaViewer(): boolean {
+        return true
+    }
+
     get smallPreviewImage() {
         return this.thumbUrl ? this.thumbUrl : this.smallThumb;
     }
