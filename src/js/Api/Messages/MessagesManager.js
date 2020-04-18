@@ -1,5 +1,5 @@
 import {Manager} from "../Manager"
-import {MTProto} from "../../MTProto/external"
+import {MTProto} from "../../MTProto/External"
 import PeersStore from "../Store/PeersStore"
 import DialogsManager from "../Dialogs/DialogsManager"
 import DialogsStore from "../Store/DialogsStore"
@@ -115,7 +115,7 @@ class MessageManager extends Manager {
             if (update.message.out) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
-            } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUser().user.id) {
+            } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUserId()) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
             } else {
@@ -131,7 +131,7 @@ class MessageManager extends Manager {
             if (update.message.out) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
-            } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUser().user.id) {
+            } else if (update.message.to_id && update.message.to_id.user_id !== MTProto.getAuthorizedUserId()) {
                 const peerType = getPeerTypeFromType(update.message.to_id._)
                 peer = PeersStore.get(peerType, update.message.to_id[`${peerType}_id`])
             } else {

@@ -10,7 +10,7 @@ import {AttachPhotosModal} from "../../../Modals/AttachPhotosModal";
 import UIEvents from "../../../../EventBus/UIEvents";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import AppConfiguration from "../../../../../Config/AppConfiguration";
-import MTProto from "../../../../../MTProto/external"
+import MTProto from "../../../../../MTProto/External"
 import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 
@@ -355,7 +355,7 @@ export class ChatInputComponent extends VComponent {
             return
         }
         // TODO refactor sending
-        MTProto.TimeManager.generateMessageID(AppConfiguration.mtproto.dataCenter.default).then(id => {
+        MTProto.TimeManager.generateMessageId().then(id => {
             var reader = new FileReader();
             reader.readAsArrayBuffer(ev.data);
             reader.onloadend = (event) => {

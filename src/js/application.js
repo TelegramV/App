@@ -1,6 +1,6 @@
 import "../sass/application.scss"
 
-import MTProto from "./MTProto/external"
+import MTProto from "./MTProto/External"
 import AppCache from "./Api/Cache/AppCache"
 
 import VApp from "./V/vapp"
@@ -11,10 +11,10 @@ import EmojiVRDOMPlugin from "./Ui/Plugins/EmojiPlugin"
 import "./globals"
 
 if (__IS_PRODUCTION__) {
+    console.log("%c%s", "color: #4ea4f6; font-size: 4em;", "Telegram V")
     AppCache.open()
 } else {
     document.title = "[dev] Telegram V"
-    window.invokeMethod = MTProto.invokeMethod
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)

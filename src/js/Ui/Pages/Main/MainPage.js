@@ -16,12 +16,11 @@ import {DialogInfoComponent} from "../../Components/Sidebars/Right/DialogInfo/Di
 import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/ArchivedDialogsBar"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
-import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
 
 function initHighLevelManagers() {
-    UpdatesManager.init().then(() => {
-        // todo: move this to DialogsManager logic
-        DialogsManager.fetchFirstPage().then(() => {
+    DialogsManager.fetchFirstPage().then(() => {
+        UpdatesManager.init().then(() => {
+            // todo: move this to DialogsManager logic
             DialogsManager.init()
             PeersManager.init()
             MessagesManager.init()

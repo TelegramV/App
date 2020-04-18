@@ -1,4 +1,4 @@
-import MTProto from "../../../MTProto/external"
+import MTProto from "../../../MTProto/External"
 
 function convertToByteArray(bytes) {
     if (Array.isArray(bytes)) {

@@ -1,4 +1,4 @@
-import MTProto from "../../MTProto/external"
+import MTProto from "../../MTProto/External"
 import PeersManager from "./Objects/PeersManager"
 import AppEvents from "../EventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../Dialogs/util"

@@ -1,6 +1,6 @@
 import DialogsManager from "../../../../../Api/Dialogs/DialogsManager"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
-import MTProto from "../../../../../MTProto/external";
+import MTProto from "../../../../../MTProto/External";
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import ConnectionStatusComponent from "./ConnectionStatusComponent"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
@@ -13,6 +13,7 @@ import LazyInput from "../../../Elements/LazyInput"
 import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 import {Folders} from "./Folders";
+import PeersStore from "../../../../../Api/Store/PeersStore"
 
 const contextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -42,7 +43,7 @@ const contextMenu = (event, archivedCount) => {
             icon: "savedmessages",
             title: "Saved",
             onClick: _ => {
-                const p = MTProto.getAuthorizedUser().user.username ? `@${MTProto.getAuthorizedUser().user.username}` : `user.${MTProto.getAuthorizedUser().user.id}`
+                const p = PeersStore.self().username ? `@${PeersStore.self().username}` : `user.${PeersStore.self().id}`
 
                 VApp.router.push("/", {
                     queryParams: {

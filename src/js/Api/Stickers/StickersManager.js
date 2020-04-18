@@ -1,5 +1,5 @@
 import {Manager} from "../Manager";
-import MTProto from "../../MTProto/external";
+import MTProto from "../../MTProto/External";
 
 class StickersManager extends Manager {
     constructor(props) {

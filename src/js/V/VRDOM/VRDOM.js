@@ -32,8 +32,6 @@ import vrdom_isTagNameComponentOrFragment from "./is/isTagNameComponentOrFragmen
 import vrdom_isTagNameList from "./is/isTagNameList"
 
 /**
- * Virtual DOM that operates on Real DOM and does not save previous rendered state. Written specially for Telegram V.
- *
  * `Fragment` is just a simple component, not React.Fragment.
  */
 const VRDOM = {

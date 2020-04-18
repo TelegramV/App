@@ -16,7 +16,7 @@
  */
 
 import {FileAPI} from "../../Api/Files/FileAPI"
-import MTProto from "../../MTProto/external"
+import MTProto from "../../MTProto/External"
 
 export class WallpaperManagerSingleton {
     init() {

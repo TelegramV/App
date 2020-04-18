@@ -1,4 +1,4 @@
-import MTProto from "../../../MTProto/external"
+import MTProto from "../../../MTProto/External"
 import PeersManager from "./PeersManager"
 import {ChannelPeer} from "./ChannelPeer";
 

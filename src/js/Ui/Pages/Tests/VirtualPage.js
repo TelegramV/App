@@ -20,7 +20,7 @@ import SimpleVirtualList from "../../../V/VRDOM/list/SimpleVirtualList"
 import {countries} from "../../Utils/utils"
 import "./Virtual.scss"
 import HardVirtualList from "../../../V/VRDOM/list/HardVirtualList"
-import Random from "../../../MTProto/utils/random"
+import Random from "../../../MTProto/Utils/Random"
 
 const flags = []
 

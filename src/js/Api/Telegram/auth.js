@@ -16,7 +16,7 @@
  */
 
 import {AppConfiguration} from "../../Config/AppConfiguration"
-import MTProto from "../../MTProto/external"
+import MTProto from "../../MTProto/External"
 
 const sendCode = (phoneNumber) => {
     return MTProto.invokeMethod("auth.sendCode", Object.assign({

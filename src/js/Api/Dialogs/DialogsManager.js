@@ -10,7 +10,7 @@ import AppSelectedChat from "../../Ui/Reactive/SelectedChat"
 import {MessageFactory} from "../Messages/MessageFactory"
 import API from "../Telegram/API"
 import PeersManager from "../Peers/Objects/PeersManager"
-import MTProto from "../../MTProto/external"
+import MTProto from "../../MTProto/External"
 import {UserPeer} from "../Peers/Objects/UserPeer"
 import UIEvents from "../../Ui/EventBus/UIEvents"
 

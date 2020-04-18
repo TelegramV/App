@@ -6,7 +6,7 @@ import PeersStore from "../Store/PeersStore"
 import AppEvents from "../EventBus/AppEvents"
 import {actionTypesMapping} from "../../Ui/Components/Sidebars/Left/Dialogs/Fragments/DialogTextFragment"
 import DialogsManager from "./DialogsManager"
-import MTProto from "../../MTProto/external"
+import MTProto from "../../MTProto/External"
 
 export class Dialog extends ReactiveObject {
 

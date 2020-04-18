@@ -1,0 +1,165 @@
+/*
+ * Copyright 2020 Telegram V authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+import {uintToInt} from "../Utils/Bin";
+import type {Invokation} from "./types";
+import MTProtoInternal from "../Internal"
+import Connection from "./Connection"
+
+function parse_rpc_error(rawError) {
+    const matches = (rawError.error_message || "").match(/^([A-Z_0-9]+\b)(: (.+))?/) || [];
+    rawError.error_code = uintToInt(rawError.error_code);
+
+    return {
+        code: !rawError.error_code || rawError.error_code <= 0 ? 500 : rawError.error_code,
+        type: matches[1] || "UNKNOWN",
+        description: matches[3] || ("CODE#" + rawError.error_code + " " + rawError.error_message),
+        originalError: rawError
+    };
+}
+
+const ALWAYS_DO_RESEND_ON_FLOOD = [
+    "messages.getHistory",
+]
+
+class MessagesProcessor {
+    connection: Connection;
+
+    pendingInvokations: Map<string, Invokation>;
+
+    constructor(connection: Connection) {
+        this.connection = connection;
+
+        this.pendingInvokations = new Map();
+    }
+
+    process_pong = (connection: Connection, pong, message_id, session_id) => {
+        //
+    }
+
+    process_bad_msg_notification = (connection: Connection, bad_msg_notification, message_id, session_id) => {
+        // todo: reinvoke
+        console.warn("bad_msg_notification", bad_msg_notification, "todo: handle it by resending message");
+    }
+
+    process_msg_detailed_info = (connection: Connection, msg_detailed_info, message_id, session_id) => {
+        // console.warn("msg_detailed_info", msg_detailed_info)
+    }
+
+    process_msg_new_detailed_info = (connection: Connection, msg_new_detailed_info, message_id, session_id) => {
+        // console.warn("msg_new_detailed_info", msg_new_detailed_info)
+    }
+
+    process_new_session_created = (connection: Connection, new_session_created, message_id, session_id) => {
+        MTProtoInternal.processUpdate(new_session_created);
+    }
+
+    process_bad_server_salt = (connection: Connection, bad_server_salt, message_id, session_id) => {
+        connection.updateServerSalt(bad_server_salt.new_server_salt).then(() => {
+            connection.reinvoke(bad_server_salt.bad_msg_id);
+        });
+    }
+
+    process_msgs_ack = (connection: Connection, msgs_ack, message_id, session_id) => {
+        connection.ackMessages(msgs_ack.msg_ids);
+    }
+
+    process_message = (connection: Connection, message, message_id, session_id) => {
+        this.process(connection, message.body, message.msg_id, session_id);
+    }
+
+    process_msg_container = (connection: Connection, msg_container, message_id, session_id) => {
+        msg_container.messages.forEach(message => {
+            this.process(connection, message, message.msg_id, session_id);
+        })
+    }
+
+    process_rpc_result = (connection: Connection, rpc_result, message_id, session_id) => {
+        connection.ackMessages([message_id]);
+
+        const invokation = this.pendingInvokations.get(rpc_result.req_msg_id);
+
+        if (!invokation) {
+            console.error("no pending invokation found", rpc_result.req_msg_id, rpc_result.result, this.pendingInvokations);
+            return;
+        }
+
+        if (rpc_result.result._ === "rpc_error") {
+            const error = {
+                method: invokation.name,
+                params: invokation.params,
+                dcId: this.connection.dcId,
+                ...parse_rpc_error(rpc_result.result)
+            };
+
+            if (error.type && error.type.startsWith("FLOOD_WAIT_")) {
+                const fwTime = parseInt(error.type.substring("FLOOD_WAIT_".length));
+
+                if (fwTime <= 30 || ALWAYS_DO_RESEND_ON_FLOOD.includes(invokation.name)) {
+                    console.warn(error.type, invokation);
+
+                    return setTimeout(() => connection.reinvoke(rpc_result.req_msg_id), (fwTime * 1000) + 1000);
+                }
+            }
+
+            invokation.reject(error);
+            this.pendingInvokations.delete(rpc_result.req_msg_id);
+        } else {
+            invokation.resolve(rpc_result.result);
+            this.pendingInvokations.delete(rpc_result.req_msg_id);
+        }
+    }
+
+    process(connection: Connection, message: any, message_id: string, session_id: string) {
+        if (!message || !message._) {
+            console.error("invalid message", message_id, session_id, message, connection);
+            return;
+        }
+
+        switch (message._) {
+            case "rpc_result":
+                return this.process_rpc_result(connection, message, message_id, session_id);
+            case "msg_container":
+                return this.process_msg_container(connection, message, message_id, session_id);
+            case "message":
+                return this.process_message(connection, message, message_id, session_id);
+            case "pong":
+                return this.process_pong(connection, message, message_id, session_id);
+            case "msgs_ack":
+                return this.process_msgs_ack(connection, message, message_id, session_id);
+            case "bad_server_salt":
+                return this.process_bad_server_salt(connection, message, message_id, session_id);
+            case "new_session_created":
+                return this.process_new_session_created(connection, message, message_id, session_id);
+            case "msg_new_detailed_info":
+                return this.process_msg_new_detailed_info(connection, message, message_id, session_id);
+            case "msg_detailed_info":
+                return this.process_msg_detailed_info(connection, message, message_id, session_id);
+            case "bad_msg_notification":
+                return this.process_bad_msg_notification(connection, message, message_id, session_id);
+            case "messageEmpty":
+                console.log("messageEmpty")
+                return null;
+
+            default:
+                MTProtoInternal.processUpdate(message);
+                return;
+        }
+    }
+}
+
+export default MessagesProcessor;

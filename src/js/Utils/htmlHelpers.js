@@ -18,7 +18,7 @@
 import AppSelectedInfoPeer from "../Ui/Reactive/SelectedInfoPeer"
 import PeersStore from "../Api/Store/PeersStore"
 import UIEvents from "../Ui/EventBus/UIEvents"
-import MTProto from "../MTProto/external";
+import MTProto from "../MTProto/External";
 
 function elemToEntity(elem, offset, length) {
     const handlers = {

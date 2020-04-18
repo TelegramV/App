@@ -1,7 +1,7 @@
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import {FileAPI} from "../../../../../../Api/Files/FileAPI"
 
-import MTProto from "../../../../../../MTProto/external"
+import MTProto from "../../../../../../MTProto/External"
 
 let stickerCounter = 0;
 

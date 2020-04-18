@@ -1,4 +1,4 @@
-import MTProto from "../../../../../../MTProto/external"
+import MTProto from "../../../../../../MTProto/External"
 
 export const DATE_FORMAT_TIME = {
     hour: '2-digit',

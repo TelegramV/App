@@ -9,7 +9,7 @@ import {
     DATE_FORMAT,
     DATE_FORMAT_TIME
 } from "../../Ui/Components/Sidebars/Left/Dialogs/Fragments/DialogTimeFragment"
-import MTProto from "../../MTProto/external"
+import MTProto from "../../MTProto/External"
 
 export class AbstractMessage extends ReactiveObject implements Message {
 

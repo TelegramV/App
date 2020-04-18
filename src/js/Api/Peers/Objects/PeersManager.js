@@ -1,6 +1,6 @@
 import {Manager} from "../../Manager";
 import PeersStore from "../../Store/PeersStore"
-import {MTProto} from "../../../MTProto/external"
+import {MTProto} from "../../../MTProto/External"
 import {UserPeer} from "./UserPeer"
 import PeerFactory from "../PeerFactory"
 import {GroupPeer} from "./GroupPeer";

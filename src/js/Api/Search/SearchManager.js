@@ -1,4 +1,4 @@
-import {MTProto} from "../../MTProto/external"
+import {MTProto} from "../../MTProto/External"
 import PeersManager from "../Peers/Objects/PeersManager"
 import {Manager} from "../Manager"
 import API from "../Telegram/API"

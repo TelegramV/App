@@ -30,8 +30,8 @@ class ProgressLoaderComponent extends VComponent {
     }
 
     componentDidMount() {
-        this.circle = this.$el.querySelector('.progress-ring__circle');  // dude what the fuck, there exist refs, did you know?) #1
-        this.withTimeout(this._calculateSize, 0); // dude what the fuck?) #2
+        this.circle = this.$el.querySelector('.progress-ring__circle');  // there are refs) #1
+        this.withTimeout(this._calculateSize, 0); // wtf?) #2
     }
 
     _calculateSize = () => {

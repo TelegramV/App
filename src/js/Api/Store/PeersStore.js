@@ -1,6 +1,6 @@
 import MappedStore from "./MappedStore"
 import {PeerParser} from "../Peers/PeerParser"
-import MTProto from "../../MTProto/external"
+import MTProto from "../../MTProto/External"
 
 /**
  * @property {Map<string, Map<number, Peer>>} _data
@@ -31,7 +31,7 @@ class PeersMapStore extends MappedStore {
      */
     self() {
         if (!this._self) {
-            this._self = this.get("user", MTProto.getAuthorizedUser().user.id)
+            this._self = this.get("user", MTProto.getAuthorizedUserId())
         }
 
         return this._self

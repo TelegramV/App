@@ -25,7 +25,7 @@ import {DocumentMessagesTool} from "../../../../Utils/document"
 import VUI from "../../../../VUI"
 import PeersStore from "../../../../../Api/Store/PeersStore"
 import UIEvents from "../../../../EventBus/UIEvents"
-import MTProto from "../../../../../MTProto/external";
+import MTProto from "../../../../../MTProto/External";
 
 export class DialogInfoComponent extends RightBarComponent {
 

@@ -119,7 +119,7 @@ const config = {
         hot: false, // doesn't work
         port: 8090,
     },
-    devtool: "inline-source-map",
+    devtool: !__IS_PRODUCTION__ && "inline-source-map",
 }
 
 module.exports = config

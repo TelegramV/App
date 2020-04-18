@@ -55,13 +55,13 @@ function vrdom_createElement(tagName: VRTagName, props: VRNodeProps): VRNode | V
 
                 if (props.ref.fragment) {
 
-                    return props.ref.fragment({...props.attrs, slot: props.children})
+                    return props.ref.fragment({...props.attrs, slot: props.children}, props.children)
 
                 } else {
 
                     props.ref.fragment = tagName
 
-                    const node = tagName({...props.attrs, slot: props.children})
+                    const node = tagName({...props.attrs, slot: props.children}, props.children)
                     node.ref = props.ref
 
                     return node
@@ -72,7 +72,7 @@ function vrdom_createElement(tagName: VRTagName, props: VRNodeProps): VRNode | V
                 return tagName({
                     ...props.attrs,
                     slot: props.children
-                })
+                }, props.children)
 
             }
 

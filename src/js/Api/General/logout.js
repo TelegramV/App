@@ -1,8 +1,7 @@
-import MTProto from "../../MTProto/external"
+import MTProto from "../../MTProto/External"
 import PeersStore from "../Store/PeersStore"
 import DialogsStore from "../Store/DialogsStore"
 import DialogsManager from "../Dialogs/DialogsManager"
-import {AppPermanentStorage} from "../Common/Storage"
 import VApp from "../../V/vapp"
 
 export function logout() {
@@ -17,8 +16,8 @@ export function logout() {
 
         DialogsManager.onLogout()
 
-        AppPermanentStorage.removeItem("authorizationData")
-        AppPermanentStorage.removeItem("topPeers")
+        localStorage.removeItem("user")
+        localStorage.removeItem("topPeers")
 
         VApp.router.replace("/login")
     })

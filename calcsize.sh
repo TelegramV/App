@@ -18,5 +18,5 @@ printsize $CSS '[CSS] RAW: '
 printsize $CSSGZ '[CSS] GZIP: '
 
 echo ''
-printsize "$CSS\|$JS" '[TOTAL] RAW: '
-printsize "$CSSGZ\|$JSGZ" '[TOTAL] GZIP: '
+printsize "$CSS\|$JS" '[TOTAL] RAW (no schema included): '
+printsize "$CSSGZ\|$JSGZ" '[TOTAL] GZIP (no schema included): '

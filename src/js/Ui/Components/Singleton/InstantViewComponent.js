@@ -15,7 +15,7 @@
  *
  */
 
-import MTProto from "../../../MTProto/external";
+import MTProto from "../../../MTProto/External";
 import {PhotoComponent} from "../Basic/photoComponent";
 import VUI from "../../VUI"
 import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"

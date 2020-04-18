@@ -1,6 +1,6 @@
 import PeersStore from "../../Api/Store/PeersStore"
 import {Peer} from "../../Api/Peers/Objects/Peer"
-import MTProto from "../../MTProto/external"
+import MTProto from "../../MTProto/External"
 import PeersManager from "../../Api/Peers/Objects/PeersManager"
 import VApp from "../../V/vapp"
 import UIEvents from "../EventBus/UIEvents"

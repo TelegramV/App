@@ -18,7 +18,7 @@
       "@babel/plugin-transform-react-jsx",
       {
         "pragma": "VRDOM.jsx",
-        "pragmaFrag": "VDOM.Fragment"
+        "pragmaFrag": "VRDOM.Fragment"
       }
     ]
   ]

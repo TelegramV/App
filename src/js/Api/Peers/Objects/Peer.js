@@ -1,5 +1,5 @@
 import {getInputFromPeer, getInputPeerFromPeer} from "../../Dialogs/util";
-import MTProto from "../../../MTProto/external"
+import MTProto from "../../../MTProto/External"
 import AppEvents from "../../EventBus/AppEvents"
 import {PeerPhoto} from "./PeerPhoto"
 import {Dialog} from "../../Dialogs/Dialog"

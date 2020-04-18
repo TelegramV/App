@@ -29,7 +29,7 @@ import {SupergroupPeer} from "../../../../Api/Peers/Objects/SupergroupPeer";
 import {MessageAvatarComponent} from "./Message/Common/MessageAvatarComponent";
 import {UserPeer} from "../../../../Api/Peers/Objects/UserPeer";
 import {ServiceMessage} from "../../../../Api/Messages/Objects/ServiceMessage";
-import MTProto from "../../../../MTProto/external";
+import MTProto from "../../../../MTProto/External";
 import {ChatInputComponent} from "./ChatInput/ChatInputComponent"
 import AudioManager from "../../../Managers/AudioManager"
 
@@ -155,7 +155,7 @@ class BubblesComponent extends VComponent {
         this.showInstant = true
         let to = message.to
         if (message.to instanceof UserPeer) {
-            if (message.to.id === MTProto.getAuthorizedUser().user.id) {
+            if (message.to.id === MTProto.getAuthorizedUserId()) {
                 to = message.from
             }
         }

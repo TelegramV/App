@@ -1,6 +1,6 @@
 import {Peer} from "./Peer";
 import {GroupPeer} from "./GroupPeer"
-import MTProto from "../../../MTProto/external"
+import MTProto from "../../../MTProto/External"
 
 function getLastSeenMessage(timestamp, now) {
     const diff = Math.abs(now - timestamp)

@@ -1,6 +1,6 @@
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import "./Folders.scss";
-import MTProto from "../../../../../MTProto/external";
+import MTProto from "../../../../../MTProto/External";
 
 const FolderFragment = ({icon, title, badge = "", selected = false, onClick}) => {
     return <div className={{

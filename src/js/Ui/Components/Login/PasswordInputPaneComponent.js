@@ -3,7 +3,7 @@ import InfoComponent from "./InfoComponent"
 import {ButtonWithProgressBarComponent} from "../Elements/ButtonComponent";
 import {InputComponent} from "../Elements/InputComponent";
 
-import MTProto from "../../../MTProto/external"
+import MTProto from "../../../MTProto/External"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 
 export default class PasswordInputPaneComponent extends PaneComponent {

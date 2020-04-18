@@ -1,4 +1,4 @@
-import MTProto from "../../../../../../MTProto/external";
+import MTProto from "../../../../../../MTProto/External";
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 
 

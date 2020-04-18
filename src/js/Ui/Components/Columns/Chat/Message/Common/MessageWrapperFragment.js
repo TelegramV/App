@@ -6,7 +6,7 @@ import {MessageParser} from "../../../../../../Api/Messages/MessageParser";
 import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer"
-import MTProto from "../../../../../../MTProto/external";
+import MTProto from "../../../../../../MTProto/External";
 import UpdatesManager from "../../../../../../Api/Updates/UpdatesManager";
 import VUI from "../../../../../VUI"
 

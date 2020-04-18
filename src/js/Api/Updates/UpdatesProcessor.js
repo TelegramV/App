@@ -1,5 +1,5 @@
 import {UpdateManager} from "./UpdatesManager"
-import MTProto from "../../MTProto/external"
+import MTProto from "../../MTProto/External"
 
 /**
  * @param rawUpdate

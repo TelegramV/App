@@ -1,5 +1,5 @@
 import {Peer} from "./Peer";
-import MTProto from "../../../MTProto/external";
+import MTProto from "../../../MTProto/External";
 import PeersStore from "../../Store/PeersStore"
 import {UserPeer} from "./UserPeer"
 import PeersManager from "./PeersManager"
