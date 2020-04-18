@@ -5,11 +5,19 @@ import {MessageParser} from "./MessageParser"
 import {Peer} from "../Peers/Objects/Peer"
 import MessagesManager from "./MessagesManager"
 import PeersStore from "../Store/PeersStore"
-import {
-    DATE_FORMAT,
-    DATE_FORMAT_TIME
-} from "../../Ui/Components/Sidebars/Left/Dialogs/Fragments/DialogTimeFragment"
 import MTProto from "../../MTProto/External"
+
+export const DATE_FORMAT_TIME = {
+    hour: '2-digit',
+    minute: '2-digit',
+    //hour12: false //support USA
+}
+
+export const DATE_FORMAT = {
+    year: '2-digit',
+    month: '2-digit',
+    day: '2-digit',
+}
 
 export class AbstractMessage extends ReactiveObject implements Message {
 
@@ -166,7 +174,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     getFormattedDate() {
-        return this.getDate("en", MTProto.TimeManager.now(true) - this.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)
+        return this.getDate(navigator.language, MTProto.TimeManager.now(true) - this.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)
     }
 
     // always call super
