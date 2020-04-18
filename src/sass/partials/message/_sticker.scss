@@ -1,0 +1,14 @@
+@mixin sticker($in: false, $transparent: false) {
+    .sticker {
+                width: 250px;
+                max-width: 512px;
+                height: auto;
+                max-height: 512px;
+                cursor: pointer;
+                display: block;
+
+                &.emoji {
+                    cursor: default;
+                }
+            }
+}

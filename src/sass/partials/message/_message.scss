@@ -28,11 +28,10 @@
         }
     }
 
-    .bubble-outer {
+    .bubbles-list .bubble-outer {
         display: flex;
         flex-direction: column;
         filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
-
 
         .bubble {
             grid-area: bubble;
@@ -68,13 +67,6 @@
                 &.has-inline-keyboard {
                     border-bottom-right-radius: 6px;
                 }
-
-                &.no-pad {
-                    .reply {
-                        margin-bottom: 0;
-                        padding-left: 13px;
-                    }
-                }
             }
 
             &.out {
@@ -84,13 +76,6 @@
 
                 &.has-inline-keyboard {
                     border-bottom-left-radius: 6px;
-                }
-
-                &.no-pad {
-                    .reply {
-                        margin-bottom: 0;
-                        padding-right: 13px;
-                    }
                 }
             }
 
@@ -106,13 +91,21 @@
             @include game;
             @include poll;
             @include box;
+            @include map;
+            @include sticker;
 
             &.in {
+                @include time($in: true);
+                @include header($in: true, $transparent: false);
+                @include reply($in: true, $transparent: false);
                 @include audio($in: true);
                 @include iv-button($in: true);
             }
 
             &.out {
+                @include time($in: false);
+                @include header($in: false, $transparent: false);
+                @include reply($in: false, $transparent: false);
                 @include audio($in: false);
                 @include iv-button($in: false);
             }
@@ -121,73 +114,31 @@
                 border-radius: 12px;
                 -webkit-mask-image: none !important;
                 mask-image: none !important;
+                overflow: visible; //fix for replies
 
                 &.in {
                     padding-left: 0 !important;
+
+                    @include header($in: true, $transparent: true);
+                    @include reply($in: true, $transparent: true);
                 }
 
                 &.out {
                     padding-right: 0 !important;
-                }
-            }
 
-            .sticker {
-                width: 250px;
-                max-width: 512px;
-                height: auto;
-                max-height: 512px;
-                cursor: pointer;
-                display: block;
-
-                &.emoji {
-                    cursor: default;
-                }
-            }
-
-            .venue {
-                padding: 10px;
-                font-size: 14px;
-
-                .title {
-                    font-weight: bold;
+                    @include header($in: false, $transparent: true);
+                    @include reply($in: false, $transparent: true);
                 }
 
-                .address {
-                    color: $darkgrey;
-                }
-            }
-
-            .map {
+                background-color: transparent;
+                box-shadow: none;
                 position: relative;
-                cursor: pointer;
-
-                &.media-wrapper {
-                    max-width: 300px;
-                    max-height: 300px;
-                }
-
-                .pin-point {
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -80%);
-                    font-size: 60px;
-                }
             }
 
-            .username,
-            .fwd {
-                color: $blueonline;
-                font-weight: 500;
-                font-size: 14px;
-                padding-bottom: 3px;
-
-                .no-bold {
-                    font-weight: 400;
-                }
-
-                .clickable-name {
-                    cursor: pointer;
+            a:not(.button) {
+                color: $darkblue;
+                &:hover {
+                    text-decoration: underline;
                 }
             }
 
@@ -201,147 +152,9 @@
                     user-select: text;
                 }
 
-                figure {
-                    &.round {
-                        width: 200px;
-                        height: 200px;
-                        border-radius: 50%;
-                        &~.time.bg {
-                            bottom: 22px !important;
-                            right: 12px !important;
-                        }
+                @include figure;
 
-                        &~.round-overlay {
-                            position: absolute;
-                            left: 50%;
-                            top: calc(50% - 10px); //requires position relative on message, but it breaks time
-                            transform: translate(-50%, -50%);
-                            width: 95%;
-                            height: calc((100% - 20px)*0.95);
-
-                            .playback {
-                                position: absolute;
-                                top: -2px;
-                                left: 0;
-                                line-height: 15px;
-                                background-color: $semiblack;
-                                border-radius: 10px;
-                                color: white;
-                                font-size: 12px;
-                                padding: 2px 6px;
-
-                                .pl-time.nosound:after {
-                                    content: $tgico-nosound;
-                                    vertical-align: top;
-                                    font-size: 16px;
-                                    margin-left: 2px;
-                                }
-                            }
-
-                            .progress-ring {
-                                width: 100%;
-                                height: 100%;
-                                opacity: 50%;
-                                transition: opacity 0.2s;
-                                &.hidden {
-                                    opacity: 0;
-                                }
-                            }
-                        }
-                    }
-
-                    &.photo,
-                    &.video {
-                        //min-width: 100px;
-                        //min-height: 100px;
-                        max-height: 512px;
-
-                        ~.time.bg {
-                            right: 15px;
-                            bottom: 5px;
-                        }
-
-                        img,
-                        video {
-                            max-height: 512px;
-                        }
-                    }
-                }
-
-                .grouped~.time.bg {
-                    right: 15px;
-                    bottom: 5px;
-                }
-
-                .media-wrapper {
-                    position: relative;
-                    width: 100%;
-                    min-width: 100px;
-                    min-height: 100px;
-                    max-height: 512px; //seems like TDesktop limit 400px
-
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    overflow: hidden;
-                    background-color: black;
-
-                    &:not(:only-child) {
-                        border-bottom-right-radius: 0 !important;
-                        border-bottom-left-radius: 0 !important;
-                    }
-
-                    .progress {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-
-                        .pause-button {
-                            background: $semiblack;
-                            width: 64px;
-                            height: 64px;
-                            line-height: 62px;
-                            position: absolute;
-                            border-radius: 100%;
-                            text-align: center;
-                            cursor: pointer;
-
-
-                            .tgico {
-                                position: relative;
-                                color: white;
-                                font-size: 40px;
-                            }
-                        }
-
-                        progress {
-                            position: relative;
-                            top: 0;
-                            left: 0;
-                            pointer-events: none;
-                        }
-                    }
-
-                    .attachment {
-                        max-width: 100%;
-                        height: auto;
-                        max-height: 512px;
-                        background-size: cover;
-                        display: block;
-
-                        &.photo {
-                            cursor: pointer;
-                        }
-                    }
-
-                    .attachment-thumb {
-                        filter: blur(10px);
-                        // needed to fix black edges: https://telegra.ph/file/7aad6eed39a29cf7dd893.jpg
-                        // do not remove unless better method found
-                        transform: scale(1.1);
-                    }
-                }
+                @include media-wrapper;
 
                 .text-wrapper.pad {
                     padding: 5px 9px;
@@ -355,10 +168,6 @@
             .message.no-pad {
                 padding: 0px;
 
-                .fwd {
-                    padding-left: 15px;
-                }
-
                 .text-wrapper {
                     padding: 5px 9px;
                 }
@@ -370,230 +179,21 @@
                 height: auto;
                 max-height: 512px;
             }
-
-
-            .time {
-                float: right;
-                display: flex;
-                font-size: $time-size;
-                user-select: none;
-                height: 20px;
-                align-items: center;
-                margin-top: 5px;
-                margin-right: -10px;
-                margin-left: 5px;
-
-                .inner {
-                	display: flex;
-                	align-items: center;
-                    .edited {
-                        margin-right: 5px;
-                    }
-                }
-
-                &.bg {
-                    position: absolute;
-                    bottom: 10px;
-                    right: 15px;
-                    line-height: 14px;
-
-                    .inner {
-                        color: white;
-                        background-color: $semiblack;
-                        border-radius: 40px;
-                        text-align: center;
-                        padding: 1px 6px !important;
-
-                        .views {
-                            margin-right: 5px;
-
-                            .tgico-channelviews {
-                                line-height: 12px;
-                            }
-                        }
-                    }
-
-                    .tgico.status:after {
-                        line-height: 12px;
-                    }
-                }
-            }
         }
     }
 
-    .bubbles-list>.in,
-    .bubbles-list>.out {
-
-        .in,
-        .out {
-            //flex-direction: row;
-            //align-items: flex-end;
-        }
-
-
-        .bubble {
-            .reply {
-                .quote {
-                    .text {
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        max-width: 400px;
-                    }
-                }
-            }
-        }
-
-        .bubble.transparent {
-            background-color: transparent;
-            box-shadow: none;
-            //border-radius: 0 !important;
-            position: relative;
-            //overflow: visible;
-            .fwd,
-            .username {
-                display: none;
-            }
-
-            .reply {
-                position: absolute;
-                right: 0;
-                transform: translateX(125%);
-                background-color: white;
-                border-radius: 10px;
-                padding: 8px;
-
-                .quote {
-                    .text {
-                        max-width: 250px;
-                    }
-                }
-            }
-        }
-
-        a:not(.button) {
-            color: $darkblue;
-
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-
-    }
-
-    .bubbles-list > .in {
-
-        .quote {
-            border-left: 2px $darkblue solid;
-
-            .name {
-                color: $darkblue;
-            }
-        }
-
-        .time {
-            color: rgba($darkgrey, 0.6);
-
-            .views {
-                display: flex;
-
-                .tgico-channelviews {
-                    margin: 0 2px;
-                    font-size: 18px;
-                    line-height: 12px;
-                }
-            }
-
-            .inner {
-                display: flex;
-                padding: 0px 12px 0px 5px;
-            }
-        }
-
+    .bubbles-list .in {
         .bubble {
             background-color: #ffffff;
         }
     }
 
-    .bubbles-list > .out {
+    .bubbles-list .out {
         align-items: flex-end;
         flex-direction: column;
 
-        .bubble.transparent {
-            .reply {
-                left: 0;
-                right: unset;
-                transform: translateX(-125%);
-            }
-        }
-
-        .quote {
-            border-left: 2px $darkgreen solid;
-
-            .name {
-                color: $darkgreen;
-            }
-        }
-
         .bubble {
             background-color: #eeffde;
-            .message.no-pad {
-                .fwd {
-                    padding-left: 5px;
-                }
-            }
-
-            .username,
-            .fwd {
-                color: $darkgreen;
-            }
-
-            figure.photo,
-            figure.video,
-            .grouped {
-                ~.time.bg:not(.use-me) {
-                    right: 25px;
-                }
-            }
-
-            .time {
-                color: $darkgreen;
-
-                .inner {
-                    padding: 2px 5px;
-                }
-            }
-
-            .time .tgico.status:after {
-                font-size: 18px;
-                line-height: 12px;
-                vertical-align: top;
-            }
-
-            .radio-input input[type=radio] {
-                &:before {
-                    background-color: $lightgreen
-                }
-            }
-        }
-
-
-        .bubble.sending {
-            .time .tgico.status:after {
-                content: $tgico-sending;
-            }
-        }
-
-        .bubble.read {
-            .time .tgico.status:after {
-                content: $tgico-checks;
-            }
-        }
-
-        .bubble.sent {
-            .time .tgico.status:after {
-                content: $tgico-check;
-            }
         }
     }
 }

@@ -1,0 +1,68 @@
+@mixin reply($in: false, $transparent: false) {
+    & .reply {
+        .quote {
+            .text {
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                max-width: 400px;
+            }
+        }
+
+        @if $transparent {
+            position: absolute;
+            @if $in {
+                right: 0;
+                transform: translateX(125%);
+            }
+            @if $in == false {
+                left: 0;
+                transform: translateX(-125%);
+            }
+            background-color: white;
+            border-radius: 10px;
+            padding: 8px;
+
+            .quote {
+                .text {
+                    max-width: 250px;
+                }
+            }
+        }
+
+        @if $in {
+            .quote {
+                border-left: 2px $darkblue solid;
+                .name {
+                    color: $darkblue;
+                }
+            }
+        }
+
+        @if $in == false {
+            .quote {
+                border-left: 2px $darkgreen solid;
+
+                .name {
+                    color: $darkgreen;
+                }
+            }
+        }
+    }
+
+    &.no-pad {
+        .reply {
+            margin-bottom: 0;
+
+            @if $in {
+                padding-left: 13px;
+            }
+
+            @if $in==false {
+                padding-right: 13px;
+            }
+        }
+    }
+
+
+}

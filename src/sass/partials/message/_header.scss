@@ -1,0 +1,33 @@
+@mixin header($in: false, $transparent: false) {
+
+    & .username,
+    & .fwd {
+        font-weight: 500;
+        font-size: 14px;
+        padding-bottom: 3px;
+
+        @if $in {
+            color: $blueonline;
+        } @else {
+            color: $darkgreen;
+        }
+
+        @if $transparent {
+            display: none;
+        }
+
+        .no-bold {
+            font-weight: 400;
+        }
+
+        .clickable-name {
+            cursor: pointer;
+        }
+    }
+
+    &.no-pad {
+        .fwd {
+            padding-left: 15px;
+        }
+    }
+}

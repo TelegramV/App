@@ -73,6 +73,21 @@
 
         .quote {
             padding-left: 8px;
+
+            @if $in {
+                border-left: 2px $darkblue solid;
+                .name {
+                    color: $darkblue;
+                }
+            }
+
+            @if $in == false {
+                border-left: 2px $darkgreen solid;
+
+                .name {
+                    color: $darkgreen;
+                }
+            }
         }
 
         .name {

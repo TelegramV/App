@@ -1,0 +1,71 @@
+@mixin media-wrapper($in: false, $transparent: false) {
+    & .media-wrapper {
+        position: relative;
+        width: 100%;
+        min-width: 100px;
+        min-height: 100px;
+        max-height: 512px; //seems like TDesktop limit 400px
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        background-color: black;
+
+        &:not(:only-child) {
+            border-bottom-right-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+        }
+
+        .progress {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            .pause-button {
+                background: $semiblack;
+                width: 64px;
+                height: 64px;
+                line-height: 62px;
+                position: absolute;
+                border-radius: 100%;
+                text-align: center;
+                cursor: pointer;
+
+
+                .tgico {
+                    position: relative;
+                    color: white;
+                    font-size: 40px;
+                }
+            }
+
+            progress {
+                position: relative;
+                top: 0;
+                left: 0;
+                pointer-events: none;
+            }
+        }
+
+        .attachment {
+            max-width: 100%;
+            height: auto;
+            max-height: 512px;
+            background-size: cover;
+            display: block;
+
+            &.photo {
+                cursor: pointer;
+            }
+        }
+
+        .attachment-thumb {
+            filter: blur(10px);
+            // needed to fix black edges: https://telegra.ph/file/7aad6eed39a29cf7dd893.jpg
+            // do not remove unless better method found
+            transform: scale(1.1);
+        }
+    }
+}

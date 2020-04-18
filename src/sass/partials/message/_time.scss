@@ -1,0 +1,138 @@
+@mixin time($in: false, $transparent: false) {
+    & .time {
+        float: right;
+        display: flex;
+        font-size: $time-size;
+        user-select: none;
+        height: 20px;
+        align-items: center;
+        margin-top: 5px;
+        margin-right: -10px;
+        margin-left: 5px;
+
+        .inner {
+            display: flex;
+            align-items: center;
+
+            .edited {
+                margin-right: 5px;
+            }
+        }
+
+        &.bg {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            line-height: 14px;
+
+            .inner {
+                color: white;
+                background-color: $semiblack;
+                border-radius: 40px;
+                text-align: center;
+                padding: 1px 6px !important;
+
+                .views {
+                    margin-right: 5px;
+
+                    .tgico-channelviews {
+                        line-height: 12px;
+                    }
+                }
+            }
+
+            .tgico.status:after {
+                line-height: 12px;
+            }
+        }
+
+        @if $in {
+            color: rgba($darkgrey, 0.6);
+
+            .views {
+                display: flex;
+
+                .tgico-channelviews {
+                    margin: 0 2px;
+                    font-size: 18px;
+                    line-height: 12px;
+                }
+            }
+
+            .inner {
+                display: flex;
+                padding: 0px 12px 0px 5px;
+            }
+        } 
+
+        @if $in == false {
+            color: $darkgreen;
+
+            .inner {
+                padding: 2px 5px;
+            }
+
+            .tgico.status:after {
+                font-size: 18px;
+                line-height: 12px;
+                vertical-align: top;
+            }
+        }
+
+    }
+
+    //appear on hover
+    & .time.bg {
+            display: none;
+        }
+
+    &:hover {
+        & .time.bg {
+            display: block;
+        }
+    }
+
+    & .round {
+        &~.time.bg {
+            bottom: 22px;
+            right: 12px;
+        }
+    }
+
+    & .photo,
+    & .video,
+    & .grouped {
+        &~.time.bg {
+            right: 15px;
+            bottom: 5px;
+        }
+
+        @if $in==false {
+            &~.time.bg {
+                right: 25px;
+            }
+        }
+    }
+
+    @if $in==false {
+        //icons
+        &.sending {
+            .time .tgico.status:after {
+                content: $tgico-sending;
+            }
+        }
+
+        &.read {
+            .time .tgico.status:after {
+                content: $tgico-checks;
+            }
+        }
+
+        &.sent {
+            .time .tgico.status:after {
+                content: $tgico-check;
+            }
+        }
+    }
+
+}

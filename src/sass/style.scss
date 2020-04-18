@@ -24,11 +24,18 @@
 @import "partials/fab";
 @import "partials/phoneCall";
 
+@import "partials/message/time";
+@import "partials/message/header";
+@import "partials/message/reply";
 @import "partials/message/bubblesList";
 @import "partials/message/avatar";
 @import "partials/message/box";
+@import "partials/message/mediaWrapper";
+@import "partials/message/figure";
 @import "partials/message/instantViewButton";
 @import "partials/message/game";
+@import "partials/message/map";
+@import "partials/message/sticker";
 @import "partials/message/poll";
 @import "partials/message/audio";
 @import "partials/message/service";
