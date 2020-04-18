@@ -27,7 +27,7 @@ class StickersManager extends Manager {
             })
 
             this.stickerSets["inputStickerSetAnimatedEmoji"] = l;
-            console.log("Animated Emoji Set ready!");
+            //console.log("Animated Emoji Set ready!");
         })
     }
 
@@ -72,7 +72,7 @@ class StickersManager extends Manager {
             if (stickerSet._ === "inputStickerSetAnimatedEmoji") id = "inputStickerSetAnimatedEmoji"
             if (stickerSet._ === "inputStickerSetDice") id = "inputStickerSetDice"
             const k = this.stickerSets[id] = l;
-            console.log(this.stickerSets)
+            //console.log(this.stickerSets)
             return k
         })
         // TODO change that to promise maybe
