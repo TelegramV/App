@@ -21,6 +21,8 @@
     top: 50%;
     transform: translateY(-50%);
     background-color: white;
+    display: flex;
+    flex-direction: column;
 
     .header {
       width: 100%;
@@ -49,7 +51,6 @@
       transition: anim(opacity);
       border-radius: 12px;
       overflow: hidden;
-      padding-bottom: 56px;
 
       .content {
         overflow-x: auto;
@@ -96,13 +97,18 @@
           }
         }
 
-        .feedback {
-          margin: 0;
-          background-color: $lightblue;
-          text-align: center;
+        .footer {
+          display: flex;
           padding: 10px;
-          color: $darkgrey;
           font-size: 14px;
+          color: $darkgrey;
+          background-color: $lightblue;
+
+          .feedback {
+            text-align: right;
+            flex-grow: 1;
+          }
+
         }
 
         .related {

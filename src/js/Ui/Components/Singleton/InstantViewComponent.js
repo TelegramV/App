@@ -256,7 +256,10 @@ export class InstantViewComponent extends SingletonComponent {
                             <div className="instant-view">
                                 <div className="content">
                                     {this.state.page.blocks.map(this.parseBlock)}
-                                    <div className="feedback">Leave feedback about this preview</div>
+                                    <div className="footer">
+                                    	<div className="views">{this.state.page.views ? (views+ " views") : ""}</div>
+                                    	<div className="feedback">Leave feedback about this preview</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>,
