@@ -220,7 +220,7 @@ class Packer {
         const method = getMethodByName(name)
 
         if (!method) {
-            throw new Error("No method " + method + " found")
+            throw new Error("No method " + name + " found")
         }
 
         this.int(intToUint(method.id))

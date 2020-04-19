@@ -81,7 +81,7 @@ class Authorization {
             this.isAuthorized = false;
             this.isAuthorizing = true;
 
-            const resPQ = (await this.connection.invokeMTProtoMethod("req_pq_multi", {
+            const resPQ = (await this.connection.invokeMTProtoMethod("req_pq", {
                 nonce: nonce,
             })).object("ResPQ");
 

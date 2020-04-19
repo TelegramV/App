@@ -1,5 +1,6 @@
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import {FileAPI} from "../../../../../../Api/Files/FileAPI"
+import lottie from "lottie-web"
 
 import MTProto from "../../../../../../MTProto/External"
 

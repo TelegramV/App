@@ -141,7 +141,7 @@ class Connection {
             return;
         }
 
-        this.pingingInvervalId = setInterval(() => this.ping(), 3000);
+        this.pingingInvervalId = setInterval(() => this.ping(), 5000);
     }
 
     stopPinging() {
@@ -177,17 +177,17 @@ class Connection {
         if (!this.withUpdates || originalUseSecondTransporter) {
             method_serializer.int(0xbf9459b7); // invokeWithoutUpdates
         }
-        if (!this.initConnection) {
-            method_serializer.int(0xc7481da6); // initConnection
-            method_serializer.int(AppConfiguration.mtproto.api.api_id, "api_id");
-            method_serializer.string(navigator.userAgent || "Unknown UserAgent", "device_model");
-            method_serializer.string(navigator.platform || "Unknown Platform", "system_version");
-            method_serializer.string(AppConfiguration.mtproto.api.app_version, "app_version");
-            method_serializer.string(navigator.language || "en", "system_lang_code");
-            method_serializer.string("", "lang_pack");
-            method_serializer.string(navigator.language || "en", "lang_code");
-            this.initConnection = true;
-        }
+        // if (!this.initConnection) {
+        method_serializer.int(0xc7481da6); // initConnection
+        method_serializer.int(AppConfiguration.mtproto.api.api_id, "api_id");
+        method_serializer.string(navigator.userAgent || "Unknown UserAgent", "device_model");
+        method_serializer.string(navigator.platform || "Unknown Platform", "system_version");
+        method_serializer.string(AppConfiguration.mtproto.api.app_version, "app_version");
+        method_serializer.string(navigator.language || "en", "system_lang_code");
+        method_serializer.string("", "lang_pack");
+        method_serializer.string(navigator.language || "en", "lang_code");
+        // this.initConnection = true;
+        // }
 
         method_serializer.method(name, params);
 
@@ -284,7 +284,8 @@ class Connection {
 
         this.invokeMethod(invokation.name, invokation.params, {useSecondTransporter: invokation.useSecondTransporter})
             .then(invokation.resolve)
-            .catch(invokation.reject);
+            .catch(invokation.reject)
+            .finally(() => this.processor.pendingInvokations.delete(message_id));
     }
 
     processResponse(response: Uint8Array): void {

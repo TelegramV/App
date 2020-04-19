@@ -92,7 +92,7 @@ export function loadSchema() {
         const xhr = new XMLHttpRequest()
         xhr.responseType = "arraybuffer";
 
-        xhr.open("GET", "static/schema.dat")
+        xhr.open("GET", "static/schema110.dat")
         xhr.onload = function () {
             // console.timeLog("schema")
             const arrayBuffer = xhr.response; // Note: not oReq.responseText

@@ -10,6 +10,7 @@ import {FileAPI} from "../../../../../Api/Files/FileAPI"
 import MTProto from "../../../../../MTProto/External"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import VApp from "../../../../../V/vapp"
+import lottie from "lottie-web"
 
 export default class ComposerComponent extends VComponent {
     constructor(props) {

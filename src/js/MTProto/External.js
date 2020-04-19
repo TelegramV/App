@@ -1,7 +1,10 @@
+// USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
+
 import MobileProtoWorker from "./Worker/MTProto.worker"
 import UpdatesManager from "../Api/Updates/UpdatesManager"
 import AppEvents from "../Api/EventBus/AppEvents"
 
+// USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 const TimeManager = {
     lastMessageID: [],
     timeOffset: 0,
@@ -16,11 +19,14 @@ const TimeManager = {
     }
 }
 
+// USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 let lastTaskId = 0
 let waitingTasks = new Map()
 
+// USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 const MTProtoWorker = new MobileProtoWorker()
 
+// USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 MTProtoWorker.addEventListener("message", event => {
     if (event.data.time) {
         TimeManager.lastMessageID = event.data.time.lastMessageID
@@ -51,6 +57,7 @@ MTProtoWorker.addEventListener("message", event => {
     }
 })
 
+// USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 function resolveTask(taskId, taskResult, failed = false) {
     let resolve: Function = waitingTasks.get(taskId)
 
@@ -69,6 +76,7 @@ function resolveTask(taskId, taskResult, failed = false) {
     }
 }
 
+// USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 function performTask(task, data) {
     return new Promise(function (resolve, reject) {
         if (lastTaskId === Number.MAX_VALUE) {
@@ -86,8 +94,6 @@ function performTask(task, data) {
         })
     })
 }
-
-// USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 
 // USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 class MTProtoBridge {
@@ -137,5 +143,7 @@ class MTProtoBridge {
 // USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 
 export const MTProto = new MTProtoBridge();
+
+// USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 
 export default MTProto;

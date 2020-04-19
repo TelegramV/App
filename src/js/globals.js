@@ -17,6 +17,5 @@
 
 global.$ = require("./Ui/Utils/$").default
 global.VRDOM = require("./V/VRDOM/VRDOM").default
-global.lottie = require("lottie-web")
 
 global.__IS_PRODUCTION__ = __IS_PRODUCTION__

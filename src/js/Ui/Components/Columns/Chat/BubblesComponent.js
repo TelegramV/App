@@ -32,6 +32,7 @@ import {ServiceMessage} from "../../../../Api/Messages/Objects/ServiceMessage";
 import MTProto from "../../../../MTProto/External";
 import {ChatInputComponent} from "./ChatInput/ChatInputComponent"
 import AudioManager from "../../../Managers/AudioManager"
+import IntersectionObserver from 'intersection-observer-polyfill';
 
 const DATA_FORMAT_MONTH_DAY = {
     month: 'long',

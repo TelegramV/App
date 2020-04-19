@@ -8,6 +8,8 @@ const FilterWarningsPlugin = require("webpack-filter-warnings-plugin")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const TerserPlugin = require("terser-webpack-plugin")
 const CompressionPlugin = require("compression-webpack-plugin")
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const BabelMinifyPlugin = require("babel-minify-webpack-plugin")
 
 const __IS_PRODUCTION__ = process.argv.mode === "production" || process.argv.includes("production")
 
@@ -109,6 +111,7 @@ const config = {
             exclude: /Critical dependency: the request of a dependency is an expression/,
         }),
         __IS_PRODUCTION__ ? new CompressionPlugin() : () => null,
+        // __IS_PRODUCTION__ ? new BabelMinifyPlugin() : () => null, // ламає код
     ],
     optimization: {
         minimize: __IS_PRODUCTION__,
