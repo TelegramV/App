@@ -107,9 +107,6 @@ const config = {
         }),
         new HtmlWebpackPlugin({template: "./src/index.html"}),
         new CleanWebpackPlugin(),
-        new FilterWarningsPlugin({
-            exclude: /Critical dependency: the request of a dependency is an expression/,
-        }),
         __IS_PRODUCTION__ ? new CompressionPlugin() : () => null,
         // __IS_PRODUCTION__ ? new BabelMinifyPlugin() : () => null, // ламає код
     ],

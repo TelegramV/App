@@ -7,6 +7,30 @@ class StickersManager extends Manager {
         this.stickerSets = {}
     }
 
+    fetchSpecialSets() {
+        /*MTProto.invokeMethod("messages.getStickerSet", {
+            stickerset: {_: "inputStickerSetDice"}
+        }).then(l => {
+            l.packs.forEach(q => {
+                q.document = l.documents.find(z => z.id === q.documents[0])
+            })
+
+            this.stickerSets["inputStickerSetDice"] = l;
+            console.log("Dice Set ready!");
+        })*/
+
+        MTProto.invokeMethod("messages.getStickerSet", {
+            stickerset: {_: "inputStickerSetAnimatedEmoji"}
+        }).then(l => {
+            l.packs.forEach(q => {
+                q.document = l.documents.find(z => z.id === q.documents[0])
+            })
+
+            this.stickerSets["inputStickerSetAnimatedEmoji"] = l;
+            //console.log("Animated Emoji Set ready!");
+        })
+    }
+
     getInstalledStickerSets() {
         let that = this;
         return new Promise(async (resolve, reject) => {
@@ -33,16 +57,21 @@ class StickersManager extends Manager {
         return this.stickerSets[id];
     }
 
+    //do not call to get special set
     getStickerSet(stickerSet) {
-        if (stickerSet._ === "inputStickerSetAnimatedEmoji") stickerSet.id = "inputStickerSetAnimatedEmoji"
         if (this.stickerSets[stickerSet.id]) return Promise.resolve(this.stickerSets[stickerSet.id])
+
         return MTProto.invokeMethod("messages.getStickerSet", {
             stickerset: stickerSet
         }).then(l => {
             l.packs.forEach(q => {
                 q.document = l.documents.find(z => z.id === q.documents[0])
             })
-            const k = this.stickerSets[stickerSet._ === "inputStickerSetAnimatedEmoji" ? stickerSet._ : l.set.id] = l
+
+            let id = l.set.id;
+            if (stickerSet._ === "inputStickerSetAnimatedEmoji") id = "inputStickerSetAnimatedEmoji"
+            if (stickerSet._ === "inputStickerSetDice") id = "inputStickerSetDice"
+            const k = this.stickerSets[id] = l;
             //console.log(this.stickerSets)
             return k
         })
@@ -51,18 +80,32 @@ class StickersManager extends Manager {
     }
 
     getAnimatedEmojiSet() {
-        return this.getStickerSet({_: "inputStickerSetAnimatedEmoji"})
+        return this.getCachedStickerSet("inputStickerSetAnimatedEmoji")
     }
 
     getAnimatedEmoji(text) {
-        if (this.stickerSets["inputStickerSetAnimatedEmoji"]) {
-            const sticker = this.stickerSets["inputStickerSetAnimatedEmoji"].packs.find(l => {
+        let set = this.getAnimatedEmojiSet();
+        if (set) {
+            const sticker = set.packs.find(l => {
                 // TODO dirty hack, should check some other way...
                 return text === l.emoticon || (text === "❤️" && l.emoticon === "❤")
             })
             if (sticker) {
                 return sticker.document
             }
+        }
+        return null
+    }
+
+    getDiceSet() {
+        return this.getCachedStickerSet("inputStickerSetDice")
+    }
+
+    getDice(value) {
+        if(value < 1 || value > 6) return null;
+        let set = this.getDiceSet();
+        if (set) {
+            return set.documents[value-1];
         }
         return null
     }

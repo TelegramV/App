@@ -54,6 +54,7 @@ const handlers = new Map([
     [MessageType.DOCUMENT, DocumentMessageComponent],
     [MessageType.GIF, GIFMessageComponent],
     [MessageType.ANIMATED_STICKER, AnimatedStickerMessageComponent],
+    [MessageType.DICE, AnimatedStickerMessageComponent],
     [MessageType.STICKER, StickerMessageComponent],
     [MessageType.VOICE, VoiceMessageComponent],
     [MessageType.AUDIO, AudioMessageComponent],

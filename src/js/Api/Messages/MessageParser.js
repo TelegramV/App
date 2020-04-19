@@ -38,6 +38,9 @@ export class MessageParser {
                 case "messageMediaContact":
                     type = MessageType.CONTACT
                     break;
+                case "messageMediaDice":
+                    type = MessageType.DICE
+                    break;
                 case "messageMediaDocument": {
                     type = MessageType.DOCUMENT
 

@@ -28,7 +28,7 @@ function initHighLevelManagers() {
         })
     })
     LocaleController.init()
-    StickerManager.getAnimatedEmojiSet()
+    StickerManager.fetchSpecialSets();
     // WallpaperManager.init();
 }
 
