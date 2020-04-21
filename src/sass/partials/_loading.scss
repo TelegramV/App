@@ -1,3 +1,103 @@
+.v-spinner {
+  &.background {
+    width: 64px;
+    height: 64px;
+    border-radius: 100%;
+    z-index: 1;
+    background: $semiblack;
+  }
+}
+.new-progress{
+  --size: 32px;
+  animation: rotate 2s linear infinite;
+  height: var(--size);
+  width: var(--size);
+  position: relative;
+
+  &.big {
+
+    --size: 64px;
+    .path {
+      cx: 32;
+      cy: 32;
+      r: 25.6;
+      animation: dash-big 1.5s ease-in-out infinite;
+    }
+
+    @keyframes dash-big{
+      0%{
+        stroke-dasharray: 1.28,256;
+        stroke-dashoffset: 0;
+      }
+      50%{
+        stroke-dasharray: 113.92,256;
+        stroke-dashoffset: -44.8;
+      }
+      100%{
+        stroke-dasharray: 113.92,256;
+        stroke-dashoffset: -158.72;
+      }
+    }
+  }
+
+  &.determinate {
+    .path {
+      transition: anim(stroke-dashoffset);
+      animation: none;
+      stroke-dasharray: 120;
+      stroke-dashoffset: 0;
+    }
+
+    &.big .path {
+      stroke-dasharray: 240;
+    }
+  }
+
+  .path {
+    cx: 16;
+    cy: 16;
+    r: 12.8;
+    fill: none;
+    stroke-width: 3;
+    stroke-miterlimit: 10;
+
+    stroke-dasharray: 0.64,128;
+    stroke-dashoffset: 0;
+    animation: dash 1.5s ease-in-out infinite;
+    stroke-linecap: round;
+    stroke: $blue;
+  }
+
+
+  &.white .path {
+    stroke: #ffffff;
+  }
+
+}
+
+
+
+
+@keyframes rotate{
+  100%{
+    transform: rotate(360deg);
+  }
+}
+@keyframes dash{
+  0%{
+    stroke-dasharray: 0.64,128;
+    stroke-dashoffset: 0;
+  }
+  50%{
+    stroke-dasharray: 59.96,128;
+    stroke-dashoffset: -22.4;
+  }
+  100%{
+    stroke-dasharray: 59.96,128;
+    stroke-dashoffset: -79.36;
+  }
+}
+
 .progress-circular {
   -webkit-appearance: none;
   -moz-appearance: none;

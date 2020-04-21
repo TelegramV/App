@@ -15,41 +15,55 @@
  *
  */
 
+import VComponent from "../../../V/VRDOM/component/VComponent";
+
 function VSpinner(
     {
-        big = true,
+        big = false,
         white = false,
         full = false,
         show = true,
         background = false,
-        id,
-        loaderRef
+        loaderRef,
+        determinate = false,
+        progress = 0
     }
 ) {
     const wrapperClassName = {
-        "full-size-loader": true,
-        "height": !full,
+        // "full-size-loader": true,
+        // "height": !full,
+        "v-spinner": true,
+        "background": background
     }
 
+
     const progressClassName = {
-        "progress-circular": true,
+        "new-progress": true,
+        "determinate": determinate,
         "big": big,
         "white": white
     }
 
-    return (
-        <div showIf={show} ref={loaderRef} id={id} className={wrapperClassName}>
-            {
-                background ? (
-                    <div className="progress-background">
-                        <progress className={progressClassName}/>
-                    </div>
-                ) : (
-                    <progress className={progressClassName}/>
-                )
-            }
-        </div>
-    )
+    const size = big ? 160 : 80
+    return <div className={wrapperClassName} ref={loaderRef}>
+        <svg className={progressClassName}>
+            {!determinate ?
+                <circle className="path"/> :
+                <circle className="path" css-stroke-dashoffset={(1 - progress) * -size}/>}
+            </svg>
+    </div>
+
+        // <div showIf={show} ref={loaderRef} id={id} className={wrapperClassName}>
+        //     {
+        //         background ? (
+        //             <div className="progress-background">
+        //                 <progress className={progressClassName}/>
+        //             </div>
+        //         ) : (
+        //             <progress className={progressClassName}/>
+        //         )
+        //     }
+        // </div>
 }
 
 export default VSpinner

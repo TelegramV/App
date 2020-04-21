@@ -7,6 +7,7 @@ import VApp from "../../V/vapp"
 import VirtualPage from "../Pages/Tests/VirtualPage"
 import ElementsPage from "../Pages/Tests/Elements"
 import ColumnsPage from "../Pages/Tests/Columns"
+import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage";
 
 /**
  * @param {VFrameworkRouter} router
@@ -51,6 +52,12 @@ function AppRoutes(router) {
     router.route("/columns", "elements", {
         h() {
             return ColumnsPage()
+        }
+    })
+
+    router.route("/spinner", "spinner", {
+        h() {
+            return SpinnerTestPage()
         }
     })
 
