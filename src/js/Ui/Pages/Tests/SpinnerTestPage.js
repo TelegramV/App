@@ -21,12 +21,16 @@ class TestDeterminateSpinner extends VComponent {
 
     render() {
         return <div>
-            <VSpinner determinate big progress={this.state.progress}/>
+            <VSpinner determinate big background progress={this.state.progress}>
+                {Math.round(this.state.progress * 100)}%
+            </VSpinner>
         </div>
     }
 }
 export function SpinnerTestPage() {
-    const ls = [...Array(100)].map((_, i) => <VSpinner white big progress={0.1} background/>)
+    const ls = [...Array(4)].map((_, i) => <VSpinner white big progress={0.1} background>
+        LOL
+    </VSpinner>)
     // const ls = [...Array(200)].map((_, i) => <progress className="progress-circular big"></progress>)
     return (
         <div>

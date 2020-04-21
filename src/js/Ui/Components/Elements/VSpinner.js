@@ -27,25 +27,27 @@ function VSpinner(
         loaderRef,
         determinate = false,
         progress = 0
-    }
+    }, slot
 ) {
     const wrapperClassName = {
         // "full-size-loader": true,
         // "height": !full,
         "v-spinner": true,
-        "background": background
+        "background": background,
+        "big": big,
+
     }
 
 
     const progressClassName = {
         "new-progress": true,
         "determinate": determinate,
-        "big": big,
         "white": white
     }
 
     const size = big ? 160 : 80
     return <div className={wrapperClassName} ref={loaderRef}>
+        {slot ? <div className="slot">{slot}</div> : ""}
         <svg className={progressClassName}>
             {!determinate ?
                 <circle className="path"/> :
