@@ -37,6 +37,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         super.appEvents(E)
         // TODO check this!
         E.bus(AppEvents.Files)
+            .only(event => event.fileId === this.doc.id)
             .on("fileDownloaded", this.onFileDownloaded)
             .on("fileDownloading", this.onFileDownloading)
     }

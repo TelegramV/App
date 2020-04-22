@@ -34,6 +34,7 @@ class PhotoMessageComponent extends GeneralMessageComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Files)
+            .only(event => event.fileId === this.message.raw.media.photo.id)
             .on("fileDownloaded", this.onFileDownloaded)
             .on("fileDownloading", this.onFileDownloading)
     }

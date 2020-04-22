@@ -37,6 +37,7 @@ class FilesManager {
             return false
         }
 
+
         file.progress = 0.0
         this.pending.set(file.id, file)
 
