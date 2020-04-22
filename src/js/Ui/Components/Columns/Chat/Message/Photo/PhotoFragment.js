@@ -1,4 +1,4 @@
-export const PhotoFragment = ({id, url = "", thumb = true, width = 0, height = 0, maxWidth = 0, maxHeight = 0}) => {
+export const PhotoFragment = ({id, url = "", width = 0, height = 0, maxWidth = 0, maxHeight = 0}) => {
     const calculatedWidth = Math.min(1, maxHeight / height) * width
     const calculatedHeight = Math.min(1, maxWidth / width) * height
 

@@ -99,7 +99,8 @@ export class DialogInfoComponent extends RightBarComponent {
 
     appEvents(E) {
         super.appEvents(E)
-        E.bus(AppEvents.General)
+        // TODO check this!
+        E.bus(AppEvents.Files)
             .on("fileDownloaded", this.onFileDownloaded)
             .on("fileDownloading", this.onFileDownloading)
 

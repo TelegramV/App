@@ -261,6 +261,8 @@ export class FileAPI {
         })
     }
 
+    // TODO check this!
+    // @deprecated use FileManager instead
     static getAllParts(file, size, thumb_size, onProgress = undefined) {
         return new Promise(async (resolve, reject) => {
             let offset = 0

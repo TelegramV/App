@@ -26,7 +26,9 @@ function VSpinner(
         background = false,
         loaderRef,
         determinate = false,
-        progress = 0
+        progress = 0,
+        onClick,
+        paused = false
     }, slot
 ) {
     const wrapperClassName = {
@@ -35,6 +37,7 @@ function VSpinner(
         "v-spinner": true,
         "background": background,
         "big": big,
+        "paused": paused
 
     }
 
@@ -45,8 +48,8 @@ function VSpinner(
         "white": white
     }
 
-    const size = big ? 160 : 80
-    return <div className={wrapperClassName} ref={loaderRef}>
+    const size = big ? 170 : 79
+    return <div className={wrapperClassName} ref={loaderRef} onClick={onClick}>
         {slot ? <div className="slot">{slot}</div> : ""}
         <svg className={progressClassName}>
             {!determinate ?

@@ -9,6 +9,7 @@ const AppEvents = {
     Messages: new EventBus(),
     General: new MessagesEventBus(),
     Calls: new EventBus(),
+    Files: new EventBus()
 }
 
 export default AppEvents

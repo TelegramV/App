@@ -78,9 +78,9 @@ export class PhotoMessage extends AbstractMessage {
         return this.photo.fetchMax()
     }
 
-    fetchMaxSize() {
-        return this.photo.fetchMaxSize()
-    }
+    // fetchMaxSize() {
+    //     return this.photo.fetchMaxSize()
+    // }
 
     fillRaw(raw: Object): PhotoMessage {
         super.fillRaw(raw)

@@ -4,19 +4,25 @@ import FileManager from "../../../../../Api/Files/FileManager"
 import CardMessageWrapperFragment from "./Common/CardMessageWrapperFragment"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
+import VSpinner from "../../../Elements/VSpinner";
 
-const IconFragment = ({isDownloading, isDownloaded, color, ext}) => {
+const IconFragment = ({isDownloading, isDownloaded, color, ext, progress = 0.0}) => {
     return (
         <div className="svg-wrapper">
-            {DocumentMessagesTool.createIcon(color)}
+            {DocumentMessagesTool.createIcon(color, !isDownloaded)}
             {
                 isDownloaded ?
                     <div className="extension">{ext}</div> :
                     <div className="progress extension">
+
+                        {/* TODO move progress bar with pause to component*/}
                         {!isDownloading ? <div className="pause-button">
                                 <i className={["tgico tgico-download"]}/>
                             </div> :
-                            <progress className={["progress-circular", "white"]}/>}
+                            <VSpinner white determinate progress={progress}>
+                                <i className={["tgico tgico-close"]}/>
+                            </VSpinner>
+                        }
                     </div>
             }
         </div>
@@ -25,15 +31,12 @@ const IconFragment = ({isDownloading, isDownloaded, color, ext}) => {
 
 class DocumentMessageComponent extends GeneralMessageComponent {
 
-    isDownloading = false
-    isDownloaded = false
-    downloadedFile = undefined
-
     iconFragmentRef = VComponent.createFragmentRef()
 
     appEvents(E) {
         super.appEvents(E)
-        E.bus(AppEvents.General)
+        // TODO check this!
+        E.bus(AppEvents.Files)
             .on("fileDownloaded", this.onFileDownloaded)
             .on("fileDownloading", this.onFileDownloading)
     }
@@ -44,14 +47,19 @@ class DocumentMessageComponent extends GeneralMessageComponent {
 
         let title = DocumentMessagesTool.getFilename(doc.attributes);
         let ext = title.split(".")[title.split(".").length - 1];
-        let size = DocumentMessagesTool.formatSize(doc.size);
+
+        const isDownloading = FileManager.isPending(doc.id)
+        const isDownloaded = FileManager.isDownloaded(doc.id)
+        const progress = FileManager.getProgress(doc.id)
+        let size = isDownloading && !isDownloaded ? Math.round(progress * 100) + "%" : DocumentMessagesTool.formatSize(doc.size);
 
         let color = DocumentMessagesTool.getColor(ext);
         let icon = <IconFragment ref={this.iconFragmentRef}
                                  ext={ext}
                                  color={color}
-                                 isDownloaded={this.isDownloaded}
-                                 isDownloading={FileManager.pending.has(doc.id)}/>
+                                 isDownloaded={isDownloaded}
+                                 progress={progress}
+                                 isDownloading={isDownloading}/>
 
 
         return (
@@ -65,33 +73,45 @@ class DocumentMessageComponent extends GeneralMessageComponent {
     }
 
     downloadDocument = () => {
-        if (this.isDownloaded && this.downloadedFile) {
-            FileManager.saveOnPc(this.downloadedFile, DocumentMessagesTool.getFilename(this.doc.attributes))
-        } else if (!this.isDownloading) {
+        if (FileManager.isDownloaded(this.doc.id)) {
+            FileManager.saveBlobUrlOnPc(FileManager.downloaded.get(this.doc.id), DocumentMessagesTool.getFilename(this.doc.attributes))
+        } else if (!FileManager.isPending(this.doc.id)) {
             FileManager.downloadDocument(this.doc)
+        } else {
+            // TODO Possible RC if cancel and redownloaded at the same time.
+            // Should probably store some random hash of the download in FileMgr.pending?
+            AppEvents.Files.fire("cancelDownload", this.doc.id)
+            this.iconFragmentRef.patch({
+                isDownloading: false,
+                progress: 0.0
+            })
+            // TODO should definitely be replaced with stateful component
+            this.forceUpdate()
         }
     }
 
     onFileDownloading = event => {
-        if (this.doc.id === event.fileId && !this.isDownloaded) {
-            this.isDownloading = true
+        if (this.doc.id === event.fileId) {
 
             this.iconFragmentRef.patch({
                 isDownloading: true,
+                progress: event.progress
             })
+            // TODO should definitely be replaced with stateful component
+            this.forceUpdate()
         }
     }
 
     onFileDownloaded = event => {
         if (this.doc.id === event.fileId) {
-            this.isDownloaded = true
-            this.isDownloading = false
-            this.downloadedFile = event.file
 
             this.iconFragmentRef.patch({
                 isDownloading: false,
                 isDownloaded: true,
             })
+
+            // TODO should definitely be replaced with stateful component
+            this.forceUpdate()
         }
     }
 }

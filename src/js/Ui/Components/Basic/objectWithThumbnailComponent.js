@@ -1,5 +1,6 @@
 import VComponent from "../../../V/VRDOM/component/VComponent"
 
+// @deprecated ObjectWithThumbnailComponent's CLOSED DUE TO AIDS
 export class ObjectWithThumbnailComponent extends VComponent {
     init() {
         this.state = {

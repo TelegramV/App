@@ -1,3 +1,10 @@
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 .v-spinner {
   --size: 32px;
 
@@ -9,8 +16,30 @@
     background: $semiblack;
   }
 
+
+  &.paused {
+    .new-progress {
+      display: none;
+    }
+  }
+
+  .slot {
+    position: absolute;
+    width: var(--size);
+    height: var(--size);
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+
   &.big {
     --size: 64px;
+
+    .slot {
+      font-size: 2em;
+    }
 
     .new-progress {
       .path {
@@ -18,6 +47,10 @@
         cy: 32;
         r: 27.6; // 25.6
         animation: dash-big 1.5s ease-in-out infinite;
+      }
+
+      &.determinate .path {
+        animation: none;
       }
 
       @keyframes dash-big {
@@ -40,16 +73,6 @@
   &.big .new-progress .path {
     stroke-dasharray: 240;
   }
-
-  .slot {
-    position: absolute;
-    width: var(--size);
-    height: 64px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-  }
 }
 .new-progress{
   animation: rotate 2s linear infinite;
@@ -59,14 +82,6 @@
 
 
 
-  &.determinate {
-    .path {
-      transition: anim(stroke-dashoffset);
-      animation: none;
-      stroke-dasharray: 120;
-      stroke-dashoffset: 0;
-    }
-  }
 
   .path {
     cx: 16;
@@ -83,6 +98,14 @@
     stroke: $blue;
   }
 
+  &.determinate {
+    .path {
+      transition: anim(stroke-dashoffset);
+      animation: none;
+      stroke-dasharray: 120;
+      stroke-dashoffset: 0;
+    }
+  }
 
   &.white .path {
     stroke: #ffffff;
