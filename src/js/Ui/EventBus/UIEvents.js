@@ -21,7 +21,6 @@ const UIEvents = {
     General: new EventBus(),
     LeftSidebar: new EventBus(),
     RightSidebar: new EventBus(),
-    Bubbles: new EventBus(),
     MediaViewer: new EventBus()
 }
 

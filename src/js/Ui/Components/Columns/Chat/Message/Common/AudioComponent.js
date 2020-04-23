@@ -65,9 +65,9 @@ class AudioComponent extends GeneralMessageComponent {
 
     /*Don't forget to super to this method!*/
     componentWillUnmount() {
-        this.progressEl.removeEventListener("mousemove", this._handleMove.bind(this));
-        this.audio.removeEventListener("timeupdate", this._audioTimeUpdate.bind(this));
-        this.audio.removeEventListener("ended", this._playButtonClick.bind(this));
+        // this.progressEl.removeEventListener("mousemove", this._handleMove.bind(this));
+        // this.audio.removeEventListener("timeupdate", this._audioTimeUpdate.bind(this));
+        // this.audio.removeEventListener("ended", this._playButtonClick.bind(this));
     }
 
     async play() {

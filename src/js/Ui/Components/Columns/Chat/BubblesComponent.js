@@ -38,7 +38,8 @@ const DATA_FORMAT_MONTH_DAY = {
     day: 'numeric',
 }
 
-// needs rewrite
+
+// legacy, doesnt work now
 class BubblesComponent extends VComponent {
 
     loaderRef = this.props.loaderRef
@@ -67,17 +68,15 @@ class BubblesComponent extends VComponent {
             .on("sendMessage", this.onSendMessage)
             .on("messageSent", this.onMessageSent)
 
-        E.bus(UIEvents.Bubbles)
-            .on("showMessage", this.onShowMessage)
-            .on("showMessageInstant", this.onShowMessageInstant)
-            .on("scrollToBottom", this.onScrollToBottom)
-
         E.bus(UIEvents.RightSidebar)
             .on("show", this.onRightSidebarShow)
             .on("hide", this.onRightSidebarHide)
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
+            .on("chat.showMessage", this.onShowMessage)
+            .on("chat.showMessageInstant", this.onShowMessageInstant)
+            .on("chat.scrollToBottom", this.onScrollToBottom)
     }
 
     onChatSelect = _ => {

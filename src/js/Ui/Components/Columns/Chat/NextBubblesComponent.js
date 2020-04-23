@@ -36,18 +36,18 @@ class NextBubblesComponent extends VComponent {
 
     hasTopMessagesToLoad = true;
     hasBottomMessagesToLoad = true;
-    
-    mainStream: VirtualMessages = new VirtualMessages();
-    secondStream: VirtualMessages = new VirtualMessages();
 
-    isUsingSecondStream = false;
+    mainVirtual: VirtualMessages = new VirtualMessages();
+    secondVirtual: VirtualMessages = new VirtualMessages();
 
-    get currentStream(): VirtualMessages {
-        if (this.isUsingSecondStream) {
-            return this.secondStream;
+    isUsingSecondVirtual = false;
+
+    get currentVirtual(): VirtualMessages {
+        if (this.isUsingSecondVirtual) {
+            return this.secondVirtual;
         }
 
-        return this.mainStream;
+        return this.mainVirtual;
     }
 
     appEvents(E) {
@@ -103,13 +103,14 @@ class NextBubblesComponent extends VComponent {
 
     refresh = () => {
         this.cleanupTree();
-        this.mainStream.refresh();
-        this.secondStream.refresh();
+        this.mainVirtual.refresh();
+        this.secondVirtual.refresh();
 
         this.hasTopMessagesToLoad = true;
         this.hasBottomMessagesToLoad = false;
 
-        this.isUsingSecondStream = false;
+        this.isUsingSecondVirtual = false;
+        this.isLoadingNextPage = false;
     }
 
     onChatSelect = () => {
@@ -121,16 +122,16 @@ class NextBubblesComponent extends VComponent {
     }
 
     onChatScrollBottomRequest = () => {
-        if (this.virtual_isMainStreamFirstPage()) {
-            this.isUsingSecondStream = false;
+        if (this.virtual_isMainVirtualFirstPage()) {
+            this.isUsingSecondVirtual = false;
             this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
         } else {
             this.cleanupTree();
-            this.isUsingSecondStream = false;
-            this.secondStream.refresh();
-            this.mainStream.offset = 0;
+            this.isUsingSecondVirtual = false;
+            this.secondVirtual.refresh();
+            this.mainVirtual.offset = 0;
             this.bubblesInnerRef.$el.append(
-                ...this.mainStream.next()
+                ...this.mainVirtual.next()
                     .map(this.renderMessage)
             );
             this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
@@ -139,27 +140,27 @@ class NextBubblesComponent extends VComponent {
 
     onChatShowMessageReady = event => {
         this.cleanupTree();
-        this.secondStream.refresh();
+        this.secondVirtual.refresh();
 
-        this.isUsingSecondStream = true;
+        this.isUsingSecondVirtual = true;
 
         let messages = event.messages;
 
-        const intersect = findIntersection(messages, this.mainStream.messages.slice(this.mainStream.messages.length - 1));
+        const intersect = findIntersection(messages, this.mainVirtual.messages.slice(this.mainVirtual.messages.length - 1));
 
         if (intersect > -1) {
-            this.isUsingSecondStream = false;
+            this.isUsingSecondVirtual = false;
 
             messages = messages.slice(intersect + 1);
 
-            this.mainStream.messages.push(...messages);
+            this.mainVirtual.messages.push(...messages);
 
-            messages = this.mainStream.messages.slice(this.mainStream.messages.length - this.mainStream.size);
+            messages = this.mainVirtual.messages.slice(this.mainVirtual.messages.length - this.mainVirtual.size);
 
-            this.mainStream.offset = this.mainStream.messages.length;
+            this.mainVirtual.offset = this.mainVirtual.messages.length;
         } else {
-            this.secondStream.messages = messages.slice().reverse();
-            this.secondStream.offset = messages.length;
+            this.secondVirtual.messages = messages.slice().reverse();
+            this.secondVirtual.offset = messages.length;
         }
 
         const $messages = messages.map(this.renderMessage);
@@ -180,20 +181,26 @@ class NextBubblesComponent extends VComponent {
             let $message = this.$el.querySelector(`#cmsg${message.id}`); // dunno better way, sorry
 
             if (!$message) {
-                const messageIndex = this.mainStream.messages.findIndex(m => m.id === message.id);
+                const messageIndex = this.mainVirtual.messages.findIndex(m => m.id === message.id);
 
                 if (messageIndex > -1) {
                     this.cleanupTree();
 
-                    const $messages = this.mainStream.messages
-                        .slice(messageIndex - this.mainStream.sizeDiv2, messageIndex + this.mainStream.sizeDiv2)
-                        .map(this.renderMessage);
+                    let messages;
+
+                    if (messageIndex <= 50) {
+                        this.mainVirtual.offset = 0;
+                        messages = this.mainVirtual.next();
+                    } else {
+                        messages = this.mainVirtual.messages
+                            .slice(Math.max(messageIndex - this.mainVirtual.sizeDiv2, 0), messageIndex + this.mainVirtual.sizeDiv2);
+                    }
+
+                    const $messages = messages.map(this.renderMessage);
 
                     this.bubblesInnerRef.$el.append(...$messages);
 
-                    $message = $messages[this.mainStream.sizeDiv2];
-
-                    this.mainStream.offset = messageIndex + this.mainStream.sizeDiv2;
+                    $message = $messages[messages.findIndex(msg => msg.id === message.id)];
                 } else {
                     AppSelectedChat.Current.api.fetchByOffsetId({
                         offset_id: message.id,
@@ -208,6 +215,14 @@ class NextBubblesComponent extends VComponent {
             } else {
                 console.log("fuckcckcckckck")
             }
+        } else {
+            AppSelectedChat.select(message.to);
+
+            AppSelectedChat.Current.api.fetchByOffsetId({
+                offset_id: message.id,
+                add_offset: -30,
+                limit: 60
+            });
         }
     }
 
@@ -223,7 +238,7 @@ class NextBubblesComponent extends VComponent {
         if (isAtTop) {
             this.virtual_onScrolledTop();
         } else if (isAtBottom) {
-            if (this.virtual_isMainStreamFirstPage()) {
+            if (this.virtual_isMainVirtualFirstPage()) {
                 UIEvents.General.fire("chat.scrollToBottom.hide");
             }
             this.virtual_onScrolledBottom();
@@ -235,18 +250,18 @@ class NextBubblesComponent extends VComponent {
 
         this.hasTopMessagesToLoad = event.messages.length === 60;
 
-        this.mainStream.messages = event.messages;
-        this.mainStream.offset = 0;
-        this.bubblesInnerRef.$el.append(...this.mainStream.next().map(this.renderMessage));
+        this.mainVirtual.messages = event.messages;
+        this.mainVirtual.offset = 0;
+        this.bubblesInnerRef.$el.append(...this.mainVirtual.next().map(this.renderMessage));
         this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
     }
 
     onNewMessage = (event) => {
         const message = event.message;
 
-        this.mainStream.messages.unshift(message);
+        this.mainVirtual.messages.unshift(message);
 
-        if (this.virtual_isMainStreamFirstPage()) {
+        if (this.virtual_isMainVirtualFirstPage()) {
             const {scrollTop, scrollHeight, clientHeight} = this.$el;
             const isAtBottom = scrollHeight - scrollTop === clientHeight;
 
@@ -259,20 +274,31 @@ class NextBubblesComponent extends VComponent {
                 this.$el.scrollTop = scrollTop;
             }
         } else {
-            this.mainStream.offset++;
+            this.mainVirtual.offset++;
         }
     }
 
     virtual_onScrolledTop = () => {
-        if (this.currentStream.offset === this.currentStream.messages.length) {
+        if (this.currentVirtual.offset === this.currentVirtual.messages.length) {
             if (this.hasTopMessagesToLoad && !this.isLoadingNextPage) {
                 this.isLoadingNextPage = true;
-                AppSelectedChat.Current.api.fetchNextPage(this.currentStream.messages[this.currentStream.messages.length - 1].id);
+                if (this.currentVirtual.messages.length > 0) {
+                    if (this.isUsingSecondVirtual) {
+                        AppSelectedChat.Current.api.fetchNextPage(this.secondVirtual.messages[0].id);
+                    } else {
+                        AppSelectedChat.Current.api.fetchNextPage(this.currentVirtual.messages[this.currentVirtual.messages.length - 1].id);
+                    }
+                }
             }
+
+            if (!this.hasTopMessagesToLoad) {
+                console.log("hasTopMessagesToLoad")
+            }
+
             return;
         }
 
-        const $nodes = this.currentStream.next().map(this.renderMessage);
+        const $nodes = this.currentVirtual.next().map(this.renderMessage);
 
         this.bubblesInnerRef.$el.append(...$nodes);
 
@@ -295,28 +321,28 @@ class NextBubblesComponent extends VComponent {
         this.isLoadingNextPage = false;
 
         this.hasTopMessagesToLoad = event.messages.length === 60;
-        this.currentStream.messages.push(...event.messages);
+        this.currentVirtual.messages.push(...event.messages);
 
-        if (this.virtual_isCurrentStreamLastPage()) {
+        if (this.virtual_isCurrentVirtualLastPage()) {
             this.virtual_onScrolledTop();
         }
     }
 
     virtual_onScrolledBottom = () => {
-        if (this.isUsingSecondStream) {
+        if (this.isUsingSecondVirtual) {
             if (!this.isLoadingPrevPage) {
                 this.isLoadingPrevPage = true;
-                AppSelectedChat.Current.api.fetchPrevPage(this.secondStream.messages[this.secondStream.messages.length - 1].id);
+                AppSelectedChat.Current.api.fetchPrevPage(this.secondVirtual.messages[this.secondVirtual.messages.length - 1].id);
             }
 
             return;
         }
 
-        if (this.virtual_isMainStreamFirstPage()) {
+        if (this.virtual_isMainVirtualFirstPage()) {
             return;
         }
 
-        const $nodes = this.mainStream.back().map(this.renderMessage);
+        const $nodes = this.mainVirtual.back().map(this.renderMessage);
 
         this.bubblesInnerRef.$el.prepend(...$nodes);
 
@@ -328,21 +354,21 @@ class NextBubblesComponent extends VComponent {
     onPrevPageMessagesReady = (event) => {
         this.isLoadingPrevPage = false;
 
-        const intersect = findIntersection(event.messages, this.mainStream.messages.slice(this.mainStream.messages.length - 1));
+        const intersect = findIntersection(event.messages, this.mainVirtual.messages.slice(this.mainVirtual.messages.length - 1));
 
         let messages = event.messages;
 
         if (intersect > -1) {
             console.log("intersect found")
-            this.isUsingSecondStream = false;
+            this.isUsingSecondVirtual = false;
 
             messages = messages.slice(intersect + 1);
 
-            this.mainStream.messages.push(...event.messages);
+            this.mainVirtual.messages.push(...event.messages);
 
-            messages = this.mainStream.messages.slice(this.mainStream.messages.length - this.mainStream.size);
+            messages = this.mainVirtual.messages.slice(this.mainVirtual.messages.length - this.mainVirtual.size);
 
-            this.mainStream.offset = this.mainStream.messages.length;
+            this.mainVirtual.offset = this.mainVirtual.messages.length;
 
             const $nodes = messages.slice(0, 30).map(this.renderMessage);
 
@@ -352,7 +378,7 @@ class NextBubblesComponent extends VComponent {
                 vrdom_delete(this.bubblesInnerRef.$el.lastChild);
             }
         } else {
-            this.secondStream.messages.push(...messages.reverse());
+            this.secondVirtual.messages.push(...messages.reverse());
 
             const $nodes = messages.slice(0, 30).map(this.renderMessage);
 
@@ -364,20 +390,20 @@ class NextBubblesComponent extends VComponent {
         }
     }
 
-    virtual_isCurrentStreamFirstPage = () => {
-        return this.currentStream.offset <= this.currentStream.size;
+    virtual_isCurrentVirtualFirstPage = () => {
+        return this.currentVirtual.offset <= this.currentVirtual.size;
     }
 
-    virtual_isMainStreamFirstPage = () => {
-        return !this.isUsingSecondStream && this.mainStream.offset <= this.mainStream.size;
+    virtual_isMainVirtualFirstPage = () => {
+        return !this.isUsingSecondVirtual && this.mainVirtual.offset <= this.mainVirtual.size;
     }
 
-    virtual_isCurrentStreamLastPage = () => {
-        return this.currentStream.offset + this.currentStream.size >= this.currentStream.messages.length;
+    virtual_isCurrentVirtualLastPage = () => {
+        return this.currentVirtual.offset + this.currentVirtual.size >= this.currentVirtual.messages.length;
     }
 
-    virtual_isMainStreamLastPage = () => {
-        return !this.isUsingSecondStream && this.mainStream.offset + this.mainStream.size >= this.mainStream.messages.length;
+    virtual_isMainVirtualLastPage = () => {
+        return !this.isUsingSecondVirtual && this.mainVirtual.offset + this.mainVirtual.size >= this.mainVirtual.messages.length;
     }
 }
 

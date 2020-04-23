@@ -32,22 +32,27 @@ import vrdom_renderVListVRNode from "./renderVList"
  */
 function vrdom_render(node: VRNode, props: VRenderProps = {}): HTMLElement | Element | Node | Text {
 
-    if (node instanceof VComponentVRNode) {
-        return vrdom_renderVComponentVNode(node)
-    } else if (node instanceof VListVRNode && props.$parent) {
-        return vrdom_renderVListVRNode(node, props)
-    }
-
-    if (node instanceof VRNode) {
-        return renderElement(node, props)
-    } else if (!node) {
-        return renderText(node)
-    } else {
-        if (typeof node === "object") {
-            return renderText(JSON.stringify(node))
-        } else {
-            return renderText(node)
+    try {
+        if (node instanceof VComponentVRNode) {
+            return vrdom_renderVComponentVNode(node)
+        } else if (node instanceof VListVRNode && props.$parent) {
+            return vrdom_renderVListVRNode(node, props)
         }
+
+        if (node instanceof VRNode) {
+            return renderElement(node, props)
+        } else if (!node) {
+            return renderText(node)
+        } else {
+            if (typeof node === "object") {
+                return renderText(JSON.stringify(node))
+            } else {
+                return renderText(node)
+            }
+        }
+    } catch (e) {
+        console.error(e)
+        return document.createTextNode(e.toString())
     }
 }
 
