@@ -16,6 +16,7 @@
  */
 
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
+import AudioManager from "../../../../Managers/AudioManager";
 import UIEvents from "../../../../EventBus/UIEvents";
 import {MessageParser} from "../../../../../Api/Messages/MessageParser";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
@@ -25,7 +26,8 @@ class ChatInfoPinnedComponent extends VComponent {
 
     state = {
         audio: undefined,
-        voice: undefined,
+        pause: undefined,
+        meta: undefined,
         message: undefined,
     }
 
@@ -35,18 +37,28 @@ class ChatInfoPinnedComponent extends VComponent {
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelected)
+
+        E.bus(UIEvents.General)
+            .on("audio.play", this.onAudioPlay)
+
+        E.bus(UIEvents.General)
+            .on("audio.pause", this.onAudioPause)
+
+        E.bus(UIEvents.General)
+            .on("audio.remove", this.onAudioRemove)
     }
 
     render() {
-        if (this.state.audio || this.state.voice) {
+        if (this.state.audio) {
+            let playClasses = ["tgico", this.state.pause ? "tgico-play" : "tgico-pause"];
             return (
                 <div className="pin active-audio">
-                    <div className="play">
-                        <i class="tgico tgico-play"/>
+                    <div className="play rp rps" onClick={() => AudioManager.toggle()}>
+                        <i class={playClasses}/>
                     </div>
                     <div className="audio-info">
-                        <div className="title">Title</div>
-                        <div className="description">Musician</div>
+                        <div className="title">{this.state.meta.title}</div>
+                        <div className="description">{this.state.meta.artist}</div>
                     </div>
                 </div>
             )
@@ -81,6 +93,29 @@ class ChatInfoPinnedComponent extends VComponent {
                 message: null
             })
         }
+    }
+
+    onAudioPlay = event => {
+        event.audio.getMeta().then(meta => {
+            this.setState({
+                audio: event.audio,
+                meta: meta,
+                pause: false
+            })
+        });
+    }
+
+    onAudioPause = event => {
+        this.setState({
+            pause: true
+        })
+    }
+
+    onAudioRemove = event => {
+        this.setState({
+            audio: undefined,
+            meta: undefined
+        })
     }
 }
 
