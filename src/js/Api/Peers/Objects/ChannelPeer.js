@@ -1,6 +1,6 @@
 import {Peer} from "./Peer";
 import MTProto from "../../../MTProto/External";
-import PeersManager from "./PeersManager"
+import PeersManager from "../PeersManager"
 
 export class ChannelPeer extends Peer {
 

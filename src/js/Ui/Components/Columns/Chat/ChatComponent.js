@@ -17,7 +17,6 @@
 
 import ChatInfoPinnedComponent from "./ChatInfo/ChatInfoPinnedComponent"
 import ChatInfoComponent from "./ChatInfo/ChatInfoComponent"
-import BubblesComponent from "./BubblesComponent"
 import {ChatInputComponent} from "./ChatInput/ChatInputComponent";
 import AppSelectedChat from "../../../Reactive/SelectedChat"
 import UIEvents from "../../../EventBus/UIEvents"
@@ -25,6 +24,8 @@ import VComponent from "../../../../V/VRDOM/component/VComponent"
 import {CallsManager} from "../../../../Api/Calls/CallManager";
 import VApp from "../../../../V/vapp"
 import VSpinner from "../../Elements/VSpinner"
+import NextBubblesComponent from "./NextBubblesComponent"
+import BubblesComponent from "./BubblesComponent"
 
 /**
  * CRITICAL: never rerender this component!
@@ -71,8 +72,11 @@ class ChatComponent extends VComponent {
                               show={true}
                               background={true}/>
 
-                    <BubblesComponent loaderRef={this.messagesLoaderRef}/>
+                    <NextBubblesComponent loaderRef={this.messagesLoaderRef}/>
+
+                    {/*<BubblesComponent loaderRef={this.messagesLoaderRef}/>*/}
                     <ChatInputComponent ref={this.chatInputRef}/>
+
                 </div>
             </div>
         )

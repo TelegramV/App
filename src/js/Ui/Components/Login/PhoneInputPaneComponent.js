@@ -6,9 +6,9 @@ import {ButtonWithProgressBarComponent} from "../Elements/ButtonComponent";
 import InfoComponent from "./InfoComponent"
 import CountryDropdownItemFragment from "./CountryDropdownItemFragment"
 import {countries} from "../../Utils/utils"
-import {AppPermanentStorage} from "../../../Api/Common/Storage";
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import API from "../../../Api/Telegram/API"
+import keval from "../../../Keval/keval"
 
 export default class PhoneInputComponent extends PaneComponent {
 
@@ -77,7 +77,8 @@ export default class PhoneInputComponent extends PaneComponent {
             })
         }).catch(error => {
             if (error.type === "AUTH_RESTART") {
-                AppPermanentStorage.clear()
+                localStorage.clear()
+                keval.auth.clear()
                 this.handlePhoneSend()
                 return
             }

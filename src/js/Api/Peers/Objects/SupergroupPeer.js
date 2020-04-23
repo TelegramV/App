@@ -1,5 +1,5 @@
 import MTProto from "../../../MTProto/External"
-import PeersManager from "./PeersManager"
+import PeersManager from "../PeersManager"
 import {ChannelPeer} from "./ChannelPeer";
 
 export class SupergroupPeer extends ChannelPeer {

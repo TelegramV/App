@@ -15,18 +15,15 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+import PeersStore from "../../Store/PeersStore"
+import {UserPeer} from "../../Peers/Objects/UserPeer"
 
-const updateFolderPeers = update => {
-    update.folder_peers.forEach(FolderPeer => {
-        const dialog = DialogsManager.findByPeer(FolderPeer.peer)
+function processUpdateUserStatus(update) {
+    const peer = PeersStore.get("user", update.user_id)
 
-        if (dialog) {
-            dialog.folderId = FolderPeer.folder_id
-        } else {
-            console.error("BUG: whoa!!! this thing is not implemented yet")
-        }
-    })
+    if (peer instanceof UserPeer) {
+        peer.status = update.status
+    }
 }
 
-export default updateFolderPeers
+export default processUpdateUserStatus;

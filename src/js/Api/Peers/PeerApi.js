@@ -1,10 +1,9 @@
 import MTProto from "../../MTProto/External"
-import PeersManager from "./Objects/PeersManager"
+import PeersManager from "./PeersManager"
 import AppEvents from "../EventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../Dialogs/util"
 import {FileAPI} from "../Files/FileAPI"
 import {MessageFactory} from "../Messages/MessageFactory"
-import AppConfiguration from "../../Config/AppConfiguration"
 import {TextMessage} from "../Messages/Objects/TextMessage";
 import UIEvents from "../../Ui/EventBus/UIEvents";
 
@@ -63,30 +62,20 @@ export class PeerApi {
     }
 
     fetchInitialMessages() {
-        return this.getHistory({}).then(messages => {
-            if (messages.length > 0) {
-                // AppEvents.Dialogs.fire("fetchedInitialMessages", {
-                //     dialog: this.peer.dialog,
-                //     messages: messages
-                // })
-                AppEvents.Peers.fire("fetchedInitialMessages", {
-                    peer: this.peer,
-                    messages: messages
-                })
-            }
+        return this.getHistory({limit: 60}).then(messages => {
+            AppEvents.Peers.fire("chat.initialReady", {
+                peer: this.peer,
+                messages: messages
+            })
         })
     }
 
     fetchByOffsetId({offset_id, limit, add_offset}) {
         return this.getHistory({offset_id, limit, add_offset: -1 + add_offset}).then(messages => {
-            // console.log("fetchByOffsetId returned", messages.length)
-            // AppEvents.Dialogs.fire("fetchedMessagesAnyPage", {
-            //     dialog: this.peer.dialog,
-            //     messages: messages
-            // })
-            AppEvents.Peers.fire("fetchedMessagesAnyPage", {
+            AppEvents.Peers.fire("chat.showMessageReady", {
                 peer: this.peer,
-                messages: messages
+                messages: messages,
+                offset_id: offset_id
             })
         })
     }
@@ -94,26 +83,19 @@ export class PeerApi {
     fetchNextPage(id = null) {
         if (!id) {
             let oldest = this.peer.messages.oldest
-            // console.log("fetchNextPage", oldest)
 
             if (!oldest) {
                 return Promise.resolve()
             }
+
             id = oldest.id
         }
 
-        return this.getHistory({offset_id: id}).then(messages => {
-            // console.log("fetchNextPage returned", messages.length)
-            if (messages.length > 0) {
-                // AppEvents.Dialogs.fire("fetchedMessagesNextPage", {
-                //     dialog: this.peer.dialog,
-                //     messages: messages
-                // })
-                AppEvents.Peers.fire("fetchedMessagesNextPage", {
-                    peer: this.peer,
-                    messages: messages
-                })
-            }
+        return this.getHistory({offset_id: id, limit: 60}).then(messages => {
+            AppEvents.Peers.fire("chat.nextPageReady", {
+                peer: this.peer,
+                messages: messages
+            })
         })
     }
 
@@ -129,19 +111,11 @@ export class PeerApi {
             id = newest.id
         }
 
-        return this.getHistory({offset_id: id, add_offset: -50}).then(messages => {
-            // console.log("fetchPrevPage returned", messages.length)
-            // if (messages.length > 0) {
-            // AppEvents.Dialogs.fire("fetchedMessagesPrevPage", {
-            //     dialog: this.peer.dialog,
-            //     messages: messages.reverse()
-            // })
-            AppEvents.Peers.fire("fetchedMessagesPrevPage", {
+        return this.getHistory({offset_id: id, add_offset: -31, limit: 30}).then(messages => {
+            AppEvents.Peers.fire("chat.prevPageReady", {
                 peer: this.peer,
-                isEnd: messages.length < 50,
-                messages: messages.reverse()
+                messages: messages
             })
-            // }
         })
     }
 
@@ -255,7 +229,7 @@ export class PeerApi {
         }
 
         // TODO fix albums
-        let randomId = genMsgId(AppConfiguration.mtproto.dataCenter.default)
+        let randomId = genMsgId()
         let message = new TextMessage(this.peer)
         message.fillRaw({
             out: true,
@@ -298,7 +272,7 @@ export class PeerApi {
                         },
                         message: i === 0 ? text : null,
                         entities: i === 0 ? messageEntities : null,
-                        random_id: genMsgId(AppConfiguration.mtproto.dataCenter.default)
+                        random_id: genMsgId()
                     }
                 }),
                 random_id: randomId
@@ -327,7 +301,7 @@ export class PeerApi {
                 peer: this.peer.inputPeer,
                 message: text,
                 media: f,
-                random_id: genMsgId(AppConfiguration.mtproto.dataCenter.default)
+                random_id: genMsgId()
             }).then(response => {
                 MTProto.UpdatesManager.process(response)
             })
@@ -347,7 +321,7 @@ export class PeerApi {
                     file_reference: document.file_reference,
                 }
             },
-            random_id: genMsgId(AppConfiguration.mtproto.dataCenter.default)
+            random_id: genMsgId()
         }).then(response => {
             MTProto.UpdatesManager.process(response)
         })

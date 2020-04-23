@@ -2,10 +2,9 @@ import {checkUpdatePts, UpdatesProcessor, UpdatesQueue} from "./UpdatesProcessor
 import {UpdateManager} from "./UpdatesManager"
 import MTProto from "../../MTProto/External"
 import AppEvents from "../EventBus/AppEvents"
-import PeersManager from "../Peers/Objects/PeersManager"
+import PeersManager from "../Peers/PeersManager"
 
 export class DefaultUpdatesProcessor extends UpdatesProcessor {
-
     differenceUpdateTypes = [
         "updates.differenceEmpty",
         "updates.differenceTooLong",

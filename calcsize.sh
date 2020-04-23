@@ -2,8 +2,10 @@
 
 JS='\.js$'
 JSGZ='\.js.gz$'
+JSBR='\.js.br'
 CSS='\.css$'
 CSSGZ='\.css.gz$'
+CSSBR='\.css.br$'
 
 [[ $1 = "du" ]] && du -h src/js vendor && echo ''
 
@@ -13,10 +15,13 @@ printsize() {
 
 printsize $JS '[JS] RAW: '
 printsize $JSGZ '[JS] GZIP: '
+printsize $JSBR '[JS] BROTLI: '
 echo ''
 printsize $CSS '[CSS] RAW: '
 printsize $CSSGZ '[CSS] GZIP: '
+printsize $CSSBR '[CSS] BROTLI: '
 
 echo ''
 printsize "$CSS\|$JS" '[TOTAL] RAW (no schema included): '
 printsize "$CSSGZ\|$JSGZ" '[TOTAL] GZIP (no schema included): '
+printsize "$CSSBR\|$JSBR" '[TOTAL] BROTLI (no schema included): '

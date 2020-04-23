@@ -15,12 +15,16 @@
  *
  */
 
-import Rusha from "rusha";
+import PeersStore from "../../Store/PeersStore"
 
-const rusha = new Rusha();
+const processUpdateUserTyping = update => {
+    let peer = PeersStore.get("user", update.user_id)
 
-function sha1(data: Uint8Array): Uint8Array {
-    return new Uint8Array(rusha.rawDigest(data).buffer);
+    if (!peer || !peer.dialog) {
+        console.log("good game telegram, good game")
+    } else {
+        peer.dialog.addAction(update)
+    }
 }
 
-export default sha1;
+export default processUpdateUserTyping

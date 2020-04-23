@@ -38,7 +38,6 @@ export function checkUpdatePts(pts, rawUpdate, {onSuccess, onFail}) {
 }
 
 export class UpdatesQueue {
-
     isProcessing = false
     isWaitingForDifference = false
 
@@ -60,7 +59,6 @@ export class UpdatesQueue {
 }
 
 export class UpdatesProcessor {
-
     updatesManager: UpdateManager
 
     updateTypes = []

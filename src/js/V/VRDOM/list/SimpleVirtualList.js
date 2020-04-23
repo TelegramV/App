@@ -90,7 +90,7 @@ class SimpleVirtualList extends VComponent {
 
 SimpleVirtualList.defaultProps = {
     containerHeight: 100,
-    renderAhread: 20,
+    renderAhread: 10,
     items: [],
 }
 

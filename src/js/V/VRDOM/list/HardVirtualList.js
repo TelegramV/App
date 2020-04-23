@@ -18,6 +18,7 @@
 import VComponent from "../component/VComponent"
 import vrdom_append from "../append"
 import vrdom_prepend from "../prepend"
+import vrdom_delete from "../delete"
 
 // Чорновий варіат, НЕ ЮЗАТИ
 class HardVirtualList extends VComponent {
@@ -30,11 +31,15 @@ class HardVirtualList extends VComponent {
     itemsContainer = VComponent.createRef()
 
     render() {
-        const {containerHeight, items, template} = this.props;
+        let {containerHeight, items, template} = this.props;
+
+        if (typeof containerHeight === "number") {
+            containerHeight = `${containerHeight}px`
+        }
 
         return (
             <div style={{
-                height: `${containerHeight}px`,
+                height: containerHeight,
                 overflow: "auto"
             }}>
                 <div style={{
@@ -80,7 +85,7 @@ class HardVirtualList extends VComponent {
         items.slice(this.nextPageOffset(), this.nextPageOffset() + 30)
             .map(item => template(item))
             .forEach((item) => {
-                $el.firstChild.remove();
+                vrdom_delete($el.firstChild);
                 vrdom_append(item, $el);
             })
     }
@@ -104,7 +109,7 @@ class HardVirtualList extends VComponent {
                 } else {
                     vrdom_prepend(item, $el);
                 }
-                $el.lastChild.remove();
+                vrdom_delete($el.lastChild);
             })
 
         --this.page.number;

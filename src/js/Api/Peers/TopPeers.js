@@ -2,7 +2,7 @@ import {Manager} from "../Manager"
 import API from "../Telegram/API"
 import PeersStore from "../Store/PeersStore"
 import AppEvents from "../EventBus/AppEvents"
-import {AppPermanentStorage} from "../Common/Storage"
+import keval from "../../Keval/keval"
 
 // todo: implement https://core.telegram.org/api/top-rating
 class TopPeersManager extends Manager {
@@ -41,7 +41,7 @@ class TopPeersManager extends Manager {
         }).then(TopPeers => {
             TopPeers.categories.forEach(TopPeerCategoryPeers => {
                 if (TopPeerCategoryPeers.category._ === "topPeerCategoryCorrespondents") {
-                    AppPermanentStorage.setItem("topPeers", TopPeerCategoryPeers.peers)
+                    keval.setItem("topPeers", TopPeerCategoryPeers.peers)
 
                     TopPeerCategoryPeers.peers
                         .map(TopPeer => PeersStore.getByPeerType(TopPeer.peer))

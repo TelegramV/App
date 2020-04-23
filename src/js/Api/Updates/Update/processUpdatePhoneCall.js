@@ -15,14 +15,10 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+// import {CallsManager} from "../../Calls/CallManager"
 
-const updateReadHistoryOutbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
-
-    if (dialog) {
-        dialog.peer.messages.readOutboxMaxId = update.max_id
-    }
+function processUpdatePhoneCall(update) {
+    // CallsManager.handleUpdate(update)
 }
 
-export default updateReadHistoryOutbox
+export default processUpdatePhoneCall;

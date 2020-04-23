@@ -2,7 +2,7 @@ import {Peer} from "./Peer";
 import MTProto from "../../../MTProto/External";
 import PeersStore from "../../Store/PeersStore"
 import {UserPeer} from "./UserPeer"
-import PeersManager from "./PeersManager"
+import PeersManager from "../PeersManager"
 
 export class GroupPeer extends Peer {
 

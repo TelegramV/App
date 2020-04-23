@@ -15,12 +15,15 @@
  *
  */
 
-import Rusha from "rusha";
+import DialogsManager from "../../Dialogs/DialogsManager"
 
-const rusha = new Rusha();
+const processUpdateReadChannelOutbox = update => {
+    const dialog = DialogsManager.find("channel", update.channel_id)
 
-function sha1(data: Uint8Array): Uint8Array {
-    return new Uint8Array(rusha.rawDigest(data).buffer);
+    if (dialog) {
+        dialog.peer.messages.readOutboxMaxId = update.max_id
+        dialog.fire("updateReadChannelOutbox")
+    }
 }
 
-export default sha1;
+export default processUpdateReadChannelOutbox

@@ -12,6 +12,7 @@ import "./globals"
 
 if (__IS_PRODUCTION__) {
     console.log("%c%s", "color: #4ea4f6; font-size: 4em;", "Telegram V")
+    console.log("%c%s", "color: #DF3F40; font-size: 1.5em;", "using console may slow down the application")
     AppCache.open()
 } else {
     document.title = "[dev] Telegram V"

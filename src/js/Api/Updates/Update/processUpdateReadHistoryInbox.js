@@ -15,12 +15,14 @@
  *
  */
 
-import Rusha from "rusha";
+import DialogsManager from "../../Dialogs/DialogsManager"
 
-const rusha = new Rusha();
+const processUpdateReadHistoryInbox = update => {
+    const dialog = DialogsManager.findByPeer(update.peer)
 
-function sha1(data: Uint8Array): Uint8Array {
-    return new Uint8Array(rusha.rawDigest(data).buffer);
+    if (dialog) {
+        dialog.peer.messages.readInboxMaxId = update.max_id
+    }
 }
 
-export default sha1;
+export default processUpdateReadHistoryInbox

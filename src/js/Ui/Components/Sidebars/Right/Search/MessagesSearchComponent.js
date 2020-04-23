@@ -21,7 +21,7 @@ const MessageFragmentItemTemplate = (message) => {
                              name={peer.name}
                              status={<span>{message.prefix}{highlightVRNodeWord(message.text, CURRENT_QUERY)}</span>}
                              time={message.getFormattedDate()}
-                             onClick={() => UIEvents.Bubbles.fire("showMessageInstant", message)}/>
+                             onClick={() => UIEvents.General.fire("chat.showMessage", message)}/>
 }
 
 const MessagesCountFragment = ({count}) => {

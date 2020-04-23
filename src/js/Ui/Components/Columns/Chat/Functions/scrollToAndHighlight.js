@@ -15,15 +15,15 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+function scrollToAndHighlight($container: HTMLElement, $el: HTMLElement) {
+    $container.scrollTo({
+        top: $el.offsetTop + ($el.clientHeight / 2 - $container.clientHeight / 2),
+        behavior: "auto"
+    })
 
-const updateReadChannelInbox = update => {
-    const dialog = DialogsManager.find("channel", update.channel_id)
+    $el.classList.add("highlightmessage");
 
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
-        dialog.fire("updateReadChannelInbox")
-    }
+    setTimeout(() => $el.classList.remove("highlightmessage"), 2000);
 }
 
-export default updateReadChannelInbox
+export default scrollToAndHighlight;

@@ -22,7 +22,7 @@ export default class ArchivedDialogListComponent extends VComponent {
     }
 
     componentDidMount() {
-        DialogsManager.fetchArchivedDialogs().then(dialogs => console.log("archived fetched", dialogs))
+        DialogsManager.fetchArchivedDialogs()
     }
 
     onDialogsGotMany = event => {

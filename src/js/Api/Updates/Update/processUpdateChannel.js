@@ -15,28 +15,27 @@
  *
  */
 
-import PeersStore from "../../Store/PeersStore"
 import AppEvents from "../../EventBus/AppEvents"
 import DialogsManager from "../../Dialogs/DialogsManager"
 
-const updateDialogPinned = update => {
-    const peer = PeersStore.getByPeerType(update.peer.peer)
-
-    if (!peer) {
-        console.error("BUG: no way telegram, no way")
-    }
-
-    if (!peer.dialog) {
-        DialogsManager.getPeerDialogs(peer).then(dialogs => {
-            AppEvents.Dialogs.fire("gotNewMany", {
-                dialogs
+const processUpdateChannel = update => {
+    DialogsManager.getPeerDialogs(update.__peer).then(dialogs => {
+        if (dialogs.length === 0) {
+            AppEvents.Dialogs.fire("hideDialogByPeer", {
+                peer: update.__peer
             })
-        })
-
-        return
-    }
-
-    peer.dialog.pinned = update.pinned || false
+        } else {
+            if (dialogs[0].peer.isLeft) {
+                AppEvents.Dialogs.fire("hideDialogByPeer", {
+                    peer: update.__peer
+                })
+            } else {
+                AppEvents.Dialogs.fire("gotNewMany", {
+                    dialogs
+                })
+            }
+        }
+    })
 }
 
-export default updateDialogPinned
+export default processUpdateChannel

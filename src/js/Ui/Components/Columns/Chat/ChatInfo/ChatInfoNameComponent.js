@@ -12,7 +12,7 @@ class ChatInfoNameComponent extends VComponent {
             .on("updateName")
 
         E.bus(UIEvents.General)
-            .on("chat.select")
+            .on("chat.select", () => AppSelectedChat.Current.fetchFull())
     }
 
     render() {

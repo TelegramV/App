@@ -1,5 +1,5 @@
 import {Manager} from "../Manager"
-import {MTProto} from "../../MTProto/External"
+import MTProto from "../../MTProto/External"
 import PeersStore from "../Store/PeersStore"
 import DialogsManager from "../Dialogs/DialogsManager"
 import DialogsStore from "../Store/DialogsStore"
@@ -63,11 +63,6 @@ class MessageManager extends Manager {
 
             peer.dialog.fire("newMessage", {
                 message
-            })
-
-            AppEvents.Dialogs.fire("newMessage", {
-                message,
-                dialog: peer.dialog
             })
         }
 
@@ -302,7 +297,7 @@ class MessageManager extends Manager {
             return PeersStore.get("channel", rawMessage.channel_id)
         }
 
-        console.error("FUCK NO DESTINATION DEATH FOR NATION", rawMessage)
+        console.error("oh shit", rawMessage)
     }
 }
 

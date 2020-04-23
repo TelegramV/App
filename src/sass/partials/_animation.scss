@@ -59,16 +59,12 @@
 
 @keyframes menu-to-arrow {
   0% {
-    content: $tgico-menu;
-  }
-
-  75% {
-    content: $tgico-back;
+    content: $tgico-next;
   }
 
   100% {
-    content: $tgico-back;
-    transform: rotate(360deg);
+    content: $tgico-next;
+    transform: rotate(180deg);
   }
 }
 

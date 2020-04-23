@@ -1,5 +1,5 @@
 import MTProto from "../../MTProto/External"
-import PeersManager from "../Peers/Objects/PeersManager"
+import PeersManager from "../Peers/PeersManager"
 
 const getTopPeers = (params = {}) => {
     return MTProto.invokeMethod("contacts.getTopPeers", params).then(TopPeers => {

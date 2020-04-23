@@ -15,12 +15,15 @@
  *
  */
 
-import Rusha from "rusha";
+import PeersStore from "../../Store/PeersStore"
+import {GroupPeer} from "../../Peers/Objects/GroupPeer"
 
-const rusha = new Rusha();
+function processUpdateChatPinnedMessage(update) {
+    const peer = PeersStore.get("chat", update.chat_id)
 
-function sha1(data: Uint8Array): Uint8Array {
-    return new Uint8Array(rusha.rawDigest(data).buffer);
+    if (peer instanceof GroupPeer) {
+        peer.pinnedMessageId = update.id
+    }
 }
 
-export default sha1;
+export default processUpdateChatPinnedMessage

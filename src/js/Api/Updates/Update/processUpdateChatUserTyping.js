@@ -15,12 +15,16 @@
  *
  */
 
-import Rusha from "rusha";
+import PeersStore from "../../Store/PeersStore"
 
-const rusha = new Rusha();
+const processUpdateChatUserTyping = update => {
+    let peer = PeersStore.get("chat", update.chat_id) || PeersStore.get("channel", update.chat_id)
 
-function sha1(data: Uint8Array): Uint8Array {
-    return new Uint8Array(rusha.rawDigest(data).buffer);
+    if (!peer || !peer.dialog) {
+        console.log("good game telegram, good game")
+    } else {
+        peer.dialog.addAction(update)
+    }
 }
 
-export default sha1;
+export default processUpdateChatUserTyping

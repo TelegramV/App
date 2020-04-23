@@ -22,7 +22,6 @@
  */
 const cleanElement = ($node: HTMLElement, unmount: boolean = false) => {
     if ($node.__v) {
-
         if (unmount) {
             if ($node.__v.component) {
                 $node.__v.component.__unmount()
@@ -44,7 +43,6 @@ const cleanElement = ($node: HTMLElement, unmount: boolean = false) => {
         $node.__v.patched_styles = null
         $node.__v.patched_events = null
         $node.__v = null
-
     }
 
     return $node

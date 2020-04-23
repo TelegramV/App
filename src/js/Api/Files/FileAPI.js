@@ -1,4 +1,4 @@
-import {MTProto} from "../../MTProto/External";
+import MTProto from "../../MTProto/External";
 import Random from "../../MTProto/Utils/Random"
 import AppCache from "../Cache/AppCache"
 import {getInputPeerFromPeer} from "../Dialogs/util"

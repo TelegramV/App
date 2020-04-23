@@ -15,16 +15,15 @@
  *
  */
 
-import PeersStore from "../../Store/PeersStore"
+import DialogsManager from "../../Dialogs/DialogsManager"
 
-const updateChatUserTyping = update => {
-    let peer = PeersStore.get("chat", update.chat_id) || PeersStore.get("channel", update.chat_id)
+const processUpdateReadChannelInbox = update => {
+    const dialog = DialogsManager.find("channel", update.channel_id)
 
-    if (!peer || !peer.dialog) {
-        console.log("good game telegram, good game")
-    } else {
-        peer.dialog.addAction(update)
+    if (dialog) {
+        dialog.peer.messages.readInboxMaxId = update.max_id
+        dialog.fire("updateReadChannelInbox")
     }
 }
 
-export default updateChatUserTyping
+export default processUpdateReadChannelInbox

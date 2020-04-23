@@ -15,12 +15,15 @@
  *
  */
 
-import Rusha from "rusha";
+import PeersStore from "../../Store/PeersStore"
+import {UserPeer} from "../../Peers/Objects/UserPeer"
 
-const rusha = new Rusha();
+function processUpdateUserPhoto(update) {
+    const peer = PeersStore.get("user", update.user_id)
 
-function sha1(data: Uint8Array): Uint8Array {
-    return new Uint8Array(rusha.rawDigest(data).buffer);
+    if (peer instanceof UserPeer) {
+        peer.photo.fillRaw(update.photo)
+    }
 }
 
-export default sha1;
+export default processUpdateUserPhoto

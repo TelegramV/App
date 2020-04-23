@@ -1,4 +1,5 @@
-import {MTProto} from "../../MTProto/External";
+
+import MTProto from "../../MTProto/External";
 import AppCache from "../Cache/AppCache"
 
 const PACK_NAME = "tdesktop";

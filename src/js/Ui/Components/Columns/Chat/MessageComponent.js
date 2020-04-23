@@ -72,11 +72,11 @@ const handlers = new Map([
  * @return {*}
  * @constructor
  */
-const MessageComponent = ({message, intersectionObserver}) => {
+const MessageComponent = ({message}) => {
     const Handler = handlers.get(message.groupedId ? MessageType.GROUP : message.type)
 
     if (Handler) {
-        return <Handler intersectionObserver={intersectionObserver} message={message}/>
+        return <Handler message={message}/>
     } else {
         return (
             <UnsupportedMessageComponent message={message}/>

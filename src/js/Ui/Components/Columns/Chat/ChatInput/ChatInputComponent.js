@@ -9,10 +9,10 @@ import {TextareaFragment} from "./TextareaFragment";
 import {AttachPhotosModal} from "../../../Modals/AttachPhotosModal";
 import UIEvents from "../../../../EventBus/UIEvents";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
-import AppConfiguration from "../../../../../Config/AppConfiguration";
 import MTProto from "../../../../../MTProto/External"
 import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
+import ChatToBottomButtonComponent from "../ChatToBottomButtonComponent"
 
 export let ChatInputManager
 
@@ -25,6 +25,7 @@ export class ChatInputComponent extends VComponent {
         super(props);
         ChatInputManager = this
         this.reply = null
+        global.xxx = this
     }
 
     get isVoiceMode() {
@@ -112,6 +113,8 @@ export class ChatInputComponent extends VComponent {
 
 
                 <div className="round-button-wrapper">
+                    <ChatToBottomButtonComponent/>
+
                     <div className="round-button delete-button rp rps" onClick={l => this.onSend(l)}
                          onMouseEnter={l => this.mouseEnterRemoveVoice(l)}
                          onMouseLeave={l => this.mouseLeaveRemoveVoice(l)}>
@@ -155,18 +158,18 @@ export class ChatInputComponent extends VComponent {
         document.querySelector("body").addEventListener("drop", ev => {
             for (let i = 0; i < ev.dataTransfer.items.length; i++) {
                 const k = ev.dataTransfer.items[i]
-                console.log(k)
+                // console.log(k)
                 if (k.type.indexOf("image") === -1) continue
                 this.pickPhoto(URL.createObjectURL(k.getAsFile()))
             }
             ev.preventDefault()
         })
         document.querySelector("body").addEventListener("dragenter", ev => {
-            console.log(ev)
+            // console.log(ev)
             ev.preventDefault()
         })
         document.querySelector("body").addEventListener("dragleave", ev => {
-            console.log(ev)
+            // console.log(ev)
             ev.preventDefault()
         })
         document.querySelector("body").addEventListener("dragover", ev => {
@@ -228,7 +231,7 @@ export class ChatInputComponent extends VComponent {
 
     navigateToReplied = () => {
         if (this.reply) {
-            UIEvents.Bubbles.fire("showMessage", this.reply.message)
+            UIEvents.General.fire("chat.showMessage", this.reply.message)
         }
     }
 

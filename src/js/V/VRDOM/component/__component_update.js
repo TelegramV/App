@@ -17,12 +17,14 @@
 
 import __component_diffProps from "./__component_diffProps"
 import VComponent from "./VComponent"
+import __diffObjects from "./__diffObjects"
 
 const __component_update = (context: VComponent, {isForce = false, nextProps, nextState}) => {
     let shouldUpdate = isForce
 
     if (!isForce) {
         let hasNextState = false
+        let hasNextProps = false
 
         if (nextState) {
             hasNextState = true
@@ -35,6 +37,7 @@ const __component_update = (context: VComponent, {isForce = false, nextProps, ne
         }
 
         if (nextProps) {
+            hasNextProps = true
             nextProps = {
                 ...context.props,
                 ...nextProps
@@ -46,8 +49,15 @@ const __component_update = (context: VComponent, {isForce = false, nextProps, ne
         shouldUpdate = context.shouldComponentUpdate(nextProps, nextState)
 
         if (shouldUpdate === undefined) {
-            const diffProps = __component_diffProps(context, nextProps) // there is a better and faster way to do this, but no time to implement
-            shouldUpdate = hasNextState || diffProps !== false
+            if (hasNextProps) {
+                const diffProps = __component_diffProps(context.props, nextProps)
+                shouldUpdate = diffProps !== false
+            }
+
+            if (hasNextState && !shouldUpdate) {
+                const diffState = __diffObjects(context.state, nextState)
+                shouldUpdate = diffState !== false
+            }
         }
 
         shouldUpdate = shouldUpdate !== false

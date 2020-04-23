@@ -15,12 +15,18 @@
  *
  */
 
-import Rusha from "rusha";
+import DialogsManager from "../../Dialogs/DialogsManager"
 
-const rusha = new Rusha();
+const processUpdateFolderPeers = update => {
+    update.folder_peers.forEach(FolderPeer => {
+        const dialog = DialogsManager.findByPeer(FolderPeer.peer)
 
-function sha1(data: Uint8Array): Uint8Array {
-    return new Uint8Array(rusha.rawDigest(data).buffer);
+        if (dialog) {
+            dialog.folderId = FolderPeer.folder_id
+        } else {
+            console.error("BUG: whoa!!! this thing is not implemented yet")
+        }
+    })
 }
 
-export default sha1;
+export default processUpdateFolderPeers

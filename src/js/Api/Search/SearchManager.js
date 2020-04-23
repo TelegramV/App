@@ -1,5 +1,5 @@
-import {MTProto} from "../../MTProto/External"
-import PeersManager from "../Peers/Objects/PeersManager"
+import MTProto from "../../MTProto/External"
+import PeersManager from "../Peers/PeersManager"
 import {Manager} from "../Manager"
 import API from "../Telegram/API"
 import PeersStore from "../Store/PeersStore"

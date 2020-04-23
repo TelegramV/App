@@ -4,7 +4,6 @@ import {InputComponent} from "../Elements/InputComponent";
 import {ButtonWithProgressBarComponent} from "../Elements/ButtonComponent";
 
 import {askForFile} from "../../Utils/utils"
-import {MTProto} from "../../../MTProto/External"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 import VApp from "../../../V/vapp"
 import API from "../../../Api/Telegram/API"

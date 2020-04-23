@@ -13,13 +13,13 @@ class GeneralMessageComponent extends VComponent {
 
     message: Message
     prevReadStatus: boolean = false
-    intersectionObserver: IntersectionObserver
+    // intersectionObserver: IntersectionObserver
 
     avatarRef = VComponent.createComponentRef()
     bubbleRef = VComponent.createRef()
 
     init() {
-        this.intersectionObserver = this.props.intersectionObserver
+        // this.intersectionObserver = this.props.intersectionObserver
         this.message = this.props.message
     }
 
@@ -27,9 +27,9 @@ class GeneralMessageComponent extends VComponent {
         this.$el.__message = this.message
         this.message.show()
 
-        if (this.intersectionObserver) {
-            this.intersectionObserver.observe(this.$el)
-        }
+        // if (this.intersectionObserver) {
+        //     this.intersectionObserver.observe(this.$el)
+        // }
     }
 
     appEvents(E) {
@@ -71,7 +71,7 @@ class GeneralMessageComponent extends VComponent {
                     show={true}
                     name={this.message.replyToMessage.from.name}
                     text={MessageParser.getPrefixNoSender(this.message.replyToMessage)}
-                    onClick={l => UIEvents.Bubbles.fire("showMessage", this.message.replyToMessage)}/>
+                    onClick={l => UIEvents.General.fire("chat.showMessage", this.message.replyToMessage)}/>
             )
         }
     }
@@ -119,9 +119,9 @@ class GeneralMessageComponent extends VComponent {
     }
 
     componentWillUnmount() {
-        if (this.intersectionObserver) {
-            this.intersectionObserver.unobserve(this.$el)
-        }
+        // if (this.intersectionObserver) {
+        //     this.intersectionObserver.unobserve(this.$el)
+        // }
     }
 }
 

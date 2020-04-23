@@ -107,7 +107,20 @@ const config = {
         }),
         new HtmlWebpackPlugin({template: "./src/index.html"}),
         new CleanWebpackPlugin(),
-        __IS_PRODUCTION__ ? new CompressionPlugin() : () => null,
+        __IS_PRODUCTION__ ? new CompressionPlugin({
+            filename: '[path].br[query]',
+            algorithm: 'brotliCompress',
+            compressionOptions: {level: 11},
+            threshold: 10240,
+            minRatio: 0.8,
+            deleteOriginalAssets: false,
+        }) : () => null,
+        __IS_PRODUCTION__ ? new CompressionPlugin({
+            filename: '[path].gz[query]',
+            algorithm: 'gzip',
+            threshold: 10240,
+            minRatio: 0.8,
+        }) : () => null,
         // __IS_PRODUCTION__ ? new BabelMinifyPlugin() : () => null, // ламає код
     ],
     optimization: {

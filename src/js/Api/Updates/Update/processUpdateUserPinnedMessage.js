@@ -15,14 +15,15 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+import PeersStore from "../../Store/PeersStore"
+import {UserPeer} from "../../Peers/Objects/UserPeer"
 
-const updateReadHistoryInbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
+function processUpdateUserPinnedMessage(update) {
+    const peer = PeersStore.get("user", update.user_id)
 
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
+    if (peer instanceof UserPeer) {
+        peer.pinnedMessageId = update.id
     }
 }
 
-export default updateReadHistoryInbox
+export default processUpdateUserPinnedMessage;

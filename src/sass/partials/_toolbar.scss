@@ -11,9 +11,9 @@
 	box-sizing: border-box;
 
 	.btn-icon.back:before {
+		transform: rotate(60deg);
 		display: block;
-		transition: anim(content);
-		animation: 0.2s menu-to-arrow linear forwards;
+		animation: 150ms menu-to-arrow linear forwards;
 	}
 }
 

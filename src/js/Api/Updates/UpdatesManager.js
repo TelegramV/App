@@ -12,15 +12,22 @@ import {arrayDelete} from "../../Utils/array"
 import AppConnectionStatus from "../../Ui/Reactive/ConnectionStatus"
 import AppEvents from "../EventBus/AppEvents"
 import process_new_session_created from "./process_new_session_created"
-import updateUserTyping from "./Update/updateUserTyping"
-import updateChatUserTyping from "./Update/updateChatUserTyping"
-import updateChannel from "./Update/updateChannel"
-import updateReadHistoryInbox from "./Update/updateReadHistoryInbox"
-import updateReadHistoryOutbox from "./Update/updateReadHistoryOutbox"
-import updateReadChannelInbox from "./Update/updateReadChannelInbox"
-import updateReadChannelOutbox from "./Update/updateReadChannelOutbox"
-import updateFolderPeers from "./Update/updateFolderPeers"
-import updateDialogPinned from "./Update/updateDialogPinned"
+import processUpdateUserTyping from "./Update/processUpdateUserTyping"
+import processUpdateChatUserTyping from "./Update/processUpdateChatUserTyping"
+import processUpdateChannel from "./Update/processUpdateChannel"
+import processUpdateReadHistoryInbox from "./Update/processUpdateReadHistoryInbox"
+import processUpdateReadHistoryOutbox from "./Update/processUpdateReadHistoryOutbox"
+import processUpdateReadChannelInbox from "./Update/processUpdateReadChannelInbox"
+import processUpdateReadChannelOutbox from "./Update/processUpdateReadChannelOutbox"
+import processUpdateFolderPeers from "./Update/processUpdateFolderPeers"
+import processUpdateDialogPinned from "./Update/processUpdateDialogPinned"
+import processUpdateUserStatus from "./Update/processUpdateUserStatus"
+import processUpdateUserPinnedMessage from "./Update/processUpdateUserPinnedMessage"
+import processUpdateChatPinnedMessage from "./Update/processUpdateChatPinnedMessage"
+import processUpdateChannelPinnedMessage from "./Update/processUpdateChannelPinnedMessage"
+import processUpdateNotifySettings from "./Update/processUpdateNotifySettings"
+import processUpdatePhoneCall from "./Update/processUpdatePhoneCall"
+import processUpdateUserPhoto from "./Update/processUpdateUserPhoto"
 
 export class UpdateManager extends Manager {
     constructor() {
@@ -41,15 +48,22 @@ export class UpdateManager extends Manager {
          */
         this.updateListeners = new Map()
 
-        this.subscribe("updateUserTyping", updateUserTyping)
-        this.subscribe("updateChatUserTyping", updateChatUserTyping)
-        this.subscribe("updateChannel", updateChannel)
-        this.subscribe("updateReadHistoryInbox", updateReadHistoryInbox)
-        this.subscribe("updateReadHistoryOutbox", updateReadHistoryOutbox)
-        this.subscribe("updateReadChannelInbox", updateReadChannelInbox)
-        this.subscribe("updateReadChannelOutbox", updateReadChannelOutbox)
-        this.subscribe("updateFolderPeers", updateFolderPeers)
-        this.subscribe("updateDialogPinned", updateDialogPinned)
+        this.subscribe("updateUserTyping", processUpdateUserTyping)
+        this.subscribe("updateChatUserTyping", processUpdateChatUserTyping)
+        this.subscribe("updateChannel", processUpdateChannel)
+        this.subscribe("updateReadHistoryInbox", processUpdateReadHistoryInbox)
+        this.subscribe("updateReadHistoryOutbox", processUpdateReadHistoryOutbox)
+        this.subscribe("updateReadChannelInbox", processUpdateReadChannelInbox)
+        this.subscribe("updateReadChannelOutbox", processUpdateReadChannelOutbox)
+        this.subscribe("updateFolderPeers", processUpdateFolderPeers)
+        this.subscribe("updateDialogPinned", processUpdateDialogPinned)
+        this.subscribe("updateUserStatus", processUpdateUserStatus)
+        this.subscribe("updateUserPhoto", processUpdateUserPhoto)
+        this.subscribe("updateUserPinnedMessage", processUpdateUserPinnedMessage)
+        this.subscribe("updateChatPinnedMessage", processUpdateChatPinnedMessage)
+        this.subscribe("updateChannelPinnedMessage", processUpdateChannelPinnedMessage)
+        this.subscribe("updateNotifySettings", processUpdateNotifySettings)
+        this.subscribe("updatePhoneCall", processUpdatePhoneCall)
 
         this.customUpdatesProcessors = new Map([
             ["updatesTooLong", processUpdatesTooLong],

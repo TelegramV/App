@@ -1,7 +1,7 @@
 import PaneComponent from "./PaneComponent"
 import {InputComponent} from "../Elements/InputComponent";
 
-import {MTProto} from "../../../MTProto/External"
+import MTProto from "../../../MTProto/External"
 import API from "../../../Api/Telegram/API"
 
 export default class CodeInputPaneComponent extends PaneComponent {

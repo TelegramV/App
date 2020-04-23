@@ -15,7 +15,9 @@
  *
  */
 
-import type {ReactiveSubscription} from "../../Api/EventBus/ReactivePublisher"
+import type {BusEvent} from "../../Api/EventBus/EventBus"
+
+export type ReactiveSubscription = (value: any, event: BusEvent) => any
 
 type Subscribe = (subscription: ReactiveSubscription) => any
 type Unsubscribe = (subscription: ReactiveSubscription) => any

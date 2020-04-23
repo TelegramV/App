@@ -1,12 +1,23 @@
-import {Manager} from "../../Manager";
-import PeersStore from "../../Store/PeersStore"
-import {MTProto} from "../../../MTProto/External"
-import {UserPeer} from "./UserPeer"
-import PeerFactory from "../PeerFactory"
-import {GroupPeer} from "./GroupPeer";
-import {ChannelPeer} from "./ChannelPeer";
-import {SupergroupPeer} from "./SupergroupPeer";
-import {CallsManager} from "../../Calls/CallManager";
+/*
+ * Copyright 2020 Telegram V authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
+import {Manager} from "../Manager";
+import PeersStore from "../Store/PeersStore"
+import PeerFactory from "./PeerFactory"
 
 class PeerManager extends Manager {
 
@@ -18,73 +29,6 @@ class PeerManager extends Manager {
         if (this._inited) {
             return Promise.resolve()
         }
-
-        MTProto.UpdatesManager.subscribe("updateUserStatus", update => {
-            const peer = PeersStore.get("user", update.user_id)
-
-            if (peer instanceof UserPeer) {
-                peer.status = update.status
-                // peer.raw.status.expires = tsNow(true) + 2
-
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateUserPhoto", update => {
-            const peer = PeersStore.get("user", update.user_id)
-
-            if (peer instanceof UserPeer) {
-                peer.photo.fillRaw(update.photo)
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateUserPinnedMessage", update => {
-            const peer = PeersStore.get("user", update.user_id)
-
-            if (peer instanceof UserPeer) {
-                peer.pinnedMessageId = update.id
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateChatPinnedMessage", update => {
-            const peer = PeersStore.get("chat", update.chat_id)
-
-            if (peer instanceof GroupPeer) {
-                peer.pinnedMessageId = update.id
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateChannelPinnedMessage", update => {
-            const peer = PeersStore.get("channel", update.channel_id)
-
-            if (peer instanceof ChannelPeer || peer instanceof SupergroupPeer) {
-                peer.pinnedMessageId = update.id
-            }
-        })
-
-        MTProto.UpdatesManager.subscribe("updateNotifySettings", update => {
-            if (update.peer._ === "notifyPeer") {
-                let peer
-                if (update.peer.peer._ === "peerUser") {
-                    peer = PeersStore.get("user", update.peer.peer.user_id)
-                } else if (update.peer.peer._ === "peerChat") {
-                    peer = PeersStore.get("chat", update.peer.peer.chat_id)
-                } else if (update.peer.peer._ === "peerChannel") {
-                    peer = PeersStore.get("channel", update.peer.peer.channel_id)
-                }
-
-                if (peer && peer.full) {
-                    peer.full.notify_settings = update.notify_settings
-                    peer.fire("updateNotificationStatus", {
-                        notifySettings: update.notify_settings
-                    })
-                }
-            }
-
-        })
-
-        MTProto.UpdatesManager.subscribe("updatePhoneCall",  update => {
-            CallsManager.handleUpdate(update)
-        })
 
         this._inited = true
     }

@@ -32,7 +32,6 @@ import {ServiceMessage} from "../../../../Api/Messages/Objects/ServiceMessage";
 import MTProto from "../../../../MTProto/External";
 import {ChatInputComponent} from "./ChatInput/ChatInputComponent"
 import AudioManager from "../../../Managers/AudioManager"
-import IntersectionObserver from 'intersection-observer-polyfill';
 
 const DATA_FORMAT_MONTH_DAY = {
     month: 'long',
@@ -55,8 +54,6 @@ class BubblesComponent extends VComponent {
         isFetchingPrevPage: false,
         messagesWaitingForRendering: new Set()
     }
-
-    intersectionObserver: IntersectionObserver
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
@@ -132,15 +129,8 @@ class BubblesComponent extends VComponent {
     }
 
     componentDidMount() {
-
         this.$el.addEventListener("scroll", this.onScroll, {
             passive: false
-        })
-
-        this.intersectionObserver = new IntersectionObserver(this.onIntersection, {
-            root: this.$el,
-            rootMargin: "2000px 100px",
-            threshold: 1.0
         })
     }
 
@@ -250,17 +240,6 @@ class BubblesComponent extends VComponent {
         }
     }
 
-    onIntersection = (entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.visibility = "visible"
-            } else {
-                entry.target.style.visibility = "hidden"
-            }
-        })
-    }
-
-
     /**
      * TODO: REWRITE!!!!
      *
@@ -276,6 +255,7 @@ class BubblesComponent extends VComponent {
         }
 
         if (this.messages.rendered.has(message.id)) {
+            console.error("message is already rendered")
             return false
         }
 
@@ -311,9 +291,7 @@ class BubblesComponent extends VComponent {
                 }
             }
         }
-        const msg = <MessageComponent
-            intersectionObserver={this.intersectionObserver}
-            message={message}/>
+        const msg = <MessageComponent message={message}/>
 
         if (message.to && message.to.messages.last && message.id === message.to.messages.last.id) {
             message.to.api.readAllHistory()

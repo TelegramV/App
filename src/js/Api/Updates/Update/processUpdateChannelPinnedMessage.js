@@ -15,12 +15,16 @@
  *
  */
 
-import Rusha from "rusha";
+import PeersStore from "../../Store/PeersStore"
+import {ChannelPeer} from "../../Peers/Objects/ChannelPeer"
+import {SupergroupPeer} from "../../Peers/Objects/SupergroupPeer"
 
-const rusha = new Rusha();
+function processUpdateChannelPinnedMessage(update) {
+    const peer = PeersStore.get("channel", update.channel_id)
 
-function sha1(data: Uint8Array): Uint8Array {
-    return new Uint8Array(rusha.rawDigest(data).buffer);
+    if (peer instanceof ChannelPeer || peer instanceof SupergroupPeer) {
+        peer.pinnedMessageId = update.id
+    }
 }
 
-export default sha1;
+export default processUpdateChannelPinnedMessage

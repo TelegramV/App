@@ -15,15 +15,22 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
-
-const updateReadChannelOutbox = update => {
-    const dialog = DialogsManager.find("channel", update.channel_id)
-
-    if (dialog) {
-        dialog.peer.messages.readOutboxMaxId = update.max_id
-        dialog.fire("updateReadChannelOutbox")
-    }
+// global application state
+const appstate = {
+    chat: {
+        current: null,
+        check: () => null,
+        bus: null,
+    },
+    chatInfo: {
+        current: null,
+        check: () => null,
+        bus: null,
+    },
 }
 
-export default updateReadChannelOutbox
+appstate.chat.bus.subscribe("change", () => {
+    // etc
+})
+
+export default appstate;

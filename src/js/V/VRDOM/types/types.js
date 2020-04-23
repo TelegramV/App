@@ -18,8 +18,6 @@
 import VRNode from "../VRNode"
 import type {BusEvent} from "../../../Api/EventBus/EventBus"
 import {EventBus} from "../../../Api/EventBus/EventBus"
-import type {ReactiveCallbackContext} from "../../Reactive/ReactiveCallback"
-import {ReactivePublisher} from "../../../Api/EventBus/ReactivePublisher"
 import {ReactiveObject} from "../../Reactive/ReactiveObject"
 import VComponent from "../component/VComponent"
 import ElementRef from "../ref/ElementRef"
@@ -97,8 +95,4 @@ export type VComponentProps = {
 
 export type ComponentState = {
     [string]: any
-}
-
-export type ComponentReactiveState = {
-    [string]: ReactiveCallbackContext | ReactivePublisher
 }

@@ -16,7 +16,6 @@ export default class ComposerComponent extends VComponent {
     constructor(props) {
         super(props);
         this.identifier = "composer"
-        console.log(props)
 
         this.tabItems = [
             {

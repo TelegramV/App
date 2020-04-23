@@ -74,8 +74,8 @@ class Connection {
             return this.authorization.authKey;
         }
 
-        const authKey = await keval.getItem(`authKey${this.dcId}`);
-        const serverSalt = await keval.getItem(`serverSalt${this.dcId}`);
+        const authKey = await keval.auth.getItem(`authKey${this.dcId}`);
+        const serverSalt = await keval.auth.getItem(`serverSalt${this.dcId}`);
 
         this.authorization.setAuthKey(authKey);
         this.authorization.serverSalt = serverSalt;
@@ -87,14 +87,14 @@ class Connection {
             await this.authorization.authorize();
         }
 
-        await keval.setItem(`authKey${this.dcId}`, this.authorization.authKey);
-        await keval.setItem(`serverSalt${this.dcId}`, this.authorization.serverSalt);
+        await keval.auth.setItem(`authKey${this.dcId}`, this.authorization.authKey);
+        await keval.auth.setItem(`serverSalt${this.dcId}`, this.authorization.serverSalt);
 
         this.isInitialized = true;
 
         if (
             this.application.mainConnection.dcId !== this.dcId &&
-            !await keval.getItem(`imported${this.dcId}`) &&
+            !await keval.auth.getItem(`imported${this.dcId}`) &&
             await this.application.isSignedIn()
         ) {
             const ExportedAuthorization = await this.application.mainConnection.invokeMethod("auth.exportAuthorization", {
@@ -103,7 +103,7 @@ class Connection {
 
             await this.invokeMethod("auth.importAuthorization", ExportedAuthorization);
 
-            await keval.setItem(`imported${this.dcId}`, true);
+            await keval.auth.setItem(`imported${this.dcId}`, true);
         }
 
         this.resolveAwaiting();
@@ -365,7 +365,7 @@ class Connection {
 
         this.authorization.serverSalt = new_server_salt;
 
-        return keval.setItem(`serverSalt${this.dcId}`, new_server_salt);
+        return keval.auth.setItem(`serverSalt${this.dcId}`, new_server_salt);
     }
 
     onConnect(socket: SocketTransporter) {

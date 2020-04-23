@@ -1,9 +1,8 @@
-import {MTProto} from "../../MTProto/External"
-import PeersManager from "../Peers/Objects/PeersManager"
+import MTProto from "../../MTProto/External"
+import PeersManager from "../Peers/PeersManager"
 import type {DialogsType, getDialogs_Params_105, getPeerDialogs_Params_105} from "./types"
 
 const getDialogs = (params: getDialogs_Params_105 = {}): Promise<DialogsType> => {
-    console.log("FETCHING DIALOGS", params)
     return MTProto.invokeMethod("messages.getDialogs", {
         exclude_pinned: params.exclude_pinned || false,
         folder_id: params.folder_id || 0,
@@ -15,9 +14,6 @@ const getDialogs = (params: getDialogs_Params_105 = {}): Promise<DialogsType> =>
         limit: params.limit || 20,
         hash: params.hash || ""
     }).then(Dialogs => {
-        console.log("DIALOGS", Dialogs)
-        console.warn("params.folder_id", params.folder_id)
-        console.warn("xxx", Dialogs)
         PeersManager.fillPeersFromUpdate(Dialogs)
 
         Dialogs.count = Dialogs.count || Dialogs.dialogs.length

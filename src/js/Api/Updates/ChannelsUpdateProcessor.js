@@ -1,12 +1,11 @@
 import MTProto from "../../MTProto/External"
 import PeersStore from "../Store/PeersStore"
-import PeersManager from "../Peers/Objects/PeersManager"
+import PeersManager from "../Peers/PeersManager"
 import {Peer} from "../Peers/Objects/Peer"
 import AppEvents from "../EventBus/AppEvents"
 import {checkUpdatePts, UpdatesProcessor, UpdatesQueue} from "./UpdatesProcessor"
 
 class ChannelUpdatesQueue extends UpdatesQueue {
-
     channelId: number
 
     constructor(channelId, queue = []) {

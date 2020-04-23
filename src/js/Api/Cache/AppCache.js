@@ -1,3 +1,6 @@
+/**
+ * @deprecated should be moved to keval
+ */
 class Cache {
     constructor() {
 
@@ -116,6 +119,9 @@ class Cache {
     }
 }
 
+/**
+ * @deprecated should be moved to keval
+ */
 const AppCache = new Cache()
 
 export default AppCache

@@ -92,6 +92,8 @@ img[src=""], img:not([src]) { content:url("data:image/gif;base64,R0lGODlhAQABAPA
   border: solid 3px transparent;
   border-radius: 5px;
   min-height: 50px;
+  height: 50px;
+  max-height: 50px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

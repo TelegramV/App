@@ -1,4 +1,4 @@
-// import {MTProto} from "../../MTProto/external";
+// import MTProto from "../../MTProto/external";
 // import Bytes from "../../MTProto/Utils/bytes";
 // import {bytesConcatBuffer} from "../../Utils/byte";
 // import AppEvents from "../EventBus/AppEvents";
