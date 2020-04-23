@@ -63,18 +63,20 @@ class AudioComponent extends GeneralMessageComponent {
         //override me
     }
 
-    play() {
-        if (this.tryingPlay) return; //I got my audio played twice without this
+    /*Don't forget to super to this method!*/
+    componentWillUnmount() {
+        this.progressEl.removeEventListener("mousemove", this._handleMove.bind(this));
+        this.audio.removeEventListener("timeupdate", this._audioTimeUpdate.bind(this));
+        this.audio.removeEventListener("ended", this._playButtonClick.bind(this));
+    }
+
+    async play() {
         this._setButtonIcon("pause")
         if (!this.audio) {
-            this.downloadAndPlay();
+            return this.downloadAndPlay();
         } else {
-            this.tryingPlay = true;
-            this.audio.play().then(q => {
-                this.tryingPlay = false;
-                this.playing = true;
-                AudioManager.set(this);
-            });
+            this.audio.play();
+            this.playing = true;
         }
     }
 
@@ -82,11 +84,12 @@ class AudioComponent extends GeneralMessageComponent {
         this._setButtonIcon("play")
         this.audio.pause();
         this.playing = false;
-        AudioManager.update();
     }
 
     async download() {
+        if(this.isLoading()) return;
         this.setLoading(true);
+        this._setButtonIcon("close"); //todo cancel download
         return FileAPI.getFile(this.message.raw.media.document).then(url => {
             this.audio = new Audio(url);
             this.audio.addEventListener("timeupdate", this._audioTimeUpdate.bind(this));
@@ -98,11 +101,10 @@ class AudioComponent extends GeneralMessageComponent {
     }
 
     downloadAndPlay() {
-        this._setButtonIcon("close")
         this.download().then(q => {
-            this.play();
+            AudioManager.set(this);
+            AudioManager.play();
         })
-
     }
 
     setLoading(val) {
@@ -157,11 +159,11 @@ class AudioComponent extends GeneralMessageComponent {
     }
 
     _handleEnter(e) {
-        this.progressEl.addEventListener("mousemove", this._handleMove);
+        this.progressEl.addEventListener("mousemove", this._handleMove.bind(this));
     }
 
     _handleLeave(e) {
-        this.progressEl.removeEventListener("mousemove", this._handleMove);
+        this.progressEl.removeEventListener("mousemove", this._handleMove.bind(this));
     }
 
     _handleMove(e) {
@@ -177,10 +179,15 @@ class AudioComponent extends GeneralMessageComponent {
     }
 
     _playButtonClick(e) {
+        AudioManager.set(this);
         if (this.playing) {
-            this.pause();
+            AudioManager.pause();
         } else {
-            this.play();
+            if(!this.audio) {
+                this.download().then(audio => AudioManager.play());
+            } else {
+                AudioManager.play();
+            }
         }
     }
 

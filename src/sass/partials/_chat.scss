@@ -121,11 +121,12 @@
 
                     .play {
                         height: 50px;
-                        width: 50px;
+                        min-width: 50px;
                         color: $blue;
+                        cursor: pointer;
                         position: relative;
 
-                        .tgico-play {
+                        .tgico {
                             font-size: 20px;
                             position: absolute;
                             top: 50%;
@@ -139,7 +140,7 @@
                         display: flex;
                         flex-direction: column;
                         justify-content: center;
-                        margin-left: 10px;
+                        min-width: 0;
                     }
                 }
 
@@ -150,7 +151,10 @@
                 .title {
                     color: $blue;
                     font-weight: bold;
-                    margin-bottom: 5px;
+                    margin-bottom: 4px;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
                 }
 
                 .description {

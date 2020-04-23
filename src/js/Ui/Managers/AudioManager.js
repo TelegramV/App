@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+import UIEvents from "../EventBus/UIEvents";
 
 class AudioManagerSingleton {
     constructor() {
@@ -46,8 +47,10 @@ class AudioManagerSingleton {
 
     play() {
         if (this.active) {
-            this.active.play();
-            this.setPlaybackState("playing");
+            this.active.play().then(audio => {
+            	this.update();
+            	UIEvents.General.fire("audio.play", {audio: this.active});
+            });
         }
     }
 
@@ -56,25 +59,41 @@ class AudioManagerSingleton {
         if (this.active) {
             this.active.pause();
         }
-        this.active = audio;
-        if (!audio) {
-            this.setPlaybackState("none");
-            return;
-        } else {
-            this.update();
+        if(!audio) {
+        	UIEvents.General.fire("audio.remove");
         }
+        this.active = audio;
+        this.update();
         this.hasMeta = !!this.active.getMeta;
         this.updateBrowserMeta();
+        //UIEvents.General.fire("audio.set");
     }
 
     pause() {
         if (this.active) {
             this.active.pause();
-            this.setPlaybackState("paused");
+            this.update();
+            UIEvents.General.fire("audio.pause");
         }
     }
 
+    toggle(pause) {
+    	if(pause === undefined) {
+    		pause = this.active.isPlaying(); //pause if playing
+    	}
+
+    	if(pause) {
+    		this.pause()
+    	} else {
+    		this.play();
+    	}
+    }
+
     update() {
+    	if(!this.active) {
+    		this.setPlaybackState("none");
+            return;
+    	}
         if (this.active.isPlaying()) {
             this.setPlaybackState("playing");
         } else {
