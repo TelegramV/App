@@ -50,7 +50,7 @@ const __component_update = (context: VComponent, {isForce = false, nextProps, ne
 
         if (shouldUpdate === undefined) {
             if (hasNextProps) {
-                const diffProps = __component_diffProps(context.props, nextProps)
+                const diffProps = __component_diffProps(context, nextProps)
                 shouldUpdate = diffProps !== false
             }
 

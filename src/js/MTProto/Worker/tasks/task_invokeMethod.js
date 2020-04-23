@@ -21,6 +21,7 @@ function task_invokeMethod({data, success, fail}) {
     MTProtoInternal.invokeMethod(data.method, data.params, data.dcID).then(result => {
         success(result)
     }).catch(error => {
+        console.error(error)
         fail(error)
     })
 }

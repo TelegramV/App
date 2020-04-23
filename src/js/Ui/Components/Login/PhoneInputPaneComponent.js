@@ -89,6 +89,8 @@ export default class PhoneInputComponent extends PaneComponent {
                 AUTH_RESTART: "Auth restarting"
             }[error.type] || "Error occured"
 
+            console.error(error)
+
             phone.error = msg
         }).finally(l => {
             this.state.isLoading = false

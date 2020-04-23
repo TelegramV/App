@@ -5,8 +5,14 @@ import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import ChatInfoAvatarComponent from "./ChatInfoAvatarComponent"
 import VApp from "../../../../../V/vapp"
+import UIEvents from "../../../../EventBus/UIEvents"
 
 class ChatInfoComponent extends VComponent {
+
+    appEvents(E: AE) {
+        E.bus(UIEvents.General)
+            .on("chat.select", this.onChatSelect)
+    }
 
     render() {
         return (
@@ -30,6 +36,10 @@ class ChatInfoComponent extends VComponent {
                 </div>
             </div>
         )
+    }
+
+    onChatSelect = () => {
+        AppSelectedChat.Current.fetchFull()
     }
 
     openPeerInfo = () => {
