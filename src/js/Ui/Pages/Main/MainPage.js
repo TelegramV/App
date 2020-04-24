@@ -27,7 +27,7 @@ function initHighLevelManagers() {
             TopPeers.init()
         })
     })
-    LocaleController.init()
+    //LocaleController.init()
     StickerManager.fetchSpecialSets();
     // WallpaperManager.init();
 }
