@@ -7,7 +7,7 @@
       "type": "Vector t"
     },
     {
-      "id": "85337187",
+      "id": 85337187,
       "predicate": "resPQ",
       "params": [
         {
@@ -30,7 +30,7 @@
       "type": "ResPQ"
     },
     {
-      "id": "-2083955988",
+      "id": -2083955988,
       "predicate": "p_q_inner_data",
       "params": [
         {
@@ -61,42 +61,7 @@
       "type": "P_Q_inner_data"
     },
     {
-      "id": "1013613780",
-      "predicate": "p_q_inner_data_temp",
-      "params": [
-        {
-          "name": "pq",
-          "type": "bytes"
-        },
-        {
-          "name": "p",
-          "type": "bytes"
-        },
-        {
-          "name": "q",
-          "type": "bytes"
-        },
-        {
-          "name": "nonce",
-          "type": "int128"
-        },
-        {
-          "name": "server_nonce",
-          "type": "int128"
-        },
-        {
-          "name": "new_nonce",
-          "type": "int256"
-        },
-        {
-          "name": "expires_in",
-          "type": "int"
-        }
-      ],
-      "type": "P_Q_inner_data"
-    },
-    {
-      "id": "2043348061",
+      "id": 2043348061,
       "predicate": "server_DH_params_fail",
       "params": [
         {
@@ -115,7 +80,7 @@
       "type": "Server_DH_Params"
     },
     {
-      "id": "-790100132",
+      "id": -790100132,
       "predicate": "server_DH_params_ok",
       "params": [
         {
@@ -134,7 +99,7 @@
       "type": "Server_DH_Params"
     },
     {
-      "id": "-1249309254",
+      "id": -1249309254,
       "predicate": "server_DH_inner_data",
       "params": [
         {
@@ -165,7 +130,7 @@
       "type": "Server_DH_inner_data"
     },
     {
-      "id": "1715713620",
+      "id": 1715713620,
       "predicate": "client_DH_inner_data",
       "params": [
         {
@@ -188,7 +153,7 @@
       "type": "Client_DH_Inner_Data"
     },
     {
-      "id": "1003222836",
+      "id": 1003222836,
       "predicate": "dh_gen_ok",
       "params": [
         {
@@ -207,7 +172,7 @@
       "type": "Set_client_DH_params_answer"
     },
     {
-      "id": "1188831161",
+      "id": 1188831161,
       "predicate": "dh_gen_retry",
       "params": [
         {
@@ -226,7 +191,7 @@
       "type": "Set_client_DH_params_answer"
     },
     {
-      "id": "-1499615742",
+      "id": -1499615742,
       "predicate": "dh_gen_fail",
       "params": [
         {
@@ -245,7 +210,7 @@
       "type": "Set_client_DH_params_answer"
     },
     {
-      "id": "-212046591",
+      "id": -212046591,
       "predicate": "rpc_result",
       "params": [
         {
@@ -260,7 +225,7 @@
       "type": "RpcResult"
     },
     {
-      "id": "558156313",
+      "id": 558156313,
       "predicate": "rpc_error",
       "params": [
         {
@@ -275,19 +240,19 @@
       "type": "RpcError"
     },
     {
-      "id": "1579864942",
+      "id": 1579864942,
       "predicate": "rpc_answer_unknown",
       "params": [],
       "type": "RpcDropAnswer"
     },
     {
-      "id": "-847714938",
+      "id": -847714938,
       "predicate": "rpc_answer_dropped_running",
       "params": [],
       "type": "RpcDropAnswer"
     },
     {
-      "id": "-1539647305",
+      "id": -1539647305,
       "predicate": "rpc_answer_dropped",
       "params": [
         {
@@ -306,7 +271,7 @@
       "type": "RpcDropAnswer"
     },
     {
-      "id": "155834844",
+      "id": 155834844,
       "predicate": "future_salt",
       "params": [
         {
@@ -325,7 +290,7 @@
       "type": "FutureSalt"
     },
     {
-      "id": "-1370486635",
+      "id": -1370486635,
       "predicate": "future_salts",
       "params": [
         {
@@ -344,7 +309,7 @@
       "type": "FutureSalts"
     },
     {
-      "id": "880243653",
+      "id": 880243653,
       "predicate": "pong",
       "params": [
         {
@@ -359,7 +324,7 @@
       "type": "Pong"
     },
     {
-      "id": "-501201412",
+      "id": -501201412,
       "predicate": "destroy_session_ok",
       "params": [
         {
@@ -370,7 +335,7 @@
       "type": "DestroySessionRes"
     },
     {
-      "id": "1658015945",
+      "id": 1658015945,
       "predicate": "destroy_session_none",
       "params": [
         {
@@ -381,7 +346,7 @@
       "type": "DestroySessionRes"
     },
     {
-      "id": "-1631450872",
+      "id": -1631450872,
       "predicate": "new_session_created",
       "params": [
         {
@@ -400,7 +365,7 @@
       "type": "NewSession"
     },
     {
-      "id": "1945237724",
+      "id": 1945237724,
       "predicate": "msg_container",
       "params": [
         {
@@ -411,7 +376,7 @@
       "type": "MessageContainer"
     },
     {
-      "id": "1538843921",
+      "id": 1538843921,
       "predicate": "message",
       "params": [
         {
@@ -434,7 +399,7 @@
       "type": "Message"
     },
     {
-      "id": "-530561358",
+      "id": -530561358,
       "predicate": "msg_copy",
       "params": [
         {
@@ -445,7 +410,7 @@
       "type": "MessageCopy"
     },
     {
-      "id": "812830625",
+      "id": 812830625,
       "predicate": "gzip_packed",
       "params": [
         {
@@ -456,7 +421,7 @@
       "type": "Object"
     },
     {
-      "id": "1658238041",
+      "id": 1658238041,
       "predicate": "msgs_ack",
       "params": [
         {
@@ -467,7 +432,7 @@
       "type": "MsgsAck"
     },
     {
-      "id": "-1477445615",
+      "id": -1477445615,
       "predicate": "bad_msg_notification",
       "params": [
         {
@@ -486,7 +451,7 @@
       "type": "BadMsgNotification"
     },
     {
-      "id": "-307542917",
+      "id": -307542917,
       "predicate": "bad_server_salt",
       "params": [
         {
@@ -509,7 +474,7 @@
       "type": "BadMsgNotification"
     },
     {
-      "id": "2105940488",
+      "id": 2105940488,
       "predicate": "msg_resend_req",
       "params": [
         {
@@ -520,7 +485,7 @@
       "type": "MsgResendReq"
     },
     {
-      "id": "-630588590",
+      "id": -630588590,
       "predicate": "msgs_state_req",
       "params": [
         {
@@ -531,7 +496,7 @@
       "type": "MsgsStateReq"
     },
     {
-      "id": "81704317",
+      "id": 81704317,
       "predicate": "msgs_state_info",
       "params": [
         {
@@ -546,7 +511,7 @@
       "type": "MsgsStateInfo"
     },
     {
-      "id": "-1933520591",
+      "id": -1933520591,
       "predicate": "msgs_all_info",
       "params": [
         {
@@ -561,7 +526,7 @@
       "type": "MsgsAllInfo"
     },
     {
-      "id": "661470918",
+      "id": 661470918,
       "predicate": "msg_detailed_info",
       "params": [
         {
@@ -584,7 +549,7 @@
       "type": "MsgDetailedInfo"
     },
     {
-      "id": "-2137147681",
+      "id": -2137147681,
       "predicate": "msg_new_detailed_info",
       "params": [
         {
@@ -601,39 +566,12 @@
         }
       ],
       "type": "MsgDetailedInfo"
-    },
-    {
-      "id": "1973679973",
-      "predicate": "bind_auth_key_inner",
-      "params": [
-        {
-          "name": "nonce",
-          "type": "long"
-        },
-        {
-          "name": "temp_auth_key_id",
-          "type": "long"
-        },
-        {
-          "name": "perm_auth_key_id",
-          "type": "long"
-        },
-        {
-          "name": "temp_session_id",
-          "type": "long"
-        },
-        {
-          "name": "expires_at",
-          "type": "int"
-        }
-      ],
-      "type": "BindAuthKeyInner"
     }
   ],
   "methods": [
     {
-      "id": "1615239032",
-      "method": "req_pq_multi",
+      "id": 1615239032,
+      "method": "req_pq",
       "params": [
         {
           "name": "nonce",
@@ -643,7 +581,7 @@
       "type": "ResPQ"
     },
     {
-      "id": "-686627650",
+      "id": -686627650,
       "method": "req_DH_params",
       "params": [
         {
@@ -674,7 +612,7 @@
       "type": "Server_DH_Params"
     },
     {
-      "id": "-184262881",
+      "id": -184262881,
       "method": "set_client_DH_params",
       "params": [
         {
@@ -693,7 +631,7 @@
       "type": "Set_client_DH_params_answer"
     },
     {
-      "id": "1491380032",
+      "id": 1491380032,
       "method": "rpc_drop_answer",
       "params": [
         {
@@ -704,7 +642,7 @@
       "type": "RpcDropAnswer"
     },
     {
-      "id": "-1188971260",
+      "id": -1188971260,
       "method": "get_future_salts",
       "params": [
         {
@@ -715,7 +653,7 @@
       "type": "FutureSalts"
     },
     {
-      "id": "2059302892",
+      "id": 2059302892,
       "method": "ping",
       "params": [
         {
@@ -726,7 +664,7 @@
       "type": "Pong"
     },
     {
-      "id": "-213746804",
+      "id": -213746804,
       "method": "ping_delay_disconnect",
       "params": [
         {
@@ -741,7 +679,7 @@
       "type": "Pong"
     },
     {
-      "id": "-414113498",
+      "id": -414113498,
       "method": "destroy_session",
       "params": [
         {
@@ -752,7 +690,7 @@
       "type": "DestroySessionRes"
     },
     {
-      "id": "-1835453025",
+      "id": -1835453025,
       "method": "http_wait",
       "params": [
         {

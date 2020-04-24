@@ -156,7 +156,9 @@ export class MediaViewerComponent extends VComponent {
                             <i className="tgico tgico-close rp rps"/>
                         </div>
                     </div>
-                    <div className="media">
+                    <div className="media" onClick={event => {
+                        event.stopPropagation();
+                    }}>
                         <MediaFragment media={message}/>
                     </div>
                     <div className="caption">{text}</div>

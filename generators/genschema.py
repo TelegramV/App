@@ -1,6 +1,8 @@
 from json import load
 import struct
+import sys
 
+version=sys.argv[1]
 
 class DataStream(bytearray):
     def append(self, v, fmt='<B'):
@@ -15,7 +17,7 @@ class DataStream(bytearray):
 
 
 x = DataStream()
-f = open("schema_combine.json", "r")
+f = open(f"schema_combine_{version}.json", "r")
 j = load(f)
 c_len = len(j["constructors"])
 m_len = len(j["methods"])
@@ -48,5 +50,5 @@ for c in j["methods"]:
         x.writeString(i["name"])
         x.writeString(i["type"])
 # print(x)
-file = open("../public/static/schema.dat", "wb")
+file = open(f"../public/static/schema{version}.dat", "wb")
 file.write(x)
