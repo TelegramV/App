@@ -1,5 +1,4 @@
 import VComponent from "../../../V/VRDOM/component/VComponent"
-import VUI from "../../VUI"
 
 export class AbstractBarComponent extends VComponent {
 

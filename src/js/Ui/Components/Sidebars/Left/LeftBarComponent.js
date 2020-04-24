@@ -7,10 +7,17 @@ class LeftBarComponent extends AbstractBarComponent {
     appEvents(E) {
         E.bus(UIEvents.LeftSidebar)
             .on("show", this.sidebarOnShow)
+            .on("hide", this.sidebarOnHide)
     }
 
     openBar = barName => {
         UIEvents.LeftSidebar.fire("show", {
+            barName
+        })
+    }
+
+    hideBar = barName => {
+        UIEvents.LeftSidebar.fire("hide", {
             barName
         })
     }

@@ -7,11 +7,13 @@ import GeneralSettingsComponent from "./GeneralSettingsComponent"
 import {logout} from "../../../../../Api/General/logout"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import VUI from "../../../../VUI"
+import {ButtonWithIconFragment} from "../../Fragments/ButtonWithIconFragment";
+import {SectionFragment} from "../../Fragments/SectionFragment";
 
 const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
     return (
         <div className="settings-main">
-            <div className="sidebar-header">
+            <div className="sidebar-header no-borders">
                 <i className="btn-icon tgico tgico-back" onClick={_ => openPane("dialogs")}/>
                 <div className="sidebar-title">Settings</div>
                 <span className="btn-icon tgico tgico-more rp rps" onClick={ev => {
@@ -33,14 +35,14 @@ const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
             </div>
             <div className="username">{me ? me.name : ""}</div>
             <div className="phone-number">+{me ? me.phone : ""}</div>
-            <div className="list-menu">
+            <SectionFragment noBorders>
                 <ButtonWithIconFragment icon="edit" name="Edit Profile"/>
                 <ButtonWithIconFragment icon="settings" name="General settings"
-                                        click={_ => openPane("general-settings")}/>
+                                        onClick={_ => openPane("general-settings")}/>
                 <ButtonWithIconFragment icon="unmute" name="Notifications"/>
                 <ButtonWithIconFragment icon="lock" name="Privacy and Security"/>
                 <ButtonWithIconFragment icon="language" name="Language"/>
-            </div>
+            </SectionFragment>
         </div>
     )
 }
@@ -133,14 +135,4 @@ export class SettingsComponent extends LeftBarComponent {
                 return false;
         }
     }
-}
-
-export const ButtonWithIconFragment = ({icon, name, click, slot}) => {
-    let iconClasses = ["button-icon", "tgico", "tgico-" + icon]
-    return (
-        <div class="button-with-icon rp" onClick={click}>
-            {icon ? <i class={iconClasses.join(" ")}/> : slot}
-            <div class="button-title">{name}</div>
-        </div>
-    )
 }

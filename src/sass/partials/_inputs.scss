@@ -138,23 +138,24 @@ input[type="password"] {
 }
 
 .checkbox-input {
-    display: block;
-    position: relative;
+    --size: 16px;
     user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    padding-top: 3px;
+    width: 24px;
+    height: 24px;
 
-    margin-top: 12px;
-    margin-bottom: 12px;
-
-    font-size: 16px;
+    // dunno why do we need this here - @undrfined
+    //padding-top: 3px;
+    //
+    //margin-top: 12px;
+    //margin-bottom: 12px;
 
     input {
-        position: absolute;
-        opacity: 0;
+        display: none;
         cursor: default;
-        height: 0;
-        width: 0;
 
         &:checked~.checkmark {
             background-color: $blue;
@@ -168,34 +169,63 @@ input[type="password"] {
     }
 
     .checkmark {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 20px;
-        width: 20px;
+        height: var(--size);
+        width: var(--size);
         border: 1px solid $lightgrey;
         border-radius: 20%;
         transition: background-color 0.2s ease-in-out;
         cursor: pointer;
 
-        font-size: 19px;
+        font-size: var(--size);
         color: transparent;
-        transition: anim(all);
+        //transition: anim(all);
 
         &:hover {
             background-color: $light;
-        }
-
-        &:after {
-            content: "";
-            position: absolute;
-            display: none;
         }
     }
 
     .checkbox-label {
         margin-left: 50px;
     }
+}
+
+.slider-input {
+    >.label {
+        display: flex;
+        justify-content: space-between;
+
+        .text {
+        }
+
+        .value {
+            color: $darkgrey;
+        }
+    }
+
+    >input {
+        --slider-color: #E6ECF0;
+        --slider-color-fill: #50a2e9;
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--slider-color);
+        outline: none;
+        &::-webkit-slider-thumb { // ::-moz-range-thumb
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 12px;
+            background: $blue;
+            cursor: pointer;
+        }
+
+    }
+
+
 }
 
 .radio-input {

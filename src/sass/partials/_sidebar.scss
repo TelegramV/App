@@ -13,6 +13,11 @@
         left: 0 !important;
     }
 
+    &.fade-out {
+        left: -80px !important;
+        filter: brightness(0.75);
+    }
+
     &.hidden:not(.right),
     .hidden {
         width: 0;
@@ -34,6 +39,11 @@
         padding: 8px 14px;
         display: flex;
         align-items: center;
+        border-bottom: 1px solid $lightgrey;
+
+        &.no-borders {
+            border: none;
+        }
 
         .sidebar-title {
             width: 100%;
@@ -50,10 +60,32 @@
     }
 
     .section {
-        border-bottom: 1px solid $verylightgrey;
-        padding-bottom: 10px;
+        border-bottom: 1px solid $lightgrey;
+        border-top: 1px solid $lightgrey;
+        //padding-top: 29px;
+        //padding-bottom: 20px;
+        padding: 20px 8px 30px;
+
+        &:nth-child(2) {
+            padding-top: 8px;
+        }
+
+        &.no-borders {
+            border: none;
+        }
+
+        > * {
+            margin: 0 12px;
+        }
+
+        > .title {
+            color: $darkgrey;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
     }
 
+    // @deprecated
     .section-title {
         color: $darkgrey;
         margin: 20px;
@@ -61,13 +93,20 @@
     }
 
     .button-with-icon {
-        margin: 1px 5px;
+        margin: 0 0;
+        padding: 16px;
         display: flex;
-        height: 50px;
         align-items: center;
         cursor: pointer;
         border-radius: 5px;
         transition: anim(background-color);
+
+
+
+        .checkbox-input {
+            //margin: 20px;
+            //padding: 10px 12px 10px 10px;
+        }
 
         &:hover {
             background-color: $light;
@@ -76,7 +115,10 @@
         .button-icon {
             color: $darkgrey;
             font-size: 24px;
-            margin: 0px 20px;
+        }
+
+        .button-title {
+            margin-left: 32px;
         }
     }
 
@@ -173,7 +215,7 @@
     &.settings {
         overflow-x: hidden;
         transform: translateX(0);
-        transition: anim(transform);
+        transition: 250ms ease-in-out transform, 250ms ease-in-out filter;
 
         &.hidden {
             display: block;
@@ -181,11 +223,22 @@
             transform: translateX(-100%);
         }
 
+
+
         .settings-header {
             display: flex;
         }
 
         .settings-main {
+            background: #ffffff;
+            height: 100%;
+            transition: 250ms ease-in-out transform, 250ms ease-in-out filter;
+
+            &.fade-out {
+                transform: translateX(-80px);
+                filter: brightness(0.75);
+            }
+
             .photo-container {
                 height: 120px;
                 width: 100%;
@@ -216,18 +269,14 @@
                 text-align: center;
                 margin: 0 auto;
             }
-
-            .list-menu {
-                margin-top: 20px;
-            }
         }
 
         .sub-settings {
             top: 0;
             left: 500px;
-            transition: anim(left), anim(opacity);
+            transition: 250ms ease-in-out left, 250ms ease-in-out filter;//;anim(left), anim(filter);
             background-color: white;
-            padding: 0 5px;
+            border-right: none;
         }
 
         .background-color,
@@ -306,15 +355,6 @@
                 margin: 10px;
                 .input-field {
                     margin: 5px;
-                }
-            }
-        }
-
-        .background-image {
-            .button-with-icon {
-                .checkbox-input {
-                    margin: 20px;
-                    padding: 10px 12px 10px 10px;
                 }
             }
         }

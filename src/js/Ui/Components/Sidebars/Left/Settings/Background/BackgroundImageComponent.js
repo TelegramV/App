@@ -1,10 +1,12 @@
 import SettingsPane from "../SettingsPane"
-import {ButtonWithIconFragment} from "../SettingsComponent"
 import WallpaperManager from "../../../../../Managers/WallpaperManager"
 import VRDOM from "../../../../../../V/VRDOM/VRDOM"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import VCheckbox from "../../../../Elements/VCheckbox"
 import {askForFile} from "../../../../../Utils/utils"
+import {ButtonWithIconFragment} from "../../../Fragments/ButtonWithIconFragment";
+import {ButtonWithCheckboxFragment} from "../../../Fragments/ButtonWithCheckboxFragment";
+import {SectionFragment} from "../../../Fragments/SectionFragment";
 
 export default class BackgroundImageComponent extends SettingsPane {
     barName = "background-image";
@@ -25,14 +27,16 @@ export default class BackgroundImageComponent extends SettingsPane {
         return (
             <div class="sidebar sub-settings background-image scrollable">
                 {this.makeHeader()}
-                <ButtonWithIconFragment icon="cameraadd" name="Upload Wallpaper" click={this._uploadBackground}/>
-                <ButtonWithIconFragment icon="colorize" name="Set a Color"
-                                        click={_ => this.openPane("background-color")}/>
-                <ButtonWithIconFragment name="Blur Wallpaper Image" click={this._blurCheckClick}>
-                    <VCheckbox checked={true}/>
-                </ButtonWithIconFragment>
-                <div ref={this.galleryRef} class="gallery background-list">
-                </div>
+
+                <SectionFragment noBorders>
+                    <ButtonWithIconFragment icon="cameraadd" name="Upload Wallpaper" onClick={this._uploadBackground}/>
+                    <ButtonWithIconFragment icon="colorize" name="Set a Color"
+                                            onClick={_ => this.openPane("background-color")}/>
+                    <ButtonWithCheckboxFragment name="Blur Wallpaper Image" onClick={this._blurCheckClick} checked/>
+
+                    <div ref={this.galleryRef} className="gallery background-list"/>
+                </SectionFragment>
+
             </div>
         )
     }

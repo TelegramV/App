@@ -26,16 +26,14 @@ function VCheckbox(
     }
 ) {
     return (
-        <div className="checkbox-input">
-            <label onInput={input}>
-                <input type="checkbox" checked={valIf(checked, true)}/>
+        <div className="checkbox-input" onClick={input}>
+            <input type="checkbox" checked={valIf(checked, true)}/>
 
-                <span className="checkmark">
-                    <span className="tgico tgico-check"/>
-                </span>
+            <div className="checkmark">
+                <span className="tgico tgico-check"/>
+            </div>
 
-                {nodeIf(<span className="checkbox-label">{label}</span>, label)}
-            </label>
+            {nodeIf(<span className="checkbox-label">{label}</span>, label)}
         </div>
     )
 }
