@@ -19,12 +19,15 @@
     transition: anim(opacity);
 
     .header {
+      z-index: 10000;
+
       height: 44px;
       display: flex;
       justify-content: space-between;
       padding: 8px;
 
       .left {
+        cursor: pointer;
         color: $darkgreytext;
         margin-left: 12px;
         display: flex;
@@ -52,6 +55,8 @@
       }
 
       .right {
+        z-index: 10000;
+
         .tgico {
           border-radius: 50%;
           padding: 8px;

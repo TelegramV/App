@@ -28,6 +28,7 @@ import {MessageFactory} from "../../../Api/Messages/MessageFactory"
 import VSpinner from "../Elements/VSpinner"
 import FileManager from "../../../Api/Files/FileManager"
 import {DocumentMessagesTool} from "../../Utils/document"
+import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -117,7 +118,11 @@ export class MediaViewerComponent extends VComponent {
                 <div className="media-viewer" onClick={this.close}>
                     <NavigationButtonFragment onClick={this.left} hidden={!this.hasLeft() && !isLoadingPage}/>
                     <div className="header">
-                        <div className="left">
+                        <div className="left" onClick={event => {
+                            event.stopPropagation();
+                            AppSelectedInfoPeer.select(message.from);
+                            this.close(event);
+                        }}>
                             <AvatarFragment peer={from}/>
                             <div className="text">
                                 <div className="name">{name}</div>
@@ -125,11 +130,17 @@ export class MediaViewerComponent extends VComponent {
                             </div>
                         </div>
                         <div className="right">
-                            <i className="tgico tgico-delete rp rps"/>
-                            <i className="tgico tgico-forward rp rps"/>
+                            <i className="tgico tgico-delete rp rps" onClick={event => {
+                                event.stopPropagation();
+                            }}/>
+                            <i className="tgico tgico-forward rp rps" onClick={event => {
+                                event.stopPropagation();
+                            }}/>
                             <i style={{
                                 "cursor": !this.state.message || !this.state.message.loaded ? "default" : "pointer",
-                            }} className="tgico tgico-download rp rps" onClick={() => {
+                            }} className="tgico tgico-download rp rps" onClick={event => {
+                                event.stopPropagation();
+
                                 if (!this.state.message || !this.state.message.loaded) {
                                     return;
                                 }
