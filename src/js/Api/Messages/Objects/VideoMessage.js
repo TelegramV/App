@@ -56,7 +56,7 @@ export class VideoMessage extends AbstractMessage {
 
         this.loaded = false
         this.loading = true
-        FileAPI.getFile(this.raw.media.document).then(url => {
+        return FileAPI.getFile(this.raw.media.document).then(url => {
             this.videoUrl = url;
 
             this.loaded = true

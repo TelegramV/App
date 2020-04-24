@@ -15,35 +15,62 @@
  *
  */
 
-import ChatInfoAvatarComponent from "../Columns/Chat/ChatInfo/ChatInfoAvatarComponent";
 import {PhotoMessage} from "../../../Api/Messages/Objects/PhotoMessage";
-import VUI from "../../VUI"
-import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"
 import VComponent from "../../../V/VRDOM/component/VComponent";
 import UIEvents from "../../EventBus/UIEvents";
 import type {AE} from "../../../V/VRDOM/component/__component_registerAppEvents";
-import {AbstractMessage} from "../../../Api/Messages/AbstractMessage";
-import {PeerPhoto} from "../../../Api/Peers/Objects/PeerPhoto";
 import {VideoMessage} from "../../../Api/Messages/Objects/VideoMessage";
-import {VideoComponent} from "../Basic/videoComponent";
-import AppSelectedChat from "../../Reactive/SelectedChat";
 import AvatarFragment from "../Basic/AvatarFragment";
 import {Photo} from "../../../Api/Media/Photo";
+import SearchManager from "../../../Api/Search/SearchManager"
+import type {Message} from "../../../Api/Messages/Message"
+import {MessageFactory} from "../../../Api/Messages/MessageFactory"
+import VSpinner from "../Elements/VSpinner"
+import FileManager from "../../../Api/Files/FileManager"
+import {DocumentMessagesTool} from "../../Utils/document"
 
-const MediaFragment = ({media}) => {
+function MediaSpinnerFragment({icon}) {
+    return <VSpinner white>
+        {/*<i renderIf={icon}*/}
+        {/*   css-font-size="15pt"*/}
+        {/*   css-opacity="50%"*/}
+        {/*   class={`tgico tgico-${icon}`}/>*/}
+    </VSpinner>
+}
+
+function MediaFragment({media}) {
+    let style = {
+        "min-width": "500px",
+        "max-width": "600px",
+    }
     if (media instanceof PhotoMessage) {
-        return <img src={media.srcUrl} alt=""/>
+        if (!media.loaded) {
+            return <MediaSpinnerFragment icon="photo"/>
+        }
+
+        return <img style={style} src={media.srcUrl} alt=""/>
     }
-    if(media instanceof VideoMessage) {
-        return <video controls src={media.videoUrl}/>
+    if (media instanceof VideoMessage) {
+        if (!media.loaded) {
+            return <MediaSpinnerFragment icon="camera"/>
+        }
+
+        return <video style={style} controls src={media.videoUrl}/>
     }
-    if(media instanceof Photo) {
-        return <img src={media.srcUrl} alt=""/>
+    if (media instanceof Photo) {
+        if (!media.loaded) {
+            return <MediaSpinnerFragment icon="photo"/>
+        }
+
+        return <img style={style} src={media.srcUrl} alt=""/>
+    }
+    if (!media || !media.loaded) {
+        return <MediaSpinnerFragment/>
     }
     return <div/>
 }
 
-const NavigationButtonFragment = ({isNext, hidden, onClick}) => {
+function NavigationButtonFragment({isNext, hidden, onClick}) {
     return <div className={{
         "navigation": true,
         "prev": !isNext,
@@ -52,202 +79,299 @@ const NavigationButtonFragment = ({isNext, hidden, onClick}) => {
         "rp": true,
         "hidden": hidden
     }} onClick={onClick}/>
-
 }
 
 export class MediaViewerComponent extends VComponent {
-
     state = {
         hidden: true,
-    }
+        peer: null,
+        messages: [],
+        message: null,
+        hasLeftPage: true,
+        hasRightPage: true,
+        isLoadingPage: false,
+    };
+
+    defaultState = {...this.state};
 
     appEvents(E: AE) {
         E.bus(UIEvents.MediaViewer)
             .on("showMessage", this.showMessage)
-            .on("showAvatar", this.showAvatar)
+            .on("showAvatar", this.showAvatar);
     }
 
-    showMessage = (message) => {
-        if (message instanceof PhotoMessage && !message.loaded) {
-            message.fetchMax().then(l => this.forceUpdate())
+    render() {
+        const {message, hidden, isLoadingPage} = this.state;
+
+        let from, name, text, date;
+
+        if (message) {
+            from = message.from;
+            name = from.name;
+            text = message.text;
+            date = message.date;
         }
+
+        return (
+            <div className={["media-viewer-wrapper", hidden ? "hidden" : ""]}>
+                <div className="media-viewer" onClick={this.close}>
+                    <NavigationButtonFragment onClick={this.left} hidden={!this.hasLeft() && !isLoadingPage}/>
+                    <div className="header">
+                        <div className="left">
+                            <AvatarFragment peer={from}/>
+                            <div className="text">
+                                <div className="name">{name}</div>
+                                <div className="time">{this.formatDate(date)}</div>
+                            </div>
+                        </div>
+                        <div className="right">
+                            <i className="tgico tgico-delete rp rps"/>
+                            <i className="tgico tgico-forward rp rps"/>
+                            <i style={{
+                                "cursor": !this.state.message || !this.state.message.loaded ? "default" : "pointer",
+                            }} className="tgico tgico-download rp rps" onClick={() => {
+                                if (!this.state.message || !this.state.message.loaded) {
+                                    return;
+                                }
+
+                                let pfn = message.srcUrl.split("/");
+                                pfn = pfn[pfn.length - 1];
+                                const f = message.raw.media.photo || message.raw.media.video || message.raw.media.document || {};
+                                FileManager.saveBlobUrlOnPc(
+                                    message.srcUrl,
+                                    DocumentMessagesTool.getFilename(f.attributes, pfn)
+                                )
+                            }}/>
+                            <i className="tgico tgico-close rp rps"/>
+                        </div>
+                    </div>
+                    <div className="media">
+                        <MediaFragment media={message}/>
+                    </div>
+                    <div className="caption">{text}</div>
+                    <NavigationButtonFragment onClick={this.right} isNext hidden={!this.hasRight() && !isLoadingPage}/>
+                </div>
+            </div>
+        )
+    }
+
+    componentDidMount() {
+        window.addEventListener("keydown", this.onKeyDown);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("keydown", this.onKeyDown);
+    }
+
+    onKeyDown = event => {
+        if (!this.state.hidden) {
+            const code = event.keyCode || event.which;
+
+            if (code === 39) {
+                this.right(event);
+            } else if (code === 37) {
+                this.left(event);
+            } else if (code === 27) {
+                this.close(event);
+            }
+        }
+    }
+
+    showMessage = (message: Message) => {
+        this.state = {...this.defaultState};
+
+        console.log("show message")
+
+        this.state.peer = message.to;
+        this.state.messages = [message];
+
+        this.downloadLeftPage();
+        this.downloadRightPage();
+
         this.setState({
             hidden: false,
-            media: message,
-            from: message.from,
-            date: message.date,
-            caption: message.text
+            message,
         })
     }
 
-    showAvatar = (event) => {
-        const peer = event.peer
-        // peer.photo.fetchBig().then(l => this.forceUpdate())
+    downloadLeftPage = () => {
+        if (!this.state.hasLeftPage || this.state.isLoadingPage) {
+            return Promise.resolve();
+        }
 
-        if(!peer._photos) {
-            peer.fetchPeerPhotos().then(l => {
-                console.log(l)
-                peer._photos[0].fetchMax().then(_ => {
-                    this.forceUpdate()
-                })
+        const limit = 10;
+        const message = this.state.messages[0];
+
+        this.setState({
+            isLoadingPage: true,
+        })
+
+        return SearchManager.searchMessages(message.to, {
+            offsetId: message.id,
+            filter: {
+                _: "inputMessagesFilterPhotoVideo"
+            },
+            limit: limit,
+        }).then(Messages => {
+            if (Messages._peer !== this.state.peer) {
+                return;
+            }
+
+            const messages = [
+                ...Messages.messages.map(message => MessageFactory.fromRaw(message.to, message)).reverse(),
+                ...this.state.messages
+            ];
+
+            if (Messages.current_count < limit) {
                 this.setState({
-                    hidden: false,
-                    media: peer._photos[0],
-                    from: peer,
-                    date: peer._photos[0].date,
-                    caption: "",
-                    currentPhoto: 0
+                    messages,
+                    hasLeftPage: false,
+                    isLoadingPage: false,
                 })
-            })
-        } else {
+            } else {
+                this.setState({
+                    messages,
+                    hasLeftPage: true,
+                    isLoadingPage: false,
+                })
+            }
+
+            // console.log(this.state.messages);
+        });
+    }
+
+    downloadRightPage = () => {
+        if (!this.state.hasRightPage || this.state.isLoadingPage) {
+            return Promise.resolve();
+        }
+
+        const limit = 10;
+        const message = this.state.messages[this.state.messages.length - 1];
+
+        this.setState({
+            isLoadingPage: true,
+        })
+
+        return SearchManager.searchMessages(message.to, {
+            offsetId: message.id,
+            filter: {
+                _: "inputMessagesFilterPhotoVideo"
+            },
+            limit: limit,
+            addOffset: -(limit + 1)
+        }).then(Messages => {
+            if (Messages._peer !== this.state.peer) {
+                return;
+            }
+
+            const messages = [
+                ...this.state.messages,
+                ...Messages.messages.map(message => MessageFactory.fromRaw(message.to, message)),
+            ];
+
+            if (Messages.current_count < limit) {
+                this.setState({
+                    messages,
+                    hasRightPage: false,
+                    isLoadingPage: false
+                })
+            } else {
+                this.setState({
+                    messages,
+                    hasRightPage: true,
+                    isLoadingPage: false
+                })
+            }
+
+            // console.log(this.state.messages);
+        });
+    }
+
+    hasLeft = () => {
+        return this.state.messages[0] !== this.state.message;
+    }
+
+    left = event => {
+        event.stopPropagation();
+
+        if (!this.hasLeft()) {
+            return;
+        }
+
+        const index = this.state.messages.findIndex(m => m === this.state.message);
+
+        if (index <= 5) {
+            this.downloadLeftPage();
+        }
+
+        console.log("left", index)
+
+        if (index > 0) {
+            const leftMessage = this.state.messages[index - 1];
+
             this.setState({
-                hidden: false,
-                media: peer._photos[0],
-                from: peer,
-                date: peer._photos[0].date,
-                caption: "",
-                currentPhoto: 0
+                message: leftMessage,
             })
-        }
-        // console.log(peer.full)
-        // this.setState({
-        //     hidden: false,
-        //     // media: peer.photo,
-        //     // from: peer,
-        //     // date: peer.full?.profile_photo.date,
-        //     // caption: ""
-        // })
-    }
 
-    getNextOrPrev(next = true) {
-        if(this.state.media instanceof AbstractMessage) {
-            const peer = this.state.media.to
-            const filtered = Array.from(peer.messages.messages, ([key, value]) => value).filter(l => {
-                return (next ? (l.id > this.state.media.id) : (l.id < this.state.media.id)) && l.isDisplayedInMediaViewer
-            })
-            if(filtered.length === 0) return null
-
-            return filtered.reduce((l, q) => {
-                return (next ? l.id < q.id : l.id > q.id) ? l : q
-            })
-        } else if(this.state.media instanceof Photo) {
-            const peer = this.state.media.peer
-            if(!peer._photos) {
-                return null
-            }
-            const q = (next ? this.state.currentPhoto + 1 : this.state.currentPhoto - 1)
-            if(q >= peer._photos.length || q < 0) return null
-            return peer._photos[q]
-        } else {
-            return null
-        }
-    }
-
-    hasNext = () => {
-        return !!this.getNextOrPrev(true)
-    }
-
-    hasPrev = () => {
-        return !!this.getNextOrPrev(false)
-    }
-
-    next = (ev) => {
-        ev.stopPropagation()
-        const n = this.getNextOrPrev(true)
-        if(n) {
-            if(n instanceof Photo) {
-                if(!n.loaded) n.fetchMax().then(_ => this.forceUpdate())
-                this.setState({
-                    hidden: false,
-                    media: n,
-                    from: n.peer,
-                    date: n.date,
-                    caption: "",
-                    currentPhoto: this.state.currentPhoto + 1
-                })
-            } else {
-                this.showMessage(n)
+            if (!leftMessage.loaded && !leftMessage.loading) {
+                (leftMessage instanceof VideoMessage ? leftMessage.fetchFullVideo() : leftMessage.fetchMax())
+                    .then(() => {
+                        if (this.state.message === leftMessage) {
+                            this.forceUpdate();
+                        }
+                    })
             }
         }
     }
 
-    prev = (ev) => {
-        ev.stopPropagation()
-        const n = this.getNextOrPrev(false)
-        if(n) {
+    hasRight = () => {
+        return this.state.messages[this.state.messages.length - 1] !== this.state.message;
+    }
 
-            if(n instanceof Photo) {
-                if(!n.loaded) n.fetchMax().then(_ => this.forceUpdate())
-                this.setState({
-                    hidden: false,
-                    media: n,
-                    from: n.peer,
-                    date: n.date,
-                    caption: "",
-                    currentPhoto: this.state.currentPhoto - 1
-                })
-            } else {
-                this.showMessage(n)
+    right = event => {
+        event.stopPropagation();
+
+        if (!this.hasRight()) {
+            return;
+        }
+
+        const index = this.state.messages.findIndex(m => m === this.state.message);
+        console.log("right", index)
+
+        if (index >= this.state.messages.length - 5) {
+            this.downloadRightPage();
+        }
+
+        if (index > -1 && index < this.state.messages.length) {
+            const rightMessage = this.state.messages[index + 1];
+
+            this.setState({
+                message: rightMessage,
+            })
+
+            if (!rightMessage.loaded && !rightMessage.loading) {
+                (rightMessage instanceof VideoMessage ? rightMessage.fetchFullVideo() : rightMessage.fetchMax())
+                    .then(() => {
+                        if (this.state.message === rightMessage) {
+                            this.forceUpdate();
+                        }
+                    })
             }
         }
     }
 
-    formatDate() {
-        return new Date(this.state.date * 1000).toLocaleString("en", {
+    formatDate(date) {
+        return new Date(date * 1000).toLocaleString("en", {
             hour: '2-digit',
             minute: '2-digit',
             hour12: false
         })
     }
 
-    render() {
-        return (
-            <div className={["media-viewer-wrapper", this.state.hidden ? "hidden" : ""]}>
-                <div className="media-viewer" onClick={this.close}>
-                    <div className="header">
-                        <div className="left">
-                            <AvatarFragment peer={this.state.from}/>
-                            <div className="text">
-                                <div className="name">{this.state.from?.name}</div>
-                                <div className="time">{this.formatDate()}</div>
-                            </div>
-                        </div>
-                        <div className="right">
-                            <i className="tgico tgico-delete rp rps"></i>
-                            <i className="tgico tgico-forward rp rps"></i>
-                            <i className="tgico tgico-download rp rps"></i>
-                            <i className="tgico tgico-close rp rps"></i>
-                        </div>
-                    </div>
-                    <div className="media">
-                        <NavigationButtonFragment onClick={this.prev} hidden={!this.hasPrev()}/>
-                        <MediaFragment media={this.state.media}/>
-                        <NavigationButtonFragment onClick={this.next} isNext hidden={!this.hasNext()}/>
-                    </div>
-                    <div className="caption">{this.state.caption}</div>
-                </div>
-            </div>
-        )
-    }
+    close = (event) => {
+        event.stopPropagation();
 
-    close = () => {
-        this.setState({
-            hidden: true,
-            media: null,
-            from: null,
-            date: null,
-            caption: null
-        })
-    }
-
-    open = (message) => {
-        if (message instanceof PhotoMessage && !message.loaded) {
-            message.fetchMax().then(l => this.forceUpdate())
-        }
-        this.setState({
-            hidden: false,
-            message: message
-        })
+        this.setState({...this.defaultState})
     }
 }
 

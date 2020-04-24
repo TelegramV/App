@@ -38,20 +38,23 @@ function getColor(extension) {
     }
 }
 
-function getFilename(attrs) {
+function getFilename(attrs, pfn) {
+    if (!attrs) {
+        return pfn;
+    }
     for (const elem of attrs) {
         if (elem._ === "documentAttributeFilename") {
             return elem.file_name;
         }
     }
-    return "UNKNOWN!?";
+    return pfn;
 }
 
 function createIcon(color, isFull = false) {
     let id = Math.random().toString(16).substring(7);
     let darker = adjust(color, -40);
     // TODO @kohutd patching the icon and changing it to full causes it to dissapear
-    if(!isFull) {
+    if (!isFull) {
         return (
             <svg width="54px" height="54px" viewBox="0 0 54 54" version="1.1" xmlns="http://www.w3.org/2000/svg">
                 <g id={id} stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -86,7 +89,7 @@ function formatSize(size) {
 
 export const DocumentMessagesTool = {
     getColor,
-    getFilename,
+    getFilename: getFilename,
     createIcon,
     adjust,
     formatSize

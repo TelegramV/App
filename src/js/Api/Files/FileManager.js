@@ -28,6 +28,7 @@ class FilesManager {
         return this.isDownloaded(fileId) ? 1.0 : (this.pending.get(fileId)?.progress ?? 0.0)
     }
 
+    // shouldn't be async, or use await
     downloadPhoto = async (photo, thumbSize = undefined) => {
         return this.downloadDocument(photo, thumbSize)
     }
@@ -36,7 +37,6 @@ class FilesManager {
         if (this.pending.has(file.id)) {
             return false
         }
-
 
         file.progress = 0.0
         this.pending.set(file.id, file)
@@ -67,7 +67,6 @@ class FilesManager {
                 thumb_size: thumbSize
             }, file.dc_id, offset)
 
-
             if (!response.bytes) {
                 console.error("Fatal error while loading part", response, file, offset, size)
             }
@@ -81,12 +80,13 @@ class FilesManager {
                 progress: offset / size
             })
             const k = this.pending.get(file.id)
-            if(k) {
+            if (k) {
                 k.progress = offset / size
             }
         }
 
         // Can be cancelled here?
+
 
         const url = FileAPI.createBlobFromParts(file, file.mime_type || "application/jpeg", parts)
 

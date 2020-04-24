@@ -7,7 +7,7 @@ import {SearchMessage} from "../Messages/SearchMessage"
 
 class SearchManagerSingleton extends Manager {
 
-    searchMessages(peer, {offsetId, filter, limit = 33, q = ""}) {
+    searchMessages(peer, {offsetId, filter, limit = 33, q = "", addOffset = 0}) {
         return MTProto.invokeMethod("messages.search", {
             peer: peer.inputPeer,
             q: q,
@@ -15,7 +15,8 @@ class SearchManagerSingleton extends Manager {
                 _: "inputMessagesFilterEmpty"
             },
             limit: limit,
-            offset_id: offsetId
+            offset_id: offsetId,
+            add_offset: addOffset
         }).then(Messages => {
             Messages.__q = q
 
