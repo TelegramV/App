@@ -17,7 +17,7 @@
 
 import VRoute from "./VRoute"
 
-// return VRoute to show next route, `false` to stay at previous or `404` to show 404 page error
+// return VRoute to show topPage route, `false` to stay at previous or `404` to show 404 page error
 type VRouterMiddlewareResponse = boolean | VRoute
 
 class VRouterMiddleware {

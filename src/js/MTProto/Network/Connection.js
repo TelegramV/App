@@ -342,7 +342,7 @@ class Connection {
 
             const message_data = decrypted_deserializer.rawBytes(message_data_length);
 
-            decrypted_deserializer_offset = decrypted_deserializer_offset.offset;
+            decrypted_deserializer_offset = decrypted_deserializer.offset;
 
             const padding_length = decrypted_length - decrypted_deserializer_offset;
             if (padding_length < 12 || padding_length > 1024) {

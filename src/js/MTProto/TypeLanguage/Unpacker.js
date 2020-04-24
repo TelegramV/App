@@ -222,6 +222,12 @@ class Unpacker {
         if (type.charAt(0) === "%") {
             constructor = schema.constructors.find(constructor => constructor.type === type.substr(1))
 
+            if (!__IS_PRODUCTION__) {
+                if (constructor.predicate === "messageEmpty") {
+                    throw new Error("fuck")
+                }
+            }
+
             if (!constructor) {
                 throw new Error("Constructor not found for type: " + type)
             }
