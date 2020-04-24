@@ -1025,7 +1025,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
                 xorBlock.call(this, words, offset, blockSize);
                 cipher.encryptBlock(words, offset);
 
-                // Remember this block to use with next block
+                // Remember this block to use with topPage block
                 this._prevBlock = words.slice(offset, offset + blockSize);
             }
         });
@@ -1049,7 +1049,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
                 var cipher = this._cipher;
                 var blockSize = cipher.blockSize;
 
-                // Remember this block to use with next block
+                // Remember this block to use with topPage block
                 var thisBlock = words.slice(offset, offset + blockSize);
 
                 // Decrypt and XOR
@@ -1119,7 +1119,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
                 }
 
 
-                // Remember this block to use with next block
+                // Remember this block to use with topPage block
                 var nextIv2p = words.slice(offset, offset + blockSize);
 
                 // XOR with previous ciphertext
@@ -1160,7 +1160,7 @@ CryptoJS.lib.Cipher || (function (undefined) {
                     this._iv2p = this._iv.slice(blockSize, 2 * blockSize);
                 }
 
-                // Remember this block to use with next block
+                // Remember this block to use with topPage block
                 var nextIvp = words.slice(offset, offset + blockSize);
 
                 // XOR with previous ciphertext
@@ -1762,7 +1762,7 @@ code.google.com/p/crypto-js/wiki/License
             INV_SUB_MIX_2[sx] = (t << 8)  | (t >>> 24);
             INV_SUB_MIX_3[sx] = t;
 
-            // Compute next counter
+            // Compute topPage counter
             if (!x) {
                 x = xi = 1;
             } else {

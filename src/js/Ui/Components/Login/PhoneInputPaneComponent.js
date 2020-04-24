@@ -64,7 +64,7 @@ export default class PhoneInputComponent extends PaneComponent {
         this.state.isLoading = true
 
         const phone = this.phoneRef.component
-        const next = this.nextRef.component
+        const nextPage = this.nextRef.component
         const phoneNumber = phone.getValue()
 
         next.isLoading = true

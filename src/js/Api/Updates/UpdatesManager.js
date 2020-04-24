@@ -179,7 +179,7 @@ export class UpdateManager extends Manager {
 
     fire(rawUpdate) {
         if (!this._inited) {
-            console.error("not inited")
+            console.error("not inited", rawUpdate)
             return
         }
         if (this.updateListeners.has(rawUpdate._)) {
@@ -193,7 +193,7 @@ export class UpdateManager extends Manager {
 
     processUpdate(type, rawUpdate) {
         if (!this._inited) {
-            console.error("not inited")
+            console.error("not inited", type, rawUpdate)
             return
         }
         if (this.channelUpdatesProcessor.updateTypes.includes(rawUpdate._)) {
@@ -205,7 +205,7 @@ export class UpdateManager extends Manager {
 
     process(rawUpdate) {
         if (!this._inited) {
-            console.error("not inited")
+            console.error("not inited", rawUpdate)
             return
         }
         if (this.customUpdatesProcessors.has(rawUpdate._)) {

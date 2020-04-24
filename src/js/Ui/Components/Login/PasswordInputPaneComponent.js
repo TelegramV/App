@@ -57,7 +57,7 @@ export default class PasswordInputPaneComponent extends PaneComponent {
         this.state.isLoading = true
 
         const passwordInput = this.passwordInputRef.component
-        const next = this.nextPasswordRef.component
+        const nextPage = this.nextPasswordRef.component
         const password = passwordInput.getValue()
 
         next.isLoading = true

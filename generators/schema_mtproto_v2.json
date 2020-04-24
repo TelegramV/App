@@ -370,7 +370,7 @@
       "params": [
         {
           "name": "messages",
-          "type": "vector<%Message>"
+          "type": "vector<%MTProtoMessage>"
         }
       ],
       "type": "MessageContainer"
@@ -396,7 +396,7 @@
           "type": "Object"
         }
       ],
-      "type": "Message"
+      "type": "MTProtoMessage"
     },
     {
       "id": -530561358,
@@ -404,7 +404,7 @@
       "params": [
         {
           "name": "orig_message",
-          "type": "Message"
+          "type": "MTProtoMessage"
         }
       ],
       "type": "MessageCopy"
