@@ -41,7 +41,7 @@ const messageObjects = new Map([
     [MessageType.STICKER, StickerMessage],
     [MessageType.ANIMATED_STICKER, AnimatedStickerMessage],
     [MessageType.ANIMATED_EMOJI, AnimatedStickerMessage],
-    //[MessageType.DICE, DiceMessage],
+    [MessageType.DICE, DiceMessage],
     [MessageType.VOICE, VoiceMessage],
     [MessageType.AUDIO, AudioMessage],
     [MessageType.ROUND, RoundVideoMessage],

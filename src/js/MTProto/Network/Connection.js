@@ -27,10 +27,10 @@ import Random from "../Utils/Random"
 import Uint8 from "../Utils/Uint8"
 import MessagesProcessor from "./MessagesProcessor"
 import TelegramApplication from "../TelegramApplication"
-import {longToBytes} from "../Utils/Bin"
+import { longToBytes } from "../Utils/Bin"
 import ConnectionState from "./ConnectionState"
 
-const {concat, compare} = Uint8;
+const { concat, compare } = Uint8;
 
 class Connection {
     constructor(dcId: number, withUpdates: boolean, application: TelegramApplication) {
@@ -49,6 +49,8 @@ class Connection {
         this.processor = new MessagesProcessor(this);
 
         this.transporter = new SocketTransporter(this);
+
+        this.timezoneOffset = new Date().getTimezoneOffset()*60; //seconds
     }
 
     get isMain() {
@@ -56,12 +58,12 @@ class Connection {
     }
 
     get isReady() {
-        return this.transporter.isReady
-            && this.isSocketConnected
-            && this.authorization
-            && this.authorization.isAuthorized
-            && !this.authorization.isAuthorizing
-            && this.isInitialized;
+        return this.transporter.isReady &&
+            this.isSocketConnected &&
+            this.authorization &&
+            this.authorization.isAuthorized &&
+            !this.authorization.isAuthorizing &&
+            this.isInitialized;
     }
 
     async init(props: { doPinging: boolean; } = {}) {
@@ -148,8 +150,8 @@ class Connection {
         this.pingingInvervalId = clearInterval(this.pingingInvervalId);
     }
 
-    invokeMethod(name: string, params?: any, props: { useSecondTransporter: boolean; } = {}): Promise<any> {
-        let {useSecondTransporter} = props;
+    invokeMethod(name: string, params ? : any, props: { useSecondTransporter: boolean; } = {}): Promise < any > {
+        let { useSecondTransporter } = props;
         let originalUseSecondTransporter = useSecondTransporter;
 
         if (useSecondTransporter) {
@@ -165,7 +167,11 @@ class Connection {
         if (!this.isReady) {
             return new Promise((resolve, reject) => {
                 this.awaitingInvokes.push({
-                    name, params, resolve, reject, useSecondTransporter,
+                    name,
+                    params,
+                    resolve,
+                    reject,
+                    useSecondTransporter,
                 })
             });
         }
@@ -178,14 +184,26 @@ class Connection {
             method_serializer.int(0xbf9459b7); // invokeWithoutUpdates
         }
         // if (!this.initConnection) {
-        method_serializer.int(0xc7481da6); // initConnection
-        method_serializer.int(AppConfiguration.mtproto.api.api_id, "api_id");
-        method_serializer.string(navigator.userAgent || "Unknown UserAgent", "device_model");
-        method_serializer.string(navigator.platform || "Unknown Platform", "system_version");
-        method_serializer.string(AppConfiguration.mtproto.api.app_version, "app_version");
-        method_serializer.string(navigator.language || "en", "system_lang_code");
-        method_serializer.string("", "lang_pack");
-        method_serializer.string(navigator.language || "en", "lang_code");
+        method_serializer.int(0xc1cd5ea9); // initConnection
+        method_serializer.int(2); //flags
+        method_serializer.int(AppConfiguration.mtproto.api.api_id); // api_id
+        method_serializer.string(navigator.userAgent || "Unknown UserAgent"); // device_model
+        method_serializer.string(navigator.platform || "Unknown Platform"); // system_version
+        method_serializer.string(AppConfiguration.mtproto.api.app_version); // app_version
+        method_serializer.string(navigator.language || "en"); // system_lang_code
+        method_serializer.string(""); // lang_pack
+        method_serializer.string(navigator.language || "en"); // lang_code
+        method_serializer.object({
+            _: "jsonObject",
+            value: [{
+                _: "jsonObjectValue",
+                key: "tz_offset",
+                value: {
+                    _: "jsonNumber",
+                    value: this.timezoneOffset
+                }
+            }]
+        }, "Object"); //FIXME JSON Packer
         // this.initConnection = true;
         // }
 
@@ -197,15 +215,22 @@ class Connection {
 
         return new Promise((resolve, reject) => {
             this.processor.pendingInvokations.set(message_id, {
-                name, params, resolve, reject, useSecondTransporter
+                name,
+                params,
+                resolve,
+                reject,
+                useSecondTransporter
             });
             this.sendMessage({
-                message_id, seq_no, message_body, useSecondTransporter,
+                message_id,
+                seq_no,
+                message_body,
+                useSecondTransporter,
             })
         });
     }
 
-    invokeMTProtoMethod(name: string, params ?: any): Promise<Unpacker> {
+    invokeMTProtoMethod(name: string, params ? : any): Promise < Unpacker > {
         return new Promise((resolve, reject) => {
             const method_serializer = TL.packer();
             method_serializer.method(name, params);
@@ -221,16 +246,16 @@ class Connection {
 
             const bytes = bytes_serializer.toUint8Array();
 
-            this.mtprotoHandler = {resolve, reject};
+            this.mtprotoHandler = { resolve, reject };
 
             this.transporter.transport(bytes.buffer);
         });
     }
 
-    sendMessage(message: { message_id: string; message_body: Uint8Array, seq_no: number; useSecondTransporter: boolean; }) {
-        const {message_id, message_body, seq_no, useSecondTransporter} = message;
+    sendMessage(message: { message_id: string;message_body: Uint8Array, seq_no: number;useSecondTransporter: boolean; }) {
+        const { message_id, message_body, seq_no, useSecondTransporter } = message;
 
-        const message_serializer = TL.packer({maxLength: message_body.length + 2048});
+        const message_serializer = TL.packer({ maxLength: message_body.length + 2048 });
 
         message_serializer.integer(this.authorization.serverSalt, 64);
         message_serializer.integer(this.authorization.sessionId, 64);
@@ -247,7 +272,7 @@ class Connection {
 
         const encryptedtext = telegram_crypto.encrypt_message(concat(message_bytes, padding), this.authorization.authKey);
 
-        const bytes_serializer = TL.packer({maxLength: encryptedtext.bytes.byteLength + 256});
+        const bytes_serializer = TL.packer({ maxLength: encryptedtext.bytes.byteLength + 256 });
         bytes_serializer.integer(this.authorization.authKeyId, 64);
         bytes_serializer.integer(encryptedtext.msg_key, 128);
         bytes_serializer.rawBytes(encryptedtext.bytes);
@@ -282,7 +307,7 @@ class Connection {
             return;
         }
 
-        this.invokeMethod(invokation.name, invokation.params, {useSecondTransporter: invokation.useSecondTransporter})
+        this.invokeMethod(invokation.name, invokation.params, { useSecondTransporter: invokation.useSecondTransporter })
             .then(invokation.resolve)
             .catch(invokation.reject)
             .finally(() => this.processor.pendingInvokations.delete(message_id));
@@ -382,7 +407,7 @@ class Connection {
     resolveAwaiting() {
         if (this.isReady) {
             this.awaitingInvokes.forEach(i => {
-                const {name, params, resolve, reject} = i;
+                const { name, params, resolve, reject } = i;
 
                 this.invokeMethod(name, params)
                     .then(resolve)

@@ -16,12 +16,16 @@ export class DiceMessage extends AbstractMessage {
     	return this.raw.media.value;
     }
 
+    get emoji() {
+        return this.raw.media.emoticon;
+    }
+
     fillRaw(raw: Object): DiceMessage {
         super.fillRaw(raw)
 
         if (this.raw.media) {
             this.animated = true;
-            this.raw.media.document = StickerManager.getDice(this.value);
+            this.raw.media.document = StickerManager.getDice(this.value, this.emoji);
         }
 
         return this
