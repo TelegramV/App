@@ -91,10 +91,15 @@ export class UpdateManager extends Manager {
             return Promise.resolve()
         }
 
+        setTimeout(() => this.init(), 1000)
+
         return MTProto.invokeMethod("updates.getState", {}).then(state => {
+            if (this._inited) {
+                return
+            }
+
             this.State = state
             this._inited = true
-        }).then(() => {
 
             if (this.updateStatusCheckingIntervalId === undefined) {
                 this.updateStatusCheckingIntervalId = setInterval(() => {
@@ -173,6 +178,10 @@ export class UpdateManager extends Manager {
     }
 
     fire(rawUpdate) {
+        if (!this._inited) {
+            console.error("not inited")
+            return
+        }
         if (this.updateListeners.has(rawUpdate._)) {
             this.updateListeners.get(rawUpdate._).forEach(listener => {
                 listener(rawUpdate)
@@ -183,6 +192,10 @@ export class UpdateManager extends Manager {
     }
 
     processUpdate(type, rawUpdate) {
+        if (!this._inited) {
+            console.error("not inited")
+            return
+        }
         if (this.channelUpdatesProcessor.updateTypes.includes(rawUpdate._)) {
             this.channelUpdatesProcessor.enqueue(rawUpdate)
         } else {
@@ -191,6 +204,10 @@ export class UpdateManager extends Manager {
     }
 
     process(rawUpdate) {
+        if (!this._inited) {
+            console.error("not inited")
+            return
+        }
         if (this.customUpdatesProcessors.has(rawUpdate._)) {
             this.customUpdatesProcessors.get(rawUpdate._)(this, rawUpdate)
         } else {
