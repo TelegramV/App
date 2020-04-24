@@ -90,7 +90,8 @@ export class MediaViewerComponent extends VComponent {
         message: null,
         hasLeftPage: true,
         hasRightPage: true,
-        isLoadingPage: false,
+        isLoadingLeftPage: false,
+        isLoadingRightPage: false,
     };
 
     defaultState = {...this.state};
@@ -102,7 +103,9 @@ export class MediaViewerComponent extends VComponent {
     }
 
     render() {
-        const {message, hidden, isLoadingPage} = this.state;
+        const {message, hidden, isLoadingLeftPage, isLoadingRightPage} = this.state;
+
+        const isLoadingPage = isLoadingLeftPage || isLoadingRightPage;
 
         let from, name, text, date;
 
@@ -208,7 +211,7 @@ export class MediaViewerComponent extends VComponent {
     }
 
     downloadLeftPage = () => {
-        if (!this.state.hasLeftPage || this.state.isLoadingPage) {
+        if (!this.state.hasLeftPage || this.state.isLoadingLeftPage) {
             return Promise.resolve();
         }
 
@@ -216,7 +219,7 @@ export class MediaViewerComponent extends VComponent {
         const message = this.state.messages[0];
 
         this.setState({
-            isLoadingPage: true,
+            isLoadingLeftPage: true,
         })
 
         return SearchManager.searchMessages(message.to, {
@@ -239,13 +242,13 @@ export class MediaViewerComponent extends VComponent {
                 this.setState({
                     messages,
                     hasLeftPage: false,
-                    isLoadingPage: false,
+                    isLoadingLeftPage: false,
                 })
             } else {
                 this.setState({
                     messages,
                     hasLeftPage: true,
-                    isLoadingPage: false,
+                    isLoadingLeftPage: false,
                 })
             }
 
@@ -254,7 +257,7 @@ export class MediaViewerComponent extends VComponent {
     }
 
     downloadRightPage = () => {
-        if (!this.state.hasRightPage || this.state.isLoadingPage) {
+        if (!this.state.hasRightPage || this.state.isLoadingRightPage) {
             return Promise.resolve();
         }
 
@@ -262,7 +265,7 @@ export class MediaViewerComponent extends VComponent {
         const message = this.state.messages[this.state.messages.length - 1];
 
         this.setState({
-            isLoadingPage: true,
+            isLoadingRightPage: true,
         })
 
         return SearchManager.searchMessages(message.to, {
@@ -279,20 +282,20 @@ export class MediaViewerComponent extends VComponent {
 
             const messages = [
                 ...this.state.messages,
-                ...Messages.messages.map(message => MessageFactory.fromRaw(message.to, message)),
+                ...Messages.messages.map(message => MessageFactory.fromRaw(message.to, message)).reverse(),
             ];
 
             if (Messages.current_count < limit) {
                 this.setState({
                     messages,
                     hasRightPage: false,
-                    isLoadingPage: false
+                    isLoadingRightPage: false
                 })
             } else {
                 this.setState({
                     messages,
                     hasRightPage: true,
-                    isLoadingPage: false
+                    isLoadingRightPage: false
                 })
             }
 
