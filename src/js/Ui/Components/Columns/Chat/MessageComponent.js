@@ -35,6 +35,7 @@ import RoundVideoMessageComponent from "./Message/RoundVideoMessageComponent"
 import PhoneCallMessageComponent from "./Message/PhoneCallMessageComponent"
 import ServiceMessageComponent from "./Message/ServiceMessageComponent"
 import AnimatedStickerMessageComponent from "./Message/AnimatedStickerMessageComponent"
+import DiceMessageComponent from "./Message/DiceMessageComponent"
 import GroupedMessageComponent from "./Message/GroupedMessageComponent";
 
 /**
@@ -54,7 +55,7 @@ const handlers = new Map([
     [MessageType.DOCUMENT, DocumentMessageComponent],
     [MessageType.GIF, GIFMessageComponent],
     [MessageType.ANIMATED_STICKER, AnimatedStickerMessageComponent],
-    [MessageType.DICE, AnimatedStickerMessageComponent],
+    [MessageType.DICE, DiceMessageComponent],
     [MessageType.STICKER, StickerMessageComponent],
     [MessageType.VOICE, VoiceMessageComponent],
     [MessageType.AUDIO, AudioMessageComponent],

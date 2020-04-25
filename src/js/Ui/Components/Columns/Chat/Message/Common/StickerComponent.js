@@ -1,5 +1,6 @@
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import {FileAPI} from "../../../../../../Api/Files/FileAPI"
+import UIEvents from "../../../../../EventBus/UIEvents"
 import lottie from "lottie-web"
 
 import MTProto from "../../../../../../MTProto/External"
@@ -10,6 +11,10 @@ export default class StickerComponent extends VComponent {
     constructor(props) {
         super(props)
 
+        this.updateSticker();
+    }
+
+    updateSticker() {
         this.sticker = this.props.sticker;
         this.width = this.props.width || 250;
         let sizeAttr = this.sticker.attributes.find(l => l._ === "documentAttributeImageSize");
@@ -42,7 +47,15 @@ export default class StickerComponent extends VComponent {
         this.downloadAndApply();
     }
 
+    componentDidUpdate() {
+        this.updateSticker();
+        this.downloadAndApply();
+    }
+
     downloadAndApply() {
+        if(this.animation) {
+            this.animation.destroy();
+        }
         FileAPI.getFile(this.sticker).then(url => {
             if (this.__.destroyed) return; //sorry, we're late
             if (this.animated) {
@@ -72,6 +85,7 @@ export default class StickerComponent extends VComponent {
                 }
             })
         }).then(r => {
+            if (this.__.destroyed) return; //sorry, we're late
             this.animation = lottie.loadAnimation({
                 container: this.$el,
                 renderer: 'canvas',
@@ -81,6 +95,7 @@ export default class StickerComponent extends VComponent {
                 animationData: r
             })
             this.animation.setSubframe(false);
+            this.animation.addEventListener("complete", this._onLoop);
         }).catch(r => {
 
         })
@@ -97,6 +112,10 @@ export default class StickerComponent extends VComponent {
         this.hovered = false;
         if (!this.animation) return;
         this.animation.loop = false;
+    }
+
+    _onLoop = (ev) => {
+        UIEvents.General.fire("sticker.loop", {sticker: this.sticker});
     }
 
     componentWillUnmount() {
