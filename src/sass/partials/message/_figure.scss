@@ -48,6 +48,7 @@
         &.photo,
         &.video {
             max-height: 512px;
+            cursor: pointer;
 
             img,
             video {

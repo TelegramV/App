@@ -19,6 +19,6 @@ class AvatarComponent extends VComponent {
 
 AvatarComponent.defaultProps = {
     saved: false
-}
+};
 
 export default AvatarComponent
