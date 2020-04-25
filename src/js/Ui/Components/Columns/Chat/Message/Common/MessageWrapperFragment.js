@@ -15,7 +15,7 @@ const ReplyToMessageFragment = ({message}) => {
         return ""
     } else if (!message.replyToMessage) {
         return <ReplyFragment id={`message-${message.id}-rpl`} show={true} onClick={l => {
-            UIEvents.General.fire("chat.showMessage", message.replyToMessage)
+            UIEvents.General.fire("chat.showMessage", {message: message.replyToMessage})
         }}/>
     }
 
@@ -24,7 +24,7 @@ const ReplyToMessageFragment = ({message}) => {
                        name={message.replyToMessage.from.name}
                        text={MessageParser.getPrefixNoSender(message.replyToMessage)}
                        show={true} onClick={l => {
-            UIEvents.General.fire("chat.showMessage", message.replyToMessage)
+            UIEvents.General.fire("chat.showMessage", {message: message.replyToMessage})
         }}/>
     )
 }

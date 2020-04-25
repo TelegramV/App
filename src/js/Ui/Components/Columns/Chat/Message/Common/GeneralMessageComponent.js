@@ -71,7 +71,7 @@ class GeneralMessageComponent extends VComponent {
                     show={true}
                     name={this.message.replyToMessage.from.name}
                     text={MessageParser.getPrefixNoSender(this.message.replyToMessage)}
-                    onClick={l => UIEvents.General.fire("chat.showMessage", this.message.replyToMessage)}/>
+                    onClick={l => UIEvents.General.fire("chat.showMessage", {message: this.message.replyToMessage})}/>
             )
         }
     }

@@ -65,7 +65,7 @@ class ChatInfoPinnedComponent extends VComponent {
         } else if (this.state.message) {
             return (
                 <div className="pin pinned-message"
-                     onClick={event => UIEvents.General.fire("chat.showMessage", this.state.message)}>
+                     onClick={event => UIEvents.General.fire("chat.showMessage", {message:this.state.message})}>
                     <div className="title">Pinned message</div>
                     <div className="description">{MessageParser.getPrefixNoSender(this.state.message)}</div>
                 </div>

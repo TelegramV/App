@@ -231,7 +231,7 @@ export class ChatInputComponent extends VComponent {
 
     navigateToReplied = () => {
         if (this.reply) {
-            UIEvents.General.fire("chat.showMessage", this.reply.message)
+            UIEvents.General.fire("chat.showMessage", {message: this.reply.message})
         }
     }
 

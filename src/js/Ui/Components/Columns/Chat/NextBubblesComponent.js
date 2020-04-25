@@ -90,7 +90,7 @@ class NextBubblesComponent extends VComponent {
         const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
 
         return vrdom_render(
-            <div id={`cmsg${message.id}`} className={["bubble-group", isOut ? "out" : "in"]}>
+            <div id={`cmsg${message.id}`} className={["bubble-group", isOut ? "out" : "in"]} onClick={() => console.log(message)}>
                 {!hideAvatar ? <MessageAvatarComponent message={message}/> : null}
                 <div className="bubbles-list">
                     <MessageComponent message={message}/>
@@ -216,7 +216,7 @@ class NextBubblesComponent extends VComponent {
         }
     }
 
-    onChatShowMessage = (message: Message) => {
+    onChatShowMessage = ({message}) => {
         if (AppSelectedChat.check(message.dialog.peer)) {
             let $message = this.$el.querySelector(`#cmsg${message.id}`); // dunno better way, sorry
 

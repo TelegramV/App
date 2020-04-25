@@ -32,7 +32,7 @@ const MessageFragmentItemTemplate = (message) => {
                              name={peer.name}
                              status={<span>{message.prefix}{highlightVRNodeWord(message.text, CURRENT_QUERY)}</span>}
                              time={message.getFormattedDate()}
-                             onClick={() => UIEvents.General.fire("chat.showMessage", message)}/>
+                             onClick={() => UIEvents.General.fire("chat.showMessage", {message: message})}/>
 }
 
 let CURRENT_QUERY = undefined
