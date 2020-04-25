@@ -44,7 +44,6 @@ class DiceMessageComponent extends GeneralMessageComponent {
     			idle: false,
     			sticker: StickerManager.getDice(this.message.value, this.message.emoji)
     		})
-    		this.forceUpdate();
     	}
     }
 }
