@@ -57,7 +57,7 @@ export default class PasswordInputPaneComponent extends PaneComponent {
         this.state.isLoading = true
 
         const passwordInput = this.passwordInputRef.component
-        const nextPage = this.nextPasswordRef.component
+        const next = this.nextPasswordRef.component
         const password = passwordInput.getValue()
 
         next.isLoading = true
@@ -80,6 +80,12 @@ export default class PasswordInputPaneComponent extends PaneComponent {
             srp_B,
             password
         })
+
+        if(!__IS_PRODUCTION__) {
+            if(!(srp_id === srp_ret.srp_id)) {
+                debugger
+            } 
+        }
 
         MTProto.invokeMethod("auth.checkPassword", {
             password: {
