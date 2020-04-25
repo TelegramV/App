@@ -1,7 +1,7 @@
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import {FileAPI} from "../../../../../../Api/Files/FileAPI"
 import UIEvents from "../../../../../EventBus/UIEvents"
-import lottie from "lottie-web"
+import lottie from "../../../../../Lottie/lottie-web"
 
 import MTProto from "../../../../../../MTProto/External"
 
