@@ -12,7 +12,8 @@ class VideoMessageComponent extends GeneralMessageComponent {
         return (
             <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
-                <VideoComponent message={this.message} controls={false} loop={true} click={() => UIEvents.MediaViewer.fire("showMessage", this.message)}/>
+                <VideoComponent message={this.message} controls={false} loop={true}
+                                click={() => UIEvents.MediaViewer.fire("showMessage", {message: this.message})}/>
                 {!text ? <MessageTimeComponent message={this.message} bg={true}/> : ""}
                 {text}
             </MessageWrapperFragment>

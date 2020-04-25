@@ -27,6 +27,7 @@ class VirtualMessages {
     sizeDiv2 = this.size / 2;
 
     currentPage = [];
+    edges = [null, null];
 
     hasMoreOnTopToDownload = true;
     hasMoreOnBottomToDownload = false;
@@ -38,52 +39,73 @@ class VirtualMessages {
         this.isDownloading = false;
         this.messages = [];
         this.currentPage = [];
+        this.edges = [null, null];
     }
 
-    sliceTop(): Message[] {
+    sliceTop(): { index: number; messages: Message[] } {
         const index = this.messages.findIndex(message => message.id === this.currentPage[0].id);
 
         if (index > -1) {
             if (index < this.sizeDiv2) {
-                return this.messages.slice(0, index);
+                return {index, messages: this.messages.slice(0, index)};
             }
 
-            return this.messages.slice(index - this.sizeDiv2, index);
+            return {index, messages: this.messages.slice(index - this.sizeDiv2, index)};
         } else {
             console.warn("BUG: [top] no message intersection found");
-            return [];
+            return {index: -1, messages: []};
         }
     }
 
-    sliceBottom(): Message[] {
+    sliceBottom(): { index: number; messages: Message[] } {
         const index = this.messages.findIndex(message => message.id === this.currentPage[this.currentPage.length - 1].id);
 
         if (index > -1) {
             if (index + this.sizeDiv2 > this.messages.length) {
                 if (index + 1 === this.messages.length) {
-                    return [];
+                    return {index, messages: []};
                 }
 
-                return this.messages.slice(index + 1, this.messages.length);
+                return {index, messages: this.messages.slice(index + 1, this.messages.length)};
             }
 
-            return this.messages.slice(index + 1, index + this.sizeDiv2 + 1);
+            return {index, messages: this.messages.slice(index + 1, index + this.sizeDiv2 + 1)};
         } else {
             console.warn("BUG: [bottom] no message intersection found");
-            return [];
+            return {index: -1, messages: []};
         }
     }
 
     nextTop(): Message[] {
-        const slice = this.sliceTop();
-        this.currentPage = slice.concat(this.currentPage.slice(0, this.currentPage.length - slice.length));
-        return slice;
+        const {index, messages} = this.sliceTop();
+
+        if (index <= this.size) {
+            this.edges = [null, null];
+        } else {
+            this.edges = [this.messages[index - this.sizeDiv2 - 1], this.messages[index + 1]];
+        }
+
+        console.log("on top edges", this.edges);
+
+        this.currentPage = messages.concat(this.currentPage.slice(0, this.currentPage.length - messages.length));
+
+        return messages;
     }
 
     nextBottom(): Message[] {
-        const slice = this.sliceBottom();
-        this.currentPage = this.currentPage.slice(slice.length).concat(slice);
-        return slice;
+        const {index, messages} = this.sliceBottom();
+
+        if (index <= this.size) {
+            this.edges = [null, null];
+        } else {
+            this.edges = [this.messages[index - this.size - 1], this.messages[index + 1]];
+        }
+
+        console.log("on bottom edges", this.edges);
+
+        this.currentPage = this.currentPage.slice(messages.length).concat(messages);
+
+        return messages;
     }
 
     isVeryTop() {
@@ -96,15 +118,26 @@ class VirtualMessages {
 
     veryTopPage() {
         if (this.messages.length < this.size) {
+            this.edges = [null, null];
             return this.currentPage = this.messages.slice();
         }
+
+        this.edges = [this.messages[this.size + 1], null];
 
         return this.currentPage = this.messages.slice(0, this.size);
     }
 
     veryBottomPage() {
         if (this.messages.length < this.size) {
+            this.edges = [null, null];
             return this.currentPage = this.messages.slice();
+        }
+
+        if (this.messages.length === this.size) {
+            this.edges = [null, null];
+        } else {
+            this.edges = [this.messages[this.messages.length - this.size - 1], null];
+            console.log(this.edges);
         }
 
         return this.currentPage = this.messages.slice(this.messages.length - this.size);
@@ -116,6 +149,10 @@ class VirtualMessages {
 
     getVeryBottomOne(): Message {
         return this.messages[this.messages.length - 1];
+    }
+
+    getBeforeVeryTopOne(): Message {
+        return this.edges[0];
     }
 
     getPageTopOne(): Message {

@@ -50,7 +50,7 @@ class VideoComponent extends VComponent {
                                       height={this.message.videoInfo.h}
                                       maxHeight={526}
                                       maxWidth={480}
-                                      clickLoader={this.toggleLoading}
+                                      clickLoader={this.props.click}
                                       loading={this.message.loading}
                                       loaded={this.message.loaded}
                 />

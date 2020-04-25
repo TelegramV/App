@@ -86,9 +86,11 @@ class NextBubblesComponent extends VComponent {
         });
     }
 
-    renderMessage = (message: Message): HTMLElement => {
+    renderMessage = (message: Message, prevMessage: Message = null): HTMLElement => {
         const isOut = !message.isPost && message.isOut;
         const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
+
+        // u can use `prevMessage` to make the grouping
 
         return vrdom_render(
             <div id={`cmsg${message.id}`} className={["bubble-group", isOut ? "out" : "in"]}
@@ -126,12 +128,36 @@ class NextBubblesComponent extends VComponent {
         scrollBottom(this.$el, this.bubblesInnerRef.$el);
     }
 
-    appendMessages($messages: HTMLElement[]) {
-        this.bubblesInnerRef.$el.append(...$messages);
+    appendMessages(messages: Message[], topMessage: Message = null) {
+        if (messages.length > 0) {
+            const $messages = [this.renderMessage(messages[0], topMessage)];
+
+            for (let i = 1; i < messages.length; i++) {
+                $messages.push(this.renderMessage(messages[i], messages[i - 1]));
+            }
+
+            this.bubblesInnerRef.$el.append(...$messages);
+
+            return $messages;
+        }
+
+        return [];
     }
 
-    prependMessages($messages: HTMLElement[]) {
-        this.bubblesInnerRef.$el.prepend(...$messages);
+    prependMessages(messages: HTMLElement[], topMessage: Message = null) {
+        if (messages.length > 0) {
+            const $messages = [this.renderMessage(messages[0], topMessage)];
+
+            for (let i = 1; i < messages.length; i++) {
+                $messages.push(this.renderMessage(messages[i], messages[i - 1]));
+            }
+
+            this.bubblesInnerRef.$el.prepend(...$messages);
+
+            return $messages;
+        }
+
+        return [];
     }
 
     onChatSelect = () => {
@@ -157,7 +183,7 @@ class NextBubblesComponent extends VComponent {
             this.cleanupTree();
             this.isUsingSecondVirtual = false;
             this.secondVirtual.refresh();
-            this.appendMessages(this.mainVirtual.veryBottomPage().map(this.renderMessage));
+            this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforeVeryTopOne());
             this.scrollBottom();
         }
     }
@@ -187,7 +213,7 @@ class NextBubblesComponent extends VComponent {
         this.currentVirtual.hasMoreOnTopToDownload = event.messages.length === 100;
 
         this.mainVirtual.messages = this.fixMessages(event.messages);
-        this.appendMessages(this.mainVirtual.veryBottomPage().map(this.renderMessage));
+        this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.messages[100 - this.mainVirtual.size - 1]);
         this.scrollBottom();
     }
 
@@ -200,7 +226,7 @@ class NextBubblesComponent extends VComponent {
             const {scrollTop, scrollHeight, clientHeight} = this.$el;
             const isAtBottom = scrollHeight - scrollTop === clientHeight;
 
-            this.appendMessages([this.renderMessage(message)]);
+            this.appendMessages([message]);
 
             if (this.mainVirtual.messages.length > this.mainVirtual.size) {
                 vrdom_delete(this.bubblesInnerRef.$el.firstChild);
@@ -231,11 +257,11 @@ class NextBubblesComponent extends VComponent {
                     this.mainVirtual.currentPage = this.mainVirtual.messages
                         .slice(Math.max(messageIndex - this.mainVirtual.sizeDiv2, 0), messageIndex + this.mainVirtual.sizeDiv2);
 
-                    const $messages = this.mainVirtual.currentPage.map(this.renderMessage);
+                    const messages = this.mainVirtual.currentPage;
 
-                    this.prependMessages($messages);
+                    this.prependMessages(messages);
 
-                    $message = $messages[this.mainVirtual.currentPage.findIndex(msg => msg.id === message.id)];
+                    $message = this.$el.querySelector(`#cmsg${message.id}`);
                 } else {
                     const peer = AppSelectedChat.Current;
 
@@ -312,11 +338,9 @@ class NextBubblesComponent extends VComponent {
             messages = this.secondVirtual.veryBottomPage();
         }
 
-        const $messages = messages.map(this.renderMessage);
+        this.appendMessages(messages);
 
-        this.appendMessages($messages);
-
-        const $message = $messages[messages.findIndex(msg => msg.id === event.offset_id)];
+        const $message = this.$el.querySelector(`#cmsg${event.offset_id}`);
 
         if ($message) {
             scrollToAndHighlight(this.$el, $message);
@@ -364,15 +388,15 @@ class NextBubblesComponent extends VComponent {
             return;
         }
 
-        const $nodes = this.currentVirtual.nextTop().map(this.renderMessage);
+        const messages = this.currentVirtual.nextTop();
 
-        this.prependMessages($nodes);
+        this.prependMessages(messages);
 
-        for (let i = 0; i < $nodes.length; i++) {
+        for (let i = 0; i < messages.length; i++) {
             vrdom_delete(this.bubblesInnerRef.$el.lastChild);
         }
 
-        let $first: HTMLElement = $nodes[$nodes.length - 1];
+        let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
 
         if ($first) {
             if ($first.nextElementSibling) {
@@ -438,11 +462,11 @@ class NextBubblesComponent extends VComponent {
             return;
         }
 
-        const $nodes = this.currentVirtual.nextBottom().map(this.renderMessage);
+        const messages = this.currentVirtual.nextBottom();
 
-        this.appendMessages($nodes);
+        this.appendMessages(messages);
 
-        for (let i = 0; i < $nodes.length; i++) {
+        for (let i = 0; i < messages.length; i++) {
             vrdom_delete(this.bubblesInnerRef.$el.firstChild);
         }
     }
