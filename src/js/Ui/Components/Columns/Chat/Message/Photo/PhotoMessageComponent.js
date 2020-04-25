@@ -5,7 +5,6 @@ import GeneralMessageComponent from "../Common/GeneralMessageComponent"
 import {PhotoMessage} from "../../../../../../Api/Messages/Objects/PhotoMessage"
 import {PhotoFigureFragment} from "./PhotoFigureFragment"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
-import VUI from "../../../../../VUI"
 import UIEvents from "../../../../../EventBus/UIEvents";
 import AppEvents from "../../../../../../Api/EventBus/AppEvents";
 import FileManager from "../../../../../../Api/Files/FileManager";
@@ -48,7 +47,8 @@ class PhotoMessageComponent extends GeneralMessageComponent {
             <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
                 <MessagePhotoFigureFragment ref={this.photoFigureRef}
-                                            message={this.message} progress={progress} pending={isPending} downloaded={isDownloaded}
+                                            message={this.message} progress={progress} pending={isPending}
+                                            downloaded={isDownloaded}
                                             clickLoader={this.toggleLoading} click={this.openMediaViewer}/>
                 {!text ? <MessageTimeComponent message={this.message} bg={true}/> : ""}
                 {text}
@@ -57,7 +57,7 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     }
 
     openMediaViewer = event => {
-        UIEvents.MediaViewer.fire("showMessage", this.message)
+        UIEvents.MediaViewer.fire("showMessage", {message: this.message})
         // VUI.MediaViewer.open(this.message)
     }
 
@@ -80,9 +80,9 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     }
 
     toggleLoading = (ev) => {
-        if(FileManager.isDownloaded(this.message.raw.media.photo.id)) return
+        if (FileManager.isDownloaded(this.message.raw.media.photo.id)) return
         ev.stopPropagation()
-        if(FileManager.isPending(this.message.raw.media.photo.id)) {
+        if (FileManager.isPending(this.message.raw.media.photo.id)) {
             AppEvents.Files.fire("cancelDownload", this.message.raw.media.photo.id)
         } else {
             this.message.fetchMax()

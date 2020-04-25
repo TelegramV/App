@@ -23,7 +23,6 @@ import {VideoMessage} from "../../../Api/Messages/Objects/VideoMessage";
 import AvatarFragment from "../Basic/AvatarFragment";
 import {Photo} from "../../../Api/Media/Photo";
 import SearchManager from "../../../Api/Search/SearchManager"
-import type {Message} from "../../../Api/Messages/Message"
 import {MessageFactory} from "../../../Api/Messages/MessageFactory"
 import VSpinner from "../Elements/VSpinner"
 import FileManager from "../../../Api/Files/FileManager"
@@ -42,7 +41,8 @@ function MediaSpinnerFragment({icon}) {
 function MediaFragment({media}) {
     let style = {
         "max-width": "60vw",
-    }
+    };
+
     if (media instanceof PhotoMessage) {
         if (!media.loaded) {
             return <MediaSpinnerFragment icon="photo"/>
@@ -192,7 +192,7 @@ export class MediaViewerComponent extends VComponent {
         }
     }
 
-    showMessage = (message: Message) => {
+    showMessage = ({message}) => {
         this.state = {...this.defaultState};
 
         console.log("show message")

@@ -45,7 +45,7 @@ export class DialogInfoPhotoComponent extends VComponent {
     }
 
     openMediaViewer = event => {
-        UIEvents.MediaViewer.fire("showMessage", this.props.message)
+        UIEvents.MediaViewer.fire("showMessage", {message:this.props.message})
     }
 
     onFileDownloaded = event => {
