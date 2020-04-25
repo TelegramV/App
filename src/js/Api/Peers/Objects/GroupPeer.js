@@ -78,12 +78,12 @@ export class GroupPeer extends Peer {
             }
 
         } else {
-            status = "loading info..."
+            status = "loading info"
         }
 
         return {
             text: status,
-            online: false
+            online: false,
         }
     }
 

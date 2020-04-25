@@ -5,7 +5,6 @@ import UIEvents from "../../../../EventBus/UIEvents"
 import AvatarFragment from "../../../Basic/AvatarFragment"
 
 class ChatInfoAvatarComponent extends VComponent {
-
     appEvents(E) {
         E.bus(AppEvents.Peers)
             .only(event => event.peer === AppSelectedChat.Current)

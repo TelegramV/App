@@ -42,6 +42,7 @@ class NextBubblesComponent extends VComponent {
     secondVirtual: VirtualMessages = new VirtualMessages();
 
     isUsingSecondVirtual = false;
+    actionCount = 0;
 
     get currentVirtual(): VirtualMessages {
         if (this.isUsingSecondVirtual) {
@@ -90,7 +91,8 @@ class NextBubblesComponent extends VComponent {
         const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
 
         return vrdom_render(
-            <div id={`cmsg${message.id}`} className={["bubble-group", isOut ? "out" : "in"]} onClick={() => console.log(message)}>
+            <div id={`cmsg${message.id}`} className={["bubble-group", isOut ? "out" : "in"]}
+                 onClick={() => console.log(message)}>
                 {!hideAvatar ? <MessageAvatarComponent message={message}/> : null}
                 <div className="bubbles-list">
                     <MessageComponent message={message}/>
@@ -217,7 +219,7 @@ class NextBubblesComponent extends VComponent {
     }
 
     onChatShowMessage = ({message}) => {
-        if (AppSelectedChat.check(message.dialog.peer)) {
+        if (AppSelectedChat.check(message.to)) {
             let $message = this.$el.querySelector(`#cmsg${message.id}`); // dunno better way, sorry
 
             if (!$message) {
@@ -237,6 +239,8 @@ class NextBubblesComponent extends VComponent {
                 } else {
                     const peer = AppSelectedChat.Current;
 
+                    const actionCount = (++this.actionCount);
+
                     API.messages.getHistory(peer, {
                         offset_id: message.id,
                         add_offset: -51,
@@ -246,6 +250,7 @@ class NextBubblesComponent extends VComponent {
                             peer,
                             messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
                             offset_id: message.id,
+                            actionCount,
                         })
                     });
                 }
@@ -257,17 +262,30 @@ class NextBubblesComponent extends VComponent {
                 console.warn("[BUG] No message to scroll found.")
             }
         } else {
-            AppSelectedChat.select(message.dialog.peer);
+            AppSelectedChat.select(message.to);
 
-            AppSelectedChat.Current.api.fetchByOffsetId({
+            const actionCount = (++this.actionCount);
+
+            API.messages.getHistory(peer, {
                 offset_id: message.id,
-                add_offset: -50,
+                add_offset: -51,
                 limit: 100
+            }).then(Messages => {
+                AppEvents.Peers.fire("chat.showMessageReady", {
+                    peer,
+                    messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
+                    offset_id: message.id,
+                    actionCount,
+                })
             });
         }
     }
 
     onChatShowMessageReady = event => {
+        if (this.actionCount > event.actionCount) {
+            return;
+        }
+
         this.cleanupTree();
         this.secondVirtual.refresh();
 
