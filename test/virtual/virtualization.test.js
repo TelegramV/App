@@ -20,8 +20,6 @@
 
 let messages = new Array(1000).fill(null).map((value, index) => index).reverse();
 
-console.log(messages)
-
 const size = 60;
 const sizeDiv2 = size / 2;
 

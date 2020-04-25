@@ -15,13 +15,12 @@
  *
  */
 
-import type {Message} from "../../../../../Api/Messages/Message"
+import type {Message} from "../../Api/Messages/Message"
 
 // returns index on left or -1
 function findIntersection(left: Message[], right: Message[]): number {
     if (left.length > right.length) {
         for (const rmessage of right) {
-
             for (let lindex = 0; lindex < left.length; lindex++) {
                 let lmessage = left[lindex];
 

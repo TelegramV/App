@@ -11,6 +11,7 @@ import {intToUint} from "../Utils/Bin"
 import {getConstructorByPredicate, getMethodByName} from "./schema"
 import BigInteger from "big-integer"
 
+// in the future will be replaced with https://github.com/TelegramV/TypeLanguage
 class Packer {
 
     maxLength: number

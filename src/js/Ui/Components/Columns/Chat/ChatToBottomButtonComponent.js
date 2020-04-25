@@ -25,8 +25,8 @@ class ChatToBottomButtonComponent extends VComponent {
 
     appEvents(E) {
         E.bus(UIEvents.General)
-            .on("chat.scrollToBottom.show", this.onShow)
-            .on("chat.scrollToBottom.hide", this.onHide);
+            .on("chat.scrollBottom.show", this.onShow)
+            .on("chat.scrollBottom.hide", this.onHide);
     }
 
     render() {
@@ -53,7 +53,7 @@ class ChatToBottomButtonComponent extends VComponent {
     }
 
     onClick = () => {
-        UIEvents.General.fire("chat.scrollToBottom");
+        UIEvents.General.fire("chat.scrollBottom");
     }
 
     onShow = () => {

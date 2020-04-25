@@ -41,8 +41,7 @@ function MediaSpinnerFragment({icon}) {
 
 function MediaFragment({media}) {
     let style = {
-        "min-width": "500px",
-        "max-width": "600px",
+        "max-width": "60vw",
     }
     if (media instanceof PhotoMessage) {
         if (!media.loaded) {

@@ -39,6 +39,7 @@ export interface Message {
      * @deprecated
      */
     +dialog: Dialog; // we should not use this thing and use `to` instead, should be deprecated
+    +dialogPeer: Peer;
 
     +id: number;
     +to: Peer;

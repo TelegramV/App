@@ -26,16 +26,17 @@ import {MessageAvatarComponent} from "./Message/Common/MessageAvatarComponent"
 import type {Message} from "../../../../Api/Messages/Message"
 import vrdom_delete from "../../../../V/VRDOM/delete"
 import vrdom_render from "../../../../V/VRDOM/render/render"
-import scrollToAndHighlight from "./Functions/scrollToAndHighlight"
-import findIntersection from "./Functions/findIntersection"
+import scrollToAndHighlight from "../../../../Utils/scrollToAndHighlight"
+import findIntersection from "../../../Virtual/findIntersection"
 import vrdom_deleteInner from "../../../../V/VRDOM/deleteInner"
-import VirtualMessages from "./VirtualMessages"
+import VirtualMessages from "../../../Virtual/VirtualMessages"
+import scrollBottom from "../../../../Utils/scrollBottom"
+import API from "../../../../Api/Telegram/API"
+import {MessageFactory} from "../../../../Api/Messages/MessageFactory"
 
+// there is no possibility and time to calculate each message size
 class NextBubblesComponent extends VComponent {
     bubblesInnerRef = VComponent.createRef();
-
-    hasTopMessagesToLoad = true;
-    hasBottomMessagesToLoad = true;
 
     mainVirtual: VirtualMessages = new VirtualMessages();
     secondVirtual: VirtualMessages = new VirtualMessages();
@@ -54,8 +55,8 @@ class NextBubblesComponent extends VComponent {
         E.bus(AppEvents.Peers)
             .only(event => AppSelectedChat.check(event.peer))
             .on("chat.initialReady", this.onInitialMessagesReady)
-            .on("chat.nextPageReady", this.onNextPageMessagesReady)
-            .on("chat.prevPageReady", this.onPrevPageMessagesReady)
+            .on("chat.topPageReady", this.onTopPageMessagesReady)
+            .on("chat.bottomPageReady", this.onBottomPageMessagesReady)
             .on("chat.showMessageReady", this.onChatShowMessageReady);
 
         E.bus(AppEvents.Dialogs)
@@ -64,8 +65,9 @@ class NextBubblesComponent extends VComponent {
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
+            .on("chat.topMessagesReady", this.onTopPageMessagesReady)
             .on("chat.showMessage", this.onChatShowMessage)
-            .on("chat.scrollToBottom", this.onChatScrollBottomRequest);
+            .on("chat.scrollBottom", this.onChatScrollBottomRequest);
     }
 
     render() {
@@ -106,123 +108,55 @@ class NextBubblesComponent extends VComponent {
         this.mainVirtual.refresh();
         this.secondVirtual.refresh();
 
-        this.hasTopMessagesToLoad = true;
-        this.hasBottomMessagesToLoad = false;
-
         this.isUsingSecondVirtual = false;
-        this.isLoadingNextPage = false;
+    }
+
+    // first message must always be last
+    fixMessages(messages: Message[]): Message[] {
+        if (messages.length > 0 && messages[0].id > messages[messages.length - 1].id) {
+            messages = messages.reverse();
+        }
+
+        return messages;
+    }
+
+    scrollBottom() {
+        scrollBottom(this.$el, this.bubblesInnerRef.$el);
+    }
+
+    appendMessages($messages: HTMLElement[]) {
+        this.bubblesInnerRef.$el.append(...$messages);
+    }
+
+    prependMessages($messages: HTMLElement[]) {
+        this.bubblesInnerRef.$el.prepend(...$messages);
     }
 
     onChatSelect = () => {
         this.refresh();
 
         if (AppSelectedChat.isSelected) {
-            AppSelectedChat.Current.api.fetchInitialMessages();
+            const peer = AppSelectedChat.Current;
+
+            API.messages.getHistory(peer, {limit: 100}).then(Messages => {
+                AppEvents.Peers.fire("chat.initialReady", {
+                    messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
+                    peer
+                });
+            });
         }
     }
 
     onChatScrollBottomRequest = () => {
-        if (this.virtual_isMainVirtualFirstPage()) {
+        if (this.virtual_isCompletelyBottom()) {
             this.isUsingSecondVirtual = false;
-            this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
+            this.scrollBottom();
         } else {
             this.cleanupTree();
             this.isUsingSecondVirtual = false;
             this.secondVirtual.refresh();
-            this.mainVirtual.offset = 0;
-            this.bubblesInnerRef.$el.append(
-                ...this.mainVirtual.next()
-                    .map(this.renderMessage)
-            );
-            this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
-        }
-    }
-
-    onChatShowMessageReady = event => {
-        this.cleanupTree();
-        this.secondVirtual.refresh();
-
-        this.isUsingSecondVirtual = true;
-
-        let messages = event.messages;
-
-        const intersect = findIntersection(messages, this.mainVirtual.messages.slice(this.mainVirtual.messages.length - 1));
-
-        if (intersect > -1) {
-            this.isUsingSecondVirtual = false;
-
-            messages = messages.slice(intersect + 1);
-
-            this.mainVirtual.messages.push(...messages);
-
-            messages = this.mainVirtual.messages.slice(this.mainVirtual.messages.length - this.mainVirtual.size);
-
-            this.mainVirtual.offset = this.mainVirtual.messages.length;
-        } else {
-            this.secondVirtual.messages = messages.slice().reverse();
-            this.secondVirtual.offset = messages.length;
-        }
-
-        const $messages = messages.map(this.renderMessage);
-
-        this.bubblesInnerRef.$el.append(...$messages);
-
-        const $message = $messages[messages.findIndex(msg => msg.id === event.offset_id)];
-
-        if ($message) {
-            scrollToAndHighlight(this.$el, $message);
-        } else {
-            console.error("funk no message");
-        }
-    }
-
-    onChatShowMessage = message => {
-        if (AppSelectedChat.check(message.to)) {
-            let $message = this.$el.querySelector(`#cmsg${message.id}`); // dunno better way, sorry
-
-            if (!$message) {
-                const messageIndex = this.mainVirtual.messages.findIndex(m => m.id === message.id);
-
-                if (messageIndex > -1) {
-                    this.cleanupTree();
-
-                    let messages;
-
-                    if (messageIndex <= 50) {
-                        this.mainVirtual.offset = 0;
-                        messages = this.mainVirtual.next();
-                    } else {
-                        messages = this.mainVirtual.messages
-                            .slice(Math.max(messageIndex - this.mainVirtual.sizeDiv2, 0), messageIndex + this.mainVirtual.sizeDiv2);
-                    }
-
-                    const $messages = messages.map(this.renderMessage);
-
-                    this.bubblesInnerRef.$el.append(...$messages);
-
-                    $message = $messages[messages.findIndex(msg => msg.id === message.id)];
-                } else {
-                    AppSelectedChat.Current.api.fetchByOffsetId({
-                        offset_id: message.id,
-                        add_offset: -30,
-                        limit: 60
-                    });
-                }
-            }
-
-            if ($message) {
-                scrollToAndHighlight(this.$el, $message);
-            } else {
-                console.log("fuckcckcckckck")
-            }
-        } else {
-            AppSelectedChat.select(message.to);
-
-            AppSelectedChat.Current.api.fetchByOffsetId({
-                offset_id: message.id,
-                add_offset: -30,
-                limit: 60
-            });
+            this.appendMessages(this.mainVirtual.veryBottomPage().map(this.renderMessage));
+            this.scrollBottom();
         }
     }
 
@@ -232,14 +166,14 @@ class NextBubblesComponent extends VComponent {
         const isAtTop = scrollTop === 0;
 
         if ((scrollHeight - scrollTop) >= (clientHeight - 20)) {
-            UIEvents.General.fire("chat.scrollToBottom.show");
+            UIEvents.General.fire("chat.scrollBottom.show");
         }
 
         if (isAtTop) {
             this.virtual_onScrolledTop();
         } else if (isAtBottom) {
-            if (this.virtual_isMainVirtualFirstPage()) {
-                UIEvents.General.fire("chat.scrollToBottom.hide");
+            if (this.virtual_isCompletelyBottom()) {
+                UIEvents.General.fire("chat.scrollBottom.hide");
             }
             this.virtual_onScrolledBottom();
         }
@@ -248,25 +182,29 @@ class NextBubblesComponent extends VComponent {
     onInitialMessagesReady = (event) => {
         this.refresh();
 
-        this.hasTopMessagesToLoad = event.messages.length === 60;
+        this.currentVirtual.hasMoreOnTopToDownload = event.messages.length === 100;
 
-        this.mainVirtual.messages = event.messages;
-        this.mainVirtual.offset = 0;
-        this.bubblesInnerRef.$el.append(...this.mainVirtual.next().map(this.renderMessage));
-        this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
+        this.mainVirtual.messages = this.fixMessages(event.messages);
+        this.appendMessages(this.mainVirtual.veryBottomPage().map(this.renderMessage));
+        this.scrollBottom();
     }
 
     onNewMessage = (event) => {
         const message = event.message;
 
-        this.mainVirtual.messages.unshift(message);
+        if (this.virtual_isCompletelyBottom()) {
+            this.mainVirtual.messages.push(message);
 
-        if (this.virtual_isMainVirtualFirstPage()) {
             const {scrollTop, scrollHeight, clientHeight} = this.$el;
             const isAtBottom = scrollHeight - scrollTop === clientHeight;
 
-            this.bubblesInnerRef.$el.prepend(this.renderMessage(message));
-            vrdom_delete(this.bubblesInnerRef.$el.lastChild);
+            this.appendMessages([this.renderMessage(message)]);
+
+            if (this.mainVirtual.messages.length > this.mainVirtual.size) {
+                vrdom_delete(this.bubblesInnerRef.$el.firstChild);
+            }
+
+            this.mainVirtual.veryBottomPage();
 
             if (isAtBottom) {
                 this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
@@ -274,128 +212,267 @@ class NextBubblesComponent extends VComponent {
                 this.$el.scrollTop = scrollTop;
             }
         } else {
-            this.mainVirtual.offset++;
+            this.mainVirtual.messages.push(message);
+        }
+    }
+
+    onChatShowMessage = (message: Message) => {
+        if (AppSelectedChat.check(message.dialog.peer)) {
+            let $message = this.$el.querySelector(`#cmsg${message.id}`); // dunno better way, sorry
+
+            if (!$message) {
+                const messageIndex = this.mainVirtual.messages.findIndex(m => m.id === message.id);
+
+                if (messageIndex > -1) {
+                    this.cleanupTree();
+
+                    this.mainVirtual.currentPage = this.mainVirtual.messages
+                        .slice(Math.max(messageIndex - this.mainVirtual.sizeDiv2, 0), messageIndex + this.mainVirtual.sizeDiv2);
+
+                    const $messages = this.mainVirtual.currentPage.map(this.renderMessage);
+
+                    this.prependMessages($messages);
+
+                    $message = $messages[this.mainVirtual.currentPage.findIndex(msg => msg.id === message.id)];
+                } else {
+                    const peer = AppSelectedChat.Current;
+
+                    API.messages.getHistory(peer, {
+                        offset_id: message.id,
+                        add_offset: -51,
+                        limit: 100
+                    }).then(Messages => {
+                        AppEvents.Peers.fire("chat.showMessageReady", {
+                            peer,
+                            messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
+                            offset_id: message.id,
+                        })
+                    });
+                }
+            }
+
+            if ($message) {
+                scrollToAndHighlight(this.$el, $message);
+            } else {
+                console.warn("[BUG] No message to scroll found.")
+            }
+        } else {
+            AppSelectedChat.select(message.dialog.peer);
+
+            AppSelectedChat.Current.api.fetchByOffsetId({
+                offset_id: message.id,
+                add_offset: -50,
+                limit: 100
+            });
+        }
+    }
+
+    onChatShowMessageReady = event => {
+        this.cleanupTree();
+        this.secondVirtual.refresh();
+
+        this.isUsingSecondVirtual = true;
+
+        let messages = this.fixMessages(event.messages);
+
+        const intersect = this.mainVirtual.isEmpty() ? -1 : findIntersection(messages, [this.mainVirtual.getVeryTopOne()]);
+
+        if (intersect > -1) {
+            console.log("[show message] intersect found");
+
+            messages = messages.slice(intersect - 1);
+
+            this.secondVirtual.messages.push(...messages);
+            this.mainVirtual.messages = [...this.secondVirtual.messages, ...this.mainVirtual.messages];
+
+            this.isUsingSecondVirtual = false;
+            this.secondVirtual.refresh();
+
+            this.mainVirtual.currentPage = messages = this.mainVirtual.messages.slice(this.mainVirtual.messages.length - this.mainVirtual.size);
+        } else {
+            this.secondVirtual.messages.push(...messages);
+            messages = this.secondVirtual.veryBottomPage();
+        }
+
+        const $messages = messages.map(this.renderMessage);
+
+        this.appendMessages($messages);
+
+        const $message = $messages[messages.findIndex(msg => msg.id === event.offset_id)];
+
+        if ($message) {
+            scrollToAndHighlight(this.$el, $message);
+        } else {
+            console.error("BUG: no message found to scroll");
         }
     }
 
     virtual_onScrolledTop = () => {
-        if (this.currentVirtual.offset === this.currentVirtual.messages.length) {
-            if (this.hasTopMessagesToLoad && !this.isLoadingNextPage) {
-                this.isLoadingNextPage = true;
-                if (this.currentVirtual.messages.length > 0) {
-                    if (this.isUsingSecondVirtual) {
-                        AppSelectedChat.Current.api.fetchNextPage(this.secondVirtual.messages[0].id);
-                    } else {
-                        AppSelectedChat.Current.api.fetchNextPage(this.currentVirtual.messages[this.currentVirtual.messages.length - 1].id);
-                    }
-                }
+        console.log("scrolled top")
+
+        if (this.currentVirtual.isVeryTop()) {
+            if (!this.currentVirtual.hasMoreOnTopToDownload) {
+                console.log("!hasMoreOnTopToDownload", this.isUsingSecondVirtual);
             }
 
-            if (!this.hasTopMessagesToLoad) {
-                console.log("hasTopMessagesToLoad")
+            if (this.currentVirtual.isDownloading) {
+                console.log("isDownloading", this.isUsingSecondVirtual);
+            }
+
+            if (this.currentVirtual.hasMoreOnTopToDownload && !this.currentVirtual.isDownloading) {
+                console.log("[top] downloading");
+
+                if (!this.currentVirtual.isEmpty()) {
+                    this.currentVirtual.isDownloading = true;
+
+                    console.log("[top] downloading ok");
+
+                    const peer = AppSelectedChat.Current;
+
+                    API.messages.getHistory(peer, {
+                        offset_id: this.currentVirtual.getVeryTopOne().id,
+                        limit: 100
+                    }).then(Messages => {
+                        console.log("messaes")
+                        AppEvents.Peers.fire("chat.topPageReady", {
+                            messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
+                            peer,
+                            isUsingSecondVirtual: this.isUsingSecondVirtual,
+                        });
+                    });
+                }
             }
 
             return;
         }
 
-        const $nodes = this.currentVirtual.next().map(this.renderMessage);
+        const $nodes = this.currentVirtual.nextTop().map(this.renderMessage);
 
-        this.bubblesInnerRef.$el.append(...$nodes);
+        this.prependMessages($nodes);
 
         for (let i = 0; i < $nodes.length; i++) {
-            vrdom_delete(this.bubblesInnerRef.$el.firstChild);
+            vrdom_delete(this.bubblesInnerRef.$el.lastChild);
         }
 
-        let $first: HTMLElement = $nodes[0];
+        let $first: HTMLElement = $nodes[$nodes.length - 1];
 
         if ($first) {
-            if ($first.previousElementSibling) {
-                this.$el.scrollTop = $first.previousElementSibling.offsetTop;
+            if ($first.nextElementSibling) {
+                this.$el.scrollTop = $first.nextElementSibling.offsetTop;
             } else {
                 this.$el.scrollTop = $first.offsetTop;
             }
         }
     }
 
-    onNextPageMessagesReady = (event) => {
-        this.isLoadingNextPage = false;
+    onTopPageMessagesReady = (event) => {
+        this.currentVirtual.isDownloading = false;
 
-        this.hasTopMessagesToLoad = event.messages.length === 60;
-        this.currentVirtual.messages.push(...event.messages);
+        if (event.isUsingSecondVirtual && !this.isUsingSecondVirtual) {
+            console.log("wat")
+            this.secondVirtual.refresh();
+            return;
+        }
 
-        if (this.virtual_isCurrentVirtualLastPage()) {
+        const ivt = this.currentVirtual.isVeryTop();
+
+        this.currentVirtual.hasMoreOnTopToDownload = event.messages.length === 100;
+
+        this.currentVirtual.messages = [...this.fixMessages(event.messages), ...this.currentVirtual.messages];
+
+        if (ivt) {
             this.virtual_onScrolledTop();
         }
     }
 
     virtual_onScrolledBottom = () => {
-        if (this.isUsingSecondVirtual) {
-            if (!this.isLoadingPrevPage) {
-                this.isLoadingPrevPage = true;
-                AppSelectedChat.Current.api.fetchPrevPage(this.secondVirtual.messages[this.secondVirtual.messages.length - 1].id);
+        console.log("on scrolled bottom");
+
+        if (this.currentVirtual.isVeryBottom()) {
+            if (this.currentVirtual.hasMoreOnBottomToDownload && !this.currentVirtual.isDownloading) {
+                if (this.currentVirtual.messages.length > 0) {
+                    this.currentVirtual.isDownloading = true;
+
+                    const peer = AppSelectedChat.Current;
+
+                    console.log("[bottom] downloading")
+
+                    API.messages.getHistory(peer, {
+                        offset_id: this.currentVirtual.getVeryBottomOne().id,
+                        limit: 99,
+                        add_offset: -100
+                    }).then(Messages => {
+                        AppEvents.Peers.fire("chat.bottomPageReady", {
+                            messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
+                            peer,
+                            isUsingSecondVirtual: this.isUsingSecondVirtual,
+                        });
+                    });
+                }
             }
 
+            console.log("isVeryBottom")
+
             return;
         }
 
-        if (this.virtual_isMainVirtualFirstPage()) {
+        if (this.virtual_isCompletelyBottom()) {
             return;
         }
 
-        const $nodes = this.mainVirtual.back().map(this.renderMessage);
+        const $nodes = this.currentVirtual.nextBottom().map(this.renderMessage);
 
-        this.bubblesInnerRef.$el.prepend(...$nodes);
+        this.appendMessages($nodes);
 
         for (let i = 0; i < $nodes.length; i++) {
-            vrdom_delete(this.bubblesInnerRef.$el.lastChild);
+            vrdom_delete(this.bubblesInnerRef.$el.firstChild);
         }
     }
 
-    onPrevPageMessagesReady = (event) => {
-        this.isLoadingPrevPage = false;
+    onBottomPageMessagesReady = (event) => {
+        //  main virtual should never fire this event
+        if (!this.isUsingSecondVirtual) {
+            this.secondVirtual.refresh();
 
-        const intersect = findIntersection(event.messages, this.mainVirtual.messages.slice(this.mainVirtual.messages.length - 1));
+            this.mainVirtual.isDownloading = false;
+            return;
+        }
 
-        let messages = event.messages;
+        this.secondVirtual.isDownloading = false;
+
+        let messages = this.fixMessages(event.messages);
+
+        const ivt = this.secondVirtual.isVeryBottom();
+        const intersect = this.mainVirtual.isEmpty() ? -1 : findIntersection(messages, [this.mainVirtual.getVeryTopOne()]);
 
         if (intersect > -1) {
-            console.log("intersect found")
+            console.log("[bottom page] intersect found");
+
+            messages = messages.slice(intersect - 1);
+
+            this.mainVirtual.currentPage = this.secondVirtual.currentPage;
+
+            this.secondVirtual.messages.push(...messages);
+            this.mainVirtual.messages = [...this.secondVirtual.messages, ...this.mainVirtual.messages];
+
             this.isUsingSecondVirtual = false;
 
-            messages = messages.slice(intersect + 1);
+            console.log(this.mainVirtual.currentPage)
 
-            this.mainVirtual.messages.push(...event.messages);
-
-            messages = this.mainVirtual.messages.slice(this.mainVirtual.messages.length - this.mainVirtual.size);
-
-            this.mainVirtual.offset = this.mainVirtual.messages.length;
-
-            const $nodes = messages.slice(0, 30).map(this.renderMessage);
-
-            this.bubblesInnerRef.$el.prepend(...$nodes);
-
-            for (let i = 0; i < $nodes.length; i++) {
-                vrdom_delete(this.bubblesInnerRef.$el.lastChild);
-            }
+            this.secondVirtual.refresh();
         } else {
-            this.secondVirtual.messages.push(...messages.reverse());
+            console.log("[bottom page] no intersect found");
 
-            const $nodes = messages.slice(0, 30).map(this.renderMessage);
+            this.secondVirtual.messages.push(...messages);
+        }
 
-            this.bubblesInnerRef.$el.prepend(...$nodes);
-
-            for (let i = 0; i < $nodes.length; i++) {
-                vrdom_delete(this.bubblesInnerRef.$el.lastChild);
-            }
+        if (ivt) {
+            this.virtual_onScrolledBottom();
         }
     }
 
-    virtual_isCurrentVirtualFirstPage = () => {
-        return this.currentVirtual.offset <= this.currentVirtual.size;
-    }
-
-    virtual_isMainVirtualFirstPage = () => {
-        return !this.isUsingSecondVirtual && this.mainVirtual.offset <= this.mainVirtual.size;
+    virtual_isCompletelyBottom = () => {
+        return !this.isUsingSecondVirtual && this.mainVirtual.isVeryBottom();
     }
 
     virtual_isCurrentVirtualLastPage = () => {
