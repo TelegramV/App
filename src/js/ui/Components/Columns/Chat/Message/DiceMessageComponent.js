@@ -10,7 +10,7 @@ let diceNumber = 0;
 class DiceMessageComponent extends GeneralMessageComponent {
 
 	state = {
-        idle: true,
+        idle: true, //not sure do we need to store this
         sticker: undefined
     }
 
