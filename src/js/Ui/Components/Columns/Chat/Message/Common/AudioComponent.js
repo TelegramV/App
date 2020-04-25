@@ -1,8 +1,8 @@
 import MessageWrapperFragment from "./MessageWrapperFragment"
 import TextWrapperComponent from "./TextWrapperComponent";
 import GeneralMessageComponent from "./GeneralMessageComponent"
-import {FileAPI} from "../../../../../../Api/Files/FileAPI"
-import {formatAudioTime} from "../../../../../Utils/utils"
+import { FileAPI } from "../../../../../../Api/Files/FileAPI"
+import { formatAudioTime } from "../../../../../Utils/utils"
 import AudioManager from "../../../../../Managers/AudioManager"
 
 class AudioComponent extends GeneralMessageComponent {
@@ -66,10 +66,10 @@ class AudioComponent extends GeneralMessageComponent {
     /*Don't forget to super to this method!*/
     componentWillUnmount() {
         this.progressEl.removeEventListener("mousemove", this._handleMove.bind(this));
-        if(this.audio) {
-	        this.audio.removeEventListener("timeupdate", this._audioTimeUpdate.bind(this));
-	        this.audio.removeEventListener("ended", this._playButtonClick.bind(this));
-	    }
+        if (this.audio) {
+            this.audio.removeEventListener("timeupdate", this._audioTimeUpdate.bind(this));
+            this.audio.removeEventListener("ended", this._playButtonClick.bind(this));
+        }
     }
 
     async play() {
@@ -77,8 +77,8 @@ class AudioComponent extends GeneralMessageComponent {
         if (!this.audio) {
             return this.downloadAndPlay();
         } else {
-            this.audio.play();
             this.playing = true;
+            return this.audio.play();
         }
     }
 
@@ -89,9 +89,9 @@ class AudioComponent extends GeneralMessageComponent {
     }
 
     async download() {
-        if(this.isLoading()) return;
+        if (this.isLoading()) return;
         this.setLoading(true);
-        this._setButtonIcon("close"); //todo cancel download
+        this._setButtonIcon("close");
         return FileAPI.getFile(this.message.raw.media.document).then(url => {
             this.audio = new Audio(url);
             this.audio.addEventListener("timeupdate", this._audioTimeUpdate.bind(this));
@@ -182,12 +182,16 @@ class AudioComponent extends GeneralMessageComponent {
     }
 
     _playButtonClick(e) {
-        AudioManager.set(this);
-        if (this.playing) {
-            AudioManager.pause();
+        if (this.loading) return; //add cancel
+        if (!this.audio) {
+            this.download().then(audio => {
+                AudioManager.set(this);
+                AudioManager.play()
+            });
         } else {
-            if(!this.audio) {
-                this.download().then(audio => AudioManager.play());
+            AudioManager.set(this);
+            if (this.playing) {
+                AudioManager.pause();
             } else {
                 AudioManager.play();
             }
