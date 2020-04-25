@@ -98,6 +98,7 @@ class AudioComponent extends GeneralMessageComponent {
             this.audio.addEventListener("ended", this._playButtonClick.bind(this));
             this.setLoading(false);
             this._onDownload();
+            this._setButtonIcon("play");
             return this.audio;
         })
     }

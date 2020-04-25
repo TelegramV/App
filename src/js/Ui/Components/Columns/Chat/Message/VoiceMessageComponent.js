@@ -12,6 +12,8 @@ export default class VoiceMessageComponent extends AudioComponent {
             }
         }
 
+        if(!this.waveform) this.waveform = [].fill(0,0,99);
+
         this.heights = convertBits(this.waveform, 8, 5);
         //maybe try another smooth functions?
         this.heights = this._smooth(this.heights, 0.05);
