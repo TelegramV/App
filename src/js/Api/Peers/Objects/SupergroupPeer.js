@@ -19,6 +19,7 @@ export class SupergroupPeer extends ChannelPeer {
 
     get statusString() {
         let status = ""
+        let isLoading = false
         if (this.full) {
             const user = this.full.participants_count === 1 ? "member" : "members"
 
@@ -29,12 +30,14 @@ export class SupergroupPeer extends ChannelPeer {
             // }
 
         } else {
-            status = "loading info..."
+            status = "loading info"
+            isLoading = true
         }
 
         return {
             text: status,
-            online: false
+            online: false,
+            isLoading
         }
     }
 

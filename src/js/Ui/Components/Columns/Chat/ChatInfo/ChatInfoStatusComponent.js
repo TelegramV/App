@@ -6,6 +6,9 @@ import classNames from "../../../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf"
 
 class ChatInfoStatusComponent extends VComponent {
+    state = {
+        isLoading: false,
+    };
 
     appEvents(E) {
         E.bus(AppEvents.Dialogs)
@@ -20,19 +23,24 @@ class ChatInfoStatusComponent extends VComponent {
 
         E.bus(UIEvents.General)
             .on("chat.select")
+            .on("chat.loading", this.onChatLoading)
     }
 
     render() {
+        const isOnline = this.statusLine.online;
+        const isLoading = this.statusLine.isAction || this.statusLine.isLoading;
+        const text = this.statusLine.text;
+
         const classes = classNames(
             "info",
-            classIf(this.statusLine.online, "online"),
-            classIf(this.statusLine.isAction, "loading-text"),
+            classIf(isOnline, "online"),
+            classIf(isLoading, "loading-text"),
         )
 
         return (
             <div className="bottom">
                 <div hideIf={AppSelectedChat.isSelected && AppSelectedChat.Current.isSelf}
-                     className={classes}>{this.statusLine.text}</div>
+                     className={classes}>{text}</div>
             </div>
         )
     }
@@ -58,12 +66,18 @@ class ChatInfoStatusComponent extends VComponent {
         const action = this.action
 
         if (action) {
-            return {text: action, isAction: true}
+            return {text: action, isAction: true, isLoading: false}
         }
 
         const peer = AppSelectedChat.Current
 
         return peer.statusString
+    }
+
+    onChatLoading = ({isLoading}) => {
+        this.setState({
+            isLoading
+        });
     }
 }
 

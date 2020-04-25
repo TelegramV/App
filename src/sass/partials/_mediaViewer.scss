@@ -6,10 +6,12 @@
 
   &.hidden {
     pointer-events: none;
+
     .media-viewer {
       opacity: 0;
     }
   }
+
   .media-viewer {
     position: absolute;
     width: 100%;
@@ -94,6 +96,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+
       img {
         max-width: 100%;
         max-height: 100%;
@@ -126,7 +129,12 @@
       transition: anim(opacity);
 
       &.hidden {
-        display: none;
+        opacity: 0;
+
+        &:hover {
+          opacity: 0;
+          cursor: default;
+        }
       }
 
       &:hover {
