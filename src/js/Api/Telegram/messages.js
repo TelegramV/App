@@ -1,6 +1,7 @@
 import MTProto from "../../MTProto/External"
 import PeersManager from "../Peers/PeersManager"
 import type {DialogsType, getDialogs_Params_105, getPeerDialogs_Params_105} from "./types"
+import {Peer} from "../Peers/Objects/Peer"
 
 const getDialogs = (params: getDialogs_Params_105 = {}): Promise<DialogsType> => {
     return MTProto.invokeMethod("messages.getDialogs", {
@@ -57,13 +58,25 @@ const getChats = id => {
     })
 }
 
-const getUsers = id => {
-    return MTProto.invokeMethod("users.getUsers", {
-        id
-    }).then(users => {
-        return PeersManager.fillPeersFromUpdate({
-            users
-        }).users
+function getHistory(peer: Peer, params = {
+    offset_id: 0,
+    offset_date: 0,
+    add_offset: 0,
+    limit: 50,
+    max_id: 0,
+    min_id: 0,
+    hash: 0,
+}): { messages: []; } {
+    params.peer = peer.inputPeer;
+
+    return MTProto.invokeMethod("messages.getHistory", params).then(Messages => {
+        if (Messages._ === "messages.channelMessages" && peer.dialog) {
+            peer.dialog.pts = Messages.pts;
+        }
+
+        PeersManager.fillPeersFromUpdate(Messages);
+
+        return Messages;
     })
 }
 
@@ -72,7 +85,7 @@ const messages = {
     getPeerDialogs: getPeerDialogs,
     searchGlobal: searchGlobal,
     getChats: getChats,
-    getUsers: getUsers,
+    getHistory: getHistory,
 }
 
 export default messages

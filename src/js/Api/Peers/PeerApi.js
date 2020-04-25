@@ -27,7 +27,7 @@ export class PeerApi {
      * @param props
      * @return {Promise<Message[]>}
      */
-    async getHistory(props = {offset_id: 0, limit: 60}, addUnread = false) {
+    async getHistory(props = {offset_id: 0, limit: 100}, addUnread = false) {
         const Messages = await MTProto.invokeMethod("messages.getHistory", {
             peer: this.peer.inputPeer,
             offset_id: props.offset_id,
@@ -62,7 +62,7 @@ export class PeerApi {
     }
 
     fetchInitialMessages() {
-        return this.getHistory({limit: 60}).then(messages => {
+        return this.getHistory({limit: 100}).then(messages => {
             AppEvents.Peers.fire("chat.initialReady", {
                 peer: this.peer,
                 messages: messages
@@ -91,7 +91,7 @@ export class PeerApi {
             id = oldest.id
         }
 
-        return this.getHistory({offset_id: id, limit: 60}).then(messages => {
+        return this.getHistory({offset_id: id, limit: 100}).then(messages => {
             AppEvents.Peers.fire("chat.nextPageReady", {
                 peer: this.peer,
                 messages: messages
@@ -244,7 +244,7 @@ export class PeerApi {
         //     dialog: this.peer.dialog,
         //     message: message
         // })
-        UIEvents.General.fire("chat.scrollToBottom")
+        UIEvents.General.fire("chat.scrollBottom")
 
         p.then(q => {
             MTProto.invokeMethod(media ? (multi ? "messages.sendMultiMedia" : "messages.sendMedia") : "messages.sendMessage", {

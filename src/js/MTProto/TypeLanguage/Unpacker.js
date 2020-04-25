@@ -22,6 +22,7 @@ export type Result = {
 
 const utf8TextDecoder = new TextDecoder("utf-8")
 
+// in the future will be replaced with https://github.com/TelegramV/TypeLanguage
 class Unpacker {
 
     buffer: ArrayBuffer

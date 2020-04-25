@@ -76,7 +76,7 @@ class BubblesComponent extends VComponent {
             .on("chat.select", this.onChatSelect)
             .on("chat.showMessage", this.onShowMessage)
             .on("chat.showMessageInstant", this.onShowMessageInstant)
-            .on("chat.scrollToBottom", this.onScrollToBottom)
+            .on("chat.scrollBottom", this.onScrollToBottom)
     }
 
     onChatSelect = _ => {
