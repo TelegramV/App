@@ -63,6 +63,16 @@ export class PeerMessages {
         this._fireTransaction = false
     }
 
+    get heap(): Map<number, Message> {
+        return this._heap;
+    }
+
+    get recent(): Map<number, Message> {
+        return this._recent;
+    }
+
+    // below deprecated stuff
+
     get messages(): Map<number, Message> {
         return this._messages
     }

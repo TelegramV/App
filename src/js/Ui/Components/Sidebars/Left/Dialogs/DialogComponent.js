@@ -328,6 +328,10 @@ export class DialogComponent extends VComponent {
     }
 
     _handleClick = () => {
+        if (AppSelectedChat.check(this.dialog.peer)) {
+            UIEvents.General.fire("chat.scrollBottom")
+        }
+
         AppSelectedChat.select(this.dialog.peer)
     }
 }

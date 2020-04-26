@@ -1,7 +1,6 @@
 import DialogsManager from "../../../Api/Dialogs/DialogsManager"
 import UpdatesManager from "../../../Api/Updates/UpdatesManager"
 import PeersManager from "../../../Api/Peers/PeersManager"
-import {LocaleController} from "../../../Api/Localization/Localization"
 import MessagesManager from "../../../Api/Messages/MessagesManager"
 import ContextMenuComponent from "../../Components/Singleton/ContextMenuComponent"
 import {ModalComponent} from "../../Components/Singleton/ModalComponent"
@@ -16,6 +15,7 @@ import {DialogInfoComponent} from "../../Components/Sidebars/Right/DialogInfo/Di
 import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/ArchivedDialogsBar"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
+import SnackbarComponent from "../../Components/Singleton/SnackbarComponent"
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -41,10 +41,10 @@ export function MainPage() {
             <ModalComponent/>
             <MediaViewerComponent/>
             <InstantViewComponent/>
+            <SnackbarComponent/>
             <SettingsComponent/>
             {/*<PhoneCallComponent/>*/}
             {/*TODO move all settings inside it's component*/}
-
 
             <SearchPanelComponent/>
 
