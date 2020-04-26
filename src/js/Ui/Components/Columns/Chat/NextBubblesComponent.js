@@ -86,7 +86,7 @@ class NextBubblesComponent extends VComponent {
         });
     }
 
-    renderMessage = (message: Message, prevMessage: Message = null): HTMLElement => {
+    renderMessage = (message: Message, prevMessage: Message = null, nextMessage: Message = null): HTMLElement => {
         const isOut = !message.isPost && message.isOut;
         const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
 
@@ -227,11 +227,11 @@ class NextBubblesComponent extends VComponent {
             const {scrollTop, scrollHeight, clientHeight} = this.$el;
             const isAtBottom = scrollHeight - scrollTop === clientHeight;
 
-            this.appendMessages([message]);
-
             if (this.mainVirtual.messages.length > this.mainVirtual.size) {
                 vrdom_delete(this.bubblesInnerRef.$el.firstChild);
             }
+
+            this.appendMessages([message]);
 
             this.mainVirtual.veryBottomPage();
 
@@ -391,11 +391,11 @@ class NextBubblesComponent extends VComponent {
 
         const messages = this.currentVirtual.nextTop();
 
-        this.prependMessages(messages);
-
         for (let i = 0; i < messages.length; i++) {
             vrdom_delete(this.bubblesInnerRef.$el.lastChild);
         }
+
+        this.prependMessages(messages);
 
         if (this.$el.scrollTop === 0) {
             let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
@@ -467,11 +467,11 @@ class NextBubblesComponent extends VComponent {
 
         const messages = this.currentVirtual.nextBottom();
 
-        this.appendMessages(messages);
-
         for (let i = 0; i < messages.length; i++) {
             vrdom_delete(this.bubblesInnerRef.$el.firstChild);
         }
+
+        this.appendMessages(messages);
     }
 
     onBottomPageMessagesReady = (event) => {

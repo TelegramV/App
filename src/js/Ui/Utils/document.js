@@ -54,6 +54,7 @@ function createIcon(color, isFull = false) {
     let id = Math.random().toString(16).substring(7);
     let darker = adjust(color, -40);
     // TODO @kohutd patching the icon and changing it to full causes it to dissapear
+    // fixed.
     if (!isFull) {
         return (
             <svg width="54px" height="54px" viewBox="0 0 54 54" version="1.1" xmlns="http://www.w3.org/2000/svg">

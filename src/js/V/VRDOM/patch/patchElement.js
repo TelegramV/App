@@ -24,6 +24,7 @@ import VRNode from "../VRNode"
 import patch_Text_VRNode from "./patch_Text_VRNode"
 import {initElement} from "../render/renderElement"
 import VApp from "../../vapp"
+import vrdom_mount from "../mount"
 
 const recreateElementByTagName = ($node: HTMLElement, tagName: string) => {
     const $newNode = document.createElement(tagName)
@@ -50,6 +51,10 @@ const ignore = new Set([
 const patchElement = ($node: HTMLElement, vRNode: VRNode) => {
     if ($node instanceof Text) {
         return patch_Text_VRNode($node, vRNode)
+    }
+
+    if (vRNode.tagName.toLowerCase() === "svg") {
+        return vrdom_mount(vRNode, $node)
     }
 
     if ($node.tagName.toLowerCase() !== vRNode.tagName.toLowerCase()) {

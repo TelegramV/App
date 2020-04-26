@@ -93,7 +93,7 @@ export class DialogsBar extends LeftBarComponent {
                             <LazyInput type="text" placeholder="Search"
                                        onFocus={this.openSearch}
                                        onInput={this.onSearchInputCapture}
-                                       lazyLevel={300}/>
+                                       lazyLevel={200}/>
                             <span className="tgico tgico-search"/>
                         </div>
                     </div>

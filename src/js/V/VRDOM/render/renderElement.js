@@ -19,8 +19,9 @@ import VRNode from "../VRNode"
 import type {VRenderProps} from "../types/types"
 import vrdom_append from "../append"
 
+const SVG_W3 = "http://www.w3.org/2000/svg"
 const XML_NAMESPACES = new Map([
-    ["svg", "http://www.w3.org/2000/svg"]
+    ["svg", SVG_W3],
 ])
 
 export function initElement($el: HTMLElement) {
@@ -59,7 +60,6 @@ const renderElement = (node: VRNode, props: VRenderProps = {}): HTMLElement => {
     initElement($el)
 
     if (node.dangerouslySetInnerHTML !== false) {
-
         if (Array.isArray(node.children)) {
             if (node.children.length > 0) {
                 console.error(node)

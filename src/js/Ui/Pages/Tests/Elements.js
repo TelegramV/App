@@ -16,10 +16,27 @@
  */
 
 import VButton from "../../Elements/Button/VButton"
+import VComponent from "../../../V/VRDOM/component/VComponent"
+import {DocumentMessagesTool} from "../../Utils/document"
+
+class Icon extends VComponent {
+    state = {
+        isDownloaded: false
+    }
+
+    render() {
+        return (
+            <div className="svg-wrapper" onClick={() => this.setState({isDownloaded: !this.state.isDownloaded})}>
+                {DocumentMessagesTool.createIcon("#E93A3A", !this.state.isDownloaded)}
+            </div>
+        )
+    }
+}
 
 function ElementsPage() {
     return (
         <div>
+            <Icon/>
             <VButton>
                 Subscribe
             </VButton>
