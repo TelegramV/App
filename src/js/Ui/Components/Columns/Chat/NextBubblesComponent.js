@@ -191,13 +191,14 @@ class NextBubblesComponent extends VComponent {
     onScroll = () => {
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
         const isAtBottom = scrollHeight - scrollTop === clientHeight;
-        const isAtTop = scrollTop === 0;
+        const isAtTop = scrollTop <= 300;
 
         if ((scrollHeight - scrollTop) >= (clientHeight - 20)) {
             UIEvents.General.fire("chat.scrollBottom.show");
         }
 
         if (isAtTop) {
+            console.log("on top")
             this.virtual_onScrolledTop();
         } else if (isAtBottom) {
             if (this.virtual_isCompletelyBottom()) {
@@ -255,7 +256,7 @@ class NextBubblesComponent extends VComponent {
                     this.cleanupTree();
 
                     this.mainVirtual.currentPage = this.mainVirtual.messages
-                        .slice(Math.max(messageIndex - this.mainVirtual.sizeDiv2, 0), messageIndex + this.mainVirtual.sizeDiv2);
+                        .slice(Math.max(messageIndex - this.mainVirtual.edgeSize, 0), messageIndex + this.mainVirtual.edgeSize);
 
                     const messages = this.mainVirtual.currentPage;
 
@@ -396,13 +397,15 @@ class NextBubblesComponent extends VComponent {
             vrdom_delete(this.bubblesInnerRef.$el.lastChild);
         }
 
-        let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
+        if (this.$el.scrollTop === 0) {
+            let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
 
-        if ($first) {
-            if ($first.nextElementSibling) {
-                this.$el.scrollTop = $first.nextElementSibling.offsetTop;
-            } else {
-                this.$el.scrollTop = $first.offsetTop;
+            if ($first) {
+                if ($first.nextElementSibling) {
+                    this.$el.scrollTop = $first.nextElementSibling.offsetTop;
+                } else {
+                    this.$el.scrollTop = $first.offsetTop;
+                }
             }
         }
     }

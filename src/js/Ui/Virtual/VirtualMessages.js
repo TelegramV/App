@@ -23,8 +23,7 @@ class VirtualMessages {
     messages: Message[] = [];
 
     size = 60;
-    sizeDiv2 = this.size / 2;
-    edgeSize = 20;
+    edgeSize = this.size / 2;
 
     currentPage = [];
     edges = [null, null];
@@ -46,11 +45,11 @@ class VirtualMessages {
         const index = this.messages.findIndex(message => message.id === this.currentPage[0].id);
 
         if (index > -1) {
-            if (index < this.sizeDiv2) {
+            if (index < this.edgeSize) {
                 return {index, messages: this.messages.slice(0, index)};
             }
 
-            return {index, messages: this.messages.slice(index - this.sizeDiv2, index)};
+            return {index, messages: this.messages.slice(index - this.edgeSize, index)};
         } else {
             console.warn("BUG: [top] no message intersection found");
             return {index: -1, messages: []};
@@ -61,7 +60,7 @@ class VirtualMessages {
         const index = this.messages.findIndex(message => message.id === this.currentPage[this.currentPage.length - 1].id);
 
         if (index > -1) {
-            if (index + this.sizeDiv2 > this.messages.length) {
+            if (index + this.edgeSize > this.messages.length) {
                 if (index + 1 === this.messages.length) {
                     return {index, messages: []};
                 }
@@ -69,7 +68,7 @@ class VirtualMessages {
                 return {index, messages: this.messages.slice(index + 1, this.messages.length)};
             }
 
-            return {index, messages: this.messages.slice(index + 1, index + this.sizeDiv2 + 1)};
+            return {index, messages: this.messages.slice(index + 1, index + this.edgeSize + 1)};
         } else {
             console.warn("BUG: [bottom] no message intersection found");
             return {index: -1, messages: []};
@@ -82,7 +81,7 @@ class VirtualMessages {
         if (index <= this.size) {
             this.edges = [null, null];
         } else {
-            this.edges = [this.messages[index - this.sizeDiv2 - 1], this.messages[index + 1]];
+            this.edges = [this.messages[index - this.edgeSize - 1], this.messages[index + 1]];
         }
 
         console.log("on top edges", this.edges);
