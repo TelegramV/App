@@ -5,7 +5,7 @@ const TextWrapperComponent = ({message, time = true, slot}) => {
     let text = parseMessageEntities(message.text, message.raw.entities);
     if (!text) return "";
     return (
-        <div class="text-wrapper">
+        <div class="text-wrapper" ondblclick={event => event.stopPropagation()}>
             {text}
             {slot}
             {time ? <MessageTimeComponent message={message}/> : ""}

@@ -1,20 +1,23 @@
+import {ChatInputManager} from "../../ChatInput/ChatInputComponent"
+
 const MessageTimeComponent = ({message, bg = false}) => {
     let classes = "time" + (bg ? " bg" : "");
+    const ondblclick = () => ChatInputManager.replyTo(message)
 
     let views = "";
     if (message.raw.views) {
         views = (
-            <span class="views">
+            <span ondblclick={ondblclick} class="views">
                 {numberFormat(message.raw.views)}
                 <span class="tgico tgico-channelviews"/>
             </span>
         )
     }
 
-    let edited = message.editDate ? (<span class="edited">edited</span>) : "";
+    let edited = message.editDate ? (<span ondblclick={ondblclick} class="edited">edited</span>) : "";
 
     return (
-        <span class={classes}>
+        <span ondblclick={ondblclick} class={classes}>
             {!bg ? views : ""}
             <div class="inner status tgico">
             	{bg ? views : ""}
