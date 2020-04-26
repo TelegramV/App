@@ -228,8 +228,8 @@ export class SocketTransporter {
     }
 
     onDisconnect() {
-        this.refreshSocket();
         this.connection.onDisconnect.call(this.connection, this);
+        this.refreshSocket();
     }
 }
 

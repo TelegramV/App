@@ -2,25 +2,40 @@ import AppEvents from "../../Api/EventBus/AppEvents"
 import UIEvents from "../EventBus/UIEvents"
 
 class ConnectionStatus {
-
     OK = 0
     WAITING_FOR_NETWORK = 1
     FETCHING_DIFFERENCE = 2
+    CONNECTING = 3
 
     constructor() {
         this._networkOk = true
         this._differenceOk = true
+        this._connectionOk = true
+
+        window.addEventListener("offline", () => {
+            this._networkOk = false
+
+            console.warn("network lost")
+            this.fire(this.Status)
+        })
+
+        window.addEventListener("online", () => {
+            this._networkOk = true
+
+            console.warn("network lost")
+            this.fire(this.Status)
+        })
 
         AppEvents.General.subscribe("connectionRestored", event => {
             console.log("connectionRestored")
-            this._nettworkOk = true
+            this._connectionOk = true
 
             this.fire(this.Status)
         })
 
         AppEvents.General.subscribe("connectionLost", event => {
             console.log("connectionLost")
-            this._nettworkOk = false
+            this._connectionOk = false
 
             this.fire(this.Status)
         })
@@ -44,6 +59,10 @@ class ConnectionStatus {
     get Status() {
         if (!this._networkOk) {
             return this.WAITING_FOR_NETWORK
+        }
+
+        if (!this._connectionOk) {
+            return this.CONNECTING
         }
 
         if (!this._differenceOk) {

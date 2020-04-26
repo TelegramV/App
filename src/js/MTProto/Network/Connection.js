@@ -27,10 +27,11 @@ import Random from "../Utils/Random"
 import Uint8 from "../Utils/Uint8"
 import MessagesProcessor from "./MessagesProcessor"
 import TelegramApplication from "../TelegramApplication"
-import { longToBytes } from "../Utils/Bin"
+import {longToBytes} from "../Utils/Bin"
 import ConnectionState from "./ConnectionState"
+import MTProtoInternal from "../Internal"
 
-const { concat, compare } = Uint8;
+const {concat, compare} = Uint8;
 
 class Connection {
     constructor(dcId: number, withUpdates: boolean, application: TelegramApplication) {
@@ -50,7 +51,7 @@ class Connection {
 
         this.transporter = new SocketTransporter(this);
 
-        this.timezoneOffset = new Date().getTimezoneOffset()*60; //seconds
+        this.timezoneOffset = new Date().getTimezoneOffset() * 60; //seconds
     }
 
     get isMain() {
@@ -150,8 +151,8 @@ class Connection {
         this.pingingInvervalId = clearInterval(this.pingingInvervalId);
     }
 
-    invokeMethod(name: string, params ? : any, props: { useSecondTransporter: boolean; } = {}): Promise < any > {
-        let { useSecondTransporter } = props;
+    invokeMethod(name: string, params ?: any, props: { useSecondTransporter: boolean; } = {}): Promise<any> {
+        let {useSecondTransporter} = props;
         let originalUseSecondTransporter = useSecondTransporter;
 
         if (useSecondTransporter) {
@@ -230,7 +231,7 @@ class Connection {
         });
     }
 
-    invokeMTProtoMethod(name: string, params ? : any): Promise < Unpacker > {
+    invokeMTProtoMethod(name: string, params ?: any): Promise<Unpacker> {
         return new Promise((resolve, reject) => {
             const method_serializer = TL.packer();
             method_serializer.method(name, params);
@@ -246,16 +247,16 @@ class Connection {
 
             const bytes = bytes_serializer.toUint8Array();
 
-            this.mtprotoHandler = { resolve, reject };
+            this.mtprotoHandler = {resolve, reject};
 
             this.transporter.transport(bytes.buffer);
         });
     }
 
-    sendMessage(message: { message_id: string;message_body: Uint8Array, seq_no: number;useSecondTransporter: boolean; }) {
-        const { message_id, message_body, seq_no, useSecondTransporter } = message;
+    sendMessage(message: { message_id: string; message_body: Uint8Array, seq_no: number; useSecondTransporter: boolean; }) {
+        const {message_id, message_body, seq_no, useSecondTransporter} = message;
 
-        const message_serializer = TL.packer({ maxLength: message_body.length + 2048 });
+        const message_serializer = TL.packer({maxLength: message_body.length + 2048});
 
         message_serializer.integer(this.authorization.serverSalt, 64);
         message_serializer.integer(this.authorization.sessionId, 64);
@@ -272,7 +273,7 @@ class Connection {
 
         const encryptedtext = telegram_crypto.encrypt_message(concat(message_bytes, padding), this.authorization.authKey);
 
-        const bytes_serializer = TL.packer({ maxLength: encryptedtext.bytes.byteLength + 256 });
+        const bytes_serializer = TL.packer({maxLength: encryptedtext.bytes.byteLength + 256});
         bytes_serializer.integer(this.authorization.authKeyId, 64);
         bytes_serializer.integer(encryptedtext.msg_key, 128);
         bytes_serializer.rawBytes(encryptedtext.bytes);
@@ -307,7 +308,7 @@ class Connection {
             return;
         }
 
-        this.invokeMethod(invokation.name, invokation.params, { useSecondTransporter: invokation.useSecondTransporter })
+        this.invokeMethod(invokation.name, invokation.params, {useSecondTransporter: invokation.useSecondTransporter})
             .then(invokation.resolve)
             .catch(invokation.reject)
             .finally(() => this.processor.pendingInvokations.delete(message_id));
@@ -398,16 +399,18 @@ class Connection {
         this.isSocketConnected = true;
         this.resolveAwaiting();
         this.application.resolveAwaiting();
+        MTProtoInternal.connectionRestored();
     }
 
     onDisconnect(socket: SocketTransporter) {
         this.isSocketConnected = false;
+        MTProtoInternal.connectionLost();
     }
 
     resolveAwaiting() {
         if (this.isReady) {
             this.awaitingInvokes.forEach(i => {
-                const { name, params, resolve, reject } = i;
+                const {name, params, resolve, reject} = i;
 
                 this.invokeMethod(name, params)
                     .then(resolve)
