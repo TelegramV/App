@@ -56,7 +56,8 @@ class ContextMenuComponent extends SingletonComponent {
                                     <div className={classNames("element", "rp", "rps", classIf(item.red, "red"))}
                                          onClick={event => this.select(item, event)}>
 
-                                        {nodeIf(() => <i className={classNames("tgico", `tgico-${item.icon}`)}/>, item.icon)}
+                                        {nodeIf(() => <i
+                                            className={classNames("tgico", `tgico-${item.icon}`)}/>, item.icon)}
 
                                         <span>{item.title}</span>
 
@@ -71,6 +72,26 @@ class ContextMenuComponent extends SingletonComponent {
                 </div>
             </div>
         )
+    }
+
+    componentDidMount() {
+        window.addEventListener("keydown", this.onKeyDown);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("keydown", this.onKeyDown);
+    }
+
+    onKeyDown = event => {
+        if (!this.state.hidden) {
+            event.stopPropagation();
+
+            const code = event.keyCode || event.which;
+
+            if (code === 27) {
+                this.close(event);
+            }
+        }
     }
 
     select = (item, event) => {

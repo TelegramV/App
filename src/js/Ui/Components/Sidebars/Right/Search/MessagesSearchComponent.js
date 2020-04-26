@@ -30,7 +30,7 @@ const MessagesCountFragment = ({count}) => {
     if (count === -2) {
         slot = <span>Type to search</span>
     } else if (count === -1) {
-        slot = <span className="loading-text">Searching...</span>
+        slot = <span className="loading-text">Searching</span>
     } else {
         slot = <span>{count} messages found</span>
     }

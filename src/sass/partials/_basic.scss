@@ -12,11 +12,18 @@ body {
   animation: loading-text 1s linear infinite;
 }
 
+.loading-text-2::after {
+  content: "";
+  animation: loading-text-2 1s linear infinite;
+}
+
 a {
   text-decoration: none;
 }
 
-img[src=""], img:not([src]) { content:url("data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw=="); }
+img[src=""], img:not([src]) {
+  content: url("data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==");
+}
 
 .app {
   display: flex;
@@ -33,8 +40,8 @@ img[src=""], img:not([src]) { content:url("data:image/gif;base64,R0lGODlhAQABAPA
     margin-right: auto;
 
     .app {
-        border-left: 1px solid #ccc;
-        border-right: 1px solid #ccc;
+      border-left: 1px solid #ccc;
+      border-right: 1px solid #ccc;
     }
   }
 }

@@ -22,7 +22,6 @@ const SectionTitleFragment = ({title}) => {
 }
 
 export class GlobalChatsSearchComponent extends VComponent {
-
     state = {
         peers: new VArray(),
         myPeers: new VArray(),

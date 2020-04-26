@@ -148,6 +148,28 @@ export class ChatInputComponent extends VComponent {
         </div>
     }
 
+    componentDidMount() {
+        this.textarea = this.$el.querySelector(".textarea")
+        this.initDragArea()
+        window.addEventListener("keydown", this.onKeyDown);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("keydown", this.onKeyDown);
+    }
+
+    onKeyDown = (event: Event) => {
+        const code = event.keyCode || event.which;
+
+        if (code === 27) {
+            if (this.reply) {
+                event.stopPropagation();
+
+                this.closeReply();
+            }
+        }
+    }
+
     appendText = (text) => {
         this.textarea.innerHTML += text
         this.chatInputTextareaRef.component.onInput();
@@ -320,11 +342,6 @@ export class ChatInputComponent extends VComponent {
         this.i++
         if (this.isRecording)
             this.withTimeout(l => this.tickTimer(), 10)
-    }
-
-    componentDidMount() {
-        this.textarea = this.$el.querySelector(".textarea")
-        this.initDragArea()
     }
 
     onSend = (ev) => {

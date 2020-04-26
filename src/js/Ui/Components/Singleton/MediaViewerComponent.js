@@ -181,6 +181,8 @@ export class MediaViewerComponent extends VComponent {
 
     onKeyDown = event => {
         if (!this.state.hidden) {
+            event.stopPropagation();
+
             const code = event.keyCode || event.which;
 
             if (code === 39) {

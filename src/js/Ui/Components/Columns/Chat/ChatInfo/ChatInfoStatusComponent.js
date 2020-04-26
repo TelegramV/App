@@ -60,7 +60,7 @@ class ChatInfoStatusComponent extends VComponent {
 
     get statusLine() {
         if (AppSelectedChat.isNotSelected) {
-            return "..."
+            return {}
         }
 
         const action = this.action
@@ -69,9 +69,7 @@ class ChatInfoStatusComponent extends VComponent {
             return {text: action, isAction: true, isLoading: false}
         }
 
-        const peer = AppSelectedChat.Current
-
-        return peer.statusString
+        return AppSelectedChat.Current.statusString
     }
 
     onChatLoading = ({isLoading}) => {

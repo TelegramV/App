@@ -86,6 +86,16 @@
   }
 }
 
+@keyframes loading-text-2 {
+  50% {
+    content: ".";
+  }
+
+  100% {
+    content: "..";
+  }
+}
+
 @keyframes roll {
   100% {
     transform: rotate(360deg);

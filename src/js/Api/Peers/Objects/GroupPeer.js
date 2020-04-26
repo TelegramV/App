@@ -65,6 +65,7 @@ export class GroupPeer extends Peer {
 
     get statusString() {
         let status = ""
+        let isLoading = false
         if (this.full) {
             const participantsCount = this.full.participants.participants.length
             const onlineCount = this.onlineCount
@@ -79,11 +80,13 @@ export class GroupPeer extends Peer {
 
         } else {
             status = "loading info"
+            isLoading = true
         }
 
         return {
             text: status,
             online: false,
+            isLoading
         }
     }
 
