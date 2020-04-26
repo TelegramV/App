@@ -79,7 +79,7 @@ function NavigationButtonFragment({isNext, hidden, onClick}) {
         "tgico-up": true,
         "rp": true,
         "hidden": hidden
-    }} onClick={!hidden ? onClick : null}/>
+    }} onClick={!hidden ? onClick : e => e.stopPropagation()}/>
 }
 
 export class MediaViewerComponent extends VComponent {
