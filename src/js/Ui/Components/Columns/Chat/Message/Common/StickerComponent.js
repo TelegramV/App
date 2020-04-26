@@ -78,10 +78,10 @@ export default class StickerComponent extends VComponent {
         this.url = url;
         fetch(url).then(async r => {
             return r.arrayBuffer().then(async b => {
-                try {
-                    return JSON.parse(new TextDecoder("utf-8").decode(new Uint8Array(b)))
-                } catch (e) {
-                    return JSON.parse(new TextDecoder("utf-8").decode(await MTProto.performWorkerTask("gzipUncompress", new Uint8Array(b))))
+                if(b[0] == 123) { //"{"
+                    return JSON.parse(new TextDecoder("utf-8").decode(new Uint8Array(b)));
+                } else {
+                    return JSON.parse(new TextDecoder("utf-8").decode(await MTProto.performWorkerTask("gzipUncompress", new Uint8Array(b))));
                 }
             })
         }).then(r => {
