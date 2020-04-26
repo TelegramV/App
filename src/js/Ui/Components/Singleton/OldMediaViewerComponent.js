@@ -41,7 +41,7 @@
 //     return <div className={{
 //         "navigation": true,
 //         "prev": !isNext,
-//         "topPage": isNext,
+//         "next": isNext,
 //         "tgico-up": true,
 //         "rp": true,
 //         "hidden": hidden
@@ -114,23 +114,23 @@
 //         // })
 //     }
 //
-//     getNextOrPrev(topPage = true) {
+//     getNextOrPrev(next = true) {
 //         if (this.state.media instanceof AbstractMessage) {
 //             const peer = this.state.media.to
 //             const filtered = Array.from(peer.messages.messages, ([key, value]) => value).filter(l => {
-//                 return (topPage ? (l.id > this.state.media.id) : (l.id < this.state.media.id)) && l.isDisplayedInMediaViewer
+//                 return (next ? (l.id > this.state.media.id) : (l.id < this.state.media.id)) && l.isDisplayedInMediaViewer
 //             })
 //             if (filtered.length === 0) return null
 //
 //             return filtered.reduce((l, q) => {
-//                 return (topPage ? l.id < q.id : l.id > q.id) ? l : q
+//                 return (next ? l.id < q.id : l.id > q.id) ? l : q
 //             })
 //         } else if (this.state.media instanceof Photo) {
 //             const peer = this.state.media.peer
 //             if (!peer._photos) {
 //                 return null
 //             }
-//             const q = (topPage ? this.state.currentPhoto + 1 : this.state.currentPhoto - 1)
+//             const q = (next ? this.state.currentPhoto + 1 : this.state.currentPhoto - 1)
 //             if (q >= peer._photos.length || q < 0) return null
 //             return peer._photos[q]
 //         } else {
@@ -146,7 +146,7 @@
 //         return !!this.getNextOrPrev(false)
 //     }
 //
-//     topPage = (ev) => {
+//     next = (ev) => {
 //         ev.stopPropagation()
 //         const n = this.getNextOrPrev(true)
 //         if (n) {
@@ -217,7 +217,7 @@
 //                     <div className="media">
 //                         <NavigationButtonFragment onClick={this.prev} hidden={!this.hasPrev()}/>
 //                         <MediaFragment media={this.state.media}/>
-//                         <NavigationButtonFragment onClick={this.topPage} isNext hidden={!this.hasNext()}/>
+//                         <NavigationButtonFragment onClick={this.next} isNext hidden={!this.hasNext()}/>
 //                     </div>
 //                     <div className="caption">{this.state.caption}</div>
 //                 </div>

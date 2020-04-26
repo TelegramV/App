@@ -34,7 +34,7 @@ import scrollBottom from "../../../../Utils/scrollBottom"
 import API from "../../../../Api/Telegram/API"
 import {MessageFactory} from "../../../../Api/Messages/MessageFactory"
 
-// there is no possibility and time to calculate each message size
+// there is no possibility nor time to calculate each message size
 class NextBubblesComponent extends VComponent {
     bubblesInnerRef = VComponent.createRef();
 

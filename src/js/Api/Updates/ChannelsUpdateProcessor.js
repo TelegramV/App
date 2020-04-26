@@ -171,7 +171,7 @@ export class ChannelsUpdateProcessor extends UpdatesProcessor {
                 queue.isProcessing = false
 
                 if (peer.isMin) {
-                    console.error("BUG: peer is min, processing topPage update", peer)
+                    console.error("BUG: peer is min, processing next update", peer)
                     queue.isWaitingForDifference = false
                     peer.dialog.pts = rawUpdate.pts
                     this.processQueue(queue)
@@ -283,7 +283,7 @@ export class ChannelsUpdateProcessor extends UpdatesProcessor {
                 this.updatesManager.processUpdate(ou._, ou)
             })
 
-            // if not final then fetch topPage diff with provided pts
+            // if not final then fetch next diff with provided pts
             if (rawDifferenceWithPeer.final === true) {
                 // console.warn("difference is final", rawDifferenceWithPeer)
 

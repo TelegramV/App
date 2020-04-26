@@ -172,7 +172,7 @@ export class DialogsBar extends LeftBarComponent {
     }
 
     /**
-     * Handles dialogs scroll. If at the bottom, then gets topPage page of dialogs.
+     * Handles dialogs scroll. If at the bottom, then gets next page of dialogs.
      * @param event
      * @private
      */
@@ -182,7 +182,7 @@ export class DialogsBar extends LeftBarComponent {
         if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.isLoadingMore) {
             this.isLoadingMore = true
 
-            console.log("fetching topPage page")
+            console.log("fetching next page")
 
             DialogsManager.fetchNextPage({}).then(() => {
                 this.isLoadingMore = false

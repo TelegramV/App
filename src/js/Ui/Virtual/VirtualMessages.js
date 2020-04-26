@@ -17,14 +17,14 @@
 
 import type {Message} from "../../Api/Messages/Message";
 
-// ля, я тільки через три дні зрозумів, що це можна перенести в інший клас.
-// і фак, це дико спростило розуміння що відбувається в коді..
+// це було не просто
 class VirtualMessages {
     // oldest first
     messages: Message[] = [];
 
     size = 60;
     sizeDiv2 = this.size / 2;
+    edgeSize = 20;
 
     currentPage = [];
     edges = [null, null];

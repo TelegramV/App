@@ -39,7 +39,7 @@ const DATA_FORMAT_MONTH_DAY = {
 }
 
 
-// legacy, doesnt work now
+// legacy, doesnt work
 class BubblesComponent extends VComponent {
 
     loaderRef = this.props.loaderRef

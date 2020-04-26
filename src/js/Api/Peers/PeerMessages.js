@@ -32,6 +32,9 @@ export class PeerMessages {
 
     _fireTransaction: boolean = false
 
+    _heap: Map<number, Message> = new Map();
+    _recent: Array<Message> = []; // length <= 60
+
     /**
      * @param {Peer} peer
      * @param {Message[]} messages
