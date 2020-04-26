@@ -1,5 +1,5 @@
 import MTProto from "../../../MTProto/External"
-import lottie from "../../Lottie/lottie-web"
+import lottie from "../../../../../vendor/lottie-web"
 
 function convertToByteArray(bytes) {
     if (Array.isArray(bytes)) {
