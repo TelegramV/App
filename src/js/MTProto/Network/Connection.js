@@ -399,12 +399,16 @@ class Connection {
         this.isSocketConnected = true;
         this.resolveAwaiting();
         this.application.resolveAwaiting();
-        MTProtoInternal.connectionRestored();
+        if (this.isMain) {
+            MTProtoInternal.connectionRestored();
+        }
     }
 
     onDisconnect(socket: SocketTransporter) {
         this.isSocketConnected = false;
-        MTProtoInternal.connectionLost();
+        if (this.isMain) {
+            MTProtoInternal.connectionLost();
+        }
     }
 
     resolveAwaiting() {

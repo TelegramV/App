@@ -97,6 +97,10 @@
       justify-content: center;
       align-items: center;
 
+      * {
+        transition: 150ms all ease-in-out;
+      }
+
       img {
         max-width: 100%;
         max-height: 100%;

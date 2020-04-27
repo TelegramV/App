@@ -48,7 +48,6 @@ function MediaFragment({media, zoom, hidden}) {
     let style = {
         "max-width": zoom ? "100vw" : "60vw",
         "max-height": zoom ? "100vh" : "80vh",
-        "transition": "150ms all linear",
         "cursor": zoom ? "zoom-out" : "zoom-in",
     };
 
@@ -176,7 +175,7 @@ export class MediaViewerComponent extends VComponent {
                             <i className="tgico tgico-close rp rps"/>
                         </div>
                     </div>
-                    <div className="media" onClick={this.onAuxClick}>
+                    <div className="media" onClick={this.onMediaClick}>
                         <MediaFragment media={message} zoom={zoom} hidden={hidden}/>
                     </div>
                     <div className="caption">{text}</div>
@@ -210,7 +209,7 @@ export class MediaViewerComponent extends VComponent {
         }
     }
 
-    onAuxClick = event => {
+    onMediaClick = event => {
         if (!this.state.hidden) {
             event.stopPropagation();
 
@@ -247,7 +246,6 @@ export class MediaViewerComponent extends VComponent {
 
         this.setState({
             isLoadingLeftPage: true,
-            zoom: false,
         })
 
         return SearchManager.searchMessages(message.to, {
@@ -271,14 +269,12 @@ export class MediaViewerComponent extends VComponent {
                     messages,
                     hasLeftPage: false,
                     isLoadingLeftPage: false,
-                    zoom: false,
                 })
             } else {
                 this.setState({
                     messages,
                     hasLeftPage: true,
                     isLoadingLeftPage: false,
-                    zoom: false,
                 })
             }
 
@@ -296,7 +292,6 @@ export class MediaViewerComponent extends VComponent {
 
         this.setState({
             isLoadingRightPage: true,
-            zoom: false,
         })
 
         return SearchManager.searchMessages(message.to, {
@@ -321,14 +316,12 @@ export class MediaViewerComponent extends VComponent {
                     messages,
                     hasRightPage: false,
                     isLoadingRightPage: false,
-                    zoom: false,
                 })
             } else {
                 this.setState({
                     messages,
                     hasRightPage: true,
                     isLoadingRightPage: false,
-                    zoom: false,
                 })
             }
 
