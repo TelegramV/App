@@ -128,12 +128,21 @@ class NextBubblesComponent extends VComponent {
         scrollBottom(this.$el, this.bubblesInnerRef.$el);
     }
 
-    appendMessages(messages: Message[], topMessage: Message = null) {
+    appendMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
         if (messages.length > 0) {
-            const $messages = [this.renderMessage(messages[0], topMessage)];
+            const $messages = [this.renderMessage(messages[0], beforeTopMessage, messages[1])];
 
-            for (let i = 1; i < messages.length; i++) {
-                $messages.push(this.renderMessage(messages[i], messages[i - 1]));
+            //[0,1,2,3]
+            //[x,0,1]
+            //[0,1,2] loop
+            //[1,2,3] loop
+            //[2,3,y]
+            for (let i = 1; i < messages.length - 1; i++) {
+                $messages.push(this.renderMessage(messages[i], messages[i - 1], messages[i + 1]));
+            }
+
+            if (messages.length > 1) {
+                $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
             this.bubblesInnerRef.$el.append(...$messages);
@@ -144,12 +153,16 @@ class NextBubblesComponent extends VComponent {
         return [];
     }
 
-    prependMessages(messages: HTMLElement[], topMessage: Message = null) {
+    prependMessages(messages: HTMLElement[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
         if (messages.length > 0) {
-            const $messages = [this.renderMessage(messages[0], topMessage)];
+            const $messages = [this.renderMessage(messages[0], beforeTopMessage, messages[1])];
 
-            for (let i = 1; i < messages.length; i++) {
-                $messages.push(this.renderMessage(messages[i], messages[i - 1]));
+            for (let i = 1; i < messages.length - 1; i++) {
+                $messages.push(this.renderMessage(messages[i], messages[i - 1], messages[i + 1]));
+            }
+
+            if (messages.length > 1) {
+                $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
             this.bubblesInnerRef.$el.prepend(...$messages);

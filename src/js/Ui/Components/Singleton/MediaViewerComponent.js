@@ -38,11 +38,27 @@ function MediaSpinnerFragment({icon}) {
     </VSpinner>
 }
 
-function MediaFragment({media}) {
+function MediaFragment({media, zoom, hidden}) {
+    if (hidden) {
+        return <div/>
+    }
+
+    const horizon = media && media.maxWidth && media.maxHeight && media.maxWidth < media.maxHeight
+
     let style = {
-        "max-width": "60vw",
-        "max-height": "80vh",
+        "max-width": zoom ? "100vw" : "60vw",
+        "max-height": zoom ? "100vh" : "80vh",
+        "transition": "150ms all linear",
+        "cursor": zoom ? "zoom-out" : "zoom-in",
     };
+
+    if (zoom) {
+        if (horizon) {
+            style["height"] = "100vh"
+        } else {
+            style["width"] = "100vw"
+        }
+    }
 
     if (media instanceof PhotoMessage) {
         if (!media.loaded) {
@@ -92,6 +108,7 @@ export class MediaViewerComponent extends VComponent {
         hasRightPage: true,
         isLoadingLeftPage: false,
         isLoadingRightPage: false,
+        zoom: false,
     };
 
     defaultState = {...this.state};
@@ -103,7 +120,7 @@ export class MediaViewerComponent extends VComponent {
     }
 
     render() {
-        const {message, hidden, isLoadingLeftPage, isLoadingRightPage} = this.state;
+        const {message, hidden, isLoadingLeftPage, isLoadingRightPage, zoom} = this.state;
 
         const isLoadingPage = isLoadingLeftPage || isLoadingRightPage;
 
@@ -159,10 +176,8 @@ export class MediaViewerComponent extends VComponent {
                             <i className="tgico tgico-close rp rps"/>
                         </div>
                     </div>
-                    <div className="media" onClick={event => {
-                        event.stopPropagation();
-                    }}>
-                        <MediaFragment media={message}/>
+                    <div className="media" onClick={this.onAuxClick}>
+                        <MediaFragment media={message} zoom={zoom} hidden={hidden}/>
                     </div>
                     <div className="caption">{text}</div>
                     <NavigationButtonFragment onClick={this.right} isNext hidden={!this.hasRight() && !isLoadingPage}/>
@@ -195,6 +210,16 @@ export class MediaViewerComponent extends VComponent {
         }
     }
 
+    onAuxClick = event => {
+        if (!this.state.hidden) {
+            event.stopPropagation();
+
+            if (event.which === 1) {
+                this.zoom(event);
+            }
+        }
+    }
+
     showMessage = ({message}) => {
         this.state = {...this.defaultState};
 
@@ -222,6 +247,7 @@ export class MediaViewerComponent extends VComponent {
 
         this.setState({
             isLoadingLeftPage: true,
+            zoom: false,
         })
 
         return SearchManager.searchMessages(message.to, {
@@ -245,12 +271,14 @@ export class MediaViewerComponent extends VComponent {
                     messages,
                     hasLeftPage: false,
                     isLoadingLeftPage: false,
+                    zoom: false,
                 })
             } else {
                 this.setState({
                     messages,
                     hasLeftPage: true,
                     isLoadingLeftPage: false,
+                    zoom: false,
                 })
             }
 
@@ -268,6 +296,7 @@ export class MediaViewerComponent extends VComponent {
 
         this.setState({
             isLoadingRightPage: true,
+            zoom: false,
         })
 
         return SearchManager.searchMessages(message.to, {
@@ -291,13 +320,15 @@ export class MediaViewerComponent extends VComponent {
                 this.setState({
                     messages,
                     hasRightPage: false,
-                    isLoadingRightPage: false
+                    isLoadingRightPage: false,
+                    zoom: false,
                 })
             } else {
                 this.setState({
                     messages,
                     hasRightPage: true,
-                    isLoadingRightPage: false
+                    isLoadingRightPage: false,
+                    zoom: false,
                 })
             }
 
@@ -329,6 +360,7 @@ export class MediaViewerComponent extends VComponent {
 
             this.setState({
                 message: leftMessage,
+                zoom: false,
             })
 
             if (!leftMessage.loaded && !leftMessage.loading) {
@@ -365,6 +397,7 @@ export class MediaViewerComponent extends VComponent {
 
             this.setState({
                 message: rightMessage,
+                zoom: false,
             })
 
             if (!rightMessage.loaded && !rightMessage.loading) {
@@ -390,6 +423,13 @@ export class MediaViewerComponent extends VComponent {
         event.stopPropagation();
 
         this.setState({...this.defaultState})
+    }
+
+    zoom = (event) => {
+        event.stopPropagation();
+        console.log("zoom")
+
+        this.setState({zoom: !this.state.zoom});
     }
 }
 

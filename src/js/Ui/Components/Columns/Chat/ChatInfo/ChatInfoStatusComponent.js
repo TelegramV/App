@@ -13,16 +13,16 @@ class ChatInfoStatusComponent extends VComponent {
     appEvents(E) {
         E.bus(AppEvents.Dialogs)
             .only(event => AppSelectedChat.check(event.dialog.peer))
-            .on("updateActions")
+            .updateOn("updateActions")
 
         E.bus(AppEvents.Peers)
             .only(event => AppSelectedChat.check(event.peer))
-            .on("updateUserStatus")
-            .on("updateChatOnlineCount")
-            .on("fullLoaded")
+            .updateOn("updateUserStatus")
+            .updateOn("updateChatOnlineCount")
+            .updateOn("fullLoaded")
 
         E.bus(UIEvents.General)
-            .on("chat.select")
+            .updateOn("chat.select")
             .on("chat.loading", this.onChatLoading)
     }
 
@@ -56,7 +56,6 @@ class ChatInfoStatusComponent extends VComponent {
 
         return false
     }
-
 
     get statusLine() {
         if (AppSelectedChat.isNotSelected) {

@@ -23,14 +23,11 @@ import VComponent from "./VComponent"
 
 export type AESubscribe = {
     // if no resolve, then forceUpdate will be used instead
-    on(type: string, resolve?: any): AESubscribe
+    on(type: string, resolve?: any): AESubscribe,
+    updateOn(type: string): AESubscribe,
 }
 
 export type AECondition = AESubscribe | {
-    /**
-     * @deprecated use `only` instead
-     */
-    condition(condition: any): AESubscribe,
     only(callback: any): AESubscribe,
 }
 
@@ -49,28 +46,20 @@ export function __component_registerAppEvents(component: VComponent): AE {
 
 function registerAppEvents_bus(component: VComponent, bus: EventBus) {
     return {
-        condition: (condition: any) => registerAppEvents_bus_condition(component, bus, condition),
         only: (callback: any) => registerAppEvents_bus_only(component, bus, callback),
-        on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, null, type, resolve)
-    }
-}
-
-function registerAppEvents_bus_condition(component: VComponent, bus: EventBus, only: any) {
-    console.warn("Deprecated usage: use `only` instead of `condition`")
-
-    return {
-        on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, only, type, resolve)
+        on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, null, type, resolve),
+        updateOn: (type: string) => registerAppEvents_bus_only_subscribe(component, bus, null, type, null)
     }
 }
 
 function registerAppEvents_bus_only(component: VComponent, bus: EventBus, only: any) {
     return {
-        on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, only, type, resolve)
+        on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, only, type, resolve),
+        updateOn: (type: string) => registerAppEvents_bus_only_subscribe(component, bus, only, type, null),
     }
 }
 
 function registerAppEvents_bus_only_subscribe(component: VComponent, bus: EventBus, only: any, type: string, resolve: any) {
-
     let busContext = component.__.appEventContexts.get(bus)
 
     if (!resolve) {
@@ -91,6 +80,7 @@ function registerAppEvents_bus_only_subscribe(component: VComponent, bus: EventB
     }
 
     return {
-        on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, only, type, resolve)
+        on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, only, type, resolve),
+        updateOn: (type: string) => registerAppEvents_bus_only_subscribe(component, bus, only, type, null),
     }
 }
