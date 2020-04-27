@@ -15,10 +15,6 @@
  *
  */
 
-/**
- * (c) Telegram V
- */
-
 import {mt_get_random_num_secure, mt_write_bytes, mt_write_uint32} from "../Cryptography/mt_inob_codec"
 import aesjs from "../../../../vendor/aes"
 import Connection from "./Connection"

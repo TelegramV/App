@@ -78,10 +78,10 @@ class VirtualMessages {
     nextTop(): Message[] {
         const {index, messages} = this.sliceTop();
 
-        if (index <= this.size) {
-            this.edges = [null, null];
+        if (messages.length < this.edgeSize) {
+            this.edges = [null, this.messages[index + this.edgeSize]];
         } else {
-            this.edges = [this.messages[index - this.edgeSize - 1], this.messages[index + 1]];
+            this.edges = [this.messages[index - this.edgeSize - 1], this.messages[index + this.edgeSize]];
         }
 
         console.log("on top edges", this.edges);
@@ -94,10 +94,10 @@ class VirtualMessages {
     nextBottom(): Message[] {
         const {index, messages} = this.sliceBottom();
 
-        if (index <= this.size) {
+        if (messages.length < this.edgeSize) {
             this.edges = [null, null];
         } else {
-            this.edges = [this.messages[index - this.size - 1], this.messages[index + 1]];
+            this.edges = [this.messages[index - this.edgeSize], this.messages[index + this.edgeSize + 1]];
         }
 
         console.log("on bottom edges", this.edges);
@@ -150,8 +150,12 @@ class VirtualMessages {
         return this.messages[this.messages.length - 1];
     }
 
-    getBeforeVeryTopOne(): Message {
+    getBeforePageTopOne(): Message | null {
         return this.edges[0];
+    }
+
+    getAfterPageBottomOne(): Message | null {
+        return this.edges[1];
     }
 
     getPageTopOne(): Message {

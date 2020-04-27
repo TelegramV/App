@@ -23,7 +23,6 @@ import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 
 class ChatInfoPinnedComponent extends VComponent {
-
     state = {
         audio: undefined,
         pause: undefined,

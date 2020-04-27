@@ -29,20 +29,19 @@ const ReplyToMessageFragment = ({message}) => {
     )
 }
 
-/**
- * @param {Message} message
- * @param transparent
- * @param slot
- * @param noPad
- * @param outerPad
- * @param contextActions
- * @param showUsername
- * @param showAvatar
- * @param avatarRef
- * @return {*}
- * @constructor
- */
-const MessageWrapperFragment = ({message, transparent = false, slot, noPad = false, outerPad = true, contextActions, showUsername = true, avatarRef, bubbleRef}) => {
+const MessageWrapperFragment = (
+    {
+        message,
+        transparent = false,
+        noPad = false,
+        outerPad = true,
+        contextActions,
+        showUsername = true,
+        avatarRef,
+        bubbleRef
+    },
+    slot
+) => {
     const defaultContextActions = [
         {
             icon: "reply",

@@ -7,7 +7,21 @@
     opacity: 1;
   }
   100% {
-    transform: scale(1000);
+    transform: scale(400);
+    opacity: 0;
+  }
+}
+
+@keyframes rippleEffectLight {
+  0% {
+    transform: scale(1);
+    opacity: .7;
+  }
+  30% {
+    opacity: .6;
+  }
+  100% {
+    transform: scale(400);
     opacity: 0;
   }
 }
@@ -19,6 +33,20 @@
   }
   30% {
     opacity: 1;
+  }
+  100% {
+    transform: scale(100);
+    opacity: 0;
+  }
+}
+
+@keyframes rippleEffectLightSmall {
+  0% {
+    transform: scale(1);
+    opacity: .7;
+  }
+  30% {
+    opacity: .6;
   }
   100% {
     transform: scale(100);

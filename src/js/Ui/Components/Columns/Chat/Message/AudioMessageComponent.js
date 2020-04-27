@@ -33,6 +33,12 @@ class AudioMessageComponent extends AudioComponent {
                 if (this.__.destroyed) return;
                 // Tint
                 this.$el.querySelector(".play").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${l})`
+
+                // uncomment these to make bg cover
+                // this.$el.querySelector(".bubble").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.9)), url(${l})`
+                // this.$el.querySelector(".bubble").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${l})`
+                // this.$el.querySelector(".message").style.backdropFilter = 'blur(20px)'
+
                 this.thumb = l
             })
         }
@@ -54,8 +60,8 @@ class AudioMessageComponent extends AudioComponent {
                     </div>
                 </div>
                 <div class="timer short">
-                    <span class="played-wrapper"><span
-                        class="time-played"></span> / </span>{formatAudioTime(this.duration)}
+                    <span class="played-wrapper"><span class="time-played"/> / </span>
+                    {formatAudioTime(this.duration)}
                 </div>
             </div>
         )

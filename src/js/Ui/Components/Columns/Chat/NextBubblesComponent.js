@@ -34,6 +34,10 @@ import scrollBottom from "../../../../Utils/scrollBottom"
 import API from "../../../../Api/Telegram/API"
 import {MessageFactory} from "../../../../Api/Messages/MessageFactory"
 
+function getMessageElementById(messageId: number): HTMLElement | null {
+    return document.getElementById(`cmsg${messageId}`); // dunno better way, sorry
+}
+
 // there is no possibility nor time to calculate each message size
 class NextBubblesComponent extends VComponent {
     bubblesInnerRef = VComponent.createRef();
@@ -130,6 +134,21 @@ class NextBubblesComponent extends VComponent {
 
     appendMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
         if (messages.length > 0) {
+            if (!__IS_PRODUCTION__) {
+                if (!beforeTopMessage) {
+                    console.log("[warn] append no before message")
+                }
+                if (!afterBottomMessage) {
+                    console.log("[warn] append no after message")
+                }
+                if (beforeTopMessage && messages[0].id < beforeTopMessage.id) {
+                    console.error("append shit before", beforeTopMessage, messages)
+                }
+                if (afterBottomMessage && messages[messages.length - 1].id > afterBottomMessage.id) {
+                    console.error("append shit after", afterBottomMessage, messages)
+                }
+            }
+
             const $messages = [this.renderMessage(messages[0], beforeTopMessage, messages[1])];
 
             //[0,1,2,3]
@@ -155,6 +174,21 @@ class NextBubblesComponent extends VComponent {
 
     prependMessages(messages: HTMLElement[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
         if (messages.length > 0) {
+            if (!__IS_PRODUCTION__) {
+                if (!beforeTopMessage) {
+                    console.log("[warn] prepend no before message")
+                }
+                if (!afterBottomMessage) {
+                    console.log("[warn] prepend no after message")
+                }
+                if (beforeTopMessage && messages[0].id < beforeTopMessage.id) {
+                    console.error("prepend shit before", beforeTopMessage, messages)
+                }
+                if (afterBottomMessage && messages[messages.length - 1].id > afterBottomMessage.id) {
+                    console.error("prepend shit after", afterBottomMessage, messages)
+                }
+            }
+
             const $messages = [this.renderMessage(messages[0], beforeTopMessage, messages[1])];
 
             for (let i = 1; i < messages.length - 1; i++) {
@@ -196,7 +230,7 @@ class NextBubblesComponent extends VComponent {
             this.cleanupTree();
             this.isUsingSecondVirtual = false;
             this.secondVirtual.refresh();
-            this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforeVeryTopOne());
+            this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
             this.scrollBottom();
         }
     }
@@ -204,7 +238,8 @@ class NextBubblesComponent extends VComponent {
     onScroll = () => {
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
         const isAtBottom = scrollHeight - scrollTop === clientHeight;
-        const isAtTop = scrollTop <= 300;
+        // const isAtTop = scrollTop <= 300;
+        const isAtTop = scrollTop === 0;
 
         if ((scrollHeight - scrollTop) >= (clientHeight - 20)) {
             UIEvents.General.fire("chat.scrollBottom.show");
@@ -227,7 +262,7 @@ class NextBubblesComponent extends VComponent {
         this.currentVirtual.hasMoreOnTopToDownload = event.messages.length === 100;
 
         this.mainVirtual.messages = this.fixMessages(event.messages);
-        this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.messages[100 - this.mainVirtual.size - 1]);
+        this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
         this.scrollBottom();
     }
 
@@ -244,9 +279,9 @@ class NextBubblesComponent extends VComponent {
                 vrdom_delete(this.bubblesInnerRef.$el.firstChild);
             }
 
-            this.appendMessages([message]);
-
             this.mainVirtual.veryBottomPage();
+
+            this.appendMessages([message], this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
 
             if (isAtBottom) {
                 this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
@@ -260,7 +295,7 @@ class NextBubblesComponent extends VComponent {
 
     onChatShowMessage = ({message}) => {
         if (AppSelectedChat.check(message.to)) {
-            let $message = this.$el.querySelector(`#cmsg${message.id}`); // dunno better way, sorry
+            let $message = getMessageElementById(message.id);
 
             if (!$message) {
                 const messageIndex = this.mainVirtual.messages.findIndex(m => m.id === message.id);
@@ -273,7 +308,7 @@ class NextBubblesComponent extends VComponent {
 
                     const messages = this.mainVirtual.currentPage;
 
-                    this.prependMessages(messages);
+                    this.prependMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
                     $message = this.$el.querySelector(`#cmsg${message.id}`);
                 } else {
@@ -299,7 +334,7 @@ class NextBubblesComponent extends VComponent {
             if ($message) {
                 scrollToAndHighlight(this.$el, $message);
             } else {
-                console.warn("[BUG] No message to scroll found.")
+                console.warn("No message to scroll found.")
             }
         } else {
             AppSelectedChat.select(message.to);
@@ -346,13 +381,13 @@ class NextBubblesComponent extends VComponent {
             this.isUsingSecondVirtual = false;
             this.secondVirtual.refresh();
 
-            this.mainVirtual.currentPage = messages = this.mainVirtual.messages.slice(this.mainVirtual.messages.length - this.mainVirtual.size);
+            messages = this.mainVirtual.nextBottom();
         } else {
             this.secondVirtual.messages.push(...messages);
             messages = this.secondVirtual.veryBottomPage();
         }
 
-        this.appendMessages(messages);
+        this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         const $message = this.$el.querySelector(`#cmsg${event.offset_id}`);
 
@@ -408,7 +443,7 @@ class NextBubblesComponent extends VComponent {
             vrdom_delete(this.bubblesInnerRef.$el.lastChild);
         }
 
-        this.prependMessages(messages);
+        this.prependMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         if (this.$el.scrollTop === 0) {
             let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
@@ -484,7 +519,7 @@ class NextBubblesComponent extends VComponent {
             vrdom_delete(this.bubblesInnerRef.$el.firstChild);
         }
 
-        this.appendMessages(messages);
+        this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
     }
 
     onBottomPageMessagesReady = (event) => {

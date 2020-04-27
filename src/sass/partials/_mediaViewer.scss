@@ -13,6 +13,7 @@
   }
 
   .media-viewer {
+    backdrop-filter: blur(10px);
     position: absolute;
     width: 100%;
     height: 100%;
@@ -81,7 +82,7 @@
             background-color: rgba(white, .1);
           }
 
-          transition: all 150ms ease-in-out;
+          transition: height 150ms ease;
         }
       }
     }

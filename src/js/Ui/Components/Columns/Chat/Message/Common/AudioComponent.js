@@ -35,7 +35,6 @@ class AudioComponent extends GeneralMessageComponent {
         }
 
         this.playing = false;
-
     }
 
     render() {
@@ -43,7 +42,7 @@ class AudioComponent extends GeneralMessageComponent {
             <MessageWrapperFragment message={this.message} showUsername={false} bubbleRef={this.bubbleRef}>
                 <div class="audio">
                     <progress class="progress-circular"/>
-                    <div class="play tgico tgico-play rp rps" onMouseDown={this._playButtonClick.bind(this)}/>
+                    <div class="play tgico tgico-play rp rps rp-white" onMouseDown={this._playButtonClick.bind(this)}/>
                     <div class="audio-wrapper">
                         {this.getControls()}
                     </div>

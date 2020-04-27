@@ -61,11 +61,25 @@ img[src=""], img:not([src]) {
   }
 }
 
+.rp.rp-white {
+  .ripple {
+    background: #ffffff;
+    animation: rippleEffectLight 1s ease;
+  }
+}
+
+.rp.rps.rp-white {
+  .ripple {
+    background: #ffffff;
+    animation: rippleEffectLightSmall 1s ease;
+  }
+}
+
 .rp.rps {
   .ripple {
     width: 1px;
     height: 1px;
-    animation: rippleEffectSmall 0.4s ease;
+    animation: rippleEffectSmall 1s ease;
   }
 }
 

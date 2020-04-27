@@ -37,9 +37,9 @@ const vrdom_patchChildren = ($node: Element, vRNode: VRNode) => {
             vrdom_append(children[i], $node, {$parent: $node})
         }
     } else if (children.length < $children.length) {
-        Array.from($children.values()).slice(children.length).forEach($node => {
-            vrdom_delete($node)
-        })
+        for (let i = children.length; i < $children.length; i++) {
+            vrdom_delete($node.lastChild)
+        }
     }
 }
 
