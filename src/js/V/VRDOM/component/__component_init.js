@@ -45,10 +45,6 @@ const __component_init = (context: VComponent) => {
         context.__unregisterReactiveObjectResolve = context.__unregisterReactiveObjectResolve.bind(context)
         context.__recreateReactiveObjects = context.__recreateReactiveObjects.bind(context)
 
-        context.__registerReactiveCallbacks = context.__registerReactiveCallbacks.bind(context)
-        context.__registerReactiveObjectCallbackResolve = context.__registerReactiveObjectCallbackResolve.bind(context)
-        context.__unregisterReactiveCallbacks = context.__unregisterReactiveCallbacks.bind(context)
-
         context.withInterval = context.withInterval.bind(context)
         context.withTimeout = context.withTimeout.bind(context)
         context.clearIntervals = context.clearIntervals.bind(context)
@@ -56,7 +52,6 @@ const __component_init = (context: VComponent) => {
 
         context.init.call(context)
 
-        context.__registerReactiveCallbacks()
 
         context.appEvents(__component_registerAppEvents(context))
         context.reactive(__component_registerReactive(context))

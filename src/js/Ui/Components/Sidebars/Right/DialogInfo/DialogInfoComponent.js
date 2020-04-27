@@ -22,10 +22,10 @@ import {PhotoMessage} from "../../../../../Api/Messages/Objects/PhotoMessage";
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import FileManager from "../../../../../Api/Files/FileManager"
 import {DocumentMessagesTool} from "../../../../Utils/document"
-import VUI from "../../../../VUI"
 import PeersStore from "../../../../../Api/Store/PeersStore"
 import UIEvents from "../../../../EventBus/UIEvents"
 import MTProto from "../../../../../MTProto/External";
+import AppSelectedChat from "../../../../Reactive/SelectedChat"
 
 export class DialogInfoComponent extends RightBarComponent {
 
@@ -106,6 +106,53 @@ export class DialogInfoComponent extends RightBarComponent {
 
         E.bus(UIEvents.General)
             .on("info.select", this.onInfoPeerSelect)
+            .on("chat.select", this.onChatSelect)
+    }
+
+    render() {
+        return (
+            <div className="dialog-info sidebar right hidden">
+                <div class="header toolbar">
+                    <span class="btn-icon tgico tgico-close rp rps" onClick={_ => this.hideBar()}/>
+                    <div class="title">Info</div>
+                    <span class="btn-icon tgico tgico-more rp rps" onClick={this.showStats}/>
+                </div>
+
+                <div class="content scrollable" onScroll={this.onScroll}>
+                    <DialogInfoAvatarComponent/>
+
+                    <DialogInfoDescriptionComponent/>
+
+                    <DialogInfoBioComponent/>
+                    <DialogInfoUsernameComponent/>
+                    <DialogInfoPhoneComponent/>
+
+                    <DialogInfoNotificationStatusComponent/>
+
+                    <div class="materials">
+
+                        <TabSelectorComponent ref={this.tabSelectorRef} items={this.tabItems}/>
+
+                        <div ref={this.contentRefs.members} className="content hidden member-list"/>
+                        <div ref={this.contentRefs.media} className="content"/>
+                        <div ref={this.contentRefs.links} className="content hidden"/>
+                        <div ref={this.contentRefs.docs} className="content hidden docs-list"/>
+                        <div ref={this.contentRefs.audio} className="content hidden audio-list"/>
+
+                        <div ref={this.loadingRef} className="content-loading">
+                            <progress className="progress-circular big"/>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    onChatSelect = _ => {
+        if (this.barVisible) {
+            AppSelectedInfoPeer.select(AppSelectedChat.Current)
+        }
     }
 
     onInfoPeerSelect = _ => {
@@ -162,46 +209,6 @@ export class DialogInfoComponent extends RightBarComponent {
         }).then(l => {
             console.log(l)
         })
-    }
-
-    render() {
-        return (
-            <div className="dialog-info sidebar right hidden">
-                <div class="header toolbar">
-                    <span class="btn-icon tgico tgico-close rp rps" onClick={_ => this.hideBar()}/>
-                    <div class="title">Info</div>
-                    <span class="btn-icon tgico tgico-more rp rps" onClick={this.showStats}/>
-                </div>
-
-                <div class="content scrollable" onScroll={this.onScroll}>
-                    <DialogInfoAvatarComponent/>
-
-                    <DialogInfoDescriptionComponent/>
-
-                    <DialogInfoBioComponent/>
-                    <DialogInfoUsernameComponent/>
-                    <DialogInfoPhoneComponent/>
-
-                    <DialogInfoNotificationStatusComponent/>
-
-                    <div class="materials">
-
-                        <TabSelectorComponent ref={this.tabSelectorRef} items={this.tabItems}/>
-
-                        <div ref={this.contentRefs.members} className="content hidden member-list"/>
-                        <div ref={this.contentRefs.media} className="content"/>
-                        <div ref={this.contentRefs.links} className="content hidden"/>
-                        <div ref={this.contentRefs.docs} className="content hidden docs-list"/>
-                        <div ref={this.contentRefs.audio} className="content hidden audio-list"/>
-
-                        <div ref={this.loadingRef} className="content-loading">
-                            <progress className="progress-circular big"/>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        )
     }
 
     openMembers = () => {
@@ -263,7 +270,7 @@ export class DialogInfoComponent extends RightBarComponent {
         const msg = new PhotoMessage(AppSelectedInfoPeer.Current)
         msg.fillRaw(rawMessage)
         VRDOM.append(<DialogInfoPhotoComponent message={msg}
-                                               click={l => UIEvents.MediaViewer.fire("showMessage", {message:msg})}/>, this.contentRefs.media.$el)
+                                               click={l => UIEvents.MediaViewer.fire("showMessage", {message: msg})}/>, this.contentRefs.media.$el)
     }
 
     openLinks = () => {

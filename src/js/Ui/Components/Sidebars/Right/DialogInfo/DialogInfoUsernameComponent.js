@@ -9,16 +9,16 @@ export class DialogInfoUsernameComponent extends VComponent {
     appEvents(E) {
         E.bus(AppEvents.Peers)
             .only(event => AppSelectedInfoPeer.check(event.peer))
-            .on("updateUsername")
-            .on("fullLoaded")
+            .updateOn("updateUsername")
+            .updateOn("fullLoaded")
 
         E.bus(UIEvents.General)
-            .on("info.select")
+            .updateOn("info.select")
     }
 
 
     render() {
-        const peer = this.callbacks.peer
+        const peer = AppSelectedInfoPeer.Current
 
         if (!peer || !peer.username) {
             return (

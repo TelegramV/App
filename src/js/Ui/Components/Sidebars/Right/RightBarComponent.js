@@ -13,18 +13,14 @@ export class RightBarComponent extends AbstractBarComponent {
     }
 
     openBar = barName => {
-        if (!this.barVisible) {
-            UIEvents.RightSidebar.fire("show", {
-                barName: barName || this.barName,
-            })
-        }
+        UIEvents.RightSidebar.fire("show", {
+            barName: barName || this.barName,
+        })
     }
 
     hideBar = barName => {
-        if (this.barVisible) {
-            UIEvents.RightSidebar.fire("hide", {
-                barName: barName || this.barName,
-            })
-        }
+        UIEvents.RightSidebar.fire("hide", {
+            barName: barName || this.barName,
+        })
     }
 }

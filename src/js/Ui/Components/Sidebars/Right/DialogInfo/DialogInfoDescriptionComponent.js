@@ -48,7 +48,8 @@ export class DialogInfoDescriptionComponent extends VComponent {
 
         return (
             <DialogInfoDescriptionFragment name={name}
-                                           status={peer.statusString.text}/>
+                                           status={peer.statusString.text}
+                                           isLoading={peer.statusString.isLoading}/>
         )
     }
 }

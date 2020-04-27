@@ -65,23 +65,6 @@ class VComponent {
         reactiveObjectContexts: new Map(),
 
         /**
-         * @type {Map<string, ReactiveCallbackContext>}
-         */
-        reactiveCallbackContexts: new Map(),
-
-
-        /**
-         * @type {Map<string, Map<ReactiveObject, Map<string, function(BusEvent)>>>}
-         */
-        reactiveCallbackObjectContexts: new Map(),
-
-
-        /**
-         * @type {Map<string, Map<EventBus, Map<string, function(BusEvent)>>>}
-         */
-        reactiveCallbackAppEventContexts: new Map(),
-
-        /**
          * @type {Set<number>}
          */
         intervals: new Set(),
@@ -91,8 +74,6 @@ class VComponent {
          */
         timeouts: new Set(),
     }
-
-    singleton: boolean = false
 
     /**
      * Default component props:
@@ -120,16 +101,6 @@ class VComponent {
      * @type {{}}
      */
     state: ComponentState = {}
-
-    /**
-     * Reactive callbacks.
-     *
-     * @see ReactiveCallback
-     *
-     * @type {{}}
-     * @deprecated
-     */
-    callbacks = {}
 
     /**
      * Name of the component.
@@ -172,10 +143,6 @@ class VComponent {
         this.props = __component_withDefaultProps(this, props.props)
         this.v = props.v
         this.identifier = props.identifier
-
-        if (this.singleton) {
-            this.identifier = this.displayName
-        }
     }
 
     set $el($el) {
@@ -361,77 +328,6 @@ class VComponent {
         this.__unregisterReactiveObjectResolves()
 
         this.reactive(__component_registerReactive(this))
-    }
-
-
-    // ReactiveCallbacks
-
-
-    /**
-     * Internal use only.
-     */
-    __registerReactiveCallbacks() {
-        for (const [key, context] of Object.entries(this.callbacks)) {
-            if (context.__rc) {
-                context.subscription = (value) => this.__resolveReactiveCallbackChange(key, value)
-                this.__.reactiveCallbackContexts.set(key, context)
-                this.callbacks[key] = context.subscribe(context.subscription)
-            } else {
-                console.error(`not reactive callback ${key}`, context)
-            }
-        }
-    }
-
-    /**
-     * Internal use only.
-     */
-    __unregisterReactiveCallbacks() {
-        for (const [key, context] of this.__.reactiveCallbackContexts) {
-            if (context.__rc) {
-                context.unsubscribe(context.subscription)
-            } else {
-                console.error(`BUG: invalid context found while disabling reactive callbacks. ${key} = ${context}`)
-            }
-        }
-    }
-
-    /**
-     * Internal use only.
-     */
-    __resolveReactiveCallbackChange(key, value) {
-
-        const context = this.__.reactiveCallbackContexts.get(key)
-
-        if (!context) {
-            console.error("BUG: reactive callback context was not found!")
-            return
-        }
-
-        if (context.patchOnly) {
-            this.callbacks[key] = value
-            this.forceUpdate()
-        } else if (context.fireOnly) {
-            this.callbacks[key] = value
-            this.callbackChanged(key, value)
-        } else {
-            this.callbacks[key] = value
-            this.callbackChanged(key, value)
-            this.forceUpdate()
-        }
-    }
-
-    /**
-     * Internal use only.
-     */
-    __registerAppEventCallbackResolve(bus: EventBus, type: string, resolve: (event: BusEvent) => any, callbackName: any) {
-
-    }
-
-    /**
-     * Internal use only.
-     */
-    __registerReactiveObjectCallbackResolve(key: string, type: string, resolve: (event: BusEvent) => any) {
-        //
     }
 
     /**

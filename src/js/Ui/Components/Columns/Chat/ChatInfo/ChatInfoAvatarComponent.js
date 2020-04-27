@@ -8,11 +8,11 @@ class ChatInfoAvatarComponent extends VComponent {
     appEvents(E) {
         E.bus(AppEvents.Peers)
             .only(event => event.peer === AppSelectedChat.Current)
-            .on("updatePhoto")
-            .on("updatePhotoSmall")
+            .updateOn("updatePhoto")
+            .updateOn("updatePhotoSmall")
 
         E.bus(UIEvents.General)
-            .on("chat.select")
+            .updateOn("chat.select")
     }
 
     render() {

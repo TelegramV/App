@@ -36,14 +36,8 @@ class ChatInfoPinnedComponent extends VComponent {
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelected)
-
-        E.bus(UIEvents.General)
             .on("audio.play", this.onAudioPlay)
-
-        E.bus(UIEvents.General)
             .on("audio.pause", this.onAudioPause)
-
-        E.bus(UIEvents.General)
             .on("audio.remove", this.onAudioRemove)
     }
 

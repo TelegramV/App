@@ -25,7 +25,6 @@ const __component_unmount = (context: VComponent) => {
     context.clearIntervals()
     context.clearTimeouts()
 
-    context.__unregisterReactiveCallbacks()
     context.__unregisterAppEventResolves()
     context.__unregisterReactiveObjectResolves()
 

@@ -9,10 +9,10 @@ class ChatInfoNameComponent extends VComponent {
     appEvents(E) {
         E.bus(AppEvents.Peers)
             .only(event => AppSelectedChat.check(event.peer))
-            .on("updateName")
+            .updateOn("updateName")
 
         E.bus(UIEvents.General)
-            .on("chat.select")
+            .updateOn("chat.select")
     }
 
     render() {
