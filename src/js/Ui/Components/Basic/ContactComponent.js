@@ -21,17 +21,12 @@ import {ContactFragment} from "./ContactFragment"
 import {callOrReturn} from "../../../Utils/func"
 
 class ContactComponent extends VComponent {
-
     init() {
         this.loadFullIfNeeded()
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         this.loadFullIfNeeded()
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-        return this.props.peer !== nextProps.peer
     }
 
     appEvents(E) {

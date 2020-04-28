@@ -18,6 +18,8 @@
 import VButton from "../../Elements/Button/VButton"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import {DocumentMessagesTool} from "../../Utils/document"
+import VInput from "../../Elements/Input/VInput"
+import VLazyInput from "../../Elements/Input/VLazyInput"
 
 class Icon extends VComponent {
     state = {
@@ -36,19 +38,25 @@ class Icon extends VComponent {
 function ElementsPage() {
     return (
         <div>
-            <Icon/>
+            {/*<Icon/>*/}
             <VButton>
                 Subscribe
             </VButton>
+            <br/>
             <VButton isFlat>
                 Subscribe
             </VButton>
+            <br/>
             <VButton isRound>
                 +
             </VButton>
+            <br/>
             <VButton isFlat isRound>
                 +
             </VButton>
+            <br/>
+            <VInput label="Search" onInput={event => console.log(event.target.value)}/>
+            <VLazyInput label="Lazy" onInput={event => console.log(event.target.value)} lazyLevel={300}/>
         </div>
     );
 }

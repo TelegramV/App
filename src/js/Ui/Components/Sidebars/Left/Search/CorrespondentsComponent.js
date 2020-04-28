@@ -19,10 +19,7 @@ export class CorrespondentsComponent extends VComponent {
     render() {
         if (TopPeers.correspondents.size === 0) {
             return (
-                <div className="people hidden section">
-                    <div className="section-title">People</div>
-                    <div className="people-list"/>
-                </div>
+                <div/>
             )
         }
 

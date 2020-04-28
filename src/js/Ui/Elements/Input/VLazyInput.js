@@ -15,22 +15,15 @@
  *
  */
 
-// global application state
-const appstate = {
-    chat: {
-        current: null,
-        check: () => null,
-        bus: null,
-    },
-    chatInfo: {
-        current: null,
-        check: () => null,
-        bus: null,
-    },
+import VSimpleLazyInput from "./VSimpleLazyInput"
+import VInput from "./VInput"
+
+class VLazyInput extends VSimpleLazyInput {
+    render() {
+        const {onInput, lazyLevel, ...args} = this.props;
+
+        return <VInput {...args} onInput={this.onInput}/>;
+    }
 }
 
-appstate.chat.bus.subscribe("change", () => {
-    // etc
-})
-
-export default appstate;
+export default VLazyInput;

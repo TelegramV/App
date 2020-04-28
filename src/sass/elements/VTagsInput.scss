@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright 2020 Telegram V authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,28 +15,41 @@
  *
  */
 
-/**
- * @param {Object} prevObject
- * @param {Object} nextObject
- * @param {function(prev, next): boolean} comparator
- * @return {boolean|Object} `false` if are equal
- */
-const __diffObjects = (prevObject, nextObject, comparator) => {
-    const diff = {}
+.VTagsInput {
+  max-width: 400px;
 
-    for (const [k, v] of Object.entries(nextObject)) {
-        const oldV = prevObject[k]
+  .tags {
+    width: 400px;
+    display: flex;
+    flex-wrap: wrap;
 
-        if (comparator) {
-            if (comparator.call(null, oldV, v)) {
-                diff[k] = v
-            }
-        } else if (oldV !== v) {
-            diff[k] = v
+    .tag {
+      background-color: #f1f3f4;
+      display: inline-flex;
+      margin-right: 5px;
+      margin-top: 5px;
+
+      border-radius: 15px;
+
+      .avatar {
+        height: 30px;
+        width: 30px;
+
+        span {
+          font-size: 8pt;
         }
+      }
+
+      span {
+        padding: 5px;
+        margin-right: 8px;
+      }
     }
 
-    return Object.keys(diff).length > 0 ? diff : false
+    .input {
+      width: auto;
+      margin-left: 10px;
+      margin-top: 10px;
+    }
+  }
 }
-
-export default __diffObjects

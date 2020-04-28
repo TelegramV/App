@@ -1,6 +1,6 @@
 import SettingsPane from "../SettingsPane"
-import {InputComponent} from "../../../../Elements/InputComponent"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent";
+import VInput from "../../../../../Elements/Input/VInput"
 
 export default class BackgroundColorComponent extends SettingsPane {
     barName = "background-color";
@@ -41,8 +41,8 @@ export default class BackgroundColorComponent extends SettingsPane {
                     </div>
                 </div>
                 <div class="inputs">
-                    <InputComponent type="text" label="HEX" value="#"/>
-                    <InputComponent label="RGB"/>
+                    <VInput type="text" label="HEX" value="#"/>
+                    <VInput label="RGB"/>
                 </div>
                 <div class="gallery color-list">
                     {this.generateColorList()}

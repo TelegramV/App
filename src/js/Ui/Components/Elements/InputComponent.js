@@ -21,7 +21,7 @@ import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 
 /**
- * @deprecated
+ * @deprecated use {@link VInput}
  */
 export class InputComponent extends VComponent {
 

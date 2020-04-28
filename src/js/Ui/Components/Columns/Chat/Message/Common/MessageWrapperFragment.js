@@ -65,7 +65,10 @@ const MessageWrapperFragment = ({
         },
         {
             icon: "forward",
-            title: "Forward"
+            title: "Forward",
+            onClick: () => {
+                UIEvents.General.fire("message.forward", {message})
+            }
         },
         {
             icon: "delete",

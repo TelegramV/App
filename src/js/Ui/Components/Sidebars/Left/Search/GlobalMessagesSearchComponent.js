@@ -56,7 +56,7 @@ export class GlobalMessagesSearchComponent extends VComponent {
     render() {
         return (
             <div className="global-messages section">
-                <div className="section-title">Global search</div>
+                <div className="section-title">Messages</div>
                 <List list={this.state.messages}
                       template={MessageFragmentItemTemplate}
                       wrapper={<div className="column-list"/>}/>

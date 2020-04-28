@@ -31,14 +31,16 @@ export default class StickerComponent extends VComponent {
                      css-width={`${this.width}px`}
                      css-height={`${this.height}px`}
                      onMouseOver={this._mOver}
-                     onMouseOut={this._mOut}/>
+                     onMouseOut={this._mOut}
+                     onClick={this.props.onClick}/>
             )
         } else {
             return (
                 <img className="sticker loading"
                      src={this.url}
                      css-width={`${this.width}px`}
-                     css-height={`${this.height}px`}/>
+                     css-height={`${this.height}px`}
+                     onClick={this.props.onClick}/>
             )
         }
     }
@@ -53,7 +55,7 @@ export default class StickerComponent extends VComponent {
     }
 
     downloadAndApply() {
-        if(this.animation) {
+        if (this.animation) {
             this.animation.destroy();
         }
         FileAPI.getFile(this.sticker).then(url => {
@@ -78,7 +80,7 @@ export default class StickerComponent extends VComponent {
         this.url = url;
         fetch(url).then(async r => {
             return r.arrayBuffer().then(async b => {
-                if(b[0] == 123) { //"{"
+                if (b[0] == 123) { //"{"
                     return JSON.parse(new TextDecoder("utf-8").decode(new Uint8Array(b)));
                 } else {
                     return JSON.parse(new TextDecoder("utf-8").decode(await MTProto.performWorkerTask("gzipUncompress", new Uint8Array(b))));

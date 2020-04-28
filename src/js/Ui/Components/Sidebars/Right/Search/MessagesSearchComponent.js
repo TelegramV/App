@@ -1,7 +1,7 @@
 import {RightBarComponent} from "../RightBarComponent"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import SearchManager from "../../../../../Api/Search/SearchManager"
-import LazyInput from "../../../Elements/LazyInput"
+import VSimpleLazyInput from "../../../../Elements/Input/VSimpleLazyInput"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import {SearchMessage} from "../../../../../Api/Messages/SearchMessage"
 import UIEvents from "../../../../EventBus/UIEvents"
@@ -31,6 +31,8 @@ const MessagesCountFragment = ({count}) => {
         slot = <span>Type to search</span>
     } else if (count === -1) {
         slot = <span className="loading-text">Searching</span>
+    } else if (count === 1) {
+        slot = <span>1 message found</span>
     } else {
         slot = <span>{count} messages found</span>
     }
@@ -72,11 +74,11 @@ export default class MessageSearchComponent extends RightBarComponent {
                     <span class="btn-icon tgico tgico-close rp rps" onClick={_ => this.hideBar()}/>
                     <div class="search">
                         <div class="input-search">
-                            <LazyInput ref={this.inputRef}
-                                       type="text"
-                                       placeholder="Search"
-                                       onInput={this.onSearchInputUpdated}
-                                       lazyLevel={500}/>
+                            <VSimpleLazyInput ref={this.inputRef}
+                                              type="text"
+                                              placeholder="Search"
+                                              onInput={this.onSearchInputUpdated}
+                                              lazyLevel={500}/>
                             <span class="tgico tgico-search"/>
                         </div>
                     </div>
@@ -140,6 +142,7 @@ export default class MessageSearchComponent extends RightBarComponent {
 
     onSearchInputUpdated = event => {
         const q = event.target.value.trim()
+        this.state.messages.clear()
 
         if (q === "") {
             CURRENT_QUERY = undefined

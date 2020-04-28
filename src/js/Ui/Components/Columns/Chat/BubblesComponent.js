@@ -81,15 +81,15 @@ class BubblesComponent extends VComponent {
 
     onChatSelect = _ => {
         if (AppSelectedChat.isSelected) {
-            if (!AppSelectedChat.Current.full) {
-                AppSelectedChat.Current.fetchFull()
+            if (!AppSelectedChat.current.full) {
+                AppSelectedChat.current.fetchFull()
             }
 
             if (!this.showInstant) {
                 this.toggleMessagesLoader(true)
                 this.refreshMessages()
             } else {
-                if ((AppSelectedChat.Current instanceof ChannelPeer && !(AppSelectedChat.Current instanceof SupergroupPeer)) && !AppSelectedChat.Current.canPostMessages) {
+                if ((AppSelectedChat.current instanceof ChannelPeer && !(AppSelectedChat.current instanceof SupergroupPeer)) && !AppSelectedChat.current.canPostMessages) {
                     this.chatInput.hide()
                 } else {
                     this.chatInput.show()
@@ -159,13 +159,13 @@ class BubblesComponent extends VComponent {
             this.scrollToMessage($rendered)
         } else if (!this.messages.isFetchingNextPage && !this.messages.isFetchingPrevPage) {
             this.toggleMessagesLoader(false)
-            AppSelectedChat.Current.messages.clear()
+            AppSelectedChat.current.messages.clear()
             this.clearBubbles()
             this.isEnd = false
             this.messages.isFetchingNextPage = true
             this.messages.isFetchingPrevPage = true
             this.waitingScrollToMessage = message.id
-            AppSelectedChat.Current.api.fetchByOffsetId({
+            AppSelectedChat.current.api.fetchByOffsetId({
                 offset_id: message.id,
                 add_offset: -25,
                 limit: 50

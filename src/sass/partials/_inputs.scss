@@ -112,23 +112,23 @@ input[type="password"] {
             border-color: $red;
         }
 
-        &:focus:not(:placeholder-shown)+label {
+        &:focus:not(:placeholder-shown) + label {
             color: $blue;
         }
 
-        &.invalid:focus:not(:placeholder-shown)+label {
+        &.invalid:focus:not(:placeholder-shown) + label {
             color: $red;
         }
 
-        &:not(:focus):not(:placeholder-shown)+label {
+        &:not(:focus):not(:placeholder-shown) + label {
             color: $darkgrey;
         }
 
-        &.invalid:not(:focus):not(:placeholder-shown)+label {
+        &.invalid:not(:focus):not(:placeholder-shown) + label {
             color: $red;
         }
 
-        &:not(:placeholder-shown)+label {
+        &:not(:placeholder-shown) + label {
             background-color: #fff;
             top: 0;
             font-size: 12px;
@@ -157,13 +157,13 @@ input[type="password"] {
         display: none;
         cursor: default;
 
-        &:checked~.checkmark {
+        &:checked ~ .checkmark {
             background-color: $blue;
             color: white;
             border: 1px solid $blue;
         }
 
-        &:checked~.checkmark:after {
+        &:checked ~ .checkmark:after {
             display: block;
         }
     }
@@ -191,7 +191,7 @@ input[type="password"] {
 }
 
 .slider-input {
-    >.label {
+    > .label {
         display: flex;
         justify-content: space-between;
 
@@ -203,7 +203,7 @@ input[type="password"] {
         }
     }
 
-    >input {
+    > input {
         --slider-color: #E6ECF0;
         --slider-color-fill: #50a2e9;
         -webkit-appearance: none;
@@ -213,6 +213,7 @@ input[type="password"] {
         border-radius: 2px;
         background: var(--slider-color);
         outline: none;
+
         &::-webkit-slider-thumb { // ::-moz-range-thumb
             -webkit-appearance: none;
             appearance: none;
@@ -229,9 +230,10 @@ input[type="password"] {
 }
 
 .radio-input {
-	label {
-		cursor: pointer;
-	}
+    label {
+        cursor: pointer;
+    }
+
     input[type=radio] {
         z-index: -1;
         position: relative;
@@ -269,17 +271,19 @@ input[type="password"] {
         }
 
         &:checked {
-        	&:before {
-        		border-color: $blue;
-        	}
-        	&:after {
-        		background-color: $blue;
-        	}
+            &:before {
+                border-color: $blue;
+            }
+
+            &:after {
+                background-color: $blue;
+            }
         }
     }
+
     .radio-label {
-    	margin-left: 5px;
-    	cursor: text;
+        margin-left: 5px;
+        cursor: text;
     }
 }
 
@@ -333,7 +337,7 @@ input[type="password"] {
 
     .dropdown-list {
         /*display: flex;
-		flex-direction: column;*/
+        flex-direction: column;*/
 
         position: absolute;
         width: 100%;

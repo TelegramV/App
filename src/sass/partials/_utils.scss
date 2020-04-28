@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright 2020 Telegram V authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,29 +15,6 @@
  *
  */
 
-function VInput(
-    {
-        type = "text",
-        width = "auto",
-        name = null,
-        label = "",
-        onInput,
-        onFocus,
-        value
-    }
-) {
-    return (
-        <div className="VInput" css-width={width}>
-            <input type={type}
-                   placeholder={label}
-                   name={name}
-                   value={value}
-                   onInput={onInput}
-                   onFocus={onFocus}/>
-
-            <label htmlFor={name}>{label}</label>
-        </div>
-    );
+.no-borders {
+  border: none;
 }
-
-export default VInput

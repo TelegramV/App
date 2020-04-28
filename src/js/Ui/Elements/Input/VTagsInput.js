@@ -15,29 +15,21 @@
  *
  */
 
-function VInput(
-    {
-        type = "text",
-        width = "auto",
-        name = null,
-        label = "",
-        onInput,
-        onFocus,
-        value
-    }
+function VTagsInput(
+    {tags = []}
 ) {
     return (
-        <div className="VInput" css-width={width}>
-            <input type={type}
-                   placeholder={label}
-                   name={name}
-                   value={value}
-                   onInput={onInput}
-                   onFocus={onFocus}/>
-
-            <label htmlFor={name}>{label}</label>
+        <div className="VTagsInput" style={{
+            "margin-left": "15px"
+        }}>
+            <div className="tags">
+                {tags}
+                <div className="input">
+                    <input type="text" placeholder="Select chat"/>
+                </div>
+            </div>
         </div>
     );
 }
 
-export default VInput
+export default VTagsInput

@@ -123,6 +123,7 @@ class SelectedChat {
 
     /**
      * @return {undefined|Peer}
+     * @deprecated
      */
     get Previous() {
         return this._previousPeer
@@ -131,7 +132,22 @@ class SelectedChat {
     /**
      * @return {undefined|Peer}
      */
+    get previous() {
+        return this._previousPeer
+    }
+
+    /**
+     * @deprecated
+     * @return {undefined|Peer}
+     */
     get Current() {
+        return this._peer
+    }
+
+    /**
+     * @return {undefined|Peer}
+     */
+    get current() {
         return this._peer
     }
 
