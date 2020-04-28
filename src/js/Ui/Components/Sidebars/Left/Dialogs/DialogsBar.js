@@ -9,7 +9,7 @@ import UIEvents from "../../../../EventBus/UIEvents"
 import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent"
 import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
 import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
-import LazyInput from "../../../Elements/LazyInput"
+import VLazyInput from "../../../Elements/VLazyInput"
 import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 import {Folders} from "./Folders";
@@ -90,10 +90,10 @@ export class DialogsBar extends LeftBarComponent {
                     }}/>
                     <div className="search">
                         <div className="input-search">
-                            <LazyInput type="text" placeholder="Search"
-                                       onFocus={this.openSearch}
-                                       onInput={this.onSearchInputCapture}
-                                       lazyLevel={200}/>
+                            <VLazyInput type="text" placeholder="Search"
+                                        onFocus={this.openSearch}
+                                        onInput={this.onSearchInputCapture}
+                                        lazyLevel={200}/>
                             <span className="tgico tgico-search"/>
                         </div>
                     </div>
