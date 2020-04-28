@@ -9,6 +9,7 @@ import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import VUI from "../../../../VUI"
 import {ButtonWithIconFragment} from "../../Fragments/ButtonWithIconFragment";
 import {SectionFragment} from "../../Fragments/SectionFragment";
+import AvatarComponent from "../../../Basic/AvatarComponent"
 
 const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
     return (
@@ -28,10 +29,8 @@ const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
                     ], ev.currentTarget, "right-top")
                 }}/>
             </div>
-            <div class="photo-container ">
-
-                {me ? <img ref={selfAvatarFragmentRef} className="photo" src={me.photo.smallUrl} alt="avatar"/> :
-                    <div/>}
+            <div class="photo-container">
+                {me ? <AvatarComponent peer={me}/> : <div/>}
             </div>
             <div className="username">{me ? me.name : ""}</div>
             <div className="phone-number">+{me ? me.phone : ""}</div>
