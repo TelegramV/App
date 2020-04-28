@@ -7,6 +7,8 @@ import {askForFile} from "../../../../../Utils/utils"
 import {ButtonWithIconFragment} from "../../../Fragments/ButtonWithIconFragment";
 import {ButtonWithCheckboxFragment} from "../../../Fragments/ButtonWithCheckboxFragment";
 import {SectionFragment} from "../../../Fragments/SectionFragment";
+import UIEvents from "../../../../../EventBus/UIEvents"
+import SquareComponent from "./SquareComponent"
 
 export default class BackgroundImageComponent extends SettingsPane {
     barName = "background-image";
@@ -17,10 +19,15 @@ export default class BackgroundImageComponent extends SettingsPane {
         this.name = "Chat Background";
 
         this.galleryRef = VComponent.createRef();
+
+        this.wallpapers = [];
     }
 
-    componentDidMount() {
-        // this.withTimeout(_=>this._fillImages(WallpaperManager.wallpapersDocumentCache),30000);
+    appEvents(E) {
+        super.appEvents(E);
+        E.bus(UIEvents.General)
+        .on("wallpaper.fetched", this._wallpapersFetched)
+        //.on("wallpaper.ready", this._wallpaperLoaded)
     }
 
     render() {
@@ -49,25 +56,34 @@ export default class BackgroundImageComponent extends SettingsPane {
         }, true)
     }
 
-    _fillImages = (cache) => {
-        console.log("Filling background settings...")
-        for (const key in cache) {
-            VRDOM.append(<ImageSquareFragment id={key} url={cache[key]}
-                                              click={this._fragmentClick}/>, this.galleryRef.$el)
-        }
+    applyWallpaper = (url) => {
+        window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
     }
 
-    applyWallpaper = (id) => {
-        let url = WallpaperManager.wallpapersDocumentCache[id];
-        if (url) {
-            window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
+    /*_wallpaperLoaded = (event) => {
+        let url = URL.createObjectURL(event.wallpaper);
+        for(let i = 0; i<this.wallpapers.length; i++) {
+            if(this.wallpapers[i].document.id == event.id) {
+                this.urls[i] = url;
+                this.forceUpdate();
+                return;
+            }
+        }
+    }*/
+
+    _wallpapersFetched = (event) => {
+        this.wallpapers = event.wallpapers;
+        for(let wallpaper of this.wallpapers) {
+            if (wallpaper.pattern) continue;
+            VRDOM.append(<SquareComponent click={this._fragmentClick} wallpaperId={wallpaper.document.id}/>, this.galleryRef.$el);
+            WallpaperManager.downloadWallpaper(wallpaper);
         }
     }
 
     _fragmentClick = (ev) => {
-        const id = ev.currentTarget.getAttribute("wallpaper-id");
-        if (id) {
-            this.applyWallpaper(id);
+        const url = ev.currentTarget.getAttribute("url");
+        if (url) {
+            this.applyWallpaper(url);
         }
     }
 
@@ -82,10 +98,4 @@ export default class BackgroundImageComponent extends SettingsPane {
             wallpaper.classList.remove("blur");
         }
     }
-}
-
-const ImageSquareFragment = ({id, url, click}) => {
-    return (
-        <div class="image-square" wallpaper-id={id} onClick={click} style={`background-image: url("${url}")`}/>
-    )
 }

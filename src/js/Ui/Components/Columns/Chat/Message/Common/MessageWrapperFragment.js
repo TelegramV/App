@@ -105,8 +105,6 @@ const MessageWrapperFragment = ({
     if (message.raw.fwd_from && (message.raw.fwd_from.saved_from_peer || message.raw.fwd_from.saved_from_msg_id)) {
         topLevelClasses["out"] = false
         topLevelClasses["in"] = true
-        wrapClasses["out"] = false
-        wrapClasses["in"] = true
     }
 
     // FIXME this should be called upon message receiving
