@@ -5,9 +5,9 @@ import DialogsManager from "../Dialogs/DialogsManager"
 import DialogsStore from "../Store/DialogsStore"
 import {getPeerTypeFromType} from "../Dialogs/util"
 import AppEvents from "../EventBus/AppEvents"
-import AppSelectedChat from "../../Ui/Reactive/SelectedChat"
 import API from "../Telegram/API"
 import UpdatesManager from "../Updates/UpdatesManager"
+import AppSelectedChat from "../../Ui/Reactive/SelectedChat"
 
 class MessageManager extends Manager {
     init() {
@@ -201,7 +201,7 @@ class MessageManager extends Manager {
 
         MTProto.UpdatesManager.subscribe("updateMessagePoll", update => {
             if (AppSelectedChat.isSelected) {
-                const messages = AppSelectedChat.Current.messages.getPollsById(update.poll_id)
+                const messages = AppSelectedChat.current.messages.getPollsById(update.poll_id)
                 for (const message of messages) {
                     message.fillPoll(update.poll, update.results)
 

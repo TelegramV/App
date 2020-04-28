@@ -48,6 +48,8 @@ class NextBubblesComponent extends VComponent {
     isUsingSecondVirtual = false;
     actionCount = 0;
 
+    identifier = `bubbles-component`;
+
     get currentVirtual(): VirtualMessages {
         if (this.isUsingSecondVirtual) {
             return this.secondVirtual;
@@ -230,6 +232,8 @@ class NextBubblesComponent extends VComponent {
             this.cleanupTree();
             this.isUsingSecondVirtual = false;
             this.secondVirtual.refresh();
+            // patching is good idea, but it doesn't work properly
+            // vrdom_patch(this.bubblesInnerRef.$el, <div ref={this.bubblesInnerRef} id="bubbles-inner">{this.mainVirtual.veryBottomPage().map(m => this.renderVRNodeMessage(m))}</div>)
             this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
             this.scrollBottom();
         }
@@ -262,7 +266,8 @@ class NextBubblesComponent extends VComponent {
         this.currentVirtual.hasMoreOnTopToDownload = event.messages.length === 100;
 
         this.mainVirtual.messages = this.fixMessages(event.messages);
-        this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
+        console.log("prepending")
+        this.prependMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
         this.scrollBottom();
     }
 

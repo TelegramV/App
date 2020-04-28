@@ -22,6 +22,7 @@
     .hidden {
         width: 0;
         display: none;
+        border: none;
     }
 
     &.right {
@@ -61,7 +62,6 @@
 
     .section {
         border-bottom: 1px solid $lightgrey;
-        border-top: 1px solid $lightgrey;
         //padding-top: 29px;
         //padding-bottom: 20px;
         padding: 20px 8px 30px;
@@ -102,7 +102,6 @@
         transition: anim(background-color);
 
 
-
         .checkbox-input {
             //margin: 20px;
             //padding: 10px 12px 10px 10px;
@@ -125,20 +124,19 @@
     &.search {
         margin-top: 60px;
         height: -webkit-fill-available;
-        padding: 0 10px;
         transition: anim(opacity), anim(transform);
-        transform: scale(1,1);
+        transform: scale(1, 1);
         transform-origin: top;
         opacity: 1;
         pointer-events: auto;
 
         .color-blue {
-          color: $blue;
+            color: $blue;
         }
 
         &.hidden {
             pointer-events: none;
-            transform: scale(0.8,0.8);
+            transform: scale(0.8, 0.8);
             display: block;
             width: 100%;
             opacity: 0;
@@ -224,7 +222,6 @@
         }
 
 
-
         .settings-header {
             display: flex;
         }
@@ -274,7 +271,7 @@
         .sub-settings {
             top: 0;
             left: 500px;
-            transition: 250ms ease-in-out left, 250ms ease-in-out filter;//;anim(left), anim(filter);
+            transition: 250ms ease-in-out left, 250ms ease-in-out filter; //;anim(left), anim(filter);
             background-color: white;
             border-right: none;
         }
@@ -294,7 +291,7 @@
                     grid-column: 1 / 1;
                 }
 
-                &>*:first-child {
+                & > *:first-child {
                     grid-row: 1 / 1;
                     grid-column: 1 / 1;
                 }
@@ -304,6 +301,7 @@
                     margin: 2px;
                     cursor: pointer;
                 }
+
                 .image-square {
                     background-size: cover;
                     background-position: center center;
@@ -322,7 +320,7 @@
                     position: absolute;
                     width: 100%;
                     height: 100%;
-                    background: linear-gradient(to right, #fff 0%, rgba(255,255,255,0) 100%);
+                    background: linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 100%);
                     border-radius: 12px;
                 }
 
@@ -350,13 +348,22 @@
                     background: linear-gradient(to right, red 0%, #ff0 17%, lime 33%, cyan 50%, blue 66%, #f0f 83%, red 100%);
                 }
             }
+
             .inputs {
                 display: flex;
                 margin: 10px;
+
                 .input-field {
                     margin: 5px;
                 }
             }
         }
+    }
+}
+
+.forward-bar {
+    .peers {
+        padding-bottom: 15px;
+        border-bottom: 1px $lightgrey solid;
     }
 }

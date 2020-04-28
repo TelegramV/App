@@ -15,7 +15,7 @@ export default class BackgroundColorComponent extends SettingsPane {
     render() {
         return (
             <div class="sidebar sub-settings general-settings scrollable">
-                {this.makeHeader()}
+                {this.makeHeader(true)}
 
                 <SectionFragment title="Settings">
                     <ButtonWithIconFragment icon="photo" name="Chat Background"

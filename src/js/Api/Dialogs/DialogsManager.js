@@ -66,8 +66,8 @@ class DialogManager extends Manager {
         }, 3000)
 
         UIEvents.General.subscribe("chat.select", _ => {
-            if (AppSelectedChat.Previous) {
-                AppSelectedChat.Previous.messages.clear()
+            if (AppSelectedChat.previous) {
+                AppSelectedChat.previous.messages.clear()
             }
         })
 

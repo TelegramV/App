@@ -1,4 +1,4 @@
-/*
+/*!
  * Copyright 2020 Telegram V authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,22 +15,6 @@
  *
  */
 
-// global application state
-const appstate = {
-    chat: {
-        current: null,
-        check: () => null,
-        bus: null,
-    },
-    chatInfo: {
-        current: null,
-        check: () => null,
-        bus: null,
-    },
+.no-borders {
+  border: none;
 }
-
-appstate.chat.bus.subscribe("change", () => {
-    // etc
-})
-
-export default appstate;

@@ -31,6 +31,8 @@ const MessagesCountFragment = ({count}) => {
         slot = <span>Type to search</span>
     } else if (count === -1) {
         slot = <span className="loading-text">Searching</span>
+    } else if (count === 1) {
+        slot = <span>1 message found</span>
     } else {
         slot = <span>{count} messages found</span>
     }
@@ -140,6 +142,7 @@ export default class MessageSearchComponent extends RightBarComponent {
 
     onSearchInputUpdated = event => {
         const q = event.target.value.trim()
+        this.state.messages.clear()
 
         if (q === "") {
             CURRENT_QUERY = undefined

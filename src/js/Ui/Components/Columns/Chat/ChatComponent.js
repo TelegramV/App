@@ -25,7 +25,6 @@ import {CallsManager} from "../../../../Api/Calls/CallManager";
 import VApp from "../../../../V/vapp"
 import VSpinner from "../../Elements/VSpinner"
 import NextBubblesComponent from "./NextBubblesComponent"
-import BubblesComponent from "./BubblesComponent"
 
 /**
  * CRITICAL: never rerender this component!
@@ -112,7 +111,7 @@ class ChatComponent extends VComponent {
     }
 
     callContact = () => {
-        CallsManager.startCall(AppSelectedChat.Current)
+        CallsManager.startCall(AppSelectedChat.current)
     }
 }
 

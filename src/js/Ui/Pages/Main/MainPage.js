@@ -16,6 +16,7 @@ import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/Archive
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import SnackbarComponent from "../../Components/Singleton/SnackbarComponent"
+import ForwardBarComponent from "../../Components/Sidebars/Right/Search/ForwardBarComponent"
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -56,6 +57,7 @@ export function MainPage() {
 
             <DialogInfoComponent/>
             <MessagesSearchComponent/>
+            <ForwardBarComponent/>
         </div>
     )
 }

@@ -24,11 +24,7 @@ export class DialogComponent extends VComponent {
     unreadMentionsCountFragmentRef = VComponent.createFragmentRef()
     unreadMarkFragmentRef = VComponent.createFragmentRef()
 
-    constructor(props) {
-        super(props)
-
-        this.identifier = `dialog-${this.props.dialog.peer.type}-${this.props.dialog.peer.id}`
-    }
+    identifier = `dialog-${this.props.dialog.peer.type}-${this.props.dialog.peer.id}`
 
     init() {
         this.dialog = this.props.dialog
@@ -102,7 +98,7 @@ export class DialogComponent extends VComponent {
                 this.$el.classList.remove("responsive-selected-chatlist")
             }
 
-            if (AppSelectedChat.Current === this.dialog.peer || AppSelectedChat.Previous === this.dialog.peer) {
+            if (AppSelectedChat.current === this.dialog.peer || AppSelectedChat.previous === this.dialog.peer) {
                 this._patchActive()
             }
         }
@@ -306,7 +302,6 @@ export class DialogComponent extends VComponent {
             return undefined
         }
 
-
         const dialog = this.dialog
         const renderedDialogs = $dialogs.childNodes
 
@@ -330,8 +325,8 @@ export class DialogComponent extends VComponent {
     _handleClick = () => {
         if (AppSelectedChat.check(this.dialog.peer)) {
             UIEvents.General.fire("chat.scrollBottom")
+        } else {
+            AppSelectedChat.select(this.dialog.peer)
         }
-
-        AppSelectedChat.select(this.dialog.peer)
     }
 }

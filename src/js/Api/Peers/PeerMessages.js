@@ -1,8 +1,10 @@
-import AppSelectedChat from "../../Ui/Reactive/SelectedChat"
 import type {Message} from "../Messages/Message"
 import {Peer} from "./Objects/Peer"
 import {arrayDeleteCallback} from "../../Utils/array"
 import {MessageFactory} from "../Messages/MessageFactory"
+import AppSelectedChat from "../../Ui/Reactive/SelectedChat"
+import __diffObjects from "../../V/VRDOM/component/__diffObjects"
+import API from "../Telegram/API"
 
 /**
  * @property {Message} _lastMessage
@@ -32,8 +34,23 @@ export class PeerMessages {
 
     _fireTransaction: boolean = false
 
-    _heap: Map<number, Message> = new Map();
-    _recent: Array<Message> = []; // length <= 60
+    //
+
+    _heap: Map<number, Message> = new Map(); // refreshed when chat changed; do not ever access this directly
+    _recent: Message[] = []; // length <= 60; oldest first; each item should be always duplicated in the `_heap`
+
+    state = {
+        unreadCount: 0,
+        unreadMentionsCount: 0,
+        readOutboxMaxId: 0,
+        readInboxMaxId: 0,
+    }
+
+    setState(nextState) {
+        if (__diffObjects(this._state, nextState)) {
+            this.peer.fire("peer.updateDialogState", Object.assign(this._state, nextState));
+        }
+    }
 
     /**
      * @param {Peer} peer
@@ -63,12 +80,72 @@ export class PeerMessages {
         this._fireTransaction = false
     }
 
+    // fuck I will rewrite it later, I just can't anymore now
+
     get heap(): Map<number, Message> {
         return this._heap;
     }
 
-    get recent(): Map<number, Message> {
-        return this._recent;
+    get next_newest(): Message | null {
+        return this.recent[this.recent.length - 1];
+    }
+
+    get next_oldest(): Message | null {
+        return this.recent[0];
+    }
+
+    getById(id: number): Message {
+        let message = this.heap.get(id);
+
+        if (!message) {
+            message = this._recent.find(message => message.id === message);
+        }
+
+        return message;
+    }
+
+    getRecent(): Promise<Message[]> {
+        if (this._recent.length > 0) {
+            return Promise.resolve(this._recent);
+        }
+
+        return API.messages.getHistory(peer, {limit: 100}).then(Messages => {
+            return this._recent = Messages.messages.map(rawMessage => this.putRawMessage(rawMessage));
+        });
+    }
+
+    putRawMessage(rawMessage): Message {
+        const message = this.heap.get(rawMessage.id);
+
+        if (message) {
+            return message.fillRaw(rawMessage);
+        }
+
+        this.heap.set(rawMessage.id, MessageFactory.fromRaw(this.peer, rawMessage));
+
+        return this.heap.get(rawMessage.id);
+    }
+
+    putNewRawMessage(rawMessage): Message {
+        const message = this.putRawMessage(rawMessage);
+
+        if (this._recent.length > 0) {
+            const newest = this._recent[this._recent.length - 1];
+
+            if (newest.id < message.id) {
+                this._recent.push(message);
+
+                if (this._recent.length > 100) {
+
+                }
+            } else {
+                console.error("BUG: putNewRawMessage got not newest message");
+            }
+        } else {
+            this._recent = [message];
+        }
+
+        return message;
     }
 
     // below deprecated stuff

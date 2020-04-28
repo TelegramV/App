@@ -4,7 +4,7 @@ const AvatarFragment = ({peer, saved}) => {
     if (!peer) {
         return (
             <div className={`avatar placeholder-0`}>
-                <span>BUG</span>
+                <span>?</span>
                 <div className="avatar-outer" css-opacity="0"/>
             </div>
         )
