@@ -8,7 +8,7 @@
         align-items: center;
         margin-top: 5px;
         margin-right: -10px;
-        margin-left: 5px;
+        margin-left: 2px;
 
         .inner {
             display: flex;
@@ -83,8 +83,8 @@
 
     //appear on hover
     & .time.bg {
-            display: none;
-        }
+        display: none;
+    }
 
     &:hover {
         & .time.bg {

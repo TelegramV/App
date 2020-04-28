@@ -1,16 +1,17 @@
-import {ChatInputManager} from "../../ChatInput/ChatInputComponent";
-import {InlineKeyboardComponent} from "./InlineKeyboardComponent";
-import {ReplyFragment} from "./ReplyFragment"
-import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
-import {MessageParser} from "../../../../../../Api/Messages/MessageParser";
-import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer";
+import { ChatInputManager } from "../../ChatInput/ChatInputComponent";
+import { InlineKeyboardComponent } from "./InlineKeyboardComponent";
+import { MessageAvatarComponent } from "./MessageAvatarComponent";
+import { ReplyFragment } from "./ReplyFragment"
+import { ForwardedHeaderFragment } from "./ForwardedHeaderFragment"
+import { MessageParser } from "../../../../../../Api/Messages/MessageParser";
+import { UserPeer } from "../../../../../../Api/Peers/Objects/UserPeer";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer"
 import MTProto from "../../../../../../MTProto/External";
 import UpdatesManager from "../../../../../../Api/Updates/UpdatesManager";
 import VUI from "../../../../../VUI"
 
-const ReplyToMessageFragment = ({message}) => {
+const ReplyToMessageFragment = ({ message }) => {
     if (!message.raw.reply_to_msg_id) {
         return ""
     } else if (!message.replyToMessage) {
@@ -29,8 +30,7 @@ const ReplyToMessageFragment = ({message}) => {
     )
 }
 
-const MessageWrapperFragment = (
-    {
+const MessageWrapperFragment = ({
         message,
         transparent = false,
         noPad = false,
@@ -42,8 +42,7 @@ const MessageWrapperFragment = (
     },
     slot
 ) => {
-    const defaultContextActions = [
-        {
+    const defaultContextActions = [{
             icon: "reply",
             title: "Reply",
             onClick: _ => ChatInputManager.replyTo(message)
@@ -78,19 +77,19 @@ const MessageWrapperFragment = (
 
     const doubleClickHandler = _ => ChatInputManager.replyTo(message)
 
-    const topLevelClasses = {
+    let topLevelClasses = {
+        "message": true,
         "channel": message.isPost,
         "out": !message.isPost && message.isOut,
-        "in": message.isPost || !message.isOut
+        "in": message.isPost || !message.isOut,
     }
 
     const inlineKeyboard = message.replyMarkup && message.replyMarkup._ === "replyInlineMarkup" ?
         <InlineKeyboardComponent message={message}/> : ""
 
-    let wrapClasses = {
-        "bubble": true,
-        "out": !message.isPost && message.isOut,
-        "in": message.isPost || !message.isOut,
+    let contentClasses = {
+        "message-content": true,
+        "no-pad": noPad,
         "transparent": transparent,
         "read": !message.isSending && message.isRead,
         "sending": message.isSending,
@@ -98,25 +97,13 @@ const MessageWrapperFragment = (
         "sent": !message.isSending && !message.isRead, //TODO more convenient method to do this
         "has-inline-keyboard": !!inlineKeyboard
     }
-
-    let messageClasses = {
-        "message": true,
-        "no-pad": noPad
-    }
-
-    let wrapOuter = {
-        "bubble-outer": true,
-        "out": !message.isPost && message.isOut,
-        "in": message.isPost || !message.isOut,
-    }
+    contentClasses["group-" + message.tailsGroup] = true;
 
     if (message.raw.fwd_from && (message.raw.fwd_from.saved_from_peer || message.raw.fwd_from.saved_from_msg_id)) {
         topLevelClasses["out"] = false
         topLevelClasses["in"] = true
         wrapClasses["out"] = false
         wrapClasses["in"] = true
-        wrapOuter["out"] = false
-        wrapOuter["in"] = true
     }
 
     // FIXME this should be called upon message receiving
@@ -125,30 +112,25 @@ const MessageWrapperFragment = (
     }
 
     const isPrivateMessages = message.to instanceof UserPeer
-    const username = showUsername && message.from.name && !message.isPost && !message.isOut && !message.raw.reply_to_msg_id && !message.raw.fwd_from && !isPrivateMessages
+    const username = showUsername && message.from.name && !message.isPost &&
+        !message.isOut && !message.raw.reply_to_msg_id && !message.raw.fwd_from && !isPrivateMessages &&
+        (message.tailsGroup === "s" || message.tailsGroup === "se")
 
     return (
         <div className={topLevelClasses}
-             id={`message-${message.id}`}
+             id={`cmsg${message.id}`}
              onContextMenu={contextMenuHandler}
              onDblClick={doubleClickHandler}>
 
-            <div className={wrapOuter}>
-
-                <div className={wrapClasses} ref={bubbleRef}>
-
+            <MessageAvatarComponent message={message} show={!message.hideAvatar}/>
+                <div className={contentClasses}>
                     <ReplyToMessageFragment message={message}/>
-
-                    <div className={messageClasses}>
-                        <ForwardedHeaderFragment message={message}/>
-                        {username ? <div css-cursor="pointer" className="username"
-                                         onClick={() => AppSelectedInfoPeer.select(message.from)}>{message.from.name}</div> : ""}
-                        {slot}
-                    </div>
+                    <ForwardedHeaderFragment message={message}/>
+                    {username ? <div css-cursor="pointer" className="username"
+                                     onClick={() => AppSelectedInfoPeer.select(message.from)}>{message.from.name}</div> : ""}
+                    {slot}
                 </div>
-
                 {inlineKeyboard}
-            </div>
         </div>
     )
 }

@@ -59,6 +59,8 @@ export interface Message {
     +isLegacy?: boolean;
     +isEditHide?: boolean;
     +isPinned: boolean;
+    +hideAvatar?: boolean;
+    +tailsGroup: string;
     +replyToMessage?: Message;
     +replyMarkup?: any;
     +forwarded?: any;

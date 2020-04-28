@@ -206,18 +206,18 @@
                 box-sizing: border-box;
                 overflow: hidden;
 
-                & > * {
+                /*& > * {
                     display: flex;
                     margin: 2px 0;
 
-                    &:first-child {
+                    &:first-child {*/
 
                         //transform-origin: bottom center;
                         //animation-name: jump-in;
                         //animation-duration: 0.2s;
                         //animation-timing-function: ease-in-out;
-                    }
-                }
+                    /*}
+                }*/
             }
 
             /*
