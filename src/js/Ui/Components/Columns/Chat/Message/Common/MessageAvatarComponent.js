@@ -24,7 +24,7 @@ export class MessageAvatarComponent extends VComponent {
 
     render() {
         if (AppSelectedChat.check(this.props.message.from) && !this.props.message.forwarded) {
-            return <div/>
+            return <div className="avatar"/>
         }
 
         if (!this.show) {

@@ -22,7 +22,6 @@ import AppEvents from "../../../../Api/EventBus/AppEvents"
 import MessageComponent from "./MessageComponent"
 import {UserPeer} from "../../../../Api/Peers/Objects/UserPeer"
 import {ServiceMessage} from "../../../../Api/Messages/Objects/ServiceMessage"
-import {MessageAvatarComponent} from "./Message/Common/MessageAvatarComponent"
 import type {Message} from "../../../../Api/Messages/Message"
 import vrdom_delete from "../../../../V/VRDOM/delete"
 import vrdom_render from "../../../../V/VRDOM/render/render"
@@ -96,17 +95,34 @@ class NextBubblesComponent extends VComponent {
         const isOut = !message.isPost && message.isOut;
         const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
 
-        // u can use `prevMessage` to make the grouping
+        message.hideAvatar = true;
+
+        let prevCurr = this._isGrouping(prevMessage, message);
+        let currNext = this._isGrouping(message, nextMessage);
+        if(!prevCurr && currNext) {
+        	message.tailsGroup = "s";
+        } else if(!currNext) {
+        	if(!prevCurr) {
+        		message.tailsGroup = "se";
+        	} else {
+	        	message.tailsGroup = "e";
+	        }
+        	if(!isOut) message.hideAvatar = false;
+        } else {
+        	message.tailsGroup = "m";
+        }
 
         return vrdom_render(
-            <div id={`cmsg${message.id}`} className={["bubble-group", isOut ? "out" : "in"]}
-                 onClick={() => console.log(message)}>
-                {!hideAvatar ? <MessageAvatarComponent message={message}/> : null}
-                <div className="bubbles-list">
-                    <MessageComponent message={message}/>
-                </div>
-            </div>
+            <MessageComponent message={message}/>
         );
+    }
+
+    _isGrouping(one: Message, two: Message) {
+    	if(!one || !two) return false;
+    	return (!(one.type instanceof ServiceMessage) && !(two.type instanceof ServiceMessage))
+	    	&& (one.isPost || one.isOut === two.isOut)
+	    	&& (one.from.id === two.from.id)
+	    	&& (Math.abs(one.date-two.date)<5*60);
     }
 
     cleanupTree = () => {

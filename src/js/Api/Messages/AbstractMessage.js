@@ -21,21 +21,24 @@ export const DATE_FORMAT = {
 
 export class AbstractMessage extends ReactiveObject implements Message {
 
-    type = MessageType.UNSUPPORTED
+    type = MessageType.UNSUPPORTED;
 
-    _dialog: Dialog
+    _dialog: Dialog;
 
-    _to: Peer
-    _from: Peer
-    prefix: string
-    replyToMessage: Message
-    replyToMessageType: string
-    forwarded: any
-    forwardedType: string
-    forwardedMessageId: number
+    _to: Peer;
+    _from: Peer;
+    prefix: string;
+    replyToMessage: Message;
+    replyToMessageType: string;
+    forwarded: any;
+    forwardedType: string;
+    forwardedMessageId: number;
 
-    _group: Array<Message> | undefined
-    _groupInitializer: boolean
+    _group: Array<Message> | undefined;
+    _groupInitializer: boolean;
+
+    _hideAvatar : boolean;
+    _tailsGroup : string;
 
     constructor(dialogPeer: Peer) {
         super()
@@ -124,6 +127,22 @@ export class AbstractMessage extends ReactiveObject implements Message {
         }
 
         return this.isOut || this.to.messages.readInboxMaxId >= this.id
+    }
+
+    get hideAvatar() : boolean {
+        return this._hideAvatar;
+    }
+
+    set hideAvatar(value: boolean) {
+        this._hideAvatar = value;
+    }
+
+    get tailsGroup() : string {
+        return this._tailsGroup;
+    }
+
+    set tailsGroup(value: string) {
+        this._tailsGroup = value;
     }
 
     get text(): string {

@@ -6,170 +6,164 @@
     @include service;
 
     .channel {
-        .bubble {
-            max-width: 100% !important;
+        .message {
+            grid-template-columns: min-content 1fr;
         }
     }
 
-    .bubble-group {
-        margin-top: 5px !important;
-        margin-bottom: 5px !important;
-        display: flex;
-        align-items: flex-end;
+    .message {
+        /*display: flex;
+        flex-direction: row;*/
+        display: grid;
+        grid-template-areas:
+        "avatar message"
+        "empty keyboard";
+        grid-template-columns: min-content fit-content(480px);
+
+        filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
 
         @include avatar;
 
-        &.in {
-            @include bubbles-list($in: true);
-        }
+        //overflow: hidden;
+        // ЖЕРЕ ХВОСТИ В ПОВІДОМЛЕНЬ
+        // я тимчасово зламаю хвостики бо перероблюю цсс, вже маю трохи ідею як зробити свгшкою то всьо
+        //                                                                          - @undrfined
+
+        //Коли вже svg?
+        //                                                                          - @prettydude
+
+        // https://youtu.be/ciL7OKWSu10
+        // Right behind you...
+        //                                                                          - @undrfined
+
+        // let total_wasted_hours = 16
 
         &.out {
-            @include bubbles-list($in: false);
+            justify-content: end;
+
+            .avatar {
+                display: none; //idk how it was done before
+            }
         }
-    }
 
-    .bubbles-list .bubble-outer {
-        display: flex;
-        flex-direction: column;
-        filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
+        &.in>.message-content {
+            background-color: #ffffff;
+            -webkit-mask-position: 0% 100%;
+            mask-position: 0% 100%;
+            //-webkit-mask-composite: xor, source-over;
 
-        .bubble {
-            grid-area: bubble;
-            max-width: 480px;
+            &.has-inline-keyboard {
+                border-bottom-right-radius: 6px;
+            }
+
+            &.transparent {
+                padding-left: 0 !important;
+
+                @include header($in: true, $transparent: true);
+                @include reply($in: true, $transparent: true);
+            }
+
+            .text-wrapper {
+                padding-left: 0px;
+            }
+
+            @include time($in: true);
+            @include box($in: true);
+            @include header($in: true, $transparent: false);
+            @include reply($in: true, $transparent: false);
+            @include audio($in: true);
+            @include iv-button($in: true);
+            @include tails($in: true);
+        }
+
+        &.out>.message-content {
+            background-color: #eeffde;
+            -webkit-mask-position: 100% 100%;
+            mask-position: 100% 100%;
+            //-webkit-mask-composite: xor, source-over;
+
+            &.has-inline-keyboard {
+                border-bottom-left-radius: 6px;
+            }
+
+            &.transparent {
+                padding-right: 0 !important;
+
+                @include header($in: false, $transparent: true);
+                @include reply($in: false, $transparent: true);
+            }
+
+            .text-wrapper {
+                padding-right: 0px;
+            }
+
+            @include time($in: false);
+            @include box($in: false);
+            @include header($in: false, $transparent: false);
+            @include reply($in: false, $transparent: false);
+            @include audio($in: false);
+            @include iv-button($in: false);
+            @include tails($in: false);
+        }
+
+        .message-content {
             min-height: 33px;
+            grid-area: message;
             border-radius: 6px;
             position: relative;
             z-index: 0;
             display: inline-table;
-            overflow: hidden; // ЖЕРЕ ХВОСТИ В ПОВІДОМЛЕНЬ
-            // я тимчасово зламаю хвостики бо перероблюю цсс, вже маю трохи ідею як зробити свгшкою то всьо
-            //                                                                          - @undrfined
-
-            //Коли вже svg?
-            //                                                                          - @prettydude
-
-            // https://youtu.be/ciL7OKWSu10
-            // Right behind you...
-            //                                                                          - @undrfined
-
-            // let total_wasted_hours = 16
-
-            &.no-mask {
-                -webkit-mask-image: none;
-                mask-image: none;
-            }
-
-            &.in {
-                -webkit-mask-position: 0% 100%;
-                mask-position: 0% 100%;
-                //-webkit-mask-composite: xor, source-over;
-
-                &.has-inline-keyboard {
-                    border-bottom-right-radius: 6px;
-                }
-            }
-
-            &.out {
-                -webkit-mask-position: 100% 100%;
-                mask-position: 100% 100%;
-                //-webkit-mask-composite: xor, source-over;
-
-                &.has-inline-keyboard {
-                    border-bottom-left-radius: 6px;
-                }
-            }
+            overflow: hidden;
 
             -webkit-mask-repeat: no-repeat;
             mask-repeat: no-repeat;
 
+            &.transparent {
+                border-radius: 12px;
+                background-color: transparent;
+                box-shadow: none;
+                position: relative;
+                //overflow: visible; //fix for replies
+            }
+
+            &.no-mask, &.transparent {
+                -webkit-mask-image: none !important;
+                mask-image: none !important;
+            }
+
             &.no-pad {
                 padding-left: 0;
                 padding-right: 0;
+
+                .text-wrapper {
+                    padding: 5px 9px;
+                }
+            }
+
+            .text-wrapper {
+                line-height: 1.2;
+                word-wrap: break-word;
+                padding: 7.5px 9px;
+                user-select: text;
             }
 
             //not dependant
             @include game;
             @include poll;
-            @include box;
             @include map;
             @include sticker;
+            @include figure;
+            @include media-wrapper;
 
-            &.in {
-                @include time($in: true);
-                @include header($in: true, $transparent: false);
-                @include reply($in: true, $transparent: false);
-                @include audio($in: true);
-                @include iv-button($in: true);
-            }
-
-            &.out {
-                @include time($in: false);
-                @include header($in: false, $transparent: false);
-                @include reply($in: false, $transparent: false);
-                @include audio($in: false);
-                @include iv-button($in: false);
-            }
-
-            &.transparent {
-                border-radius: 12px;
-                -webkit-mask-image: none !important;
-                mask-image: none !important;
-                overflow: visible; //fix for replies
-
-                &.in {
-                    padding-left: 0 !important;
-
-                    @include header($in: true, $transparent: true);
-                    @include reply($in: true, $transparent: true);
-                }
-
-                &.out {
-                    padding-right: 0 !important;
-
-                    @include header($in: false, $transparent: true);
-                    @include reply($in: false, $transparent: true);
-                }
-
-                background-color: transparent;
-                box-shadow: none;
-                position: relative;
+            .text-wrapper.pad {
+                padding: 5px 9px;
             }
 
             a:not(.button) {
                 color: $darkblue;
+
                 &:hover {
                     text-decoration: underline;
-                }
-            }
-
-            .message {
-                line-height: 1.2;
-                word-wrap: break-word;
-                padding: 7.5px 9px;
-
-                .text-wrapper {
-                    word-break: break-word;
-                    user-select: text;
-                }
-
-                @include figure;
-
-                @include media-wrapper;
-
-                .text-wrapper.pad {
-                    padding: 5px 9px;
-                }
-
-                .emoji-sizer {
-                    font-size: 1.25em;
-                }
-            }
-
-            .message.no-pad {
-                padding: 0px;
-
-                .text-wrapper {
-                    padding: 5px 9px;
                 }
             }
 
@@ -179,21 +173,6 @@
                 height: auto;
                 max-height: 512px;
             }
-        }
-    }
-
-    .bubbles-list .in {
-        .bubble {
-            background-color: #ffffff;
-        }
-    }
-
-    .bubbles-list .out {
-        align-items: flex-end;
-        flex-direction: column;
-
-        .bubble {
-            background-color: #eeffde;
         }
     }
 }
