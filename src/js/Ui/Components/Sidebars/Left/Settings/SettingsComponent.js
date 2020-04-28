@@ -11,6 +11,7 @@ import {ButtonWithIconFragment} from "../../Fragments/ButtonWithIconFragment";
 import {SectionFragment} from "../../Fragments/SectionFragment";
 import AvatarComponent from "../../../Basic/AvatarComponent"
 import EditProfilePane from "./EditProfilePane"
+import PrivacyAndSecurityPane from "./Privacy/PrivacyAndSecurityPane"
 
 const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
     return (
@@ -44,7 +45,9 @@ const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
                                         onClick={_ => openPane("general-settings")}/>
 
                 <ButtonWithIconFragment icon="unmute" name="Notifications"/>
-                <ButtonWithIconFragment icon="lock" name="Privacy and Security"/>
+                <ButtonWithIconFragment icon="lock"
+                                        name="Privacy and Security"
+                                        onClick={_ => openPane("privacy-security")}/>
                 <ButtonWithIconFragment icon="language" name="Language"/>
             </SectionFragment>
         </div>
@@ -83,6 +86,7 @@ export class SettingsComponent extends LeftBarComponent {
                                       openPane={this.openPane}/>
 
                 <EditProfilePane previous="settings"/>
+                <PrivacyAndSecurityPane previous="settings"/>
                 <GeneralSettingsComponent previous="settings"/>
                 <BackgroundImageComponent previous="general-settings"/>
                 <BackgroundColorComponent previous="background-image"/>
@@ -137,7 +141,7 @@ export class SettingsComponent extends LeftBarComponent {
         switch (name) {
             case "background-color":
             case "general-settings":
-                return true;
+            case "privacy-security":
             case "edit-profile":
                 return true;
             default:

@@ -38,6 +38,7 @@ export function askForFile(accept, callback, asBuffer = false, multiple = false)
 
     }
     input.click();
+    input.remove();
 }
 
 export function formatAudioTime(time) {

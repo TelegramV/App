@@ -25,11 +25,26 @@ import PeersManager from "../../../../../Api/Peers/PeersManager"
 import UIEvents from "../../../../EventBus/UIEvents"
 import VLazyInput from "../../../../Elements/Input/VLazyInput"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
+import {askForFile} from "../../../../Utils/utils"
+import {FileAPI} from "../../../../../Api/Files/FileAPI"
 
 const BR20 = () => <div css-height="20px"/>
 
 function Hint(_, slot) {
     return <p className="VInputHint">{slot}</p>
+}
+
+function EditAvatar({onClick, srcUrl}) {
+    return (
+        <div className="edit-avatar-wrapper">
+            <div className="edit-avatar rp rps" onClick={onClick} style={{
+                "background-image": `url(${srcUrl})`,
+            }}>
+                <div className="tint hidden"/>
+                <div className="add-icon tgico tgico-cameraadd"/>
+            </div>
+        </div>
+    );
 }
 
 class EditProfilePane extends SettingsPane {
@@ -41,6 +56,8 @@ class EditProfilePane extends SettingsPane {
     saveRef = VComponent.createFragmentRef();
     loadingRef = VComponent.createFragmentRef();
 
+    editAvatarRef = VComponent.createFragmentRef();
+
     nameInputRef = VComponent.createComponentRef();
     lastNameInputRef = VComponent.createComponentRef();
     bioInputRef = VComponent.createComponentRef();
@@ -50,10 +67,12 @@ class EditProfilePane extends SettingsPane {
 
     appEvents(E) {
         super.appEvents(E);
-        
+
         E.bus(AppEvents.Peers)
             .only(event => event.peer === this.peer)
             .updateOn("updateUsername")
+            .updateOn("updatePhoto")
+            .updateOn("updatePhotoSmall")
     }
 
     init() {
@@ -66,20 +85,16 @@ class EditProfilePane extends SettingsPane {
     }
 
     render() {
-        const name = this.peer.firstName;
-        const lastName = this.peer.lastName;
-        const username = this.peer.username;
+        const name = this.peer?.firstName;
+        const lastName = this.peer?.lastName;
+        const username = this.peer?.username;
+        const photoUrl = this.peer?.photo?.smallUrl;
 
         return (
             <div class="sidebar sub-settings edit-page-pane scrollable">
                 {this.makeHeader(true)}
 
-                <div className="edit-picture-wrapper">
-                    <div className="edit-picture rp rps">
-                        <div className="tint hidden"/>
-                        <div className="add-icon tgico tgico-cameraadd"/>
-                    </div>
-                </div>
+                <EditAvatar ref={this.editAvatarRef} onClick={this.onClickEditAvatar} srcUrl={photoUrl}/>
 
                 <SectionFragment>
                     <VLazyInput lazyLevel={500}
@@ -119,6 +134,19 @@ class EditProfilePane extends SettingsPane {
                 <SettingsFabFragment hide={true} ref={this.saveRef} isLoading={false} onClick={this.updateUsername}/>
             </div>
         );
+    }
+
+    updateAvatar = (bytes: ArrayBuffer) => {
+        this.showLoading();
+        this.hideSave();
+
+        FileAPI.uploadProfilePhoto("avatar.jpg", bytes).then(Photo => {
+            this.hideLoading();
+
+            UIEvents.General.fire("snackbar.show", {text: "Photo successfully updated!", time: 2, success: true});
+        }).catch(error => {
+            UIEvents.General.fire("snackbar.show", {text: error.type, time: 4, error: true});
+        })
     }
 
     updateProfile = (field, value, error, success, ref) => {
@@ -168,6 +196,10 @@ class EditProfilePane extends SettingsPane {
             return;
         }
 
+        if (username === "") {
+            return;
+        }
+
         this.showLoading();
 
         MTProto.invokeMethod("account.updateUsername", {
@@ -196,6 +228,10 @@ class EditProfilePane extends SettingsPane {
         });
     }
 
+    onClickEditAvatar = (event: Event) => {
+        askForFile("jpg", this.updateAvatar, true)
+    }
+
     onInputName = (event: InputEvent) => {
         this.updateProfile("first_name", event.target.value, "Invalid name", "Name successfully updated!", this.nameInputRef);
     }
@@ -210,6 +246,15 @@ class EditProfilePane extends SettingsPane {
 
     onInputUsername = (event: InputEvent) => {
         const username = event.target.value.trim();
+
+        if (username === "") {
+            this.usernameInputRef.update({
+                isError: true,
+                error: "Invalid username"
+            });
+
+            return;
+        }
 
         this.currentlyCheckingUsername = username;
 
