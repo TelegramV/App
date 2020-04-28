@@ -15,27 +15,23 @@
  *
  */
 
-import VComponent from "../component/VComponent"
-import VApp from "../../vapp"
-
-class ComponentRef {
-    __component_ref = true
-    identifier: number
-
-    component: VComponent
-
-    constructor() {
-        this.identifier = ++(VApp.latestInstantiatedRef)
+function SettingsFabFragment(
+    {
+        isLoading = false,
+        icon = "check",
+        onClick,
+        hide = false
     }
-
-    update(props = {}) {
-        this.component.updateProps(props);
-    }
-
-    unmount() {
-        this.component && this.component.__unmount()
-        this.component = undefined
-    }
+) {
+    return (
+        <div hideIf={hide} onClick={onClick} className="settings-fab rp rps">
+            {
+                isLoading
+                    ? <progress className="progress-circular white"/>
+                    : <i className={`tgico tgico-${icon}`}/>
+            }
+        </div>
+    );
 }
 
-export default ComponentRef
+export default SettingsFabFragment;

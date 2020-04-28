@@ -10,12 +10,13 @@ import VUI from "../../../../VUI"
 import {ButtonWithIconFragment} from "../../Fragments/ButtonWithIconFragment";
 import {SectionFragment} from "../../Fragments/SectionFragment";
 import AvatarComponent from "../../../Basic/AvatarComponent"
+import EditProfilePane from "./EditProfilePane"
 
 const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
     return (
         <div className="settings-main">
             <div className="sidebar-header no-borders">
-                <i className="btn-icon tgico tgico-back" onClick={_ => openPane("dialogs")}/>
+                <i className="btn-icon tgico tgico-back rp rps" onClick={_ => openPane("dialogs")}/>
                 <div className="sidebar-title">Settings</div>
                 <span className="btn-icon tgico tgico-more rp rps" onClick={ev => {
                     VUI.ContextMenu.openBelow([
@@ -35,9 +36,13 @@ const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
             <div className="username">{me ? me.name : ""}</div>
             <div className="phone-number">+{me ? me.phone : ""}</div>
             <SectionFragment noBorders>
-                <ButtonWithIconFragment icon="edit" name="Edit Profile"/>
-                <ButtonWithIconFragment icon="settings" name="General settings"
+                <ButtonWithIconFragment icon="edit"
+                                        name="Edit Profile"
+                                        onClick={() => openPane("edit-profile")}/>
+                <ButtonWithIconFragment icon="settings"
+                                        name="General settings"
                                         onClick={_ => openPane("general-settings")}/>
+
                 <ButtonWithIconFragment icon="unmute" name="Notifications"/>
                 <ButtonWithIconFragment icon="lock" name="Privacy and Security"/>
                 <ButtonWithIconFragment icon="language" name="Language"/>
@@ -76,6 +81,8 @@ export class SettingsComponent extends LeftBarComponent {
                                       ref={this.settingsMainRef}
                                       selfAvatarFragmentRef={this.selfAvatarFragmentRef}
                                       openPane={this.openPane}/>
+
+                <EditProfilePane previous="settings"/>
                 <GeneralSettingsComponent previous="settings"/>
                 <BackgroundImageComponent previous="general-settings"/>
                 <BackgroundColorComponent previous="background-image"/>
@@ -125,10 +132,13 @@ export class SettingsComponent extends LeftBarComponent {
         this.$el.classList.add("hidden");
     }
 
+    // dich
     _isSettingsBar = (name) => {
         switch (name) {
             case "background-color":
             case "general-settings":
+                return true;
+            case "edit-profile":
                 return true;
             default:
                 return false;

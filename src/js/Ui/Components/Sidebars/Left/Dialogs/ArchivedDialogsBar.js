@@ -7,7 +7,7 @@ export class ArchivedDialogsBar extends LeftBarComponent {
 
     render() {
         return (
-            <div className="settings sidebar scrollable hidden">
+            <div className="archived settings sidebar scrollable hidden">
                 <div className="settings-main">
                     <div className="sidebar-header no-borders">
                         <i className="btn-icon tgico tgico-back" onClick={_ => this.openBar("dialogs")}/>

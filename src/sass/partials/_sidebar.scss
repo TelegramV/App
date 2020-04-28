@@ -80,7 +80,7 @@
 
         > .title {
             color: $darkgrey;
-            font-weight: bold;
+            font-weight: 500;
             margin-bottom: 20px;
         }
     }
@@ -89,7 +89,7 @@
     .section-title {
         color: $darkgrey;
         margin: 20px;
-        font-weight: bold;
+        font-weight: 500;
     }
 
     .button-with-icon {
@@ -366,5 +366,60 @@
     .peers {
         padding-bottom: 15px;
         border-bottom: 1px $lightgrey solid;
+    }
+}
+
+.settings-fab {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 54px;
+    height: 54px;
+    border-radius: 100%;
+    background-color: $blue;
+    display: flex;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.edit-page-pane {
+    .edit-picture-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+
+        .edit-picture {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: $blue;
+            background-size: contain;
+
+            cursor: pointer;
+
+            .tint {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                background-color: $semiblack;
+
+                &.hidden {
+                    display: none;
+                }
+            }
+
+            .add-icon {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 48px;
+                color: white;
+            }
+        }
     }
 }

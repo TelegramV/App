@@ -32,7 +32,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs) => {
                 continue
             }
 
-            if (v === undefined) {
+            if (v == null) {
                 $el.removeAttribute(k)
             } else if ($el.getAttribute(k) !== v) {
                 $el.setAttribute(k, String(v))
@@ -44,7 +44,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs) => {
                 continue
             }
 
-            if (newAttrs[name] === undefined) {
+            if (newAttrs[name] == null) {
                 $el.removeAttribute(name)
             }
         }

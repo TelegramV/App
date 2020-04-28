@@ -22,37 +22,53 @@ class SnackbarComponent extends VComponent {
     state = {
         text: null,
         isShown: false,
+        success: false,
+        error: false,
     };
 
     appEvents(E: AE) {
         E.bus(UIEvents.General)
-            .on("snackbar.show", this.onSnackbarShow)
-            .on("snackbar.close", this.onSnackbarClose);
+            .on("snackbar.show", this.show)
+            .on("snackbar.close", this.close);
     }
 
     render() {
-        const {text, isShown} = this.state;
+        const {text, isShown, success, error} = this.state;
 
         return (
             <div id="snackbar" className={{
                 "show": isShown,
+                "success": success,
+                "error": error,
             }}>
                 <span>{text}</span>
             </div>
         );
     }
 
-    onSnackbarShow = event => {
+    show = event => {
+        this.clearTimeouts();
+
         this.setState({
             text: event.text,
             isShown: true,
+            success: event.success,
+            error: event.error,
         });
+
+        if (event.time) {
+            this.withTimeout(this.close, event.time * 1000);
+        }
     }
 
-    onSnackbarClose = event => {
+    close = () => {
+        this.clearTimeouts();
+
         this.setState({
             text: null,
             isShown: false,
+            success: false,
+            error: false,
         });
     }
 }

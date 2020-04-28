@@ -353,6 +353,11 @@ class VComponent {
         })
     }
 
+    updateProps(props = {}) {
+        Object.assign(this.props, props);
+        this.forceUpdate();
+    }
+
     __update(props) {
         return __component_update(this, props)
     }

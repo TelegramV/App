@@ -48,7 +48,7 @@ export default class SettingsPane extends LeftBarComponent {
     }
 
     hideAnimation = event => {
-        if(event.barName === this.barName) {
+        if (event.barName === this.barName) {
             this.$el.classList.toggle("fade-out", event.hide);
 
             console.log("HIDE ANIM", this.barName)
@@ -58,7 +58,7 @@ export default class SettingsPane extends LeftBarComponent {
     barOnShow = () => {
         console.log("barOnShow", this.name, this.props)
         this.$el.classList.add("fade-in");
-        if(this.props.previous === "settings") {
+        if (this.props.previous === "settings") {
             this.$el.parentElement.querySelector(".settings-main").classList.add("fade-out")
         }
 
@@ -71,7 +71,7 @@ export default class SettingsPane extends LeftBarComponent {
     barOnHide = () => {
         console.log("barOnHide", this.name, this.props)
         this.$el.classList.remove("fade-in")
-        if(this.props.previous === "settings") {
+        if (this.props.previous === "settings") {
             this.$el.parentElement.querySelector(".settings-main").classList.remove("fade-out")
         }
     }
@@ -103,7 +103,7 @@ export default class SettingsPane extends LeftBarComponent {
     makeHeader = (noBorders = false) => {
         return (
             <div class={{"sidebar-header": true, "no-borders": noBorders}}>
-                <i class="btn-icon tgico tgico-back" onClick={this.onBack.bind(this)}/>
+                <i class="btn-icon tgico tgico-back rp rps" onClick={this.onBack}/>
                 <div class="sidebar-title">{this.name}</div>
             </div>
         )

@@ -56,6 +56,29 @@
 
         &.invalid {
             border-color: $red;
+            border-width: 2px;
+
+            & + label {
+                color: $red;
+            }
+        }
+
+        &.success {
+            border-color: #26962f;
+            border-width: 2px;
+        }
+
+        &.success:focus {
+            border-width: 2px;
+            border-color: #26962f;
+        }
+
+        &.success:focus:not(:placeholder-shown) + label {
+            color: #26962f;
+        }
+
+        &.success:not(:focus):not(:placeholder-shown) + label {
+            color: #26962f;
         }
 
         &:focus {
@@ -91,4 +114,10 @@
             font-weight: 500;
         }
     }
+}
+
+.VInputHint {
+    padding-left: 5px;
+    color: #707579;
+    font-weight: 100;
 }

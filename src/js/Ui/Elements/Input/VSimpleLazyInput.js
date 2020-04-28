@@ -31,9 +31,13 @@ class VSimpleLazyInput extends VComponent {
     }
 
     onInput = (event) => {
-        if (!this.value !== event.target.value) {
+        if (event.target.value === "") {
+            this.clearTimeouts();
+
+            this.props.onInput(event);
+        } else if (!this.value !== event.target.value) {
             this.value = event.target.value;
-            
+
             this.clearTimeouts();
 
             this.withTimeout(() => {
