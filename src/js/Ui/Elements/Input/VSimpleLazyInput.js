@@ -17,7 +17,7 @@
 
 import VComponent from "../../../V/VRDOM/component/VComponent"
 
-class VLazyInput extends VComponent {
+class VSimpleLazyInput extends VComponent {
     lazyLevel = this.props.lazyLevel || 1000;
     value = this.props.value;
 
@@ -31,11 +31,13 @@ class VLazyInput extends VComponent {
     }
 
     onInput = (event) => {
-        this.clearTimeouts();
+        if (!this.value !== event.target.value) {
+            this.value = event.target.value;
+            
+            this.clearTimeouts();
 
-        if (!this.value !== event.value) {
             this.withTimeout(() => {
-                if (!this.value !== event.value) {
+                if (!this.value !== event.target.value) {
                     this.props.onInput(event);
                 }
             }, this.lazyLevel);
@@ -43,8 +45,8 @@ class VLazyInput extends VComponent {
     }
 }
 
-VLazyInput.defaultProps = {
+VSimpleLazyInput.defaultProps = {
     type: "text"
 }
 
-export default VLazyInput
+export default VSimpleLazyInput

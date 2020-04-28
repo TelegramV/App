@@ -15,6 +15,80 @@
  *
  */
 
-.v-input {
+.VInput {
+    position: relative;
+    width: auto;
+    height: $input-height;
+    box-sizing: border-box;
+    margin-top: 12px;
+    margin-bottom: 12px;
 
+    label {
+        position: absolute;
+        top: 50%;
+        left: 11px;
+        transform: translateY(-50%);
+        cursor: text;
+        user-select: none;
+        transition: top 100ms, font-size 100ms;
+        font-size: 16px;
+        color: $grey;
+        padding: 5px;
+        border-radius: 1em;
+        pointer-events: none;
+    }
+
+    input {
+        height: 100%;
+        padding: 0 15px;
+        border: 1px solid $lightgrey;
+        transition: 100ms ease-in-out border-color;
+        border-radius: 10px;
+
+        &:hover {
+            border-color: #aaa;
+            border-width: 1px;
+        }
+
+        &::placeholder {
+            color: transparent;
+        }
+
+        &.invalid {
+            border-color: $red;
+        }
+
+        &:focus {
+            border-width: 2px;
+            border-color: $blue;
+        }
+
+        &.invalid:focus {
+            border-width: 2px;
+            border-color: $red;
+        }
+
+        &:focus:not(:placeholder-shown) + label {
+            color: $blue;
+        }
+
+        &.invalid:focus:not(:placeholder-shown) + label {
+            color: $red;
+        }
+
+        &:not(:focus):not(:placeholder-shown) + label {
+            color: $darkgrey;
+        }
+
+        &.invalid:not(:focus):not(:placeholder-shown) + label {
+            color: $red;
+        }
+
+        &:not(:placeholder-shown) + label {
+            background-color: #fff;
+            top: 0;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    }
 }

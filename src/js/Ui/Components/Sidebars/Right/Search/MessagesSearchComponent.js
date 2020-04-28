@@ -1,7 +1,7 @@
 import {RightBarComponent} from "../RightBarComponent"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import SearchManager from "../../../../../Api/Search/SearchManager"
-import VLazyInput from "../../../Elements/VLazyInput"
+import VSimpleLazyInput from "../../../../Elements/Input/VSimpleLazyInput"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import {SearchMessage} from "../../../../../Api/Messages/SearchMessage"
 import UIEvents from "../../../../EventBus/UIEvents"
@@ -74,11 +74,11 @@ export default class MessageSearchComponent extends RightBarComponent {
                     <span class="btn-icon tgico tgico-close rp rps" onClick={_ => this.hideBar()}/>
                     <div class="search">
                         <div class="input-search">
-                            <VLazyInput ref={this.inputRef}
-                                        type="text"
-                                        placeholder="Search"
-                                        onInput={this.onSearchInputUpdated}
-                                        lazyLevel={500}/>
+                            <VSimpleLazyInput ref={this.inputRef}
+                                              type="text"
+                                              placeholder="Search"
+                                              onInput={this.onSearchInputUpdated}
+                                              lazyLevel={500}/>
                             <span class="tgico tgico-search"/>
                         </div>
                     </div>

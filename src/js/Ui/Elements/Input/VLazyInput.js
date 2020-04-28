@@ -15,29 +15,15 @@
  *
  */
 
-function VInput(
-    {
-        type = "text",
-        width = "auto",
-        name = null,
-        label = "",
-        onInput,
-        onFocus,
-        value
-    }
-) {
-    return (
-        <div className="VInput" css-width={width}>
-            <input type={type}
-                   placeholder={label}
-                   name={name}
-                   value={value}
-                   onInput={onInput}
-                   onFocus={onFocus}/>
+import VSimpleLazyInput from "./VSimpleLazyInput"
+import VInput from "./VInput"
 
-            <label htmlFor={name}>{label}</label>
-        </div>
-    );
+class VLazyInput extends VSimpleLazyInput {
+    render() {
+        const {onInput, lazyLevel, ...args} = this.props;
+
+        return <VInput {...args} onInput={this.onInput}/>;
+    }
 }
 
-export default VInput
+export default VLazyInput;
