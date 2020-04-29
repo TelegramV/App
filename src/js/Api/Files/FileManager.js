@@ -33,7 +33,7 @@ class FilesManager {
         return this.downloadDocument(photo, thumbSize)
     }
 
-    downloadDocument = async (file, thumbSize = undefined) => {
+    downloadDocument = async (file, thumbSize = undefined, useCache = false) => {
         if (this.pending.has(file.id)) {
             return false
         }
@@ -46,6 +46,28 @@ class FilesManager {
             raw: file,
             progress: 0
         })
+
+        if (useCache) {
+            try {
+                const cachedUrl = await FileAPI.tryCache(file)
+
+                this.pending.delete(file.id)
+                this.downloaded.set(file.id, cachedUrl)
+
+                AppEvents.Files.fire("fileDownloaded", {
+                    fileId: file.id,
+                    raw: file,
+                    url: cachedUrl
+                })
+
+
+                if (cachedUrl) {
+                    return cachedUrl
+                }
+            } catch (e) {
+                console.error(e)
+            }
+        }
 
         const size = file.size || (file.thumbs || file.sizes).find(l => l.type === thumbSize).size
         let offset = 0
@@ -88,7 +110,7 @@ class FilesManager {
         // Can be cancelled here?
         // no
 
-        const url = FileAPI.createBlobFromParts(file, file.mime_type || "application/jpeg", parts)
+        const url = FileAPI.createBlobFromParts(file, file.mime_type || "application/jpeg", parts, useCache)
 
         this.pending.delete(file.id)
         this.downloaded.set(file.id, url)
@@ -96,21 +118,12 @@ class FilesManager {
         AppEvents.Files.fire("fileDownloaded", {
             fileId: file.id,
             file: parts,
-            raw: file
+            raw: file,
+            url
         })
 
         // Backwards compatibility
         return url
-
-        // FileAPI.getAllParts(file, file.size).then(x => {
-        //     this.pending.delete(file.id)
-        //
-        //     AppEvents.Files.fire("fileDownloaded", {
-        //         fileId: file.id,
-        //         file: x,
-        //         raw: file
-        //     })
-        // })
     }
 
     saveOnPc = (data, fileName) => {

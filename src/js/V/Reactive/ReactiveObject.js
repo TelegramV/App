@@ -21,6 +21,7 @@ import {EventBus} from "../../Api/EventBus/EventBus"
 
 type ReactiveObjectSubscription = (object: this, event: any) => any
 
+// should be probably moved somewhere else
 export class ReactiveObject extends TypedPublisher<ReactiveObjectSubscription, BusEvent> {
 
     eventBus: EventBus = undefined

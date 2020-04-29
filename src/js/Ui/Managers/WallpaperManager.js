@@ -43,7 +43,7 @@ class WallpaperManagerSingleton {
             UIEvents.General.fire("wallpaper.fetched", {wallpapers: this.wallpapers});
 
             this.wallpapers.forEach(wallpaper => {
-                FileManager.downloadDocument(wallpaper.document);
+                FileManager.downloadDocument(wallpaper.document, undefined, true);
             });
 
             return this.wallpapers;
@@ -55,11 +55,9 @@ class WallpaperManagerSingleton {
             return;
         }
 
-        const blob = new Blob(event.file, {type: event.raw.mime_type || "application/jpeg"});
-
         UIEvents.General.fire("wallpaper.ready", {
             id: event.fileId,
-            wallpaperUrl: URL.createObjectURL(blob)
+            wallpaperUrl: event.url
         });
     }
 }

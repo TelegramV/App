@@ -25,7 +25,6 @@ export class ChatInputComponent extends VComponent {
         super(props);
         ChatInputManager = this
         this.reply = null
-        global.xxx = this
     }
 
     get isVoiceMode() {
