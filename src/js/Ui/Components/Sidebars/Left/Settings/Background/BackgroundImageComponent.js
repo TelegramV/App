@@ -2,7 +2,6 @@ import SettingsPane from "../SettingsPane"
 import WallpaperManager from "../../../../../Managers/WallpaperManager"
 import VRDOM from "../../../../../../V/VRDOM/VRDOM"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
-import VCheckbox from "../../../../Elements/VCheckbox"
 import {askForFile} from "../../../../../Utils/utils"
 import {ButtonWithIconFragment} from "../../../Fragments/ButtonWithIconFragment";
 import {ButtonWithCheckboxFragment} from "../../../Fragments/ButtonWithCheckboxFragment";
@@ -10,24 +9,18 @@ import {SectionFragment} from "../../../Fragments/SectionFragment";
 import UIEvents from "../../../../../EventBus/UIEvents"
 import SquareComponent from "./SquareComponent"
 
-export default class BackgroundImageComponent extends SettingsPane {
+class BackgroundImageComponent extends SettingsPane {
+    name = "Chat Background";
     barName = "background-image";
+    galleryRef = VComponent.createRef();
 
-    constructor(props) {
-        super(props);
-
-        this.name = "Chat Background";
-
-        this.galleryRef = VComponent.createRef();
-
-        this.wallpapers = [];
-    }
+    wallpapers = [];
 
     appEvents(E) {
         super.appEvents(E);
+
         E.bus(UIEvents.General)
-        .on("wallpaper.fetched", this._wallpapersFetched)
-        //.on("wallpaper.ready", this._wallpaperLoaded)
+            .on("wallpaper.fetched", this.onWallpaperFetched)
     }
 
     render() {
@@ -36,10 +29,15 @@ export default class BackgroundImageComponent extends SettingsPane {
                 {this.makeHeader()}
 
                 <SectionFragment noBorders>
-                    <ButtonWithIconFragment icon="cameraadd" name="Upload Wallpaper" onClick={this._uploadBackground}/>
-                    <ButtonWithIconFragment icon="colorize" name="Set a Color"
-                                            onClick={_ => this.openPane("background-color")}/>
-                    <ButtonWithCheckboxFragment name="Blur Wallpaper Image" onClick={this._blurCheckClick} checked/>
+                    <ButtonWithIconFragment icon="cameraadd" name="Upload Wallpaper" onClick={this.uploadBackground}/>
+
+                    <ButtonWithIconFragment icon="colorize"
+                                            name="Set a Color"
+                                            onClick={() => this.openPane("background-color")}/>
+
+                    <ButtonWithCheckboxFragment name="Blur Wallpaper Image"
+                                                onClick={this._blurCheckClick}
+                                                checked/>
 
                     <div ref={this.galleryRef} className="gallery background-list"/>
                 </SectionFragment>
@@ -48,7 +46,7 @@ export default class BackgroundImageComponent extends SettingsPane {
         )
     }
 
-    _uploadBackground = () => {
+    uploadBackground = () => {
         askForFile("image/*", buffer => {
             let blob = new Blob([buffer]);
             let url = URL.createObjectURL(blob);
@@ -60,23 +58,12 @@ export default class BackgroundImageComponent extends SettingsPane {
         window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
     }
 
-    /*_wallpaperLoaded = (event) => {
-        let url = URL.createObjectURL(event.wallpaper);
-        for(let i = 0; i<this.wallpapers.length; i++) {
-            if(this.wallpapers[i].document.id == event.id) {
-                this.urls[i] = url;
-                this.forceUpdate();
-                return;
-            }
-        }
-    }*/
-
-    _wallpapersFetched = (event) => {
+    onWallpaperFetched = event => {
         this.wallpapers = event.wallpapers;
-        for(let wallpaper of this.wallpapers) {
+        for (let wallpaper of this.wallpapers) {
             if (wallpaper.pattern) continue;
-            VRDOM.append(<SquareComponent click={this._fragmentClick} wallpaperId={wallpaper.document.id}/>, this.galleryRef.$el);
-            WallpaperManager.downloadWallpaper(wallpaper);
+            VRDOM.append(<SquareComponent click={this._fragmentClick}
+                                          wallpaperId={wallpaper.document.id}/>, this.galleryRef.$el);
         }
     }
 
@@ -98,4 +85,10 @@ export default class BackgroundImageComponent extends SettingsPane {
             wallpaper.classList.remove("blur");
         }
     }
+
+    barWillOpen() {
+        WallpaperManager.fetchAllWallPapers();
+    }
 }
+
+export default BackgroundImageComponent;

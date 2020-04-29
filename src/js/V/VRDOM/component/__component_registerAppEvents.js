@@ -28,7 +28,11 @@ export type AESubscribe = {
 }
 
 export type AECondition = AESubscribe | {
+    /**
+     * @deprecated use filter instead
+     */
     only(callback: any): AESubscribe,
+    filter(callback: any): AESubscribe,
 }
 
 export type AE = {
@@ -47,6 +51,7 @@ export function __component_registerAppEvents(component: VComponent): AE {
 function registerAppEvents_bus(component: VComponent, bus: EventBus) {
     return {
         only: (callback: any) => registerAppEvents_bus_only(component, bus, callback),
+        filter: (callback: any) => registerAppEvents_bus_only(component, bus, callback),
         on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, null, type, resolve),
         updateOn: (type: string) => registerAppEvents_bus_only_subscribe(component, bus, null, type, null)
     }

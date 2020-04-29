@@ -53,9 +53,7 @@ class FilesManager {
 
         while (offset < size) {
             if (!this.pending.has(file.id)) {
-                //reject("Cancelled by user")
                 console.info("Cancelled by user download")
-                // Cancelled by user
                 return false
             }
 
@@ -65,7 +63,7 @@ class FilesManager {
                 access_hash: file.access_hash,
                 file_reference: file.file_reference,
                 thumb_size: thumbSize
-            }, file.dc_id, offset)
+            }, file.dc_id, offset);
 
             if (!response.bytes) {
                 console.error("Fatal error while loading part", response, file, offset, size)
@@ -78,15 +76,17 @@ class FilesManager {
                 fileId: file.id,
                 raw: file,
                 progress: offset / size
-            })
-            const k = this.pending.get(file.id)
+            });
+
+            const k = this.pending.get(file.id);
+
             if (k) {
-                k.progress = offset / size
+                k.progress = offset / size;
             }
         }
 
         // Can be cancelled here?
-
+        // no
 
         const url = FileAPI.createBlobFromParts(file, file.mime_type || "application/jpeg", parts)
 

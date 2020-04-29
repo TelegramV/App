@@ -20,66 +20,48 @@ import MTProto from "../../MTProto/External"
 import AppEvents from "../../Api/EventBus/AppEvents"
 import UIEvents from "../../Ui/EventBus/UIEvents"
 
-export class WallpaperManagerSingleton {
+class WallpaperManagerSingleton {
+    wallpapers = [];
+    isFetching = false;
+
     init() {
-        this.wallpapers = [];
-        //this.wallpapersDocumentCache = {};
-
-        this._receiveWallpaperList().then(_ => {
-            UIEvents.General.fire("wallpaper.fetched", {wallpapers: this.wallpapers});
-        });
-
-        AppEvents.Files.subscribe("fileDownloaded", this._wallpaperDownloaded);
-
+        AppEvents.Files.subscribe("fileDownloaded", this.onFileDownloaded);
     }
 
-    async _receiveWallpaperList() {
+    fetchAllWallPapers() {
+        if (this.wallpapers.length > 0 || this.isFetching) {
+            return Promise.resolve(this.wallpapers);
+        }
+
+        this.isFetching = true;
+
         return MTProto.invokeMethod("account.getWallPapers", {hash: 0}).then(result => {
-            for (const wallpaper of result.wallpapers) {
-                this.wallpapers.push(wallpaper);
-            }
-        })
+            this.isFetching = true;
+
+            this.wallpapers = result.wallpapers;
+
+            UIEvents.General.fire("wallpaper.fetched", {wallpapers: this.wallpapers});
+
+            this.wallpapers.forEach(wallpaper => {
+                FileManager.downloadDocument(wallpaper.document);
+            });
+
+            return this.wallpapers;
+        });
     }
 
-    downloadWallpaper(wallpaper) {
-        FileManager.downloadDocument(wallpaper.document);
+    onFileDownloaded = event => {
+        if (!this.wallpapers.find(w => w.document.id === event.fileId)) {
+            return;
+        }
+
+        const blob = new Blob(event.file, {type: event.raw.mime_type || "application/jpeg"});
+
+        UIEvents.General.fire("wallpaper.ready", {
+            id: event.fileId,
+            wallpaperUrl: URL.createObjectURL(blob)
+        });
     }
-
-    _wallpaperDownloaded = (event) => {
-        if(!this.wallpapers.find(el => el.document.id === event.fileId)) return;
-        let blob = new Blob(event.file, {type: event.raw.mime_type || "application/jpeg"});
-        UIEvents.General.fire("wallpaper.ready", {id: event.fileId, wallpaper: blob});
-    }
-
-    // 5947530738516623361
-    /*setLegendaryCamomileWallpaper() {
-        this.downloadWallpaper(this.wallpapers.find(l => l.id === "5947530738516623361")).then(url => {
-            window.document.documentElement.style.setProperty("--chat-bg-image", `url("${url}")`);
-        })
-    }*/
-
-    getWallpapers() {
-        return this.wallpapers;
-    }
-
-    /*async cacheWallpaperImages() {
-        this.getWallpapers().then(wallpapers => {
-            let i = 0;
-            for (const wallpaper of wallpapers) {
-                if (wallpaper.pattern) continue;
-                i++;
-                setTimeout(_ => {
-                    const id = wallpaper.id;
-                    this.downloadWallpaper(wallpaper).then(url => {
-                        //console.log("downloaded!")
-                        this.wallpapersDocumentCache[id] = url;
-                    })
-                }, 500 * i);
-            }
-        }).then(_ => {
-            return this.wallpapersDocumentCache;
-        })
-    }*/
 }
 
 const WallpaperManager = new WallpaperManagerSingleton();

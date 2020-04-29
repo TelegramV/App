@@ -1,5 +1,6 @@
 import LeftBarComponent from "../LeftBarComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
+import WallpaperManager from "../../../../Managers/WallpaperManager"
 
 export default class SettingsPane extends LeftBarComponent {
     constructor(props) {
@@ -56,6 +57,7 @@ export default class SettingsPane extends LeftBarComponent {
     }
 
     barOnShow = () => {
+        this.barWillOpen()
         console.log("barOnShow", this.name, this.props)
         this.$el.classList.add("fade-in");
         if (this.props.previous === "settings") {
@@ -66,6 +68,9 @@ export default class SettingsPane extends LeftBarComponent {
             barName: this.previous,
             hide: true
         })
+    }
+
+    barWillOpen() {
     }
 
     barOnHide = () => {
@@ -96,8 +101,6 @@ export default class SettingsPane extends LeftBarComponent {
         UIEvents.LeftSidebar.fire("show", {
             barName: name
         })
-
-
     }
 
     makeHeader = (noBorders = false) => {

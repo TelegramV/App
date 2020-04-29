@@ -237,7 +237,7 @@ class EditProfilePane extends SettingsPane {
     }
 
     onInputLastName = (event: InputEvent) => {
-        this.updateProfile("last_name", event.target.value, "Invalid last name", "Last name successfully updated!", this.lastNameInputRef);
+        this.updateProfile("last_name", event.target.value, null, "Last name successfully updated!", this.lastNameInputRef);
     }
 
     onInputBio = (event: InputEvent) => {

@@ -23,7 +23,7 @@ export function useKeval(dbPromise, storeName: string) {
 const DEFAULT_DB_PROMISE = openDB(defaultDbName, 1, {
     upgrade(db) {
         db.createObjectStore(defaultStoreName);
-        db.createObjectStore("authorization"); // since version 2
+        db.createObjectStore("authorization");
     },
 });
 

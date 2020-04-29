@@ -1,32 +1,31 @@
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../../EventBus/UIEvents"
 
-export default class SquareComponent extends VComponent {
+class SquareComponent extends VComponent {
+    state = {
+        url: undefined
+    };
 
-	init() {
-		super.init();
-		this.state = {
-			url: undefined
-		}
-	}
+    appEvents(E) {
+        E.bus(UIEvents.General)
+            .filter(event => event.id === this.props.wallpaperId)
+            .on("wallpaper.ready", this.onWallpaperReady);
+    }
 
-	appEvents(E) {
-		E.bus(UIEvents.General)
-		.on("wallpaper.ready", this._wallpaperLoaded)
-	}
+    render() {
+        return (
+            <div class="image-square"
+                 onClick={this.props.click}
+                 url={this.state.url}
+                 style={{"background-image": `url(${this.state.url})`}}/>
+        );
+    }
 
-	_wallpaperLoaded = (event) => {
-		if(event.id === this.props.wallpaperId) {
-			let url = URL.createObjectURL(event.wallpaper);
-			this.setState({
-				url: url
-			})
-		}
-	}
-
-	render() {
-		return (
-			<div class="image-square" onClick={this.props.click} url={this.state.url} style={{"background-image": `url(${this.state.url})`}}/>
-			)
-	}
+    onWallpaperReady = event => {
+        this.setState({
+            url: event.wallpaperUrl
+        });
+    }
 }
+
+export default SquareComponent;
