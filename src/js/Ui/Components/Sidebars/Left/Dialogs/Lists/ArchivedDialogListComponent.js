@@ -38,18 +38,20 @@ export default class ArchivedDialogListComponent extends VComponent {
     }
 
     prependDialog = dialog => {
-        if (VApp.mountedComponents.has(`dialog-${dialog.peer.type}-${dialog.peer.id}`)) {
-            console.error("BUG: dialog already rendered")
+        if (VApp.mountedComponents.has(`dialog-${dialog.peer.type}-${dialog.peer.id}-archive`)) {
+            // Normal behaviour, not an error
+            // console.error("BUG: dialog already rendered", dialog.peer.name, this.props.folder)
         } else {
-            VRDOM.prepend(<DialogComponent dialog={dialog}/>, this.$el)
+            VRDOM.prepend(<DialogComponent dialog={dialog} folderId={"archive"} list={this}/>, this.$el)
         }
     }
 
     appendDialog = dialog => {
-        if (VApp.mountedComponents.has(`dialog-${dialog.peer.type}-${dialog.peer.id}`)) {
-            console.error("BUG: dialog already rendered")
+        if (VApp.mountedComponents.has(`dialog-${dialog.peer.type}-${dialog.peer.id}-archive`)) {
+            // Normal behaviour, not an error
+            // console.error("BUG: dialog already rendered", dialog.peer.name, this.props.folder)
         } else {
-            VRDOM.append(<DialogComponent dialog={dialog}/>, this.$el)
+            VRDOM.append(<DialogComponent dialog={dialog} folderId={"archive"} list={this}/>, this.$el)
         }
     }
 }

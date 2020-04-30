@@ -24,7 +24,7 @@ export class DialogComponent extends VComponent {
     unreadMentionsCountFragmentRef = VComponent.createFragmentRef()
     unreadMarkFragmentRef = VComponent.createFragmentRef()
 
-    identifier = `dialog-${this.props.dialog.peer.type}-${this.props.dialog.peer.id}`
+    identifier = `dialog-${this.props.dialog.peer.type}-${this.props.dialog.peer.id}-${this.props.folderId}`
 
     init() {
         this.dialog = this.props.dialog
@@ -83,7 +83,7 @@ export class DialogComponent extends VComponent {
     componentDidMount() {
         this.Archived = VComponent.getComponentById(`dialogs-archived-list`)
         this.Pinned = VComponent.getComponentById(`dialogs-pinned-list`)
-        this.General = VComponent.getComponentById(`dialogs-general-list`)
+        this.General = this.props.list //VComponent.getComponentById(`dialogs-general-list`)
 
         this.$el.__message = this.dialog.peer.messages.last
         this.$el.__pinned = this.dialog.pinned

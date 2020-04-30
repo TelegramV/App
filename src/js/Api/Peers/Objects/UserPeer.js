@@ -65,6 +65,10 @@ export class UserPeer extends Peer {
         return this.raw.phone
     }
 
+    get isContact(): boolean {
+        return !!this.raw.contact
+    }
+
     set status(status) {
         this.raw.status = status
         this.fire("updateUserStatus")
@@ -131,5 +135,9 @@ export class UserPeer extends Peer {
 
             default:
         }
+    }
+
+    get isBot() {
+        return false
     }
 }

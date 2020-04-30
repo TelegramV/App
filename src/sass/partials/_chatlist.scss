@@ -29,6 +29,20 @@
   &:hover ~ .new-chat {
     bottom: 25px;
   }
+
+  .dialog-lists {
+
+    .empty {
+      width: 300px;
+      height: 300px;
+    }
+
+    > * {
+      &.hidden {
+        display: none;
+      }
+    }
+  }
 }
 
 .new-chat {

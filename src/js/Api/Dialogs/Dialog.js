@@ -118,6 +118,77 @@ export class Dialog extends ReactiveObject {
         }
     }
 
+    matchesFilter(f) {
+        const dialog = this
+        const include = f.include_peers
+        const exclude = f.exclude_peers
+        const peer = dialog.peer
+        const isUser = peer.type === "user" && !peer.isBot
+        const isContact = isUser && peer.isContact
+        const isGroup = peer.type === "chat" || (peer.type === "channel" && peer.isSupergroup)
+        const isChannel = peer.type === "channel" && !isGroup
+        const isBot = peer.type === "user" && peer.isBot
+        const isMuted = dialog.isMuted
+        // TODO needs checking
+        const isRead = dialog.peer.messages.unreadCount === 0 || !dialog.unreadMark
+        const isArchived = dialog.isArchived
+
+        if(include && include.some(l => {
+            if(l._ === "inputPeerUser" && peer.type === "user" && peer.id === l.user_id) return true
+            if(l._ === "inputPeerChannel" && peer.type === "channel" && peer.id === l.channel_id) return true
+            if(l._ === "inputPeerChat" && peer.type === "chat" && peer.id === l.chat_id) return true
+            if(l._ === "inputPeerSelf" && peer.type === "user" && peer.isSelf) return true
+            return false
+        })) {
+            return true
+        }
+
+        if(exclude && include.some(l => {
+            if(l._ === "inputPeerUser" && peer.type === "user" && peer.id === l.user_id) return true
+            if(l._ === "inputPeerChannel" && peer.type === "channel" && peer.id === l.channel_id) return true
+            if(l._ === "inputPeerChat" && peer.type === "chat" && peer.id === l.chat_id) return true
+            if(l._ === "inputPeerSelf" && peer.type === "user" && peer.isSelf) return true
+            return false
+        })) {
+            return false
+        }
+
+        if(!f.contacts && isContact) {
+            return false
+        }
+
+        if(!f.non_contacts && !isContact && isUser) {
+            return false
+        }
+
+        if(!f.groups && isGroup) {
+            return false
+        }
+
+        if(!f.broadcasts && isChannel) {
+            return false
+        }
+
+        if(!f.bots && isBot) {
+
+            return false
+        }
+
+        if(f.exclude_muted && isMuted) {
+            return false
+        }
+
+        if(f.exclude_read && isRead) {
+            return false
+        }
+
+        if(f.exclude_archived && isArchived) {
+            return false
+        }
+
+        return true
+    }
+
     get peer(): Peer {
         if (!this._peer) {
             this._peer = PeersStore.getByPeerType(this.raw.peer)

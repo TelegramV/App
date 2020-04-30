@@ -17,6 +17,7 @@ import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import SnackbarComponent from "../../Components/Singleton/SnackbarComponent"
 import ForwardBarComponent from "../../Components/Sidebars/Right/Search/ForwardBarComponent"
+import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -51,7 +52,7 @@ export function MainPage() {
 
             <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
 
-            {/*<Folders/>*/}
+            <Folders/>
             <DialogsBar/>
             <ChatComponent/>
 

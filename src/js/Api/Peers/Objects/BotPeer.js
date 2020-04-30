@@ -14,4 +14,8 @@ export class BotPeer extends UserPeer {
             online: false
         }
     }
+
+    get isBot() {
+        return true
+    }
 }

@@ -97,4 +97,8 @@ export class ChannelPeer extends Peer {
             this.findPinnedMessage()
         })
     }
+
+    get isSupergroup() {
+        return false
+    }
 }

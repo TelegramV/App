@@ -14,8 +14,10 @@ import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 import {Folders} from "./Folders";
 import PeersStore from "../../../../../Api/Store/PeersStore"
+import {DialogListsComponent} from "./DialogListsComponent";
+import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 
-const contextMenu = (event, archivedCount) => {
+export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
         {
             icon: "newgroup",
@@ -84,9 +86,10 @@ export class DialogsBar extends LeftBarComponent {
         return (
             <div className="chatlist sidebar">
                 <div className="toolbar">
-                    <i className="btn-icon rp rps tgico-menu" onClick={ev => {
+                    {/* TODO Must be shown if back button exists!*/}
+                    <i className={{"btn-icon rp rps tgico-menu": true, /*"hidden": FoldersManager.hasFolders()*/}} onClick={ev => {
                         if (ev.currentTarget.classList.contains("back")) return true; //Button currently in back state
-                        contextMenu(ev, this.Archived && this.Archived.$el.childElementCount)
+                        DialogsBarContextMenu(ev, this.Archived && this.Archived.$el.childElementCount)
                     }}/>
                     <div className="search">
                         <div className="input-search">
@@ -106,8 +109,7 @@ export class DialogsBar extends LeftBarComponent {
                         <progress className="progress-circular big"/>
                     </div>
 
-                    <PinnedDialogListComponent/>
-                    <GeneralDialogListComponent/>
+                    <DialogListsComponent/>
                 </div>
                 <div class="new-chat"><i class="tgico tgico-newchat_filled"/></div>
             </div>
@@ -125,12 +127,25 @@ export class DialogsBar extends LeftBarComponent {
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.onDialogsGotMany)
 
+        E.bus(AppEvents.General)
+            .on("selectFolder", this.onFolderSelect)
+
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
     }
 
     onDialogsGotMany = _ => {
         this.loaderRef.hide()
+    }
+
+    onFolderSelect = _ => {
+        this.dialogsWrapperRef.$el.scrollTop = 0
+        setTimeout(l => {
+            // console.log(this.$el.querySelector(".dialog-lists").clientHeight, "VS", this.$el.clientHeight)
+            if(this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
+                this.loadNextPage()
+            }
+        }, 0)
     }
 
     onChatSelect = _ => {
@@ -180,14 +195,22 @@ export class DialogsBar extends LeftBarComponent {
         const $element = event.target
 
         if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.isLoadingMore) {
-            this.isLoadingMore = true
-
-            console.log("fetching next page")
-
-            DialogsManager.fetchNextPage({}).then(() => {
-                this.isLoadingMore = false
-            })
+            this.loadNextPage()
         }
+    }
+
+    loadNextPage() {
+        if(this.isLoadingMore) return
+        this.isLoadingMore = true
+        console.log("STARTED LOADING NEW PAGE")
+
+        DialogsManager.fetchNextPage({}).then(() => {
+            this.isLoadingMore = false
+            console.log("STOPPED LOADING NEW PAGE")
+            if(this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
+                this.loadNextPage()
+            }
+        })
     }
 
     onSearchInputCapture = event => {
