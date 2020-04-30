@@ -45,6 +45,10 @@ class TelegramApplication {
         return this.connections.get(this.mainDcId);
     }
 
+    get isReady() {
+        return this._isReady && this.mainConnection;
+    }
+
     async isSignedIn() {
         if (this.user) {
             return true;
@@ -64,11 +68,7 @@ class TelegramApplication {
         }
     }
 
-    get isReady() {
-        return this._isReady && this.mainConnection;
-    }
-
-    async start(): Promise<void> {
+    async start(): Promise<any> {
         if (this.isReady) {
             console.warn("already started, ignoring")
             return Promise.reject();
@@ -96,6 +96,8 @@ class TelegramApplication {
         this._isReady = true;
 
         this.resolveAwaiting();
+
+        return this.user;
     }
 
     invokeMethod<P = any, R = any>(name: string, params: P = {}, options: { dcId?: number, useSecondTransporter?: boolean; } = {}): Promise<R> {

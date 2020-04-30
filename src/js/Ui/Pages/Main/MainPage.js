@@ -15,6 +15,7 @@ import {DialogInfoComponent} from "../../Components/Sidebars/Right/DialogInfo/Di
 import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/ArchivedDialogsBar"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
+import WallpaperManager from "../../Managers/WallpaperManager";
 import SnackbarComponent from "../../Components/Singleton/SnackbarComponent"
 import ForwardBarComponent from "../../Components/Sidebars/Right/Search/ForwardBarComponent"
 import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
@@ -31,7 +32,7 @@ function initHighLevelManagers() {
     })
     //LocaleController.init()
     StickerManager.fetchSpecialSets();
-    // WallpaperManager.init();
+    WallpaperManager.init();
 }
 
 export function MainPage() {
@@ -49,7 +50,7 @@ export function MainPage() {
             {/*TODO move all settings inside it's component*/}
 
             <SearchPanelComponent/>
-
+            <CreateChannelBar/>
             <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
 
             <Folders/>

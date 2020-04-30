@@ -15,27 +15,28 @@
  *
  */
 
-import VComponent from "../component/VComponent"
-import VApp from "../../vapp"
+import __component_withDefaultProps from "./__component_withDefaultProps"
 
-class ComponentRef {
-    __component_ref = true
-    identifier: number
+class StatelessComponent {
+    static defaultProps;
 
-    component: VComponent
+    props = {};
+    identifier = null;
 
-    constructor() {
-        this.identifier = ++(VApp.latestInstantiatedRef)
+    constructor(config) {
+        this.props = __component_withDefaultProps(this, config.props);
+        this.identifier = config.identifier;
     }
 
-    update(props = {}) {
-        this.component.updateProps(props);
-    }
-
-    unmount() {
-        this.component && this.component.__unmount()
-        this.component = undefined
+    render(props) {
+        //
     }
 }
 
-export default ComponentRef
+class Clock extends StatelessComponent {
+    render(props) {
+        return <h1>{new Date().toLocaleDateString()}</h1>
+    }
+}
+
+export default StatelessComponent;

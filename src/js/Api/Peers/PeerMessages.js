@@ -46,12 +46,6 @@ export class PeerMessages {
         readInboxMaxId: 0,
     }
 
-    setState(nextState) {
-        if (__diffObjects(this._state, nextState)) {
-            this.peer.fire("peer.updateDialogState", Object.assign(this._state, nextState));
-        }
-    }
-
     /**
      * @param {Peer} peer
      * @param {Message[]} messages
@@ -78,6 +72,12 @@ export class PeerMessages {
         this._unreadMentionsCount = unreadMentionsCount || 0
 
         this._fireTransaction = false
+    }
+
+    setState(nextState) {
+        if (__diffObjects(this._state, nextState)) {
+            this.peer.fire("peer.updateDialogState", Object.assign(this._state, nextState));
+        }
     }
 
     // fuck I will rewrite it later, I just can't anymore now

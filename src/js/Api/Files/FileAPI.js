@@ -297,9 +297,12 @@ export class FileAPI {
         })
     }
 
-    static createBlobFromParts(file, mime, parts) {
+    static createBlobFromParts(file, mime, parts, useCache = true) {
         const blob = new Blob(parts, {type: mime})
-        this.putCache(file, blob)
+
+        if (useCache) {
+            this.putCache(file, blob)
+        }
 
         return URL.createObjectURL(blob)
     }

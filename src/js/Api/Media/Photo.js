@@ -33,7 +33,7 @@ export class Photo extends ReactiveObject {
     }
 
     fetchMax() {
-        return FileManager.downloadDocument(this.raw, this.maxSizeType)
+        return FileManager.downloadDocument(this.raw, this.maxSizeType, true)
 
         // return FileAPI.getFile(this.raw, this.maxSizeType).then(srcUrl => {
         //     this.srcUrl = srcUrl

@@ -15,27 +15,18 @@
  *
  */
 
-import VComponent from "../component/VComponent"
-import VApp from "../../vapp"
 
-class ComponentRef {
-    __component_ref = true
-    identifier: number
-
-    component: VComponent
-
-    constructor() {
-        this.identifier = ++(VApp.latestInstantiatedRef)
-    }
-
-    update(props = {}) {
-        this.component.updateProps(props);
-    }
-
-    unmount() {
-        this.component && this.component.__unmount()
-        this.component = undefined
-    }
+function EditAvatarFragment({onClick, srcUrl}) {
+    return (
+        <div className="edit-avatar-wrapper">
+            <div className="edit-avatar rp rps" onClick={onClick} style={{
+                "background-image": `url(${srcUrl})`,
+            }}>
+                <div className="tint hidden"/>
+                <div className="add-icon tgico tgico-cameraadd"/>
+            </div>
+        </div>
+    );
 }
 
-export default ComponentRef
+export default EditAvatarFragment;

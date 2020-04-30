@@ -235,7 +235,7 @@ class Packer {
                 for (const param of hashParams) {
                     const [cond] = param.type.split("?")
                     const [field, bit] = cond.split(".")
-                    if (!(params[field] & (1 << bit)) && params[param.name]) {
+                    if (!(params[field] & (1 << bit)) && params[param.name] != null && params[param.name] !== false) { // todo check only for null
                         params[field] |= 1 << bit
                     }
                 }
@@ -327,7 +327,7 @@ class Packer {
                 for (const param of hashParams) {
                     const [cond, condType] = param.type.split("?")
                     const [field, bit] = cond.split(".")
-                    if (!(constructor[field] & (1 << bit)) && constructor[param.name]) {
+                    if (!(constructor[field] & (1 << bit)) && constructor[param.name] != null && constructor[param.name] !== false) { // todo: check only on null
                         constructor[field] |= 1 << bit
                     }
                 }

@@ -353,6 +353,11 @@ class VComponent {
         })
     }
 
+    updateProps(props = {}) {
+        Object.assign(this.props, props);
+        this.forceUpdate();
+    }
+
     __update(props) {
         return __component_update(this, props)
     }
@@ -368,7 +373,9 @@ class VComponent {
      * @param args
      */
     withInterval(handler: TimerHandler, timeout?: number, ...args: any[]) {
-        this.__.intervals.add(setInterval(handler, timeout, ...args))
+        const handle = setInterval(handler, timeout, ...args)
+        this.__.intervals.add(handle)
+        return handle
     }
 
     /**
@@ -379,7 +386,9 @@ class VComponent {
      * @param args
      */
     withTimeout(handler: TimerHandler, timeout?: number, ...args: any[]) {
-        this.__.timeouts.add(setTimeout(handler, timeout, ...args))
+        const handle = setTimeout(handler, timeout, ...args)
+        this.__.timeouts.add(handle)
+        return handle
     }
 
     /**
@@ -391,11 +400,33 @@ class VComponent {
     }
 
     /**
+     * Clear single interval
+     * @param handle
+     */
+    clearInterval(handle) {
+        if (this.__.intervals.has(handle)) {
+            clearInterval(handle);
+            this.__.intervals.delete(handle);
+        }
+    }
+
+    /**
      * Clear all timeouts.
      */
     clearTimeouts() {
         this.__.timeouts.forEach(handle => clearTimeout(handle))
         this.__.timeouts.clear()
+    }
+
+    /**
+     * Clear single timeout
+     * @param handle
+     */
+    clearTimeout(handle) {
+        if (this.__.timeouts.has(handle)) {
+            clearTimeout(handle);
+            this.__.timeouts.delete(handle);
+        }
     }
 
     // other

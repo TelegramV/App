@@ -9,6 +9,8 @@ import RippleVRDOMPlugin from "./Ui/Plugins/RipplePlugin"
 import EmojiVRDOMPlugin from "./Ui/Plugins/EmojiPlugin"
 
 import "./globals"
+import PeerFactory from "./Api/Peers/PeerFactory"
+import PeersStore from "./Api/Store/PeersStore"
 
 if (__IS_PRODUCTION__) {
     console.log("%c%s", "color: #4ea4f6; font-size: 4em;", "Telegram V")
@@ -23,6 +25,10 @@ VApp.registerPlugin(EmojiVRDOMPlugin)
 VApp.useRoutes(AppRoutes)
 VApp.mount("#app")
 
-MTProto.connect().then(_ => {
-    console.log("connected")
+MTProto.connect().then(user => {
+    if (user) {
+        PeersStore.set(PeerFactory.fromRaw(user));
+    }
+
+    console.log("connected");
 })

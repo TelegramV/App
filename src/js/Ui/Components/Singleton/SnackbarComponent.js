@@ -20,40 +20,53 @@ import UIEvents from "../../EventBus/UIEvents";
 
 class SnackbarComponent extends VComponent {
     state = {
-        text: null,
-        isShown: false,
+        snackbars: new Map(),
     };
 
     appEvents(E: AE) {
         E.bus(UIEvents.General)
-            .on("snackbar.show", this.onSnackbarShow)
-            .on("snackbar.close", this.onSnackbarClose);
+            .on("snackbar.show", this.show)
+            .on("snackbar.close", this.close);
     }
 
     render() {
-        const {text, isShown} = this.state;
+        const {snackbars} = this.state;
 
         return (
-            <div id="snackbar" className={{
-                "show": isShown,
-            }}>
-                <span>{text}</span>
+            <div className="snackbar-container">
+                {Array.from(snackbars.values()).map(snackbar => (
+                    <div className={{
+                        "snackbar": true,
+                        "show": true,
+                        "success": snackbar.success,
+                        "error": snackbar.error,
+                    }}>
+                        <span>{snackbar.text}</span>
+                    </div>
+                ))}
             </div>
         );
     }
 
-    onSnackbarShow = event => {
-        this.setState({
+    show = event => {
+        let timeout; // pizda kostyl'
+        timeout = this.withTimeout(() => {
+            this.clearTimeout(timeout);
+            this.state.snackbars.delete(timeout);
+            this.forceUpdate();
+        }, event.time * 1000);
+        this.state.snackbars.set(timeout, {
             text: event.text,
-            isShown: true,
+            success: event.success,
+            fail: event.fail,
         });
+        this.forceUpdate();
     }
 
-    onSnackbarClose = event => {
-        this.setState({
-            text: null,
-            isShown: false,
-        });
+    close = () => {
+        this.clearTimeouts();
+        this.state.snackbars.clear();
+        this.forceUpdate();
     }
 }
 

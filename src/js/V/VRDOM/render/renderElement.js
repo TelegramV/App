@@ -80,13 +80,13 @@ const renderElement = (node: VRNode, props: VRenderProps = {}): HTMLElement => {
     }
 
     for (let [k, v] of Object.entries(node.attrs)) {
-        if (v !== undefined) {
+        if (v != null) {
             $el.setAttribute(k, v)
         }
     }
 
     for (let [k, v] of Object.entries(node.style)) {
-        if (v !== undefined) {
+        if (v != null) {
             $el.style.setProperty(k, v)
             $el.__v.patched_styles.add(k)
         }

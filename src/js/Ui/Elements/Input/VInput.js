@@ -23,19 +23,36 @@ function VInput(
         label = "",
         onInput,
         onFocus,
-        value
+        value,
+        isError = false,
+        error,
+        isSuccess = false,
+        success,
+        disabled = false
     }
 ) {
+    let text = label;
+
+    if (isError) {
+        isSuccess = false
+        text = error;
+    } else if (isSuccess) {
+        isError = false;
+        text = success || label;
+    }
+
     return (
         <div className="VInput" css-width={width}>
-            <input type={type}
-                   placeholder={label}
+            <input disabled={disabled ? "true" : undefined}
+                   className={{"invalid": isError, "success": isSuccess}}
+                   type={type}
+                   placeholder={text}
                    name={name}
                    value={value}
                    onInput={onInput}
                    onFocus={onFocus}/>
 
-            <label htmlFor={name}>{label}</label>
+            <label htmlFor={name}>{text}</label>
         </div>
     );
 }

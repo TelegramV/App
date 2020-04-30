@@ -15,27 +15,8 @@
  *
  */
 
-import VComponent from "../component/VComponent"
-import VApp from "../../vapp"
-
-class ComponentRef {
-    __component_ref = true
-    identifier: number
-
-    component: VComponent
-
-    constructor() {
-        this.identifier = ++(VApp.latestInstantiatedRef)
-    }
-
-    update(props = {}) {
-        this.component.updateProps(props);
-    }
-
-    unmount() {
-        this.component && this.component.__unmount()
-        this.component = undefined
-    }
+function InputHint(_, slot) {
+    return <p className="VInputHint">{slot}</p>
 }
 
-export default ComponentRef
+export default InputHint;

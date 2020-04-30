@@ -51,6 +51,7 @@ class ChatComponent extends VComponent {
                     <VSpinner loaderRef={this.chatLoaderRef}
                               id="chat-wrapper-loader"
                               full={true}
+                              big={true}
                               show={true}
                               background={true}
                               white={true}/>
