@@ -20,6 +20,7 @@ import SnackbarComponent from "../../Components/Singleton/SnackbarComponent"
 import ForwardBarComponent from "../../Components/Sidebars/Right/Search/ForwardBarComponent"
 import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
 import CreateChannelBar from "../../Components/Sidebars/Left/Create/CreateChannelBar";
+import FoldersManager from "../../../Api/Dialogs/FolderManager";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -34,6 +35,7 @@ function initHighLevelManagers() {
     //LocaleController.init()
     StickerManager.fetchSpecialSets();
     WallpaperManager.init();
+    FoldersManager.init()
 }
 
 export function MainPage() {

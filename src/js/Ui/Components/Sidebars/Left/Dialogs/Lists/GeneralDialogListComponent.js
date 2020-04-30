@@ -11,6 +11,9 @@ import {SupergroupPeer} from "../../../../../../Api/Peers/Objects/SupergroupPeer
 import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer";
 import lottie from "../../../../../../../../vendor/lottie-web";
 import MTProto from "../../../../../../MTProto/External";
+import DialogsManager from "../../../../../../Api/Dialogs/DialogsManager";
+import DialogsStore from "../../../../../../Api/Store/DialogsStore";
+import {vrdom_resolveMount} from "../../../../../../V/VRDOM/mount";
 
 export default class GeneralDialogListComponent extends VComponent {
 
@@ -21,6 +24,7 @@ export default class GeneralDialogListComponent extends VComponent {
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.onDialogsGotMany)
             .on("gotNewMany", this.onDialogsGotNewMany)
+            .on("gotOne", this.onDialogsGotOne)
     }
 
     render() {
@@ -104,6 +108,39 @@ export default class GeneralDialogListComponent extends VComponent {
         return true
     }
 
+    _findRenderedDialogToInsertBefore = (dialog) => {
+        const $dialogs = this.$el
+        if (!dialog.messages.last) {
+            return undefined
+        }
+
+        const renderedDialogs = $dialogs.childNodes
+
+        if (renderedDialogs.size === 0) {
+            return undefined
+        }
+
+        const lastMessageDate = dialog.peer.messages.last.date
+
+        for (const $rendered of renderedDialogs) {
+            if ($rendered !== this.$el) {
+                if ($rendered.__message && lastMessageDate >= $rendered.__message.date) {
+                    return $rendered // todo: fix if dialog is last in the list
+                }
+            }
+        }
+
+        return undefined
+    }
+
+    onDialogsGotOne = event => {
+        const dialog = event.dialog
+        if(!this.applyFilter(dialog)) return
+        const $insertBefore = this._findRenderedDialogToInsertBefore(dialog)
+        this.insertBeforeDialog(dialog, $insertBefore)
+
+    }
+
     onDialogsGotMany = event => {
         $(this.$el).show()
 
@@ -120,7 +157,7 @@ export default class GeneralDialogListComponent extends VComponent {
 
     prependDialog = dialog => {
         if (VApp.mountedComponents.has(`dialog-${dialog.peer.type}-${dialog.peer.id}-${this.props.folderId}`)) {
-            console.error("BUG: dialog already rendered", dialog.peer.name, this.props.folderId)
+            // console.error("BUG: dialog already rendered", dialog.peer.name, this.props.folderId)
         } else {
             VRDOM.prepend(<DialogComponent dialog={dialog} folderId={this.props.folderId} list={this}/>, this.$el)
         }
@@ -132,9 +169,20 @@ export default class GeneralDialogListComponent extends VComponent {
         }
 
         if (VApp.mountedComponents.has(`dialog-${dialog.peer.type}-${dialog.peer.id}-${this.props.folderId}`)) {
-            console.error("BUG: dialog already rendered", dialog.peer.name, this.props.folderId)
+            // console.error("BUG: dialog already rendered", dialog.peer.name, this.props.folderId)
         } else {
             VRDOM.append(<DialogComponent dialog={dialog} folderId={this.props.folderId} list={this}/>, this.$el)
+        }
+    }
+
+    insertBeforeDialog = (dialog, $el) => {
+        if (VApp.mountedComponents.has(`dialog-${dialog.peer.type}-${dialog.peer.id}-${this.props.folderId}`)) {
+            // Normal behaviour, not an error
+            // console.error("BUG: dialog already rendered", dialog.peer.name, this.props.folder)
+        } else {
+            const c = VRDOM.render(<DialogComponent dialog={dialog} folderId={this.props.folderId} list={this}/>)
+            this.$el.insertBefore(c, $el)
+            vrdom_resolveMount(c)
         }
     }
 

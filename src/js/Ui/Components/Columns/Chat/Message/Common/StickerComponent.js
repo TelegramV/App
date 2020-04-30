@@ -46,6 +46,7 @@ export default class StickerComponent extends VComponent {
     }
 
     componentDidMount() {
+        super.componentDidMount()
         this.downloadAndApply();
     }
 

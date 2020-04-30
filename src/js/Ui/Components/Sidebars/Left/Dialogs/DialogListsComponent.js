@@ -14,6 +14,7 @@ const DialogFolderFragment = ({folderId, filter, selected}) => {
     </div>
 }
 
+// FIXME since this elements patches if the folder is changed, it removes all the dialogs added with append. To rewrite.
 export class DialogListsComponent extends VComponent {
     state = {
         folders: [],

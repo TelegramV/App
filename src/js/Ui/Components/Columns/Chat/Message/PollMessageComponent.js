@@ -75,6 +75,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     componentDidMount() {
+        super.componentDidMount()
         this.actionButton = this.$el.querySelector(".action-button");
         this._applyPercents();
     }

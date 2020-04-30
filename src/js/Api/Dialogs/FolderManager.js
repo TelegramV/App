@@ -3,6 +3,9 @@ import AppEvents from "../EventBus/AppEvents";
 import UpdatesManager from "../Updates/UpdatesManager";
 import DialogsManager from "./DialogsManager";
 import DialogsStore from "../Store/DialogsStore";
+import {Peer} from "../Peers/Objects/Peer";
+import {isEquivalent} from "../../Utils/array";
+import keval from "../../Keval/keval";
 
 class FolderManager {
     folders = []
@@ -10,7 +13,16 @@ class FolderManager {
     MAX_FOLDERS = 10
 
     constructor() {
-        this.init()
+        keval.getItem("foldersData").then(foldersData => {
+            this.folders = foldersData.folders
+            this.selectedFolder = foldersData.selected
+
+            this.fireUpdate()
+            AppEvents.General.fire("selectFolder", {
+                folder: this.getFolder(this.selectedFolder),
+                folderId: this.selectedFolder
+            })
+        })
     }
 
     init() {
@@ -49,8 +61,49 @@ class FolderManager {
 
     async fetchFolders() {
         this.folders = await MTProto.invokeMethod("messages.getDialogFilters")
-        console.log(this.folders)
+        this.updateCache()
         this.fireUpdate()
+    }
+
+    updateCache() {
+        keval.setItem("foldersData", {
+            folders: this.folders,
+            selected: this.selectedFolder
+        })
+    }
+
+    getFolder(folderId: number) {
+        return this.folders.find(l => l.id === folderId)
+    }
+
+    isPinned(peer: Peer, folderId: number) {
+        const filter = this.getFolder(folderId)
+        if(filter == null) return false
+        return filter.pinned_peers.find(l => isEquivalent(l, peer.inputPeer))
+    }
+
+    async setPinned(pinned: boolean, peer: Peer, folderId: number) {
+        // updateDialogFilter#26ffde7d flags:# id:int filter:flags.0?DialogFilter = Update;
+        // messages.updateDialogFilter#1ad4a04a flags:# id:int filter:flags.0?DialogFilter = Bool;
+        const filter = this.getFolder(folderId)
+        if(pinned) {
+            if(!filter.pinned_peers.find(l => isEquivalent(l, peer.inputPeer))) {
+                filter.pinned_peers.push(peer.inputPeer)
+            }
+        } else {
+            if(filter.pinned_peers.find(l => isEquivalent(l, peer.inputPeer))) {
+                filter.pinned_peers.splice(filter.pinned_peers.indexOf(peer.inputPeer), 1)
+            }
+        }
+        const response = await MTProto.invokeMethod("messages.updateDialogFilter", {
+            id: folderId,
+            filter: filter
+        })
+
+        if(response._ === "boolTrue") {
+            peer.dialog.fire("updatePinned")
+        }
+
     }
 
     fireUpdate() {
@@ -97,6 +150,7 @@ class FolderManager {
             folder: folder,
             folderId: folderId
         })
+        this.updateCache()
     }
 
 

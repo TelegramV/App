@@ -8,6 +8,8 @@ import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
 import {DialogFragment} from "./Fragments/DialogFragment"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import UIEvents from "../../../../EventBus/UIEvents"
+import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
+import VApp from "../../../../../V/vapp";
 
 export class DialogComponent extends VComponent {
 
@@ -28,7 +30,7 @@ export class DialogComponent extends VComponent {
 
     init() {
         this.dialog = this.props.dialog
-        this._contextMenuListener = dialogContextMenu(this.dialog)
+        this._contextMenuListener = dialogContextMenu(this.dialog, this.props.folderId)
     }
 
     appEvents(E) {
@@ -82,11 +84,11 @@ export class DialogComponent extends VComponent {
 
     componentDidMount() {
         this.Archived = VComponent.getComponentById(`dialogs-archived-list`)
-        this.Pinned = VComponent.getComponentById(`dialogs-pinned-list`)
+        this.Pinned = VComponent.getComponentById(`dialogs-pinned-list-${this.props.folderId}`)
         this.General = this.props.list //VComponent.getComponentById(`dialogs-general-list`)
 
         this.$el.__message = this.dialog.peer.messages.last
-        this.$el.__pinned = this.dialog.pinned
+        this.$el.__pinned = this.props.folderId == null ? this.dialog.pinned : FoldersManager.isPinned(this.dialog.peer, this.props.folderId)
         this.$el.__archived = this.dialog.isArchived
     }
 
@@ -240,51 +242,54 @@ export class DialogComponent extends VComponent {
             $(this.$el).show()
         }
 
-        if (this.dialog.pinned !== this.$el.__pinned) {
+        const isPinned = this.props.folderId == null ? this.dialog.pinned : FoldersManager.isPinned(this.dialog.peer, this.props.folderId)
 
-            if (this.dialog.isPinned) {
-                this.Pinned.$el.prepend(this.$el)
+        if (isPinned !== this.$el.__pinned) {
+            if (isPinned) {
+                this.__destroy()
+
+                this.Pinned.prependDialog(this.dialog)
+
+                return
             } else {
-                const AppendList = this.dialog.isArchived ? this.Archived : this.General
+                this.__destroy()
 
-                const $foundRendered = this._findRenderedDialogToInsertBefore(AppendList.$el)
-
-                if ($foundRendered) {
-                    AppendList.$el.insertBefore(this.$el, $foundRendered)
-                } else {
-                    this.__destroy() // ...
-                }
+                AppEvents.Dialogs.fire("gotOne", {
+                    dialog: this.dialog
+                })
+                return
             }
-
-            this.$el.__pinned = this.dialog.isPinned
 
         } else if (this.dialog.isArchived !== this.$el.__archived) {
-
             if (this.dialog.isArchived) {
-                this.Archived.$el.prepend(this.$el)
+                this.__destroy()
+
+                this.Archived.prependDialog(this.dialog)
+                return
             } else {
-                const AppendList = this.dialog.isPinned ? this.Pinned : this.General
+                this.__destroy()
 
-                const $foundRendered = this._findRenderedDialogToInsertBefore(AppendList.$el)
-
-                if ($foundRendered) {
-                    AppendList.$el.insertBefore(this.$el, $foundRendered)
-                } else {
-                    this.__destroy() // ...
-                }
+                AppEvents.Dialogs.fire("gotOne", {
+                    dialog: this.dialog
+                })
+                return
             }
-
-            this.$el.__archived = this.dialog.isArchived
 
         } else if (!this.dialog.peer.messages.last) {
             // todo: handle no last message
         } else if (this.$el.__message.date !== this.dialog.peer.messages.last.date) {
-            if (!this.dialog.isPinned) {
+            if (!isPinned) {
                 if (this.$el.previousSibling) {
                     if (this.dialog.isArchived) {
-                        this.Archived.$el.prepend(this.$el)
+                        this.__destroy()
+
+                        this.Archived.prependDialog(this.dialog)
+                        return
                     } else {
-                        this.General.$el.prepend(this.$el)
+                        this.__destroy()
+
+                        this.General.prependDialog(this.dialog)
+                        return
                     }
                 }
             }

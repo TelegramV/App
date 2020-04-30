@@ -288,7 +288,7 @@ class DialogManager extends Manager {
 
         return this.getDialogs({
             limit: limit,
-            offset_peer: this.latestDialog.peer.inputPeer,
+            offset_peer: this.latestDialog?.peer.inputPeer,
             exclude_pinned: true
         }).then(dialogs => {
 
