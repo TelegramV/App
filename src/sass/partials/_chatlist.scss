@@ -81,6 +81,11 @@
   &.pinned {
     border-bottom: 1px $lightgrey solid;
 
+    &:empty {
+      border-bottom: none;
+      padding: 0;
+    }
+
     .person {
       .badge:empty {
         display: block;

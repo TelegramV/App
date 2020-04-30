@@ -5,26 +5,25 @@ import VApp from "../../../../../../V/vapp"
 import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer";
 import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer";
 import {GroupPeer} from "../../../../../../Api/Peers/Objects/GroupPeer";
+import {vrdom_resolveMount} from "../../../../../../V/VRDOM/mount";
 
 export default class PinnedDialogListComponent extends VComponent {
 
     // TODO needs rework!!
-    // identifier = `dialogs-pinned-list`
+    identifier = `dialogs-pinned-list-${this.props.folderId}`
 
     appEvents(E) {
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.onDialogsGotMany)
             .on("gotNewMany", this.onDialogsGotNewMany)
+            .on("gotOne", this.onDialogsGotOne)
+
     }
 
     render() {
         return (
             <div id="dialogsPinned" className="list pinned hidden"/>
         )
-    }
-
-    componentDidMount() {
-        // Sortable.create(this.$el)
     }
 
     applyFilter = (dialog) => {
@@ -44,6 +43,39 @@ export default class PinnedDialogListComponent extends VComponent {
         })
     }
 
+    _findRenderedDialogToInsertBefore = (dialog) => {
+        const $dialogs = this.$el
+        if (!dialog.messages.last) {
+            return undefined
+        }
+
+        const renderedDialogs = $dialogs.childNodes
+
+        if (renderedDialogs.size === 0) {
+            return undefined
+        }
+
+        const lastMessageDate = dialog.peer.messages.last.date
+
+        for (const $rendered of renderedDialogs) {
+            if ($rendered !== this.$el) {
+                if ($rendered.__message && lastMessageDate >= $rendered.__message.date) {
+                    return $rendered // todo: fix if dialog is last in the list
+                }
+            }
+        }
+
+        return undefined
+    }
+
+    onDialogsGotOne = event => {
+        const dialog = event.dialog
+        if(!this.applyFilter(dialog)) return
+        const $insertBefore = this._findRenderedDialogToInsertBefore(dialog)
+        this.insertBeforeDialog(dialog, $insertBefore)
+
+    }
+
     onDialogsGotMany = event => {
         $(this.$el).show()
 
@@ -60,7 +92,7 @@ export default class PinnedDialogListComponent extends VComponent {
 
     prependDialog = dialog => {
         if (VApp.mountedComponents.has(`dialog-${dialog.peer.type}-${dialog.peer.id}-${this.props.folderId}`)) {
-            console.error("BUG: dialog already rendered")
+            // console.error("BUG: dialog already rendered")
         } else {
             VRDOM.prepend(<DialogComponent dialog={dialog} folderId={this.props.folderId} list={this}/>, this.$el)
         }
@@ -68,9 +100,20 @@ export default class PinnedDialogListComponent extends VComponent {
 
     appendDialog = dialog => {
         if (VApp.mountedComponents.has(`dialog-${dialog.peer.type}-${dialog.peer.id}-${this.props.folderId}`)) {
-            console.error("BUG: dialog already rendered")
+            // console.error("BUG: dialog already rendered")
         } else {
             VRDOM.append(<DialogComponent dialog={dialog} folderId={this.props.folderId} list={this}/>, this.$el)
+        }
+    }
+
+    insertBeforeDialog = (dialog, $el) => {
+        if (VApp.mountedComponents.has(`dialog-${dialog.peer.type}-${dialog.peer.id}-${this.props.folderId}`)) {
+            // Normal behaviour, not an error
+            // console.error("BUG: dialog already rendered", dialog.peer.name, this.props.folder)
+        } else {
+            const c = VRDOM.render(<DialogComponent dialog={dialog} folderId={this.props.folderId} list={this}/>)
+            this.$el.insertBefore(c, $el)
+            vrdom_resolveMount(c)
         }
     }
 

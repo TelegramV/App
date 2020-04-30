@@ -23,8 +23,9 @@ import {DialogAvatarFragment} from "./Fragments/DialogAvatarFragment"
 import {FlatButtonComponent} from "../../../Elements/FlatButtonComponent"
 import {Dialog} from "../../../../../Api/Dialogs/Dialog"
 import VUI from "../../../../VUI"
+import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 
-export const dialogContextMenu = (dialog: Dialog) => {
+export const dialogContextMenu = (dialog: Dialog, folderId) => {
     return VUI.ContextMenu.listener([
         () => {
             return {
@@ -40,14 +41,23 @@ export const dialogContextMenu = (dialog: Dialog) => {
             }
         },
         () => {
+            const isPinned =  folderId === null ? dialog.isPinned : FoldersManager.isPinned(dialog.peer, folderId)
             return {
-                icon: dialog.isPinned ? "unpin" : "pin",
-                title: dialog.isPinned ? "Unpin from top" : "Pin to top",
+                icon: isPinned ? "unpin" : "pin",
+                title: isPinned ? "Unpin from top" : "Pin to top",
                 onClick: _ => {
-                    if (dialog.isPinned) {
-                        dialog.api.setPinned(false)
+                    if(folderId == null) {
+                        if (dialog.isPinned) {
+                            dialog.api.setPinned(false)
+                        } else {
+                            dialog.api.setPinned(true)
+                        }
                     } else {
-                        dialog.api.setPinned(true)
+                        if (FoldersManager.isPinned(dialog.peer, folderId)) {
+                            FoldersManager.setPinned(false, dialog.peer, folderId)
+                        } else {
+                            FoldersManager.setPinned(true, dialog.peer, folderId)
+                        }
                     }
                 }
             }

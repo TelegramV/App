@@ -1,5 +1,6 @@
 import MTProto from "../../MTProto/External"
 import {Dialog} from "./Dialog"
+import FoldersManager from "./FolderManager";
 
 /**
  * @property {Dialog} dialog
