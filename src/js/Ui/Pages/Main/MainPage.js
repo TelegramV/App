@@ -19,6 +19,7 @@ import WallpaperManager from "../../Managers/WallpaperManager";
 import SnackbarComponent from "../../Components/Singleton/SnackbarComponent"
 import ForwardBarComponent from "../../Components/Sidebars/Right/Search/ForwardBarComponent"
 import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
+import CreateChannelBar from "../../Components/Sidebars/Left/Create/CreateChannelBar";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
