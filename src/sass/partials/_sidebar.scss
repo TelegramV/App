@@ -18,6 +18,7 @@
         filter: brightness(0.75);
     }
 
+
     &.hidden:not(.right),
     .hidden {
         width: 0;
@@ -129,6 +130,10 @@
     }
 
     &.search {
+
+        &.folders-offset {
+            left: 72px !important;
+        }
         margin-top: 60px;
         height: -webkit-fill-available;
         transition: anim(opacity), anim(transform);
@@ -218,6 +223,9 @@
     }
 
     &.settings {
+        &.folders-offset {
+            left: 72px !important;
+        }
         overflow-x: hidden;
         transform: translateX(0);
         transition: 250ms ease-in-out transform, 250ms ease-in-out filter;

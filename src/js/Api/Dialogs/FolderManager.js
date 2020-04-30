@@ -87,7 +87,6 @@ class FolderManager {
     }
 
     hasFolders() {
-        return true
         return this.folders.length > 0
     }
 
