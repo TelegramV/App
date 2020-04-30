@@ -20,10 +20,7 @@ import UIEvents from "../../EventBus/UIEvents";
 
 class SnackbarComponent extends VComponent {
     state = {
-        text: null,
-        isShown: false,
-        success: false,
-        error: false,
+        snackbars: new Map(),
     };
 
     appEvents(E: AE) {
@@ -33,43 +30,43 @@ class SnackbarComponent extends VComponent {
     }
 
     render() {
-        const {text, isShown, success, error} = this.state;
+        const {snackbars} = this.state;
 
         return (
-            <div id="snackbar" className={{
-                "show": isShown,
-                "success": success,
-                "error": error,
-            }}>
-                <span>{text}</span>
+            <div className="snackbar-container">
+                {Array.from(snackbars.values()).map(snackbar => (
+                    <div className={{
+                        "snackbar": true,
+                        "show": true,
+                        "success": snackbar.success,
+                        "error": snackbar.error,
+                    }}>
+                        <span>{snackbar.text}</span>
+                    </div>
+                ))}
             </div>
         );
     }
 
     show = event => {
-        this.clearTimeouts();
-
-        this.setState({
+        let timeout; // pizda kostyl'
+        timeout = this.withTimeout(() => {
+            this.clearTimeout(timeout);
+            this.state.snackbars.delete(timeout);
+            this.forceUpdate();
+        }, event.time * 1000);
+        this.state.snackbars.set(timeout, {
             text: event.text,
-            isShown: true,
             success: event.success,
-            error: event.error,
+            fail: event.fail,
         });
-
-        if (event.time) {
-            this.withTimeout(this.close, event.time * 1000);
-        }
+        this.forceUpdate();
     }
 
     close = () => {
         this.clearTimeouts();
-
-        this.setState({
-            text: null,
-            isShown: false,
-            success: false,
-            error: false,
-        });
+        this.state.snackbars.clear();
+        this.forceUpdate();
     }
 }
 

@@ -1,6 +1,5 @@
 import DialogsManager from "../../../../../Api/Dialogs/DialogsManager"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
-import MTProto from "../../../../../MTProto/External";
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import ConnectionStatusComponent from "./ConnectionStatusComponent"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
@@ -12,7 +11,6 @@ import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
 import VSimpleLazyInput from "../../../../Elements/Input/VSimpleLazyInput"
 import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
-import {Folders} from "./Folders";
 import PeersStore from "../../../../../Api/Store/PeersStore"
 
 const contextMenu = (event, archivedCount) => {
@@ -109,7 +107,27 @@ export class DialogsBar extends LeftBarComponent {
                     <PinnedDialogListComponent/>
                     <GeneralDialogListComponent/>
                 </div>
-                <div class="new-chat"><i class="tgico tgico-newchat_filled"/></div>
+                <div class="new-chat rp rps" onClick={event => {
+                    VUI.ContextMenu.openAbove([
+                        {
+                            icon: "channel",
+                            title: "New Channel",
+                            onClick: () => {
+                                UIEvents.LeftSidebar.fire("show", {barName: "create-channel"})
+                            }
+                        },
+                        {
+                            icon: "group",
+                            title: "New Group"
+                        },
+                        {
+                            icon: "user",
+                            title: "New Private Chat"
+                        }
+                    ], event.target)
+                }}>
+                    <i class="tgico tgico-newchat_filled"/>
+                </div>
             </div>
         )
     }

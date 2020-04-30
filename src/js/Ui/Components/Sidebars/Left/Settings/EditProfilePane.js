@@ -27,25 +27,9 @@ import VLazyInput from "../../../../Elements/Input/VLazyInput"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import {askForFile} from "../../../../Utils/utils"
 import {FileAPI} from "../../../../../Api/Files/FileAPI"
-
-const BR20 = () => <div css-height="20px"/>
-
-function Hint(_, slot) {
-    return <p className="VInputHint">{slot}</p>
-}
-
-function EditAvatar({onClick, srcUrl}) {
-    return (
-        <div className="edit-avatar-wrapper">
-            <div className="edit-avatar rp rps" onClick={onClick} style={{
-                "background-image": `url(${srcUrl})`,
-            }}>
-                <div className="tint hidden"/>
-                <div className="add-icon tgico tgico-cameraadd"/>
-            </div>
-        </div>
-    );
-}
+import EditAvatarFragment from "../../Fragments/EditAvatarFragment"
+import BR20 from "../../Fragments/BR20"
+import InputHint from "../../Fragments/InputHint"
 
 class EditProfilePane extends SettingsPane {
     barName = "edit-profile";
@@ -94,7 +78,7 @@ class EditProfilePane extends SettingsPane {
             <div class="sidebar sub-settings edit-page-pane scrollable">
                 {this.makeHeader(true)}
 
-                <EditAvatar ref={this.editAvatarRef} onClick={this.onClickEditAvatar} srcUrl={photoUrl}/>
+                <EditAvatarFragment ref={this.editAvatarRef} onClick={this.onClickEditAvatar} srcUrl={photoUrl}/>
 
                 <SectionFragment>
                     <VLazyInput lazyLevel={500}
@@ -108,9 +92,9 @@ class EditProfilePane extends SettingsPane {
                     <BR20/>
                     <VLazyInput ref={this.bioInputRef} label="Bio (optional)" onInput={this.onInputBio}/>
                     <BR20/>
-                    <Hint>
+                    <InputHint>
                         Any details such as age, occupation or city. Example: 23 y.o. designer from San Francisco.
-                    </Hint>
+                    </InputHint>
                 </SectionFragment>
 
                 <SectionFragment title="Username" noBorders>
@@ -120,14 +104,14 @@ class EditProfilePane extends SettingsPane {
                                 value={username}
                                 onInput={this.onInputUsername}/>
                     <BR20/>
-                    <Hint>
+                    <InputHint>
                         You can choose a username on Telegram. If you do, other people will be able to find you by this
                         username and contact you without knowing your phone number.
-                    </Hint>
+                    </InputHint>
                     <BR20/>
-                    <Hint>
+                    <InputHint>
                         You can use a-z, 0-9 and underscores. Minimum length is 5 characters.
-                    </Hint>
+                    </InputHint>
                 </SectionFragment>
 
                 <SettingsFabFragment hide={true} ref={this.loadingRef} isLoading={true}/>
@@ -287,6 +271,7 @@ class EditProfilePane extends SettingsPane {
                         isError: true,
                         error: "Username is already taken",
                     });
+                    this.hideSave();
                 }
             }).catch(error => {
                 this.hideLoading();

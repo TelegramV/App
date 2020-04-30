@@ -18,6 +18,7 @@ import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
 import SnackbarComponent from "../../Components/Singleton/SnackbarComponent"
 import ForwardBarComponent from "../../Components/Sidebars/Right/Search/ForwardBarComponent"
+import CreateChannelBar from "../../Components/Sidebars/Left/Create/CreateChannelBar"
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -49,7 +50,7 @@ export function MainPage() {
             {/*TODO move all settings inside it's component*/}
 
             <SearchPanelComponent/>
-
+            <CreateChannelBar/>
             <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
 
             {/*<Folders/>*/}
