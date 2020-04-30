@@ -3,6 +3,10 @@
 
     & {
         border-radius: 6px;
+
+        &~.inline-keyboard {
+            margin-left: 11px;
+        }
     }
 
     &.group-s {
@@ -21,19 +25,15 @@
 
     &.group-se {
         margin-top: 10px;
-
-        .username, .fwd {
-            margin-left: 10px;
-        }
     }
 
     @if $in {
         & {
             margin-left: 11px;
-            padding-left: 10px;
-            &.no-pad {
+            //padding-left: 10px;
+            /*&.no-pad {
                 padding-left: 0;
-            }
+            }*/
 
             border-top-right-radius: 12px;
             border-bottom-right-radius: 12px;
@@ -66,12 +66,13 @@
 
         &.group-e, &.group-se {
             margin-left: 0;
-            .inline-keyboard {
-                margin-left: 11px;
-            }
-            .text-wrapper {
+            padding-left: 21px;
+            /*.text-wrapper {
                 padding-left: 11px;
-            }
+            }*/
+            &.no-pad {
+		    	padding-left: 0px;
+		    }
         }
     }
 
@@ -81,6 +82,7 @@
             padding-right: 10px;
             &.no-pad {
                 padding-right: 0;
+                padding-left: 0;
             } 
 
             border-top-left-radius: 12px;
@@ -114,12 +116,13 @@
 
         &.group-e, &.group-se {
             margin-right: 0;
-            .inline-keyboard {
+            padding-right: 21px;
+            &~.inline-keyboard {
                 margin-right: 11px;
             }
-            .text-wrapper {
+            /*.text-wrapper {
                 padding-right: 11px;
-            }
+            }*/
         }
     }
 }

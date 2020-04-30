@@ -8,10 +8,10 @@
             &~.round-overlay {
                 position: absolute;
                 left: 50%;
-                top: calc(50% - 10px); //requires position relative on message, but it breaks time
+                top: calc(50%); //requires position relative on message, but it breaks time
                 transform: translate(-50%, -50%);
                 width: 95%;
-                height: calc((100% - 20px)*0.95);
+                height: calc(95%);
 
                 .playback {
                     position: absolute;
