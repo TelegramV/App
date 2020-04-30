@@ -15,15 +15,12 @@
  *
  */
 
-import __diffObjects from "./__diffObjects";
-import __component_withDefaultProps from "./__component_withDefaultProps";
-import VComponent from "./VComponent";
+import AbstractComponent from "./AbstractComponent";
 
-const comparator = (prev, next) => typeof prev === "object" || prev !== next;
-
-const __component_diffProps = (component: VComponent, nextProps) => {
-    nextProps = __component_withDefaultProps(component, nextProps);
-    return __diffObjects(component.props, nextProps, comparator);
+function __component_render_wip(component: AbstractComponent) {
+    const renderedVRNode = component.render();
+    renderedVRNode.component = component;
+    return renderedVRNode;
 }
 
-export default __component_diffProps
+export default __component_render_wip;

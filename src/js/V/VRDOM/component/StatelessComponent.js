@@ -15,28 +15,10 @@
  *
  */
 
-import __component_withDefaultProps from "./__component_withDefaultProps"
+import AbstractComponent from "./AbstractComponent";
 
-class StatelessComponent {
-    static defaultProps;
-
-    props = {};
-    identifier = null;
-
-    constructor(config) {
-        this.props = __component_withDefaultProps(this, config.props);
-        this.identifier = config.identifier;
-    }
-
-    render(props) {
-        //
-    }
-}
-
-class Clock extends StatelessComponent {
-    render(props) {
-        return <h1>{new Date().toLocaleDateString()}</h1>
-    }
+// wip
+class StatelessComponent extends AbstractComponent {
 }
 
 export default StatelessComponent;

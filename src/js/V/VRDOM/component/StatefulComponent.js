@@ -15,15 +15,27 @@
  *
  */
 
-import __diffObjects from "./__diffObjects";
-import __component_withDefaultProps from "./__component_withDefaultProps";
-import VComponent from "./VComponent";
+import AbstractComponent from "./AbstractComponent";
+import __component_update from "./__component_update";
 
-const comparator = (prev, next) => typeof prev === "object" || prev !== next;
+// wip
+class StatefulComponent extends AbstractComponent {
+    state = {};
 
-const __component_diffProps = (component: VComponent, nextProps) => {
-    nextProps = __component_withDefaultProps(component, nextProps);
-    return __diffObjects(component.props, nextProps, comparator);
+    render(props, state) {
+    }
+
+    setState(nextState) {
+        if (typeof nextState === "function") {
+            __component_update(this, {
+                nextState: nextState(this.state)
+            });
+        } else {
+            __component_update(this, {
+                nextState
+            });
+        }
+    }
 }
 
-export default __component_diffProps
+export default StatefulComponent;

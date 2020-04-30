@@ -15,13 +15,15 @@
  *
  */
 
+import __component_update from "./__component_update";
+
+// wip
 // blah blah blah no time sry
 class AbstractComponent {
     __ = {
         initialized: false,
         mounted: false,
         destroyed: false,
-        created: false,
         isUpdatingItSelf: false,
         isDeletingItself: false,
 
@@ -45,4 +47,145 @@ class AbstractComponent {
          */
         timeouts: new Set(),
     }
+
+    static defaultProps: any = null;
+    static displayName: string = "VComponent";
+
+    props: any = {};
+    slot: any = null;
+
+    $el: HTMLElement = null;
+
+    constructor(config) {
+        this.props = __component_withDefaultProps_wip(this, config.props);
+        this.identifier = config.identifier;
+    }
+
+    /**
+     * Never use here data from props!
+     */
+    init() {
+    }
+
+    /**
+     * @param {AE} E
+     */
+    appEvents(E) {
+    }
+
+    /**
+     * @param {RORC} R
+     */
+    reactive(R) {
+    }
+
+    /**
+     * @param props
+     */
+    render(props) {
+    }
+
+    /**
+     * @param $el
+     */
+    componentDidMount($el: HTMLElement) {
+    }
+
+    componentWillUnmount() {
+    }
+
+    /**
+     * @param nextProps
+     * @param nextState
+     */
+    shouldComponentUpdate(nextProps, nextState) {
+    }
+
+    /**
+     * @param prevProps
+     * @param prevState
+     * @param snapshot
+     */
+    componentDidUpdate(prevProps, prevState, snapshot) {
+    }
+
+    forceUpdate() {
+        __component_update(this, {
+            isForce: true,
+        });
+    }
+
+    updateProps(nextProps = {}) {
+        Object.assign(this.props, nextProps);
+        this.forceUpdate();
+    }
+
+    // Intervals and Timeouts
+
+    /**
+     * Register interval.
+     *
+     * @param handler
+     * @param timeout
+     * @param args
+     */
+    withInterval(handler: TimerHandler, timeout?: number, ...args: any[]): number {
+        const id = setInterval(handler, timeout, ...args);
+        this.__.intervals.add(id);
+        return id;
+    }
+
+    /**
+     * Register timeout.
+     *
+     * @param handler
+     * @param timeout
+     * @param args
+     */
+    withTimeout(handler: TimerHandler, timeout?: number, ...args: any[]): number {
+        const id = setTimeout(handler, timeout, ...args);
+        this.__.timeouts.add(id);
+        return id;
+    }
+
+    /**
+     * Clear all intervals.
+     */
+    clearIntervals() {
+        this.__.intervals.forEach(handle => clearInterval(handle));
+        this.__.intervals.clear();
+    }
+
+    /**
+     * Clear single interval.
+     *
+     * @param id
+     */
+    clearInterval(id) {
+        if (this.__.intervals.has(id)) {
+            clearInterval(id);
+            this.__.intervals.delete(id);
+        }
+    }
+
+    /**
+     * Clear all timeouts.
+     */
+    clearTimeouts() {
+        this.__.timeouts.forEach(handle => clearTimeout(handle));
+        this.__.timeouts.clear();
+    }
+
+    /**
+     * Clear single timeout
+     * @param id
+     */
+    clearTimeout(id) {
+        if (this.__.timeouts.has(id)) {
+            clearTimeout(id);
+            this.__.timeouts.delete(id);
+        }
+    }
 }
+
+export default AbstractComponent;

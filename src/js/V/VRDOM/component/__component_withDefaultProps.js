@@ -16,6 +16,19 @@
  */
 
 import VComponent from "./VComponent"
+import AbstractComponent from "./AbstractComponent"
+
+function __component_withDefaultProps_wip(component: AbstractComponent, nextProps) {
+    if (component.constructor.defaultProps) {
+        for (const [k, v] of Object.entries(component.constructor.defaultProps)) {
+            if (nextProps[k] === undefined) {
+                nextProps[k] = v;
+            }
+        }
+    }
+
+    return nextProps;
+}
 
 const __component_withDefaultProps = (context: VComponent, nextProps) => {
     if (context.constructor.defaultProps) {

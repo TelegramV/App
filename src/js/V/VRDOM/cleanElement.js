@@ -39,7 +39,7 @@ const cleanElement = ($node: HTMLElement, unmount: boolean = false) => {
         $node.__v.component = null
         $node.__v.ref = null
         $node.__v.patched_styles.forEach(k => $node.style.removeProperty(k))
-        $node.__v.patched_events.forEach(k => $node[`on${k}`] = undefined)
+        $node.__v.patched_events.forEach(k => $node[`on${k}`] = null)
         $node.__v.patched_styles = null
         $node.__v.patched_events = null
         $node.__v = null

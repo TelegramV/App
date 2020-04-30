@@ -15,15 +15,27 @@
  *
  */
 
-import __diffObjects from "./__diffObjects";
-import __component_withDefaultProps from "./__component_withDefaultProps";
-import VComponent from "./VComponent";
 
-const comparator = (prev, next) => typeof prev === "object" || prev !== next;
+import VComponent from "../../../V/VRDOM/component/VComponent"
+import AppEvents from "../../../Api/EventBus/AppEvents"
 
-const __component_diffProps = (component: VComponent, nextProps) => {
-    nextProps = __component_withDefaultProps(component, nextProps);
-    return __diffObjects(component.props, nextProps, comparator);
+class PeerName extends VComponent {
+    appEvents(E: AE) {
+        E.bus(AppEvents.Peers)
+            .filter(event => event.peer === this.props.peer)
+            .updateOn("peer.updateStatus")
+            .updateOn("peer.update");
+    }
+
+    render() {
+        const {template, peer} = this.props;
+
+        if (template) {
+            return <template peer={peer}/>;
+        }
+
+        return <span class="peer-status">todo: implement</span>;
+    }
 }
 
-export default __component_diffProps
+export default PeerName;

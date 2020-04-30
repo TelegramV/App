@@ -18,6 +18,40 @@
 import VComponent from "./VComponent"
 import {initElement} from "../render/renderElement"
 import VApp from "../../vapp"
+import StatefulComponent from "./StatefulComponent"
+import StatelessComponent from "./StatelessComponent"
+
+function __component_mount_wip(component: StatefulComponent | StatelessComponent, $el: HTMLElement) {
+    initElement($el);
+
+    if (component.__.mounted) {
+        component.$el = $el;
+        component.$el.__v.component = component;
+
+        component.__.mounted = true;
+        component.forceUpdate();
+
+        if (!VApp.mountedComponents.has(component.identifier)) {
+            console.error("BUG: component with such id was not found!", component)
+            VApp.mountedComponents.set(component.identifier, component)
+        }
+    } else {
+        initElement($el);
+        component.$el = $el;
+        component.$el.__v.component = component;
+        
+        component.__.mounted = true;
+
+        component.componentDidMount();
+
+        if (VApp.mountedComponents.has(component.identifier)) {
+            console.error("BUG: component with such id already mounted!", component)
+        } else {
+            VApp.mountedComponents.set(context.identifier, component)
+        }
+
+    }
+}
 
 const __component_mount = (context: VComponent, $el: HTMLElement) => {
     // context.__.destroyed = false

@@ -20,10 +20,10 @@ import VRDOM from "../VRDOM"
 import type {BusEvent} from "../../../Api/EventBus/EventBus"
 import {EventBus} from "../../../Api/EventBus/EventBus"
 import {ReactiveObject} from "../../Reactive/ReactiveObject"
-import type {AE} from "./__component_registerAppEvents"
-import {__component_registerAppEvents} from "./__component_registerAppEvents"
-import type {RORC} from "./__component_registerReactive"
-import {__component_registerReactive} from "./__component_registerReactive"
+import type {AE} from "./__component_appEventsBuilder"
+import {__component_appEventsBuilder} from "./__component_appEventsBuilder"
+import type {RORC} from "./__component_reactiveObjectEventsBuilder"
+import {__component_reactiveObjectEventsBuilder} from "./__component_reactiveObjectEventsBuilder"
 import __component_update from "./__component_update"
 import __component_unmount from "./__component_unmount"
 import __component_mount from "./__component_mount"
@@ -209,16 +209,6 @@ class VComponent {
     }
 
     /**
-     * ReactiveCallback was changed.
-     *
-     * @param key
-     * @param value
-     */
-    callbackChanged(key: string, value: any) {
-        //
-    }
-
-    /**
      * Internal use only.
      */
     __render() {
@@ -289,7 +279,7 @@ class VComponent {
     __recreateAppEventsResolves() {
         this.__unregisterAppEventResolves()
 
-        this.appEvents(__component_registerAppEvents(this))
+        this.appEvents(__component_appEventsBuilder(this))
     }
 
 
@@ -327,7 +317,7 @@ class VComponent {
     __recreateReactiveObjects() {
         this.__unregisterReactiveObjectResolves()
 
-        this.reactive(__component_registerReactive(this))
+        this.reactive(__component_reactiveObjectEventsBuilder(this))
     }
 
     /**
