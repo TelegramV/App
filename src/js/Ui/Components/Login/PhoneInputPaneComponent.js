@@ -38,7 +38,7 @@ export default class PhoneInputComponent extends PaneComponent {
             <div id="phonePane" className={classList.join(" ")}>
                 <img className="object" src="./static/images/loginlogo.svg" alt=""/>
                 <InfoComponent header="Sign in to Telegram"
-                               description="Please confirm your country and enter your phone integer"/>
+                               description="Please confirm your country and enter your phone number"/>
                 <DropdownComponent label="Country" data={this.generateFullDropdown()}
                                    template={CountryDropdownItemFragment} selected={this.onDropdownSelect}
                                    ref={this.dropdownRef}/>
@@ -83,8 +83,8 @@ export default class PhoneInputComponent extends PaneComponent {
                 return
             }
             const msg = {
-                PHONE_NUMBER_INVALID: "Invalid phone integer",
-                PHONE_NUMBER_BANNED: "Phone integer is banned",
+                PHONE_NUMBER_INVALID: "Invalid phone number",
+                PHONE_NUMBER_BANNED: "Phone number is banned",
                 PHONE_NUMBER_FLOOD: "Too many attempts",
                 AUTH_RESTART: "Auth restarting"
             }[error.type] || "Error occured"
@@ -100,7 +100,7 @@ export default class PhoneInputComponent extends PaneComponent {
     }
 
     phoneInput = (ev) => {
-        // Add + if entering a integer
+        // Add + if entering a number
         if (localStorage.getItem("testMode")) { // test dc
             this.state.nextDisabled = false
             this.nextRef.component.setDisabled(false)
@@ -150,6 +150,7 @@ export default class PhoneInputComponent extends PaneComponent {
     }
 
     checkboxInput = (ev) => {
-        this.state.keepLogged = ev.currentTarget.querySelector("input[type=checkbox]").checked;
+        this.state.keepLogged = !ev.currentTarget.querySelector("input[type=checkbox]").checked;
+        ev.currentTarget.querySelector("input[type=checkbox]").checked = this.state.keepLogged
     }
 }
