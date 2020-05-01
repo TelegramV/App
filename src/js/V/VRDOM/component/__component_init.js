@@ -15,9 +15,43 @@
  *
  */
 
-import VComponent from "./VComponent"
-import {__component_registerAppEvents} from "./__component_registerAppEvents"
-import {__component_registerReactive} from "./__component_registerReactive"
+import VComponent from "./VComponent";
+import {__component_appEventsBuilder} from "./__component_appEventsBuilder";
+import {__component_reactiveObjectEventsBuilder} from "./__component_reactiveObjectEventsBuilder";
+import StatefulComponent from "./StatefulComponent";
+import StatelessComponent from "./StatelessComponent";
+
+function __component_init_wip(component: StatefulComponent | StatelessComponent) {
+    if (!component.__.initialized) {
+        component.init = component.init.bind(component);
+        component.render = component.render.bind(component);
+        component.componentDidMount = component.componentDidMount.bind(component);
+        component.shouldComponentUpdate = component.shouldComponentUpdate.bind(component);
+        component.componentDidUpdate = component.componentDidUpdate.bind(component);
+        component.forceUpdate = component.forceUpdate.bind(component);
+
+        component.appEvents = component.appEvents.bind(component);
+        component.reactive = component.reactive.bind(component);
+
+        component.withInterval = component.withInterval.bind(component);
+        component.withTimeout = component.withTimeout.bind(component);
+        component.clearIntervals = component.clearIntervals.bind(component);
+        component.clearTimeouts = component.clearTimeouts.bind(component);
+
+        if (component instanceof StatefulComponent) {
+            component.setState = component.setState.bind(component);
+        }
+
+        component.appEvents(__component_appEventsBuilder(component));
+        component.reactive(__component_reactiveObjectEventsBuilder(component));
+
+        component.init();
+
+        component.__.initialized = true;
+    } else {
+        console.warn("BUG: component already initialized")
+    }
+}
 
 const __component_init = (context: VComponent) => {
     if (!context.__.inited) {
@@ -53,8 +87,8 @@ const __component_init = (context: VComponent) => {
         context.init.call(context)
 
 
-        context.appEvents(__component_registerAppEvents(context))
-        context.reactive(__component_registerReactive(context))
+        context.appEvents(__component_appEventsBuilder(context))
+        context.reactive(__component_reactiveObjectEventsBuilder(context))
 
         context.__.inited = true
     } else {

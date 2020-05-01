@@ -2,7 +2,7 @@ import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent";
 import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent";
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
-import type {AE} from "../../../../../V/VRDOM/component/__component_registerAppEvents";
+import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf";
 import MTProto from "../../../../../MTProto/External";
 import lottie from "../../../../../../../vendor/lottie-web";

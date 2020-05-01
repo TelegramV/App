@@ -18,6 +18,76 @@
 import __component_diffProps from "./__component_diffProps"
 import VComponent from "./VComponent"
 import __diffObjects from "./__diffObjects"
+import StatelessComponent from "./StatelessComponent"
+import StatefulComponent from "./StatefulComponent"
+import __component_render_wip from "./__component_render"
+
+function __component_update_wip(component: StatefulComponent | StatelessComponent, {isForce, nextState, nextProps}) {
+    const isStateful = component instanceof StatefulComponent;
+
+    let shouldUpdate = isForce;
+
+    if (!isForce) {
+        let hasNextState = false
+        let hasNextProps = false
+
+        if (isStateful) {
+            if (nextState) {
+                hasNextState = true;
+                nextState = {
+                    ...component.state,
+                    ...nextState
+                };
+            } else {
+                nextState = component.state;
+            }
+        }
+
+        if (nextProps) {
+            hasNextProps = true;
+            nextProps = {
+                ...component.props,
+                ...nextProps
+            };
+        } else {
+            nextProps = component.props;
+        }
+
+        shouldUpdate = component.shouldComponentUpdate(nextProps, nextState);
+
+        if (shouldUpdate === undefined) {
+            if (hasNextProps) {
+                const diffProps = __component_diffProps(component, nextProps);
+                shouldUpdate = diffProps !== false;
+            }
+
+            if (isStateful) {
+                if (hasNextState && !shouldUpdate) {
+                    const diffState = __diffObjects(component.state, nextState);
+                    shouldUpdate = diffState !== false;
+                }
+            }
+        }
+
+        shouldUpdate = shouldUpdate !== false;
+    }
+
+    if (shouldUpdate) {
+        if (nextProps) {
+            Object.assign(component.props, nextProps);
+        }
+
+        if (isStateful && nextState) {
+            Object.assign(component.state, nextState);
+        }
+
+        component.__.isUpdatingItSelf = true;
+        component.$el = VRDOM.patch(component.$el, __component_render_wip(component))
+        component.__.isUpdatingItSelf = false;
+
+        component.componentDidUpdate(null, null, null); // todo: pass previous data
+    }
+}
 
 const __component_update = (context: VComponent, {isForce = false, nextProps, nextState}) => {
     let shouldUpdate = isForce

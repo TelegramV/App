@@ -114,6 +114,7 @@
             z-index: 0;
             display: inline-table;
             overflow: hidden;
+            padding-left: 10px;
 
             -webkit-mask-repeat: no-repeat;
             mask-repeat: no-repeat;
@@ -131,19 +132,19 @@
                 mask-image: none !important;
             }
 
-            &.no-pad {
+            /*&.no-pad {
                 padding-left: 0;
                 padding-right: 0;
 
                 .text-wrapper {
                     padding: 5px 9px;
                 }
-            }
+            }*/
 
             .text-wrapper {
                 line-height: 1.2;
                 word-wrap: break-word;
-                padding: 7.5px 9px;
+                margin: 3px 3px 3px 0px;
                 user-select: text;
             }
 
@@ -155,9 +156,9 @@
             @include figure;
             @include media-wrapper;
 
-            .text-wrapper.pad {
+            /*.text-wrapper.pad {
                 padding: 5px 9px;
-            }
+            }*/
 
             a:not(.button) {
                 color: $darkblue;

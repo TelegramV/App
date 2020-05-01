@@ -119,7 +119,7 @@ const MessageWrapperFragment = ({
 
     return (
         <div className={topLevelClasses}
-             id={`cmsg${message.id}`}
+             id={`message-${message.id}`}
              onContextMenu={contextMenuHandler}
              onDblClick={doubleClickHandler}>
 

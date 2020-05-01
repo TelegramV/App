@@ -15,15 +15,15 @@
  *
  */
 
-import __diffObjects from "./__diffObjects"
-import __component_withDefaultProps from "./__component_withDefaultProps"
-import VComponent from "./VComponent"
+import __diffObjects from "./__diffObjects";
+import __component_withDefaultProps from "./__component_withDefaultProps";
+import VComponent from "./VComponent";
 
-const comparator = (prev, next) => typeof prev === "object" || Array.isArray(prev) || prev !== next
+const comparator = (prev, next) => typeof prev === "object" || prev !== next;
 
-const __component_diffProps = (context: VComponent, next) => {
-    next = __component_withDefaultProps(context, next, comparator)
-    return __diffObjects(context.props, next)
+const __component_diffProps = (component: VComponent, nextProps) => {
+    nextProps = __component_withDefaultProps(component, nextProps);
+    return __diffObjects(component.props, nextProps, comparator);
 }
 
 export default __component_diffProps

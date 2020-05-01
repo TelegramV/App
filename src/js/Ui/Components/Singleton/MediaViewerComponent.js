@@ -18,7 +18,7 @@
 import {PhotoMessage} from "../../../Api/Messages/Objects/PhotoMessage";
 import VComponent from "../../../V/VRDOM/component/VComponent";
 import UIEvents from "../../EventBus/UIEvents";
-import type {AE} from "../../../V/VRDOM/component/__component_registerAppEvents";
+import type {AE} from "../../../V/VRDOM/component/__component_appEventsBuilder";
 import {VideoMessage} from "../../../Api/Messages/Objects/VideoMessage";
 import AvatarFragment from "../Basic/AvatarFragment";
 import {Photo} from "../../../Api/Media/Photo";
@@ -43,19 +43,21 @@ function MediaFragment({media, zoom, hidden}) {
         return <div/>
     }
 
-    const horizon = media && media.maxWidth && media.maxHeight && media.maxWidth < media.maxHeight
+    const horizon = document.body.clientHeight > document.body.clientWidth
 
     let style = {
-        "max-width": zoom ? "100vw" : "60vw",
-        "max-height": zoom ? "100vh" : "80vh",
+        "max-width": zoom ? "unset" : "60vw",
+        "max-height": zoom ? "unset" : "80vh",
         "cursor": zoom ? "zoom-out" : "zoom-in",
     };
 
     if (zoom) {
         if (horizon) {
             style["height"] = "100vh"
+            style["width"] = ""
         } else {
             style["width"] = "100vw"
+            style["height"] = ""
         }
     }
 

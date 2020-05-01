@@ -17,9 +17,10 @@
 
 import AbstractComponent from "./AbstractComponent";
 
-// wip
-// since the client is generally event-driven, we don't need stateful components so much
-class StatelessComponent extends AbstractComponent {
+function __component_clearAppEvents(component: AbstractComponent) {
+    component.__.appEventContexts.forEach((busContext, bus) => {
+        busContext.forEach((resolve, type) => bus.unsubscribe(type, resolve));
+    });
 }
 
-export default StatelessComponent;
+export default __component_clearAppEvents;

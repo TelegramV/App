@@ -34,7 +34,7 @@ import API from "../../../../Api/Telegram/API"
 import {MessageFactory} from "../../../../Api/Messages/MessageFactory"
 
 function getMessageElementById(messageId: number): HTMLElement | null {
-    return document.getElementById(`cmsg${messageId}`); // dunno better way, sorry
+    return document.getElementById(`message-${messageId}`); // dunno better way, sorry
 }
 
 // there is no possibility nor time to calculate each message size
@@ -99,30 +99,32 @@ class NextBubblesComponent extends VComponent {
 
         let prevCurr = this._isGrouping(prevMessage, message);
         let currNext = this._isGrouping(message, nextMessage);
-        if(!prevCurr && currNext) {
-        	message.tailsGroup = "s";
-        } else if(!currNext) {
-        	if(!prevCurr) {
-        		message.tailsGroup = "se";
-        	} else {
-	        	message.tailsGroup = "e";
-	        }
-        	if(!isOut) message.hideAvatar = false;
+        if (!prevCurr && currNext) {
+            message.tailsGroup = "s";
+        } else if (!currNext) {
+            if (!prevCurr) {
+                message.tailsGroup = "se";
+            } else {
+                message.tailsGroup = "e";
+            }
+            if (!isOut) message.hideAvatar = false;
         } else {
-        	message.tailsGroup = "m";
+            message.tailsGroup = "m";
         }
 
         return vrdom_render(
-            <MessageComponent message={message}/>
+            <div>
+                <MessageComponent message={message}/>
+            </div>
         );
     }
 
     _isGrouping(one: Message, two: Message) {
-    	if(!one || !two) return false;
-    	return (!(one.type instanceof ServiceMessage) && !(two.type instanceof ServiceMessage))
-	    	&& (one.isPost || one.isOut === two.isOut)
-	    	&& (one.from.id === two.from.id)
-	    	&& (Math.abs(one.date-two.date)<5*60);
+        if (!one || !two) return false;
+        return (!(one.type instanceof ServiceMessage) && !(two.type instanceof ServiceMessage))
+            && (one.isPost || one.isOut === two.isOut)
+            && (one.from.id === two.from.id)
+            && (Math.abs(one.date - two.date) < 5 * 60);
     }
 
     cleanupTree = () => {
@@ -331,7 +333,7 @@ class NextBubblesComponent extends VComponent {
 
                     this.prependMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
-                    $message = this.$el.querySelector(`#cmsg${message.id}`);
+                    $message = this.$el.querySelector(`#message-${message.id}`);
                 } else {
                     const peer = AppSelectedChat.Current;
 
@@ -410,7 +412,7 @@ class NextBubblesComponent extends VComponent {
 
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
-        const $message = this.$el.querySelector(`#cmsg${event.offset_id}`);
+        const $message = this.$el.querySelector(`#message${event.offset_id}`);
 
         if ($message) {
             scrollToAndHighlight(this.$el, $message);

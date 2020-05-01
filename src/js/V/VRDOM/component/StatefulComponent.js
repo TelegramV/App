@@ -16,10 +16,26 @@
  */
 
 import AbstractComponent from "./AbstractComponent";
+import __component_update from "./__component_update";
 
 // wip
-// since the client is generally event-driven, we don't need stateful components so much
-class StatelessComponent extends AbstractComponent {
+class StatefulComponent extends AbstractComponent {
+    state = {};
+
+    render(props, state) {
+    }
+
+    setState(nextState) {
+        if (typeof nextState === "function") {
+            __component_update(this, {
+                nextState: nextState(this.state)
+            });
+        } else {
+            __component_update(this, {
+                nextState
+            });
+        }
+    }
 }
 
-export default StatelessComponent;
+export default StatefulComponent;

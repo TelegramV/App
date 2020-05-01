@@ -42,29 +42,29 @@ export type AE = {
 
 // functions
 
-export function __component_registerAppEvents(component: VComponent): AE {
+export function __component_appEventsBuilder(component: VComponent): AE {
     return {
-        bus: (bus: EventBus) => registerAppEvents_bus(component, bus)
+        bus: (bus: EventBus) => __bus(component, bus)
     }
 }
 
-function registerAppEvents_bus(component: VComponent, bus: EventBus) {
+function __bus(component: VComponent, bus: EventBus) {
     return {
-        only: (callback: any) => registerAppEvents_bus_only(component, bus, callback),
-        filter: (callback: any) => registerAppEvents_bus_only(component, bus, callback),
-        on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, null, type, resolve),
-        updateOn: (type: string) => registerAppEvents_bus_only_subscribe(component, bus, null, type, null)
+        only: (callback: any) => __bus_filter(component, bus, callback),
+        filter: (callback: any) => __bus_filter(component, bus, callback),
+        on: (type: string, resolve: any) => __bus_filter_subscribe(component, bus, null, type, resolve),
+        updateOn: (type: string) => __bus_filter_subscribe(component, bus, null, type, null)
     }
 }
 
-function registerAppEvents_bus_only(component: VComponent, bus: EventBus, only: any) {
+function __bus_filter(component: VComponent, bus: EventBus, filter: any) {
     return {
-        on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, only, type, resolve),
-        updateOn: (type: string) => registerAppEvents_bus_only_subscribe(component, bus, only, type, null),
+        on: (type: string, resolve: any) => __bus_filter_subscribe(component, bus, filter, type, resolve),
+        updateOn: (type: string) => __bus_filter_subscribe(component, bus, filter, type, null),
     }
 }
 
-function registerAppEvents_bus_only_subscribe(component: VComponent, bus: EventBus, only: any, type: string, resolve: any) {
+function __bus_filter_subscribe(component: VComponent, bus: EventBus, filter: any, type: string, resolve: any) {
     let busContext = component.__.appEventContexts.get(bus)
 
     if (!resolve) {
@@ -78,14 +78,14 @@ function registerAppEvents_bus_only_subscribe(component: VComponent, bus: EventB
         busContext.set(type, resolve)
     }
 
-    if (only === null) {
+    if (filter === null) {
         bus.subscribe(type, resolve)
     } else {
-        bus.only(only, type, resolve)
+        bus.withFilter(filter, type, resolve)
     }
 
     return {
-        on: (type: string, resolve: any) => registerAppEvents_bus_only_subscribe(component, bus, only, type, resolve),
-        updateOn: (type: string) => registerAppEvents_bus_only_subscribe(component, bus, only, type, null),
+        on: (type: string, resolve: any) => __bus_filter_subscribe(component, bus, filter, type, resolve),
+        updateOn: (type: string) => __bus_filter_subscribe(component, bus, filter, type, null),
     }
 }

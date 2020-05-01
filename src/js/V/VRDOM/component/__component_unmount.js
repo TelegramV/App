@@ -17,6 +17,27 @@
 
 import VComponent from "./VComponent"
 import VApp from "../../vapp"
+import StatelessComponent from "./StatelessComponent"
+import StatefulComponent from "./StatefulComponent"
+import __component_clearAppEvents from "./__component_clearAppEvents"
+import __component_clearReactiveObjects from "./__component_clearReactiveObjects"
+
+function __component_unmount_wip(component: StatelessComponent | StatefulComponent) {
+    component.componentWillUnmount();
+
+    component.clearIntervals();
+    component.clearTimeouts();
+
+    __component_clearAppEvents(component);
+    __component_clearReactiveObjects(component);
+
+    component.$el.__v.component = null;
+    component.$el = null;
+    component.__.destroyed = true;
+    component.__.mounted = false;
+
+    VApp.mountedComponents.delete(component.identifier);
+}
 
 const __component_unmount = (context: VComponent) => {
     // console.debug("unmounting", context.identifier, context.displayName)

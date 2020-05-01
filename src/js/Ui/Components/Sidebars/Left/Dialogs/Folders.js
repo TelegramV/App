@@ -2,7 +2,7 @@ import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import "./Folders.scss";
 import MTProto from "../../../../../MTProto/External";
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
-import type {AE} from "../../../../../V/VRDOM/component/__component_registerAppEvents";
+import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VUI from "../../../../VUI";
 import {ChatInputManager} from "../../../Columns/Chat/ChatInput/ChatInputComponent";

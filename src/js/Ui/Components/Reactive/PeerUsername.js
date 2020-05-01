@@ -15,11 +15,26 @@
  *
  */
 
-import AbstractComponent from "./AbstractComponent";
+import VComponent from "../../../V/VRDOM/component/VComponent"
+import AppEvents from "../../../Api/EventBus/AppEvents"
 
-// wip
-// since the client is generally event-driven, we don't need stateful components so much
-class StatelessComponent extends AbstractComponent {
+class PeerUsername extends VComponent {
+    appEvents(E: AE) {
+        E.bus(AppEvents.Peers)
+            .filter(event => event.peer === this.props.peer)
+            .updateOn("peer.updateUsername")
+            .updateOn("peer.update");
+    }
+
+    render() {
+        const {template, peer} = this.props;
+
+        if (template) {
+            return <template peer={peer}/>;
+        }
+
+        return <span class="peer-username">{peer.username}</span>;
+    }
 }
 
-export default StatelessComponent;
+export default PeerUsername;

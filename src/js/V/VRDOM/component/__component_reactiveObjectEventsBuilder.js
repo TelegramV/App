@@ -34,20 +34,20 @@ export type RORC = {
 
 // functions
 
-export function __component_registerReactive(component: VComponent) {
+export function __component_reactiveObjectEventsBuilder(component: VComponent) {
     return {
-        object: (object: ReactiveObject) => registerReactive_object(component, object),
+        object: (object: ReactiveObject) => __object(component, object),
         fromProps: (name: string) => registerReactive_fromProps(component, name),
     }
 }
 
-function registerReactive_object(component: VComponent, object: ReactiveObject) {
+function __object(component: VComponent, object: ReactiveObject) {
     return {
-        on: (type: string, resolve: any) => registerReactive_object_subscribe(component, object, type, resolve)
+        on: (type: string, resolve: any) => __object_subscribe(component, object, type, resolve)
     }
 }
 
-function registerReactive_object_subscribe(component: VComponent, object: ReactiveObject, type: string, resolve: any) {
+function __object_subscribe(component: VComponent, object: ReactiveObject, type: string, resolve: any) {
 
     let reactiveObjectContext = component.__.reactiveObjectContexts.get(object)
 
@@ -60,6 +60,6 @@ function registerReactive_object_subscribe(component: VComponent, object: Reacti
 
     object.subscribe(type, resolve)
     return {
-        on: (type: string, resolve: any) => registerReactive_object_subscribe(component, object, type, resolve)
+        on: (type: string, resolve: any) => __object_subscribe(component, object, type, resolve)
     }
 }

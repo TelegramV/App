@@ -17,9 +17,10 @@
 
 import AbstractComponent from "./AbstractComponent";
 
-// wip
-// since the client is generally event-driven, we don't need stateful components so much
-class StatelessComponent extends AbstractComponent {
+function __component_render_wip(component: AbstractComponent) {
+    const renderedVRNode = component.render();
+    renderedVRNode.component = component;
+    return renderedVRNode;
 }
 
-export default StatelessComponent;
+export default __component_render_wip;
