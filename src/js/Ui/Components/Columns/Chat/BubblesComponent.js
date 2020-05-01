@@ -101,16 +101,6 @@ class BubblesComponent extends VComponent {
         }
     }
 
-    onRightSidebarShow = l => {
-        this.$el.parentNode.classList.add("right-bar-open")
-        this.rightSidebarOpen = true
-    }
-
-    onRightSidebarHide = l => {
-        this.$el.parentNode.classList.remove("right-bar-open")
-        this.rightSidebarOpen = false
-    }
-
     render() {
         return (
             <div id="bubbles" class="scrollable">

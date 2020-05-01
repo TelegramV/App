@@ -38,6 +38,11 @@
 
     will-change: transform;
 
+
+    &.right-bar-open #chat {
+        width: calc(100% - 422px);
+    }
+
     .wallpaper {
         position: absolute;
         top: -10px;
@@ -80,10 +85,6 @@
         position: relative;
         transition: anim(width);
 
-        &.right-bar-open {
-            width: calc(100% - 422px);
-        }
-
         #topbar {
             width: 100%;
             background-color: #fff;
@@ -97,6 +98,10 @@
 
             & > * {
                 margin: 0 2px;
+            }
+
+            >.hidden {
+                display: none;
             }
 
             .chat-info {

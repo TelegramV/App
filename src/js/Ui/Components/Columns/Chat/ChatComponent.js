@@ -25,6 +25,7 @@ import {CallsManager} from "../../../../Api/Calls/CallManager";
 import VApp from "../../../../V/vapp"
 import VSpinner from "../../Elements/VSpinner"
 import NextBubblesComponent from "./NextBubblesComponent"
+import ChatInfoCallButtonComponent from "./ChatInfo/ChatInfoCallButtonComponent";
 
 /**
  * CRITICAL: never rerender this component!
@@ -40,6 +41,11 @@ class ChatComponent extends VComponent {
     appEvents(E) {
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
+
+
+        E.bus(UIEvents.RightSidebar)
+            .on("show", this.onRightSidebarShow)
+            .on("hide", this.onRightSidebarHide)
     }
 
     render() {
@@ -61,7 +67,7 @@ class ChatComponent extends VComponent {
                     <div id="topbar">
                         <ChatInfoComponent/>
                         <ChatInfoPinnedComponent/>
-                        <div className="btn-icon rp rps tgico-phone" onClick={this.callContact}/>
+                        <ChatInfoCallButtonComponent/>
                         <div className="btn-icon rp rps tgico-search" onClick={this.openSearch}/>
                         <div className="btn-icon rp rps tgico-more"/>
                     </div>
@@ -82,11 +88,23 @@ class ChatComponent extends VComponent {
         )
     }
 
+
     componentDidMount() {
         if (!VApp.router.activeRoute.queryParams.p) {
             this.noChatRef.$el.style.display = ""
             this.chatLoaderRef.$el.style.display = "none"
         }
+    }
+
+
+    onRightSidebarShow = l => {
+        this.$el.classList.add("right-bar-open")
+        this.rightSidebarOpen = true
+    }
+
+    onRightSidebarHide = l => {
+        this.$el.classList.remove("right-bar-open")
+        this.rightSidebarOpen = false
     }
 
     onChatSelect = _ => {
@@ -109,10 +127,6 @@ class ChatComponent extends VComponent {
         UIEvents.RightSidebar.fire("show", {
             barName: "messages-search"
         })
-    }
-
-    callContact = () => {
-        CallsManager.startCall(AppSelectedChat.current)
     }
 }
 

@@ -19,6 +19,7 @@ export class RightBarComponent extends AbstractBarComponent {
     }
 
     hideBar = barName => {
+        if(!this.barVisible) return
         UIEvents.RightSidebar.fire("hide", {
             barName: barName || this.barName,
         })

@@ -19,9 +19,7 @@ class ChatInfoComponent extends VComponent {
             <div id="messages-wrapper-chat-info" className="chat-info">
                 <div className="person">
 
-                    <button class="responsive-only-mobile btn btn-flat" onClick={this.backToMainPage}>
-                        {"<-"}
-                    </button>
+                    <div class="responsive-only-mobile btn-icon tgico-back" onClick={this.backToMainPage}/>
 
                     <ChatInfoAvatarComponent/>
 
@@ -39,11 +37,11 @@ class ChatInfoComponent extends VComponent {
     }
 
     onChatSelect = () => {
-        AppSelectedChat.Current.fetchFull()
+        AppSelectedChat.current.fetchFull()
     }
 
     openPeerInfo = () => {
-        AppSelectedInfoPeer.select(AppSelectedChat.Current)
+        AppSelectedInfoPeer.select(AppSelectedChat.current)
     }
 
     backToMainPage = () => {

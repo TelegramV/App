@@ -138,14 +138,14 @@ input[type="password"] {
 }
 
 .checkbox-input {
-    --size: 16px;
+    --size: 14px;
     user-select: none;
     display: flex;
     align-items: center;
     justify-content: center;
 
-    width: 24px;
-    height: 24px;
+    //width: 22px;
+    //height: 22px;
 
     // dunno why do we need this here - @undrfined
     //padding-top: 3px;
@@ -160,7 +160,7 @@ input[type="password"] {
         &:checked ~ .checkmark {
             background-color: $blue;
             color: white;
-            border: 1px solid $blue;
+            border: 2px solid $blue;
         }
 
         &:checked ~ .checkmark:after {
@@ -171,8 +171,8 @@ input[type="password"] {
     .checkmark {
         height: var(--size);
         width: var(--size);
-        border: 1px solid $lightgrey;
-        border-radius: 20%;
+        border: 2px solid $darkgrey;
+        border-radius: 3px;
         transition: background-color 0.2s ease-in-out;
         cursor: pointer;
 
