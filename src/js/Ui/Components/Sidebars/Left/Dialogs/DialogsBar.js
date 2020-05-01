@@ -85,10 +85,10 @@ export class DialogsBar extends LeftBarComponent {
             <div className="chatlist sidebar">
                 <div className="toolbar">
                     {/* TODO Must be shown if back button exists!*/}
-                    <i className={{"btn-icon rp rps tgico-menu": true, /*"hidden": FoldersManager.hasFolders()*/}} onClick={ev => {
-                        if (ev.currentTarget.classList.contains("back")) return true; //Button currently in back state
-                        DialogsBarContextMenu(ev, this.Archived && this.Archived.$el.childElementCount)
-                    }}/>
+                    {/*<i className={{"btn-icon rp rps tgico-menu": true, "hidden": FoldersManager.hasFolders()}} onClick={ev => {*/}
+                    {/*    if (ev.currentTarget.classList.contains("back")) return true; //Button currently in back state*/}
+                    {/*    DialogsBarContextMenu(ev, this.Archived && this.Archived.$el.childElementCount)*/}
+                    {/*}}/>*/}
                     <div className="search">
                         <div className="input-search">
                             <VSimpleLazyInput type="text" placeholder="Search"
@@ -150,6 +150,9 @@ export class DialogsBar extends LeftBarComponent {
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
+
+        E.bus(UIEvents.LeftSidebar)
+            .on("burger.backPressed", this.onBackPressed)
     }
 
     onDialogsGotMany = _ => {
@@ -174,28 +177,29 @@ export class DialogsBar extends LeftBarComponent {
         }
     }
 
+    onBackPressed = (event) => {
+        if(event.id === "search") {
+            this._searchBackClick()
+        }
+    }
+
     openSearch = () => {
         console.warn("open")
 
-        // dude use ref pls
-
-        let icon = this.$el.querySelector(".toolbar .btn-icon");
-        icon.classList.add("back");
-        icon.addEventListener("click", this._searchBackClick);
+        UIEvents.LeftSidebar.fire("burger.changeToBack", {
+            id: "search"
+        })
 
         UIEvents.LeftSidebar.fire("show", {
             barName: "search"
         })
     }
 
-    // навіщо ж так костильно(
     _searchBackClick = (ev) => {
-        let icon = ev.currentTarget;
         UIEvents.LeftSidebar.fire("show", {
             barName: "dialogs"
         })
-        icon.classList.remove("back");
-        icon.removeEventListener("click", this._searchBackClick);
+        UIEvents.LeftSidebar.fire("burger.changeToBurger", {})
     }
 
     //Ми не ховаємось в тіні!!!

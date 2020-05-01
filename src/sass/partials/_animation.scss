@@ -85,9 +85,21 @@
   }
 }
 
+@keyframes arrow-to-menu {
+  0% {
+    content: $tgico-next;
+    transform: rotate(180deg);
+  }
+
+  100% {
+    content: $tgico-menu;
+    transform: rotate(0deg);
+  }
+}
 @keyframes menu-to-arrow {
   0% {
     content: $tgico-next;
+    transform: rotate(60deg);
   }
 
   100% {

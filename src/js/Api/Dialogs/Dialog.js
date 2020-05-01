@@ -7,6 +7,7 @@ import AppEvents from "../EventBus/AppEvents"
 import {actionTypesMapping} from "../../Ui/Components/Sidebars/Left/Dialogs/Fragments/DialogTextFragment"
 import DialogsManager from "./DialogsManager"
 import MTProto from "../../MTProto/External"
+import DialogsStore from "../Store/DialogsStore";
 
 export class Dialog extends ReactiveObject {
 

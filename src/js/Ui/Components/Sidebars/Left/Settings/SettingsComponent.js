@@ -17,7 +17,7 @@ const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
     return (
         <div className="settings-main">
             <div className="sidebar-header no-borders">
-                <i className="btn-icon tgico tgico-back rp rps" onClick={_ => openPane("dialogs")}/>
+                {/*<i className="btn-icon tgico tgico-back rp rps" onClick={_ => openPane("dialogs")}/>*/}
                 <div className="sidebar-title">Settings</div>
                 <span className="btn-icon tgico tgico-more rp rps" onClick={ev => {
                     VUI.ContextMenu.openBelow([
@@ -75,6 +75,12 @@ export class SettingsComponent extends LeftBarComponent {
         })
     }
 
+    appEvents(E) {
+        super.appEvents(E)
+        E.bus(UIEvents.LeftSidebar)
+            .on("burger.backPressed", this.onBackPressed)
+    }
+
     render() {
         const me = PeersStore.self()
 
@@ -99,6 +105,9 @@ export class SettingsComponent extends LeftBarComponent {
     }
 
     open = () => {
+        UIEvents.LeftSidebar.fire("burger.changeToBack", {
+            id: this.barName
+        })
         this.fill();
         this.$el.classList.remove("hidden");
     }
@@ -107,6 +116,12 @@ export class SettingsComponent extends LeftBarComponent {
         UIEvents.LeftSidebar.fire("show", {
             barName: name
         })
+    }
+
+    onBackPressed = (event) => {
+        if(event.id === this.barName) {
+            this.openPane("dialogs")
+        }
     }
 
     onSelfPhotoUpdate = _ => {
@@ -134,6 +149,7 @@ export class SettingsComponent extends LeftBarComponent {
 
     close = () => {
         this.$el.classList.add("hidden");
+        UIEvents.LeftSidebar.fire("burger.changeToBurger", {})
     }
 
     // dich

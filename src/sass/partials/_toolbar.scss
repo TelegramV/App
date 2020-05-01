@@ -10,11 +10,6 @@
 	display: flex;
 	box-sizing: border-box;
 
-	.btn-icon.back:before {
-		transform: rotate(60deg);
-		display: block;
-		animation: 150ms menu-to-arrow linear forwards;
-	}
 }
 
 .btn-icon {
@@ -27,8 +22,19 @@
 	transition: anim(background-color);
 	color: $darkgrey;
 	cursor: pointer;
+
 	&:hover {
 		background-color: $light;
+	}
+
+	&.burger:before {
+		display: block;
+		animation: 150ms arrow-to-menu linear backwards;
+	}
+
+	&.back:before {
+		display: block;
+		animation: 150ms menu-to-arrow linear forwards;
 	}
 }
 

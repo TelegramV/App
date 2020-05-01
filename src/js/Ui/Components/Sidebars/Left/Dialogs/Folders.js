@@ -7,6 +7,7 @@ import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VUI from "../../../../VUI";
 import {ChatInputManager} from "../../../Columns/Chat/ChatInput/ChatInputComponent";
 import {DialogsBarContextMenu} from "./DialogsBar";
+import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
 
 const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0}, selected = false, onClick}) => {
     return <div className={{
@@ -61,10 +62,7 @@ export class Folders extends VComponent {
             "folder-list": true,
             "hidden": !FoldersManager.hasFolders()
         }}>
-            <i className="btn-icon rp rps tgico-menu" onClick={(ev) => {
-                // TODO this.Archived && this.Archived.$el.childElementCount
-                DialogsBarContextMenu(ev, 0)
-            }}/>
+            <BurgerAndBackComponent isMain/>
             <FolderFragment icon="🐶" title="All chats" selected={this.state.selectedFolder == null} badge={FoldersManager.getBadgeCount(null)} onClick={_ => FoldersManager.selectFolder(null)}/>
             {this.state.folders.map(l => {
                 return <FolderFragment icon={l.emoticon || "🤪"} title={l.title} selected={l.id === this.state.selectedFolder} badge={FoldersManager.getBadgeCount(l.id)} folderId={l.id} onClick={_ => FoldersManager.selectFolder(l.id)}/>

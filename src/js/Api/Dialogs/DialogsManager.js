@@ -280,6 +280,11 @@ class DialogManager extends Manager {
         })
     }
 
+
+    get archivedMessagesCount(): number {
+        return DialogsStore.toArray().filter(l => l.isArchived).length
+    }
+
     fetchNextPage({limit = 40}) {
         if (this.allWasFetched || DialogsStore.count >= this.count) {
             console.warn("all dialogs were fetched")

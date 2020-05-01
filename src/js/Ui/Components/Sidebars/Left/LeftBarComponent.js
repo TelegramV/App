@@ -2,11 +2,12 @@ import UIEvents from "../../../EventBus/UIEvents"
 import {AbstractBarComponent} from "../AbstractBarComponent"
 import AppEvents from "../../../../Api/EventBus/AppEvents";
 import FoldersManager from "../../../../Api/Dialogs/FolderManager";
+import type {AE} from "../../../../V/VRDOM/component/__component_registerAppEvents";
 
 class LeftBarComponent extends AbstractBarComponent {
 
     // CRITICAL: always call super
-    appEvents(E) {
+    appEvents(E: AE) {
         E.bus(UIEvents.LeftSidebar)
             .on("show", this.sidebarOnShow)
             .on("hide", this.sidebarOnHide)

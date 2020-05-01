@@ -16,6 +16,8 @@ export default class SettingsPane extends LeftBarComponent {
         super.appEvents(E);
         E.bus(UIEvents.LeftSidebar)
             .on("hideAnimation", this.hideAnimation)
+            .on("burger.backPressed", this.onBack)
+
     }
 
     sidebarOnShow = event => {
@@ -58,7 +60,9 @@ export default class SettingsPane extends LeftBarComponent {
 
     barOnShow = () => {
         this.barWillOpen()
-        console.log("barOnShow", this.name, this.props)
+        UIEvents.LeftSidebar.fire("burger.changeToBack", {
+            id: this.barName
+        })
         this.$el.classList.add("fade-in");
         if (this.props.previous === "settings") {
             this.$el.parentElement.querySelector(".settings-main").classList.add("fade-out")
@@ -74,39 +78,47 @@ export default class SettingsPane extends LeftBarComponent {
     }
 
     barOnHide = () => {
-        console.log("barOnHide", this.name, this.props)
         this.$el.classList.remove("fade-in")
         if (this.props.previous === "settings") {
             this.$el.parentElement.querySelector(".settings-main").classList.remove("fade-out")
         }
     }
 
-    onBack = () => {
-        console.log("back", this.name, this.previous)
+    onBack = (event) => {
+        if(event.id === this.barName) {
 
-        UIEvents.LeftSidebar.fire("hide", {
-            barName: this.barName
-        })
-        UIEvents.LeftSidebar.fire("hideAnimation", {
-            barName: this.previous,
-            hide: false
-        })
-        UIEvents.LeftSidebar.fire("show", {
-            barName: this.previous
-        })
+            UIEvents.LeftSidebar.fire("burger.changeToBack", {
+                id: this.previous
+            })
+
+            UIEvents.LeftSidebar.fire("hide", {
+                barName: this.barName
+            })
+            UIEvents.LeftSidebar.fire("hideAnimation", {
+                barName: this.previous,
+                hide: false
+            })
+            UIEvents.LeftSidebar.fire("show", {
+                barName: this.previous
+            })
+        }
     }
 
     openPane = (name) => {
-        console.log("openPane", name, "this", this.name, this.previous)
+        // UIEvents.LeftSidebar.fire("burger.changeToBack", {
+        //     id: name
+        // })
+        console.log("openPane", name, "this", this.barName)
         UIEvents.LeftSidebar.fire("show", {
             barName: name
         })
+
     }
 
     makeHeader = (noBorders = false) => {
         return (
             <div class={{"sidebar-header": true, "no-borders": noBorders}}>
-                <i class="btn-icon tgico tgico-back rp rps" onClick={this.onBack}/>
+                {/*<i class="btn-icon tgico tgico-back rp rps hidden" onClick={this.onBack}/>*/}
                 <div class="sidebar-title">{this.name}</div>
             </div>
         )
