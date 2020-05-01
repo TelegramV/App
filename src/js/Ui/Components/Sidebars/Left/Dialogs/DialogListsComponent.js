@@ -6,20 +6,42 @@ import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBui
 import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf";
 import MTProto from "../../../../../MTProto/External";
 import lottie from "../../../../../../../vendor/lottie-web";
+import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 
-const DialogFolderFragment = ({folderId, filter, selected}) => {
-    return <div class={classIf(!selected, "hidden")}>
-        <PinnedDialogListComponent folderId={folderId} filter={filter}/>
-        <GeneralDialogListComponent folderId={folderId} filter={filter}/>
-    </div>
+class DialogFolderFragment extends VComponent {
+
+    pinned = VComponent.createComponentRef()
+    general = VComponent.createComponentRef()
+
+    get folderId() {
+        return this.props.folderId
+    }
+
+    render() {
+        const selected = this.props.selected
+        const folderId = this.props.folderId
+        const filter = this.props.filter
+
+        return <div class={classIf(!selected, "hidden")}>
+            <PinnedDialogListComponent ref={this.pinned} folderId={folderId} filter={filter}/>
+            <GeneralDialogListComponent ref={this.general} folderId={folderId} filter={filter}/>
+        </div>
+    }
+
+    set hidden(value) {
+        this.$el.classList.toggle("hidden", value)
+    }
+
+    updateFilter(newFilter) {
+        this.pinned.component.updateFilter(newFilter)
+        this.general.component.updateFilter(newFilter)
+    }
 }
 
-// FIXME since this elements patches if the folder is changed, it removes all the dialogs added with append. To rewrite.
 export class DialogListsComponent extends VComponent {
-    state = {
-        folders: [],
-        selectedFolder: null
-    }
+    folders = []
+    selectedFolder = null
+    folderRefs = [VComponent.createComponentRef()]
 
     appEvents(E: AE) {
         E.bus(AppEvents.General)
@@ -31,10 +53,10 @@ export class DialogListsComponent extends VComponent {
         return <div className="dialog-lists">
             {/*<div className="empty"/>*/}
             {/* All chats */}
-            <DialogFolderFragment folderId={null} filter={null} selected={this.state.selectedFolder == null}/>
-            {this.state.folders.map(l => {
-                return <DialogFolderFragment folderId={l.id} filter={l} selected={this.state.selectedFolder === l.id}/>
-            })}
+            <DialogFolderFragment ref={this.folderRefs[0]} folderId={null} filter={null} selected={this.selectedFolder == null}/>
+            {/*{this.state.folders.map(l => {*/}
+            {/*    return <DialogFolderFragment folderId={l.id} filter={l} selected={this.selectedFolder === l.id}/>*/}
+            {/*})}*/}
         </div>
     }
 
@@ -71,19 +93,56 @@ export class DialogListsComponent extends VComponent {
     //     })
     // }
 
+    addFolder = (folder) => {
+        const ref = VComponent.createComponentRef()
+        this.folderRefs.push(ref)
+        VRDOM.append(<DialogFolderFragment ref={ref} folderId={folder.id} filter={folder} selected={this.selectedFolder === folder.id}/>, this.$el)
+    }
+
     onFoldersUpdate = (event) => {
-        this.state.folders = []
-        this.setState({
-            folders: event.folders
+        this.folders = event.folders
+        const found = [null]
+        const destroyed = []
+        this.folderRefs.forEach(l => {
+            const component: DialogFolderFragment = l.component
+            if(component.folderId == null) return
+            const folder = this.folders.find(l => l.id === component.folderId)
+            if(folder) {
+                found.push(component.folderId)
+                component.updateFilter(folder)
+            } else {
+                if(this.selectedFolder === component.folderId) {
+                    FoldersManager.selectFolder(null)
+                }
+                component.__destroy()
+                destroyed.push(l)
+            }
         })
+
+        destroyed.forEach(l => {
+            this.folderRefs.splice(this.folderRefs.indexOf(l), 1)
+        })
+
+        this.folders.forEach(l => {
+            if(!found.includes(l.id)) {
+                this.addFolder(l)
+            }
+        })
+        // this.setState({
+        //     folders: event.folders
+        // })
     }
 
     onSelectFolder = (event) => {
         // console.log("select folder", event.folderId)
-        const folderId = event.folderId
-        this.setState({
-            selectedFolder: folderId
+        this.selectedFolder = event.folderId
+        this.folderRefs.forEach(l => {
+            const component: DialogFolderFragment = l.component
+            component.hidden = component.folderId !== this.selectedFolder
         })
+        // this.setState({
+        //     selectedFolder: folderId
+        // })
     }
 
 }

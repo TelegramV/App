@@ -91,8 +91,12 @@ class FolderManager {
                 filter.pinned_peers.push(peer.inputPeer)
             }
         } else {
-            if(filter.pinned_peers.find(l => isEquivalent(l, peer.inputPeer))) {
-                filter.pinned_peers.splice(filter.pinned_peers.indexOf(peer.inputPeer), 1)
+            const a = filter.pinned_peers.find(l => isEquivalent(l, peer.inputPeer))
+            if(a) {
+                filter.pinned_peers.splice(filter.pinned_peers.indexOf(a), 1)
+                if(!peer.dialog.matchesFilter(filter)) {
+                    filter.include_peers.push(peer.inputPeer)
+                }
             }
         }
         const response = await MTProto.invokeMethod("messages.updateDialogFilter", {

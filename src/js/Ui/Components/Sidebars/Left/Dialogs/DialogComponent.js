@@ -26,7 +26,7 @@ export class DialogComponent extends VComponent {
     unreadMentionsCountFragmentRef = VComponent.createFragmentRef()
     unreadMarkFragmentRef = VComponent.createFragmentRef()
 
-    identifier = `dialog-${this.props.dialog.peer.type}-${this.props.dialog.peer.id}-${this.props.folderId}`
+    identifier = `dialog-${this.props.dialog.peer.type}-${this.props.dialog.peer.id}-${this.props.folderId}${this.props.isPin ? "-pin" : ""}`
 
     init() {
         this.dialog = this.props.dialog
@@ -87,6 +87,7 @@ export class DialogComponent extends VComponent {
         this.Pinned = VComponent.getComponentById(`dialogs-pinned-list-${this.props.folderId}`)
         this.General = this.props.list //VComponent.getComponentById(`dialogs-general-list`)
 
+        this.$el.__dialog = this.dialog
         this.$el.__message = this.dialog.peer.messages.last
         this.$el.__pinned = this.props.folderId == null ? this.dialog.pinned : FoldersManager.isPinned(this.dialog.peer, this.props.folderId)
         this.$el.__archived = this.dialog.isArchived

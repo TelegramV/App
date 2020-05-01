@@ -224,11 +224,11 @@ export class DialogsBar extends LeftBarComponent {
     loadNextPage() {
         if(this.isLoadingMore) return
         this.isLoadingMore = true
-        console.log("STARTED LOADING NEW PAGE")
+        // console.log("STARTED LOADING NEW PAGE")
 
         DialogsManager.fetchNextPage({}).then(() => {
             this.isLoadingMore = false
-            console.log("STOPPED LOADING NEW PAGE")
+            // console.log("STOPPED LOADING NEW PAGE")
             if(this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
                 this.loadNextPage()
             }
