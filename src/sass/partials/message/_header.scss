@@ -4,8 +4,7 @@
     & .fwd {
         font-weight: 500;
         font-size: 14px;
-        //padding-bottom: 3px;
-        margin: 5px 11px 0px 0px;
+        margin: 6px 11px -4px 0px;
 
         @if $in {
             color: $blueonline;
