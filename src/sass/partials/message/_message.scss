@@ -57,14 +57,12 @@
             }
 
             &.transparent {
-                padding-left: 0 !important;
-
                 @include header($in: true, $transparent: true);
                 @include reply($in: true, $transparent: true);
             }
 
             .text-wrapper {
-                padding-left: 0px;
+                margin-right: 3px;
             }
 
             @include time($in: true);
@@ -87,14 +85,10 @@
             }
 
             &.transparent {
-                padding-right: 0 !important;
+                padding-right: 0;
 
                 @include header($in: false, $transparent: true);
                 @include reply($in: false, $transparent: true);
-            }
-
-            .text-wrapper {
-                padding-right: 0px;
             }
 
             @include time($in: false);
@@ -114,13 +108,12 @@
             z-index: 0;
             display: inline-table;
             overflow: hidden;
-            padding-left: 10px;
 
             -webkit-mask-repeat: no-repeat;
             mask-repeat: no-repeat;
 
             &.transparent {
-                border-radius: 12px;
+                border-radius: 0 !important;
                 background-color: transparent;
                 box-shadow: none;
                 position: relative;
@@ -144,7 +137,8 @@
             .text-wrapper {
                 line-height: 1.2;
                 word-wrap: break-word;
-                margin: 3px 3px 3px 0px;
+                margin-top: 7px;
+                margin-bottom: 4px;
                 user-select: text;
             }
 
