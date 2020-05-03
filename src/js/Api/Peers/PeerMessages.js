@@ -114,9 +114,7 @@ export class PeerMessages {
         }).then(Messages => {
             this.isDownloadingRecent = false;
             const messages = this.putRawMessages(Messages.messages);
-
-            console.log("AA", messages[0].id < messages[messages.length - 1].id)
-
+            
             this._recent = [...this._recent, ...messages];
 
             this.peer.fire("messages.allRecent", {
@@ -181,7 +179,7 @@ export class PeerMessages {
         const message = this.putRawMessage(rawMessage);
 
         if (this._recent.length > 0) {
-            const newest = this._recent[this._recent.length - 1];
+            const newest = this._recent[0];
 
             if (newest.id < message.id) {
                 this._recent.unshift(message);

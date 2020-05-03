@@ -30,6 +30,10 @@ const slotLoadingHeight = (photo, real) => {
 }
 
 export const PhotoComponent = ({photo}) => {
-    return <ObjectWithThumbnailComponent type="photo" loadObject={loadObject} object={photo} slotLoaded={slotLoaded}
-                                         slotLoadingWidth={slotLoadingWidth} slotLoadingHeight={slotLoadingHeight}/>
+    return <ObjectWithThumbnailComponent type="photo"
+                                         loadObject={loadObject}
+                                         object={photo}
+                                         slotLoaded={slotLoaded}
+                                         slotLoadingWidth={slotLoadingWidth} slotLoadingHeigh
+                                         t={slotLoadingHeight}/>
 }

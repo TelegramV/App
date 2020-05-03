@@ -3,6 +3,29 @@ import MessageWrapperFragment from "./Common/MessageWrapperFragment"
 import TextWrapperComponent from "./Common/TextWrapperComponent"
 import {PhotoComponent} from "../../../Basic/photoComponent"
 import VUI from "../../../../VUI"
+import {PhotoFigureFragment} from "./Photo/PhotoFigureFragment"
+import VComponent from "../../../../../V/VRDOM/component/VComponent"
+
+class FileImageComponent extends VComponent {
+    reactive(R: RORC) {
+        R.object(this.props.photo)
+            .on("downloaded", this.forceUpdate);
+    }
+
+    render() {
+        const photo = this.photo;
+
+        return (
+            <PhotoFigureFragment srcUrl={photo.srcUrl}
+                                 width={photo.maxWidth}
+                                 height={photo.maxHeight}
+                                 maxWidth={470}
+                                 maxHeight={512}
+                                 loading={false}
+                                 loaded={true}/>
+        );
+    }
+}
 
 class WebpageMessageComponent extends GeneralMessageComponent {
 
