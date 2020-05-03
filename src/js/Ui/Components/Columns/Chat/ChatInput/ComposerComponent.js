@@ -1,6 +1,5 @@
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import VRDOM from "../../../../../V/VRDOM/VRDOM";
-import TabSelectorComponent from "../../../Tab/TabSelectorComponent"
 import StickerComponent from "../Message/Common/StickerComponent"
 import {VideoComponent} from "../../../Basic/videoComponent"
 import {ChatInputManager} from "./ChatInputComponent"
@@ -13,77 +12,94 @@ import VApp from "../../../../../V/vapp"
 import lottie from "../../../../../../../vendor/lottie-web"
 
 export default class ComposerComponent extends VComponent {
-    constructor(props) {
-        super(props);
-        this.identifier = "composer"
+    identifier = "composer";
 
-        this.tabItems = [
-            {
-                text: "Emoji",
-                click: this.openEmoji.bind(this),
-                selected: true
-            },
-            {
-                text: "Stickers",
-                click: this.openStickers.bind(this),
-            },
-            {
-                text: "GIFs",
-                click: this.openGIF.bind(this),
-            }
-        ]
-
-
+    stateless = {
+        emojiCategory: "people"
     }
 
     render() {
         return (
             <div class="composer" onMouseEnter={this.props.mouseEnter} onMouseLeave={this.props.mouseLeave}>
-                <TabSelectorComponent items={this.tabItems}/>
+                <div className="tab-selector">
+                    <div className="item rp rps selected">
+                        <span>Emoji</span>
+                    </div>
+                    <div className="item rp rps">
+                        <span>Stickers</span>
+                    </div>
+                    <div className="item rp rps">
+                        <span>GIFs</span>
+                    </div>
+                </div>
+
                 <div class="content">
                     <div class="emoji-wrapper">
                         <div class="emoji-table">
-                            <div class="recent scrollable" data-category="recent"></div>
+                            <div class="recent scrollable" data-category="recent"/>
                             <div class="people scrollable" data-category="people"/>
-                            <div class="nature scrollable" data-category="nature"></div>
-                            <div class="food scrollable" data-category="food"></div>
-                            <div class="travel scrollable" data-category="travel"></div>
-                            <div class="activity scrollable" data-category="activity"></div>
-                            <div class="objects scrollable" data-category="objects"></div>
-                            <div class="symbols scrollable" data-category="symbols"></div>
+                            <div class="nature scrollable" data-category="nature"/>
+                            <div class="food scrollable" data-category="food"/>
+                            <div class="travel scrollable" data-category="travel"/>
+                            <div class="activity scrollable" data-category="activity"/>
+                            <div class="objects scrollable" data-category="objects"/>
+                            <div class="symbols scrollable" data-category="symbols"/>
                         </div>
                         <div class="emoji-types">
-                            <div class="rp emoji-type-item" data-category="recent" onClick={this._emojiTypeClick}><i
-                                class="tgico tgico-sending"/></div>
-                            <div class="rp emoji-type-item selected" data-category="people"
-                                 onClick={this._emojiTypeClick}><i class="tgico tgico-smile"/></div>
-                            <div class="rp emoji-type-item" data-category="nature" onClick={this._emojiTypeClick}><i
-                                class="tgico tgico-animals"/></div>
-                            <div class="rp emoji-type-item" data-category="food" onClick={this._emojiTypeClick}><i
-                                class="tgico tgico-eats"/></div>
-                            <div class="rp emoji-type-item" data-category="travel" onClick={this._emojiTypeClick}><i
-                                class="tgico tgico-car"/></div>
-                            <div class="rp emoji-type-item" data-category="activity" onClick={this._emojiTypeClick}><i
-                                class="tgico tgico-sport"/></div>
-                            <div class="rp emoji-type-item" data-category="objects" onClick={this._emojiTypeClick}><i
-                                class="tgico tgico-lamp"/></div>
-                            <div class="rp emoji-type-item" data-category="symbols" onClick={this._emojiTypeClick}><i
-                                class="tgico tgico-flag"/></div>
+                            <div class="rp rps emoji-type-item"
+                                 data-category="recent"
+                                 onClick={this.onClickSwitchEmojiCategory}>
+                                <i class="tgico tgico-sending"/>
+                            </div>
+                            <div class="rp rps emoji-type-item selected"
+                                 data-category="people"
+                                 onClick={this.onClickSwitchEmojiCategory}>
+                                <i class="tgico tgico-smile"/>
+                            </div>
+                            <div class="rp rps emoji-type-item"
+                                 data-category="nature"
+                                 onClick={this.onClickSwitchEmojiCategory}>
+                                <i class="tgico tgico-animals"/>
+                            </div>
+                            <div class="rp rps emoji-type-item"
+                                 data-category="food"
+                                 onClick={this.onClickSwitchEmojiCategory}>
+                                <i class="tgico tgico-eats"/>
+                            </div>
+                            <div class="rp rps emoji-type-item"
+                                 data-category="travel"
+                                 onClick={this.onClickSwitchEmojiCategory}>
+                                <i class="tgico tgico-car"/>
+                            </div>
+                            <div class="rp rps emoji-type-item"
+                                 data-category="activity"
+                                 onClick={this.onClickSwitchEmojiCategory}>
+                                <i class="tgico tgico-sport"/>
+                            </div>
+                            <div class="rp rps emoji-type-item"
+                                 data-category="objects"
+                                 onClick={this.onClickSwitchEmojiCategory}>
+                                <i class="tgico tgico-lamp"/>
+                            </div>
+                            <div class="rp rps emoji-type-item"
+                                 data-category="symbols"
+                                 onClick={this.onClickSwitchEmojiCategory}>
+                                <i class="tgico tgico-flag"/>
+                            </div>
                         </div>
                     </div>
                     <div class="sticker-wrapper hidden">
                         <div class="sticker-table">
-                            <div class="selected scrollable">
-
-                            </div>
+                            <div class="selected scrollable"/>
                         </div>
                         <div class="sticker-packs">
-                            <div class="rp sticker-packs-item selected"><i class="tgico tgico-sending"/></div>
+                            <div class="rp sticker-packs-item selected">
+                                <i class="tgico tgico-sending"/>
+                            </div>
                         </div>
                     </div>
                     <div class="gif-wrapper hidden">
                         <div class="gif-masonry scrollable">
-
                         </div>
                     </div>
                 </div>
@@ -160,19 +176,38 @@ export default class ComposerComponent extends VComponent {
         this.loadSavedGifs();
     }
 
-    _emojiTypeClick = (ev) => {
-        let el = ev.currentTarget;
-        let category = el.getAttribute("data-category");
-        if (!category) return;
-        this.$el.querySelector(".emoji-types").childNodes.forEach(node => node.classList.remove("selected"));
-        el.classList.add("selected");
-        this.$el.querySelector(".emoji-table").childNodes.forEach(node => node.classList.remove("selected"));
-        let newEl = this.$el.querySelector(".emoji-table").querySelector("." + category);
-        newEl.classList.add("selected");
-        while (newEl.firstChild) newEl.removeChild(newEl.firstChild)
-        newEl.innerText = emojiCategories[category];
-        replaceEmoji(newEl);
-        this._bindEmojiClickEvents();
+    onClickSwitchEmojiCategory = (ev) => {
+        const $el = ev.currentTarget;
+        const category = $el.getAttribute("data-category");
+
+        if (!category || this.stateless.emojiCategory === category) {
+            return;
+        }
+
+        this.stateless.emojiCategory = category;
+
+        this.$el.querySelector(".emoji-types").childNodes
+            .forEach(node => node.classList.remove("selected"));
+
+        $el.classList.add("selected");
+
+        this.$el.querySelector(".emoji-table").childNodes
+            .forEach(node => node.classList.remove("selected"));
+
+        const $emojiPanel = this.$el.querySelector(".emoji-table")
+            .querySelector("." + category);
+
+        $emojiPanel.classList.add("selected");
+
+        while ($emojiPanel.firstChild) {
+            $emojiPanel.removeChild($emojiPanel.firstChild); // holly shit
+        }
+
+        $emojiPanel.innerText = emojiCategories[category]; // holly crab
+
+        replaceEmoji($emojiPanel);
+
+        this._bindEmojiClickEvents(); // holly idk
     }
 
     _bindEmojiClickEvents = () => {
@@ -242,7 +277,7 @@ export default class ComposerComponent extends VComponent {
         let ref = ev.currentTarget.getAttribute("data-component-id");
         if (!ref) return;
         let sticker = VApp.mountedComponents.get(ref).sticker;
-        AppSelectedChat.Current.api.sendExistingMedia(sticker);
+        AppSelectedChat.current.api.sendExistingMedia(sticker);
     }
 
     loadSavedGifs = () => {
