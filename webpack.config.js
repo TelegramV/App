@@ -12,6 +12,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const BabelMinifyPlugin = require("babel-minify-webpack-plugin")
 
 const __IS_PRODUCTION__ = process.argv.mode === "production" || process.argv.includes("production")
+const __IS_DEV__ = !__IS_PRODUCTION__
 
 const config = {
     node: {
@@ -98,6 +99,7 @@ const config = {
         }]),
         new webpack.DefinePlugin({
             __IS_PRODUCTION__: __IS_PRODUCTION__,
+            __IS_DEV__: __IS_DEV__,
         }),
         // new FlowWebpackPlugin(),
         new MiniCssExtractPlugin({
@@ -132,7 +134,7 @@ const config = {
         hot: false, // doesn't work
         port: 8090,
     },
-    devtool: !__IS_PRODUCTION__ && "inline-source-map",
+    devtool: __IS_DEV__ && "inline-source-map",
 }
 
 module.exports = config

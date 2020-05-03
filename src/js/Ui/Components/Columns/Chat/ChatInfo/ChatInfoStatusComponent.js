@@ -40,7 +40,10 @@ class ChatInfoStatusComponent extends VComponent {
         return (
             <div className="bottom">
                 <div hideIf={AppSelectedChat.isSelected && AppSelectedChat.Current.isSelf}
-                     className={classes}>{text}</div>
+                     className={classes}
+                     style={{
+                         "font-style": this.statusLine.isAction ? "italic" : "normal",
+                     }}>{text}</div>
             </div>
         )
     }

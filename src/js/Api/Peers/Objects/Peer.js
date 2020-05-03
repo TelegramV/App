@@ -315,7 +315,7 @@ export class Peer extends ReactiveObject {
                 return
             }
 
-            const message = this.messages.get(this.pinnedMessageId)
+            const message = this.messages.getById(this.pinnedMessageId)
 
             if (message) {
                 this._pinnedMessage = message
@@ -326,24 +326,24 @@ export class Peer extends ReactiveObject {
                     })
                 }
             } else {
-                this.api.getHistory({
-                    offset_id: this.pinnedMessageId, // ???
-                    add_offset: -1,
-                    limit: 1
-                }).then(messages => {
-                    if (messages.length && messages[0].id === this.pinnedMessageId) {
-                        this.messages.appendOtherSingle(messages[0])
-                        this._pinnedMessage = messages[0]
-
-                        if (fire) {
-                            this.fire("pinnedMessageFound", {
-                                message: this._pinnedMessage
-                            })
-                        }
-                    } else {
-                        console.log("no pinned!")
-                    }
-                })
+                // this.api.getHistory({
+                //     offset_id: this.pinnedMessageId, // ???
+                //     add_offset: -1,
+                //     limit: 1
+                // }).then(messages => {
+                //     if (messages.length && messages[0].id === this.pinnedMessageId) {
+                //         this.messages.putRawMessage(messages[0])
+                //         this._pinnedMessage = messages[0]
+                //
+                //         if (fire) {
+                //             this.fire("pinnedMessageFound", {
+                //                 message: this._pinnedMessage
+                //             })
+                //         }
+                //     } else {
+                //         console.log("no pinned!")
+                //     }
+                // })
             }
         } else {
             this.fire("pinnedMessageFound", {

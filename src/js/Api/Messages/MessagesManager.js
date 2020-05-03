@@ -54,7 +54,7 @@ class MessageManager extends Manager {
                 return
             }
 
-            const message = peer.messages.appendSingleFromRaw(lastMessage, true)
+            const message = peer.messages.putNewRawMessage(lastMessage, true)
             message.init()
 
             if (message.from && message.from.type === "user") {
@@ -185,7 +185,7 @@ class MessageManager extends Manager {
             const to = this.getToPeerMessage(update.message)
 
             if (to) {
-                const message = to.dialog.peer.messages.get(update.message.id)
+                const message = to.dialog.peer.messages.getById(update.message.id)
 
                 if (message) {
                     message.fillRaw(update.message)
@@ -214,7 +214,7 @@ class MessageManager extends Manager {
             const to = this.getToPeerMessage(update.message)
 
             if (to) {
-                const message = to.dialog.peer.messages.get(update.message.id)
+                const message = to.dialog.peer.messages.getById(update.message.id)
 
                 if (message) {
                     message.fillRaw(update.message)

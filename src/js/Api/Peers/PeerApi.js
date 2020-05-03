@@ -52,71 +52,13 @@ export class PeerApi {
             return MessageFactory.fromRaw(this.peer, rawMessage)
         })
 
-        this.peer.messages.appendMany(messages, addUnread)
+        this.peer.messages.putRawMessages(messages, addUnread)
 
         messages.forEach(message => {
             message.init()
         })
 
         return messages
-    }
-
-    fetchInitialMessages() {
-        return this.getHistory({limit: 100}).then(messages => {
-            AppEvents.Peers.fire("chat.initialReady", {
-                peer: this.peer,
-                messages: messages
-            })
-        })
-    }
-
-    fetchByOffsetId({offset_id, limit, add_offset}) {
-        return this.getHistory({offset_id, limit, add_offset: -1 + add_offset}).then(messages => {
-            AppEvents.Peers.fire("chat.showMessageReady", {
-                peer: this.peer,
-                messages: messages,
-                offset_id: offset_id
-            })
-        })
-    }
-
-    fetchNextPage(id = null) {
-        if (!id) {
-            let oldest = this.peer.messages.oldest
-
-            if (!oldest) {
-                return Promise.resolve()
-            }
-
-            id = oldest.id
-        }
-
-        return this.getHistory({offset_id: id, limit: 100}).then(messages => {
-            AppEvents.Peers.fire("chat.nextPageReady", {
-                peer: this.peer,
-                messages: messages
-            })
-        })
-    }
-
-
-    fetchPrevPage(id = null) {
-        if (!id) {
-            let newest = this.peer.messages.newest
-            // console.log("fetchNextPage", newest)
-
-            if (!newest) {
-                return Promise.resolve()
-            }
-            id = newest.id
-        }
-
-        return this.getHistory({offset_id: id, add_offset: -31, limit: 30}).then(messages => {
-            AppEvents.Peers.fire("chat.prevPageReady", {
-                peer: this.peer,
-                messages: messages
-            })
-        })
     }
 
     fetchParticipants(offset, limit = 33) {

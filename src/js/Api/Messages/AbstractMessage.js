@@ -243,7 +243,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         }
 
         if (this.raw.reply_to_msg_id) {
-            const replyToMessage = this.to.messages.get(this.raw.reply_to_msg_id)
+            const replyToMessage = this.to.messages.getById(this.raw.reply_to_msg_id)
 
             if (replyToMessage) {
                 this.replyToMessage = replyToMessage
@@ -253,27 +253,28 @@ export class AbstractMessage extends ReactiveObject implements Message {
                     this.fire("replyToMessageFound")
                 }
             } else {
-                this.to.api.getHistory({
-                    offset_id: this.raw.reply_to_msg_id, // ???
-                    add_offset: -1,
-                    limit: 1
-                }).then(messages => {
-                    if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
-                        this.to.messages.appendOtherSingle(messages[0])
-                        this.replyToMessage = messages[0]
-                        this.replyToMessageType = "replyToMessageFound"
-
-                        if (fire) {
-                            this.fire("replyToMessageFound")
-                        }
-                    } else {
-                        this.replyToMessageType = "replyToMessageNotFound"
-
-                        if (fire) {
-                            this.fire("replyToMessageNotFound")
-                        }
-                    }
-                })
+                // todo fix reply
+                // this.to.api.getHistory({
+                //     offset_id: this.raw.reply_to_msg_id, // ???
+                //     add_offset: -1,
+                //     limit: 1
+                // }).then(messages => {
+                //     if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
+                //         this.to.messages.putRawMessage(messages[0])
+                //         this.replyToMessage = messages[0]
+                //         this.replyToMessageType = "replyToMessageFound"
+                //
+                //         if (fire) {
+                //             this.fire("replyToMessageFound")
+                //         }
+                //     } else {
+                //         this.replyToMessageType = "replyToMessageNotFound"
+                //
+                //         if (fire) {
+                //             this.fire("replyToMessageNotFound")
+                //         }
+                //     }
+                // })
             }
         }
     }
@@ -335,7 +336,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
         // reply
         if (this.to) {
-            const replyToMessage = this.to.messages.get(this.raw.reply_to_msg_id)
+            const replyToMessage = this.to.messages.getById(this.raw.reply_to_msg_id)
             if (replyToMessage) {
                 this.replyToMessage = replyToMessage
             }

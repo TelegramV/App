@@ -37,8 +37,12 @@ const vrdom_patchChildren = ($node: Element, vRNode: VRNode) => {
             vrdom_append(children[i], $node, {$parent: $node})
         }
     } else if (children.length < $children.length) {
-        Array.from($children.values()).slice(children.length).forEach($node => {
-            vrdom_delete($node)
+        Array.from($children.values()).slice(children.length).forEach(($node: Node) => {
+            if ($node.attributes && !$node.attributes["class"] !== "ripple") {
+                vrdom_delete($node)
+            } else {
+                vrdom_delete($node)
+            }
         })
     }
 }

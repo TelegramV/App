@@ -77,7 +77,7 @@ class DialogManager extends Manager {
             rawDifferenceWithPeer.__peer.dialog.fillRaw(rawDifferenceWithPeer.dialog)
 
             rawDifferenceWithPeer.messages = rawDifferenceWithPeer.messages.filter(m => m._ !== "messageEmpty").map(m => MessageFactory.fromRaw(rawDifferenceWithPeer.__peer, m))
-            rawDifferenceWithPeer.__peer.messages.appendMany(rawDifferenceWithPeer.messages)
+            rawDifferenceWithPeer.__peer.messages.putRawMessages(rawDifferenceWithPeer.messages)
 
             AppEvents.Dialogs.fire("ChannelRefreshCausedByDifferenceTooLong", {
                 dialog: rawDifferenceWithPeer.__peer.dialog
@@ -204,7 +204,7 @@ class DialogManager extends Manager {
     createDialogFromDialogs(Dialog, Dialogs) {
         const dialog = this.setFromRaw(Dialog)
         const rawTopMessage = Dialogs.messages.find(message => message.id === Dialog.top_message)
-        dialog.peer.messages.appendSingleFromRaw(rawTopMessage, false)
+        dialog.peer.messages.putNewRawMessage(rawTopMessage, false)
         return dialog
     }
 

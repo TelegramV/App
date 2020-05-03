@@ -111,7 +111,7 @@ export class Dialog extends ReactiveObject {
 
     handleUpdateMessageID(id, randomId): void {
         return
-        const msg = this.messages.get(id)
+        const msg = this.messages.getById(id)
         if (msg) {
             msg.raw.random_id = randomId
         } else {
