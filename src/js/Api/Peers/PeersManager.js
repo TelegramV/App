@@ -20,7 +20,6 @@ import PeersStore from "../Store/PeersStore"
 import PeerFactory from "./PeerFactory"
 
 class PeerManager extends Manager {
-
     constructor() {
         super()
     }

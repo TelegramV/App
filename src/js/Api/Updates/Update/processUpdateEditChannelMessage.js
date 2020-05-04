@@ -17,14 +17,22 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+function processUpdateEditChannelMessage(update) {
+    const to = this.getToPeerMessage(update.message)
 
-const processUpdateReadHistoryInbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
+    if (to) {
+        const message = to.dialog.peer.messages.getById(update.message.id)
 
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
+        if (message) {
+            message.fillRaw(update.message)
+
+            message.fire("edit")
+
+            to.dialog.fire("editMessage", {
+                message: message,
+            })
+        }
     }
 }
 
-export default processUpdateReadHistoryInbox
+export default processUpdateEditChannelMessage;

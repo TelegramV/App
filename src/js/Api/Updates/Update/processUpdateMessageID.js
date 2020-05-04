@@ -17,14 +17,8 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
-
-const processUpdateReadHistoryInbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
-
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
-    }
+function processUpdateMessageID(update) {
+    update.dialog && update.dialog.handleUpdateMessageID(update.id, update.random_id);
 }
 
-export default processUpdateReadHistoryInbox
+export default processUpdateMessageID;

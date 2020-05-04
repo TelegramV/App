@@ -19,12 +19,12 @@
 
 import DialogsManager from "../../Dialogs/DialogsManager"
 
-const processUpdateReadHistoryInbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
+function processUpdateDraftMessage(update) {
+    const dialog = DialogsManager.findByPeer(update.peer);
 
     if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
+        dialog.draft.fillRawAndFire(update.draft);
     }
 }
 
-export default processUpdateReadHistoryInbox
+export default processUpdateDraftMessage;

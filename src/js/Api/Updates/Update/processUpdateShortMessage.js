@@ -17,14 +17,22 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+import PeersStore from "../../Store/PeersStore"
+import UpdatesManager from "../UpdatesManager"
+import MessagesManager from "../../Messages/MessagesManager"
 
-const processUpdateReadHistoryInbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
+function processUpdateShortMessage(update) {
+    const user = PeersStore.get("user", update.user_id)
 
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
+    if (!user) {
+        UpdatesManager.defaultUpdatesProcessor.getDifference({
+            pts: UpdatesManager.State.pts - 1
+        }).then(diff => {
+            UpdatesManager.defaultUpdatesProcessor.processDifference(diff)
+        })
+    } else {
+        MessagesManager.processNewMessage(user, update)
     }
 }
 
-export default processUpdateReadHistoryInbox
+export default processUpdateShortMessage;

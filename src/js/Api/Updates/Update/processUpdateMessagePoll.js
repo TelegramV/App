@@ -17,14 +17,18 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+import AppSelectedChat from "../../../Ui/Reactive/SelectedChat"
 
-const processUpdateReadHistoryInbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
+function processUpdateMessagePoll(update) {
+    if (AppSelectedChat.isSelected) {
+        const messages = AppSelectedChat.current.messages.getPollsById(update.poll_id)
 
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
+        for (const message of messages) {
+            message.fillPoll(update.poll, update.results)
+
+            message.fire("pollEdit")
+        }
     }
 }
 
-export default processUpdateReadHistoryInbox
+export default processUpdateMessagePoll;

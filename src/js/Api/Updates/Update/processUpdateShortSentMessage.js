@@ -17,14 +17,10 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+import MessagesManager from "../../Messages/MessagesManager"
 
-const processUpdateReadHistoryInbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
-
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
-    }
+function processUpdateShortSentMessage(update) {
+    MessagesManager.processNewMessage(update.peer, update);
 }
 
-export default processUpdateReadHistoryInbox
+export default processUpdateShortSentMessage;

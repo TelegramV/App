@@ -1,9 +1,9 @@
 import MTProto from "../../MTProto/External"
 import PeersManager from "../Peers/PeersManager"
-import type {DialogsType, getDialogs_Params_105, getPeerDialogs_Params_105} from "./types"
+import type {getDialogs_Params_105} from "./types"
 import {Peer} from "../Peers/Objects/Peer"
 
-const getDialogs = (params: getDialogs_Params_105 = {}): Promise<DialogsType> => {
+function getDialogs(params: getDialogs_Params_105 = {}) {
     return MTProto.invokeMethod("messages.getDialogs", {
         exclude_pinned: params.exclude_pinned || false,
         folder_id: params.folder_id || 0,
@@ -24,17 +24,19 @@ const getDialogs = (params: getDialogs_Params_105 = {}): Promise<DialogsType> =>
     })
 }
 
-const getPeerDialogs = (params: getPeerDialogs_Params_105 = {}): Promise<Object> => MTProto.invokeMethod("messages.getPeerDialogs", {
-    peers: params.peers
-}).then(Dialogs => {
-    PeersManager.fillPeersFromUpdate(Dialogs)
+function getPeerDialogs({peers}) {
+    return MTProto.invokeMethod("messages.getPeerDialogs", {
+        peers
+    }).then(Dialogs => {
+        PeersManager.fillPeersFromUpdate(Dialogs)
 
-    Dialogs.count = Dialogs.count || Dialogs.dialogs.length
+        Dialogs.count = Dialogs.count || Dialogs.dialogs.length
 
-    return Dialogs
-})
+        return Dialogs
+    })
+}
 
-const searchGlobal = (params) => {
+function searchGlobal(params) {
     return MTProto.invokeMethod("messages.searchGlobal", {
         q: params.q,
         offset_rate: params.offsetRate || 0,
@@ -49,11 +51,10 @@ const searchGlobal = (params) => {
     })
 }
 
-const getChats = id => {
+function getChats(id) {
     return MTProto.invokeMethod("messages.getChats", {
         id
     }).then(Chats => {
-        console.log(Chats)
         return PeersManager.fillPeersFromUpdate(Chats).chats
     })
 }

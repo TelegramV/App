@@ -17,14 +17,20 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+import PeersStore from "../../Store/PeersStore"
+import API from "../../Telegram/API"
+import MessagesManager from "../../Messages/MessagesManager"
 
-const processUpdateReadHistoryInbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
+function processUpdateShortChatMessage(update) {
+    const chat = PeersStore.get("chat", update.chat_id)
 
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
+    if (!chat) {
+        API.messages.getChats([update.chat_id]).then(chats => {
+            MessagesManager.processNewMessage(chats[0], update);
+        })
+    } else {
+        MessagesManager.processNewMessage(chat, update);
     }
 }
 
-export default processUpdateReadHistoryInbox
+export default processUpdateShortChatMessage;

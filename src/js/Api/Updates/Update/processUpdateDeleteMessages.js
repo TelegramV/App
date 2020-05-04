@@ -17,14 +17,27 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+import DialogsStore from "../../Store/DialogsStore"
 
-const processUpdateReadHistoryInbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
+// todo rewrite
+function processUpdateDeleteMessages(update) {
+    DialogsStore.toArray().forEach(dialog => {
+        if (dialog.peer.type !== "channel") {
+            dialog.peer.messages.startTransaction();
 
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
-    }
+            update.messages.sort().forEach(mId => {
+                dialog.peer.messages.deleteSingle(mId);
+            })
+
+            if (!dialog.peer.messages.last) {
+                dialog.refresh();
+            }
+
+            dialog.peer.messages.fireTransaction("deleteMessages", {
+                messages: update.messages
+            });
+        }
+    });
 }
 
-export default processUpdateReadHistoryInbox
+export default processUpdateDeleteMessages;

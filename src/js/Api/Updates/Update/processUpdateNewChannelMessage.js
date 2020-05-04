@@ -17,14 +17,13 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+import PeersStore from "../../Store/PeersStore"
+import MessagesManager from "../../Messages/MessagesManager"
 
-const processUpdateReadHistoryInbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
+function processUpdateNewChannelMessage(update) {
+    const peer = PeersStore.get("channel", update.message.to_id.channel_id)
 
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id
-    }
+    MessagesManager.processNewMessage(peer, update.message)
 }
 
-export default processUpdateReadHistoryInbox
+export default processUpdateNewChannelMessage;
