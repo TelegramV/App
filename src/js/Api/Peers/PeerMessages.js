@@ -407,14 +407,23 @@ export class PeerMessages {
         })
     }
 
+    /**
+     * @deprecated we really should avoid this
+     */
     startTransaction() {
         this._fireTransaction = true
     }
 
+    /**
+     * @deprecated we really should avoid this #2
+     */
     stopTransaction() {
         this._fireTransaction = false
     }
 
+    /**
+     * @deprecated we really should avoid this #3
+     */
     fireTransaction(eventName = "updateSingle", data = {}) {
         this.stopTransaction()
 

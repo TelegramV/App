@@ -19,14 +19,14 @@
 
 import DialogsManager from "../../Dialogs/DialogsManager"
 
-const processUpdateFolderPeers = update => {
+function processUpdateFolderPeers(update) {
     update.folder_peers.forEach(FolderPeer => {
-        const dialog = DialogsManager.findByPeer(FolderPeer.peer)
+        const dialog = DialogsManager.findByPeer(FolderPeer.peer);
 
         if (dialog) {
-            dialog.folderId = FolderPeer.folder_id
+            dialog.folderId = FolderPeer.folder_id;
         } else {
-            console.error("BUG: whoa!!! this thing is not implemented yet")
+            console.error("BUG: whoa!!! this thing is not implemented yet");
         }
     })
 }

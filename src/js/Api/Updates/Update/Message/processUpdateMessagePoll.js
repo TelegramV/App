@@ -17,20 +17,18 @@
  *
  */
 
-import PeersStore from "../../Store/PeersStore"
-import API from "../../Telegram/API"
-import MessagesManager from "../../Messages/MessagesManager"
+import AppSelectedChat from "../../../../Ui/Reactive/SelectedChat"
 
-function processUpdateShortChatMessage(update) {
-    const chat = PeersStore.get("chat", update.chat_id)
+function processUpdateMessagePoll(update) {
+    if (AppSelectedChat.isSelected) {
+        // todo: @prettydude fix it pls
+        const messages = AppSelectedChat.current.messages.getPollsById(update.poll_id);
 
-    if (!chat) {
-        API.messages.getChats([update.chat_id]).then(chats => {
-            MessagesManager.processNewMessage(chats[0], update);
-        })
-    } else {
-        MessagesManager.processNewMessage(chat, update);
+        for (const message of messages) {
+            message.fillPoll(update.poll, update.results);
+            message.fire("pollEdit");
+        }
     }
 }
 
-export default processUpdateShortChatMessage;
+export default processUpdateMessagePoll;

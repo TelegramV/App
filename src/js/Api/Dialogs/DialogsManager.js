@@ -182,8 +182,6 @@ class DialogManager extends Manager {
     }
 
     getPeerDialogs(peer) {
-        console.log(peer)
-
         const peerData = {
             _: "inputDialogPeer",
             peer: peer.inputPeer ? peer.inputPeer : !peer.access_hash ? getInputPeerFromPeerWithoutAccessHash(peer._, peer.id) : getInputPeerFromPeer(peer._, peer.id, peer.access_hash)

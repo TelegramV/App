@@ -17,10 +17,10 @@
  *
  */
 
-import {getPeerTypeFromType} from "../../Dialogs/util"
-import PeersStore from "../../Store/PeersStore"
-import MTProto from "../../../MTProto/External"
-import MessagesManager from "../../Messages/MessagesManager"
+import {getPeerTypeFromType} from "../../../Dialogs/util";
+import PeersStore from "../../../Store/PeersStore";
+import MTProto from "../../../../MTProto/External";
+import MessagesManager from "../../../Messages/MessagesManager";
 
 function processUpdateNewMessage(update) {
     let peer;

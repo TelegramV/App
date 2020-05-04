@@ -17,14 +17,16 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+import DialogsManager from "../../Dialogs/DialogsManager";
 
 const processUpdateReadChannelOutbox = update => {
-    const dialog = DialogsManager.find("channel", update.channel_id)
+    const dialog = DialogsManager.find("channel", update.channel_id);
 
     if (dialog) {
-        dialog.peer.messages.readOutboxMaxId = update.max_id
-        dialog.fire("updateReadChannelOutbox")
+        dialog.peer.messages.readOutboxMaxId = update.max_id;
+        dialog.fire("updateReadChannelOutbox");
+    } else {
+        console.warn("BUG: [processUpdateReadChannelOutbox] no dialog found");
     }
 }
 

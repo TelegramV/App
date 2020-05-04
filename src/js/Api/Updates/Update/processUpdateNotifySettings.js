@@ -21,20 +21,20 @@ import PeersStore from "../../Store/PeersStore"
 
 function processUpdateNotifySettings(update) {
     if (update.peer._ === "notifyPeer") {
-        let peer
-        if (update.peer.peer._ === "peerUser") {
-            peer = PeersStore.get("user", update.peer.peer.user_id)
-        } else if (update.peer.peer._ === "peerChat") {
-            peer = PeersStore.get("chat", update.peer.peer.chat_id)
-        } else if (update.peer.peer._ === "peerChannel") {
-            peer = PeersStore.get("channel", update.peer.peer.channel_id)
+        const peer = PeersStore.getByPeerType(update.peer.peer);
+
+        if (!peer) {
+            console.warn("BUG: [processUpdateNotifySettings] no peer found");
+            return;
         }
 
-        if (peer && peer.full) {
-            peer.full.notify_settings = update.notify_settings
+        // todo: fix full
+        if (peer.full) {
+            peer.full.notify_settings = update.notify_settings;
+
             peer.fire("updateNotificationStatus", {
-                notifySettings: update.notify_settings
-            })
+                notifySettings: update.notify_settings,
+            });
         }
     }
 }

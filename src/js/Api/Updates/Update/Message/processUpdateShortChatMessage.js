@@ -17,13 +17,20 @@
  *
  */
 
-import PeersStore from "../../Store/PeersStore"
-import MessagesManager from "../../Messages/MessagesManager"
+import PeersStore from "../../../Store/PeersStore";
+import API from "../../../Telegram/API";
+import MessagesManager from "../../../Messages/MessagesManager";
 
-function processUpdateNewChannelMessage(update) {
-    const peer = PeersStore.get("channel", update.message.to_id.channel_id)
+function processUpdateShortChatMessage(update) {
+    const chat = PeersStore.get("chat", update.chat_id)
 
-    MessagesManager.processNewMessage(peer, update.message)
+    if (!chat) {
+        API.messages.getChats([update.chat_id]).then(chats => {
+            MessagesManager.processNewMessage(chats[0], update);
+        });
+    } else {
+        MessagesManager.processNewMessage(chat, update);
+    }
 }
 
-export default processUpdateNewChannelMessage;
+export default processUpdateShortChatMessage;

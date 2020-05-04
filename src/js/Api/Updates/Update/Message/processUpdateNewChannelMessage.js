@@ -17,27 +17,13 @@
  *
  */
 
-import DialogsStore from "../../Store/DialogsStore"
+import PeersStore from "../../../Store/PeersStore"
+import MessagesManager from "../../../Messages/MessagesManager"
 
-// todo rewrite
-function processUpdateDeleteMessages(update) {
-    DialogsStore.toArray().forEach(dialog => {
-        if (dialog.peer.type !== "channel") {
-            dialog.peer.messages.startTransaction();
+function processUpdateNewChannelMessage(update) {
+    const peer = PeersStore.get("channel", update.message.to_id.channel_id);
 
-            update.messages.sort().forEach(mId => {
-                dialog.peer.messages.deleteSingle(mId);
-            })
-
-            if (!dialog.peer.messages.last) {
-                dialog.refresh();
-            }
-
-            dialog.peer.messages.fireTransaction("deleteMessages", {
-                messages: update.messages
-            });
-        }
-    });
+    MessagesManager.processNewMessage(peer, update.message);
 }
 
-export default processUpdateDeleteMessages;
+export default processUpdateNewChannelMessage;

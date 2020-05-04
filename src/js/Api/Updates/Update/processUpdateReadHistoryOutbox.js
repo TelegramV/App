@@ -17,13 +17,15 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager"
+import DialogsManager from "../../Dialogs/DialogsManager";
 
 const processUpdateReadHistoryOutbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer)
+    const dialog = DialogsManager.findByPeer(update.peer);
 
     if (dialog) {
-        dialog.peer.messages.readOutboxMaxId = update.max_id
+        dialog.peer.messages.readOutboxMaxId = update.max_id;
+    } else {
+        console.warn("BUG: [processUpdateReadHistoryOutbox] no dialog found");
     }
 }
 

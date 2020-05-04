@@ -17,8 +17,7 @@
  *
  */
 
-import DialogsStore from "../../Store/DialogsStore"
-
+import DialogsStore from "../../../Store/DialogsStore"
 
 // todo: rewrite
 function processUpdateDeleteChannelMessages(update) {
@@ -42,6 +41,8 @@ function processUpdateDeleteChannelMessages(update) {
         dialog.peer.messages.fireTransaction("deleteMessages", {
             messages: update.messages
         });
+    } else {
+        console.log("BUG: [processUpdateDeleteChannelMessages] no dialog found");
     }
 }
 

@@ -17,22 +17,27 @@
  *
  */
 
-function processUpdateEditChannelMessage(update) {
-    const to = this.getToPeerMessage(update.message)
+import DialogsStore from "../../../Store/DialogsStore"
 
-    if (to) {
-        const message = to.dialog.peer.messages.getById(update.message.id)
+// todo rewrite
+function processUpdateDeleteMessages(update) {
+    DialogsStore.toArray().forEach(dialog => {
+        if (dialog.peer.type !== "channel") {
+            dialog.peer.messages.startTransaction();
 
-        if (message) {
-            message.fillRaw(update.message)
-
-            message.fire("edit")
-
-            to.dialog.fire("editMessage", {
-                message: message,
+            update.messages.sort().forEach(mId => {
+                dialog.peer.messages.deleteSingle(mId);
             })
+
+            if (!dialog.peer.messages.last) {
+                dialog.refresh();
+            }
+
+            dialog.peer.messages.fireTransaction("deleteMessages", {
+                messages: update.messages
+            });
         }
-    }
+    });
 }
 
-export default processUpdateEditChannelMessage;
+export default processUpdateDeleteMessages;

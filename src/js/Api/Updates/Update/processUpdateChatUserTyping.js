@@ -17,15 +17,15 @@
  *
  */
 
-import PeersStore from "../../Store/PeersStore"
+import PeersStore from "../../Store/PeersStore";
 
 const processUpdateChatUserTyping = update => {
-    let peer = PeersStore.get("chat", update.chat_id) || PeersStore.get("channel", update.chat_id)
+    let peer = PeersStore.get("chat", update.chat_id) || PeersStore.get("channel", update.chat_id);
 
     if (!peer || !peer.dialog) {
-        console.log("good game telegram, good game")
+        console.log("BUG: [processUpdateChatUserTyping] no peer or dialog found");
     } else {
-        peer.dialog.addAction(update)
+        peer.dialog.addAction(update);
     }
 }
 

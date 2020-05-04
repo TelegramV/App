@@ -17,15 +17,16 @@
  *
  */
 
-import PeersStore from "../../Store/PeersStore"
-import AppEvents from "../../EventBus/AppEvents"
-import DialogsManager from "../../Dialogs/DialogsManager"
+import PeersStore from "../../Store/PeersStore";
+import AppEvents from "../../EventBus/AppEvents";
+import DialogsManager from "../../Dialogs/DialogsManager";
 
+// todo: rewrite
 const processUpdateDialogPinned = update => {
-    const peer = PeersStore.getByPeerType(update.peer.peer)
+    const peer = PeersStore.getByPeerType(update.peer.peer);
 
     if (!peer) {
-        console.error("BUG: no way telegram, no way")
+        console.error("BUG: [processUpdateDialogPinned] no peer found");
     }
 
     if (!peer.dialog) {
@@ -33,12 +34,12 @@ const processUpdateDialogPinned = update => {
             AppEvents.Dialogs.fire("gotNewMany", {
                 dialogs
             })
-        })
+        });
 
-        return
+        return;
     }
 
-    peer.dialog.pinned = update.pinned || false
+    peer.dialog.pinned = update.pinned || false;
 }
 
 export default processUpdateDialogPinned

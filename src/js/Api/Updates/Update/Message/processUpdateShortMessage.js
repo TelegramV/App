@@ -17,21 +17,21 @@
  *
  */
 
-import PeersStore from "../../Store/PeersStore"
-import UpdatesManager from "../UpdatesManager"
-import MessagesManager from "../../Messages/MessagesManager"
+import PeersStore from "../../../Store/PeersStore";
+import UpdatesManager from "../../UpdatesManager";
+import MessagesManager from "../../../Messages/MessagesManager";
 
 function processUpdateShortMessage(update) {
-    const user = PeersStore.get("user", update.user_id)
+    const user = PeersStore.get("user", update.user_id);
 
     if (!user) {
         UpdatesManager.defaultUpdatesProcessor.getDifference({
-            pts: UpdatesManager.State.pts - 1
+            pts: UpdatesManager.State.pts - 1,
         }).then(diff => {
-            UpdatesManager.defaultUpdatesProcessor.processDifference(diff)
+            UpdatesManager.defaultUpdatesProcessor.processDifference(diff);
         })
     } else {
-        MessagesManager.processNewMessage(user, update)
+        MessagesManager.processNewMessage(user, update);
     }
 }
 

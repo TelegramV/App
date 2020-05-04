@@ -1,5 +1,4 @@
 import {Manager} from "../Manager"
-import MTProto from "../../MTProto/External"
 import PeersStore from "../Store/PeersStore"
 import DialogsManager from "../Dialogs/DialogsManager"
 import AppEvents from "../EventBus/AppEvents"
@@ -16,25 +15,28 @@ class MessageManager extends Manager {
 
     processNewMessage(peer: Peer, rawMessage) {
         if (rawMessage._ === "messageEmpty") {
+            console.log(rawMessage)
             return
         }
 
         if (!peer) {
-            console.error("BUG: peer was not found", rawMessage)
+            console.error("BUG: processNewMessage peer was not found", rawMessage)
             return
         }
 
 
-        if (peer.isAbleToHandleUpdates && !peer.dialog) {
-            console.log("no dialog", peer, peer.dialog)
+        if (peer.isAbleToHandleUpdates) {
+            if (!peer.dialog) {
+                console.log("BUG: processNewMessage no dialog", peer, peer.dialog)
 
-            DialogsManager.getPeerDialogs(peer).then(dialogs => {
-                AppEvents.Dialogs.fire("gotNewMany", {
-                    dialogs
+                DialogsManager.getPeerDialogs(peer).then(dialogs => {
+                    AppEvents.Dialogs.fire("gotNewMany", {
+                        dialogs
+                    })
                 })
-            })
 
-            return
+                return
+            }
         }
 
         if (peer.messages._sendingMessages.has(rawMessage.id)) {

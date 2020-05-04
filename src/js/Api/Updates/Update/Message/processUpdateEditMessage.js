@@ -17,7 +17,7 @@
  *
  */
 
-import MessagesManager from "../../Messages/MessagesManager"
+import MessagesManager from "../../../Messages/MessagesManager"
 
 function processUpdateEditMessage(update) {
     const to = MessagesManager.getToPeerMessage(update.message);
@@ -28,12 +28,15 @@ function processUpdateEditMessage(update) {
         if (message) {
             message.fillRaw(update.message);
 
+            // todo: fix events
             message.fire("edit");
 
             to.dialog.fire("editMessage", {
                 message: message,
             });
         }
+    } else {
+        console.log("BUG: [processUpdateEditMessage] no peer found")
     }
 }
 

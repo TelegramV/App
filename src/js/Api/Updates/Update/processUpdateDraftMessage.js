@@ -24,6 +24,8 @@ function processUpdateDraftMessage(update) {
 
     if (dialog) {
         dialog.draft.fillRawAndFire(update.draft);
+    } else {
+        console.warn("BUG: [processUpdateDraftMessage] no dialog found");
     }
 }
 

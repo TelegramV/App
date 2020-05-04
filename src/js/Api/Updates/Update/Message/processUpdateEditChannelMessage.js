@@ -17,18 +17,27 @@
  *
  */
 
-import AppSelectedChat from "../../../Ui/Reactive/SelectedChat"
+import MessagesManager from "../../../Messages/MessagesManager";
 
-function processUpdateMessagePoll(update) {
-    if (AppSelectedChat.isSelected) {
-        const messages = AppSelectedChat.current.messages.getPollsById(update.poll_id)
+// todo rewrite
+function processUpdateEditChannelMessage(update) {
+    const to = MessagesManager.getToPeerMessage(update.message);
 
-        for (const message of messages) {
-            message.fillPoll(update.poll, update.results)
+    if (to) {
+        const message = to.dialog.peer.messages.getById(update.message.id);
 
-            message.fire("pollEdit")
+        if (message) {
+            message.fillRaw(update.message);
+
+            message.fire("edit");
+
+            to.dialog.fire("editMessage", {
+                message: message,
+            });
         }
+    } else {
+        console.log("BUG: [processUpdateEditChannelMessage] no peer found")
     }
 }
 
-export default processUpdateMessagePoll;
+export default processUpdateEditChannelMessage;

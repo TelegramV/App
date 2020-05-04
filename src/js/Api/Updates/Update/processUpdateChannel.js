@@ -20,12 +20,13 @@
 import AppEvents from "../../EventBus/AppEvents"
 import DialogsManager from "../../Dialogs/DialogsManager"
 
+// todo: rewrite
 const processUpdateChannel = update => {
     DialogsManager.getPeerDialogs(update.__peer).then(dialogs => {
         if (dialogs.length === 0) {
             AppEvents.Dialogs.fire("hideDialogByPeer", {
                 peer: update.__peer
-            })
+            });
         } else {
             if (dialogs[0].peer.isLeft) {
                 AppEvents.Dialogs.fire("hideDialogByPeer", {

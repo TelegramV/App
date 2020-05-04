@@ -17,14 +17,19 @@
  *
  */
 
-import PeersStore from "../../Store/PeersStore"
-import {UserPeer} from "../../Peers/Objects/UserPeer"
+import PeersStore from "../../Store/PeersStore";
+import {UserPeer} from "../../Peers/Objects/UserPeer";
 
 function processUpdateUserPhoto(update) {
-    const peer = PeersStore.get("user", update.user_id)
+    const peer = PeersStore.get("user", update.user_id);
+
+    if (!peer) {
+        console.warn("BUG: [processUpdateUserPhoto] no peer found");
+        return;
+    }
 
     if (peer instanceof UserPeer) {
-        peer.photo.fillRaw(update.photo)
+        peer.photo.fillRaw(update.photo);
     }
 }
 
