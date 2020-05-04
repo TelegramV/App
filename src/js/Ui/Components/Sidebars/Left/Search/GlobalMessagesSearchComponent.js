@@ -107,7 +107,7 @@ export class GlobalMessagesSearchComponent extends VComponent {
                         this.setState({
                             isSearching: false
                         })
-                        
+
                         this.state.messages.set(Messages.messages)
                         this.offsetRate = Messages.next_rate
 

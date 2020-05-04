@@ -204,7 +204,7 @@ class DialogManager extends Manager {
     createDialogFromDialogs(Dialog, Dialogs) {
         const dialog = this.setFromRaw(Dialog)
         const rawTopMessage = Dialogs.messages.find(message => message.id === Dialog.top_message)
-        dialog.peer.messages.putNewRawMessage(rawTopMessage, false)
+        dialog.peer.messages.putNewRawMessage(rawTopMessage)
         return dialog
     }
 

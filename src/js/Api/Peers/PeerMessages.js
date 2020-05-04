@@ -108,13 +108,13 @@ export class PeerMessages {
         }
 
         API.messages.getHistory(this.peer, {
-            offset_id: this._recent[0].id,
+            offset_id: this._recent[this._recent.length - 1].id,
             limit: 100 - this._recent.length,
             add_offset: 0,
         }).then(Messages => {
             this.isDownloadingRecent = false;
             const messages = this.putRawMessages(Messages.messages);
-            
+
             this._recent = [...this._recent, ...messages];
 
             this.peer.fire("messages.allRecent", {

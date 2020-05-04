@@ -302,11 +302,13 @@ class NextBubblesComponent extends VComponent {
     }
 
     onPeerMessagesAllRecent = event => {
+        this.isLoadingRecent = true;
         event.messages = this.fixMessages(event.messages.slice());
+        const lenbeforefuck = this.mainVirtual.currentPage.length;
         this.mainVirtual.messages = [...event.messages, ...this.mainVirtual.messages];
         this.currentVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.length === 100;
         const vbp = this.mainVirtual.veryBottomPage();
-        this.prependMessages(vbp.slice(0, vbp.length - 1), null, this.mainVirtual.messages[0]);
+        this.prependMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.messages[0]);
         this.scrollBottom();
         this.isLoadingRecent = false;
     }

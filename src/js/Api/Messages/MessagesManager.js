@@ -54,7 +54,7 @@ class MessageManager extends Manager {
                 return
             }
 
-            const message = peer.messages.putNewRawMessage(lastMessage, true)
+            const message = peer.messages.putNewRawMessage(lastMessage)
             message.init()
 
             if (message.from && message.from.type === "user") {
