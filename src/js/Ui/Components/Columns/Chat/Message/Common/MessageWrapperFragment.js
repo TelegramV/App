@@ -92,7 +92,7 @@ const MessageWrapperFragment = ({
 
     let contentClasses = {
         "message-content": true,
-        "no-pad": noPad,
+        // "no-pad": noPad,
         "transparent": transparent,
         "read": !message.isSending && message.isRead,
         "sending": message.isSending,

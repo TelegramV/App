@@ -73,7 +73,7 @@ export default class TabSelectorComponent extends VComponent {
 
 const TabSelectorItemFragment = ({selected = false, text, hidden = false, tabIndex = -1, click}) => {
     const classes = classNames(
-        "item", "rp",
+        "item", "rp rps",
         classIf(selected, "selected"),
         classIf(hidden, "hidden")
     )

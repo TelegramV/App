@@ -142,9 +142,10 @@ export default class MessageSearchComponent extends RightBarComponent {
 
     onSearchInputUpdated = event => {
         const q = event.target.value.trim()
-        this.state.messages.clear()
 
         if (q === "") {
+            this.state.messages.clear()
+
             CURRENT_QUERY = undefined
             this.state.messagesCount = -2
             this.messagesCountRef.patch({
@@ -152,6 +153,8 @@ export default class MessageSearchComponent extends RightBarComponent {
             })
             this.state.messages.clear()
         } else if (q !== CURRENT_QUERY) {
+            this.state.messages.clear()
+
             CURRENT_QUERY = q
             this.offsetId = 0
             this.allFetched = false

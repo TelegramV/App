@@ -1,6 +1,6 @@
-import { Manager } from "../Manager";
+import {Manager} from "../Manager";
 import MTProto from "../../MTProto/External";
-'use strict';
+
 class StickersManager extends Manager {
     constructor(props) {
         super(props);
@@ -15,7 +15,7 @@ class StickersManager extends Manager {
     fetchSpecialSets() {
         for (let [key, emoji] of Object.entries(this.diceEmojis)) {
             MTProto.invokeMethod("messages.getStickerSet", {
-                stickerset: { _: "inputStickerSetDice", emoticon: emoji}
+                stickerset: {_: "inputStickerSetDice", emoticon: emoji}
             }).then(l => {
                 l.packs.forEach(q => {
                     q.document = l.documents.find(z => z.id === q.documents[0])
@@ -27,7 +27,7 @@ class StickersManager extends Manager {
         }
 
         MTProto.invokeMethod("messages.getStickerSet", {
-            stickerset: { _: "inputStickerSetAnimatedEmoji" }
+            stickerset: {_: "inputStickerSetAnimatedEmoji"}
         }).then(l => {
             l.packs.forEach(q => {
                 q.document = l.documents.find(z => z.id === q.documents[0])
@@ -38,12 +38,18 @@ class StickersManager extends Manager {
         })
     }
 
+    /**
+     * ой людоньки шо це робиться
+     * я це не видалятиму хай буде на пам'ять
+     *
+     * @deprecated
+     */
     getInstalledStickerSets() {
         let that = this;
         return new Promise(async (resolve, reject) => {
             MTProto.invokeMethod("messages.getAllStickers", {
                 hash: 0
-            }).then(async function(response) {
+            }).then(async function (response) {
                 let sets = response.sets;
                 let parsed = [];
                 for (const set of sets) {
@@ -78,12 +84,9 @@ class StickersManager extends Manager {
             let id = l.set.id;
             if (stickerSet._ === "inputStickerSetAnimatedEmoji") id = "inputStickerSetAnimatedEmoji"
             if (stickerSet._ === "inputStickerSetDice") id = "inputStickerSetDice"
-            const k = this.stickerSets[id] = l;
             //console.log(this.stickerSets)
-            return k
+            return this.stickerSets[id] = l
         })
-        // TODO change that to promise maybe
-        return null
     }
 
     getAnimatedEmojiSet() {

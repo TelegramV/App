@@ -8,9 +8,12 @@ import AppRoutes from "./Ui/Routing"
 import RippleVRDOMPlugin from "./Ui/Plugins/RipplePlugin"
 import EmojiVRDOMPlugin from "./Ui/Plugins/EmojiPlugin"
 
-import "./globals"
 import PeerFactory from "./Api/Peers/PeerFactory"
 import PeersStore from "./Api/Store/PeersStore"
+
+import keval from "./Keval/keval"
+
+import "./globals"
 
 if (__IS_PRODUCTION__) {
     console.log("%c%s", "color: #4ea4f6; font-size: 4em;", "Telegram V")
@@ -18,6 +21,8 @@ if (__IS_PRODUCTION__) {
     AppCache.open()
 } else {
     document.title = "[dev] Telegram V"
+    window.invoke = MTProto.invokeMethod
+    window.keval = keval
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)

@@ -1,7 +1,6 @@
 import MTProto from "../../MTProto/External";
 import AppEvents from "../EventBus/AppEvents";
 import UpdatesManager from "../Updates/UpdatesManager";
-import DialogsManager from "./DialogsManager";
 import DialogsStore from "../Store/DialogsStore";
 import {Peer} from "../Peers/Objects/Peer";
 import {isEquivalent} from "../../Utils/array";
@@ -26,6 +25,7 @@ class FolderManager {
     }
 
     init() {
+        // should be separated in different files and moved to Api/Updates/Update
         UpdatesManager.subscribe("updateDialogFilter", this.updateDialogFilter)
         UpdatesManager.subscribe("updateDialogFilterOrder", this.updateDialogFilterOrder)
         UpdatesManager.subscribe("updateDialogFilters", this.updateDialogFilters)
@@ -34,9 +34,9 @@ class FolderManager {
     updateDialogFilter = (event) => {
         const filter = event.filter
         const index = this.folders.findIndex(l => l.id === event.id)
-        if(!filter) {
+        if (!filter) {
             this.folders.splice(index, 1)
-        } else if(index === -1) {
+        } else if (index === -1) {
             this.folders.push(filter)
         } else {
             this.folders[index] = filter
@@ -47,7 +47,7 @@ class FolderManager {
     updateDialogFilterOrder = (event) => {
         const order = event.order
         const newFolders = order.map(() => null)
-        for(let i = 0; i < order.length; i++) {
+        for (let i = 0; i < order.length; i++) {
             newFolders[i] = this.folders.find(l => l.id === order[i])
         }
         this.folders = newFolders
@@ -78,7 +78,7 @@ class FolderManager {
 
     isPinned(peer: Peer, folderId: number) {
         const filter = this.getFolder(folderId)
-        if(filter == null) return false
+        if (filter == null) return false
         return filter.pinned_peers.find(l => isEquivalent(l, peer.inputPeer))
     }
 
@@ -86,15 +86,15 @@ class FolderManager {
         // updateDialogFilter#26ffde7d flags:# id:int filter:flags.0?DialogFilter = Update;
         // messages.updateDialogFilter#1ad4a04a flags:# id:int filter:flags.0?DialogFilter = Bool;
         const filter = this.getFolder(folderId)
-        if(pinned) {
-            if(!filter.pinned_peers.find(l => isEquivalent(l, peer.inputPeer))) {
+        if (pinned) {
+            if (!filter.pinned_peers.find(l => isEquivalent(l, peer.inputPeer))) {
                 filter.pinned_peers.push(peer.inputPeer)
             }
         } else {
             const a = filter.pinned_peers.find(l => isEquivalent(l, peer.inputPeer))
-            if(a) {
+            if (a) {
                 filter.pinned_peers.splice(filter.pinned_peers.indexOf(a), 1)
-                if(!peer.dialog.matchesFilter(filter)) {
+                if (!peer.dialog.matchesFilter(filter)) {
                     filter.include_peers.push(peer.inputPeer)
                 }
             }
@@ -104,7 +104,7 @@ class FolderManager {
             filter: filter
         })
 
-        if(response._ === "boolTrue") {
+        if (response._ === "boolTrue") {
             peer.dialog.fire("updatePinned")
         }
 
@@ -126,7 +126,7 @@ class FolderManager {
     }
 
     getBadgeCount(folderId) {
-        if(folderId === null) {
+        if (folderId === null) {
             const found = DialogsStore.toArray().filter(l => !l.isArchived && (l.peer.messages.unreadCount > 0 || l.peer.messages.unreadMentionsCount > 0))
             return {
                 count: found.length,

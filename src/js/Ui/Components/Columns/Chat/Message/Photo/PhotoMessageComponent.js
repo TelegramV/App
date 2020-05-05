@@ -70,7 +70,7 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     }
 
     patchFigure = () => {
-        this.photoFigureRef.patch({
+        this.photoFigureRef.update({
             message: this.message,
             progress: FileManager.getProgress(this.message.raw.media.photo.id),
             pending: FileManager.isPending(this.message.raw.media.photo.id),

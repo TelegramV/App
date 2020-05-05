@@ -28,6 +28,18 @@ import processUpdateChannelPinnedMessage from "./Update/processUpdateChannelPinn
 import processUpdateNotifySettings from "./Update/processUpdateNotifySettings"
 import processUpdatePhoneCall from "./Update/processUpdatePhoneCall"
 import processUpdateUserPhoto from "./Update/processUpdateUserPhoto"
+import processUpdateMessageID from "./Update/Message/processUpdateMessageID"
+import processUpdateShortSentMessage from "./Update/processUpdateShortSentMessage"
+import processUpdateShortMessage from "./Update/Message/processUpdateShortMessage"
+import processUpdateShortChatMessage from "./Update/Message/processUpdateShortChatMessage"
+import processUpdateNewMessage from "./Update/Message/processUpdateNewMessage"
+import processUpdateDeleteChannelMessages from "./Update/Message/processUpdateDeleteChannelMessages"
+import processUpdateDeleteMessages from "./Update/Message/processUpdateDeleteMessages"
+import processUpdateEditMessage from "./Update/Message/processUpdateEditMessage"
+import processUpdateMessagePoll from "./Update/Message/processUpdateMessagePoll"
+import processUpdateEditChannelMessage from "./Update/Message/processUpdateEditChannelMessage"
+import processUpdateNewChannelMessage from "./Update/Message/processUpdateNewChannelMessage"
+import processUpdateDraftMessage from "./Update/processUpdateDraftMessage"
 
 export class UpdateManager extends Manager {
     constructor() {
@@ -64,6 +76,18 @@ export class UpdateManager extends Manager {
         this.subscribe("updateChannelPinnedMessage", processUpdateChannelPinnedMessage)
         this.subscribe("updateNotifySettings", processUpdateNotifySettings)
         this.subscribe("updatePhoneCall", processUpdatePhoneCall)
+        this.subscribe("updateMessageID", processUpdateMessageID)
+        this.subscribe("updateShortSentMessage", processUpdateShortSentMessage)
+        this.subscribe("updateShortMessage", processUpdateShortMessage)
+        this.subscribe("updateShortChatMessage", processUpdateShortChatMessage)
+        this.subscribe("updateNewMessage", processUpdateNewMessage)
+        this.subscribe("updateDeleteChannelMessages", processUpdateDeleteChannelMessages)
+        this.subscribe("updateDeleteMessages", processUpdateDeleteMessages)
+        this.subscribe("updateEditMessage", processUpdateEditMessage)
+        this.subscribe("updateMessagePoll", processUpdateMessagePoll)
+        this.subscribe("updateEditChannelMessage", processUpdateEditChannelMessage)
+        this.subscribe("updateNewChannelMessage", processUpdateNewChannelMessage)
+        this.subscribe("updateDraftMessage", processUpdateDraftMessage)
 
         this.customUpdatesProcessors = new Map([
             ["updatesTooLong", processUpdatesTooLong],

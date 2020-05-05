@@ -45,6 +45,7 @@ export class GlobalMessagesSearchComponent extends VComponent {
 
     state = {
         messages: new VArray(),
+        isSearching: false
     }
 
     appEvents(E) {
@@ -56,7 +57,7 @@ export class GlobalMessagesSearchComponent extends VComponent {
     render() {
         return (
             <div className="global-messages section">
-                <div className="section-title">Messages</div>
+                <div className="section-title">{this.state.isSearching ? "Searching messages..." : "Messages"}</div>
                 <List list={this.state.messages}
                       template={MessageFragmentItemTemplate}
                       wrapper={<div className="column-list"/>}/>
@@ -94,10 +95,19 @@ export class GlobalMessagesSearchComponent extends VComponent {
             this.offsetRate = 0
             this.allFetched = false
             this.isFetching = true
+            this.$el.classList.remove("hidden")
+
+            this.setState({
+                isSearching: true
+            })
 
             if (!this.allFetched) {
                 SearchManager.globalSearch(q, {limit: 20, offsetRate: this.offsetRate}).then(Messages => {
                     if (Messages.__q === CURRENT_QUERY) {
+                        this.setState({
+                            isSearching: false
+                        })
+
                         this.state.messages.set(Messages.messages)
                         this.offsetRate = Messages.next_rate
 
@@ -106,6 +116,10 @@ export class GlobalMessagesSearchComponent extends VComponent {
                         if (Messages._ === "messages" || Messages.count < 20) {
                             this.offsetRate = 0
                             this.allFetched = true
+                        }
+
+                        if (Messages.count === 0) {
+                            this.$el.classList.add("hidden")
                         }
                     }
                 })

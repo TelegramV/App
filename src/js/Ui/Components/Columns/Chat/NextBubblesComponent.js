@@ -41,6 +41,7 @@ function getMessageElementById(messageId: number): HTMLElement | null {
 class NextBubblesComponent extends VComponent {
     bubblesInnerRef = VComponent.createRef();
 
+    isLoadingRecent = false;
     mainVirtual: VirtualMessages = new VirtualMessages();
     secondVirtual: VirtualMessages = new VirtualMessages();
 
@@ -60,9 +61,10 @@ class NextBubblesComponent extends VComponent {
     appEvents(E) {
         E.bus(AppEvents.Peers)
             .only(event => AppSelectedChat.check(event.peer))
-            .on("chat.initialReady", this.onInitialMessagesReady)
-            .on("chat.topPageReady", this.onTopPageMessagesReady)
-            .on("chat.bottomPageReady", this.onBottomPageMessagesReady)
+            .on("messages.recent", this.onPeerMessagesRecent)
+            .on("messages.allRecent", this.onPeerMessagesAllRecent)
+            .on("messages.nextTopPageDownloaded", this.onTopPageMessagesReady)
+            .on("messages.nextBottomPageDownloaded", this.onBottomPageMessagesReady)
             .on("chat.showMessageReady", this.onChatShowMessageReady);
 
         E.bus(AppEvents.Dialogs)
@@ -136,6 +138,7 @@ class NextBubblesComponent extends VComponent {
         this.mainVirtual.refresh();
         this.secondVirtual.refresh();
 
+        this.isLoadingRecent = false;
         this.isUsingSecondVirtual = false;
     }
 
@@ -153,6 +156,8 @@ class NextBubblesComponent extends VComponent {
     }
 
     appendMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
+        // messages = messages.slice().reverse();
+
         if (messages.length > 0) {
             if (!__IS_PRODUCTION__) {
                 if (!beforeTopMessage) {
@@ -193,6 +198,8 @@ class NextBubblesComponent extends VComponent {
     }
 
     prependMessages(messages: HTMLElement[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
+        // messages = messages.slice().reverse();
+
         if (messages.length > 0) {
             if (!__IS_PRODUCTION__) {
                 if (!beforeTopMessage) {
@@ -231,18 +238,17 @@ class NextBubblesComponent extends VComponent {
         this.refresh();
 
         if (AppSelectedChat.isSelected) {
-            const peer = AppSelectedChat.Current;
+            this.isLoadingRecent = true;
 
-            API.messages.getHistory(peer, {limit: 100}).then(Messages => {
-                AppEvents.Peers.fire("chat.initialReady", {
-                    messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
-                    peer
-                });
-            });
+            AppSelectedChat.current.messages.fireRecent();
         }
     }
 
     onChatScrollBottomRequest = () => {
+        if (this.isLoadingRecent) {
+            return;
+        }
+
         if (this.virtual_isCompletelyBottom()) {
             this.isUsingSecondVirtual = false;
             this.scrollBottom();
@@ -254,14 +260,15 @@ class NextBubblesComponent extends VComponent {
             // vrdom_patch(this.bubblesInnerRef.$el, <div ref={this.bubblesInnerRef} id="bubbles-inner">{this.mainVirtual.veryBottomPage().map(m => this.renderVRNodeMessage(m))}</div>)
             this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
             this.scrollBottom();
+            this.dev_checkTree();
         }
     }
 
     onScroll = () => {
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
         const isAtBottom = scrollHeight - scrollTop === clientHeight;
-        // const isAtTop = scrollTop <= 300;
-        const isAtTop = scrollTop === 0;
+        const isAtTop = scrollTop <= 400;
+        // const isAtTop = scrollTop === 0;
 
         if ((scrollHeight - scrollTop) >= (clientHeight - 20)) {
             UIEvents.General.fire("chat.scrollBottom.show");
@@ -271,22 +278,39 @@ class NextBubblesComponent extends VComponent {
             console.log("on top")
             this.virtual_onScrolledTop();
         } else if (isAtBottom) {
-            if (this.virtual_isCompletelyBottom()) {
+            if (this.virtual_isCompletelyBottom() || (!this.mainVirtual.hasMoreOnTopToDownload && this.virtual_isCompletelyBottom())) {
                 UIEvents.General.fire("chat.scrollBottom.hide");
             }
             this.virtual_onScrolledBottom();
         }
     }
 
-    onInitialMessagesReady = (event) => {
+    onPeerMessagesRecent = (event) => {
         this.refresh();
 
-        this.currentVirtual.hasMoreOnTopToDownload = event.messages.length === 100;
+        this.currentVirtual.hasMoreOnTopToDownload = true;
 
-        this.mainVirtual.messages = this.fixMessages(event.messages);
-        console.log("prepending")
+        this.mainVirtual.messages = this.fixMessages(event.messages.slice());
+
+        if (event.messages.length < 60) {
+            this.isLoadingRecent = true;
+            AppSelectedChat.current.messages.fireAllRecent();
+        }
+
         this.prependMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
         this.scrollBottom();
+    }
+
+    onPeerMessagesAllRecent = event => {
+        this.isLoadingRecent = true;
+        event.messages = this.fixMessages(event.messages.slice());
+        const lenbeforefuck = this.mainVirtual.currentPage.length;
+        this.mainVirtual.messages = [...event.messages, ...this.mainVirtual.messages];
+        this.currentVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.length === 100;
+        const vbp = this.mainVirtual.veryBottomPage();
+        this.prependMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.messages[0]);
+        this.scrollBottom();
+        this.isLoadingRecent = false;
     }
 
     onNewMessage = (event) => {
@@ -298,8 +322,9 @@ class NextBubblesComponent extends VComponent {
             const {scrollTop, scrollHeight, clientHeight} = this.$el;
             const isAtBottom = scrollHeight - scrollTop === clientHeight;
 
-            if (this.mainVirtual.messages.length > this.mainVirtual.size) {
+            if (this.mainVirtual.currentPage.length > this.mainVirtual.size) {
                 vrdom_delete(this.bubblesInnerRef.$el.firstChild);
+                this.dev_checkTree();
             }
 
             this.mainVirtual.veryBottomPage();
@@ -317,6 +342,10 @@ class NextBubblesComponent extends VComponent {
     }
 
     onChatShowMessage = ({message}) => {
+        if (this.isLoadingRecent) {
+            return;
+        }
+
         if (AppSelectedChat.check(message.to)) {
             let $message = getMessageElementById(message.id);
 
@@ -380,6 +409,10 @@ class NextBubblesComponent extends VComponent {
     }
 
     onChatShowMessageReady = event => {
+        if (this.isLoadingRecent) {
+            return;
+        }
+
         if (this.actionCount > event.actionCount) {
             return;
         }
@@ -422,6 +455,10 @@ class NextBubblesComponent extends VComponent {
     }
 
     virtual_onScrolledTop = () => {
+        if (this.isLoadingRecent) {
+            return;
+        }
+
         console.log("scrolled top")
 
         if (this.currentVirtual.isVeryTop()) {
@@ -434,25 +471,14 @@ class NextBubblesComponent extends VComponent {
             }
 
             if (this.currentVirtual.hasMoreOnTopToDownload && !this.currentVirtual.isDownloading) {
-                console.log("[top] downloading");
-
+                console.log(this.currentVirtual.isEmpty())
                 if (!this.currentVirtual.isEmpty()) {
                     this.currentVirtual.isDownloading = true;
 
-                    console.log("[top] downloading ok");
+                    console.log("[top] downloading");
 
-                    const peer = AppSelectedChat.Current;
-
-                    API.messages.getHistory(peer, {
-                        offset_id: this.currentVirtual.getVeryTopOne().id,
-                        limit: 100
-                    }).then(Messages => {
-                        console.log("messaes")
-                        AppEvents.Peers.fire("chat.topPageReady", {
-                            messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
-                            peer,
-                            isUsingSecondVirtual: this.isUsingSecondVirtual,
-                        });
+                    AppSelectedChat.current.messages.downloadNextTopPage(this.currentVirtual.getVeryTopOne().id, {
+                        isUsingSecondVirtual: this.isUsingSecondVirtual
                     });
                 }
             }
@@ -462,11 +488,15 @@ class NextBubblesComponent extends VComponent {
 
         const messages = this.currentVirtual.nextTop();
 
-        for (let i = 0; i < messages.length; i++) {
-            vrdom_delete(this.bubblesInnerRef.$el.lastChild);
+        if (this.currentVirtual.currentPage.length > messages.length) {
+            for (let i = 0; i < messages.length; i++) {
+                vrdom_delete(this.bubblesInnerRef.$el.lastChild);
+            }
         }
 
         this.prependMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
+
+        this.dev_checkTree();
 
         if (this.$el.scrollTop === 0) {
             let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
@@ -482,9 +512,13 @@ class NextBubblesComponent extends VComponent {
     }
 
     onTopPageMessagesReady = (event) => {
+        if (this.isLoadingRecent) {
+            return;
+        }
+
         this.currentVirtual.isDownloading = false;
 
-        if (event.isUsingSecondVirtual && !this.isUsingSecondVirtual) {
+        if (event.context.isUsingSecondVirtual && !this.isUsingSecondVirtual) {
             console.log("wat")
             this.secondVirtual.refresh();
             return;
@@ -502,6 +536,10 @@ class NextBubblesComponent extends VComponent {
     }
 
     virtual_onScrolledBottom = () => {
+        if (this.isLoadingRecent) {
+            return;
+        }
+
         console.log("on scrolled bottom");
 
         if (this.currentVirtual.isVeryBottom()) {
@@ -509,20 +547,10 @@ class NextBubblesComponent extends VComponent {
                 if (this.currentVirtual.messages.length > 0) {
                     this.currentVirtual.isDownloading = true;
 
-                    const peer = AppSelectedChat.Current;
-
                     console.log("[bottom] downloading")
 
-                    API.messages.getHistory(peer, {
-                        offset_id: this.currentVirtual.getVeryBottomOne().id,
-                        limit: 99,
-                        add_offset: -100
-                    }).then(Messages => {
-                        AppEvents.Peers.fire("chat.bottomPageReady", {
-                            messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
-                            peer,
-                            isUsingSecondVirtual: this.isUsingSecondVirtual,
-                        });
+                    AppSelectedChat.current.messages.downloadNextBottomPage(this.currentVirtual.getVeryBottomOne().id, {
+                        isUsingSecondVirtual: this.isUsingSecondVirtual
                     });
                 }
             }
@@ -538,14 +566,20 @@ class NextBubblesComponent extends VComponent {
 
         const messages = this.currentVirtual.nextBottom();
 
-        for (let i = 0; i < messages.length; i++) {
+        for (let i = 0; i < Math.min(this.currentVirtual.currentPage.length, messages.length); i++) {
             vrdom_delete(this.bubblesInnerRef.$el.firstChild);
         }
 
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
+
+        this.dev_checkTree();
     }
 
     onBottomPageMessagesReady = (event) => {
+        if (this.isLoadingRecent) {
+            return;
+        }
+
         //  main virtual should never fire this event
         if (!this.isUsingSecondVirtual) {
             this.secondVirtual.refresh();
@@ -591,12 +625,12 @@ class NextBubblesComponent extends VComponent {
         return !this.isUsingSecondVirtual && this.mainVirtual.isVeryBottom();
     }
 
-    virtual_isCurrentVirtualLastPage = () => {
-        return this.currentVirtual.offset + this.currentVirtual.size >= this.currentVirtual.messages.length;
-    }
-
-    virtual_isMainVirtualLastPage = () => {
-        return !this.isUsingSecondVirtual && this.mainVirtual.offset + this.mainVirtual.size >= this.mainVirtual.messages.length;
+    dev_checkTree = () => {
+        if (__IS_DEV__) {
+            if (this.bubblesInnerRef.$el.childElementCount < 60) {
+                console.log("BUG: < 60 messages rendered!!!")
+            }
+        }
     }
 }
 
