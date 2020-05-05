@@ -20,9 +20,9 @@ import mt_srp_check_password from "../../Cryptography/mt_srp"
 function task_mt_srp_check_password({data, success, fail}) {
     try {
         const {g, p, salt1, salt2, srp_id, srp_B, password} = data
-        const srp = mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, password)
-
-        success(srp)
+        mt_srp_check_password(g, p, salt1, salt2, srp_id, srp_B, password).then(srp => {
+         	success(srp)
+        })
     } catch (error) {
         fail(error)
     }

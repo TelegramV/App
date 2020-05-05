@@ -7,6 +7,7 @@ import VApp from "../../V/vapp"
 import VirtualPage from "../Pages/Tests/VirtualPage"
 import ElementsPage from "../Pages/Tests/Elements"
 import ColumnsPage from "../Pages/Tests/Columns"
+import CryptoTestPage from "../Pages/Tests/Crypto"
 import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage";
 
 /**
@@ -25,41 +26,49 @@ function AppRoutes(router) {
         }
     })
 
-    router.route("/test", "test", {
-        h() {
-            return NewComponentPage()
-        }
-    })
+    if(!__IS_PRODUCTION__) {
+        router.route("/test", "test", {
+            h() {
+                return NewComponentPage()
+            }
+        })
 
-    router.route("/reactlist", "test", {
-        h() {
-            return ReactListPage()
-        }
-    })
+        router.route("/reactlist", "test", {
+            h() {
+                return ReactListPage()
+            }
+        })
 
-    router.route("/virtual-list", "virtual-list", {
-        h() {
-            return VirtualPage()
-        }
-    })
+        router.route("/virtual-list", "virtual-list", {
+            h() {
+                return VirtualPage()
+            }
+        })
 
-    router.route("/elements", "elements", {
-        h() {
-            return ElementsPage()
-        }
-    })
+        router.route("/elements", "elements", {
+            h() {
+                return ElementsPage()
+            }
+        })
 
-    router.route("/columns", "elements", {
-        h() {
-            return ColumnsPage()
-        }
-    })
+        router.route("/columns", "elements", {
+            h() {
+                return ColumnsPage()
+            }
+        })
 
-    router.route("/spinner", "spinner", {
-        h() {
-            return SpinnerTestPage()
-        }
-    })
+        router.route("/spinner", "spinner", {
+            h() {
+                return SpinnerTestPage()
+            }
+        })
+
+        router.route("/crypto", "crypto", {
+            h() {
+                return CryptoTestPage()
+            }
+        })
+    }
 
     router.middleware(toRoute => {
         if (!MTProto.isUserAuthorized()) {

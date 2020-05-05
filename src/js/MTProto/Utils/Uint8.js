@@ -24,8 +24,11 @@ function substr(bytes: Uint8Array, start: number, length: number): Uint8Array {
 
 function concat(...uint8Arrays: Uint8Array[]): Uint8Array {
     let length = 0;
-
+    
     for (let i = 0; i < uint8Arrays.length; i++) {
+        if (uint8Arrays[i] instanceof ArrayBuffer) {
+            uint8Arrays[i] = new Uint8Array(uint8Arrays[i])
+        }
         length += uint8Arrays[i].length;
     }
 
@@ -120,6 +123,60 @@ function modPow(x: Uint8Array, y: Uint8Array, m: Uint8Array) {
     return result;
 }
 
+function fromBits(byteArr, endian = true) {
+    if(!endian) {
+        let copy = new Uint8Array(byteArr.length);
+        copy.set(byteArr,0);
+        byteArr = this.endian(copy);
+    }
+    /*const bytes = []
+
+    for (let i = 0; i < byteArr.length; i++) {
+        bytes.push((byteArr[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff)
+    }
+
+    return bytes*/
+    return Array.from(byteArr);
+}
+
+function endian(bytes) { //changes endian to opposite
+    let len = bytes.length;
+    let holder;
+
+    for (let i = 0; i<len; i+=4) {
+        holder = bytes[i];
+        bytes[i] = bytes[i+3];
+        bytes[i+3] = holder;
+        holder = bytes[i+1];
+        bytes[i+1] = bytes[i+2];
+        bytes[i+2] = holder;
+    }
+    return bytes; //idk why return, buffer already changed, maybe clone?
+}
+
+function toBits(byteArr, endian = true) {
+    if (byteArr instanceof ArrayBuffer) {
+        byteArr = new Uint8Array(bytes)
+    }
+
+    const len = byteArr.length
+    const words = []
+
+    for (let i = 0; i < len; i++) {
+        words[i >>> 2] |= byteArr[i] << (24 - (i % 4) * 8)
+    }
+
+    let bytes = new Uint8Array(new Int32Array(words).buffer);
+    if(!endian) return bytes;
+    return this.endian(bytes);
+}
+
+function fromString(string, endian = true) {
+    let bytes = new TextEncoder().encode(string);
+    if(endian) return bytes; //TextEncoder already encodes with endian
+    return this.endian(bytes);
+}
+
 const Uint8 = {
     substr: substr,
     concat: concat,
@@ -131,6 +188,10 @@ const Uint8 = {
     fromBigInteger: fromBigInteger,
     toBigInteger: toBigInteger,
     modPow: modPow,
+    toBits: toBits,
+    endian: endian,
+    fromBits: fromBits,
+    fromString: fromString,
 };
 
 export default Uint8;
