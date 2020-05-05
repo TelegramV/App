@@ -11,6 +11,8 @@ import EmojiVRDOMPlugin from "./Ui/Plugins/EmojiPlugin"
 import PeerFactory from "./Api/Peers/PeerFactory"
 import PeersStore from "./Api/Store/PeersStore"
 
+import keval from "./Keval/keval"
+
 import "./globals"
 
 if (__IS_PRODUCTION__) {
@@ -20,6 +22,7 @@ if (__IS_PRODUCTION__) {
 } else {
     document.title = "[dev] Telegram V"
     window.invoke = MTProto.invokeMethod
+    window.keval = keval
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)
