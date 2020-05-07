@@ -50,12 +50,8 @@ class BackgroundImageComponent extends SettingsPane {
         askForFile("image/*", buffer => {
             let blob = new Blob([buffer]);
             let url = URL.createObjectURL(blob);
-            window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
+            WallpaperManager.setWallpaper(url);
         }, true)
-    }
-
-    applyWallpaper = (url) => {
-        window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
     }
 
     onWallpaperFetched = event => {
@@ -70,7 +66,7 @@ class BackgroundImageComponent extends SettingsPane {
     _fragmentClick = (ev) => {
         const url = ev.currentTarget.getAttribute("url");
         if (url) {
-            this.applyWallpaper(url);
+            WallpaperManager.setWallpaper(url);
         }
     }
 

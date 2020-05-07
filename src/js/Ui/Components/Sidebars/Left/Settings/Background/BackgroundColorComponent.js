@@ -1,6 +1,7 @@
 import SettingsPane from "../SettingsPane"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent";
 import VInput from "../../../../../Elements/Input/VInput"
+import WallpaperManager from "../../../../../Managers/WallpaperManager"
 
 export default class BackgroundColorComponent extends SettingsPane {
     barName = "background-color";
@@ -59,13 +60,8 @@ export default class BackgroundColorComponent extends SettingsPane {
         return elements;
     }
 
-    applyColor = (color) => {
-        window.document.documentElement.style.setProperty("--chat-bg-image", "none");
-        window.document.documentElement.style.setProperty("--chat-bg-color", color);
-    }
-
     _fragmentClick = (ev) => {
-        this.applyColor(ev.currentTarget.getAttribute("color"));
+        WallpaperManager.setColor(ev.currentTarget.getAttribute("color"));
     }
 }
 

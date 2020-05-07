@@ -19,6 +19,7 @@ import FileManager from "../../Api/Files/FileManager"
 import MTProto from "../../MTProto/External"
 import AppEvents from "../../Api/EventBus/AppEvents"
 import UIEvents from "../../Ui/EventBus/UIEvents"
+import keval from "../../Keval/keval";
 
 class WallpaperManagerSingleton {
     wallpapers = [];
@@ -26,6 +27,15 @@ class WallpaperManagerSingleton {
 
     init() {
         AppEvents.Files.subscribe("fileDownloaded", this.onFileDownloaded);
+        keval.getItem("background").then(data => {
+            if(!data) return;
+            if(data.blob) {
+                let url = URL.createObjectURL(data.blob);
+                this.setWallpaper(url);
+            } else if(data.color) {
+                this.setColor(data.color);
+            }
+        })
     }
 
     fetchAllWallPapers() {
@@ -48,6 +58,36 @@ class WallpaperManagerSingleton {
 
             return this.wallpapers;
         });
+    }
+
+    _applyWallpaper(url) {
+        
+    }
+
+    _applyColor(hex) {
+        
+    }
+
+    setWallpaper(url) {
+        if(!url) {
+            window.document.documentElement.style.removeProperty("--chat-bg-image");
+            return;
+        }
+        window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
+        fetch(url).then(async response => {
+            let blob = await response.blob();
+            keval.setItem("background", {blob: blob});
+        })
+    }
+
+    setColor(hex) {
+        if(!hex) {
+            window.document.documentElement.style.removeProperty("--chat-bg-color");
+            return;
+        }
+        this.setWallpaper(undefined); //remove wallpaper
+        window.document.documentElement.style.setProperty("--chat-bg-color", hex);
+        keval.setItem("background", {color: hex});
     }
 
     onFileDownloaded = event => {
