@@ -5,6 +5,9 @@
         font-weight: 500;
         font-size: 14px;
         margin: 6px 11px -4px 0px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
 
         @if $in {
             color: $blueonline;
