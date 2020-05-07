@@ -35,7 +35,7 @@
     display: flex;
     flex-grow: 1;
     transition: anim(width);
-
+    overflow: hidden;
     will-change: transform;
 
 
@@ -70,7 +70,7 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%,-50%);
+            transform: translate(-50%, -50%);
         }
     }
 
@@ -96,7 +96,7 @@
             box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.07);
             z-index: 1;
 
-            & > * {
+            &>* {
                 margin: 0 2px;
             }
 
@@ -106,6 +106,7 @@
 
             .chat-info {
                 flex-grow: 1;
+                overflow: hidden;
             }
 
             .content {
@@ -194,8 +195,14 @@
                     font-size: 14px;
                     line-height: 18px;
 
-                    .info.online {
-                        color: $blueonline;
+                    .info {
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+
+                        .online {
+                            color: $blueonline;
+                        }
                     }
                 }
             }
@@ -217,24 +224,7 @@
                 margin: 0 auto;
                 box-sizing: border-box;
                 overflow: hidden;
-
-                /*& > * {
-                    display: flex;
-                    margin: 2px 0;
-
-                    &:first-child {*/
-
-                        //transform-origin: bottom center;
-                        //animation-name: jump-in;
-                        //animation-duration: 0.2s;
-                        //animation-timing-function: ease-in-out;
-                    /*}
-                }*/
             }
-
-            /*
-            MESSAGES NOW IN _message.scss!
-        	*/
         }
     }
 }
