@@ -60,14 +60,6 @@ class WallpaperManagerSingleton {
         });
     }
 
-    _applyWallpaper(url) {
-        
-    }
-
-    _applyColor(hex) {
-        
-    }
-
     setWallpaper(url) {
         if(!url) {
             window.document.documentElement.style.removeProperty("--chat-bg-image");
