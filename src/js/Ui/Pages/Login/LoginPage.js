@@ -17,6 +17,7 @@ class VLoginPage extends VPage {
 }
 
 const LoginPage = () => {
+	document.querySelector("body").classList.add("scrollable"); //TODO better fix
     return (
         <div>
             <ModalComponent/>
