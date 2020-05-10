@@ -21,11 +21,12 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
             <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false}
                                     bubbleRef={this.bubbleRef}>
                 <VideoComponent ref={this.videoRef} message={this.message} controls={false} round autodownload autoplay
-                                muted={this.muted}/>
-                <div class="round-overlay" onClick={this._click}>
-                    <div class="playback"><span class="pl-time tgico nosound"></span></div>
-                    <ProgressLoaderComponent ref={this.progressRef}/>
-                </div>
+                                muted={this.muted}>
+                    <div class="round-overlay" onClick={this._click}>
+                        <ProgressLoaderComponent ref={this.progressRef}/>
+                    </div>
+                </VideoComponent>
+                <div class="playback"><span class="pl-time tgico nosound"></span></div>
                 <MessageTimeComponent message={this.message} bg={true}/>
             </MessageWrapperFragment>
         )

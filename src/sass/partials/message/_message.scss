@@ -15,6 +15,7 @@
         /*display: flex;
         flex-direction: row;*/
         display: grid;
+        position: relative;
         grid-template-areas:
         "avatar message"
         "empty keyboard";
@@ -104,7 +105,8 @@
             min-height: 33px;
             grid-area: message;
             border-radius: 6px;
-            position: relative;
+            //position: relative;
+            position: static;
             z-index: 0;
             display: inline-table;
             overflow: hidden;
@@ -116,7 +118,6 @@
                 border-radius: 0 !important;
                 background-color: transparent;
                 box-shadow: none;
-                position: relative;
                 //overflow: visible; //fix for replies
             }
 
@@ -124,15 +125,6 @@
                 -webkit-mask-image: none !important;
                 mask-image: none !important;
             }
-
-            /*&.no-pad {
-                padding-left: 0;
-                padding-right: 0;
-
-                .text-wrapper {
-                    padding: 5px 9px;
-                }
-            }*/
 
             .text-wrapper {
                 line-height: 1.2;
@@ -149,10 +141,6 @@
             @include sticker;
             @include figure;
             @include media-wrapper;
-
-            /*.text-wrapper.pad {
-                padding: 5px 9px;
-            }*/
 
             a:not(.button) {
                 color: $darkblue;

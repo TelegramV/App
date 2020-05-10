@@ -4,19 +4,32 @@
             width: 200px;
             height: 200px;
             border-radius: 50%;
+            position: relative;
 
-            &~.round-overlay {
+            .round-overlay {
                 position: absolute;
                 left: 50%;
-                top: calc(50%); //requires position relative on message, but it breaks time
+                top: 50%;
                 transform: translate(-50%, -50%);
                 width: 95%;
-                height: calc(95%);
+                height: 95%;
 
-                .playback {
+                .progress-ring {
+                    width: 100%;
+                    height: 100%;
+                    opacity: 50%;
+                    transition: opacity 0.2s;
+
+                    &.hidden {
+                        opacity: 0;
+                    }
+                }
+            }
+
+            &~.playback {
                     position: absolute;
-                    top: -2px;
-                    left: 0;
+                    top: 5px;
+                    transform: translateX(-10px);
                     line-height: 15px;
                     background-color: $semiblack;
                     border-radius: 10px;
@@ -31,18 +44,6 @@
                         margin-left: 2px;
                     }
                 }
-
-                .progress-ring {
-                    width: 100%;
-                    height: 100%;
-                    opacity: 50%;
-                    transition: opacity 0.2s;
-
-                    &.hidden {
-                        opacity: 0;
-                    }
-                }
-            }
         }
 
         &.photo,

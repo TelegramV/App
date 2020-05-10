@@ -17,11 +17,11 @@
         @if $transparent {
             position: absolute;
             @if $in {
-                right: 0;
+                //right: 0;
                 transform: translateX(125%);
             }
             @if $in == false {
-                left: 0;
+                //left: 0;
                 transform: translateX(-125%);
             }
             background-color: white;
@@ -52,6 +52,10 @@
                     color: $darkgreen;
                 }
             }
+        }
+
+        & ~ figure {
+            margin-top: 10px;
         }
     }
 

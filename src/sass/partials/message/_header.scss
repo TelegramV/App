@@ -26,6 +26,10 @@
         .clickable-name {
             cursor: pointer;
         }
+
+        & ~ figure {
+            margin-top: 10px;
+        }
     }
 
     &.no-pad {

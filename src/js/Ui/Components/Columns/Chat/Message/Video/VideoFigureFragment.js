@@ -1,4 +1,4 @@
-export const VideoPreviewFragment = ({type = "video", round = false, id, thumbSrc, width, height, maxHeight, maxWidth, loading, loaded, clickLoader}) => {
+export const VideoPreviewFragment = ({type = "video", round = false, id, thumbSrc, width, height, maxHeight, maxWidth, loading, loaded, clickLoader}, slot) => {
     width = height < maxHeight ? width : maxHeight / height * width;
     height = height < maxHeight ? height : maxHeight;
 
@@ -12,12 +12,13 @@ export const VideoPreviewFragment = ({type = "video", round = false, id, thumbSr
                  width={width}
                  height={height}
             />
+            {slot}
             <LoadingFragment loading={loading} show={!loaded} click={clickLoader}/>
         </figure>
     )
 }
 
-export const LoadingFragment = ({id, loading = false, click = undefined, show = true, showPause = true}) => {
+export const LoadingFragment = ({id, loading = false, click = undefined, show = true, showPause = true}, slot) => {
     return (
         <div css-display={show ? "" : "none"} id={id} className="progress" onClick={click}>
 
@@ -25,13 +26,13 @@ export const LoadingFragment = ({id, loading = false, click = undefined, show = 
                 <i className={["tgico", loading ? "tgico-close" : "tgico-play"]}/>
             </div>
 
-            <progress
-                className={["progress-circular", "big", "white", loading ? "" : "paused"]}/>
+            <progress className={["progress-circular", "big", "white", loading ? "" : "paused"]}/>
+            {slot}
         </div>
     )
 }
 
-export const VideoFigureFragment = ({type = "video", id, srcUrl, round = false, width, height, maxHeight, maxWidth, loop = false, muted, autoplay = true, controls = true, click}) => {
+export const VideoFigureFragment = ({type = "video", id, srcUrl, round = false, width, height, maxHeight, maxWidth, loop = false, muted, autoplay = true, controls = true, click}, slot) => {
     width = height < maxHeight ? width : maxHeight / height * width;
     height = height < maxHeight ? height : maxHeight;
 
@@ -49,6 +50,7 @@ export const VideoFigureFragment = ({type = "video", id, srcUrl, round = false, 
                    onCanPlay={l => l.target.volume = 0}
                    onClick={click}
             />
+            {slot}
         </figure>
     )
 }

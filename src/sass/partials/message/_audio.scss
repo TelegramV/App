@@ -7,6 +7,7 @@
         flex-direction: row;
         align-items: center;
         position: relative;
+        margin-top: 5px;
 
         .play {
             color: white;
@@ -67,7 +68,7 @@
                 .audio-name {
                     font-weight: bold;
                     text-overflow: ellipsis;
-                    margin-top: 10px;
+                    //margin-top: 10px;
                 }
 
                 .audio-artist {

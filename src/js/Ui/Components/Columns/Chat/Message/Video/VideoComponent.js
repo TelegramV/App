@@ -37,7 +37,7 @@ class VideoComponent extends VComponent {
                                      controls={this.props.controls}
                                      muted={this.props.muted}
                                      click={this.props.click}
-                />
+                >{this.slot}</VideoFigureFragment>
             )
         } else {
             return (
@@ -53,7 +53,7 @@ class VideoComponent extends VComponent {
                                       clickLoader={this.props.click}
                                       loading={this.message.loading}
                                       loaded={this.message.loaded}
-                />
+                >{this.slot}</VideoPreviewFragment>
             )
         }
     }

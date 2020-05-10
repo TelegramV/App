@@ -18,6 +18,8 @@
 import VComponent from "../../../V/VRDOM/component/VComponent"
 
 // я спочатку не зрозумів для чого воно, може краще перейменуй і перемісти кудась інакше, бо цю папку варто би видалити
+
+// юзається як мінімум в відосах-кружочках, перероби на VSpinner і видали
 class ProgressLoaderComponent extends VComponent {
 
     render() {
@@ -30,8 +32,9 @@ class ProgressLoaderComponent extends VComponent {
     }
 
     componentDidMount() {
-        this.circle = this.$el.querySelector('.progress-ring__circle');  // there are refs) #1
-        this.withTimeout(this._calculateSize, 0); // wtf?) #2
+        console.log(this.$el);
+        this.circle = this.$el.querySelector(".progress-ring__circle");
+        this.withTimeout(this._calculateSize, 0); // wtf?) #2 // svg magic
     }
 
     _calculateSize = () => {
