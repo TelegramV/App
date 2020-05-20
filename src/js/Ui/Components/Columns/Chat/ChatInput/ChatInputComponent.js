@@ -13,10 +13,11 @@ import MTProto from "../../../../../MTProto/External"
 import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 import ChatToBottomButtonComponent from "../ChatToBottomButtonComponent"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
 export let ChatInputManager
 
-export class ChatInputComponent extends VComponent {
+export class ChatInputComponent extends StatelessComponent {
     chatInputTextareaRef = VComponent.createComponentRef()
 
     identifier = `chat-input`

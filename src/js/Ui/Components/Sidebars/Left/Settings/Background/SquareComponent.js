@@ -1,7 +1,7 @@
-import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../../EventBus/UIEvents"
+import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulComponent"
 
-class SquareComponent extends VComponent {
+class SquareComponent extends StatefulComponent {
     state = {
         url: undefined
     };

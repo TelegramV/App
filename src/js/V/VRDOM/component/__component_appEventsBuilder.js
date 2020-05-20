@@ -16,7 +16,6 @@
  */
 
 import {EventBus} from "../../../Api/EventBus/EventBus"
-import VComponent from "./VComponent"
 
 
 // types
@@ -42,13 +41,13 @@ export type AE = {
 
 // functions
 
-export function __component_appEventsBuilder(component: VComponent): AE {
+export function __component_appEventsBuilder(component): AE {
     return {
         bus: (bus: EventBus) => __bus(component, bus)
     }
 }
 
-function __bus(component: VComponent, bus: EventBus) {
+function __bus(component, bus: EventBus) {
     return {
         only: (callback: any) => __bus_filter(component, bus, callback),
         filter: (callback: any) => __bus_filter(component, bus, callback),
@@ -57,14 +56,14 @@ function __bus(component: VComponent, bus: EventBus) {
     }
 }
 
-function __bus_filter(component: VComponent, bus: EventBus, filter: any) {
+function __bus_filter(component, bus: EventBus, filter: any) {
     return {
         on: (type: string, resolve: any) => __bus_filter_subscribe(component, bus, filter, type, resolve),
         updateOn: (type: string) => __bus_filter_subscribe(component, bus, filter, type, null),
     }
 }
 
-function __bus_filter_subscribe(component: VComponent, bus: EventBus, filter: any, type: string, resolve: any) {
+function __bus_filter_subscribe(component, bus: EventBus, filter: any, type: string, resolve: any) {
     let busContext = component.__.appEventContexts.get(bus)
 
     if (!resolve) {

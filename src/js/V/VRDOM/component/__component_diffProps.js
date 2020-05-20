@@ -17,11 +17,10 @@
 
 import __diffObjects from "./__diffObjects";
 import __component_withDefaultProps from "./__component_withDefaultProps";
-import VComponent from "./VComponent";
 
 const comparator = (prev, next) => typeof prev === "object" || prev !== next;
 
-const __component_diffProps = (component: VComponent, nextProps) => {
+const __component_diffProps = (component, nextProps) => {
     nextProps = __component_withDefaultProps(component, nextProps);
     return __diffObjects(component.props, nextProps, comparator);
 }

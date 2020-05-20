@@ -15,10 +15,10 @@
  *
  */
 
-import VComponent from "../../../V/VRDOM/component/VComponent";
 import UIEvents from "../../EventBus/UIEvents";
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-class SnackbarComponent extends VComponent {
+class SnackbarComponent extends StatefulComponent {
     state = {
         snackbars: new Map(),
     };

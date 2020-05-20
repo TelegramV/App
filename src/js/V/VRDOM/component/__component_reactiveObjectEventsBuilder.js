@@ -16,38 +16,34 @@
  */
 
 import {ReactiveObject} from "../../Reactive/ReactiveObject"
-import VComponent from "./VComponent"
 
 
 // types
 
 export type ROSubscribe = {
     on(type: string, resolve: any): ROSubscribe,
-    // onProperty(key: string, resolve: any): ROSubscribe
 }
 
 export type RORC = {
     object(reactiveObject: ReactiveObject): ROSubscribe,
-    fromProps(name: string): ROSubscribe,
 }
 
 
 // functions
 
-export function __component_reactiveObjectEventsBuilder(component: VComponent) {
+export function __component_reactiveObjectEventsBuilder(component) {
     return {
         object: (object: ReactiveObject) => __object(component, object),
-        fromProps: (name: string) => registerReactive_fromProps(component, name),
     }
 }
 
-function __object(component: VComponent, object: ReactiveObject) {
+function __object(component, object: ReactiveObject) {
     return {
         on: (type: string, resolve: any) => __object_subscribe(component, object, type, resolve)
     }
 }
 
-function __object_subscribe(component: VComponent, object: ReactiveObject, type: string, resolve: any) {
+function __object_subscribe(component, object: ReactiveObject, type: string, resolve: any) {
 
     let reactiveObjectContext = component.__.reactiveObjectContexts.get(object)
 
@@ -59,6 +55,7 @@ function __object_subscribe(component: VComponent, object: ReactiveObject, type:
     }
 
     object.subscribe(type, resolve)
+
     return {
         on: (type: string, resolve: any) => __object_subscribe(component, object, type, resolve)
     }

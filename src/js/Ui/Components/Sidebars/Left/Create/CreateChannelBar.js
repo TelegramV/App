@@ -25,7 +25,6 @@ import InputHint from "../../Fragments/InputHint"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import MTProto from "../../../../../MTProto/External"
-import type {AE} from "../../../../../V/VRDOM/component/__component_registerAppEvents";
 
 class CreateChannelBar extends LeftBarComponent {
     barName = "create-channel";

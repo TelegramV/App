@@ -1,5 +1,3 @@
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
-import {ContactFragment} from "../../../Basic/ContactFragment"
 import DialogsStore from "../../../../../Api/Store/DialogsStore"
 import {UserPeer} from "../../../../../Api/Peers/Objects/UserPeer"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
@@ -8,6 +6,7 @@ import {BotPeer} from "../../../../../Api/Peers/Objects/BotPeer"
 import ContactComponent from "../../../Basic/ContactComponent"
 import List from "../../../../../V/VRDOM/list/List"
 import VArray from "../../../../../V/VRDOM/list/VArray"
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 
 const ContactFragmentItemTemplate = (peer) => {
     return <ContactComponent peer={peer}
@@ -17,7 +16,7 @@ const ContactFragmentItemTemplate = (peer) => {
                              onClick={() => AppSelectedChat.select(peer)}/>
 }
 
-export class RecentComponent extends VComponent {
+export class RecentComponent extends StatefulComponent {
 
     state = {
         peers: new VArray()

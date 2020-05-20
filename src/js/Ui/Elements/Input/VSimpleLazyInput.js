@@ -15,9 +15,9 @@
  *
  */
 
-import VComponent from "../../../V/VRDOM/component/VComponent"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-class VSimpleLazyInput extends VComponent {
+class VSimpleLazyInput extends StatefulComponent {
     lazyLevel = this.props.lazyLevel || 1000;
     value = this.props.value;
 

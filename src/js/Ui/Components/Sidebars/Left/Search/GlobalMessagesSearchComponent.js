@@ -15,7 +15,6 @@
  *
  */
 
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import SearchManager from "../../../../../Api/Search/SearchManager"
 import PeersStore from "../../../../../Api/Store/PeersStore"
@@ -23,6 +22,7 @@ import {highlightVRNodeWord} from "../../../../Utils/highlightVRNodeText"
 import ContactComponent from "../../../Basic/ContactComponent"
 import VArray from "../../../../../V/VRDOM/list/VArray"
 import List from "../../../../../V/VRDOM/list/List"
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 
 const MessageFragmentItemTemplate = (message) => {
     const peer = message.to === PeersStore.self() ? message.from : message.to
@@ -37,7 +37,7 @@ const MessageFragmentItemTemplate = (message) => {
 
 let CURRENT_QUERY = undefined
 
-export class GlobalMessagesSearchComponent extends VComponent {
+export class GlobalMessagesSearchComponent extends StatefulComponent {
 
     offsetRate = 0
     allFetched = false

@@ -19,10 +19,10 @@ import VRNode from "../VRNode"
 import type {VRenderProps} from "../types/types"
 import renderElement from "./renderElement"
 import renderText from "./renderText"
-import vrdom_renderVComponentVNode from "./renderVComponent"
-import VComponentVRNode from "../component/VComponentVRNode"
 import VListVRNode from "../list/VListVRNode"
 import vrdom_renderVListVRNode from "./renderVList"
+import AbstractComponentVRNode from "../component/AbstractComponentVRNode"
+import vrdom_renderAbstractComponentVNode from "./renderAbstractComponent"
 
 /**
  * Creates Real DOM Element from VRNode
@@ -31,10 +31,9 @@ import vrdom_renderVListVRNode from "./renderVList"
  * @param props
  */
 function vrdom_render(node: VRNode, props: VRenderProps = {}): HTMLElement | Element | Node | Text {
-
     try {
-        if (node instanceof VComponentVRNode) {
-            return vrdom_renderVComponentVNode(node)
+        if (node instanceof AbstractComponentVRNode) {
+            return vrdom_renderAbstractComponentVNode(node)
         } else if (node instanceof VListVRNode && props.$parent) {
             return vrdom_renderVListVRNode(node, props)
         }

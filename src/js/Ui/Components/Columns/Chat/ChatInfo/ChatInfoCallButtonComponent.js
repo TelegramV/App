@@ -1,16 +1,10 @@
-import ChatInfoStatusComponent from "./ChatInfoStatusComponent"
-import ChatInfoNameComponent from "./ChatInfoNameComponent"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
-import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
-import ChatInfoAvatarComponent from "./ChatInfoAvatarComponent"
-import VApp from "../../../../../V/vapp"
 import UIEvents from "../../../../EventBus/UIEvents"
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
-import {CallsManager} from "../../../../../Api/Calls/CallManager";
 import {UserPeer} from "../../../../../Api/Peers/Objects/UserPeer";
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-class ChatInfoCallButtonComponent extends VComponent {
+class ChatInfoCallButtonComponent extends StatelessComponent {
 
     appEvents(E: AE) {
         E.bus(UIEvents.General)

@@ -22,8 +22,9 @@ import AppSelectedChat from "../../Reactive/SelectedChat";
 import {FileAPI} from "../../../Api/Files/FileAPI";
 import {Layouter} from "../../Utils/layout";
 import VUI from "../../VUI"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-class GalleryFragment extends VComponent {
+class GalleryFragment extends StatelessComponent {
     render() {
         return <div className={["grouped", Layouter.getClass(this.props.blobs.length)]}>
             {this.props.blobs.map(l => {
@@ -47,7 +48,7 @@ class GalleryFragment extends VComponent {
     }
 }
 
-export class AttachPhotosModal extends VComponent {
+export class AttachPhotosModal extends StatelessComponent {
     captionRef = VComponent.createComponentRef()
     galleryRef = VComponent.createComponentRef()
 

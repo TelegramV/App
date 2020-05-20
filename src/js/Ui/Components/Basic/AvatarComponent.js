@@ -1,8 +1,8 @@
-import VComponent from "../../../V/VRDOM/component/VComponent";
 import AppEvents from "../../../Api/EventBus/AppEvents";
 import AvatarFragment from "./AvatarFragment"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-class AvatarComponent extends VComponent {
+class AvatarComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)

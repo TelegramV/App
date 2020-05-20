@@ -18,9 +18,9 @@
 import type {VComponentVRNodeProps, VRAttrs, VRSlot} from "../types/types"
 import VComponent from "./VComponent"
 
-class VComponentVRNode {
+class AbstractComponentVRNode {
 
-    component: Class<VComponent>
+    componentClass: Class<VComponent>
 
     attrs: VRAttrs = {}
     slot: VRSlot
@@ -28,8 +28,8 @@ class VComponentVRNode {
 
     identifier: string | void
 
-    constructor(component: Class<VComponent>, props: VComponentVRNodeProps, slot?: VRSlot) {
-        this.component = component
+    constructor(componentClass: Class<VComponent>, props: VComponentVRNodeProps, slot?: VRSlot) {
+        this.componentClass = componentClass
         this.attrs = props.attrs
         this.slot = slot
         this.ref = props.ref
@@ -37,4 +37,4 @@ class VComponentVRNode {
     }
 }
 
-export default VComponentVRNode
+export default AbstractComponentVRNode

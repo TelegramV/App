@@ -19,10 +19,10 @@ import AppEvents from "../../../../../Api/EventBus/AppEvents";
 import AudioManager from "../../../../Managers/AudioManager";
 import UIEvents from "../../../../EventBus/UIEvents";
 import {MessageParser} from "../../../../../Api/Messages/MessageParser";
-import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 
-class ChatInfoPinnedComponent extends VComponent {
+class ChatInfoPinnedComponent extends StatefulComponent {
     state = {
         audio: undefined,
         pause: undefined,
@@ -58,7 +58,7 @@ class ChatInfoPinnedComponent extends VComponent {
         } else if (this.state.message) {
             return (
                 <div className="pin pinned-message"
-                     onClick={event => UIEvents.General.fire("chat.showMessage", {message:this.state.message})}>
+                     onClick={event => UIEvents.General.fire("chat.showMessage", {message: this.state.message})}>
                     <div className="title">Pinned message</div>
                     <div className="description">{MessageParser.getPrefixNoSender(this.state.message)}</div>
                 </div>

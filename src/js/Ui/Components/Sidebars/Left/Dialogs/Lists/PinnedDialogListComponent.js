@@ -1,4 +1,3 @@
-import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import {DialogComponent} from "../DialogComponent"
 import VApp from "../../../../../../V/vapp"
@@ -7,8 +6,9 @@ import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer";
 import {GroupPeer} from "../../../../../../Api/Peers/Objects/GroupPeer";
 import {vrdom_resolveMount} from "../../../../../../V/VRDOM/mount";
 import DialogsStore from "../../../../../../Api/Store/DialogsStore";
+import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
-export default class PinnedDialogListComponent extends VComponent {
+export default class PinnedDialogListComponent extends StatelessComponent {
 
     // TODO needs rework!!
     identifier = `dialogs-pinned-list-${this.props.folderId}`
@@ -50,10 +50,10 @@ export default class PinnedDialogListComponent extends VComponent {
         //     return false
         // }))
         return pinned.some(l => {
-            if(l._ === "inputPeerUser" && peer instanceof UserPeer && peer.id === l.user_id) return true
-            if(l._ === "inputPeerChannel" && peer instanceof ChannelPeer && peer.id === l.channel_id) return true
-            if(l._ === "inputPeerChat" && peer instanceof GroupPeer && peer.id === l.chat_id) return true
-            if(l._ === "inputPeerSelf" && peer instanceof UserPeer && peer.isSelf) return true
+            if (l._ === "inputPeerUser" && peer instanceof UserPeer && peer.id === l.user_id) return true
+            if (l._ === "inputPeerChannel" && peer instanceof ChannelPeer && peer.id === l.channel_id) return true
+            if (l._ === "inputPeerChat" && peer instanceof GroupPeer && peer.id === l.chat_id) return true
+            if (l._ === "inputPeerSelf" && peer instanceof UserPeer && peer.isSelf) return true
             return false
         })
     }
@@ -115,7 +115,7 @@ export default class PinnedDialogListComponent extends VComponent {
 
     onDialogsGotOne = event => {
         const dialog = event.dialog
-        if(!this.applyFilter(dialog)) return
+        if (!this.applyFilter(dialog)) return
         this.addNewDialog(dialog)
 
     }

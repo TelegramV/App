@@ -4,9 +4,9 @@ import TextWrapperComponent from "./Common/TextWrapperComponent"
 import {PhotoComponent} from "../../../Basic/photoComponent"
 import VUI from "../../../../VUI"
 import {PhotoFigureFragment} from "./Photo/PhotoFigureFragment"
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-class FileImageComponent extends VComponent {
+class FileImageComponent extends StatelessComponent {
     reactive(R: RORC) {
         R.object(this.props.photo)
             .on("downloaded", this.forceUpdate);

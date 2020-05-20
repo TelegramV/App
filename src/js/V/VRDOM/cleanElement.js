@@ -15,6 +15,8 @@
  *
  */
 
+import {__component_unmount_wip} from "./component/__component_unmount"
+
 /**
  * @param {HTMLElement|Text} $node
  * @param unmount unmount component/list/ref if exist
@@ -24,7 +26,7 @@ const cleanElement = ($node: HTMLElement, unmount: boolean = false) => {
     if ($node.__v) {
         if (unmount) {
             if ($node.__v.component) {
-                $node.__v.component.__unmount()
+                __component_unmount_wip($node.__v.component)
             }
 
             if ($node.__v.list) {

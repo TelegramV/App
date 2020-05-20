@@ -15,12 +15,12 @@
  *
  */
 
-import VComponent from "../../../V/VRDOM/component/VComponent"
 import AppEvents from "../../../Api/EventBus/AppEvents"
 import {ContactFragment} from "./ContactFragment"
 import {callOrReturn} from "../../../Utils/func"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-class ContactComponent extends VComponent {
+class ContactComponent extends StatelessComponent {
     init() {
         this.loadFullIfNeeded()
     }

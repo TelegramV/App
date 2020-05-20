@@ -1,4 +1,4 @@
-import {TypedPublisher} from "./TypedPublisher"
+import TypedPublisher from "./TypedPublisher"
 
 export type BusEvent = {
     type: string,

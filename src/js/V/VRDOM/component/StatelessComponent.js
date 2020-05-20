@@ -15,11 +15,9 @@
  *
  */
 
-import AbstractComponent from "./AbstractComponent";
+import VComponent from "./VComponent"
 
-// wip
-// since the client is generally event-driven, we don't need stateful components so much
-class StatelessComponent extends AbstractComponent {
+class StatelessComponent extends VComponent {
 }
 
 export default StatelessComponent;

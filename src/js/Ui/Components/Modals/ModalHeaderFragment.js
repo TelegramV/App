@@ -15,10 +15,10 @@
  *
  */
 
-import VComponent from "../../../V/VRDOM/component/VComponent"
 import VUI from "../../VUI"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-export class ModalHeaderFragment extends VComponent {
+export class ModalHeaderFragment extends StatelessComponent {
     render() {
         return <div className="header">
             {

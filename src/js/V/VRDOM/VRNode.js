@@ -16,7 +16,6 @@
  */
 
 import type {Ref, VRAttrs, VREvents, VRNodeProps, VRTagName} from "./types/types"
-import VComponent from "./component/VComponent"
 import List from "./list/List"
 
 class VRNode {
@@ -30,7 +29,7 @@ class VRNode {
     ref: Ref
 
     dangerouslySetInnerHTML: any | boolean = false
-    component: VComponent = undefined
+    component = undefined
     list: List = undefined
 
     constructor(tagName: VRTagName, props: VRNodeProps) {

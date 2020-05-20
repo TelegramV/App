@@ -18,9 +18,9 @@
 import VUI from "../../VUI"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
-import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-export class ModalComponent extends SingletonComponent {
+export class ModalComponent extends StatefulComponent {
 
     state = {
         hidden: true,

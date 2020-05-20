@@ -15,42 +15,19 @@
  *
  */
 
-import type {ComponentState, VComponentMeta, VComponentProps, VRAttrs, VRSlot} from "../types/types"
-import VRDOM from "../VRDOM"
-import type {BusEvent} from "../../../Api/EventBus/EventBus"
-import {EventBus} from "../../../Api/EventBus/EventBus"
-import {ReactiveObject} from "../../Reactive/ReactiveObject"
-import type {AE} from "./__component_appEventsBuilder"
-import {__component_appEventsBuilder} from "./__component_appEventsBuilder"
-import type {RORC} from "./__component_reactiveObjectEventsBuilder"
-import {__component_reactiveObjectEventsBuilder} from "./__component_reactiveObjectEventsBuilder"
-import __component_update from "./__component_update"
-import __component_unmount from "./__component_unmount"
-import __component_mount from "./__component_mount"
-import __component_init from "./__component_init"
-import __component_withDefaultProps from "./__component_withDefaultProps"
 import FragmentRef from "../ref/FragmentRef"
 import ComponentRef from "../ref/ComponentRef"
 import ElementRef from "../ref/ElementRef"
 import VApp from "../../vapp"
+import __component_withDefaultProps from "./__component_withDefaultProps"
+import {__component_update_wip} from "./__component_update"
 
-/**
- * Features:
- * - reactive state
- * - app events
- * - reactive objects
- * - reactive callbacks
- * - refs for $elements, fragments and components
- * - timeouts
- * - intervals
- */
 class VComponent {
-
-    __: VComponentMeta = {
-        inited: false,
+    __ = {
+        stateful: false,
+        initialized: false,
         mounted: false,
         destroyed: false,
-        created: false,
         isUpdatingItSelf: false,
         isDeletingItself: false,
 
@@ -75,75 +52,13 @@ class VComponent {
         timeouts: new Set(),
     }
 
-    /**
-     * Default component props:
-     *
-     * Example:
-     * class SomeComponent extends VComponent {
-     *     render() {
-     *         return <h1>{this.props.header}</h1>
-     *     }
-     * }
-     *
-     * SomeComponent.defaultProps = {
-     *     header: "Wow!"
-     * }
-     *
-     * @type {undefined}
-     */
-    static defaultProps = undefined
+    static defaultProps: any = null;
+    static displayName: string = "VComponent";
 
-    /**
-     * Component state.
-     *
-     * Note that the proxy will be created only for `state` object and not for inner.
-     *
-     * @type {{}}
-     */
-    state: ComponentState = {}
+    props: any = {};
+    slot: any = null;
 
-    /**
-     * Name of the component.
-     *
-     * @deprecated
-     */
-    name: string
-
-    /**
-     * Name of the component.
-     */
-    displayName: string
-
-    /**
-     * Unique identifier of the component.
-     */
-    identifier: string
-
-    /**
-     * Component's props.
-     * @type {{}}
-     */
-    props: VRAttrs = {}
-
-    /**
-     * Content inside the component.
-     *
-     * @type {undefined}
-     */
-    slot: VRSlot = undefined
-
-    /**
-     * Mounted element.
-     */
-    _$el: HTMLElement
-
-    constructor(props: VComponentProps) {
-        this.displayName = props.displayName || this.constructor.name
-        this.slot = props.slot
-        this.props = __component_withDefaultProps(this, props.props)
-        this.v = props.v
-        this.identifier = props.identifier
-    }
+    _$el: HTMLElement = null;
 
     set $el($el) {
         this._$el = $el
@@ -151,207 +66,75 @@ class VComponent {
 
     get $el() {
         if (this.__.destroyed) {
-            console.error("component is already destroyed!", this.displayName)
+            console.error("component is already destroyed!", this.constructor.displayName)
         } else if (!this.__.mounted) {
-            console.error("component is not mounted!", this.displayName)
+            console.error("component is not mounted!", this.constructor.displayName)
         }
 
         return this._$el
     }
 
+    constructor(config) {
+        this.props = __component_withDefaultProps(this, config.props);
+        this.identifier = config.identifier;
+        this.slot = config.slot;
+    }
+
     /**
-     * Do initialization logic here.
+     * Never use here data from props!
      */
     init() {
     }
 
     /**
-     * WARNING: if you need to manually render a component, then DO NOT USE THIS METHOD, use {@link __render} instead.
-     */
-    render() {
-    }
-
-    componentDidMount() {
-
-    }
-
-    componentWillUnmount() {
-
-    }
-
-    shouldComponentUpdate(nextProps, nextState) {
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-
-    }
-
-    /**
-     * Register application events.
-     *
-     * @see AppEvents
-     *
      * @param {AE} E
      */
     appEvents(E) {
-
     }
 
     /**
-     * Register reactive objects.
-     *
-     * @see ReactiveObject
-     *
      * @param {RORC} R
      */
     reactive(R) {
-
     }
 
     /**
-     * Internal use only.
+     * @param props
      */
-    __render() {
-        const renderedVRNode = this.render()
-        renderedVRNode.component = this
-        return renderedVRNode
+    render(props) {
+    }
+
+    componentDidMount() {
+    }
+
+    componentWillUnmount() {
     }
 
     /**
-     * Internal use only.
-     */
-    __mount($el: HTMLElement) {
-        return __component_mount(this, $el)
-    }
-
-    /**
-     * Internal use only.
-     */
-    __unmount() {
-        return __component_unmount(this)
-    }
-
-    /**
-     * Internal use only.
-     */
-    __destroy() {
-        return VRDOM.delete(this.$el)
-    }
-
-    /**
-     * Internal use only.
-     */
-    __init() {
-        return __component_init(this)
-    }
-
-    // AppEvents
-
-    /**
-     * Internal use only.
-     */
-    __unregisterAppEventResolves() {
-        this.__.appEventContexts.forEach((busContext, bus) => {
-            busContext.forEach((resolve, type) => bus.unsubscribe(type, resolve))
-        })
-    }
-
-    /**
-     * Internal use only.
-     */
-    __unregisterAppEventResolve(bus: EventBus, type: string) {
-        let busContext = this.__.appEventContexts.get(bus)
-
-        if (!busContext) {
-            console.error("BUG: bus is not registered")
-            return
-        }
-
-        const resolve = busContext.get(type)
-
-        bus.unsubscribe(type, resolve)
-        busContext.delete(type)
-    }
-
-    /**
-     * Internal use only.
-     */
-    __recreateAppEventsResolves() {
-        this.__unregisterAppEventResolves()
-
-        this.appEvents(__component_appEventsBuilder(this))
-    }
-
-
-    // ReactiveObjects
-
-    /**
-     * Internal use only.
-     */
-    __unregisterReactiveObjectResolves() {
-        this.__.reactiveObjectContexts.forEach((reactiveObjectContext, object) => {
-            reactiveObjectContext.forEach((resolve, type) => object.unsubscribe(type, resolve))
-        })
-    }
-
-    /**
-     * Internal use only.
-     */
-    __unregisterReactiveObjectResolve(object: ReactiveObject, type: string) {
-        let reactiveObjectContext = this.__.reactiveObjectContexts.get(object)
-
-        if (!reactiveObjectContext) {
-            console.error("BUG: reactiveObject is not registered")
-            return
-        }
-
-        const resolve = reactiveObjectContext.get(type)
-
-        object.unsubscribe(type, resolve)
-        reactiveObjectContext.delete(type)
-    }
-
-    /**
-     * Internal use only.
-     */
-    __recreateReactiveObjects() {
-        this.__unregisterReactiveObjectResolves()
-
-        this.reactive(__component_reactiveObjectEventsBuilder(this))
-    }
-
-    /**
-     * Set state data.
+     * before patch callback
      *
+     * @param nextProps
      * @param nextState
      */
-    setState(nextState) {
-        if (typeof nextState === "function") {
-            this.__update({
-                nextState: nextState(this.state)
-            })
-        } else {
-            this.__update({
-                nextState
-            })
-        }
+    shouldComponentUpdate(nextProps, nextState) {
+    }
+
+    /**
+     * after patch callback
+     */
+    componentDidUpdate() {
     }
 
     forceUpdate() {
-        this.__update({
-            isForce: true
-        })
+        __component_update_wip(this, {
+            isForce: true,
+        });
     }
 
-    updateProps(props = {}) {
-        Object.assign(this.props, props);
+    updateProps(nextProps = {}) {
+        Object.assign(this.props, nextProps);
         this.forceUpdate();
     }
-
-    __update(props) {
-        return __component_update(this, props)
-    }
-
 
     // Intervals and Timeouts
 
@@ -362,10 +145,10 @@ class VComponent {
      * @param timeout
      * @param args
      */
-    withInterval(handler: TimerHandler, timeout?: number, ...args: any[]) {
-        const handle = setInterval(handler, timeout, ...args)
-        this.__.intervals.add(handle)
-        return handle
+    withInterval(handler: TimerHandler, timeout?: number, ...args: any[]): number {
+        const id = setInterval(handler, timeout, ...args);
+        this.__.intervals.add(id);
+        return id;
     }
 
     /**
@@ -375,28 +158,29 @@ class VComponent {
      * @param timeout
      * @param args
      */
-    withTimeout(handler: TimerHandler, timeout?: number, ...args: any[]) {
-        const handle = setTimeout(handler, timeout, ...args)
-        this.__.timeouts.add(handle)
-        return handle
+    withTimeout(handler: TimerHandler, timeout?: number, ...args: any[]): number {
+        const id = setTimeout(handler, timeout, ...args);
+        this.__.timeouts.add(id);
+        return id;
     }
 
     /**
      * Clear all intervals.
      */
     clearIntervals() {
-        this.__.intervals.forEach(handle => clearInterval(handle))
-        this.__.intervals.clear()
+        this.__.intervals.forEach(handle => clearInterval(handle));
+        this.__.intervals.clear();
     }
 
     /**
-     * Clear single interval
-     * @param handle
+     * Clear single interval.
+     *
+     * @param id
      */
-    clearInterval(handle) {
-        if (this.__.intervals.has(handle)) {
-            clearInterval(handle);
-            this.__.intervals.delete(handle);
+    clearInterval(id) {
+        if (this.__.intervals.has(id)) {
+            clearInterval(id);
+            this.__.intervals.delete(id);
         }
     }
 
@@ -404,28 +188,24 @@ class VComponent {
      * Clear all timeouts.
      */
     clearTimeouts() {
-        this.__.timeouts.forEach(handle => clearTimeout(handle))
-        this.__.timeouts.clear()
+        this.__.timeouts.forEach(handle => clearTimeout(handle));
+        this.__.timeouts.clear();
     }
 
     /**
      * Clear single timeout
-     * @param handle
+     * @param id
      */
-    clearTimeout(handle) {
-        if (this.__.timeouts.has(handle)) {
-            clearTimeout(handle);
-            this.__.timeouts.delete(handle);
+    clearTimeout(id) {
+        if (this.__.timeouts.has(id)) {
+            clearTimeout(id);
+            this.__.timeouts.delete(id);
         }
     }
 
-    // other
-
     toString() {
-        return this.identifier
+        return `${this.constructor.displayName}#${this.identifier}`
     }
-
-    // ref
 
     /**
      * Create ref for a simple node.

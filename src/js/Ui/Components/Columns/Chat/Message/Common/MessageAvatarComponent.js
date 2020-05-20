@@ -2,9 +2,9 @@ import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer";
 import type {Message} from "../../../../../../Api/Messages/Message"
 import AppSelectedChat from "../../../../../Reactive/SelectedChat"
-import VComponent from "../../../../../../V/VRDOM/component/VComponent"
+import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
-export class MessageAvatarComponent extends VComponent {
+export class MessageAvatarComponent extends StatelessComponent {
 
     init() {
         this.show = this.props.show === undefined ? true : this.props.show

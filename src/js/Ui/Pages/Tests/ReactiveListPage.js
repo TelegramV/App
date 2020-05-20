@@ -1,10 +1,11 @@
-import VComponent from "../../../V/VRDOM/component/VComponent"
 import List from "../../../V/VRDOM/list/List"
 import VArray from "../../../V/VRDOM/list/VArray"
 
 import "./ReactiveListPage.scss"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-class IFComponent extends VComponent {
+class IFComponent extends StatelessComponent {
     render() {
         return <div>
             <a onClick={() => this.props.array.delete(this.props.index)}>{this.props.item}</a>
@@ -22,7 +23,7 @@ const array = new VArray([
     "c"
 ])
 
-class ReactiveListComponent extends VComponent {
+class ReactiveListComponent extends StatefulComponent {
 
     identifier = `kekcomponent`
 

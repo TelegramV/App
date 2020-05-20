@@ -1,11 +1,11 @@
-import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import {DialogComponent} from "../DialogComponent"
 import DialogsManager from "../../../../../../Api/Dialogs/DialogsManager"
 import VApp from "../../../../../../V/vapp"
 import {vrdom_resolveMount} from "../../../../../../V/VRDOM/mount";
+import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
-export default class ArchivedDialogListComponent extends VComponent {
+export default class ArchivedDialogListComponent extends StatelessComponent {
 
     identifier = `dialogs-archived-list`
 
@@ -55,7 +55,7 @@ export default class ArchivedDialogListComponent extends VComponent {
 
     onDialogsGotOne = event => {
         const dialog = event.dialog
-        if(!dialog.isArchived) return
+        if (!dialog.isArchived) return
         const $insertBefore = this._findRenderedDialogToInsertBefore(dialog)
         this.insertBeforeDialog(dialog, $insertBefore)
 

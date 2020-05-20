@@ -1,6 +1,6 @@
-import VComponent from "../../../V/VRDOM/component/VComponent"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-export default class PaneComponent extends VComponent {
+export default class PaneComponent extends StatefulComponent {
     constructor(props) {
         super(props)
     }

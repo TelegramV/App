@@ -53,13 +53,6 @@ const VRDOM = {
     isTagNameList: vrdom_isTagNameList,
     isTagNameComponentOrFragment: vrdom_isTagNameComponentOrFragment,
 
-    // TEXTAREA_SET_VALUE: 0,
-    // TEXTAREA_SET_INNER_HTML: 1,
-    // TEXTAREA_PATCH: 2,
-
-    COMPONENT_PATCH_DEFAULT: 0,
-    COMPONENT_PATCH_FAST: 1, // currently is not working
-
     Fragment: 69
 }
 

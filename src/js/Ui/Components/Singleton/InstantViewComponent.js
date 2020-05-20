@@ -18,10 +18,10 @@
 import MTProto from "../../../MTProto/External";
 import {PhotoComponent} from "../Basic/photoComponent";
 import VUI from "../../VUI"
-import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-export class InstantViewComponent extends SingletonComponent {
+export class InstantViewComponent extends StatefulComponent {
 
     state = {
         hidden: true,
@@ -257,8 +257,8 @@ export class InstantViewComponent extends SingletonComponent {
                                 <div className="content">
                                     {this.state.page.blocks.map(this.parseBlock)}
                                     <div className="footer">
-                                    	<div className="views">{this.state.page.views ? (views+ " views") : ""}</div>
-                                    	<div className="feedback">Leave feedback about this preview</div>
+                                        <div className="views">{this.state.page.views ? (views + " views") : ""}</div>
+                                        <div className="feedback">Leave feedback about this preview</div>
                                     </div>
                                 </div>
                             </div>

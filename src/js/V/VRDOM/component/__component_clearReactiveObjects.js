@@ -15,9 +15,7 @@
  *
  */
 
-import AbstractComponent from "./AbstractComponent"
-
-function __component_clearReactiveObjects(component: AbstractComponent) {
+function __component_clearReactiveObjects(component) {
     component.__.reactiveObjectContexts.forEach((reactiveObjectContext, object) => {
         reactiveObjectContext.forEach((resolve, type) => object.unsubscribe(type, resolve));
     });

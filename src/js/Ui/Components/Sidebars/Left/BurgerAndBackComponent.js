@@ -1,11 +1,10 @@
-import VComponent from "../../../../V/VRDOM/component/VComponent";
-import FoldersManager from "../../../../Api/Dialogs/FolderManager";
 import {DialogsBarContextMenu} from "./Dialogs/DialogsBar";
 import DialogsManager from "../../../../Api/Dialogs/DialogsManager";
 import UIEvents from "../../../EventBus/UIEvents";
 import type {AE} from "../../../../V/VRDOM/component/__component_registerAppEvents";
+import StatefulComponent from "../../../../V/VRDOM/component/StatefulComponent"
 
-export class BurgerAndBackComponent extends VComponent {
+export class BurgerAndBackComponent extends StatefulComponent {
     state = {
         back: false,
         id: null
@@ -22,17 +21,21 @@ export class BurgerAndBackComponent extends VComponent {
     }
 
     render() {
-        return <i className={{"burger-and-back btn-icon rp rps tgico-menu": true, "burger": !this.state.back, "back": this.state.back}} onClick={this.onClick}/>
+        return <i className={{
+            "burger-and-back btn-icon rp rps tgico-menu": true,
+            "burger": !this.state.back,
+            "back": this.state.back
+        }} onClick={this.onClick}/>
     }
 
     onClick = (event) => {
-       if(this.state.back) {
-           UIEvents.LeftSidebar.fire("burger.backPressed", {
-               id: this.state.id
-           })
-       } else {
-           DialogsBarContextMenu(event, DialogsManager.archivedMessagesCount)
-       }
+        if (this.state.back) {
+            UIEvents.LeftSidebar.fire("burger.backPressed", {
+                id: this.state.id
+            })
+        } else {
+            DialogsBarContextMenu(event, DialogsManager.archivedMessagesCount)
+        }
     }
 
     onChangeToBack = (event) => {

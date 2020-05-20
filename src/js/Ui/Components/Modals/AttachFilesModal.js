@@ -22,8 +22,9 @@ import AppSelectedChat from "../../Reactive/SelectedChat";
 import {FileAPI} from "../../../Api/Files/FileAPI";
 import {DocumentMessagesTool} from "../../Utils/document";
 import VUI from "../../VUI"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-class FileListFragment extends VComponent {
+class FileListFragment extends StatelessComponent {
     render() {
         return <div className="file-list">
             {this.props.blobs.map(l => {
@@ -68,7 +69,7 @@ class FileListFragment extends VComponent {
     }
 }
 
-export class AttachFilesModal extends VComponent {
+export class AttachFilesModal extends StatelessComponent {
     captionRef = VComponent.createComponentRef()
     fileListRef = VComponent.createComponentRef()
 

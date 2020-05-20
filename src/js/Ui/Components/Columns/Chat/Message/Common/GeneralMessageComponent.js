@@ -6,8 +6,9 @@ import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../../EventBus/UIEvents";
 import {MessageParser} from "../../../../../../Api/Messages/MessageParser";
+import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
-class GeneralMessageComponent extends VComponent {
+class GeneralMessageComponent extends StatelessComponent {
 
     useProxyState = false
 

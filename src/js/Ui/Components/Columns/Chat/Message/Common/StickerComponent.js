@@ -1,16 +1,14 @@
-import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import {FileAPI} from "../../../../../../Api/Files/FileAPI"
 import UIEvents from "../../../../../EventBus/UIEvents"
 import lottie from "../../../../../../../../vendor/lottie-web"
 
 import MTProto from "../../../../../../MTProto/External"
+import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
 let stickerCounter = 0;
 
-export default class StickerComponent extends VComponent {
-    constructor(props) {
-        super(props)
-
+export default class StickerComponent extends StatelessComponent {
+    init() {
         this.updateSticker();
     }
 
@@ -93,7 +91,7 @@ export default class StickerComponent extends VComponent {
                 container: this.$el,
                 renderer: 'canvas',
                 loop: false,
-                autoplay: true,
+                autoplay: this.props.play || false,
                 name: this.identifier,
                 animationData: r
             })

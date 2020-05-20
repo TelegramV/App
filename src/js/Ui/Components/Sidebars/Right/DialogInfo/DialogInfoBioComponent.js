@@ -1,10 +1,10 @@
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import {DialogInfoDetailsFragment} from "./Fragments/DialogInfoDetailsFragment"
 import UIEvents from "../../../../EventBus/UIEvents"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-export class DialogInfoBioComponent extends VComponent {
+export class DialogInfoBioComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)

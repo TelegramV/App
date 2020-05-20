@@ -18,10 +18,8 @@
 import vrdom_mount from "../mount"
 import VRNode from "../VRNode"
 import patchVRNodeUndefined from "./patchVRNodeUndefined"
-import VComponentVRNode from "../component/VComponentVRNode"
 import patchVRNodeNull from "./patchNull"
 import patchNodeText from "./patchText"
-import patchVComponentVRNode from "./patchVComponentNRNode"
 import VListVRNode from "../list/VListVRNode"
 import patchList from "./patchList"
 import vrdom_deleteInner from "../deleteInner"
@@ -29,6 +27,9 @@ import patch_Text_VRNode from "./patch_Text_VRNode"
 import patch_Node_VRNode from "./patch_Node_VRNode"
 import {initElement} from "../render/renderElement"
 import cleanElement from "../cleanElement"
+import AbstractComponentVRNode from "../component/AbstractComponentVRNode"
+import patchAbstractComponentVRNode from "./patchAbstractComponentNRNode"
+import {__component_unmount_wip} from "../component/__component_unmount"
 
 /**
  * Patches VRNode to Real DOM Element
@@ -37,7 +38,7 @@ import cleanElement from "../cleanElement"
  * @param vRNode
  * @param options
  */
-const vrdom_patch = ($node, vRNode: VRNode | VComponentVRNode, options = {}): Node => {
+const vrdom_patch = ($node, vRNode: VRNode, options = {}): Node => {
     if ($node === undefined) {
         console.error("BUG: `undefined` was passed as $node ")
         return $node
@@ -52,10 +53,18 @@ const vrdom_patch = ($node, vRNode: VRNode | VComponentVRNode, options = {}): No
 
         return patch_Node_VRNode($node, vRNode)
 
-    } else if (vRNode instanceof VComponentVRNode) {
+    } else
+        //     if (vRNode instanceof VComponentVRNode) {
+        //     // console.log("[patch] VComponent")
+        //
+        //     return patchVComponentVRNode($node, vRNode)
+        //
+        // } else
+
+    if (vRNode instanceof AbstractComponentVRNode) {
         // console.log("[patch] VComponent")
 
-        return patchVComponentVRNode($node, vRNode)
+        return patchAbstractComponentVRNode($node, vRNode)
 
     } else if (vRNode instanceof VListVRNode) {
         // console.log("[patch] List")
@@ -76,7 +85,7 @@ const vrdom_patch = ($node, vRNode: VRNode | VComponentVRNode, options = {}): No
         // console.log("[patch] unexpected", $node, vRNode)
 
         if ($node.__v && $node.__v.component) {
-            $node.__v.component.__unmount()
+            __component_unmount_wip($node.__v.component)
         }
 
         if ($node instanceof Text) {

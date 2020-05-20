@@ -15,7 +15,7 @@
  *
  */
 
-import {TypedPublisher} from "../../Api/EventBus/TypedPublisher"
+import TypedPublisher from "../../Api/EventBus/TypedPublisher"
 import type {BusEvent} from "../../Api/EventBus/EventBus"
 import {EventBus} from "../../Api/EventBus/EventBus"
 

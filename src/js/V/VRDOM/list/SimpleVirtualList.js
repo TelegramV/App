@@ -15,9 +15,9 @@
  *
  */
 
-import VComponent from "../component/VComponent"
+import StatefulComponent from "../component/StatefulComponent"
 
-class SimpleVirtualList extends VComponent {
+class SimpleVirtualList extends StatefulComponent {
     state = {
         start: 0,
         count: 0,

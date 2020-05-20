@@ -1,6 +1,6 @@
-import VComponent from "../../../../../../V/VRDOM/component/VComponent";
 import AppEvents from "../../../../../../Api/EventBus/AppEvents";
 import UIEvents from "../../../../../EventBus/UIEvents";
+import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
 
 // макс перепиши цю діч(
@@ -8,7 +8,7 @@ import UIEvents from "../../../../../EventBus/UIEvents";
 // кайф, тільки наступного разу роби ctrl+alt+l
 //   (в мене воно атоматом код форматить і чистить непотрібні імпорти) - @kohutd
 
-export class DialogInfoPhotoComponent extends VComponent {
+export class DialogInfoPhotoComponent extends StatelessComponent {
 
     init() {
         if (!this.props.message.loaded && !this.props.message.loading) {

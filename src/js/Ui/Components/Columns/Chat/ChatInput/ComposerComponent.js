@@ -1,4 +1,3 @@
-import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import VRDOM from "../../../../../V/VRDOM/VRDOM";
 import StickerComponent from "../Message/Common/StickerComponent"
 import {VideoComponent} from "../../../Basic/videoComponent"
@@ -10,13 +9,16 @@ import MTProto from "../../../../../MTProto/External"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import VApp from "../../../../../V/vapp"
 import lottie from "../../../../../../../vendor/lottie-web"
+import API from "../../../../../Api/Telegram/API"
+import StickerSet from "../../../../../Api/Stickers/StickerSet"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
 // this should be StatelessComponent
-export default class ComposerComponent extends VComponent {
+export default class ComposerComponent extends StatelessComponent {
     identifier = "composer";
 
     stateless = {
-        pane: "emoji",
+        panel: "emoji",
         emojiCategory: "people",
         emojiCategories: [
             {name: "recent", icon: "sending"},
@@ -28,6 +30,8 @@ export default class ComposerComponent extends VComponent {
             {name: "objects", icon: "lamp"},
             {name: "symbols", icon: "flag"},
         ],
+        stickerSet: null,
+        allStickers: [],
     };
 
     render() {
@@ -82,27 +86,34 @@ export default class ComposerComponent extends VComponent {
     }
 
     componentDidMount() {
-        this.emojiPanel = this.$el.querySelector(".emoji-wrapper");
-        this.stickersPanel = this.$el.querySelector(".sticker-wrapper");
-        this.gifPanel = this.$el.querySelector(".gif-wrapper");
+        this.$emojiPanel = this.$el.querySelector(".emoji-wrapper");
+        this.$stickersPanel = this.$el.querySelector(".sticker-wrapper");
+        this.$gifPanel = this.$el.querySelector(".gif-wrapper");
 
-        const $selected = this.emojiPanel.querySelector(".emoji-table").querySelector(".people");
+        const $selected = this.$emojiPanel.querySelector(".emoji-table").querySelector(".people");
         $selected.classList.add("selected");
         $selected.innerText = emojiCategories["people"];
         replaceEmoji($selected);
+        this.$el.querySelector(`.emoji-types > [data-category=people]`).classList.add("selected");
         this.$el.querySelector(".emoji-table > .selected").childNodes.forEach(node => {
             node.addEventListener("click", this.onClickEmoji);
+        });
+
+        API.messages.getAllStickers().then(AllStickers => {
+            this.stateless.allStickers = AllStickers;
+            AllStickers.sets.map(raw => new StickerSet(raw))
+                .forEach(stickerSet => stickerSet.fetchThumb().then(console.log));
         });
     }
 
     onHide = () => {
-        this.stickersPanel.querySelector(".selected").childNodes.forEach(node => {
+        this.$stickersPanel.querySelector(".selected").childNodes.forEach(node => {
             if (node.id) {
                 lottie.pause(node.id);
             }
         });
 
-        this.gifPanel.querySelectorAll("video").forEach(video => {
+        this.$gifPanel.querySelectorAll("video").forEach(video => {
             video.pause();
         });
 
@@ -114,15 +125,15 @@ export default class ComposerComponent extends VComponent {
             return;
         }
 
-        this.gifPanel.querySelectorAll("video").forEach(video => {
+        this.$gifPanel.querySelectorAll("video").forEach(video => {
             video.play();
         });
 
         this.paused = false;
     }
 
-    togglePane = (name: string) => {
-        if (this.stateless.pane === name) {
+    togglePanel = (name: string) => {
+        if (this.stateless.panel === name) {
             return;
         }
 
@@ -132,27 +143,28 @@ export default class ComposerComponent extends VComponent {
 
         this.$el.querySelector(`.tab-selector > [data-tab-name=${name}]`).classList.add("selected");
 
-        this.emojiPanel.classList.add("hidden");
-        this.gifPanel.classList.add("hidden");
-        this.stickersPanel.classList.add("hidden");
+        this.$emojiPanel.classList.add("hidden");
+        this.$gifPanel.classList.add("hidden");
+        this.$stickersPanel.classList.add("hidden");
 
-        this[`${name}Panel`].classList.remove("hidden");
+        this[`$${name}Panel`].classList.remove("hidden");
 
-        this.stateless.pane = name;
+        this.stateless.panel = name;
     }
 
     onClickOpenEmoji = () => {
-        this.togglePane("emoji");
+        this.togglePanel("emoji");
     }
 
     onClickOpenStickers = () => {
-        this.togglePane("stickers");
+        this.togglePanel("stickers");
     }
 
     onClickOpenGif = () => {
-        this.togglePane("gif");
+        this.togglePanel("gif");
     }
 
+    // DOM hell
     onClickSwitchEmojiCategory = (ev) => {
         const $el = ev.currentTarget;
         const category = $el.getAttribute("data-category");
@@ -187,6 +199,17 @@ export default class ComposerComponent extends VComponent {
         }
     }
 
+    onClickSwitchStickerSet = (ev) => {
+        const $el = ev.currentTarget;
+        const stickerSetId = $el.getAttribute("data-set-id");
+
+        if (!stickerSetId || this.stateless.sticketSetId === stickerSetId) {
+            return;
+        }
+
+        this.stateless.sticketSetId = stickerSetId;
+    }
+
     onClickEmoji = (ev) => {
         ChatInputManager.appendText(ev.currentTarget.alt);
     }
@@ -194,7 +217,7 @@ export default class ComposerComponent extends VComponent {
     loadInstalledStickerSets = () => {
         if (this.stickersInit) return;
         StickerManager.getInstalledStickerSets().then(async sets => {
-            let container = this.stickersPanel.querySelector(".sticker-packs");
+            let container = this.$stickersPanel.querySelector(".sticker-packs");
             for (const set of sets) {
                 if (set.set.thumb) {
                     //download thumb
@@ -215,11 +238,11 @@ export default class ComposerComponent extends VComponent {
     }
 
     setStickerSet = (id) => {
-        let table = this.stickersPanel.querySelector(".selected");
+        let table = this.$stickersPanel.querySelector(".selected");
         while (table.firstChild) table.removeChild(table.firstChild);
         let set = StickerManager.getCachedStickerSet(id);
         for (const sticker of set.documents) {
-            VRDOM.append(<StickerComponent width={75} sticker={sticker}/>, table);
+            VRDOM.append(<StickerComponent play={false} width={75} sticker={sticker}/>, table);
         }
         this._bindStickerEvents();
     }
@@ -230,7 +253,7 @@ export default class ComposerComponent extends VComponent {
         }).then(response => {
             let packs = response.packs;
             let stickers = response.stickers;
-            let table = this.stickersPanel.querySelector(".selected");
+            let table = this.$stickersPanel.querySelector(".selected");
             for (let i = 0; i < Math.min(25, stickers.length); i++) {
                 VRDOM.append(<StickerComponent width={75} sticker={stickers[i]}/>, table);
             }
@@ -251,7 +274,7 @@ export default class ComposerComponent extends VComponent {
     }
 
     loadSavedGifs = () => {
-        let masonry = this.gifPanel.querySelector(".gif-masonry");
+        let masonry = this.$gifPanel.querySelector(".gif-masonry");
         MTProto.invokeMethod("messages.getSavedGifs").then(response => {
             for (const gif of response.gifs) {
                 let size = FileAPI.getMaxSize(gif);
@@ -265,7 +288,7 @@ export default class ComposerComponent extends VComponent {
     }
 
     _bindGifClickEvents = () => {
-        this.gifPanel.querySelector(".gif-masonry").childNodes.forEach(node => {
+        this.$gifPanel.querySelector(".gif-masonry").childNodes.forEach(node => {
             node.firstChild.addEventListener("click", this._gifClick);
         })
     }
@@ -280,8 +303,7 @@ export default class ComposerComponent extends VComponent {
 
 const StickerSetItemFragment = ({setId, url, click}) => {
     return (
-        <div class="sticker-packs-item"
-             set-id={setId} onClick={click}>
+        <div class="sticker-packs-item" set-id={setId} onClick={click}>
             <img src={url} alt="Sticker Pack"/>
         </div>
     )

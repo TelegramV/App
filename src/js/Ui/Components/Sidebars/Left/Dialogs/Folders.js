@@ -1,13 +1,10 @@
-import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import "./Folders.scss";
-import MTProto from "../../../../../MTProto/External";
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VUI from "../../../../VUI";
-import {ChatInputManager} from "../../../Columns/Chat/ChatInput/ChatInputComponent";
-import {DialogsBarContextMenu} from "./DialogsBar";
 import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 
 const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0}, selected = false, onClick}) => {
     return <div className={{
@@ -37,11 +34,12 @@ const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0
     </div>
 }
 
-export class Folders extends VComponent {
+export class Folders extends StatefulComponent {
     state = {
         folders: [],
         selectedFolder: null
     }
+
     appEvents(E: AE) {
         E.bus(AppEvents.General)
             .on("foldersUpdate", this.onFoldersUpdate)
@@ -63,9 +61,14 @@ export class Folders extends VComponent {
             "hidden": !FoldersManager.hasFolders()
         }}>
             <BurgerAndBackComponent isMain/>
-            <FolderFragment icon="🐶" title="All chats" selected={this.state.selectedFolder == null} badge={FoldersManager.getBadgeCount(null)} onClick={_ => FoldersManager.selectFolder(null)}/>
+            <FolderFragment icon="🐶" title="All chats" selected={this.state.selectedFolder == null}
+                            badge={FoldersManager.getBadgeCount(null)}
+                            onClick={_ => FoldersManager.selectFolder(null)}/>
             {this.state.folders.map(l => {
-                return <FolderFragment icon={l.emoticon || "🤪"} title={l.title} selected={l.id === this.state.selectedFolder} badge={FoldersManager.getBadgeCount(l.id)} folderId={l.id} onClick={_ => FoldersManager.selectFolder(l.id)}/>
+                return <FolderFragment icon={l.emoticon || "🤪"} title={l.title}
+                                       selected={l.id === this.state.selectedFolder}
+                                       badge={FoldersManager.getBadgeCount(l.id)} folderId={l.id}
+                                       onClick={_ => FoldersManager.selectFolder(l.id)}/>
             })}
 
             <FolderFragment icon="⚙" title="Edit" onClick={this.editFolders}/>

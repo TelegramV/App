@@ -9,9 +9,10 @@ import {DialogFragment} from "./Fragments/DialogFragment"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import UIEvents from "../../../../EventBus/UIEvents"
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
-import VApp from "../../../../../V/vapp";
+import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-export class DialogComponent extends VComponent {
+export class DialogComponent extends StatelessComponent {
 
     dialog: Dialog
 
@@ -334,5 +335,9 @@ export class DialogComponent extends VComponent {
         } else {
             AppSelectedChat.select(this.dialog.peer)
         }
+    }
+
+    __destroy = () => {
+        __component_destroy(this)
     }
 }

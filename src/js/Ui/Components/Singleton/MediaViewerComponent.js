@@ -16,7 +16,6 @@
  */
 
 import {PhotoMessage} from "../../../Api/Messages/Objects/PhotoMessage";
-import VComponent from "../../../V/VRDOM/component/VComponent";
 import UIEvents from "../../EventBus/UIEvents";
 import type {AE} from "../../../V/VRDOM/component/__component_appEventsBuilder";
 import {VideoMessage} from "../../../Api/Messages/Objects/VideoMessage";
@@ -28,6 +27,7 @@ import VSpinner from "../Elements/VSpinner"
 import FileManager from "../../../Api/Files/FileManager"
 import {DocumentMessagesTool} from "../../Utils/document"
 import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -99,7 +99,7 @@ function NavigationButtonFragment({isNext, hidden, onClick}) {
     }} onClick={!hidden ? onClick : e => e.stopPropagation()}/>
 }
 
-export class MediaViewerComponent extends VComponent {
+export class MediaViewerComponent extends StatefulComponent {
     state = {
         hidden: true,
         peer: null,

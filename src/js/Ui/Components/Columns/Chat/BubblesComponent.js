@@ -40,7 +40,7 @@
 //
 //
 // // legacy, doesnt work
-// class BubblesComponent extends VComponent {
+// class BubblesComponent extends StatelessComponent {
 //
 //     loaderRef = this.props.loaderRef
 //     bubblesInnerRef = VComponent.createRef()

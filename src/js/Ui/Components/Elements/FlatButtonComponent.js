@@ -15,14 +15,14 @@
  *
  */
 
-import VComponent from "../../../V/VRDOM/component/VComponent"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
 /**
  * @deprecated
  */
-export class FlatButtonComponent extends VComponent {
+export class FlatButtonComponent extends StatelessComponent {
 
     render() {
         const classNames = classNames(

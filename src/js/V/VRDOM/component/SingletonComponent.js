@@ -15,9 +15,9 @@
  *
  */
 
-import VComponent from "./VComponent"
+import StatefulComponent from "./StatefulComponent"
 
-class SingletonComponent extends VComponent {
+class SingletonComponent extends StatefulComponent {
 
     static instance: this
 

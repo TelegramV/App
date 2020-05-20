@@ -1,6 +1,6 @@
-import VComponent from "../../../V/VRDOM/component/VComponent"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-export class AbstractBarComponent extends VComponent {
+export class AbstractBarComponent extends StatefulComponent {
 
     barName = undefined
     barVisible = false

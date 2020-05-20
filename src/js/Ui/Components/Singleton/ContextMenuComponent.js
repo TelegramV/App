@@ -15,14 +15,14 @@
  *
  */
 
-import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"
 import VUI from "../../VUI"
 import {callOrReturn} from "../../../Utils/func"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-class ContextMenuComponent extends SingletonComponent {
+class ContextMenuComponent extends StatefulComponent {
 
     state = {
         hidden: true,

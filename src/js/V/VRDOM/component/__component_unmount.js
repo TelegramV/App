@@ -15,14 +15,11 @@
  *
  */
 
-import VComponent from "./VComponent"
 import VApp from "../../vapp"
-import StatelessComponent from "./StatelessComponent"
-import StatefulComponent from "./StatefulComponent"
 import __component_clearAppEvents from "./__component_clearAppEvents"
 import __component_clearReactiveObjects from "./__component_clearReactiveObjects"
 
-function __component_unmount_wip(component: StatelessComponent | StatefulComponent) {
+export function __component_unmount_wip(component) {
     component.componentWillUnmount();
 
     component.clearIntervals();
@@ -39,22 +36,4 @@ function __component_unmount_wip(component: StatelessComponent | StatefulCompone
     VApp.mountedComponents.delete(component.identifier);
 }
 
-const __component_unmount = (context: VComponent) => {
-    // console.debug("unmounting", context.identifier, context.displayName)
-    context.componentWillUnmount()
-
-    context.clearIntervals()
-    context.clearTimeouts()
-
-    context.__unregisterAppEventResolves()
-    context.__unregisterReactiveObjectResolves()
-
-    context.$el.__v.component = undefined
-    context.$el = undefined
-    context.__.destroyed = true
-    context.__.mounted = false
-
-    VApp.mountedComponents.delete(context.identifier)
-}
-
-export default __component_unmount
+export default __component_unmount_wip

@@ -5,11 +5,11 @@ export type TypedSubscription = (event: BusEvent) => void
 /**
  * WARNING: type `*` is reserved.
  */
-export class TypedPublisher<T: TypedSubscription | Function> {
+class TypedPublisher<T: TypedSubscription | Function> {
 
     /**
      * @type {Map<string, Set<T>>}
-     * @private
+     * @protected
      */
     _subscriptions: Map<any, Set<T>> = new Map([
         ["*", new Set()]
@@ -63,3 +63,5 @@ export class TypedPublisher<T: TypedSubscription | Function> {
         }
     }
 }
+
+export default TypedPublisher

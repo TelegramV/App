@@ -15,20 +15,18 @@
  *
  */
 
-import VComponent from "./VComponent"
 import {initElement} from "../render/renderElement"
 import VApp from "../../vapp"
-import StatefulComponent from "./StatefulComponent"
-import StatelessComponent from "./StatelessComponent"
 
-function __component_mount_wip(component: StatefulComponent | StatelessComponent, $el: HTMLElement) {
+export function __component_mount_wip(component, $el: HTMLElement) {
     initElement($el);
 
     if (component.__.mounted) {
+        component.__.mounted = true;
+
         component.$el = $el;
         component.$el.__v.component = component;
 
-        component.__.mounted = true;
         component.forceUpdate();
 
         if (!VApp.mountedComponents.has(component.identifier)) {
@@ -36,52 +34,20 @@ function __component_mount_wip(component: StatefulComponent | StatelessComponent
             VApp.mountedComponents.set(component.identifier, component)
         }
     } else {
-        initElement($el);
+        component.__.mounted = true;
+
         component.$el = $el;
         component.$el.__v.component = component;
-        
-        component.__.mounted = true;
 
         component.componentDidMount();
 
         if (VApp.mountedComponents.has(component.identifier)) {
             console.error("BUG: component with such id already mounted!", component)
         } else {
-            VApp.mountedComponents.set(context.identifier, component)
+            VApp.mountedComponents.set(component.identifier, component)
         }
 
     }
 }
 
-const __component_mount = (context: VComponent, $el: HTMLElement) => {
-    // context.__.destroyed = false
-
-    if (context.__.mounted) {
-        context.__.mounted = true
-        initElement($el)
-        // console.warn("remounting component", context.displayName)
-        context.$el = $el
-        context.$el.__v.component = context
-        context.forceUpdate()
-
-        if (!VApp.mountedComponents.has(context.identifier)) {
-            console.error("BUG: component with such id was not found!", context)
-            VApp.mountedComponents.set(context.identifier, context)
-        }
-    } else {
-        // console.warn("mounting component", context.displayName)
-        context.__.mounted = true
-        initElement($el)
-        context.$el = $el
-        context.$el.__v.component = context
-        context.componentDidMount()
-
-        if (VApp.mountedComponents.has(context.identifier)) {
-            console.error("BUG: component with such id already mounted!", context)
-        } else {
-            VApp.mountedComponents.set(context.identifier, context)
-        }
-    }
-}
-
-export default __component_mount
+export default __component_mount_wip

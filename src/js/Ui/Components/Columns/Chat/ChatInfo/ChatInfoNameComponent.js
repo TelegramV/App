@@ -1,10 +1,10 @@
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-class ChatInfoNameComponent extends VComponent {
+class ChatInfoNameComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)

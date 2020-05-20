@@ -3,8 +3,9 @@ import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import {DialogInfoDetailsCheckboxFragment} from "./Fragments/DialogInfoDetailsCheckboxFragment"
 import UIEvents from "../../../../EventBus/UIEvents"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-export class DialogInfoNotificationStatusComponent extends VComponent {
+export class DialogInfoNotificationStatusComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)

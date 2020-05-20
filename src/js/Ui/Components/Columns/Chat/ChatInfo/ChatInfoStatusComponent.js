@@ -1,11 +1,11 @@
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import classNames from "../../../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf"
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 
-class ChatInfoStatusComponent extends VComponent {
+class ChatInfoStatusComponent extends StatefulComponent {
     state = {
         isLoading: false,
     };

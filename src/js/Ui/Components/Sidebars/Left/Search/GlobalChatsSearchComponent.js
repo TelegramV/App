@@ -1,4 +1,3 @@
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import SearchManager from "../../../../../Api/Search/SearchManager"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
@@ -6,6 +5,7 @@ import List from "../../../../../V/VRDOM/list/List"
 import VArray from "../../../../../V/VRDOM/list/VArray"
 import {highlightVRNodeWord} from "../../../../Utils/highlightVRNodeText"
 import ContactComponent from "../../../Basic/ContactComponent"
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 
 let CURRENT_QUERY = undefined
 
@@ -21,7 +21,7 @@ const SectionTitleFragment = ({title}) => {
     return <div className="section-title">{title}</div>
 }
 
-export class GlobalChatsSearchComponent extends VComponent {
+export class GlobalChatsSearchComponent extends StatefulComponent {
     state = {
         peers: new VArray(),
         myPeers: new VArray(),

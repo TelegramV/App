@@ -21,8 +21,9 @@ import VComponent from "../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../Reactive/SelectedChat";
 import VCheckbox from "../Elements/VCheckbox";
 import VUI from "../../VUI"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-class OptionsFragment extends VComponent {
+class OptionsFragment extends StatelessComponent {
     init() {
         super.init()
         this.optionCount = 1
@@ -65,7 +66,7 @@ class OptionsFragment extends VComponent {
     }
 }
 
-export class AttachPollModal extends VComponent {
+export class AttachPollModal extends StatelessComponent {
     askQuestionRef = VComponent.createComponentRef()
     optionsRef = VComponent.createComponentRef()
     anonymousRef = VComponent.createFragmentRef()

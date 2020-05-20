@@ -1,7 +1,7 @@
-import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import {VideoFigureFragment, VideoPreviewFragment} from "./VideoFigureFragment"
+import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
-class VideoComponent extends VComponent {
+class VideoComponent extends StatelessComponent {
 
     init() {
         this.message = this.props.message;

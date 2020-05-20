@@ -15,10 +15,10 @@
  *
  */
 
-import VComponent from "../../../../V/VRDOM/component/VComponent";
 import UIEvents from "../../../EventBus/UIEvents";
+import StatefulComponent from "../../../../V/VRDOM/component/StatefulComponent"
 
-class ChatToBottomButtonComponent extends VComponent {
+class ChatToBottomButtonComponent extends StatefulComponent {
     state = {
         isShown: false,
     };

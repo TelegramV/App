@@ -9,6 +9,7 @@ import ElementsPage from "../Pages/Tests/Elements"
 import ColumnsPage from "../Pages/Tests/Columns"
 import CryptoTestPage from "../Pages/Tests/Crypto"
 import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage";
+import NextGenPage from "../Pages/Tests/NextGen"
 
 /**
  * @param {VFrameworkRouter} router
@@ -66,6 +67,12 @@ function AppRoutes(router) {
         router.route("/crypto", "crypto", {
             h() {
                 return CryptoTestPage()
+            }
+        })
+
+        router.route("/nextgen", "crypto", {
+            h() {
+                return NextGenPage()
             }
         })
     }

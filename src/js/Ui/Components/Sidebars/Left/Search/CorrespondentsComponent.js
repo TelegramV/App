@@ -1,9 +1,9 @@
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import {PeopleListItemFragment} from "./PeopleListItemFragment"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import TopPeers from "../../../../../Api/Peers/TopPeers"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-export class CorrespondentsComponent extends VComponent {
+export class CorrespondentsComponent extends StatelessComponent {
 
     hidden = false
 
@@ -12,7 +12,7 @@ export class CorrespondentsComponent extends VComponent {
             .on("gotCorrespondents")
 
         E.bus(AppEvents.Peers)
-            .only(event => TopPeers.correspondents.has(event.peer))
+            .filter(event => TopPeers.correspondents.has(event.peer))
             .on("updatePhotoSmall")
     }
 

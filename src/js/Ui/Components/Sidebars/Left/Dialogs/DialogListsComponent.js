@@ -4,11 +4,10 @@ import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent";
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf";
-import MTProto from "../../../../../MTProto/External";
-import lottie from "../../../../../../../vendor/lottie-web";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-class DialogFolderFragment extends VComponent {
+class DialogFolderFragment extends StatelessComponent {
 
     pinned = VComponent.createComponentRef()
     general = VComponent.createComponentRef()
@@ -38,7 +37,7 @@ class DialogFolderFragment extends VComponent {
     }
 }
 
-export class DialogListsComponent extends VComponent {
+export class DialogListsComponent extends StatelessComponent {
     folders = []
     selectedFolder = null
     folderRefs = [VComponent.createComponentRef()]
@@ -53,7 +52,8 @@ export class DialogListsComponent extends VComponent {
         return <div className="dialog-lists">
             {/*<div className="empty"/>*/}
             {/* All chats */}
-            <DialogFolderFragment ref={this.folderRefs[0]} folderId={null} filter={null} selected={this.selectedFolder == null}/>
+            <DialogFolderFragment ref={this.folderRefs[0]} folderId={null} filter={null}
+                                  selected={this.selectedFolder == null}/>
             {/*{this.state.folders.map(l => {*/}
             {/*    return <DialogFolderFragment folderId={l.id} filter={l} selected={this.selectedFolder === l.id}/>*/}
             {/*})}*/}
@@ -96,7 +96,8 @@ export class DialogListsComponent extends VComponent {
     addFolder = (folder) => {
         const ref = VComponent.createComponentRef()
         this.folderRefs.push(ref)
-        VRDOM.append(<DialogFolderFragment ref={ref} folderId={folder.id} filter={folder} selected={this.selectedFolder === folder.id}/>, this.$el)
+        VRDOM.append(<DialogFolderFragment ref={ref} folderId={folder.id} filter={folder}
+                                           selected={this.selectedFolder === folder.id}/>, this.$el)
     }
 
     onFoldersUpdate = (event) => {
@@ -105,13 +106,13 @@ export class DialogListsComponent extends VComponent {
         const destroyed = []
         this.folderRefs.forEach(l => {
             const component: DialogFolderFragment = l.component
-            if(component.folderId == null) return
+            if (component.folderId == null) return
             const folder = this.folders.find(l => l.id === component.folderId)
-            if(folder) {
+            if (folder) {
                 found.push(component.folderId)
                 component.updateFilter(folder)
             } else {
-                if(this.selectedFolder === component.folderId) {
+                if (this.selectedFolder === component.folderId) {
                     FoldersManager.selectFolder(null)
                 }
                 component.__destroy()
@@ -124,7 +125,7 @@ export class DialogListsComponent extends VComponent {
         })
 
         this.folders.forEach(l => {
-            if(!found.includes(l.id)) {
+            if (!found.includes(l.id)) {
                 this.addFolder(l)
             }
         })

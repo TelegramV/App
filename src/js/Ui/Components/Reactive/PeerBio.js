@@ -15,10 +15,10 @@
  *
  */
 
-import VComponent from "../../../V/VRDOM/component/VComponent"
 import AppEvents from "../../../Api/EventBus/AppEvents"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-class PeerBio extends VComponent {
+class PeerBio extends StatelessComponent {
     appEvents(E: AE) {
         E.bus(AppEvents.Peers)
             .filter(event => event.peer === this.props.peer)

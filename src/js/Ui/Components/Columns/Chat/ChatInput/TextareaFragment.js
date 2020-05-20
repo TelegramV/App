@@ -1,9 +1,9 @@
 import {replaceEmoji} from "../../../../Utils/replaceEmoji";
 import {AttachLinkModal} from "../../../Modals/AttackLinkModal";
-import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import VUI from "../../../../VUI"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-export class TextareaFragment extends VComponent {
+export class TextareaFragment extends StatelessComponent {
 
     render() {
         return <div className="textarea empty"

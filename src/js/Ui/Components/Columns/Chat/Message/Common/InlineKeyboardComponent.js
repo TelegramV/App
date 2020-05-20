@@ -1,8 +1,8 @@
 import MTProto from "../../../../../../MTProto/External";
-import VComponent from "../../../../../../V/VRDOM/component/VComponent"
+import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
 
-export class InlineKeyboardComponent extends VComponent {
+export class InlineKeyboardComponent extends StatelessComponent {
     static parseButton(message, button) {
         const loader = <progress className="progress-circular white disabled"/>
         const handlers = {

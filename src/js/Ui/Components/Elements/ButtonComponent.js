@@ -15,14 +15,14 @@
  *
  */
 
-import VComponent from "../../../V/VRDOM/component/VComponent"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
 /**
  * @deprecated
  */
-export class ButtonWithProgressBarComponent extends VComponent {
+export class ButtonWithProgressBarComponent extends StatefulComponent {
 
     state = {
         isLoading: false

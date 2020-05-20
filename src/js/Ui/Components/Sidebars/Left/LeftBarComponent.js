@@ -2,7 +2,6 @@ import UIEvents from "../../../EventBus/UIEvents"
 import {AbstractBarComponent} from "../AbstractBarComponent"
 import AppEvents from "../../../../Api/EventBus/AppEvents";
 import FoldersManager from "../../../../Api/Dialogs/FolderManager";
-import type {AE} from "../../../../V/VRDOM/component/__component_registerAppEvents";
 
 class LeftBarComponent extends AbstractBarComponent {
 

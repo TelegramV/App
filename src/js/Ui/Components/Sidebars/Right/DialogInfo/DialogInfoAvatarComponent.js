@@ -2,12 +2,13 @@ import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import UIEvents from "../../../../EventBus/UIEvents"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-export class DialogInfoAvatarComponent extends VComponent {
+export class DialogInfoAvatarComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .only(event => AppSelectedInfoPeer.check(event.peer))
+            .filter(event => AppSelectedInfoPeer.check(event.peer))
             .on("updatePhoto")
             .on("updatePhotoSmall")
 

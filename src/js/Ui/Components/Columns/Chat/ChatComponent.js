@@ -21,16 +21,16 @@ import {ChatInputComponent} from "./ChatInput/ChatInputComponent";
 import AppSelectedChat from "../../../Reactive/SelectedChat"
 import UIEvents from "../../../EventBus/UIEvents"
 import VComponent from "../../../../V/VRDOM/component/VComponent"
-import {CallsManager} from "../../../../Api/Calls/CallManager";
 import VApp from "../../../../V/vapp"
 import VSpinner from "../../Elements/VSpinner"
 import NextBubblesComponent from "./NextBubblesComponent"
 import ChatInfoCallButtonComponent from "./ChatInfo/ChatInfoCallButtonComponent";
+import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
 
 /**
  * CRITICAL: never rerender this component!
  */
-class ChatComponent extends VComponent {
+class ChatComponent extends StatelessComponent {
 
     noChatRef = VComponent.createRef()
     chatRef = VComponent.createRef()

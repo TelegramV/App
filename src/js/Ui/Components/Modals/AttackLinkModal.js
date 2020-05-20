@@ -19,8 +19,9 @@ import {InputComponent} from "../Elements/InputComponent";
 import {ModalHeaderFragment} from "./ModalHeaderFragment";
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import VUI from "../../VUI"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-export class AttachLinkModal extends VComponent {
+export class AttachLinkModal extends StatelessComponent {
     render() {
         return <div className="attach-modal">
             <ModalHeaderFragment title="Create link" close actionText="Create" action={this.create}/>
@@ -32,8 +33,8 @@ export class AttachLinkModal extends VComponent {
     }
 
     create() {
-        const text = this.refs.get("createLinkText").getValue()
-        const url = this.refs.get("createLinkUrl").getValue()
+        const text = VComponent.getComponentById("createLinkText").getValue()
+        const url = VComponent.getComponentById("createLinkUrl").getValue()
         this.props.close(text, url)
         VUI.Modal.close()
     }

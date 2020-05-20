@@ -16,14 +16,12 @@
  */
 
 import __component_diffProps from "./__component_diffProps"
-import VComponent from "./VComponent"
 import __diffObjects from "./__diffObjects"
-import StatelessComponent from "./StatelessComponent"
-import StatefulComponent from "./StatefulComponent"
 import __component_render_wip from "./__component_render"
+import vrdom_patch from "../patch/patch"
 
-function __component_update_wip(component: StatefulComponent | StatelessComponent, {isForce, nextState, nextProps}) {
-    const isStateful = component instanceof StatefulComponent;
+export function __component_update_wip(component, {isForce, nextState, nextProps}) {
+    const isStateful = component.__.stateful;
 
     let shouldUpdate = isForce;
 
@@ -82,72 +80,11 @@ function __component_update_wip(component: StatefulComponent | StatelessComponen
         }
 
         component.__.isUpdatingItSelf = true;
-        component.$el = VRDOM.patch(component.$el, __component_render_wip(component))
+        component.$el = vrdom_patch(component.$el, __component_render_wip(component))
         component.__.isUpdatingItSelf = false;
 
         component.componentDidUpdate(null, null, null); // todo: pass previous data
     }
 }
 
-const __component_update = (context: VComponent, {isForce = false, nextProps, nextState}) => {
-    let shouldUpdate = isForce
-
-    if (!isForce) {
-        let hasNextState = false
-        let hasNextProps = false
-
-        if (nextState) {
-            hasNextState = true
-            nextState = {
-                ...context.state,
-                ...nextState
-            }
-        } else {
-            nextState = context.state
-        }
-
-        if (nextProps) {
-            hasNextProps = true
-            nextProps = {
-                ...context.props,
-                ...nextProps
-            }
-        } else {
-            nextProps = context.props
-        }
-
-        shouldUpdate = context.shouldComponentUpdate(nextProps, nextState)
-
-        if (shouldUpdate === undefined) {
-            if (hasNextProps) {
-                const diffProps = __component_diffProps(context, nextProps)
-                shouldUpdate = diffProps !== false
-            }
-
-            if (hasNextState && !shouldUpdate) {
-                const diffState = __diffObjects(context.state, nextState)
-                shouldUpdate = diffState !== false
-            }
-        }
-
-        shouldUpdate = shouldUpdate !== false
-    }
-
-    if (shouldUpdate) {
-        if (nextProps) {
-            Object.assign(context.props, nextProps)
-        }
-
-        if (nextState) {
-            Object.assign(context.state, nextState)
-        }
-
-        context.__.isUpdatingItSelf = true
-        context.$el = VRDOM.patch(context.$el, context.__render())
-        context.__.isUpdatingItSelf = false
-
-        context.componentDidUpdate(null, null, null) // todo: pass previous data
-    }
-}
-
-export default __component_update
+export default __component_update_wip

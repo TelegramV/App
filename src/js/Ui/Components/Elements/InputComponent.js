@@ -19,11 +19,12 @@ import VComponent from "../../../V/VRDOM/component/VComponent"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
 /**
  * @deprecated use {@link VInput}
  */
-export class InputComponent extends VComponent {
+export class InputComponent extends StatelessComponent {
 
     inputRef = VComponent.createRef()
 

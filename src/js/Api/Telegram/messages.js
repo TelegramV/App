@@ -81,12 +81,17 @@ function getHistory(peer: Peer, params = {
     })
 }
 
+function getAllStickers({hash = 0} = {hash: 0}) {
+    return MTProto.invokeMethod("messages.getAllStickers", {hash})
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
     searchGlobal: searchGlobal,
     getChats: getChats,
     getHistory: getHistory,
+    getAllStickers: getAllStickers,
 }
 
 export default messages

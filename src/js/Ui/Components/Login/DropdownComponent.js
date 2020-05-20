@@ -1,6 +1,6 @@
-import VComponent from "../../../V/VRDOM/component/VComponent"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-export class DropdownComponent extends VComponent {
+export class DropdownComponent extends StatefulComponent {
     constructor(props) {
         super(props);
         this.state = {

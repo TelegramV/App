@@ -4,8 +4,9 @@ import QRLoginPaneComponent from "./QRLoginPaneComponent"
 import RegisterPaneComponent from "./RegisterPaneComponent"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import VApp from "../../../V/vapp"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-export default class LoginComponent extends VComponent {
+export default class LoginComponent extends StatelessComponent {
 
     qrLoginPaneRef = VComponent.createComponentRef()
     phonePaneRef = VComponent.createComponentRef()

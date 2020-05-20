@@ -1,4 +1,4 @@
-import {TypedPublisher} from "../EventBus/TypedPublisher"
+import TypedPublisher from "../EventBus/TypedPublisher"
 
 /**
  * Simple Store class

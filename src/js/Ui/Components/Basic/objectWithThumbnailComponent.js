@@ -1,7 +1,7 @@
-import VComponent from "../../../V/VRDOM/component/VComponent"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
 // @deprecated ObjectWithThumbnailComponent's CLOSED DUE TO AIDS
-export class ObjectWithThumbnailComponent extends VComponent {
+export class ObjectWithThumbnailComponent extends StatefulComponent {
     init() {
         this.state = {
             object: this.props.object,

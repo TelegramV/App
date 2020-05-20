@@ -15,10 +15,8 @@
  *
  */
 
-import AbstractComponent from "./AbstractComponent";
-
-function __component_render_wip(component: AbstractComponent) {
-    const renderedVRNode = component.render();
+function __component_render_wip(component) {
+    const renderedVRNode = component.__.stateful ? component.render(component.props, component.state) : component.render(component.props);
     renderedVRNode.component = component;
     return renderedVRNode;
 }

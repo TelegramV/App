@@ -32,13 +32,14 @@ import VirtualMessages from "../../../Virtual/VirtualMessages"
 import scrollBottom from "../../../../Utils/scrollBottom"
 import API from "../../../../Api/Telegram/API"
 import {MessageFactory} from "../../../../Api/Messages/MessageFactory"
+import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
 
 function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
 }
 
 // there is no possibility nor time to calculate each message size
-class NextBubblesComponent extends VComponent {
+class NextBubblesComponent extends StatelessComponent {
     bubblesInnerRef = VComponent.createRef();
 
     isLoadingRecent = false;

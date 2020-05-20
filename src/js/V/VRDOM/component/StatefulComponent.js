@@ -15,11 +15,16 @@
  *
  */
 
-import AbstractComponent from "./AbstractComponent";
-import __component_update from "./__component_update";
+import {__component_update_wip} from "./__component_update";
+import VComponent from "./VComponent"
 
 // wip
-class StatefulComponent extends AbstractComponent {
+class StatefulComponent extends VComponent {
+    constructor(config) {
+        super(config);
+        this.__.stateful = true;
+    }
+
     state = {};
 
     render(props, state) {
@@ -27,11 +32,11 @@ class StatefulComponent extends AbstractComponent {
 
     setState(nextState) {
         if (typeof nextState === "function") {
-            __component_update(this, {
+            __component_update_wip(this, {
                 nextState: nextState(this.state)
             });
         } else {
-            __component_update(this, {
+            __component_update_wip(this, {
                 nextState
             });
         }

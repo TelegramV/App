@@ -19,9 +19,10 @@ import VComponent from "../component/VComponent"
 import vrdom_append from "../append"
 import vrdom_prepend from "../prepend"
 import vrdom_delete from "../delete"
+import StatelessComponent from "../component/StatelessComponent"
 
 // Чорновий варіат, НЕ ЮЗАТИ
-class HardVirtualList extends VComponent {
+class HardVirtualList extends StatelessComponent {
 
     page = {
         number: 0,

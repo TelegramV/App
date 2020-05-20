@@ -1,10 +1,10 @@
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import AvatarFragment from "../../../Basic/AvatarFragment"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-class ChatInfoAvatarComponent extends VComponent {
+class ChatInfoAvatarComponent extends StatelessComponent {
     appEvents(E) {
         E.bus(AppEvents.Peers)
             .only(event => event.peer === AppSelectedChat.Current)

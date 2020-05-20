@@ -15,12 +15,12 @@
  *
  */
 
-import VComponent from "../../../V/VRDOM/component/VComponent"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
 // я спочатку не зрозумів для чого воно, може краще перейменуй і перемісти кудась інакше, бо цю папку варто би видалити
 
 // юзається як мінімум в відосах-кружочках, перероби на VSpinner і видали
-class ProgressLoaderComponent extends VComponent {
+class ProgressLoaderComponent extends StatelessComponent {
 
     render() {
         let progress = Number.isInteger(this.props.progress) ? this.props.progress : 0;

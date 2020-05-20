@@ -16,12 +16,12 @@
  */
 
 import VButton from "../../Elements/Button/VButton"
-import VComponent from "../../../V/VRDOM/component/VComponent"
 import {DocumentMessagesTool} from "../../Utils/document"
 import VInput from "../../Elements/Input/VInput"
 import VLazyInput from "../../Elements/Input/VLazyInput"
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-class Icon extends VComponent {
+class Icon extends StatelessComponent {
     state = {
         isDownloaded: false
     }

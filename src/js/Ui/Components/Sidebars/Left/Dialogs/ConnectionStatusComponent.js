@@ -1,8 +1,8 @@
 import AppConnectionStatus from "../../../../Reactive/ConnectionStatus"
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-class ConnectionStatusComponent extends VComponent {
+class ConnectionStatusComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(UIEvents.General)

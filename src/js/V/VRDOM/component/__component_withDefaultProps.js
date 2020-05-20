@@ -15,10 +15,7 @@
  *
  */
 
-import VComponent from "./VComponent"
-import AbstractComponent from "./AbstractComponent"
-
-function __component_withDefaultProps_wip(component: AbstractComponent, nextProps) {
+function __component_withDefaultProps(component, nextProps) {
     if (component.constructor.defaultProps) {
         for (const [k, v] of Object.entries(component.constructor.defaultProps)) {
             if (nextProps[k] === undefined) {
@@ -28,18 +25,6 @@ function __component_withDefaultProps_wip(component: AbstractComponent, nextProp
     }
 
     return nextProps;
-}
-
-const __component_withDefaultProps = (context: VComponent, nextProps) => {
-    if (context.constructor.defaultProps) {
-        for (const [k, v] of Object.entries(context.constructor.defaultProps)) {
-            if (nextProps[k] === undefined) {
-                nextProps[k] = v
-            }
-        }
-    }
-
-    return nextProps
 }
 
 export default __component_withDefaultProps

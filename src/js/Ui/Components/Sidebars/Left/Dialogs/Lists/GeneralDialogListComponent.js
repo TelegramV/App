@@ -1,4 +1,3 @@
-import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import {DialogComponent} from "../DialogComponent"
 import {GroupForbiddenPeer} from "../../../../../../Api/Peers/Objects/GroupForbiddenPeer"
@@ -9,13 +8,11 @@ import {BotPeer} from "../../../../../../Api/Peers/Objects/BotPeer";
 import {GroupPeer} from "../../../../../../Api/Peers/Objects/GroupPeer";
 import {SupergroupPeer} from "../../../../../../Api/Peers/Objects/SupergroupPeer";
 import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer";
-import lottie from "../../../../../../../../vendor/lottie-web";
-import MTProto from "../../../../../../MTProto/External";
-import DialogsManager from "../../../../../../Api/Dialogs/DialogsManager";
 import DialogsStore from "../../../../../../Api/Store/DialogsStore";
 import {vrdom_resolveMount} from "../../../../../../V/VRDOM/mount";
+import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
-export default class GeneralDialogListComponent extends VComponent {
+export default class GeneralDialogListComponent extends StatelessComponent {
 
     init() {
         super.init()
@@ -40,7 +37,7 @@ export default class GeneralDialogListComponent extends VComponent {
     applyFilter = (dialog) => {
         const f = this.filter
         const id = this.folderId
-        if(f == null || id == null) {
+        if (f == null || id == null) {
             return !dialog.isPinned && !dialog.folderId && !dialog.isArchived
         }
         const include = f.include_peers
@@ -57,55 +54,55 @@ export default class GeneralDialogListComponent extends VComponent {
 
         const isArchived = dialog.isArchived
 
-        if(include && include.some(l => {
-            if(l._ === "inputPeerUser" && peer instanceof UserPeer && peer.id === l.user_id) return true
-            if(l._ === "inputPeerChannel" && peer instanceof ChannelPeer && peer.id === l.channel_id) return true
-            if(l._ === "inputPeerChat" && peer instanceof GroupPeer && peer.id === l.chat_id) return true
-            if(l._ === "inputPeerSelf" && peer instanceof UserPeer && peer.isSelf) return true
+        if (include && include.some(l => {
+            if (l._ === "inputPeerUser" && peer instanceof UserPeer && peer.id === l.user_id) return true
+            if (l._ === "inputPeerChannel" && peer instanceof ChannelPeer && peer.id === l.channel_id) return true
+            if (l._ === "inputPeerChat" && peer instanceof GroupPeer && peer.id === l.chat_id) return true
+            if (l._ === "inputPeerSelf" && peer instanceof UserPeer && peer.isSelf) return true
             return false
         })) {
             return true
         }
 
-        if(exclude && include.some(l => {
-            if(l._ === "inputPeerUser" && peer instanceof UserPeer && peer.id === l.user_id) return true
-            if(l._ === "inputPeerChannel" && peer instanceof ChannelPeer && peer.id === l.channel_id) return true
-            if(l._ === "inputPeerChat" && peer instanceof GroupPeer && peer.id === l.chat_id) return true
-            if(l._ === "inputPeerSelf" && peer instanceof UserPeer && peer.isSelf) return true
+        if (exclude && include.some(l => {
+            if (l._ === "inputPeerUser" && peer instanceof UserPeer && peer.id === l.user_id) return true
+            if (l._ === "inputPeerChannel" && peer instanceof ChannelPeer && peer.id === l.channel_id) return true
+            if (l._ === "inputPeerChat" && peer instanceof GroupPeer && peer.id === l.chat_id) return true
+            if (l._ === "inputPeerSelf" && peer instanceof UserPeer && peer.isSelf) return true
             return false
         })) {
             return false
         }
 
-        if(!f.contacts && isContact) {
+        if (!f.contacts && isContact) {
             return false
         }
 
-        if(!f.non_contacts && !isContact && isUser) {
+        if (!f.non_contacts && !isContact && isUser) {
             return false
         }
 
-        if(!f.groups && isGroup) {
+        if (!f.groups && isGroup) {
             return false
         }
 
-        if(!f.broadcasts && isChannel) {
+        if (!f.broadcasts && isChannel) {
             return false
         }
 
-        if(!f.bots && isBot) {
+        if (!f.bots && isBot) {
             return false
         }
 
-        if(f.exclude_muted && isMuted) {
+        if (f.exclude_muted && isMuted) {
             return false
         }
 
-        if(f.exclude_read && isRead) {
+        if (f.exclude_read && isRead) {
             return false
         }
 
-        if(f.exclude_archived && isArchived) {
+        if (f.exclude_archived && isArchived) {
             return false
         }
 
@@ -169,7 +166,7 @@ export default class GeneralDialogListComponent extends VComponent {
 
     onDialogsGotOne = event => {
         const dialog = event.dialog
-        if(!this.applyFilter(dialog)) return
+        if (!this.applyFilter(dialog)) return
         this.addNewDialog(dialog)
 
     }
