@@ -19,7 +19,7 @@ import VApp from "../../vapp"
 import __component_clearAppEvents from "./__component_clearAppEvents"
 import __component_clearReactiveObjects from "./__component_clearReactiveObjects"
 
-export function __component_unmount_wip(component) {
+export function __component_unmount(component) {
     component.componentWillUnmount();
 
     component.clearIntervals();
@@ -27,6 +27,10 @@ export function __component_unmount_wip(component) {
 
     __component_clearAppEvents(component);
     __component_clearReactiveObjects(component);
+
+    component.props = null;
+    component.slot = null;
+    component.state = null;
 
     component.$el.__v.component = null;
     component.$el = null;
@@ -36,4 +40,4 @@ export function __component_unmount_wip(component) {
     VApp.mountedComponents.delete(component.identifier);
 }
 
-export default __component_unmount_wip
+export default __component_unmount

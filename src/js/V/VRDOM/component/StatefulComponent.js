@@ -15,7 +15,7 @@
  *
  */
 
-import {__component_update_wip} from "./__component_update";
+import {__component_update_state} from "./__component_update";
 import VComponent from "./VComponent"
 
 // wip
@@ -32,13 +32,9 @@ class StatefulComponent extends VComponent {
 
     setState(nextState) {
         if (typeof nextState === "function") {
-            __component_update_wip(this, {
-                nextState: nextState(this.state)
-            });
+            __component_update_state(this, nextState(this.state));
         } else {
-            __component_update_wip(this, {
-                nextState
-            });
+            __component_update_state(this, nextState);
         }
     }
 }

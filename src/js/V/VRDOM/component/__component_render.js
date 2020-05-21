@@ -15,10 +15,10 @@
  *
  */
 
-function __component_render_wip(component) {
+function __component_render(component) {
     const renderedVRNode = component.__.stateful ? component.render(component.props, component.state) : component.render(component.props);
     renderedVRNode.component = component;
     return renderedVRNode;
 }
 
-export default __component_render_wip;
+export default __component_render;

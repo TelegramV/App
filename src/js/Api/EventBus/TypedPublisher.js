@@ -51,12 +51,16 @@ class TypedPublisher<T: TypedSubscription | Function> {
      * @param {BusEvent} event
      */
     fire(type: any, event: BusEvent = {}) {
-
         Object.assign(event, {
             type
         })
 
-        this._subscriptions.get("*").forEach(subscription => subscription(event))
+        // why commits? try to remove them, and you'll realize
+        const commits = []
+
+        this._subscriptions.get("*").forEach(s => commits.push(s))
+
+        commits.forEach(subscription => subscription(event))
 
         if (this._subscriptions.has(type)) {
             this._subscriptions.get(type).forEach(subscription => subscription(event))

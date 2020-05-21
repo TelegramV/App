@@ -18,7 +18,7 @@
 import {initElement} from "../render/renderElement"
 import VApp from "../../vapp"
 
-export function __component_mount_wip(component, $el: HTMLElement) {
+function __component_mount(component, $el: HTMLElement) {
     initElement($el);
 
     if (component.__.mounted) {
@@ -50,4 +50,4 @@ export function __component_mount_wip(component, $el: HTMLElement) {
     }
 }
 
-export default __component_mount_wip
+export default __component_mount

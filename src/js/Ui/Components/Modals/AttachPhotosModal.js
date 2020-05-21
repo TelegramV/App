@@ -35,13 +35,13 @@ class GalleryFragment extends StatelessComponent {
         </div>
     }
 
-    addPhoto(blob) {
+    addPhoto = (blob) => {
         if (this.props.blobs.length >= 10) return
         this.props.blobs.push(blob)
         this.forceUpdate()
     }
 
-    getMedia() {
+    getMedia = () => {
         return Promise.all(this.props.blobs.map(async l => {
             return await FileAPI.uploadPhoto(await fetch(l).then(r => r.arrayBuffer()), "lol.jpg")
         }))
@@ -52,11 +52,11 @@ export class AttachPhotosModal extends StatelessComponent {
     captionRef = VComponent.createComponentRef()
     galleryRef = VComponent.createComponentRef()
 
-    render() {
+    render(props) {
         return <div>
             <ModalHeaderFragment title="Send Photos" close actionText="Send" action={this.send.bind(this)}/>
             <div className="padded">
-                <GalleryFragment ref={this.galleryRef} blobs={this.props.media}/>
+                <GalleryFragment ref={this.galleryRef} blobs={props.media}/>
                 <InputComponent ref={this.captionRef} label="Caption"/>
             </div>
         </div>
@@ -69,7 +69,7 @@ export class AttachPhotosModal extends StatelessComponent {
     async send() {
         VUI.Modal.close()
         const media = await this.galleryRef.component.getMedia()
-        AppSelectedChat.Current.api.sendMessage({
+        AppSelectedChat.current.api.sendMessage({
             text: this.captionRef.component.getValue(),
             media: media
         })

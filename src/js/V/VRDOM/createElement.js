@@ -19,7 +19,7 @@ import type {VRNodeProps, VRTagName} from "./types/types"
 import VRNode from "./VRNode"
 import VListVRNode from "./list/VListVRNode"
 import vrdom_isTagNameList from "./is/isTagNameList"
-import AbstractComponentVRNode from "./component/AbstractComponentVRNode"
+import ComponentVRNode from "./component/ComponentVRNode"
 import VComponent from "./component/VComponent"
 
 /**
@@ -36,7 +36,7 @@ function vrdom_createElement(tagName: VRTagName, props: VRNodeProps): VRNode {
 
             // console.debug("[createElement] creating acomp node")
 
-            return new AbstractComponentVRNode(tagName, {
+            return new ComponentVRNode(tagName, {
                 attrs: props.attrs,
                 ref: props.ref
             }, props.children)

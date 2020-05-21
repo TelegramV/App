@@ -17,19 +17,19 @@
 
 import patch_Text_VRNode from "./patch_Text_VRNode"
 import {initElement} from "../render/renderElement"
-import AbstractComponentVRNode from "../component/AbstractComponentVRNode"
-import {__component_update_wip} from "../component/__component_update"
-import {__component_unmount_wip} from "../component/__component_unmount"
-import {__component_mount_wip} from "../component/__component_mount"
+import ComponentVRNode from "../component/ComponentVRNode"
+import {__component_update_props} from "../component/__component_update"
+import __component_unmount from "../component/__component_unmount"
+import __component_mount from "../component/__component_mount"
 import vrdom_renderAbstractComponentVNode from "../render/renderAbstractComponent"
 
-function patchAbstractComponentVRNode($node: Element, vRNode: AbstractComponentVRNode) {
+function patchAbstractComponentVRNode($node: Element, vRNode: ComponentVRNode) {
 
     if ($node instanceof Text) {
         return patch_Text_VRNode($node, vRNode)
     }
 
-    if (!(vRNode instanceof AbstractComponentVRNode)) {
+    if (!(vRNode instanceof ComponentVRNode)) {
         console.error("BUG: BUG")
     }
 
@@ -38,18 +38,16 @@ function patchAbstractComponentVRNode($node: Element, vRNode: AbstractComponentV
     if ($node.__v && $node.__v.component) {
         if ($node.__v.component.constructor === vRNode.componentClass) {
             // console.warn("updating", $node.__v.component)
-            __component_update_wip($node.__v.component, {
-                nextProps: vRNode.attrs,
-            })
+            __component_update_props($node.__v.component, vRNode.attrs)
         } else {
-            __component_unmount_wip($node.__v.component)
+            __component_unmount($node.__v.component)
             $node = vrdom_renderAbstractComponentVNode(vRNode, $node)
-            __component_mount_wip($node.__v.component, $node)
+            __component_mount($node.__v.component, $node)
             $node.__v.component.forceUpdate.call($node.__v.component)
         }
     } else {
         $node = vrdom_renderAbstractComponentVNode(vRNode, $node)
-        __component_mount_wip($node.__v.component, $node)
+        __component_mount($node.__v.component, $node)
         $node.__v.component.forceUpdate.call($node.__v.component)
     }
 

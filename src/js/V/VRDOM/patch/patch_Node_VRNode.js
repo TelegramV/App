@@ -19,7 +19,7 @@ import VRNode from "../VRNode"
 import patchElement from "./patchElement"
 import patch_Text_VRNode from "./patch_Text_VRNode"
 import {initElement} from "../render/renderElement"
-import {__component_unmount_wip} from "../component/__component_unmount"
+import {__component_unmount} from "../component/__component_unmount"
 
 const patch_Node_VRNode = ($node: HTMLElement, vRNode: VRNode): HTMLElement => {
     if ($node instanceof Text) {
@@ -30,7 +30,7 @@ const patch_Node_VRNode = ($node: HTMLElement, vRNode: VRNode): HTMLElement => {
 
     if ($node.__v.component) {
         if ($node.__v.component !== vRNode.component) {
-            __component_unmount_wip($node.__v.component)
+            __component_unmount($node.__v.component)
         }
     } else if (vRNode.component) {
         console.error("BUG: unimplemented thing [vRNode.component]", $node, vRNode)

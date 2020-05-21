@@ -22,6 +22,7 @@ import {ReactiveObject} from "../../Reactive/ReactiveObject"
 
 export type ROSubscribe = {
     on(type: string, resolve: any): ROSubscribe,
+    updateOn(type: string): ROSubscribe,
 }
 
 export type RORC = {
@@ -31,20 +32,14 @@ export type RORC = {
 
 // functions
 
-export function __component_reactiveObjectEventsBuilder(component) {
-    return {
-        object: (object: ReactiveObject) => __object(component, object),
-    }
-}
-
 function __object(component, object: ReactiveObject) {
     return {
-        on: (type: string, resolve: any) => __object_subscribe(component, object, type, resolve)
+        on: (type: string, resolve: any) => __object_subscribe(component, object, type, resolve),
+        updateOn: (type: string) => __object_subscribe(component, object, type, component.forceUpdate)
     }
 }
 
 function __object_subscribe(component, object: ReactiveObject, type: string, resolve: any) {
-
     let reactiveObjectContext = component.__.reactiveObjectContexts.get(object)
 
     if (!reactiveObjectContext) {
@@ -57,6 +52,13 @@ function __object_subscribe(component, object: ReactiveObject, type: string, res
     object.subscribe(type, resolve)
 
     return {
-        on: (type: string, resolve: any) => __object_subscribe(component, object, type, resolve)
+        on: (type: string, resolve: any) => __object_subscribe(component, object, type, resolve),
+        updateOn: (type: string) => __object_subscribe(component, object, type, component.forceUpdate)
+    }
+}
+
+export function __component_reactiveObjectEventsBuilder(component) {
+    return {
+        object: (object: ReactiveObject) => __object(component, object),
     }
 }

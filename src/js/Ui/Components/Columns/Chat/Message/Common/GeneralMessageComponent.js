@@ -4,33 +4,22 @@ import type {Message} from "../../../../../../Api/Messages/Message"
 import {ReplyFragment} from "./ReplyFragment"
 import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
-import UIEvents from "../../../../../EventBus/UIEvents";
-import {MessageParser} from "../../../../../../Api/Messages/MessageParser";
 import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
+import __component_destroy from "../../../../../../V/VRDOM/component/__component_destroy"
 
 class GeneralMessageComponent extends StatelessComponent {
-
-    useProxyState = false
-
     message: Message
-    prevReadStatus: boolean = false
-    // intersectionObserver: IntersectionObserver
 
     avatarRef = VComponent.createComponentRef()
     bubbleRef = VComponent.createRef()
 
     init() {
-        // this.intersectionObserver = this.props.intersectionObserver
         this.message = this.props.message
     }
 
     componentDidMount() {
         this.$el.__message = this.message
         this.message.show()
-
-        // if (this.intersectionObserver) {
-        //     this.intersectionObserver.observe(this.$el)
-        // }
     }
 
     appEvents(E) {
@@ -63,18 +52,19 @@ class GeneralMessageComponent extends StatelessComponent {
     }
 
     messageOnReplyFound = () => {
-        if (this.__.mounted) {
-            VRDOM.patch(
-                this.$el.querySelector(`#message-${this.message.id}-rpl`),
-                <ReplyFragment
-                    id={`message-${this.message.id}-rpl`}
-                    messageId={this.message.id}
-                    show={true}
-                    name={this.message.replyToMessage.from.name}
-                    text={MessageParser.getPrefixNoSender(this.message.replyToMessage)}
-                    onClick={l => UIEvents.General.fire("chat.showMessage", {message: this.message.replyToMessage})}/>
-            )
-        }
+        this.forceUpdate()
+        // if (this.__.mounted) {
+        //     VRDOM.patch(
+        //         this.$el.querySelector(`#message-${this.message.id}-rpl`),
+        //         <ReplyFragment
+        //             id={`message-${this.message.id}-rpl`}
+        //             messageId={this.message.id}
+        //             show={true}
+        //             name={this.message.replyToMessage.from.name}
+        //             text={MessageParser.getPrefixNoSender(this.message.replyToMessage)}
+        //             onClick={l => UIEvents.General.fire("chat.showMessage", {message: this.message.replyToMessage})}/>
+        //     )
+        // }
     }
 
     messageOnReplyNotFound = () => {
@@ -107,7 +97,7 @@ class GeneralMessageComponent extends StatelessComponent {
     }
 
     messageOnDelete = () => {
-        this.__destroy()
+        __component_destroy(this)
     }
 
     messageOnRead = () => {
@@ -120,9 +110,7 @@ class GeneralMessageComponent extends StatelessComponent {
     }
 
     componentWillUnmount() {
-        // if (this.intersectionObserver) {
-        //     this.intersectionObserver.unobserve(this.$el)
-        // }
+
     }
 }
 

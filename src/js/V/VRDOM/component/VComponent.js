@@ -20,8 +20,10 @@ import ComponentRef from "../ref/ComponentRef"
 import ElementRef from "../ref/ElementRef"
 import VApp from "../../vapp"
 import __component_withDefaultProps from "./__component_withDefaultProps"
-import {__component_update_wip} from "./__component_update"
+import {__component_update_force} from "./__component_update"
 
+
+// abstract stateless component
 class VComponent {
     __ = {
         stateful: false,
@@ -126,14 +128,11 @@ class VComponent {
     }
 
     forceUpdate() {
-        __component_update_wip(this, {
-            isForce: true,
-        });
+        __component_update_force(this);
     }
 
-    updateProps(nextProps = {}) {
-        Object.assign(this.props, nextProps);
-        this.forceUpdate();
+    updateProps(nextProps) {
+        __component_update_force(this, nextProps);
     }
 
     // Intervals and Timeouts

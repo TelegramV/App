@@ -19,6 +19,16 @@
 
 import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import {ReactiveObject} from "../../../V/Reactive/ReactiveObject"
+
+class ReactiveCounter extends ReactiveObject {
+    count = 0;
+
+    increment() {
+        this.count++;
+        this.fire("increment");
+    }
+}
 
 const Button = ({onClick}, slot) => {
     return <button onClick={onClick}>{slot}</button>;
@@ -35,19 +45,20 @@ Title.defaultProps = {
 };
 
 class Counter extends StatefulComponent {
-    state = {
-        count: 0,
-    };
+    counter = new ReactiveCounter()
+
+    reactive(R) {
+        R.object(this.counter)
+            .on("increment", this.forceUpdate)
+    }
 
     render(props, state) {
         return (
             <div>
-                <Title title={state.count}/>
-                {state.count}
+                <Title title={this.counter.count}/>
+                {this.counter.count}
 
-                <Button onClick={() => this.setState({
-                    count: this.state.count + 1
-                })}>Increment</Button>
+                <Button onClick={() => this.counter.increment()}>Increment</Button>
             </div>
         );
     }

@@ -43,6 +43,7 @@ export class DialogComponent extends StatelessComponent {
     }
 
     reactive(R) {
+        // why so many listeners you might ask, idk i'll answer
         R.object(this.dialog)
             .on("updateDraftMessage", this.onDialogUpdateDraftMessage)
             .on("readHistory", this.onDialogReadHistory)
@@ -298,35 +299,6 @@ export class DialogComponent extends StatelessComponent {
         }
 
         this._patchMessage()
-    }
-
-    /**
-     * @return {ChildNode|Element|Node|undefined}
-     * @private
-     */
-    _findRenderedDialogToInsertBefore = $dialogs => {
-        if (!this.dialog.messages.last) {
-            return undefined
-        }
-
-        const dialog = this.dialog
-        const renderedDialogs = $dialogs.childNodes
-
-        if (renderedDialogs.size === 0) {
-            return undefined
-        }
-
-        const lastMessageDate = dialog.peer.messages.last.date
-
-        for (const $rendered of renderedDialogs) {
-            if ($rendered !== this.$el) {
-                if (lastMessageDate >= $rendered.__message.date) {
-                    return $rendered // todo: fix if dialog is last in the list
-                }
-            }
-        }
-
-        return undefined
     }
 
     _handleClick = () => {

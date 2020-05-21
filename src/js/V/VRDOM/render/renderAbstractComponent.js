@@ -18,9 +18,9 @@
 import vrdom_render from "./render"
 import {initElement} from "./renderElement"
 import VApp from "../../vapp"
-import AbstractComponentVRNode from "../component/AbstractComponentVRNode"
+import ComponentVRNode from "../component/ComponentVRNode"
 import {__component_init_wip} from "../component/__component_init"
-import __component_render_wip from "../component/__component_render"
+import __component_render from "../component/__component_render"
 
 export function vrdom_instantiateAbstractComponentVNode(componentNode) {
     const componentInstance = new (componentNode.componentClass)({
@@ -53,9 +53,9 @@ function vrdom_renderAbstractComponentVNode(componentNode, $node: HTMLElement = 
     const componentInstance = vrdom_instantiateAbstractComponentVNode(componentNode)
 
     if (!$node) {
-        const renderedVRNode = __component_render_wip(componentInstance)
+        const renderedVRNode = __component_render(componentInstance)
 
-        if (renderedVRNode instanceof AbstractComponentVRNode) {
+        if (renderedVRNode instanceof ComponentVRNode) {
             throw new Error("Components on top level are forbidden.")
         }
 

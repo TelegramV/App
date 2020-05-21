@@ -19,6 +19,7 @@ function __component_clearAppEvents(component) {
     component.__.appEventContexts.forEach((busContext, bus) => {
         busContext.forEach((resolve, type) => bus.unsubscribe(type, resolve));
     });
+    component.__.appEventContexts.clear();
 }
 
 export default __component_clearAppEvents;

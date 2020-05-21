@@ -17,8 +17,11 @@
 
 function __component_clearReactiveObjects(component) {
     component.__.reactiveObjectContexts.forEach((reactiveObjectContext, object) => {
-        reactiveObjectContext.forEach((resolve, type) => object.unsubscribe(type, resolve));
+        reactiveObjectContext.forEach((resolve, type) => {
+            object.unsubscribe(type, resolve)
+        });
     });
+    component.__.reactiveObjectContexts.clear();
 }
 
 export default __component_clearReactiveObjects;

@@ -27,7 +27,7 @@ function AppRoutes(router) {
         }
     })
 
-    if(!__IS_PRODUCTION__) {
+    if (!__IS_PRODUCTION__) {
         router.route("/test", "test", {
             h() {
                 return NewComponentPage()
@@ -75,6 +75,12 @@ function AppRoutes(router) {
                 return NextGenPage()
             }
         })
+
+        // router.route("/reactcalc", "crypto", {
+        //     h() {
+        //         return calculatorpage()
+        //     }
+        // })
     }
 
     router.middleware(toRoute => {

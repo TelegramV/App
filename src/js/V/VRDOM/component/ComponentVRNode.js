@@ -18,8 +18,7 @@
 import type {VComponentVRNodeProps, VRAttrs, VRSlot} from "../types/types"
 import VComponent from "./VComponent"
 
-class AbstractComponentVRNode {
-
+class ComponentVRNode {
     componentClass: Class<VComponent>
 
     attrs: VRAttrs = {}
@@ -37,4 +36,4 @@ class AbstractComponentVRNode {
     }
 }
 
-export default AbstractComponentVRNode
+export default ComponentVRNode

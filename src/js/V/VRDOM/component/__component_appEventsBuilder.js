@@ -77,7 +77,7 @@ function __bus_filter_subscribe(component, bus: EventBus, filter: any, type: str
         busContext.set(type, resolve)
     }
 
-    if (filter === null) {
+    if (filter == null) {
         bus.subscribe(type, resolve)
     } else {
         bus.withFilter(filter, type, resolve)

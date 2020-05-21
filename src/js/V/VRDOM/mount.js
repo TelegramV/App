@@ -19,7 +19,7 @@ import vrdom_render from "./render/render"
 import type VRNode from "./VRNode"
 import type {VRenderProps} from "./types/types"
 import VApp from "../vapp"
-import {__component_mount_wip} from "./component/__component_mount"
+import __component_mount from "./component/__component_mount"
 import VComponent from "./component/VComponent"
 
 export function vrdom_resolveMount($mounted: Element) {
@@ -33,7 +33,7 @@ export function vrdom_resolveMount($mounted: Element) {
 
             if (component instanceof VComponent) {
                 // console.log("mount", component)
-                __component_mount_wip(component, $mounted)
+                __component_mount(component, $mounted)
             } else {
                 console.error("component was not found. it means that there is a potential bug in the vrdom")
             }

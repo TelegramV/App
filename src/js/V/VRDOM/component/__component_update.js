@@ -17,74 +17,81 @@
 
 import __component_diffProps from "./__component_diffProps"
 import __diffObjects from "./__diffObjects"
-import __component_render_wip from "./__component_render"
+import __component_render from "./__component_render"
 import vrdom_patch from "../patch/patch"
+import __component_withDefaultProps from "./__component_withDefaultProps"
+import __component_recreateReactiveObjects from "./__component_recreateReactiveObjects"
 
-export function __component_update_wip(component, {isForce, nextState, nextProps}) {
-    const isStateful = component.__.stateful;
+export function __component_update_props(component, nextProps) {
+    if (nextProps) {
+        nextProps = __component_withDefaultProps(component, {
+            ...component.props,
+            ...nextProps
+        });
 
-    let shouldUpdate = isForce;
-
-    if (!isForce) {
-        let hasNextState = false
-        let hasNextProps = false
-
-        if (isStateful) {
-            if (nextState) {
-                hasNextState = true;
-                nextState = {
-                    ...component.state,
-                    ...nextState
-                };
-            } else {
-                nextState = component.state;
-            }
-        }
-
-        if (nextProps) {
-            hasNextProps = true;
-            nextProps = {
-                ...component.props,
-                ...nextProps
-            };
-        } else {
-            nextProps = component.props;
-        }
-
-        shouldUpdate = component.shouldComponentUpdate(nextProps, nextState);
+        let shouldUpdate = component.shouldComponentUpdate(nextProps, component.state);
 
         if (shouldUpdate === undefined) {
-            if (hasNextProps) {
-                const diffProps = __component_diffProps(component, nextProps);
-                shouldUpdate = diffProps !== false;
-            }
-
-            if (isStateful) {
-                if (hasNextState && !shouldUpdate) {
-                    const diffState = __diffObjects(component.state, nextState);
-                    shouldUpdate = diffState !== false;
-                }
-            }
+            const diffProps = __component_diffProps(component, nextProps);
+            shouldUpdate = diffProps !== false;
         }
 
-        shouldUpdate = shouldUpdate !== false;
-    }
-
-    if (shouldUpdate) {
-        if (nextProps) {
+        if (shouldUpdate) {
             Object.assign(component.props, nextProps);
+
+            __component_recreateReactiveObjects(component);
+
+            component.__.isUpdatingItSelf = true;
+            component.$el = vrdom_patch(component.$el, __component_render(component))
+            component.__.isUpdatingItSelf = false;
+
+            component.componentDidUpdate();
         }
-
-        if (isStateful && nextState) {
-            Object.assign(component.state, nextState);
-        }
-
-        component.__.isUpdatingItSelf = true;
-        component.$el = vrdom_patch(component.$el, __component_render_wip(component))
-        component.__.isUpdatingItSelf = false;
-
-        component.componentDidUpdate(null, null, null); // todo: pass previous data
     }
 }
 
-export default __component_update_wip
+export function __component_update_state(component, nextState) {
+    if (nextState) {
+        nextState = {
+            ...component.state,
+            ...nextState
+        };
+
+        let shouldUpdate = component.shouldComponentUpdate(component.props, nextState);
+
+        if (shouldUpdate === undefined) {
+            const diffState = __diffObjects(component.state, nextState);
+            shouldUpdate = diffState !== false;
+        }
+
+        if (shouldUpdate) {
+            Object.assign(component.state, nextState);
+
+            __component_recreateReactiveObjects(component);
+
+            component.__.isUpdatingItSelf = true;
+            component.$el = vrdom_patch(component.$el, __component_render(component))
+            component.__.isUpdatingItSelf = false;
+
+            component.componentDidUpdate();
+        }
+    }
+}
+
+export function __component_update_force(component, nextProps, nextState) {
+    if (nextProps) {
+        Object.assign(component.props, nextProps);
+    }
+
+    if (nextState) {
+        Object.assign(component.state, nextState);
+    }
+
+    __component_recreateReactiveObjects(component);
+
+    component.__.isUpdatingItSelf = true;
+    component.$el = vrdom_patch(component.$el, __component_render(component))
+    component.__.isUpdatingItSelf = false;
+
+    component.componentDidUpdate();
+}

@@ -15,7 +15,7 @@
  *
  */
 
-import {__component_unmount_wip} from "./component/__component_unmount"
+import {__component_unmount} from "./component/__component_unmount"
 
 /**
  * @param {HTMLElement|Text} $node
@@ -26,7 +26,7 @@ const cleanElement = ($node: HTMLElement, unmount: boolean = false) => {
     if ($node.__v) {
         if (unmount) {
             if ($node.__v.component) {
-                __component_unmount_wip($node.__v.component)
+                __component_unmount($node.__v.component)
             }
 
             if ($node.__v.list) {

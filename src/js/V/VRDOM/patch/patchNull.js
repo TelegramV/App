@@ -16,12 +16,13 @@
  */
 import vrdom_deleteInner from "../deleteInner"
 import {initElement} from "../render/renderElement"
+import __component_unmount from "../component/__component_unmount"
 
-const patchVRNodeUndefined = ($node: Element) => {
+const patchVRNodeNull = ($node: Element) => {
     initElement($node)
 
     if ($node.__v && $node.__v.component) {
-        $node.__v.component.__unmount()
+        __component_unmount($node.__v.component)
     }
 
     vrdom_deleteInner($node)
@@ -32,4 +33,4 @@ const patchVRNodeUndefined = ($node: Element) => {
     return $newNode
 }
 
-export default patchVRNodeUndefined
+export default patchVRNodeNull
