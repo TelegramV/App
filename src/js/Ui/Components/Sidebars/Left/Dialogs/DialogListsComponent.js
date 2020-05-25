@@ -6,6 +6,7 @@ import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBui
 import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy";
 
 class DialogFolderFragment extends StatelessComponent {
 
@@ -115,7 +116,8 @@ export class DialogListsComponent extends StatelessComponent {
                 if (this.selectedFolder === component.folderId) {
                     FoldersManager.selectFolder(null)
                 }
-                component.__destroy()
+
+                __component_destroy(component)
                 destroyed.push(l)
             }
         })

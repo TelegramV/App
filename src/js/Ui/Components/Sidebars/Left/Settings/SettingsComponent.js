@@ -12,11 +12,14 @@ import {SectionFragment} from "../../Fragments/SectionFragment";
 import AvatarComponent from "../../../Basic/AvatarComponent"
 import EditProfilePane from "./EditProfilePane"
 import PrivacyAndSecurityPane from "./Privacy/PrivacyAndSecurityPane"
+import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
+import FoldersPane from "./Folders/FoldersPane";
 
 const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
     return (
         <div className="settings-main">
             <div className="sidebar-header no-borders">
+                <BurgerAndBackComponent/>
                 {/*<i className="btn-icon tgico tgico-back rp rps" onClick={_ => openPane("dialogs")}/>*/}
                 <div className="sidebar-title">Settings</div>
                 <span className="btn-icon tgico tgico-more rp rps" onClick={ev => {
@@ -48,6 +51,10 @@ const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
                 <ButtonWithIconFragment icon="lock"
                                         name="Privacy and Security"
                                         onClick={_ => openPane("privacy-security")}/>
+
+                <ButtonWithIconFragment icon="smile"
+                                        name="Folders"
+                                        onClick={_ => openPane("folder-settings")}/>
                 <ButtonWithIconFragment icon="language" name="Language"/>
             </SectionFragment>
         </div>
@@ -92,6 +99,7 @@ export class SettingsComponent extends LeftBarComponent {
                                       openPane={this.openPane}/>
 
                 <EditProfilePane previous="settings"/>
+                <FoldersPane previous="settings"/>
                 <PrivacyAndSecurityPane previous="settings"/>
                 <GeneralSettingsComponent previous="settings"/>
                 <BackgroundImageComponent previous="general-settings"/>
@@ -157,6 +165,7 @@ export class SettingsComponent extends LeftBarComponent {
         switch (name) {
             case "background-color":
             case "general-settings":
+            case "folder-settings":
             case "privacy-security":
             case "edit-profile":
                 return true;

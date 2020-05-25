@@ -25,6 +25,7 @@ import InputHint from "../../Fragments/InputHint"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import MTProto from "../../../../../MTProto/External"
+import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
 
 class CreateChannelBar extends LeftBarComponent {
     barName = "create-channel";
@@ -50,6 +51,7 @@ class CreateChannelBar extends LeftBarComponent {
         return (
             <div className="settings sidebar scrollable hidden">
                 <div className="sidebar-header no-borders">
+                    <BurgerAndBackComponent/>
                     {/*<i className="btn-icon tgico tgico-back rp rps" onClick={() => this.openBar("dialogs")}/>*/}
                     <div className="sidebar-title">Create Channel</div>
                 </div>

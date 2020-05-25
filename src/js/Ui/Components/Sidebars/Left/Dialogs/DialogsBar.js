@@ -14,6 +14,7 @@ import VApp from "../../../../../V/vapp"
 import PeersStore from "../../../../../Api/Store/PeersStore"
 import {DialogListsComponent} from "./DialogListsComponent";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
+import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -85,6 +86,8 @@ export class DialogsBar extends LeftBarComponent {
             <div className="chatlist sidebar">
                 <div className="toolbar">
                     {/* TODO Must be shown if back button exists!*/}
+                    <BurgerAndBackComponent isMain isNoFolders/>
+
                     {/*<i className={{"btn-icon rp rps tgico-menu": true, "hidden": FoldersManager.hasFolders()}} onClick={ev => {*/}
                     {/*    if (ev.currentTarget.classList.contains("back")) return true; //Button currently in back state*/}
                     {/*    DialogsBarContextMenu(ev, this.Archived && this.Archived.$el.childElementCount)*/}

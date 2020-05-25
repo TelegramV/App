@@ -10,6 +10,7 @@ class FolderManager {
     folders = []
     selectedFolder = null
     MAX_FOLDERS = 10
+    suggestedFolders = null
 
     constructor() {
         keval.getItem("foldersData").then(foldersData => {
@@ -41,6 +42,7 @@ class FolderManager {
         } else {
             this.folders[index] = filter
         }
+        this.updateCache()
         this.fireUpdate()
     }
 
@@ -51,6 +53,7 @@ class FolderManager {
             newFolders[i] = this.folders.find(l => l.id === order[i])
         }
         this.folders = newFolders
+        this.updateCache()
         this.fireUpdate()
     }
 
@@ -63,6 +66,13 @@ class FolderManager {
         this.folders = await MTProto.invokeMethod("messages.getDialogFilters")
         this.updateCache()
         this.fireUpdate()
+    }
+
+    async fetchSuggestedFolders() {
+        this.suggestedFolders = await MTProto.invokeMethod("messages.getSuggestedDialogFilters")
+        AppEvents.General.fire("suggestedFoldersUpdate", {
+            suggestedFolders: this.suggestedFolders
+        })
     }
 
     updateCache() {
@@ -117,12 +127,20 @@ class FolderManager {
     }
 
     async deleteFolder(folderId) {
-
+        this.folders = this.folders.filter(l => l.id !== folderId)
+        const response = await MTProto.invokeMethod("messages.updateDialogFilter", {
+            id: folderId
+        })
+        this.updateCache()
+        this.fireUpdate()
     }
 
-    async getSuggestedFolders() {
-        const suggested = await MTProto.invokeMethod("messages.getSuggestedDialogFilters")
-        console.log(suggested)
+    getSuggestedFolders() {
+        if(this.suggestedFolders == null) {
+            this.fetchSuggestedFolders()
+            return []
+        }
+        return this.suggestedFolders
     }
 
     getBadgeCount(folderId) {

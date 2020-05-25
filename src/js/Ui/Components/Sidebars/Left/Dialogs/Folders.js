@@ -5,6 +5,7 @@ import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VUI from "../../../../VUI";
 import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
+import UIEvents from "../../../../EventBus/UIEvents";
 
 const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0}, selected = false, onClick}) => {
     return <div className={{
@@ -77,7 +78,14 @@ export class Folders extends StatefulComponent {
 
     editFolders = () => {
         console.log("edit folders")
-        FoldersManager.getSuggestedFolders()
+
+        // UIEvents.LeftSidebar.fire("show", {
+        //     barName: "settings"
+        // })
+        // UIEvents.LeftSidebar.fire("show", {
+        //     barName: "folder-settings"
+        // })
+        // FoldersManager.getSuggestedFolders()
     }
 
     onFoldersUpdate = (event) => {

@@ -22,6 +22,11 @@
 	transition: anim(background-color);
 	color: $darkgrey;
 	cursor: pointer;
+	flex-shrink: 0;
+
+	&.hidden {
+		display: none;
+	}
 
 	&:hover {
 		background-color: $light;

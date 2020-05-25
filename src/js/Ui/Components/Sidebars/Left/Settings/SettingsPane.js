@@ -1,6 +1,7 @@
 import LeftBarComponent from "../LeftBarComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import WallpaperManager from "../../../../Managers/WallpaperManager"
+import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
 
 export default class SettingsPane extends LeftBarComponent {
     constructor(props) {
@@ -118,6 +119,7 @@ export default class SettingsPane extends LeftBarComponent {
     makeHeader = (noBorders = false) => {
         return (
             <div class={{"sidebar-header": true, "no-borders": noBorders}}>
+                <BurgerAndBackComponent/>
                 {/*<i class="btn-icon tgico tgico-back rp rps hidden" onClick={this.onBack}/>*/}
                 <div class="sidebar-title">{this.name}</div>
             </div>
