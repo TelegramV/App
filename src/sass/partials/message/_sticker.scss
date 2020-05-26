@@ -1,6 +1,6 @@
 @mixin sticker($in: false, $transparent: false) {
     .sticker {
-                width: 250px;
+                min-width: 200px;
                 max-width: 512px;
                 height: auto;
                 max-height: 512px;

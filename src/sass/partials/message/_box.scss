@@ -11,9 +11,9 @@
         &:hover {
             cursor: pointer;
             @if $in {
-                background-color: $light;
+                background-color: $lightgrey;
             } @else {
-                background-color: rgba($green, 0.12);
+                background-color: mix($lightgreen, $lightgrey, 40%);
             }
         }
 

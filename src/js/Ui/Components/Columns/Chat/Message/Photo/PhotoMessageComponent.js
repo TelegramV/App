@@ -44,7 +44,7 @@ class PhotoMessageComponent extends GeneralMessageComponent {
         const progress = FileManager.getProgress(this.message.raw.media.photo.id)
         const text = (this.message.text.length > 0) ? <TextWrapperComponent message={this.message}/> : ""
         return (
-            <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""}
+            <MessageWrapperFragment message={this.message} showUsername={false} outerPad={text !== ""}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
                 <MessagePhotoFigureFragment ref={this.photoFigureRef}
                                             message={this.message} progress={progress} pending={isPending}
