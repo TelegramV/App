@@ -318,24 +318,24 @@ export class FileAPI {
         return file.attributes && file.attributes.find(l => l._ === attribute)
     }
 
-    static photoThumbnail(file, resolve) {
-        const max = FileAPI.getMinSize(file)
+    static async photoThumbnail(file) {
+        const max = FileAPI.getMaxSize(file)
 
         try {
-            resolve({
+            return {
                 src: FileAPI.getThumbnail(file),
                 size: [max.w, max.h],
                 thumbnail: true
-            })
+            };
         } catch {
 
         } finally {
-            FileAPI.getFile(file, max.type).then(file => {
-                resolve({
+            return FileAPI.getFile(file, max.type).then(file => {
+                return {
                     src: file,
                     size: [max.w, max.h],
                     thumbnail: false
-                })
+                };
             })
         }
     }

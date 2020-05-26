@@ -17,12 +17,12 @@
         @if $transparent {
             position: absolute;
             @if $in {
-                //right: 0;
-                transform: translateX(125%);
+                right: 0;
+                transform: translateX(calc(100% + 10px));
             }
             @if $in == false {
-                //left: 0;
-                transform: translateX(-125%);
+                left: 0;
+                transform: translateX(calc(-100% - 10px));
             }
             background-color: white;
             border-radius: 10px;

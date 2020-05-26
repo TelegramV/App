@@ -1,13 +1,17 @@
 #bubbles {
     height: 100%;
+    padding-bottom: 5px;
     -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) calc(100% - 16px), rgba(0, 0, 0, 0));
     mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) calc(100% - 16px), rgba(0, 0, 0, 0));
 
     @include service;
 
     .channel {
-        .message {
+        &.message {
             grid-template-columns: min-content 1fr;
+            .avatar {
+                display: none;
+            }
         }
     }
 
@@ -39,8 +43,13 @@
 
         // let total_wasted_hours = 16
 
+        &.in {
+            float: left;
+        }
+
         &.out {
-            justify-content: end;
+            //justify-content: end;
+            float: right;
 
             .avatar {
                 display: none; //idk how it was done before
@@ -132,6 +141,11 @@
                 margin-top: 7px;
                 margin-bottom: 4px;
                 user-select: text;
+            }
+
+            .card {
+                margin-top: 10px;
+                margin-bottom: 10px;
             }
 
             //not dependant

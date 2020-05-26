@@ -5,6 +5,7 @@
         &~.inline-keyboard {
             margin-left: 11px;
         }
+        padding-right: 5px;
     }
 
     &.group-s {
@@ -34,8 +35,15 @@
             border-bottom-right-radius: 12px;
 
         	figure.photo, figure.video {
-	    		margin-left: -20px;
+	    		margin-left: -10px;
+                margin-right: -5px;
 		    }
+
+            .box {
+                figure.photo, figure.video {
+                    margin-left: 0px; //embed
+                }
+            }
 
 			&.transparent {
 	        	padding-left: 0;
