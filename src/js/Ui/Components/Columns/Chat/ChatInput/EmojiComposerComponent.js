@@ -20,6 +20,7 @@
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 import {emojiCategories, replaceEmoji} from "../../../../Utils/replaceEmoji"
 import {ChatInputManager} from "./ChatInputComponent"
+import keval from "../../../../../Keval/keval"
 
 class EmojiComposerComponent extends StatelessComponent {
     emojiCategory = null
