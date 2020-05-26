@@ -114,6 +114,9 @@ class VComponent {
     componentWillUnmount() {
     }
 
+    componentWillUpdate(nextProps, nextState) {
+    }
+
     /**
      * before patch callback
      *

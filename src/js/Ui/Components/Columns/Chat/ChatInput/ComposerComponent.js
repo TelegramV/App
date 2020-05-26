@@ -1,19 +1,15 @@
 import VRDOM from "../../../../../V/VRDOM/VRDOM";
-import StickerComponent from "../Message/Common/StickerComponent"
 import {VideoComponent} from "../../../Basic/videoComponent"
 import {ChatInputManager} from "./ChatInputComponent"
 import {emojiCategories, replaceEmoji} from "../../../../Utils/replaceEmoji"
-import {StickerManager} from "../../../../../Api/Stickers/StickersManager"
 import {FileAPI} from "../../../../../Api/Files/FileAPI"
 import MTProto from "../../../../../MTProto/External"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import VApp from "../../../../../V/vapp"
 import lottie from "../../../../../../../vendor/lottie-web"
-import API from "../../../../../Api/Telegram/API"
-import StickerSet from "../../../../../Api/Stickers/StickerSet"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import StickersComposerComponent from "./StickersComposerComponent"
 
-// this should be StatelessComponent
 export default class ComposerComponent extends StatelessComponent {
     identifier = "composer";
 
@@ -66,16 +62,7 @@ export default class ComposerComponent extends StatelessComponent {
                             ))}
                         </div>
                     </div>
-                    <div class="sticker-wrapper hidden">
-                        <div class="sticker-table">
-                            <div class="selected scrollable"/>
-                        </div>
-                        <div class="sticker-packs">
-                            <div class="rp sticker-packs-item selected">
-                                <i class="tgico tgico-sending"/>
-                            </div>
-                        </div>
-                    </div>
+                    <StickersComposerComponent/>
                     <div class="gif-wrapper hidden">
                         <div class="gif-masonry scrollable">
                         </div>
@@ -97,12 +84,6 @@ export default class ComposerComponent extends StatelessComponent {
         this.$el.querySelector(`.emoji-types > [data-category=people]`).classList.add("selected");
         this.$el.querySelector(".emoji-table > .selected").childNodes.forEach(node => {
             node.addEventListener("click", this.onClickEmoji);
-        });
-
-        API.messages.getAllStickers().then(AllStickers => {
-            this.stateless.allStickers = AllStickers;
-            AllStickers.sets.map(raw => new StickerSet(raw))
-                .forEach(stickerSet => stickerSet.fetchThumb().then(console.log));
         });
     }
 
@@ -214,65 +195,6 @@ export default class ComposerComponent extends StatelessComponent {
         ChatInputManager.appendText(ev.currentTarget.alt);
     }
 
-    loadInstalledStickerSets = () => {
-        if (this.stickersInit) return;
-        StickerManager.getInstalledStickerSets().then(async sets => {
-            let container = this.$stickersPanel.querySelector(".sticker-packs");
-            for (const set of sets) {
-                if (set.set.thumb) {
-                    //download thumb
-                } else { //first sticker
-                    let url = await FileAPI.getThumb(set.documents[0], "min");
-                    VRDOM.append(<StickerSetItemFragment setId={set.set.id} url={url}
-                                                         click={this._stickerPackClick.bind(this)}/>, container);
-                }
-            }
-        })
-        this.stickersInit = true;
-    }
-
-    _stickerPackClick = (ev) => {
-        let id = ev.currentTarget.getAttribute("set-id");
-        if (!id) return;
-        this.setStickerSet(id);
-    }
-
-    setStickerSet = (id) => {
-        let table = this.$stickersPanel.querySelector(".selected");
-        while (table.firstChild) table.removeChild(table.firstChild);
-        let set = StickerManager.getCachedStickerSet(id);
-        for (const sticker of set.documents) {
-            VRDOM.append(<StickerComponent play={false} width={75} sticker={sticker}/>, table);
-        }
-        this._bindStickerEvents();
-    }
-
-    loadRecentStickers = () => {
-        return MTProto.invokeMethod("messages.getRecentStickers", {
-            hash: 0
-        }).then(response => {
-            let packs = response.packs;
-            let stickers = response.stickers;
-            let table = this.$stickersPanel.querySelector(".selected");
-            for (let i = 0; i < Math.min(25, stickers.length); i++) {
-                VRDOM.append(<StickerComponent width={75} sticker={stickers[i]}/>, table);
-            }
-        })
-    }
-
-    _bindStickerEvents = () => {
-        this.$el.querySelector(".sticker-table > .selected").childNodes.forEach(node => {
-            node.addEventListener("click", this._stickerClick);
-        })
-    }
-
-    _stickerClick = (ev) => {
-        let ref = ev.currentTarget.getAttribute("data-component-id");
-        if (!ref) return;
-        let sticker = VApp.mountedComponents.get(ref).sticker;
-        AppSelectedChat.current.api.sendExistingMedia(sticker);
-    }
-
     loadSavedGifs = () => {
         let masonry = this.$gifPanel.querySelector(".gif-masonry");
         MTProto.invokeMethod("messages.getSavedGifs").then(response => {
@@ -299,12 +221,4 @@ export default class ComposerComponent extends StatelessComponent {
         let gif = VApp.mountedComponents.get(ref).props.object;
         AppSelectedChat.Current.api.sendExistingMedia(gif);
     }
-}
-
-const StickerSetItemFragment = ({setId, url, click}) => {
-    return (
-        <div class="sticker-packs-item" set-id={setId} onClick={click}>
-            <img src={url} alt="Sticker Pack"/>
-        </div>
-    )
 }

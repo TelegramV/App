@@ -18,9 +18,12 @@
  */
 
 import {FileAPI} from "../Files/FileAPI"
+import MTProto from "../../MTProto/External"
 
 class StickerSet {
     thumbUrl: string;
+
+    rawStickerSet: Object;
 
     constructor(raw) {
         this.raw = raw;
@@ -34,16 +37,51 @@ class StickerSet {
         };
     }
 
-    fetchThumb(): Promise<string> {
-        if (!this.raw.thumb) {
-            return Promise.resolve("no thumb");
+    getStickerSet() {
+        if (!this.rawStickerSet) {
+            return MTProto.invokeMethod("messages.getStickerSet", {
+                stickerset: {
+                    _: "inputStickerSetID",
+                    id: this.raw.id,
+                    access_hash: this.raw.access_hash,
+                }
+            }).then(StickerSet => {
+                this.rawStickerSet = StickerSet;
+                return StickerSet;
+            });
         }
 
-        console.log(this.raw.thumb);
+        return Promise.resolve(this.rawStickerSet)
+    }
 
-        return FileAPI.downloadStickerSetThumb(this).then(blob => {
-            return URL.createObjectURL(blob);
-        });
+    fetchThumb(): Promise<string> {
+        if (this.json) {
+            return Promise.resolve(this.json);
+        } else if (this.thumbUrl) {
+            return Promise.resolve(this.thumbUrl);
+        }
+
+        const download = () => {
+            return FileAPI.downloadStickerSetThumb(this).then(File => {
+                if (this.raw.animated) {
+                    return FileAPI.parseAnimatedStickerFile(File).then(json => {
+                        return this.json = json;
+                    })
+                }
+
+                this.thumbUrl = FileAPI.getUrl(File);
+
+                return this.thumbUrl;
+            });
+        }
+
+        if (!this.raw.thumb) {
+            return this.getStickerSet().then(() => {
+                return download();
+            });
+        }
+
+        return download();
     }
 
     fillRaw(raw): StickerSet {

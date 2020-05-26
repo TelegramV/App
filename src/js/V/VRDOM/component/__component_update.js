@@ -39,6 +39,8 @@ export function __component_update_props(component, nextProps) {
         }
 
         if (shouldUpdate) {
+            component.componentWillUpdate(nextProps, component.state);
+
             Object.assign(component.props, nextProps);
 
             __component_recreateReactiveObjects(component);
@@ -67,6 +69,8 @@ export function __component_update_state(component, nextState) {
         }
 
         if (shouldUpdate) {
+            component.componentWillUpdate(component.props, nextState);
+
             Object.assign(component.state, nextState);
 
             __component_recreateReactiveObjects(component);
@@ -81,6 +85,8 @@ export function __component_update_state(component, nextState) {
 }
 
 export function __component_update_force(component, nextProps, nextState) {
+    component.componentWillUpdate(nextProps || component.props, nextState || component.state);
+
     if (nextProps) {
         Object.assign(component.props, nextProps);
     }

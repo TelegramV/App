@@ -27,6 +27,7 @@ export function __component_init_wip(component) {
         component.componentDidMount = component.componentDidMount.bind(component);
         component.shouldComponentUpdate = component.shouldComponentUpdate.bind(component);
         component.componentDidUpdate = component.componentDidUpdate.bind(component);
+        component.componentWillUpdate = component.componentWillUpdate.bind(component);
         component.forceUpdate = component.forceUpdate.bind(component);
 
         component.appEvents = component.appEvents.bind(component);

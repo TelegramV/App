@@ -71,7 +71,7 @@ const patchElement = ($node: HTMLElement, vRNode: VRNode) => {
 
     if (vRNode.dangerouslySetInnerHTML !== false) {
         patchDangerouslySetInnerHTML($node, vRNode.dangerouslySetInnerHTML)
-    } else {
+    } else if (!vRNode.doNotTouchMyChildren) {
         vrdom_patchChildren($node, vRNode)
     }
 

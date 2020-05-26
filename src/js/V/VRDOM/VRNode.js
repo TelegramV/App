@@ -31,6 +31,7 @@ class VRNode {
     ref: Ref
 
     dangerouslySetInnerHTML: any | boolean = false
+    doNotTouchMyChildren: any | boolean = false
     component = undefined
     list: List = undefined
 
@@ -44,6 +45,7 @@ class VRNode {
         this.ref = props.ref
 
         this.dangerouslySetInnerHTML = props.dangerouslySetInnerHTML || false
+        this.doNotTouchMyChildren = props.doNotTouchMyChildren || false
         this.component = props.component
         this.list = props.list
     }

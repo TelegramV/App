@@ -1,11 +1,9 @@
 import {FileAPI} from "../../../../../../Api/Files/FileAPI"
 import UIEvents from "../../../../../EventBus/UIEvents"
 import lottie from "../../../../../../../../vendor/lottie-web"
-
-import MTProto from "../../../../../../MTProto/External"
 import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
-let stickerCounter = 0;
+export let stickerCounter = 0;
 
 export default class StickerComponent extends StatelessComponent {
     init() {
@@ -77,29 +75,21 @@ export default class StickerComponent extends StatelessComponent {
 
     _applyAnimated(url) {
         this.url = url;
-        fetch(url).then(async r => {
-            return r.arrayBuffer().then(async b => {
-                if (b[0] == 123) { //"{"
-                    return JSON.parse(new TextDecoder("utf-8").decode(new Uint8Array(b)));
-                } else {
-                    return JSON.parse(new TextDecoder("utf-8").decode(await MTProto.performWorkerTask("gzipUncompress", new Uint8Array(b))));
-                }
+        fetch(url)
+            .then(r => r.arrayBuffer().then(b => new Uint8Array(b)))
+            .then(b => FileAPI.decodeAnimatedStickerBytes(b))
+            .then(json => {
+                this.animation = lottie.loadAnimation({
+                    container: this.$el,
+                    renderer: 'canvas',
+                    loop: false,
+                    autoplay: this.props.play || false,
+                    name: this.identifier,
+                    animationData: json
+                })
+                this.animation.setSubframe(false);
+                this.animation.addEventListener("complete", this._onLoop);
             })
-        }).then(r => {
-            if (this.__.destroyed) return; //sorry, we're late
-            this.animation = lottie.loadAnimation({
-                container: this.$el,
-                renderer: 'canvas',
-                loop: false,
-                autoplay: this.props.play || false,
-                name: this.identifier,
-                animationData: r
-            })
-            this.animation.setSubframe(false);
-            this.animation.addEventListener("complete", this._onLoop);
-        }).catch(r => {
-
-        })
     }
 
     _mOver = (ev) => {

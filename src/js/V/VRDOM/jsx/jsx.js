@@ -46,6 +46,7 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
 
     let ref = undefined
     let dangerouslySetInnerHTML: boolean = false
+    let doNotTouchMyChildren: boolean = false
 
     if (attributes) {
         for (const [k, v] of Object.entries(attributes)) {
@@ -57,6 +58,8 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
             } else if (k === "dangerouslySetInnerHTML") {
                 dangerouslySetInnerHTML = v
                 attrs["vr-dangerouslySetInnerHTML"] = true
+            } else if (k === "doNotTouchMyChildren") {
+                doNotTouchMyChildren = v
             } else if (key.startsWith("css-")) {
                 const styleKey = key.substring(4)
                 style[styleKey] = v
@@ -92,7 +95,8 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
         ref,
         style,
 
-        dangerouslySetInnerHTML
+        dangerouslySetInnerHTML,
+        doNotTouchMyChildren,
     })
 }
 
