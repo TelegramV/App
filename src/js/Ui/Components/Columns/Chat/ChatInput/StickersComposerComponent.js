@@ -25,6 +25,8 @@ import Lottie from "../../../../Lottie/Lottie"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
+import UIEvents from "../../../../EventBus/UIEvents"
+import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
 
 const StickerSetItemFragment = ({setId, url, onClick}) => {
     return (
@@ -40,6 +42,13 @@ class StickersComposerComponent extends StatelessComponent {
 
     stickerPacksRef = VComponent.createRef();
     stickersTableRef = VComponent.createRef();
+
+    initialized = false;
+
+    appEvents(E: AE) {
+        E.bus(UIEvents.General)
+            .on("composer.togglePanel", this.onComposerTogglePanel)
+    }
 
     render(props) {
         return (
@@ -59,53 +68,88 @@ class StickersComposerComponent extends StatelessComponent {
     }
 
     componentDidMount() {
-        API.messages.getAllStickers().then(AllStickers => {
-            this.allStickers = AllStickers;
+    }
 
-            AllStickers.sets.map(raw => new StickerSet(raw))
-                .forEach(stickerSet => stickerSet.fetchThumb().then(() => {
-                    const onClick = () => this.openStickerSet(stickerSet);
+    onComposerTogglePanel = event => {
+        if (event.panel === "stickers" && !this.initialized) {
+            API.messages.getAllStickers().then(AllStickers => {
+                this.allStickers = AllStickers;
 
-                    if (stickerSet.raw.animated) {
-                        const options = {
-                            animationData: stickerSet.json,
-                            loop: false,
-                            autoplay: false,
-                        };
+                AllStickers.sets.map(raw => new StickerSet(raw))
+                    .forEach(stickerSet => stickerSet.fetchThumb().then(() => {
+                        const onClick = () => this.openStickerSet(stickerSet);
 
-                        VRDOM.append(
-                            <div>
-                                <Lottie class="sticker-packs-item rp rps"
-                                        width={35}
-                                        height={35}
-                                        options={options}
-                                        onClick={onClick}
-                                        playOnHover/>
-                            </div>,
-                            this.stickerPacksRef.$el);
-                    } else if (stickerSet.thumbUrl) {
-                        VRDOM.append(
-                            <StickerSetItemFragment setId={stickerSet.raw.id}
-                                                    url={stickerSet.thumbUrl}
-                                                    onClick={onClick}/>,
-                            this.stickerPacksRef.$el
-                        );
-                    }
-                }));
-        });
+                        if (stickerSet.raw.animated) {
+                            const options = {
+                                animationData: stickerSet.json,
+                                loop: false,
+                                autoplay: false,
+                            };
 
-        API.messages.getRecentStickers().then(RecentStickers => {
-            const $el = document.getElementById("composer-sticker-pack-recent");
-
-            RecentStickers.stickers.forEach(Document => {
-                VRDOM.append(
-                    <BetterStickerComponent width={75}
-                                            document={Document}
-                                            onClick={() => AppSelectedChat.current.api.sendExistingMedia(Document)}/>,
-                    $el
-                );
+                            VRDOM.append(
+                                <div>
+                                    <Lottie class="sticker-packs-item rp rps"
+                                            width={35}
+                                            height={35}
+                                            options={options}
+                                            onClick={onClick}
+                                            loadDelay={50}
+                                            playOnHover/>
+                                </div>,
+                                this.stickerPacksRef.$el);
+                        } else if (stickerSet.thumbUrl) {
+                            VRDOM.append(
+                                <StickerSetItemFragment setId={stickerSet.raw.id}
+                                                        url={stickerSet.thumbUrl}
+                                                        onClick={onClick}/>,
+                                this.stickerPacksRef.$el
+                            );
+                        }
+                    }));
             });
-        });
+
+            API.messages.getRecentStickers().then(RecentStickers => {
+                const $el = document.getElementById("composer-sticker-pack-recent");
+
+                RecentStickers.stickers.forEach(Document => {
+                    VRDOM.append(
+                        <BetterStickerComponent id={`composer-sticker-recent-${Document.id}`}
+                                                width={75}
+                                                document={Document}
+                                                onClick={() => this.sendSticker(Document)}/>,
+                        $el
+                    );
+                });
+            });
+
+            this.initialized = true;
+        }
+    }
+
+    sendSticker = Document => {
+        AppSelectedChat.current.api.sendExistingMedia(Document);
+
+        const $recent = document.getElementById("composer-sticker-pack-recent");
+
+        let $stickerOnRecent = $recent.querySelector(`#composer-sticker-recent-${Document.id}`)
+
+        if ($stickerOnRecent) {
+            $recent.prepend($stickerOnRecent);
+        } else {
+            VRDOM.prepend(
+                <BetterStickerComponent id={`composer-sticker-recent-${Document.id}`}
+                                        width={75}
+                                        document={Document}
+                                        onClick={() => this.sendSticker(Document)}/>,
+                $recent
+            );
+
+            if ($recent.childElementCount >= 15) {
+                if ($recent.lastChild.__v) {
+                    __component_destroy($recent.lastChild.__v.component);
+                }
+            }
+        }
     }
 
     // DOM HELL
@@ -138,7 +182,7 @@ class StickersComposerComponent extends StatelessComponent {
                 StickerSet.documents.forEach(Document => {
                     VRDOM.append(
                         <BetterStickerComponent
-                            onClick={() => AppSelectedChat.current.api.sendExistingMedia(Document)}
+                            onClick={() => this.sendSticker(Document)}
                             width={75}
                             document={Document}
                             isAnimated={stickerSet.raw.animated}/>,

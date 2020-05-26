@@ -47,7 +47,8 @@ class BetterStickerComponent extends StatefulComponent {
             };
 
             return (
-                <div class="sticker rp rps"
+                <div id={props.id}
+                     class="sticker rp rps"
                      onClick={props.onClick}>
                     <Lottie width={width}
                             height={height}
@@ -58,7 +59,8 @@ class BetterStickerComponent extends StatefulComponent {
             )
         } else {
             return (
-                <div class="sticker"
+                <div id={props.id}
+                     class="sticker"
                      onClick={props.onClick}>
                     <img class="loading"
                          src={state.thumbUrl}
