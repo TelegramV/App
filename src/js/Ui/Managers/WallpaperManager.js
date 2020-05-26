@@ -54,7 +54,7 @@ class WallpaperManagerSingleton {
         return this.fetchPromise = MTProto.invokeMethod("account.getWallPapers", { hash: 0 }).then(result => {
 
             this.wallpapers = result.wallpapers;
-            console.log(this.wallpapers);
+            //console.log(this.wallpapers);
             this.isFetching = false;
 
             UIEvents.General.fire("wallpaper.fetched", { wallpapers: this.wallpapers });
