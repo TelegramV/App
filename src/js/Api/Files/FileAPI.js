@@ -44,7 +44,7 @@ export class FileAPI {
      */
     static downloadDocument(document, thumb) {
         if (document._ === "documentEmpty") {
-            return Promise.resolve();
+            return Promise.reject("documentEmpty");
         }
 
         return FileAPI.downloadDocumentAllParts(document, thumb);
@@ -93,9 +93,7 @@ export class FileAPI {
     }
 
     static getBlob(file, type): Blob {
-        const blob = new Blob([file.bytes], {type: type});
-
-        return blob;
+        return new Blob([file.bytes], {type: type});
     }
 
     static getUrl(file, type): Blob {
@@ -279,7 +277,7 @@ export class FileAPI {
 
     static getMaxSize(file, onlyThumb = false) {
         if (!onlyThumb) {
-            const video = this.getAttribute(file, "documentAttributeVideo")
+            const video = FileAPI.getAttribute(file, "documentAttributeVideo")
             if (video) {
                 return video
             }

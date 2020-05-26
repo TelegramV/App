@@ -24,6 +24,12 @@ import VApp from "../../vapp"
 import __component_withDefaultProps from "./__component_withDefaultProps"
 import {__component_update_force} from "./__component_update"
 
+export class ComponentIsNotReady {
+    constructor(reason: any) {
+        this.reason = reason;
+    }
+}
+
 
 // abstract stateless component
 class VComponent {
@@ -136,6 +142,10 @@ class VComponent {
         __component_update_force(this);
     }
 
+    /**
+     * @deprecated never use it (but sometimes you can)
+     * @param nextProps
+     */
     updateProps(nextProps) {
         __component_update_force(this, nextProps);
     }
@@ -205,6 +215,36 @@ class VComponent {
             clearTimeout(id);
             this.__.timeouts.delete(id);
         }
+    }
+
+    /**
+     * @param promise
+     * @return {Promise<*>}
+     */
+    assure(promise: Promise<any>) {
+        return promise.then(_ => {
+            if (!this.__.mounted) {
+                throw new ComponentIsNotReady("Not mounted.")
+            } else if (this.__.destroyed) {
+                throw new ComponentIsNotReady("Already destroyed.")
+            }
+
+            return _;
+        });
+    }
+
+    /**
+     * @param promise
+     * @return {Promise<*>}
+     */
+    assureNotDestroyed(promise: Promise<any>) {
+        return promise.then(_ => {
+            if (this.__.destroyed) {
+                throw new ComponentIsNotReady("Already destroyed.")
+            }
+
+            return _;
+        });
     }
 
     toString() {

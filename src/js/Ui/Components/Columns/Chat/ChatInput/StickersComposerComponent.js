@@ -27,6 +27,7 @@ import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import UIEvents from "../../../../EventBus/UIEvents"
 import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
+import VSpinner from "../../../Elements/VSpinner"
 
 const StickerSetItemFragment = ({setId, url, onClick}) => {
     return (
