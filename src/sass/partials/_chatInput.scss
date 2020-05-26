@@ -361,9 +361,9 @@
         left: 0;
         z-index: 900;
 
-        &.visible {
+        //&.visible {
             transform: scale(1, 1);
-        }
+        //}
 
         .tab-selector {
             height: 45px;

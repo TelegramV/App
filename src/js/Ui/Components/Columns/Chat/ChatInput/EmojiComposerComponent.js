@@ -38,8 +38,10 @@ class EmojiComposerComponent extends StatelessComponent {
         return (
             <div className="emoji-wrapper">
                 <div className="emoji-table">
-                    {this.emojiCategories.map(category => (
-                        <div className={`${category.name} scrollable`} data-category={category.name}/>
+                    <div id={`composer-emoji-panel-recent`} className={`recent scrollable`} data-category={'recent'}/>
+                    {this.emojiCategories.slice(1).map(category => (
+                        <div id={`composer-emoji-panel-${category.name}`} className={`${category.name} scrollable`}
+                             data-category={category.name}/>
                     ))}
                 </div>
                 <div className="emoji-types">
@@ -63,6 +65,20 @@ class EmojiComposerComponent extends StatelessComponent {
         this.$el.querySelector(`.emoji-types > [data-category=people]`).classList.add("selected");
         this.$el.querySelector(".emoji-table > .selected").childNodes.forEach(node => {
             node.addEventListener("click", this.onClickEmoji);
+        });
+
+        const $recentPanel = this.$el.querySelector(`.emoji-table > [data-category=recent]`);
+        keval.getItem("recentEmoji").then(recent => {
+            recent = recent || "";
+            $recentPanel.innerText = recent;
+            replaceEmoji($recentPanel);
+            $recentPanel.childNodes.forEach(node => {
+                node.onclick = this.onClickEmoji;
+            });
+            if (recent.length) {
+                $recentPanel.classList.add("selected")
+                this.$el.querySelector(`.emoji-types > [data-category=recent]`).classList.add("selected");
+            }
         });
     }
 
@@ -102,7 +118,24 @@ class EmojiComposerComponent extends StatelessComponent {
     }
 
     onClickEmoji = (ev) => {
-        ChatInputManager.appendText(ev.currentTarget.alt);
+        const alt = ev.currentTarget.alt
+        ChatInputManager.appendText(alt);
+
+        const $recentPanel = document.getElementById("composer-emoji-panel-recent");
+
+        keval.getItem("recentEmoji").then((recent: string) => {
+            recent = recent || ""
+
+            recent = alt + Array.from(recent).filter(c => c !== alt).join("")
+
+            keval.setItem("recentEmoji", recent).then(() => {
+                $recentPanel.innerText = recent;
+                replaceEmoji($recentPanel);
+                $recentPanel.childNodes.forEach(node => {
+                    node.onclick = this.onClickEmoji;
+                });
+            })
+        });
     }
 }
 
