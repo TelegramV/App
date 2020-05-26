@@ -1,7 +1,3 @@
-import VRDOM from "../../../../../V/VRDOM/VRDOM";
-import {VideoComponent} from "../../../Basic/videoComponent"
-import {FileAPI} from "../../../../../Api/Files/FileAPI"
-import MTProto from "../../../../../MTProto/External"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import VApp from "../../../../../V/vapp"
 import lottie from "../../../../../../../vendor/lottie-web"
@@ -9,6 +5,7 @@ import StatelessComponent from "../../../../../V/VRDOM/component/StatelessCompon
 import StickersComposerComponent from "./StickersComposerComponent"
 import EmojiComposerComponent from "./EmojiComposerComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
+import GifsComposerComponent from "./GifsComposerComponent"
 
 export default class ComposerComponent extends StatelessComponent {
     identifier = "composer";
@@ -37,10 +34,7 @@ export default class ComposerComponent extends StatelessComponent {
                 <div class="content">
                     <EmojiComposerComponent/>
                     <StickersComposerComponent/>
-                    <div class="gif-wrapper hidden">
-                        <div class="gif-masonry scrollable">
-                        </div>
-                    </div>
+                    <GifsComposerComponent/>
                 </div>
             </div>
         )
@@ -112,38 +106,6 @@ export default class ComposerComponent extends StatelessComponent {
 
     onClickOpenGif = () => {
         this.togglePanel("gif");
-    }
-
-
-    onClickSwitchStickerSet = (ev) => {
-        const $el = ev.currentTarget;
-        const stickerSetId = $el.getAttribute("data-set-id");
-
-        if (!stickerSetId || this.stateless.sticketSetId === stickerSetId) {
-            return;
-        }
-
-        this.stateless.sticketSetId = stickerSetId;
-    }
-
-    loadSavedGifs = () => {
-        let masonry = this.$gifPanel.querySelector(".gif-masonry");
-        MTProto.invokeMethod("messages.getSavedGifs").then(response => {
-            for (const gif of response.gifs) {
-                let size = FileAPI.getMaxSize(gif);
-                const height = 100;
-                let width = Math.max((size.w / size.h) * height, 40);
-                VRDOM.append(<div class="masonry-item" css-width={width + "px"}><VideoComponent video={gif}/>
-                </div>, masonry);
-            }
-            this._bindGifClickEvents();
-        })
-    }
-
-    _bindGifClickEvents = () => {
-        this.$gifPanel.querySelector(".gif-masonry").childNodes.forEach(node => {
-            node.firstChild.addEventListener("click", this._gifClick);
-        })
     }
 
     _gifClick = (ev) => {

@@ -22,7 +22,7 @@ import {emojiCategories, replaceEmoji} from "../../../../Utils/replaceEmoji"
 import {ChatInputManager} from "./ChatInputComponent"
 
 class EmojiComposerComponent extends StatelessComponent {
-    emojiCategory = "people"
+    emojiCategory = null
     emojiCategories = [
         {name: "recent", icon: "sending"},
         {name: "people", icon: "smile"},
@@ -58,26 +58,32 @@ class EmojiComposerComponent extends StatelessComponent {
     }
 
     componentDidMount() {
-        const $selected = this.$el.querySelector(".emoji-table").querySelector(".people");
-        $selected.classList.add("selected");
-        $selected.innerText = emojiCategories["people"];
-        replaceEmoji($selected);
-        this.$el.querySelector(`.emoji-types > [data-category=people]`).classList.add("selected");
-        this.$el.querySelector(".emoji-table > .selected").childNodes.forEach(node => {
-            node.addEventListener("click", this.onClickEmoji);
-        });
-
-        const $recentPanel = this.$el.querySelector(`.emoji-table > [data-category=recent]`);
         keval.getItem("recentEmoji").then(recent => {
+
             recent = recent || "";
-            $recentPanel.innerText = recent;
-            replaceEmoji($recentPanel);
-            $recentPanel.childNodes.forEach(node => {
-                node.onclick = this.onClickEmoji;
-            });
-            if (recent.length) {
-                $recentPanel.classList.add("selected")
+
+            if (!recent.length) {
+                this.emojiCategory = "people";
+                const $selected = this.$el.querySelector(".emoji-table").querySelector(".people");
+                $selected.classList.add("selected");
+                $selected.innerText = emojiCategories["people"];
+                replaceEmoji($selected);
+                this.$el.querySelector(`.emoji-types > [data-category=people]`).classList.add("selected");
+                this.$el.querySelector(".emoji-table > .selected").childNodes.forEach(node => {
+                    node.addEventListener("click", this.onClickEmoji);
+                });
+            } else {
+                this.emojiCategory = "recent";
+                const $selected = this.$el.querySelector(".emoji-table").querySelector(".recent");
+                $selected.classList.add("selected");
+                $selected.innerText = recent;
+                replaceEmoji($selected);
+
                 this.$el.querySelector(`.emoji-types > [data-category=recent]`).classList.add("selected");
+
+                $selected.childNodes.forEach(node => {
+                    node.onclick = this.onClickEmoji;
+                });
             }
         });
     }
@@ -107,7 +113,7 @@ class EmojiComposerComponent extends StatelessComponent {
         $emojiPanel.classList.add("selected");
 
         if ($emojiPanel.childElementCount === 0) {
-            $emojiPanel.innerText = emojiCategories[category];
+            $emojiPanel.innerText = emojiCategories[category] || "";
 
             replaceEmoji($emojiPanel);
 
