@@ -42,9 +42,11 @@ class BetterStickerComponent extends StatefulComponent {
         if (state.isAnimated) {
             const options = {
                 animationData: state.animationData,
-                loop: false,
-                autoplay: false,
+                loop: props.loop ?? false,
+                autoplay: props.autoplay ?? false,
             };
+            const playOnHover = props.playOnHover ?? true;
+            const isPaused = props.paused ?? true;
 
             return (
                 <div id={props.id}
@@ -54,7 +56,8 @@ class BetterStickerComponent extends StatefulComponent {
                             height={height}
                             isPaused={true}
                             options={options}
-                            playOnHover/>
+                            playOnHover={playOnHover}
+                            isPaused={isPaused}/>
                 </div>
             )
         } else {

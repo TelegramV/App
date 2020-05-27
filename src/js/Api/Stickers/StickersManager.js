@@ -5,27 +5,10 @@ class StickersManager extends Manager {
     constructor(props) {
         super(props);
         this.stickerSets = {}
-
-        this.diceEmojis = {
-            "dice": "🎲",
-            "dart": "🎯"
-        };
+        this.pendingSets = {}
     }
 
     fetchSpecialSets() {
-        for (let [key, emoji] of Object.entries(this.diceEmojis)) {
-            MTProto.invokeMethod("messages.getStickerSet", {
-                stickerset: {_: "inputStickerSetDice", emoticon: emoji}
-            }).then(l => {
-                l.packs.forEach(q => {
-                    q.document = l.documents.find(z => z.id === q.documents[0])
-                })
-
-                this.stickerSets[key] = l;
-                console.log("Dice Set ready: " + key);
-            })
-        }
-
         MTProto.invokeMethod("messages.getStickerSet", {
             stickerset: {_: "inputStickerSetAnimatedEmoji"}
         }).then(l => {
@@ -107,14 +90,30 @@ class StickersManager extends Manager {
         return null
     }
 
-    getDiceSet(emoji) {
-        let key = Object.keys(this.diceEmojis).find(key => this.diceEmojis[key] === emoji);
-        return this.getCachedStickerSet(key);
+    async getDiceSet(emoji) {
+        let set = this.getCachedStickerSet(emoji);
+        if(set) return set;
+
+        set = this.pendingSets[emoji];
+        if(set) return set;
+
+        set = this.pendingSets[emoji] = MTProto.invokeMethod("messages.getStickerSet", {
+            stickerset: {_: "inputStickerSetDice", emoticon: emoji}
+        }).then(l => {
+            l.packs.forEach(q => {
+                q.document = l.documents.find(z => z.id === q.documents[0])
+            })
+
+            this.stickerSets[emoji] = l;
+            //console.log("Dice Set ready: " + emoji);
+            return l;
+        })
+        return set;
     }
 
-    getDice(value, emoji = "🎲") {
+    async getDice(value, emoji = "🎲") {
         if (value < 1 || value > 6) return null;
-        let set = this.getDiceSet(emoji);
+        let set = await this.getDiceSet(emoji);
         if (set) {
             return set.documents[value];
         }
