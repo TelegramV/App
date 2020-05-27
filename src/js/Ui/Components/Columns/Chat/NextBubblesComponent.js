@@ -116,9 +116,7 @@ class NextBubblesComponent extends StatelessComponent {
         }
 
         return vrdom_render(
-            <div>
                 <MessageComponent message={message}/>
-            </div>
         );
     }
 

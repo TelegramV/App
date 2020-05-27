@@ -82,6 +82,10 @@
 		    	padding-left: 0;
 		    	padding-right: 0;
 
+                .reply {
+                    margin-left: 20px;
+                }
+
 		    	figure.photo, figure.video {
 		    		margin-left: 0px;
 			    }
@@ -129,6 +133,11 @@
             &.no-pad {
 		    	padding-right: 0;
 		    	padding-left: 0;
+
+                .reply {
+                    margin-left: 10px;
+                }
+
 		    	figure.photo, figure.video {
 		    		margin-left: 0;
 		    		margin-right: 0;

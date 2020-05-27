@@ -61,15 +61,7 @@
 
     &.no-pad {
         .reply {
-            margin-bottom: 0;
-
-            @if $in {
-                padding-left: 13px;
-            }
-
-            @if $in==false {
-                padding-right: 13px;
-            }
+            padding-right: 13px;
         }
     }
 
