@@ -247,6 +247,20 @@ class VComponent {
         });
     }
 
+    /**
+     * @param promise
+     * @return {Promise<*>}
+     */
+    assureMounted(promise: Promise<any>) {
+        return promise.then(_ => {
+            if (!this.__.mounted) {
+                throw new ComponentIsNotReady("Not mounted.")
+            }
+
+            return _;
+        });
+    }
+
     toString() {
         return `${this.constructor.displayName}#${this.identifier}`
     }

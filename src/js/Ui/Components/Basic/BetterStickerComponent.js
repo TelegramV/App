@@ -77,13 +77,13 @@ class BetterStickerComponent extends StatefulComponent {
 
         this.state.isDownloading = true;
 
-        FileAPI.downloadDocument(document, isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "").then(File => {
+        this.assure(FileAPI.downloadDocument(document, isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "")).then(File => {
             if (!this.__.mounted) {
                 return
             }
 
             if (isAnimated) {
-                FileAPI.parseAnimatedStickerFile(File).then(json => {
+                this.assure(FileAPI.parseAnimatedStickerFile(File)).then(json => {
                     if (!this.__.mounted) {
                         return
                     }
@@ -99,7 +99,7 @@ class BetterStickerComponent extends StatefulComponent {
                     isDownloading: false,
                 });
             }
-        }).finally(() => {
+        }).then(() => {
             this.state.isDownloading = false;
         });
     }

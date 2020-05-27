@@ -37,3 +37,5 @@ MTProto.connect().then(user => {
 
     console.log("connected");
 })
+
+console.log(false ?? "kek")
