@@ -54,7 +54,15 @@
         // TAILS
         &.group-s {}
 
-        &.group-m {}
+        &.group-m {
+            figure.round {
+                margin-left: 0px;
+
+                &~.playback {
+                    left: 10px;
+                }
+            }
+        }
 
         &.group-e {
             -webkit-mask-image: url("../../public/static/images/tail-left.svg"),
@@ -110,7 +118,11 @@
         // TAILS
         &.group-s {}
 
-        &.group-m {}
+        &.group-m {
+            figure.round {
+                margin-right: 0px;
+            }
+        }
 
         &.group-e {
             -webkit-mask-image: url("../../public/static/images/tail-right.svg"),
