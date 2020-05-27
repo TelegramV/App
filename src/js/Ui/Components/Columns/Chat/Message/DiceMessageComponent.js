@@ -23,16 +23,19 @@ class DiceMessageComponent extends GeneralMessageComponent {
             });
             this.state.sticker.idleId = diceNumber++;
         })*/
-        StickerManager.getDice(this.message.value, this.message.emoji).then(sticker => {
-            this.sticker = sticker
-            this.forceUpdate();
-        })
     }
 
     /*appEvents(E) {
         E.bus(UIEvents.General)
             .on("sticker.loop", this.onStickerLoop)
     }*/
+
+    componentDidMount() {
+        StickerManager.getDice(this.message.value, this.message.emoji).then(sticker => {
+            this.sticker = sticker
+            this.forceUpdate();
+        })
+    }
 
     render() {
         return (

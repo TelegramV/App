@@ -24,8 +24,7 @@ class AudioMessageComponent extends AudioComponent {
         }
     }
 
-    init() {
-        super.init();
+    addCover = () => {
         let file = this.message.raw.media.document
 
         if (file.thumbs) {
@@ -75,6 +74,8 @@ class AudioMessageComponent extends AudioComponent {
 
         this.listened = this.$el.querySelector(".listened");
         this.artistEl = this.$el.querySelector(".audio-artist");
+
+        this.addCover();
     }
 
     updatePercent(percent) {
