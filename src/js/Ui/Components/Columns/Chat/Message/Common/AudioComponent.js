@@ -54,6 +54,7 @@ class AudioComponent extends GeneralMessageComponent {
     }
 
     componentDidMount() {
+        super.componentDidMount()
         this.loadProgress = this.$el.querySelector(".progress-circular");
         this.playButton = this.$el.querySelector(".play");
         this.controlsMounted();

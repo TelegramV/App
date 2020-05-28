@@ -31,6 +31,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
     }*/
 
     componentDidMount() {
+        super.componentDidMount()
         StickerManager.getDice(this.message.value, this.message.emoji).then(sticker => {
             this.sticker = sticker
             this.forceUpdate();

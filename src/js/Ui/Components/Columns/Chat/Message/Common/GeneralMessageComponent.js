@@ -4,16 +4,17 @@ import type {Message} from "../../../../../../Api/Messages/Message"
 import {ReplyFragment} from "./ReplyFragment"
 import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
-import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 import __component_destroy from "../../../../../../V/VRDOM/component/__component_destroy"
+import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulComponent"
 
-class GeneralMessageComponent extends StatelessComponent {
+class GeneralMessageComponent extends StatefulComponent {
     message: Message
 
     avatarRef = VComponent.createComponentRef()
     bubbleRef = VComponent.createRef()
 
-    init() {
+    constructor(props) {
+        super(props);
         this.message = this.props.message
     }
 

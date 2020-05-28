@@ -24,7 +24,13 @@ import VApp from "../../vapp"
 import __component_withDefaultProps from "./__component_withDefaultProps"
 import {__component_update_force} from "./__component_update"
 
-export class ComponentIsNotReady {
+export class ComponentDidNotMount {
+    constructor(reason: any) {
+        this.reason = reason;
+    }
+}
+
+export class ComponentWasDestroyed {
     constructor(reason: any) {
         this.reason = reason;
     }
@@ -76,9 +82,9 @@ class VComponent {
 
     get $el() {
         if (this.__.destroyed) {
-            console.error("component is already destroyed!", this.constructor.displayName)
+            console.error("component is destroyed!", this.constructor.name)
         } else if (!this.__.mounted) {
-            console.error("component is not mounted!", this.constructor.displayName)
+            console.error("component is not mounted!", this.constructor.name)
         }
 
         return this._$el
@@ -224,9 +230,9 @@ class VComponent {
     assure(promise: Promise<any>) {
         return promise.then(_ => {
             if (!this.__.mounted) {
-                throw new ComponentIsNotReady("Not mounted.")
+                throw new ComponentDidNotMount()
             } else if (this.__.destroyed) {
-                throw new ComponentIsNotReady("Already destroyed.")
+                throw new ComponentWasDestroyed()
             }
 
             return _;
@@ -240,7 +246,7 @@ class VComponent {
     assureNotDestroyed(promise: Promise<any>) {
         return promise.then(_ => {
             if (this.__.destroyed) {
-                throw new ComponentIsNotReady("Already destroyed.")
+                throw new ComponentWasDestroyed()
             }
 
             return _;
@@ -254,7 +260,7 @@ class VComponent {
     assureMounted(promise: Promise<any>) {
         return promise.then(_ => {
             if (!this.__.mounted) {
-                throw new ComponentIsNotReady("Not mounted.")
+                throw new ComponentDidNotMount()
             }
 
             return _;

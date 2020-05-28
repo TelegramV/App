@@ -3,7 +3,6 @@ import TextWrapperComponent from "./Common/TextWrapperComponent";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 
 class TextMessageComponent extends GeneralMessageComponent {
-
     render() {
         return (
             <MessageWrapperFragment message={this.message} avatarRef={this.avatarRef}

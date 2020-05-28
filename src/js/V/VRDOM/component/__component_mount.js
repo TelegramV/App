@@ -24,28 +24,26 @@ function __component_mount(component, $el: HTMLElement) {
     initElement($el);
 
     if (component.__.mounted) {
-        component.__.mounted = true;
-
-        component.$el = $el;
-        component.$el.__v.component = component;
-
-        component.forceUpdate();
-
         if (!VApp.mountedComponents.has(component.identifier)) {
             console.error("BUG: component with such id was not found!", component)
             VApp.mountedComponents.set(component.identifier, component)
+        } else {
+            component.$el = $el;
+            component.$el.__v.component = component;
+
+            component.forceUpdate();
         }
     } else {
-        component.__.mounted = true;
-
-        component.$el = $el;
-        component.$el.__v.component = component;
-
-        component.componentDidMount();
-
         if (VApp.mountedComponents.has(component.identifier)) {
             console.error("BUG: component with such id already mounted!", component)
         } else {
+            component.__.mounted = true;
+
+            component.$el = $el;
+            component.$el.__v.component = component;
+
+            component.componentDidMount();
+
             VApp.mountedComponents.set(component.identifier, component)
         }
 

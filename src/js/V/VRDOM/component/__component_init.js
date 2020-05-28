@@ -20,7 +20,7 @@
 import {__component_appEventsBuilder} from "./__component_appEventsBuilder";
 import {__component_reactiveObjectEventsBuilder} from "./__component_reactiveObjectEventsBuilder";
 
-export function __component_init_wip(component) {
+export function __component_init(component) {
     if (!component.__.initialized) {
         component.init = component.init.bind(component);
         component.render = component.render.bind(component);
@@ -53,4 +53,4 @@ export function __component_init_wip(component) {
     }
 }
 
-export default __component_init_wip
+export default __component_init

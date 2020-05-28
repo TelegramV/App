@@ -34,7 +34,6 @@ export function vrdom_resolveMount($mounted: Element) {
             // } else
 
             if (component instanceof VComponent) {
-                // console.log("mount", component)
                 __component_mount(component, $mounted)
             } else {
                 console.error("component was not found. it means that there is a potential bug in the vrdom")

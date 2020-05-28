@@ -33,6 +33,8 @@ import scrollBottom from "../../../../Utils/scrollBottom"
 import API from "../../../../Api/Telegram/API"
 import {MessageFactory} from "../../../../Api/Messages/MessageFactory"
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
+import {vrdom_appendRealMany} from "../../../../V/VRDOM/append"
+import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
 
 function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
@@ -95,6 +97,10 @@ class NextBubblesComponent extends StatelessComponent {
     }
 
     renderMessage = (message: Message, prevMessage: Message = null, nextMessage: Message = null): HTMLElement => {
+        return vrdom_render(this.renderVRMessage(message, prevMessage, nextMessage));
+    }
+
+    renderVRMessage = (message: Message, prevMessage: Message = null, nextMessage: Message = null): HTMLElement => {
         const isOut = !message.isPost && message.isOut;
         const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
 
@@ -115,9 +121,7 @@ class NextBubblesComponent extends StatelessComponent {
             message.tailsGroup = "m";
         }
 
-        return vrdom_render(
-                <MessageComponent message={message}/>
-        );
+        return <MessageComponent message={message}/>;
     }
 
     _isGrouping(one: Message, two: Message) {
@@ -188,7 +192,7 @@ class NextBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
-            this.bubblesInnerRef.$el.append(...$messages);
+            vrdom_appendRealMany($messages.reverse(), this.bubblesInnerRef.$el)
 
             return $messages;
         }
@@ -225,7 +229,7 @@ class NextBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
-            this.bubblesInnerRef.$el.prepend(...$messages);
+            vrdom_prependRealMany($messages.reverse(), this.bubblesInnerRef.$el);
 
             return $messages;
         }
