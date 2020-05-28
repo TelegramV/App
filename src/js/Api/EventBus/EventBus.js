@@ -21,11 +21,12 @@ export class EventBus extends TypedPublisher {
         super.fire(type, event)
 
         if (this._conditionalSubscriptions.has(type)) {
-            this._conditionalSubscriptions.get(type).forEach((v, k) => {
-                if (v(event)) {
-                    k(event)
-                }
-            })
+            this._conditionalSubscriptions.get(type)
+                .forEach((v, k) => {
+                    if (v(event)) {
+                        k(event)
+                    }
+                })
         }
     }
 

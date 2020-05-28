@@ -8,8 +8,7 @@ export class Photo extends ReactiveObject {
 
     constructor(rawPhoto) {
         super()
-        this.raw = rawPhoto
-        this.fillRaw(this.raw)
+        this.fillRaw(rawPhoto)
     }
 
     get fileId() {
@@ -65,6 +64,8 @@ export class Photo extends ReactiveObject {
     // }
 
     fillRaw(raw: Object): Photo {
+        this.raw = raw
+
         this.thumbnail = FileAPI.hasThumbnail(this.raw) ? FileAPI.getThumbnail(this.raw) : ""
 
         const minSize = FileAPI.getMinSize(this.raw)

@@ -39,15 +39,13 @@ export class ReactiveObject extends TypedPublisher<ReactiveObjectSubscription, B
             type
         })
 
-        this._subscriptions.get("*").forEach(subscription => subscription(this, event))
-
-        const commits = []
+        Array.from(this._subscriptions.get("*"))
+            .forEach(subscription => subscription(this, event))
 
         if (this._subscriptions.has(type)) {
-            this._subscriptions.get(type).forEach(s => commits.push(s))
+            Array.from(this._subscriptions.get(type))
+                .forEach(subscription => subscription(this, event))
         }
-
-        commits.forEach(subscription => subscription(this, event))
 
         if (this.eventBus) {
             event[this.eventObjectName] = this

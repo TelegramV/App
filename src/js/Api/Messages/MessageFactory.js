@@ -56,7 +56,7 @@ export class MessageFactory {
         const type = MessageParser.getType(raw)
 
         if (messageObjects.has(type)) {
-            return new (messageObjects.get(type))(dialogPeer, raw).fillRaw(raw)
+            return new (messageObjects.get(type))(dialogPeer).fillRaw(raw)
         } else {
             return new UnsupportedMessage(dialogPeer).fillRaw(raw)
         }

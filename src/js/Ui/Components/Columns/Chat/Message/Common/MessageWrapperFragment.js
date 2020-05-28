@@ -1,19 +1,19 @@
-import { ChatInputManager } from "../../ChatInput/ChatInputComponent";
-import { InlineKeyboardComponent } from "./InlineKeyboardComponent";
-import { MessageAvatarComponent } from "./MessageAvatarComponent";
-import { ReplyFragment } from "./ReplyFragment"
-import { ForwardedHeaderFragment } from "./ForwardedHeaderFragment"
-import { MessageParser } from "../../../../../../Api/Messages/MessageParser";
-import { UserPeer } from "../../../../../../Api/Peers/Objects/UserPeer";
+import {ChatInputManager} from "../../ChatInput/ChatInputComponent";
+import {InlineKeyboardComponent} from "./InlineKeyboardComponent";
+import {MessageAvatarComponent} from "./MessageAvatarComponent";
+import {ReplyFragment} from "./ReplyFragment"
+import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
+import {MessageParser} from "../../../../../../Api/Messages/MessageParser";
+import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer"
 import MTProto from "../../../../../../MTProto/External";
 import UpdatesManager from "../../../../../../Api/Updates/UpdatesManager";
 import VUI from "../../../../../VUI"
 
-const ReplyToMessageFragment = ({ message }) => {
+const ReplyToMessageFragment = ({message}) => {
     if (!message.raw.reply_to_msg_id) {
-        return ""
+        return undefined
     } else if (!message.replyToMessage) {
         return <ReplyFragment id={`message-${message.id}-rpl`} show={true} onClick={l => {
             UIEvents.General.fire("chat.showMessage", {message: message.replyToMessage})
@@ -30,7 +30,8 @@ const ReplyToMessageFragment = ({ message }) => {
     )
 }
 
-const MessageWrapperFragment = ({
+const MessageWrapperFragment = (
+    {
         message,
         transparent = false,
         noPad = false,
@@ -43,10 +44,10 @@ const MessageWrapperFragment = ({
     slot
 ) => {
     const defaultContextActions = [{
-            icon: "reply",
-            title: "Reply",
-            onClick: _ => ChatInputManager.replyTo(message)
-        },
+        icon: "reply",
+        title: "Reply",
+        onClick: _ => ChatInputManager.replyTo(message)
+    },
         {
             icon: "copy",
             title: "Copy"
@@ -124,14 +125,14 @@ const MessageWrapperFragment = ({
              onDblClick={doubleClickHandler}>
 
             <MessageAvatarComponent message={message} show={!message.hideAvatar}/>
-                <div className={contentClasses}>
-                    <ReplyToMessageFragment message={message}/>
-                    <ForwardedHeaderFragment message={message}/>
-                    {username ? <div css-cursor="pointer" className="username"
-                                     onClick={() => AppSelectedInfoPeer.select(message.from)}>{message.from.name}</div> : ""}
-                    {slot}
-                </div>
-                {inlineKeyboard}
+            <div className={contentClasses}>
+                <ReplyToMessageFragment message={message}/>
+                <ForwardedHeaderFragment message={message}/>
+                {username ? <div css-cursor="pointer" className="username"
+                                 onClick={() => AppSelectedInfoPeer.select(message.from)}>{message.from.name}</div> : ""}
+                {slot}
+            </div>
+            {inlineKeyboard}
         </div>
     )
 }

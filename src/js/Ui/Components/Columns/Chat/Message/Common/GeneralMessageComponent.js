@@ -54,40 +54,14 @@ class GeneralMessageComponent extends StatefulComponent {
 
     messageOnReplyFound = () => {
         this.forceUpdate()
-        // if (this.__.mounted) {
-        //     VRDOM.patch(
-        //         this.$el.querySelector(`#message-${this.message.id}-rpl`),
-        //         <ReplyFragment
-        //             id={`message-${this.message.id}-rpl`}
-        //             messageId={this.message.id}
-        //             show={true}
-        //             name={this.message.replyToMessage.from.name}
-        //             text={MessageParser.getPrefixNoSender(this.message.replyToMessage)}
-        //             onClick={l => UIEvents.General.fire("chat.showMessage", {message: this.message.replyToMessage})}/>
-        //     )
-        // }
     }
 
     messageOnReplyNotFound = () => {
-        if (this.__.mounted) {
-            VRDOM.patch(
-                this.$el.querySelector(`#message-${this.message.id}-rpl`),
-                <ReplyFragment
-                    id={`message-${this.message.id}-rpl`}
-                    show={true}
-                    name={"Deleted message"}
-                    text={"Deleted message"}/>
-            )
-        }
+        this.forceUpdate()
     }
 
     messageOnForwardedFound = () => {
-        if (this.__.mounted) {
-            VRDOM.patch(
-                this.$el.querySelector(`#message-${this.message.id}-fwd`),
-                <ForwardedHeaderFragment message={this.message}/>
-            )
-        }
+        this.forceUpdate()
     }
 
     messageOnEdit = event => {
