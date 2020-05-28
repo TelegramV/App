@@ -66,12 +66,10 @@ export function vrdom_appendMany(nodes: VRNode[], $parent: HTMLElement, props?: 
  * @param props
  */
 export function vrdom_appendRealMany($nodes: Node[], $parent: HTMLElement) {
-    return $nodes.map($node => {
+    return $nodes.forEach($node => {
         $parent.appendChild($node)
 
         vrdom_resolveMount($node)
-
-        return $node
     })
 }
 

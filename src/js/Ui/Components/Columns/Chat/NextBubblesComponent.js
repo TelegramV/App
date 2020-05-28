@@ -192,7 +192,7 @@ class NextBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
-            vrdom_appendRealMany($messages.reverse(), this.bubblesInnerRef.$el)
+            vrdom_appendRealMany($messages, this.bubblesInnerRef.$el)
 
             return $messages;
         }

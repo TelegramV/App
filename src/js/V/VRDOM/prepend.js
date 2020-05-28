@@ -65,13 +65,11 @@ export function vrdom_prependMany(nodes: VRNode, $el: Element, props?: VRenderPr
  * @param $el
  * @param props
  */
-export function vrdom_prependRealMany($nodes: VRNode, $el: Element, props?: VRenderProps): Element | HTMLElement {
-    return $nodes.map($node => {
+export function vrdom_prependRealMany($nodes: Node[], $el: Element, props?: VRenderProps): Element | HTMLElement {
+    return $nodes.forEach($node => {
         $el.prepend($node)
 
         vrdom_resolveMount($node)
-
-        return $node
     })
 }
 
