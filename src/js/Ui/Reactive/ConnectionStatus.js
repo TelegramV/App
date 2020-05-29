@@ -25,9 +25,11 @@ class ConnectionStatus {
 
             console.warn("got network")
 
-            UpdatesManager.defaultUpdatesProcessor.getDifference()
-                .then(UpdatesManager.defaultUpdatesProcessor.processDifference)
-            
+            if (UpdatesManager.State.pts != null) {
+                UpdatesManager.defaultUpdatesProcessor.getDifference()
+                    .then(diff => UpdatesManager.defaultUpdatesProcessor.processDifference(diff))
+            }
+
             this.fire(this.Status)
         })
 
@@ -35,8 +37,10 @@ class ConnectionStatus {
             console.log("connectionRestored")
             this._connectionOk = true
 
-            UpdatesManager.defaultUpdatesProcessor.getDifference()
-                .then(UpdatesManager.defaultUpdatesProcessor.processDifference)
+            if (UpdatesManager.State.pts != null) {
+                UpdatesManager.defaultUpdatesProcessor.getDifference()
+                    .then(diff => UpdatesManager.defaultUpdatesProcessor.processDifference(diff))
+            }
 
             this.fire(this.Status)
         })
