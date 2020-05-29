@@ -190,6 +190,8 @@ export class PeerMessages {
 
                 if (message.isOut) {
                     this.clearUnread();
+                } else {
+                    this.addUnread(message.id)
                 }
             } else {
                 // console.warn("BUG: putNewRawMessage got not newest message", newest.id, message.id);
@@ -232,10 +234,8 @@ export class PeerMessages {
         this._unreadCount = unreadCount
         this.clearUnreadIds()
 
-        if (!this.isTransaction) {
-            if (this.peer.dialog) {
-                this.peer.dialog.fire("updateUnread")
-            }
+        if (this.peer.dialog) {
+            this.peer.dialog.fire("updateUnread")
         }
     }
 
@@ -246,13 +246,12 @@ export class PeerMessages {
     set unreadMentionsCount(unreadMentionsCount: number) {
         this._unreadMentionsCount = unreadMentionsCount || this._unreadMentionsCount
 
-        if (!this.isTransaction) {
+        if (this.peer.dialog) {
             if (this.peer.dialog) {
-                if (this.peer.dialog) {
-                    this.peer.dialog.fire("updateUnreadMentionsCount")
-                }
+                this.peer.dialog.fire("updateUnreadMentionsCount")
             }
         }
+
     }
 
     get readOutboxMaxId(): number {
@@ -266,10 +265,8 @@ export class PeerMessages {
         if (this.readOutboxMaxId < readOutboxMaxId) {
             this._readOutboxMaxId = readOutboxMaxId || this._readOutboxMaxId
 
-            if (!this.isTransaction) {
-                if (this.peer.dialog) {
-                    this.peer.dialog.fire("updateReadOutboxMaxId")
-                }
+            if (this.peer.dialog) {
+                this.peer.dialog.fire("updateReadOutboxMaxId")
             }
         }
     }
@@ -290,10 +287,8 @@ export class PeerMessages {
 
             this._readInboxMaxId = readInboxMaxId || this._readInboxMaxId
 
-            if (!this.isTransaction) {
-                if (this.peer.dialog) {
-                    this.peer.dialog.fire("updateReadInboxMaxId")
-                }
+            if (this.peer.dialog) {
+                this.peer.dialog.fire("updateReadInboxMaxId")
             }
         }
     }
@@ -319,11 +314,9 @@ export class PeerMessages {
 
         this.deleteUnread(messageId);
 
-        if (!this.isTransaction) {
-            this.peer.dialog.fire("deleteMessage", {
-                messageId
-            });
-        }
+        this.peer.dialog.fire("deleteMessage", {
+            messageId
+        });
     }
 
     /**
@@ -336,10 +329,8 @@ export class PeerMessages {
             --(this._unreadCount)
         }
 
-        if (!this.isTransaction) {
-            if (this.peer.dialog) {
-                this.peer.dialog.fire("updateUnread")
-            }
+        if (this.peer.dialog) {
+            this.peer.dialog.fire("updateUnread")
         }
     }
 
@@ -374,11 +365,8 @@ export class PeerMessages {
         this.clearUnreadIds()
         this._unreadCount = 0
 
-        if (!this.isTransaction) {
-
-            if (this.peer.dialog) {
-                this.peer.dialog.fire("updateUnread")
-            }
+        if (this.peer.dialog) {
+            this.peer.dialog.fire("updateUnread")
         }
     }
 
