@@ -136,6 +136,24 @@ class MTProtoBridge {
         })
     }
 
+    generateEmojiFingerprint(authKey, gA) {
+        return performTask("generateEmojiFingerprint", {
+            authKey, gA
+        })
+    }
+
+    getAuthKey(gB, random, p) {
+        return performTask("getAuthKey", {
+            gB, random, p
+        })
+    }
+
+    startCall(dhConfig) {
+        return performTask("startCall", {
+            dhConfig
+        })
+    }
+
     isUserAuthorized() {
         return !!localStorage.getItem("user")
     }

@@ -17,10 +17,15 @@
  *
  */
 
-import {CallsManager} from "../../Calls/CallManager"
 
-function processUpdatePhoneCall(update) {
-    CallsManager.handleUpdate(update)
+import {CallsInternal} from "../../Calls/Internal";
+
+function task_generateEmojiFingerprint({data, success, fail}) {
+    try {
+        success(CallsInternal.generateEmojiFingerprint(data.authKey, data.gA))
+    } catch (error) {
+        fail(error)
+    }
 }
 
-export default processUpdatePhoneCall;
+export default task_generateEmojiFingerprint

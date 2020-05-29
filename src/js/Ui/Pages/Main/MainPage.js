@@ -22,6 +22,7 @@ import CreateChannelBar from "../../Components/Sidebars/Left/Create/CreateChanne
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
 import ForwardBarComponent from "../../Components/Sidebars/Right/ForwardBarComponent";
 import Localization from "../../../Api/Localization/Localization";
+import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -50,7 +51,7 @@ export function MainPage() {
             <InstantViewComponent/>
             <SnackbarComponent/>
             <SettingsComponent/>
-            {/*<PhoneCallComponent/>*/}
+            <PhoneCallComponent/>
             {/*TODO move all settings inside it's component*/}
 
             <SearchPanelComponent/>

@@ -24,6 +24,9 @@ import task_connect from "./tasks/task_connect"
 import task_mt_srp_check_password from "./tasks/task_mt_srp_check_password"
 import task_gzipUncompress from "./tasks/task_gzipUncompress"
 import task_time_generateMessageId from "./tasks/task_time_generate_message_id"
+import task_startCall from "./CallsTasks/task_startCall";
+import task_getAuthKey from "./CallsTasks/task_getAuthKey";
+import task_generateEmojiFingerprint from "./CallsTasks/task_generateEmojiFingerprint";
 
 type Task = {
     id: number,
@@ -60,6 +63,9 @@ TASKS.set("connect", task_connect)
 TASKS.set("mt_srp_check_password", task_mt_srp_check_password)
 TASKS.set("gzipUncompress", task_gzipUncompress)
 TASKS.set("time_generateMessageId", task_time_generateMessageId)
+TASKS.set("startCall", task_startCall)
+TASKS.set("getAuthKey", task_getAuthKey)
+TASKS.set("generateEmojiFingerprint", task_generateEmojiFingerprint)
 
 self.addEventListener("message", event => {
     const data = event.data

@@ -3,6 +3,7 @@ import UIEvents from "../../../../EventBus/UIEvents"
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import {UserPeer} from "../../../../../Api/Peers/Objects/UserPeer";
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import {CallsManager} from "../../../../../Api/Calls/CallManager";
 
 class ChatInfoCallButtonComponent extends StatelessComponent {
 
@@ -20,7 +21,7 @@ class ChatInfoCallButtonComponent extends StatelessComponent {
     }
 
     callContact = () => {
-        //CallsManager.startCall(AppSelectedChat.current)
+        CallsManager.startCall(AppSelectedChat.current)
     }
 
     onChatSelect = (event) => {

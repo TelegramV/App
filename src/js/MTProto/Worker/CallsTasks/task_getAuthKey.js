@@ -17,10 +17,15 @@
  *
  */
 
-import {CallsManager} from "../../Calls/CallManager"
 
-function processUpdatePhoneCall(update) {
-    CallsManager.handleUpdate(update)
+import {CallsInternal} from "../../Calls/Internal";
+
+function task_getAuthKey({data, success, fail}) {
+    try {
+        success(CallsInternal.getAuthKey(data.gB, data.random, data.p))
+    } catch (error) {
+        fail(error)
+    }
 }
 
-export default processUpdatePhoneCall;
+export default task_getAuthKey
