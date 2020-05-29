@@ -69,7 +69,7 @@ const MessageWrapperFragment = (
             icon: "forward",
             title: "Forward",
             onClick: () => {
-                UIEvents.General.fire("message.forward", {message})
+                UIEvents.General.fire("message.forward", {message, from: message.dialog.peer})
             }
         },
         {

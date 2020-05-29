@@ -21,4 +21,9 @@ export class GroupForbiddenPeer extends Peer {
     get type() {
         return "chatForbidden"
     }
+
+
+    get canSendMessage() {
+        return false
+    }
 }

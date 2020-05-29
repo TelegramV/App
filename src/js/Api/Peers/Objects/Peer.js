@@ -394,4 +394,8 @@ export class Peer extends ReactiveObject {
 
         return this
     }
+
+    get canSendMessage() {
+        return true
+    }
 }

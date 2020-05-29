@@ -28,6 +28,7 @@ import FileManager from "../../../Api/Files/FileManager"
 import {DocumentMessagesTool} from "../../Utils/document"
 import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -154,9 +155,13 @@ export class MediaViewerComponent extends StatefulComponent {
                             <i className="tgico tgico-delete rp rps" onClick={event => {
                                 event.stopPropagation();
                             }}/>
-                            <i className="tgico tgico-forward rp rps" onClick={event => {
-                                event.stopPropagation();
-                            }}/>
+                            {
+                                nodeIf( <i className="tgico tgico-forward rp rps" onClick={event => {
+                                    event.stopPropagation();
+                                    UIEvents.General.fire("message.forward", {message, from: message.dialog.peer})
+                                }}/>, !!message)
+                            }
+
                             <i style={{
                                 "cursor": !this.state.message || !this.state.message.loaded ? "default" : "pointer",
                             }} className="tgico tgico-download rp rps" onClick={event => {

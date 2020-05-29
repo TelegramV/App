@@ -46,6 +46,16 @@ export default class ComposerComponent extends StatelessComponent {
         this.$gifPanel = this.$el.querySelector(".gif-wrapper");
     }
 
+    show = () => {
+        this.$el.classList.add("visible");
+        this.onShow();
+    }
+
+    hide = () => {
+        this.$el.classList.remove("visible");
+        this.onHide();
+    }
+
     onHide = () => {
         this.$stickersPanel.querySelector(".selected").childNodes.forEach(node => {
             if (node.id) {

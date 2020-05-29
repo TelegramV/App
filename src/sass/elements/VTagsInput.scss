@@ -30,6 +30,33 @@
       margin-top: 5px;
 
       border-radius: 15px;
+      //animation: tag-appear 0.2s ease-in-out;
+
+      &:hover {
+        .close {
+          opacity: 1;
+        }
+      }
+
+      .close {
+        height: 30px;
+        width: 30px;
+        position: absolute;
+        background-color: $red;
+        border-radius: 50%;
+        z-index: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        opacity: 0;
+        transition: anim(opacity);
+
+
+        span {
+          font-size: 8pt;
+        }
+      }
 
       .avatar {
         height: 30px;

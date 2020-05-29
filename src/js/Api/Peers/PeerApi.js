@@ -6,6 +6,7 @@ import {FileAPI} from "../Files/FileAPI"
 import {MessageFactory} from "../Messages/MessageFactory"
 import {TextMessage} from "../Messages/Objects/TextMessage";
 import UIEvents from "../../Ui/EventBus/UIEvents";
+import UpdatesManager from "../Updates/UpdatesManager";
 
 const genMsgId = () => (new Date).getTime()
 
@@ -144,6 +145,25 @@ export class PeerApi {
                 if (show_previews !== undefined) this.peer.full.notify_settings.show_previews = show_previews
             }
         })
+    }
+
+    async forwardMessages({
+        messages = [],
+        to = null,
+                    }) {
+        let randomId = genMsgId()
+        const randomIds = messages.map(l => randomId++)
+        const response = await MTProto.invokeMethod("messages.forwardMessages", {
+            silent: false,
+            background: true,
+            with_my_score: true,
+            grouped: false,
+            from_peer: this.peer.inputPeer,
+            to_peer: to.inputPeer,
+            id: messages.map(l => l.id),
+            random_id: randomIds
+        })
+        MTProto.UpdatesManager.process(response)
     }
 
     sendMessage({

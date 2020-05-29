@@ -21,6 +21,7 @@ import StatelessComponent from "../../../../../V/VRDOM/component/StatelessCompon
 import API from "../../../../../Api/Telegram/API"
 import StickerSet from "../../../../../Api/Stickers/StickerSet"
 import VRDOM from "../../../../../V/VRDOM/VRDOM"
+import VApp from "../../../../../V/vapp"
 import Lottie from "../../../../Lottie/Lottie"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
@@ -112,7 +113,7 @@ class StickersComposerComponent extends StatelessComponent {
             API.messages.getRecentStickers().then(RecentStickers => {
                 const $el = document.getElementById("composer-sticker-pack-recent");
 
-                RecentStickers.stickers.forEach(Document => {
+                RecentStickers.stickers.slice(0, 50).forEach(Document => {
                     VRDOM.append(
                         <BetterStickerComponent id={`composer-sticker-recent-${Document.id}`}
                                                 width={75}
@@ -151,6 +152,7 @@ class StickersComposerComponent extends StatelessComponent {
                 }
             }
         }
+        VApp.mountedComponents.get("composer").hide(); //close composer after that
     }
 
     // DOM HELL
