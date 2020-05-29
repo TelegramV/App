@@ -12,7 +12,7 @@ export const CheckboxWithPeerFragment = ({peer, onClick, checked = false}) => {
             })
         }}>
             <VCheckbox checked={checked}/>
-            <AvatarComponent peer={peer}/>
+            <AvatarComponent peer={peer} onClick={null}/>
             <div className="text">
                 <div className="name">{peer.name}</div>
                 <div className="description">{"last seen a long time ago"}</div>
