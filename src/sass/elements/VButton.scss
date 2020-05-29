@@ -15,15 +15,13 @@
  *
  */
 
-@import "../colors";
-
 .v-button {
   transition: all .2s ease-in-out;
 
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
-  background-color: $button-background;
-  color: $button-text-color;
+  background-color: $blue;
+  color: $verylightgrey;
   padding: 12px 16px;
   border-radius: 8px;
   border: none;
@@ -34,7 +32,7 @@
   font-size: 15px;
 
   &:hover {
-    background-color: $button-background-hover;
+    background-color: $bluehover;
   }
 }
 
@@ -57,6 +55,6 @@
   color: $blue;
 
   &:hover {
-    background-color: $flat-button-hover-background;
+    background-color: $lightgrey;
   }
 }

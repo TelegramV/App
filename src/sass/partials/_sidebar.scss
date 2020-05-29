@@ -143,10 +143,6 @@
         opacity: 1;
         pointer-events: auto;
 
-        .color-blue {
-            color: $blue;
-        }
-
         &.hidden {
             pointer-events: none;
             transform: scale(0.8, 0.8);
