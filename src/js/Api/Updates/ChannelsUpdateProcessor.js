@@ -266,7 +266,7 @@ export class ChannelsUpdateProcessor extends UpdatesProcessor {
     }
 
     processDifference(channelQueue, rawDifferenceWithPeer) {
-        console.debug("[channel] got difference", rawDifferenceWithPeer)
+        // console.debug("[channel] got difference", rawDifferenceWithPeer)
 
         if (rawDifferenceWithPeer._ === "updates.channelDifference") {
 
@@ -329,7 +329,6 @@ export class ChannelsUpdateProcessor extends UpdatesProcessor {
         } else if (rawDifferenceWithPeer._ === "updates.channelDifferenceEmpty") {
             // console.warn("difference empty")
 
-
             AppEvents.General.fire("gotDifference", {
                 diffType: 0 // channel
             })
@@ -357,7 +356,7 @@ export class ChannelsUpdateProcessor extends UpdatesProcessor {
         this.latestDifferencePeer = peer
         this.latestDifferenceTime = MTProto.TimeManager.now(true)
 
-        console.warn("[channel] fetching difference")
+        // console.warn("[channel] fetching difference")
 
         return MTProto.invokeMethod("updates.getChannelDifference", {
             force: false,

@@ -92,7 +92,7 @@ export class DefaultUpdatesProcessor extends UpdatesProcessor {
     }
 
     processDifference(rawDifference) {
-        console.debug("[default] got difference", rawDifference)
+        // console.debug("[default] got difference", rawDifference)
 
         if (rawDifference._ === "updates.difference") {
 

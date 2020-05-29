@@ -170,10 +170,10 @@ class NextBubblesComponent extends StatelessComponent {
                     console.log("[warn] append no after message")
                 }
                 if (beforeTopMessage && messages[0].id < beforeTopMessage.id) {
-                    console.error("append shit before", beforeTopMessage, messages)
+                    console.error("append before", beforeTopMessage, messages)
                 }
                 if (afterBottomMessage && messages[messages.length - 1].id > afterBottomMessage.id) {
-                    console.error("append shit after", afterBottomMessage, messages)
+                    console.error("append after", afterBottomMessage, messages)
                 }
             }
 
@@ -278,7 +278,7 @@ class NextBubblesComponent extends StatelessComponent {
         }
 
         if (isAtTop) {
-            console.log("on top")
+            // console.log("on top")
             this.virtual_onScrolledTop();
         } else if (isAtBottom) {
             if (this.virtual_isCompletelyBottom() || (!this.mainVirtual.hasMoreOnTopToDownload && this.virtual_isCompletelyBottom())) {
@@ -462,15 +462,15 @@ class NextBubblesComponent extends StatelessComponent {
             return;
         }
 
-        console.log("scrolled top")
+        // console.log("scrolled top")
 
         if (this.currentVirtual.isVeryTop()) {
             if (!this.currentVirtual.hasMoreOnTopToDownload) {
-                console.log("!hasMoreOnTopToDownload", this.isUsingSecondVirtual);
+                // console.log("!hasMoreOnTopToDownload", this.isUsingSecondVirtual);
             }
 
             if (this.currentVirtual.isDownloading) {
-                console.log("isDownloading", this.isUsingSecondVirtual);
+                // console.log("isDownloading", this.isUsingSecondVirtual);
             }
 
             if (this.currentVirtual.hasMoreOnTopToDownload && !this.currentVirtual.isDownloading) {
@@ -478,7 +478,7 @@ class NextBubblesComponent extends StatelessComponent {
                 if (!this.currentVirtual.isEmpty()) {
                     this.currentVirtual.isDownloading = true;
 
-                    console.log("[top] downloading");
+                    // console.log("[top] downloading");
 
                     AppSelectedChat.current.messages.downloadNextTopPage(this.currentVirtual.getVeryTopOne().id, {
                         isUsingSecondVirtual: this.isUsingSecondVirtual
@@ -543,14 +543,14 @@ class NextBubblesComponent extends StatelessComponent {
             return;
         }
 
-        console.log("on scrolled bottom");
+        // console.log("on scrolled bottom");
 
         if (this.currentVirtual.isVeryBottom()) {
             if (this.currentVirtual.hasMoreOnBottomToDownload && !this.currentVirtual.isDownloading) {
                 if (this.currentVirtual.messages.length > 0) {
                     this.currentVirtual.isDownloading = true;
 
-                    console.log("[bottom] downloading")
+                    // console.log("[bottom] downloading")
 
                     AppSelectedChat.current.messages.downloadNextBottomPage(this.currentVirtual.getVeryBottomOne().id, {
                         isUsingSecondVirtual: this.isUsingSecondVirtual
@@ -558,7 +558,7 @@ class NextBubblesComponent extends StatelessComponent {
                 }
             }
 
-            console.log("isVeryBottom")
+            // console.log("isVeryBottom")
 
             return;
         }
@@ -610,7 +610,7 @@ class NextBubblesComponent extends StatelessComponent {
 
             this.isUsingSecondVirtual = false;
 
-            console.log(this.mainVirtual.currentPage)
+            // console.log(this.mainVirtual.currentPage)
 
             this.secondVirtual.refresh();
         } else {

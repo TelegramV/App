@@ -42,7 +42,9 @@ const vrdom_patchChildren = ($node: Element, vRNode: VRNode) => {
         }
     } else if (children.length < $children.length) {
         Array.from($children.values()).slice(children.length).forEach(($node: Node) => {
-            vrdom_delete($node)
+            if (!$node.__ripple) {
+                vrdom_delete($node)
+            }
         })
     }
 }

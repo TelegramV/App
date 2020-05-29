@@ -13,7 +13,8 @@ import VUI from "../../../../../VUI"
 
 const ReplyToMessageFragment = ({message}) => {
     if (!message.raw.reply_to_msg_id) {
-        return undefined
+        return ""
+        // here was `undefined` instead of "", pls do not use `undefined` anymore here..(
     } else if (!message.replyToMessage) {
         return <ReplyFragment id={`message-${message.id}-rpl`} show={true} onClick={l => {
             UIEvents.General.fire("chat.showMessage", {message: message.replyToMessage})
