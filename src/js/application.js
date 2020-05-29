@@ -22,7 +22,7 @@ if (__IS_PRODUCTION__) {
 } else {
     document.title = "[dev] Telegram V"
     window.invoke = MTProto.invokeMethod
-    window.keval = keval
+    window.devkeval = keval
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)
@@ -37,5 +37,3 @@ MTProto.connect().then(user => {
 
     console.log("connected");
 })
-
-console.log(false ?? "kek")

@@ -33,9 +33,9 @@ img[src=""], img:not([src]) {
   user-select: none;
 }
 
-@media (min-width: 1680px) {
+@media (min-width: 1920px) {
   body {
-    width: 80%;
+    width: 1920px;
     margin-left: auto;
     margin-right: auto;
 
