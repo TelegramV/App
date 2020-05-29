@@ -69,7 +69,7 @@ export default class MessageSearchComponent extends RightBarComponent {
 
     render() {
         return (
-            <div class="sidebar right scrollable hidden messages-search search-results" onScroll={this.onScroll}>
+            <div class="sidebar right hidden messages-search search-results" onScroll={this.onScroll}>
                 <div class="toolbar">
                     <span class="btn-icon tgico tgico-close rp rps" onClick={_ => this.hideBar()}/>
                     <div class="search">
@@ -83,7 +83,7 @@ export default class MessageSearchComponent extends RightBarComponent {
                         </div>
                     </div>
                 </div>
-                <div class="global-messages">
+                <div class="global-messages scrollable">
                     <MessagesCountFragment ref={this.messagesCountRef}
                                            count={this.state.messagesCount}/>
 

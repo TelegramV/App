@@ -149,6 +149,7 @@ class ForwardBarComponent extends OnTopRightBarComponent {
         this.state.selected = []
         this.state.selectedMessages = []
         this.state.from = null
+        this.state.filter = null
         this.forceUpdate()
     }
 
