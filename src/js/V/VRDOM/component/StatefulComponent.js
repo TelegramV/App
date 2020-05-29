@@ -33,6 +33,10 @@ class StatefulComponent extends VComponent {
     }
 
     setState(nextState) {
+        if (this.__.destroyed) {
+            return;
+        }
+
         if (typeof nextState === "function") {
             __component_update_state(this, nextState(this.state));
         } else {

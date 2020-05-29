@@ -31,7 +31,6 @@ export const MessageType = {
 }
 
 export interface Message {
-
     +type: number,
     +raw: Object;
 
@@ -81,5 +80,4 @@ export interface Message {
     read(): Promise;
 
     fillRaw(raw: Object): Message;
-
 }

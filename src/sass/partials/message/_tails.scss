@@ -5,6 +5,7 @@
         &~.inline-keyboard {
             margin-left: 11px;
         }
+        padding-right: 5px;
     }
 
     &.group-s {
@@ -34,8 +35,15 @@
             border-bottom-right-radius: 12px;
 
         	figure.photo, figure.video {
-	    		margin-left: -20px;
+	    		margin-left: -10px;
+                margin-right: -5px;
 		    }
+
+            .box {
+                figure.photo, figure.video {
+                    margin-left: 0px; //embed
+                }
+            }
 
 			&.transparent {
 	        	padding-left: 0;
@@ -46,7 +54,15 @@
         // TAILS
         &.group-s {}
 
-        &.group-m {}
+        &.group-m {
+            figure.round {
+                margin-left: 0px;
+
+                &~.playback {
+                    left: 10px;
+                }
+            }
+        }
 
         &.group-e {
             -webkit-mask-image: url("../../public/static/images/tail-left.svg"),
@@ -74,6 +90,10 @@
 		    	padding-left: 0;
 		    	padding-right: 0;
 
+                .reply {
+                    margin-left: 20px;
+                }
+
 		    	figure.photo, figure.video {
 		    		margin-left: 0px;
 			    }
@@ -98,7 +118,11 @@
         // TAILS
         &.group-s {}
 
-        &.group-m {}
+        &.group-m {
+            figure.round {
+                margin-right: 0px;
+            }
+        }
 
         &.group-e {
             -webkit-mask-image: url("../../public/static/images/tail-right.svg"),
@@ -121,6 +145,11 @@
             &.no-pad {
 		    	padding-right: 0;
 		    	padding-left: 0;
+
+                .reply {
+                    margin-left: 10px;
+                }
+
 		    	figure.photo, figure.video {
 		    		margin-left: 0;
 		    		margin-right: 0;

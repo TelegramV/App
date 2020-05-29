@@ -24,7 +24,7 @@ import renderText from "./renderText"
 import VListVRNode from "../list/VListVRNode"
 import vrdom_renderVListVRNode from "./renderVList"
 import ComponentVRNode from "../component/ComponentVRNode"
-import vrdom_renderAbstractComponentVNode from "./renderAbstractComponent"
+import vrdom_renderComponentVNode from "./renderComponent"
 
 /**
  * Creates Real DOM Element from VRNode
@@ -35,7 +35,7 @@ import vrdom_renderAbstractComponentVNode from "./renderAbstractComponent"
 function vrdom_render(node: VRNode, props: VRenderProps = {}): HTMLElement | Element | Node | Text {
     try {
         if (node instanceof ComponentVRNode) {
-            return vrdom_renderAbstractComponentVNode(node)
+            return vrdom_renderComponentVNode(node)
         } else if (node instanceof VListVRNode && props.$parent) {
             return vrdom_renderVListVRNode(node, props)
         }

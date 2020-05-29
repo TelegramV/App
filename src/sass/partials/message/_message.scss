@@ -1,19 +1,21 @@
 #bubbles {
     height: 100%;
+    padding-bottom: 5px;
     -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) calc(100% - 16px), rgba(0, 0, 0, 0));
     mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) calc(100% - 16px), rgba(0, 0, 0, 0));
 
     @include service;
 
     .channel {
-        .message {
+        &.message {
             grid-template-columns: min-content 1fr;
+            .avatar {
+                display: none;
+            }
         }
     }
 
     .message {
-        /*display: flex;
-        flex-direction: row;*/
         display: grid;
         position: relative;
         grid-template-areas:
@@ -105,8 +107,7 @@
             min-height: 33px;
             grid-area: message;
             border-radius: 6px;
-            //position: relative;
-            position: static;
+            position: relative;
             z-index: 0;
             display: inline-table;
             overflow: hidden;
@@ -132,6 +133,11 @@
                 margin-top: 7px;
                 margin-bottom: 4px;
                 user-select: text;
+            }
+
+            .card {
+                margin-top: 10px;
+                margin-bottom: 10px;
             }
 
             //not dependant

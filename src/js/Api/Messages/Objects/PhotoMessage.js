@@ -2,7 +2,6 @@
 
 import {AbstractMessage} from "../AbstractMessage"
 import {MessageType} from "../Message"
-import {FileAPI} from "../../Files/FileAPI"
 import {Photo} from "../../Media/Photo";
 
 export class PhotoMessage extends AbstractMessage {
@@ -60,7 +59,6 @@ export class PhotoMessage extends AbstractMessage {
     }
 
 
-
     show() {
         super.show()
         this.fetchMax()
@@ -75,6 +73,9 @@ export class PhotoMessage extends AbstractMessage {
     }
 
     fetchMax() {
+        if (!this.photo) {
+            return Promise.reject()
+        }
         return this.photo.fetchMax()
     }
 
@@ -84,6 +85,10 @@ export class PhotoMessage extends AbstractMessage {
 
     fillRaw(raw: Object): PhotoMessage {
         super.fillRaw(raw)
+
+        if (!raw.media) {
+            console.warn("FUCK", this)
+        }
 
         this.photo = new Photo(raw.media.photo)
 

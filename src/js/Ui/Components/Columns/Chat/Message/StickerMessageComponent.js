@@ -1,7 +1,8 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
 import MessageTimeComponent from "./Common/MessageTimeComponent"
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import StickerComponent from "./Common/StickerComponent"
+import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
+import VUI from "../../../../VUI"
 /*import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
 import VRDOM from "../../../../../v/vrdom/VRDOM"*/
 
@@ -78,7 +79,9 @@ class StickerMessageComponent extends GeneralMessageComponent {
             <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
 
-                <StickerComponent width={200} sticker={this.message.raw.media.document}/>
+                <BetterStickerComponent isFull width={200} document={this.message.raw.media.document} onClick={() => {
+                    VUI.Modal.open(<div>TODO: implement me!</div>)
+                }}/>
 
                 <MessageTimeComponent message={this.message} bg={true}/>
 

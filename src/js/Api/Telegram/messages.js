@@ -85,6 +85,14 @@ function getAllStickers({hash = 0} = {hash: 0}) {
     return MTProto.invokeMethod("messages.getAllStickers", {hash})
 }
 
+function getRecentStickers({hash = 0} = {hash: 0}) {
+    return MTProto.invokeMethod("messages.getRecentStickers", {hash})
+}
+
+function getSavedGifs({hash = 0} = {hash: 0}) {
+    return MTProto.invokeMethod("messages.getSavedGifs", {hash})
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
@@ -92,6 +100,8 @@ const messages = {
     getChats: getChats,
     getHistory: getHistory,
     getAllStickers: getAllStickers,
+    getRecentStickers: getRecentStickers,
+    getSavedGifs: getSavedGifs,
 }
 
 export default messages

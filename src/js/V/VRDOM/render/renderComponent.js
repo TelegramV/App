@@ -21,7 +21,7 @@ import vrdom_render from "./render"
 import {initElement} from "./renderElement"
 import VApp from "../../vapp"
 import ComponentVRNode from "../component/ComponentVRNode"
-import {__component_init_wip} from "../component/__component_init"
+import __component_init from "../component/__component_init"
 import __component_render from "../component/__component_render"
 
 export function vrdom_instantiateAbstractComponentVNode(componentNode) {
@@ -42,7 +42,7 @@ export function vrdom_instantiateAbstractComponentVNode(componentNode) {
         componentInstance.identifier = String(VApp.uniqueComponentId())
     }
 
-    __component_init_wip(componentInstance)
+    __component_init(componentInstance)
 
     return componentInstance
 }
@@ -51,7 +51,7 @@ export function vrdom_instantiateAbstractComponentVNode(componentNode) {
  * @param componentNode
  * @param $node
  */
-function vrdom_renderAbstractComponentVNode(componentNode, $node: HTMLElement = undefined) {
+function vrdom_renderComponentVNode(componentNode, $node: HTMLElement = undefined) {
     const componentInstance = vrdom_instantiateAbstractComponentVNode(componentNode)
 
     if (!$node) {
@@ -72,4 +72,4 @@ function vrdom_renderAbstractComponentVNode(componentNode, $node: HTMLElement = 
 }
 
 
-export default vrdom_renderAbstractComponentVNode
+export default vrdom_renderComponentVNode

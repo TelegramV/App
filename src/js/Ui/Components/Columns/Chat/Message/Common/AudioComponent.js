@@ -38,11 +38,12 @@ class AudioComponent extends GeneralMessageComponent {
     }
 
     render() {
+        console.log("render")
         return (
             <MessageWrapperFragment message={this.message} showUsername={false} bubbleRef={this.bubbleRef}>
                 <div class="audio">
-                    <progress class="progress-circular"/>
                     <div class="play tgico tgico-play rp rps rp-white" onMouseDown={this._playButtonClick.bind(this)}/>
+                    <progress class="progress-circular"/>
                     <div class="audio-wrapper">
                         {this.getControls()}
                     </div>
@@ -53,6 +54,7 @@ class AudioComponent extends GeneralMessageComponent {
     }
 
     componentDidMount() {
+        super.componentDidMount()
         this.loadProgress = this.$el.querySelector(".progress-circular");
         this.playButton = this.$el.querySelector(".play");
         this.controlsMounted();

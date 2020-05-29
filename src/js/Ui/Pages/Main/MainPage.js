@@ -21,6 +21,7 @@ import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
 import CreateChannelBar from "../../Components/Sidebars/Left/Create/CreateChannelBar";
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
 import ForwardBarComponent from "../../Components/Sidebars/Right/ForwardBarComponent";
+import Localization from "../../../Api/Localization/Localization";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -32,10 +33,10 @@ function initHighLevelManagers() {
             TopPeers.init()
         })
     })
-    //LocaleController.init()
     StickerManager.fetchSpecialSets();
     WallpaperManager.init();
     FoldersManager.init()
+    Localization.init();
 }
 
 export function MainPage() {

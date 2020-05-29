@@ -4,16 +4,17 @@ import type {Message} from "../../../../../../Api/Messages/Message"
 import {ReplyFragment} from "./ReplyFragment"
 import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
-import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 import __component_destroy from "../../../../../../V/VRDOM/component/__component_destroy"
+import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulComponent"
 
-class GeneralMessageComponent extends StatelessComponent {
+class GeneralMessageComponent extends StatefulComponent {
     message: Message
 
     avatarRef = VComponent.createComponentRef()
     bubbleRef = VComponent.createRef()
 
-    init() {
+    constructor(props) {
+        super(props);
         this.message = this.props.message
     }
 
@@ -53,40 +54,14 @@ class GeneralMessageComponent extends StatelessComponent {
 
     messageOnReplyFound = () => {
         this.forceUpdate()
-        // if (this.__.mounted) {
-        //     VRDOM.patch(
-        //         this.$el.querySelector(`#message-${this.message.id}-rpl`),
-        //         <ReplyFragment
-        //             id={`message-${this.message.id}-rpl`}
-        //             messageId={this.message.id}
-        //             show={true}
-        //             name={this.message.replyToMessage.from.name}
-        //             text={MessageParser.getPrefixNoSender(this.message.replyToMessage)}
-        //             onClick={l => UIEvents.General.fire("chat.showMessage", {message: this.message.replyToMessage})}/>
-        //     )
-        // }
     }
 
     messageOnReplyNotFound = () => {
-        if (this.__.mounted) {
-            VRDOM.patch(
-                this.$el.querySelector(`#message-${this.message.id}-rpl`),
-                <ReplyFragment
-                    id={`message-${this.message.id}-rpl`}
-                    show={true}
-                    name={"Deleted message"}
-                    text={"Deleted message"}/>
-            )
-        }
+        this.forceUpdate()
     }
 
     messageOnForwardedFound = () => {
-        if (this.__.mounted) {
-            VRDOM.patch(
-                this.$el.querySelector(`#message-${this.message.id}-fwd`),
-                <ForwardedHeaderFragment message={this.message}/>
-            )
-        }
+        this.forceUpdate()
     }
 
     messageOnEdit = event => {

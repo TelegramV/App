@@ -32,7 +32,6 @@ class ProgressLoaderComponent extends StatelessComponent {
     }
 
     componentDidMount() {
-        console.log(this.$el);
         this.circle = this.$el.querySelector(".progress-ring__circle");
         this.withTimeout(this._calculateSize, 0); // wtf?) #2 // svg magic
     }

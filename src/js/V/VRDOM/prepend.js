@@ -39,4 +39,38 @@ function vrdom_prepend(node: VRNode, $el: Element, props?: VRenderProps): Elemen
     return $node
 }
 
+/**
+ * Prepends VRNode to Real DOM Element children
+ *
+ * @param nodes
+ * @param $el
+ * @param props
+ */
+export function vrdom_prependMany(nodes: VRNode, $el: Element, props?: VRenderProps): Element | HTMLElement {
+    return nodes.map(node => {
+        const $node = vrdom_render(node, props)
+
+        $el.prepend($node)
+
+        vrdom_resolveMount($node)
+
+        return $node
+    })
+}
+
+/**
+ * Prepends VRNode to Real DOM Element children
+ *
+ * @param $nodes
+ * @param $el
+ * @param props
+ */
+export function vrdom_prependRealMany($nodes: Node[], $el: Element, props?: VRenderProps): Element | HTMLElement {
+    return $nodes.forEach($node => {
+        $el.prepend($node)
+
+        vrdom_resolveMount($node)
+    })
+}
+
 export default vrdom_prepend

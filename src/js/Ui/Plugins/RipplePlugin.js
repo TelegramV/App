@@ -9,7 +9,8 @@ class RippleVRDOMPlugin extends VRDOMPlugin {
                 let X = e.clientX - rect.left
                 let Y = e.clientY - rect.top
 
-                let $rippleDiv = document.createElement("div")
+                const $rippleDiv = document.createElement("div")
+                $rippleDiv.__ripple = true
 
                 $rippleDiv.classList.add("ripple")
 

@@ -24,6 +24,18 @@ import VApp from "../../vapp"
 import __component_withDefaultProps from "./__component_withDefaultProps"
 import {__component_update_force} from "./__component_update"
 
+export class ComponentDidNotMount {
+    constructor(reason: any) {
+        this.reason = reason;
+    }
+}
+
+export class ComponentWasDestroyed {
+    constructor(reason: any) {
+        this.reason = reason;
+    }
+}
+
 
 // abstract stateless component
 class VComponent {
@@ -70,9 +82,9 @@ class VComponent {
 
     get $el() {
         if (this.__.destroyed) {
-            console.error("component is already destroyed!", this.constructor.displayName)
+            console.error("component is destroyed!", this.constructor.name)
         } else if (!this.__.mounted) {
-            console.error("component is not mounted!", this.constructor.displayName)
+            console.error("component is not mounted!", this.constructor.name)
         }
 
         return this._$el
@@ -114,6 +126,9 @@ class VComponent {
     componentWillUnmount() {
     }
 
+    componentWillUpdate(nextProps, nextState) {
+    }
+
     /**
      * before patch callback
      *
@@ -133,6 +148,10 @@ class VComponent {
         __component_update_force(this);
     }
 
+    /**
+     * @deprecated never use it (but sometimes you can)
+     * @param nextProps
+     */
     updateProps(nextProps) {
         __component_update_force(this, nextProps);
     }
@@ -202,6 +221,50 @@ class VComponent {
             clearTimeout(id);
             this.__.timeouts.delete(id);
         }
+    }
+
+    /**
+     * @param promise
+     * @return {Promise<*>}
+     */
+    assure(promise: Promise<any>) {
+        return promise.then(_ => {
+            if (!this.__.mounted) {
+                throw new ComponentDidNotMount()
+            } else if (this.__.destroyed) {
+                throw new ComponentWasDestroyed()
+            }
+
+            return _;
+        });
+    }
+
+    /**
+     * @param promise
+     * @return {Promise<*>}
+     */
+    assureNotDestroyed(promise: Promise<any>) {
+        return promise.then(_ => {
+            if (this.__.destroyed) {
+                throw new ComponentWasDestroyed()
+            }
+
+            return _;
+        });
+    }
+
+    /**
+     * @param promise
+     * @return {Promise<*>}
+     */
+    assureMounted(promise: Promise<any>) {
+        return promise.then(_ => {
+            if (!this.__.mounted) {
+                throw new ComponentDidNotMount()
+            }
+
+            return _;
+        });
     }
 
     toString() {

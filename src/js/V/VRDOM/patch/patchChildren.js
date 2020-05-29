@@ -31,7 +31,9 @@ const vrdom_patchChildren = ($node: Element, vRNode: VRNode) => {
     const children = vRNode.children
 
     $children.forEach(($oldChild, i) => {
-        vrdom_patch($oldChild, children[i])
+        if (!$oldChild.__ripple || children[i]) {
+            vrdom_patch($oldChild, children[i])
+        }
     })
 
     if (children.length > $children.length) {
@@ -40,9 +42,7 @@ const vrdom_patchChildren = ($node: Element, vRNode: VRNode) => {
         }
     } else if (children.length < $children.length) {
         Array.from($children.values()).slice(children.length).forEach(($node: Node) => {
-            if ($node.attributes && !$node.attributes["class"] !== "ripple") {
-                vrdom_delete($node)
-            } else {
+            if (!$node.__ripple) {
                 vrdom_delete($node)
             }
         })

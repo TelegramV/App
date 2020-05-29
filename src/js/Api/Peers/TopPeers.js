@@ -53,16 +53,18 @@ class TopPeersManager extends Manager {
     updateTopPeers = (topPeers) => {
         this.correspondents.clear();
 
-        topPeers.categories.forEach(TopPeerCategoryPeers => {
-            if (TopPeerCategoryPeers.category._ === "topPeerCategoryCorrespondents") {
-                TopPeerCategoryPeers.peers.map(TopPeer => PeersStore.getByPeerType(TopPeer.peer))
-                    .forEach(peer => this.correspondents.add(peer));
+        if (topPeers.categories) {
+            topPeers.categories.forEach(TopPeerCategoryPeers => {
+                if (TopPeerCategoryPeers.category._ === "topPeerCategoryCorrespondents") {
+                    TopPeerCategoryPeers.peers.map(TopPeer => PeersStore.getByPeerType(TopPeer.peer))
+                        .forEach(peer => this.correspondents.add(peer));
 
-                AppEvents.Peers.fire("gotCorrespondents", {
-                    correspondents: this.correspondents
-                });
-            }
-        })
+                    AppEvents.Peers.fire("gotCorrespondents", {
+                        correspondents: this.correspondents
+                    });
+                }
+            })
+        }
     }
 }
 

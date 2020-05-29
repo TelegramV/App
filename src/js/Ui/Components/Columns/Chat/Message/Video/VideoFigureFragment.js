@@ -6,14 +6,14 @@ export const VideoPreviewFragment = ({type = "video", round = false, id, thumbSr
     width = width < maxWidth ? width : maxWidth;
 
     return (
-        <figure id={id} className={[type, round ? "round" : ""]}>
+        <figure id={id} className={[type, round ? "round" : "", loading ? "thumbnail" : ""]}>
             <img class="video-preview"
                  src={thumbSrc}
                  width={width}
                  height={height}
             />
             {slot}
-            <LoadingFragment loading={loading} show={!loaded} click={clickLoader}/>
+            {/*<LoadingFragment loading={loading} show={!loaded} click={clickLoader}/>*/}
         </figure>
     )
 }

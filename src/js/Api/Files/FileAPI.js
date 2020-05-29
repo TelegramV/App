@@ -4,7 +4,7 @@ import AppCache from "../Cache/AppCache"
 import {getInputPeerFromPeer} from "../Dialogs/util"
 import {Peer} from "../Peers/Objects/Peer";
 import AppConfiguration from "../../Config/AppConfiguration";
-import {bytesAsHex, bytesConcatBuffer, bytesFromHex} from "../../Utils/byte"
+import {bytesAsHex, bytesConcat, bytesConcatBuffer, bytesFromHex} from "../../Utils/byte"
 import API from "../Telegram/API"
 import StickerSet from "../Stickers/StickerSet"
 
@@ -14,6 +14,10 @@ export class FileAPI {
     static downloadStickerSetThumb(stickerSet: StickerSet) {
         const thumb = stickerSet.raw.thumb;
 
+        if (!thumb) {
+            return FileAPI.downloadDocument(stickerSet.rawStickerSet.documents[0]);
+        }
+
         if (thumb._ === "photoSize") {
             return API.upload.getFile({
                 location: {
@@ -22,20 +26,78 @@ export class FileAPI {
                     volume_id: thumb.location.volume_id,
                     local_id: thumb.location.local_id,
                 },
-            }).then(InputFileLocation => {
-                console.log(InputFileLocation);
-                if (new Int32Array(InputFileLocation.bytes.buffer)[0] === 0x3072cfa1) {
-                    console.warn("GZIPPED PROBABLY TG")
-                }
-                return new Blob([InputFileLocation.bytes], {
-                    type: "application/jpeg"
-                });
-            })
+            }, stickerSet.thumb_dc_id);
         } else if (thumb._ === "photoCachedSize" || thumb._ === "photoStrippedSize") {
+            console.log("todo gg")
             return Promise.resolve(null);
         } else {
+            console.log("todo kk")
             return Promise.resolve(null);
         }
+    }
+
+    /**
+     * @see https://core.telegram.org/type/Document
+     *
+     * @param document
+     * @param thumb
+     */
+    static downloadDocument(document, thumb) {
+        if (document._ === "documentEmpty") {
+            return Promise.reject("documentEmpty");
+        }
+
+        return FileAPI.downloadDocumentAllParts(document, thumb);
+    }
+
+    static async downloadDocumentAllParts(document, thumb) {
+        let bytes = new Uint8Array();
+        let file = {};
+
+        const location = {
+            _: "inputDocumentFileLocation",
+            id: document.id,
+            access_hash: document.access_hash,
+            file_reference: document.file_reference,
+            thumb_size: thumb ? thumb.type : "",
+        };
+
+        const size = thumb ? thumb.size : document.size;
+
+        while (bytes.length < size) {
+            file = await API.upload.getFile({
+                location: location,
+                offset: bytes.length,
+            }, document.dc_id);
+
+            bytes = bytesConcat(bytes, file.bytes)
+        }
+
+        file.bytes = bytes
+
+        return file
+    }
+
+    static parseAnimatedStickerFile(file) {
+        return FileAPI.decodeAnimatedStickerBytes(file.bytes);
+    }
+
+    static async decodeAnimatedStickerBytes(bytes) {
+        if (bytes[0] == 123) { //"{"
+            return JSON.parse(new TextDecoder("utf-8").decode(bytes));
+        } else {
+            return MTProto.performWorkerTask("gzipUncompress", bytes).then(bytes => {
+                return JSON.parse(new TextDecoder("utf-8").decode(bytes));
+            });
+        }
+    }
+
+    static getBlob(file, type): Blob {
+        return new Blob([file.bytes], {type: type});
+    }
+
+    static getUrl(file, type): Blob {
+        return URL.createObjectURL(FileAPI.getBlob(file, type));
     }
 
     static getInputName(file) {
@@ -215,7 +277,7 @@ export class FileAPI {
 
     static getMaxSize(file, onlyThumb = false) {
         if (!onlyThumb) {
-            const video = this.getAttribute(file, "documentAttributeVideo")
+            const video = FileAPI.getAttribute(file, "documentAttributeVideo")
             if (video) {
                 return video
             }
@@ -256,24 +318,24 @@ export class FileAPI {
         return file.attributes && file.attributes.find(l => l._ === attribute)
     }
 
-    static photoThumbnail(file, resolve) {
-        const max = FileAPI.getMinSize(file)
+    static async photoThumbnail(file) {
+        const max = FileAPI.getMaxSize(file)
 
         try {
-            resolve({
+            return {
                 src: FileAPI.getThumbnail(file),
                 size: [max.w, max.h],
                 thumbnail: true
-            })
+            };
         } catch {
 
         } finally {
-            FileAPI.getFile(file, max.type).then(file => {
-                resolve({
+            return FileAPI.getFile(file, max.type).then(file => {
+                return {
                     src: file,
                     size: [max.w, max.h],
                     thumbnail: false
-                })
+                };
             })
         }
     }

@@ -1,8 +1,8 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
 import MessageTimeComponent from "./Common/MessageTimeComponent"
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import StickerComponent from "./Common/StickerComponent"
 import VUI from "../../../../VUI"
+import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 
 class AnimatedStickerMessageComponent extends GeneralMessageComponent {
     render() {
@@ -13,9 +13,9 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
                                     avatarRef={this.avatarRef}
                                     bubbleRef={this.bubbleRef}>
 
-                <StickerComponent onClick={() => {
+                <BetterStickerComponent onClick={() => {
                     VUI.Modal.open(<div>TODO: implement me!</div>)
-                }} width={200} sticker={this.message.raw.media.document}/>
+                }} width={200} document={this.message.raw.media.document}/>
 
                 <MessageTimeComponent message={this.message} bg={true}/>
 

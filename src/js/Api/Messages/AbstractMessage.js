@@ -6,6 +6,7 @@ import {Peer} from "../Peers/Objects/Peer"
 import MessagesManager from "./MessagesManager"
 import PeersStore from "../Store/PeersStore"
 import MTProto from "../../MTProto/External"
+import API from "../Telegram/API"
 
 export const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -37,8 +38,8 @@ export class AbstractMessage extends ReactiveObject implements Message {
     _group: Array<Message> | undefined;
     _groupInitializer: boolean;
 
-    _hideAvatar : boolean;
-    _tailsGroup : string;
+    _hideAvatar: boolean;
+    _tailsGroup: string;
 
     constructor(dialogPeer: Peer) {
         super()
@@ -129,7 +130,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.isOut || this.to.messages.readInboxMaxId >= this.id
     }
 
-    get hideAvatar() : boolean {
+    get hideAvatar(): boolean {
         return this._hideAvatar;
     }
 
@@ -137,7 +138,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         this._hideAvatar = value;
     }
 
-    get tailsGroup() : string {
+    get tailsGroup(): string {
         return this._tailsGroup;
     }
 
@@ -238,6 +239,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
         if (!this.to) {
             return false
         }
+
         if (this.replyToMessage && this.replyToMessageType && fire) {
             this.fire(this.replyToMessageType)
         }
@@ -253,28 +255,30 @@ export class AbstractMessage extends ReactiveObject implements Message {
                     this.fire("replyToMessageFound")
                 }
             } else {
-                // todo fix reply
-                // this.to.api.getHistory({
-                //     offset_id: this.raw.reply_to_msg_id, // ???
-                //     add_offset: -1,
-                //     limit: 1
-                // }).then(messages => {
-                //     if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
-                //         this.to.messages.putRawMessage(messages[0])
-                //         this.replyToMessage = messages[0]
-                //         this.replyToMessageType = "replyToMessageFound"
-                //
-                //         if (fire) {
-                //             this.fire("replyToMessageFound")
-                //         }
-                //     } else {
-                //         this.replyToMessageType = "replyToMessageNotFound"
-                //
-                //         if (fire) {
-                //             this.fire("replyToMessageNotFound")
-                //         }
-                //     }
-                // })
+                API.messages.getHistory(this.to, {
+                    offset_id: this.raw.reply_to_msg_id, // ???
+                    add_offset: -1,
+                    limit: 1
+                }).then(Messages => {
+                    const messages = this.to.messages.putRawMessages(Messages.messages)
+                    console.log("messages", messages)
+
+                    if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
+                        this.to.messages.putRawMessage(messages[0])
+                        this.replyToMessage = messages[0]
+                        this.replyToMessageType = "replyToMessageFound"
+
+                        if (fire) {
+                            this.fire("replyToMessageFound")
+                        }
+                    } else {
+                        this.replyToMessageType = "replyToMessageNotFound"
+
+                        if (fire) {
+                            this.fire("replyToMessageNotFound")
+                        }
+                    }
+                })
             }
         }
     }
@@ -342,7 +346,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
             }
 
             // forwarded
-            this.findForwarded(false)
+            this.findForwarded()
         }
 
         // ...

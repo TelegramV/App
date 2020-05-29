@@ -33,6 +33,8 @@ import scrollBottom from "../../../../Utils/scrollBottom"
 import API from "../../../../Api/Telegram/API"
 import {MessageFactory} from "../../../../Api/Messages/MessageFactory"
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
+import {vrdom_appendRealMany} from "../../../../V/VRDOM/append"
+import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
 
 function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
@@ -95,6 +97,10 @@ class NextBubblesComponent extends StatelessComponent {
     }
 
     renderMessage = (message: Message, prevMessage: Message = null, nextMessage: Message = null): HTMLElement => {
+        return vrdom_render(this.renderVRMessage(message, prevMessage, nextMessage));
+    }
+
+    renderVRMessage = (message: Message, prevMessage: Message = null, nextMessage: Message = null): HTMLElement => {
         const isOut = !message.isPost && message.isOut;
         const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
 
@@ -115,11 +121,7 @@ class NextBubblesComponent extends StatelessComponent {
             message.tailsGroup = "m";
         }
 
-        return vrdom_render(
-            <div>
-                <MessageComponent message={message}/>
-            </div>
-        );
+        return <MessageComponent message={message}/>;
     }
 
     _isGrouping(one: Message, two: Message) {
@@ -168,10 +170,10 @@ class NextBubblesComponent extends StatelessComponent {
                     console.log("[warn] append no after message")
                 }
                 if (beforeTopMessage && messages[0].id < beforeTopMessage.id) {
-                    console.error("append shit before", beforeTopMessage, messages)
+                    console.error("append before", beforeTopMessage, messages)
                 }
                 if (afterBottomMessage && messages[messages.length - 1].id > afterBottomMessage.id) {
-                    console.error("append shit after", afterBottomMessage, messages)
+                    console.error("append after", afterBottomMessage, messages)
                 }
             }
 
@@ -190,7 +192,7 @@ class NextBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
-            this.bubblesInnerRef.$el.append(...$messages);
+            vrdom_appendRealMany($messages, this.bubblesInnerRef.$el)
 
             return $messages;
         }
@@ -227,7 +229,7 @@ class NextBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
-            this.bubblesInnerRef.$el.prepend(...$messages);
+            vrdom_prependRealMany($messages.reverse(), this.bubblesInnerRef.$el);
 
             return $messages;
         }
@@ -276,7 +278,7 @@ class NextBubblesComponent extends StatelessComponent {
         }
 
         if (isAtTop) {
-            console.log("on top")
+            // console.log("on top")
             this.virtual_onScrolledTop();
         } else if (isAtBottom) {
             if (this.virtual_isCompletelyBottom() || (!this.mainVirtual.hasMoreOnTopToDownload && this.virtual_isCompletelyBottom())) {
@@ -460,15 +462,15 @@ class NextBubblesComponent extends StatelessComponent {
             return;
         }
 
-        console.log("scrolled top")
+        // console.log("scrolled top")
 
         if (this.currentVirtual.isVeryTop()) {
             if (!this.currentVirtual.hasMoreOnTopToDownload) {
-                console.log("!hasMoreOnTopToDownload", this.isUsingSecondVirtual);
+                // console.log("!hasMoreOnTopToDownload", this.isUsingSecondVirtual);
             }
 
             if (this.currentVirtual.isDownloading) {
-                console.log("isDownloading", this.isUsingSecondVirtual);
+                // console.log("isDownloading", this.isUsingSecondVirtual);
             }
 
             if (this.currentVirtual.hasMoreOnTopToDownload && !this.currentVirtual.isDownloading) {
@@ -476,7 +478,7 @@ class NextBubblesComponent extends StatelessComponent {
                 if (!this.currentVirtual.isEmpty()) {
                     this.currentVirtual.isDownloading = true;
 
-                    console.log("[top] downloading");
+                    // console.log("[top] downloading");
 
                     AppSelectedChat.current.messages.downloadNextTopPage(this.currentVirtual.getVeryTopOne().id, {
                         isUsingSecondVirtual: this.isUsingSecondVirtual
@@ -541,14 +543,14 @@ class NextBubblesComponent extends StatelessComponent {
             return;
         }
 
-        console.log("on scrolled bottom");
+        // console.log("on scrolled bottom");
 
         if (this.currentVirtual.isVeryBottom()) {
             if (this.currentVirtual.hasMoreOnBottomToDownload && !this.currentVirtual.isDownloading) {
                 if (this.currentVirtual.messages.length > 0) {
                     this.currentVirtual.isDownloading = true;
 
-                    console.log("[bottom] downloading")
+                    // console.log("[bottom] downloading")
 
                     AppSelectedChat.current.messages.downloadNextBottomPage(this.currentVirtual.getVeryBottomOne().id, {
                         isUsingSecondVirtual: this.isUsingSecondVirtual
@@ -556,7 +558,7 @@ class NextBubblesComponent extends StatelessComponent {
                 }
             }
 
-            console.log("isVeryBottom")
+            // console.log("isVeryBottom")
 
             return;
         }
@@ -608,7 +610,7 @@ class NextBubblesComponent extends StatelessComponent {
 
             this.isUsingSecondVirtual = false;
 
-            console.log(this.mainVirtual.currentPage)
+            // console.log(this.mainVirtual.currentPage)
 
             this.secondVirtual.refresh();
         } else {

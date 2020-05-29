@@ -17,12 +17,12 @@
         @if $transparent {
             position: absolute;
             @if $in {
-                //right: 0;
-                transform: translateX(125%);
+                right: 0;
+                transform: translateX(calc(100% + 10px));
             }
             @if $in == false {
-                //left: 0;
-                transform: translateX(-125%);
+                left: 0;
+                transform: translateX(calc(-100% - 10px));
             }
             background-color: white;
             border-radius: 10px;
@@ -61,15 +61,7 @@
 
     &.no-pad {
         .reply {
-            margin-bottom: 0;
-
-            @if $in {
-                padding-left: 13px;
-            }
-
-            @if $in==false {
-                padding-right: 13px;
-            }
+            padding-right: 13px;
         }
     }
 

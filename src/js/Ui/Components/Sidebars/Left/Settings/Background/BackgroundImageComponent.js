@@ -58,15 +58,18 @@ class BackgroundImageComponent extends SettingsPane {
         this.wallpapers = event.wallpapers;
         for (let wallpaper of this.wallpapers) {
             if (wallpaper.pattern) continue;
-            VRDOM.append(<SquareComponent click={this._fragmentClick}
-                                          wallpaperId={wallpaper.document.id}/>, this.galleryRef.$el);
+            WallpaperManager.fetchPreview(wallpaper).then(url => {
+                VRDOM.append(<SquareComponent click={this._fragmentClick} src={url}
+                                          wallpaper={wallpaper.document.id}/>, this.galleryRef.$el);
+            })
         }
     }
 
     _fragmentClick = (ev) => {
-        const url = ev.currentTarget.getAttribute("url");
-        if (url) {
-            WallpaperManager.setWallpaper(url);
+        const wallpaperId = ev.currentTarget.getAttribute("wallpaper");
+        let wallpaper = this.wallpapers.find(wp => wp.document.id === wallpaperId);
+        if (wallpaper) {
+            WallpaperManager.requestAndInstall(wallpaper);
         }
     }
 

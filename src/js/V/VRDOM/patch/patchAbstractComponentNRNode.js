@@ -23,7 +23,7 @@ import ComponentVRNode from "../component/ComponentVRNode"
 import {__component_update_props} from "../component/__component_update"
 import __component_unmount from "../component/__component_unmount"
 import __component_mount from "../component/__component_mount"
-import vrdom_renderAbstractComponentVNode from "../render/renderAbstractComponent"
+import vrdom_renderComponentVNode from "../render/renderComponent"
 
 function patchAbstractComponentVRNode($node: Element, vRNode: ComponentVRNode) {
 
@@ -43,12 +43,12 @@ function patchAbstractComponentVRNode($node: Element, vRNode: ComponentVRNode) {
             __component_update_props($node.__v.component, vRNode.attrs)
         } else {
             __component_unmount($node.__v.component)
-            $node = vrdom_renderAbstractComponentVNode(vRNode, $node)
+            $node = vrdom_renderComponentVNode(vRNode, $node)
             __component_mount($node.__v.component, $node)
             $node.__v.component.forceUpdate.call($node.__v.component)
         }
     } else {
-        $node = vrdom_renderAbstractComponentVNode(vRNode, $node)
+        $node = vrdom_renderComponentVNode(vRNode, $node)
         __component_mount($node.__v.component, $node)
         $node.__v.component.forceUpdate.call($node.__v.component)
     }
