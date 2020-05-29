@@ -1,6 +1,6 @@
 import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"
 
-const AvatarFragment = ({peer, saved}) => {
+const AvatarFragment = ({peer, saved, onClick}) => {
     if (!peer) {
         return (
             <div className={`avatar placeholder-0`}>
@@ -14,7 +14,11 @@ const AvatarFragment = ({peer, saved}) => {
     let deleted = peer.isDeleted
     let hasAvatar = !photo.isEmpty && !photo._isFetchingSmall
 
-    const onClick = () => AppSelectedInfoPeer.select(peer)
+    if(onClick === null) {
+
+    } else {
+        onClick = () => AppSelectedInfoPeer.select(peer)
+    }
 
 
 
