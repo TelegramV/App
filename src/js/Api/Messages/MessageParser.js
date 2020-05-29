@@ -12,7 +12,7 @@ export class MessageParser {
         if (media) {
             switch (media._) {
                 case "messageMediaPhoto":
-                    return MessageType.PHOTO
+                    type = MessageType.PHOTO
                     break;
                 case "messageMediaGeo":
                     type = MessageType.GEO

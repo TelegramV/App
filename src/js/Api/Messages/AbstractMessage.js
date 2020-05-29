@@ -260,12 +260,11 @@ export class AbstractMessage extends ReactiveObject implements Message {
                     add_offset: -1,
                     limit: 1
                 }).then(Messages => {
-                    const messages = this.to.messages.putRawMessages(Messages.messages)
-                    console.log("messages", messages)
+                    const messages = Messages.messages
 
                     if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
-                        this.to.messages.putRawMessage(messages[0])
-                        this.replyToMessage = messages[0]
+                        const replyMessage = this.to.messages.putRawMessage(messages[0])
+                        this.replyToMessage = replyMessage
                         this.replyToMessageType = "replyToMessageFound"
 
                         if (fire) {

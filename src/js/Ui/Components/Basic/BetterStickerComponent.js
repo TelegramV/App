@@ -54,7 +54,6 @@ class BetterStickerComponent extends StatefulComponent {
                      onClick={props.onClick}>
                     <Lottie width={width}
                             height={height}
-                            isPaused={true}
                             options={options}
                             playOnHover={playOnHover}
                             isPaused={isPaused}/>

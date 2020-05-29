@@ -20,7 +20,7 @@
 import {Zlib} from "../../../../vendor/zlib"
 
 function gzip_compress(data: Uint8Array): Uint8Array {
-    // probably doesn't work, I didn't try it
+    // probably won't work, I didn't try it
     return (new Zlib.Gunzip(bytes)).compress()
 }
 

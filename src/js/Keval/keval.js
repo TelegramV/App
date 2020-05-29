@@ -1,7 +1,5 @@
 import {openDB} from "idb";
 
-// асинхронне, працює і в воркері, і поза ним (правда не певен чи секурне, але пофіг), зберігає що завгодно
-
 const defaultDbName = "telegram-v";
 const defaultStoreName = "keval";
 const cachedKevals = {};
