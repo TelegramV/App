@@ -28,6 +28,9 @@
     z-index: 2;
     position: absolute;
     box-sizing: border-box;
+    overflow: hidden;
+    flex-direction: column;
+    display: flex;
 
     &.fade-in {
         left: 0 !important;
@@ -299,6 +302,9 @@
             background: #ffffff;
             height: 100%;
             transition: 250ms ease-in-out transform, 250ms ease-in-out filter;
+            overflow: hidden;
+            flex-direction: column;
+            display: flex;
 
             &.fade-out {
                 transform: translateX(-80px);
