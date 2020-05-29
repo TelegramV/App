@@ -1,6 +1,7 @@
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer";
 import type {Message} from "../../../../../../Api/Messages/Message"
+import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer"
 import AppSelectedChat from "../../../../../Reactive/SelectedChat"
 import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
@@ -23,6 +24,10 @@ export class MessageAvatarComponent extends StatelessComponent {
     }
 
     render() {
+        if(this.props.message.to instanceof UserPeer) {
+            return <div id={this.props.id} className="avatar remove"/>
+        }
+
         if (AppSelectedChat.check(this.props.message.from) && !this.props.message.forwarded) {
             return <div className="avatar"/>
         }

@@ -1,5 +1,6 @@
 import {replaceEmoji} from "../../../../Utils/replaceEmoji";
 import {AttachLinkModal} from "../../../Modals/AttackLinkModal";
+import UIEvents from "../../../../EventBus/UIEvents"
 import VUI from "../../../../VUI"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
@@ -153,6 +154,9 @@ export class TextareaFragment extends StatelessComponent {
     onInput = (ev) => {
         this.parent.updateSendButton()
         replaceEmoji(this.$el)
+        UIEvents.General.fire("textarea.onInput", {
+            textarea: this,
+        })
     }
 
     contextMenu = l => {

@@ -26,6 +26,10 @@
             height: 0;
         }
 
+        &.remove {
+            display: none;
+        }
+
         &.placeholder-0 {
             background-color: #cc90e2;
         }
