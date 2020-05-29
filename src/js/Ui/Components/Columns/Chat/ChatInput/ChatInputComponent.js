@@ -210,8 +210,7 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     mouseEnterEmoji = () => {
-        VApp.mountedComponents.get("composer").onShow();
-        VApp.mountedComponents.get("composer").$el.classList.add("visible");
+        VApp.mountedComponents.get("composer").show();
         this.hideComposer = false;
     }
 
@@ -223,8 +222,7 @@ export class ChatInputComponent extends StatelessComponent {
     planComposerClose = () => {
         this.withTimeout(() => {
             if (this.hideComposer) {
-                VApp.mountedComponents.get("composer").$el.classList.remove("visible");
-                VApp.mountedComponents.get("composer").onHide();
+                VApp.mountedComponents.get("composer").hide();
             }
         }, 250);
     }
