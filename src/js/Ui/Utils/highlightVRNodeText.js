@@ -23,7 +23,9 @@ export const highlightVRNodeWord = (text: string, str: string) => {
     const originalText = text
 
     text = text.toLowerCase()
-    str = str.toLowerCase()
+    str = str.toLowerCase().trim()
+
+    str === "+" && (str = `\\${str}`)
 
     const position = text.search(str)
 

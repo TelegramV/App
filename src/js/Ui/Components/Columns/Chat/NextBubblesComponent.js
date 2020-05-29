@@ -31,7 +31,6 @@ import vrdom_deleteInner from "../../../../V/VRDOM/deleteInner"
 import VirtualMessages from "../../../Virtual/VirtualMessages"
 import scrollBottom from "../../../../Utils/scrollBottom"
 import API from "../../../../Api/Telegram/API"
-import {MessageFactory} from "../../../../Api/Messages/MessageFactory"
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
 import {vrdom_appendRealMany} from "../../../../V/VRDOM/append"
 import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
@@ -63,7 +62,7 @@ class NextBubblesComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .only(event => AppSelectedChat.check(event.peer))
+            .filter(event => AppSelectedChat.check(event.peer))
             .on("messages.recent", this.onPeerMessagesRecent)
             .on("messages.allRecent", this.onPeerMessagesAllRecent)
             .on("messages.nextTopPageDownloaded", this.onTopPageMessagesReady)
@@ -71,7 +70,7 @@ class NextBubblesComponent extends StatelessComponent {
             .on("chat.showMessageReady", this.onChatShowMessageReady);
 
         E.bus(AppEvents.Dialogs)
-            .only(event => AppSelectedChat.check(event.dialog.peer))
+            .filter(event => AppSelectedChat.check(event.dialog.peer))
             .on("newMessage", this.onNewMessage);
 
         E.bus(UIEvents.General)
@@ -91,6 +90,7 @@ class NextBubblesComponent extends StatelessComponent {
 
     componentDidMount() {
         this.props.loaderRef.$el.style.display = "none";
+
         this.$el.addEventListener("scroll", this.onScroll, {
             passive: true,
         });
@@ -378,7 +378,7 @@ class NextBubblesComponent extends StatelessComponent {
                     }).then(Messages => {
                         AppEvents.Peers.fire("chat.showMessageReady", {
                             peer,
-                            messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
+                            messages: peer.messages.putRawMessages(Messages.messages),
                             offset_id: message.id,
                             actionCount,
                         })
@@ -392,6 +392,8 @@ class NextBubblesComponent extends StatelessComponent {
                 console.warn("No message to scroll found.")
             }
         } else {
+            const peer = AppSelectedChat.Current;
+
             AppSelectedChat.select(message.to);
 
             const actionCount = (++this.actionCount);
@@ -403,7 +405,7 @@ class NextBubblesComponent extends StatelessComponent {
             }).then(Messages => {
                 AppEvents.Peers.fire("chat.showMessageReady", {
                     peer,
-                    messages: Messages.messages.map(rawMessage => MessageFactory.fromRaw(peer, rawMessage)),
+                    messages: peer.messages.putRawMessages(Messages.messages),
                     offset_id: message.id,
                     actionCount,
                 })
@@ -448,7 +450,7 @@ class NextBubblesComponent extends StatelessComponent {
 
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
-        const $message = this.$el.querySelector(`#message${event.offset_id}`);
+        const $message = this.$el.querySelector(`#message-${event.offset_id}`);
 
         if ($message) {
             scrollToAndHighlight(this.$el, $message);

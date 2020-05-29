@@ -1,4 +1,5 @@
 import type {Message} from "../Messages/Message"
+import {MessageType} from "../Messages/Message"
 import {Peer} from "./Objects/Peer"
 import {arrayDeleteCallback} from "../../Utils/array"
 import {MessageFactory} from "../Messages/MessageFactory"
@@ -206,7 +207,8 @@ export class PeerMessages {
     getByGroupedId(groupedId: string): Array<Message> {
         return (
             [...this._heap.values()]
-                .filter(l => l.groupedId === groupedId)
+                .filter(message => message.type === MessageType.GROUP && message.id === groupedId)
+                .flatMap(message => message.messages)
         )
     }
 

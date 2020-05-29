@@ -50,6 +50,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
         }
     }
 
+    get dialogPeer() {
+        return this.to; // todo: fix this
+    }
+
     get dialog() {
         if (!this._dialog) {
             this._dialog = MessagesManager.getToPeerMessage(this.raw).dialog

@@ -74,7 +74,7 @@ const handlers = new Map([
  * @constructor
  */
 const MessageComponent = ({message}) => {
-    const Handler = handlers.get(message.groupedId ? MessageType.GROUP : message.type)
+    const Handler = handlers.get(message.type)
 
     if (Handler) {
         return <Handler message={message}/>

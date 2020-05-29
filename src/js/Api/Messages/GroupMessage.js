@@ -17,22 +17,24 @@
  *
  */
 
-import cleanElement from "./cleanElement"
+import type {Message} from "./Message"
+import {MessageType} from "./Message"
 
-function deepUnmount($el: HTMLElement) {
-    cleanElement($el, true);
+class GroupMessage {
+    type = MessageType.GROUP;
 
-    for (const $child of $el.childNodes) {
-        deepUnmount($child);
+    groupedId: string;
+
+    messages: Array<Message>;
+
+    constructor(message: Message) {
+        this.messages = [message];
+        this.groupedId = message.groupedId;
+    }
+
+    get id() {
+        return this.groupedId;
     }
 }
 
-function vrdom_delete($el: HTMLElement) {
-    if ($el) {
-        deepUnmount($el);
-
-        $el.remove()
-    }
-}
-
-export default vrdom_delete
+export default GroupMessage;
