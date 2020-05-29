@@ -126,7 +126,7 @@ class EmojiComposerComponent extends StatelessComponent {
 
     onClickEmoji = (ev) => {
         const alt = ev.currentTarget.alt
-        ChatInputManager.appendText(alt);
+        ChatInputManager.insertAtCaret(alt);
 
         const $recentPanel = document.getElementById("composer-emoji-panel-recent");
 

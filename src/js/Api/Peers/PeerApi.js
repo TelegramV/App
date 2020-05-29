@@ -3,10 +3,8 @@ import PeersManager from "./PeersManager"
 import AppEvents from "../EventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../Dialogs/util"
 import {FileAPI} from "../Files/FileAPI"
-import {MessageFactory} from "../Messages/MessageFactory"
 import {TextMessage} from "../Messages/Objects/TextMessage";
 import UIEvents from "../../Ui/EventBus/UIEvents";
-import UpdatesManager from "../Updates/UpdatesManager";
 
 const genMsgId = () => (new Date).getTime()
 
@@ -49,11 +47,7 @@ export class PeerApi {
 
         PeersManager.fillPeersFromUpdate(Messages)
 
-        const messages = Messages.messages.filter(m => m._ !== "messageEmpty").map(rawMessage => {
-            return MessageFactory.fromRaw(this.peer, rawMessage)
-        })
-
-        this.peer.messages.putRawMessages(messages, addUnread)
+        const messages = this.peer.messages.putRawMessages(Messages.messages.filter(m => m._ !== "messageEmpty"))
 
         messages.forEach(message => {
             message.init()
@@ -148,9 +142,9 @@ export class PeerApi {
     }
 
     async forwardMessages({
-        messages = [],
-        to = null,
-                    }) {
+                              messages = [],
+                              to = null,
+                          }) {
         let randomId = genMsgId()
         const randomIds = messages.map(l => randomId++)
         const response = await MTProto.invokeMethod("messages.forwardMessages", {

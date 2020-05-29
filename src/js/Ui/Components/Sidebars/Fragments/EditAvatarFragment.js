@@ -16,7 +16,7 @@
  */
 
 
-function EditAvatarFragment({onClick, srcUrl}) {
+function EditAvatarFragment({onClick, srcUrl=""}) {
     return (
         <div className="edit-avatar-wrapper">
             <div className="edit-avatar rp rps" onClick={onClick} style={{

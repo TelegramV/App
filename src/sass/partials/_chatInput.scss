@@ -341,4 +341,56 @@
             }
         }
     }
+
+    .suggestion {
+        position: absolute;
+        transform: scale(0, 0);
+        transition: transform 250ms ease-in-out;
+        transform-origin: left bottom;
+        overflow: hidden;
+
+        box-shadow: 0 2px 3px 0 rgba(16, 35, 47, .15);
+
+        display: flex;
+        background-color: white;
+        border-radius: 10px;
+        bottom: 50px;
+        left: 40px;
+        z-index: 899;
+
+        &.visible {
+            transform: scale(1, 1);
+        }
+
+        &.emoji-suggestion {
+            flex-direction: column;
+            align-items: center;
+            width: 40px;
+            max-height: 200px;
+            padding: 5px 0;
+            overflow-y: scroll;
+            direction: rtl; //fix for scrollbar on top
+
+            transform: scale(0, 0) rotate(-90deg);
+
+            &.visible {
+                transform: scale(1, 1) rotate(-90deg) translateY(100%);
+            }
+
+            .emoji {
+                display: block;
+                width: 32px;
+                height: 32px;
+                border-radius: 3px;
+                transition: anim(background-color);
+                cursor: pointer;
+                margin: 2px;
+                transform: rotate(90deg);
+
+                &:hover {
+                    background-color: $lightgrey;
+                }
+            }
+        }
+    }
 }

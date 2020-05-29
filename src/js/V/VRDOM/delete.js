@@ -28,9 +28,11 @@ function deepUnmount($el: HTMLElement) {
 }
 
 function vrdom_delete($el: HTMLElement) {
-    deepUnmount($el);
+    if ($el) {
+        deepUnmount($el);
 
-    $el.remove()
+        $el.remove()
+    }
 }
 
 export default vrdom_delete

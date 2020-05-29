@@ -1,5 +1,6 @@
 import AppEvents from "../../Api/EventBus/AppEvents"
 import UIEvents from "../EventBus/UIEvents"
+import UpdatesManager from "../../Api/Updates/UpdatesManager"
 
 class ConnectionStatus {
     OK = 0
@@ -22,13 +23,24 @@ class ConnectionStatus {
         window.addEventListener("online", () => {
             this._networkOk = true
 
-            console.warn("network lost")
+            console.warn("got network")
+
+            if (UpdatesManager.State.pts != null) {
+                UpdatesManager.defaultUpdatesProcessor.getDifference()
+                    .then(diff => UpdatesManager.defaultUpdatesProcessor.processDifference(diff))
+            }
+
             this.fire(this.Status)
         })
 
         AppEvents.General.subscribe("connectionRestored", event => {
             console.log("connectionRestored")
             this._connectionOk = true
+
+            if (UpdatesManager.State.pts != null) {
+                UpdatesManager.defaultUpdatesProcessor.getDifference()
+                    .then(diff => UpdatesManager.defaultUpdatesProcessor.processDifference(diff))
+            }
 
             this.fire(this.Status)
         })

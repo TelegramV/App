@@ -14,16 +14,22 @@ class GeneralMessageComponent extends StatefulComponent {
     bubbleRef = VComponent.createRef()
 
     constructor(props) {
-        super(props);
+        super(props)
+
         this.message = this.props.message
     }
 
-    componentDidMount() {
-        this.$el.__message = this.message
-        this.message.show()
-    }
-
     appEvents(E) {
+        E.bus(AppEvents.General)
+            .filter(event => event.message && event.message.id === this.message.id)
+            .on("messages.deleted", this.onMessageDeleted)
+            .on("messages.edited", this.onMessageEdited)
+
+        E.bus(AppEvents.General)
+            .filter(event => event.message && event.message.dialogPeer === this.message.dialogPeer)
+            .on("messages.read", this.onMessagesRead)
+
+
         E.bus(AppEvents.Dialogs)
             .on("deleteMessages", this.onMessagesDeleteEvent)
             .on("deleteChannelMessages", this.onMessagesDeleteEvent)
@@ -38,6 +44,14 @@ class GeneralMessageComponent extends StatefulComponent {
             .on("replyToMessageNotFound", this.messageOnReplyNotFound)
             .on("forwardedNameOnlyFound", this.messageOnForwardedFound)
             .on("forwardedChannelFound", this.messageOnForwardedFound)
+    }
+
+    componentDidMount() {
+        this.message.show()
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        this.message = nextProps.message
     }
 
     onMessagesDeleteEvent = (event: BusEvent) => {
@@ -82,10 +96,6 @@ class GeneralMessageComponent extends StatefulComponent {
                 this.bubbleRef.$el.classList.remove("sent")
             }
         }
-    }
-
-    componentWillUnmount() {
-
     }
 }
 

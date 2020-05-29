@@ -7,7 +7,6 @@ import DialogsStore from "../Store/DialogsStore"
 import AppEvents from "../EventBus/AppEvents"
 import PeersStore from "../Store/PeersStore"
 import AppSelectedChat from "../../Ui/Reactive/SelectedChat"
-import {MessageFactory} from "../Messages/MessageFactory"
 import API from "../Telegram/API"
 import PeersManager from "../Peers/PeersManager"
 import MTProto from "../../MTProto/External"
@@ -76,7 +75,7 @@ class DialogManager extends Manager {
 
             rawDifferenceWithPeer.__peer.dialog.fillRaw(rawDifferenceWithPeer.dialog)
 
-            rawDifferenceWithPeer.messages = rawDifferenceWithPeer.messages.filter(m => m._ !== "messageEmpty").map(m => MessageFactory.fromRaw(rawDifferenceWithPeer.__peer, m))
+            rawDifferenceWithPeer.messages = rawDifferenceWithPeer.messages.filter(m => m._ !== "messageEmpty")
             rawDifferenceWithPeer.__peer.messages.putRawMessages(rawDifferenceWithPeer.messages)
 
             AppEvents.Dialogs.fire("ChannelRefreshCausedByDifferenceTooLong", {

@@ -1,61 +1,61 @@
 figure.photo, figure.video, figure.round-video {
-  background-color: black;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
+    background-color: black;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
 
 
-  &.thumbnail {
-    >img {
-      filter: blur(10px);
-      transform: scale(1.2);
-    }
-  }
-
-  &.round-video {
-    border-radius: 100%;
-
-    video {
-      width: 100%;
-    }
-  }
-
-  >img, >video {
-    max-width: 100%;
-    object-fit: contain;
-  }
-
-  >.progress {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    >.pause-button {
-      background: $semiblack;
-      width: 64px;
-      height: 64px;
-      line-height: 62px;
-      position: absolute;
-      border-radius: 100%;
-      text-align: center;
-      cursor: pointer;
-
-
-      >.tgico {
-        position: relative;
-        color: white;
-        font-size: 32px;
-      }
+    &.thumbnail {
+        > img {
+            filter: blur(10px);
+            transform: scale(1.2);
+        }
     }
 
-    >progress {
-      position: relative;
-      top: 0;
-      left: 0;
-      pointer-events: none;
+    &.round-video {
+        border-radius: 100%;
+
+        video {
+            width: 100%;
+        }
     }
-  }
+
+    > img, > video {
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    > .progress {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+
+        > .pause-button {
+            background: $semiblack;
+            width: 64px;
+            height: 64px;
+            line-height: 62px;
+            position: absolute;
+            border-radius: 100%;
+            text-align: center;
+            cursor: pointer;
+
+
+            > .tgico {
+                position: relative;
+                color: white;
+                font-size: 32px;
+            }
+        }
+
+        > progress {
+            position: relative;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+    }
 }

@@ -17,11 +17,24 @@
  *
  */
 
-import {Zlib} from "../../../../vendor/zlib"
+import type {Message} from "./Message"
+import {MessageType} from "./Message"
 
-function gzip_compress(data: Uint8Array): Uint8Array {
-    // probably won't work, I didn't try it
-    return (new Zlib.Gunzip(bytes)).compress()
+class GroupMessage {
+    type = MessageType.GROUP;
+
+    groupedId: string;
+
+    messages: Array<Message>;
+
+    constructor(message: Message) {
+        this.messages = [message];
+        this.groupedId = message.groupedId;
+    }
+
+    get id() {
+        return this.groupedId;
+    }
 }
 
-export default gzip_compress;
+export default GroupMessage;

@@ -1,12 +1,13 @@
-import {askForFile, convertBits, formatAudioTime} from "../../../../Utils/utils";
+import { askForFile, convertBits, formatAudioTime } from "../../../../Utils/utils";
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import ComposerComponent from "./ComposerComponent"
-import {MessageParser} from "../../../../../Api/Messages/MessageParser";
-import {domToMessageEntities} from "../../../../../Utils/htmlHelpers";
-import {AttachFilesModal} from "../../../Modals/AttachFilesModal";
-import {AttachPollModal} from "../../../Modals/AttachPollModal";
-import {TextareaFragment} from "./TextareaFragment";
-import {AttachPhotosModal} from "../../../Modals/AttachPhotosModal";
+import SuggestionComponent from "./SuggestionComponent"
+import { MessageParser } from "../../../../../Api/Messages/MessageParser";
+import { domToMessageEntities } from "../../../../../Utils/htmlHelpers";
+import { AttachFilesModal } from "../../../Modals/AttachFilesModal";
+import { AttachPollModal } from "../../../Modals/AttachPollModal";
+import { TextareaFragment } from "./TextareaFragment";
+import { AttachPhotosModal } from "../../../Modals/AttachPhotosModal";
 import UIEvents from "../../../../EventBus/UIEvents";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import MTProto from "../../../../../MTProto/External"
@@ -41,6 +42,7 @@ export class ChatInputComponent extends StatelessComponent {
             <div className="chat-input">
                 <ComposerComponent mouseEnter={this.mouseEnterComposer.bind(this)}
                                    mouseLeave={this.mouseLeaveComposer.bind(this)}/>
+                <SuggestionComponent/>
                 <div className="input-and-keyboard-wrapper">
                     <div className="input-field-wrapper">
                         <div className="reply hidden">
@@ -171,7 +173,22 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     appendText = (text) => {
-        this.textarea.innerHTML += text
+        this.textarea.textContent += text
+        this.chatInputTextareaRef.component.onInput();
+    }
+
+    insertAtCaret = (text) => {
+        let sel, range;
+        if (window.getSelection) {
+            sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode( document.createTextNode(text) );
+            }
+        } else if (document.selection && document.selection.createRange) {
+            document.selection.createRange().text = text;
+        }
         this.chatInputTextareaRef.component.onInput();
     }
 
@@ -245,13 +262,13 @@ export class ChatInputComponent extends StatelessComponent {
 
     clear = () => {
         this.closeReply()
-        this.textarea.focus()
+        this.focus()
         this.chatInputTextareaRef.component.clearInput()
     }
 
     navigateToReplied = () => {
         if (this.reply) {
-            UIEvents.General.fire("chat.showMessage", {message: this.reply.message})
+            UIEvents.General.fire("chat.showMessage", { message: this.reply.message })
         }
     }
 
@@ -271,7 +288,7 @@ export class ChatInputComponent extends StatelessComponent {
         } else {
             this.$el.querySelector(".reply .message .image").classList.add("hidden")
         }
-        this.textarea.focus()
+        this.focus()
     }
 
     closeReply = () => {
@@ -320,7 +337,7 @@ export class ChatInputComponent extends StatelessComponent {
 
     attachFile = () => {
         askForFile("", (bytes, file) => {
-            const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
+            const blob = new Blob(new Array(bytes), { type: 'application/jpeg' })
 
             this.pickFile(URL.createObjectURL(blob), file)
         }, true, true)
@@ -328,7 +345,7 @@ export class ChatInputComponent extends StatelessComponent {
 
     attachPhoto = () => {
         askForFile("image/*,video/*", (bytes, file) => {
-            const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
+            const blob = new Blob(new Array(bytes), { type: 'application/jpeg' })
 
             this.pickPhoto(URL.createObjectURL(blob))
         }, true, true)
@@ -356,7 +373,7 @@ export class ChatInputComponent extends StatelessComponent {
         this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
 
         this.recorder.stop()
-        this.microphone.getTracks().forEach(function (track) {
+        this.microphone.getTracks().forEach(function(track) {
             track.stop();
         });
         this.microphone = null
@@ -374,7 +391,7 @@ export class ChatInputComponent extends StatelessComponent {
         }
         // TODO refactor sending
         MTProto.TimeManager.generateMessageId().then(id => {
-            var reader = new FileReader();
+            let reader = new FileReader();
             reader.readAsArrayBuffer(ev.data);
             reader.onloadend = (event) => {
                 // The contents of the BLOB are in reader.result:
@@ -388,8 +405,7 @@ export class ChatInputComponent extends StatelessComponent {
                         name: "audio.ogg"
                     },
                     mime_type: "audio/ogg",
-                    attributes: [
-                        {
+                    attributes: [{
                             //flags: 1024,
                             // duration: 100,
                             _: "documentAttributeAudio",
@@ -410,7 +426,7 @@ export class ChatInputComponent extends StatelessComponent {
     onMouseDown = (ev) => {
         if (!this.isVoiceMode) return
         if (!this.microphone) {
-            navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
+            navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(l => {
                 this.waveform = []
                 const processInput = audioProcessingEvent => {
                     // console.log(this.waveform)
@@ -482,11 +498,31 @@ export class ChatInputComponent extends StatelessComponent {
         }
     }
 
+    nodeText = (node) => {
+        let text = "";
+        for (const elem of node.childNodes) {
+            if (elem.nodeType === Node.TEXT_NODE) {
+                text += elem.textContent;
+            } else {
+                if (elem.alt) {
+                    text += elem.alt;
+                } else {
+                    text += this.nodeText(elem)
+                }
+            }
+        }
+        return text;
+    }
+
+    get text() {
+        return this.nodeText(this.textarea);
+    }
+
     send = (silent = false) => {
         this.convertEmojiToText(this.textarea)
         let reply = this.reply ? this.reply.message.id : null
 
-        const {text, messageEntities} = domToMessageEntities(this.textarea)
+        const { text, messageEntities } = domToMessageEntities(this.textarea)
 
         AppSelectedChat.Current.api.sendMessage({
             text: text,
@@ -499,6 +535,21 @@ export class ChatInputComponent extends StatelessComponent {
         this.closeReply()
         this.textarea.innerHTML = ""
         this.updateSendButton()
+    }
+
+    focus = () => {
+        this.textarea.focus();
+        this.setEndOfContenteditable(this.textarea);
+    }
+
+    setEndOfContenteditable = (contentEditableElement) => {
+        let range, selection;
+        range = document.createRange();
+        range.selectNodeContents(contentEditableElement);
+        range.collapse(false);
+        selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
     }
 
     updateSendButton = () => {

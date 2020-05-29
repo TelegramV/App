@@ -6,7 +6,6 @@
 
 .highlightmessage {
     background-color: rgba($blue, .2);
-    transition: background-color 500ms ease-in-out;
     border-radius: 10px;
 }
 
@@ -36,7 +35,7 @@
     flex-grow: 1;
     transition: anim(width);
     overflow: hidden;
-    will-change: transform;
+    //will-change: transform;
 
 
     &.right-bar-open #chat {
@@ -96,11 +95,11 @@
             box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.07);
             z-index: 1;
 
-            &>* {
+            & > * {
                 margin: 0 2px;
             }
 
-            >.hidden {
+            > .hidden {
                 display: none;
             }
 
@@ -209,11 +208,11 @@
         }
 
         #bubbles {
-            will-change: transform;
+            //will-change: transform;
             width: 100%;
 
             #bubbles-inner {
-                will-change: transform;
+                //will-change: transform;
                 max-width: $max-chat-width;
                 width: 100%;
                 display: flex;
