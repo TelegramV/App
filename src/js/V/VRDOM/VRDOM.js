@@ -33,9 +33,6 @@ import vrdom_isTagNameFragment from "./is/isTagNameFragment"
 import vrdom_isTagNameComponentOrFragment from "./is/isTagNameComponentOrFragment"
 import vrdom_isTagNameList from "./is/isTagNameList"
 
-/**
- * `Fragment` is just a simple component, not React.Fragment.
- */
 const VRDOM = {
     createElement: vrdom_createElement,
     jsx: vrdom_jsx,
