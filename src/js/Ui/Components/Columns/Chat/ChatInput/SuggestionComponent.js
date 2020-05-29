@@ -118,6 +118,8 @@ export default class SuggestionComponent extends StatelessComponent {
                     this.show();
                 }
             })
+        } else {
+            if(this.visible) this.hide();
         }
     }
 }

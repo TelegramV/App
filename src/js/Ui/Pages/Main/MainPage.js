@@ -37,6 +37,8 @@ function initHighLevelManagers() {
     WallpaperManager.init();
     FoldersManager.init()
     Localization.init();
+
+    window.document.body.classList.remove("scrollable"); //remove scrollability from login
 }
 
 export function MainPage() {

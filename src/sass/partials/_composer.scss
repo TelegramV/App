@@ -105,6 +105,13 @@
             }
         }
     }
+    .emoji-wrapper {
+        .emoji-table {
+            &>*.selected {
+                align-items: start;
+            }
+        }
+    }
 
     .sticker-wrapper {
         .sticker-table {

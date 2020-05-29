@@ -1,7 +1,7 @@
 body {
   font-family: Roboto, sans-serif !important;
   background-color: #fff;
-  overflow: hidden; //broken login scroll
+  overflow: hidden;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -33,7 +33,7 @@ img[src=""], img:not([src]) {
   user-select: none;
 }
 
-@media (min-width: 1921px) {
+@media (min-width: 1922px) {
   body {
     width: 1920px;
     margin-left: auto;
