@@ -99,7 +99,7 @@ export class TextareaFragment extends StatelessComponent {
         this.formatBlock("italic")
     }
 
-    strikethrougrender = () => {
+    strikethrough = () => {
         this.formatBlock("strikeThrough")
     }
 

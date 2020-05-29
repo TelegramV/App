@@ -17,10 +17,10 @@ import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
 import SnackbarComponent from "../../Components/Singleton/SnackbarComponent"
-import ForwardBarComponent from "../../Components/Sidebars/Right/Search/ForwardBarComponent"
 import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
 import CreateChannelBar from "../../Components/Sidebars/Left/Create/CreateChannelBar";
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
+import ForwardBarComponent from "../../Components/Sidebars/Right/ForwardBarComponent";
 import Localization from "../../../Api/Localization/Localization";
 
 function initHighLevelManagers() {

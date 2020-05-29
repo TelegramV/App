@@ -15,8 +15,10 @@
  *
  */
 
+import AvatarComponent from "../../Components/Basic/AvatarComponent";
+
 function VTagsInput(
-    {tags = []}
+    {tags = [], onInput}
 ) {
     return (
         <div className="VTagsInput" style={{
@@ -25,11 +27,21 @@ function VTagsInput(
             <div className="tags">
                 {tags}
                 <div className="input">
-                    <input type="text" placeholder="Select chat"/>
+                    <input type="text" placeholder="Select chat" onInput={onInput}/>
                 </div>
             </div>
         </div>
     );
+}
+
+export function VTag(
+    {peer, onRemove}
+) {
+    return <span className="tag" onClick={onRemove}>
+            <i className="tgico-close close"></i>
+             <AvatarComponent peer={peer} onClick={null}/>
+             <span>{peer.name}</span>
+            </span>
 }
 
 export default VTagsInput

@@ -98,11 +98,14 @@ class ChatComponent extends StatelessComponent {
 
 
     onRightSidebarShow = l => {
+        // if(l.barName === "forward-message") return
         this.$el.classList.add("right-bar-open")
         this.rightSidebarOpen = true
     }
 
     onRightSidebarHide = l => {
+        // if(l.barName === "forward-message") return
+
         this.$el.classList.remove("right-bar-open")
         this.rightSidebarOpen = false
     }

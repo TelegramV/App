@@ -81,6 +81,10 @@ export class ChannelPeer extends Peer {
         return this.isCreator || !!this.adminRights.add_admins
     }
 
+    get canSendMessage() {
+        return this.canPostMessages
+    }
+
     /**
      * @return {Promise<*>}
      */

@@ -16,7 +16,7 @@ export class ArchivedDialogsBar extends LeftBarComponent {
 
     render() {
         return (
-            <div className="archived settings sidebar scrollable hidden">
+            <div className="archived settings sidebar hidden">
                 <div className="settings-main">
                     <div className="sidebar-header no-borders">
                         <BurgerAndBackComponent/>

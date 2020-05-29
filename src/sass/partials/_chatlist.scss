@@ -71,8 +71,9 @@
 }
 
 .list {
+  height: 100%;
+  overflow: auto;
   padding: 8px;
-  padding-left: 8px;
 
   * {
     user-select: none;
