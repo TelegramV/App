@@ -32,8 +32,9 @@ class Localization0 {
         })
     }
 
-    async suggestEmoji(text) {
-        let keywords = await this.getEmojiKeywords();
+    async suggestEmojis(text, langCode) {
+        if(text.trim().length === 0) return [];
+        let keywords = await this.getEmojiKeywords(langCode);
         let suggested = [];
         for(let key in keywords) {
             if(key.startsWith(text)) suggested.push(...keywords[key]);

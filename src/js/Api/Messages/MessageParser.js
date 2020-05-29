@@ -134,7 +134,7 @@ export class MessageParser {
             case MessageType.GEO_LIVE:
                 return "Live Location"
             case MessageType.GAME:
-                return "🎮 " + message.raw.media.game.title
+                return "🎮 " + message.raw?.media?.game?.title ?? ""
             case MessageType.POLL:
                 return message.raw.media.poll.question;
             case MessageType.INVOICE:
