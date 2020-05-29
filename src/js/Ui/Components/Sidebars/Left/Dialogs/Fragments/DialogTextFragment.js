@@ -19,7 +19,7 @@ function Draft({id, text, entities}) {
     return (
         <div id={id} className="message">
             <span className="draft">Draft: </span>
-            {parseMessageEntities(text, entities, true)}
+            {text/*parseMessageEntities(text, entities, true)*/}
         </div>
     )
 }
@@ -34,14 +34,14 @@ function Action({id, user, action}) {
 }
 
 function Text({id, user, text, entities}) {
-    if (text.length > 50) {
-        text = text.substring(0, 50)
+    if (text.length > 100) {
+        text = text.substring(0, 100)
     }
 
     return (
         <div id={id} className="message">
             <span className="sender">{user}</span>
-            {parseMessageEntities(text, entities, true)}
+            {text/*parseMessageEntities(text, entities, true)*/}
         </div>
     )
 }
@@ -68,6 +68,6 @@ export const DialogTextFragment = ({id, dialog}) => {
     return (
         <Text id={id}
               user={dialog.peer.messages.last.prefix}
-              text={dialog.peer.messages.last.text.substring(0, 50)} entities={dialog.peer.messages.last.raw.entities}/>
+              text={dialog.peer.messages.last.text.substring(0, 100)} entities={dialog.peer.messages.last.raw.entities}/>
     )
 }
