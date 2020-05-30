@@ -120,7 +120,6 @@ export default class SettingsPane extends LeftBarComponent {
         return (
             <div class={{"sidebar-header": true, "no-borders": noBorders}}>
                 <BurgerAndBackComponent/>
-                {/*<i class="btn-icon tgico tgico-back rp rps hidden" onClick={this.onBack}/>*/}
                 <div class="sidebar-title">{this.name}</div>
             </div>
         )

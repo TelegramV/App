@@ -14,6 +14,8 @@ import EditProfilePane from "./EditProfilePane"
 import PrivacyAndSecurityPane from "./Privacy/PrivacyAndSecurityPane"
 import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
 import FoldersPane from "./Folders/FoldersPane";
+import CreateFolderPane from "./Folders/CreateFolderPane";
+import FolderPeersPane from "./Folders/FolderPeersPane";
 
 const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
     return (
@@ -52,7 +54,7 @@ const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
                                         name="Privacy and Security"
                                         onClick={_ => openPane("privacy-security")}/>
 
-                <ButtonWithIconFragment icon="smile"
+                <ButtonWithIconFragment icon="folder"
                                         name="Folders"
                                         onClick={_ => openPane("folder-settings")}/>
                 <ButtonWithIconFragment icon="language" name="Language"/>
@@ -100,6 +102,8 @@ export class SettingsComponent extends LeftBarComponent {
 
                 <EditProfilePane previous="settings"/>
                 <FoldersPane previous="settings"/>
+                <CreateFolderPane previous="folder-settings"/>
+                <FolderPeersPane previous="create-folder"/>
                 <PrivacyAndSecurityPane previous="settings"/>
                 <GeneralSettingsComponent previous="settings"/>
                 <BackgroundImageComponent previous="general-settings"/>

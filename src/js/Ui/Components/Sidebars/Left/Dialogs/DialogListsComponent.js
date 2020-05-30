@@ -46,6 +46,8 @@ export class DialogListsComponent extends StatelessComponent {
     folders = []
     selectedFolder = null
     folderRefs = [VComponent.createComponentRef()]
+    noChatsLottie = VComponent.createComponentRef()
+    loadingLottie = VComponent.createComponentRef()
 
     appEvents(E: AE) {
         E.bus(AppEvents.General)
@@ -63,6 +65,7 @@ export class DialogListsComponent extends StatelessComponent {
         return <div className="dialog-lists">
             <div className="folder-screen loading">
                 <Lottie
+                    ref={this.loadingLottie}
                     width={100}
                     height={100}
                     options={{
@@ -79,6 +82,7 @@ export class DialogListsComponent extends StatelessComponent {
 
             <div className="folder-screen no-chats">
                 <Lottie
+                    ref={this.noChatsLottie}
                     width={100}
                     height={100}
                     options={{
@@ -207,6 +211,7 @@ export class DialogListsComponent extends StatelessComponent {
         if(this.isNoChats()) {
             this.setNoChats(false)
         }
+        value ? this.loadingLottie.component.play() : this.loadingLottie.component.pause()
         this.$el.classList.toggle("loading", value)
     }
 
@@ -214,6 +219,7 @@ export class DialogListsComponent extends StatelessComponent {
         if(this.isLoading()) {
             this.setLoading(false)
         }
+        value ? this.noChatsLottie.component.play() : this.noChatsLottie.component.pause()
         this.$el.classList.toggle("no-chats", value)
     }
 

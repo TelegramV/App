@@ -39,15 +39,22 @@
 .v-round-button {
   @extend .v-button;
 
-  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  padding: 0;
-
+  font-size: 1em;
+  padding: 0 16px;
   min-width: 44px;
-  min-height: 44px;
-  font-weight: normal;
+  height: 44px;
+  font-weight: 500;
+  border-radius: 22px;
+  text-transform: none;
 
-  border-radius: 50%;
+  .tgico-add {
+    margin-right: 10px;
+  }
+
 }
 
 .v-button.flat {

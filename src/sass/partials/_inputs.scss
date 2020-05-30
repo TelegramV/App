@@ -144,6 +144,7 @@ input[type="password"] {
     align-items: center;
     justify-content: center;
 
+
     //width: 22px;
     //height: 22px;
 
@@ -187,6 +188,14 @@ input[type="password"] {
 
     .checkbox-label {
         margin-left: 35px;
+    }
+
+
+    &.circle {
+        .checkmark {
+            border: 2px solid $lightgrey;
+            border-radius: 50%;
+        }
     }
 }
 

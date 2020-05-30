@@ -117,6 +117,9 @@
 }
 
 .VInputHint {
+    &.center {
+        text-align: center;
+    }
     padding-left: 5px;
     color: #707579;
     font-weight: 100;

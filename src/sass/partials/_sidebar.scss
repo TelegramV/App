@@ -32,6 +32,10 @@
     flex-direction: column;
     display: flex;
 
+    >.VInput {
+        margin: 0 16px;
+    }
+
     &.fade-in {
         left: 0 !important;
     }
@@ -82,6 +86,10 @@
             color: $darkgrey;
             font-size: 24px;
             flex-shrink: 0;
+
+            &.blue {
+                color: $blue;
+            }
         }
     }
 
@@ -159,6 +167,38 @@
         cursor: pointer;
         border-radius: 5px;
         transition: anim(background-color);
+
+        &.small {
+            padding: 9px;
+
+            .button-icon {
+                width: 32px;
+                height: 32px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
+
+        &.button-with-avatar {
+            .avatar {
+                --avatar-size: 32px;
+            }
+        }
+
+        &.blue {
+            color: $blueonline;
+
+            .button-icon {
+                color: $blueonline;
+            }
+        }
+
+        &.and-checkmark {
+            .checkbox-input {
+                margin-left: auto;
+            }
+        }
 
         &.and-description {
             padding-top: 10px;
@@ -344,7 +384,17 @@
             transition: 250ms ease-in-out left, 250ms ease-in-out filter; //;anim(left), anim(filter);
             background-color: white;
             border-right: none;
+
+            .center {
+                margin: 0 auto;
+                width: 70%;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
         }
+
 
         .background-color,
         .background-image {

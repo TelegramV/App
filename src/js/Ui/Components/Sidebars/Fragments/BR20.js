@@ -15,6 +15,6 @@
  *
  */
 
-const BR20 = () => <div css-height="20px"/>
+const BR20 = () => <div css-height="20px" css-min-height="20px"/>
 
 export default BR20;

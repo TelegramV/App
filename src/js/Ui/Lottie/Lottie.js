@@ -35,9 +35,9 @@ class Lottie extends StatefulComponent {
                 this.anim = lottie.loadAnimation(this.options);
                 this.anim.setSubframe(false);
                 this.registerEvents(eventListeners);
-                this.anim.isPaused = false;
-                this.anim.container.width = this.props.width
-                this.anim.container.height = this.props.height
+                // this.anim.isPaused = false;
+                // this.anim.container.width = this.props.width
+                // this.anim.container.height = this.props.height
             }, this.props.loadDelay)
         } else {
             this.anim = lottie.loadAnimation(this.options);
