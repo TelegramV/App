@@ -32,6 +32,10 @@
     flex-direction: column;
     display: flex;
 
+    @include mobile {
+        max-width: 100%;
+    }
+
     &.fade-in {
         left: 0 !important;
     }
@@ -436,7 +440,7 @@
     transition: anim(transform);
     display: flex;
     flex-direction: column;
-
+    
     .peers {
         padding-bottom: 15px;
         margin-bottom: 8px;

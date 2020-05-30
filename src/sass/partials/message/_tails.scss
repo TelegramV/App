@@ -90,8 +90,12 @@
 		    	padding-left: 0;
 		    	padding-right: 0;
 
+                .fwd, .username {
+                    padding-left: 21px;
+                }
+
                 .reply {
-                    margin-left: 20px;
+                    margin-left: 21px;
                 }
 
 		    	figure.photo, figure.video {
@@ -138,16 +142,22 @@
 
         &.group-e, &.group-se {
             margin-right: 0;
-            padding-right: 20px;
+            padding-right: 21px;
+
             &~.inline-keyboard {
                 margin-right: 11px;
             }
+
             &.no-pad {
 		    	padding-right: 0;
 		    	padding-left: 0;
 
                 .reply {
                     margin-left: 10px;
+                }
+
+                .fwd, .username {
+                    padding-left: 10px;
                 }
 
 		    	figure.photo, figure.video {

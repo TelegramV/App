@@ -168,3 +168,15 @@ body {
     }
   }
 }
+
+@mixin mobile {
+  @media (max-width: 991.98px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 992px) {
+    @content;
+  }
+}
