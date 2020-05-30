@@ -54,7 +54,7 @@ function MediaFragment({media, zoom, hidden}) {
 
     if (zoom) {
         if (horizon) {
-            style["height"] = "100vh"
+            style["height"] = "var(--vh100)"
             style["width"] = ""
         } else {
             style["width"] = "100vw"

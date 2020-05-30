@@ -37,13 +37,25 @@ function initHighLevelManagers() {
     StickerManager.fetchSpecialSets();
     WallpaperManager.init();
     FoldersManager.init()
-    Localization.init();
+    Localization.init();   
+}
 
-    window.document.body.classList.remove("scrollable"); //remove scrollability from login
+function vhFix() {
+    let vh = window.innerHeight;
+    document.documentElement.style.setProperty('--vh100', `${vh}px`);
 }
 
 export function MainPage() {
-    initHighLevelManagers()
+    initHighLevelManagers();
+
+    window.document.body.classList.remove("scrollable"); //remove scrollability from login
+
+    //TODO move this somewhere
+    vhFix();
+
+    window.addEventListener('resize', () => {
+      vhFix();
+    });
 
     return (
         <div class="app">

@@ -98,7 +98,7 @@
 
       img {
         max-width: 100vw;
-        max-height: 100vh;
+        max-height: var(--vh100);
         //width: 100%;
       }
     }
