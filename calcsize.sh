@@ -10,18 +10,18 @@ CSSBR='\.css.br$'
 [[ $1 = "du" ]] && du -h src/js vendor && echo ''
 
 printsize() {
-  ls -la dist/ | grep $1 | awk "{sum+=\$5};END{print \"$2\" sum / 1024 \"K\"}"
+  ls -la dist/ | grep $1 | awk "{sum+=\$5};END{print \"$2\" sum / 1024 \"K $3\"}"
 }
 
-printsize $JS '[JS] RAW: '
-printsize $JSGZ '[JS] GZIP: '
-printsize $JSBR '[JS] BROTLI: '
+printsize $JS '[JS] RAW: \t\t'
+printsize $JSGZ '[JS] GZIP: \t\t'
+printsize $JSBR '[JS] BROTLI: \t\t'
 echo ''
-printsize $CSS '[CSS] RAW: '
-printsize $CSSGZ '[CSS] GZIP: '
-printsize $CSSBR '[CSS] BROTLI: '
+printsize $CSS '[CSS] RAW: \t\t'
+printsize $CSSGZ '[CSS] GZIP: \t\t'
+printsize $CSSBR '[CSS] BROTLI: \t\t'
 
 echo ''
-printsize "$CSS\|$JS" '[TOTAL] RAW (no schema included): '
-printsize "$CSSGZ\|$JSGZ" '[TOTAL] GZIP (no schema included): '
-printsize "$CSSBR\|$JSBR" '[TOTAL] BROTLI (no schema included): '
+printsize "$CSS\|$JS" '[TOTAL] RAW: \t\t' '\t +100K schema'
+printsize "$CSSGZ\|$JSGZ" '[TOTAL] GZIP: \t\t' '\t +35K schema'
+printsize "$CSSBR\|$JSBR" '[TOTAL] BROTLI: \t' '\t +30K schema'

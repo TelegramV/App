@@ -50,30 +50,28 @@ function vrdom_createElement(tagName: VRTagName, props: VRNodeProps): VRNode {
             return new VListVRNode(tagName, props.attrs)
 
         } else {
-
             if (props.ref && props.ref.__fragment_ref) {
                 props.ref.slot = props.children.length > 0 ? props.children : undefined
                 props.ref.props = props.attrs
 
                 if (props.ref.fragment) {
-
-                    return props.ref.fragment({...props.attrs, slot: props.children}, props.children)
-
+                    return props.ref.fragment({
+                        ...props.attrs,
+                    }, props.children)
                 } else {
-
                     props.ref.fragment = tagName
 
-                    const node = tagName({...props.attrs, slot: props.children}, props.children)
+                    const node = tagName({
+                        ...props.attrs,
+                    }, props.children)
                     node.ref = props.ref
 
                     return node
-
                 }
             } else {
 
                 return tagName({
                     ...props.attrs,
-                    slot: props.children
                 }, props.children)
 
             }
