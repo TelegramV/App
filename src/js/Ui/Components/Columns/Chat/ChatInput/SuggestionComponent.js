@@ -71,15 +71,17 @@ export default class SuggestionComponent extends StatelessComponent {
     }
 
     scheduleSuggestion = () => {
-        this.lastInputText = ChatInputManager.text;
-        if(this.lastInputText.trim().length == 0) {
+        let lastText = ChatInputManager.text;
+        if(lastText.trim().length == 0) {
             this.hide();
             return;
         }
 
+        this.clearTimeouts();
+
         this.withTimeout(_ => {
-            if(this.lastInputText === ChatInputManager.text) {
-                this.makeSuggestion(this.lastInputText);
+            if(lastText === ChatInputManager.text) {
+                this.makeSuggestion(lastText);
             }
         }, 500);
     }
