@@ -1,13 +1,10 @@
 @font-face {
-  font-family: "#{$tgico-font-family}";
-  src: url("#{$tgico-font-path}/#{$tgico-font-family}.eot?owpifk");
-  src: url("#{$tgico-font-path}/#{$tgico-font-family}.eot?owpifk#iefix")
-  format("embedded-opentype"),
-  url("#{$tgico-font-path}/#{$tgico-font-family}.ttf?owpifk")
-  format("truetype"),
-  url("#{$tgico-font-path}/#{$tgico-font-family}.woff?owpifk") format("woff"),
-  url("#{$tgico-font-path}/#{$tgico-font-family}.svg?owpifk##{$tgico-font-family}")
-  format("svg");
+  font-family: '#{$tgico-font-family}';
+  src:  url('#{$tgico-font-path}/#{$tgico-font-family}.eot?n2cxmc');
+  src:  url('#{$tgico-font-path}/#{$tgico-font-family}.eot?n2cxmc#iefix') format('embedded-opentype'),
+    url('#{$tgico-font-path}/#{$tgico-font-family}.ttf?n2cxmc') format('truetype'),
+    url('#{$tgico-font-path}/#{$tgico-font-family}.woff?n2cxmc') format('woff'),
+    url('#{$tgico-font-path}/#{$tgico-font-family}.svg?n2cxmc##{$tgico-font-family}') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -17,7 +14,8 @@
 .tgico:before,
 .tgico:after,
 [class*=" tgico-"] {
-  font-family: "#{$tgico-font-family}" !important;
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: '#{$tgico-font-family}' !important;
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -25,10 +23,10 @@
   text-transform: none;
   //line-height: 1;
 
+  /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
 
 .tgico-check {
   &:before {
@@ -100,6 +98,16 @@
     content: $tgico-back; 
   }
 }
+.tgico-bots {
+  &:before {
+    content: $tgico-bots; 
+  }
+}
+.tgico-calendar {
+  &:before {
+    content: $tgico-calendar; 
+  }
+}
 .tgico-camera {
   &:before {
     content: $tgico-camera; 
@@ -130,6 +138,11 @@
     content: $tgico-chatsplaceholder; 
   }
 }
+.tgico-check1 {
+  &:before {
+    content: $tgico-check1; 
+  }
+}
 .tgico-checkbox {
   &:before {
     content: $tgico-checkbox; 
@@ -155,6 +168,11 @@
     content: $tgico-close; 
   }
 }
+.tgico-clouddownload {
+  &:before {
+    content: $tgico-clouddownload; 
+  }
+}
 .tgico-colorize {
   &:before {
     content: $tgico-colorize; 
@@ -170,9 +188,19 @@
     content: $tgico-data; 
   }
 }
+.tgico-delete_filled {
+  &:before {
+    content: $tgico-delete_filled; 
+  }
+}
 .tgico-delete {
   &:before {
     content: $tgico-delete; 
+  }
+}
+.tgico-deleteleft {
+  &:before {
+    content: $tgico-deleteleft; 
   }
 }
 .tgico-deleteuser {
@@ -215,9 +243,19 @@
     content: $tgico-eye2; 
   }
 }
+.tgico-favourites {
+  &:before {
+    content: $tgico-favourites; 
+  }
+}
 .tgico-flag {
   &:before {
     content: $tgico-flag; 
+  }
+}
+.tgico-folder {
+  &:before {
+    content: $tgico-folder; 
   }
 }
 .tgico-forward {
@@ -225,9 +263,14 @@
     content: $tgico-forward; 
   }
 }
-.tgico-fullscreen {
+.tgico-full_screen {
   &:before {
-    content: $tgico-fullscreen; 
+    content: $tgico-full_screen; 
+  }
+}
+.tgico-gifs {
+  &:before {
+    content: $tgico-gifs; 
   }
 }
 .tgico-group {
@@ -243,6 +286,16 @@
 .tgico-info {
   &:before {
     content: $tgico-info; 
+  }
+}
+.tgico-info2 {
+  &:before {
+    content: $tgico-info2; 
+  }
+}
+.tgico-keyboard {
+  &:before {
+    content: $tgico-keyboard; 
   }
 }
 .tgico-lamp {
@@ -278,6 +331,16 @@
 .tgico-lock {
   &:before {
     content: $tgico-lock; 
+  }
+}
+.tgico-loginlogodesktop {
+  &:before {
+    content: $tgico-loginlogodesktop; 
+  }
+}
+.tgico-loginlogomobile {
+  &:before {
+    content: $tgico-loginlogomobile; 
   }
 }
 .tgico-logout {
@@ -320,6 +383,11 @@
     content: $tgico-mute; 
   }
 }
+.tgico-muted {
+  &:before {
+    content: $tgico-muted; 
+  }
+}
 .tgico-newchannel {
   &:before {
     content: $tgico-newchannel; 
@@ -343,6 +411,11 @@
 .tgico-next {
   &:before {
     content: $tgico-next; 
+  }
+}
+.tgico-noncontacts {
+  &:before {
+    content: $tgico-noncontacts; 
   }
 }
 .tgico-nosound {
@@ -400,9 +473,14 @@
     content: $tgico-radioon; 
   }
 }
-.tgico-recent_svg {
+.tgico-readchats {
   &:before {
-    content: $tgico-recent_svg; 
+    content: $tgico-readchats; 
+  }
+}
+.tgico-recent {
+  &:before {
+    content: $tgico-recent; 
   }
 }
 .tgico-reply {
@@ -465,9 +543,19 @@
     content: $tgico-sport; 
   }
 }
+.tgico-stickers {
+  &:before {
+    content: $tgico-stickers; 
+  }
+}
 .tgico-stop {
   &:before {
     content: $tgico-stop; 
+  }
+}
+.tgico-tip {
+  &:before {
+    content: $tgico-tip; 
   }
 }
 .tgico-unarchive {
