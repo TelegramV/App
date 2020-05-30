@@ -1,8 +1,6 @@
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import type {BusEvent} from "../../../../../../Api/EventBus/EventBus"
 import type {Message} from "../../../../../../Api/Messages/Message"
-import {ReplyFragment} from "./ReplyFragment"
-import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import __component_destroy from "../../../../../../V/VRDOM/component/__component_destroy"
 import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulComponent"
@@ -48,6 +46,16 @@ class GeneralMessageComponent extends StatefulComponent {
 
     componentDidMount() {
         this.message.show()
+
+        if (this.props.observer) {
+            this.props.observer.observe(this.$el)
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.props.observer) {
+            this.props.observer.unobserve(this.$el)
+        }
     }
 
     componentWillUpdate(nextProps, nextState) {

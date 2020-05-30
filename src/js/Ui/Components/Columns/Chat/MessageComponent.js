@@ -73,14 +73,14 @@ const handlers = new Map([
  * @return {*}
  * @constructor
  */
-const MessageComponent = ({message}) => {
+const MessageComponent = ({message, ...attrs}) => {
     const Handler = handlers.get(message.type)
 
     if (Handler) {
-        return <Handler message={message}/>
+        return <Handler message={message} {...attrs}/>
     } else {
         return (
-            <UnsupportedMessageComponent message={message}/>
+            <UnsupportedMessageComponent message={message} {...attrs}/>
         )
     }
 }

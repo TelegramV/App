@@ -212,7 +212,7 @@
             width: 100%;
 
             #bubbles-inner {
-                //will-change: transform;
+                will-change: transform;
                 max-width: $max-chat-width;
                 width: 100%;
                 display: flex;
@@ -228,16 +228,20 @@
     }
 }
 
-@media (max-width: 780px) {
-    #chat:not(.responsive-selected-chat) {
-        display: none;
-    }
-}
+//@media (max-width: 780px) {
+//    #chat:not(.responsive-selected-chat) {
+//        display: none;
+//    }
+//}
+//
+//@media (min-width: 780px) {
+//
+//    // прикрутиш стилі ок
+//    .responsive-only-mobile {
+//        display: none;
+//    }
+//}
 
-@media (min-width: 780px) {
-
-    // прикрутиш стилі ок
-    .responsive-only-mobile {
-        display: none;
-    }
+.responsive-only-mobile {
+    display: none;
 }

@@ -23,7 +23,7 @@ function scrollToAndHighlight($container: HTMLElement, $el: HTMLElement) {
 
     $el.classList.add("highlightmessage");
 
-    setTimeout(() => $el.classList.remove("highlightmessage"), 2000);
+    setTimeout(() => $el.classList.remove("highlightmessage"), 4000);
 }
 
 export default scrollToAndHighlight;
