@@ -94,7 +94,7 @@ class NextBubblesComponent extends StatelessComponent {
     componentDidMount() {
         this.observer = new IntersectionObserver(this.onIntersection, {
             root: this.$el,
-            rootMargin: "1000px 100px",
+            rootMargin: "2000px 100px",
             threshold: 1.0,
         });
 
