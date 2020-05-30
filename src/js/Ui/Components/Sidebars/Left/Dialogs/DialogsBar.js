@@ -15,6 +15,7 @@ import PeersStore from "../../../../../Api/Store/PeersStore"
 import {DialogListsComponent} from "./DialogListsComponent";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
+import {Folders} from "./Folders";
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -101,7 +102,9 @@ export class DialogsBar extends LeftBarComponent {
                             <span className="tgico tgico-search"/>
                         </div>
                     </div>
+
                 </div>
+                <Folders/>
 
                 <ConnectionStatusComponent/>
 

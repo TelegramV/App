@@ -60,7 +60,6 @@ export function MainPage() {
             <CreateChannelBar/>
             <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
 
-            <Folders/>
             <DialogsBar/>
             <ChatComponent/>
 
