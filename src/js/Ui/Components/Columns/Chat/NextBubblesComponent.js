@@ -330,7 +330,7 @@ class NextBubblesComponent extends StatelessComponent {
         event.messages = this.fixMessages(event.messages.slice());
         const lenbeforefuck = this.mainVirtual.currentPage.length;
         this.mainVirtual.messages = [...event.messages, ...this.mainVirtual.messages];
-        this.currentVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length === 100;
+        this.currentVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
         const vbp = this.mainVirtual.veryBottomPage();
         this.prependMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.messages[0]);
         this.scrollBottom();
@@ -552,7 +552,7 @@ class NextBubblesComponent extends StatelessComponent {
 
         const ivt = this.currentVirtual.isVeryTop();
 
-        this.currentVirtual.hasMoreOnTopToDownload = event.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length === 100;
+        this.currentVirtual.hasMoreOnTopToDownload = event.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
 
         this.currentVirtual.messages = [...this.fixMessages(event.messages), ...this.currentVirtual.messages];
 
