@@ -24,8 +24,6 @@ export class BurgerAndBackComponent extends StatefulComponent {
         E.bus(UIEvents.LeftSidebar)
             .on("burger.changeToBack", this.onChangeToBack)
             .on("burger.changeToBurger", this.onChangeToBurger)
-        E.bus(AppEvents.General)
-            .on("foldersUpdate", this.onFoldersUpdate)
     }
 
     render() {
@@ -33,7 +31,7 @@ export class BurgerAndBackComponent extends StatefulComponent {
             "burger-and-back btn-icon rp rps tgico-menu": true,
             "burger": !this.state.back,
             "back": this.state.back,
-            "hidden": (!this.isMain && FoldersManager.hasFolders()) || (this.isNoFolders && FoldersManager.hasFolders())
+            "hidden": false
         }} onClick={this.onClick}/>
     }
 

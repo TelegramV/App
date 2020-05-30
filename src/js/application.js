@@ -14,6 +14,7 @@ import PeersStore from "./Api/Store/PeersStore"
 import keval from "./Keval/keval"
 
 import "./globals"
+import HorizontalScrollVRDOMPlugin from "./Ui/Plugins/HorizontalScrollPlugin";
 
 if (__IS_PRODUCTION__) {
     console.log("%c%s", "color: #4ea4f6; font-size: 4em;", "Telegram V")
@@ -27,6 +28,7 @@ if (__IS_PRODUCTION__) {
 
 VApp.registerPlugin(RippleVRDOMPlugin)
 VApp.registerPlugin(EmojiVRDOMPlugin)
+VApp.registerPlugin(HorizontalScrollVRDOMPlugin)
 VApp.useRoutes(AppRoutes)
 VApp.mount("#app")
 

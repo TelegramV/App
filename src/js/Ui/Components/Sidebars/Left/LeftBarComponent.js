@@ -10,8 +10,6 @@ class LeftBarComponent extends AbstractBarComponent {
         E.bus(UIEvents.LeftSidebar)
             .on("show", this.sidebarOnShow)
             .on("hide", this.sidebarOnHide)
-        E.bus(AppEvents.General)
-            .on("foldersUpdate", this.onFoldersUpdate)
     }
 
     openBar = barName => {
@@ -28,12 +26,6 @@ class LeftBarComponent extends AbstractBarComponent {
 
     componentDidMount() {
         super.componentDidMount()
-        this.$el.classList.toggle("folders-offset", FoldersManager.hasFolders())
-
-    }
-
-    onFoldersUpdate = (event) => {
-        this.$el.classList.toggle("folders-offset", event.folders.length > 0)
     }
 }
 
