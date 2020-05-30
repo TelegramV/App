@@ -211,20 +211,24 @@ class DialogManager extends Manager {
             }
 
             const dialogs = Dialogs.dialogs.map(rawDialog => {
-                const dialog = this.createDialogFromDialogs(rawDialog, Dialogs)
+                try {
+                    const dialog = this.createDialogFromDialogs(rawDialog, Dialogs)
 
-                if (dialog.peer.messages.last) {
-                    this.offsetDate = dialog.peer.messages.last.date
-                } else {
-                    console.error("BUG: no last message!")
+                    if (dialog.peer.messages.last) {
+                        this.offsetDate = dialog.peer.messages.last.date
+                    } else {
+                        console.error("BUG: no last message!")
+                    }
+
+                    if (this.offsetDate && !dialog.pinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
+                        this.dialogsOffsetDate = this.offsetDate
+                    }
+
+                    return dialog
+                } catch (e) {
+                    return null
                 }
-
-                if (this.offsetDate && !dialog.pinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
-                    this.dialogsOffsetDate = this.offsetDate
-                }
-
-                return dialog
-            })
+            }).filter(l => l)
 
             this.latestDialog = dialogs[dialogs.length - 1]
 
@@ -256,6 +260,10 @@ class DialogManager extends Manager {
 
     fetchNextPage({limit = 40}) {
         if (this.allWasFetched || DialogsStore.count >= this.count) {
+            this.allWasFetched = true
+            AppEvents.Dialogs.fire("allWasFetched", {
+
+            })
             console.warn("all dialogs were fetched")
             return Promise.reject()
         }

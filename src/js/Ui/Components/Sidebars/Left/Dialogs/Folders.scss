@@ -17,7 +17,8 @@
     flex-shrink: 0;
   }
 
-  .folder span {
+  .folder .title {
+    padding: 0 12px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -27,7 +28,7 @@
       margin-left: 6px;
       flex-shrink: 0;
       right: 0;
-      background-color: #8393A3;
+      background-color: #c4c9cc;
       min-width: 24px;
       height: 24px;
       text-align: center;

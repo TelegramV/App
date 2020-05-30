@@ -294,7 +294,7 @@ export class Dialog extends ReactiveObject {
         this._rawDialog = rawDialog
 
         if (!this.peer) {
-            console.error("BUG: there is no peer connected to this dialog.", this)
+            throw new Error("BUG: there is no peer connected to this dialog.", this)
         }
 
         this.pts = rawDialog.pts || -1

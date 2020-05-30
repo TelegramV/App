@@ -108,7 +108,7 @@ export class DialogsBar extends LeftBarComponent {
 
                 <ConnectionStatusComponent/>
 
-                <div ref={this.dialogsWrapperRef} id="dialogsWrapper" class="scrollable">
+                <div ref={this.dialogsWrapperRef} id="dialogsWrapper" class={{"scrollable": true, "loading": true}}>
                     <div ref={this.loaderRef} className="full-size-loader" id="loader">
                         <progress className="progress-circular big"/>
                     </div>
@@ -163,6 +163,7 @@ export class DialogsBar extends LeftBarComponent {
 
     onDialogsGotMany = _ => {
         this.loaderRef.hide()
+        this.dialogsWrapperRef.$el.classList.remove("loading")
     }
 
     onFolderSelect = _ => {
