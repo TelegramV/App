@@ -5,20 +5,28 @@ import CardMessageWrapperFragment from "./Common/CardMessageWrapperFragment"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import VSpinner from "../../../Elements/VSpinner";
+import {FileAPI} from "../../../../../Api/Files/FileAPI"
 
-const IconFragment = ({isDownloading, isDownloaded, color, ext, progress = 0.0}) => {
+const IconFragment = ({document, isDownloading, isDownloaded, color, ext, progress = 0.0}) => {
     return (
         <div className="svg-wrapper">
-            {DocumentMessagesTool.createIcon(color, !isDownloaded)}
+            {FileAPI.hasThumbnail(document) ?
+                <div class="thumbnail">
+                    <img style={{
+                        "width": "100%"
+                    }} src={FileAPI.getThumbnail(document)}/>
+                </div> : DocumentMessagesTool.createIcon(color, !isDownloaded)}
             {
                 isDownloaded ?
                     <div className="extension">{ext}</div> :
                     <div className="progress extension">
 
                         {/* TODO move progress bar with pause to component*/}
-                        {!isDownloading ? <div className="pause-button">
-                                <i className={["tgico tgico-download"]}/>
-                            </div> :
+                        {!isDownloading ? (
+                                <div className="pause-button">
+                                    <i className={["tgico tgico-download"]}/>
+                                </div>
+                            ) :
                             <VSpinner white determinate progress={progress}>
                                 <i className={["tgico tgico-close"]}/>
                             </VSpinner>
@@ -37,7 +45,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         super.appEvents(E)
         // TODO check this!
         E.bus(AppEvents.Files)
-            .only(event => event.fileId === this.doc.id)
+            .filter(event => event.fileId === this.doc.id)
             .on("fileDownloaded", this.onFileDownloaded)
             .on("fileDownloading", this.onFileDownloading)
     }
@@ -60,8 +68,8 @@ class DocumentMessageComponent extends GeneralMessageComponent {
                                  color={color}
                                  isDownloaded={isDownloaded}
                                  progress={progress}
-                                 isDownloading={isDownloading}/>
-
+                                 isDownloading={isDownloading}
+                                 document={doc}/>;
 
         return (
             <CardMessageWrapperFragment message={this.message}

@@ -34,6 +34,7 @@ import API from "../../../../Api/Telegram/API"
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
 import {vrdom_appendRealMany} from "../../../../V/VRDOM/append"
 import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
+import IntersectionObserver from 'intersection-observer-polyfill';
 
 function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
@@ -51,6 +52,8 @@ class NextBubblesComponent extends StatelessComponent {
     actionCount = 0;
 
     identifier = `bubbles-component`;
+
+    observer: IntersectionObserver;
 
     get currentVirtual(): VirtualMessages {
         if (this.isUsingSecondVirtual) {
@@ -89,11 +92,27 @@ class NextBubblesComponent extends StatelessComponent {
     }
 
     componentDidMount() {
+        this.observer = new IntersectionObserver(this.onIntersection, {
+            root: this.$el,
+            rootMargin: "2000px 100px",
+            threshold: 1.0,
+        });
+
         this.props.loaderRef.$el.style.display = "none";
 
         this.$el.addEventListener("scroll", this.onScroll, {
             passive: true,
         });
+    }
+
+    onIntersection = (entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.visibility = "visible"
+            } else {
+                entry.target.style.visibility = "hidden"
+            }
+        })
     }
 
     renderMessage = (message: Message, prevMessage: Message = null, nextMessage: Message = null): HTMLElement => {
@@ -121,7 +140,7 @@ class NextBubblesComponent extends StatelessComponent {
             message.tailsGroup = "m";
         }
 
-        return <MessageComponent message={message}/>;
+        return <MessageComponent observer={this.observer} message={message}/>;
     }
 
     _isGrouping(one: Message, two: Message) {

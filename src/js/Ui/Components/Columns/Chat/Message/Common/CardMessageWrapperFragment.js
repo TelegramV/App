@@ -7,7 +7,7 @@ const CardMessageWrapperFragment = ({message, icon, title, description, bubbleRe
     return (
         <MessageWrapperFragment message={message} showUsername={false} bubbleRef={bubbleRef}>
             <div class="card" css-cursor="pointer" onClick={onClick}>
-                <div class="card-icon rp rps rp-white">
+                <div class="card-icon rp rps rp-white" css-border-radius="5px">
                     {icon}
                 </div>
                 <div class="card-info">
