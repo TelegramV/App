@@ -23,6 +23,10 @@
         "empty keyboard";
         grid-template-columns: min-content fit-content(480px);
 
+        @include mobile {
+            grid-template-columns: min-content fit-content(90%);
+        }
+
         filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
 
         @include avatar;
@@ -109,7 +113,7 @@
             border-radius: 6px;
             position: relative;
             z-index: 0;
-            display: inline-table;
+            //display: inline-table;
             overflow: hidden;
 
             -webkit-mask-repeat: no-repeat;
