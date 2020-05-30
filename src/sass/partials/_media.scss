@@ -1,5 +1,12 @@
 .thumbnail {
     > img {
+        filter: blur(10px);
+        transform: scale(1.2);
+    }
+}
+
+.thumbnail3px {
+    > img {
         filter: blur(3px);
         transform: scale(1.2);
     }
