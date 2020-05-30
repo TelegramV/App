@@ -7,6 +7,10 @@ import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy";
+import Lottie from "../../../../Lottie/Lottie";
+import filterFilling from "../../../../../../../public/static/animated/filter_new.json";
+import filterNoChats from "../../../../../../../public/static/animated/filter_no_chats.json";
+import DialogsManager from "../../../../../Api/Dialogs/DialogsManager";
 
 class DialogFolderFragment extends StatelessComponent {
 
@@ -47,12 +51,47 @@ export class DialogListsComponent extends StatelessComponent {
         E.bus(AppEvents.General)
             .on("foldersUpdate", this.onFoldersUpdate)
             .on("selectFolder", this.onSelectFolder)
+        E.bus(AppEvents.Dialogs)
+            .on("gotMany", this.onGotMany)
+            .on("gotArchived", this.onGotMany)
+            .on("gotNewMany", this.onGotMany)
+            .on("gotOne", this.onGotMany)
+            .on("allWasFetched", this.onAllWasFetched)
     }
 
     render() {
         return <div className="dialog-lists">
-            {/*<div className="empty"/>*/}
-            {/* All chats */}
+            <div className="folder-screen loading">
+                <Lottie
+                    width={100}
+                    height={100}
+                    options={{
+                        animationData: filterFilling,
+                        loop: true,
+                        autoplay: true,
+                    }}
+                    // onClick={onClick}
+                    loadDelay={50}
+                    />
+                <div className="title">Adding chats</div>
+                <div className="description">Please wait a few moments while we fill this folder for you...</div>
+            </div>
+
+            <div className="folder-screen no-chats">
+                <Lottie
+                    width={100}
+                    height={100}
+                    options={{
+                        animationData: filterNoChats,
+                        loop: false,
+                        autoplay: true,
+                    }}
+                    // onClick={onClick}
+                    loadDelay={50}
+                    playOnHover/>
+                <div className="title">No chats found</div>
+                <div className="description">No chats currently belong to this folder.</div>
+            </div>
             <DialogFolderFragment ref={this.folderRefs[0]} folderId={null} filter={null}
                                   selected={this.selectedFolder == null}/>
             {/*{this.state.folders.map(l => {*/}
@@ -136,6 +175,48 @@ export class DialogListsComponent extends StatelessComponent {
         // })
     }
 
+    onAllWasFetched = _ => {
+        this.onGotMany(_)
+    }
+
+    onGotMany = _ => {
+        const component: DialogFolderFragment = this.folderRefs.find(l => {
+            const component: DialogFolderFragment = l.component
+            return component.folderId === this.selectedFolder
+        }).component
+        if(component.general.component.$el.childNodes.length + component.pinned.component.$el.childNodes.length >= 5) {
+            this.setLoading(false)
+        } else {
+            if(DialogsManager.allWasFetched) {
+                this.setNoChats()
+            } else {
+                this.setLoading()
+            }
+        }
+    }
+
+    isLoading = () => {
+        return this.$el.classList.contains("loading")
+    }
+
+    isNoChats = () => {
+        return this.$el.classList.contains("no-chats")
+    }
+
+    setLoading = (value = true) => {
+        if(this.isNoChats()) {
+            this.setNoChats(false)
+        }
+        this.$el.classList.toggle("loading", value)
+    }
+
+    setNoChats = (value = true) => {
+        if(this.isLoading()) {
+            this.setLoading(false)
+        }
+        this.$el.classList.toggle("no-chats", value)
+    }
+
     onSelectFolder = (event) => {
         // console.log("select folder", event.folderId)
         this.selectedFolder = event.folderId
@@ -143,6 +224,11 @@ export class DialogListsComponent extends StatelessComponent {
             const component: DialogFolderFragment = l.component
             component.hidden = component.folderId !== this.selectedFolder
         })
+        if(this.selectedFolder == null) {
+            this.setLoading(false)
+        } else {
+            this.onGotMany()
+        }
         // this.setState({
         //     selectedFolder: folderId
         // })

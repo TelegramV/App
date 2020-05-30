@@ -288,6 +288,10 @@ class DialogManager extends Manager {
 
     fetchNextPage({limit = 40}) {
         if (this.allWasFetched || DialogsStore.count >= this.count) {
+            this.allWasFetched = true
+            AppEvents.Dialogs.fire("allWasFetched", {
+
+            })
             console.warn("all dialogs were fetched")
             return Promise.reject()
         }

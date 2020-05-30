@@ -26,11 +26,64 @@
 
   height: 100%;
 
+  &.loading {
+    overflow: hidden;
+  }
+
   &:hover ~ .new-chat {
     bottom: 25px;
   }
 
   .dialog-lists {
+    height: 100%;
+
+
+    .folder-screen {
+      display: flex;
+
+      position: absolute;
+      width: 80%;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      visibility: hidden;
+
+      .title {
+        margin-top: 16px;
+        font-size: 1.2em;
+        font-weight: 400;
+      }
+
+      .description {
+        margin-top: 5px;
+      }
+
+    }
+
+    &.loading {
+
+      .loading {
+        visibility: visible;
+
+        ~ * {
+          display: none;
+        }
+      }
+    }
+
+    &.no-chats {
+      .no-chats {
+        visibility: visible;
+
+        ~ * {
+          display: none;
+        }
+      }
+    }
 
     .empty {
       width: 300px;

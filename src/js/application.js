@@ -15,6 +15,7 @@ import keval from "./Keval/keval"
 
 import "./globals"
 import HorizontalScrollVRDOMPlugin from "./Ui/Plugins/HorizontalScrollPlugin";
+import UIEvents from "./Ui/EventBus/UIEvents";
 
 if (__IS_PRODUCTION__) {
     console.log("%c%s", "color: #4ea4f6; font-size: 4em;", "Telegram V")
@@ -24,6 +25,9 @@ if (__IS_PRODUCTION__) {
     document.title = "[dev] Telegram V"
     window.invoke = MTProto.invokeMethod
     window.devkeval = keval
+    window.snackbar = (message, error) => {
+        UIEvents.General.fire("snackbar.show", {text: message, time: 4, error: error});
+    }
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)
