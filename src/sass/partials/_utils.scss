@@ -18,3 +18,14 @@
 .no-borders {
   border: none;
 }
+
+.color-blue {
+  color: $blue;
+}
+
+.grabbable {
+  cursor: move; /* fallback if grab cursor is unsupported */
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}

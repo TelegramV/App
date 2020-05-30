@@ -35,8 +35,8 @@
     flex-grow: 1;
     transition: anim(width);
     overflow: hidden;
+    position: relative;
     //will-change: transform;
-
 
     &.right-bar-open #chat {
         width: calc(100% - 422px);
@@ -71,6 +71,10 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
+
+        @include mobile {
+            display: none;
+        }
     }
 
     #chat {
@@ -78,11 +82,13 @@
         // padding: 200px;
         width: 100%;
         align-items: center;
-        height: 100vh;
+        height: var(--vh100);
         overflow: hidden;
         flex-direction: column;
         position: relative;
         transition: anim(width);
+
+
 
         #topbar {
             width: 100%;
@@ -178,7 +184,8 @@
             }
 
             .person {
-                padding: 8px;
+                padding: 0px;
+                margin: 8px;
 
                 &:hover {
                     background-color: transparent;
@@ -228,20 +235,14 @@
     }
 }
 
-//@media (max-width: 780px) {
-//    #chat:not(.responsive-selected-chat) {
-//        display: none;
-//    }
-//}
-//
-//@media (min-width: 780px) {
-//
-//    // прикрутиш стилі ок
-//    .responsive-only-mobile {
-//        display: none;
-//    }
-//}
+@include mobile {
+    #chat:not(.responsive-selected-chat) {
+        display: none;
+    }
+}
 
-.responsive-only-mobile {
-    display: none;
+@include desktop {
+    .responsive-only-mobile {
+        display: none;
+    }
 }

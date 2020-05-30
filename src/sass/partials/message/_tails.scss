@@ -2,9 +2,10 @@
     $out: $in==false;
 
     & {
-        &~.inline-keyboard {
+        & ~ .inline-keyboard {
             margin-left: 11px;
         }
+
         padding-right: 5px;
     }
 
@@ -34,31 +35,40 @@
             border-top-right-radius: 12px;
             border-bottom-right-radius: 12px;
 
-        	figure.photo, figure.video {
-	    		margin-left: -10px;
+            figure.photo, figure.video {
+                margin-left: -10px;
                 margin-right: -5px;
-		    }
+            }
 
             .box {
                 figure.photo, figure.video {
                     margin-left: 0px; //embed
+                    max-height: 250px;
+                    height: 250px;
+                    width: 100%;
+
+                    img {
+                        width: 100%;
+                        object-fit: cover;
+                    }
                 }
             }
 
-			&.transparent {
-	        	padding-left: 0;
-	        }
+            &.transparent {
+                padding-left: 0;
+            }
 
         }
 
         // TAILS
-        &.group-s {}
+        &.group-s {
+        }
 
         &.group-m {
             figure.round {
                 margin-left: 0px;
 
-                &~.playback {
+                & ~ .playback {
                     left: 10px;
                 }
             }
@@ -78,26 +88,31 @@
 
         &.group-e, &.group-se {
             margin-left: 0;
-            &:not(.transparent) {
-		        padding-left: 21px;
-		    }
 
-		    &.transparent {
-		    	padding-left: 10px; //заберіть мене в дурку
-		    }
+            &:not(.transparent) {
+                padding-left: 21px;
+            }
+
+            &.transparent {
+                padding-left: 10px; //заберіть мене в дурку
+            }
 
             &.no-pad {
-		    	padding-left: 0;
-		    	padding-right: 0;
+                padding-left: 0;
+                padding-right: 0;
 
-                .reply {
-                    margin-left: 20px;
+                .fwd, .username {
+                    padding-left: 21px;
                 }
 
-		    	figure.photo, figure.video {
-		    		margin-left: 0px;
-			    }
-		    }
+                .reply {
+                    margin-left: 21px;
+                }
+
+                figure.photo, figure.video {
+                    margin-left: 0px;
+                }
+            }
         }
     }
 
@@ -106,17 +121,19 @@
             margin-right: 11px;
             padding-left: 10px;
             padding-right: 10px;
-        	figure.photo, figure.video {
-	    		margin-left: -10px;
-	    		margin-right: -10px;
-		    }
+
+            figure.photo, figure.video {
+                margin-left: -10px;
+                margin-right: -10px;
+            }
 
             border-top-left-radius: 12px;
             border-bottom-left-radius: 12px;
         }
 
         // TAILS
-        &.group-s {}
+        &.group-s {
+        }
 
         &.group-m {
             figure.round {
@@ -133,21 +150,27 @@
 
         &.group-se {
             -webkit-mask-image: url("../../public/static/images/tail-right.svg"), url("../../public/static/images/rect-right.svg");
-             mask-image: url("../../public/static/images/tail-right.svg"), url("../../public/static/images/rect-right.svg");
+            mask-image: url("../../public/static/images/tail-right.svg"), url("../../public/static/images/rect-right.svg");
         }
 
         &.group-e, &.group-se {
             margin-right: 0;
-            padding-right: 20px;
+            padding-right: 21px;
+
             &~.inline-keyboard {
                 margin-right: 11px;
             }
+
             &.no-pad {
-		    	padding-right: 0;
-		    	padding-left: 0;
+                padding-right: 0;
+                padding-left: 0;
 
                 .reply {
                     margin-left: 10px;
+                }
+
+                .fwd, .username {
+                    padding-left: 10px;
                 }
 
 		    	figure.photo, figure.video {

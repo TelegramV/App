@@ -9,18 +9,14 @@ const AvatarFragment = ({peer, saved, onClick}) => {
             </div>
         )
     }
-    
+
     let photo = peer.photo
     let deleted = peer.isDeleted
     let hasAvatar = !photo.isEmpty && !photo._isFetchingSmall
 
-    if(onClick === null) {
-
-    } else {
+    if (!onClick) {
         onClick = () => AppSelectedInfoPeer.select(peer)
     }
-
-
 
     if (saved && peer.isSelf) {
         return (

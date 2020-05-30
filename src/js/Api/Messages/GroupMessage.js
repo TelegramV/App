@@ -19,21 +19,25 @@
 
 import type {Message} from "./Message"
 import {MessageType} from "./Message"
+import {AbstractMessage} from "./AbstractMessage"
 
-class GroupMessage {
+// shouldn't extend AbstractMessage, but no time as always
+class GroupMessage extends AbstractMessage {
     type = MessageType.GROUP;
-
-    groupedId: string;
-
-    messages: Array<Message>;
+    messages: Set<Message>;
 
     constructor(message: Message) {
-        this.messages = [message];
-        this.groupedId = message.groupedId;
+        super(message.dialogPeer);
+
+        this.messages = new Set([message]);
     }
 
-    get id() {
-        return this.groupedId;
+    init() {
+        this.messages.forEach(message => message.init())
+    }
+
+    get raw() {
+        return Array.from(this.messages)[this.messages.size - 1].raw
     }
 }
 

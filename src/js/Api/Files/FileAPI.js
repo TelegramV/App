@@ -11,7 +11,7 @@ import StickerSet from "../Stickers/StickerSet"
 export class FileAPI {
     static thumbHeader = bytesFromHex("ffd8ffe000104a46494600010100000100010000ffdb004300281c1e231e19282321232d2b28303c64413c37373c7b585d4964918099968f808c8aa0b4e6c3a0aadaad8a8cc8ffcbdaeef5ffffff9bc1fffffffaffe6fdfff8ffdb0043012b2d2d3c353c76414176f8a58ca5f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8f8ffc00011080000000003012200021101031101ffc4001f0000010501010101010100000000000000000102030405060708090a0bffc400b5100002010303020403050504040000017d01020300041105122131410613516107227114328191a1082342b1c11552d1f02433627282090a161718191a25262728292a3435363738393a434445464748494a535455565758595a636465666768696a737475767778797a838485868788898a92939495969798999aa2a3a4a5a6a7a8a9aab2b3b4b5b6b7b8b9bac2c3c4c5c6c7c8c9cad2d3d4d5d6d7d8d9dae1e2e3e4e5e6e7e8e9eaf1f2f3f4f5f6f7f8f9faffc4001f0100030101010101010101010000000000000102030405060708090a0bffc400b51100020102040403040705040400010277000102031104052131061241510761711322328108144291a1b1c109233352f0156272d10a162434e125f11718191a262728292a35363738393a434445464748494a535455565758595a636465666768696a737475767778797a82838485868788898a92939495969798999aa2a3a4a5a6a7a8a9aab2b3b4b5b6b7b8b9bac2c3c4c5c6c7c8c9cad2d3d4d5d6d7d8d9dae2e3e4e5e6e7e8e9eaf2f3f4f5f6f7f8f9faffda000c03010002110311003f00")
 
-    static downloadStickerSetThumb(stickerSet: StickerSet) {
+    static downloadStickerSetThumb(stickerSet: StickerSet): Promise<Blob> {
         const thumb = stickerSet.raw.thumb;
 
         if (!thumb) {
@@ -26,7 +26,7 @@ export class FileAPI {
                     volume_id: thumb.location.volume_id,
                     local_id: thumb.location.local_id,
                 },
-            }, stickerSet.thumb_dc_id);
+            }, stickerSet.thumb_dc_id).then(file => FileAPI.getBlob(file, document.mime_type));
         } else if (thumb._ === "photoCachedSize" || thumb._ === "photoStrippedSize") {
             console.log("todo gg")
             return Promise.resolve(null);
@@ -41,18 +41,13 @@ export class FileAPI {
      *
      * @param document
      * @param thumb
+     * @param onPartDownloaded
+     * @param useCache
      */
-    static downloadDocument(document, thumb) {
+    static downloadDocument(document, thumb, onPartDownloaded, useCache = true): Promise<Blob> {
         if (document._ === "documentEmpty") {
             return Promise.reject("documentEmpty");
         }
-
-        return FileAPI.downloadDocumentAllParts(document, thumb);
-    }
-
-    static async downloadDocumentAllParts(document, thumb) {
-        let bytes = new Uint8Array();
-        let file = {};
 
         const location = {
             _: "inputDocumentFileLocation",
@@ -64,25 +59,77 @@ export class FileAPI {
 
         const size = thumb ? thumb.size : document.size;
 
+        return FileAPI.downloadAllParts(location, size, document.dc_id, onPartDownloaded)
+            .then(file => FileAPI.getBlob(file, document.mime_type));
+    }
+
+    /**
+     * @see https://core.telegram.org/type/Photo
+     *
+     * @param photo
+     * @param size
+     */
+    static downloadPhoto(photo, size): Promise<Blob> {
+        if (photo._ === "photoEmpty") {
+            return Promise.reject("photoEmpty");
+        }
+
+        if (!size) {
+            size = photo.sizes[photo.sizes.length - 1]
+        }
+
+        const location = {
+            _: "inputPhotoFileLocation",
+            id: photo.id,
+            access_hash: photo.access_hash,
+            file_reference: photo.file_reference,
+            thumb_size: size.type,
+        };
+
+        return FileAPI.downloadAllParts(location, size.size, photo.dc_id)
+            .then(file => FileAPI.getBlob(file, "application/jpeg"));
+    }
+
+    /**
+     * @param location
+     * @param size
+     * @param dcId
+     * @param onPartDownloaded
+     * @returns {Promise<{bytes: Uint8Array}>}
+     */
+    static async downloadAllParts(location, size, dcId, onPartDownloaded) {
+        let bytes = new Uint8Array();
+        let file = {};
+
         while (bytes.length < size) {
             file = await API.upload.getFile({
                 location: location,
                 offset: bytes.length,
-            }, document.dc_id);
+            }, dcId);
 
-            bytes = bytesConcat(bytes, file.bytes)
+            bytes = bytesConcat(bytes, file.bytes);
+
+            if (onPartDownloaded) {
+                if (onPartDownloaded(file.bytes, bytes) === false) {
+                    break; // interrupted
+                }
+            }
         }
 
-        file.bytes = bytes
+        file.bytes = bytes;
 
-        return file
+        return file;
     }
 
-    static parseAnimatedStickerFile(file) {
-        return FileAPI.decodeAnimatedStickerBytes(file.bytes);
-    }
+    static async decodeAnimatedSticker(bytes) {
+        if (bytes instanceof Blob) {
+            bytes = await bytes.arrayBuffer();
+        }
 
-    static async decodeAnimatedStickerBytes(bytes) {
+        if (!(bytes instanceof Uint8Array)) {
+            bytes = new Uint8Array(bytes);
+        }
+
         if (bytes[0] == 123) { //"{"
             return JSON.parse(new TextDecoder("utf-8").decode(bytes));
         } else {
@@ -97,8 +144,16 @@ export class FileAPI {
     }
 
     static getUrl(file, type): Blob {
+        if (file instanceof Blob) {
+            return URL.createObjectURL(file);
+        }
+
         return URL.createObjectURL(FileAPI.getBlob(file, type));
     }
+
+
+    // OUTDATED BELOW
+
 
     static getInputName(file) {
         switch (file._) {
@@ -202,7 +257,7 @@ export class FileAPI {
         }))
     }
 
-    static getFileLocation(location, dcID = null, offset = 0) {
+    static obsolete_getFileLocation(location, dcID = null, offset = 0) {
         return MTProto.invokeMethod("upload.getFile", {
             location: location,
             offset: offset,
@@ -256,7 +311,7 @@ export class FileAPI {
         return AppCache.get("peerAvatars", file.volume_id + "_" + file.local_id).then(blob => {
             return URL.createObjectURL(blob)
         }).catch(error => {
-            return this.getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
+            return this.obsolete_getFileLocation(this.getInputPeerPhoto(file, peer, big), dcID).then(response => {
                 if (!response) {
                     return ""
                 }
@@ -364,7 +419,7 @@ export class FileAPI {
                     reject("Cancelled by user")
                     return
                 }
-                let response = await this.getFileLocation({
+                let response = await this.obsolete_getFileLocation({
                     _: this.getInputName(file),
                     id: file.id,
                     access_hash: file.access_hash,

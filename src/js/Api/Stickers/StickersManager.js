@@ -17,7 +17,7 @@ class StickersManager extends Manager {
             })
 
             this.stickerSets["inputStickerSetAnimatedEmoji"] = l;
-            console.log("Animated Emoji Set ready!");
+            //console.log("Animated Emoji Set ready!");
         })
     }
 
@@ -54,8 +54,8 @@ class StickersManager extends Manager {
     }
 
     //do not call to get special set
-    getStickerSet(stickerSet) {
-        if (this.stickerSets[stickerSet.id]) return Promise.resolve(this.stickerSets[stickerSet.id])
+    async getStickerSet(stickerSet) {
+        if (this.stickerSets[stickerSet.id]) return this.stickerSets[stickerSet.id];
 
         return MTProto.invokeMethod("messages.getStickerSet", {
             stickerset: stickerSet
@@ -66,7 +66,6 @@ class StickersManager extends Manager {
 
             let id = l.set.id;
             if (stickerSet._ === "inputStickerSetAnimatedEmoji") id = "inputStickerSetAnimatedEmoji"
-            if (stickerSet._ === "inputStickerSetDice") id = "inputStickerSetDice"
             //console.log(this.stickerSets)
             return this.stickerSets[id] = l
         })

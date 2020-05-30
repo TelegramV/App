@@ -5,7 +5,6 @@ import {Peer} from "../Peers/Objects/Peer";
 import {PeerParser} from "../Peers/PeerParser"
 import DialogsStore from "../Store/DialogsStore"
 import AppEvents from "../EventBus/AppEvents"
-import PeersStore from "../Store/PeersStore"
 import AppSelectedChat from "../../Ui/Reactive/SelectedChat"
 import API from "../Telegram/API"
 import PeersManager from "../Peers/PeersManager"
@@ -137,36 +136,6 @@ class DialogManager extends Manager {
     }
 
     /**
-     * @param type
-     * @param id
-     * @return {Promise<Dialog|null>}
-     */
-    async findOrFetch(type, id) {
-        console.log("fetch or find")
-
-        let dialog = DialogsStore.get(type, id)
-
-        if (!dialog) {
-            let peer = PeersStore.get(type, id)
-
-            if (peer) {
-                dialog = peer.dialog
-
-                if (!dialog) {
-                    dialog = await this.getPeerDialogs(peer)[0]
-                }
-
-                DialogsStore.set(dialog)
-            } else {
-                dialog = await this.getPeerDialogs({_: type, id})[0]
-                DialogsStore.set(dialog)
-            }
-        }
-
-        return dialog
-    }
-
-    /**
      * @param peer
      * @return {Dialog}
      */
@@ -202,6 +171,9 @@ class DialogManager extends Manager {
         const dialog = this.setFromRaw(Dialog)
         const rawTopMessage = Dialogs.messages.find(message => message.id === Dialog.top_message)
         dialog.peer.messages.putNewRawMessage(rawTopMessage)
+        if (dialog.peer.id === 392565311) {
+            console.warn("RAWTOP", rawTopMessage)
+        }
         return dialog
     }
 

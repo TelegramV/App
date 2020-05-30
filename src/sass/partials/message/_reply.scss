@@ -1,16 +1,10 @@
 @mixin reply($in: false, $transparent: false) {
     & .reply {
         .quote {
-            .name {
+            .name, .text {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-            }
-            .text {
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                overflow: hidden;
-                max-width: 400px;
             }
         }
 
@@ -29,9 +23,7 @@
             padding: 8px;
 
             .quote {
-                .text {
-                    max-width: 250px;
-                }
+                max-width: 250px;
             }
         }
 

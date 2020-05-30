@@ -54,7 +54,7 @@ function MediaFragment({media, zoom, hidden}) {
 
     if (zoom) {
         if (horizon) {
-            style["height"] = "100vh"
+            style["height"] = "var(--vh100)"
             style["width"] = ""
         } else {
             style["width"] = "100vw"
@@ -156,7 +156,7 @@ export class MediaViewerComponent extends StatefulComponent {
                                 event.stopPropagation();
                             }}/>
                             {
-                                nodeIf( <i className="tgico tgico-forward rp rps" onClick={event => {
+                                nodeIf(<i className="tgico tgico-forward rp rps" onClick={event => {
                                     event.stopPropagation();
                                     UIEvents.General.fire("message.forward", {message, from: message.dialog.peer})
                                 }}/>, !!message)
@@ -236,6 +236,15 @@ export class MediaViewerComponent extends StatefulComponent {
 
         this.downloadLeftPage();
         this.downloadRightPage();
+
+        if (!message.loaded && !message.loading) {
+            (message instanceof VideoMessage ? message.fetchFullVideo() : message.fetchMax())
+                .then(() => {
+                    if (this.state.message === message) {
+                        this.forceUpdate();
+                    }
+                })
+        }
 
         this.setState({
             hidden: false,

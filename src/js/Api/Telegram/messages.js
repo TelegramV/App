@@ -47,6 +47,7 @@ function searchGlobal(params) {
         limit: params.limit
     }).then(Messages => {
         PeersManager.fillPeersFromUpdate(Messages)
+
         return Messages
     })
 }
@@ -93,6 +94,10 @@ function getSavedGifs({hash = 0} = {hash: 0}) {
     return MTProto.invokeMethod("messages.getSavedGifs", {hash})
 }
 
+function getStickerSet(props) {
+    return MTProto.invokeMethod("messages.getStickerSet", props)
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
@@ -102,6 +107,7 @@ const messages = {
     getAllStickers: getAllStickers,
     getRecentStickers: getRecentStickers,
     getSavedGifs: getSavedGifs,
+    getStickerSet: getStickerSet,
 }
 
 export default messages

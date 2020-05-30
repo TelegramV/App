@@ -11,7 +11,7 @@ const IconFragment = ({document, isDownloading, isDownloaded, color, ext, progre
     return (
         <div className="svg-wrapper">
             {FileAPI.hasThumbnail(document) ?
-                <div class="thumbnail">
+                <div class="thumbnail3px">
                     <img style={{
                         "width": "100%"
                     }} src={FileAPI.getThumbnail(document)}/>

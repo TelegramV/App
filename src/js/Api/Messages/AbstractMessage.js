@@ -35,9 +35,6 @@ export class AbstractMessage extends ReactiveObject implements Message {
     forwardedType: string;
     forwardedMessageId: number;
 
-    _group: Array<Message> | undefined;
-    _groupInitializer: boolean;
-
     _hideAvatar: boolean;
     _tailsGroup: string;
 
@@ -48,6 +45,9 @@ export class AbstractMessage extends ReactiveObject implements Message {
             this._to = dialogPeer
             this._dialog = dialogPeer.dialog
         }
+    }
+
+    init() {
     }
 
     get dialogPeer() {
@@ -213,30 +213,6 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     get groupedId() {
         return this.raw.grouped_id
-    }
-
-    init() {
-        if (this.to) {
-            this.findGrouped()
-        }
-    }
-
-    findGrouped(fire = true) {
-        if (!this.to) {
-            return false
-        }
-        if (!this.groupedId) return
-        if (this.groupedId && !this.group) {
-            let hasInit = false
-            this.group = this.to.messages.getByGroupedId(this.groupedId)
-            this.group.forEach(l => {
-                l.group = this.group
-                hasInit |= l.groupInitializer
-            })
-            this.groupInitializer = !hasInit
-        } else if (this.groupedId) {
-            this.group.find(l => l.groupInitializer).fire("updateGrouped")
-        }
     }
 
     findReplyTo(fire = true) {

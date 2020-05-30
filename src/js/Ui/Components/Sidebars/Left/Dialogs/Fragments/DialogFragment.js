@@ -21,6 +21,7 @@ export const DialogFragment = (
     }
 ) => {
     const peer = dialog.peer
+    let lastMessage = dialog.peer.messages.last
 
     const personClasses = {
         "person": true,
@@ -31,16 +32,16 @@ export const DialogFragment = (
         "muted": dialog.isMuted,
     }
 
-    if (dialog.peer.messages.last && dialog.peer.messages.last.isOut && !dialog.peer.isSelf) {
+    if (lastMessage && lastMessage.isOut && !dialog.peer.isSelf) {
         personClasses["sent"] = true
 
-        if (dialog.peer.messages.last.isRead) {
+        if (lastMessage.isRead) {
             personClasses["read"] = true
         }
     }
 
     return (
-        <div data-message-id={dialog.peer.messages.last.id}
+        <div data-message-id={lastMessage.id}
              className={personClasses}
 
              onClick={click}

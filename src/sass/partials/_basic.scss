@@ -84,13 +84,6 @@ img[src=""], img:not([src]) {
   }
 }
 
-.grabbable {
-  cursor: move; /* fallback if grab cursor is unsupported */
-  cursor: grab;
-  cursor: -moz-grab;
-  cursor: -webkit-grab;
-}
-
 .emoji {
   height: 1.3em;
   width: 1.3em;
@@ -98,10 +91,6 @@ img[src=""], img:not([src]) {
   vertical-align: -0.3em;
   user-select: all;
   cursor: text;
-}
-
-.color-blue {
-  color: $blue;
 }
 
 ::-webkit-scrollbar {
@@ -166,5 +155,17 @@ body {
     &:hover {
       overflow-x: auto;
     }
+  }
+}
+
+@mixin mobile {
+  @media (max-width: 991.98px) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 992px) {
+    @content;
   }
 }
