@@ -272,7 +272,7 @@ export class FileAPI {
     }
 
     static hasThumbnail(file) {
-        return (file.sizes || file.thumbs).some(l => l.type === "i")
+        return (file.sizes || file.thumbs) && (file.sizes || file.thumbs).some(l => l.type === "i")
     }
 
     static getMaxSize(file, onlyThumb = false) {
