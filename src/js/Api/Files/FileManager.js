@@ -79,7 +79,7 @@ class FilesManager {
                 return false
             }
 
-            let response = await FileAPI.getFileLocation({
+            let response = await FileAPI.obsolete_getFileLocation({
                 _: FileAPI.getInputName(file),
                 id: file.id,
                 access_hash: file.access_hash,

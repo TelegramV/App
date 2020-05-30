@@ -1,9 +1,9 @@
 import type {Message} from "../Messages/Message"
-import {MessageType} from "../Messages/Message"
 import {Peer} from "./Objects/Peer"
 import {arrayDeleteCallback} from "../../Utils/array"
 import {MessageFactory} from "../Messages/MessageFactory"
 import API from "../Telegram/API"
+import GroupMessage from "../Messages/GroupMessage"
 
 export class PeerMessages {
 
@@ -23,6 +23,7 @@ export class PeerMessages {
     _fireTransaction: boolean = false
 
     _heap: Map<number, Message> = new Map(); // refreshed when chat changed; do not ever access this directly
+    _groupsHeap: Map<number, GroupMessage> = new Map();
     _recent: Message[] = []; // newest first; each item may be duplicated in the `_heap`
 
     isDownloadingRecent = false;
@@ -59,7 +60,13 @@ export class PeerMessages {
         let message = this._heap.get(id);
 
         if (!message) {
-            message = this._recent.find(message => message.id === message);
+            message = Array.from(this._groupsHeap.values())
+                .flatMap(group => Array.from(group.messages))
+                .find(message => message.id === id);
+        }
+
+        if (!message) {
+            message = this._recent.find(message => message.id === id);
         }
 
         return message;
@@ -149,13 +156,28 @@ export class PeerMessages {
      * @return {Message}
      */
     putRawMessage = (rawMessage): Message => {
-        const message = this._heap.get(rawMessage.id);
+        let message = this.getById(rawMessage.id);
 
         if (message) {
             return message.fillRaw(rawMessage);
         }
 
-        this._heap.set(rawMessage.id, MessageFactory.fromRaw(this.peer, rawMessage));
+        message = MessageFactory.fromRaw(this.peer, rawMessage);
+
+        if (message.groupedId) {
+            let group = this._groupsHeap.get(message.groupedId)
+
+            if (group) {
+                group.messages.add(message);
+            } else {
+                group = new GroupMessage(message);
+                this._groupsHeap.set(message.groupedId, group);
+            }
+
+            return group;
+        }
+
+        this._heap.set(rawMessage.id, message);
 
         return this._heap.get(rawMessage.id);
     }
@@ -167,7 +189,7 @@ export class PeerMessages {
      * @param rawMessages
      */
     putRawMessages = (rawMessages): Message[] => {
-        return rawMessages.map(this.putRawMessage)
+        return [...new Set(rawMessages.map(this.putRawMessage))] // todo: find out better way
     }
 
     /**
@@ -204,12 +226,14 @@ export class PeerMessages {
         return message;
     }
 
-    getByGroupedId(groupedId: string): Array<Message> {
-        return (
-            [...this._heap.values()]
-                .filter(message => message.type === MessageType.GROUP && message.id === groupedId)
-                .flatMap(message => message.messages)
-        )
+    getByGroupedId(groupedId: string): Set<Message> {
+        const group = this._groupsHeap.get(groupedId);
+
+        if (group) {
+            return group.messages;
+        }
+
+        return null;
     }
 
     getPollsById(poll_id: number): Array<Message> {
@@ -378,23 +402,6 @@ export class PeerMessages {
 
     clear() {
         this._heap.clear();
-    }
-
-    /**
-     * @param {Message[]} messages
-     * @private
-     * @return {Message[]}
-     */
-    _sortMessagesArray(messages) {
-        return messages.sort((a, b) => {
-            if (a.date > b.date) {
-                return 1
-            } else if (a.date < b.date) {
-                return -1
-            } else {
-                return 0
-            }
-        })
     }
 
     /**

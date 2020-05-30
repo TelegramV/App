@@ -25,15 +25,9 @@ import __component_withDefaultProps from "./__component_withDefaultProps"
 import {__component_update_force} from "./__component_update"
 
 export class ComponentDidNotMount {
-    constructor(reason: any) {
-        this.reason = reason;
-    }
 }
 
 export class ComponentWasDestroyed {
-    constructor(reason: any) {
-        this.reason = reason;
-    }
 }
 
 

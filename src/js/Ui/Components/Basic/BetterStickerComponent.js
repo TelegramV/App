@@ -79,29 +79,30 @@ class BetterStickerComponent extends StatefulComponent {
 
         this.state.isDownloading = true;
 
-        this.assure(FileAPI.downloadDocument(document, isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "")).then(File => {
-            if (!this.__.mounted) {
-                return
-            }
+        this.assure(FileAPI.downloadDocument(document, isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : ""))
+            .then(blob => {
+                if (!this.__.mounted) {
+                    return
+                }
 
-            if (isAnimated) {
-                this.assure(FileAPI.parseAnimatedStickerFile(File)).then(json => {
-                    if (!this.__.mounted) {
-                        return
-                    }
+                if (isAnimated) {
+                    this.assure(FileAPI.decodeAnimatedSticker(blob)).then(json => {
+                        if (!this.__.mounted) {
+                            return
+                        }
 
-                    this.setState({
-                        animationData: json,
-                        isDownloading: false,
+                        this.setState({
+                            animationData: json,
+                            isDownloading: false,
+                        })
                     })
-                })
-            } else {
-                this.setState({
-                    thumbUrl: FileAPI.getUrl(File, document.mime_type),
-                    isDownloading: false,
-                });
-            }
-        }).then(() => {
+                } else {
+                    this.setState({
+                        thumbUrl: FileAPI.getUrl(blob),
+                        isDownloading: false,
+                    });
+                }
+            }).then(() => {
             this.state.isDownloading = false;
         });
     }

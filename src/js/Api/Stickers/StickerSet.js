@@ -18,7 +18,7 @@
  */
 
 import {FileAPI} from "../Files/FileAPI"
-import MTProto from "../../MTProto/External"
+import API from "../Telegram/API"
 
 class StickerSet {
     thumbUrl: string;
@@ -39,7 +39,7 @@ class StickerSet {
 
     getStickerSet() {
         if (!this.rawStickerSet) {
-            return MTProto.invokeMethod("messages.getStickerSet", {
+            return API.messages.getStickerSet({
                 stickerset: {
                     _: "inputStickerSetID",
                     id: this.raw.id,
@@ -62,14 +62,12 @@ class StickerSet {
         }
 
         const download = () => {
-            return FileAPI.downloadStickerSetThumb(this).then(File => {
+            return FileAPI.downloadStickerSetThumb(this).then(blob => {
                 if (this.raw.animated) {
-                    return FileAPI.parseAnimatedStickerFile(File).then(json => {
-                        return this.json = json;
-                    })
+                    return FileAPI.decodeAnimatedSticker(blob).then(json => this.json = json)
                 }
 
-                this.thumbUrl = FileAPI.getUrl(File);
+                this.thumbUrl = FileAPI.getUrl(blob);
 
                 return this.thumbUrl;
             });

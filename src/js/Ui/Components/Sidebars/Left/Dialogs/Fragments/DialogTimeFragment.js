@@ -1,5 +1,3 @@
-import MTProto from "../../../../../../MTProto/External"
-
 export const DialogTimeFragment = ({id, dialog}) => {
     let today = new Date();
     today.setHours(0);
