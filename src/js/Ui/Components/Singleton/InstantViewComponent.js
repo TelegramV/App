@@ -16,10 +16,10 @@
  */
 
 import MTProto from "../../../MTProto/External";
-import {PhotoComponent} from "../Basic/photoComponent";
 import VUI from "../../VUI"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import BetterPhotoComponent from "../Basic/BetterPhotoComponent"
 
 export class InstantViewComponent extends StatefulComponent {
 
@@ -148,7 +148,7 @@ export class InstantViewComponent extends StatefulComponent {
                 return <aside>{this.parseRichText(block.text)}<cite>{this.parseRichText(block.caption)}</cite></aside>
 
             case "pageBlockPhoto":
-                return <PhotoComponent photo={this.findPhoto(block.photo_id)}/>
+                return <BetterPhotoComponent photo={this.findPhoto(block.photo_id)}/>
             case "pageBlockVideo":
                 return <figure>Video here</figure>
             case "pageBlockAudio":
@@ -210,7 +210,7 @@ export class InstantViewComponent extends StatefulComponent {
                     <div className="title">{this.parseRichText(block.title)}</div>
                     <div className="articles">{block.articles.map(article => {
                         return <div className="article">
-                            <PhotoComponent photo={this.findPhoto(article.photo_id)}/>
+                            <BetterPhotoComponent photo={this.findPhoto(article.photo_id)}/>
                             <div className="article-name">{article.title}</div>
                             <div
                                 className="article-description">by {article.author} on {new Date(article.published_date * 1000).toLocaleString("en", {

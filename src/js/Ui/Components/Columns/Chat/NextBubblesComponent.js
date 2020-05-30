@@ -23,6 +23,7 @@ import MessageComponent from "./MessageComponent"
 import {UserPeer} from "../../../../Api/Peers/Objects/UserPeer"
 import {ServiceMessage} from "../../../../Api/Messages/Objects/ServiceMessage"
 import type {Message} from "../../../../Api/Messages/Message"
+import {MessageType} from "../../../../Api/Messages/Message"
 import vrdom_delete from "../../../../V/VRDOM/delete"
 import vrdom_render from "../../../../V/VRDOM/render/render"
 import scrollToAndHighlight from "../../../../Utils/scrollToAndHighlight"
@@ -35,6 +36,7 @@ import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent
 import {vrdom_appendRealMany} from "../../../../V/VRDOM/append"
 import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
 import IntersectionObserver from 'intersection-observer-polyfill';
+import GroupMessage from "../../../../Api/Messages/GroupMessage"
 
 function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
@@ -144,7 +146,7 @@ class NextBubblesComponent extends StatelessComponent {
     }
 
     _isGrouping(one: Message, two: Message) {
-        if (!one || !two) return false;
+        if (!one || !two || one.type === MessageType.GROUP || two.type === MessageType.GROUP) return false;
         return (!(one.type instanceof ServiceMessage) && !(two.type instanceof ServiceMessage))
             && (one.isPost || one.isOut === two.isOut)
             && (one.from.id === two.from.id)
@@ -328,7 +330,7 @@ class NextBubblesComponent extends StatelessComponent {
         event.messages = this.fixMessages(event.messages.slice());
         const lenbeforefuck = this.mainVirtual.currentPage.length;
         this.mainVirtual.messages = [...event.messages, ...this.mainVirtual.messages];
-        this.currentVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.length === 100;
+        this.currentVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length === 100;
         const vbp = this.mainVirtual.veryBottomPage();
         this.prependMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.messages[0]);
         this.scrollBottom();
@@ -550,7 +552,7 @@ class NextBubblesComponent extends StatelessComponent {
 
         const ivt = this.currentVirtual.isVeryTop();
 
-        this.currentVirtual.hasMoreOnTopToDownload = event.messages.length === 100;
+        this.currentVirtual.hasMoreOnTopToDownload = event.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length === 100;
 
         this.currentVirtual.messages = [...this.fixMessages(event.messages), ...this.currentVirtual.messages];
 

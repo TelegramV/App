@@ -1,10 +1,10 @@
-import {PhotoComponent} from "../../../../Basic/photoComponent"
+import BetterPhotoComponent from "../../../../Basic/BetterPhotoComponent"
 
 export const DialogInfoLinkComponent = ({title, description, url, photo, displayUrl, letter}) => {
     return <a className="link rp" href={url} target="_blank">
         {
             photo ?
-                <PhotoComponent photo={photo}/>
+                <BetterPhotoComponent photo={photo}/>
                 :
                 <div className="photo letter">{letter}</div>
         }

@@ -21,7 +21,7 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 
-class BetterVideoComponent extends StatefulComponent {
+class BetterPhotoComponent extends StatefulComponent {
     state = {
         url: "",
         isLoading: true,
@@ -34,36 +34,27 @@ class BetterVideoComponent extends StatefulComponent {
     videoRef = VComponent.createRef();
 
     init() {
-        const {document} = this.props;
+        const {photo} = this.props;
 
-        const maxSize = FileAPI.getMaxSize(document);
+        const maxSize = FileAPI.getMaxSize(photo);
         this.state.width = maxSize.w;
         this.state.height = maxSize.h;
-        this.state.thumbnailUrl = FileAPI.hasThumbnail(document) ? FileAPI.getThumbnail(document) : "";
+        this.state.thumbnailUrl = FileAPI.hasThumbnail(photo) ? FileAPI.getThumbnail(photo) : "";
     }
 
-    render({document, onClick, controls, autoPlay, loop}, {isLoading, url, thumbnailUrl, width, height}) {
+    render({photo, onClick, controls, autoPlay, loop}, {isLoading, url, thumbnailUrl, width, height}) {
         return (
-            <figure className={["video rp rps", isLoading && "thumbnail"]} onClick={onClick}>
+            <figure className={["photo rp rps", isLoading ? "thumbnail" : ""]} onClick={onClick}>
                 {
                     !isLoading ?
-                        <video ref={this.videoRef}
-                               src={url}
-                               type={document.mime_type}
-                               controls={controls || null}
-                               autoPlay={autoPlay || null}
-                               loop={loop || null}
-                               onMouseOver={this.onMouseOver}
-                               onMouseOut={this.onMouseOut}
-                               onEnded={this.onEnded}
-                        />
+                        <img src={url} alt={"Photo"}/>
                         :
                         (width > height ?
                                 <img src={thumbnailUrl} alt=""
-                                     width={width ? width + "px" : ""}/>
+                                     css-width={width ? width + "px" : ""}/>
                                 :
                                 <img src={thumbnailUrl} alt=""
-                                     height={height ? height + "px" : ""}/>
+                                     css-height={height ? height + "px" : ""}/>
                         )
                 }
             </figure>
@@ -71,11 +62,11 @@ class BetterVideoComponent extends StatefulComponent {
     }
 
     componentDidMount() {
-        const {document} = this.props;
+        const {photo} = this.props;
 
-        this.assure(FileAPI.downloadDocument(document))
-            .then(blob => {
-                const url = FileAPI.getUrl(blob);
+        this.assure(FileAPI.downloadPhoto(photo))
+            .then(file => {
+                const url = FileAPI.getUrl(file);
 
                 this.setState({
                     isLoading: false,
@@ -83,26 +74,6 @@ class BetterVideoComponent extends StatefulComponent {
                 });
             })
     }
-
-    onMouseOver = e => {
-        if (this.props.playOnHover) {
-            this.state.isHovered = true;
-            e.target.play();
-        }
-    }
-
-    onMouseOut = e => {
-        if (this.props.playOnHover) {
-            this.state.isHovered = false;
-            e.target.pause();
-        }
-    }
-
-    onEnded = e => {
-        if (this.state.isHovered) {
-            e.target.play();
-        }
-    }
 }
 
-export default BetterVideoComponent;
+export default BetterPhotoComponent;

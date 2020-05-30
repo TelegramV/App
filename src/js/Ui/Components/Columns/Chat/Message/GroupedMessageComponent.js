@@ -1,51 +1,47 @@
-import MessageWrapperFragment from "./Common/MessageWrapperFragment"
-import TextWrapperComponent from "./Common/TextWrapperComponent";
-import MessageTimeComponent from "./Common/MessageTimeComponent";
-import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import {PhotoComponent} from "../../../Basic/photoComponent";
 import {PhotoMessage} from "../../../../../Api/Messages/Objects/PhotoMessage";
 import {VideoMessage} from "../../../../../Api/Messages/Objects/VideoMessage";
-import {VideoComponent} from "../../../Basic/videoComponent";
-import type {BusEvent} from "../../../../../Api/EventBus/EventBus";
 import {Layouter} from "../../../../Utils/layout";
+import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
+import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
+import MessageWrapperFragment from "./Common/MessageWrapperFragment"
+import TextWrapperComponent from "./Common/TextWrapperComponent"
+import MessageTimeComponent from "./Common/MessageTimeComponent"
+import GeneralMessageComponent from "./Common/GeneralMessageComponent"
+import UIEvents from "../../../../EventBus/UIEvents"
 
 class GroupedMessageComponent extends GeneralMessageComponent {
 
-    reactive(R) {
-        super.reactive(R)
+    render({message: group}) {
+        console.log(group)
 
-        R.object(this.message)
-            .on("updateGrouped", this.onUpdateGrouped)
-    }
-
-    render() {
-        const text = this.message.text.length > 0 ? <TextWrapperComponent message={this.message}/> : ""
+        const text = group.text.length > 0 ? <TextWrapperComponent message={group}/> : ""
 
         return (
-            <MessageWrapperFragment ref={`msg-${this.message.id}`} message={this.message} noPad showUsername={false}
-                                    outerPad={text !== ""} bubbleRef={this.bubbleRef}>
-                <div className={["grouped", this.message.group ? Layouter.getClass(this.message.group.length) : ""]}>
-                    {this.message.group && this.message.group.map(l => {
-                        if (l instanceof PhotoMessage) {
-                            return <PhotoComponent photo={l.raw.media.photo}/>
-                        } else if (l instanceof VideoMessage) {
-                            return <VideoComponent video={l.raw.media.document}/>
-                        } else {
-                            console.log(l)
-                            debugger;
-                        }
-                    })}
+            <MessageWrapperFragment message={group}
+                                    noPad
+                                    showUsername={false}
+                                    outerPad={text !== ""}
+                                    bubbleRef={this.bubbleRef}>
+                <div id={`message-${group.id}`}
+                     className={["grouped", Layouter.getClass(group.messages.size)]}>
+                    {
+                        Array.from(group.messages).reverse().map(message => {
+                            if (message instanceof PhotoMessage) {
+                                return <BetterPhotoComponent photo={message.raw.media.photo} onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>
+                            } else if (message instanceof VideoMessage) {
+                                return <BetterVideoComponent document={message.raw.media.document} onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>
+                            } else {
+                                console.error(message)
+                                return null;
+                            }
+                        })
+                    }
                 </div>
-                {!text ? <MessageTimeComponent message={this.message} bg={true}/> : ""}
+                {!text ? <MessageTimeComponent message={group} bg={true}/> : ""}
                 {text}
             </MessageWrapperFragment>
         )
     }
-
-    onUpdateGrouped = (event: BusEvent) => {
-        this.forceUpdate()
-    }
-
 }
 
 export default GroupedMessageComponent

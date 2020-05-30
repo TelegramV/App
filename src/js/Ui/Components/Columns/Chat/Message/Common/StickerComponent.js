@@ -77,7 +77,7 @@ export default class StickerComponent extends StatelessComponent {
         this.url = url;
         fetch(url)
             .then(r => r.arrayBuffer().then(b => new Uint8Array(b)))
-            .then(b => FileAPI.decodeAnimatedStickerBytes(b))
+            .then(b => FileAPI.decodeAnimatedSticker(b))
             .then(json => {
                 this.animation = lottie.loadAnimation({
                     container: this.$el,

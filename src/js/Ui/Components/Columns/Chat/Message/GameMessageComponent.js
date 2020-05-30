@@ -1,7 +1,7 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment"
-import {PhotoComponent} from "../../../Basic/photoComponent";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import {parseMessageEntities} from "../../../../../Utils/htmlHelpers"
+import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
 
 class GameMessageComponent extends GeneralMessageComponent {
 
@@ -17,7 +17,7 @@ class GameMessageComponent extends GeneralMessageComponent {
                     <div class="info">
                         {this.message.text ? parseMessageEntities(this.message.text) : game.description}
                     </div>
-                    <PhotoComponent photo={game.photo}/>
+                    <BetterPhotoComponent photo={game.photo}/>
                 </div>
             </MessageWrapperFragment>
         )
