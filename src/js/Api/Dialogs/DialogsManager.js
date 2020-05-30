@@ -239,20 +239,24 @@ class DialogManager extends Manager {
             }
 
             const dialogs = Dialogs.dialogs.map(rawDialog => {
-                const dialog = this.createDialogFromDialogs(rawDialog, Dialogs)
+                try {
+                    const dialog = this.createDialogFromDialogs(rawDialog, Dialogs)
 
-                if (dialog.peer.messages.last) {
-                    this.offsetDate = dialog.peer.messages.last.date
-                } else {
-                    console.error("BUG: no last message!")
+                    if (dialog.peer.messages.last) {
+                        this.offsetDate = dialog.peer.messages.last.date
+                    } else {
+                        console.error("BUG: no last message!")
+                    }
+
+                    if (this.offsetDate && !dialog.pinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
+                        this.dialogsOffsetDate = this.offsetDate
+                    }
+
+                    return dialog
+                } catch (e) {
+                    return null
                 }
-
-                if (this.offsetDate && !dialog.pinned && (!this.dialogsOffsetDate || this.offsetDate < this.dialogsOffsetDate)) {
-                    this.dialogsOffsetDate = this.offsetDate
-                }
-
-                return dialog
-            })
+            }).filter(l => l)
 
             this.latestDialog = dialogs[dialogs.length - 1]
 
