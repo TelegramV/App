@@ -120,6 +120,30 @@ class FolderManager {
 
     }
 
+    async updateFolder(filter) {
+        console.log("updateFolder", filter)
+        const response = await MTProto.invokeMethod("messages.updateDialogFilter", {
+            id: filter.id,
+            filter: filter
+        })
+        console.log(response)
+        this.folders[this.folders.findIndex(l => l.id === filter.id)] = filter
+        this.fireUpdate()
+        this.updateCache()
+
+    }
+
+    async createFolder(filter) {
+        filter.id = this.folders.reduce((l, q) => {
+            return l.id > q.id
+        }).id + 1
+        console.log("creating foldder", filter, this.folders)
+        const response = await MTProto.invokeMethod("messages.updateDialogFilter", {
+            id: filter.id,
+            filter: filter
+        })
+    }
+
     fireUpdate() {
         AppEvents.General.fire("foldersUpdate", {
             folders: this.folders

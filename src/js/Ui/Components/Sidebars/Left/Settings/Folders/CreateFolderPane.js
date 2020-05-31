@@ -39,6 +39,8 @@ export default class CreateFolderPane extends SettingsPane {
         E.bus(UIEvents.LeftSidebar)
             .on("folders.createNew", this.onCreateNewFolder)
             .on("folders.edit", this.onEditFolder)
+        E.bus(AppEvents.General)
+            .on("foldersUpdate", this.onFoldersUpdate)
     }
 
     render() {
@@ -48,10 +50,9 @@ export default class CreateFolderPane extends SettingsPane {
             exclude_peers: []
         }
         this.name = this.state.currentFolder == null ? "New Folder" : "Edit Folder"
-        console.log(f)
 
         return (
-            <div class="sidebar sub-settings scrollable">
+            <div class={{"sidebar sub-settings scrollable": true, "fade-in": this.barVisible}}>
                 {this.makeHeader(true)}
 
                 <Center>
@@ -109,6 +110,23 @@ export default class CreateFolderPane extends SettingsPane {
                 </SectionFragment>
             </div>
         )
+    }
+
+    onFoldersUpdate = (event) => {
+        console.log("onFoldersUpdate", event, this.state.currentFolder)
+        if(this.state.currentFolder == null) return
+        const f = event.folders.find(l => l.id === this.state.currentFolder.id)
+        console.log("f", f)
+        if(!f) {
+            console.log("!f")
+            this.hide()
+            return
+        }
+        console.log("!!!")
+        this.setState({
+            currentFolder: f
+        })
+        this.forceUpdate()
     }
 
     includeChats = () => {

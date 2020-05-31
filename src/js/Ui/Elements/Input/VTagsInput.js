@@ -38,10 +38,22 @@ export function VTag(
     {peer, onRemove}
 ) {
     return <span className="tag" onClick={onRemove}>
-            <i className="tgico-close close"></i>
+            <i className="tgico-close close"/>
              <AvatarComponent peer={peer} onClick={null}/>
              <span>{peer.name}</span>
             </span>
 }
+
+
+export function VTagIcon(
+    {icon, onRemove, text}
+) {
+    return <span className="tag" onClick={onRemove}>
+            <i className="tgico-close close"/>
+            <i className={["tgico-" + icon, "icon"]}/>
+             <span>{text}</span>
+            </span>
+}
+
 
 export default VTagsInput
