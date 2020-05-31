@@ -19,7 +19,6 @@ import {DialogInfoAudioComponent} from "./Fragments/DialogInfoAudioComponent";
 import {FileAPI} from "../../../../../Api/Files/FileAPI";
 import {formatAudioTime} from "../../../../Utils/utils";
 import {PhotoMessage} from "../../../../../Api/Messages/Objects/PhotoMessage";
-import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import PeersStore from "../../../../../Api/Store/PeersStore"
 import UIEvents from "../../../../EventBus/UIEvents"
 import MTProto from "../../../../../MTProto/External";
@@ -95,10 +94,6 @@ export class DialogInfoComponent extends RightBarComponent {
 
     appEvents(E) {
         super.appEvents(E)
-        // TODO check this!
-        E.bus(AppEvents.Files)
-            .on("fileDownloaded", this.onFileDownloaded)
-            .on("fileDownloading", this.onFileDownloading)
 
         E.bus(UIEvents.General)
             .on("info.select", this.onInfoPeerSelect)
