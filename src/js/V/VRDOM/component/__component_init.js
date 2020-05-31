@@ -29,6 +29,7 @@ export function __component_init(component) {
         component.componentDidUpdate = component.componentDidUpdate.bind(component);
         component.componentWillUpdate = component.componentWillUpdate.bind(component);
         component.forceUpdate = component.forceUpdate.bind(component);
+        component.componentWillMount = component.componentWillMount.bind(component);
 
         component.appEvents = component.appEvents.bind(component);
         component.reactive = component.reactive.bind(component);
@@ -42,10 +43,12 @@ export function __component_init(component) {
             component.setState = component.setState.bind(component);
         }
 
-        component.init.call(component);
+        component.init.call(component, component.props);
 
         component.appEvents(__component_appEventsBuilder(component));
         component.reactive(__component_reactiveObjectEventsBuilder(component));
+
+        component.componentWillMount.call(component, component.props);
 
         component.__.initialized = true;
     } else {

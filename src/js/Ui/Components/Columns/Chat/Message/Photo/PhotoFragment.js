@@ -4,20 +4,20 @@ export const PhotoFragment = ({id, url = "", width = 0, height = 0, maxWidth = 0
 
     if (width >= height) {
         if (width >= 470) {
-            return <img id={id} src={url} alt="Image" css-width={width ? `${width}px` : undefined}
-                        css-height={calculatedHeight ? `${calculatedHeight}px` : undefined}/>
+            return <img id={id} src={url} alt="Image" css-width={width && `${width}px`}
+                        css-height={calculatedHeight && `${calculatedHeight}px`}/>
         } else {
-            return <img id={id} src={url} alt="Image" css-width={width ? `${width}px` : undefined}
-                        css-height={height ? `${height}px` : undefined}/>
+            return <img id={id} src={url} alt="Image" css-width={width && `${width}px`}
+                        css-height={height && `${height}px`}/>
         }
     } else { // height={height ? `${height}px` : undefined}
         // TODO calculate height?
         if (height > 512) {
-            return <img id={id} src={url} alt="Image" css-width={calculatedWidth ? `${calculatedWidth}px` : undefined}
-                        css-height={height ? `${height}px` : undefined}/>
+            return <img id={id} src={url} alt="Image" css-width={calculatedWidth && `${calculatedWidth}px`}
+                        css-height={height && `${height}px`}/>
         } else {
-            return <img id={id} src={url} alt="Image" css-width={width ? `${width}px` : undefined}
-                        css-height={height ? `${height}px` : undefined}/>
+            return <img id={id} src={url} alt="Image" css-width={width && `${width}px`}
+                        css-height={height && `${height}px`}/>
 
         }
     }

@@ -38,6 +38,8 @@ const openFullMap = (ev) => {
     win.focus();
 }
 
+// ПЕРЕПИСАТИ!!!! !!! !!! А А А А А А А АА А А  А А
+
 const MapComponent = ({map, zoom = 16, scale = 1}) => {
     let obj = {
         geo: map,

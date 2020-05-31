@@ -171,9 +171,6 @@ class DialogManager extends Manager {
         const dialog = this.setFromRaw(Dialog)
         const rawTopMessage = Dialogs.messages.find(message => message.id === Dialog.top_message)
         dialog.peer.messages.putNewRawMessage(rawTopMessage)
-        if (dialog.peer.id === 392565311) {
-            console.warn("RAWTOP", rawTopMessage)
-        }
         return dialog
     }
 
@@ -261,9 +258,7 @@ class DialogManager extends Manager {
     fetchNextPage({limit = 40}) {
         if (this.allWasFetched || DialogsStore.count >= this.count) {
             this.allWasFetched = true
-            AppEvents.Dialogs.fire("allWasFetched", {
-
-            })
+            AppEvents.Dialogs.fire("allWasFetched", {})
             console.warn("all dialogs were fetched")
             return Promise.reject()
         }

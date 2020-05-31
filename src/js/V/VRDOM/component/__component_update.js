@@ -107,7 +107,5 @@ export function __component_update_force(component, nextProps, nextState) {
         component.__.isUpdatingItSelf = false;
 
         component.componentDidUpdate();
-    } else {
-        console.log("DURKAAAAA")
     }
 }

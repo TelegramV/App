@@ -5,17 +5,17 @@ import {MessageType} from "../Message"
 import {Photo} from "../../Media/Photo";
 
 export class PhotoMessage extends AbstractMessage {
-
     type = MessageType.PHOTO
 
     photo: Photo
 
-    get srcUrl() {
-        return this.photo.srcUrl
+    show() {
+        super.show()
+        this.fetchMax()
     }
 
-    get srcMaxSizeUrl() {
-        return this.photo.srcMaxSizeUrl
+    get srcUrl() {
+        return this.photo.srcUrl
     }
 
     get minSizeType() {
@@ -58,12 +58,6 @@ export class PhotoMessage extends AbstractMessage {
         return this.photo.height
     }
 
-
-    show() {
-        super.show()
-        this.fetchMax()
-    }
-
     get smallPreviewImage() {
         return this.srcUrl
     }
@@ -76,19 +70,12 @@ export class PhotoMessage extends AbstractMessage {
         if (!this.photo) {
             return Promise.reject()
         }
+
         return this.photo.fetchMax()
     }
 
-    // fetchMaxSize() {
-    //     return this.photo.fetchMaxSize()
-    // }
-
     fillRaw(raw: Object): PhotoMessage {
         super.fillRaw(raw)
-
-        if (!raw.media) {
-            console.warn("FUCK", this)
-        }
 
         this.photo = new Photo(raw.media.photo)
 

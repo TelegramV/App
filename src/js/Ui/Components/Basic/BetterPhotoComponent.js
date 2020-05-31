@@ -19,60 +19,68 @@
 
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
-import VComponent from "../../../V/VRDOM/component/VComponent"
+import {PhotoFragment} from "../Columns/Chat/Message/Photo/PhotoFragment"
+import AppEvents from "../../../Api/EventBus/AppEvents"
+import FileManager from "../../../Api/Files/FileManager"
+import {LoadingFragment} from "../Columns/Chat/Message/Photo/PhotoFigureFragment"
 
+// probably patch-compatible
 class BetterPhotoComponent extends StatefulComponent {
     state = {
-        url: "",
-        isLoading: true,
         thumbnailUrl: false,
         width: 0,
         height: 0,
-        isHovered: false,
     };
 
-    videoRef = VComponent.createRef();
-
-    init() {
-        const {photo} = this.props;
-
-        const maxSize = FileAPI.getMaxSize(photo);
-        this.state.width = maxSize.w;
-        this.state.height = maxSize.h;
-        this.state.thumbnailUrl = FileAPI.hasThumbnail(photo) ? FileAPI.getThumbnail(photo) : "";
+    appEvents(E) {
+        E.bus(AppEvents.Files)
+            .filter(event => event.file.id === this.props.photo.id)
+            .updateOn("download.start")
+            // .on("download.newPart", this.onDownloadNewPart)
+            .updateOn("download.done")
     }
 
-    render({photo, onClick, controls, autoPlay, loop}, {isLoading, url, thumbnailUrl, width, height}) {
+    render({photo, onClick, maxWidth, maxHeight}, {url, thumbnailUrl, width, height}) {
+        const isLoading = FileManager.isPending(photo.id);
+
         return (
-            <figure className={["photo rp rps", isLoading ? "thumbnail" : ""]} onClick={onClick}>
+            <figure className={["photo", isLoading ? "thumbnail" : ""]} onClick={onClick}>
                 {
                     !isLoading ?
-                        <img src={url} alt={"Photo"}/>
+                        <PhotoFragment url={URL.createObjectURL(FileManager.get(photo.id))}
+                                       width={width}
+                                       height={height}
+                                       maxWidth={maxWidth || width}
+                                       maxHeight={maxHeight || height}/>
                         :
-                        (width > height ?
-                                <img src={thumbnailUrl} alt=""
-                                     css-width={width ? width + "px" : ""}/>
-                                :
-                                <img src={thumbnailUrl} alt=""
-                                     css-height={height ? height + "px" : ""}/>
-                        )
+                        <PhotoFragment url={thumbnailUrl}
+                                       width={width}
+                                       height={height}
+                                       maxWidth={maxWidth || width}
+                                       maxHeight={maxHeight || height}/>
                 }
             </figure>
         )
     }
 
-    componentDidMount() {
-        const {photo} = this.props;
+    componentWillMount() {
+        this.calculateState(this.props.photo);
 
-        this.assure(FileAPI.downloadPhoto(photo))
-            .then(file => {
-                const url = FileAPI.getUrl(file);
+        FileManager.downloadPhoto(this.props.photo);
+    }
 
-                this.setState({
-                    isLoading: false,
-                    url: url,
-                });
-            })
+    componentWillUpdate(nextProps, nextState) {
+        if (nextProps.photo !== this.props.photo) {
+            this.calculateState(nextProps.photo);
+            FileManager.downloadPhoto(this.props.photo);
+        }
+    }
+
+    calculateState = photo => {
+        const maxSize = FileAPI.getMaxSize(photo);
+        this.state.width = maxSize.w;
+        this.state.height = maxSize.h;
+        this.state.thumbnailUrl = FileAPI.hasThumbnail(photo) ? FileAPI.getThumbnail(photo) : "";
     }
 }
 

@@ -8,6 +8,8 @@ import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulCompo
 class GeneralMessageComponent extends StatefulComponent {
     message: Message
 
+    // NEVER USE STATE HERE
+
     avatarRef = VComponent.createComponentRef()
     bubbleRef = VComponent.createRef()
 
