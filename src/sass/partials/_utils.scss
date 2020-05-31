@@ -16,16 +16,20 @@
  */
 
 .no-borders {
-  border: none;
+    border: none;
 }
 
 .color-blue {
-  color: $blue;
+    color: $blue;
 }
 
 .grabbable {
-  cursor: move; /* fallback if grab cursor is unsupported */
-  cursor: grab;
-  cursor: -moz-grab;
-  cursor: -webkit-grab;
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+    cursor: -moz-grab;
+    cursor: -webkit-grab;
+}
+
+.fw-500 {
+    font-weight: 500;
 }

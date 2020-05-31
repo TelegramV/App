@@ -21,7 +21,6 @@ import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
 export class ModalComponent extends StatefulComponent {
-
     state = {
         hidden: true,
         body: ""

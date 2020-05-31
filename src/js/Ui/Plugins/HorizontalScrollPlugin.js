@@ -1,5 +1,4 @@
 import VRDOMPlugin from "../../V/VRDOM/plugin/VRDOMPlugin"
-import {replaceEmoji} from "../Utils/replaceEmoji"
 
 class HorizontalScrollVRDOMPlugin extends VRDOMPlugin {
     elementDidMount($el) {

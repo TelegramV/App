@@ -213,7 +213,7 @@ class NextBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
-            vrdom_appendRealMany($messages, this.bubblesInnerRef.$el)
+            vrdom_appendRealMany($messages.reverse(), this.bubblesInnerRef.$el)
 
             return $messages;
         }
@@ -250,7 +250,7 @@ class NextBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
-            vrdom_prependRealMany($messages.reverse(), this.bubblesInnerRef.$el);
+            vrdom_prependRealMany($messages, this.bubblesInnerRef.$el);
 
             return $messages;
         }
@@ -321,7 +321,7 @@ class NextBubblesComponent extends StatelessComponent {
             AppSelectedChat.current.messages.fireAllRecent();
         }
 
-        this.prependMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
+        this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
         this.scrollBottom();
     }
 
@@ -332,7 +332,7 @@ class NextBubblesComponent extends StatelessComponent {
         this.mainVirtual.messages = [...event.messages, ...this.mainVirtual.messages];
         this.currentVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
         const vbp = this.mainVirtual.veryBottomPage();
-        this.prependMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.messages[0]);
+        this.appendMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.messages[0]);
         this.scrollBottom();
         this.isLoadingRecent = false;
     }
@@ -353,7 +353,7 @@ class NextBubblesComponent extends StatelessComponent {
 
             this.mainVirtual.veryBottomPage();
 
-            this.appendMessages([message], this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
+            this.prependMessages([message], this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
 
             if (isAtBottom) {
                 this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
@@ -516,11 +516,11 @@ class NextBubblesComponent extends StatelessComponent {
 
         if (this.currentVirtual.currentPage.length > messages.length) {
             for (let i = 0; i < messages.length; i++) {
-                vrdom_delete(this.bubblesInnerRef.$el.lastChild);
+                vrdom_delete(this.bubblesInnerRef.$el.firstChild);
             }
         }
 
-        this.prependMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
+        this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         this.dev_checkTree();
 
@@ -528,8 +528,8 @@ class NextBubblesComponent extends StatelessComponent {
             let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
 
             if ($first) {
-                if ($first.nextElementSibling) {
-                    this.$el.scrollTop = $first.nextElementSibling.offsetTop;
+                if ($first.previousElementSibling) {
+                    this.$el.scrollTop = $first.previousElementSibling.offsetTop;
                 } else {
                     this.$el.scrollTop = $first.offsetTop;
                 }
@@ -593,10 +593,10 @@ class NextBubblesComponent extends StatelessComponent {
         const messages = this.currentVirtual.nextBottom();
 
         for (let i = 0; i < Math.min(this.currentVirtual.currentPage.length, messages.length); i++) {
-            vrdom_delete(this.bubblesInnerRef.$el.firstChild);
+            vrdom_delete(this.bubblesInnerRef.$el.lastChild);
         }
 
-        this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
+        this.prependMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         this.dev_checkTree();
     }

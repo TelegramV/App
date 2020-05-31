@@ -120,7 +120,7 @@ function getNewlines(str, ignore = false) {
 
 
 const handlersText = {
-    messageEntityBold: (l, a) => <b>{a}</b>,
+    messageEntityBold: (l, a) => <b class="fw-500">{a}</b>,
     messageEntityItalic: (l, a) => <i>{a}</i>,
     messageEntityCode: (l, a) => <code>{a}</code>,
     messageEntityPre: (l, a) => <code>{a}</code>,

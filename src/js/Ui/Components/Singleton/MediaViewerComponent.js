@@ -63,7 +63,19 @@ function MediaFragment({media, zoom, hidden}) {
     }
 
     if (media instanceof PhotoMessage) {
+
         if (!media.loaded) {
+            if (media.thumbnail) {
+                return (
+                    <div class="thumbnail" style={style}>
+                        <img style={{
+                            width: `${media.width}px`,
+                            height: `${media.height}px`,
+                        }} src={media.thumbnail} alt=""/>
+                    </div>
+                )
+            }
+
             return <MediaSpinnerFragment icon="photo"/>
         }
 
