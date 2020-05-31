@@ -4,11 +4,11 @@
     & .fwd {
         font-weight: 500;
         font-size: 14px;
-        margin: 6px 11px -4px 0px;
+        margin: 6px 11px -8px 0px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        display: inherit;
+        display: inline-block;
 
         @if $in {
             color: $blueonline;

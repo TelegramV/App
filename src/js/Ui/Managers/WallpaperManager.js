@@ -27,7 +27,7 @@ class WallpaperManagerSingleton {
     isFetching = false;
 
     init() {
-        AppEvents.Files.subscribe("download.done", this.onFileDownloaded);
+        //AppEvents.Files.subscribe("download.done", this.onFileDownloaded);
 
         keval.getItem("background").then(data => {
             if (!data) return;
@@ -73,13 +73,36 @@ class WallpaperManagerSingleton {
         });
     }
 
-    requestFull(wallpaper) {
-        FileManager.downloadDocument(wallpaper.document, undefined, true);
+    async requestFull(wallpaper) {
+        return FileManager.downloadDocument(wallpaper.document).then(async blob => {
+            if(wallpaper.pattern) {
+                let type = "png";
+                let typeAttr = wallpaper.document.attributes.find(attr => attr._ =="documentAttributeFilename");
+                if(typeAttr) {
+                    let split = typeAttr.file_name.split(".");
+                    type = split[split.length-1];
+                }
+                
+                if(type === "tgv") { //gzipped svg
+                    blob = await MTProto.performWorkerTask("gzipUncompress", new Uint8Array(await blob.arrayBuffer())).then(bytes => {
+                        return new Blob([bytes], {type: "image/svg+xml"});
+                    })
+                }
+            }
+
+            UIEvents.General.fire("wallpaper.fullReady", {
+                id: wallpaper.document.id,
+                wallpaperUrl: URL.createObjectURL(blob)
+            })
+            return blob;
+        });
     }
 
     requestAndInstall(wallpaper) {
-        this.requestFull(wallpaper);
-        this.currentWallpaper = wallpaper;
+        this.requestFull(wallpaper).then(async blob => {
+            this.setWallpaper(URL.createObjectURL(blob));
+        })
+        //this.currentWallpaper = wallpaper;
     }
 
     setWallpaper(url) {
@@ -104,7 +127,7 @@ class WallpaperManagerSingleton {
         keval.setItem("background", {color: hex});
     }
 
-    onFileDownloaded = event => {
+    /*onFileDownloaded = event => {
         if (!this.wallpapers.find(w => w.document.id === event.file.id)) {
             return;
         }
@@ -124,7 +147,7 @@ class WallpaperManagerSingleton {
                 wallpaperUrl: event.url
             });
         }
-    }
+    }*/
 }
 
 const WallpaperManager = new WallpaperManagerSingleton();

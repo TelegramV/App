@@ -29,7 +29,9 @@
             grid-template-columns: min-content fit-content(90%);
 
             filter: none; // drop-shadow is very laggy on Webkit browsers
-            border: $verylightgrey 1px solid;
+            /*.message-content {
+                border: $semiblack 0.5px solid; //make messages more contrast
+            }*/
         }
 
         
