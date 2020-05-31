@@ -74,6 +74,11 @@
         display: flex;
         align-items: center;
         border-bottom: 1px solid $lightgrey;
+        background-color: white;
+
+        position: sticky;
+        top: 0;
+        z-index: 1;
 
         &.no-borders {
             border: none;
@@ -340,7 +345,7 @@
             background: #ffffff;
             height: 100%;
             transition: 250ms ease-in-out transform, 250ms ease-in-out filter;
-            overflow: hidden;
+            //overflow: hidden;
             flex-direction: column;
             display: flex;
 
@@ -349,21 +354,10 @@
                 filter: brightness(0.75);
             }
 
-            .photo-container {
+            .avatar {
+                align-self: center;
+                width: 120px;
                 height: 120px;
-                width: 100%;
-                position: relative;
-
-                .avatar {
-                    margin: 0;
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translateY(-50%) translateX(-50%);
-                    border-radius: 50%;
-                    width: 100px;
-                    height: 100px;
-                }
             }
 
             .username {
