@@ -57,7 +57,6 @@ class BackgroundImageComponent extends SettingsPane {
     onWallpaperFetched = event => {
         this.wallpapers = event.wallpapers;
         for (let wallpaper of this.wallpapers) {
-            if (wallpaper.pattern) continue;
             WallpaperManager.fetchPreview(wallpaper).then(url => {
                 VRDOM.append(<SquareComponent click={this._fragmentClick} src={url}
                                           wallpaper={wallpaper.document.id}/>, this.galleryRef.$el);

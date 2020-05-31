@@ -27,7 +27,7 @@ class WallpaperManagerSingleton {
     isFetching = false;
 
     init() {
-        AppEvents.Files.subscribe("fileDownloaded", this.onFileDownloaded);
+        //AppEvents.Files.subscribe("download.done", this.onFileDownloaded);
 
         keval.getItem("background").then(data => {
             if (!data) return;
@@ -51,13 +51,13 @@ class WallpaperManagerSingleton {
 
         this.isFetching = true;
 
-        return this.fetchPromise = MTProto.invokeMethod("account.getWallPapers", { hash: 0 }).then(result => {
+        return this.fetchPromise = MTProto.invokeMethod("account.getWallPapers", {hash: 0}).then(result => {
 
             this.wallpapers = result.wallpapers;
             //console.log(this.wallpapers);
             this.isFetching = false;
 
-            UIEvents.General.fire("wallpaper.fetched", { wallpapers: this.wallpapers });
+            UIEvents.General.fire("wallpaper.fetched", {wallpapers: this.wallpapers});
 
             /*this.wallpapers.forEach(wallpaper => { // don't download with fetching
                 FileManager.downloadDocument(wallpaper.document, undefined, true);
@@ -73,13 +73,36 @@ class WallpaperManagerSingleton {
         });
     }
 
-    requestFull(wallpaper) {
-        FileManager.downloadDocument(wallpaper.document, undefined, true);
+    async requestFull(wallpaper) {
+        return FileManager.downloadDocument(wallpaper.document).then(async blob => {
+            if(wallpaper.pattern) {
+                let type = "png";
+                let typeAttr = wallpaper.document.attributes.find(attr => attr._ =="documentAttributeFilename");
+                if(typeAttr) {
+                    let split = typeAttr.file_name.split(".");
+                    type = split[split.length-1];
+                }
+                
+                if(type === "tgv") { //gzipped svg
+                    blob = await MTProto.performWorkerTask("gzipUncompress", new Uint8Array(await blob.arrayBuffer())).then(bytes => {
+                        return new Blob([bytes], {type: "image/svg+xml"});
+                    })
+                }
+            }
+
+            UIEvents.General.fire("wallpaper.fullReady", {
+                id: wallpaper.document.id,
+                wallpaperUrl: URL.createObjectURL(blob)
+            })
+            return blob;
+        });
     }
 
     requestAndInstall(wallpaper) {
-        this.requestFull(wallpaper);
-        this.currentWallpaper = wallpaper;
+        this.requestFull(wallpaper).then(async blob => {
+            this.setWallpaper(URL.createObjectURL(blob));
+        })
+        //this.currentWallpaper = wallpaper;
     }
 
     setWallpaper(url) {
@@ -90,7 +113,7 @@ class WallpaperManagerSingleton {
         window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
         fetch(url).then(async response => {
             let blob = await response.blob();
-            keval.setItem("background", { blob: blob });
+            keval.setItem("background", {blob: blob});
         })
     }
 
@@ -101,29 +124,30 @@ class WallpaperManagerSingleton {
         }
         this.setWallpaper(undefined); //remove wallpaper
         window.document.documentElement.style.setProperty("--chat-bg-color", hex);
-        keval.setItem("background", { color: hex });
+        keval.setItem("background", {color: hex});
     }
 
-    onFileDownloaded = event => {
-        if (!this.wallpapers.find(w => w.document.id === event.fileId)) {
+    /*onFileDownloaded = event => {
+        if (!this.wallpapers.find(w => w.document.id === event.file.id)) {
             return;
         }
+
         if (event.thumbSize) {
             UIEvents.General.fire("wallpaper.previewReady", {
-                id: event.fileId,
+                id: event.file.id,
                 wallpaperUrl: event.url
             });
         } else {
-            if(this.currentWallpaper?.document.id === event.fileId) {
-                this.setWallpaper(event.url); //apply full wallpaper
+            if (this.currentWallpaper?.document.id === event.file.id) {
+                this.setWallpaper(URL.createObjectURL(event.blob)); //apply full wallpaper
             }
 
             UIEvents.General.fire("wallpaper.fullReady", {
-                id: event.fileId,
+                id: event.file.id,
                 wallpaperUrl: event.url
             });
         }
-    }
+    }*/
 }
 
 const WallpaperManager = new WallpaperManagerSingleton();

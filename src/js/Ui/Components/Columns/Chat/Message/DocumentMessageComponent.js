@@ -2,7 +2,6 @@ import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import {DocumentMessagesTool} from "../../../../Utils/document"
 import FileManager from "../../../../../Api/Files/FileManager"
 import CardMessageWrapperFragment from "./Common/CardMessageWrapperFragment"
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import VSpinner from "../../../Elements/VSpinner";
 import {FileAPI} from "../../../../../Api/Files/FileAPI"
@@ -10,24 +9,28 @@ import {FileAPI} from "../../../../../Api/Files/FileAPI"
 const IconFragment = ({document, isDownloading, isDownloaded, color, ext, progress = 0.0}) => {
     return (
         <div className="svg-wrapper">
-            {FileAPI.hasThumbnail(document) ?
-                <div class="thumbnail3px">
-                    <img style={{
-                        "width": "100%"
-                    }} src={FileAPI.getThumbnail(document)}/>
-                </div> : DocumentMessagesTool.createIcon(color, !isDownloaded)}
+            {
+                FileAPI.hasThumbnail(document) ?
+                    <div class="thumbnail3px">
+                        <img style={{
+                            "width": "100%"
+                        }} src={FileAPI.getThumbnail(document)} alt="Thumb"/>
+                    </div>
+                    :
+                    DocumentMessagesTool.createIcon(color, !isDownloaded)
+            }
             {
                 isDownloaded ?
-                    <div className="extension">{ext}</div> :
+                    <div className="extension">{ext}</div>
+                    :
                     <div className="progress extension">
-
                         {/* TODO move progress bar with pause to component*/}
                         {!isDownloading ? (
                                 <div className="pause-button">
                                     <i className={["tgico tgico-download"]}/>
                                 </div>
                             ) :
-                            <VSpinner white determinate progress={progress}>
+                            <VSpinner white determinate progress={progress / 100}>
                                 <i className={["tgico tgico-close"]}/>
                             </VSpinner>
                         }
@@ -38,38 +41,38 @@ const IconFragment = ({document, isDownloading, isDownloaded, color, ext, progre
 }
 
 class DocumentMessageComponent extends GeneralMessageComponent {
-
-    iconFragmentRef = VComponent.createFragmentRef()
-
     appEvents(E) {
-        super.appEvents(E)
-        // TODO check this!
+        super.appEvents(E);
+
         E.bus(AppEvents.Files)
-            .filter(event => event.fileId === this.doc.id)
-            .on("fileDownloaded", this.onFileDownloaded)
-            .on("fileDownloading", this.onFileDownloading)
+            .filter(event => event.file.id === this.message.raw.media.document.id)
+            .updateOn("download.start")
+            .updateOn("download.newPart")
+            .updateOn("download.done")
+            .updateOn("download.canceled")
     }
 
     render() {
-        this.doc = this.message.raw.media.document
-        let doc = this.message.raw.media.document;
+        const document = this.message.raw.media.document;
 
-        let title = DocumentMessagesTool.getFilename(doc.attributes);
-        let ext = title.split(".")[title.split(".").length - 1];
+        const title = DocumentMessagesTool.getFilename(document.attributes);
+        const ext = title.split(".")[title.split(".").length - 1];
 
-        const isDownloading = FileManager.isPending(doc.id)
-        const isDownloaded = FileManager.isDownloaded(doc.id)
-        const progress = FileManager.getProgress(doc.id)
-        let size = isDownloading && !isDownloaded ? Math.round(progress * 100) + "%" : DocumentMessagesTool.formatSize(doc.size);
+        const isDownloading = FileManager.isPending(document.id);
+        const isDownloaded = FileManager.isDownloaded(document.id);
+        const percentage = FileManager.getPercentage(document.id);
+        const pendingSize = FileManager.getPendingSize(document.id);
 
-        let color = DocumentMessagesTool.getColor(ext);
-        let icon = <IconFragment ref={this.iconFragmentRef}
-                                 ext={ext}
-                                 color={color}
-                                 isDownloaded={isDownloaded}
-                                 progress={progress}
-                                 isDownloading={isDownloading}
-                                 document={doc}/>;
+        const size = isDownloading && !isDownloaded ? `${Math.round(percentage)}% / ${DocumentMessagesTool.formatSize(pendingSize)}` : DocumentMessagesTool.formatSize(document.size);
+
+        const color = DocumentMessagesTool.getColor(ext);
+
+        const icon = <IconFragment ext={ext}
+                                   color={color}
+                                   isDownloaded={isDownloaded}
+                                   progress={percentage}
+                                   isDownloading={isDownloading}
+                                   document={document}/>;
 
         return (
             <CardMessageWrapperFragment message={this.message}
@@ -81,46 +84,21 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         )
     }
 
+    componentWillMount(props) {
+        if (!FileManager.isDownloaded(this.message.raw.media.document.id)) {
+            FileManager.checkCache(this.message.raw.media.document);
+        }
+    }
+
     downloadDocument = () => {
-        if (FileManager.isDownloaded(this.doc.id)) {
-            FileManager.saveBlobUrlOnPc(FileManager.downloaded.get(this.doc.id), DocumentMessagesTool.getFilename(this.doc.attributes))
-        } else if (!FileManager.isPending(this.doc.id)) {
-            FileManager.downloadDocument(this.doc)
+        const document = this.message.raw.media.document;
+
+        if (FileManager.isDownloaded(document.id)) {
+            FileManager.save(document.id, DocumentMessagesTool.getFilename(document.attributes))
+        } else if (!FileManager.isPending(document.id)) {
+            FileManager.downloadDocument(document)
         } else {
-            // TODO Possible RC if cancel and redownloaded at the same time.
-            // Should probably store some random hash of the download in FileMgr.pending?
-            AppEvents.Files.fire("cancelDownload", this.doc.id)
-            this.iconFragmentRef.patch({
-                isDownloading: false,
-                progress: 0.0
-            })
-            // TODO should definitely be replaced with stateful component
-            this.forceUpdate()
-        }
-    }
-
-    onFileDownloading = event => {
-        if (this.doc.id === event.fileId) {
-
-            this.iconFragmentRef.patch({
-                isDownloading: true,
-                progress: event.progress
-            })
-            // TODO should definitely be replaced with stateful component
-            this.forceUpdate()
-        }
-    }
-
-    onFileDownloaded = event => {
-        if (this.doc.id === event.fileId) {
-
-            this.iconFragmentRef.patch({
-                isDownloading: false,
-                isDownloaded: true,
-            })
-
-            // TODO should definitely be replaced with stateful component
-            this.forceUpdate()
+            FileManager.cancel(document.id)
         }
     }
 }

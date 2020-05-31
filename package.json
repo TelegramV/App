@@ -12,7 +12,7 @@
     "build-prod": "webpack -p --mode production",
     "prod": "webpack -p --mode production",
     "watch": "webpack -d --mode development --watch --info-verbosity verbose",
-    "dev": "webpack-dev-server --color -d --mode development --watch --info-verbosity verbose --host 0.0.0.0",
+    "dev": "webpack-dev-server --color -d --mode development --info-verbosity verbose --host 0.0.0.0",
     "analize-bundle": "webpack --json | webpack-bundle-size-analyzer",
     "test": "jest"
   },
@@ -44,7 +44,7 @@
     "clean-webpack-plugin": "^3.0.0",
     "compression-webpack-plugin": "^3.1.0",
     "copy-webpack-plugin": "^5.1.1",
-    "core-js": "^3.6.4",
+    "core-js": "3",
     "css-loader": "^3.2.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
@@ -62,6 +62,7 @@
     "mini-css-extract-plugin": "^0.8.0",
     "net": "^1.0.2",
     "node-sass": "^4.13.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
     "path": "^0.12.7",
     "postcss-loader": "^3.0.0",
     "querystring": "^0.2.0",
@@ -90,5 +91,13 @@
       "bower_components",
       "shared"
     ]
-  }
+  },
+  "browserslist": [
+    "> 0.25%",
+    "not dead"
+  ],
+  "targets": [
+    "> 0.25%",
+    "not dead"
+  ]
 }

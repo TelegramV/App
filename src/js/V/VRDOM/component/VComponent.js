@@ -138,6 +138,10 @@ class VComponent {
     componentDidUpdate() {
     }
 
+    // same as init, but called after init, kostyl..
+    componentWillMount(props) {
+    }
+
     forceUpdate() {
         __component_update_force(this);
     }

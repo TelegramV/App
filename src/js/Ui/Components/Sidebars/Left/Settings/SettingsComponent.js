@@ -19,7 +19,7 @@ import FolderPeersPane from "./Folders/FolderPeersPane";
 
 const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
     return (
-        <div className="settings-main">
+        <div className="settings-main scrollable">
             <div className="sidebar-header no-borders">
                 <BurgerAndBackComponent/>
                 {/*<i className="btn-icon tgico tgico-back rp rps" onClick={_ => openPane("dialogs")}/>*/}
@@ -36,9 +36,7 @@ const SettingsMainFragment = ({me, selfAvatarFragmentRef, openPane}) => {
                     ], ev.currentTarget, "right-top")
                 }}/>
             </div>
-            <div class="photo-container">
-                {me ? <AvatarComponent peer={me}/> : <div/>}
-            </div>
+            {me ? <AvatarComponent peer={me}/> : <div/>}
             <div className="username">{me ? me.name : ""}</div>
             <div className="phone-number">+{me ? me.phone : ""}</div>
             <SectionFragment noBorders>
@@ -94,7 +92,7 @@ export class SettingsComponent extends LeftBarComponent {
         const me = PeersStore.self()
 
         return (
-            <div class="settings sidebar scrollable hidden">
+            <div class="settings sidebar hidden">
                 <SettingsMainFragment me={me}
                                       ref={this.settingsMainRef}
                                       selfAvatarFragmentRef={this.selfAvatarFragmentRef}

@@ -2,14 +2,7 @@ import AppEvents from "../../../../../../Api/EventBus/AppEvents";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
-
-// макс перепиши цю діч(
-// гатова! - @undrfined
-// кайф, тільки наступного разу роби ctrl+alt+l
-//   (в мене воно атоматом код форматить і чистить непотрібні імпорти) - @kohutd
-
 export class DialogInfoPhotoComponent extends StatelessComponent {
-
     init() {
         if (!this.props.message.loaded && !this.props.message.loading) {
             this.props.message.fetchMax()
@@ -18,33 +11,24 @@ export class DialogInfoPhotoComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Files)
-            .filter(event => event.fileId === this.props.message.raw.media.photo.id)
-            .on("fileDownloaded", this.onFileDownloaded)
-            .on("fileDownloading", this.onFileDownloading)
+            .filter(event => event.file.id === this.props.message.raw.media.photo.id)
+            .updateOn("download.start")
+            .updateOn("download.done")
     }
 
-    render() {
+    render({message}) {
         return (
             <figure style={{"cursor": "pointer"}}
-                    className={["photo rp", !this.props.message.loaded ? "thumbnail" : ""]}
+                    className={["photo rp", message.loaded || "thumbnail"]}
                     onClick={this.openMediaViewer}>
 
-                <img src={this.props.message.srcUrl || this.props.message.thumbnail} alt="Image"/>
-
+                <img src={message.srcUrl || message.thumbnail} alt="Image"/>
             </figure>
         )
     }
 
-    openMediaViewer = event => {
+    openMediaViewer = () => {
         UIEvents.MediaViewer.fire("showMessage", {message: this.props.message})
-    }
-
-    onFileDownloaded = event => {
-        console.log("onFileDownloaded!")
-        this.forceUpdate()
-    }
-
-    onFileDownloading = event => {
     }
 }
 

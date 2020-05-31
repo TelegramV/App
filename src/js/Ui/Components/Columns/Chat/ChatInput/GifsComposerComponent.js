@@ -22,6 +22,7 @@ import UIEvents from "../../../../EventBus/UIEvents"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import {FileAPI} from "../../../../../Api/Files/FileAPI"
 import VRDOM from "../../../../../V/VRDOM/VRDOM"
+import VApp from "../../../../../V/vapp"
 import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
 import API from "../../../../../Api/Telegram/API"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
@@ -59,7 +60,10 @@ class GifsComposerComponent extends StatelessComponent {
                     VRDOM.append(
                         <div class="masonry-item" css-width={width + "px"}>
                             <BetterVideoComponent document={document}
-                                                  onClick={() => AppSelectedChat.current.api.sendExistingMedia(document)}
+                                                  onClick={() => {
+                                                    AppSelectedChat.current.api.sendExistingMedia(document);
+                                                    VApp.mountedComponents.get("composer").hide();
+                                                  }}
                                                   playOnHover/>
                         </div>,
                         this.masonryRef.$el

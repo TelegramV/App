@@ -75,6 +75,11 @@ const vrdom_patch = ($node, vRNode: VRNode | ComponentVRNode, options = {}): Nod
 
         return patchVRNodeNull($node)
 
+    } else if (!vRNode) {
+        // console.log("[patch] false")
+
+        return patchVRNodeNull($node)
+
     } else {
         // console.log("[patch] unexpected", $node, vRNode)
 

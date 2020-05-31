@@ -82,7 +82,7 @@ class List {
     }
 
     __destroy = () => {
-
+        this.list.mutationSubscribers.delete(this.onArrayChange)
     }
 
     __update = ({list}) => {

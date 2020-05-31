@@ -4,130 +4,160 @@ import AppEvents from "../EventBus/AppEvents"
 class FilesManager {
 
     pending = new Map()
-    // TODO should definitely use cache here, storing in RAM is awful
-    downloaded = new Map()
+    downloaded: Map<string, { blob: Blob; url: string; }> = new Map()
 
-    constructor() {
-        AppEvents.Files.subscribe("cancelDownload", this.onCancelDownload)
-    }
-
-    onCancelDownload = fileId => {
-        // TODO cancel download
-        this.pending.delete(fileId)
-    }
-
-    isPending = fileId => {
+    isPending(fileId) {
         return this.pending.has(fileId)
     }
 
-    isDownloaded = fileId => {
+    isDownloaded(fileId) {
         return this.downloaded.has(fileId)
     }
 
-    getProgress = fileId => {
-        return this.isDownloaded(fileId) ? 1.0 : (this.pending.get(fileId)?.progress ?? 0.0)
+    getPercentage(fileId) {
+        return this.pending.get(fileId)?._percentage ?? 0
     }
 
-    // shouldn't be async, or use await
-    downloadPhoto = async (photo, thumbSize = undefined) => {
-        return this.downloadDocument(photo, thumbSize)
+    getPendingSize(fileId) {
+        return this.pending.get(fileId)?._downloadedSize ?? 0
     }
 
-    downloadDocument = async (file, thumbSize = undefined, useCache = false) => {
-        if (this.pending.has(file.id)) {
-            return false
-        }
+    get(fileId) {
+        return this.downloaded.get(fileId)
+    }
 
-        file.progress = 0.0
-        this.pending.set(file.id, file)
+    cancel(fileId) {
+        this.pending.delete(fileId)
 
-        AppEvents.Files.fire("fileDownloading", {
-            fileId: file.id,
-            raw: file,
-            progress: 0
+        AppEvents.Files.fire("download.canceled", {
+            file: {
+                id: fileId, // todo: aaaaa
+            }
         })
+    }
 
-        if (useCache) {
-            try {
-                const cachedUrl = await FileAPI.tryCache(file)
+    checkCache(file, size): Promise<Blob> | any {
+        if (this.downloaded.has(file.id)) {
+            const downloaded = this.downloaded.get(file.id);
 
-                this.pending.delete(file.id)
-                this.downloaded.set(file.id, cachedUrl)
-
-                AppEvents.Files.fire("fileDownloaded", {
-                    fileId: file.id,
-                    raw: file,
-                    url: cachedUrl
-                })
-
-
-                if (cachedUrl) {
-                    return cachedUrl
-                }
-            } catch (e) {
-                console.error(e)
-            }
-        }
-
-        const size = file.size || (file.thumbs || file.sizes).find(l => l.type === thumbSize).size
-        let offset = 0
-        const parts = []
-
-        while (offset < size) {
-            if (!this.pending.has(file.id)) {
-                console.info("Cancelled by user download")
-                return false
-            }
-
-            let response = await FileAPI.obsolete_getFileLocation({
-                _: FileAPI.getInputName(file),
-                id: file.id,
-                access_hash: file.access_hash,
-                file_reference: file.file_reference,
-                thumb_size: thumbSize
-            }, file.dc_id, offset);
-
-            if (!response.bytes) {
-                console.error("Fatal error while loading part", response, file, offset, size)
-            }
-
-            offset += response.bytes.length
-            parts.push(response.bytes)
-
-            AppEvents.Files.fire("fileDownloading", {
-                fileId: file.id,
-                raw: file,
-                progress: offset / size
+            AppEvents.Files.fire("download.done", {
+                file,
+                blob: downloaded.blob,
+                url: downloaded.url,
             });
 
-            const k = this.pending.get(file.id);
-
-            if (k) {
-                k.progress = offset / size;
-            }
+            return Promise.resolve(downloaded);
         }
 
-        // Can be cancelled here?
-        // no
-
-        const url = FileAPI.createBlobFromParts(file, file.mime_type || "application/jpeg", parts, useCache)
-
-        this.pending.delete(file.id)
-        this.downloaded.set(file.id, url)
-
-        AppEvents.Files.fire("fileDownloaded", {
-            fileId: file.id,
-            file: parts,
-            raw: file,
-            url
+        return FileAPI.tryFromCache(file, size).then(blob => this.internal_downloadDone(file, blob)).catch(error => {
+            // console.error(error)
         })
+    }
 
-        // Backwards compatibility
-        return url
+    downloadPhoto(photo, size): Promise<Blob> | any {
+        if (this.downloaded.has(photo.id)) {
+            const downloaded = this.downloaded.get(photo.id);
+
+            AppEvents.Files.fire("download.done", {
+                file: photo,
+                blob: downloaded.blob,
+                url: downloaded.url,
+            });
+
+            return Promise.resolve(downloaded);
+        }
+
+        if (this.pending.has(photo.id)) {
+            return this.pending.get(photo.id)._promise;
+        }
+
+        this.internal_downloadStart(photo);
+
+        return photo._promise = FileAPI.downloadPhoto(photo, size, event => this.internal_downloadNewPart(photo, event))
+            .then(blob => this.internal_downloadDone(photo, blob));
+    }
+
+    downloadDocument(document, thumb): Promise<Blob> | any {
+        if (this.downloaded.has(document.id)) {
+            const downloaded = this.downloaded.get(document.id);
+
+            AppEvents.Files.fire("download.done", {
+                file: document,
+                blob: downloaded.blob,
+                url: downloaded.url,
+            });
+
+            return Promise.resolve(downloaded);
+        }
+
+        if (this.pending.has(document.id)) {
+            return this.pending.get(document.id)._promise;
+        }
+
+        this.internal_downloadStart(document);
+
+        return document._promise = FileAPI.downloadDocument(document, thumb, event => this.internal_downloadNewPart(document, event))
+            .then(blob => this.internal_downloadDone(document, blob));
+    }
+
+    internal_downloadDone(file, blob) {
+        file._percentage = 100;
+
+        const downloaded = {
+            blob,
+            url: URL.createObjectURL(blob),
+        };
+
+        this.pending.delete(file.id);
+        this.downloaded.set(file.id, downloaded);
+
+        AppEvents.Files.fire("download.done", {
+            file: file,
+            blob,
+            url: downloaded.url,
+        });
+
+        file._promise = Promise.resolve(downloaded);
+
+        return blob;
+    }
+
+    internal_downloadStart(file) {
+        file._percentage = 0;
+        file._downloadedSize = 0;
+
+        this.pending.set(file.id, file)
+
+        AppEvents.Files.fire("download.start", {
+            file,
+        });
+    }
+
+    internal_downloadNewPart(file, event) {
+        const {newBytes, totalBytes, sizeToBeDownloaded, percentage} = event;
+
+        file._percentage = percentage;
+        file._downloadedSize = totalBytes.length;
+
+        AppEvents.Files.fire("download.newPart", {
+            file,
+            newBytes,
+            totalBytes,
+            sizeToBeDownloaded,
+            percentage
+        });
+
+        return !!this.pending.get(file.id); // cancel then
     }
 
     saveOnPc = (data, fileName) => {
         this.saveBlobOnPc(new Blob(data, {type: "octet/stream"}), fileName)
+    }
+
+    save(fileId, fileName) {
+        const url = this.get(fileId).url
+
+        this.saveBlobUrlOnPc(url, fileName)
     }
 
     saveBlobOnPc = (blob, fileName) => {

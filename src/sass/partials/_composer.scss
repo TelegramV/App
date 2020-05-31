@@ -109,6 +109,8 @@
         .emoji-table {
             &>*.selected {
                 align-items: start;
+                height: auto;
+                max-height: 100%; //allow overflow
             }
         }
     }
@@ -117,7 +119,7 @@
         .sticker-table {
             .selected {
                 grid-template-columns: repeat(5, 1fr);
-                grid-template-rows: repeat(auto-fit, 75px);
+                grid-auto-rows: 75px;
                 gap: 5px;
                 padding: 0 5px;
                 align-items: flex-start;

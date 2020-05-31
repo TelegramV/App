@@ -3,6 +3,7 @@ import {FileAPI} from "../Files/FileAPI";
 import {ReactiveObject} from "../../V/Reactive/ReactiveObject";
 import FileManager from "../Files/FileManager";
 
+// this class is probably redundant
 export class Photo extends ReactiveObject {
     thumbnail: string
 
@@ -24,7 +25,7 @@ export class Photo extends ReactiveObject {
     }
 
     get srcUrl() {
-        return this.loaded && FileManager.downloaded.get(this.fileId)
+        return this.loaded && FileManager.downloaded.get(this.fileId).url
     }
 
     get date() {
@@ -32,36 +33,12 @@ export class Photo extends ReactiveObject {
     }
 
     fetchMax() {
-        return FileManager.downloadDocument(this.raw, this.maxSizeType, true).then(url => {
+        return FileManager.downloadPhoto(this.raw).then(({url}) => {
             this.fire("downloaded", {url})
 
             return url
         })
-
-        // return FileAPI.getFile(this.raw, this.maxSizeType).then(srcUrl => {
-        //     this.srcUrl = srcUrl
-        //
-        //     this.thumbnail = false
-        //     this.loaded = true
-        //     this.loading = false
-        //
-        //     if (!this.interrupted) {
-        //         this.interrupted = false
-        //         this.fire("photoLoaded")
-        //     }
-        // })
     }
-
-    // fetchMaxSize() {
-    //     return FileAPI.getFile(this.raw, this.minSizeType).then(srcMaxUrl => {
-    //         this.srcMaxSizeUrl = srcMaxUrl
-    //
-    //         if (!this.interrupted) {
-    //             this.interrupted = false
-    //             // this.fire("maxSizeLoaded")
-    //         }
-    //     })
-    // }
 
     fillRaw(raw: Object): Photo {
         this.raw = raw

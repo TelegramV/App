@@ -20,17 +20,24 @@
 import Lottie from "../../Lottie/Lottie"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
+import FileManager from "../../../Api/Files/FileManager"
+import AppEvents from "../../../Api/EventBus/AppEvents"
 
+// probably patch-compatible
 class BetterStickerComponent extends StatefulComponent {
     state = {
         isAnimated: false,
         animationData: null,
+        url: null,
         thumbUrl: null,
         isDownloading: false,
     }
 
-    init() {
-        this.state.isAnimated = this.props.isAnimated != null ? this.props.isAnimated : this.props.document.mime_type === "application/x-tgsticker";
+    appEvents(E) {
+        E.bus(AppEvents.Files)
+            .filter(event => event.file.id === this.props.document.id)
+            .on("download.start", this.onDownloadStart)
+            .on("download.done", this.onDownloadDone)
     }
 
     render(props, state) {
@@ -45,6 +52,7 @@ class BetterStickerComponent extends StatefulComponent {
                 loop: props.loop ?? false,
                 autoplay: props.autoplay ?? false,
             };
+
             const playOnHover = props.playOnHover ?? true;
             const isPaused = props.paused ?? true;
 
@@ -65,7 +73,7 @@ class BetterStickerComponent extends StatefulComponent {
                      class="sticker"
                      onClick={props.onClick}>
                     <img class="loading"
-                         src={state.thumbUrl}
+                         src={state.url || state.thumbUrl}
                          css-width={`${width}px`}
                          css-height={`${height}px`}/>
                 </div>
@@ -73,38 +81,51 @@ class BetterStickerComponent extends StatefulComponent {
         }
     }
 
-    componentDidMount() {
-        const {document, isFull} = this.props;
-        const {isAnimated} = this.state;
+    componentWillMount({document, isFull}) {
+        const isAnimated = this.props.isAnimated != null ? this.props.isAnimated : document.mime_type === "application/x-tgsticker";
+        const thumb = isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "";
 
-        this.state.isDownloading = true;
-
-        this.assure(FileAPI.downloadDocument(document, isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : ""))
-            .then(blob => {
-                if (!this.__.mounted) {
-                    return
-                }
-
-                if (isAnimated) {
-                    this.assure(FileAPI.decodeAnimatedSticker(blob)).then(json => {
-                        if (!this.__.mounted) {
-                            return
-                        }
-
-                        this.setState({
-                            animationData: json,
-                            isDownloading: false,
-                        })
-                    })
-                } else {
-                    this.setState({
-                        thumbUrl: FileAPI.getUrl(blob),
-                        isDownloading: false,
-                    });
-                }
-            }).then(() => {
-            this.state.isDownloading = false;
+        this.setState({
+            isDownloading: true,
+            isAnimated,
         });
+
+        FileManager.downloadDocument(document, thumb);
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if (nextProps.document !== this.props.document) {
+            const {document, isFull} = nextProps;
+            const isAnimated = nextProps.isAnimated != null ? nextProps.isAnimated : document.mime_type === "application/x-tgsticker";
+            const thumb = isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "";
+
+            nextState.isDownloading = true;
+            nextState.isAnimated = isAnimated;
+
+            FileManager.downloadDocument(document, thumb);
+        }
+    }
+
+    onDownloadStart = () => {
+        this.setState({
+            isDownloading: true,
+        });
+    }
+
+    onDownloadDone = event => {
+        if (this.state.isAnimated) {
+            this.assure(FileAPI.decodeAnimatedSticker(event.blob)).then(json => {
+                this.setState({
+                    animationData: json,
+                    isDownloading: false,
+                });
+            });
+        } else {
+            this.setState({
+                url: FileAPI.getUrl(event.blob),
+                isDownloading: false,
+            });
+        }
     }
 }
 
