@@ -157,6 +157,12 @@ export class SettingsComponent extends LeftBarComponent {
         this.close();
     }
 
+    barAfterHide = (ev) => {
+        if (ev && this._isSettingsBar(ev.barName)) return;
+        this.$el.style.display = "none"
+
+    }
+
     close = () => {
         this.$el.classList.add("hidden");
         UIEvents.LeftSidebar.fire("burger.changeToBurger", {})

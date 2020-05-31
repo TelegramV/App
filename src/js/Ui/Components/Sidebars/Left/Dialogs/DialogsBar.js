@@ -140,6 +140,10 @@ export class DialogsBar extends LeftBarComponent {
         )
     }
 
+    barAfterHide = () => {
+
+    }
+
     componentDidMount() {
         this.Archived = VComponent.getComponentById(`dialogs-archived-list`)
         this.dialogsWrapperRef.$el.addEventListener("scroll", this._scrollHandler, {passive: true})

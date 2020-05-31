@@ -30,6 +30,11 @@ export class AbstractBarComponent extends StatefulComponent {
         }
     }
 
+    componentDidMount() {
+        super.componentDidMount();
+        this.barAfterHide()
+    }
+
     openBar = barName => {
     }
 
@@ -48,11 +53,14 @@ export class AbstractBarComponent extends StatefulComponent {
     }
 
     barAfterShow = (event) => {
+        console.log("bar after show", this.barName)
+        this.$el.style.display = ""
     }
 
     // hide
 
     barBeforeHide = (event) => {
+
     }
 
     barOnHide = (event) => {
@@ -60,5 +68,10 @@ export class AbstractBarComponent extends StatefulComponent {
     }
 
     barAfterHide = (event) => {
+        console.log("barAfterHide", this.barName)
+
+
+        this.$el.style.display = "none"
+
     }
 }
