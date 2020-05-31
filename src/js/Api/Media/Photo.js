@@ -25,7 +25,7 @@ export class Photo extends ReactiveObject {
     }
 
     get srcUrl() {
-        return this.loaded && URL.createObjectURL(FileManager.downloaded.get(this.fileId))
+        return this.loaded && FileManager.downloaded.get(this.fileId).url
     }
 
     get date() {
@@ -33,9 +33,7 @@ export class Photo extends ReactiveObject {
     }
 
     fetchMax() {
-        return FileManager.downloadPhoto(this.raw).then(blob => {
-            const url = FileAPI.getUrl(blob)
-
+        return FileManager.downloadPhoto(this.raw).then(({url}) => {
             this.fire("downloaded", {url})
 
             return url

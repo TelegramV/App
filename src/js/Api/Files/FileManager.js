@@ -4,7 +4,7 @@ import AppEvents from "../EventBus/AppEvents"
 class FilesManager {
 
     pending = new Map()
-    downloaded = new Map()
+    downloaded: Map<string, { blob: Blob; url: string; }> = new Map()
 
     isPending(fileId) {
         return this.pending.has(fileId)
@@ -38,14 +38,15 @@ class FilesManager {
 
     checkCache(file, size): Promise<Blob> | any {
         if (this.downloaded.has(file.id)) {
-            const blob = this.downloaded.get(file.id);
+            const downloaded = this.downloaded.get(file.id);
 
             AppEvents.Files.fire("download.done", {
                 file,
-                blob,
+                blob: downloaded.blob,
+                url: downloaded.url,
             });
 
-            return Promise.resolve(blob);
+            return Promise.resolve(downloaded);
         }
 
         return FileAPI.tryFromCache(file, size).then(blob => this.internal_downloadDone(file, blob)).catch(error => {
@@ -55,58 +56,68 @@ class FilesManager {
 
     downloadPhoto(photo, size): Promise<Blob> | any {
         if (this.downloaded.has(photo.id)) {
-            const blob = this.downloaded.get(photo.id);
+            const downloaded = this.downloaded.get(photo.id);
 
             AppEvents.Files.fire("download.done", {
                 file: photo,
-                blob,
+                blob: downloaded.blob,
+                url: downloaded.url,
             });
 
-            return Promise.reject(blob);
+            return Promise.resolve(downloaded);
         }
 
         if (this.pending.has(photo.id)) {
-            return Promise.resolve(null);
+            return this.pending.get(photo.id)._promise;
         }
 
         this.internal_downloadStart(photo);
 
-        return FileAPI.downloadPhoto(photo, size, event => this.internal_downloadNewPart(photo, event))
+        return photo._promise = FileAPI.downloadPhoto(photo, size, event => this.internal_downloadNewPart(photo, event))
             .then(blob => this.internal_downloadDone(photo, blob));
     }
 
     downloadDocument(document, thumb): Promise<Blob> | any {
         if (this.downloaded.has(document.id)) {
-            const blob = this.downloaded.get(document.id);
+            const downloaded = this.downloaded.get(document.id);
 
             AppEvents.Files.fire("download.done", {
                 file: document,
-                blob,
+                blob: downloaded.blob,
+                url: downloaded.url,
             });
 
-            return Promise.resolve(blob);
+            return Promise.resolve(downloaded);
         }
 
         if (this.pending.has(document.id)) {
-            return Promise.reject(null);
+            return this.pending.get(document.id)._promise;
         }
 
         this.internal_downloadStart(document);
 
-        return FileAPI.downloadDocument(document, thumb, event => this.internal_downloadNewPart(document, event))
+        return document._promise = FileAPI.downloadDocument(document, thumb, event => this.internal_downloadNewPart(document, event))
             .then(blob => this.internal_downloadDone(document, blob));
     }
 
     internal_downloadDone(file, blob) {
         file._percentage = 100;
 
+        const downloaded = {
+            blob,
+            url: URL.createObjectURL(blob),
+        };
+
         this.pending.delete(file.id);
-        this.downloaded.set(file.id, blob);
+        this.downloaded.set(file.id, downloaded);
 
         AppEvents.Files.fire("download.done", {
             file: file,
             blob,
+            url: downloaded.url,
         });
+
+        file._promise = Promise.resolve(downloaded);
 
         return blob;
     }
@@ -141,6 +152,12 @@ class FilesManager {
 
     saveOnPc = (data, fileName) => {
         this.saveBlobOnPc(new Blob(data, {type: "octet/stream"}), fileName)
+    }
+
+    save(fileId, fileName) {
+        const url = this.get(fileId).url
+
+        this.saveBlobUrlOnPc(url, fileName)
     }
 
     saveBlobOnPc = (blob, fileName) => {

@@ -80,7 +80,7 @@ class DialogInfoDocumentComponent extends StatelessComponent {
         const document = this.props.document;
 
         if (FileManager.isDownloaded(document.id)) {
-            FileManager.saveBlobOnPc(FileManager.downloaded.get(document.id), DocumentMessagesTool.getFilename(document.attributes))
+            FileManager.save(document.id, DocumentMessagesTool.getFilename(document.attributes))
         } else if (!FileManager.isPending(document.id)) {
             FileManager.downloadDocument(document)
         } else {
