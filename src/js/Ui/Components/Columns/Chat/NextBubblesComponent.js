@@ -294,7 +294,8 @@ class NextBubblesComponent extends StatelessComponent {
         const isAtTop = scrollTop <= 400;
         // const isAtTop = scrollTop === 0;
 
-        if ((scrollHeight - scrollTop) >= (clientHeight - 20)) {
+        // todo: may cause performance issues
+        if (!isAtBottom) {
             UIEvents.General.fire("chat.scrollBottom.show");
         }
 

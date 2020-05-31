@@ -57,15 +57,19 @@ class ChatToBottomButtonComponent extends StatefulComponent {
     }
 
     onShow = () => {
-        this.setState({
-            isShown: true,
-        });
+        if (!this.state.isShown) {
+            this.setState({
+                isShown: true,
+            });
+        }
     }
 
     onHide = () => {
-        this.setState({
-            isShown: false,
-        });
+        if (this.state.isShown) {
+            this.setState({
+                isShown: false,
+            });
+        }
     }
 }
 
