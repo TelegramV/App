@@ -85,6 +85,23 @@ export default class SettingsPane extends LeftBarComponent {
         }
     }
 
+    hide = () => {
+        UIEvents.LeftSidebar.fire("burger.changeToBack", {
+            id: this.previous
+        })
+
+        UIEvents.LeftSidebar.fire("hide", {
+            barName: this.barName
+        })
+        UIEvents.LeftSidebar.fire("hideAnimation", {
+            barName: this.previous,
+            hide: false
+        })
+        UIEvents.LeftSidebar.fire("show", {
+            barName: this.previous
+        })
+    }
+
     onBack = (event) => {
         if(event.id === this.barName) {
 

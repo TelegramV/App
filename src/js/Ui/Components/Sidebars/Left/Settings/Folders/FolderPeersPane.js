@@ -18,7 +18,7 @@ import nodeIf from "../../../../../../V/VRDOM/jsx/helpers/nodeIf";
 import {ButtonWithAvatarFragment} from "../../../Fragments/ButtonWithAvatarFragment";
 import VComponent from "../../../../../../V/VRDOM/component/VComponent";
 import {ButtonWithIconAndCheckmarkFragment} from "../../../Fragments/ButtonWithIconAndCheckmark";
-import VTagsInput, {VTag} from "../../../../../Elements/Input/VTagsInput";
+import VTagsInput, {VTag, VTagIcon} from "../../../../../Elements/Input/VTagsInput";
 import {BurgerAndBackComponent} from "../../BurgerAndBackComponent";
 import DialogsStore from "../../../../../../Api/Store/DialogsStore";
 import {CheckboxWithPeerFragment} from "../../../Fragments/CheckboxWithPeerFragment";
@@ -57,12 +57,28 @@ export default class FolderPeersPane extends SettingsPane {
             exclude_peers: []
         }
         // this.name = this.state.currentFolder == null ? "New Folder" : "Edit Folder"
-        console.log(f)
 
         //this.state.selected.map(peer => {
         //                             return <VTag peer={peer} onRemove={l => this.togglePeer(peer)}/>
         //                         }
         //                     )
+        const tags = [
+            nodeIf(<VTagIcon icon="newprivate" text="Contacts" onRemove={l => this.toggle("contacts")}/>, f.contacts),
+            nodeIf(<VTagIcon icon="noncontacts" text="Non-Contacts" onRemove={l => this.toggle("non_contacts")}/>, f.non_contacts),
+            nodeIf(<VTagIcon icon="newgroup" text="Groups" onRemove={l => this.toggle("groups")}/>, f.groups),
+            nodeIf(<VTagIcon icon="newchannel" text="Channels" onRemove={l => this.toggle("broadcasts")}/>, f.broadcasts),
+            nodeIf(<VTagIcon icon="bots" text="Bots" onRemove={l => this.toggle("bots")}/>, f.bots),
+        ]
+
+        DialogsStore.toSortedArray().forEach(dialog => {
+            const exists = this.state.selectedChats.has(dialog.peer)
+            if(exists) {
+                tags.push(<VTag peer={dialog.peer} onRemove={ev => {
+                    this.togglePeer(dialog.peer, exists)
+                }}/>)
+            }
+        })
+
         return (
             <div class={{
                 "sidebar sub-settings scrollable": true,
@@ -75,7 +91,7 @@ export default class FolderPeersPane extends SettingsPane {
                 </div>
                 <div className="peers">
 
-                    <VTagsInput tags={[]} onInput={this.onPeerNameInput}/>
+                    <VTagsInput tags={tags} onInput={this.onPeerNameInput}/>
                 </div>
 
 
@@ -135,7 +151,13 @@ export default class FolderPeersPane extends SettingsPane {
     }
 
     apply = () => {
-
+        this.state.currentFolder.include_peers = []
+        this.state.selectedChats.forEach(l => {
+            this.state.currentFolder.include_peers.push(l.inputPeer)
+        })
+        delete this.state.currentFolder.flags;
+        FoldersManager.updateFolder(this.state.currentFolder)
+        this.hide()
     }
 
     onEditFolder = (event) => {

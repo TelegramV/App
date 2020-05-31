@@ -58,6 +58,18 @@
         }
       }
 
+      .icon {
+        width: 30px;
+        height: 30px;
+        background-color: $blue;
+        color: white;
+        border-radius: 50%;
+        font-size: 16pt;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
       .avatar {
         z-index: 0;
         height: 30px;
