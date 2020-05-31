@@ -6,16 +6,16 @@ import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
 class GameMessageComponent extends GeneralMessageComponent {
 
     render() {
-        let game = this.message.raw.media.game
+        let game = this.props.message.raw.media.game
 
         //DRAFT VERSION
         return (
-            <MessageWrapperFragment message={this.message} showUsername={false} avatarRef={this.avatarRef}
+            <MessageWrapperFragment message={this.props.message} showUsername={false} avatarRef={this.avatarRef}
                                     bubbleRef={this.bubbleRef}>
                 <div class="game">
                     <div class="title">{game.title}</div>
                     <div class="info">
-                        {this.message.text ? parseMessageEntities(this.message.text) : game.description}
+                        {this.props.message.text ? parseMessageEntities(this.props.message.text) : game.description}
                     </div>
                     <BetterPhotoComponent photo={game.photo}/>
                 </div>

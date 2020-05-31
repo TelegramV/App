@@ -36,7 +36,7 @@ export class PhoneCallComponent extends SingletonComponent {
     render() {
         const classes = {"phone-call-wrapper": true, "hidden": this.state.hidden}
         const classesInner = {"phone-call": true, "accepted-call": this.state.acceptedCall}
-        return <div className={classes}>
+        return <div css-display={this.state.hidden && "none"} className={classes}>
             <div className={classesInner}>
                 {this.state.peer ? <AvatarComponent peer={this.state.peer || null}/> : ""}
                 <div className={{

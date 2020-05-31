@@ -6,15 +6,15 @@ import PeersStore from "../../../../../Api/Store/PeersStore";
 class PhoneCallMessageComponent extends GeneralMessageComponent {
 
     render() {
-        const peer = this.message.to === PeersStore.self() ? this.message.from : this.message.to
+        const peer = this.props.message.to === PeersStore.self() ? this.props.message.from : this.props.message.to
         let title = ""
-        switch (this.message.raw.action.reason._) {
+        switch (this.props.message.raw.action.reason._) {
             case "phoneCallDiscardReasonMissed":
                 title = "Cancelled call"
                 break
             case "phoneCallDiscardReasonDisconnect":
             case "phoneCallDiscardReasonHangup":
-                title = this.message.isOut ? "Outgoing call" : "Incoming call"
+                title = this.props.message.isOut ? "Outgoing call" : "Incoming call"
                 break
 
             case "phoneCallDiscardReasonBusy":
@@ -24,8 +24,8 @@ class PhoneCallMessageComponent extends GeneralMessageComponent {
         let icon = <i className="tgico tgico-phone" css-font-size="32px"/>
         return (
             <CardMessageWrapperFragment icon={icon} title={title}
-                                        description={this.message.raw.action.duration + " seconds"}
-                                        message={this.message}
+                                        description={this.props.message.raw.action.duration + " seconds"}
+                                        message={this.props.message}
                                         bubbleRef={this.bubbleRef} onClick={l => CallsManager.startCall(peer)}/>
         )
     }

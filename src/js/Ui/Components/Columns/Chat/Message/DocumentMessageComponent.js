@@ -45,7 +45,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         super.appEvents(E);
 
         E.bus(AppEvents.Files)
-            .filter(event => event.file.id === this.message.raw.media.document.id)
+            .filter(event => event.file.id === this.props.message.raw.media.document.id)
             .updateOn("download.start")
             .updateOn("download.newPart")
             .updateOn("download.done")
@@ -53,7 +53,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
     }
 
     render() {
-        const document = this.message.raw.media.document;
+        const document = this.props.message.raw.media.document;
 
         const title = DocumentMessagesTool.getFilename(document.attributes);
         const ext = title.split(".")[title.split(".").length - 1];
@@ -75,7 +75,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
                                    document={document}/>;
 
         return (
-            <CardMessageWrapperFragment message={this.message}
+            <CardMessageWrapperFragment message={this.props.message}
                                         icon={icon}
                                         title={title}
                                         description={size}
@@ -85,13 +85,13 @@ class DocumentMessageComponent extends GeneralMessageComponent {
     }
 
     componentWillMount(props) {
-        if (!FileManager.isDownloaded(this.message.raw.media.document.id)) {
-            FileManager.checkCache(this.message.raw.media.document);
+        if (!FileManager.isDownloaded(this.props.message.raw.media.document.id)) {
+            FileManager.checkCache(this.props.message.raw.media.document);
         }
     }
 
     downloadDocument = () => {
-        const document = this.message.raw.media.document;
+        const document = this.props.message.raw.media.document;
 
         if (FileManager.isDownloaded(document.id)) {
             FileManager.save(document.id, DocumentMessagesTool.getFilename(document.attributes))

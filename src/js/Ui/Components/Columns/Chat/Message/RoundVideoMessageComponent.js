@@ -18,16 +18,16 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
 
     render() {
         return (
-            <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false}
+            <MessageWrapperFragment message={this.props.message} transparent={true} noPad showUsername={false}
                                     bubbleRef={this.bubbleRef}>
-                <VideoComponent ref={this.videoRef} message={this.message} controls={false} round autodownload autoplay
+                <VideoComponent ref={this.videoRef} message={this.props.message} controls={false} round autodownload autoplay
                                 muted={this.muted}>
                     <div class="round-overlay" onClick={this._click}>
                         <ProgressLoaderComponent ref={this.progressRef}/>
                     </div>
                 </VideoComponent>
                 <div class="playback"><span class="pl-time tgico nosound"></span></div>
-                <MessageTimeComponent message={this.message} bg={true}/>
+                <MessageTimeComponent message={this.props.message} bg={true}/>
             </MessageWrapperFragment>
         )
     }
@@ -35,7 +35,7 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
     reactive(R) {
         super.reactive(R)
 
-        R.object(this.message)
+        R.object(this.props.message)
             .on("videoAppended", this.videoReady)
     }
 
@@ -48,7 +48,7 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
 
         this.playback = this.$el.querySelector(".playback");
         this.playbackTime = this.playback.querySelector(".pl-time");
-        this.playbackTime.textContent = formatAudioTime(this.message.videoInfo.duration);
+        this.playbackTime.textContent = formatAudioTime(this.props.message.videoInfo.duration);
     }
 
     _onTimeUpdate = (ev) => {
@@ -61,7 +61,7 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
     _onLoopEnd = (ev) => {
         this.video.volume = 0;
         this.setMuted(true)
-        this.playbackTime.textContent = formatAudioTime(this.message.videoInfo.duration);
+        this.playbackTime.textContent = formatAudioTime(this.props.message.videoInfo.duration);
         this.toggleProgress(this.muted);
         this.video.play();
     }

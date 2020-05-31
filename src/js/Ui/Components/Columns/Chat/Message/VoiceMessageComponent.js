@@ -5,7 +5,7 @@ import {convertBits, formatAudioTime} from "../../../../Utils/utils"
 export default class VoiceMessageComponent extends AudioComponent {
     constructor(props) {
         super(props);
-        let doc = this.message.raw.media.document;
+        let doc = this.props.message.raw.media.document;
         for (const attr of doc.attributes) {
             if (attr._ == "documentAttributeAudio" && attr.voice) {
                 this.waveform = attr.waveform;
@@ -58,14 +58,14 @@ export default class VoiceMessageComponent extends AudioComponent {
                      onMouseEnter={this._handleEnter.bind(this)} onMouseLeave={this._handleLeave.bind(this)}
                      onMouseDown={this._handleMove.bind(this)}>
                     <defs>
-                        <mask id={`bars-${this.message.id}`}>
+                        <mask id={`bars-${this.props.message.id}`}>
                             {this._generateBars()}
                         </mask>
                     </defs>
                     <rect class="back" x="0" y="0" width={this.width + "px"} height="100%"
-                          mask={`url(#bars-${this.message.id})`}/>
+                          mask={`url(#bars-${this.props.message.id})`}/>
                     <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%"
-                          mask={`url(#bars-${this.message.id})`}/>
+                          mask={`url(#bars-${this.props.message.id})`}/>
                 </svg>
                 <div class="timer">
                     <span class="time-played">{formatAudioTime(this.duration)}</span>

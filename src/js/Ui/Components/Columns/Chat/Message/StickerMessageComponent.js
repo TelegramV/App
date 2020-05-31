@@ -34,14 +34,14 @@ class StickerMessageComponent extends GeneralMessageComponent {
         this.calculateSize()
 
         return (
-            <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false}>
+            <MessageWrapperFragment message={this.props.message} transparent={true} noPad showUsername={false}>
 
-                <StickerFragment id={`sticker-${this.message.id}`}
-                                 url={this.message.srcUrl}
+                <StickerFragment id={`sticker-${this.props.message.id}`}
+                                 url={this.props.message.srcUrl}
                                  w={this.width}
                                  h={this.height}/>
 
-                <MessageTimeComponent message={this.message} bg={true}/>
+                <MessageTimeComponent message={this.props.message} bg={true}/>
 
             </MessageWrapperFragment>
         )
@@ -49,17 +49,17 @@ class StickerMessageComponent extends GeneralMessageComponent {
 
     mounted() {
         super.mounted()
-        this.$sticker = this.$el.querySelector(`#sticker-${this.message.id}`)
+        this.$sticker = this.$el.querySelector(`#sticker-${this.props.message.id}`)
     }
 
     calculateSize() {
         this.width = 250
-        this.height = this.message.h ? this.message.h / this.message.w * this.width : 250
+        this.height = this.props.message.h ? this.props.message.h / this.props.message.w * this.width : 250
     }
 
     patchSticker() {
-        VRDOM.patch(this.$sticker, <StickerFragment id={`sticker-${this.message.id}`}
-                                                    url={this.message.srcUrl}
+        VRDOM.patch(this.$sticker, <StickerFragment id={`sticker-${this.props.message.id}`}
+                                                    url={this.props.message.srcUrl}
                                                     w={this.width}
                                                     h={this.height}/>)
     }
@@ -76,14 +76,14 @@ class StickerMessageComponent extends GeneralMessageComponent {
 class StickerMessageComponent extends GeneralMessageComponent {
     render() {
         return (
-            <MessageWrapperFragment message={this.message} transparent={true} noPad showUsername={false}
+            <MessageWrapperFragment message={this.props.message} transparent={true} noPad showUsername={false}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
 
-                <BetterStickerComponent isFull width={200} document={this.message.raw.media.document} onClick={() => {
+                <BetterStickerComponent isFull width={200} document={this.props.message.raw.media.document} onClick={() => {
                     VUI.Modal.open(<div>TODO: implement me!</div>)
                 }}/>
 
-                <MessageTimeComponent message={this.message} bg={true}/>
+                <MessageTimeComponent message={this.props.message} bg={true}/>
 
             </MessageWrapperFragment>
         )

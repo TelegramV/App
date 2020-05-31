@@ -37,6 +37,7 @@ import {vrdom_appendRealMany} from "../../../../V/VRDOM/append"
 import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
 import IntersectionObserver from 'intersection-observer-polyfill';
 import GroupMessage from "../../../../Api/Messages/GroupMessage"
+import vrdom_patchChildren from "../../../../V/VRDOM/patch/patchChildren"
 
 function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
@@ -221,7 +222,7 @@ class NextBubblesComponent extends StatelessComponent {
         return [];
     }
 
-    prependMessages(messages: HTMLElement[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
+    prependMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
         // messages = messages.slice().reverse();
 
         if (messages.length > 0) {
@@ -233,10 +234,10 @@ class NextBubblesComponent extends StatelessComponent {
                     console.log("[warn] prepend no after message")
                 }
                 if (beforeTopMessage && messages[0].id < beforeTopMessage.id) {
-                    console.error("prepend shit before", beforeTopMessage, messages)
+                    console.error("prepend before", beforeTopMessage, messages)
                 }
                 if (afterBottomMessage && messages[messages.length - 1].id > afterBottomMessage.id) {
-                    console.error("prepend shit after", afterBottomMessage, messages)
+                    console.error("prepend after", afterBottomMessage, messages)
                 }
             }
 
@@ -253,6 +254,42 @@ class NextBubblesComponent extends StatelessComponent {
             vrdom_prependRealMany($messages, this.bubblesInnerRef.$el);
 
             return $messages;
+        }
+
+        return [];
+    }
+
+    patchMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
+
+        if (messages.length > 0) {
+            if (!__IS_PRODUCTION__) {
+                if (!beforeTopMessage) {
+                    console.log("[warn] patch no before message")
+                }
+                if (!afterBottomMessage) {
+                    console.log("[warn] patch no after message")
+                }
+                if (beforeTopMessage && messages[0].id < beforeTopMessage.id) {
+                    console.error("patch before", beforeTopMessage, messages)
+                }
+                if (afterBottomMessage && messages[messages.length - 1].id > afterBottomMessage.id) {
+                    console.error("patch after", afterBottomMessage, messages)
+                }
+            }
+
+            const messageVRNodes = [this.renderVRMessage(messages[0], beforeTopMessage, messages[1])];
+
+            for (let i = 1; i < messages.length - 1; i++) {
+                messageVRNodes.push(this.renderVRMessage(messages[i], messages[i - 1], messages[i + 1]));
+            }
+
+            if (messages.length > 1) {
+                messageVRNodes.push(this.renderVRMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
+            }
+
+            vrdom_patchChildren(this.bubblesInnerRef.$el, {children: messageVRNodes});
+
+            return messageVRNodes;
         }
 
         return [];
@@ -471,6 +508,7 @@ class NextBubblesComponent extends StatelessComponent {
         }
 
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
+        // this.patchMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         const $message = this.$el.querySelector(`#message-${event.offset_id}`);
 

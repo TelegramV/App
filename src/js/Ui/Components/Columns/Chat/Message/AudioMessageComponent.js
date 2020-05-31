@@ -6,7 +6,7 @@ class AudioMessageComponent extends AudioComponent {
 
     constructor(props) {
         super(props);
-        let attrs = this.message.raw.media.document.attributes;
+        let attrs = this.props.message.raw.media.document.attributes;
         this.meta = {};
 
         for (const attr of attrs) {
@@ -25,7 +25,7 @@ class AudioMessageComponent extends AudioComponent {
     }
 
     addCover = () => {
-        let file = this.message.raw.media.document
+        let file = this.props.message.raw.media.document
 
         if (file.thumbs) {
             FileAPI.getThumb(file, "max").then(l => {
@@ -84,7 +84,7 @@ class AudioMessageComponent extends AudioComponent {
     }
 
     async getMeta() {
-        let file = this.message.raw.media.document
+        let file = this.props.message.raw.media.document
         let size = FileAPI.getMaxSize(file)
         let src = this.thumb;
         const minSize = 114;

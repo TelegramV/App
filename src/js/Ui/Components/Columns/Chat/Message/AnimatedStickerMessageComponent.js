@@ -5,9 +5,9 @@ import VUI from "../../../../VUI"
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 
 class AnimatedStickerMessageComponent extends GeneralMessageComponent {
-    render() {
+    render({message}) {
         return (
-            <MessageWrapperFragment message={this.message}
+            <MessageWrapperFragment message={message}
                                     transparent={true}
                                     noPad
                                     avatarRef={this.avatarRef}
@@ -15,9 +15,9 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
 
                 <BetterStickerComponent onClick={() => {
                     VUI.Modal.open(<div>TODO: implement me!</div>)
-                }} width={200} document={this.message.raw.media.document}/>
+                }} width={200} document={message.raw.media.document}/>
 
-                <MessageTimeComponent message={this.message} bg={true}/>
+                <MessageTimeComponent message={message} bg={true}/>
 
             </MessageWrapperFragment>
         )

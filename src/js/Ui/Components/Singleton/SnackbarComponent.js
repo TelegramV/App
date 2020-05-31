@@ -21,6 +21,7 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 class SnackbarComponent extends StatefulComponent {
     state = {
         snackbars: new Map(),
+        hidden: true,
     };
 
     appEvents(E: AE) {
@@ -33,7 +34,7 @@ class SnackbarComponent extends StatefulComponent {
         const {snackbars} = this.state;
 
         return (
-            <div className="snackbar-container">
+            <div css-display={this.state.hidden && "none"} className="snackbar-container">
                 {Array.from(snackbars.values()).map(snackbar => (
                     <div className={{
                         "snackbar": true,

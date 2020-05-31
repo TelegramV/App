@@ -38,7 +38,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     reactive(R) {
-        R.object(this.message)
+        R.object(this.props.message)
             .on("pollEdit", this.onPollEdit)
     }
 

@@ -148,7 +148,7 @@ export class MediaViewerComponent extends StatefulComponent {
         }
 
         return (
-            <div className={["media-viewer-wrapper", hidden ? "hidden" : ""]}>
+            <div css-display={this.state.hidden && "none"} className={["media-viewer-wrapper", hidden ? "hidden" : ""]}>
                 <div className="media-viewer" onClick={this.close}>
                     <NavigationButtonFragment onClick={this.left} hidden={!this.hasLeft() && !isLoadingPage}/>
                     <div className="header">

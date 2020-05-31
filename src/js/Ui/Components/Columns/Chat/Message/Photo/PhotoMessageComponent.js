@@ -27,21 +27,21 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     message: PhotoMessage
 
     render() {
-        const text = this.message.text.length > 0 ? <TextWrapperComponent message={this.message}/> : ""
+        const text = this.props.message.text.length > 0 ? <TextWrapperComponent message={this.props.message}/> : ""
 
         return (
-            <MessageWrapperFragment message={this.message}
+            <MessageWrapperFragment message={this.props.message}
                                     showUsername={false}
                                     outerPad={text !== ""}
                                     avatarRef={this.avatarRef}
                                     bubbleRef={this.bubbleRef}>
 
-                <BetterPhotoComponent photo={this.message.raw.media.photo}
-                                      maxWidth={this.message.text.length === 0 ? 480 : 470}
+                <BetterPhotoComponent photo={this.props.message.raw.media.photo}
+                                      maxWidth={this.props.message.text.length === 0 ? 480 : 470}
                                       maxHeight={512}
                                       onClick={this.openMediaViewer}/>
 
-                {!text && <MessageTimeComponent message={this.message} bg={true}/>}
+                {!text && <MessageTimeComponent message={this.props.message} bg={true}/>}
 
                 {text}
             </MessageWrapperFragment>
@@ -49,7 +49,7 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     }
 
     openMediaViewer = () => {
-        UIEvents.MediaViewer.fire("showMessage", {message: this.message})
+        UIEvents.MediaViewer.fire("showMessage", {message: this.props.message})
     }
 }
 

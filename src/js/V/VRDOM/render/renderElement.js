@@ -88,7 +88,7 @@ const renderElement = (node: VRNode, props: VRenderProps = {}): HTMLElement => {
     }
 
     for (let [k, v] of Object.entries(node.style)) {
-        if (v != null) {
+        if (v) {
             $el.style.setProperty(k, v)
             $el.__v.patched_styles.add(k)
         }

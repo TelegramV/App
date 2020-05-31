@@ -16,7 +16,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
 
     init() {
         super.init();
-        /*StickerManager.getDiceSet(this.message.emoji).then(set => {
+        /*StickerManager.getDiceSet(this.props.message.emoji).then(set => {
             console.log(this);
             this.setState({
                 sticker: set.documents[0]
@@ -32,7 +32,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
 
     componentDidMount() {
         super.componentDidMount()
-        StickerManager.getDice(this.message.value, this.message.emoji).then(sticker => {
+        StickerManager.getDice(this.props.message.value, this.props.message.emoji).then(sticker => {
             this.sticker = sticker
             this.forceUpdate();
         })
@@ -40,7 +40,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
 
     render() {
         return (
-            <MessageWrapperFragment message={this.message} transparent={true} noPad avatarRef={this.avatarRef}
+            <MessageWrapperFragment message={this.props.message} transparent={true} noPad avatarRef={this.avatarRef}
                                     bubbleRef={this.bubbleRef}>
 
                 {this.sticker ? 
@@ -49,7 +49,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
                     <div css-height={"200px"}/>
                 }
 
-                <MessageTimeComponent message={this.message} bg={true}/>
+                <MessageTimeComponent message={this.props.message} bg={true}/>
 
             </MessageWrapperFragment>
         )
@@ -57,7 +57,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
 
     /*onStickerLoop = (e) => {
         if (this.state.idle && e.sticker === this.state.sticker) {
-            StickerManager.getDice(this.message.value, this.message.emoji).then(sticker => {
+            StickerManager.getDice(this.props.message.value, this.props.message.emoji).then(sticker => {
                 this.setState({
                     idle: false,
                     sticker: sticker

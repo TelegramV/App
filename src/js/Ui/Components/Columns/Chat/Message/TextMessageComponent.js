@@ -5,9 +5,9 @@ import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 class TextMessageComponent extends GeneralMessageComponent {
     render() {
         return (
-            <MessageWrapperFragment message={this.message} avatarRef={this.avatarRef}
+            <MessageWrapperFragment message={this.props.message} avatarRef={this.avatarRef}
                                     bubbleRef={this.bubbleRef}>
-                <TextWrapperComponent message={this.message}/>
+                <TextWrapperComponent message={this.props.message}/>
             </MessageWrapperFragment>
         )
     }

@@ -8,13 +8,13 @@ import UIEvents from "../../../../../EventBus/UIEvents";
 class VideoMessageComponent extends GeneralMessageComponent {
 
     render() {
-        const text = (this.message.text.length > 0) ? <TextWrapperComponent message={this.message}/> : ""
+        const text = (this.props.message.text.length > 0) ? <TextWrapperComponent message={this.props.message}/> : ""
         return (
-            <MessageWrapperFragment message={this.message} noPad showUsername={false} outerPad={text !== ""}
+            <MessageWrapperFragment message={this.props.message} noPad showUsername={false} outerPad={text !== ""}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
-                <VideoComponent message={this.message} controls={false} loop={true}
-                                click={() => UIEvents.MediaViewer.fire("showMessage", {message: this.message})}/>
-                {!text ? <MessageTimeComponent message={this.message} bg={true}/> : ""}
+                <VideoComponent message={this.props.message} controls={false} loop={true}
+                                click={() => UIEvents.MediaViewer.fire("showMessage", {message: this.props.message})}/>
+                {!text ? <MessageTimeComponent message={this.props.message} bg={true}/> : ""}
                 {text}
             </MessageWrapperFragment>
         )

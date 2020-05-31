@@ -7,10 +7,10 @@ class GIFMessageComponent extends GeneralMessageComponent {
 
     render() {
         return (
-            <MessageWrapperFragment message={this.message} showUsername={false}
-                                    bubbleRef={this.bubbleRef} outerPad={this.message.text.length > 0}>
-                <VideoComponent message={this.message} autodownload autoplay controls={false} loop muted/>
-                <MessageTimeComponent message={this.message} bg={true}/>
+            <MessageWrapperFragment message={this.props.message} showUsername={false}
+                                    bubbleRef={this.bubbleRef} outerPad={this.props.message.text.length > 0}>
+                <VideoComponent message={this.props.message} autodownload autoplay controls={false} loop muted/>
+                <MessageTimeComponent message={this.props.message} bg={true}/>
             </MessageWrapperFragment>
         )
     }

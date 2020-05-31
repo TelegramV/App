@@ -242,7 +242,7 @@ export class InstantViewComponent extends StatefulComponent {
     render() {
         //console.log(this.state.page)
         return (
-            <div className={["instant-view-wrapper", this.state.hidden ? "hidden" : ""]}>
+            <div css-display={this.state.hidden && "none"} className={["instant-view-wrapper", this.state.hidden ? "hidden" : ""]}>
                 {
                     nodeIf(
                         () => <div class="container">

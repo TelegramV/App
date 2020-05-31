@@ -29,7 +29,7 @@ class ContextMenuComponent extends StatefulComponent {
         data: [],
         x: 0,
         y: 0,
-        animation: "left-top"
+        animation: "left-top",
     }
 
     init() {
@@ -38,7 +38,7 @@ class ContextMenuComponent extends StatefulComponent {
 
     render() {
         return (
-            <div className={classNames("context-menu-wrapper", classIf(this.state.hidden, "hidden"))}
+            <div css-display={this.state.hidden && "none"} className={classNames("context-menu-wrapper")}
                  onClick={this.close}
                  onContextMenu={this.close}>
 

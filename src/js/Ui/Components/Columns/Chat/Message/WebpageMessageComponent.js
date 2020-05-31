@@ -7,10 +7,10 @@ import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
 class WebpageMessageComponent extends GeneralMessageComponent {
 
     render() {
-        let webpage = this.message.raw.media.webpage;
+        let webpage = this.props.message.raw.media.webpage;
         return (
-            <MessageWrapperFragment message={this.message} showUsername={false} bubbleRef={this.bubbleRef}>
-                <TextWrapperComponent message={this.message}>
+            <MessageWrapperFragment message={this.props.message} showUsername={false} bubbleRef={this.bubbleRef}>
+                <TextWrapperComponent message={this.props.message}>
                     <a href={webpage.url} target="_blank" className="box web rp">
                         <div className="quote">
                             {webpage.photo ? <BetterPhotoComponent photo={webpage.photo}/> : ""}

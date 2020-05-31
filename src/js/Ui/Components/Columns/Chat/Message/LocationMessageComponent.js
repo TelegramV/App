@@ -6,19 +6,19 @@ import MapComponent from "./Common/MapComponent"
 class LocationMessageComponent extends GeneralMessageComponent {
 
     render() {
-        let geo = this.message.raw.media.geo;
+        let geo = this.props.message.raw.media.geo;
         let venue = "";
-        if (this.message.type === MessageType.VENUE) {
+        if (this.props.message.type === MessageType.VENUE) {
             venue = (
                 <div class="venue">
-                    <div class="title">{this.message.raw.media.title}</div>
-                    <div class="address">{this.message.raw.media.address}</div>
+                    <div class="title">{this.props.message.raw.media.title}</div>
+                    <div class="address">{this.props.message.raw.media.address}</div>
                 </div>
             )
         }
 
         return (
-            <MessageWrapperFragment message={this.message} noPad showUsername={false} bubbleRef={this.bubbleRef}>
+            <MessageWrapperFragment message={this.props.message} noPad showUsername={false} bubbleRef={this.bubbleRef}>
                 {venue}
                 <MapComponent map={geo}/>
             </MessageWrapperFragment>
