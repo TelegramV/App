@@ -8,8 +8,7 @@ const FilterWarningsPlugin = require("webpack-filter-warnings-plugin")
 const CopyWebpackPlugin = require("copy-webpack-plugin")
 const TerserPlugin = require("terser-webpack-plugin")
 const CompressionPlugin = require("compression-webpack-plugin")
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-const BabelMinifyPlugin = require("babel-minify-webpack-plugin")
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin")
 
 const __IS_PRODUCTION__ = process.argv.mode === "production" || process.argv.includes("production")
 const __IS_DEV__ = !__IS_PRODUCTION__
@@ -21,7 +20,7 @@ const config = {
     entry: "./src/js/application.js",
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: "bundle.[hash].js",
+        filename: __IS_PRODUCTION__ ? "bundle.[hash].js" : "[name].js",
     },
     module: {
         rules: [
@@ -54,17 +53,26 @@ const config = {
             {
                 test: /\.s?css/i,
                 use: [
-                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: MiniCssExtractPlugin.loader,
+                        options: {
+                            hmr: __IS_DEV__,
+                            reloadAll: true,
+                        },
+                    },
                     {
                         loader: "css-loader",
-                        query: {
-                            modules: {
-                                mode: "global",
-                                localIdentName: __IS_PRODUCTION__ ? "[hash:base64]" : "[name]__[local]",
-                                context: path.resolve(__dirname, "src/sass"),
-                            },
-                            localsConvention: "camelCase",
+                        options: {
+                            importLoaders: 2,
                         },
+                        // query: {
+                        // modules: {
+                        //     mode: "global",
+                        //     localIdentName: __IS_PRODUCTION__ ? "[hash:base64]" : "[name]__[local]",
+                        //     context: path.resolve(__dirname, "src/sass"),
+                        // },
+                        // localsConvention: "camelCase",
+                        // },
                     },
                     {
                         loader: "sass-loader",
@@ -103,9 +111,8 @@ const config = {
         }),
         // new FlowWebpackPlugin(),
         new MiniCssExtractPlugin({
-            filename: "bundle.[hash].css",
+            filename: __IS_PRODUCTION__ ? "bundle.[hash].css" : "[name].css",
             chunkFilename: "./src/sass/application.scss",
-            ignoreOrder: false,
         }),
         new HtmlWebpackPlugin({template: "./src/index.html"}),
         new CleanWebpackPlugin(),
@@ -123,18 +130,18 @@ const config = {
             threshold: 10240,
             minRatio: 0.8,
         }) : () => null,
-        // __IS_PRODUCTION__ ? new BabelMinifyPlugin() : () => null, // ламає код
+        // __IS_DEV__ ? new webpack.HotModuleReplacementPlugin({}) : () => null, // ламає код
     ],
     optimization: {
         minimize: __IS_PRODUCTION__,
-        minimizer: [new TerserPlugin()],
+        minimizer: [new TerserPlugin(), new OptimizeCSSAssetsPlugin({})],
     },
     devServer: {
         contentBase: path.join(__dirname, "dist"),
-        hot: false, // doesn't work
+        hot: true,
+        inline: true,
         port: 8090,
     },
-    devtool: __IS_DEV__ && "inline-source-map",
 }
 
 module.exports = config

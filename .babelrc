@@ -6,7 +6,9 @@
         "modules": false,
         "exclude": [
           "babel-plugin-transform-exponentiation-operator"
-        ]
+        ],
+        "useBuiltIns": "entry",
+        "corejs": "3"
       }
     ]
   ],
