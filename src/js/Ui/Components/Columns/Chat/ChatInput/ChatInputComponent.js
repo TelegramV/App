@@ -173,7 +173,7 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     appendText = (text) => {
-        this.textarea.textContent += text
+        this.textarea.textContent = this.text + text;
         this.chatInputTextareaRef.component.onInput();
     }
 
@@ -181,13 +181,15 @@ export class ChatInputComponent extends StatelessComponent {
         let sel, range;
         if (window.getSelection) {
             sel = window.getSelection();
-            if (sel.getRangeAt && sel.rangeCount) {
-                range = sel.getRangeAt(0);
-                range.deleteContents();
-                range.insertNode( document.createTextNode(text) );
+            if(sel.baseNode.parentElement === this.textarea) {
+                if (sel.getRangeAt && sel.rangeCount) {
+                    range = sel.getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode( document.createTextNode(text) );
+                }
+            } else { //no selection inside our input
+                this.appendText(text);
             }
-        } else if (document.selection && document.selection.createRange) {
-            document.selection.createRange().text = text;
         }
         this.chatInputTextareaRef.component.onInput();
     }
