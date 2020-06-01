@@ -21,7 +21,7 @@
 
 if (!Blob.prototype.arrayBuffer) {
     Blob.prototype.arrayBuffer = function () {
-        return new Promise<ArrayBuffer>((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const fileReader = new FileReader();
 
             fileReader.onload = event => {

@@ -16,8 +16,7 @@ export class ArchivedDialogsBar extends LeftBarComponent {
 
     render() {
         return (
-            <div className="archived settings sidebar hidden">
-                <div className="settings-main">
+            <div className="archived sidebar hidden">
                     <div className="sidebar-header no-borders">
                         <BurgerAndBackComponent/>
                         {/*<i className="btn-icon tgico tgico-back" onClick={_ => this.openBar("dialogs")}/>*/}
@@ -25,7 +24,6 @@ export class ArchivedDialogsBar extends LeftBarComponent {
                     </div>
 
                     <ArchivedDialogListComponent/>
-                </div>
             </div>
         )
     }

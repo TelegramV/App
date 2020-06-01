@@ -19,22 +19,21 @@ export default class ComposerComponent extends StatelessComponent {
     render() {
         return (
             <div class="composer" onMouseEnter={this.props.mouseEnter} onMouseLeave={this.props.mouseLeave}>
-                <div className="tab-selector">
-                    <div data-tab-name="emoji" className="item rp rps selected" onClick={this.onClickOpenEmoji}>
-                        <span>Emoji</span>
-                    </div>
-                    <div data-tab-name="stickers" className="item rp rps" onClick={this.onClickOpenStickers}>
-                        <span>Stickers</span>
-                    </div>
-                    <div data-tab-name="gif" className="item rp rps" onClick={this.onClickOpenGif}>
-                        <span>GIFs</span>
-                    </div>
-                </div>
-
                 <div class="content">
                     <EmojiComposerComponent/>
                     <StickersComposerComponent/>
                     <GifsComposerComponent/>
+                </div>
+                <div className="composer-tab-selector">
+                    <div data-tab-name="emoji" className="item rp rps selected" onClick={this.onClickOpenEmoji}>
+                        <i class="tgico tgico-smile"/>
+                    </div>
+                    <div data-tab-name="stickers" className="item rp rps" onClick={this.onClickOpenStickers}>
+                        <i class="tgico tgico-stickers"/>
+                    </div>
+                    <div data-tab-name="gif" className="item rp rps" onClick={this.onClickOpenGif}>
+                        <i class="tgico tgico-gifs"/>
+                    </div>
                 </div>
             </div>
         )
@@ -48,15 +47,26 @@ export default class ComposerComponent extends StatelessComponent {
 
     show = () => {
         this.$el.classList.add("visible");
+        this.visible = true;
         this.onShow();
     }
 
     hide = () => {
         this.$el.classList.remove("visible");
+        this.visible = false;
         this.onHide();
     }
 
+    toggle = (show) => {
+        if(!show || this.visible) {
+            this.hide();
+        } else {
+            this.show();
+        }
+    }
+
     onHide = () => {
+        window.document.getElementById("chat").classList.remove("composer-opened");
         this.$stickersPanel.querySelector(".selected").childNodes.forEach(node => {
             if (node.id) {
                 lottie.pause(node.id);
@@ -71,6 +81,8 @@ export default class ComposerComponent extends StatelessComponent {
     }
 
     onShow = () => {
+        window.document.getElementById("chat").classList.add("composer-opened");
+
         if (!this.paused) {
             return;
         }
@@ -87,11 +99,11 @@ export default class ComposerComponent extends StatelessComponent {
             return;
         }
 
-        this.$el.querySelector(".tab-selector").childNodes.forEach($node => {
+        this.$el.querySelector(".composer-tab-selector").childNodes.forEach($node => {
             $node.classList.remove("selected");
         });
 
-        this.$el.querySelector(`.tab-selector > [data-tab-name=${name}]`).classList.add("selected");
+        this.$el.querySelector(`.composer-tab-selector > [data-tab-name=${name}]`).classList.add("selected");
 
         this.$emojiPanel.classList.add("hidden");
         this.$gifPanel.classList.add("hidden");

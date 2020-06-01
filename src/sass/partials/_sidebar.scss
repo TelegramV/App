@@ -356,8 +356,7 @@
 
             .avatar {
                 align-self: center;
-                width: 120px;
-                height: 120px;
+                --avatar-size: 120px;
             }
 
             .username {

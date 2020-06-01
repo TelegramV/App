@@ -11,7 +11,7 @@
         display: flex;
         align-items: flex-end;
 
-        .input-and-keyboard-wrapper {
+        /*.input-and-keyboard-wrapper {
             display: flex;
             flex-direction: column;
             width: 100%;
@@ -22,6 +22,18 @@
             .keyboard-markup {
                 margin-top: 0;
             }
+        }*/
+
+        .input-row {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+        }
+
+        .input-column {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
         }
 
         .input-field-wrapper {
