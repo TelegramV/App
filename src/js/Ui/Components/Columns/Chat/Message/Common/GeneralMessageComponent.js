@@ -4,6 +4,9 @@ import type {Message} from "../../../../../../Api/Messages/Message"
 import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 import __component_destroy from "../../../../../../V/VRDOM/component/__component_destroy"
 import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulComponent"
+import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer"
+import {ServiceMessage} from "../../../../../../Api/Messages/Objects/ServiceMessage"
+import {isGrouping} from "../../VirtualizedBubblesComponent"
 
 class GeneralMessageComponent extends StatefulComponent {
     message: Message
@@ -104,6 +107,31 @@ class GeneralMessageComponent extends StatefulComponent {
 
     onElementHidden() {
         // console.log("hidden", this)
+    }
+
+    domSiblingUpdated(prevMessage, nextMessage) {
+        const message = this.props.message;
+        const isOut = !message.isPost && message.isOut;
+        const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
+
+        message.hideAvatar = true;
+
+        let prevCurr = isGrouping(prevMessage, message);
+        let currNext = isGrouping(message, nextMessage);
+        if (!prevCurr && currNext) {
+            message.tailsGroup = "s";
+        } else if (!currNext) {
+            if (!prevCurr) {
+                message.tailsGroup = "se";
+            } else {
+                message.tailsGroup = "e";
+            }
+            if (!isOut) message.hideAvatar = false;
+        } else {
+            message.tailsGroup = "m";
+        }
+
+        this.forceUpdate();
     }
 }
 

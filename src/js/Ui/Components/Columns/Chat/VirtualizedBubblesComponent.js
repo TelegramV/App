@@ -43,6 +43,14 @@ function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
 }
 
+export function isGrouping(one: Message, two: Message) {
+    if (!one || !two || one.type === MessageType.GROUP || two.type === MessageType.GROUP) return false;
+    return (!(one.type instanceof ServiceMessage) && !(two.type instanceof ServiceMessage))
+        && (one.isPost || one.isOut === two.isOut)
+        && (one.from.id === two.from.id)
+        && (Math.abs(one.date - two.date) < 5 * 60);
+}
+
 // there is no possibility nor time to calculate each message size
 class VirtualizedBubblesComponent extends StatelessComponent {
     bubblesInnerRef = VComponent.createRef();
@@ -112,10 +120,10 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.style.visibility = "visible";
-                entry.target.__v.component.onElementVisible.call(entry.target.__v.component);
+                entry.target.__v?.component.onElementVisible.call(entry.target.__v.component);
             } else {
                 entry.target.style.visibility = "hidden";
-                entry.target.__v.component.onElementHidden.call(entry.target.__v.component);
+                entry.target.__v?.component.onElementHidden.call(entry.target.__v.component);
             }
         })
     }
@@ -130,8 +138,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         message.hideAvatar = true;
 
-        let prevCurr = this._isGrouping(prevMessage, message);
-        let currNext = this._isGrouping(message, nextMessage);
+        let prevCurr = isGrouping(prevMessage, message);
+        let currNext = isGrouping(message, nextMessage);
         if (!prevCurr && currNext) {
             message.tailsGroup = "s";
         } else if (!currNext) {
@@ -146,14 +154,6 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         }
 
         return <MessageComponent observer={this.observer} message={message}/>;
-    }
-
-    _isGrouping(one: Message, two: Message) {
-        if (!one || !two || one.type === MessageType.GROUP || two.type === MessageType.GROUP) return false;
-        return (!(one.type instanceof ServiceMessage) && !(two.type instanceof ServiceMessage))
-            && (one.isPost || one.isOut === two.isOut)
-            && (one.from.id === two.from.id)
-            && (Math.abs(one.date - two.date) < 5 * 60);
     }
 
     cleanupTree = () => {
@@ -216,6 +216,13 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
+            // this.bubblesInnerRef.$el.lastElementChild?.__v.component.domSiblingUpdated
+            //     .call(
+            //         this.bubblesInnerRef.$el.lastElementChild?.__v.component,
+            //         this.bubblesInnerRef.$el.lastElementChild.previousElementSibling?.__v.component.props.message,
+            //         messages[messages.length - 1],
+            //     );
+
             vrdom_appendRealMany($messages.reverse(), this.bubblesInnerRef.$el)
 
             return $messages;
@@ -252,6 +259,13 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             if (messages.length > 1) {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
+
+            this.bubblesInnerRef.$el.firstElementChild.__v.component.domSiblingUpdated
+                .call(
+                    this.bubblesInnerRef.$el.firstElementChild.__v.component,
+                    this.bubblesInnerRef.$el.firstElementChild.nextElementSibling.__v.component.props.message,
+                    messages[0],
+                );
 
             vrdom_prependRealMany($messages, this.bubblesInnerRef.$el);
 
@@ -372,7 +386,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         this.mainVirtual.messages = [...event.messages, ...this.mainVirtual.messages];
         this.currentVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
         const vbp = this.mainVirtual.veryBottomPage();
-        this.appendMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.messages[0]);
+        this.appendMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.getVeryBottomOne());
         this.scrollBottom();
         this.isLoadingRecent = false;
     }
@@ -381,6 +395,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         const message = event.message;
 
         if (this.virtual_isCompletelyBottom()) {
+            const afterMessage = this.mainVirtual.getVeryBottomOne();
+
             this.mainVirtual.messages.push(message);
 
             const {scrollTop, scrollHeight, clientHeight} = this.$el;
@@ -393,7 +409,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
             this.mainVirtual.veryBottomPage();
 
-            this.prependMessages([message], this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
+            this.prependMessages([message], afterMessage, null);
 
             if (isAtBottom) {
                 this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
