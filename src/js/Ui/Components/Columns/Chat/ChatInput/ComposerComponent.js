@@ -6,6 +6,7 @@ import StickersComposerComponent from "./StickersComposerComponent"
 import EmojiComposerComponent from "./EmojiComposerComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import GifsComposerComponent from "./GifsComposerComponent"
+import {ChatInputManager} from "./ChatInputComponent"
 
 export default class ComposerComponent extends StatelessComponent {
     identifier = "composer";
@@ -25,6 +26,8 @@ export default class ComposerComponent extends StatelessComponent {
                     <GifsComposerComponent/>
                 </div>
                 <div className="composer-tab-selector">
+                    <div class="filler"/>
+                    <div class="filler"/>
                     <div data-tab-name="emoji" className="item rp rps selected" onClick={this.onClickOpenEmoji}>
                         <i class="tgico tgico-smile"/>
                     </div>
@@ -33,6 +36,10 @@ export default class ComposerComponent extends StatelessComponent {
                     </div>
                     <div data-tab-name="gif" className="item rp rps" onClick={this.onClickOpenGif}>
                         <i class="tgico tgico-gifs"/>
+                    </div>
+                    <div class="filler"/>
+                    <div className="item rp rps" onClick={this.onBackspaceClick}>
+                        <i class="tgico tgico-deleteleft"/>
                     </div>
                 </div>
             </div>
@@ -130,10 +137,7 @@ export default class ComposerComponent extends StatelessComponent {
         this.togglePanel("gif");
     }
 
-    _gifClick = (ev) => {
-        let ref = ev.currentTarget.getAttribute("data-component-id");
-        if (!ref) return;
-        let gif = VApp.mountedComponents.get(ref).props.object;
-        AppSelectedChat.Current.api.sendExistingMedia(gif);
+    onBackspaceClick = () => {
+        ChatInputManager.backspace();
     }
 }

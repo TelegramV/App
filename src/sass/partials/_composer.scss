@@ -63,6 +63,10 @@
                 color: $blue;
             }
         }
+
+        .filler {
+            flex-grow: 1;
+        }
     }
 
     .emoji-wrapper,
@@ -203,6 +207,7 @@
             height: 100%;
             display: flex;
             flex-wrap: wrap;
+            overflow-x: hidden;
 
             .masonry-item {
                 flex: 1 0 auto;

@@ -169,7 +169,6 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     insertAtCaret = (text) => {
-        console.log(text)
         let sel, range;
         if (window.getSelection) {
             sel = window.getSelection();
@@ -179,6 +178,28 @@ export class ChatInputComponent extends StatelessComponent {
                 range.insertNode( document.createTextNode(text) );
             } else { //no selection inside our input
                 this.appendText(text);
+            }
+        }
+        this.chatInputTextareaRef.component.onInput();
+    }
+
+    backspace = () => { //BUGGY!!!, REWRITE THIS
+        let sel, range;
+        if (window.getSelection) {
+            sel = window.getSelection();
+            if((sel.baseNode?.parentElement === this.textarea || sel.baseNode === this.textarea)
+                && sel.getRangeAt && sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                if(range.collapsed) { //no selection
+                    if(range.startOffset > 0) {
+                        let nr = new Range();
+                        nr.setStart(range.startContainer, range.startOffset-1);
+                        nr.setEnd(range.endContainer, range.endOffset);
+                        range = nr;
+                    }
+                }
+                //console.log(range);
+                range.deleteContents();
             }
         }
         this.chatInputTextareaRef.component.onInput();
@@ -540,6 +561,8 @@ export class ChatInputComponent extends StatelessComponent {
         this.closeReply()
         this.textarea.innerHTML = ""
         this.updateSendButton()
+
+        this.chatInputTextareaRef.component.onInput(); //trigger to close suggestion
     }
 
     focus = () => {
