@@ -41,7 +41,7 @@ class BetterPhotoComponent extends StatefulComponent {
     }
 
     render({photo, onClick, maxWidth, maxHeight}, {url, thumbnailUrl, width, height}) {
-        const isLoading = FileManager.isPending(photo.id);
+        const isLoading = FileManager.isPending(photo);
 
         return (
             <figure className={["photo", isLoading ? "thumbnail" : ""]} onClick={onClick}>

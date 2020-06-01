@@ -22,7 +22,7 @@ class VirtualMessages {
     // oldest first
     messages: Message[] = [];
 
-    size = 60;
+    size = 100;
     edgeSize = this.size / 2;
 
     currentPage = [];

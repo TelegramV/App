@@ -21,7 +21,7 @@ export class Photo extends ReactiveObject {
     }
 
     get loading() {
-        return FileManager.isPending(this.fileId)
+        return FileManager.isPendingById(this.fileId)
     }
 
     get srcUrl() {

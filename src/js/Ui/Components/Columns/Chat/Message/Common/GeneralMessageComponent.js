@@ -97,6 +97,14 @@ class GeneralMessageComponent extends StatefulComponent {
             }
         }
     }
+
+    onElementVisible() {
+        // console.log("visible", this)
+    }
+
+    onElementHidden() {
+        // console.log("hidden", this)
+    }
 }
 
 export default GeneralMessageComponent

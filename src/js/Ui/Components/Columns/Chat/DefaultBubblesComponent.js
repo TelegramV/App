@@ -43,8 +43,7 @@ function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
 }
 
-// there is no possibility nor time to calculate each message size
-class NextBubblesComponent extends StatelessComponent {
+class DefaultBubblesComponent extends StatelessComponent {
     bubblesInnerRef = VComponent.createRef();
 
     isLoadingRecent = false;
@@ -111,9 +110,11 @@ class NextBubblesComponent extends StatelessComponent {
     onIntersection = (entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.visibility = "visible"
+                entry.target.style.visibility = "visible";
+                entry.target.__v.component.onElementVisible.call(entry.target.__v.component);
             } else {
-                entry.target.style.visibility = "hidden"
+                entry.target.style.visibility = "hidden";
+                entry.target.__v.component.onElementHidden.call(entry.target.__v.component);
             }
         })
     }
@@ -426,7 +427,7 @@ class NextBubblesComponent extends StatelessComponent {
 
                     $message = this.$el.querySelector(`#message-${message.id}`);
                 } else {
-                    const peer = AppSelectedChat.Current;
+                    const peer = AppSelectedChat.current;
 
                     const actionCount = (++this.actionCount);
 
@@ -451,7 +452,8 @@ class NextBubblesComponent extends StatelessComponent {
                 console.warn("No message to scroll found.")
             }
         } else {
-            const peer = AppSelectedChat.Current;
+            console.log('NO SELECT!!!', event)
+            const peer = AppSelectedChat.current;
 
             AppSelectedChat.select(message.to);
 
@@ -473,13 +475,14 @@ class NextBubblesComponent extends StatelessComponent {
     }
 
     onChatShowMessageReady = event => {
-        if (this.isLoadingRecent) {
-            return;
-        }
+        console.log('SHIWWWWWWW', event)
+        // if (this.isLoadingRecent) {
+        //     return;
+        // }
 
-        if (this.actionCount > event.actionCount) {
-            return;
-        }
+        // if (this.actionCount > event.actionCount) {
+        //     return;
+        // }
 
         this.cleanupTree();
         this.secondVirtual.refresh();
@@ -513,14 +516,16 @@ class NextBubblesComponent extends StatelessComponent {
         const $message = this.$el.querySelector(`#message-${event.offset_id}`);
 
         if ($message) {
+            // this.isBlockingScroll = true;
             scrollToAndHighlight(this.$el, $message);
+            // this.isBlockingScroll = false;
         } else {
             console.error("BUG: no message found to scroll");
         }
     }
 
     virtual_onScrolledTop = () => {
-        if (this.isLoadingRecent) {
+        if (this.isLoadingRecent || this.isBlockingScroll) {
             return;
         }
 
@@ -553,27 +558,33 @@ class NextBubblesComponent extends StatelessComponent {
 
         const messages = this.currentVirtual.nextTop();
 
-        if (this.currentVirtual.currentPage.length > messages.length) {
-            for (let i = 0; i < messages.length; i++) {
-                vrdom_delete(this.bubblesInnerRef.$el.firstChild);
-            }
-        }
+        // if (this.currentVirtual.currentPage.length > messages.length) {
+        //     for (let i = 0; i < messages.length; i++) {
+        //         vrdom_delete(this.bubblesInnerRef.$el.firstChild);
+        //     }
+        // }
+
+        const z = this.$el.scrollTop
+        const k = this.bubblesInnerRef.$el.clientHeight
 
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
-
-        this.dev_checkTree();
-
-        if (this.$el.scrollTop === 0) {
-            let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
-
-            if ($first) {
-                if ($first.previousElementSibling) {
-                    this.$el.scrollTop = $first.previousElementSibling.offsetTop;
-                } else {
-                    this.$el.scrollTop = $first.offsetTop;
-                }
-            }
+        if(this.$el.scrollTop === 0) {
+            this.$el.scrollTop = z + this.bubblesInnerRef.$el.clientHeight - k
         }
+
+        // this.dev_checkTree();
+
+        // if (this.$el.scrollTop === 0) {
+        //     let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
+        //
+        //     if ($first) {
+        //         if ($first.nextElementSibling) {
+        //             this.$el.scrollTop = $first.nextElementSibling.offsetTop;
+        //         } else {
+        //             this.$el.scrollTop = $first.offsetTop;
+        //         }
+        //     }
+        // }
     }
 
     onTopPageMessagesReady = (event) => {
@@ -601,6 +612,7 @@ class NextBubblesComponent extends StatelessComponent {
     }
 
     virtual_onScrolledBottom = () => {
+        return
         if (this.isLoadingRecent) {
             return;
         }
@@ -699,4 +711,4 @@ class NextBubblesComponent extends StatelessComponent {
     }
 }
 
-export default NextBubblesComponent;
+export default DefaultBubblesComponent;

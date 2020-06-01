@@ -16,7 +16,7 @@ class DialogInfoDocumentComponent extends StatelessComponent {
     }
 
     render({document}) {
-        const isDownloading = FileManager.isPending(document.id);
+        const isDownloading = FileManager.isPending(document);
         const isDownloaded = FileManager.isDownloaded(document);
 
         const title = DocumentMessagesTool.getFilename(document.attributes);

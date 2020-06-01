@@ -18,7 +18,7 @@
 function scrollToAndHighlight($container: HTMLElement, $el: HTMLElement) {
     $container.scrollTo({
         top: $el.offsetTop + ($el.clientHeight / 2 - $container.clientHeight / 2),
-        behavior: "smooth"
+        // behavior: "smooth"
     })
 
     $el.classList.add("highlightmessage");

@@ -23,9 +23,10 @@ import UIEvents from "../../../EventBus/UIEvents"
 import VComponent from "../../../../V/VRDOM/component/VComponent"
 import VApp from "../../../../V/vapp"
 import VSpinner from "../../Elements/VSpinner"
-import NextBubblesComponent from "./NextBubblesComponent"
+import VirtualizedBubblesComponent from "./VirtualizedBubblesComponent"
 import ChatInfoCallButtonComponent from "./ChatInfo/ChatInfoCallButtonComponent";
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
+import DefaultBubblesComponent from "./DefaultBubblesComponent"
 
 /**
  * CRITICAL: never rerender this component!
@@ -78,7 +79,8 @@ class ChatComponent extends StatelessComponent {
                               show={true}
                               background={true}/>
 
-                    <NextBubblesComponent loaderRef={this.messagesLoaderRef}/>
+                    <VirtualizedBubblesComponent loaderRef={this.messagesLoaderRef}/>
+                    {/*<DefaultBubblesComponent loaderRef={this.messagesLoaderRef}/>*/}
 
                     {/*<BubblesComponent loaderRef={this.messagesLoaderRef}/>*/}
                     <ChatInputComponent ref={this.chatInputRef}/>

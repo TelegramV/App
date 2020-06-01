@@ -6,7 +6,11 @@ class FilesManager {
     pending = new Map()
     downloaded: Map<string, { blob: Blob; url: string; }> = new Map()
 
-    isPending(fileId) {
+    isPending(file) {
+        return this.pending.has(file.id)
+    }
+
+    isPendingById(fileId) {
         return this.pending.has(fileId)
     }
 

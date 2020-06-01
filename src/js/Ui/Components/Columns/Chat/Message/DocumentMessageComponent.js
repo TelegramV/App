@@ -59,7 +59,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         const title = DocumentMessagesTool.getFilename(document.attributes);
         const ext = title.split(".")[title.split(".").length - 1];
 
-        const isDownloading = FileManager.isPending(document.id);
+        const isDownloading = FileManager.isPending(document);
         const isDownloaded = FileManager.isDownloadedById(document.id);
         const percentage = FileManager.getPercentage(document.id);
         const pendingSize = FileManager.getPendingSize(document.id);
@@ -96,7 +96,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
 
         if (FileManager.isDownloaded(document)) {
             FileManager.save(document.id, DocumentParser.attributeFilename(document))
-        } else if (!FileManager.isPending(document.id)) {
+        } else if (!FileManager.isPending(document)) {
             FileManager.downloadDocument(document)
         } else {
             FileManager.cancel(document)
