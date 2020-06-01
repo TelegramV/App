@@ -1,8 +1,8 @@
 import MessageWrapperFragment from "./MessageWrapperFragment"
 import TextWrapperComponent from "./TextWrapperComponent";
 import GeneralMessageComponent from "./GeneralMessageComponent"
-import { FileAPI } from "../../../../../../Api/Files/FileAPI"
-import { formatAudioTime } from "../../../../../Utils/utils"
+import {FileAPI} from "../../../../../../Api/Files/FileAPI"
+import {formatAudioTime} from "../../../../../Utils/utils"
 import AudioManager from "../../../../../Managers/AudioManager"
 
 class AudioComponent extends GeneralMessageComponent {
@@ -65,7 +65,7 @@ class AudioComponent extends GeneralMessageComponent {
 
     /*Don't forget to super to this method!*/
     componentWillUnmount() {
-        if(this.progressEl) this.progressEl.removeEventListener("mousemove", this._handleMove.bind(this));
+        if (this.progressEl) this.progressEl.removeEventListener("mousemove", this._handleMove.bind(this));
         if (this.audio) {
             this.audio.removeEventListener("timeupdate", this._audioTimeUpdate.bind(this));
             this.audio.removeEventListener("ended", this._playButtonClick.bind(this));

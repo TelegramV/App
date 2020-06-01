@@ -17,7 +17,7 @@ class DialogInfoDocumentComponent extends StatelessComponent {
 
     render({document}) {
         const isDownloading = FileManager.isPending(document.id);
-        const isDownloaded = FileManager.isDownloaded(document.id);
+        const isDownloaded = FileManager.isDownloaded(document);
 
         const title = DocumentMessagesTool.getFilename(document.attributes);
         const ext = title.split(".")[title.split(".").length - 1];
@@ -72,7 +72,7 @@ class DialogInfoDocumentComponent extends StatelessComponent {
     }
 
     componentWillMount(props) {
-        if (!FileManager.isDownloaded(this.props.document.id)) {
+        if (!FileManager.isDownloaded(this.props.document)) {
             FileManager.checkCache(this.props.document);
         }
     }
@@ -80,12 +80,12 @@ class DialogInfoDocumentComponent extends StatelessComponent {
     downloadDocument = () => {
         const document = this.props.document;
 
-        if (FileManager.isDownloaded(document.id)) {
+        if (FileManager.isDownloaded(document)) {
             FileManager.save(document.id, DocumentParser.attributeFilename(document))
-        } else if (!FileManager.isPending(document.id)) {
+        } else if (!FileManager.isPending(document)) {
             FileManager.downloadDocument(document)
         } else {
-            FileManager.cancel(document.id)
+            FileManager.cancel(document)
         }
     }
 }

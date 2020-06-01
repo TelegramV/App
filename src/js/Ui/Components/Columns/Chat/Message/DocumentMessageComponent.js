@@ -60,7 +60,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         const ext = title.split(".")[title.split(".").length - 1];
 
         const isDownloading = FileManager.isPending(document.id);
-        const isDownloaded = FileManager.isDownloaded(document.id);
+        const isDownloaded = FileManager.isDownloadedById(document.id);
         const percentage = FileManager.getPercentage(document.id);
         const pendingSize = FileManager.getPendingSize(document.id);
 
@@ -86,7 +86,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
     }
 
     componentWillMount(props) {
-        if (!FileManager.isDownloaded(this.props.message.raw.media.document.id)) {
+        if (!FileManager.isDownloaded(this.props.message.raw.media.document)) {
             FileManager.checkCache(this.props.message.raw.media.document);
         }
     }
@@ -94,12 +94,12 @@ class DocumentMessageComponent extends GeneralMessageComponent {
     downloadDocument = () => {
         const document = this.props.message.raw.media.document;
 
-        if (FileManager.isDownloaded(document.id)) {
+        if (FileManager.isDownloaded(document)) {
             FileManager.save(document.id, DocumentParser.attributeFilename(document))
         } else if (!FileManager.isPending(document.id)) {
             FileManager.downloadDocument(document)
         } else {
-            FileManager.cancel(document.id)
+            FileManager.cancel(document)
         }
     }
 }

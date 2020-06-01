@@ -47,7 +47,7 @@ class BetterPhotoComponent extends StatefulComponent {
             <figure className={["photo", isLoading ? "thumbnail" : ""]} onClick={onClick}>
                 {
                     !isLoading ?
-                        <PhotoFragment url={FileManager.get(photo.id).url}
+                        <PhotoFragment url={FileManager.get(photo).url}
                                        width={width}
                                        height={height}
                                        maxWidth={maxWidth || width}

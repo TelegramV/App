@@ -21,6 +21,8 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import FileManager from "../../../Api/Files/FileManager"
 import AppEvents from "../../../Api/EventBus/AppEvents"
 import VComponent from "../../../V/VRDOM/component/VComponent"
+import DocumentParser from "../../../Api/Files/DocumentParser"
+import AudioPlayer from "../../../Api/Audio/AudioPlayer"
 
 let FILE;
 
@@ -81,83 +83,81 @@ FILE = {
     }, {"_": "documentAttributeFilename", "file_name": "The Rasmus - In the Shadows.mp3"}]
 }
 
-// FILE = {
-//     "_": "document",
-//     "flags": 1,
-//     "id": "5337189815303540256",
-//     "access_hash": "1049044396251195175",
-//     "file_reference": [
-//         2,
-//         83,
-//         126,
-//         31,
-//         130,
-//         0,
-//         0,
-//         0,
-//         2,
-//         94,
-//         213,
-//         34,
-//         123,
-//         159,
-//         173,
-//         233,
-//         249,
-//         109,
-//         140,
-//         100,
-//         112,
-//         86,
-//         72,
-//         199,
-//         221,
-//         30,
-//         27,
-//         53,
-//         42
-//     ],
-//     "date": 1589755173,
-//     "mime_type": "audio/mp4",
-//     "size": 115524833,
-//     "thumbs": [{
-//         "_": "photoSize",
-//         "type": "m",
-//         "location": {"_": "fileLocationToBeDeprecated", "volume_id": "200058900584", "local_id": 881},
-//         "w": 320,
-//         "h": 240,
-//         "size": 25152
-//     }],
-//     "dc_id": 2,
-//     "attributes": [{
-//         "_": "documentAttributeAudio",
-//         "flags": 3,
-//         "duration": 7269,
-//         "title": "Я, «ПОБЕДА» І БЕРЛІН - Кузьма Скрябін (Андрій Кузьменко) | Аудіокнига",
-//         "performer": "Аудіокнига.UA"
-//     }, {
-//         "_": "documentAttributeFilename",
-//         "file_name": "АудіокнигаUA_Я_ПОБЕДА_І_БЕРЛІН_Кузьма_Скрябін_Андрій_Кузьменко_Аудіокнига.m4a"
-//     }]
-// }
+let BOOK = {
+    "_": "document",
+    "flags": 1,
+    "id": "5337189815303540256",
+    "access_hash": "1049044396251195175",
+    "file_reference": [
+        2,
+        83,
+        126,
+        31,
+        130,
+        0,
+        0,
+        0,
+        2,
+        94,
+        213,
+        34,
+        123,
+        159,
+        173,
+        233,
+        249,
+        109,
+        140,
+        100,
+        112,
+        86,
+        72,
+        199,
+        221,
+        30,
+        27,
+        53,
+        42
+    ],
+    "date": 1589755173,
+    "mime_type": "audio/mp4",
+    "size": 115524833,
+    "thumbs": [{
+        "_": "photoSize",
+        "type": "m",
+        "location": {"_": "fileLocationToBeDeprecated", "volume_id": "200058900584", "local_id": 881},
+        "w": 320,
+        "h": 240,
+        "size": 25152
+    }],
+    "dc_id": 2,
+    "attributes": [{
+        "_": "documentAttributeAudio",
+        "flags": 3,
+        "duration": 7269,
+        "title": "Я, «ПОБЕДА» І БЕРЛІН - Кузьма Скрябін (Андрій Кузьменко) | Аудіокнига",
+        "performer": "Аудіокнига.UA"
+    }, {
+        "_": "documentAttributeFilename",
+        "file_name": "АудіокнигаUA_Я_ПОБЕДА_І_БЕРЛІН_Кузьма_Скрябін_Андрій_Кузьменко_Аудіокнига.m4a"
+    }]
+}
 
-class Streaming extends StatefulComponent {
+class StreamableAudioComponent extends StatefulComponent {
     state = {
         mediaSource: null,
+        sourceBuffer: null,
         url: null,
         bufferedSize: 0,
+        queue: [],
     }
-
-    queue = []
 
     audioRef = VComponent.createRef()
 
     appEvents(E: AE) {
         E.bus(AppEvents.Files)
-            .filter(event => event.file.id === FILE.id)
-            // .updateOn("download.start")
+            .filter(event => event.file.id === this.props.document.id)
             .on("download.done", this.onDownloadDone)
-            // .on("download.canceled")
             .on("download.newPart", this.onDownloadNewPart)
     }
 
@@ -165,53 +165,108 @@ class Streaming extends StatefulComponent {
         return <audio ref={this.audioRef} src={url} {...args}/>
     }
 
-    componentDidMount() {
-        const mediaSource = new MediaSource();
+    componentWillMount() {
+        const {document} = this.props;
 
-        this.state.mediaSource = mediaSource;
-        this.state.url = URL.createObjectURL(this.state.mediaSource)
 
-        mediaSource.onsourceopen = () => {
-            const sourceBuffer = mediaSource.addSourceBuffer(FILE.mime_type === "audio/mp4" ? 'audio/mp4; codecs="mp4a.40.2"' : FILE.mime_type);
-            mediaSource.duration = FILE.attributes[0].duration;
+        if (FileManager.isDownloaded(document)) {
+            this.state.url = FileManager.get(document).url;
+        } else {
+            const mediaSource = new MediaSource();
 
-            sourceBuffer.addEventListener("updateend", () => {
-                if (this.queue.length) {
-                    sourceBuffer.appendBuffer(this.queue.shift());
-                }
-            });
+            this.state.mediaSource = mediaSource;
+            this.state.url = URL.createObjectURL(this.state.mediaSource);
 
-            FileManager.downloadDocument(FILE);
+            mediaSource.onsourceopen = () => {
+                const sourceBuffer = mediaSource.addSourceBuffer(document.mime_type === "audio/mp4" ? 'audio/mp4; codecs="mp4a.40.2"' : document.mime_type);
+                mediaSource.duration = DocumentParser.attributeAudio(document)?.duration;
+                this.state.sourceBuffer = sourceBuffer;
+
+                sourceBuffer.addEventListener("updateend", () => {
+                    if (this.state.queue.length) {
+                        sourceBuffer.appendBuffer(this.state.queue.shift());
+                    }
+                });
+
+                FileManager.downloadDocument(document);
+            }
         }
     }
 
     onDownloadNewPart = ({newBytes}) => {
-        if (!this.state.buffer.updating) {
-            this.state.buffer.appendBuffer(event.newBytes);
+        if (!this.state.sourceBuffer.updating) {
+            this.state.sourceBuffer.appendBuffer(newBytes);
         } else {
-            this.queue.push(newBytes)
+            this.state.queue.push(newBytes)
         }
 
         this.state.bufferedSize += newBytes.length;
     }
 
-    onDownloadDone = ({file}) => {
-        file.blob.arrayBuffer().then(buff => {
+    onDownloadDone = ({blob}) => {
+        blob.arrayBuffer().then(buff => {
             const lastPart = buff.slice(this.state.bufferedSize);
 
-            if (!this.state.buffer.updating) {
-                this.state.buffer.appendBuffer(lastPart);
+            if (!this.state.sourceBuffer.updating) {
+                this.state.sourceBuffer.appendBuffer(lastPart);
             } else {
-                this.queue.push(lastPart)
+                this.state.queue.push(lastPart)
             }
         });
+    }
+}
+
+class AAAA extends StatefulComponent {
+    state = {
+        document: FILE
+    }
+
+    appEvents(E) {
+        E.bus(AppEvents.General)
+            .updateOn("audio.play")
+            .updateOn("audio.paused")
+            .updateOn("audio.loading")
+            .updateOn("audio.buffered")
+    }
+
+    render(props, {document}) {
+        return (
+            <div>
+                {/*<StreamableAudioComponent document={document} controls/>*/}
+                {/*<br/>*/}
+                {/*{document === FILE ? "BOOK" : "FILE"}*/}
+                {/*<br/>*/}
+                {/*<button onClick={() => {*/}
+                {/*    this.setState({*/}
+                {/*        document: document === FILE ? BOOK : FILE*/}
+                {/*    });*/}
+                {/*}}>toggle*/}
+                {/*</button>*/}
+
+                {AudioPlayer.state.buffered}
+
+                <button onClick={() => {
+                    AudioPlayer.toggle(document)
+                }}>
+                    {this.buttonText}
+                </button>
+            </div>
+        )
+    }
+
+    get buttonText() {
+        if (AudioPlayer.isPaused() || !AudioPlayer.isCurrent(document)) {
+            return AudioPlayer.isLoading() ? "loading" : "play"
+        } else {
+            return "pause"
+        }
     }
 }
 
 export function StreamingPage() {
     return (
         <div>
-            <Streaming controls/>
+            <AAAA/>
         </div>
     )
 }

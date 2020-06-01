@@ -17,7 +17,7 @@ export class Photo extends ReactiveObject {
     }
 
     get loaded() {
-        return FileManager.isDownloaded(this.fileId)
+        return FileManager.isDownloadedById(this.fileId)
     }
 
     get loading() {
