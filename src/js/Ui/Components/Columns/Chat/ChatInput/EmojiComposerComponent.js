@@ -38,13 +38,6 @@ class EmojiComposerComponent extends StatelessComponent {
     render(props) {
         return (
             <div className="emoji-wrapper">
-                <div className="emoji-table">
-                    <div id={`composer-emoji-panel-recent`} className={`recent scrollable`} data-category={'recent'}/>
-                    {this.emojiCategories.slice(1).map(category => (
-                        <div id={`composer-emoji-panel-${category.name}`} className={`${category.name} scrollable`}
-                             data-category={category.name}/>
-                    ))}
-                </div>
                 <div className="emoji-types">
                     {this.emojiCategories.map(category => (
                         <div className="rp rps emoji-type-item"
@@ -52,6 +45,13 @@ class EmojiComposerComponent extends StatelessComponent {
                              onClick={this.onClickSwitchEmojiCategory}>
                             <i className={`tgico tgico-${category.icon}`}/>
                         </div>
+                    ))}
+                </div>
+                <div className="emoji-table">
+                    <div id={`composer-emoji-panel-recent`} className={`recent scrollable`} data-category={'recent'}/>
+                    {this.emojiCategories.slice(1).map(category => (
+                        <div id={`composer-emoji-panel-${category.name}`} className={`${category.name} scrollable`}
+                             data-category={category.name}/>
                     ))}
                 </div>
             </div>

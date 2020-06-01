@@ -67,7 +67,8 @@ export class Folders extends StatefulComponent {
             "folder-list": true,
             "tab-selector": true,
             "hidden": !FoldersManager.hasFolders(),
-            "horizontal-scroll": true
+            "scrollable-x": true,
+            "hide-scroll": true
         }}>
             {/*<BurgerAndBackComponent isMain/>*/}
 

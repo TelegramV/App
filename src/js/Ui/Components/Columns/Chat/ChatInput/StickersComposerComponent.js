@@ -55,15 +55,15 @@ class StickersComposerComponent extends StatelessComponent {
     render(props) {
         return (
             <div className="sticker-wrapper hidden">
-                <div ref={this.stickersTableRef} className="sticker-table">
-                    <div id="composer-sticker-pack-recent" className="selected scrollable"/>
-                </div>
-                <div ref={this.stickerPacksRef} className="sticker-packs">
+                <div ref={this.stickerPacksRef} className="sticker-packs scrollable-x hide-scroll">
                     <div id="composer-pack-thumb-recent"
                          className="rp sticker-packs-item selected"
                          onClick={this.openRecent}>
                         <i className="tgico tgico-sending"/>
                     </div>
+                </div>
+                <div ref={this.stickersTableRef} className="sticker-table">
+                    <div id="composer-sticker-pack-recent" className="selected scrollable"/>
                 </div>
             </div>
         )
