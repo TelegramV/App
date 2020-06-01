@@ -27,18 +27,18 @@ class AudioMessageComponent extends AudioComponent {
     addCover = () => {
         let file = this.props.message.raw.media.document
 
-        if (file.thumbs) {
-            FileAPI.getThumb(file, "max").then(l => {
-                if (this.__.destroyed) return;
-                // Tint
-                this.$el.querySelector(".play").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${l})`
+        console.log(file)
 
+        if (file.thumbs) {
+            this.assure(FileAPI.getThumb(file, "max")).then(url => {
                 // uncomment these to make bg cover
-                // this.$el.querySelector(".bubble").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.9)), url(${l})`
-                // this.$el.querySelector(".bubble").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${l})`
+                this.$el.querySelector(".play").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${url})`
+
+                // this.$el.querySelector(".bubble").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.9)), url(${url})`
+                // this.$el.querySelector(".bubble").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${url})`
                 // this.$el.querySelector(".message").style.backdropFilter = 'blur(20px)'
 
-                this.thumb = l
+                this.thumb = url
             })
         }
 

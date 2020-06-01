@@ -7,7 +7,7 @@
 
 .thumbnail3px {
     > img {
-        filter: blur(3px);
+        filter: blur(3px) brightness(50%);
         transform: scale(1.2);
     }
 }

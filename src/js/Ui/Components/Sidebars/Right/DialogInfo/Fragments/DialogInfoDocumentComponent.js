@@ -3,6 +3,7 @@ import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessCom
 import FileManager from "../../../../../../Api/Files/FileManager"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import {FileAPI} from "../../../../../../Api/Files/FileAPI"
+import DocumentParser from "../../../../../../Api/Files/DocumentParser"
 
 class DialogInfoDocumentComponent extends StatelessComponent {
     appEvents(E: AE) {
@@ -80,7 +81,7 @@ class DialogInfoDocumentComponent extends StatelessComponent {
         const document = this.props.document;
 
         if (FileManager.isDownloaded(document.id)) {
-            FileManager.save(document.id, DocumentMessagesTool.getFilename(document.attributes))
+            FileManager.save(document.id, DocumentParser.attributeFilename(document))
         } else if (!FileManager.isPending(document.id)) {
             FileManager.downloadDocument(document)
         } else {

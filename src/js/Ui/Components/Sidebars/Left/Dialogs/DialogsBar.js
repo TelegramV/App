@@ -5,15 +5,12 @@ import ConnectionStatusComponent from "./ConnectionStatusComponent"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import LeftBarComponent from "../LeftBarComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
-import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent"
-import GeneralDialogListComponent from "./Lists/GeneralDialogListComponent"
 import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
 import VSimpleLazyInput from "../../../../Elements/Input/VSimpleLazyInput"
 import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 import PeersStore from "../../../../../Api/Store/PeersStore"
 import {DialogListsComponent} from "./DialogListsComponent";
-import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
 import {Folders} from "./Folders";
 
@@ -157,8 +154,6 @@ export class DialogsBar extends LeftBarComponent {
 
         E.bus(AppEvents.General)
             .on("selectFolder", this.onFolderSelect)
-
-        E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
 
         E.bus(UIEvents.LeftSidebar)
@@ -172,12 +167,9 @@ export class DialogsBar extends LeftBarComponent {
 
     onFolderSelect = _ => {
         this.dialogsWrapperRef.$el.scrollTop = 0
-        setTimeout(l => {
-            // console.log(this.$el.querySelector(".dialog-lists").clientHeight, "VS", this.$el.clientHeight)
-            if(this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
-                this.loadNextPage()
-            }
-        }, 0)
+        if (this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
+            this.loadNextPage()
+        }
     }
 
     onChatSelect = _ => {
@@ -189,7 +181,7 @@ export class DialogsBar extends LeftBarComponent {
     }
 
     onBackPressed = (event) => {
-        if(event.id === "search") {
+        if (event.id === "search") {
             this._searchBackClick()
         }
     }
@@ -219,11 +211,6 @@ export class DialogsBar extends LeftBarComponent {
     barOnHide = () => {
     }
 
-    /**
-     * Handles dialogs scroll. If at the bottom, then gets next page of dialogs.
-     * @param event
-     * @private
-     */
     _scrollHandler = (event) => {
         const $element = event.target
 
@@ -233,16 +220,14 @@ export class DialogsBar extends LeftBarComponent {
     }
 
     loadNextPage() {
-        if(this.isLoadingMore) return
+        if (this.isLoadingMore) return
         this.isLoadingMore = true
-        // console.log("STARTED LOADING NEW PAGE")
 
         DialogsManager.fetchNextPage({}).then(() => {
             this.isLoadingMore = false
-            // console.log("STOPPED LOADING NEW PAGE")
-            if(this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
-                this.loadNextPage()
-            }
+            // if (this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
+            //     this.loadNextPage()
+            // }
         })
     }
 

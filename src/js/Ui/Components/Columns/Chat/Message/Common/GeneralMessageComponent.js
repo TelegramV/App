@@ -13,20 +13,14 @@ class GeneralMessageComponent extends StatefulComponent {
     avatarRef = VComponent.createComponentRef()
     bubbleRef = VComponent.createRef()
 
-    constructor(props) {
-        super(props)
-
-        this.message = this.props.message
-    }
-
     appEvents(E) {
         E.bus(AppEvents.General)
-            .filter(event => event.message && event.message.id === this.message.id)
+            .filter(event => event.message && event.message.id === this.props.message.id)
             .on("messages.deleted", this.onMessageDeleted)
             .on("messages.edited", this.onMessageEdited)
 
         E.bus(AppEvents.General)
-            .filter(event => event.message && event.message.dialogPeer === this.message.dialogPeer)
+            .filter(event => event.message && event.message.dialogPeer === this.props.message.dialogPeer)
             .on("messages.read", this.onMessagesRead)
 
 
@@ -38,7 +32,7 @@ class GeneralMessageComponent extends StatefulComponent {
     }
 
     reactive(R) {
-        R.object(this.message)
+        R.object(this.props.message)
             .on("edit", this.messageOnEdit)
             .on("replyToMessageFound", this.messageOnReplyFound)
             .on("replyToMessageNotFound", this.messageOnReplyNotFound)
@@ -47,7 +41,7 @@ class GeneralMessageComponent extends StatefulComponent {
     }
 
     componentDidMount() {
-        this.message.show()
+        this.props.message.show()
 
         if (this.props.observer) {
             this.props.observer.observe(this.$el)
@@ -60,18 +54,14 @@ class GeneralMessageComponent extends StatefulComponent {
         }
     }
 
-    componentWillUpdate(nextProps, nextState) {
-        this.message = nextProps.message
-    }
-
     onMessagesDeleteEvent = (event: BusEvent) => {
-        if (event.messages.indexOf(this.message.id) > -1) {
+        if (event.messages.indexOf(this.props.message.id) > -1) {
             this.messageOnDelete()
         }
     }
 
     onReadOutboxMaxId = (event: BusEvent) => {
-        if (this.message.id <= this.message.to.messages.readOutboxMaxId && this.message.isOut) {
+        if (this.props.message.id <= this.props.message.to.messages.readOutboxMaxId && this.props.message.isOut) {
             this.messageOnRead()
         }
     }
@@ -89,8 +79,8 @@ class GeneralMessageComponent extends StatefulComponent {
     }
 
     messageOnEdit = event => {
-        if (event.message === this.message) {
-            this.message.show()
+        if (event.message === this.props.message) {
+            this.props.message.show()
             this.forceUpdate()
         }
     }
@@ -101,7 +91,7 @@ class GeneralMessageComponent extends StatefulComponent {
 
     messageOnRead = () => {
         if (this.bubbleRef.$el) {
-            if (this.message.isRead && !this.bubbleRef.$el.classList.contains("read")) {
+            if (this.props.message.isRead && !this.bubbleRef.$el.classList.contains("read")) {
                 this.bubbleRef.$el.classList.add("read")
                 this.bubbleRef.$el.classList.remove("sent")
             }

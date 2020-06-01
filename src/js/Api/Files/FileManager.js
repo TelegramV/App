@@ -15,7 +15,7 @@ class FilesManager {
     }
 
     getPercentage(fileId) {
-        return this.pending.get(fileId)?._percentage ?? 0
+        return this.pending.get(fileId)?._percentage ?? 100
     }
 
     getPendingSize(fileId) {
@@ -78,8 +78,10 @@ class FilesManager {
     }
 
     downloadDocument(document, thumb): Promise<Blob> | any {
-        if (this.downloaded.has(document.id)) {
-            const downloaded = this.downloaded.get(document.id);
+        const id = thumb ? `${document.id}_${thumb.id}` : document.id;
+
+        if (this.downloaded.has(id)) {
+            const downloaded = this.downloaded.get(id);
 
             AppEvents.Files.fire("download.done", {
                 file: document,
@@ -90,8 +92,8 @@ class FilesManager {
             return Promise.resolve(downloaded);
         }
 
-        if (this.pending.has(document.id)) {
-            return this.pending.get(document.id)._promise;
+        if (this.pending.has(id)) {
+            return this.pending.get(id)._promise;
         }
 
         this.internal_downloadStart(document);
@@ -104,6 +106,7 @@ class FilesManager {
         file._percentage = 100;
 
         const downloaded = {
+            id: file.id,
             blob,
             url: URL.createObjectURL(blob),
         };
@@ -119,7 +122,7 @@ class FilesManager {
 
         file._promise = Promise.resolve(downloaded);
 
-        return blob;
+        return downloaded;
     }
 
     internal_downloadStart(file) {

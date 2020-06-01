@@ -74,7 +74,7 @@ class WallpaperManagerSingleton {
     }
 
     async requestFull(wallpaper) {
-        return FileManager.downloadDocument(wallpaper.document).then(async blob => {
+        return FileManager.downloadDocument(wallpaper.document).then(async ({blob}) => {
             if(wallpaper.pattern) {
                 let type = "png";
                 let typeAttr = wallpaper.document.attributes.find(attr => attr._ =="documentAttributeFilename");

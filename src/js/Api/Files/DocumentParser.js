@@ -17,22 +17,14 @@
  *
  */
 
-// WARNING: DO NOT IMPORT ANYTHING HERE, BECAUSE IT ALSO IMPORTED IN WORKER
+class DocumentParser {
+    static attributeFilename(document) {
+        return document.attributes?.find(attr => attr._ === "documentAttributeFilename")?.file_name;
+    }
 
-if (!Blob.prototype.arrayBuffer) {
-    Blob.prototype.arrayBuffer = function () {
-        return new Promise((resolve, reject) => {
-            const fileReader = new FileReader();
-
-            fileReader.onload = event => {
-                resolve(event.target.result);
-            }
-
-            fileReader.onerror = error => {
-                reject(error)
-            }
-
-            fileReader.readAsArrayBuffer(this);
-        })
+    static attributeAudio(document) {
+        return document.attributes?.find(attr => attr._ === "documentAttributeAudio");
     }
 }
+
+export default DocumentParser;

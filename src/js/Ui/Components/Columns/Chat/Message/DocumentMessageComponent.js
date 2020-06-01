@@ -5,6 +5,7 @@ import CardMessageWrapperFragment from "./Common/CardMessageWrapperFragment"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import VSpinner from "../../../Elements/VSpinner";
 import {FileAPI} from "../../../../../Api/Files/FileAPI"
+import DocumentParser from "../../../../../Api/Files/DocumentParser"
 
 const IconFragment = ({document, isDownloading, isDownloaded, color, ext, progress = 0.0}) => {
     return (
@@ -94,7 +95,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         const document = this.props.message.raw.media.document;
 
         if (FileManager.isDownloaded(document.id)) {
-            FileManager.save(document.id, DocumentMessagesTool.getFilename(document.attributes))
+            FileManager.save(document.id, DocumentParser.attributeFilename(document))
         } else if (!FileManager.isPending(document.id)) {
             FileManager.downloadDocument(document)
         } else {
