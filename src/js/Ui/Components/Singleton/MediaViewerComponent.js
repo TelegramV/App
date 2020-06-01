@@ -150,7 +150,6 @@ export class MediaViewerComponent extends StatefulComponent {
         return (
             <div css-display={this.state.hidden && "none"} className={["media-viewer-wrapper", hidden ? "hidden" : ""]}>
                 <div className="media-viewer" onClick={this.close}>
-                    <NavigationButtonFragment onClick={this.left} hidden={!this.hasLeft() && !isLoadingPage}/>
                     <div className="header">
                         <div className="left" onClick={event => {
                             event.stopPropagation();
@@ -194,11 +193,16 @@ export class MediaViewerComponent extends StatefulComponent {
                             <i className="tgico tgico-close rp rps"/>
                         </div>
                     </div>
-                    <div className="media" onClick={this.onMediaClick}>
-                        <MediaFragment media={message} zoom={zoom} hidden={hidden}/>
+                    <div class="content-wrapper">
+                        <NavigationButtonFragment onClick={this.left} hidden={!this.hasLeft() && !isLoadingPage}/>
+                            <div class="content">
+                                <div className="media" onClick={this.onMediaClick}>
+                                    <MediaFragment media={message} zoom={zoom} hidden={hidden}/>
+                                </div>
+                                <div className="caption">{text}</div>
+                            </div>
+                        <NavigationButtonFragment onClick={this.right} isNext hidden={!this.hasRight() && !isLoadingPage}/>
                     </div>
-                    <div className="caption">{text}</div>
-                    <NavigationButtonFragment onClick={this.right} isNext hidden={!this.hasRight() && !isLoadingPage}/>
                 </div>
             </div>
         )
