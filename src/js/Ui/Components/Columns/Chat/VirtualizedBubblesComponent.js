@@ -20,7 +20,6 @@ import AppSelectedChat from "../../../Reactive/SelectedChat"
 import UIEvents from "../../../EventBus/UIEvents"
 import AppEvents from "../../../../Api/EventBus/AppEvents"
 import MessageComponent from "./MessageComponent"
-import {UserPeer} from "../../../../Api/Peers/Objects/UserPeer"
 import {ServiceMessage} from "../../../../Api/Messages/Objects/ServiceMessage"
 import type {Message} from "../../../../Api/Messages/Message"
 import {MessageType} from "../../../../Api/Messages/Message"
@@ -83,9 +82,13 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             .on("messages.nextBottomPageDownloaded", this.onBottomPageMessagesReady)
             .on("chat.showMessageReady", this.onChatShowMessageReady);
 
-        E.bus(AppEvents.Dialogs)
-            .filter(event => AppSelectedChat.check(event.dialog.peer))
-            .on("newMessage", this.onNewMessage);
+        // E.bus(AppEvents.Dialogs)
+        //     .filter(event => AppSelectedChat.check(event.dialog.peer))
+        //     .on("newMessage", this.onNewMessage);
+
+        E.bus(AppEvents.Peers)
+            .filter(event => AppSelectedChat.check(event.peer))
+            .on("messages.new", this.onNewMessage);
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
@@ -134,7 +137,6 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     renderVRMessage = (message: Message, prevMessage: Message = null, nextMessage: Message = null): HTMLElement => {
         const isOut = !message.isPost && message.isOut;
-        const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
 
         message.hideAvatar = true;
 
@@ -186,7 +188,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         // messages = messages.slice().reverse();
 
         if (messages.length > 0) {
-            if (!__IS_PRODUCTION__) {
+            if (__IS_DEV__) {
                 if (!beforeTopMessage) {
                     console.log("[warn] append no before message")
                 }
@@ -235,7 +237,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         // messages = messages.slice().reverse();
 
         if (messages.length > 0) {
-            if (!__IS_PRODUCTION__) {
+            if (__IS_DEV__) {
                 if (!beforeTopMessage) {
                     console.log("[warn] prepend no before message")
                 }

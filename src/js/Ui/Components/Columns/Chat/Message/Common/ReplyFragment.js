@@ -1,6 +1,6 @@
-export const ReplyFragment = ({id, name = null, text = null, show = false, onClick}) => {
+export const ReplyFragment = ({name = null, text = null, show = false, onClick}) => {
     return (
-        <div id={id} className="reply box rp" css-display={show ? "" : "none"} onClick={onClick}>
+        <div className="reply box rp" css-display={show ? "" : "none"} onClick={onClick}>
             <div className="quote">
                 <div className={{
                     "name": true,

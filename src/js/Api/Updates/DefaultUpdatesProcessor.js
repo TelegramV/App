@@ -62,33 +62,32 @@ export class DefaultUpdatesProcessor extends UpdatesProcessor {
     }
 
     processWithValidation(queue: UpdatesQueue, rawUpdate, pts) {
-        checkUpdatePts(this.updatesManager.State.pts, rawUpdate, {
-            onSuccess: (type) => {
-                if (type === this.updatesManager.UPDATE_CAN_BE_APPLIED) {
-                    this.updatesManager.State.pts = rawUpdate.pts
-                    this.applyUpdate(rawUpdate)
-                } else if (type === this.updatesManager.UPDATE_HAS_NO_PTS) {
-                    this.applyUpdate(rawUpdate)
-                }
+        const type = checkUpdatePts(this.updatesManager.State.pts, rawUpdate);
 
+        if (type) {
+            if (type === this.updatesManager.UPDATE_CAN_BE_APPLIED) {
+                this.updatesManager.State.pts = rawUpdate.pts
+                this.applyUpdate(rawUpdate)
+            } else if (type === this.updatesManager.UPDATE_HAS_NO_PTS) {
+                this.applyUpdate(rawUpdate)
+            }
+
+            this.queue.isProcessing = false
+            this.processQueue(this.queue)
+        } else {
+            this.latestDifferenceTime = MTProto.TimeManager.now(true)
+            this.queue.isWaitingForDifference = true
+            this.queue.isProcessing = false
+
+            this.getDifference(this.updatesManager.State).then(rawDifference => {
+                this.processDifference(rawDifference)
+            }).catch(e => {
+                console.error("[default] BUG: difference obtaining failed", e)
+                this.queue.isWaitingForDifference = false
                 this.queue.isProcessing = false
                 this.processQueue(this.queue)
-            },
-            onFail: (type) => {
-                this.latestDifferenceTime = MTProto.TimeManager.now(true)
-                this.queue.isWaitingForDifference = true
-                this.queue.isProcessing = false
-
-                this.getDifference(this.updatesManager.State).then(rawDifference => {
-                    this.processDifference(rawDifference)
-                }).catch(e => {
-                    console.error("[default] BUG: difference obtaining failed", e)
-                    this.queue.isWaitingForDifference = false
-                    this.queue.isProcessing = false
-                    this.processQueue(this.queue)
-                })
-            }
-        })
+            })
+        }
     }
 
     processDifference(rawDifference) {
@@ -196,6 +195,26 @@ export class DefaultUpdatesProcessor extends UpdatesProcessor {
             })
         } else {
             console.error("BUG: invalid difference constructor")
+        }
+    }
+
+    processAffectedMessages(affectedMessages) {
+        const type = checkUpdatePts(this.updatesManager.State.pts, affectedMessages);
+
+        if (type) {
+            return true;
+        } else {
+            console.log("affected messages fail")
+            this.latestDifferenceTime = MTProto.TimeManager.now(true)
+            this.queue.isWaitingForDifference = true
+
+            this.getDifference(this.updatesManager.State).then(rawDifference => {
+                this.processDifference(rawDifference)
+            }).catch(e => {
+                console.error("[default] BUG: difference obtaining failed", e)
+                this.queue.isWaitingForDifference = false
+                this.processQueue(this.queue)
+            })
         }
     }
 

@@ -61,6 +61,10 @@ class MessageManager extends Manager {
         peer.dialog.fire("newMessage", {
             message
         })
+
+        peer.fire("messages.new", {
+            message,
+        })
     }
 
     getFromPeerMessage(rawMessage) {
