@@ -13,7 +13,8 @@ class AvatarComponent extends StatelessComponent {
 
     render() {
         return <AvatarFragment peer={this.props.peer}
-                               saved={this.props.saved} onClick={this.props.onClick}/>
+                               saved={this.props.saved}
+                               onClick={this.props.onClick}/>
     }
 }
 

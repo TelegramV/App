@@ -1,12 +1,13 @@
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import CardMessageWrapperFragment from "./Common/CardMessageWrapperFragment"
-import AvatarFragment from "../../../Basic/AvatarFragment"
+import AvatarComponent from "../../../Basic/AvatarComponent"
 
 class ContactMessageComponent extends GeneralMessageComponent {
     //TODO clickable photo and phone formatting
     render({message}) {
         return (
-            <CardMessageWrapperFragment message={message} icon={<AvatarFragment peer={message.contact}/>}
+            <CardMessageWrapperFragment message={message}
+                                        icon={<AvatarComponent peer={message.contact}/>}
                                         title={message.raw.media.first_name + (message.raw.media.last_name ? (" " + message.raw.media.last_name) : "")}
                                         description={message.raw.media.phone_number}
                                         bubbleRef={this.bubbleRef}/>

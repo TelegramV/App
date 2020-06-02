@@ -7,21 +7,15 @@ import PeersStore from "../../Store/PeersStore"
 export class ContactMessage extends AbstractMessage {
 
     type = MessageType.CONTACT
-    peer = undefined;
+    peer = null;
 
-    show() {
-        super.show()
-    }
+    _contact = null;
 
     get contact() {
-    	return this.peer;
-    }
+        if (!this._contact) {
+            this._contact = PeersStore.get("user", this.raw.media.user_id);
+        }
 
-    fillRaw(raw: Object): ContactMessage {
-    	super.fillRaw(raw);
-
-    	this.peer = PeersStore.get("user", raw.media.user_id);
-
-    	return this;
+        return this._contact;
     }
 }
