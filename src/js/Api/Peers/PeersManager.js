@@ -15,21 +15,18 @@
  *
  */
 
-import {Manager} from "../Manager";
 import PeersStore from "../Store/PeersStore"
 import PeerFactory from "./PeerFactory"
 
-class PeerManager extends Manager {
-    constructor() {
-        super()
-    }
+class PeerManager {
+    initialized = false
 
     init() {
-        if (this._inited) {
+        if (this.initialized) {
             return Promise.resolve()
         }
 
-        this._inited = true
+        this.initialized = true
     }
 
     _findMessageByUser(messages, peer) {
@@ -131,11 +128,6 @@ class PeerManager extends Manager {
         } else {
             const peer = PeerFactory.fromRaw(rawPeer)
             PeersStore.set(peer)
-
-            peer.fire("updateSingle", {
-                peer
-            })
-
             return peer
         }
     }

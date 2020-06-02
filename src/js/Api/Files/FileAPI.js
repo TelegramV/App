@@ -7,7 +7,6 @@ import {getInputPeerFromPeer} from "../Dialogs/util"
 import Random from "../../MTProto/Utils/Random"
 
 class DownloadCanceledException {
-
 }
 
 export class FileAPI {

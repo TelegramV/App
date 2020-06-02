@@ -5,6 +5,7 @@ import {MessageFactory} from "../Messages/MessageFactory"
 import API from "../Telegram/API"
 import GroupMessage from "../Messages/GroupMessage"
 
+// бля це треба переписати а мені так впадло(((((((((9(
 export class PeerMessages {
 
     peer: Peer = undefined
@@ -28,15 +29,6 @@ export class PeerMessages {
 
     isDownloadingRecent = false;
 
-    /**
-     * @param {Peer} peer
-     * @param {Message[]} messages
-     * @param unreadCount
-     * @param unreadMark
-     * @param unreadMentionsCount
-     * @param readOutboxMaxId
-     * @param readInboxMaxId
-     */
     constructor(peer, messages = [], {
         unreadCount = 0,
         unreadMentionsCount = 0,

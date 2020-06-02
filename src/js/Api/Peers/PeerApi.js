@@ -22,40 +22,6 @@ export class PeerApi {
         this.peer = peer
     }
 
-    /**
-     * @param props
-     * @return {Promise<Message[]>}
-     */
-    async getHistory(props = {offset_id: 0, limit: 100}, addUnread = false) {
-        const Messages = await MTProto.invokeMethod("messages.getHistory", {
-            peer: this.peer.inputPeer,
-            offset_id: props.offset_id,
-            offset_date: props.offset_date || 0,
-            add_offset: props.add_offset || 0,
-            limit: props.limit || 50,
-            max_id: props.max_id || 0,
-            min_id: props.min_id || 0,
-            hash: props.hash || 0
-        })
-
-
-        if (Messages._ === "messages.channelMessages") {
-            if (this.peer.dialog) {
-                this.peer.dialog.pts = Messages.pts
-            }
-        }
-
-        PeersManager.fillPeersFromUpdate(Messages)
-
-        const messages = this.peer.messages.putRawMessages(Messages.messages.filter(m => m._ !== "messageEmpty"))
-
-        messages.forEach(message => {
-            message.init()
-        })
-
-        return messages
-    }
-
     fetchParticipants(offset, limit = 33) {
         if (this.peer.type === "channel") {
             return MTProto.invokeMethod("channels.getParticipants", {
@@ -281,17 +247,5 @@ export class PeerApi {
         }).then(response => {
             MTProto.UpdatesManager.process(response)
         })
-    }
-
-    deleteMessages(id) {
-        if (this.peer.type === "channel") {
-            return MTProto.invokeMethod("channels.deleteMessages", {
-                channel: this.peer.inputChannel,
-                id: id
-            })
-        } else {
-
-        }
-
     }
 }
