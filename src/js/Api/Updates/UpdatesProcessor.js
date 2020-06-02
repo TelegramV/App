@@ -20,20 +20,18 @@ export function hasUpdatePtsCount(rawUpdate) {
 /**
  * @param {number} pts
  * @param rawUpdate
- * @param onSuccess
- * @param onFail
  */
-export function checkUpdatePts(pts, rawUpdate, {onSuccess, onFail}) {
+export function checkUpdatePts(pts, rawUpdate) {
     if (hasUpdatePts(rawUpdate) && hasUpdatePtsCount(rawUpdate)) {
         if ((pts + rawUpdate.pts_count) === rawUpdate.pts) {
-            onSuccess(MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED)
+            return MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED;
         } else if ((pts + rawUpdate.pts_count) > rawUpdate.pts) {
-            onSuccess(MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED)
+            return MTProto.UpdatesManager.UPDATE_WAS_ALREADY_APPLIED
         } else {
-            onFail(MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED)
+            return MTProto.UpdatesManager.UPDATE_CANNOT_BE_APPLIED
         }
     } else {
-        onSuccess(MTProto.UpdatesManager.UPDATE_HAS_NO_PTS)
+        return MTProto.UpdatesManager.UPDATE_HAS_NO_PTS
     }
 }
 

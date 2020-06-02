@@ -1,9 +1,9 @@
 import MTProto from "../../MTProto/External"
 import PeersManager from "../Peers/PeersManager"
-import type {getDialogs_Params_105} from "./types"
 import {Peer} from "../Peers/Objects/Peer"
+import UpdatesManager from "../Updates/UpdatesManager"
 
-function getDialogs(params: getDialogs_Params_105 = {}) {
+function getDialogs(params = {}) {
     return MTProto.invokeMethod("messages.getDialogs", {
         exclude_pinned: params.exclude_pinned || false,
         folder_id: params.folder_id || 0,
@@ -98,6 +98,32 @@ function getStickerSet(props) {
     return MTProto.invokeMethod("messages.getStickerSet", props)
 }
 
+function deleteMessages(id: number[], revoke = true) {
+    return MTProto.invokeMethod("messages.deleteMessages", {
+        revoke,
+        id,
+    }).then(affectedMessages => {
+        if (UpdatesManager.defaultUpdatesProcessor.processAffectedMessages(affectedMessages)) {
+            UpdatesManager.defaultUpdatesProcessor.enqueue({
+                ...affectedMessages,
+                messages: id,
+                _: "updateDeleteMessages",
+            });
+        }
+
+        return affectedMessages
+    })
+}
+
+function updatePinnedMessage(message) {
+    return MTProto.invokeMethod("messages.updatePinnedMessage", {
+        peer: message.dialogPeer.inputPeer,
+        id: message.isPinned ? -1 : message.id,
+    }).then(updates => {
+        UpdatesManager.process(updates)
+    })
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
@@ -108,6 +134,8 @@ const messages = {
     getRecentStickers: getRecentStickers,
     getSavedGifs: getSavedGifs,
     getStickerSet: getStickerSet,
+    deleteMessages: deleteMessages,
+    updatePinnedMessage: updatePinnedMessage,
 }
 
 export default messages

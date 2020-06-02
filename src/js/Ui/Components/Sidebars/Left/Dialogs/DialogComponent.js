@@ -52,7 +52,7 @@ export class DialogComponent extends StatelessComponent {
             .on("updateUnreadMark", this.onDialogUnreadMark)
             .on("updateReadInboxMaxId", this.onDialogReadHistory)
             .on("updateReadOutboxMaxId", this.onDialogReadHistory)
-            .on("newMessage", this.onDialogNewMessage)
+            // .on("newMessage", this.onDialogNewMessage)
             .on("editMessage", this.onDialogEditMessage)
             .on("updateSingle", this.onDialogUpdateSingle)
             .on("updatePinned", this.onDialogUpdatePinned)
@@ -64,6 +64,7 @@ export class DialogComponent extends StatelessComponent {
             .on("deleteMessages", this.onDialogDeleteMessage)
 
         R.object(this.dialog.peer)
+            .on("messages.new", this.onDialogNewMessage)
             .on("updatePhoto", this.onPeerUpdatePhoto)
             .on("updatePhotoSmall", this.onPeerUpdatePhoto)
             .on("updateUserStatus", this.onPeerUpdateUserStatus)

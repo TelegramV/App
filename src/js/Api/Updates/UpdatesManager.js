@@ -47,10 +47,10 @@ export class UpdateManager extends Manager {
 
         this._State = {}
 
-        this.UPDATE_CAN_BE_APPLIED = 0
-        this.UPDATE_WAS_ALREADY_APPLIED = 1
-        this.UPDATE_CANNOT_BE_APPLIED = -1
-        this.UPDATE_HAS_NO_PTS = 2
+        this.UPDATE_CANNOT_BE_APPLIED = 0
+        this.UPDATE_CAN_BE_APPLIED = 1
+        this.UPDATE_WAS_ALREADY_APPLIED = 2
+        this.UPDATE_HAS_NO_PTS = 3
 
         this.channelUpdatesProcessor = new ChannelsUpdateProcessor(this)
         this.defaultUpdatesProcessor = new DefaultUpdatesProcessor(this)
