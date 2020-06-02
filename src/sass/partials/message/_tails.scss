@@ -2,10 +2,6 @@
     $out: $in==false;
 
     & {
-        & ~ .inline-keyboard {
-            margin-left: 11px;
-        }
-
         padding-right: 5px;
     }
 
@@ -40,6 +36,10 @@
                 margin-right: -5px;
             }
 
+            & ~ .inline-keyboard {
+	            margin-left: 11px;
+	        }
+
             .box {
                 figure.photo, figure.video {
                     margin-left: 0px; //embed
@@ -65,6 +65,9 @@
         }
 
         &.group-m {
+        }
+
+        &.group-s, &.group-m {
             figure.round {
                 margin-left: 0px;
 
@@ -122,6 +125,10 @@
             padding-left: 10px;
             padding-right: 10px;
 
+            & ~ .inline-keyboard {
+	            margin-right: 11px;
+	        }
+
             figure.photo, figure.video {
                 margin-left: -10px;
                 margin-right: -10px;
@@ -136,6 +143,9 @@
         }
 
         &.group-m {
+        }
+
+        &.group-s, &.group-m {
             figure.round {
                 margin-right: 0px;
             }
@@ -157,10 +167,9 @@
             margin-right: 0;
             padding-right: 21px;
 
-            &~.inline-keyboard {
+            /*&~.inline-keyboard {
                 margin-right: 11px;
-            }
-
+            }*/
             &.no-pad {
                 padding-right: 0;
                 padding-left: 0;

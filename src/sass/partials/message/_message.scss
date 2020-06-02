@@ -9,7 +9,7 @@
     .channel {
         &.message {
             grid-template-columns: min-content 1fr;
-            .avatar {
+            & > .avatar {
                 display: none;
             }
         }
@@ -55,7 +55,7 @@
         &.out {
             justify-content: end;
 
-            .avatar {
+            & > .avatar {
                 display: none; //idk how it was done before
             }
         }

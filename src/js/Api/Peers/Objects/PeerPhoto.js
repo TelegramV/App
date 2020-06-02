@@ -61,10 +61,6 @@ export class PeerPhoto {
         this._photoSmallUrl = smallUrl
 
         this._peer.fire("updatePhotoSmall")
-
-        AppEvents.Peers.fire("updatePhotoSmall", {
-            peer: this._peer
-        })
     }
 
     /**
@@ -97,10 +93,6 @@ export class PeerPhoto {
         this._photoBigUrl = bigUrl
 
         this._peer.fire("updatePhotoBig")
-
-        AppEvents.Peers.fire("updatePhotoBig", {
-            peer: this._peer
-        })
     }
 
     /**
@@ -156,7 +148,7 @@ export class PeerPhoto {
 
         return FileAPI.getPeerPhoto(this._photoSmall, this._dcId, this._peer, false).then(url => {
             this._isFetchingSmall = false
-
+            
             return this.smallUrl = url
         })
     }

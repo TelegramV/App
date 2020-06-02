@@ -7,8 +7,8 @@ class AvatarComponent extends StatelessComponent {
     appEvents(E) {
         E.bus(AppEvents.Peers)
             .filter(event => event.peer === this.props.peer)
-            .on("updatePhoto")
-            .on("updatePhotoSmall")
+            .updateOn("updatePhoto")
+            .updateOn("updatePhotoSmall")
     }
 
     render() {

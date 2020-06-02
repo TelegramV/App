@@ -18,9 +18,8 @@ const CardMessageWrapperFragment = ({message, icon, title, description, bubbleRe
                         {description}
                     </div>
                 </div>
-                {!text ? <MessageTimeComponent message={message}/> : ""}
             </div>
-            {text ? <TextWrapperComponent message={message}/> : ""}
+            <TextWrapperComponent message={message}/>
         </MessageWrapperFragment>
     )
 }
