@@ -188,3 +188,7 @@ body {
         @content;
     }
 }
+
+b, strong {
+    font-weight: 500;
+}
