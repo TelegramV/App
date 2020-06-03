@@ -231,7 +231,14 @@ export class PeerMessages {
     getPollsById(poll_id: number): Array<Message> {
         return (
             [...this._heap.values()]
-                .filter(msg => msg.raw.media && msg.raw.media.poll && msg.raw.media.poll.id === poll_id)
+                .filter(msg => msg.raw?.media?.poll?.id === poll_id)
+        )
+    }
+
+    getGamesById(game_id: number): Array<Message> {
+        return (
+            [...this._heap.values()]
+                .filter(msg => msg?.game?.id === game_id)
         )
     }
 

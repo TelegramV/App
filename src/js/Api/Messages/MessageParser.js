@@ -122,6 +122,9 @@ export class MessageParser {
     }
 
     static getMediaPreviewName(message: Message) {
+        if(!message) {
+            return "";
+        }
         if (message.groupedId) {
             return "Album"
         }
