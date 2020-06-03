@@ -51,27 +51,31 @@
                 width: 40px;
                 margin-right: 5px;
 
-                .checkbox-input {
-                    margin-right: 30px;
-                    margin-bottom: 20px;
-                }
+                /*.checkbox-input, .radio-input {
+                    margin: auto;
+                }*/
 
                 .percent {
                     font-weight: bold;
                 }
 
                 .voted {
-                    height: 15px;
-                    width: 15px;
+                    height: 16px;
+                    width: 16px;
                     color: white;
                     border-radius: 50%;
+                    position: relative;
 
-                    &:not(:empty) {
+                    &:not(:empty) { //TODO add classes right/wrong
                         background-color: $green;
                     }
 
-                    .tgico.tgico-check {
-                        line-height: 15px;
+                    .tgico {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        font-size: 14px;
                     }
                 }
             }

@@ -86,12 +86,18 @@ img:not([src]) {
 }
 
 .emoji {
-    height: 1.3em;
-    width: 1.3em;
-    margin: 0 .05em 0 .1em;
-    vertical-align: -0.3em;
-    user-select: all;
-    cursor: text;
+    &:not(.native) {
+        height: 1.3em;
+        width: 1.3em;
+        margin: 0 .05em 0 .1em;
+        vertical-align: -0.3em;
+        user-select: all;
+        cursor: text;
+    }
+
+    &.native {
+        display: inline-block;
+    }
 }
 
 ::-webkit-scrollbar {

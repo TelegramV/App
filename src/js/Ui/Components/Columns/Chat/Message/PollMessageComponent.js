@@ -4,13 +4,17 @@ import MessageWrapperFragment from "./Common/MessageWrapperFragment"
 import VRadio from "../../../Elements/VRadio"
 import VCheckbox from "../../../Elements/VCheckbox"
 
+// TODO Big refractor, add closing, retracting votes
+// Add state, make more useful fragments
+// Currently, do not supports showing snackbar after voting
+// works on 3 костилі і один велосипед
 export default class PollMessageComponent extends GeneralMessageComponent {
     constructor(props) {
         super(props);
         let message = this.props.message;
 
-        this.poll = message.raw.media.poll;
-        this.results = message.raw.media.results;
+        this.poll = message.poll;
+        this.results = message.results;
 
         this.multiple = this.poll.multiple_choice;
         this.public = this.poll.public_voters;
@@ -59,7 +63,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     _prepareFooter = () => {
-        if (this.isVoted) {
+        if (this.isVoted()) {
             if (this.public) {
                 return <div class="action-button" onClick={this._actionClick}>Results</div>;
             } else {
@@ -93,7 +97,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     closeVoting = () => {
-        MTProto.invokeMethod("messages.sendVote", {})
+        
     }
 
     addAnswer = (option) => {
@@ -138,7 +142,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     _patchAnswers = () => {
         this.forceUpdate();
-        setTimeout(this._applyPercents, 0);
+        this.withTimeout(this._applyPercents, 0); //used to animate percents
     }
 
     _applyPercents = () => {

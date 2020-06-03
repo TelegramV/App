@@ -11,6 +11,14 @@ export class PollMessage extends AbstractMessage {
         super.show()
     }
 
+    get poll() {
+        return this.raw.media.poll;
+    }
+
+    get results() {
+        return this.raw.media.results;
+    }
+
     fillPoll(poll, results) {
         if (poll) {
             this.raw.media.poll = poll;

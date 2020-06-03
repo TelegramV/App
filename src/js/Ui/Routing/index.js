@@ -1,16 +1,16 @@
 import LoginPage from "../Pages/Login/LoginPage"
 import {MainPage} from "../Pages/Main/MainPage"
 import MTProto from "../../MTProto/External"
-import {NewComponentPage} from "../Pages/Tests/NewComponentTestPage"
-import {ReactListPage} from "../Pages/Tests/ReactiveListPage"
+//import {NewComponentPage} from "../Pages/Tests/NewComponentTestPage"
+//import {ReactListPage} from "../Pages/Tests/ReactiveListPage"
 import VApp from "../../V/vapp"
-import VirtualPage from "../Pages/Tests/VirtualPage"
-import ElementsPage from "../Pages/Tests/Elements"
-import ColumnsPage from "../Pages/Tests/Columns"
-import CryptoTestPage from "../Pages/Tests/Crypto"
-import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage";
-import NextGenPage from "../Pages/Tests/NextGen"
-import {StreamingPage} from "../Pages/Tests/Streaming"
+//import VirtualPage from "../Pages/Tests/VirtualPage"
+//import ElementsPage from "../Pages/Tests/Elements"
+//import ColumnsPage from "../Pages/Tests/Columns"
+//import CryptoTestPage from "../Pages/Tests/Crypto"
+//import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage";
+//import NextGenPage from "../Pages/Tests/NextGen"
+//import {StreamingPage} from "../Pages/Tests/Streaming"
 
 /**
  * @param {VFrameworkRouter} router
@@ -28,7 +28,7 @@ function AppRoutes(router) {
         }
     })
 
-    if (!__IS_PRODUCTION__) {
+    /*if (!__IS_PRODUCTION__) {
         router.route("/test", "test", {
             h() {
                 return NewComponentPage()
@@ -88,7 +88,7 @@ function AppRoutes(router) {
         //         return calculatorpage()
         //     }
         // })
-    }
+    }*/
 
     router.middleware(toRoute => {
         if (!MTProto.isUserAuthorized()) {
