@@ -1,6 +1,6 @@
 @mixin map($in: false, $transparent: false) {
     & .venue {
-        padding: 10px;
+        padding: 5px;
         font-size: 14px;
 
         .title {
@@ -12,20 +12,21 @@
         }
     }
 
-    & .map {
+    & .map-wrapper {
         position: relative;
         cursor: pointer;
+        margin: 0 -10px;
 
-        &.media-wrapper {
+        &.map {
             max-width: 300px;
             max-height: 300px;
         }
 
         .pin-point {
             position: absolute;
-            top: 50%;
+            bottom: 50%;
             left: 50%;
-            transform: translate(-50%, -80%);
+            transform: translate(-50%, 0);
             font-size: 60px;
         }
     }
