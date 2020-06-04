@@ -237,60 +237,62 @@ export class DialogComponent extends StatelessComponent {
     }
 
     _patchMessageAndResort = () => {
-        if (!this.props.dialog.messages.last) {
+        const dialog = this.props.dialog;
+        if (!dialog.messages.last) {
             $(this.$el).hide()
             return
         } else {
             $(this.$el).show()
         }
 
-        const isPinned = this.props.folderId == null ? this.props.dialog.pinned : FoldersManager.isPinned(this.props.dialog.peer, this.props.folderId)
+        const isPinned = this.props.folderId == null ? dialog.pinned : FoldersManager.isPinned(dialog.peer, this.props.folderId)
 
         if (isPinned !== this.$el.__pinned) {
             if (isPinned) {
                 this.__destroy()
 
-                this.Pinned.prependDialog(this.props.dialog)
+                this.Pinned.prependDialog(dialog)
 
                 return
             } else {
                 this.__destroy()
 
                 AppEvents.Dialogs.fire("gotOne", {
-                    dialog: this.props.dialog
+                    dialog: dialog
                 })
+
                 return
             }
 
-        } else if (this.props.dialog.isArchived !== this.$el.__archived) {
-            if (this.props.dialog.isArchived) {
+        } else if (dialog.isArchived !== this.$el.__archived) {
+            if (dialog.isArchived) {
                 this.__destroy()
 
-                this.Archived.prependDialog(this.props.dialog)
+                this.Archived.prependDialog(dialog)
                 return
             } else {
                 this.__destroy()
 
                 AppEvents.Dialogs.fire("gotOne", {
-                    dialog: this.props.dialog
+                    dialog: dialog
                 })
                 return
             }
 
-        } else if (!this.props.dialog.peer.messages.last) {
+        } else if (!dialog.peer.messages.last) {
             // todo: handle no last message
-        } else if (this.$el.__message.date !== this.props.dialog.peer.messages.last.date) {
+        } else if (this.$el.__message.date !== dialog.peer.messages.last.date) {
             if (!isPinned) {
                 if (this.$el.previousSibling) {
-                    if (this.props.dialog.isArchived) {
+                    if (dialog.isArchived) {
                         this.__destroy()
 
-                        this.Archived.prependDialog(this.props.dialog)
+                        this.Archived.prependDialog(dialog)
                         return
                     } else {
                         this.__destroy()
 
-                        this.General.prependDialog(this.props.dialog)
+                        this.General.prependDialog(dialog)
                         return
                     }
                 }
