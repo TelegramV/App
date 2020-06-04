@@ -11,9 +11,14 @@ import UIEvents from "../../../../EventBus/UIEvents"
 
 class GroupedMessageComponent extends GeneralMessageComponent {
 
-    render({message: group}) {
-        console.log(group)
+    reactive(R) {
+        super.reactive(R);
 
+        R.object(this.props.message)
+            .updateOn("groupUpdated")
+    }
+
+    render({message: group}) {
         const text = group.text.length > 0 ? <TextWrapperComponent message={group}/> : ""
 
         return (
@@ -27,9 +32,11 @@ class GroupedMessageComponent extends GeneralMessageComponent {
                     {
                         Array.from(group.messages).reverse().map(message => {
                             if (message instanceof PhotoMessage) {
-                                return <BetterPhotoComponent photo={message.raw.media.photo} onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>
+                                return <BetterPhotoComponent photo={message.raw.media.photo}
+                                                             onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>
                             } else if (message instanceof VideoMessage) {
-                                return <BetterVideoComponent document={message.raw.media.document} onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>
+                                return <BetterVideoComponent document={message.raw.media.document}
+                                                             onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>
                             } else {
                                 console.error(message)
                                 return null;

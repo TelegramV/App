@@ -1,4 +1,5 @@
 import type {Message} from "../Messages/Message"
+import {MessageType} from "../Messages/Message"
 import {Peer} from "./Objects/Peer"
 import {arrayDeleteCallback} from "../../Utils/array"
 import {MessageFactory} from "../Messages/MessageFactory"
@@ -151,16 +152,22 @@ export class PeerMessages {
         let message = this.getById(rawMessage.id);
 
         if (message) {
-            return message.fillRaw(rawMessage);
+            message = message.fillRaw(rawMessage);
+
+            if (message.groupedId) {
+                return this._groupsHeap.get(message.groupedId);
+            }
+
+            return message;
         }
 
         message = MessageFactory.fromRaw(this.peer, rawMessage);
 
         if (message.groupedId) {
-            let group = this._groupsHeap.get(message.groupedId)
+            let group = this._groupsHeap.get(message.groupedId);
 
             if (group) {
-                group.messages.add(message);
+                group.add(message);
             } else {
                 group = new GroupMessage(message);
                 this._groupsHeap.set(message.groupedId, group);
@@ -194,13 +201,15 @@ export class PeerMessages {
         const message = this.putRawMessage(rawMessage);
 
         if (this._recent.length > 0) {
-            const newest = this._recent[0];
+            let newest = this._recent[0];
 
             if (newest.id < message.id) {
-                this._recent.unshift(message);
+                if (message.type !== MessageType.GROUP || !message.messages.size) {
+                    this._recent.unshift(message);
 
-                if (this._recent.length > 100) {
-                    this._recent.pop();
+                    if (this._recent.length > 100) {
+                        this._recent.pop();
+                    }
                 }
 
                 if (message.isOut) {
@@ -209,7 +218,8 @@ export class PeerMessages {
                     this.addUnread(message.id)
                 }
             } else {
-                // console.warn("BUG: putNewRawMessage got not newest message", newest.id, message.id);
+                // console.warn("BUG: putNewRawMessage got not newest message", message.dialogPeer.name, newest.id, message.id);
+                // return false;
             }
         } else {
             this._recent = [message];

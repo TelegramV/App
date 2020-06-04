@@ -20,7 +20,7 @@
 import PeersStore from "../../Store/PeersStore"
 
 const processUpdateReadChannelInbox = update => {
-    const peer = PeersStore.find("channel", update.channel_id);
+    const peer = PeersStore.get("channel", update.channel_id);
 
     if (peer) {
         const prevMaxId = peer.messages.readInboxMaxId;

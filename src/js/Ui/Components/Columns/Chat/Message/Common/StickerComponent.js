@@ -4,7 +4,7 @@ import lottie from "../../../../../../../../vendor/lottie-web"
 import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
 
 export let stickerCounter = 0;
-
+// dont use it anymore
 export default class StickerComponent extends StatelessComponent {
     init() {
         this.updateSticker();

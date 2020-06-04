@@ -17,10 +17,10 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager";
+import PeersStore from "../../Store/PeersStore"
 
 const processUpdateReadChannelOutbox = update => {
-    const peer = DialogsManager.find("channel", update.channel_id);
+    const peer = PeersStore.get("channel", update.channel_id);
 
     if (peer) {
         const prevMaxId = peer.messages.readOutboxMaxId;

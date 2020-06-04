@@ -177,6 +177,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             messages = messages.reverse();
         }
 
+        messages = messages.filter(message => !document.getElementById(`message-${message.id}`));
+
         return messages;
     }
 
@@ -395,6 +397,10 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     onNewMessage = (event) => {
         const message = event.message;
+
+        if (document.getElementById(`message-${message.id}`)) {
+            return;
+        }
 
         if (this.virtual_isCompletelyBottom()) {
             const afterMessage = this.mainVirtual.getVeryBottomOne();
