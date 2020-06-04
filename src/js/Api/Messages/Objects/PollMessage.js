@@ -7,10 +7,6 @@ export class PollMessage extends AbstractMessage {
 
     type = MessageType.POLL
 
-    show() {
-        super.show()
-    }
-
     get poll() {
         return this.raw.media.poll;
     }

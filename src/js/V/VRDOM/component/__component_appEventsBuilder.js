@@ -18,14 +18,15 @@
  */
 
 import {EventBus} from "../../../Api/EventBus/EventBus"
+import __component_destroy from "./__component_destroy"
 
 
 // types
 
 export type AESubscribe = {
-    // if no resolve, then forceUpdate will be used instead
-    on(type: string, resolve?: any): AESubscribe,
+    on(type: string, resolve: any): AESubscribe,
     updateOn(type: string): AESubscribe,
+    destroyOn(type: string): AESubscribe, // be careful with this
 }
 
 export type AECondition = AESubscribe | {
@@ -54,14 +55,16 @@ function __bus(component, bus: EventBus) {
         only: (callback: any) => __bus_filter(component, bus, callback),
         filter: (callback: any) => __bus_filter(component, bus, callback),
         on: (type: string, resolve: any) => __bus_filter_subscribe(component, bus, null, type, resolve),
-        updateOn: (type: string) => __bus_filter_subscribe(component, bus, null, type, null)
+        updateOn: (type: string) => __bus_filter_subscribe(component, bus, null, type, 0),
+        destroyOn: (type: string) => __bus_filter_subscribe(component, bus, null, type, 1),
     }
 }
 
 function __bus_filter(component, bus: EventBus, filter: any) {
     return {
         on: (type: string, resolve: any) => __bus_filter_subscribe(component, bus, filter, type, resolve),
-        updateOn: (type: string) => __bus_filter_subscribe(component, bus, filter, type, null),
+        updateOn: (type: string) => __bus_filter_subscribe(component, bus, filter, type, 0),
+        destroyOn: (type: string) => __bus_filter_subscribe(component, bus, filter, type, 1),
     }
 }
 
@@ -70,6 +73,8 @@ function __bus_filter_subscribe(component, bus: EventBus, filter: any, type: str
 
     if (!resolve) {
         resolve = component.forceUpdate
+    } else if (resolve === 1) {
+        resolve = () => __component_destroy(component)
     }
 
     if (!busContext) {
@@ -87,6 +92,7 @@ function __bus_filter_subscribe(component, bus: EventBus, filter: any, type: str
 
     return {
         on: (type: string, resolve: any) => __bus_filter_subscribe(component, bus, filter, type, resolve),
-        updateOn: (type: string) => __bus_filter_subscribe(component, bus, filter, type, null),
+        updateOn: (type: string) => __bus_filter_subscribe(component, bus, filter, type, 0),
+        destroyOn: (type: string) => __bus_filter_subscribe(component, bus, filter, type, 1),
     }
 }

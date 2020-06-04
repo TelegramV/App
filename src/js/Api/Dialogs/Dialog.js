@@ -7,7 +7,6 @@ import AppEvents from "../EventBus/AppEvents"
 import {actionTypesMapping} from "../../Ui/Components/Sidebars/Left/Dialogs/Fragments/DialogTextFragment"
 import DialogsManager from "./DialogsManager"
 import MTProto from "../../MTProto/External"
-import DialogsStore from "../Store/DialogsStore";
 
 export class Dialog extends ReactiveObject {
 
@@ -134,56 +133,56 @@ export class Dialog extends ReactiveObject {
         const isRead = dialog.peer.messages.unreadCount === 0 || !dialog.unreadMark
         const isArchived = dialog.isArchived
 
-        if(include && include.some(l => {
-            if(l._ === "inputPeerUser" && peer.type === "user" && peer.id === l.user_id) return true
-            if(l._ === "inputPeerChannel" && peer.type === "channel" && peer.id === l.channel_id) return true
-            if(l._ === "inputPeerChat" && peer.type === "chat" && peer.id === l.chat_id) return true
-            if(l._ === "inputPeerSelf" && peer.type === "user" && peer.isSelf) return true
+        if (include && include.some(l => {
+            if (l._ === "inputPeerUser" && peer.type === "user" && peer.id === l.user_id) return true
+            if (l._ === "inputPeerChannel" && peer.type === "channel" && peer.id === l.channel_id) return true
+            if (l._ === "inputPeerChat" && peer.type === "chat" && peer.id === l.chat_id) return true
+            if (l._ === "inputPeerSelf" && peer.type === "user" && peer.isSelf) return true
             return false
         })) {
             return true
         }
 
-        if(exclude && include.some(l => {
-            if(l._ === "inputPeerUser" && peer.type === "user" && peer.id === l.user_id) return true
-            if(l._ === "inputPeerChannel" && peer.type === "channel" && peer.id === l.channel_id) return true
-            if(l._ === "inputPeerChat" && peer.type === "chat" && peer.id === l.chat_id) return true
-            if(l._ === "inputPeerSelf" && peer.type === "user" && peer.isSelf) return true
+        if (exclude && include.some(l => {
+            if (l._ === "inputPeerUser" && peer.type === "user" && peer.id === l.user_id) return true
+            if (l._ === "inputPeerChannel" && peer.type === "channel" && peer.id === l.channel_id) return true
+            if (l._ === "inputPeerChat" && peer.type === "chat" && peer.id === l.chat_id) return true
+            if (l._ === "inputPeerSelf" && peer.type === "user" && peer.isSelf) return true
             return false
         })) {
             return false
         }
 
-        if(!f.contacts && isContact) {
+        if (!f.contacts && isContact) {
             return false
         }
 
-        if(!f.non_contacts && !isContact && isUser) {
+        if (!f.non_contacts && !isContact && isUser) {
             return false
         }
 
-        if(!f.groups && isGroup) {
+        if (!f.groups && isGroup) {
             return false
         }
 
-        if(!f.broadcasts && isChannel) {
+        if (!f.broadcasts && isChannel) {
             return false
         }
 
-        if(!f.bots && isBot) {
+        if (!f.bots && isBot) {
 
             return false
         }
 
-        if(f.exclude_muted && isMuted) {
+        if (f.exclude_muted && isMuted) {
             return false
         }
 
-        if(f.exclude_read && isRead) {
+        if (f.exclude_read && isRead) {
             return false
         }
 
-        if(f.exclude_archived && isArchived) {
+        if (f.exclude_archived && isArchived) {
             return false
         }
 
@@ -299,14 +298,10 @@ export class Dialog extends ReactiveObject {
 
         this.pts = rawDialog.pts || -1
 
-        this.peer.messages.startTransaction()
-
         this.peer.messages.unreadCount = rawDialog.unread_count || 0
         this.peer.messages.readInboxMaxId = rawDialog.read_inbox_max_id || 0
         this.peer.messages.readOutboxMaxId = rawDialog.read_outbox_max_id || 0
         this.peer.messages.unreadMentionsCount = rawDialog.unread_mentions_count || 0
-
-        this.peer.messages.stopTransaction()
 
         this._draft.fillRaw(this, rawDialog.draft)
 

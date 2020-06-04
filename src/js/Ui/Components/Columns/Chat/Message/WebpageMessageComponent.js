@@ -8,6 +8,7 @@ class WebpageMessageComponent extends GeneralMessageComponent {
 
     render() {
         let webpage = this.props.message.raw.media.webpage;
+
         return (
             <MessageWrapperFragment message={this.props.message} showUsername={false} bubbleRef={this.bubbleRef}>
                 <TextWrapperComponent message={this.props.message}>
@@ -23,7 +24,7 @@ class WebpageMessageComponent extends GeneralMessageComponent {
                         webpage.cached_page
                         &&
                         <div className="instant-view-button"
-                             onClick={l => VUI.InstantView.open(webpage.cached_page, webpage.site_name, webpage.photo)}>
+                             onClick={() => VUI.InstantView.open(webpage.cached_page, webpage.site_name, webpage.photo)}>
                             Instant View
                         </div>
                     }

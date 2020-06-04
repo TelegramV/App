@@ -19,21 +19,14 @@
 
 import MessagesManager from "../../../Messages/MessagesManager";
 
-// todo rewrite
 function processUpdateEditChannelMessage(update) {
-    const to = MessagesManager.getToPeerMessage(update.message);
+    const dialogPeer = MessagesManager.getToPeerMessage(update.message);
 
-    if (to) {
-        const message = to.dialog.peer.messages.getById(update.message.id);
+    if (dialogPeer) {
+        const message = dialogPeer.messages.getById(update.message.id);
 
         if (message) {
-            message.fillRaw(update.message);
-
-            message.fire("edit");
-
-            to.dialog.fire("editMessage", {
-                message: message,
-            });
+            message.fillEdited(update.message);
         }
     } else {
         console.log("BUG: [processUpdateEditChannelMessage] no peer found")

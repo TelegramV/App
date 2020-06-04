@@ -289,10 +289,6 @@ export class PeerMessages {
     set readOutboxMaxId(readOutboxMaxId: number) {
         if (this.readOutboxMaxId < readOutboxMaxId) {
             this._readOutboxMaxId = readOutboxMaxId || this._readOutboxMaxId
-
-            if (this.peer.dialog) {
-                this.peer.dialog.fire("updateReadOutboxMaxId")
-            }
         }
     }
 
@@ -311,10 +307,6 @@ export class PeerMessages {
             this.deleteUnreadBy(readInboxMaxId)
 
             this._readInboxMaxId = readInboxMaxId || this._readInboxMaxId
-
-            if (this.peer.dialog) {
-                this.peer.dialog.fire("updateReadInboxMaxId")
-            }
         }
     }
 
@@ -329,19 +321,21 @@ export class PeerMessages {
         return this._fireTransaction
     }
 
-    /**
-     * @param {number} messageId
-     */
-    deleteSingle(messageId) {
-        arrayDeleteCallback(this._recent, message => message.id === messageId);
+    deleteSingle(messageId: number, markAsDeleted = true) {
+        arrayDeleteCallback(this._recent, message => {
+            if (message.id === messageId) {
+                if (markAsDeleted) {
+                    message.isDeleted = true;
+                }
 
-        this._heap.delete(messageId)
+                return true;
+            }
 
-        this.deleteUnread(messageId);
-
-        this.peer.dialog.fire("deleteMessage", {
-            messageId
+            return false;
         });
+
+        this._heap.delete(messageId);
+        this.deleteUnread(messageId);
     }
 
     /**
@@ -415,16 +409,6 @@ export class PeerMessages {
      */
     stopTransaction() {
         this._fireTransaction = false
-    }
-
-    /**
-     * @deprecated we really should avoid this #3
-     */
-    fireTransaction(eventName = "updateSingle", data = {}) {
-        this.stopTransaction()
-
-        this.peer.dialog.fire(eventName, data)
-
     }
 
     addUnread(id) {

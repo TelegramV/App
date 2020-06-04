@@ -42,7 +42,7 @@ class BetterVideoComponent extends StatefulComponent {
         this.state.thumbnailUrl = FileAPI.hasThumbnail(document) ? FileAPI.getThumbnail(document) : "";
     }
 
-    render({document, onClick, controls, autoPlay, loop}, {isLoading, url, thumbnailUrl, width, height}) {
+    render({document, onClick, controls, autoPlay, loop, muted}, {isLoading, url, thumbnailUrl, width, height}) {
         return (
             <figure className={["video rp rps", isLoading && "thumbnail"]} onClick={onClick}>
                 {
@@ -56,6 +56,7 @@ class BetterVideoComponent extends StatefulComponent {
                                onMouseOver={this.onMouseOver}
                                onMouseOut={this.onMouseOut}
                                onEnded={this.onEnded}
+                               muted={muted}
                         />
                         :
                         (width > height ?

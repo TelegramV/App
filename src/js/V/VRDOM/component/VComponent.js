@@ -32,7 +32,7 @@ export class ComponentWasDestroyed {
 
 
 // abstract stateless component
-class VComponent {
+class VComponent<P> {
     __ = {
         stateful: false,
         initialized: false,
@@ -65,7 +65,7 @@ class VComponent {
     static defaultProps: any = null;
     static displayName: string = "VComponent";
 
-    props: any = {};
+    props: P = {};
     slot: any = null;
 
     _$el: HTMLElement = null;

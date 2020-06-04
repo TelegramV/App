@@ -10,8 +10,4 @@ export class GameMessage extends AbstractMessage {
     get game() {
     	return this.raw?.media?.game;
     }
-
-    show() {
-        super.show()
-    }
 }

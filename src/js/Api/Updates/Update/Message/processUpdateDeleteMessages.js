@@ -17,24 +17,18 @@
  *
  */
 
-import DialogsStore from "../../../Store/DialogsStore"
+import PeersStore from "../../../Store/PeersStore";
+import {ChannelPeer} from "../../../Peers/Objects/ChannelPeer"
 
-// todo rewrite
 function processUpdateDeleteMessages(update) {
-    DialogsStore.toArray().forEach(dialog => {
-        if (dialog.peer.type !== "channel") {
-            dialog.peer.messages.startTransaction();
+    PeersStore.toArray().forEach(peer => {
+        if (!(peer instanceof ChannelPeer)) {
+            update.messages.forEach(id => {
+                peer.messages.deleteSingle(id);
+            });
 
-            update.messages.sort().forEach(mId => {
-                dialog.peer.messages.deleteSingle(mId);
-            })
-
-            if (!dialog.peer.messages.last) {
-                dialog.refresh();
-            }
-
-            dialog.peer.messages.fireTransaction("deleteMessages", {
-                messages: update.messages
+            peer.fire("messages.deleted", {
+                messages: update.messages,
             });
         }
     });

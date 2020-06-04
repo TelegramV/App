@@ -21,13 +21,13 @@ import {__component_update_state} from "./__component_update";
 import VComponent from "./VComponent"
 
 // wip
-class StatefulComponent extends VComponent {
+class StatefulComponent<P, S> extends VComponent<P> {
     constructor(config) {
         super(config);
         this.__.stateful = true;
     }
 
-    state = {};
+    state: S = {};
 
     render(props, state) {
     }

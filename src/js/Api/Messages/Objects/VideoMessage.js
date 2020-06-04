@@ -4,6 +4,8 @@ import {AbstractMessage} from "../AbstractMessage"
 import {MessageType} from "../Message"
 import {FileAPI} from "../../Files/FileAPI"
 
+
+// TOdo: REWRITE!!!!!!!!!!!!!!!!!!!!!!
 export class VideoMessage extends AbstractMessage {
 
     type = MessageType.VIDEO

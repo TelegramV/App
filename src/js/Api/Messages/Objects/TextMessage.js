@@ -7,8 +7,4 @@ export class
 TextMessage extends AbstractMessage {
 
     type = MessageType.TEXT
-
-    show() {
-        super.show()
-    }
 }

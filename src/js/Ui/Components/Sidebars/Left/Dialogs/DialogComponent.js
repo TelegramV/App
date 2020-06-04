@@ -13,7 +13,6 @@ import __component_destroy from "../../../../../V/VRDOM/component/__component_de
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
 export class DialogComponent extends StatelessComponent {
-
     dialog: Dialog
 
     Archived: ArchivedDialogListComponent
@@ -31,12 +30,22 @@ export class DialogComponent extends StatelessComponent {
 
     init() {
         this.dialog = this.props.dialog
-        this._contextMenuListener = dialogContextMenu(this.dialog, this.props.folderId)
     }
 
     appEvents(E) {
         E.bus(AppEvents.Dialogs)
+            .filter(event => event.peer === this.props.dialog.peer)
             .on("hideDialogByPeer", this.onHideDialogByPeer)
+
+        E.bus(AppEvents.Peers)
+            .filter(event => event.message && event.message === this.props.dialog.peer.messages.last)
+            .on("messages.edited", this.onDialogEditMessage)
+
+        E.bus(AppEvents.Peers)
+            .filter(event => event.peer === this.props.dialog.peer)
+            .on("messages.deleted", this._patchMessageAndResort)
+            .on("messages.readOut", this.onDialogReadHistory)
+            .on("messages.readIn", this.onDialogReadHistory)
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelected)
@@ -44,26 +53,19 @@ export class DialogComponent extends StatelessComponent {
 
     reactive(R) {
         // why so many listeners you might ask, idk i'll answer
-        R.object(this.dialog)
+        R.object(this.props.dialog)
             .on("updateDraftMessage", this.onDialogUpdateDraftMessage)
-            .on("readHistory", this.onDialogReadHistory)
             .on("updateUnreadCount", this.onDialogReadHistory)
             .on("updateUnread", this.onDialogReadHistory)
             .on("updateUnreadMark", this.onDialogUnreadMark)
-            .on("updateReadInboxMaxId", this.onDialogReadHistory)
-            .on("updateReadOutboxMaxId", this.onDialogReadHistory)
-            // .on("newMessage", this.onDialogNewMessage)
-            .on("editMessage", this.onDialogEditMessage)
             .on("updateSingle", this.onDialogUpdateSingle)
             .on("updatePinned", this.onDialogUpdatePinned)
             .on("updateFolderId", this.onDialogUpdateFolderId)
             .on("updateActions", this.onDialogUpdateActions)
             .on("refreshed", this.onDialogRefreshed)
             .on("deleted", this.onDialogDeleted)
-            .on("deleteMessage", this.onDialogDeleteMessage)
-            .on("deleteMessages", this.onDialogDeleteMessage)
 
-        R.object(this.dialog.peer)
+        R.object(this.props.dialog.peer)
             .on("messages.new", this.onDialogNewMessage)
             .on("updatePhoto", this.onPeerUpdatePhoto)
             .on("updatePhotoSmall", this.onPeerUpdatePhoto)
@@ -72,9 +74,9 @@ export class DialogComponent extends StatelessComponent {
 
     render() {
         return (
-            <DialogFragment dialog={this.dialog}
+            <DialogFragment dialog={this.props.dialog}
                             click={this._handleClick}
-                            contextMenu={this._contextMenuListener}
+                            contextMenu={dialogContextMenu(this.props.dialog, this.props.folderId)}
                             timeFragmentRef={this.timeFragmentRef}
                             textFragmentRef={this.textFragmentRef}
                             avatarFragmentRef={this.avatarFragmentRef}
@@ -90,10 +92,10 @@ export class DialogComponent extends StatelessComponent {
         this.Pinned = VComponent.getComponentById(`dialogs-pinned-list-${this.props.folderId}`)
         this.General = this.props.list //VComponent.getComponentById(`dialogs-general-list`)
 
-        this.$el.__dialog = this.dialog
-        this.$el.__message = this.dialog.peer.messages.last
-        this.$el.__pinned = this.props.folderId == null ? this.dialog.pinned : FoldersManager.isPinned(this.dialog.peer, this.props.folderId)
-        this.$el.__archived = this.dialog.isArchived
+        this.$el.__dialog = this.props.dialog
+        this.$el.__message = this.props.dialog.peer.messages.last
+        this.$el.__pinned = this.props.folderId == null ? this.props.dialog.pinned : FoldersManager.isPinned(this.props.dialog.peer, this.props.folderId)
+        this.$el.__archived = this.props.dialog.isArchived
     }
 
     onChatSelected = event => {
@@ -104,7 +106,7 @@ export class DialogComponent extends StatelessComponent {
                 this.$el.classList.remove("responsive-selected-chatlist")
             }
 
-            if (AppSelectedChat.current === this.dialog.peer || AppSelectedChat.previous === this.dialog.peer) {
+            if (AppSelectedChat.current === this.props.dialog.peer || AppSelectedChat.previous === this.props.dialog.peer) {
                 this._patchActive()
             }
         }
@@ -123,9 +125,7 @@ export class DialogComponent extends StatelessComponent {
     }
 
     onDialogEditMessage = event => {
-        if (event.message === this.dialog.messages.last) {
-            this._patchMessage()
-        }
+        this._patchMessage()
     }
 
     onDialogRefreshed = _ => {
@@ -171,14 +171,12 @@ export class DialogComponent extends StatelessComponent {
     }
 
     onHideDialogByPeer = event => {
-        if (event.peer === this.dialog.peer) {
-            this.dialog.peer.dialog = undefined
-            this.__destroy()
-        }
+        this.props.dialog.peer.dialog = undefined
+        this.__destroy()
     }
 
     _patchActive = () => {
-        if (AppSelectedChat.check(this.dialog.peer)) {
+        if (AppSelectedChat.check(this.props.dialog.peer)) {
             this.$el.classList.add("active")
         } else {
             this.$el.classList.remove("active")
@@ -187,7 +185,7 @@ export class DialogComponent extends StatelessComponent {
 
     _patchStatus = () => {
         if (this.__.mounted) {
-            if (this.dialog.peer.onlineStatus.online) {
+            if (this.props.dialog.peer.onlineStatus.online) {
                 this.$el.classList.add("online")
             } else {
                 this.$el.classList.remove("online")
@@ -196,7 +194,7 @@ export class DialogComponent extends StatelessComponent {
     }
 
     _patchMessage = () => {
-        if (!this.dialog.messages.last) {
+        if (!this.props.dialog.messages.last) {
             $(this.$el).hide()
             return
         } else {
@@ -204,8 +202,8 @@ export class DialogComponent extends StatelessComponent {
         }
 
         if (this.__.mounted) {
-            this.$el.__message = this.dialog.peer.messages.last
-            this.$el.setAttribute("data-message-id", this.dialog.peer.messages.last.id)
+            this.$el.__message = this.props.dialog.peer.messages.last
+            this.$el.setAttribute("data-message-id", this.props.dialog.peer.messages.last.id)
 
             this._patchReadStatus()
             this.textFragmentRef.patch()
@@ -216,7 +214,7 @@ export class DialogComponent extends StatelessComponent {
     }
 
     _patchReadStatus = () => {
-        if (!this.dialog.messages.last) {
+        if (!this.props.dialog.messages.last) {
             $(this.$el).hide()
             return
         } else {
@@ -224,10 +222,10 @@ export class DialogComponent extends StatelessComponent {
         }
 
 
-        if (this.dialog.peer.messages.last.isOut && !this.dialog.peer.isSelf) {
+        if (this.props.dialog.peer.messages.last.isOut && !this.props.dialog.peer.isSelf) {
             this.$el.classList.add("sent")
 
-            if (this.dialog.peer.messages.last.isRead) {
+            if (this.props.dialog.peer.messages.last.isRead) {
                 this.$el.classList.add("read")
             } else {
                 this.$el.classList.remove("read")
@@ -239,60 +237,60 @@ export class DialogComponent extends StatelessComponent {
     }
 
     _patchMessageAndResort = () => {
-        if (!this.dialog.messages.last) {
+        if (!this.props.dialog.messages.last) {
             $(this.$el).hide()
             return
         } else {
             $(this.$el).show()
         }
 
-        const isPinned = this.props.folderId == null ? this.dialog.pinned : FoldersManager.isPinned(this.dialog.peer, this.props.folderId)
+        const isPinned = this.props.folderId == null ? this.props.dialog.pinned : FoldersManager.isPinned(this.props.dialog.peer, this.props.folderId)
 
         if (isPinned !== this.$el.__pinned) {
             if (isPinned) {
                 this.__destroy()
 
-                this.Pinned.prependDialog(this.dialog)
+                this.Pinned.prependDialog(this.props.dialog)
 
                 return
             } else {
                 this.__destroy()
 
                 AppEvents.Dialogs.fire("gotOne", {
-                    dialog: this.dialog
+                    dialog: this.props.dialog
                 })
                 return
             }
 
-        } else if (this.dialog.isArchived !== this.$el.__archived) {
-            if (this.dialog.isArchived) {
+        } else if (this.props.dialog.isArchived !== this.$el.__archived) {
+            if (this.props.dialog.isArchived) {
                 this.__destroy()
 
-                this.Archived.prependDialog(this.dialog)
+                this.Archived.prependDialog(this.props.dialog)
                 return
             } else {
                 this.__destroy()
 
                 AppEvents.Dialogs.fire("gotOne", {
-                    dialog: this.dialog
+                    dialog: this.props.dialog
                 })
                 return
             }
 
-        } else if (!this.dialog.peer.messages.last) {
+        } else if (!this.props.dialog.peer.messages.last) {
             // todo: handle no last message
-        } else if (this.$el.__message.date !== this.dialog.peer.messages.last.date) {
+        } else if (this.$el.__message.date !== this.props.dialog.peer.messages.last.date) {
             if (!isPinned) {
                 if (this.$el.previousSibling) {
-                    if (this.dialog.isArchived) {
+                    if (this.props.dialog.isArchived) {
                         this.__destroy()
 
-                        this.Archived.prependDialog(this.dialog)
+                        this.Archived.prependDialog(this.props.dialog)
                         return
                     } else {
                         this.__destroy()
 
-                        this.General.prependDialog(this.dialog)
+                        this.General.prependDialog(this.props.dialog)
                         return
                     }
                 }
@@ -303,10 +301,10 @@ export class DialogComponent extends StatelessComponent {
     }
 
     _handleClick = () => {
-        if (AppSelectedChat.check(this.dialog.peer)) {
+        if (AppSelectedChat.check(this.props.dialog.peer)) {
             UIEvents.General.fire("chat.scrollBottom")
         } else {
-            AppSelectedChat.select(this.dialog.peer)
+            AppSelectedChat.select(this.props.dialog.peer)
         }
     }
 

@@ -91,6 +91,14 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         }
     }
 
+    componentWillUpdate(nextProps, nextState) {
+        if (this.props.message.raw.media.document.id !== nextProps.message.raw.media.document.id) {
+            if (!FileManager.isDownloaded(nextProps.message.raw.media.document)) {
+                FileManager.checkCache(nextProps.message.raw.media.document);
+            }
+        }
+    }
+
     downloadDocument = () => {
         const document = this.props.message.raw.media.document;
 

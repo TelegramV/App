@@ -1,6 +1,5 @@
 import MTProto from "../../MTProto/External"
 import PeersManager from "./PeersManager"
-import AppEvents from "../EventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../Dialogs/util"
 import {FileAPI} from "../Files/FileAPI"
 import {TextMessage} from "../Messages/Objects/TextMessage";
@@ -55,11 +54,14 @@ export class PeerApi {
                 max_id: maxId
             }).then(response => {
                 if (response._ === "boolTrue") {
-                    this.peer.messages.readInboxMaxId = maxId
+                    const prevMaxId = this.peer.messages.readInboxMaxId;
 
-                    AppEvents.Dialogs.fire("readHistory", {
-                        dialog: this.peer.dialog
-                    })
+                    this.peer.messages.readInboxMaxId = maxId;
+
+                    peer.fire("messages.readIn", {
+                        maxId: this.peer.messages.readInboxMaxId,
+                        prevMaxId,
+                    });
                 }
             })
         } else {
@@ -67,11 +69,14 @@ export class PeerApi {
                 peer: getInputPeerFromPeer(this.peer.type, this.peer.id, this.peer.accessHash),
                 max_id: maxId
             }).then(response => {
-                this.peer.messages.readInboxMaxId = maxId
+                const prevMaxId = this.peer.messages.readInboxMaxId;
 
-                AppEvents.Dialogs.fire("readHistory", {
-                    dialog: this.peer.dialog
-                })
+                this.peer.messages.readInboxMaxId = maxId;
+
+                peer.fire("messages.readIn", {
+                    maxId: this.peer.messages.readInboxMaxId,
+                    prevMaxId,
+                });
             })
         }
     }

@@ -20,13 +20,19 @@
 import DialogsManager from "../../Dialogs/DialogsManager";
 
 const processUpdateReadChannelOutbox = update => {
-    const dialog = DialogsManager.find("channel", update.channel_id);
+    const peer = DialogsManager.find("channel", update.channel_id);
 
-    if (dialog) {
-        dialog.peer.messages.readOutboxMaxId = update.max_id;
-        dialog.fire("updateReadChannelOutbox");
+    if (peer) {
+        const prevMaxId = peer.messages.readOutboxMaxId;
+
+        peer.messages.readOutboxMaxId = update.max_id;
+
+        peer.fire("messages.readOut", {
+            maxId: update.max_id,
+            prevMaxId
+        });
     } else {
-        console.warn("BUG: [processUpdateReadChannelOutbox] no dialog found");
+        console.warn("BUG: [processUpdateReadChannelOutbox] no peer found");
     }
 }
 

@@ -17,14 +17,20 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager";
+import PeersStore from "../../Store/PeersStore"
 
 const processUpdateReadChannelInbox = update => {
-    const dialog = DialogsManager.find("channel", update.channel_id);
+    const peer = PeersStore.find("channel", update.channel_id);
 
-    if (dialog) {
-        dialog.peer.messages.readInboxMaxId = update.max_id;
-        dialog.fire("updateReadChannelInbox");
+    if (peer) {
+        const prevMaxId = peer.messages.readInboxMaxId;
+
+        peer.messages.readInboxMaxId = update.max_id;
+
+        peer.fire("messages.readIn", {
+            maxId: peer.messages.readInboxMaxId,
+            prevMaxId,
+        });
     } else {
         console.warn("BUG: [processUpdateReadChannelInbox] no dialog found");
     }

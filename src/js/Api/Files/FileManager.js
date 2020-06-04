@@ -31,7 +31,11 @@ class FilesManager {
     }
 
     get(file, thumb) {
-        return this.downloaded.get(file.id)
+        return this.downloaded.get(file.id, thumb)
+    }
+
+    getUrl(file, thumb) {
+        return this.downloaded.get(file.id, thumb)?.url
     }
 
     getById(fileId, thumbType) {

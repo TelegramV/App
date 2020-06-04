@@ -1,46 +1,27 @@
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import type {BusEvent} from "../../../../../../Api/EventBus/EventBus"
 import type {Message} from "../../../../../../Api/Messages/Message"
-import VComponent from "../../../../../../V/VRDOM/component/VComponent"
-import __component_destroy from "../../../../../../V/VRDOM/component/__component_destroy"
 import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulComponent"
-import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer"
-import {ServiceMessage} from "../../../../../../Api/Messages/Objects/ServiceMessage"
 import {isGrouping} from "../../VirtualizedBubblesComponent"
 
-class GeneralMessageComponent extends StatefulComponent {
-    message: Message
+type Props = {
+    message: Message;
+    observer: IntersectionObserver;
+}
 
-    // NEVER USE STATE HERE
-
-    avatarRef = VComponent.createComponentRef()
-    bubbleRef = VComponent.createRef()
-
+class GeneralMessageComponent extends StatefulComponent<Props> {
     appEvents(E) {
-        E.bus(AppEvents.General)
-            .filter(event => event.message && event.message.id === this.props.message.id)
-            .on("messages.deleted", this.onMessageDeleted)
-            .on("messages.edited", this.onMessageEdited)
-
-        E.bus(AppEvents.General)
-            .filter(event => event.message && event.message.dialogPeer === this.props.message.dialogPeer)
-            .on("messages.read", this.onMessagesRead)
-
-
-        E.bus(AppEvents.Dialogs)
-            .on("deleteMessages", this.onMessagesDeleteEvent)
-            .on("deleteChannelMessages", this.onMessagesDeleteEvent)
-            .on("editMessage", this.messageOnEdit)
-            .on("updateReadOutboxMaxId", this.onReadOutboxMaxId)
+        E.bus(AppEvents.Peers)
+            .filter(event => event.peer === this.props.message.dialogPeer)
+            .on("messages.deleted", this.onMessagesDeleted)
+            .on("messages.readOut", this.onMessagesReadOut)
     }
 
     reactive(R) {
         R.object(this.props.message)
-            .on("edit", this.messageOnEdit)
-            .on("replyToMessageFound", this.messageOnReplyFound)
-            .on("replyToMessageNotFound", this.messageOnReplyNotFound)
-            .on("forwardedNameOnlyFound", this.messageOnForwardedFound)
-            .on("forwardedChannelFound", this.messageOnForwardedFound)
+            .updateOn("edited")
+            .updateOn("replyFound")
+            .updateOn("forwardedFound")
     }
 
     componentDidMount() {
@@ -57,47 +38,11 @@ class GeneralMessageComponent extends StatefulComponent {
         }
     }
 
-    onMessagesDeleteEvent = (event: BusEvent) => {
-        if (event.messages.indexOf(this.props.message.id) > -1) {
-            this.messageOnDelete()
-        }
-    }
+    onMessagesReadOut = ({maxId, prevMaxId}) => {
+        const id = this.props.message.id
 
-    onReadOutboxMaxId = (event: BusEvent) => {
-        if (this.props.message.id <= this.props.message.to.messages.readOutboxMaxId && this.props.message.isOut) {
-            this.messageOnRead()
-        }
-    }
-
-    messageOnReplyFound = () => {
-        this.forceUpdate()
-    }
-
-    messageOnReplyNotFound = () => {
-        this.forceUpdate()
-    }
-
-    messageOnForwardedFound = () => {
-        this.forceUpdate()
-    }
-
-    messageOnEdit = event => {
-        if (event.message === this.props.message) {
-            this.props.message.show()
+        if (id <= maxId && id > prevMaxId) {
             this.forceUpdate()
-        }
-    }
-
-    messageOnDelete = () => {
-        __component_destroy(this)
-    }
-
-    messageOnRead = () => {
-        if (this.bubbleRef.$el) {
-            if (this.props.message.isRead && !this.bubbleRef.$el.classList.contains("read")) {
-                this.bubbleRef.$el.classList.add("read")
-                this.bubbleRef.$el.classList.remove("sent")
-            }
         }
     }
 
@@ -112,7 +57,6 @@ class GeneralMessageComponent extends StatefulComponent {
     domSiblingUpdated(prevMessage, nextMessage) {
         const message = this.props.message;
         const isOut = !message.isPost && message.isOut;
-        const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
 
         message.hideAvatar = true;
 
@@ -132,6 +76,13 @@ class GeneralMessageComponent extends StatefulComponent {
         }
 
         this.forceUpdate();
+    }
+
+
+    onMessagesDeleted = (event: BusEvent) => {
+        if (event.messages.indexOf(this.props.message.id) > -1) {
+            this.forceUpdate();
+        }
     }
 }
 

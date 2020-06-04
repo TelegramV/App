@@ -9,11 +9,6 @@ export class PhotoMessage extends AbstractMessage {
 
     photo: Photo
 
-    show() {
-        super.show()
-        this.fetchMax()
-    }
-
     get srcUrl() {
         return this.photo.srcUrl
     }

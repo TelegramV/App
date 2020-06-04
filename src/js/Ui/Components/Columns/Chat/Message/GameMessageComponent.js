@@ -17,7 +17,7 @@ class GameMessageComponent extends GeneralMessageComponent {
                     <div class="info">
                         {this.props.message.text ? parseMessageEntities(this.props.message.text) : game.description}
                     </div>
-                    <BetterPhotoComponent photo={game.photo}/>
+                    <BetterPhotoComponent photo={game.photo} calculateSize={true}/>
                 </div>
             </MessageWrapperFragment>
         )

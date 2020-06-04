@@ -79,9 +79,12 @@ class StickerMessageComponent extends GeneralMessageComponent {
             <MessageWrapperFragment message={this.props.message} transparent={true} noPad showUsername={false}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
 
-                <BetterStickerComponent isFull width={200} document={this.props.message.raw.media.document} onClick={() => {
-                    VUI.Modal.open(<div>TODO: implement me!</div>)
-                }}/>
+                <BetterStickerComponent isFull
+                                        width={200}
+                                        document={this.props.message.raw.media.document}
+                                        onClick={() => {
+                                            VUI.Modal.open(<div>TODO: implement me!</div>)
+                                        }}/>
 
                 <MessageTimeComponent message={this.props.message} bg={true}/>
 

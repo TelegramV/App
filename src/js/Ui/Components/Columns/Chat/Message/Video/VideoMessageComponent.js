@@ -2,8 +2,8 @@ import GeneralMessageComponent from "../Common/GeneralMessageComponent"
 import MessageWrapperFragment from "../Common/MessageWrapperFragment";
 import TextWrapperComponent from "../Common/TextWrapperComponent";
 import MessageTimeComponent from "../Common/MessageTimeComponent";
-import VideoComponent from "./VideoComponent"
 import UIEvents from "../../../../../EventBus/UIEvents";
+import BetterVideoComponent from "../../../../Basic/BetterVideoComponent"
 
 class VideoMessageComponent extends GeneralMessageComponent {
 
@@ -12,8 +12,11 @@ class VideoMessageComponent extends GeneralMessageComponent {
         return (
             <MessageWrapperFragment message={this.props.message} noPad showUsername={false} outerPad={text !== ""}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
-                <VideoComponent message={this.props.message} controls={false} loop={true}
-                                click={() => UIEvents.MediaViewer.fire("showMessage", {message: this.props.message})}/>
+
+                <BetterVideoComponent document={this.props.message.raw.media.document}
+                                      onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: this.props.message})}
+                                      playOnHover/>
+
                 {!text ? <MessageTimeComponent message={this.props.message} bg={true}/> : ""}
                 {text}
             </MessageWrapperFragment>

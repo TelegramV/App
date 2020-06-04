@@ -3,7 +3,6 @@ import CardMessageWrapperFragment from "./Common/CardMessageWrapperFragment"
 import AvatarComponent from "../../../Basic/AvatarComponent"
 
 class ContactMessageComponent extends GeneralMessageComponent {
-    //TODO clickable photo and phone formatting
     render({message}) {
         return (
             <CardMessageWrapperFragment message={message}

@@ -8,10 +8,6 @@ export class DiceMessage extends AbstractMessage {
 
     type = MessageType.DICE
 
-    show() {
-        super.show()
-    }
-
     get value() {
     	return this.raw.media.value;
     }
