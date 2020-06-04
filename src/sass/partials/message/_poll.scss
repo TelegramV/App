@@ -5,7 +5,7 @@
         min-width: 300px;
 
         .question {
-            font-weight: bold;
+            font-weight: 500;
             margin-bottom: 5px;
         }
 
@@ -56,7 +56,7 @@
                 }*/
 
                 .percent {
-                    font-weight: bold;
+                    font-weight: 500;
                 }
 
                 .voted {
@@ -114,7 +114,7 @@
             line-height: 30px;
 
             color: $blue;
-            font-weight: bold;
+            font-weight: 500;
             cursor: pointer;
 
             transition: anim(color) anim(background-color);
