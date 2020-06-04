@@ -27,16 +27,17 @@ class GroupedMessageComponent extends GeneralMessageComponent {
                                     showUsername={false}
                                     outerPad={text !== ""}
                                     bubbleRef={this.bubbleRef}>
-                <div id={`message-${group.id}`}
-                     className={["grouped", Layouter.getClass(group.messages.size)]}>
+                <div className={["grouped", Layouter.getClass(group.messages.size)]}>
                     {
                         Array.from(group.messages).reverse().map(message => {
                             if (message instanceof PhotoMessage) {
                                 return <BetterPhotoComponent photo={message.raw.media.photo}
-                                                             onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>
+                                                             onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}
+                                                             calculateSize/>
                             } else if (message instanceof VideoMessage) {
                                 return <BetterVideoComponent document={message.raw.media.document}
-                                                             onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>
+                                                             onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}
+                                                             calculateSize/>
                             } else {
                                 console.error(message)
                                 return null;
