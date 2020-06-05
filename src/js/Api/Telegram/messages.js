@@ -124,6 +124,17 @@ function updatePinnedMessage(message) {
     })
 }
 
+function sendVote(message, answers) {
+    return MTProto.invokeMethod("messages.sendVote", {
+        peer: message.from.inputPeer,
+        msg_id: message.id,
+        options: answers
+    }).then(response => {
+        UpdatesManager.process(response);
+        return response;
+    });
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
@@ -136,6 +147,7 @@ const messages = {
     getStickerSet: getStickerSet,
     deleteMessages: deleteMessages,
     updatePinnedMessage: updatePinnedMessage,
+    sendVote: sendVote,
 }
 
 export default messages

@@ -86,6 +86,7 @@
             @include audio($in: true);
             @include iv-button($in: true);
             @include tails($in: true);
+            @include poll($in: true);
         }
 
         &.out>.message-content {
@@ -112,6 +113,7 @@
             @include audio($in: false);
             @include iv-button($in: false);
             @include tails($in: false);
+            @include poll($in: false);
         }
 
         .message-content {
@@ -153,7 +155,6 @@
 
             //not dependant
             @include game;
-            @include poll;
             @include map;
             @include sticker;
             @include figure;
