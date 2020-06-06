@@ -87,6 +87,7 @@
             @include audio($in: true);
             @include iv-button($in: true);
             @include tails($in: true);
+            @include poll($in: true);
         }
 
         &.out>.message-content {
@@ -113,6 +114,7 @@
             @include audio($in: false);
             @include iv-button($in: false);
             @include tails($in: false);
+            @include poll($in: false);
         }
 
         .message-content {
@@ -145,6 +147,11 @@
                 margin-top: 7px;
                 margin-bottom: 4px;
                 user-select: text;
+
+                &.empty {
+                    margin-bottom: 0;
+                    margin-top: -20px; //TODO check for overlaping
+                }
             }
 
             .card {
@@ -156,7 +163,6 @@
 
             //not dependant
             @include game;
-            @include poll;
             @include map;
             @include sticker;
             @include figure;

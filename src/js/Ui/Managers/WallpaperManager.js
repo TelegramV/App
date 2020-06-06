@@ -32,7 +32,9 @@ class WallpaperManagerSingleton {
         //AppEvents.Files.subscribe("download.done", this.onFileDownloaded);
 
         keval.getItem("background").then(data => {
-            if (!data) return;
+            if (!data) {
+                this.setWallpaper("../../../../public/static/images/default_bg.jpg")
+            }
             if (data.blob) {
                 let url = URL.createObjectURL(data.blob);
                 this.setWallpaper(url);
@@ -109,7 +111,7 @@ class WallpaperManagerSingleton {
 
     setWallpaper(url) {
         if (!url) {
-            window.document.documentElement.style.removeProperty("--chat-bg-image");
+            window.document.documentElement.style.setProperty("--chat-bg-image", `none`);
             return;
         }
         window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
@@ -121,7 +123,7 @@ class WallpaperManagerSingleton {
 
     setColor(hex) {
         if (!hex) {
-            window.document.documentElement.style.removeProperty("--chat-bg-color");
+            window.document.documentElement.style.setProperty("--chat-bg-color", "none");
             return;
         }
         this.setWallpaper(undefined); //remove wallpaper

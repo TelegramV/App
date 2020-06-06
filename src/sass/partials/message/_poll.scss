@@ -3,6 +3,7 @@
         display: flex;
         flex-direction: column;
         min-width: 300px;
+        margin: 5px 0;
 
         .question {
             font-weight: 500;
@@ -33,13 +34,47 @@
                 background-color: $light;
             }
 
+            &.chosen {
+                .result-wrapper>.voted {
+                    @if $in {
+                        background-color: $blue;
+                    }
+
+                    @if $in == false {
+                        background-color: $green;
+                    }
+                }
+            }
+
             &.wrong {
                 .options-wrapper>.progress-wrapper>.progress {
                     background-color: $red;
                 }
 
-                .result-wrapper>.voted:not(:empty) {
+                .result-wrapper>.voted {
                     background-color: $red;
+                }
+            }
+
+            &.right {
+                .result-wrapper>.voted {
+                    background-color: $green;
+                }
+            }
+
+            @if $in {
+                &/*.chosen*/ {
+                    .options-wrapper>.progress-wrapper>.progress {
+                        background-color: $blue;
+                    }
+                }
+            }
+
+            @if $in == false {
+                &/*.chosen*/ {
+                    .options-wrapper>.progress-wrapper>.progress {
+                        background-color: $green;
+                    }
                 }
             }
 
@@ -65,10 +100,6 @@
                     color: white;
                     border-radius: 50%;
                     position: relative;
-
-                    &:not(:empty) { //TODO add classes right/wrong
-                        background-color: $green;
-                    }
 
                     .tgico {
                         position: absolute;
@@ -100,7 +131,6 @@
                         min-width: 5px;
                         height: 5px;
                         border-radius: 5px;
-                        background-color: $green;
                         transition: 1s ease-in-out width;
                     }
                 }
@@ -131,6 +161,7 @@
 
         .stats {
             color: $darkgrey;
+            align-self: center;
         }
     }
 }
