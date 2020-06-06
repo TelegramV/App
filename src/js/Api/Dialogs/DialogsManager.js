@@ -278,6 +278,7 @@ class DialogManager extends Manager {
     }
 
     fetchFirstPage() {
+        console.log("test!")
         if (this.isFetched) {
             AppEvents.Dialogs.fire("gotMany", {
                 dialogs: DialogsStore.toSortedArray(),

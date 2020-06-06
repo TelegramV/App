@@ -29,6 +29,7 @@ img[src=""], img:not([src]) {
   display: flex;
   background-color: $lightblue;
   overflow: hidden;
+  height: 100%;
   // Only specific parts should be selectable
   user-select: none;
 }

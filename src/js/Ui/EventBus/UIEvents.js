@@ -19,8 +19,15 @@ import {EventBus} from "../../Api/EventBus/EventBus"
 
 const UIEvents = {
     General: new EventBus(),
+    /**
+     * @deprecated Use UIEvents.Sidebars
+     */
     LeftSidebar: new EventBus(),
+    /**
+     * @deprecated Use UIEvents.Sidebars
+     */
     RightSidebar: new EventBus(),
+    Sidebars: new EventBus(),
     MediaViewer: new EventBus()
 }
 

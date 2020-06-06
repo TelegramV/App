@@ -23,6 +23,17 @@ import FoldersManager from "../../../Api/Dialogs/FolderManager";
 import ForwardBarComponent from "../../Components/Sidebars/Right/ForwardBarComponent";
 import Localization from "../../../Api/Localization/Localization";
 import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
+import {SettingsSidebar} from "../../Components/SidebarsNeo/Left/Settings/SettingsSidebar";
+import {LanguageSidebar} from "../../Components/SidebarsNeo/Left/Settings/LanguageSidebar";
+import {GeneralSidebar} from "../../Components/SidebarsNeo/Left/Settings/General/GeneralSidebar";
+import {NotificationsSidebar} from "../../Components/SidebarsNeo/Left/Settings/Notifications/NotificationsSidebar";
+import {PrivacySidebar} from "../../Components/SidebarsNeo/Left/Settings/Privacy/PrivacySidebar";
+import {ActiveSessionsSidebar} from "../../Components/SidebarsNeo/Left/Settings/Privacy/ActiveSessionsSidebar";
+import {BlockedSidebar} from "../../Components/SidebarsNeo/Left/Settings/Privacy/BlockedSidebar";
+import {DialogsSidebar} from "../../Components/SidebarsNeo/Left/Dialogs/DialogsSidebar";
+import {LeftSidebarHistory} from "../../Components/SidebarsNeo/GenericSidebarHistory";
+import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
+import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -64,20 +75,35 @@ export function MainPage() {
             <MediaViewerComponent/>
             <InstantViewComponent/>
             <SnackbarComponent/>
-            <SettingsComponent/>
+            {/*<SettingsComponent/>*/}
+
+            <LeftSidebars/>
+            {/*<div className="sidebar-wrapper left">*/}
+            {/*    <SettingsSidebar/>*/}
+            {/*    /!*<LanguageSidebar/>*!/*/}
+            {/*    /!*<GeneralSidebar/>*!/*/}
+            {/*    /!*<NotificationsSidebar/>*!/*/}
+            {/*    /!*<PrivacySidebar/>*!/*/}
+            {/*    /!*<ActiveSessionsSidebar/>*!/*/}
+            {/*    /!*<BlockedSidebar/>*!/*/}
+            {/*    <DialogsSidebar/>*/}
+            {/*</div>*/}
+
+
             <PhoneCallComponent/>
-            {/*TODO move all settings inside it's component*/}
 
-            <SearchPanelComponent/>
-            <CreateChannelBar/>
-            <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
+            {/*<SearchPanelComponent/>*/}
+            {/*<CreateChannelBar/>*/}
+            {/*<ArchivedDialogsBar/> /!* critical: archived bar should be always before dialogs bar *!/*/}
 
-            <DialogsBar/>
+            {/*<DialogsBar/>*/}
             <ChatComponent/>
 
-            <DialogInfoComponent/>
-            <MessagesSearchComponent/>
-            <ForwardBarComponent/>
+            {/*<RightSidebars/>*/}
+
+            {/*<DialogInfoComponent/>*/}
+            {/*<MessagesSearchComponent/>*/}
+            {/*<ForwardBarComponent/>*/}
         </div>
     )
 }

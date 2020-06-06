@@ -3,7 +3,7 @@ import VRDOMPlugin from "../../V/VRDOM/plugin/VRDOMPlugin"
 class HorizontalScrollVRDOMPlugin extends VRDOMPlugin {
     elementDidMount($el) {
         if ($el.nodeType !== Node.TEXT_NODE && $el.classList.contains("horizontal-scroll")) {
-            $el.addEventListener('wheel', this.transformScroll)
+            $el.addEventListener('wheel', this.transformScroll, {passive: true})
         }
     }
 

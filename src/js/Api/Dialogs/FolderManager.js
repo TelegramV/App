@@ -14,6 +14,7 @@ class FolderManager {
 
     constructor() {
         keval.getItem("foldersData").then(foldersData => {
+            if(!foldersData) return
             this.folders = foldersData.folders
             this.selectedFolder = foldersData.selected
 

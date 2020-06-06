@@ -9,6 +9,7 @@ import {DialogUnreadMarkBadge} from "./DialogUnreadMarkBadge"
 
 export const DialogFragment = (
     {
+        peer,
         dialog,
         contextMenu,
         click,
@@ -18,9 +19,11 @@ export const DialogFragment = (
         unreadMentionsCountFragmentRef,
         unreadCountFragmentRef,
         unreadMarkFragmentRef,
+        ...otherArgs
     }
 ) => {
-    const peer = dialog.peer
+    console.log(peer, otherArgs)
+    // const peer = dialog.peer
     let lastMessage = dialog.peer.messages.last
 
     const personClasses = {
