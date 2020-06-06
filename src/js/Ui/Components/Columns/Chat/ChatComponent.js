@@ -28,6 +28,7 @@ import VSpinner from "../../Elements/VSpinner"
 import VirtualizedBubblesComponent from "./VirtualizedBubblesComponent"
 import ChatInfoCallButtonComponent from "./ChatInfo/ChatInfoCallButtonComponent";
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
+import SnackbarComponent from "../../Singleton/SnackbarComponent"
 
 /**
  * CRITICAL: never rerender this component!
@@ -86,6 +87,7 @@ class ChatComponent extends StatelessComponent {
                     <ChatInputComponent ref={this.chatInputRef}/>
 
                 </div>
+                <SnackbarComponent/>
             </div>
         )
     }

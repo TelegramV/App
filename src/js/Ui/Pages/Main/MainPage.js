@@ -16,7 +16,6 @@ import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/Archive
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
-import SnackbarComponent from "../../Components/Singleton/SnackbarComponent"
 import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
 import CreateChannelBar from "../../Components/Sidebars/Left/Create/CreateChannelBar";
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
@@ -63,7 +62,6 @@ export function MainPage() {
             <ModalComponent/>
             <MediaViewerComponent/>
             <InstantViewComponent/>
-            <SnackbarComponent/>
             <SettingsComponent/>
             <PhoneCallComponent/>
             {/*TODO move all settings inside it's component*/}

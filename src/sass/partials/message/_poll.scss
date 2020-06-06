@@ -7,11 +7,80 @@
 
         .question {
             font-weight: 500;
-            margin-bottom: 5px;
+            margin-top: 5px;
         }
 
-        .poll-type {
-            color: $darkgrey;
+        .subtitle {
+            display: flex;
+            align-items: center;
+            height: 36px;
+
+            .poll-type {
+                color: $darkgrey;
+            }
+
+            .recent-voters {
+                display: flex;
+                flex-direction: row-reverse;
+                padding-left: 10px;
+
+                .avatar {
+                    --avatar-size: 14px;
+                    transform: scale(1.5); //overlaying
+                }
+            }
+
+            .filler {
+                flex-grow: 1;
+            }
+
+            .tip {
+                border-radius: 50%;
+                cursor: pointer;
+
+                .tgico {
+                    font-size: 24px;
+                    color: $blue;
+                }
+
+                &:hover {
+                    background-color: $light;
+                }
+            }
+
+            .timer {
+                display: flex;
+                align-items: center;
+
+                .v-spinner {
+                    transform: scale(0.75);
+
+                    .new-progress {
+                        animation: none;
+                        transform: rotate(-90deg);
+
+                        &>circle {
+                            stroke-width: 4;
+                        }
+                    }
+                }
+
+                @if $in {
+                    .time-left {
+                        color: $darkgrey;
+                    }
+                }
+
+                @if $in==false {
+                    .v-spinner .new-progress>circle {
+                        stroke: $green;
+                    }
+
+                    .time-left {
+                        color: $green;
+                    }
+                }
+            }
         }
 
         &.voted {
@@ -26,113 +95,132 @@
 
         .answer {
             width: 100%;
-            display: flex;
-            height: 40px;
+            display: grid;
+            grid-template-areas:
+                "topleft answer"
+                "voted progress";
+            grid-template-columns: 40px 1fr;
+            grid-template-rows: max-content 20px;
+            grid-column-gap: 5px;
             cursor: pointer;
+
+            /*&.voting {
+                grid-template-rows: unset;
+                padding-top: 5px;
+            }*/
 
             &:hover {
                 background-color: $light;
             }
 
             &.chosen {
-                .result-wrapper>.voted {
+                .voted {
                     @if $in {
                         background-color: $blue;
                     }
 
-                    @if $in == false {
+                    @if $in==false {
                         background-color: $green;
                     }
                 }
             }
 
             &.wrong {
-                .options-wrapper>.progress-wrapper>.progress {
+                .progress-wrapper>.progress {
                     background-color: $red;
                 }
 
-                .result-wrapper>.voted {
+                .voted {
                     background-color: $red;
                 }
             }
 
             &.right {
-                .result-wrapper>.voted {
+                .progress-wrapper>.progress {
+                    background-color: $green;
+                }
+
+                .voted {
                     background-color: $green;
                 }
             }
 
             @if $in {
-                &/*.chosen*/ {
-                    .options-wrapper>.progress-wrapper>.progress {
+                &
+
+                /*.chosen*/
+                    {
+                    .progress-wrapper>.progress {
                         background-color: $blue;
                     }
                 }
             }
 
-            @if $in == false {
-                &/*.chosen*/ {
-                    .options-wrapper>.progress-wrapper>.progress {
+            @if $in==false {
+                &
+
+                /*.chosen*/
+                    {
+                    .progress-wrapper>.progress {
                         background-color: $green;
                     }
                 }
             }
 
-            .result-wrapper {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: flex-end;
-                width: 40px;
-                margin-right: 5px;
-
-                /*.checkbox-input, .radio-input {
-                    margin: auto;
-                }*/
-
-                .percent {
-                    font-weight: 500;
-                }
-
-                .voted {
-                    height: 16px;
-                    width: 16px;
-                    color: white;
+            .checkbox-input {
+                --size: 16px;
+                &>.checkmark {
                     border-radius: 50%;
-                    position: relative;
-
-                    .tgico {
-                        position: absolute;
-                        top: 50%;
-                        left: 50%;
-                        transform: translate(-50%, -50%);
-                        font-size: 14px;
-                    }
                 }
             }
 
-            .options-wrapper {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: flex-start;
-                flex-grow: 1;
+            .vote {
+                grid-area: topleft;
+                align-self: center;
+                justify-self: end;
+            }
 
-                .answer-text {
-                    line-height: 1.5em;
+            .percent {
+                grid-area: topleft;
+                align-self: center;
+                justify-self: end;
+                font-weight: 500;
+            }
+
+            .voted {
+                grid-area: voted;
+                justify-self: end;
+                height: 16px;
+                width: 16px;
+                color: white;
+                border-radius: 50%;
+                position: relative;
+
+                .tgico {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    font-size: 14px;
                 }
+            }
 
-                .progress-wrapper {
-                    height: 10px;
-                    width: 100%;
-                    padding-top: 5px;
+            .answer-text {
+                grid-area: answer;
+                line-height: 1.5em;
+            }
 
-                    .progress {
-                        min-width: 5px;
-                        height: 5px;
-                        border-radius: 5px;
-                        transition: 1s ease-in-out width;
-                    }
+            .progress-wrapper {
+                grid-area: progress;
+                height: 10px;
+                width: 100%;
+                padding-top: 5px;
+
+                .progress {
+                    min-width: 5px;
+                    height: 5px;
+                    border-radius: 5px;
+                    transition: 1s ease-in-out width;
                 }
             }
         }

@@ -37,6 +37,7 @@ import processUpdateDeleteChannelMessages from "./Update/Message/processUpdateDe
 import processUpdateDeleteMessages from "./Update/Message/processUpdateDeleteMessages"
 import processUpdateEditMessage from "./Update/Message/processUpdateEditMessage"
 import processUpdateMessagePoll from "./Update/Message/processUpdateMessagePoll"
+import processUpdateMessagePollVote from "./Update/Message/processUpdateMessagePollVote"
 import processUpdateEditChannelMessage from "./Update/Message/processUpdateEditChannelMessage"
 import processUpdateNewChannelMessage from "./Update/Message/processUpdateNewChannelMessage"
 import processUpdateDraftMessage from "./Update/processUpdateDraftMessage"
@@ -85,6 +86,7 @@ export class UpdateManager extends Manager {
         this.subscribe("updateDeleteMessages", processUpdateDeleteMessages)
         this.subscribe("updateEditMessage", processUpdateEditMessage)
         this.subscribe("updateMessagePoll", processUpdateMessagePoll)
+        this.subscribe("updateMessagePollVote", processUpdateMessagePollVote)
         this.subscribe("updateEditChannelMessage", processUpdateEditChannelMessage)
         this.subscribe("updateNewChannelMessage", processUpdateNewChannelMessage)
         this.subscribe("updateDraftMessage", processUpdateDraftMessage)

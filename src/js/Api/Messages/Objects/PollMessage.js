@@ -18,7 +18,7 @@ export class PollMessage extends AbstractMessage {
     }
 
     get isVoted() {
-        return this.results?.results?.find(res => res.chosen);
+        return !!this.results.results?.find(res => res.chosen);
     }
 
     get isPublic() {
@@ -27,6 +27,10 @@ export class PollMessage extends AbstractMessage {
 
     get isMultiple() {
         return this.poll.multiple_choice;
+    }
+
+    get isVotedCorrectly() {
+        return this.results?.results?.find(res => res.chosen)?.correct;
     }
 
     /**
@@ -55,10 +59,19 @@ export class PollMessage extends AbstractMessage {
  
     // legacy? (still needed though)
     fillPoll(poll, results) {
-        if (poll) {
-            this.raw.media.poll = poll;
+        if(poll) this.raw.media.poll = poll;
+
+        if(results) this.raw.media.results = results;
+    }
+
+    fillPollVote(userId, options) {
+        if(this.results.recent_voters) {
+            this.results.recent_voters.unshift(userId);
+            this.results.recent_voters.pop();
         }
 
-        this.raw.media.results = results;
+        if(this.results.results) {
+            this.results.results.filter(res => options.includes(res.option)).forEach(res => res.voters++);
+        }
     }
 }
