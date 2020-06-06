@@ -135,6 +135,31 @@ function sendVote(message, answers) {
     });
 }
 
+function closePoll(message) {
+    if(!message.poll) return;
+    message.poll.closed = true;
+    let poll = {
+        _: "inputMediaPoll",
+        poll: message.poll,
+        correct_answers: message.results?.results?.filter(res => res.correct)?.map(res => res.option),
+        solution: message.results?.solution,
+        solution_entities: message.result?.solution_entities
+    }
+
+    return MTProto.invokeMethod("messages.editMessage", {
+        no_webpage: false,
+        peer: message.from.inputPeer,
+        id: message.id,
+        message: message.text,
+        media: poll,
+        reply_markup: message.replyMarkup,
+        entities: message.raw.entities,
+        schedule_date: 0
+    }).then(updates => {
+        UpdatesManager.process(updates)
+    })
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
@@ -148,6 +173,7 @@ const messages = {
     deleteMessages: deleteMessages,
     updatePinnedMessage: updatePinnedMessage,
     sendVote: sendVote,
+    closePoll: closePoll,
 }
 
 export default messages

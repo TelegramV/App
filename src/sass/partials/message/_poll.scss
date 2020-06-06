@@ -63,7 +63,7 @@
             }
 
             @if $in {
-                &.chosen {
+                &/*.chosen*/ {
                     .options-wrapper>.progress-wrapper>.progress {
                         background-color: $blue;
                     }
@@ -71,7 +71,7 @@
             }
 
             @if $in == false {
-                &.chosen {
+                &/*.chosen*/ {
                     .options-wrapper>.progress-wrapper>.progress {
                         background-color: $green;
                     }
@@ -161,6 +161,7 @@
 
         .stats {
             color: $darkgrey;
+            align-self: center;
         }
     }
 }

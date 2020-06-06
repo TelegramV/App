@@ -45,11 +45,13 @@ export class PollMessage extends AbstractMessage {
 
     calculateAbsolutePercent(pollAnswerVotes) {
         if(!pollAnswerVotes) return null;
+        if(this.results.total_voters === 0) return 0;
         return Math.round((pollAnswerVotes.voters/this.results.total_voters)*100)
     }
 
     calculateRelativePercent(pollAnswerVotes) {
         if(!pollAnswerVotes) return null;
+        if(this.mostPopularAnswer.voters === 0) return 0;
         return (pollAnswerVotes.voters/this.mostPopularAnswer.voters)*100;
     }
  

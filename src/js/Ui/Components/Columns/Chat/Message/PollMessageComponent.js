@@ -1,6 +1,7 @@
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import MTProto from "../../../../../MTProto/External"
 import MessageWrapperFragment from "./Common/MessageWrapperFragment"
+import TextWrapperComponent from "./Common/TextWrapperComponent"
 import VRadio from "../../../Elements/VRadio"
 import VCheckbox from "../../../Elements/VCheckbox"
 import messages from "../../../../../Api/Telegram/messages"
@@ -15,7 +16,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         super.init();
 
         let message = this.props.message;
-        console.log(message);
+        //console.log(message);
 
         this.answers = [];
 
@@ -32,7 +33,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
             this.contextActions.push({
                 icon: "close",
                 title: "Close voting",
-                onClick: _ => this.closeVoting()
+                onClick: _ => this.closePoll()
             })
         }
     }
@@ -61,12 +62,15 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                     {this.makeAnswerBlock()}
                     <FooterFragment message={message} actionClick={this.onActionClick}/>
                 </div>
+                <TextWrapperComponent message={message}/>
             </MessageWrapperFragment>
         )
     }
 
     getPollType = () => {
         let message = this.props.message;
+
+        if(message.poll.closed) return "Final results";
 
         if(message.isPublic) {
             return message.isQuiz ? "Quiz" : "Public poll";
@@ -138,11 +142,11 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     cancelVote = () => {
-
+        messages.sendVote(this.props.message, []);
     }
 
-    closeVoting = () => {
-
+    closePoll = () => {
+        messages.closePoll(this.props.message);
     }
 }
 
@@ -150,7 +154,7 @@ const AnswerFragment = ({message, option, click}) => {
     let answer = message.poll.answers.find(answ => answ.option[0] === option);
     let result = message.results?.results?.find(res => res.option[0] === option);
 
-    if(!message.isVoted) {
+    if(!message.isVoted && !message.poll.closed) {
         return (
             <div class="answer rp" option={answer.option} onClick={click}>
                 <div class="result-wrapper">
@@ -162,9 +166,9 @@ const AnswerFragment = ({message, option, click}) => {
             </div>
         )
     } else {
-        let relPercent = message.calculateRelativePercent(result);
+        let relPercent = Math.max(message.calculateRelativePercent(result), 1); //0% doesn't show a bar
         let absPercent = message.calculateAbsolutePercent(result);
-        if(absPercent === null) return <div/>;
+        if(absPercent === null) return undefined;
 
         let votedClass = {
             "tgico": true,
