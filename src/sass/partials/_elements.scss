@@ -51,19 +51,20 @@
     }
 
     .card-info {
-        margin-left: 5px;
+        margin-left: 10px;
         display: flex;
         flex-direction: column;
         justify-content: center;
 
         font-size: 14px;
+        line-height: 20px;
 
         .title {
             font-weight: 500;
         }
 
         .description {
-            padding-top: 5px;
+            //padding-top: 5px;
             color: $darkgrey;
         }
     }

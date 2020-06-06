@@ -7,7 +7,7 @@ import StatelessComponent from "../../../../../V/VRDOM/component/StatelessCompon
 class ChatInfoAvatarComponent extends StatelessComponent {
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .only(event => event.peer === AppSelectedChat.Current)
+            .filter(event => event.peer === AppSelectedChat.Current)
             .updateOn("updatePhoto")
             .updateOn("updatePhotoSmall")
 

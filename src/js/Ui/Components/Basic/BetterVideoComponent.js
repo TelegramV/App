@@ -19,7 +19,6 @@
 
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
-import VComponent from "../../../V/VRDOM/component/VComponent"
 
 class BetterVideoComponent extends StatefulComponent {
     state = {
@@ -31,8 +30,6 @@ class BetterVideoComponent extends StatefulComponent {
         isHovered: false,
     };
 
-    videoRef = VComponent.createRef();
-
     init() {
         const {document} = this.props;
 
@@ -42,21 +39,17 @@ class BetterVideoComponent extends StatefulComponent {
         this.state.thumbnailUrl = FileAPI.hasThumbnail(document) ? FileAPI.getThumbnail(document) : "";
     }
 
-    render({document, onClick, controls, autoPlay, loop, muted}, {isLoading, url, thumbnailUrl, width, height}) {
+    render({document, onClick, playOnHover, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
         return (
             <figure className={["video rp rps", isLoading && "thumbnail"]} onClick={onClick}>
                 {
                     !isLoading ?
-                        <video ref={this.videoRef}
-                               src={url}
+                        <video src={url}
                                type={document.mime_type}
-                               controls={controls || null}
-                               autoPlay={autoPlay || null}
-                               loop={loop || null}
                                onMouseOver={this.onMouseOver}
                                onMouseOut={this.onMouseOut}
                                onEnded={this.onEnded}
-                               muted={muted}
+                               {...otherArgs}
                         />
                         :
                         (width > height ?

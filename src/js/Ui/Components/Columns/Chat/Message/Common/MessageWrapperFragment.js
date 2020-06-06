@@ -10,6 +10,7 @@ import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer"
 import VUI from "../../../../../VUI"
 import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer"
 import API from "../../../../../../Api/Telegram/API"
+import PeerName from "../../../../Reactive/PeerName"
 
 function ReplyToMessageFragment({message}) {
     if (!message.raw.reply_to_msg_id) {
@@ -130,8 +131,10 @@ function MessageWrapperFragment(
             <div className={contentClasses}>
                 <ReplyToMessageFragment message={message}/>
                 <ForwardedHeaderFragment message={message}/>
-                {username ? <div css-cursor="pointer" className="username"
-                                 onClick={() => AppSelectedInfoPeer.select(message.from)}>{message.from.name}</div> : ""}
+                {username ? <PeerName peer={message.from} template={(peer) => {
+                    return <div css-cursor="pointer" className="username"
+                                onClick={() => AppSelectedInfoPeer.select(peer)}>{peer.name}</div>
+                }}/> : ""}
                 {slot}
             </div>
             {inlineKeyboard}

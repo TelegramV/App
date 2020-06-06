@@ -61,8 +61,8 @@ class GifsComposerComponent extends StatelessComponent {
                         <div class="masonry-item" css-width={width + "px"}>
                             <BetterVideoComponent document={document}
                                                   onClick={() => {
-                                                    AppSelectedChat.current.api.sendExistingMedia(document);
-                                                    VApp.mountedComponents.get("composer").hide();
+                                                      AppSelectedChat.current.api.sendExistingMedia(document);
+                                                      VApp.mountedComponents.get("composer").hide();
                                                   }}
                                                   playOnHover/>
                         </div>,

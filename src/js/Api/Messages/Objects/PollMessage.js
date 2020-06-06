@@ -1,5 +1,3 @@
-// @flow
-
 import {AbstractMessage} from "../AbstractMessage"
 import {MessageType} from "../Message"
 
@@ -19,6 +17,7 @@ export class PollMessage extends AbstractMessage {
         if (poll) {
             this.raw.media.poll = poll;
         }
+
         this.raw.media.results = results;
     }
 }

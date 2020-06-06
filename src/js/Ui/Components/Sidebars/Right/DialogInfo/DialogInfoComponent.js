@@ -17,13 +17,13 @@ import {DialogInfoMemberComponent} from "./Fragments/DialogInfoMemberComponent";
 import {DialogInfoAudioComponent} from "./Fragments/DialogInfoAudioComponent";
 import {FileAPI} from "../../../../../Api/Files/FileAPI";
 import {formatAudioTime} from "../../../../Utils/utils";
-import {PhotoMessage} from "../../../../../Api/Messages/Objects/PhotoMessage";
 import PeersStore from "../../../../../Api/Store/PeersStore"
 import UIEvents from "../../../../EventBus/UIEvents"
 import MTProto from "../../../../../MTProto/External";
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
 import vrdom_append from "../../../../../V/VRDOM/append"
+import {MessageFactory} from "../../../../../Api/Messages/MessageFactory"
 
 export class DialogInfoComponent extends RightBarComponent {
 
@@ -259,10 +259,11 @@ export class DialogInfoComponent extends RightBarComponent {
         if (rawMessage.id < this.contentPages.media.offsetId) {
             this.contentPages.media.offsetId = rawMessage.id
         }
-        const message = new PhotoMessage(AppSelectedInfoPeer.Current)
-            .fillRaw(rawMessage)
+
+        const message = MessageFactory.fromRaw(AppSelectedInfoPeer.Current, rawMessage)
+
         vrdom_append(
-            <BetterPhotoComponent photo={message.raw.media.photo}
+            <BetterPhotoComponent photo={message.media}
                                   onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>,
             this.contentRefs.media.$el
         )

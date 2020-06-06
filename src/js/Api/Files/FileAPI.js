@@ -192,14 +192,14 @@ export class FileAPI {
         return URL.createObjectURL(FileAPI.getBlob(file, type));
     }
 
-    static tryFromCache(file, size): Promise<Blob> {
+    static tryFromCache(file, thumbOrSize): Promise<Blob> {
         let sectorName = "files";
 
         if (file._ === "photo") {
             sectorName = "images"
         }
 
-        return AppCache.get(sectorName, `${file.id}${size ? "_" + size.type : ""}`).then(blob => {
+        return AppCache.get(sectorName, `${file.id}${thumbOrSize ? "_" + thumbOrSize.type : ""}`).then(blob => {
             if (blob) {
                 return blob
             }
@@ -208,7 +208,7 @@ export class FileAPI {
         });
     }
 
-    static putToCache(file, blob: Blob, size): Promise<Blob> {
+    static putToCache(file, blob: Blob, thumbOrSize): Promise<Blob> {
         if (blob.size > 10485760) { // do not cache larger than 10MB
             return Promise.resolve(blob);
         }
@@ -219,7 +219,7 @@ export class FileAPI {
             sectorName = "images"
         }
 
-        return AppCache.put(sectorName, `${file.id}${size ? "_" + size.type : ""}`, blob)
+        return AppCache.put(sectorName, `${file.id}${thumbOrSize ? "_" + thumbOrSize.type : ""}`, blob)
             .then(() => blob)
             .catch(() => blob)
     }

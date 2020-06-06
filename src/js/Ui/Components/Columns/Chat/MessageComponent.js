@@ -30,13 +30,13 @@ import VideoMessageComponent from "./Message/Video/VideoMessageComponent"
 import GIFMessageComponent from "./Message/GIFMessageComponent"
 import StickerMessageComponent from "./Message/StickerMessageComponent"
 import VoiceMessageComponent from "./Message/VoiceMessageComponent"
-import AudioMessageComponent from "./Message/AudioMessageComponent"
 import RoundVideoMessageComponent from "./Message/RoundVideoMessageComponent"
 import PhoneCallMessageComponent from "./Message/PhoneCallMessageComponent"
 import ServiceMessageComponent from "./Message/ServiceMessageComponent"
 import AnimatedStickerMessageComponent from "./Message/AnimatedStickerMessageComponent"
 import DiceMessageComponent from "./Message/DiceMessageComponent"
 import GroupedMessageComponent from "./Message/GroupedMessageComponent";
+import NewAudioMessageComponent from "./Message/NewAudioMessageComponent"
 
 /**
  * @type {Map<number, function({message: *}): *>}
@@ -58,7 +58,8 @@ const handlers = new Map([
     [MessageType.DICE, DiceMessageComponent],
     [MessageType.STICKER, StickerMessageComponent],
     [MessageType.VOICE, VoiceMessageComponent],
-    [MessageType.AUDIO, AudioMessageComponent],
+    [MessageType.AUDIO, NewAudioMessageComponent],
+    // [MessageType.AUDIO, AudioMessageComponent],
     [MessageType.ROUND, RoundVideoMessageComponent],
     [MessageType.VIDEO, VideoMessageComponent],
     [MessageType.PHONE_CALL, PhoneCallMessageComponent],

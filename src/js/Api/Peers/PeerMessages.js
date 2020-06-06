@@ -204,7 +204,7 @@ export class PeerMessages {
             let newest = this._recent[0];
 
             if (newest.id < message.id) {
-                if (message.type !== MessageType.GROUP || !message.messages.size) {
+                if (message.type !== MessageType.GROUP || message.messages.size <= 1) {
                     this._recent.unshift(message);
 
                     if (this._recent.length > 100) {

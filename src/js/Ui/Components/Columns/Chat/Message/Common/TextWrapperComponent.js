@@ -1,8 +1,7 @@
-import {parseMessageEntities} from "../../../../../../Utils/htmlHelpers";
 import MessageTimeComponent from "./MessageTimeComponent";
 
 const TextWrapperComponent = ({message, time = true, color}, slot) => {
-    let text = parseMessageEntities(message.text, message.raw.entities);
+    let text = message.parsed;
     if (!text) return "";
     return (
         <div class="text-wrapper" css-color={color} ondblclick={event => event.stopPropagation()}>

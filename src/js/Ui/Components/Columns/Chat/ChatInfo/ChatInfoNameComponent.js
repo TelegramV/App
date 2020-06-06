@@ -8,7 +8,7 @@ class ChatInfoNameComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .only(event => AppSelectedChat.check(event.peer))
+            .filter(event => AppSelectedChat.check(event.peer))
             .updateOn("updateName")
 
         E.bus(UIEvents.General)
@@ -22,7 +22,7 @@ class ChatInfoNameComponent extends StatelessComponent {
 
         return (
             <div className="title" onClick={this.openPeerInfo}>
-                {AppSelectedChat.Current.isSelf ? "Saved Messages" : AppSelectedChat.Current.name}
+                {AppSelectedChat.current.isSelf ? "Saved Messages" : AppSelectedChat.Current.name}
             </div>
         )
     }

@@ -1,6 +1,5 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment"
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import {parseMessageEntities} from "../../../../../Utils/htmlHelpers"
 import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
 
 class GameMessageComponent extends GeneralMessageComponent {
@@ -15,7 +14,7 @@ class GameMessageComponent extends GeneralMessageComponent {
                 <div class="game">
                     <div class="title">{game.title}</div>
                     <div class="info">
-                        {this.props.message.text ? parseMessageEntities(this.props.message.text) : game.description}
+                        {this.props.message.text ? this.props.message.parsed : game.description}
                     </div>
                     <BetterPhotoComponent photo={game.photo} calculateSize={true}/>
                 </div>

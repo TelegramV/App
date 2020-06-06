@@ -1,5 +1,3 @@
-// @flow
-
 import {AbstractMessage} from "../AbstractMessage"
 import {MessageType} from "../Message"
 

@@ -1,8 +1,5 @@
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer";
 
-const openUser = forwarded => {
-    AppSelectedInfoPeer.select(forwarded)
-}
 export const ForwardedHeaderFragment = ({message}) => {
     if (!message.raw.fwd_from) {
         return <div/>
@@ -18,7 +15,8 @@ export const ForwardedHeaderFragment = ({message}) => {
         </div>
     } else {
         return <div id={`message-${message.id}-fwd`} className="fwd">
-            Forwarded from <span className="clickable-name" onClick={() => openUser(message.forwarded)}>
+            Forwarded from <span className="clickable-name"
+                                onClick={() => AppSelectedInfoPeer.select(message.forwarded)}>
                 {message.forwarded.name}
             </span>
         </div>

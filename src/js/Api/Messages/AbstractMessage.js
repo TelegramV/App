@@ -9,6 +9,7 @@ import MTProto from "../../MTProto/External"
 import API from "../Telegram/API"
 import type {BusEvent} from "../EventBus/EventBus"
 import AppEvents from "../EventBus/AppEvents"
+import {parseMessageEntities} from "../../Utils/htmlHelpers"
 
 export const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -36,6 +37,8 @@ export class AbstractMessage extends ReactiveObject implements Message {
     forwarded: any;
     forwardedType: string;
     forwardedMessageId: number;
+
+    parsed = "";
 
     _hideAvatar: boolean;
     _tailsGroup: string;
@@ -153,7 +156,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get text(): string {
-        return this.raw.message || ""
+        return this.raw ? this.raw.message || "" : ""
     }
 
     get to(): Peer {
@@ -195,6 +198,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.raw.edit_date
     }
 
+    get media(): Object {
+        return this.raw.media
+    }
+
     getDate(locale: any, format: any) {
         return new Date(this.date * 1000).toLocaleString(locale, format)
     }
@@ -207,10 +214,6 @@ export class AbstractMessage extends ReactiveObject implements Message {
     show() {
         this.findReplyTo()
         this.findForwarded()
-    }
-
-    get smallPreviewImage() {
-        return null
     }
 
     get groupedId() {
@@ -315,6 +318,8 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     // WARNING: always call super
     fillRaw(raw: Object): Message {
+        this.parsed = parseMessageEntities(raw.message || "", raw.entities)
+
         this.raw = raw
         this.prefix = MessageParser.getDialogPrefix(this)
 
@@ -349,3 +354,5 @@ export class AbstractMessage extends ReactiveObject implements Message {
         super.fire(type, event)
     }
 }
+
+export default AbstractMessage

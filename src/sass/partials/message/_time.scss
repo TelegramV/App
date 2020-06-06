@@ -63,7 +63,7 @@
                 display: flex;
                 padding: 0px 12px 0px 5px;
             }
-        } 
+        }
 
         @if $in == false {
             color: $darkgreen;
@@ -93,7 +93,7 @@
     }
 
     & .round {
-        &~.time.bg {
+        & ~ .time.bg {
             bottom: 22px;
             right: 12px;
         }
@@ -102,13 +102,13 @@
     & .photo,
     & .video,
     & .grouped {
-        &~.time.bg {
+        & ~ .time.bg {
             right: 15px;
             bottom: 5px;
         }
 
         @if $in==false {
-            &~.time.bg {
+            & ~ .time.bg {
                 right: 25px;
             }
         }

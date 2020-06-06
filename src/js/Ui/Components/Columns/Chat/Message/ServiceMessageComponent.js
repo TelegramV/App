@@ -68,11 +68,11 @@ class ServiceMessageComponent extends GeneralMessageComponent {
         }
 
         if (type === "messageActionChatAddUser") {
-            if(action.users.length === 1 && action.users[0] === message.from) {
+            if (action.users.length === 1 && action.users[0] === message.from.id) {
                 return [this.wrapPeer(message.from),
-                " joined the group"]
+                    " joined the group"]
             }
-            
+
             let users = [];
             for (let userId of action.users) {
                 let peer = PeersStore.get("user", userId);

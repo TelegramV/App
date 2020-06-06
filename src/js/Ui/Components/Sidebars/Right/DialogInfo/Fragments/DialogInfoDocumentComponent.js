@@ -21,8 +21,8 @@ class DialogInfoDocumentComponent extends StatelessComponent {
 
         const title = DocumentMessagesTool.getFilename(document.attributes);
         const ext = title.split(".")[title.split(".").length - 1];
-        const percentage = FileManager.getPercentage(document.id);
-        const pendingSize = FileManager.getPendingSize(document.id);
+        const percentage = FileManager.getPercentage(document);
+        const pendingSize = FileManager.getPendingSize(document);
 
         const size = isDownloading && !isDownloaded ? `${Math.round(percentage)}% / ${DocumentMessagesTool.formatSize(pendingSize)}` : DocumentMessagesTool.formatSize(document.size);
 

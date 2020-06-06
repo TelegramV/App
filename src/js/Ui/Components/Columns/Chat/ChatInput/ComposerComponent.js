@@ -1,5 +1,3 @@
-import AppSelectedChat from "../../../../Reactive/SelectedChat"
-import VApp from "../../../../../V/vapp"
 import lottie from "../../../../../../../vendor/lottie-web"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 import StickersComposerComponent from "./StickersComposerComponent"
@@ -65,7 +63,7 @@ export default class ComposerComponent extends StatelessComponent {
     }
 
     toggle = (show) => {
-        if(!show || this.visible) {
+        if (!show || this.visible) {
             this.hide();
         } else {
             this.show();

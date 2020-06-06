@@ -16,11 +16,11 @@
  */
 
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
-import AudioManager from "../../../../Managers/AudioManager";
 import UIEvents from "../../../../EventBus/UIEvents";
 import {MessageParser} from "../../../../../Api/Messages/MessageParser";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
+import AudioPlayer from "../../../../../Api/Audio/AudioPlayer"
 
 class ChatInfoPinnedComponent extends StatefulComponent {
     state = {
@@ -36,22 +36,24 @@ class ChatInfoPinnedComponent extends StatefulComponent {
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelected)
-            .on("audio.play", this.onAudioPlay)
-            .on("audio.pause", this.onAudioPause)
-            .on("audio.remove", this.onAudioRemove)
+
+        E.bus(AppEvents.General)
+            .updateOn("audio.play")
+            .updateOn("audio.paused")
+            .updateOn("audio.stop")
     }
 
     render() {
-        if (this.state.audio) {
-            let playClasses = ["tgico", this.state.pause ? "tgico-play" : "tgico-pause"];
+        if (AudioPlayer.state.document) {
+            let playClasses = ["tgico", AudioPlayer.isPaused() || AudioPlayer.isEnded() ? "tgico-play" : "tgico-pause"];
             return (
                 <div className="pin active-audio">
-                    <div className="play rp rps" onClick={() => AudioManager.toggle()}>
+                    <div className="play rp rps" onClick={() => AudioPlayer.toggle()}>
                         <i class={playClasses}/>
                     </div>
                     <div className="audio-info">
-                        <div className="title">{this.state.meta.title}</div>
-                        <div className="description">{this.state.meta.artist}</div>
+                        <div className="title">{AudioPlayer.audioInfo().title}</div>
+                        <div className="description">{AudioPlayer.audioInfo().performer}</div>
                     </div>
                 </div>
             )

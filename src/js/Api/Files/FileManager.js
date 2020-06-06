@@ -4,45 +4,37 @@ import AppEvents from "../EventBus/AppEvents"
 class FilesManager {
 
     pending = new Map()
-    downloaded: Map<string, { blob: Blob; url: string; }> = new Map()
+    downloaded: Map<string, { url?: string; }> = new Map()
 
-    isPending(file) {
+    isPending(file, thumbOrSize) {
         return this.pending.has(file.id)
     }
 
-    isPendingById(fileId) {
-        return this.pending.has(fileId)
-    }
-
-    isDownloaded(file) {
+    isDownloaded(file, thumbOrSize) {
         return this.downloaded.has(file.id)
     }
 
-    isDownloadedById(fileId) {
-        return this.downloaded.has(fileId)
+    getPercentage(file, thumbOrSize) {
+        return this.pending.get(file.id)?._percentage ?? 100
     }
 
-    getPercentage(fileId) {
-        return this.pending.get(fileId)?._percentage ?? 100
+    getPendingSize(file, thumbOrSize) {
+        return this.pending.get(file.id)?._downloadedBytes?.length ?? 0
     }
 
-    getPendingSize(fileId) {
-        return this.pending.get(fileId)?._downloadedBytes?.length ?? 0
+    get(file, thumbOrSize) {
+        return this.downloaded.get(file.id)
     }
 
-    get(file, thumb) {
-        return this.downloaded.get(file.id, thumb)
+    getUrl(file, thumbOrSize) {
+        return this.get(file, thumbOrSize)?.url
     }
 
-    getUrl(file, thumb) {
-        return this.downloaded.get(file.id, thumb)?.url
-    }
-
-    getById(fileId, thumbType) {
+    getById(fileId, thumbOrSize) {
         return this.downloaded.get(fileId)
     }
 
-    cancel(file) {
+    cancel(file, thumbOrSize) {
         this.pending.delete(file.id)
 
         AppEvents.Files.fire("download.canceled", {
@@ -50,9 +42,9 @@ class FilesManager {
         })
     }
 
-    checkCache(file, size): Promise<Blob> | any {
+    checkCache(file, thumbOrSize): Promise<Blob> | any {
         if (this.downloaded.has(file.id)) {
-            const downloaded = this.downloaded.get(file.id);
+            const downloaded = this.get(file, thumbOrSize);
 
             AppEvents.Files.fire("download.done", {
                 file,
@@ -63,7 +55,7 @@ class FilesManager {
             return Promise.resolve(downloaded);
         }
 
-        return FileAPI.tryFromCache(file, size).then(blob => this.internal_downloadDone(file, blob)).catch(error => {
+        return FileAPI.tryFromCache(file, thumbOrSize).then(blob => this.internal_downloadDone(file, blob)).catch(error => {
             // console.error(error)
         })
     }
@@ -122,7 +114,6 @@ class FilesManager {
 
         const downloaded = {
             id: file.id,
-            blob,
             url: URL.createObjectURL(blob),
         };
 

@@ -21,6 +21,7 @@ const attrAliases = new Map([
     ["className", "class"],
     ["htmlFor", "for"],
     ["xlinkHref", "xlink:href"],
+    ["onDoubleClick", "ondblclick"],
 ])
 
 export default attrAliases

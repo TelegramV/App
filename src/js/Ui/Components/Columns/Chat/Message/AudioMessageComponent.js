@@ -27,8 +27,6 @@ class AudioMessageComponent extends AudioComponent {
     addCover = () => {
         let file = this.props.message.raw.media.document
 
-        console.log(file)
-
         if (file.thumbs) {
             this.assure(FileAPI.getThumb(file, "max")).then(url => {
                 // uncomment these to make bg cover
@@ -36,7 +34,7 @@ class AudioMessageComponent extends AudioComponent {
 
                 // this.$el.querySelector(".bubble").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.9)), url(${url})`
                 // this.$el.querySelector(".bubble").style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${url})`
-                // this.$el.querySelector(".message").style.backdropFilter = 'blur(20px)'
+                // this.$el.querySelector(".play").style.backdropFilter = 'blur(20px)'
 
                 this.thumb = url
             })

@@ -12,11 +12,11 @@ class ChatInfoStatusComponent extends StatefulComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Dialogs)
-            .only(event => AppSelectedChat.check(event.dialog.peer))
+            .filter(event => AppSelectedChat.check(event.dialog.peer))
             .updateOn("updateActions")
 
         E.bus(AppEvents.Peers)
-            .only(event => AppSelectedChat.check(event.peer))
+            .filter(event => AppSelectedChat.check(event.peer))
             .updateOn("updateUserStatus")
             .updateOn("updateChatOnlineCount")
             .updateOn("fullLoaded")

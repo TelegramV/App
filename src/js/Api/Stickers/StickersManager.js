@@ -91,10 +91,10 @@ class StickersManager extends Manager {
 
     async getDiceSet(emoji) {
         let set = this.getCachedStickerSet(emoji);
-        if(set) return set;
+        if (set) return set;
 
         set = this.pendingSets[emoji];
-        if(set) return set;
+        if (set) return set;
 
         set = this.pendingSets[emoji] = MTProto.invokeMethod("messages.getStickerSet", {
             stickerset: {_: "inputStickerSetDice", emoticon: emoji}

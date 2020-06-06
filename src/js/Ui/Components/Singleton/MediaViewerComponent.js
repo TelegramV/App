@@ -20,7 +20,6 @@ import UIEvents from "../../EventBus/UIEvents";
 import type {AE} from "../../../V/VRDOM/component/__component_appEventsBuilder";
 import {VideoMessage} from "../../../Api/Messages/Objects/VideoMessage";
 import AvatarFragment from "../Basic/AvatarFragment";
-import {Photo} from "../../../Api/Media/Photo";
 import SearchManager from "../../../Api/Search/SearchManager"
 import {MessageFactory} from "../../../Api/Messages/MessageFactory"
 import VSpinner from "../Elements/VSpinner"
@@ -29,6 +28,8 @@ import {DocumentMessagesTool} from "../../Utils/document"
 import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
+import BetterPhotoComponent from "../Basic/BetterPhotoComponent"
+import BasicVideoComponent from "../Basic/BasicVideoComponent"
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -63,41 +64,17 @@ function MediaFragment({media, zoom, hidden}) {
     }
 
     if (media instanceof PhotoMessage) {
-
-        if (!media.loaded) {
-            if (media.thumbnail) {
-                return (
-                    <div class="thumbnail" style={style}>
-                        <img style={{
-                            width: `${media.width}px`,
-                            height: `${media.height}px`,
-                        }} src={media.thumbnail} alt=""/>
-                    </div>
-                )
-            }
-
-            return <MediaSpinnerFragment icon="photo"/>
-        }
-
-        return <img style={style} src={media.srcUrl} alt=""/>
+        return <BetterPhotoComponent photo={media.raw.media.photo} calculateSize maxHeight="100%"/>
     }
+
     if (media instanceof VideoMessage) {
-        if (!media.loaded) {
-            return <MediaSpinnerFragment icon="camera"/>
-        }
-
-        return <video style={style} controls src={media.videoUrl}/>
+        return <BasicVideoComponent document={media.raw.media.document} controls/>
     }
-    if (media instanceof Photo) {
-        if (!media.loaded) {
-            return <MediaSpinnerFragment icon="photo"/>
-        }
 
-        return <img style={style} src={media.srcUrl} alt=""/>
-    }
-    if (!media || !media.loaded) {
+    if (!media) {
         return <MediaSpinnerFragment/>
     }
+
     return <div/>
 }
 
@@ -140,6 +117,8 @@ export class MediaViewerComponent extends StatefulComponent {
 
         let from, name, text, date;
 
+        let downloaded = message && FileManager.isDownloaded(message.raw.media.photo || message.raw.media.document)
+
         if (message) {
             from = message.from;
             name = from.name;
@@ -174,11 +153,11 @@ export class MediaViewerComponent extends StatefulComponent {
                             }
 
                             <i style={{
-                                "cursor": !this.state.message || !this.state.message.loaded ? "default" : "pointer",
+                                "cursor": !downloaded ? "default" : "pointer",
                             }} className="tgico tgico-download rp rps" onClick={event => {
                                 event.stopPropagation();
 
-                                if (!this.state.message || !this.state.message.loaded) {
+                                if (!downloaded) {
                                     return;
                                 }
 
@@ -195,13 +174,14 @@ export class MediaViewerComponent extends StatefulComponent {
                     </div>
                     <div class="content-wrapper">
                         <NavigationButtonFragment onClick={this.left} hidden={!this.hasLeft() && !isLoadingPage}/>
-                            <div class="content">
-                                <div className="media" onClick={this.onMediaClick}>
-                                    <MediaFragment media={message} zoom={zoom} hidden={hidden}/>
-                                </div>
-                                <div className="caption">{text}</div>
+                        <div class="content">
+                            <div className="media" onClick={this.onMediaClick}>
+                                <MediaFragment media={message} zoom={zoom} hidden={hidden}/>
                             </div>
-                        <NavigationButtonFragment onClick={this.right} isNext hidden={!this.hasRight() && !isLoadingPage}/>
+                            <div className="caption">{text}</div>
+                        </div>
+                        <NavigationButtonFragment onClick={this.right} isNext
+                                                  hidden={!this.hasRight() && !isLoadingPage}/>
                     </div>
                 </div>
             </div>
@@ -253,14 +233,14 @@ export class MediaViewerComponent extends StatefulComponent {
         this.downloadLeftPage();
         this.downloadRightPage();
 
-        if (!message.loaded && !message.loading) {
-            (message instanceof VideoMessage ? message.fetchFullVideo() : message.fetchMax())
-                .then(() => {
-                    if (this.state.message === message) {
-                        this.forceUpdate();
-                    }
-                })
-        }
+        // if (!message.loaded && !message.loading) {
+        //     (message instanceof VideoMessage ? message.fetchFullVideo() : message.fetchMax())
+        //         .then(() => {
+        //             if (this.state.message === message) {
+        //                 this.forceUpdate();
+        //             }
+        //         })
+        // }
 
         this.setState({
             hidden: false,
@@ -388,14 +368,14 @@ export class MediaViewerComponent extends StatefulComponent {
                 zoom: false,
             })
 
-            if (!leftMessage.loaded && !leftMessage.loading) {
-                (leftMessage instanceof VideoMessage ? leftMessage.fetchFullVideo() : leftMessage.fetchMax())
-                    .then(() => {
-                        if (this.state.message === leftMessage) {
-                            this.forceUpdate();
-                        }
-                    })
-            }
+            // if (!leftMessage.loaded && !leftMessage.loading) {
+            //     (leftMessage instanceof VideoMessage ? leftMessage.fetchFullVideo() : leftMessage.fetchMax())
+            //         .then(() => {
+            //             if (this.state.message === leftMessage) {
+            //                 this.forceUpdate();
+            //             }
+            //         })
+            // }
         }
     }
 
@@ -425,14 +405,14 @@ export class MediaViewerComponent extends StatefulComponent {
                 zoom: false,
             })
 
-            if (!rightMessage.loaded && !rightMessage.loading) {
-                (rightMessage instanceof VideoMessage ? rightMessage.fetchFullVideo() : rightMessage.fetchMax())
-                    .then(() => {
-                        if (this.state.message === rightMessage) {
-                            this.forceUpdate();
-                        }
-                    })
-            }
+            // if (!rightMessage.loaded && !rightMessage.loading) {
+            //     (rightMessage instanceof VideoMessage ? rightMessage.fetchFullVideo() : rightMessage.fetchMax())
+            //         .then(() => {
+            //             if (this.state.message === rightMessage) {
+            //                 this.forceUpdate();
+            //             }
+            //         })
+            // }
         }
     }
 

@@ -19,11 +19,11 @@
 
 class DocumentParser {
     static attributeFilename(document) {
-        return document.attributes?.find(attr => attr._ === "documentAttributeFilename")?.file_name;
+        return document?.attributes?.find(attr => attr._ === "documentAttributeFilename")?.file_name;
     }
 
     static attributeAudio(document) {
-        return document.attributes?.find(attr => attr._ === "documentAttributeAudio");
+        return document?.attributes?.find(attr => attr._ === "documentAttributeAudio");
     }
 }
 

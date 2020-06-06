@@ -1,4 +1,4 @@
-function StickyDateComponent({message}) {
+function StickyDateFragment({message}) {
     return (
         <div className="service date">
             <div className="service-msg">{message.getDate("en", {
@@ -9,4 +9,4 @@ function StickyDateComponent({message}) {
     )
 }
 
-export default StickyDateComponent
+export default StickyDateFragment

@@ -32,6 +32,12 @@ class StatefulComponent<P, S> extends VComponent<P> {
     render(props, state) {
     }
 
+    componentWillUpdate(nextProps: P, nextState: S) {
+    }
+
+    shouldComponentUpdate(nextProps: P, nextState: S) {
+    }
+
     setState(nextState) {
         if (this.__.destroyed) {
             return;

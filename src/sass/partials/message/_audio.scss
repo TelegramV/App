@@ -11,8 +11,8 @@
 
         .play {
             color: white;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 100%;
             display: flex;
             align-items: center;
@@ -23,6 +23,10 @@
 
             &:before {
                 font-size: 2em;
+            }
+
+            &:active {
+                transform: scale(.95);
             }
 
             &.tgico-play:before {
@@ -41,8 +45,8 @@
             &.visible {
                 display: block;
                 position: absolute;
-                width: 50px;
-                height: 50px;
+                width: 60px;
+                height: 60px;
                 color: white;
             }
         }
@@ -61,7 +65,7 @@
                 display: flex;
                 flex-direction: column;
 
-                &>* {
+                & > * {
                     margin: 1px 0; //small margin between children
                 }
 
@@ -94,6 +98,16 @@
                         border-radius: 1.5px;
                     }
 
+                    .buffered {
+                        width: 100%;
+                        height: 3px;
+                        margin: 5px 0;
+                        border-radius: 1.5px;
+                        position: absolute;
+                        top: 0;
+                        transition: width 0.25s linear;
+                    }
+
                     .listened-wrapper {
                         display: flex;
                         width: 100%;
@@ -107,7 +121,7 @@
                             width: 1%;
                             height: 3px;
                             border-radius: 1.5px;
-                            transition: width 0.25s linear;
+                            transition: width 50ms linear;
                         }
 
                         .control-ball {
@@ -195,6 +209,14 @@
                 }
 
                 .progress-line {
+                    @if $in {
+                        background-color: $lightgrey
+                    } @else {
+                        background-color: lighten($darkgreen, 25%);
+                    }
+                }
+
+                .buffered {
                     @if $in {
                         background-color: $grey
                     } @else {

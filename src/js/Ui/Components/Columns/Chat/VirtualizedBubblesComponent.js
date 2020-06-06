@@ -80,14 +80,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             .on("messages.allRecent", this.onPeerMessagesAllRecent)
             .on("messages.nextTopPageDownloaded", this.onTopPageMessagesReady)
             .on("messages.nextBottomPageDownloaded", this.onBottomPageMessagesReady)
-            .on("chat.showMessageReady", this.onChatShowMessageReady);
-
-        // E.bus(AppEvents.Dialogs)
-        //     .filter(event => AppSelectedChat.check(event.dialog.peer))
-        //     .on("newMessage", this.onNewMessage);
-
-        E.bus(AppEvents.Peers)
-            .filter(event => AppSelectedChat.check(event.peer))
+            .on("chat.showMessageReady", this.onChatShowMessageReady)
             .on("messages.new", this.onNewMessage);
 
         E.bus(UIEvents.General)
@@ -536,7 +529,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         }
 
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
-        // this.patchMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
+        // this.patchMessages(messages.reverse(), this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         const $message = this.$el.querySelector(`#message-${event.offset_id}`);
 
@@ -597,11 +590,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
 
             if ($first) {
-                if ($first.nextElementSibling) {
-                    this.$el.scrollTop = $first.nextElementSibling.offsetTop;
-                } else {
+                // if ($first.nextElementSibling) {
+                //     this.$el.scrollTop = $first.nextElementSibling.offsetTop;
+                // } else {
                     this.$el.scrollTop = $first.offsetTop;
-                }
+                // }
             }
         }
     }

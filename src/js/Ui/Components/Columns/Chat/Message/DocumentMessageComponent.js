@@ -60,9 +60,9 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         const ext = title.split(".")[title.split(".").length - 1];
 
         const isDownloading = FileManager.isPending(document);
-        const isDownloaded = FileManager.isDownloadedById(document.id);
-        const percentage = FileManager.getPercentage(document.id);
-        const pendingSize = FileManager.getPendingSize(document.id);
+        const isDownloaded = FileManager.isDownloaded(document);
+        const percentage = FileManager.getPercentage(document);
+        const pendingSize = FileManager.getPendingSize(document);
 
         const size = isDownloading && !isDownloaded ? `${Math.round(percentage)}% / ${DocumentMessagesTool.formatSize(pendingSize)}` : DocumentMessagesTool.formatSize(document.size);
 
