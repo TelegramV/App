@@ -17,42 +17,40 @@
  *
  */
 
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 import AppEvents from "../../../Api/EventBus/AppEvents"
 import FileManager from "../../../Api/Files/FileManager"
-import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 
-class BasicVideoComponent extends StatelessComponent {
+class BackgroundImageThumbComponent extends StatelessComponent {
     appEvents(E) {
         E.bus(AppEvents.Files)
-            .filter(event => event.file.id === this.props.document.id && this.url !== FileManager.getUrl(this.props.document))
+            .filter(event => event.file.id === this.props.photo.id && this.url !== FileManager.getUrl(this.props.photo, this.props.size))
             .updateOn("download.done");
     }
 
-    render({document, ...otherArgs}) {
-        this.url = FileManager.getUrl(document); // very dirty hack, do not repeat it!
+    render({photo, size, tag = "div", ...otherArgs}) {
+        this.url = FileManager.getUrl(photo, size);
 
         return (
-            <video src={this.url}
-                   type={document.mime_type}
-                   {...otherArgs}/>
-        );
+            <tag css-background-image={this.url} {...otherArgs}/>
+        )
     }
 
     componentDidMount() {
-        FileManager.downloadDocument(this.props.document);
+        FileManager.downloadPhoto(this.props.photo, this.props.size);
     }
 
     componentWillUpdate(nextProps, nextState) {
-        if (nextProps.document.id !== this.props.document.id) {
-            FileManager.downloadDocument(this.props.document);
+        if (nextProps.photo.id !== this.props.photo.id) {
+            FileManager.downloadPhoto(this.props.photo, this.props.size);
         }
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-        if (nextProps.document.id !== this.props.document.id) {
+        if (nextProps.photo.id !== this.props.photo.id) {
             return true;
         }
     }
 }
 
-export default BasicVideoComponent;
+export default BackgroundImageThumbComponent
