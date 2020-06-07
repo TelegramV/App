@@ -16,11 +16,11 @@
  */
 
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
-import AudioManager from "../../../../Managers/AudioManager";
 import UIEvents from "../../../../EventBus/UIEvents";
 import {MessageParser} from "../../../../../Api/Messages/MessageParser";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
+import AudioPlayer from "../../../../../Api/Audio/AudioPlayer"
 
 class ChatInfoPinnedComponent extends StatefulComponent {
     state = {
@@ -36,29 +36,33 @@ class ChatInfoPinnedComponent extends StatefulComponent {
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelected)
-            .on("audio.play", this.onAudioPlay)
-            .on("audio.pause", this.onAudioPause)
-            .on("audio.remove", this.onAudioRemove)
+
+        E.bus(AppEvents.Audio)
+            .updateOn("audio.play")
+            .updateOn("audio.paused")
+            .updateOn("audio.stop")
+            .updateOn("audio.timeUpdate")
     }
 
     render() {
-        if (this.state.audio) {
-            let playClasses = ["tgico", this.state.pause ? "tgico-play" : "tgico-pause"];
+        if (AudioPlayer.state.message) {
+            let playClasses = ["tgico", !AudioPlayer.state.isPaused ? "tgico-pause" : "tgico-play"];
             return (
                 <div className="pin active-audio">
-                    <div className="play rp rps" onClick={() => AudioManager.toggle()}>
+                    <div className="play rp rps" onClick={() => AudioPlayer.toggle()}>
                         <i class={playClasses}/>
                     </div>
-                    <div className="audio-info">
-                        <div className="title">{this.state.meta.title}</div>
-                        <div className="description">{this.state.meta.artist}</div>
+                    <div className="audio-info"
+                         onClick={() => UIEvents.General.$chat.showMessage(AudioPlayer.state.message)}>
+                        <div className="title">{AudioPlayer.state.audioInfo.title}</div>
+                        <div className="description">{AudioPlayer.state.audioInfo.performer}</div>
                     </div>
                 </div>
             )
         } else if (this.state.message) {
             return (
                 <div className="pin pinned-message"
-                     onClick={event => UIEvents.General.fire("chat.showMessage", {message: this.state.message})}>
+                     onClick={event => UIEvents.General.$chat.showMessage(this.state.message)}>
                     <div className="title">Pinned message</div>
                     <div className="description">{MessageParser.getPrefixNoSender(this.state.message)}</div>
                 </div>

@@ -52,20 +52,19 @@ class MessageManager extends Manager {
         }
 
         const message = peer.messages.putNewRawMessage(rawMessage)
-        message.init()
 
-        if (message.from && message.from.type === "user") {
-            peer.dialog.removeAction(message.from)
+        if (message) {
+            message.init()
+
+            if (message.from && message.from.type === "user") {
+                peer.dialog.removeAction(message.from)
+            }
+
+
+        peer.fire("messages.new", {
+                message,
+            })
         }
-
-        AppEvents.Dialogs.fire("newMessage", {
-            dialog: peer.dialog,
-            message
-        })
-
-        peer.dialog.fire("newMessage", {
-            message
-        })
     }
 
     getFromPeerMessage(rawMessage) {

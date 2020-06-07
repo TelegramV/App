@@ -8,7 +8,6 @@ import {ReactiveObject} from "../../../V/Reactive/ReactiveObject"
 import {PeerMessages} from "../PeerMessages"
 import DialogsStore from "../../Store/DialogsStore"
 import type {Message} from "../../Messages/Message";
-import {Photo} from "../../Media/Photo";
 
 export class Peer extends ReactiveObject {
 
@@ -282,12 +281,12 @@ export class Peer extends ReactiveObject {
             offset: 0,
             max_id: -1
         }).then(l => {
-            this._photos = l.photos.map(q => {
-                const photo = new Photo(q)
-                photo.peer = this
-                return photo
-            })
-            return this._photos
+            // this._photos = l.photos.map(q => {
+            //     const photo = new Photo(q)
+            //     photo.peer = this
+            //     return photo
+            // })
+            return l
         })
     }
 

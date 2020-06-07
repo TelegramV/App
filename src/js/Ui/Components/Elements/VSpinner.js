@@ -28,7 +28,8 @@ function VSpinner(
         determinate = false,
         progress = 0,
         onClick,
-        paused = false
+        paused = false,
+        color,
     }, slot
 ) {
     const wrapperClassName = {
@@ -54,7 +55,7 @@ function VSpinner(
         <svg className={progressClassName}>
             {!determinate ?
                 <circle className="path"/> :
-                <circle className="path" css-stroke-dashoffset={(1 - progress) * -size}/>}
+                <circle className="path" css-stroke-dashoffset={(1 - progress) * -size} css-stroke={color}/>}
             </svg>
     </div>
 

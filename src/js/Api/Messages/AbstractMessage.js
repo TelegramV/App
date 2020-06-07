@@ -7,6 +7,9 @@ import MessagesManager from "./MessagesManager"
 import PeersStore from "../Store/PeersStore"
 import MTProto from "../../MTProto/External"
 import API from "../Telegram/API"
+import type {BusEvent} from "../EventBus/EventBus"
+import AppEvents from "../EventBus/AppEvents"
+import {parseMessageEntities} from "../../Utils/htmlHelpers"
 
 export const DATE_FORMAT_TIME = {
     hour: '2-digit',
@@ -34,6 +37,8 @@ export class AbstractMessage extends ReactiveObject implements Message {
     forwarded: any;
     forwardedType: string;
     forwardedMessageId: number;
+
+    parsed = "";
 
     _hideAvatar: boolean;
     _tailsGroup: string;
@@ -111,27 +116,27 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get isPinned(): boolean {
-        return this.to.pinnedMessageId === this.id
+        return this.dialogPeer.pinnedMessageId === this.id
     }
 
     set isPinned(value) {
-        this.to.pinnedMessageId = value ? this.id : 0
+        this.dialogPeer.pinnedMessageId = value ? this.id : 0
     }
 
     get isRead(): boolean {
-        if (!this.to) {
+        if (!this.dialogPeer) {
             return false
         }
 
-        return this.to.messages.readOutboxMaxId >= this.id || (this.isOut && this.isPost)
+        return this.dialogPeer.messages.readOutboxMaxId >= this.id || (this.isOut && this.isPost)
     }
 
     get isInRead(): boolean {
-        if (!this.to) {
+        if (!this.dialogPeer) {
             return false
         }
 
-        return this.isOut || this.to.messages.readInboxMaxId >= this.id
+        return this.isOut || this.dialogPeer.messages.readInboxMaxId >= this.id
     }
 
     get hideAvatar(): boolean {
@@ -151,7 +156,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get text(): string {
-        return this.raw.message || ""
+        return this.raw ? this.raw.message || "" : ""
     }
 
     get to(): Peer {
@@ -193,6 +198,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.raw.edit_date
     }
 
+    get media(): Object {
+        return this.raw.media
+    }
+
     getDate(locale: any, format: any) {
         return new Date(this.date * 1000).toLocaleString(locale, format)
     }
@@ -207,16 +216,12 @@ export class AbstractMessage extends ReactiveObject implements Message {
         this.findForwarded()
     }
 
-    get smallPreviewImage() {
-        return null
-    }
-
     get groupedId() {
         return this.raw.grouped_id
     }
 
     findReplyTo(fire = true) {
-        if (!this.to) {
+        if (!this.dialogPeer) {
             return false
         }
 
@@ -225,17 +230,17 @@ export class AbstractMessage extends ReactiveObject implements Message {
         }
 
         if (this.raw.reply_to_msg_id) {
-            const replyToMessage = this.to.messages.getById(this.raw.reply_to_msg_id)
+            const replyToMessage = this.dialogPeer.messages.getById(this.raw.reply_to_msg_id)
 
             if (replyToMessage) {
                 this.replyToMessage = replyToMessage
-                this.replyToMessageType = "replyToMessageFound"
+                this.replyToMessageType = "replyFound"
 
                 if (fire) {
-                    this.fire("replyToMessageFound")
+                    this.fire("replyFound")
                 }
             } else {
-                API.messages.getHistory(this.to, {
+                API.messages.getHistory(this.dialogPeer, {
                     offset_id: this.raw.reply_to_msg_id, // ???
                     add_offset: -1,
                     limit: 1
@@ -243,18 +248,17 @@ export class AbstractMessage extends ReactiveObject implements Message {
                     const messages = Messages.messages
 
                     if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
-                        const replyMessage = this.to.messages.putRawMessage(messages[0])
-                        this.replyToMessage = replyMessage
-                        this.replyToMessageType = "replyToMessageFound"
+                        this.replyToMessage = this.dialogPeer.messages.putRawMessage(messages[0])
+                        this.replyToMessageType = "replyFound"
 
                         if (fire) {
-                            this.fire("replyToMessageFound")
+                            this.fire("replyFound")
                         }
                     } else {
-                        this.replyToMessageType = "replyToMessageNotFound"
+                        this.replyToMessageType = "replyFound"
 
                         if (fire) {
-                            this.fire("replyToMessageNotFound")
+                            this.fire("replyFound")
                         }
                     }
                 })
@@ -273,10 +277,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
             if (!this.raw.fwd_from.from_id) {
                 if (this.raw.fwd_from.from_name) {
                     this.forwarded = this.raw.fwd_from.from_name
-                    this.forwardedType = "forwardedNameOnlyFound"
+                    this.forwardedType = "forwardedFound"
 
                     if (fire) {
-                        this.fire("forwardedNameOnlyFound")
+                        this.fire("forwardedFound")
                     }
                 }
             } else {
@@ -284,10 +288,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
                 if (forwarded) {
                     this.forwarded = forwarded
-                    this.forwardedType = "forwardedUserFound"
+                    this.forwardedType = "forwardedFound"
 
                     if (fire) {
-                        this.fire("forwardedUserFound")
+                        this.fire("forwardedFound")
                     }
                 }
             }
@@ -298,10 +302,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
                 if (forwarded) {
                     this.forwarded = forwarded
                     this.forwardedMessageId = this.raw.fwd_from.channel_post
-                    this.forwardedType = "forwardedChannelFound"
+                    this.forwardedType = "forwardedFound"
 
                     if (fire) {
-                        this.fire("forwardedChannelFound")
+                        this.fire("forwardedFound")
                     }
                 }
             }
@@ -309,35 +313,46 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     read() {
-        return this.to.api.readHistory(this.id)
+        return this.dialogPeer.api.readHistory(this.id)
     }
 
     // WARNING: always call super
     fillRaw(raw: Object): Message {
+        this.parsed = parseMessageEntities(raw.message || "", raw.entities)
+
         this.raw = raw
         this.prefix = MessageParser.getDialogPrefix(this)
 
-        // reply
-        if (this.to) {
-            const replyToMessage = this.to.messages.getById(this.raw.reply_to_msg_id)
+        if (this.dialogPeer) {
+            const replyToMessage = this.dialogPeer.messages.getById(this.raw.reply_to_msg_id)
+
             if (replyToMessage) {
                 this.replyToMessage = replyToMessage
             }
 
-            // forwarded
             this.findForwarded()
         }
 
-        // ...
-
         return this
     }
 
-    fillRawAndFire(raw: Object): Message {
-        this.fillRaw(raw)
+    fillEdited(raw: Object): Message {
+        const message = this.fillRaw(raw)
 
-        this.fire("rawFilled")
+        this.fire("edited")
 
-        return this
+        return message
+    }
+
+    fire(type: string, event: BusEvent = {}) {
+        AppEvents.Peers.fire(`messages.${type}`, {
+            peer: this.dialogPeer,
+            message: this,
+            ...event
+        })
+
+        super.fire(type, event)
     }
 }
+
+export default AbstractMessage

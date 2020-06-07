@@ -18,6 +18,7 @@
  */
 
 import AppSelectedChat from "../../../../Ui/Reactive/SelectedChat"
+import messagesApi from "../../../Telegram/messages"
 
 function processUpdateMessagePoll(update) {
     if (AppSelectedChat.isSelected) {
@@ -25,6 +26,10 @@ function processUpdateMessagePoll(update) {
         const messages = AppSelectedChat.current.messages.getPollsById(update.poll_id);
 
         for (const message of messages) {
+        	if(update.poll?.min || update.results?.min) {
+        		messagesApi.getPollResults(message); //ask for full, if getting min
+        		return;
+        	}
             message.fillPoll(update.poll, update.results);
             message.fire("pollEdit");
         }

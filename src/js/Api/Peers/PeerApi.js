@@ -1,6 +1,5 @@
 import MTProto from "../../MTProto/External"
 import PeersManager from "./PeersManager"
-import AppEvents from "../EventBus/AppEvents"
 import {getInputFromPeer, getInputPeerFromPeer} from "../Dialogs/util"
 import {FileAPI} from "../Files/FileAPI"
 import {TextMessage} from "../Messages/Objects/TextMessage";
@@ -20,40 +19,6 @@ export class PeerApi {
      */
     constructor(peer) {
         this.peer = peer
-    }
-
-    /**
-     * @param props
-     * @return {Promise<Message[]>}
-     */
-    async getHistory(props = {offset_id: 0, limit: 100}, addUnread = false) {
-        const Messages = await MTProto.invokeMethod("messages.getHistory", {
-            peer: this.peer.inputPeer,
-            offset_id: props.offset_id,
-            offset_date: props.offset_date || 0,
-            add_offset: props.add_offset || 0,
-            limit: props.limit || 50,
-            max_id: props.max_id || 0,
-            min_id: props.min_id || 0,
-            hash: props.hash || 0
-        })
-
-
-        if (Messages._ === "messages.channelMessages") {
-            if (this.peer.dialog) {
-                this.peer.dialog.pts = Messages.pts
-            }
-        }
-
-        PeersManager.fillPeersFromUpdate(Messages)
-
-        const messages = this.peer.messages.putRawMessages(Messages.messages.filter(m => m._ !== "messageEmpty"))
-
-        messages.forEach(message => {
-            message.init()
-        })
-
-        return messages
     }
 
     fetchParticipants(offset, limit = 33) {
@@ -89,11 +54,14 @@ export class PeerApi {
                 max_id: maxId
             }).then(response => {
                 if (response._ === "boolTrue") {
-                    this.peer.messages.readInboxMaxId = maxId
+                    const prevMaxId = this.peer.messages.readInboxMaxId;
 
-                    AppEvents.Dialogs.fire("readHistory", {
-                        dialog: this.peer.dialog
-                    })
+                    this.peer.messages.readInboxMaxId = maxId;
+
+                    peer.fire("messages.readIn", {
+                        maxId: this.peer.messages.readInboxMaxId,
+                        prevMaxId,
+                    });
                 }
             })
         } else {
@@ -101,11 +69,14 @@ export class PeerApi {
                 peer: getInputPeerFromPeer(this.peer.type, this.peer.id, this.peer.accessHash),
                 max_id: maxId
             }).then(response => {
-                this.peer.messages.readInboxMaxId = maxId
+                const prevMaxId = this.peer.messages.readInboxMaxId;
 
-                AppEvents.Dialogs.fire("readHistory", {
-                    dialog: this.peer.dialog
-                })
+                this.peer.messages.readInboxMaxId = maxId;
+
+                peer.fire("messages.readIn", {
+                    maxId: this.peer.messages.readInboxMaxId,
+                    prevMaxId,
+                });
             })
         }
     }
@@ -281,17 +252,5 @@ export class PeerApi {
         }).then(response => {
             MTProto.UpdatesManager.process(response)
         })
-    }
-
-    deleteMessages(id) {
-        if (this.peer.type === "channel") {
-            return MTProto.invokeMethod("channels.deleteMessages", {
-                channel: this.peer.inputChannel,
-                id: id
-            })
-        } else {
-
-        }
-
     }
 }

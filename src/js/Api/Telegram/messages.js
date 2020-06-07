@@ -1,9 +1,28 @@
+/*
+ * Telegram V
+ * Copyright (C) 2020 original authors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 import MTProto from "../../MTProto/External"
 import PeersManager from "../Peers/PeersManager"
-import type {getDialogs_Params_105} from "./types"
 import {Peer} from "../Peers/Objects/Peer"
+import UpdatesManager from "../Updates/UpdatesManager"
 
-function getDialogs(params: getDialogs_Params_105 = {}) {
+function getDialogs(params = {}) {
     return MTProto.invokeMethod("messages.getDialogs", {
         exclude_pinned: params.exclude_pinned || false,
         folder_id: params.folder_id || 0,
@@ -98,6 +117,77 @@ function getStickerSet(props) {
     return MTProto.invokeMethod("messages.getStickerSet", props)
 }
 
+function deleteMessages(id: number[], revoke = true) {
+    return MTProto.invokeMethod("messages.deleteMessages", {
+        revoke,
+        id,
+    }).then(affectedMessages => {
+        if (UpdatesManager.defaultUpdatesProcessor.processAffectedMessages(affectedMessages)) {
+            UpdatesManager.defaultUpdatesProcessor.enqueue({
+                ...affectedMessages,
+                messages: id,
+                _: "updateDeleteMessages",
+            });
+        }
+
+        return affectedMessages
+    })
+}
+
+function updatePinnedMessage(message) {
+    return MTProto.invokeMethod("messages.updatePinnedMessage", {
+        peer: message.dialogPeer.inputPeer,
+        id: message.isPinned ? -1 : message.id,
+    }).then(updates => {
+        UpdatesManager.process(updates)
+    })
+}
+
+function sendVote(message, answers) {
+    return MTProto.invokeMethod("messages.sendVote", {
+        peer: message.from.inputPeer,
+        msg_id: message.id,
+        options: answers
+    }).then(response => {
+        UpdatesManager.process(response);
+        return response;
+    });
+}
+
+function closePoll(message) {
+    if(!message.poll) return;
+    message.poll.closed = true;
+    let poll = {
+        _: "inputMediaPoll",
+        poll: message.poll,
+        correct_answers: message.results?.results?.filter(res => res.correct)?.map(res => res.option),
+        solution: message.results?.solution,
+        solution_entities: message.result?.solution_entities
+    }
+
+    return MTProto.invokeMethod("messages.editMessage", {
+        no_webpage: false,
+        peer: message.from.inputPeer,
+        id: message.id,
+        message: message.text,
+        media: poll,
+        reply_markup: message.replyMarkup,
+        entities: message.raw.entities,
+        schedule_date: 0
+    }).then(updates => {
+        UpdatesManager.process(updates)
+    })
+}
+
+function getPollResults(message) {
+    return MTProto.invokeMethod("messages.getPollResults", {
+        peer: message.dialogPeer.inputPeer,
+        msg_id: message.id
+    }).then(updates => {
+        UpdatesManager.process(updates)
+    })
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
@@ -108,6 +198,11 @@ const messages = {
     getRecentStickers: getRecentStickers,
     getSavedGifs: getSavedGifs,
     getStickerSet: getStickerSet,
+    deleteMessages: deleteMessages,
+    updatePinnedMessage: updatePinnedMessage,
+    sendVote: sendVote,
+    closePoll: closePoll,
+    getPollResults: getPollResults,
 }
 
 export default messages

@@ -7,7 +7,6 @@ import {getInputPeerFromPeer} from "../Dialogs/util"
 import Random from "../../MTProto/Utils/Random"
 
 class DownloadCanceledException {
-
 }
 
 export class FileAPI {
@@ -40,39 +39,26 @@ export class FileAPI {
 
     /**
      * @see https://core.telegram.org/type/Document
-     *
-     * @param document
-     * @param thumb
-     * @param onPartDownloaded
      */
-    static downloadDocument(document, thumb, onPartDownloaded): Promise<Blob> {
+    static downloadDocument(document, thumb, onPartDownloaded, options): Promise<Blob> {
         if (document._ === "documentEmpty") {
             return Promise.reject("documentEmpty");
         }
 
-        const location = {
-            _: "inputDocumentFileLocation",
-            id: document.id,
-            access_hash: document.access_hash,
-            file_reference: document.file_reference,
-            thumb_size: thumb ? thumb.type : "",
-        };
+        const location = FileAPI.makeDocumentLocation(document, thumb);
 
         const size = thumb ? thumb.size : document.size;
+        const limit = options?.limit ?? 1048576;
 
-        return FileAPI.downloadAllParts(location, size, document.dc_id, onPartDownloaded)
+        return FileAPI.downloadAllParts(location, size, limit, document.dc_id, onPartDownloaded)
             .then(file => FileAPI.getBlob(file, document.mime_type))
             .then(blob => FileAPI.putToCache(document, blob));
     }
 
     /**
      * @see https://core.telegram.org/type/Photo
-     *
-     * @param photo
-     * @param size
-     * @param onPartDownloaded
      */
-    static downloadPhoto(photo, size, onPartDownloaded): Promise<Blob> {
+    static downloadPhoto(photo, size, onPartDownloaded, options): Promise<Blob> {
         if (photo._ === "photoEmpty") {
             return Promise.reject("photoEmpty");
         }
@@ -82,45 +68,33 @@ export class FileAPI {
                 size = photo.sizes[photo.sizes.length - 1]
             }
 
-            const location = {
-                _: "inputPhotoFileLocation",
-                id: photo.id,
-                access_hash: photo.access_hash,
-                file_reference: photo.file_reference,
-                thumb_size: size.type,
-            };
+            const location = this.makePhotoLocation(photo, size);
+            const limit = options?.limit ?? 1048576;
 
-            return FileAPI.downloadAllParts(location, size.size, photo.dc_id, onPartDownloaded)
+            return FileAPI.downloadAllParts(location, size.size, limit, photo.dc_id, onPartDownloaded)
                 .then(file => FileAPI.getBlob(file, "image/jpeg"))
                 .then(blob => FileAPI.putToCache(photo, blob, size))
         })
     }
 
-    /**
-     * @param location
-     * @param size
-     * @param dcId
-     * @param onPartDownloaded
-     * @returns {Promise<{bytes: Uint8Array}>}
-     */
-    static async downloadAllParts(location, size, dcId, onPartDownloaded): Promise<Object> {
+    static async downloadAllParts(location, totalSize, limit, dcId, onPartDownloaded): Promise<{ bytes: Uint8Array }> {
         let bytes = new Uint8Array();
         let file = {};
 
-        while (bytes.length < size) {
-            file = await API.upload.getFile({
+        while (bytes.length < totalSize) {
+            file = await FileAPI.downloadPart({
                 location: location,
                 offset: bytes.length,
             }, dcId);
 
             bytes = bytesConcat(bytes, file.bytes);
 
-            if (bytes.length !== size && onPartDownloaded) {
+            if (bytes.length !== totalSize && onPartDownloaded) {
                 if (onPartDownloaded({
                     newBytes: file.bytes,
                     totalBytes: bytes,
-                    sizeToBeDownloaded: size,
-                    percentage: bytes.length / size * 100,
+                    sizeToBeDownloaded: totalSize,
+                    percentage: bytes.length / totalSize * 100,
                 }) === false) {
                     throw new DownloadCanceledException()
                 }
@@ -130,6 +104,58 @@ export class FileAPI {
         file.bytes = bytes;
 
         return file;
+    }
+
+    static downloadDocumentPart(document, thumb, limit, offset): Promise<{ bytes: Uint8Array }> {
+        if (document._ === "documentEmpty") {
+            return Promise.reject("documentEmpty");
+        }
+
+        const location = FileAPI.makeDocumentLocation(document, thumb);
+
+        return FileAPI.downloadPart({location, limit, offset}, document.dc_id);
+    }
+
+    static downloadPhotoPart(photo, size, limit, offset): Promise<{ bytes: Uint8Array }> {
+        if (photo._ === "photoEmpty") {
+            return Promise.reject("photoEmpty");
+        }
+
+        const location = FileAPI.makePhotoLocation(photo, size);
+
+        return FileAPI.downloadPart({location, limit, offset}, photo.dc_id);
+    }
+
+    static downloadPart({location, limit, offset}, dcId): Promise<{ bytes: Uint8Array }> {
+        return API.upload.getFile({
+            location,
+            limit,
+            offset,
+        }, dcId);
+    }
+
+    static makePhotoLocation(photo, size) {
+        if (!size) {
+            size = photo.sizes[photo.sizes.length - 1];
+        }
+
+        return {
+            _: "inputPhotoFileLocation",
+            id: photo.id,
+            access_hash: photo.access_hash,
+            file_reference: photo.file_reference,
+            thumb_size: size.type,
+        };
+    }
+
+    static makeDocumentLocation(document, thumb) {
+        return {
+            _: "inputDocumentFileLocation",
+            id: document.id,
+            access_hash: document.access_hash,
+            file_reference: document.file_reference,
+            thumb_size: thumb ? thumb.type : "",
+        };
     }
 
     static async decodeAnimatedSticker(bytes): Promise<Object> {
@@ -166,14 +192,14 @@ export class FileAPI {
         return URL.createObjectURL(FileAPI.getBlob(file, type));
     }
 
-    static tryFromCache(file, size): Promise<Blob> {
+    static tryFromCache(file, thumbOrSize): Promise<Blob> {
         let sectorName = "files";
 
         if (file._ === "photo") {
             sectorName = "images"
         }
 
-        return AppCache.get(sectorName, `${file.id}${size ? "_" + size.type : ""}`).then(blob => {
+        return AppCache.get(sectorName, `${file.id}${thumbOrSize ? "_" + thumbOrSize.type : ""}`).then(blob => {
             if (blob) {
                 return blob
             }
@@ -182,7 +208,7 @@ export class FileAPI {
         });
     }
 
-    static putToCache(file, blob: Blob, size): Promise<Blob> {
+    static putToCache(file, blob: Blob, thumbOrSize): Promise<Blob> {
         if (blob.size > 10485760) { // do not cache larger than 10MB
             return Promise.resolve(blob);
         }
@@ -193,11 +219,10 @@ export class FileAPI {
             sectorName = "images"
         }
 
-        return AppCache.put(sectorName, `${file.id}${size ? "_" + size.type : ""}`, blob)
+        return AppCache.put(sectorName, `${file.id}${thumbOrSize ? "_" + thumbOrSize.type : ""}`, blob)
             .then(() => blob)
             .catch(() => blob)
     }
-
 
     // OUTDATED BELOW
 

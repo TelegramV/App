@@ -1,10 +1,12 @@
 import type {Message} from "../Messages/Message"
+import {MessageType} from "../Messages/Message"
 import {Peer} from "./Objects/Peer"
 import {arrayDeleteCallback} from "../../Utils/array"
 import {MessageFactory} from "../Messages/MessageFactory"
 import API from "../Telegram/API"
 import GroupMessage from "../Messages/GroupMessage"
 
+// бля це треба переписати а мені так впадло(((((((((9(
 export class PeerMessages {
 
     peer: Peer = undefined
@@ -28,15 +30,6 @@ export class PeerMessages {
 
     isDownloadingRecent = false;
 
-    /**
-     * @param {Peer} peer
-     * @param {Message[]} messages
-     * @param unreadCount
-     * @param unreadMark
-     * @param unreadMentionsCount
-     * @param readOutboxMaxId
-     * @param readInboxMaxId
-     */
     constructor(peer, messages = [], {
         unreadCount = 0,
         unreadMentionsCount = 0,
@@ -159,16 +152,22 @@ export class PeerMessages {
         let message = this.getById(rawMessage.id);
 
         if (message) {
-            return message.fillRaw(rawMessage);
+            message = message.fillRaw(rawMessage);
+
+            if (message.groupedId) {
+                return this._groupsHeap.get(message.groupedId);
+            }
+
+            return message;
         }
 
         message = MessageFactory.fromRaw(this.peer, rawMessage);
 
         if (message.groupedId) {
-            let group = this._groupsHeap.get(message.groupedId)
+            let group = this._groupsHeap.get(message.groupedId);
 
             if (group) {
-                group.messages.add(message);
+                group.add(message);
             } else {
                 group = new GroupMessage(message);
                 this._groupsHeap.set(message.groupedId, group);
@@ -202,13 +201,15 @@ export class PeerMessages {
         const message = this.putRawMessage(rawMessage);
 
         if (this._recent.length > 0) {
-            const newest = this._recent[0];
+            let newest = this._recent[0];
 
             if (newest.id < message.id) {
-                this._recent.unshift(message);
+                if (message.type !== MessageType.GROUP || message.messages.size <= 1) {
+                    this._recent.unshift(message);
 
-                if (this._recent.length > 100) {
-                    this._recent.pop();
+                    if (this._recent.length > 100) {
+                        this._recent.pop();
+                    }
                 }
 
                 if (message.isOut) {
@@ -217,7 +218,8 @@ export class PeerMessages {
                     this.addUnread(message.id)
                 }
             } else {
-                // console.warn("BUG: putNewRawMessage got not newest message", newest.id, message.id);
+                // console.warn("BUG: putNewRawMessage got not newest message", message.dialogPeer.name, newest.id, message.id);
+                // return false;
             }
         } else {
             this._recent = [message];
@@ -239,7 +241,14 @@ export class PeerMessages {
     getPollsById(poll_id: number): Array<Message> {
         return (
             [...this._heap.values()]
-                .filter(msg => msg.raw.media && msg.raw.media.poll && msg.raw.media.poll.id === poll_id)
+                .filter(msg => msg.raw?.media?.poll?.id === poll_id)
+        )
+    }
+
+    getGamesById(game_id: number): Array<Message> {
+        return (
+            [...this._heap.values()]
+                .filter(msg => msg?.game?.id === game_id)
         )
     }
 
@@ -290,10 +299,6 @@ export class PeerMessages {
     set readOutboxMaxId(readOutboxMaxId: number) {
         if (this.readOutboxMaxId < readOutboxMaxId) {
             this._readOutboxMaxId = readOutboxMaxId || this._readOutboxMaxId
-
-            if (this.peer.dialog) {
-                this.peer.dialog.fire("updateReadOutboxMaxId")
-            }
         }
     }
 
@@ -312,10 +317,6 @@ export class PeerMessages {
             this.deleteUnreadBy(readInboxMaxId)
 
             this._readInboxMaxId = readInboxMaxId || this._readInboxMaxId
-
-            if (this.peer.dialog) {
-                this.peer.dialog.fire("updateReadInboxMaxId")
-            }
         }
     }
 
@@ -330,19 +331,21 @@ export class PeerMessages {
         return this._fireTransaction
     }
 
-    /**
-     * @param {number} messageId
-     */
-    deleteSingle(messageId) {
-        arrayDeleteCallback(this._recent, message => message.id === messageId);
+    deleteSingle(messageId: number, markAsDeleted = true) {
+        arrayDeleteCallback(this._recent, message => {
+            if (message.id === messageId) {
+                if (markAsDeleted) {
+                    message.isDeleted = true;
+                }
 
-        this._heap.delete(messageId)
+                return true;
+            }
 
-        this.deleteUnread(messageId);
-
-        this.peer.dialog.fire("deleteMessage", {
-            messageId
+            return false;
         });
+
+        this._heap.delete(messageId);
+        this.deleteUnread(messageId);
     }
 
     /**
@@ -416,16 +419,6 @@ export class PeerMessages {
      */
     stopTransaction() {
         this._fireTransaction = false
-    }
-
-    /**
-     * @deprecated we really should avoid this #3
-     */
-    fireTransaction(eventName = "updateSingle", data = {}) {
-        this.stopTransaction()
-
-        this.peer.dialog.fire(eventName, data)
-
     }
 
     addUnread(id) {

@@ -1,5 +1,3 @@
-// @flow
-
 import {Peer} from "../Peers/Objects/Peer"
 import {Dialog} from "../Dialogs/Dialog"
 

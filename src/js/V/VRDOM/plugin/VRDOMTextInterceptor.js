@@ -17,26 +17,27 @@
  *
  */
 
-import VRNode from "../VRNode"
-import type {VRenderProps} from "../types/types"
+class VRDOMTextInterceptor {
+    intercepted = false;
 
-class VRDOMInterceptor {
-    constructor() {
+    constructor(v) {
+        this.v = v;
     }
 
-    /**
-     * @return {HTMLElement | undefined} undefined to do nothing
-     */
-    elementCreateIntercept(node: VRNode, props: VRenderProps): HTMLElement | undefined {
-
+    interceptRender(text: string): any {
+        return text;
     }
 
-    /**
-     * @return {Node | undefined} undefined to do nothing
-     */
-    textCreateIntercept(text: string): Node | undefined {
-
+    __interceptRender(text) {
+        if (this.intercepted) {
+            return text;
+        } else {
+            this.intercepted = true;
+            const i = this.interceptRender(text);
+            this.intercepted = false;
+            return i;
+        }
     }
 }
 
-export default VRDOMInterceptor
+export default VRDOMTextInterceptor;

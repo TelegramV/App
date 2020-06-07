@@ -2,7 +2,7 @@
     & .service {
         align-self: center;
         justify-content: center;
-        margin-bottom: 10px !important;
+        margin: 5px 0;
 
         &.date {
             z-index: 100;
@@ -11,15 +11,40 @@
             transition: anim(opacity);
         }
 
+        .photo {
+            display: none;
+
+            &[src] {
+                display: block;
+                margin: auto;
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                margin-top: 5px;
+            }
+        }
+
         .service-msg {
-            color: #fff;
+            color: white;
             background-color: $semiblack;
             font-weight: 500;
             padding: 0 8px;
             line-height: 24px;
             font-size: 15px;
             border-radius: 12px;
-            user-select: none;
+            user-select: text;
+
+            .clickable {
+                cursor: pointer;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
+
+            a, a:visited {
+                color: white;
+            }
         }
     }
 }

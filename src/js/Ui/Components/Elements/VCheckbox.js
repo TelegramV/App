@@ -34,7 +34,7 @@ function VCheckbox(
                 <span className="tgico tgico-check"/>
             </div>
 
-            {nodeIf(<span className="checkbox-label">{label}</span>, label)}
+            {label && <span className="checkbox-label">{label}</span>}
         </div>
     )
 }

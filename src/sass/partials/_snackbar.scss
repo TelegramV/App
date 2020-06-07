@@ -1,20 +1,21 @@
 .snackbar-container {
-    position: fixed;
-    z-index: 9999999;
+    position: absolute;
+    z-index: 99999;
     left: 50%;
-    bottom: 30px;
+    transform: translateX(-50%);
+    top: 100px;
+    display: block !important; // DEBUG
 }
 
 .snackbar {
-    min-width: 250px;
-    margin-left: -125px;
-    margin-bottom: 15px;
-    background-color: #333;
+    min-width: 100px;
+    max-width: 300px;
+    background-color: rgba(black, 0.6);
     color: #fff;
     text-align: center;
-    border-radius: 25px;
-    padding: 16px;
-    z-index: 9999999;
+    border-radius: 10px;
+    padding: 10px;
+    //z-index: 9999999;
     box-shadow: 3px 3px 15px rgba(0, 0, 0, .10);
 
     &.success {
@@ -23,6 +24,20 @@
 
     &.error {
         background-color: $red;
+    }
+
+    .solution {
+        display: flex;
+        align-items: center;
+
+        .tgico {
+            font-size: 24px;
+        }
+
+        .text {
+            text-align: left;
+            padding-left: 10px;
+        }
     }
 }
 

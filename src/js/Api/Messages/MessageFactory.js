@@ -7,6 +7,8 @@ import {PhotoMessage} from "./Objects/PhotoMessage"
 import type {Message} from "./Message"
 import {MessageType} from "./Message"
 import {LocationMessage} from "./Objects/LocationMessage"
+import {LiveLocationMessage} from "./Objects/LiveLocationMessage"
+import {VenueMessage} from "./Objects/VenueMessage"
 import {GameMessage} from "./Objects/GameMessage"
 import {PollMessage} from "./Objects/PollMessage"
 import {InvoiceMessage} from "./Objects/InvoiceMessage"
@@ -29,8 +31,8 @@ const messageObjects = new Map([
     [MessageType.TEXT, TextMessage],
     [MessageType.PHOTO, PhotoMessage],
     [MessageType.GEO, LocationMessage],
-    [MessageType.GEO_LIVE, LocationMessage],
-    [MessageType.VENUE, LocationMessage],
+    [MessageType.GEO_LIVE, LiveLocationMessage],
+    [MessageType.VENUE, VenueMessage],
     [MessageType.GAME, GameMessage],
     [MessageType.POLL, PollMessage],
     [MessageType.INVOICE, InvoiceMessage], //requires encryption, component just tells to use other app

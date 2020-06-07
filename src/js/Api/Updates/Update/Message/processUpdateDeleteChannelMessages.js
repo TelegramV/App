@@ -17,29 +17,22 @@
  *
  */
 
-import DialogsStore from "../../../Store/DialogsStore"
+import PeersStore from "../../../Store/PeersStore";
 
-// todo: rewrite
 function processUpdateDeleteChannelMessages(update) {
-    const dialog = DialogsStore.get("channel", update.channel_id);
+    let peer = PeersStore.get("channel", update.channel_id);
 
-    if (dialog) {
-        dialog.peer.messages.startTransaction();
+    if (!peer) {
+        peer = PeersStore.get("chatForbidden", update.channel_id);
+    }
 
-        update.messages.sort().forEach(mId => {
-            dialog.peer.messages.deleteSingle(mId);
-        })
-
-        if (!dialog.peer.messages.last) {
-            dialog.refresh();
-        }
-
-        dialog.peer.messages.fireTransaction("deleteChannelMessages", {
-            messages: update.messages
+    if (peer) {
+        update.messages.forEach(id => {
+            peer.messages.deleteSingle(id);
         });
 
-        dialog.peer.messages.fireTransaction("deleteMessages", {
-            messages: update.messages
+        peer.fire("messages.deleted", {
+            messages: update.messages,
         });
     } else {
         console.log("BUG: [processUpdateDeleteChannelMessages] no dialog found");

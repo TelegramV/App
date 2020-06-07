@@ -1,6 +1,3 @@
-import AppSelectedChat from "../../../../Reactive/SelectedChat"
-import VApp from "../../../../../V/vapp"
-import lottie from "../../../../../../../vendor/lottie-web"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import Localization from "../../../../../Api/Localization/Localization"
@@ -32,7 +29,7 @@ export default class SuggestionComponent extends StatelessComponent {
     }
 
     componentDidMount() {
-        
+
     }
 
     show = () => {
@@ -52,9 +49,11 @@ export default class SuggestionComponent extends StatelessComponent {
     }
 
     onShow = () => {
-        if(this.stateless.type=="emoji") {
+        if (this.stateless.type == "emoji") {
             let emojis = this.$el.querySelectorAll(".emoji");
-            emojis.forEach(emoji => {emoji.addEventListener("click", this.onEmojiClick)});
+            emojis.forEach(emoji => {
+                emoji.addEventListener("click", this.onEmojiClick)
+            });
         }
     }
 
@@ -72,7 +71,7 @@ export default class SuggestionComponent extends StatelessComponent {
 
     scheduleSuggestion = () => {
         let lastText = ChatInputManager.text;
-        if(lastText.trim().length == 0) {
+        if (lastText.trim().length == 0) {
             this.hide();
             return;
         }
@@ -80,7 +79,7 @@ export default class SuggestionComponent extends StatelessComponent {
         this.clearTimeouts();
 
         this.withTimeout(_ => {
-            if(lastText === ChatInputManager.text) {
+            if (lastText === ChatInputManager.text) {
                 this.makeSuggestion(lastText);
             }
         }, 500);
@@ -91,17 +90,17 @@ export default class SuggestionComponent extends StatelessComponent {
         let key = undefined;
 
         let split = text.split(/\s/);
-        if(split.length > 1) {
-            let last = split[split.length-1];
-            if(last.startsWith(":")) {
+        if (split.length > 1) {
+            let last = split[split.length - 1];
+            if (last.startsWith(":")) {
                 key = last.substr(1);
                 this.currentEmojiKey = last;
             }
         } else {
-            if(text.length > 0) {
+            if (text.length > 0) {
                 key = text.trim();
                 this.currentEmojiKey = key;
-                if(key.startsWith(":")) {
+                if (key.startsWith(":")) {
                     key = key.substr(1);
                 }
             } else {
@@ -109,19 +108,19 @@ export default class SuggestionComponent extends StatelessComponent {
             }
         }
 
-        if(key) {
+        if (key) {
             Localization.suggestEmojis(key).then(list => {
-                if(list.length == 0) {
+                if (list.length == 0) {
                     this.currentSuggestion = undefined;
                     this.hide();
                 } else {
-                    if(this.currentSuggestion == list) return; //nothing changed
+                    if (this.currentSuggestion == list) return; //nothing changed
                     this.currentSuggestion = list;
                     this.show();
                 }
             })
         } else {
-            if(this.visible) this.hide();
+            if (this.visible) this.hide();
         }
     }
 }

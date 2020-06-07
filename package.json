@@ -10,7 +10,7 @@
     "clean": "rm dist/bundle.js",
     "build-dev": "webpack -d --mode development",
     "build-prod": "webpack -p --mode production",
-    "prod": "webpack -p --mode production",
+    "prod": "webpack-dev-server --color -d --mode production --info-verbosity verbose --host 0.0.0.0",
     "watch": "webpack -d --mode development --watch --info-verbosity verbose",
     "dev": "webpack-dev-server --color -d --mode development --info-verbosity verbose --host 0.0.0.0",
     "analize-bundle": "webpack --json | webpack-bundle-size-analyzer",
@@ -21,6 +21,7 @@
     "big-integer": "^1.6.48",
     "croppie": "^2.6.4",
     "idb": "^5.0.2",
+    "lottie-web": "^5.6.10",
     "qr-code-styling": "^1.0.1",
     "rusha": "^0.8.13",
     "twemoji": "^13.0.0"

@@ -4,41 +4,47 @@ import AppEvents from "../EventBus/AppEvents"
 class FilesManager {
 
     pending = new Map()
-    downloaded: Map<string, { blob: Blob; url: string; }> = new Map()
+    downloaded: Map<string, { url?: string; }> = new Map()
 
-    isPending(fileId) {
-        return this.pending.has(fileId)
+    isPending(file, thumbOrSize) {
+        return this.pending.has(file.id)
     }
 
-    isDownloaded(fileId) {
-        return this.downloaded.has(fileId)
+    isDownloaded(file, thumbOrSize) {
+        return this.downloaded.has(file.id)
     }
 
-    getPercentage(fileId) {
-        return this.pending.get(fileId)?._percentage ?? 0
+    getPercentage(file, thumbOrSize) {
+        return this.pending.get(file.id)?._percentage ?? 100
     }
 
-    getPendingSize(fileId) {
-        return this.pending.get(fileId)?._downloadedSize ?? 0
+    getPendingSize(file, thumbOrSize) {
+        return this.pending.get(file.id)?._downloadedBytes?.length ?? 0
     }
 
-    get(fileId) {
+    get(file, thumbOrSize) {
+        return this.downloaded.get(file.id)
+    }
+
+    getUrl(file, thumbOrSize) {
+        return this.get(file, thumbOrSize)?.url
+    }
+
+    getById(fileId, thumbOrSize) {
         return this.downloaded.get(fileId)
     }
 
-    cancel(fileId) {
-        this.pending.delete(fileId)
+    cancel(file, thumbOrSize) {
+        this.pending.delete(file.id)
 
         AppEvents.Files.fire("download.canceled", {
-            file: {
-                id: fileId, // todo: aaaaa
-            }
+            file: file,
         })
     }
 
-    checkCache(file, size): Promise<Blob> | any {
+    checkCache(file, thumbOrSize): Promise<Blob> | any {
         if (this.downloaded.has(file.id)) {
-            const downloaded = this.downloaded.get(file.id);
+            const downloaded = this.get(file, thumbOrSize);
 
             AppEvents.Files.fire("download.done", {
                 file,
@@ -49,12 +55,12 @@ class FilesManager {
             return Promise.resolve(downloaded);
         }
 
-        return FileAPI.tryFromCache(file, size).then(blob => this.internal_downloadDone(file, blob)).catch(error => {
+        return FileAPI.tryFromCache(file, thumbOrSize).then(blob => this.internal_downloadDone(file, blob)).catch(error => {
             // console.error(error)
         })
     }
 
-    downloadPhoto(photo, size): Promise<Blob> | any {
+    downloadPhoto(photo, size, options): Promise<Blob> | any {
         if (this.downloaded.has(photo.id)) {
             const downloaded = this.downloaded.get(photo.id);
 
@@ -73,13 +79,16 @@ class FilesManager {
 
         this.internal_downloadStart(photo);
 
-        return photo._promise = FileAPI.downloadPhoto(photo, size, event => this.internal_downloadNewPart(photo, event))
+        return photo._promise = FileAPI.downloadPhoto(photo, size, event => this.internal_downloadNewPart(photo, event), options)
             .then(blob => this.internal_downloadDone(photo, blob));
     }
 
-    downloadDocument(document, thumb): Promise<Blob> | any {
-        if (this.downloaded.has(document.id)) {
-            const downloaded = this.downloaded.get(document.id);
+    downloadDocument(document, thumb, options): Promise<Blob> | any {
+        // const id = thumb ? `${document.id}_${thumb.id}` : document.id;
+        const id = document.id;
+
+        if (this.downloaded.has(id)) {
+            const downloaded = this.downloaded.get(id);
 
             AppEvents.Files.fire("download.done", {
                 file: document,
@@ -90,13 +99,13 @@ class FilesManager {
             return Promise.resolve(downloaded);
         }
 
-        if (this.pending.has(document.id)) {
-            return this.pending.get(document.id)._promise;
+        if (this.pending.has(id)) {
+            return this.pending.get(id)._promise;
         }
 
         this.internal_downloadStart(document);
 
-        return document._promise = FileAPI.downloadDocument(document, thumb, event => this.internal_downloadNewPart(document, event))
+        return document._promise = FileAPI.downloadDocument(document, thumb, event => this.internal_downloadNewPart(document, event), options)
             .then(blob => this.internal_downloadDone(document, blob));
     }
 
@@ -104,7 +113,7 @@ class FilesManager {
         file._percentage = 100;
 
         const downloaded = {
-            blob,
+            id: file.id,
             url: URL.createObjectURL(blob),
         };
 
@@ -119,12 +128,11 @@ class FilesManager {
 
         file._promise = Promise.resolve(downloaded);
 
-        return blob;
+        return downloaded;
     }
 
     internal_downloadStart(file) {
         file._percentage = 0;
-        file._downloadedSize = 0;
 
         this.pending.set(file.id, file)
 
@@ -137,7 +145,7 @@ class FilesManager {
         const {newBytes, totalBytes, sizeToBeDownloaded, percentage} = event;
 
         file._percentage = percentage;
-        file._downloadedSize = totalBytes.length;
+        file._downloadedBytes = totalBytes;
 
         AppEvents.Files.fire("download.newPart", {
             file,
@@ -155,7 +163,7 @@ class FilesManager {
     }
 
     save(fileId, fileName) {
-        const url = this.get(fileId).url
+        const url = this.getById(fileId).url
 
         this.saveBlobUrlOnPc(url, fileName)
     }

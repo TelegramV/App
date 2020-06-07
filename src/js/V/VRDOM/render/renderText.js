@@ -17,21 +17,7 @@
  *
  */
 
-import VApp from "../../vapp"
-
 const renderText = text => {
-    if (VApp.interceptor) {
-        const intercepted = VApp.interceptor.textCreateIntercept(text)
-
-        if (intercepted === undefined) {
-            return document.createTextNode(text)
-        } else if (intercepted instanceof Node) {
-            return intercepted
-        } else if (intercepted instanceof NodeList || Array.isArray(intercepted) || intercepted[Symbol.iterator]) {
-            return intercepted
-        }
-    }
-
     return document.createTextNode(text)
 }
 

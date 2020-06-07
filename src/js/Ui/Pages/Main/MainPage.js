@@ -16,24 +16,10 @@ import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/Archive
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
-import SnackbarComponent from "../../Components/Singleton/SnackbarComponent"
-import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
-import CreateChannelBar from "../../Components/Sidebars/Left/Create/CreateChannelBar";
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
-import ForwardBarComponent from "../../Components/Sidebars/Right/ForwardBarComponent";
 import Localization from "../../../Api/Localization/Localization";
 import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
-import {SettingsSidebar} from "../../Components/SidebarsNeo/Left/Settings/SettingsSidebar";
-import {LanguageSidebar} from "../../Components/SidebarsNeo/Left/Settings/LanguageSidebar";
-import {GeneralSidebar} from "../../Components/SidebarsNeo/Left/Settings/General/GeneralSidebar";
-import {NotificationsSidebar} from "../../Components/SidebarsNeo/Left/Settings/Notifications/NotificationsSidebar";
-import {PrivacySidebar} from "../../Components/SidebarsNeo/Left/Settings/Privacy/PrivacySidebar";
-import {ActiveSessionsSidebar} from "../../Components/SidebarsNeo/Left/Settings/Privacy/ActiveSessionsSidebar";
-import {BlockedSidebar} from "../../Components/SidebarsNeo/Left/Settings/Privacy/BlockedSidebar";
-import {DialogsSidebar} from "../../Components/SidebarsNeo/Left/Dialogs/DialogsSidebar";
-import {LeftSidebarHistory} from "../../Components/SidebarsNeo/GenericSidebarHistory";
 import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
-import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -90,6 +76,7 @@ export function MainPage() {
             {/*</div>*/}
 
 
+            <SettingsComponent/>
             <PhoneCallComponent/>
 
             {/*<SearchPanelComponent/>*/}

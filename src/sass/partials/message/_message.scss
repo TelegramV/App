@@ -8,8 +8,9 @@
 
     .channel {
         &.message {
-            grid-template-columns: min-content 1fr;
-            .avatar {
+            grid-template-columns: min-content fit-content(100%);
+
+            & > .avatar {
                 display: none;
             }
         }
@@ -18,12 +19,11 @@
     .message {
         display: grid;
         position: relative;
-        grid-template-areas:
-        "avatar message"
-        "empty keyboard";
+        grid-template-areas: "avatar message" "empty keyboard";
         grid-template-columns: min-content fit-content(480px);
 
         filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
+        //filter: none;
 
         @include mobile {
             grid-template-columns: min-content fit-content(90%);
@@ -34,7 +34,6 @@
             }*/
         }
 
-        
 
         @include avatar;
 
@@ -55,12 +54,12 @@
         &.out {
             justify-content: end;
 
-            .avatar {
+            & > .avatar {
                 display: none; //idk how it was done before
             }
         }
 
-        &.in>.message-content {
+        &.in > .message-content {
             background-color: #ffffff;
             -webkit-mask-position: 0% 100%;
             mask-position: 0% 100%;
@@ -86,9 +85,10 @@
             @include audio($in: true);
             @include iv-button($in: true);
             @include tails($in: true);
+            @include poll($in: true);
         }
 
-        &.out>.message-content {
+        &.out > .message-content {
             background-color: #eeffde;
             -webkit-mask-position: 100% 100%;
             mask-position: 100% 100%;
@@ -105,6 +105,10 @@
                 @include reply($in: false, $transparent: true);
             }
 
+            a, a > span {
+                color: $darkgreen;
+            }
+
             @include time($in: false);
             @include box($in: false);
             @include header($in: false, $transparent: false);
@@ -112,6 +116,7 @@
             @include audio($in: false);
             @include iv-button($in: false);
             @include tails($in: false);
+            @include poll($in: false);
         }
 
         .message-content {
@@ -144,16 +149,22 @@
                 margin-top: 7px;
                 margin-bottom: 4px;
                 user-select: text;
+
+                &.empty {
+                    margin-bottom: 0;
+                    margin-top: -20px; //TODO check for overlaping
+                }
             }
 
             .card {
+                min-width: 150px;
                 margin-top: 10px;
-                margin-bottom: 10px;
+                padding-right: 10px;
+                margin-bottom: 5px;
             }
 
             //not dependant
             @include game;
-            @include poll;
             @include map;
             @include sticker;
             @include figure;
@@ -171,7 +182,7 @@
                 border-radius: 0;
                 grid-gap: 2px;
                 height: auto;
-                max-height: 512px;
+                max-height: 640px;
             }
         }
     }

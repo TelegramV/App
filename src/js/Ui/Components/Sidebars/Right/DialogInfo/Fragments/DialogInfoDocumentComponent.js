@@ -3,6 +3,7 @@ import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessCom
 import FileManager from "../../../../../../Api/Files/FileManager"
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import {FileAPI} from "../../../../../../Api/Files/FileAPI"
+import DocumentParser from "../../../../../../Api/Files/DocumentParser"
 
 class DialogInfoDocumentComponent extends StatelessComponent {
     appEvents(E: AE) {
@@ -15,13 +16,13 @@ class DialogInfoDocumentComponent extends StatelessComponent {
     }
 
     render({document}) {
-        const isDownloading = FileManager.isPending(document.id);
-        const isDownloaded = FileManager.isDownloaded(document.id);
+        const isDownloading = FileManager.isPending(document);
+        const isDownloaded = FileManager.isDownloaded(document);
 
         const title = DocumentMessagesTool.getFilename(document.attributes);
         const ext = title.split(".")[title.split(".").length - 1];
-        const percentage = FileManager.getPercentage(document.id);
-        const pendingSize = FileManager.getPendingSize(document.id);
+        const percentage = FileManager.getPercentage(document);
+        const pendingSize = FileManager.getPendingSize(document);
 
         const size = isDownloading && !isDownloaded ? `${Math.round(percentage)}% / ${DocumentMessagesTool.formatSize(pendingSize)}` : DocumentMessagesTool.formatSize(document.size);
 
@@ -71,7 +72,7 @@ class DialogInfoDocumentComponent extends StatelessComponent {
     }
 
     componentWillMount(props) {
-        if (!FileManager.isDownloaded(this.props.document.id)) {
+        if (!FileManager.isDownloaded(this.props.document)) {
             FileManager.checkCache(this.props.document);
         }
     }
@@ -79,12 +80,12 @@ class DialogInfoDocumentComponent extends StatelessComponent {
     downloadDocument = () => {
         const document = this.props.document;
 
-        if (FileManager.isDownloaded(document.id)) {
-            FileManager.save(document.id, DocumentMessagesTool.getFilename(document.attributes))
-        } else if (!FileManager.isPending(document.id)) {
+        if (FileManager.isDownloaded(document)) {
+            FileManager.save(document.id, DocumentParser.attributeFilename(document))
+        } else if (!FileManager.isPending(document)) {
             FileManager.downloadDocument(document)
         } else {
-            FileManager.cancel(document.id)
+            FileManager.cancel(document)
         }
     }
 }

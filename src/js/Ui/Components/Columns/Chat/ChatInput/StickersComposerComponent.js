@@ -28,7 +28,6 @@ import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import UIEvents from "../../../../EventBus/UIEvents"
 import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
-import VSpinner from "../../../Elements/VSpinner"
 
 const StickerSetItemFragment = ({setId, url, onClick}) => {
     return (
@@ -55,15 +54,15 @@ class StickersComposerComponent extends StatelessComponent {
     render(props) {
         return (
             <div className="sticker-wrapper hidden">
-                <div ref={this.stickersTableRef} className="sticker-table">
-                    <div id="composer-sticker-pack-recent" className="selected scrollable"/>
-                </div>
-                <div ref={this.stickerPacksRef} className="sticker-packs">
+                <div ref={this.stickerPacksRef} className="sticker-packs scrollable-x hide-scroll">
                     <div id="composer-pack-thumb-recent"
                          className="rp sticker-packs-item selected"
                          onClick={this.openRecent}>
                         <i className="tgico tgico-sending"/>
                     </div>
+                </div>
+                <div ref={this.stickersTableRef} className="sticker-table">
+                    <div id="composer-sticker-pack-recent" className="selected scrollable"/>
                 </div>
             </div>
         )

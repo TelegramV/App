@@ -88,7 +88,11 @@
         position: relative;
         transition: anim(width);
 
-
+        @include mobile {
+            &.composer-opened {
+                height: calc(var(--vh100) * 0.6);
+            }
+        }
 
         #topbar {
             width: 100%;
@@ -169,7 +173,7 @@
 
                 .title {
                     color: $blue;
-                    font-weight: bold;
+                    font-weight: 500;
                     margin-bottom: 4px;
                     white-space: nowrap;
                     text-overflow: ellipsis;
@@ -215,11 +219,11 @@
         }
 
         #bubbles {
-            //will-change: transform;
+            will-change: transform;
             width: 100%;
 
             #bubbles-inner {
-                will-change: transform;
+                //will-change: transform;
                 max-width: $max-chat-width;
                 width: 100%;
                 display: flex;

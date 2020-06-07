@@ -15,10 +15,10 @@
  *
  */
 
-function scrollToAndHighlight($container: HTMLElement, $el: HTMLElement) {
+function scrollToAndHighlight($container: HTMLElement, $el: HTMLElement, behavior = "auto") {
     $container.scrollTo({
         top: $el.offsetTop + ($el.clientHeight / 2 - $container.clientHeight / 2),
-        behavior: "smooth"
+        behavior,
     })
 
     $el.classList.add("highlightmessage");

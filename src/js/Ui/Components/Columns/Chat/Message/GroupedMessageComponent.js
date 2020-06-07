@@ -11,9 +11,14 @@ import UIEvents from "../../../../EventBus/UIEvents"
 
 class GroupedMessageComponent extends GeneralMessageComponent {
 
-    render({message: group}) {
-        console.log(group)
+    reactive(R) {
+        super.reactive(R);
 
+        R.object(this.props.message)
+            .updateOn("groupUpdated")
+    }
+
+    render({message: group}) {
         const text = group.text.length > 0 ? <TextWrapperComponent message={group}/> : ""
 
         return (
@@ -22,14 +27,17 @@ class GroupedMessageComponent extends GeneralMessageComponent {
                                     showUsername={false}
                                     outerPad={text !== ""}
                                     bubbleRef={this.bubbleRef}>
-                <div id={`message-${group.id}`}
-                     className={["grouped", Layouter.getClass(group.messages.size)]}>
+                <div className={["grouped", Layouter.getClass(group.messages.size)]}>
                     {
                         Array.from(group.messages).reverse().map(message => {
                             if (message instanceof PhotoMessage) {
-                                return <BetterPhotoComponent photo={message.raw.media.photo} onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>
+                                return <BetterPhotoComponent photo={message.raw.media.photo}
+                                                             onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}
+                                                             calculateSize/>
                             } else if (message instanceof VideoMessage) {
-                                return <BetterVideoComponent document={message.raw.media.document} onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>
+                                return <BetterVideoComponent document={message.raw.media.document}
+                                                             onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}
+                                                             calculateSize/>
                             } else {
                                 console.error(message)
                                 return null;

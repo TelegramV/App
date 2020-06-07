@@ -49,7 +49,11 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
     let doNotTouchMyChildren: boolean = false
 
     if (attributes) {
-        for (const [k, v] of Object.entries(attributes)) {
+        for (let [k, v] of Object.entries(attributes)) {
+            if (attrAliases.has(k)) {
+                k = attrAliases.get(k)
+            }
+
             const isComponentOrFragment = vrdom_isTagNameComponentOrFragment(tagName)
             let key = isComponentOrFragment ? k : k.toLowerCase()
 

@@ -1,6 +1,5 @@
 import LeftBarComponent from "../LeftBarComponent"
 import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
-import type {AE} from "../../../../../V/VRDOM/component/__component_registerAppEvents";
 import UIEvents from "../../../../EventBus/UIEvents";
 import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
 
@@ -16,16 +15,14 @@ export class ArchivedDialogsBar extends LeftBarComponent {
 
     render() {
         return (
-            <div className="archived settings sidebar hidden">
-                <div className="settings-main">
-                    <div className="sidebar-header no-borders">
-                        <BurgerAndBackComponent/>
-                        {/*<i className="btn-icon tgico tgico-back" onClick={_ => this.openBar("dialogs")}/>*/}
-                        <div className="sidebar-title">Archived Chats</div>
-                    </div>
-
-                    <ArchivedDialogListComponent/>
+            <div className="archived sidebar hidden">
+                <div className="sidebar-header no-borders">
+                    <BurgerAndBackComponent/>
+                    {/*<i className="btn-icon tgico tgico-back" onClick={_ => this.openBar("dialogs")}/>*/}
+                    <div className="sidebar-title">Archived Chats</div>
                 </div>
+
+                <ArchivedDialogListComponent/>
             </div>
         )
     }
@@ -38,7 +35,7 @@ export class ArchivedDialogsBar extends LeftBarComponent {
     }
 
     onBackPressed = (event) => {
-        if(event.id === this.barName) {
+        if (event.id === this.barName) {
             this.openBar("dialogs")
             UIEvents.LeftSidebar.fire("burger.changeToBurger", {})
         }

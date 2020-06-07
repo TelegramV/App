@@ -20,6 +20,7 @@
 import type {Message} from "./Message"
 import {MessageType} from "./Message"
 import {AbstractMessage} from "./AbstractMessage"
+import {compareFn} from "../../Utils/array"
 
 // shouldn't extend AbstractMessage, but no time as always
 class GroupMessage extends AbstractMessage {
@@ -33,11 +34,20 @@ class GroupMessage extends AbstractMessage {
     }
 
     init() {
-        this.messages.forEach(message => message.init())
+        this.messages.forEach(message => message.init());
     }
 
     get raw() {
-        return Array.from(this.messages)[this.messages.size - 1].raw
+        return Array.from(this.messages).sort(compareFn("id", "asc"))[0].raw;
+    }
+
+    get newest() {
+        return Array.from(this.messages).sort(compareFn("id", "desc"))[0].raw;
+    }
+
+    add(message: Message) {
+        this.messages.add(message);
+        this.fire("groupUpdated");
     }
 }
 

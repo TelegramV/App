@@ -7,7 +7,7 @@ export class GameMessage extends AbstractMessage {
 
     type = MessageType.GAME
 
-    show() {
-        super.show()
+    get game() {
+    	return this.raw?.media?.game;
     }
 }

@@ -22,7 +22,6 @@ import {FileAPI} from "../../../Api/Files/FileAPI"
 import {PhotoFragment} from "../Columns/Chat/Message/Photo/PhotoFragment"
 import AppEvents from "../../../Api/EventBus/AppEvents"
 import FileManager from "../../../Api/Files/FileManager"
-import {LoadingFragment} from "../Columns/Chat/Message/Photo/PhotoFigureFragment"
 
 // probably patch-compatible
 class BetterPhotoComponent extends StatefulComponent {
@@ -35,25 +34,47 @@ class BetterPhotoComponent extends StatefulComponent {
     appEvents(E) {
         E.bus(AppEvents.Files)
             .filter(event => event.file.id === this.props.photo.id)
-            .updateOn("download.start")
+            // .updateOn("download.start")
             // .on("download.newPart", this.onDownloadNewPart)
-            .updateOn("download.done")
+            .updateOn("download.done");
     }
 
-    render({photo, onClick, maxWidth, maxHeight}, {url, thumbnailUrl, width, height}) {
-        const isLoading = FileManager.isPending(photo.id);
+    render({photo, size, onClick, maxWidth, maxHeight, calculateSize = false, wrapFigure = true, ...otherArgs}, {url, thumbnailUrl, width, height}) {
+        const isLoading = FileManager.isPending(photo, size);
+
+        if (!wrapFigure) {
+            return !isLoading ?
+                <PhotoFragment calculateSize={calculateSize}
+                               url={FileManager.getUrl(photo, size)}
+                               width={width}
+                               height={height}
+                               maxWidth={maxWidth || width}
+                               maxHeight={maxHeight || height}
+                               {...otherArgs}/>
+                :
+                <PhotoFragment calculateSize={calculateSize}
+                               url={thumbnailUrl}
+                               width={width}
+                               height={height}
+                               maxWidth={maxWidth || width}
+                               maxHeight={maxHeight || height}
+                               {...otherArgs}/>;
+        }
 
         return (
-            <figure className={["photo", isLoading ? "thumbnail" : ""]} onClick={onClick}>
+            <figure css-cursor="pointer" className={["photo rp", isLoading && "thumbnail"]}
+                    onClick={onClick} {...otherArgs}>
                 {
                     !isLoading ?
-                        <PhotoFragment url={FileManager.get(photo.id).url}
+                        <PhotoFragment calculateSize={calculateSize}
+                                       url={FileManager.getUrl(photo, size)}
                                        width={width}
                                        height={height}
                                        maxWidth={maxWidth || width}
                                        maxHeight={maxHeight || height}/>
                         :
-                        <PhotoFragment url={thumbnailUrl}
+                        <PhotoFragment calculateSize={calculateSize}
+                                       url={thumbnailUrl}
                                        width={width}
                                        height={height}
                                        maxWidth={maxWidth || width}
@@ -64,23 +85,27 @@ class BetterPhotoComponent extends StatefulComponent {
     }
 
     componentWillMount() {
-        this.calculateState(this.props.photo);
+        this.calculateState(this.props);
 
         FileManager.downloadPhoto(this.props.photo);
     }
 
     componentWillUpdate(nextProps, nextState) {
-        if (nextProps.photo !== this.props.photo) {
-            this.calculateState(nextProps.photo);
-            FileManager.downloadPhoto(this.props.photo);
+        if (nextProps.photo.id !== this.props.photo.id) {
+            this.calculateState(nextProps);
+
+            FileManager.downloadPhoto(nextProps.photo);
         }
     }
 
-    calculateState = photo => {
-        const maxSize = FileAPI.getMaxSize(photo);
-        this.state.width = maxSize.w;
-        this.state.height = maxSize.h;
-        this.state.thumbnailUrl = FileAPI.hasThumbnail(photo) ? FileAPI.getThumbnail(photo) : "";
+    calculateState = props => {
+        if (props.calculateSize) {
+            const maxSize = FileAPI.getMaxSize(props.photo);
+            this.state.width = maxSize.w;
+            this.state.height = maxSize.h;
+        }
+
+        this.state.thumbnailUrl = FileAPI.hasThumbnail(props.photo) ? FileAPI.getThumbnail(props.photo) : "";
     }
 }
 

@@ -23,6 +23,8 @@ import ElementRef from "../ref/ElementRef"
 import VApp from "../../vapp"
 import __component_withDefaultProps from "./__component_withDefaultProps"
 import {__component_update_force} from "./__component_update"
+import type {RORC} from "./__component_reactiveObjectEventsBuilder"
+import type {AE} from "./__component_appEventsBuilder"
 
 export class ComponentDidNotMount {
 }
@@ -32,7 +34,7 @@ export class ComponentWasDestroyed {
 
 
 // abstract stateless component
-class VComponent {
+class VComponent<P> {
     __ = {
         stateful: false,
         initialized: false,
@@ -65,7 +67,7 @@ class VComponent {
     static defaultProps: any = null;
     static displayName: string = "VComponent";
 
-    props: any = {};
+    props: P = {};
     slot: any = null;
 
     _$el: HTMLElement = null;
@@ -76,9 +78,9 @@ class VComponent {
 
     get $el() {
         if (this.__.destroyed) {
-            console.error("component is destroyed!", this.constructor.name)
+            console.error("BUG: component is destroyed!", this.constructor.name)
         } else if (!this.__.mounted) {
-            console.error("component is not mounted!", this.constructor.name)
+            console.error("BUG: component is not mounted!", this.constructor.name)
         }
 
         return this._$el
@@ -96,21 +98,12 @@ class VComponent {
     init() {
     }
 
-    /**
-     * @param {AE} E
-     */
-    appEvents(E) {
+    appEvents(E: AE) {
     }
 
-    /**
-     * @param {RORC} R
-     */
-    reactive(R) {
+    reactive(R: RORC) {
     }
 
-    /**
-     * @param props
-     */
     render(props) {
     }
 
@@ -120,16 +113,10 @@ class VComponent {
     componentWillUnmount() {
     }
 
-    componentWillUpdate(nextProps, nextState) {
+    componentWillUpdate(nextProps: P) {
     }
 
-    /**
-     * before patch callback
-     *
-     * @param nextProps
-     * @param nextState
-     */
-    shouldComponentUpdate(nextProps, nextState) {
+    shouldComponentUpdate(nextProps: P) {
     }
 
     /**

@@ -19,7 +19,7 @@
 
 import VComponent from "./VComponent"
 
-class StatelessComponent extends VComponent {
+class StatelessComponent<P> extends VComponent<P> {
 }
 
 export default StatelessComponent;

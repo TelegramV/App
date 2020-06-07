@@ -1,13 +1,13 @@
-import { askForFile, convertBits, formatAudioTime } from "../../../../Utils/utils";
+import {askForFile, convertBits, formatAudioTime} from "../../../../Utils/utils";
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import ComposerComponent from "./ComposerComponent"
 import SuggestionComponent from "./SuggestionComponent"
-import { MessageParser } from "../../../../../Api/Messages/MessageParser";
-import { domToMessageEntities } from "../../../../../Utils/htmlHelpers";
-import { AttachFilesModal } from "../../../Modals/AttachFilesModal";
-import { AttachPollModal } from "../../../Modals/AttachPollModal";
-import { TextareaFragment } from "./TextareaFragment";
-import { AttachPhotosModal } from "../../../Modals/AttachPhotosModal";
+import {MessageParser} from "../../../../../Api/Messages/MessageParser";
+import {domToMessageEntities} from "../../../../../Utils/htmlHelpers";
+import {AttachFilesModal} from "../../../Modals/AttachFilesModal";
+import {AttachPollModal} from "../../../Modals/AttachPollModal";
+import {TextareaFragment} from "./TextareaFragment";
+import {AttachPhotosModal} from "../../../Modals/AttachPhotosModal";
 import UIEvents from "../../../../EventBus/UIEvents";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import MTProto from "../../../../../MTProto/External"
@@ -40,111 +40,102 @@ export class ChatInputComponent extends StatelessComponent {
     render() {
         return <div className="chat-input-wrapper">
             <div className="chat-input">
-                <ComposerComponent mouseEnter={this.mouseEnterComposer.bind(this)}
-                                   mouseLeave={this.mouseLeaveComposer.bind(this)}/>
                 <SuggestionComponent/>
-                <div className="input-and-keyboard-wrapper">
-                    <div className="input-field-wrapper">
-                        <div className="reply hidden">
-                            <i className="tgico tgico-close btn-icon" onClick={this.closeReply.bind(this)}/>
-                            <div className="message" onClick={this.navigateToReplied.bind(this)}>
-                                <img src="" className="image hidden"/>
-                                <div className="reply-wrapper">
-                                    <div className="title"/>
-                                    <div className="description"/>
+                <div class="input-column">
+                    <div class="input-row">
+                        <div className="input-field-wrapper">
+                            <div className="reply hidden">
+                                <i className="tgico tgico-close btn-icon" onClick={this.closeReply.bind(this)}/>
+                                <div className="message" onClick={this.navigateToReplied.bind(this)}>
+                                    <img src="" className="image hidden"/>
+                                    <div className="reply-wrapper">
+                                        <div className="title"/>
+                                        <div className="description"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="field">
+                                <div className="another-fucking-wrapper">
+                                    <div className="ico-wrapper">
+                                        <i className="tgico tgico-smile btn-icon rp rps"
+                                           onMouseEnter={this.mouseEnterEmoji.bind(this)}
+                                           onMouseLeave={this.mouseLeaveEmoji.bind(this)}
+                                           onClick={this.mouseClickEmoji.bind(this)}/>
+                                    </div>
+                                    <TextareaFragment ref={this.chatInputTextareaRef} parent={this}/>
+
+                                    <div className="ico-wrapper">
+
+                                        <i className="tgico tgico-smallscreen btn-icon hidden"/>
+                                    </div>
+                                    <div className="ico-wrapper">
+
+                                        <i className="tgico tgico-attach btn-icon rp rps"
+                                           onClick={
+                                               l => VUI.ContextMenu.openAbove([
+                                                   {
+                                                       icon: "poll",
+                                                       title: "Poll",
+                                                       onClick: _ => {
+                                                           this.pickPoll()
+                                                       }
+                                                   },
+                                                   {
+                                                       icon: "photo",
+                                                       title: "Photo or Video",
+                                                       onClick: this.attachPhoto
+                                                   },
+                                                   {
+                                                       icon: "document",
+                                                       title: "Document",
+                                                       onClick: this.attachFile
+                                                   },
+                                               ], l.target)
+                                           }/>
+                                    </div>
+
+                                    <div className="voice-seconds hidden"/>
+
                                 </div>
                             </div>
                         </div>
 
-                        <div className="field">
-                            <div className="another-fucking-wrapper">
-                                <div className="ico-wrapper">
-                                    <i className="tgico tgico-smile btn-icon rp rps"
-                                       onMouseEnter={this.mouseEnterEmoji.bind(this)}
-                                       onMouseLeave={this.mouseLeaveEmoji.bind(this)}/>
-                                </div>
-                                <TextareaFragment ref={this.chatInputTextareaRef} parent={this}/>
+                        <div className="round-button-wrapper">
+                            <ChatToBottomButtonComponent/>
 
-                                <div className="ico-wrapper">
-
-                                    <i className="tgico tgico-smallscreen btn-icon hidden"/>
-                                </div>
-                                <div className="ico-wrapper">
-
-                                    <i className="tgico tgico-attach btn-icon rp rps"
-                                       onClick={
-                                           l => VUI.ContextMenu.openAbove([
-                                               {
-                                                   icon: "poll",
-                                                   title: "Poll",
-                                                   onClick: _ => {
-                                                       this.pickPoll()
-                                                   }
-                                               },
-                                               {
-                                                   icon: "photo",
-                                                   title: "Photo or Video",
-                                                   onClick: this.attachPhoto
-                                               },
-                                               {
-                                                   icon: "document",
-                                                   title: "Document",
-                                                   onClick: this.attachFile
-                                               },
-                                           ], l.target)
-                                       }/>
-                                </div>
-
-                                <div className="voice-seconds hidden"/>
-
+                            <div className="round-button delete-button rp rps" onClick={l => this.onSend(l)}
+                                 onMouseEnter={l => this.mouseEnterRemoveVoice(l)}
+                                 onMouseLeave={l => this.mouseLeaveRemoveVoice(l)}>
+                                <i className="tgico tgico-delete"/>
                             </div>
+
+                            <div className="round-button send-button rp rps" onClick={l => this.onSend(l)}
+                                 onMouseDown={l => this.onMouseDown(l)} onContextMenu={l => VUI.ContextMenu.openAbove([
+                                {
+                                    icon: "mute",
+                                    title: "Send without sound",
+                                    onClick: _ => {
+                                        this.send(true)
+                                    }
+                                },
+                                {
+                                    // TODO replace icon to calendar
+                                    icon: "recent",
+                                    title: "Schedule message",
+                                    onClick: _ => {
+                                    }
+                                },
+                            ], l.target)}>
+                                <i className="tgico tgico-send hidden"/>
+                                <i className="tgico tgico-microphone2"/>
+                            </div>
+                            <div className="voice-circle"/>
+
                         </div>
-
                     </div>
-
-                    <div className="keyboard-markup">
-                        {/*{this.keyboardMarkup.rows.map(l => {*/}
-                        {/*    return <div classNames="row">*/}
-                        {/*        {l.buttons.map(q => {*/}
-                        {/*            return InlineKeyboardComponent.parseButton(null, q)*/}
-                        {/*        })}*/}
-                        {/*    </div>*/}
-                        {/*})}*/}
-                    </div>
-                </div>
-
-
-                <div className="round-button-wrapper">
-                    <ChatToBottomButtonComponent/>
-
-                    <div className="round-button delete-button rp rps" onClick={l => this.onSend(l)}
-                         onMouseEnter={l => this.mouseEnterRemoveVoice(l)}
-                         onMouseLeave={l => this.mouseLeaveRemoveVoice(l)}>
-                        <i className="tgico tgico-delete"/>
-                    </div>
-
-                    <div className="round-button send-button rp rps" onClick={l => this.onSend(l)}
-                         onMouseDown={l => this.onMouseDown(l)} onContextMenu={l => VUI.ContextMenu.openAbove([
-                        {
-                            icon: "mute",
-                            title: "Send without sound",
-                            onClick: _ => {
-                                this.send(true)
-                            }
-                        },
-                        {
-                            // TODO replace icon to calendar
-                            icon: "recent",
-                            title: "Schedule message",
-                            onClick: _ => {
-                            }
-                        },
-                    ], l.target)}>
-                        <i className="tgico tgico-send hidden"/>
-                        <i className="tgico tgico-microphone2"/>
-                    </div>
-                    <div className="voice-circle"/>
-
+                    <ComposerComponent mouseEnter={this.mouseEnterComposer.bind(this)}
+                                       mouseLeave={this.mouseLeaveComposer.bind(this)}/>
                 </div>
             </div>
         </div>
@@ -181,14 +172,34 @@ export class ChatInputComponent extends StatelessComponent {
         let sel, range;
         if (window.getSelection) {
             sel = window.getSelection();
-            if(sel.baseNode.parentElement === this.textarea) {
-                if (sel.getRangeAt && sel.rangeCount) {
-                    range = sel.getRangeAt(0);
-                    range.deleteContents();
-                    range.insertNode( document.createTextNode(text) );
-                }
+            if (sel.baseNode?.parentElement === this.textarea && sel.getRangeAt && sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(text));
             } else { //no selection inside our input
                 this.appendText(text);
+            }
+        }
+        this.chatInputTextareaRef.component.onInput();
+    }
+
+    backspace = () => { //BUGGY!!!, REWRITE THIS
+        let sel, range;
+        if (window.getSelection) {
+            sel = window.getSelection();
+            if ((sel.baseNode?.parentElement === this.textarea || sel.baseNode === this.textarea)
+                && sel.getRangeAt && sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                if (range.collapsed) { //no selection
+                    if (range.startOffset > 0) {
+                        let nr = new Range();
+                        nr.setStart(range.startContainer, range.startOffset - 1);
+                        nr.setEnd(range.endContainer, range.endOffset);
+                        range = nr;
+                    }
+                }
+                //console.log(range);
+                range.deleteContents();
             }
         }
         this.chatInputTextareaRef.component.onInput();
@@ -238,6 +249,19 @@ export class ChatInputComponent extends StatelessComponent {
         this.planComposerClose()
     }
 
+    mouseClickEmoji = (ev) => {
+        let composer = VApp.mountedComponents.get("composer");
+        if (composer.visible) {
+            composer.hide();
+            ev.currentTarget.classList.add("tgico-smile");
+            ev.currentTarget.classList.remove("tgico-keyboard");
+        } else {
+            composer.show();
+            ev.currentTarget.classList.remove("tgico-smile");
+            ev.currentTarget.classList.add("tgico-keyboard");
+        }
+    }
+
     planComposerClose = () => {
         this.withTimeout(() => {
             if (this.hideComposer) {
@@ -270,7 +294,7 @@ export class ChatInputComponent extends StatelessComponent {
 
     navigateToReplied = () => {
         if (this.reply) {
-            UIEvents.General.fire("chat.showMessage", { message: this.reply.message })
+            UIEvents.General.fire("chat.showMessage", {message: this.reply.message})
         }
     }
 
@@ -279,12 +303,12 @@ export class ChatInputComponent extends StatelessComponent {
             title: message.from.name,
             description: MessageParser.getPrefixNoSender(message),
             message: message,
-            image: message.smallPreviewImage
+            image: message.srcUrl
         }
         this.$el.querySelector(".reply").classList.remove("hidden")
         this.$el.querySelector(".reply .message .title").innerHTML = this.reply.title
         this.$el.querySelector(".reply .message .description").innerHTML = this.reply.description
-        if (this.reply.image !== null) {
+        if (this.reply.image) {
             this.$el.querySelector(".reply .message .image").classList.remove("hidden")
             this.$el.querySelector(".reply .message .image").src = this.reply.image
         } else {
@@ -339,7 +363,7 @@ export class ChatInputComponent extends StatelessComponent {
 
     attachFile = () => {
         askForFile("", (bytes, file) => {
-            const blob = new Blob(new Array(bytes), { type: 'application/jpeg' })
+            const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
 
             this.pickFile(URL.createObjectURL(blob), file)
         }, true, true)
@@ -347,7 +371,7 @@ export class ChatInputComponent extends StatelessComponent {
 
     attachPhoto = () => {
         askForFile("image/*,video/*", (bytes, file) => {
-            const blob = new Blob(new Array(bytes), { type: 'application/jpeg' })
+            const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
 
             this.pickPhoto(URL.createObjectURL(blob))
         }, true, true)
@@ -375,7 +399,7 @@ export class ChatInputComponent extends StatelessComponent {
         this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
 
         this.recorder.stop()
-        this.microphone.getTracks().forEach(function(track) {
+        this.microphone.getTracks().forEach(function (track) {
             track.stop();
         });
         this.microphone = null
@@ -408,12 +432,12 @@ export class ChatInputComponent extends StatelessComponent {
                     },
                     mime_type: "audio/ogg",
                     attributes: [{
-                            //flags: 1024,
-                            // duration: 100,
-                            _: "documentAttributeAudio",
-                            voice: true,
-                            waveform: convertBits(this.waveform, 8, 5)
-                        },
+                        //flags: 1024,
+                        // duration: 100,
+                        _: "documentAttributeAudio",
+                        voice: true,
+                        waveform: convertBits(this.waveform, 8, 5)
+                    },
                         {
                             _: "documentAttributeFilename",
                             file_name: ""
@@ -428,7 +452,7 @@ export class ChatInputComponent extends StatelessComponent {
     onMouseDown = (ev) => {
         if (!this.isVoiceMode) return
         if (!this.microphone) {
-            navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(l => {
+            navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
                 this.waveform = []
                 const processInput = audioProcessingEvent => {
                     // console.log(this.waveform)
@@ -524,7 +548,7 @@ export class ChatInputComponent extends StatelessComponent {
         this.convertEmojiToText(this.textarea)
         let reply = this.reply ? this.reply.message.id : null
 
-        const { text, messageEntities } = domToMessageEntities(this.textarea)
+        const {text, messageEntities} = domToMessageEntities(this.textarea)
 
         AppSelectedChat.Current.api.sendMessage({
             text: text,
@@ -537,6 +561,8 @@ export class ChatInputComponent extends StatelessComponent {
         this.closeReply()
         this.textarea.innerHTML = ""
         this.updateSendButton()
+
+        this.chatInputTextareaRef.component.onInput(); //trigger to close suggestion
     }
 
     focus = () => {

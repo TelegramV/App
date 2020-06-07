@@ -153,40 +153,39 @@ export class ChannelsUpdateProcessor extends UpdatesProcessor {
             return
         }
 
-        checkUpdatePts(peer.dialog.pts, rawUpdate, {
-            onSuccess: (type) => {
-                if (type === MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED) {
-                    peer.dialog.pts = rawUpdate.pts
-                    this.applyUpdate(rawUpdate)
-                } else if (type === MTProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
-                    this.applyUpdate(rawUpdate)
-                }
+        const type = checkUpdatePts(peer.dialog.pts, rawUpdate);
 
-                queue.isProcessing = false
-                this.processQueue(queue)
-            },
-            onFail: (type) => {
-                this.latestDifferenceTime = MTProto.TimeManager.now(true)
-                queue.isWaitingForDifference = true
-                queue.isProcessing = false
-
-                if (peer.isMin) {
-                    console.error("BUG: peer is min, processing next update", peer)
-                    queue.isWaitingForDifference = false
-                    peer.dialog.pts = rawUpdate.pts
-                    this.processQueue(queue)
-                    return
-                }
-
-                this.getChannelDifference(peer).then(rawDifference => {
-                    this.processDifference(queue, rawDifference)
-                }).catch(e => {
-                    console.error("BUG: channel difference obtaining failed", e)
-                    queue.isWaitingForDifference = false
-                    this.processQueue(queue)
-                })
+        if (type) {
+            if (type === MTProto.UpdatesManager.UPDATE_CAN_BE_APPLIED) {
+                peer.dialog.pts = rawUpdate.pts
+                this.applyUpdate(rawUpdate)
+            } else if (type === MTProto.UpdatesManager.UPDATE_HAS_NO_PTS) {
+                this.applyUpdate(rawUpdate)
             }
-        })
+
+            queue.isProcessing = false
+            this.processQueue(queue);
+        } else {
+            this.latestDifferenceTime = MTProto.TimeManager.now(true)
+            queue.isWaitingForDifference = true
+            queue.isProcessing = false
+
+            if (peer.isMin) {
+                console.error("BUG: peer is min, processing next update", peer)
+                queue.isWaitingForDifference = false
+                peer.dialog.pts = rawUpdate.pts
+                this.processQueue(queue)
+                return
+            }
+
+            this.getChannelDifference(peer).then(rawDifference => {
+                this.processDifference(queue, rawDifference)
+            }).catch(e => {
+                console.error("BUG: channel difference obtaining failed", e)
+                queue.isWaitingForDifference = false
+                this.processQueue(queue)
+            })
+        }
     }
 
 
@@ -263,6 +262,35 @@ export class ChannelsUpdateProcessor extends UpdatesProcessor {
         }
 
         this.processWithValidation(channelQueue, rawUpdate, peer)
+    }
+
+    processAffectedMessages(peer, affectedMessages) {
+        const queue = this.queues.get(peer.id)
+
+        const type = checkUpdatePts(peer.dialog.pts, affectedMessages);
+
+        if (type) {
+            return true
+        } else {
+            this.latestDifferenceTime = MTProto.TimeManager.now(true)
+            queue.isWaitingForDifference = true
+
+            if (peer.isMin) {
+                console.error("BUG: peer is min, processing next update", peer)
+                queue.isWaitingForDifference = false
+                peer.dialog.pts = affectedMessages.pts
+                this.processQueue(queue)
+                return
+            }
+
+            this.getChannelDifference(peer).then(rawDifference => {
+                this.processDifference(queue, rawDifference)
+            }).catch(e => {
+                console.error("BUG: channel difference obtaining failed", e)
+                queue.isWaitingForDifference = false
+                this.processQueue(queue)
+            })
+        }
     }
 
     processDifference(channelQueue, rawDifferenceWithPeer) {

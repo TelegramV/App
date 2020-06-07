@@ -1,7 +1,7 @@
 @mixin game($in: false, $transparent: false) {
     & .game {
         .title {
-            font-weight: bold;
+            font-weight: 500;
         }
 
         .info {

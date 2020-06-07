@@ -7,6 +7,20 @@
 // const fa = BigInteger(Array.from(new Uint8Array(8)), 256)
 
 import twemoji from "twemoji"
+import { getOS } from "./utils"
+
+const isApple = ["mac", "ios"].includes(getOS());
+
+//wrap emoji to allow styling
+twemoji.onerror = function() {
+    if (this.parentNode) {
+        let elem = document.createElement("div");
+        elem.classList.add("emoji");
+        elem.classList.add("native");
+        elem.textContent = this.alt;
+        this.parentNode.replaceChild(elem, this);
+    }
+}
 
 export const replaceEmoji = (element) => {
     return twemoji.parse(element, {
@@ -14,7 +28,9 @@ export const replaceEmoji = (element) => {
         ext: ".png",
         folder: "img-apple-64",
         callback: (icon, options) => {
-            //there's a difference between twemoji and apple
+            if (isApple) return "#"; //cause error to not download emoji on Apple devices
+
+            //there's a difference between twemoji and apple codes
             if (icon.length < 4) {
                 icon = icon.padStart(4, 0);
             }

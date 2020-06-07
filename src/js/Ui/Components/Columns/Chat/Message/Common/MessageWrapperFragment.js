@@ -7,48 +7,38 @@ import {MessageParser} from "../../../../../../Api/Messages/MessageParser";
 import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer"
-import MTProto from "../../../../../../MTProto/External";
-import UpdatesManager from "../../../../../../Api/Updates/UpdatesManager";
 import VUI from "../../../../../VUI"
+import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer"
+import API from "../../../../../../Api/Telegram/API"
+import PeerName from "../../../../Reactive/PeerName"
 
-const ReplyToMessageFragment = ({message}) => {
+function ReplyToMessageFragment({message}) {
     if (!message.raw.reply_to_msg_id) {
-        return ""
-        // here was `undefined` instead of "", pls do not use `undefined` anymore here..(
+        return null
     } else if (!message.replyToMessage) {
-        return <ReplyFragment id={`message-${message.id}-rpl`} show={true} onClick={l => {
-            UIEvents.General.fire("chat.showMessage", {message: message.replyToMessage})
-        }}/>
+        return (
+            <ReplyFragment show={true}/>
+        )
     }
 
     return (
-        <ReplyFragment id={`message-${message.id}-rpl`}
-                       name={message.replyToMessage.from.name}
+        <ReplyFragment name={message.replyToMessage.from.name}
                        text={MessageParser.getPrefixNoSender(message.replyToMessage)}
-                       show={true} onClick={l => {
-            UIEvents.General.fire("chat.showMessage", {message: message.replyToMessage})
-        }}/>
+                       show={true}
+                       onClick={() => {
+                           UIEvents.General.fire("chat.showMessage", {message: message.replyToMessage})
+                       }}
+        />
     )
 }
 
-const MessageWrapperFragment = (
-    {
-        message,
-        transparent = false,
-        noPad = false,
-        outerPad = true,
-        contextActions,
-        showUsername = true,
-        avatarRef,
-        bubbleRef
-    },
-    slot
-) => {
-    const defaultContextActions = [{
-        icon: "reply",
-        title: "Reply",
-        onClick: _ => ChatInputManager.replyTo(message)
-    },
+function createContextMenu(message) {
+    return [
+        {
+            icon: "reply",
+            title: "Reply",
+            onClick: _ => ChatInputManager.replyTo(message)
+        },
         {
             icon: "copy",
             title: "Copy"
@@ -57,12 +47,7 @@ const MessageWrapperFragment = (
             icon: _ => message.isPinned ? "unpin" : "pin",
             title: _ => message.isPinned ? "Unpin" : "Pin",
             onClick: _ => {
-                MTProto.invokeMethod("messages.updatePinnedMessage", {
-                    peer: message.to.inputPeer,
-                    id: message.isPinned ? -1 : message.id
-                }).then(l => {
-                    UpdatesManager.process(l)
-                })
+                API.messages.updatePinnedMessage(message)
             }
         },
         {
@@ -75,14 +60,37 @@ const MessageWrapperFragment = (
         {
             icon: "delete",
             title: "Delete",
-            red: true
+            red: true,
+            onClick: () => {
+                if (message.dialogPeer instanceof ChannelPeer) {
+                    API.channels.deleteMessages(message.dialogPeer, [message.id]);
+                } else {
+                    API.messages.deleteMessages([message.id]);
+                }
+            }
         },
     ];
-    const contextMenuHandler = VUI.ContextMenu.listener(contextActions ? contextActions : defaultContextActions);
+}
+
+function MessageWrapperFragment(
+    {
+        message,
+        transparent = false,
+        outerPad = true,
+        contextActions,
+        showUsername = true,
+    },
+    slot
+) {
+    if (message.isDeleted) {
+        return <div/> // we don't delete entire element because we need virtualization to continue to work..
+    }
+
+    const contextMenuHandler = VUI.ContextMenu.listener(contextActions ? contextActions : createContextMenu(message));
 
     const doubleClickHandler = _ => ChatInputManager.replyTo(message)
 
-    let topLevelClasses = {
+    const topLevelClasses = {
         "message": true,
         "channel": message.isPost,
         "out": !message.isPost && message.isOut,
@@ -94,7 +102,6 @@ const MessageWrapperFragment = (
 
     let contentClasses = {
         "message-content": true,
-        // "no-pad": noPad,
         "transparent": transparent,
         "read": !message.isSending && message.isRead,
         "sending": message.isSending,
@@ -107,11 +114,6 @@ const MessageWrapperFragment = (
     if (message.raw.fwd_from && (message.raw.fwd_from.saved_from_peer || message.raw.fwd_from.saved_from_msg_id)) {
         topLevelClasses["out"] = false
         topLevelClasses["in"] = true
-    }
-
-    // FIXME this should be called upon message receiving
-    if (message.replyMarkup && (message.replyMarkup._ === "replyKeyboardHide" || message.replyMarkup._ === "replyKeyboardForceReply" || message.replyMarkup._ === "replyKeyboardMarkup")) {
-        ChatInputManager.setKeyboardMarkup(message.replyMarkup)
     }
 
     const isPrivateMessages = message.to instanceof UserPeer
@@ -129,8 +131,10 @@ const MessageWrapperFragment = (
             <div className={contentClasses}>
                 <ReplyToMessageFragment message={message}/>
                 <ForwardedHeaderFragment message={message}/>
-                {username ? <div css-cursor="pointer" className="username"
-                                 onClick={() => AppSelectedInfoPeer.select(message.from)}>{message.from.name}</div> : ""}
+                {username ? <PeerName peer={message.from} template={(peer) => {
+                    return <div css-cursor="pointer" className="username"
+                                onClick={() => AppSelectedInfoPeer.select(peer)}>{peer.name}</div>
+                }}/> : ""}
                 {slot}
             </div>
             {inlineKeyboard}

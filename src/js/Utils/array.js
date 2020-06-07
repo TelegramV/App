@@ -40,3 +40,21 @@ export function isEquivalent(a, b) {
 
     return true
 }
+
+export function compareFn(column, order = "asc") {
+    const isAsc = order === 'asc';
+    const x = isAsc ? -1 : 1;
+    const y = isAsc ? 1 : -1;
+
+    return (a, b) => {
+        if (a[column] < b[column]) {
+            return x;
+        }
+
+        if (a[column] > b[column]) {
+            return y;
+        }
+
+        return 0;
+    }
+}

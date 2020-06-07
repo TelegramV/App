@@ -19,7 +19,6 @@
 
 import vrdom_mount from "../mount"
 import VRNode from "../VRNode"
-import patchVRNodeUndefined from "./patchVRNodeUndefined"
 import patchVRNodeNull from "./patchNull"
 import patchNodeText from "./patchText"
 import VListVRNode from "../list/VListVRNode"
@@ -68,7 +67,7 @@ const vrdom_patch = ($node, vRNode: VRNode | ComponentVRNode, options = {}): Nod
     } else if (vRNode === undefined) {
         // console.log("[patch] undefined")
 
-        return patchVRNodeUndefined($node)
+        return patchVRNodeNull($node)
 
     } else if (vRNode === null) {
         // console.log("[patch] null")

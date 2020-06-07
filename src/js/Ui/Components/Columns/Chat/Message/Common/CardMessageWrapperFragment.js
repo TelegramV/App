@@ -1,9 +1,7 @@
 import MessageWrapperFragment from "./MessageWrapperFragment";
-import MessageTimeComponent from "./MessageTimeComponent";
 import TextWrapperComponent from "./TextWrapperComponent";
 
 const CardMessageWrapperFragment = ({message, icon, title, description, bubbleRef, onClick}) => {
-    let text = message.text;
     return (
         <MessageWrapperFragment message={message} showUsername={false} bubbleRef={bubbleRef}>
             <div class="card" css-cursor="pointer" onClick={onClick}>
@@ -18,9 +16,8 @@ const CardMessageWrapperFragment = ({message, icon, title, description, bubbleRe
                         {description}
                     </div>
                 </div>
-                {!text ? <MessageTimeComponent message={message}/> : ""}
             </div>
-            {text ? <TextWrapperComponent message={message}/> : ""}
+            <TextWrapperComponent message={message}/>
         </MessageWrapperFragment>
     )
 }

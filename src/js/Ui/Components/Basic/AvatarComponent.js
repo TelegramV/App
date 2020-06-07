@@ -7,13 +7,14 @@ class AvatarComponent extends StatelessComponent {
     appEvents(E) {
         E.bus(AppEvents.Peers)
             .filter(event => event.peer === this.props.peer)
-            .on("updatePhoto")
-            .on("updatePhotoSmall")
+            .updateOn("updatePhoto")
+            .updateOn("updatePhotoSmall")
     }
 
     render() {
         return <AvatarFragment peer={this.props.peer}
-                               saved={this.props.saved} onClick={this.props.onClick}/>
+                               saved={this.props.saved}
+                               onClick={this.props.onClick}/>
     }
 }
 

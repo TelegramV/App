@@ -17,15 +17,22 @@
  *
  */
 
-import DialogsManager from "../../Dialogs/DialogsManager";
+import PeersStore from "../../Store/PeersStore"
 
 const processUpdateReadHistoryOutbox = update => {
-    const dialog = DialogsManager.findByPeer(update.peer);
+    const peer = PeersStore.getByPeerType(update.peer);
 
-    if (dialog) {
-        dialog.peer.messages.readOutboxMaxId = update.max_id;
+    if (peer) {
+        const prevMaxId = peer.messages.readOutboxMaxId;
+
+        peer.messages.readOutboxMaxId = update.max_id;
+
+        peer.fire("messages.readOut", {
+            maxId: update.max_id,
+            prevMaxId
+        });
     } else {
-        console.warn("BUG: [processUpdateReadHistoryOutbox] no dialog found");
+        console.warn("BUG: [processUpdateReadHistoryOutbox] no peer found");
     }
 }
 

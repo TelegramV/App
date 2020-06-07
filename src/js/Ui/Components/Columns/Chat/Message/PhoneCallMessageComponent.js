@@ -4,29 +4,34 @@ import {CallsManager} from "../../../../../Api/Calls/CallManager";
 import PeersStore from "../../../../../Api/Store/PeersStore";
 
 class PhoneCallMessageComponent extends GeneralMessageComponent {
+    render({message}) {
+        const peer = message.to === PeersStore.self() ? message.from : message.to
 
-    render() {
-        const peer = this.props.message.to === PeersStore.self() ? this.props.message.from : this.props.message.to
         let title = ""
-        switch (this.props.message.raw.action.reason._) {
+
+        switch (message.raw.action.reason._) {
             case "phoneCallDiscardReasonMissed":
                 title = "Cancelled call"
                 break
             case "phoneCallDiscardReasonDisconnect":
             case "phoneCallDiscardReasonHangup":
-                title = this.props.message.isOut ? "Outgoing call" : "Incoming call"
+                title = message.isOut ? "Outgoing call" : "Incoming call"
                 break
 
             case "phoneCallDiscardReasonBusy":
                 title = "Missed call"
                 break
         }
-        let icon = <i className="tgico tgico-phone" css-font-size="32px"/>
+
+        let icon = <i style={{
+            color: message.raw.action.reason && message.raw.action.reason._ !== "phoneCallDiscardReasonHangup" && !message.raw.action.duration && "red"
+        }} className="tgico tgico-phone" css-font-size="32px"/>
+
         return (
             <CardMessageWrapperFragment icon={icon} title={title}
-                                        description={this.props.message.raw.action.duration + " seconds"}
-                                        message={this.props.message}
-                                        bubbleRef={this.bubbleRef} onClick={l => CallsManager.startCall(peer)}/>
+                                        description={(message.raw.action.duration ?? 0) + " seconds"}
+                                        message={message}
+                                        onClick={() => CallsManager.startCall(peer)}/>
         )
     }
 }

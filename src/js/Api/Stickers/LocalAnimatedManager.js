@@ -1,6 +1,4 @@
 import MTProto from "../../MTProto/External";
-import lottie from "../../../../vendor/lottie-web";
-import AppEvents from "../EventBus/AppEvents";
 import UIEvents from "../../Ui/EventBus/UIEvents";
 
 // TODO

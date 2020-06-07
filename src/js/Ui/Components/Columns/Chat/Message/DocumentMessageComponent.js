@@ -5,6 +5,7 @@ import CardMessageWrapperFragment from "./Common/CardMessageWrapperFragment"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import VSpinner from "../../../Elements/VSpinner";
 import {FileAPI} from "../../../../../Api/Files/FileAPI"
+import DocumentParser from "../../../../../Api/Files/DocumentParser"
 
 const IconFragment = ({document, isDownloading, isDownloaded, color, ext, progress = 0.0}) => {
     return (
@@ -58,10 +59,10 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         const title = DocumentMessagesTool.getFilename(document.attributes);
         const ext = title.split(".")[title.split(".").length - 1];
 
-        const isDownloading = FileManager.isPending(document.id);
-        const isDownloaded = FileManager.isDownloaded(document.id);
-        const percentage = FileManager.getPercentage(document.id);
-        const pendingSize = FileManager.getPendingSize(document.id);
+        const isDownloading = FileManager.isPending(document);
+        const isDownloaded = FileManager.isDownloaded(document);
+        const percentage = FileManager.getPercentage(document);
+        const pendingSize = FileManager.getPendingSize(document);
 
         const size = isDownloading && !isDownloaded ? `${Math.round(percentage)}% / ${DocumentMessagesTool.formatSize(pendingSize)}` : DocumentMessagesTool.formatSize(document.size);
 
@@ -85,20 +86,28 @@ class DocumentMessageComponent extends GeneralMessageComponent {
     }
 
     componentWillMount(props) {
-        if (!FileManager.isDownloaded(this.props.message.raw.media.document.id)) {
+        if (!FileManager.isDownloaded(this.props.message.raw.media.document)) {
             FileManager.checkCache(this.props.message.raw.media.document);
+        }
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if (this.props.message.raw.media.document.id !== nextProps.message.raw.media.document.id) {
+            if (!FileManager.isDownloaded(nextProps.message.raw.media.document)) {
+                FileManager.checkCache(nextProps.message.raw.media.document);
+            }
         }
     }
 
     downloadDocument = () => {
         const document = this.props.message.raw.media.document;
 
-        if (FileManager.isDownloaded(document.id)) {
-            FileManager.save(document.id, DocumentMessagesTool.getFilename(document.attributes))
-        } else if (!FileManager.isPending(document.id)) {
+        if (FileManager.isDownloaded(document)) {
+            FileManager.save(document.id, DocumentParser.attributeFilename(document))
+        } else if (!FileManager.isPending(document)) {
             FileManager.downloadDocument(document)
         } else {
-            FileManager.cancel(document.id)
+            FileManager.cancel(document)
         }
     }
 }

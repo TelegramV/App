@@ -20,7 +20,6 @@ import AppSelectedChat from "../../../Reactive/SelectedChat"
 import UIEvents from "../../../EventBus/UIEvents"
 import AppEvents from "../../../../Api/EventBus/AppEvents"
 import MessageComponent from "./MessageComponent"
-import {UserPeer} from "../../../../Api/Peers/Objects/UserPeer"
 import {ServiceMessage} from "../../../../Api/Messages/Objects/ServiceMessage"
 import type {Message} from "../../../../Api/Messages/Message"
 import {MessageType} from "../../../../Api/Messages/Message"
@@ -43,8 +42,16 @@ function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
 }
 
+export function isGrouping(one: Message, two: Message) {
+    if (!one || !two || one.type === MessageType.GROUP || two.type === MessageType.GROUP) return false;
+    return (!(one.type instanceof ServiceMessage) && !(two.type instanceof ServiceMessage))
+        && (one.isPost || one.isOut === two.isOut)
+        && (one.from.id === two.from.id)
+        && (Math.abs(one.date - two.date) < 5 * 60);
+}
+
 // there is no possibility nor time to calculate each message size
-class NextBubblesComponent extends StatelessComponent {
+class VirtualizedBubblesComponent extends StatelessComponent {
     bubblesInnerRef = VComponent.createRef();
 
     isLoadingRecent = false;
@@ -73,11 +80,8 @@ class NextBubblesComponent extends StatelessComponent {
             .on("messages.allRecent", this.onPeerMessagesAllRecent)
             .on("messages.nextTopPageDownloaded", this.onTopPageMessagesReady)
             .on("messages.nextBottomPageDownloaded", this.onBottomPageMessagesReady)
-            .on("chat.showMessageReady", this.onChatShowMessageReady);
-
-        E.bus(AppEvents.Dialogs)
-            .filter(event => AppSelectedChat.check(event.dialog.peer))
-            .on("newMessage", this.onNewMessage);
+            .on("chat.showMessageReady", this.onChatShowMessageReady)
+            .on("messages.new", this.onNewMessage);
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
@@ -111,9 +115,11 @@ class NextBubblesComponent extends StatelessComponent {
     onIntersection = (entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.style.visibility = "visible"
+                entry.target.style.visibility = "visible";
+                entry.target.__v?.component.onElementVisible.call(entry.target.__v.component);
             } else {
-                entry.target.style.visibility = "hidden"
+                entry.target.style.visibility = "hidden";
+                entry.target.__v?.component.onElementHidden.call(entry.target.__v.component);
             }
         })
     }
@@ -124,12 +130,11 @@ class NextBubblesComponent extends StatelessComponent {
 
     renderVRMessage = (message: Message, prevMessage: Message = null, nextMessage: Message = null): HTMLElement => {
         const isOut = !message.isPost && message.isOut;
-        const hideAvatar = isOut || message.isPost || message.to instanceof UserPeer || message instanceof ServiceMessage;
 
         message.hideAvatar = true;
 
-        let prevCurr = this._isGrouping(prevMessage, message);
-        let currNext = this._isGrouping(message, nextMessage);
+        let prevCurr = isGrouping(prevMessage, message);
+        let currNext = isGrouping(message, nextMessage);
         if (!prevCurr && currNext) {
             message.tailsGroup = "s";
         } else if (!currNext) {
@@ -144,14 +149,6 @@ class NextBubblesComponent extends StatelessComponent {
         }
 
         return <MessageComponent observer={this.observer} message={message}/>;
-    }
-
-    _isGrouping(one: Message, two: Message) {
-        if (!one || !two || one.type === MessageType.GROUP || two.type === MessageType.GROUP) return false;
-        return (!(one.type instanceof ServiceMessage) && !(two.type instanceof ServiceMessage))
-            && (one.isPost || one.isOut === two.isOut)
-            && (one.from.id === two.from.id)
-            && (Math.abs(one.date - two.date) < 5 * 60);
     }
 
     cleanupTree = () => {
@@ -173,6 +170,8 @@ class NextBubblesComponent extends StatelessComponent {
             messages = messages.reverse();
         }
 
+        messages = messages.filter(message => !document.getElementById(`message-${message.id}`));
+
         return messages;
     }
 
@@ -184,7 +183,7 @@ class NextBubblesComponent extends StatelessComponent {
         // messages = messages.slice().reverse();
 
         if (messages.length > 0) {
-            if (!__IS_PRODUCTION__) {
+            if (__IS_DEV__) {
                 if (!beforeTopMessage) {
                     console.log("[warn] append no before message")
                 }
@@ -214,6 +213,13 @@ class NextBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
+            // this.bubblesInnerRef.$el.lastElementChild?.__v.component.domSiblingUpdated
+            //     .call(
+            //         this.bubblesInnerRef.$el.lastElementChild?.__v.component,
+            //         this.bubblesInnerRef.$el.lastElementChild.previousElementSibling?.__v.component.props.message,
+            //         messages[messages.length - 1],
+            //     );
+
             vrdom_appendRealMany($messages.reverse(), this.bubblesInnerRef.$el)
 
             return $messages;
@@ -226,7 +232,7 @@ class NextBubblesComponent extends StatelessComponent {
         // messages = messages.slice().reverse();
 
         if (messages.length > 0) {
-            if (!__IS_PRODUCTION__) {
+            if (__IS_DEV__) {
                 if (!beforeTopMessage) {
                     console.log("[warn] prepend no before message")
                 }
@@ -250,6 +256,13 @@ class NextBubblesComponent extends StatelessComponent {
             if (messages.length > 1) {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
+
+            this.bubblesInnerRef.$el.firstElementChild.__v.component.domSiblingUpdated
+                .call(
+                    this.bubblesInnerRef.$el.firstElementChild.__v.component,
+                    this.bubblesInnerRef.$el.firstElementChild.nextElementSibling.__v.component.props.message,
+                    messages[0],
+                );
 
             vrdom_prependRealMany($messages, this.bubblesInnerRef.$el);
 
@@ -354,7 +367,7 @@ class NextBubblesComponent extends StatelessComponent {
 
         this.mainVirtual.messages = this.fixMessages(event.messages.slice());
 
-        if (event.messages.length < 60) {
+        if (event.messages.length < 100) {
             this.isLoadingRecent = true;
             AppSelectedChat.current.messages.fireAllRecent();
         }
@@ -370,7 +383,7 @@ class NextBubblesComponent extends StatelessComponent {
         this.mainVirtual.messages = [...event.messages, ...this.mainVirtual.messages];
         this.currentVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
         const vbp = this.mainVirtual.veryBottomPage();
-        this.appendMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.messages[0]);
+        this.appendMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.getVeryBottomOne());
         this.scrollBottom();
         this.isLoadingRecent = false;
     }
@@ -378,7 +391,13 @@ class NextBubblesComponent extends StatelessComponent {
     onNewMessage = (event) => {
         const message = event.message;
 
+        if (document.getElementById(`message-${message.id}`)) {
+            return;
+        }
+
         if (this.virtual_isCompletelyBottom()) {
+            const afterMessage = this.mainVirtual.getVeryBottomOne();
+
             this.mainVirtual.messages.push(message);
 
             const {scrollTop, scrollHeight, clientHeight} = this.$el;
@@ -391,7 +410,7 @@ class NextBubblesComponent extends StatelessComponent {
 
             this.mainVirtual.veryBottomPage();
 
-            this.prependMessages([message], this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
+            this.prependMessages([message], afterMessage, null);
 
             if (isAtBottom) {
                 this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
@@ -426,7 +445,7 @@ class NextBubblesComponent extends StatelessComponent {
 
                     $message = this.$el.querySelector(`#message-${message.id}`);
                 } else {
-                    const peer = AppSelectedChat.Current;
+                    const peer = AppSelectedChat.current;
 
                     const actionCount = (++this.actionCount);
 
@@ -451,7 +470,8 @@ class NextBubblesComponent extends StatelessComponent {
                 console.warn("No message to scroll found.")
             }
         } else {
-            const peer = AppSelectedChat.Current;
+            console.log('NO SELECT!!!', event)
+            const peer = AppSelectedChat.current;
 
             AppSelectedChat.select(message.to);
 
@@ -473,13 +493,14 @@ class NextBubblesComponent extends StatelessComponent {
     }
 
     onChatShowMessageReady = event => {
-        if (this.isLoadingRecent) {
-            return;
-        }
+        console.log('SHIWWWWWWW', event)
+        // if (this.isLoadingRecent) {
+        //     return;
+        // }
 
-        if (this.actionCount > event.actionCount) {
-            return;
-        }
+        // if (this.actionCount > event.actionCount) {
+        //     return;
+        // }
 
         this.cleanupTree();
         this.secondVirtual.refresh();
@@ -508,19 +529,21 @@ class NextBubblesComponent extends StatelessComponent {
         }
 
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
-        // this.patchMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
+        // this.patchMessages(messages.reverse(), this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         const $message = this.$el.querySelector(`#message-${event.offset_id}`);
 
         if ($message) {
+            // this.isBlockingScroll = true;
             scrollToAndHighlight(this.$el, $message);
+            // this.isBlockingScroll = false;
         } else {
             console.error("BUG: no message found to scroll");
         }
     }
 
     virtual_onScrolledTop = () => {
-        if (this.isLoadingRecent) {
+        if (this.isLoadingRecent || this.isBlockingScroll) {
             return;
         }
 
@@ -567,11 +590,11 @@ class NextBubblesComponent extends StatelessComponent {
             let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
 
             if ($first) {
-                if ($first.previousElementSibling) {
-                    this.$el.scrollTop = $first.previousElementSibling.offsetTop;
-                } else {
+                // if ($first.nextElementSibling) {
+                //     this.$el.scrollTop = $first.nextElementSibling.offsetTop;
+                // } else {
                     this.$el.scrollTop = $first.offsetTop;
-                }
+                // }
             }
         }
     }
@@ -692,11 +715,11 @@ class NextBubblesComponent extends StatelessComponent {
 
     dev_checkTree = () => {
         if (__IS_DEV__) {
-            if (this.bubblesInnerRef.$el.childElementCount < 60) {
-                console.log("BUG: < 60 messages rendered!!!")
+            if (this.bubblesInnerRef.$el.childElementCount < 100) {
+                console.log("BUG: < 100 messages rendered!!!")
             }
         }
     }
 }
 
-export default NextBubblesComponent;
+export default VirtualizedBubblesComponent;

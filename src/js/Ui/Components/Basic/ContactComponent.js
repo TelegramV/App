@@ -31,7 +31,7 @@ class ContactComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .only(event => event.peer === this.props.peer)
+            .filter(event => event.peer === this.props.peer)
             .on("updatePhoto")
             .on("updatePhotoSmall")
             .on("updateUserStatus")

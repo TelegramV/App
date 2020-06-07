@@ -17,6 +17,23 @@
     left: 0;
     z-index: 900;
 
+    @include mobile {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 0;
+        z-index: 100;
+        border-radius: 0px;
+        transform: none;
+
+        &.visible {
+            transform: none;
+            height: calc(var(--vh100) * 0.4);
+        }
+    }
+
     &.visible {
         transform: scale(1, 1);
     }
@@ -25,6 +42,31 @@
         overflow: hidden;
         //padding: 0 5px;
         height: 100%;
+    }
+
+    .composer-tab-selector {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 50px;
+        border-top: 1px solid $lightgrey;
+
+        &>.item {
+            padding: 0 15px;
+            cursor: pointer;
+            .tgico {
+                color: $darkgrey;
+                font-size: 24px;
+            }
+
+            &.selected .tgico {
+                color: $blue;
+            }
+        }
+
+        .filler {
+            flex-grow: 1;
+        }
     }
 
     .emoji-wrapper,
@@ -60,6 +102,7 @@
                     margin: 5px;
                     width: 32px;
                     height: 32px;
+                    font-size: 28px;
                     cursor: pointer;
                     padding: 5px;
                     margin: 0 -5px;
@@ -82,6 +125,7 @@
             height: 40px;
             align-items: center;
             background-color: white;
+            border-bottom: 1px solid $lightgrey;
 
             .emoji-type-item,
             .sticker-packs-item {
@@ -137,7 +181,6 @@
         }
 
         .sticker-packs {
-            overflow-x: auto;
             overflow-y: hidden;
             padding: 5px 0;
             justify-content: start;
@@ -165,6 +208,7 @@
             height: 100%;
             display: flex;
             flex-wrap: wrap;
+            overflow-x: hidden;
 
             .masonry-item {
                 flex: 1 0 auto;

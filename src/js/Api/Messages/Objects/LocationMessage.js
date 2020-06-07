@@ -7,7 +7,11 @@ export class LocationMessage extends AbstractMessage {
 
     type = MessageType.GEO
 
-    show() {
-        super.show()
+    get geo() {
+        return this.media?.geo
+    }
+
+    get zoom() {
+        return 16; //idk if we need to adapt...
     }
 }

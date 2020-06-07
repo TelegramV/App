@@ -34,7 +34,6 @@ export class ReactiveObject extends TypedPublisher<ReactiveObjectSubscription, B
      * @param {BusEvent} event
      */
     fire(type: string, event: BusEvent = {}) {
-
         Object.assign(event, {
             type
         })
