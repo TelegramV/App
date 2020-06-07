@@ -9,18 +9,19 @@ import VApp from "../../../../../V/vapp";
 import {SettingsSidebar} from "../Settings/SettingsSidebar";
 import {ArchivedSidebar} from "./ArchivedSidebar";
 import {Section} from "../../Fragments/Section";
-import {DialogComponent} from "../../../Sidebars/Left/Dialogs/DialogComponent";
 import VArray from "../../../../../V/VRDOM/list/VArray";
 import List from "../../../../../V/VRDOM/list/List";
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
-import {DialogFragment} from "./Fragments/DialogFragment";
 import TabSelectorComponent from "../../../Tab/TabSelectorComponent";
 import {TabSelector} from "../../Fragments/TabSelector";
 import ConnectionStatusComponent from "../../../Sidebars/Left/Dialogs/ConnectionStatusComponent";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VButton from "../../../../Elements/Button/VButton";
 import SimpleVirtualList from "../../../../../V/VRDOM/list/SimpleVirtualList";
+import DynamicHeightVirtualList from "../../../../../V/VRDOM/list/DynamicHeightVirtualList";
+import {Dialog} from "../../../../../Api/Dialogs/Dialog";
+import {DialogComponent} from "./Fragments/DialogComponent";
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -75,8 +76,13 @@ export const DialogsBarContextMenu = (event, archivedCount) => {
 export class DialogsSidebar extends LeftSidebar {
     state = {
         hidden: false,
-        pinned: new VArray(),
-        dialogs: new VArray(),
+        // pinned: new VArray(),
+        // [{
+        //   folderId: number,
+        //   pinned: new VArray,
+        //   dialogs: new VArray()
+        // }]
+        dialogs: [],
         folders: []
     }
 
@@ -84,6 +90,7 @@ export class DialogsSidebar extends LeftSidebar {
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.onGotMany)
             .on("gotNewMany", this.onGotMany)
+            .on("newMessage", this.onNewMessage)
         E.bus(AppEvents.General)
             .on("foldersUpdate", this.onFoldersUpdate)
     }
@@ -92,30 +99,45 @@ export class DialogsSidebar extends LeftSidebar {
         FoldersManager.fetchFolders()
     }
 
+    onNewMessage = (event) => {
+        console.time("onNewMessage")
+        this.forceUpdate()
+        console.timeEnd("onNewMessage")
+    }
+
     content(): * {
+        const dialogHeight = 72 + 4
         return <this.contentWrapper>
             <ConnectionStatusComponent/>
-            <VButton onClick={_ => this.loadNextPage()}/>
 
 
-            <TabSelector tabs={this.state.folders.map(folder => {
+            <TabSelector tabs={[{
+                name: "All",
+                content: <DynamicHeightVirtualList items={this.state.dialogs.sort(this.compareDialogs)}
+                                                   itemHeight={dialogHeight}
+                                                   template={DialogComponent} onScroll={this.onSectionScroll}/>
+            }, ...this.state.folders.map(folder => {
                 return {
                     name: folder.title,
                     // onScroll: this.onSectionScroll,
-                    content: <SimpleVirtualList items={this.state.dialogs.items}
-                                                 containerHeight={900}
-                                                 itemHeight={72}
-                                                 template={DialogFragment}
+                    content: <DynamicHeightVirtualList items={this.state.dialogs.filter(dialog => dialog.matchesFilter(folder)).sort(this.compareDialogs)}
+                                                       itemHeight={dialogHeight}
+                                                       template={DialogComponent} onScroll={this.onSectionScroll}
                     />
                     //<List template={DialogFragment} list={this.state.dialogs} wrapper={<Section/>}/>
                 }
-            })}/>
+            })]}/>
+
             {/*<Section>*/}
             {/*    /!*<List template={DialogComponent} list={this.state.pinned}/>*!/*/}
             {/*</Section>*/}
 
             {/*<List template={DialogFragment} list={this.state.dialogs} wrapper={<Section/>}/>*/}
         </this.contentWrapper>
+    }
+
+    compareDialogs = (a: Dialog, b: Dialog) => {
+        return b.messages.last.date - a.messages.last.date
     }
 
     onSectionScroll = (event) => {
@@ -129,14 +151,9 @@ export class DialogsSidebar extends LeftSidebar {
     loadNextPage() {
         if(this.isLoadingMore) return
         this.isLoadingMore = true
-        // console.log("STARTED LOADING NEW PAGE")
 
         DialogsManager.fetchNextPage({}).then(() => {
             this.isLoadingMore = false
-            // console.log("STOPPED LOADING NEW PAGE")
-            // if(this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
-            //     this.loadNextPage()
-            // }
         })
     }
 
@@ -156,9 +173,10 @@ export class DialogsSidebar extends LeftSidebar {
     }
 
     onGotMany = (event) => {
-        console.log("got many", event.dialogs)
-        this.state.dialogs.addMany(event.dialogs)
+        this.state.dialogs.push(...event.dialogs)
+        console.time("lol")
         this.forceUpdate()
+        console.timeEnd("lol")
     }
 
     onLeftButtonPressed = (event) => {

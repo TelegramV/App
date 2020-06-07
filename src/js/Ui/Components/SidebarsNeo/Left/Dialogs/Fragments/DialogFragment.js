@@ -9,7 +9,7 @@ import {DialogTimeFragment} from "../../../../Sidebars/Left/Dialogs/Fragments/Di
 import AppSelectedChat from "../../../../../Reactive/SelectedChat";
 import AvatarComponent from "../../../../Basic/AvatarComponent";
 
-export const DialogFragment = (dialog: Dialog) => {
+export const DialogFragment = ({dialog}) => {
     const peer = dialog.peer
     let lastMessage = dialog.peer.messages.last
 
