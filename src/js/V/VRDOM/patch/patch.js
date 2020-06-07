@@ -49,35 +49,35 @@ const vrdom_patch = ($node, vRNode: VRNode | ComponentVRNode, options = {}): Nod
 
     if (vRNode instanceof VRNode) {
         if ($node instanceof Text) {
-            return patch_Text_VRNode($node, vRNode)
+            return patch_Text_VRNode($node, vRNode, options)
         }
 
-        return patch_Node_VRNode($node, vRNode)
+        return patch_Node_VRNode($node, vRNode, options)
 
     } else if (vRNode instanceof ComponentVRNode) {
         // console.log("[patch] VComponent")
 
-        return patchComponentVRNode($node, vRNode)
+        return patchComponentVRNode($node, vRNode, options)
 
     } else if (vRNode instanceof VListVRNode) {
         // console.log("[patch] List")
 
-        return patchList($node, vRNode)
+        return patchList($node, vRNode, options)
 
     } else if (vRNode === undefined) {
         // console.log("[patch] undefined")
 
-        return patchVRNodeNull($node)
+        return patchVRNodeNull($node, options)
 
     } else if (vRNode === null) {
         // console.log("[patch] null")
 
-        return patchVRNodeNull($node)
+        return patchVRNodeNull($node, options)
 
     } else if (!vRNode) {
         // console.log("[patch] false")
 
-        return patchVRNodeNull($node)
+        return patchVRNodeNull($node, options)
 
     } else {
         // console.log("[patch] unexpected", $node, vRNode)
@@ -87,13 +87,13 @@ const vrdom_patch = ($node, vRNode: VRNode | ComponentVRNode, options = {}): Nod
         }
 
         if ($node instanceof Text) {
-            return patchNodeText($node, vRNode)
+            return patchNodeText($node, vRNode, options)
         }
 
         vrdom_deleteInner($node)
         cleanElement($node, true)
 
-        return vrdom_mount(vRNode, $node)
+        return vrdom_mount(vRNode, $node, options)
 
     }
 }

@@ -57,10 +57,10 @@ export function vrdom_resolveMount($mounted: Element) {
  *
  * @param node
  * @param $el
- * @param props
+ * @param options
  */
-function vrdom_mount(node: VRNode, $el: Element | Node | Text, props?: VRenderProps): Element | Node | Text {
-    const $mounted = vrdom_realMount(vrdom_render(node, props), $el)
+function vrdom_mount(node: VRNode, $el: Element | Node | Text, options?: VRenderProps): Element | Node | Text {
+    const $mounted = vrdom_realMount(vrdom_render(node, options), $el)
 
     vrdom_resolveMount($mounted)
 

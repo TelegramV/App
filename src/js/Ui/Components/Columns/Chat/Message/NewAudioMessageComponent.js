@@ -53,7 +53,10 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
                         class={`play tgico tgico-${isPlaying && !isPaused ? 'pause' : 'play'} rp rps rp-white`}
                         onClick={this.onClickPlay}
                         onDoubleClick={event => event.stopPropagation()}/>
-
+                    {/*<progress className={{*/}
+                    {/*    "progress-circular": true,*/}
+                    {/*    "visible": FileManager.isPending(message.media.document)*/}
+                    {/*}}/>*/}
                     <div class="audio-wrapper rp rps">
                         <div className="controls">
                             <div className="audio-name">

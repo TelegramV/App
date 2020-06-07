@@ -37,6 +37,7 @@ import AnimatedStickerMessageComponent from "./Message/AnimatedStickerMessageCom
 import DiceMessageComponent from "./Message/DiceMessageComponent"
 import GroupedMessageComponent from "./Message/GroupedMessageComponent";
 import NewAudioMessageComponent from "./Message/NewAudioMessageComponent"
+import NewVoiceMessageComponent from "./Message/NewVoiceMessageComponent"
 
 /**
  * @type {Map<number, function({message: *}): *>}
@@ -57,7 +58,8 @@ const handlers = new Map([
     [MessageType.ANIMATED_STICKER, AnimatedStickerMessageComponent],
     [MessageType.DICE, DiceMessageComponent],
     [MessageType.STICKER, StickerMessageComponent],
-    [MessageType.VOICE, VoiceMessageComponent],
+    [MessageType.VOICE, NewVoiceMessageComponent],
+    // [MessageType.VOICE, VoiceMessageComponent],
     [MessageType.AUDIO, NewAudioMessageComponent],
     // [MessageType.AUDIO, AudioMessageComponent],
     [MessageType.ROUND, RoundVideoMessageComponent],

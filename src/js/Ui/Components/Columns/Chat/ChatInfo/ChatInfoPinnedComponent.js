@@ -54,8 +54,10 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                     </div>
                     <div className="audio-info"
                          onClick={() => UIEvents.General.$chat.showMessage(AudioPlayer.state.message)}>
-                        <div className="title">{AudioPlayer.state.audioInfo.title}</div>
-                        <div className="description">{AudioPlayer.state.audioInfo.performer}</div>
+                        <div
+                            className="title">{AudioPlayer.state.isVoice ? AudioPlayer.state.message.from.name : AudioPlayer.state.audioInfo.title}</div>
+                        <div
+                            className="description">{AudioPlayer.state.isVoice ? "Voice message" : AudioPlayer.state.audioInfo.performer}</div>
                     </div>
                 </div>
             )

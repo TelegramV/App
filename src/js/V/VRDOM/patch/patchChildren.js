@@ -25,24 +25,25 @@ import vrdom_patch from "./patch"
 /**
  * @param {Element} $node
  * @param {Array<VRNode | any>} vRNode
+ * @param options
  */
-const vrdom_patchChildren = ($node: Element, vRNode: VRNode) => {
+const vrdom_patchChildren = ($node: Element, vRNode: VRNode, options = {}) => {
     const $children = $node.childNodes
     const children = vRNode.children
 
     $children.forEach(($oldChild, i) => {
-        if (!$oldChild.__ripple || children[i]) {
-            vrdom_patch($oldChild, children[i])
+        if ($oldChild.__v || children[i]) { // may be bugs, pls report(
+            vrdom_patch($oldChild, children[i], options)
         }
     })
 
     if (children.length > $children.length) {
         for (let i = $children.length; i < children.length; i++) {
-            vrdom_append(children[i], $node, {$parent: $node})
+            vrdom_append(children[i], $node, {$parent: $node}, options)
         }
     } else if (children.length < $children.length) {
         Array.from($children.values()).slice(children.length).forEach(($node: Node) => {
-            if (!$node.__ripple) {
+            if ($node.__v) {
                 vrdom_delete($node)
             }
         })

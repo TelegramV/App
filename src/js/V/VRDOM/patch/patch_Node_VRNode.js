@@ -23,9 +23,9 @@ import patch_Text_VRNode from "./patch_Text_VRNode"
 import {initElement} from "../render/renderElement"
 import {__component_unmount} from "../component/__component_unmount"
 
-const patch_Node_VRNode = ($node: HTMLElement, vRNode: VRNode): HTMLElement => {
+const patch_Node_VRNode = ($node: HTMLElement, vRNode: VRNode, options = {}): HTMLElement => {
     if ($node instanceof Text) {
-        return patch_Text_VRNode($node, vRNode)
+        return patch_Text_VRNode($node, vRNode, options)
     }
 
     initElement($node)
@@ -44,7 +44,7 @@ const patch_Node_VRNode = ($node: HTMLElement, vRNode: VRNode): HTMLElement => {
         console.error("BUG: unimplemented thing [vRNode.list]")
     }
 
-    $node = patchElement($node, vRNode)
+    $node = patchElement($node, vRNode, options)
 
     return $node
 }

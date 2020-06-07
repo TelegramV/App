@@ -25,29 +25,53 @@ const ignoringAttributes = new Set([
     // "class"
 ])
 
-const patchAttrs = ($el: Element, newAttrs: VRAttrs) => {
+const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
     if ($el.nodeType !== Node.TEXT_NODE) {
         initElement($el)
 
-        for (const [k, v] of Object.entries(newAttrs)) {
-            if (ignoringAttributes.has(k)) {
-                continue
+        if (options.xmlns) {
+            for (const [k, v] of Object.entries(newAttrs)) {
+                if (ignoringAttributes.has(k)) {
+                    continue
+                }
+
+                if (v == null) {
+                    $el.removeAttributeNS(null, k)
+                } else if ($el.getAttribute(k) !== v) {
+                    $el.setAttributeNS(null, k, String(v))
+                }
             }
 
-            if (v == null) {
-                $el.removeAttribute(k)
-            } else if ($el.getAttribute(k) !== v) {
-                $el.setAttribute(k, String(v))
-            }
-        }
+            for (const name of $el.getAttributeNames()) {
+                if (ignoringAttributes.has(name)) {
+                    continue
+                }
 
-        for (const name of $el.getAttributeNames()) {
-            if (ignoringAttributes.has(name)) {
-                continue
+                if (newAttrs[name] == null) {
+                    $el.removeAttributeNS(null, name)
+                }
+            }
+        } else {
+            for (const [k, v] of Object.entries(newAttrs)) {
+                if (ignoringAttributes.has(k)) {
+                    continue
+                }
+
+                if (v == null) {
+                    $el.removeAttribute(k)
+                } else if ($el.getAttribute(k) !== v) {
+                    $el.setAttribute(k, String(v))
+                }
             }
 
-            if (newAttrs[name] == null) {
-                $el.removeAttribute(name)
+            for (const name of $el.getAttributeNames()) {
+                if (ignoringAttributes.has(name)) {
+                    continue
+                }
+
+                if (newAttrs[name] == null) {
+                    $el.removeAttribute(name)
+                }
             }
         }
     }

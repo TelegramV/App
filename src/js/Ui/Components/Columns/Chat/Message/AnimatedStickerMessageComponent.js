@@ -15,7 +15,7 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
 
                 <BetterStickerComponent onClick={() => {
                     VUI.Modal.open(<div>TODO: implement me!</div>)
-                }} width={200} document={message.raw.media.document}/>
+                }} width={200} document={message.media.document}/>
 
                 <MessageTimeComponent message={message} bg={true}/>
 

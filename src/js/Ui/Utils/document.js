@@ -58,7 +58,7 @@ function createIcon(color, isFull = false) {
     if (!isFull) {
         return (
             <svg width="54px" height="54px" viewBox="0 0 54 54" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                <g id={id} stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                     <path
                         d="M54,22 C54,19.790861 52.209139,18 50,18 L40,18 C37.790861,18 36,16.209139 36,14 L36,4 C36,1.790861 34.209139,-4.05812251e-16 32,0 L33.8020203,8.8817842e-15 C35.3933192,1.00028247e-14 36.9194427,0.632141042 38.0446609,1.75735931 L52.2426407,15.9553391 C53.367859,17.0805573 54,18.6066808 54,20.1979797 L54,22 Z"
                         id="Corner" fill={darker}/>

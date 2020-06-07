@@ -20,8 +20,8 @@
 import VRNode from "../VRNode"
 import vrdom_mount from "../mount"
 
-const patch_Text_VRNode = ($text: Text, vRNode: VRNode) => {
-    return vrdom_mount(vRNode, $text)
+const patch_Text_VRNode = ($text: Text, vRNode: VRNode, options = {}) => {
+    return vrdom_mount(vRNode, $text, options)
 }
 
 export default patch_Text_VRNode

@@ -176,7 +176,7 @@ class Lottie extends StatefulComponent {
                  role={ariaRole}
                  aria-label={ariaLabel}
                  tabIndex="0"
-                 doNotTouchMyChildren={true}
+                // doNotTouchMyChildren={true}
                  onMouseOver={this.onMouseOver}
                  onMouseOut={this.onMouseOut}
             />

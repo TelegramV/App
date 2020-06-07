@@ -21,7 +21,7 @@ import AppEvents from "../EventBus/AppEvents"
 import FileManager from "../Files/FileManager"
 import DocumentParser from "../Files/DocumentParser"
 
-class NewAudioPlayerX {
+class AudioPlayer {
     audio: HTMLAudioElement;
     sources: Map<string, {
         mediaSource: MediaSource;
@@ -43,7 +43,9 @@ class NewAudioPlayerX {
         this.audio.addEventListener("ended", this.internal_fireEnded);
 
         AppEvents.Files.subscribe("download.start", event => {
-            if (this.isCurrent(event.file)) {
+            if (this.state.isVoice) {
+                // this.audio.play();
+            } else if (this.isCurrent(event.file)) {
                 let source = this.sources.get(event.file.id);
                 if (!source) {
                     source = {
@@ -80,7 +82,7 @@ class NewAudioPlayerX {
         });
 
         AppEvents.Files.subscribe("download.newPart", event => {
-            if (this.isCurrent(event.file)) {
+            if (this.isCurrent(event.file) && !this.state.isVoice) {
                 const source = this.sources.get(event.file.id);
                 const {mediaSource, bufferQueue} = source;
                 const sourceBuffer = mediaSource.sourceBuffers[0];
@@ -98,7 +100,10 @@ class NewAudioPlayerX {
         });
 
         AppEvents.Files.subscribe("download.done", event => {
-            if (this.isCurrent(event.file)) {
+            if (this.state.isVoice) {
+                this.audio.src = event.url;
+                this.audio.play();
+            } else if (this.isCurrent(event.file)) {
                 const source = this.sources.get(event.file.id);
 
                 source.bufferedPercentage = 100;
@@ -130,21 +135,23 @@ class NewAudioPlayerX {
     get state() {
         const info = DocumentParser.attributeAudio(this.currentMessage?.media.document);
         const source = this.sources.get(this.currentMessage?.media.document.id);
+        const isVoice = info?.voice;
 
         return {
             message: this.currentMessage,
-            isPaused: this.audio.paused || this.audio.ended || this.audio.currentTime >= info?.duration,
+            isPaused: this.audio.paused || this.audio.ended || (info?.duration && this.audio.currentTime >= info?.duration),
             isEnded: this.audio.ended || this.audio.currentTime >= info?.duration,
             isLoading: false,
             currentTime: this.audio.currentTime,
             duration: info?.duration,
-            bufferedPercentage: source?.bufferedPercentage ?? 100,
-            audioInfo: info
+            bufferedPercentage: isVoice ? 100 : source?.bufferedPercentage ?? 100,
+            audioInfo: info,
+            isVoice,
         }
     }
 
     isCurrent(messageOrDocument) {
-        return this.state.message && messageOrDocument && (this.state.message === messageOrDocument || this.state.message.media.document.id === messageOrDocument.id);
+        return this.currentMessage && messageOrDocument && (this.currentMessage === messageOrDocument || this.currentMessage.media.document.id === messageOrDocument.id);
     }
 
     play(message = this.currentMessage) {
@@ -165,7 +172,7 @@ class NewAudioPlayerX {
             } else {
                 this.internal_fireLoading();
                 this.pause();
-                this.audio.src = null;
+                this.audio.src = "";
 
                 FileManager.downloadDocument(message.media.document);
             }
@@ -242,6 +249,6 @@ class NewAudioPlayerX {
     }
 }
 
-const NewAudioPlayer = new NewAudioPlayerX();
+const player = new AudioPlayer();
 
-export default NewAudioPlayer;
+export default player;

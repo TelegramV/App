@@ -28,8 +28,8 @@ import {initElement} from "../render/renderElement"
 import VApp from "../../vapp"
 import vrdom_mount from "../mount"
 
-const recreateElementByTagName = ($node: HTMLElement, tagName: string) => {
-    const $newNode = document.createElement(tagName)
+const recreateElementByTagName = ($node: HTMLElement, tagName: string, options = {}) => {
+    const $newNode = options.xmlns ? document.createElementNS(options.xmlns, tagName) : document.createElement(tagName)
 
     initElement($newNode)
 
@@ -40,39 +40,36 @@ const recreateElementByTagName = ($node: HTMLElement, tagName: string) => {
     return $newNode
 }
 
-
-const ignore = new Set([
-    "svg"
-])
-
 /**
  * @param $node
  * @param vRNode
+ * @param options
  * @return {HTMLElement}
  */
-const patchElement = ($node: HTMLElement, vRNode: VRNode) => {
+const patchElement = ($node: HTMLElement, vRNode: VRNode, options = {}) => {
     if ($node instanceof Text) {
-        return patch_Text_VRNode($node, vRNode)
+        return patch_Text_VRNode($node, vRNode, options)
     }
 
     if (vRNode.tagName.toLowerCase() === "svg") {
-        return vrdom_mount(vRNode, $node)
+        // options.xmlns = "http://www.w3.org/2000/svg"
+        return vrdom_mount(vRNode, $node, options)
     }
 
     if ($node.tagName.toLowerCase() !== vRNode.tagName.toLowerCase()) {
         const $oldNode = $node
-        $node = recreateElementByTagName($node, vRNode.tagName)
+        $node = recreateElementByTagName($node, vRNode.tagName, options)
         $oldNode.replaceWith($node)
     }
 
-    patchAttrs($node, vRNode.attrs)
+    patchAttrs($node, vRNode.attrs, options)
     patchEvents($node, vRNode.events)
     patchStyle($node, vRNode.style)
 
     if (vRNode.dangerouslySetInnerHTML !== false) {
         patchDangerouslySetInnerHTML($node, vRNode.dangerouslySetInnerHTML)
     } else if (!vRNode.doNotTouchMyChildren) {
-        vrdom_patchChildren($node, vRNode)
+        vrdom_patchChildren($node, vRNode, options)
     }
 
     VApp.plugins.forEach(plugin => plugin.elementDidUpdate($node))

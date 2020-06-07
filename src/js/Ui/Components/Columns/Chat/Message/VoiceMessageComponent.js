@@ -137,13 +137,6 @@ export default class VoiceMessageComponent extends AudioComponent {
         return rect;
     }
 
-    _getVpPos(el) {
-        if (el.parentNode.nodeName === 'svg') {
-            return el.parentNode.getBoundingClientRect();
-        }
-        return getVpPos(el.parentNode);
-    }
-
     _smooth(values, alpha) {
         var weighted = this._average(values) * alpha;
         var smoothed = [];

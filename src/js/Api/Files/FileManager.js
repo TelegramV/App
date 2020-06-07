@@ -46,10 +46,12 @@ class FilesManager {
         if (this.downloaded.has(file.id)) {
             const downloaded = this.get(file, thumbOrSize);
 
-            AppEvents.Files.fire("download.done", {
-                file,
-                blob: downloaded.blob,
-                url: downloaded.url,
+            fetch(downloaded.url).then(r => r.blob()).then(blob => {
+                AppEvents.Files.fire("download.done", {
+                    file,
+                    blob: blob,
+                    url: downloaded.url,
+                });
             });
 
             return Promise.resolve(downloaded);
@@ -64,10 +66,12 @@ class FilesManager {
         if (this.downloaded.has(photo.id)) {
             const downloaded = this.downloaded.get(photo.id);
 
-            AppEvents.Files.fire("download.done", {
-                file: photo,
-                blob: downloaded.blob,
-                url: downloaded.url,
+            fetch(downloaded.url).then(r => r.blob()).then(blob => {
+                AppEvents.Files.fire("download.done", {
+                    file: photo,
+                    blob: blob,
+                    url: downloaded.url,
+                });
             });
 
             return Promise.resolve(downloaded);
@@ -90,10 +94,12 @@ class FilesManager {
         if (this.downloaded.has(id)) {
             const downloaded = this.downloaded.get(id);
 
-            AppEvents.Files.fire("download.done", {
-                file: document,
-                blob: downloaded.blob,
-                url: downloaded.url,
+            fetch(downloaded.url).then(r => r.blob()).then(blob => {
+                AppEvents.Files.fire("download.done", {
+                    file: document,
+                    blob: blob,
+                    url: downloaded.url,
+                });
             });
 
             return Promise.resolve(downloaded);

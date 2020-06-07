@@ -42,6 +42,7 @@
 
         .progress-circular {
             display: none;
+            padding: 0.25em;
 
             &.visible {
                 display: block;

@@ -1,6 +1,12 @@
-import AudioComponent from "./Common/AudioComponent"
-import PeersStore from "../../../../../Api/Store/PeersStore"
 import {convertBits, formatAudioTime} from "../../../../Utils/utils"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import DocumentParser from "../../../../../Api/Files/DocumentParser"
+import TextWrapperComponent from "./Common/TextWrapperComponent"
+import MessageWrapperFragment from "./Common/MessageWrapperFragment"
+import AudioPlayer from "../../../../../Api/Audio/AudioPlayer"
+import AppEvents from "../../../../../Api/EventBus/AppEvents"
+import FileManager from "../../../../../Api/Files/FileManager"
+import VComponent from "../../../../../V/VRDOM/component/VComponent"
 
 function largestTriangleThreeBuckets(data, threshold) {
     const data_length = data.length
@@ -64,168 +70,160 @@ function largestTriangleThreeBuckets(data, threshold) {
     return sampled;
 }
 
-class NewVoiceMessageComponent extends AudioComponent {
-    constructor(props) {
-        super(props);
-        let doc = this.props.message.raw.media.document;
-        for (const attr of doc.attributes) {
-            if (attr._ == "documentAttributeAudio" && attr.voice) {
-                this.waveform = attr.waveform;
-            }
+function average(data) {
+    const sum = data.reduce(function (sum, value) {
+        return sum + value;
+    }, 0);
+
+    return sum / data.length;
+}
+
+function smooth(values, alpha) {
+    const weighted = average(values) * alpha
+    const smoothed = []
+    for (const i in values) {
+        const curr = values[i]
+        const prev = smoothed[i - 1] || values[values.length - 1]
+        const next = curr || values[0]
+        const improved = Number(average([weighted, prev, curr, next]).toFixed(2))
+        smoothed.push(improved);
+    }
+    return smoothed;
+}
+
+function heightToPx(height) {
+    return Math.max(2, height * (25 / 32)) + "px";
+}
+
+class NewVoiceMessageComponent extends StatelessComponent {
+    svgRef = VComponent.createRef();
+
+    appEvents(E) {
+        super.appEvents(E)
+
+        E.bus(AppEvents.Audio)
+            .filter(event => event.state.message === this.props.message || this.isPlaying)
+            .updateOn("audio.play")
+            .updateOn("audio.play")
+            .updateOn("audio.paused")
+            .updateOn("audio.loading")
+            .updateOn("audio.buffered")
+            .updateOn("audio.timeUpdate")
+            .updateOn("audio.ended")
+    }
+
+    render({message}) {
+        const isPlaying = AudioPlayer.isCurrent(message);
+        const audioInfo = DocumentParser.attributeAudio(message.media.document);
+        const {isPaused, currentTime} = AudioPlayer.state;
+
+        this.isPlaying = isPlaying;
+
+        let waveform = audioInfo.waveform;
+
+        if (!waveform) {
+            waveform = [].fill(0, 0, 99);
         }
 
-        if (!this.waveform) this.waveform = [].fill(0, 0, 99);
+        let heights = convertBits(waveform, 8, 5);
+        heights = smooth(heights, 0.05);
+        heights = largestTriangleThreeBuckets(heights, 50);
 
-        this.heights = convertBits(this.waveform, 8, 5);
-        //maybe try another smooth functions?
-        this.heights = this._smooth(this.heights, 0.05);
-        //TODO adaptive bars count
-        this.heights = this._largestTriangleThreeBuckets(this.heights, 50);
+        const width = heights.length * 4 + 4;
 
-        this.barWidth = 2;
-        this.barMargin = 2;
+        const bars = [];
+        for (let i = 0, x = 2; i < heights.length; i++, x += 4) {
+            bars.push(
+                <rect x={`${x}px`}
+                      rx={`2px`}
+                      ry={`2px`}
+                      width={`2px`}
+                      height={heightToPx(heights[i])}
+                      fill="white"/>
+            );
+        }
 
-        this.width = this.heights.length * (this.barWidth + this.barMargin) + this.barMargin * 2;
-    }
-
-    updatePercent(percent) {
-        if (this.__.destroyed) return;
-        this._setAttr(this.progress, "width", percent * this.width + "px");
-    }
-
-    getMeta() {
-        return new Promise(async (resolve, reject) => {
-            let message = this.props.message;
-            let peer = message.raw.fwd_from ? await PeersStore.get("user", message.raw.fwd_from.from_id) : message.from;
-
-            let chatName = message.dialog.peer.type != "user" ? message.dialog.peer.name : "";
-            let avatar = peer.photo.bigUrl || (await peer.photo.fetchBig());
-            resolve({
-                title: peer.name,
-                artist: "Voice message",
-                album: chatName,
-
-                artwork: [{
-                    src: avatar,
-                    type: "image/png",
-                    sizes: "640x640" //hardcoded, todo: get image size
-                }]
-            })
-        })
-    }
-
-    getControls() {
         return (
-            <div class="controls rp rps">
-                <svg css-width={`${this.width}px`} css-transform="scaleY(-1)"
-                     onMouseEnter={this._handleEnter.bind(this)} onMouseLeave={this._handleLeave.bind(this)}
-                     onMouseDown={this._handleMove.bind(this)}>
-                    <defs>
-                        <mask id={`bars-${this.props.message.id}`}>
-                            {this._generateBars()}
-                        </mask>
-                    </defs>
-                    <rect class="back" x="0" y="0" width={this.width + "px"} height="100%"
-                          mask={`url(#bars-${this.props.message.id})`}/>
-                    <rect class="progress" x="0" y="0" width={this.width + "px"} height="100%"
-                          mask={`url(#bars-${this.props.message.id})`}/>
-                </svg>
-                <div class="timer">
-                    <span class="time-played">{formatAudioTime(this.duration)}</span>
+            <MessageWrapperFragment message={message} showUsername={false}>
+                <div class="audio">
+                    <div class={`play tgico tgico-${isPlaying && !isPaused ? 'pause' : 'play'} rp rps rp-white`}
+                         onClick={this.onClickPlay}
+                         onDoubleClick={event => event.stopPropagation()}/>
+                    <progress className={{
+                        "progress-circular": true,
+                        "visible": FileManager.isPending(message.media.document)
+                    }}/>
+                    <div class="audio-wrapper">
+                        <div className="controls">
+                            <div className="controls rp rps" style={{cursor: "pointer"}}>
+                                <svg css-width={`${width}px`}
+                                     css-transform="scaleY(-1)"
+                                     onMouseEnter={this.onMouseEnter}
+                                     onMouseLeave={this.onMouseLeave}
+                                     onMouseDown={this.onMouseDown}>
+
+                                    <defs>
+                                        <mask id={`bars-${message.id}`}>
+                                            {bars}
+                                        </mask>
+                                    </defs>
+                                    <rect className="back"
+                                          x="0"
+                                          y="0"
+                                          width={`${width}px`}
+                                          height="100%"
+                                          mask={`url(#bars-${message.id})`}/>
+                                    <rect className="progress"
+                                          x="0"
+                                          y="0"
+                                          width={`${(currentTime || 0) / (audioInfo.duration || 1) * 100}%`}
+                                          height="100%"
+                                          mask={`url(#bars-${message.id})`}/>
+                                </svg>
+                                <div className="timer">
+                                    <span
+                                        className="time-played">{isPlaying ? formatAudioTime(currentTime) + "/" : ""}{formatAudioTime(audioInfo.duration)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        )
+
+                <TextWrapperComponent message={message}/>
+            </MessageWrapperFragment>
+        );
     }
 
-    controlsMounted() {
-        this.svgContainer = this.$el.querySelector("svg");
-        this.progress = this.svgContainer.querySelector(".progress")
-
-        this.timer = this.$el.querySelector(".time-played");
-        this.setTimerElement(this.timer);
-        this.setProgressElement(this.progress);
-
-        this.download();
+    onClickPlay = () => {
+        AudioPlayer.toggle(this.props.message)
     }
 
-    _handleMove(e) {
-        if (!this.audio) return;
-        if (e.buttons === undefined ?
-            e.which === 1 :
-            e.buttons === 1) {
-            let box = this.svgContainer.getBoundingClientRect();
-            let percent = (e.pageX - box.x) / box.width;
-            this.updatePercent(percent);
-            this.audio.currentTime = this.audio.duration * percent;
+    onMouseEnter = event => {
+        if (!AudioPlayer.isCurrent(this.props.message.media.document)) {
+            return;
         }
+
+        event.target.addEventListener("mousemove", this.onMouseDown);
     }
 
-    //own methods
-
-    _generateBars() {
-        let x = this.barMargin;
-        let width = this.barWidth;
-        let elemArr = [];
-        for (let i = 0; i < this.heights.length; i++) {
-            let value = this.heights[i];
-            let rect = this._newBar(x, width, this._heightToPx(value));
-            elemArr.push(rect);
-            x += width + this.barMargin;
+    onMouseLeave = event => {
+        if (!AudioPlayer.isCurrent(this.props.message.media.document)) {
+            return;
         }
-        return elemArr;
+
+        event.target.removeEventListener("mousemove", this.onMouseDown);
     }
 
-    _heightToPx(height) {
-        return Math.max(2, height * (25 / 32)) + "px";
-    }
-
-    _setAttr(elem, attr, value) {
-        return elem.setAttributeNS(null, attr, value);
-    }
-
-    _newBar(x, width, height) {
-        return <rect x={x + "px"}
-                     rx={this.barWidth + "px"}
-                     ry={this.barWidth + "px"}
-                     width={width + "px"}
-                     height={height} fill="white"/>
-    }
-
-    _newRect(x, y, width, height) {
-        let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        this._setAttr(rect, "x", x);
-        this._setAttr(rect, "y", y);
-        this._setAttr(rect, "width", width);
-        this._setAttr(rect, "height", height);
-        return rect;
-    }
-
-    _getVpPos(el) {
-        if (el.parentNode.nodeName === 'svg') {
-            return el.parentNode.getBoundingClientRect();
+    onMouseDown = (event: MouseEvent) => {
+        if (!AudioPlayer.isCurrent(this.props.message.media.document)) {
+            return;
         }
-        return getVpPos(el.parentNode);
-    }
 
-    _smooth(values, alpha) {
-        var weighted = this._average(values) * alpha;
-        var smoothed = [];
-        for (var i in values) {
-            var curr = values[i];
-            var prev = smoothed[i - 1] || values[values.length - 1];
-            var next = curr || values[0];
-            var improved = Number(this._average([weighted, prev, curr, next]).toFixed(2));
-            smoothed.push(improved);
+        if (event.buttons === 1) {
+            const box = event.target.getBoundingClientRect();
+            const percent = (event.pageX - box.x) / box.width;
+            AudioPlayer.updateTime(DocumentParser.attributeAudio(this.props.message.media.document).duration * percent)
         }
-        return smoothed;
-    }
-
-    _average(data) {
-        var sum = data.reduce(function (sum, value) {
-            return sum + value;
-        }, 0);
-        var avg = sum / data.length;
-        return avg;
     }
 }
 

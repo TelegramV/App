@@ -27,10 +27,10 @@ import vrdom_render from "./render/render"
  *
  * @param node
  * @param $parent
- * @param props
+ * @param options
  */
-const vrdom_append = (node: VRNode, $parent: HTMLElement, props?: VRenderProps) => {
-    const $node = vrdom_render(node, props)
+const vrdom_append = (node: VRNode, $parent: HTMLElement, options?: VRenderProps) => {
+    const $node = vrdom_render(node, options)
 
     $parent.appendChild($node)
 
