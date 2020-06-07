@@ -19,8 +19,14 @@
 
 import {EventBus} from "../../Api/EventBus/EventBus"
 
+class GeneralEventBus extends EventBus {
+    $chat = {
+        showMessage: message => this.fire("chat.showMessage", {message})
+    }
+}
+
 const UIEvents = {
-    General: new EventBus(),
+    General: new GeneralEventBus(),
     LeftSidebar: new EventBus(),
     RightSidebar: new EventBus(),
     MediaViewer: new EventBus()

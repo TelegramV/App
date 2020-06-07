@@ -58,7 +58,7 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
                         onClick={this.onClickPlay}
                         onDoubleClick={event => event.stopPropagation()}/>
 
-                    <div class="audio-wrapper">
+                    <div class="audio-wrapper rp rps">
                         <div className="controls">
                             <div className="audio-name">
                                 {audio.title || DocumentParser.attributeFilename(message.media.document)}

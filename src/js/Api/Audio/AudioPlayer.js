@@ -23,24 +23,24 @@ import DocumentParser from "../Files/DocumentParser"
 
 class AudioPlayer {
     audio: HTMLAudioElement;
-    mediaSource: MediaSource;
+    sources: Map<string, {
+        mediaSource: MediaSource;
+        bufferQueue: Uint8Array[];
+        bufferedSize: number;
+        bufferedPercentage: number;
+        url: string;
+    }>;
 
     state = {
         document: null,
-        /**
-         * @var {SourceBuffer}
-         */
-        sourceBuffer: null,
         bufferedPercentage: 0,
-        bufferedSize: 0,
-        queue: [],
     };
 
     defaultState = {...this.state};
 
     constructor() {
-        this.mediaSource = new MediaSource();
-        this.audio = new Audio(URL.createObjectURL(this.mediaSource));
+        this.audio = new Audio();
+        this.sources = new Map();
 
         this.audio.addEventListener("timeupdate", this.internal_fireTimeUpdate);
         this.audio.addEventListener("play", this.internal_firePlay);
@@ -51,53 +51,86 @@ class AudioPlayer {
 
         AppEvents.Files.subscribe("download.start", event => {
             if (this.isCurrent(event.file)) {
-                // if (this.mediaSource.sourceBuffers[0]) {
-                //     this.mediaSource.removeSourceBuffer(this.mediaSource.sourceBuffers[0]);
-                // }
+                let source = this.sources.get(event.file.id);
+                if (!source) {
+                    source = {
+                        mediaSource: new MediaSource(),
+                        bufferQueue: [],
+                        bufferedSize: 0,
+                        bufferedPercentage: 0,
+                    };
+                    source.url = URL.createObjectURL(source.mediaSource);
 
-                // this.state.sourceBuffer = this.mediaSource.addSourceBuffer(event.file.mime_type);
+                    this.sources.set(event.file.id, source);
+                }
+
+                const {mediaSource, bufferQueue, url} = source;
+
+                this.audio.src = url;
+
+                if (mediaSource.readyState !== "open") {
+                    mediaSource.onsourceopen = () => {
+                        const sourceBuffer = mediaSource.addSourceBuffer(event.file.mime_type);
+                        mediaSource.duration = DocumentParser.attributeAudio(event.file).duration;
+
+                        sourceBuffer.addEventListener("updateend", () => {
+                            if (bufferQueue.length) {
+                                sourceBuffer.appendBuffer(bufferQueue.shift());
+                            }
+                        });
+                    }
+                }
 
                 this.internal_fireLoading();
             }
         });
 
         AppEvents.Files.subscribe("download.newPart", event => {
-            // if (this.isCurrent(event.file)) {
-            //     if (!this.state.bufferedPercentage) {
-            //         this.audio.play()
-            //     }
-            //
-            //     this.state.bufferedPercentage = event.percentage;
-            //
-            //     if (!this.state.sourceBuffer.updating) {
-            //         this.state.sourceBuffer.appendBuffer(event.newBytes);
-            //     } else {
-            //         this.state.queue.push(event.newBytes)
-            //     }
-            //
-            //     this.state.bufferedSize += event.newBytes.length;
-            // }
+            if (this.isCurrent(event.file)) {
+                const source = this.sources.get(event.file.id);
+                const {mediaSource, bufferQueue, url} = source;
+                const sourceBuffer = mediaSource.sourceBuffers[0];
+
+                if (!source.bufferedPercentage) {
+                    this.audio.play();
+                }
+
+                source.bufferedPercentage = event.percentage;
+
+                if (!sourceBuffer || !sourceBuffer.updating) {
+                    sourceBuffer.appendBuffer(event.newBytes);
+                } else {
+                    bufferQueue.push(event.newBytes)
+                }
+
+                source.bufferedSize += event.newBytes.length;
+            }
         });
 
         AppEvents.Files.subscribe("download.done", event => {
             if (this.isCurrent(event.file)) {
-                this.state.bufferedPercentage = 100;
+                const source = this.sources.get(event.file.id);
 
-                // if (this.state.sourceBuffer) {
-                //     event.blob.arrayBuffer().then(buff => {
-                //         const lastPart = buff.slice(this.state.bufferedSize);
-                //
-                //         if (!this.state.sourceBuffer.updating) {
-                //             this.state.sourceBuffer.appendBuffer(lastPart);
-                //         } else {
-                //             this.state.queue.push(lastPart)
-                //         }
-                //     });
-                // } else {
-                this.audio.src = event.url;
+                source.bufferedPercentage = 100;
 
-                this.audio.play()
-                // }
+                if (source) {
+                    const {mediaSource, bufferQueue, url} = source;
+                    const sourceBuffer = mediaSource.sourceBuffers[0];
+
+                    event.blob.arrayBuffer().then(buff => {
+                        const lastPart = buff.slice(source.bufferedSize);
+
+                        if (!sourceBuffer.updating) {
+                            sourceBuffer.appendBuffer(lastPart);
+                        } else {
+                            bufferQueue.push(lastPart)
+                        }
+                    });
+                } else {
+                    this.audio.src = event.url;
+
+                    this.audio.play()
+                }
             }
         });
 
@@ -127,7 +160,11 @@ class AudioPlayer {
     }
 
     bufferedPercentage() {
-        return this.state.bufferedPercentage;
+        return this.current()?.bufferedPercentage ?? 100;
+    }
+
+    current() {
+        return this.sources.get(this.state.document?.id)
     }
 
     audioInfo() {

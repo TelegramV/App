@@ -7,7 +7,8 @@
         flex-direction: row;
         align-items: center;
         position: relative;
-        margin-top: 5px;
+        margin-top: 10px;
+        margin-bottom: 5px;
 
         .play {
             color: white;
@@ -86,6 +87,7 @@
                 .progress-wrapper {
                     position: relative;
                     height: 15px;
+                    cursor: pointer;
 
                     &.hidden {
                         display: none;
@@ -220,7 +222,7 @@
                     @if $in {
                         background-color: $grey
                     } @else {
-                        background-color: lighten($darkgreen, 25%);
+                        background-color: lighten($darkgreen, 20%);
                     }
                 }
 

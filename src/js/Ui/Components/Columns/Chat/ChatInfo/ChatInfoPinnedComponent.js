@@ -51,7 +51,7 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                     <div className="play rp rps" onClick={() => AudioPlayer.toggle()}>
                         <i class={playClasses}/>
                     </div>
-                    <div className="audio-info">
+                    <div className="audio-info" onClick={() => UIEvents.General.$chat.showMessage(null)}>
                         <div className="title">{AudioPlayer.audioInfo().title}</div>
                         <div className="description">{AudioPlayer.audioInfo().performer}</div>
                     </div>
@@ -60,7 +60,7 @@ class ChatInfoPinnedComponent extends StatefulComponent {
         } else if (this.state.message) {
             return (
                 <div className="pin pinned-message"
-                     onClick={event => UIEvents.General.fire("chat.showMessage", {message: this.state.message})}>
+                     onClick={event => UIEvents.General.$chat.showMessage(this.state.message)}>
                     <div className="title">Pinned message</div>
                     <div className="description">{MessageParser.getPrefixNoSender(this.state.message)}</div>
                 </div>
