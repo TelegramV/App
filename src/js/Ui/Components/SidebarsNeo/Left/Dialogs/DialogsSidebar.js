@@ -200,9 +200,10 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
 
         DialogsManager.fetchNextPage({}).then(() => {
             this.isLoadingMore = false
-            // if (this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
-            //     this.loadNextPage()
-            // }
+            // TODO should also check if filter is fulfilled
+            if (this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
+                this.loadNextPage()
+            }
         })
     }
 

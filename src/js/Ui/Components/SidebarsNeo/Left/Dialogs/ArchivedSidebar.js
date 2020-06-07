@@ -2,12 +2,13 @@ import {LeftSidebar} from "../LeftSidebar";
 import VSimpleLazyInput from "../../../../Elements/Input/VSimpleLazyInput";
 import DialogsManager from "../../../../../Api/Dialogs/DialogsManager";
 import {UnpatchableLeftSidebar} from "../UnpatchableLeftSidebar";
+import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent";
 
 export class ArchivedSidebar extends UnpatchableLeftSidebar {
     content(): * {
         return <this.contentWrapper>
-            тут будуть архівовані діалоги
-        </this.contentWrapper>
+            <ArchivedDialogListComponent/>
+       </this.contentWrapper>
     }
 
 
