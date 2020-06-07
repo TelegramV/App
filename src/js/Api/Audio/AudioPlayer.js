@@ -21,7 +21,7 @@ import AppEvents from "../EventBus/AppEvents"
 import FileManager from "../Files/FileManager"
 import DocumentParser from "../Files/DocumentParser"
 
-class AudioPlayer {
+class NewAudioPlayerX {
     audio: HTMLAudioElement;
     sources: Map<string, {
         mediaSource: MediaSource;
@@ -30,13 +30,6 @@ class AudioPlayer {
         bufferedPercentage: number;
         url: string;
     }>;
-
-    state = {
-        document: null,
-        bufferedPercentage: 0,
-    };
-
-    defaultState = {...this.state};
 
     constructor() {
         this.audio = new Audio();
@@ -66,8 +59,6 @@ class AudioPlayer {
 
                 const {mediaSource, bufferQueue, url} = source;
 
-                this.audio.src = url;
-
                 if (mediaSource.readyState !== "open") {
                     mediaSource.onsourceopen = () => {
                         const sourceBuffer = mediaSource.addSourceBuffer(event.file.mime_type);
@@ -81,6 +72,9 @@ class AudioPlayer {
                     }
                 }
 
+                this.audio.src = url;
+                this.audio.play();
+
                 this.internal_fireLoading();
             }
         });
@@ -88,19 +82,15 @@ class AudioPlayer {
         AppEvents.Files.subscribe("download.newPart", event => {
             if (this.isCurrent(event.file)) {
                 const source = this.sources.get(event.file.id);
-                const {mediaSource, bufferQueue, url} = source;
+                const {mediaSource, bufferQueue} = source;
                 const sourceBuffer = mediaSource.sourceBuffers[0];
-
-                if (!source.bufferedPercentage) {
-                    this.audio.play();
-                }
 
                 source.bufferedPercentage = event.percentage;
 
                 if (!sourceBuffer || !sourceBuffer.updating) {
                     sourceBuffer.appendBuffer(event.newBytes);
                 } else {
-                    bufferQueue.push(event.newBytes)
+                    bufferQueue.push(event.newBytes);
                 }
 
                 source.bufferedSize += event.newBytes.length;
@@ -112,11 +102,10 @@ class AudioPlayer {
                 const source = this.sources.get(event.file.id);
 
                 source.bufferedPercentage = 100;
+                const {mediaSource, bufferQueue, url} = source;
+                const sourceBuffer = mediaSource.sourceBuffers[0];
 
-                if (source) {
-                    const {mediaSource, bufferQueue, url} = source;
-                    const sourceBuffer = mediaSource.sourceBuffers[0];
-
+                if (sourceBuffer) {
                     event.blob.arrayBuffer().then(buff => {
                         const lastPart = buff.slice(source.bufferedSize);
 
@@ -128,82 +117,70 @@ class AudioPlayer {
                     });
                 } else {
                     this.audio.src = event.url;
-
                     this.audio.play()
                 }
             }
         });
 
         AppEvents.Files.subscribe("download.canceled", event => {
-
+            this.sources.delete(event.file.id) // todo: should probably clean sourceBuffer etc.
         });
     }
 
-    isCurrent(document) {
-        return this.state.document && document && this.state.document.id === document.id;
+    get state() {
+        const info = DocumentParser.attributeAudio(this.currentMessage?.media.document);
+        const source = this.sources.get(this.currentMessage?.media.document.id);
+
+        return {
+            message: this.currentMessage,
+            isPaused: this.audio.paused || this.audio.ended || this.audio.currentTime >= info?.duration,
+            isEnded: this.audio.ended || this.audio.currentTime >= info?.duration,
+            isLoading: false,
+            currentTime: this.audio.currentTime,
+            duration: info?.duration,
+            bufferedPercentage: source?.bufferedPercentage ?? 100,
+            audioInfo: info
+        }
     }
 
-    isPaused() {
-        return this.audio.paused;
+    isCurrent(messageOrDocument) {
+        return this.state.message && messageOrDocument && (this.state.message === messageOrDocument || this.state.message.media.document.id === messageOrDocument.id);
     }
 
-    isEnded() {
-        return this.audio.ended || this.audio.currentTime >= this.audioInfo()?.duration;
-    }
-
-    isLoading(document = null) {
-        return document ? document.id === this.state.document?.id && this.state.status === "loading" : this.state.status === "loading";
-    }
-
-    currentTime() {
-        return this.audio.currentTime;
-    }
-
-    bufferedPercentage() {
-        return this.current()?.bufferedPercentage ?? 100;
-    }
-
-    current() {
-        return this.sources.get(this.state.document?.id)
-    }
-
-    audioInfo() {
-        return DocumentParser.attributeAudio(this.state.document)
-    }
-
-    play(document = this.state.document) {
-        if (this.isCurrent(document)) {
-            if (this.isLoading()) {
-                FileManager.cancel(document);
-            } else if (this.isPaused()) {
+    play(message = this.currentMessage) {
+        if (this.isCurrent(message)) {
+            // if (this.isLoading()) {
+            //     FileManager.cancel(message.media.document);
+            // } else
+            if (this.state.isPaused) {
                 this.audio.play()
             }
         } else {
-            this.state.document = document;
+            this.currentMessage = message;
 
-            if (FileManager.isDownloaded(document)) {
+            if (FileManager.isDownloaded(message.media.document)) {
                 this.pause();
-                this.audio.src = FileManager.getUrl(document);
+                this.audio.src = FileManager.getUrl(message.media.document);
                 this.audio.play();
             } else {
                 this.internal_fireLoading();
                 this.pause();
                 this.audio.src = null;
 
-                FileManager.downloadDocument(document);
+                FileManager.downloadDocument(message.media.document);
             }
         }
     }
 
-    toggle(document = this.state.document) {
-        if (!this.isCurrent(document) || this.isPaused()) {
-            this.play(document);
-        } else {
-            if (this.isEnded()) {
+    toggle(message = this.currentMessage) {
+        if (!this.isCurrent(message) || this.state.isPaused) {
+            if (this.state.isEnded) {
                 this.audio.currentTime = 0;
-            } else {
-                this.pause();
             }
+
+            this.play(message);
+        } else {
+            this.pause();
         }
     }
 
@@ -211,47 +188,60 @@ class AudioPlayer {
         this.audio.pause();
     }
 
+    stop() {
+        this.currentMessage = null;
+        this.audio.src = "";
+        this.audio.pause();
+        this.internal_fireStop();
+    }
+
     updateTime(time: number) {
         this.audio.currentTime = time;
     }
 
     internal_fireLoading = () => {
-        AppEvents.General.fire("audio.loading", {
+        AppEvents.Audio.fire("audio.loading", {
+            state: this.state,
+        });
+    }
+
+    internal_fireStop = () => {
+        AppEvents.Audio.fire("audio.stop", {
             state: this.state,
         });
     }
 
     internal_fireEnded = () => {
-        AppEvents.General.fire("audio.ended", {
+        AppEvents.Audio.fire("audio.ended", {
             state: this.state,
         });
     }
 
     internal_firePlay = () => {
-        AppEvents.General.fire("audio.play", {
+        AppEvents.Audio.fire("audio.play", {
             state: this.state,
         });
     }
 
     internal_firePaused = () => {
-        AppEvents.General.fire("audio.paused", {
+        AppEvents.Audio.fire("audio.paused", {
             state: this.state,
         });
     }
 
     internal_fireBuffered = () => {
-        AppEvents.General.fire("audio.buffered", {
+        AppEvents.Audio.fire("audio.buffered", {
             state: this.state,
         });
     }
 
     internal_fireTimeUpdate = () => {
-        AppEvents.General.fire("audio.timeUpdate", {
+        AppEvents.Audio.fire("audio.timeUpdate", {
             state: this.state,
         });
     }
 }
 
-const player = new AudioPlayer();
+const NewAudioPlayer = new NewAudioPlayerX();
 
-export default player;
+export default NewAudioPlayer;

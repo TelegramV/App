@@ -37,23 +37,25 @@ class ChatInfoPinnedComponent extends StatefulComponent {
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelected)
 
-        E.bus(AppEvents.General)
+        E.bus(AppEvents.Audio)
             .updateOn("audio.play")
             .updateOn("audio.paused")
             .updateOn("audio.stop")
+            .updateOn("audio.timeUpdate")
     }
 
     render() {
-        if (AudioPlayer.state.document) {
-            let playClasses = ["tgico", AudioPlayer.isPaused() || AudioPlayer.isEnded() ? "tgico-play" : "tgico-pause"];
+        if (AudioPlayer.state.message) {
+            let playClasses = ["tgico", !AudioPlayer.state.isPaused ? "tgico-pause" : "tgico-play"];
             return (
                 <div className="pin active-audio">
                     <div className="play rp rps" onClick={() => AudioPlayer.toggle()}>
                         <i class={playClasses}/>
                     </div>
-                    <div className="audio-info" onClick={() => UIEvents.General.$chat.showMessage(null)}>
-                        <div className="title">{AudioPlayer.audioInfo().title}</div>
-                        <div className="description">{AudioPlayer.audioInfo().performer}</div>
+                    <div className="audio-info"
+                         onClick={() => UIEvents.General.$chat.showMessage(AudioPlayer.state.message)}>
+                        <div className="title">{AudioPlayer.state.audioInfo.title}</div>
+                        <div className="description">{AudioPlayer.state.audioInfo.performer}</div>
                     </div>
                 </div>
             )

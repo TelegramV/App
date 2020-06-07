@@ -21,16 +21,16 @@ import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import TextWrapperComponent from "./Common/TextWrapperComponent"
 import MessageWrapperFragment from "./Common/MessageWrapperFragment"
 import DocumentParser from "../../../../../Api/Files/DocumentParser"
-import AudioPlayer from "../../../../../Api/Audio/AudioPlayer"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import {formatAudioTime} from "../../../../Utils/utils"
+import AudioPlayer from "../../../../../Api/Audio/AudioPlayer"
 
 class NewAudioMessageComponent extends GeneralMessageComponent {
     appEvents(E) {
         super.appEvents(E)
 
-        E.bus(AppEvents.General)
-            .filter(event => event.state.document.id === this.props.message.media.document.id || this.isPlaying)
+        E.bus(AppEvents.Audio)
+            .filter(event => event.state.message === this.props.message || this.isPlaying)
             .updateOn("audio.play")
             .updateOn("audio.paused")
             .updateOn("audio.loading")
@@ -40,13 +40,9 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
     }
 
     render({message}, state) {
-        const document = message.media.document
-        const audio = DocumentParser.attributeAudio(document)
-        const isPlaying = AudioPlayer.isCurrent(document)
-        const isPaused = AudioPlayer.isPaused()
-        const isEnded = AudioPlayer.isEnded()
-        const timestamp = AudioPlayer.currentTime()
-        const bufferedPercentage = AudioPlayer.bufferedPercentage()
+        const isPlaying = AudioPlayer.isCurrent(message);
+        const audioInfo = DocumentParser.attributeAudio(message.media.document);
+        const {isPaused, currentTime, bufferedPercentage} = AudioPlayer.state;
 
         this.isPlaying = isPlaying // dirty hack, do not repeat
 
@@ -54,16 +50,16 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
             <MessageWrapperFragment message={message} showUsername={false}>
                 <div class="audio">
                     <div
-                        class={`play tgico tgico-${isPlaying && !isPaused && !isEnded ? 'pause' : 'play'} rp rps rp-white`}
+                        class={`play tgico tgico-${isPlaying && !isPaused ? 'pause' : 'play'} rp rps rp-white`}
                         onClick={this.onClickPlay}
                         onDoubleClick={event => event.stopPropagation()}/>
 
                     <div class="audio-wrapper rp rps">
                         <div className="controls">
                             <div className="audio-name">
-                                {audio.title || DocumentParser.attributeFilename(message.media.document)}
+                                {audioInfo.title || DocumentParser.attributeFilename(message.media.document)}
                             </div>
-                            <div className="audio-artist">{audio.performer}</div>
+                            <div className="audio-artist">{audioInfo.performer}</div>
 
                             <div className={[`progress-wrapper`, isPlaying || `hidden`]}
                                  onMouseEnter={this.onMouseEnter}
@@ -75,17 +71,17 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
                                 <div className="progress-line"/>
                                 <div className="listened-wrapper">
                                     <div style={{
-                                        width: `${timestamp / audio.duration * 100}%`
+                                        width: `${currentTime / audioInfo.duration * 100}%`
                                     }} className="listened"/>
                                     <div className="control-ball"/>
                                 </div>
                             </div>
                             <div className="timer">
                                 {isPlaying && <span className="played-wrapper">
-                                    <span className="time-played">{formatAudioTime(timestamp)}</span>
+                                    <span className="time-played">{formatAudioTime(currentTime)}</span>
                                     /
                                 </span>}
-                                {formatAudioTime(audio.duration)}
+                                {formatAudioTime(audioInfo.duration)}
                             </div>
                         </div>
 
@@ -98,7 +94,7 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
     }
 
     onClickPlay = () => {
-        AudioPlayer.toggle(this.props.message.media.document)
+        AudioPlayer.toggle(this.props.message)
     }
 
     onMouseEnter = event => {

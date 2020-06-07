@@ -214,7 +214,7 @@
                     @if $in {
                         background-color: $lightgrey
                     } @else {
-                        background-color: lighten($darkgreen, 25%);
+                        background-color: lighten($darkgreen, 30%);
                     }
                 }
 
