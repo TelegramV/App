@@ -25,7 +25,8 @@ export class TabSelector extends StatefulComponent {
                 })}
             </div>
 
-            <div className="content" ref={this.content} onScroll={this.onContentScroll}>
+            {/*onScroll={this.onContentScroll}*/}
+            <div className="content" ref={this.content}>
                 {props.tabs.map(l => {
                     return <div className="content-wrapper" onScroll={l.onScroll}>
                         {l.content}

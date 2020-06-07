@@ -35,16 +35,15 @@ class SimpleVirtualList extends StatefulComponent {
             <div style={{
                 height: `${containerHeight}px`,
                 overflow: "auto"
-            }}>
+            }} css-will-change="transform">
 
                 <div style={{
                     overflow: "hidden",
-                    willChange: "transform",
                     height: `${totalHeight || items.length * itemHeight}px`,
                     position: "relative"
-                }}>
+                }} >
                     <div style={{
-                        willChange: "transform",
+                        // willChange: "transform",
                         transform: `translateY(${offsetY}px)`
                     }}>
                         {items.slice(start, start + count).map(item => template(item))}

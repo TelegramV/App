@@ -19,6 +19,8 @@ import TabSelectorComponent from "../../../Tab/TabSelectorComponent";
 import {TabSelector} from "../../Fragments/TabSelector";
 import ConnectionStatusComponent from "../../../Sidebars/Left/Dialogs/ConnectionStatusComponent";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
+import VButton from "../../../../Elements/Button/VButton";
+import SimpleVirtualList from "../../../../../V/VRDOM/list/SimpleVirtualList";
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -93,12 +95,19 @@ export class DialogsSidebar extends LeftSidebar {
     content(): * {
         return <this.contentWrapper>
             <ConnectionStatusComponent/>
+            <VButton onClick={_ => this.loadNextPage()}/>
+
 
             <TabSelector tabs={this.state.folders.map(folder => {
                 return {
                     name: folder.title,
-                    onScroll: this.onSectionScroll,
-                    content: <List template={DialogFragment} list={this.state.dialogs} wrapper={<Section/>}/>
+                    // onScroll: this.onSectionScroll,
+                    content: <SimpleVirtualList items={this.state.dialogs.items}
+                                                 containerHeight={900}
+                                                 itemHeight={72}
+                                                 template={DialogFragment}
+                    />
+                    //<List template={DialogFragment} list={this.state.dialogs} wrapper={<Section/>}/>
                 }
             })}/>
             {/*<Section>*/}

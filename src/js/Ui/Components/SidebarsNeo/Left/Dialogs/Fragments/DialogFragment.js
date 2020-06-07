@@ -33,7 +33,7 @@ export const DialogFragment = (dialog: Dialog) => {
     return (
         <div className={personClasses}
 
-             // onClick={click}
+             onClick={_ => AppSelectedChat.select(peer)}
              // onContextMenu={contextMenu}
         >
 

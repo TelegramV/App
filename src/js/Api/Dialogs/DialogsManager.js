@@ -255,7 +255,7 @@ class DialogManager extends Manager {
         return DialogsStore.toArray().filter(l => l.isArchived).length
     }
 
-    fetchNextPage({limit = 40}) {
+    fetchNextPage({limit = 200}) {
         if (this.allWasFetched || DialogsStore.count >= this.count) {
             this.allWasFetched = true
             AppEvents.Dialogs.fire("allWasFetched", {})
