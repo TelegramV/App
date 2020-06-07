@@ -1,18 +1,14 @@
 import DialogsManager from "../../../../../Api/Dialogs/DialogsManager"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
-import ConnectionStatusComponent from "./ConnectionStatusComponent"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import LeftBarComponent from "../LeftBarComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
-import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent"
 import VSimpleLazyInput from "../../../../Elements/Input/VSimpleLazyInput"
 import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 import PeersStore from "../../../../../Api/Store/PeersStore"
-import {DialogListsComponent} from "./DialogListsComponent";
 import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
-import {Folders} from "./Folders";
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -82,57 +78,57 @@ export class DialogsBar extends LeftBarComponent {
     render() {
         return (
             <div className="chatlist sidebar">
-                <div className="toolbar">
-                    {/* TODO Must be shown if back button exists!*/}
-                    <BurgerAndBackComponent isMain isNoFolders/>
+                {/*<div className="toolbar">*/}
+                {/*    /!* TODO Must be shown if back button exists!*!/*/}
+                {/*    <BurgerAndBackComponent isMain isNoFolders/>*/}
 
-                    {/*<i className={{"btn-icon rp rps tgico-menu": true, "hidden": FoldersManager.hasFolders()}} onClick={ev => {*/}
-                    {/*    if (ev.currentTarget.classList.contains("back")) return true; //Button currently in back state*/}
-                    {/*    DialogsBarContextMenu(ev, this.Archived && this.Archived.$el.childElementCount)*/}
-                    {/*}}/>*/}
-                    <div className="search">
-                        <div className="input-search">
-                            <VSimpleLazyInput type="text" placeholder="Search"
-                                              onFocus={this.openSearch}
-                                              onInput={this.onSearchInputCapture}
-                                              lazyLevel={200}/>
-                            <span className="tgico tgico-search"/>
-                        </div>
-                    </div>
+                {/*    /!*<i className={{"btn-icon rp rps tgico-menu": true, "hidden": FoldersManager.hasFolders()}} onClick={ev => {*!/*/}
+                {/*    /!*    if (ev.currentTarget.classList.contains("back")) return true; //Button currently in back state*!/*/}
+                {/*    /!*    DialogsBarContextMenu(ev, this.Archived && this.Archived.$el.childElementCount)*!/*/}
+                {/*    /!*}}/>*!/*/}
+                {/*    <div className="search">*/}
+                {/*        <div className="input-search">*/}
+                {/*            <VSimpleLazyInput type="text" placeholder="Search"*/}
+                {/*                              onFocus={this.openSearch}*/}
+                {/*                              onInput={this.onSearchInputCapture}*/}
+                {/*                              lazyLevel={200}/>*/}
+                {/*            <span className="tgico tgico-search"/>*/}
+                {/*        </div>*/}
+                {/*    </div>*/}
 
-                </div>
-                <Folders/>
+                {/*</div>*/}
+                {/*<Folders/>*/}
 
-                <ConnectionStatusComponent/>
+                {/*<ConnectionStatusComponent/>*/}
 
-                <div ref={this.dialogsWrapperRef} id="dialogsWrapper" class={{"scrollable": true, "loading": true}}>
-                    <div ref={this.loaderRef} className="full-size-loader" id="loader">
-                        <progress className="progress-circular big"/>
-                    </div>
+                {/*<div ref={this.dialogsWrapperRef} id="dialogsWrapper" class={{"scrollable": true, "loading": true}}>*/}
+                {/*    <div ref={this.loaderRef} className="full-size-loader" id="loader">*/}
+                {/*        <progress className="progress-circular big"/>*/}
+                {/*    </div>*/}
 
-                    <DialogListsComponent/>
-                </div>
-                <div class="new-chat rp rps" onClick={event => {
-                    VUI.ContextMenu.openAbove([
-                        {
-                            icon: "channel",
-                            title: "New Channel",
-                            onClick: () => {
-                                UIEvents.LeftSidebar.fire("show", {barName: "create-channel"})
-                            }
-                        },
-                        {
-                            icon: "group",
-                            title: "New Group"
-                        },
-                        {
-                            icon: "user",
-                            title: "New Private Chat"
-                        }
-                    ], event.target)
-                }}>
-                    <i class="tgico tgico-newchat_filled"/>
-                </div>
+                {/*    <DialogListsComponent/>*/}
+                {/*</div>*/}
+                {/*<div class="new-chat rp rps" onClick={event => {*/}
+                {/*    VUI.ContextMenu.openAbove([*/}
+                {/*        {*/}
+                {/*            icon: "channel",*/}
+                {/*            title: "New Channel",*/}
+                {/*            onClick: () => {*/}
+                {/*                UIEvents.LeftSidebar.fire("show", {barName: "create-channel"})*/}
+                {/*            }*/}
+                {/*        },*/}
+                {/*        {*/}
+                {/*            icon: "group",*/}
+                {/*            title: "New Group"*/}
+                {/*        },*/}
+                {/*        {*/}
+                {/*            icon: "user",*/}
+                {/*            title: "New Private Chat"*/}
+                {/*        }*/}
+                {/*    ], event.target)*/}
+                {/*}}>*/}
+                {/*    <i class="tgico tgico-newchat_filled"/>*/}
+                {/*</div>*/}
             </div>
         )
     }

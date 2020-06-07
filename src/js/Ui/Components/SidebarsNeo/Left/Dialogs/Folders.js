@@ -3,11 +3,7 @@ import AppEvents from "../../../../../Api/EventBus/AppEvents";
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VUI from "../../../../VUI";
-import {BurgerAndBackComponent} from "../BurgerAndBackComponent";
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
-import UIEvents from "../../../../EventBus/UIEvents";
-import TabSelectorComponent from "../../../Tab/TabSelectorComponent";
-import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf";
 
 const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0}, selected = false, onClick}) => {
     return <div className={{

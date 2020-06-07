@@ -1,15 +1,26 @@
-import {Dialog} from "../../../../../../Api/Dialogs/Dialog";
-import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer";
-import {DialogAvatarFragment} from "../../../../Sidebars/Left/Dialogs/Fragments/DialogAvatarFragment";
-import {DialogTextFragment} from "../../../../Sidebars/Left/Dialogs/Fragments/DialogTextFragment";
-import {DialogUnreadMentionsCountBadge} from "../../../../Sidebars/Left/Dialogs/Fragments/DialogUnreadMentionsCountBadge";
-import {DialogUnreadCountBadge} from "../../../../Sidebars/Left/Dialogs/Fragments/DialogUnreadCountBadge";
-import {DialogUnreadMarkBadge} from "../../../../Sidebars/Left/Dialogs/Fragments/DialogUnreadMarkBadge";
-import {DialogTimeFragment} from "../../../../Sidebars/Left/Dialogs/Fragments/DialogTimeFragment";
-import AppSelectedChat from "../../../../../Reactive/SelectedChat";
-import AvatarComponent from "../../../../Basic/AvatarComponent";
+import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer"
+import AppSelectedChat from "../../../../../Reactive/SelectedChat"
+import {DialogAvatarFragment} from "./DialogAvatarFragment"
+import {DialogTimeFragment} from "./DialogTimeFragment"
+import {DialogTextFragment} from "./DialogTextFragment"
+import {DialogUnreadMentionsCountBadge} from "./DialogUnreadMentionsCountBadge"
+import {DialogUnreadCountBadge} from "./DialogUnreadCountBadge"
+import {DialogUnreadMarkBadge} from "./DialogUnreadMarkBadge"
 
-export const DialogFragment = ({dialog}) => {
+export const DialogFragment = (
+    {
+        dialog,
+        contextMenu,
+        click,
+        avatarFragmentRef,
+        timeFragmentRef,
+        textFragmentRef,
+        unreadMentionsCountFragmentRef,
+        unreadCountFragmentRef,
+        unreadMarkFragmentRef,
+        ...otherArgs
+    }
+) => {
     const peer = dialog.peer
     let lastMessage = dialog.peer.messages.last
 
@@ -31,14 +42,14 @@ export const DialogFragment = ({dialog}) => {
     }
 
     return (
-        <div className={personClasses}
+        <div data-message-id={lastMessage.id}
+             className={personClasses}
 
-             onClick={_ => AppSelectedChat.select(peer)}
-             // onContextMenu={contextMenu}
-        >
+             onClick={click}
+             onContextMenu={contextMenu}>
 
-            <AvatarComponent peer={peer} saved={true}/>
-            {/*<DialogAvatarFragment peer={dialog.peer}/>*/}
+            <DialogAvatarFragment ref={avatarFragmentRef}
+                                  peer={dialog.peer}/>
 
             <div className="content">
 
@@ -49,18 +60,18 @@ export const DialogFragment = ({dialog}) => {
 
                     <div className="status tgico"/>
 
-                    <DialogTimeFragment
+                    <DialogTimeFragment ref={timeFragmentRef}
                                         dialog={dialog}/>
                 </div>
 
                 <div className="bottom">
-                    <DialogTextFragment
+                    <DialogTextFragment ref={textFragmentRef}
                                         dialog={dialog}/>
 
-                    <DialogUnreadMentionsCountBadge dialog={dialog}/>
-                    <DialogUnreadCountBadge dialog={dialog}/>
+                    <DialogUnreadMentionsCountBadge ref={unreadMentionsCountFragmentRef} dialog={dialog}/>
+                    <DialogUnreadCountBadge ref={unreadCountFragmentRef} dialog={dialog}/>
 
-                    <DialogUnreadMarkBadge dialog={dialog}/>
+                    <DialogUnreadMarkBadge ref={unreadMarkFragmentRef} dialog={dialog}/>
                 </div>
             </div>
         </div>

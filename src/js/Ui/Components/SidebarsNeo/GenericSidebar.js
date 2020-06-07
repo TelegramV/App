@@ -26,7 +26,7 @@ export class GenericSidebar extends StatefulComponent {
             <div className={this.classes} onAnimationEnd={this.onTransitionEnd}>
                 {this.header()}
                 {this.content()}
-                {nodeIf(<FloatingActionButton icon={this.floatingActionButtonIcon} hidden={this.isFloatingActionButtonHidden} onClick={this.onFloatingActionButtonPressed()}/>, !!this.floatingActionButtonIcon)}
+                {nodeIf(<FloatingActionButton icon={this.floatingActionButtonIcon} hidden={this.isFloatingActionButtonHidden} onClick={this.onFloatingActionButtonPressed}/>, !!this.floatingActionButtonIcon)}
             </div>
         )
     }

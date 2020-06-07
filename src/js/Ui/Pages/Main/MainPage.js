@@ -12,7 +12,6 @@ import {SettingsComponent} from "../../Components/Sidebars/Left/Settings/Setting
 import {SearchPanelComponent} from "../../Components/Sidebars/Left/Search/SearchPanelComponent"
 import MessagesSearchComponent from "../../Components/Sidebars/Right/Search/MessagesSearchComponent"
 import {DialogInfoComponent} from "../../Components/Sidebars/Right/DialogInfo/DialogInfoComponent"
-import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/ArchivedDialogsBar"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
@@ -60,7 +59,7 @@ export function MainPage() {
             <ModalComponent/>
             <MediaViewerComponent/>
             <InstantViewComponent/>
-            <SnackbarComponent/>
+            {/*<SnackbarComponent/>*/}
             {/*<SettingsComponent/>*/}
 
             <LeftSidebars/>
@@ -76,7 +75,7 @@ export function MainPage() {
             {/*</div>*/}
 
 
-            <SettingsComponent/>
+            {/*<SettingsComponent/>*/}
             <PhoneCallComponent/>
 
             {/*<SearchPanelComponent/>*/}

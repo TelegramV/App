@@ -15,13 +15,17 @@ import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBui
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
 import TabSelectorComponent from "../../../Tab/TabSelectorComponent";
 import {TabSelector} from "../../Fragments/TabSelector";
-import ConnectionStatusComponent from "../../../Sidebars/Left/Dialogs/ConnectionStatusComponent";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VButton from "../../../../Elements/Button/VButton";
 import SimpleVirtualList from "../../../../../V/VRDOM/list/SimpleVirtualList";
 import DynamicHeightVirtualList from "../../../../../V/VRDOM/list/DynamicHeightVirtualList";
 import {Dialog} from "../../../../../Api/Dialogs/Dialog";
-import {DialogComponent} from "./Fragments/DialogComponent";
+import {UnpatchableLeftSidebar} from "../UnpatchableLeftSidebar";
+import ConnectionStatusComponent from "./ConnectionStatusComponent";
+import {DialogListsComponent} from "./DialogListsComponent";
+import VComponent from "../../../../../V/VRDOM/component/VComponent";
+import AppSelectedChat from "../../../../Reactive/SelectedChat";
+import {Folders} from "./Folders";
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -73,74 +77,116 @@ export const DialogsBarContextMenu = (event, archivedCount) => {
     ], event.target)
 }
 
-export class DialogsSidebar extends LeftSidebar {
-    state = {
-        hidden: false,
-        // pinned: new VArray(),
-        // [{
-        //   folderId: number,
-        //   pinned: new VArray,
-        //   dialogs: new VArray()
-        // }]
-        dialogs: [],
-        folders: []
-    }
+export class DialogsSidebar extends UnpatchableLeftSidebar {
+    isLoadingMore = false
 
-    appEvents(E: AE) {
-        E.bus(AppEvents.Dialogs)
-            .on("gotMany", this.onGotMany)
-            .on("gotNewMany", this.onGotMany)
-            .on("newMessage", this.onNewMessage)
-        E.bus(AppEvents.General)
-            .on("foldersUpdate", this.onFoldersUpdate)
-    }
+    loaderRef = VComponent.createRef()
+    dialogsWrapperRef = VComponent.createRef()
+
 
     init() {
         FoldersManager.fetchFolders()
     }
 
-    onNewMessage = (event) => {
-        console.time("onNewMessage")
-        this.forceUpdate()
-        console.timeEnd("onNewMessage")
+    onFloatingActionButtonPressed = (event) => {
+        VUI.ContextMenu.openAbove([
+            {
+                icon: "channel",
+                title: "New Channel",
+                onClick: () => {
+                    // UIEvents.LeftSidebar.fire("show", {barName: "create-channel"})
+                }
+            },
+            {
+                icon: "group",
+                title: "New Group"
+            },
+            {
+                icon: "user",
+                title: "New Private Chat"
+            }
+        ], event.target)
     }
 
     content(): * {
-        const dialogHeight = 72 + 4
         return <this.contentWrapper>
             <ConnectionStatusComponent/>
+            <Folders/>
 
+            <div ref={this.dialogsWrapperRef} id="dialogsWrapper" class={{"scrollable": true, "loading": true}}>
+                <div ref={this.loaderRef} className="full-size-loader" id="loader">
+                    <progress className="progress-circular big"/>
+                </div>
 
-            <TabSelector tabs={[{
-                name: "All",
-                content: <DynamicHeightVirtualList items={this.state.dialogs.sort(this.compareDialogs)}
-                                                   itemHeight={dialogHeight}
-                                                   template={DialogComponent} onScroll={this.onSectionScroll}/>
-            }, ...this.state.folders.map(folder => {
-                return {
-                    name: folder.title,
-                    // onScroll: this.onSectionScroll,
-                    content: <DynamicHeightVirtualList items={this.state.dialogs.filter(dialog => dialog.matchesFilter(folder)).sort(this.compareDialogs)}
-                                                       itemHeight={dialogHeight}
-                                                       template={DialogComponent} onScroll={this.onSectionScroll}
-                    />
-                    //<List template={DialogFragment} list={this.state.dialogs} wrapper={<Section/>}/>
-                }
-            })]}/>
-
-            {/*<Section>*/}
-            {/*    /!*<List template={DialogComponent} list={this.state.pinned}/>*!/*/}
-            {/*</Section>*/}
-
-            {/*<List template={DialogFragment} list={this.state.dialogs} wrapper={<Section/>}/>*/}
+                <DialogListsComponent/>
+            </div>
         </this.contentWrapper>
     }
 
-    compareDialogs = (a: Dialog, b: Dialog) => {
-        return b.messages.last.date - a.messages.last.date
+    componentDidMount() {
+        this.Archived = VComponent.getComponentById(`dialogs-archived-list`)
+        this.dialogsWrapperRef.$el.addEventListener("scroll", this._scrollHandler, {passive: true})
     }
 
-    onSectionScroll = (event) => {
+    appEvents(E) {
+        super.appEvents(E)
+
+        E.bus(AppEvents.Dialogs)
+            .on("gotMany", this.onDialogsGotMany)
+
+        E.bus(AppEvents.General)
+            .on("selectFolder", this.onFolderSelect)
+            .on("chat.select", this.onChatSelect)
+
+
+    }
+
+    onDialogsGotMany = _ => {
+        if(this.loaderRef.$el.parentElement) this.loaderRef.$el.parentElement.removeChild(this.loaderRef.$el)
+        this.dialogsWrapperRef.$el.classList.remove("loading")
+    }
+
+    onFolderSelect = _ => {
+        this.dialogsWrapperRef.$el.scrollTop = 0
+        if (this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
+            this.loadNextPage()
+        }
+    }
+
+    onChatSelect = _ => {
+        if (AppSelectedChat.isSelected) {
+            this.$el.classList.add("responsive-selected-chatlist")
+        } else {
+            this.$el.classList.remove("responsive-selected-chatlist")
+        }
+    }
+
+    onBackPressed = (event) => {
+        if (event.id === "search") {
+            this._searchBackClick()
+        }
+    }
+
+    openSearch = () => {
+        console.warn("open")
+
+        UIEvents.LeftSidebar.fire("burger.changeToBack", {
+            id: "search"
+        })
+
+        UIEvents.LeftSidebar.fire("show", {
+            barName: "search"
+        })
+    }
+
+    _searchBackClick = (ev) => {
+        UIEvents.LeftSidebar.fire("show", {
+            barName: "dialogs"
+        })
+        UIEvents.LeftSidebar.fire("burger.changeToBurger", {})
+    }
+
+    _scrollHandler = (event) => {
         const $element = event.target
 
         if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.isLoadingMore) {
@@ -149,34 +195,21 @@ export class DialogsSidebar extends LeftSidebar {
     }
 
     loadNextPage() {
-        if(this.isLoadingMore) return
+        if (this.isLoadingMore) return
         this.isLoadingMore = true
 
         DialogsManager.fetchNextPage({}).then(() => {
             this.isLoadingMore = false
+            // if (this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
+            //     this.loadNextPage()
+            // }
         })
     }
 
-    clone = () => {
-        const f = this.state.dialogs
-        f.addMany(f.items)
-        this.setState({
-            dialogs: f
+    onSearchInputCapture = event => {
+        UIEvents.LeftSidebar.fire("searchInputUpdated", {
+            string: event.target.value.trim()
         })
-    }
-
-    onFoldersUpdate = (event) => {
-        console.log("onFoldersUpdate", event.folders)
-        this.setState({
-            folders: event.folders
-        })
-    }
-
-    onGotMany = (event) => {
-        this.state.dialogs.push(...event.dialogs)
-        console.time("lol")
-        this.forceUpdate()
-        console.timeEnd("lol")
     }
 
     onLeftButtonPressed = (event) => {
@@ -217,13 +250,5 @@ export class DialogsSidebar extends LeftSidebar {
 
     get headerBorder(): boolean {
         return false
-    }
-
-    openSearch = () => {
-
-    }
-
-    onSearchInputCapture = () => {
-
     }
 }
