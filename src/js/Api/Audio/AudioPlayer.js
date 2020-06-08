@@ -137,6 +137,7 @@ class AudioPlayer {
     }
 
     get state() {
+        const fileName = DocumentParser.attributeFilename(this.currentMessage?.media.document);
         const info = DocumentParser.attributeAudio(this.currentMessage?.media.document);
         const source = this.sources.get(this.currentMessage?.media.document.id);
         const isVoice = info?.voice;
@@ -151,6 +152,7 @@ class AudioPlayer {
             bufferedPercentage: isVoice ? 100 : source?.bufferedPercentage ?? 100,
             audioInfo: info,
             isVoice,
+            fileName,
         }
     }
 
