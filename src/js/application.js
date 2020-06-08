@@ -6,7 +6,6 @@ import AppCache from "./Api/Cache/AppCache"
 import VApp from "./V/vapp"
 import AppRoutes from "./Ui/Routing"
 import RippleVRDOMPlugin from "./Ui/Plugins/RipplePlugin"
-import EmojiVRDOMPlugin from "./Ui/Plugins/EmojiPlugin"
 
 import HorizontalScrollVRDOMPlugin from "./Ui/Plugins/HorizontalScrollPlugin"
 
@@ -30,7 +29,6 @@ if (__IS_PRODUCTION__) {
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)
-VApp.registerPlugin(EmojiVRDOMPlugin)
 VApp.registerPlugin(HorizontalScrollVRDOMPlugin)
 VApp.useRoutes(AppRoutes)
 VApp.mount("#app")

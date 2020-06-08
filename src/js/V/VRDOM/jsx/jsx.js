@@ -25,6 +25,9 @@ import vrdom_createElement from "../createElement"
 import VRDOM from "../VRDOM"
 import postAttrProcessor from "./attrProcessors/postAttrProcessor"
 import vrdom_isTagNameComponentOrFragment from "../is/isTagNameComponentOrFragment"
+import {text2emoji} from "../../../Ui/Plugins/EmojiTextInterceptor"
+
+let intercepted = false
 
 /**
  * JSX Translator
@@ -39,6 +42,20 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
     }
 
     children = children.flat(Infinity)
+
+    if (!intercepted) {
+        intercepted = true
+
+        children = children.map(child => {
+            if (typeof child === "string") {
+                return text2emoji(child)
+            }
+
+            return child
+        }).flat(Infinity)
+
+        intercepted = false
+    }
 
     const attrs: VRAttrs = Object.create(null)
     const events: VREvents = Object.create(null)

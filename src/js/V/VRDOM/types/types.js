@@ -52,7 +52,7 @@ export type VREvents = {
 export type VRenderProps = {
     xmlns?: string | void;
     $parent?: HTMLElement;
-    doNotIntercept: boolean;
+    intercepted: boolean;
 }
 
 export type Ref = ElementRef | FragmentRef | ComponentRef
