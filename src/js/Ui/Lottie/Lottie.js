@@ -30,20 +30,9 @@ class Lottie extends StatefulComponent {
 
         this.options = {...this.options, ...options};
 
-        if (this.props.loadDelay) {
-            this.withTimeout(() => {
-                this.anim = lottie.loadAnimation(this.options);
-                this.anim.setSubframe(false);
-                this.registerEvents(eventListeners);
-                // this.anim.isPaused = false;
-                // this.anim.container.width = this.props.width
-                // this.anim.container.height = this.props.height
-            }, this.props.loadDelay)
-        } else {
-            this.anim = lottie.loadAnimation(this.options);
-            this.anim.setSubframe(false);
-            this.registerEvents(eventListeners);
-        }
+        this.anim = lottie.loadAnimation(this.options);
+        this.anim.setSubframe(false);
+        this.registerEvents(eventListeners);
     }
 
     componentWillUpdate(nextProps /* , nextState */) {
@@ -123,23 +112,12 @@ class Lottie extends StatefulComponent {
         });
     }
 
-    handleClickToPause = () => {
-        // The pause() method is for handling pausing by passing a prop isPaused
-        // This method is for handling the ability to pause by clicking on the animation
-        if (this.anim.isPaused) {
-            this.anim.play();
-        } else {
-            this.anim.pause();
-        }
-    }
-
     render() {
         const {
             width,
             height,
             ariaRole,
             ariaLabel,
-            isClickToPauseDisabled,
             onClick,
             title,
         } = this.props;
@@ -163,8 +141,7 @@ class Lottie extends StatefulComponent {
             outline: 'none',
             ...this.props.style,
         };
-
-        const onClickHandler = onClick ? onClick : isClickToPauseDisabled ? () => null : this.handleClickToPause;
+        const onClickHandler = onClick ? onClick : () => null;
 
         return (
             // Bug with eslint rules https://github.com/airbnb/javascript/issues/1374
@@ -204,7 +181,6 @@ Lottie.defaultProps = {
     speed: 1,
     ariaRole: 'button',
     ariaLabel: 'animation',
-    isClickToPauseDisabled: false,
     title: '',
 };
 

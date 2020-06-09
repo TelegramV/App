@@ -94,7 +94,6 @@ class StickersComposerComponent extends StatelessComponent {
                                             height={35}
                                             options={options}
                                             onClick={onClick}
-                                            loadDelay={50}
                                             playOnHover/>
                                 </div>,
                                 this.stickerPacksRef.$el);

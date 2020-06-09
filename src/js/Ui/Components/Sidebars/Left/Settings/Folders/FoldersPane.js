@@ -13,8 +13,6 @@ import VButton from "../../../../../Elements/Button/VButton";
 import Center from "../../Fragments/Center";
 import UIEvents from "../../../../../EventBus/UIEvents";
 
-
-
 export default class FoldersPane extends SettingsPane {
     barName = "folder-settings";
 
@@ -46,7 +44,6 @@ export default class FoldersPane extends SettingsPane {
                             autoplay: true,
                         }}
                         // onClick={onClick}
-                        loadDelay={50}
                         playOnHover/>
                         <BR20/>
                     <InputHint center>
@@ -84,7 +81,7 @@ export default class FoldersPane extends SettingsPane {
         this.openPane("create-folder")
     }
 
-    createFolder = () => {
+    createFolder = (folder) => {
 
         UIEvents.LeftSidebar.fire("folders.createNew", {
             folder: folder

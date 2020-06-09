@@ -74,7 +74,6 @@ export class DialogListsComponent extends StatelessComponent {
                         autoplay: true,
                     }}
                     // onClick={onClick}
-                    loadDelay={50}
                     />
                 <div className="title">Adding chats</div>
                 <div className="description">Please wait a few moments while we fill this folder for you...</div>
@@ -91,7 +90,6 @@ export class DialogListsComponent extends StatelessComponent {
                         autoplay: true,
                     }}
                     // onClick={onClick}
-                    loadDelay={50}
                     playOnHover/>
                 <div className="title">No chats found</div>
                 <div className="description">No chats currently belong to this folder.</div>
@@ -211,7 +209,9 @@ export class DialogListsComponent extends StatelessComponent {
         if(this.isNoChats()) {
             this.setNoChats(false)
         }
-        value ? this.loadingLottie.component.play() : this.loadingLottie.component.pause()
+        if(this.loadingLottie.component.anim) {
+            value ? this.loadingLottie.component.play() : this.loadingLottie.component.pause()
+        }
         this.$el.classList.toggle("loading", value)
     }
 
