@@ -19,11 +19,12 @@ import "./polyfills"
 
 
 if (__IS_PRODUCTION__) {
+    document.title = "Connecting.."
     console.log("%c%s", "color: #4ea4f6; font-size: 4em;", "Telegram V")
     console.log("%c%s", "color: #DF3F40; font-size: 1.5em;", "using console may slow down the application")
     AppCache.open()
 } else {
-    document.title = "[dev] Telegram V"
+    document.title = "[dev] Connecting.."
     window.invoke = MTProto.invokeMethod
     window.devkeval = keval
 }
@@ -38,5 +39,9 @@ MTProto.connect().then(user => {
         PeersStore.set(PeerFactory.fromRaw(user));
     }
 
-    console.log("connected");
+    if (__IS_PRODUCTION__) {
+        document.title = "Telegram V"
+    } else {
+        document.title = "[dev] Telegram V"
+    }
 })
