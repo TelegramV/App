@@ -2,7 +2,7 @@
     & .poll {
         display: flex;
         flex-direction: column;
-        min-width: 300px;
+        min-width: 250px;
         margin: 5px 0;
 
         .question {
@@ -13,10 +13,11 @@
         .subtitle {
             display: flex;
             align-items: center;
-            height: 36px;
+            height: 30px;
 
             .poll-type {
                 color: $darkgrey;
+                font-size: 14px;
             }
 
             .recent-voters {
@@ -95,13 +96,14 @@
 
         .answer {
             width: 100%;
+            margin-top: 5px;
             display: grid;
             grid-template-areas:
                 "topleft answer"
                 "voted progress";
-            grid-template-columns: 40px 1fr;
+            grid-template-columns: 30px 1fr;
             grid-template-rows: max-content 20px;
-            grid-column-gap: 5px;
+            grid-column-gap: 10px;
             cursor: pointer;
 
             /*&.voting {
@@ -177,7 +179,7 @@
             .vote {
                 grid-area: topleft;
                 align-self: center;
-                justify-self: end;
+                justify-self: center;
             }
 
             .percent {
@@ -185,6 +187,7 @@
                 align-self: center;
                 justify-self: end;
                 font-weight: 500;
+                font-size: 14px;
             }
 
             .voted {
@@ -232,6 +235,7 @@
             line-height: 30px;
 
             color: $blue;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
 

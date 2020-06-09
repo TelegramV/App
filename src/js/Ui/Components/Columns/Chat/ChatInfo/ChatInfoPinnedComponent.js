@@ -59,14 +59,22 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                         <div
                             className="description">{AudioPlayer.state.isVoice ? "Voice message" : AudioPlayer.state.audioInfo.performer}</div>
                     </div>
+                    <div class="close">
+                        <i className="tgico tgico-close"/>
+                    </div>
                 </div>
             )
         } else if (this.state.message) {
             return (
                 <div className="pin pinned-message"
                      onClick={event => UIEvents.General.$chat.showMessage(this.state.message)}>
-                    <div className="title">Pinned message</div>
-                    <div className="description">{MessageParser.getPrefixNoSender(this.state.message)}</div>
+                    <div class="message-info">
+                        <div className="title">Pinned message</div>
+                        <div className="description">{MessageParser.getPrefixNoSender(this.state.message)}</div>
+                    </div>
+                    <div class="close">
+                        <i className="tgico tgico-close"/>
+                    </div>
                 </div>
             )
         } else {

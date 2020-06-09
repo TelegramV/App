@@ -28,13 +28,6 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         this.prepareContextMenu()
     }
 
-    componentDidUpdate() {
-        super.componentDidUpdate();
-        console.log("poll update");
-
-        this.prepareContextMenu()
-    }
-
     prepareContextMenu = () => {
         let message = this.props.message;
         this.contextActions = [];
@@ -66,10 +59,11 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
         this.actionButton = this.$el.querySelector(".action-button");
 
-        if(this.props.message.poll.close_date) this.withInterval(this.updateTimer, 1000);
+        if(this.props.message.poll.close_date) this.withInterval(this.updateTimer, 500);
     }
 
     render({ message }) {
+        this.prepareContextMenu();
         let classes = {
             "poll": true,
             "voted": message.isVoted
@@ -99,9 +93,9 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         if(message.poll.closed) return "Final results";
 
         if(message.isPublic) {
-            return message.isQuiz ? "Quiz" : "Public poll";
+            return message.isQuiz ? "Quiz" : "Public Poll";
         } else {
-            return message.isQuiz ? "Anonymous quiz" : "Anonymous poll";
+            return message.isQuiz ? "Anonymous Quiz" : "Anonymous Poll";
         }
     }
 
@@ -181,7 +175,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     updateTimer = () => {
         let message = this.props.message;
-        let left = Math.floor(message.poll.close_date - Date.now()/1000);
+        let left = message.poll.close_date - Date.now()/1000;
         if(left < 0) {
             this.clearIntervals();
             this.withTimeout(_=>messages.getPollResults(message), 1000);
@@ -254,8 +248,8 @@ const AnswerFragment = ({message, option, click}) => {
 
 const FooterFragment = ({ message, actionClick }) => {
     if (message.isVoted && message.isPublic) {
-        return <div class="action-button" onClick={actionClick}>Results</div>;
-    } else if (message.isMultiple) {
+        return <div class="action-button" onClick={actionClick}>View results</div>;
+    } else if (!message.isVoted && message.isMultiple) {
         return <div class="action-button disabled" onClick={actionClick}>Vote</div>;
     }
     return <div class="stats">{message.results.total_voters + " voted"}</div>;
@@ -298,6 +292,7 @@ const TimerFragment = ({left, total}) => {
     if(total === 0) return <div class="timer"/>;
     if(left < 0) left = 0;
     let percent = left / total;
+    left = Math.floor(left);
     let formatted = formatAudioTime(left);
     let color;
     if(left < 6) color = "#DF3F40";

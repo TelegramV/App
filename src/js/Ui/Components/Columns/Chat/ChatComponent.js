@@ -69,11 +69,11 @@ class ChatComponent extends StatelessComponent {
                 <div ref={this.chatRef} id="chat" css-display="none">
                     <div id="topbar">
                         <ChatInfoComponent/>
-                        <ChatInfoPinnedComponent/>
                         <ChatInfoCallButtonComponent/>
                         <div className="btn-icon rp rps tgico-search" onClick={this.openSearch}/>
                         <div className="btn-icon rp rps tgico-more"/>
                     </div>
+                    <ChatInfoPinnedComponent/>
 
                     <VSpinner loaderRef={this.messagesLoaderRef}
                               id="messages-wrapper-messages-loader"

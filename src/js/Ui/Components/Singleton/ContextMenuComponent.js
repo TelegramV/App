@@ -165,9 +165,10 @@ class ContextMenuComponent extends StatefulComponent {
     }
 
     listener = (data = []) => {
+        if(!data) return _ => {}; // empty context menu blocks scroll
         return event => {
             event.preventDefault()
-            this.openXY(data, event.clientX, event.clientY)
+            this.openXY(data, event.clientX, event.clientY);
         }
     }
 }

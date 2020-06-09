@@ -102,14 +102,14 @@
             user-select: none;
             display: flex;
             align-items: center;
-            box-shadow: 0 1px 2px 0 rgba(16, 35, 47, 0.07);
+            box-shadow: 0 1px 2px 0 $semiblack;
             z-index: 1;
 
-            & > * {
+            &>* {
                 margin: 0 2px;
             }
 
-            > .hidden {
+            >.hidden {
                 display: none;
             }
 
@@ -120,71 +120,6 @@
 
             .content {
                 padding-left: 16px;
-            }
-
-            .pin {
-                width: 200px;
-                padding: 0 10px;
-                box-sizing: border-box;
-                font-size: 14px;
-
-                &:empty {
-                    display: none;
-                }
-
-                transition: anim(background-color);
-
-                &.pinned-message {
-                    border-left: 2px solid $blue;
-                    cursor: pointer;
-                }
-
-                &.active-audio {
-                    display: flex;
-
-                    .play {
-                        height: 50px;
-                        min-width: 50px;
-                        color: $blue;
-                        cursor: pointer;
-                        position: relative;
-
-                        .tgico {
-                            font-size: 20px;
-                            position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            transform: translate(-50%, -50%);
-                            font-size: 30px;
-                        }
-                    }
-
-                    .audio-info {
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        min-width: 0;
-                    }
-                }
-
-                &:hover {
-                    background-color: $light;
-                }
-
-                .title {
-                    color: $blue;
-                    font-weight: 500;
-                    margin-bottom: 4px;
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    overflow: hidden;
-                }
-
-                .description {
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    overflow: hidden;
-                }
             }
 
             .person {
@@ -214,6 +149,107 @@
                             color: $blueonline;
                         }
                     }
+                }
+            }
+        }
+
+        .pin {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 14px;
+            background-color: white;
+            box-shadow: 0 1px 2px 0 $semiblack;
+
+            &:empty {
+                display: none;
+            }
+
+            transition: anim(background-color);
+
+            &.active-audio {
+                .play {
+                    height: 50px;
+                    width: 50px;
+                    margin: 0 5px;
+                    color: $blue;
+                    cursor: pointer;
+                    position: relative;
+
+                    .tgico {
+                        font-size: 20px;
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        font-size: 30px;
+                    }
+                }
+
+                .audio-info {
+                    display: flex;
+                    flex-grow: 1;
+                    flex-direction: column;
+                    justify-content: center;
+                    min-width: 0;
+
+                    .description {
+                        color: $darkgrey;
+                    }
+                }
+            }
+
+            .message-info {
+                margin: 6px 20px;
+                padding: 0 10px;
+                border-radius: 2px;
+                border-left: 2px solid $blue;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                flex-grow: 1;
+
+                .title {
+                    color: $blue;
+                    font-weight: 500;
+                    margin-bottom: 4px;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                }
+
+                .description {
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                }
+
+                &:hover {
+                    background-color: $verylightgrey;
+                }
+            }
+
+            .close {
+                width: 20px;
+                height: 20px;
+                padding: 7px;
+                margin-right: 15px;
+                border-radius: 50%;
+                font-size: 24px;
+                color: $darkgrey;
+                cursor: pointer;
+                position: relative;
+
+                .tgico {
+                    position: absolute;
+                    left: 50%;
+                    top: 50%;
+                    transform: translate(-50%, -50%);
+                }
+
+                &:hover {
+                    background-color: $verylightgrey;
                 }
             }
         }

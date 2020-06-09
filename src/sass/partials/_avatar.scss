@@ -13,7 +13,7 @@
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: calc(var(--avatar-size) / 1.5);
+  font-size: calc(var(--avatar-size) / 2.5); //somehow, em works bad with small size
 
   span {
     position: absolute;
