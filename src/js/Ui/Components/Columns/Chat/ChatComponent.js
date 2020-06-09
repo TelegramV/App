@@ -29,6 +29,9 @@ import VirtualizedBubblesComponent from "./VirtualizedBubblesComponent"
 import ChatInfoCallButtonComponent from "./ChatInfo/ChatInfoCallButtonComponent";
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
 import SnackbarComponent from "../../Singleton/SnackbarComponent"
+import DefaultBubblesComponent from "./DefaultBubblesComponent"
+
+const useVirtualized = true || Boolean(localStorage.getItem("settings.messages.virtualized"))
 
 /**
  * CRITICAL: never rerender this component!
@@ -81,8 +84,12 @@ class ChatComponent extends StatelessComponent {
                               show={true}
                               background={true}/>
 
-                    <VirtualizedBubblesComponent loaderRef={this.messagesLoaderRef}/>
-                    {/*<DefaultBubblesComponent loaderRef={this.messagesLoaderRef}/>*/}
+                    {
+                        useVirtualized ?
+                            <VirtualizedBubblesComponent loaderRef={this.messagesLoaderRef}/>
+                            :
+                            <DefaultBubblesComponent loaderRef={this.messagesLoaderRef}/>
+                    }
 
                     <ChatInputComponent ref={this.chatInputRef}/>
 

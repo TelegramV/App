@@ -33,6 +33,10 @@ class VirtualMessages {
     hasMoreOnBottomToDownload = false;
     isDownloading = false;
 
+    constructor(options) {
+        this.size = options?.size ?? 100;
+    }
+
     refresh() {
         this.hasMoreOnTopToDownload = true;
         this.hasMoreOnBottomToDownload = true;
