@@ -34,6 +34,18 @@ class FilesManager {
         return this.downloaded.get(fileId)
     }
 
+    download(file, thumbOrSize, options): Promise<Blob> | any {
+        switch (file._) {
+            case "photo":
+                return this.downloadPhoto(file, thumbOrSize, options);
+            case "document":
+                return this.downloadPhoto(file, thumbOrSize, options);
+
+            default:
+                return Promise.reject("Unsupported type: ", file._);
+        }
+    }
+
     cancel(file, thumbOrSize) {
         this.pending.delete(file.id)
 
@@ -134,7 +146,7 @@ class FilesManager {
 
         file._promise = Promise.resolve(downloaded);
 
-        return downloaded;
+        return {...downloaded, blob};
     }
 
     internal_downloadStart(file) {

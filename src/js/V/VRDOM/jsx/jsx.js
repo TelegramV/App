@@ -57,6 +57,30 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
         intercepted = false
     }
 
+    // if (intercepted) {
+    //     children = children.flatMap(value => value)
+    // } else {
+    //     intercepted = true
+    //
+    //     children = children.flatMap(child => {
+    //         if (Array.isArray(child)) {
+    //             return child.map(value => {
+    //                 if (typeof value === "string") {
+    //                     return text2emoji(value)
+    //                 }
+    //
+    //                 return value
+    //             })
+    //         } else if (typeof child === "string") {
+    //             return text2emoji(child)
+    //         }
+    //
+    //         return child
+    //     })
+    //
+    //     intercepted = false
+    // }
+
     const attrs: VRAttrs = Object.create(null)
     const events: VREvents = Object.create(null)
     const style: VRStyle = Object.create(null)
