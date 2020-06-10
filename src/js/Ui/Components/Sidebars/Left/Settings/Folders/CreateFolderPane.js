@@ -65,7 +65,6 @@ export default class CreateFolderPane extends SettingsPane {
                             autoplay: true,
                         }}
                         // onClick={onClick}
-                        loadDelay={50}
                         playOnHover/>
                     <BR20/>
                     <InputHint center>
