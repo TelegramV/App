@@ -17,17 +17,49 @@
  *
  */
 
-import AppEvents from "../../../Api/EventBus/AppEvents"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import VComponent from "../../../V/VRDOM/component/VComponent"
-
+import DocumentParser from "../../../Api/Files/DocumentParser"
 import MP4Box from "mp4box"
 import FileManager from "../../../Api/Files/FileManager"
-import DocumentParser from "../../../Api/Files/DocumentParser"
+import AppEvents from "../../../Api/EventBus/AppEvents"
 
-class BasicVideoComponent extends StatefulComponent {
+const videoDocument = {
+    "_": "document",
+    "flags": 1,
+    "id": "5330469046183789925",
+    "access_hash": "2206168299258949860",
+    "file_reference": new Uint8Array([2, 73, 179, 200, 76, 0, 0, 0, 6, 94, 225, 65, 78, 104, 57, 164, 7, 39, 45, 147, 97, 130, 47, 23, 202, 179, 25, 187, 176]),
+    "date": 1589591364,
+    "mime_type": "video/mp4",
+    "size": 6910095,
+    "thumbs": [{
+        "_": "photoStrippedSize",
+        "type": "i",
+        "bytes": new Uint8Array([1, 22, 40, 217, 162, 138, 40, 0, 162, 138, 40, 0, 162, 138, 40, 0, 162, 138, 40, 0, 162, 138, 40, 0, 162, 138, 40, 3])
+    }, {
+        "_": "photoSize",
+        "type": "m",
+        "location": {"_": "fileLocationToBeDeprecated", "volume_id": "235409175", "local_id": 7820},
+        "w": 320,
+        "h": 180,
+        "size": 644
+    }],
+    "dc_id": 2,
+    "attributes": [{
+        "_": "documentAttributeVideo",
+        "flags": 2,
+        "supports_streaming": true,
+        "duration": 27,
+        "w": 1920,
+        "h": 1080
+    }, {"_": "documentAttributeFilename", "file_name": "intro_5.mp4"}]
+}
+
+export class VideoStreaming extends StatefulComponent {
     state = {
         url: "",
+        frameUrl: "",
         bufferOffset: 0,
     };
 
@@ -45,13 +77,20 @@ class BasicVideoComponent extends StatefulComponent {
             .on("download.newPart", this.onDownloadNewPart);
     }
 
-    render({document}, {url}) {
+    render({document}, {url, frameUrl}) {
         return (
-            <video css-max-width="500px"
-                   ref={this.videoRef}
-                   src={url}
-                   autoPlay
-                   controls/>
+            <div>
+                <video css-max-width="500px"
+                       ref={this.videoRef}
+                       src={url}
+                       controls/>
+                <video css-max-width="500px"
+                       src={url}
+                       controls/>
+                <br/>
+                <div style="border: 3px solid blue; width: 100%;" onMouseMove={this.onMouseMove}/>
+                <img src={frameUrl} css-max-width="200px" alt="alt"/>
+            </div>
         );
     }
 
@@ -68,7 +107,7 @@ class BasicVideoComponent extends StatefulComponent {
                 sourceBuffer.segmentIndex++;
                 sourceBuffer.pendingAppends.push({id, buffer, sampleNum, is_last});
 
-                console.warn("Application", "Received new segment for track " + id + " up to sample #" + sampleNum + ", segments pending append: " + sourceBuffer.pendingAppends.length);
+                // console.warn("Application", "Received new segment for track " + id + " up to sample #" + sampleNum + ", segments pending append: " + sourceBuffer.pendingAppends.length);
 
                 this.onUpdateEnd(sourceBuffer, true, false);
             }
@@ -78,10 +117,18 @@ class BasicVideoComponent extends StatefulComponent {
 
                 info.tracks.forEach(this.initTrack);
 
+                this.videoTrack = info.videoTracks[0];
+
                 const initSegments = this.mp4box.initializeSegmentation();
                 initSegments.forEach(this.initSegment);
 
                 this.mp4box.start();
+
+                // console.log(this.mp4box.getSample(info.tracks[0], 100))
+                console.log(info)
+            }
+            this.mp4box.onSamples = (id, user, samples) => {
+                console.warn(id, user, samples)
             }
 
             FileManager.downloadDocument(document);
@@ -122,7 +169,7 @@ class BasicVideoComponent extends StatefulComponent {
     onUpdateEnd = (sourceBuffer, isNotInit, isEndOfAppend) => {
         if (isEndOfAppend === true) {
             if (isNotInit === true) {
-                console.log(sourceBuffer, "Update ended");
+                // console.log(sourceBuffer, "Update ended");
             }
 
             if (sourceBuffer.sampleNum) {
@@ -135,8 +182,6 @@ class BasicVideoComponent extends StatefulComponent {
             }
         }
 
-        console.log("onUpdateEnd")
-
         if (this.mediaSource.readyState === "open" && !sourceBuffer.updating && sourceBuffer.pendingAppends.length > 0) {
             const part = sourceBuffer.pendingAppends.shift();
 
@@ -147,7 +192,7 @@ class BasicVideoComponent extends StatefulComponent {
     }
 
     onDownloadNewPart = ({newBytes, totalBytes}) => {
-        console.warn("STREAMING: appendBuffer");
+        // console.warn("STREAMING: appendBuffer");
 
         const part = newBytes.buffer;
         part.fileStart = this.state.bufferOffset;
@@ -164,25 +209,18 @@ class BasicVideoComponent extends StatefulComponent {
             this.mp4box.appendBuffer(lastPart, true);
             this.mp4box.flush();
         });
-        console.warn("STREAMING: done")
+        // console.warn("STREAMING: done")
+    }
+
+    onMouseMove = (event: MouseEvent) => {
+        // console.log(event)
     }
 }
 
-
-// componentDidMount() {
-//     FileManager.downloadDocument(this.props.document);
-// }
-//
-// componentWillUpdate(nextProps, nextState) {
-//     if (nextProps.document.id !== this.props.document.id) {
-//         FileManager.downloadDocument(this.props.document);
-//     }
-// }
-//
-// shouldComponentUpdate(nextProps, nextState) {
-//     if (nextProps.document.id !== this.props.document.id) {
-//         return true;
-//     }
-// }
-
-export default BasicVideoComponent;
+export function VideoStreamingPage() {
+    return (
+        <div>
+            <VideoStreaming document={videoDocument}/>
+        </div>
+    )
+}

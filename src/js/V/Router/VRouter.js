@@ -145,7 +145,9 @@ class VFrameworkRouter {
             const vNode = route.page.h()
 
             if (vNode instanceof VRNode) {
-                VRDOM.patch(this.$mountElement, vNode)
+                VRDOM.patch(this.$mountElement, vNode, {
+                    touchAll: true
+                })
             } else {
                 throw new Error("page first parent cannot be component for some reason")
             }

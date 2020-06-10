@@ -32,7 +32,7 @@ const vrdom_patchChildren = ($node: Element, vRNode: VRNode, options = {}) => {
     const children = vRNode.children
 
     $children.forEach(($oldChild, i) => {
-        if ($oldChild.__v || $oldChild.nodeType === Node.TEXT_NODE || children[i]) { // may be bugs, pls report(
+        if (options.touchAll || $oldChild.__v || $oldChild.nodeType === Node.TEXT_NODE || children[i]) { // may be bugs, pls report(
             vrdom_patch($oldChild, children[i], options)
         }
     })
@@ -43,7 +43,7 @@ const vrdom_patchChildren = ($node: Element, vRNode: VRNode, options = {}) => {
         }
     } else if (children.length < $children.length) {
         Array.from($children.values()).slice(children.length).forEach(($node: Node) => {
-            if ($node.__v || $node.nodeType === Node.TEXT_NODE) {
+            if (options.touchAll || $node.__v || $node.nodeType === Node.TEXT_NODE) {
                 vrdom_delete($node)
             }
         })

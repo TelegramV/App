@@ -12,17 +12,24 @@ const IconFragment = ({document, isDownloading, isDownloaded, color, ext, progre
         <div className="svg-wrapper">
             {
                 FileAPI.hasThumbnail(document) ?
-                    <div class="thumbnail3px">
+                    <div style={{
+                        "width": "100%",
+                        "height": "100%",
+                    }} class={{thumbnail3px: !FileManager.isDownloaded(document)}}>
                         <img style={{
-                            "width": "100%"
-                        }} src={FileAPI.getThumbnail(document)} alt="Thumb"/>
+                            "width": "100%",
+                            "height": "100%",
+                            "object-fit": "cover",
+                        }}
+                             src={FileManager.isDownloaded(document) ? FileManager.getUrl(document) : FileAPI.getThumbnail(document)}
+                             alt="Thumb"/>
                     </div>
                     :
                     DocumentMessagesTool.createIcon(color, !isDownloaded)
             }
             {
                 isDownloaded ?
-                    <div className="extension">{ext}</div>
+                    !FileAPI.hasThumbnail(document) && <div className="extension">{ext}</div>
                     :
                     <div className="progress extension">
                         {/* TODO move progress bar with pause to component*/}

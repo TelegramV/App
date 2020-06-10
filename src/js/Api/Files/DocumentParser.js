@@ -25,6 +25,10 @@ class DocumentParser {
     static attributeAudio(document) {
         return document?.attributes?.find(attr => attr._ === "documentAttributeAudio");
     }
+
+    static attributeVideo(document) {
+        return document?.attributes?.find(attr => attr._ === "documentAttributeVideo");
+    }
 }
 
 export default DocumentParser;

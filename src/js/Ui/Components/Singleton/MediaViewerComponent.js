@@ -29,7 +29,7 @@ import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
 import BetterPhotoComponent from "../Basic/BetterPhotoComponent"
-import BasicVideoComponent from "../Basic/BasicVideoComponent"
+import BetterVideoComponent from "../Basic/BetterVideoComponent"
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -68,7 +68,7 @@ function MediaFragment({media, zoom, hidden}) {
     }
 
     if (media instanceof VideoMessage) {
-        return <BasicVideoComponent document={media.raw.media.document} controls/>
+        return <BetterVideoComponent document={media.raw.media.document} controls/>
     }
 
     if (!media) {

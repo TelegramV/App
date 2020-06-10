@@ -29,7 +29,6 @@ import DocumentMessageComponent from "./Message/DocumentMessageComponent"
 import VideoMessageComponent from "./Message/Video/VideoMessageComponent"
 import GIFMessageComponent from "./Message/GIFMessageComponent"
 import StickerMessageComponent from "./Message/StickerMessageComponent"
-import VoiceMessageComponent from "./Message/VoiceMessageComponent"
 import RoundVideoMessageComponent from "./Message/RoundVideoMessageComponent"
 import PhoneCallMessageComponent from "./Message/PhoneCallMessageComponent"
 import ServiceMessageComponent from "./Message/ServiceMessageComponent"
@@ -59,9 +58,7 @@ const handlers = new Map([
     [MessageType.DICE, DiceMessageComponent],
     [MessageType.STICKER, StickerMessageComponent],
     [MessageType.VOICE, NewVoiceMessageComponent],
-    // [MessageType.VOICE, VoiceMessageComponent],
     [MessageType.AUDIO, NewAudioMessageComponent],
-    // [MessageType.AUDIO, AudioMessageComponent],
     [MessageType.ROUND, RoundVideoMessageComponent],
     [MessageType.VIDEO, VideoMessageComponent],
     [MessageType.PHONE_CALL, PhoneCallMessageComponent],

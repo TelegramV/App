@@ -113,10 +113,10 @@ class VComponent<P> {
     componentWillUnmount() {
     }
 
-    componentWillUpdate(nextProps: P) {
+    componentWillUpdate(nextProps) {
     }
 
-    shouldComponentUpdate(nextProps: P) {
+    shouldComponentUpdate(nextProps) {
     }
 
     /**
