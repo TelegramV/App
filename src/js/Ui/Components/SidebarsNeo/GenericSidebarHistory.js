@@ -9,24 +9,36 @@ export class GenericSidebarHistory extends StatelessComponent {
 
     appEvents(E: AE) {
         E.bus(UIEvents.Sidebars)
-            .on("push", this.push)
-            .on("pop", this.pop)
+            .on("push", (e) => this.push(e))
+            .on("pop", (e) => this.pop(e))
     }
 
-    pop = () => {
+    pop() {
         const type = this.history[this.history.length - 1]
         const bar = this.bars.get(type)
+
+        if(!bar) return
         if(bar.isStatic) return
+
         bar.hide()
         this.history.pop()
-        this.bars.get(this.history[this.history.length - 1]).show()
+
+        const last = this.bars.get(this.history[this.history.length - 1])
+        if(!last) return
+        last.show()
     }
 
-    push = (type) => {
+    push(type) {
+        let params = []
+        if(typeof(type) === "object") {
+            type = type.type
+            params = type
+        }
         const bar = this.bars.get(type)
+        if(!bar) return
         this.bars.get(this.history[this.history.length - 1])?.fadeOut()
         this.history.push(type)
-        bar.show()
+        bar.show(params)
     }
 
     componentDidMount() {

@@ -1,18 +1,63 @@
 import {GenericSidebarHistory} from "../GenericSidebarHistory";
-import {BlockedSidebar} from "../Left/Settings/Privacy/BlockedSidebar";
+import {SearchSidebar} from "./Search/SearchSidebar";
+import {DialogInfoSidebar} from "./DialogInfo/DialogInfoSidebar";
 
 export class RightSidebars extends GenericSidebarHistory {
     render() {
         return (
-            <div className="sidebar-wrapper right">
-
-                <BlockedSidebar/>
+            <div className="sidebar-wrapper right hidden">
+                <SearchSidebar/>
+                <DialogInfoSidebar/>
             </div>
         )
     }
 
-    pop = () => {
-        super.pop()
-        // TODO last bar should close with other animation
+    push(type) {
+        let params = []
+        if(typeof(type) === "object") {
+            type = type.type
+            params = type
+        }
+        const bar = this.bars.get(type)
+
+
+        if(!bar) return
+        if(this.history.includes(type)) {
+            bar.forceUpdate()
+            return
+        }
+        this.bars.get(this.history[this.history.length - 1])?.fadeOut()
+        this.history.push(type)
+        bar.show(this.history.length === 1, params)
+        if(this.history.length === 1) {
+            this.show()
+        }
+    }
+
+    pop() {
+        const type = this.history[this.history.length - 1]
+        const bar = this.bars.get(type)
+
+        if(!bar) return
+        if(bar.isStatic) return
+
+        this.history.pop()
+        bar.hide(this.history.length === 0)
+
+        const last = this.bars.get(this.history[this.history.length - 1])
+
+        if(this.history.length === 0) {
+            this.hide()
+        }
+        if(!last) return
+        last.show()
+    }
+
+    hide() {
+        this.$el.classList.toggle("hidden", true)
+    }
+
+    show() {
+        this.$el.classList.toggle("hidden", false)
     }
 }

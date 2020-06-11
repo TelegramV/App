@@ -12,8 +12,12 @@ import {GeneralSidebar} from "./General/GeneralSidebar";
 import {NotificationsSidebar} from "./Notifications/NotificationsSidebar";
 import {PrivacySidebar} from "./Privacy/PrivacySidebar";
 import {LanguageSidebar} from "./LanguageSidebar";
+import AppEvents from "../../../../../Api/EventBus/AppEvents";
+import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
+import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 
 export class SettingsSidebar extends LeftSidebar {
+
     content() {
         const me = PeersStore.self()
 

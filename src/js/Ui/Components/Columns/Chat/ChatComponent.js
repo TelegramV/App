@@ -29,6 +29,8 @@ import VirtualizedBubblesComponent from "./VirtualizedBubblesComponent"
 import ChatInfoCallButtonComponent from "./ChatInfo/ChatInfoCallButtonComponent";
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
 import SnackbarComponent from "../../Singleton/SnackbarComponent"
+import {SearchSidebar} from "../../SidebarsNeo/Right/Search/SearchSidebar";
+import {RightSidebars} from "../../SidebarsNeo/Right/RightSidebars";
 
 /**
  * CRITICAL: never rerender this component!
@@ -46,9 +48,8 @@ class ChatComponent extends StatelessComponent {
             .on("chat.select", this.onChatSelect)
 
 
-        E.bus(UIEvents.RightSidebar)
-            .on("show", this.onRightSidebarShow)
-            .on("hide", this.onRightSidebarHide)
+        // E.bus(UIEvents.Sidebars)
+        //     .on("rightSidebarHidden", this.onRightSidebarHidden)
     }
 
     render() {
@@ -88,6 +89,8 @@ class ChatComponent extends StatelessComponent {
 
                 </div>
                 <SnackbarComponent/>
+                <RightSidebars/>
+
             </div>
         )
     }
@@ -101,18 +104,18 @@ class ChatComponent extends StatelessComponent {
     }
 
 
-    onRightSidebarShow = l => {
-        // if(l.barName === "forward-message") return
-        this.$el.classList.add("right-bar-open")
-        this.rightSidebarOpen = true
-    }
+    // onRightSidebarHidden = l => {
+    //     // if(l.barName === "forward-message") return
+    //     this.$el.classList.toggle("right-bar-open", !l.hidden)
+    //     this.rightSidebarOpen = true
+    // }
 
-    onRightSidebarHide = l => {
-        // if(l.barName === "forward-message") return
-
-        this.$el.classList.remove("right-bar-open")
-        this.rightSidebarOpen = false
-    }
+    // onRightSidebarHide = l => {
+    //     if(l.barName === "forward-message") return
+        //
+        // this.$el.classList.remove("right-bar-open")
+        // this.rightSidebarOpen = false
+    // }
 
     onChatSelect = _ => {
         this.chatLoaderRef.$el.style.display = "none"
@@ -131,9 +134,7 @@ class ChatComponent extends StatelessComponent {
     }
 
     openSearch = () => {
-        UIEvents.RightSidebar.fire("show", {
-            barName: "messages-search"
-        })
+        UIEvents.Sidebars.fire("push", SearchSidebar)
     }
 }
 

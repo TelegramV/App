@@ -63,6 +63,10 @@ export class GenericSidebar extends StatefulComponent {
         }
     }
 
+    onShown(params) {
+
+    }
+
     hide() {
         this.setState({
             hidden: true
@@ -75,7 +79,7 @@ export class GenericSidebar extends StatefulComponent {
         })
     }
 
-    show() {
+    show(params) {
         this.reallyHidden = false
 
         // this.withTimeout(_ => {
@@ -86,6 +90,8 @@ export class GenericSidebar extends StatefulComponent {
             fadeIn: this.state.fadeOut,
             fadeOut: false
         })
+
+        this.onShown(params)
         // }, 0)
     }
 

@@ -33,14 +33,14 @@
 .chat-wrapper {
     display: flex;
     flex-grow: 1;
-    transition: anim(width);
+    transition: anim(width, 250ms);
     overflow: hidden;
     position: relative;
-    //will-change: transform;
+    will-change: transform;
 
-    &.right-bar-open #chat {
-        width: calc(100% - 422px);
-    }
+    //&.right-bar-open #chat {
+    //    width: calc(100% - 422px);
+    //}
 
     .wallpaper {
         position: absolute;

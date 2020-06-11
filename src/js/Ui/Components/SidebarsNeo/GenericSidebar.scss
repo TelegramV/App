@@ -11,7 +11,7 @@
   overflow: hidden;
 
   max-width: 422px;
-  width: 100%;
+  width: 422px;
   height: 100%;
 
   $border: 1px $lightgrey solid;
@@ -168,6 +168,10 @@
       color: $darkgrey;
       text-align: center;
       margin: 0 auto;
+
+      &.online {
+        color: $blue;
+      }
     }
 
     > .hint {

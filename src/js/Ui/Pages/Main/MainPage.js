@@ -19,6 +19,7 @@ import FoldersManager from "../../../Api/Dialogs/FolderManager";
 import Localization from "../../../Api/Localization/Localization";
 import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
 import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
+import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -85,7 +86,6 @@ export function MainPage() {
             {/*<DialogsBar/>*/}
             <ChatComponent/>
 
-            {/*<RightSidebars/>*/}
 
             {/*<DialogInfoComponent/>*/}
             {/*<MessagesSearchComponent/>*/}
