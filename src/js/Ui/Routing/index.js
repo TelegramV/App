@@ -2,6 +2,7 @@ import LoginPage from "../Pages/Login/LoginPage"
 import {MainPage} from "../Pages/Main/MainPage"
 import MTProto from "../../MTProto/External"
 import VApp from "../../V/vapp"
+import CalendarTestPage from "../Pages/Tests/CalendarTestPage"
 //import {VideoStreamingPage} from "../Pages/Tests/VideoStreaming"
 //import CalendarTestPage from "../Pages/Tests/CalendarTestPage"
 //import VirtualPage from "../Pages/Tests/VirtualPage"
@@ -29,13 +30,13 @@ function AppRoutes(router) {
             return MainPage()
         }
     })
+    // router.route("/calendar", "calendar", {
+    //     h() {
+    //         return CalendarTestPage()
+    //     }
+    // })
 
     /*if (!__IS_PRODUCTION__) {
-	    router.route("/calendar", "calendar", {
-	    	h() {
-	            return CalendarTestPage()
-	        }
-	    })
     // router.route("/fff", "fff", {
     //     h() {
     //         return FragmentsPage()

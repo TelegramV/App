@@ -6,8 +6,8 @@
     }
 
     &.group-s {
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
+        border-top-left-radius: 15px;
+        border-top-right-radius: 15px;
         margin-top: 10px;
     }
 
@@ -28,8 +28,8 @@
             margin-left: 11px;
             padding-left: 10px;
 
-            border-top-right-radius: 12px;
-            border-bottom-right-radius: 12px;
+            border-top-right-radius: 15px;
+            border-bottom-right-radius: 15px;
 
             figure.photo, figure.video {
                 margin-left: -10px;
@@ -117,7 +117,7 @@
                 }
 
                 .video-info {
-                    margin-right: 5px;
+                    margin-left: 15px;
                 }
             }
         }
@@ -138,8 +138,8 @@
                 margin-right: -10px;
             }
 
-            border-top-left-radius: 12px;
-            border-bottom-left-radius: 12px;
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
         }
 
         // TAILS
@@ -192,7 +192,7 @@
 			    }
 
                 .video-info {
-                    margin-right: 5px;
+                    margin-right: 15px;
                 }
 		    }
         }

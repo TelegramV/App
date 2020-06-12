@@ -71,7 +71,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         const percentage = FileManager.getPercentage(document);
         const pendingSize = FileManager.getPendingSize(document);
 
-        const size = isDownloading && !isDownloaded ? `${Math.round(percentage)}% / ${DocumentMessagesTool.formatSize(pendingSize)}` : DocumentMessagesTool.formatSize(document.size);
+        const size = isDownloading && !isDownloaded ? `${DocumentMessagesTool.formatSize(pendingSize)} / ${DocumentMessagesTool.formatSize(document.size)}` : DocumentMessagesTool.formatSize(document.size);
 
         const color = DocumentMessagesTool.getColor(ext);
 

@@ -259,10 +259,10 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
-            this.bubblesInnerRef.$el.firstElementChild.__v.component.domSiblingUpdated
+            this.bubblesInnerRef.$el.firstElementChild?.__v.component.domSiblingUpdated
                 .call(
-                    this.bubblesInnerRef.$el.firstElementChild.__v.component,
-                    this.bubblesInnerRef.$el.firstElementChild.nextElementSibling.__v.component.props.message,
+                    this.bubblesInnerRef.$el.firstElementChild?.__v.component,
+                    this.bubblesInnerRef.$el.firstElementChild?.nextElementSibling?.__v.component.props.message,
                     messages[0],
                 );
 
@@ -595,7 +595,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 // if ($first.nextElementSibling) {
                 //     this.$el.scrollTop = $first.nextElementSibling.offsetTop;
                 // } else {
-                    this.$el.scrollTop = $first.offsetTop;
+                this.$el.scrollTop = $first.offsetTop;
                 // }
             }
         }
