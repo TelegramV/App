@@ -64,7 +64,7 @@ function MediaFragment({media, zoom, hidden}) {
     }
 
     if (media instanceof PhotoMessage) {
-        return <BetterPhotoComponent photo={media.raw.media.photo} calculateSize maxHeight="100%"/>
+        return <BetterPhotoComponent photo={media.raw.media.photo} calculateSize maxHeight="70%"/>
     }
 
     if (media instanceof VideoMessage) {
