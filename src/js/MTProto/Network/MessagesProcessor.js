@@ -29,7 +29,6 @@ function parse_rpc_error(rawError) {
     return {
         code: !rawError.error_code || rawError.error_code <= 0 ? 500 : rawError.error_code,
         type: matches[1] || "UNKNOWN",
-        description: matches[3] || ("CODE#" + rawError.error_code + " " + rawError.error_message),
         originalError: rawError
     };
 }

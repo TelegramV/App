@@ -3,7 +3,7 @@ import UpdatesManager from "../../../Api/Updates/UpdatesManager"
 import PeersManager from "../../../Api/Peers/PeersManager"
 import MessagesManager from "../../../Api/Messages/MessagesManager"
 import ContextMenuComponent from "../../Components/Singleton/ContextMenuComponent"
-import {ModalComponent} from "../../Components/Singleton/ModalComponent"
+import ModalContainer from "../../Components/Singleton/ModalContainer"
 import {MediaViewerComponent} from "../../Components/Singleton/MediaViewerComponent"
 import {InstantViewComponent} from "../../Components/Singleton/InstantViewComponent"
 import {DialogsBar} from "../../Components/Sidebars/Left/Dialogs/DialogsBar"
@@ -16,7 +16,6 @@ import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/Archive
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
-import {Folders} from "../../Components/Sidebars/Left/Dialogs/Folders";
 import CreateChannelBar from "../../Components/Sidebars/Left/Create/CreateChannelBar";
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
 import ForwardBarComponent from "../../Components/Sidebars/Right/ForwardBarComponent";
@@ -36,7 +35,7 @@ function initHighLevelManagers() {
     StickerManager.fetchSpecialSets();
     WallpaperManager.init();
     FoldersManager.init()
-    Localization.init();   
+    Localization.init();
 }
 
 function vhFix() {
@@ -53,13 +52,13 @@ export function MainPage() {
     vhFix();
 
     window.addEventListener('resize', () => {
-      vhFix();
+        vhFix();
     });
 
     return (
         <div class="app">
             <ContextMenuComponent/>
-            <ModalComponent/>
+            <ModalContainer/>
             <MediaViewerComponent/>
             <InstantViewComponent/>
             <SettingsComponent/>

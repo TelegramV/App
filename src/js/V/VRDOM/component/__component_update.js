@@ -88,6 +88,20 @@ export function __component_update_state(component, nextState) {
     }
 }
 
+export function __component_update_global_state(component, globalState) {
+    if (globalState) {
+        component.componentWillUpdate(component.props, component.state);
+
+        if (component.__.mounted) {
+            component.__.isUpdatingItSelf = true;
+            component.$el = vrdom_patch(component.$el, __component_render(component))
+            component.__.isUpdatingItSelf = false;
+
+            component.componentDidUpdate();
+        }
+    }
+}
+
 export function __component_update_force(component, nextProps, nextState) {
     component.componentWillUpdate(nextProps || component.props, nextState || component.state);
 

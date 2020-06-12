@@ -29,13 +29,20 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
     if ($el.nodeType !== Node.TEXT_NODE) {
         initElement($el)
 
+        if ($el instanceof HTMLInputElement) {
+            if (newAttrs.value && newAttrs.value !== $el.value) {
+                $el.value = newAttrs.value;
+                delete newAttrs.value;
+            }
+        }
+
         if (options.xmlns) {
             for (const [k, v] of Object.entries(newAttrs)) {
                 if (ignoringAttributes.has(k)) {
                     continue
                 }
 
-                if (v == null) {
+                if (!v && v !== 0) {
                     $el.removeAttributeNS(null, k)
                 } else if ($el.getAttribute(k) !== v) {
                     $el.setAttributeNS(null, k, String(v))
@@ -47,7 +54,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
                     continue
                 }
 
-                if (newAttrs[name] == null) {
+                if (!newAttrs[name] && newAttrs[name] !== 0) {
                     $el.removeAttributeNS(null, name)
                 }
             }
@@ -57,7 +64,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
                     continue
                 }
 
-                if (v == null) {
+                if (!v && v !== 0) {
                     $el.removeAttribute(k)
                 } else if ($el.getAttribute(k) !== v) {
                     $el.setAttribute(k, String(v))
@@ -69,7 +76,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
                     continue
                 }
 
-                if (newAttrs[name] == null) {
+                if (!newAttrs[name] && newAttrs[name] !== 0) {
                     $el.removeAttribute(name)
                 }
             }

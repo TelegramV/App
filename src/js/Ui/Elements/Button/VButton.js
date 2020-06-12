@@ -21,6 +21,11 @@ function VButton(
     {
         isFlat = false,
         isRound = false,
+        isBlock = false,
+        isLoading = false,
+        isStatic = false,
+        isUppercase = true,
+        useLoadingText = false,
         ...otherArgs
     },
     slot
@@ -29,12 +34,17 @@ function VButton(
 
     return (
         <button class={{
-            "v-button": !isRound,
-            "v-round-button": isRound,
+            "VButton": !isRound,
+            "VRoundButton": isRound,
             "flat": isFlat,
-            "rp rps": true,
+            "block": isBlock,
+            "static": isStatic,
+            "uppercase": isUppercase,
+            "rp": true,
+            "rps": !isBlock,
         }} {...otherArgs}>
-            {slot}
+            {useLoadingText && isLoading ? <span className="loading-text">{slot}</span> : slot}
+            {isLoading && <progress className="progress-circular white"/>}
         </button>
     );
 }

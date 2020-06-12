@@ -29,7 +29,14 @@ class StatefulComponent<P, S> extends VComponent<P> {
 
     state: S = {};
 
-    render(props, state) {
+    /**
+     * WARNING: Be very careful with this.
+     * global state patches component without making a difference each time it updated.
+     * if you want just to update the state, please do not put it here and instead update it directly.
+     */
+    globalState = {};
+
+    render(props, state, globalState) {
     }
 
     componentWillUpdate(nextProps: P, nextState: S) {
@@ -47,6 +54,12 @@ class StatefulComponent<P, S> extends VComponent<P> {
             __component_update_state(this, nextState(this.state));
         } else {
             __component_update_state(this, nextState);
+        }
+    }
+
+    setGlobalState(nextState) {
+        for (const [k, v] of Object.entries(nextState)) {
+            this.globalState[k].set(v);
         }
     }
 }

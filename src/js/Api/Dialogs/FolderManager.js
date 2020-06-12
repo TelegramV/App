@@ -13,6 +13,7 @@ class FolderManager {
     suggestedFolders = null
 
     constructor() {
+        // макс чого воно при логіні показується????????????????????????????
         keval.getItem("foldersData").then(foldersData => {
             this.folders = foldersData.folders
             this.selectedFolder = foldersData.selected

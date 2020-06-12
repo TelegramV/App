@@ -104,11 +104,11 @@ class TelegramApplication {
 
     invokeMethod<P = any, R = any>(name: string, params: P = {}, options: { dcId?: number, useSecondTransporter?: boolean; } = {}): Promise<R> {
         let {
-            dcId = this.mainDcId,
+            dcId,
             useSecondTransporter = false,
         } = options;
 
-        if (!dcId) {
+        if (dcId == null) {
             dcId = this.mainDcId;
         }
 

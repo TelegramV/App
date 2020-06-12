@@ -37,8 +37,8 @@ type Task = {
 function postMessageWithTime(data) {
     Object.assign(data, {
         time: {
-            lastMessageID: MTProtoInternal.application.mainConnection.state.lastMessageId,
-            timeOffset: MTProtoInternal.application.mainConnection.state.offset,
+            lastMessageID: MTProtoInternal.application.mainConnection?.state.lastMessageId,
+            timeOffset: MTProtoInternal.application.mainConnection?.state.offset,
         }
     })
 

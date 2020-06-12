@@ -23,6 +23,25 @@
     margin-top: 12px;
     margin-bottom: 12px;
 
+    &.withButton {
+        position: relative;
+
+        input {
+            letter-spacing: 1px;
+        }
+
+        &:not(.withButton) .btn-icon {
+            display: none;
+        }
+
+        .btn-icon {
+            position: absolute;
+            font-size: 28px;
+            right: 10px;
+            top: 10%;
+        }
+    }
+
     label {
         position: absolute;
         top: 50%;
@@ -41,22 +60,37 @@
     input {
         height: 100%;
         padding: 0 15px;
-        border: 1px solid $lightgrey;
-        transition: 100ms ease-in-out border-color;
+        //border: 1px solid $lightgrey;
+        box-shadow: 0 0 0 1px $lightgrey;
+        transition: 100ms ease-in-out box-shadow;
         border-radius: 10px;
 
+        &:disabled {
+            background-color: $verylightgrey;
+            box-shadow: none;
+
+            &:hover {
+                box-shadow: none;
+            }
+
+            color: $darkgrey;
+        }
+
         &:hover {
-            border-color: #aaa;
-            border-width: 1px;
+            box-shadow: 0 0 0 1px #aaa;
+            //border-color: #aaa;
+            //border-width: 1px;
         }
 
         &::placeholder {
             color: transparent;
+            user-select: none;
         }
 
         &.invalid {
-            border-color: $red;
-            border-width: 2px;
+            box-shadow: 0 0 0 2px $red;
+            //border-color: $red;
+            //border-width: 2px;
 
             & + label {
                 color: $red;
@@ -64,13 +98,15 @@
         }
 
         &.success {
-            border-color: #26962f;
-            border-width: 2px;
+            box-shadow: 0 0 0 2px #26962f;
+            //border-color: #26962f;
+            //border-width: 2px;
         }
 
         &.success:focus {
-            border-width: 2px;
-            border-color: #26962f;
+            box-shadow: 0 0 0 2px #26962f;
+            //border-width: 2px;
+            //border-color: #26962f;
         }
 
         &.success:focus:not(:placeholder-shown) + label {
@@ -82,13 +118,15 @@
         }
 
         &:focus {
-            border-width: 2px;
-            border-color: $blue;
+            box-shadow: 0 0 0 2px $blue;
+            //border-width: 2px;
+            //border-color: $blue;
         }
 
         &.invalid:focus {
-            border-width: 2px;
-            border-color: $red;
+            box-shadow: 0 0 0 2px $red;
+            //border-width: 2px;
+            //border-color: $red;
         }
 
         &:focus:not(:placeholder-shown) + label {
@@ -120,7 +158,44 @@
     &.center {
         text-align: center;
     }
+
     padding-left: 5px;
     color: #707579;
     font-weight: 100;
+}
+
+.VInputDropdown {
+    position: relative;
+
+    .VInputDropdownList {
+        position: absolute;
+        width: 100%;
+        top: $input-height;
+
+        background-color: white;
+        border-radius: 8px;
+        z-index: 42;
+        box-shadow: 0 3px 30px #ddd;
+
+        overflow-y: scroll;
+        margin-top: 8px;
+        max-height: 30vh;
+
+        &.hidden {
+            display: none;
+        }
+
+        .dropdown-item {
+            cursor: pointer;
+            min-height: 20px;
+
+            &.hidden {
+                display: none !important;
+            }
+
+            &:hover {
+                background-color: $verylightgrey;
+            }
+        }
+    }
 }

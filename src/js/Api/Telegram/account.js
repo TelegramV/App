@@ -17,10 +17,14 @@
  *
  */
 
-function __component_render(component) {
-    const renderedVRNode = component.__.stateful ? component.render(component.props, component.state, component.globalState) : component.render(component.props);
-    renderedVRNode.component = component;
-    return renderedVRNode;
+import MTProto from "../../MTProto/External"
+
+function getPassword() {
+    return MTProto.invokeMethod("account.getPassword", {});
 }
 
-export default __component_render;
+const account = {
+    getPassword: getPassword,
+};
+
+export default account;

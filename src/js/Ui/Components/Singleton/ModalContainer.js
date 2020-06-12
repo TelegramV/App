@@ -20,7 +20,7 @@ import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-export class ModalComponent extends StatefulComponent {
+class ModalContainer extends StatefulComponent {
     state = {
         hidden: true,
         body: ""
@@ -34,7 +34,8 @@ export class ModalComponent extends StatefulComponent {
 
     render() {
         return (
-            <div css-display={this.state.hidden && "none"} className={classNames("modal-wrapper", classIf(this.state.hidden, "hidden"))}>
+            <div css-display={this.state.hidden && "none"}
+                 className={classNames("modal-wrapper", classIf(this.state.hidden, "hidden"))}>
                 <div className="modal" onClick={this.close}>
                     <div className="dialog" onClick={event => event.stopPropagation()}>
                         {this.state.body}
@@ -58,3 +59,5 @@ export class ModalComponent extends StatefulComponent {
         })
     }
 }
+
+export default ModalContainer;

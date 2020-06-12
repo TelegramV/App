@@ -32,6 +32,11 @@ if (__IS_PRODUCTION__) {
 VApp.registerPlugin(RippleVRDOMPlugin)
 VApp.registerPlugin(HorizontalScrollVRDOMPlugin)
 VApp.useRoutes(AppRoutes)
+
+if (document.getElementById("page-loader")) {
+    document.getElementById("page-loader").remove()
+}
+
 VApp.mount("#app")
 
 MTProto.connect().then(user => {

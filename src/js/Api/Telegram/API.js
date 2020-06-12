@@ -22,9 +22,11 @@ import messages from "./messages"
 import contacts from "./contacts"
 import upload from "./upload"
 import channels from "./channels"
+import account from "./account"
 
 const API = {
     auth,
+    account,
     messages,
     channels,
     contacts,

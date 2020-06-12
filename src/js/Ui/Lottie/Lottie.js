@@ -3,6 +3,8 @@
 import StatefulComponent from "../../V/VRDOM/component/StatefulComponent"
 import lottie from "../../../../vendor/lottie-web"
 
+// import lottie from "lottie-web"
+
 class Lottie extends StatefulComponent {
     componentDidMount() {
         const {

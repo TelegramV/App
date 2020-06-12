@@ -138,7 +138,7 @@ input[type="password"] {
 }
 
 .checkbox-input {
-    --size: 14px;
+    --size: 15px;
     user-select: none;
     display: flex;
     align-items: center;
@@ -158,10 +158,14 @@ input[type="password"] {
         display: none;
         cursor: default;
 
+        & ~ .checkmark {
+            border: 1px solid $grey;
+        }
+
         &:checked ~ .checkmark {
             background-color: $blue;
             color: white;
-            border: 2px solid $blue;
+            border: 1px solid $blue;
         }
 
         &:checked ~ .checkmark:after {
@@ -172,7 +176,7 @@ input[type="password"] {
     .checkmark {
         height: var(--size);
         width: var(--size);
-        border: 2px solid $darkgrey;
+        border: 1px solid $darkgrey;
         border-radius: 3px;
         transition: background-color 0.2s ease-in-out;
         cursor: pointer;
@@ -296,7 +300,7 @@ input[type="password"] {
     }
 }
 
-.password-input.peekable {
+.peekable {
     position: relative;
 
     input {

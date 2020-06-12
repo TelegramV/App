@@ -32,6 +32,13 @@ export function __component_unmount(component) {
 
     component.props = null;
     component.slot = null;
+    if (component.__.stateful && component.globalState) {
+        if (component.globalState) {
+            for (const state of Object.values(component.globalState)) {
+                state.__components.delete(component);
+            }
+        }
+    }
     component.state = null;
 
     component.$el.__v.component = null;

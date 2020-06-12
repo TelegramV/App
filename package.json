@@ -10,7 +10,7 @@
     "clean": "rm dist/bundle.js",
     "build-dev": "webpack -d --mode development",
     "build-prod": "webpack -p --mode production",
-    "prod": "webpack-dev-server --color -d --mode production --info-verbosity verbose --host 0.0.0.0",
+    "prod": "webpack -p --mode production",
     "watch": "webpack -d --mode development --watch --info-verbosity verbose",
     "dev": "webpack-dev-server --color -d --mode development --info-verbosity verbose --host 0.0.0.0",
     "analize-bundle": "webpack --json | webpack-bundle-size-analyzer",

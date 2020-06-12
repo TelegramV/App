@@ -17,46 +17,209 @@
  *
  */
 
+import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import List from "../../../V/VRDOM/list/List"
+
 function VInput(
     {
+        id,
         type = "text",
         width = "auto",
         name = null,
         label = "",
         onInput,
+        onKeyPress,
         onFocus,
+        onBlur,
         value,
-        isError = false,
+        autoFocus,
         error,
-        isSuccess = false,
         success,
-        disabled = false
+        disabled = false,
+        onButtonClick,
+        withButton = false,
+        buttonIcon = "eye1",
+        maxLength,
     }
 ) {
     let text = label;
 
-    if (isError) {
-        isSuccess = false
+    if (error) {
+        success = false;
         text = error;
-    } else if (isSuccess) {
-        isError = false;
+    } else if (success) {
+        error = false;
         text = success || label;
     }
 
     return (
-        <div className="VInput" css-width={width}>
-            <input disabled={disabled ? "true" : undefined}
-                   className={{"invalid": isError, "success": isSuccess}}
+        <div className={{
+            "VInput": true,
+            "withButton": withButton,
+        }} css-width={width}>
+            {
+                withButton && <i className={`btn-icon rp rps tgico tgico-${buttonIcon}`} onClick={onButtonClick}/>
+            }
+
+            <input id={id}
+                   disabled={disabled ? "true" : undefined}
+                   className={{"invalid": error, "success": success}}
                    type={type}
                    placeholder={text}
                    name={name}
                    value={value}
                    onInput={onInput}
-                   onFocus={onFocus}/>
+                   onKeyPress={onKeyPress}
+                   onBlur={onBlur}
+                   onFocus={onFocus}
+                   autoFocus={autoFocus}
+                   maxLength={maxLength}
+            />
 
             <label htmlFor={name}>{text}</label>
         </div>
     );
+}
+
+export class VInputValidate extends StatelessComponent {
+    render(props) {
+        const onInput = props.onInput;
+
+        props.onInput = event => {
+            const validated = this.onInput(event);
+
+            if (validated === event) {
+                onInput(event);
+            }
+        }
+
+        if (props.type === "number") {
+            // prevent non-digit values
+            props.onKeyPress = event => event.keyCode === 8 || event.keyCode === 46 ? true : !isNaN(Number(event.key));
+        }
+
+        return (
+            <VInput {...{...props, filter: undefined}}/>
+        );
+    }
+
+    onInput = (event: { target: HTMLInputElement; }) => {
+        const filter = this.props.filter;
+
+        if (filter) {
+            const value = event.target.value;
+            const previousValue = event.target.previousValue || "";
+
+            if (filter(value)) {
+                event.target.previousValue = value;
+                return event;
+            } else {
+                event.target.value = previousValue;
+                return false;
+            }
+        }
+    }
+}
+
+export class VInputPassword extends StatefulComponent {
+    state = {
+        isShown: this.props.isShown ?? false,
+    }
+
+    render(props, {isShown}) {
+        props = {
+            ...props,
+            type: isShown ? "text" : "password",
+            buttonIcon: isShown ? "eye2" : "eye1",
+            withButton: true,
+        }
+
+        return (
+            <VInput {...props} onButtonClick={() => {
+                this.setState({
+                    isShown: !isShown,
+                });
+
+                if (props.onShownUpdate) {
+                    props.onShownUpdate(!isShown);
+                }
+            }}/>
+        );
+    }
+}
+
+export class VInputDropdown extends StatefulComponent {
+    state = {
+        isShown: this.props.isShown ?? false,
+        inputValue: "",
+    }
+
+    render(props, {isShown, inputValue}) {
+        props = {
+            ...props,
+            buttonIcon: isShown ? "up" : "down",
+            withButton: true,
+            onFocus: this.onFocus,
+            onBlur: this.onBlur,
+            onInput: this.onInput,
+        }
+
+        return (
+            <div className="VInputDropdown">
+                <VInput {...props} value={inputValue || props.currentValue} onButtonClick={this.onButtonClick}/>
+
+                <div className={{"VInputDropdownList": true, "hidden": !isShown || props.disabled}}>
+                    <List template={props.template}
+                          wrapper={<div/>}
+                          list={props.items}/>
+                </div>
+            </div>
+        );
+    }
+
+    onInput = (event: InputEvent) => {
+        const input = event.target.value.trim();
+
+        const $nodes = this.$el.querySelector(`.VInputDropdownList`).firstElementChild.childNodes;
+
+        $nodes.forEach(($node, index) => {
+            if (this.props.filter(input, this.props.items.items[index])) {
+                $node.classList.remove("hidden");
+            } else {
+                $node.classList.add("hidden");
+            }
+        });
+    }
+
+    onFocus = () => {
+        this.setState({
+            isShown: !this.props.disabled,
+        });
+    }
+
+    onBlur = (event) => {
+        this.setState({
+            isShown: false,
+        });
+    }
+
+    onButtonClick = () => {
+        this.setState({
+            isShown: !this.state.isShown,
+        });
+
+        if (this.props.onShownUpdate) {
+            this.props.onShownUpdate(this.state.isShown);
+        }
+    }
+
+    setCurrent = item => {
+        this.setState({
+            isShown: false,
+            inputValue: item.name,
+        })
+    }
 }
 
 export default VInput

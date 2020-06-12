@@ -23,11 +23,12 @@ function VCheckbox(
         label = "",
         checked,
         input,
+        onClick,
         circle = false
     }
 ) {
     return (
-        <div className={{"checkbox-input": true, circle}} onClick={input}>
+        <div className={{"checkbox-input": true, circle}} onClick={input || onClick}>
             <input type="checkbox" checked={valIf(checked, true)}/>
 
             <div className="checkmark">

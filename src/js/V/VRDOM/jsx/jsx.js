@@ -51,6 +51,11 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
                 return text2emoji(child)
             }
 
+            // basic <></> support
+            if (child && typeof child === "object" && child.tagName === VRDOM.Fragment) {
+                return child.children;
+            }
+
             return child
         }).flat(Infinity)
 
@@ -103,18 +108,18 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
             } else if (k === "dangerouslySetInnerHTML") {
                 dangerouslySetInnerHTML = v
                 attrs["vr-dangerouslySetInnerHTML"] = true
-            } else if (k === "doNotTouchMyChildren") {
+            } else if (k === "doNotTouchMyChildren" && !isComponentOrFragment) {
                 doNotTouchMyChildren = v
-            } else if (key.startsWith("css-")) {
+            } else if (key.startsWith("css-") && !isComponentOrFragment) {
                 const styleKey = key.substring(4)
                 style[styleKey] = v
-            } else if (k === "showIf") {
+            } else if (k === "showIf" && !isComponentOrFragment) {
                 style.display = v ? undefined : "none"
-            } else if (k === "hideIf") {
+            } else if (k === "hideIf" && !isComponentOrFragment) {
                 style.display = v ? "none" : undefined
             } else if (key === "ref") {
                 ref = v
-            } else if (key === "style" && typeof v === "object") {
+            } else if (key === "style" && typeof v === "object" && !isComponentOrFragment) {
                 Object.assign(style, v)
             } else {
                 if (attrAliases.has(k)) {

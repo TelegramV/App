@@ -20,7 +20,7 @@
 import {AppConfiguration} from "../../Config/AppConfiguration"
 import MTProto from "../../MTProto/External"
 
-const sendCode = (phoneNumber) => {
+const sendCode = (phoneNumber, dcId = null) => {
     return MTProto.invokeMethod("auth.sendCode", Object.assign({
         phone_number: phoneNumber,
         api_id: AppConfiguration.mtproto.api.api_id,
@@ -32,15 +32,15 @@ const sendCode = (phoneNumber) => {
             allow_flashcall: false
         },
         lang_code: navigator.language || 'en'
-    }))
+    }), dcId)
 }
 
-const signIn = (phoneNumber, phoneCodeHash, phoneCode) => {
+const signIn = (phoneNumber, phoneCodeHash, phoneCode, dcId = null) => {
     return MTProto.invokeMethod("auth.signIn", Object.assign({
         phone_number: phoneNumber,
         phone_code_hash: phoneCodeHash,
         phone_code: phoneCode
-    }))
+    }), dcId)
 }
 
 const signUp = (phoneNumber, phoneCodeHash, firstName, lastName) => {
@@ -52,10 +52,29 @@ const signUp = (phoneNumber, phoneCodeHash, firstName, lastName) => {
     }))
 }
 
+function checkPassword(password) {
+    return MTProto.invokeMethod("auth.checkPassword", {
+        password
+    });
+}
+
+function exportLoginToken(props = {}) {
+    return MTProto.invokeMethod("auth.exportLoginToken", {
+        ...{
+            api_id: AppConfiguration.mtproto.api.api_id,
+            api_hash: AppConfiguration.mtproto.api.api_hash,
+            except_ids: []
+        },
+        ...props,
+    });
+}
+
 const auth = {
     sendCode: sendCode,
     signIn: signIn,
     signUp: signUp,
+    checkPassword: checkPassword,
+    exportLoginToken: exportLoginToken,
 }
 
 export default auth

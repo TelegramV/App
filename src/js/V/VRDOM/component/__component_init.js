@@ -41,6 +41,13 @@ export function __component_init(component) {
 
         if (component.__.stateful) {
             component.setState = component.setState.bind(component);
+            component.setGlobalState = component.setGlobalState.bind(component);
+
+            if (component.globalState) {
+                for (const state of Object.values(component.globalState)) {
+                    state.__components.add(component);
+                }
+            }
         }
 
         component.init.call(component, component.props);

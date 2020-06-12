@@ -17,10 +17,32 @@
  *
  */
 
-function __component_render(component) {
-    const renderedVRNode = component.__.stateful ? component.render(component.props, component.state, component.globalState) : component.render(component.props);
-    renderedVRNode.component = component;
-    return renderedVRNode;
+import StatefulComponent from "./StatefulComponent"
+import {__component_update_global_state} from "./__component_update"
+
+class State {
+    __global = true;
+    __components: Set<StatefulComponent>;
+
+    constructor() {
+        this.__components = new Set();
+    }
+
+    set(nextState) {
+        if (typeof nextState === "function") {
+            nextState = nextState(this);
+        }
+
+        Object.assign(this, nextState);
+
+        this.__components.forEach(component => __component_update_global_state(component, this));
+    }
+
+    static create(defaultState) {
+        const state = new State();
+        Object.assign(state, defaultState);
+        return state;
+    }
 }
 
-export default __component_render;
+export default State;

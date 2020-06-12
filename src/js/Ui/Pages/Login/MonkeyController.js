@@ -1,22 +1,6 @@
 import MTProto from "../../../MTProto/External"
 import lottie from "../../../../../vendor/lottie-web"
 
-function convertToByteArray(bytes) {
-    if (Array.isArray(bytes)) {
-        return bytes
-    }
-
-    bytes = new Uint8Array(bytes)
-
-    const newBytes = []
-
-    for (let i = 0, len = bytes.length; i < len; i++) {
-        newBytes.push(bytes[i])
-    }
-
-    return newBytes
-}
-
 export class MonkeyController {
     constructor() {
 
@@ -40,6 +24,10 @@ export class MonkeyController {
     }
 
     init(player) {
+        if (this.animation && this.$monkey !== player) {
+            this.destroy()
+        }
+
         this.$monkey = player
         this.load(this.states.idle)
     }
@@ -55,7 +43,7 @@ export class MonkeyController {
         if (symbols == this.trackSym) return;
 
         let start = 18;
-        let nextFrame = start + symbols * 3;
+        let nextFrame = start + symbols * 4;
 
         if (this.trackSym == 0) {
             if (symbols > 0) { //started typing
@@ -87,7 +75,7 @@ export class MonkeyController {
 
         return fetch(path).then(l => {
             return l.arrayBuffer().then(async q => {
-                return await MTProto.performWorkerTask("gzipUncompress", convertToByteArray(q))
+                return await MTProto.performWorkerTask("gzipUncompress", new Uint8Array(q))
             })
         }).then(l => {
             if (this.animation) {
@@ -224,6 +212,11 @@ export class MonkeyController {
     stop() {
         if (this.animation)
             this.animation.stop();
+    }
+
+    destroy() {
+        if (this.animation)
+            this.animation.destroy();
     }
 
     _frameListener(event) {
