@@ -64,7 +64,7 @@
             -webkit-mask-position: 0% 100%;
             mask-position: 0% 100%;
             //-webkit-mask-composite: xor, source-over;
-            border-bottom-left-radius: 0;
+            border-bottom-left-radius: 6px;
 
 
             &.has-inline-keyboard {
@@ -96,7 +96,7 @@
             -webkit-mask-position: 100% 100%;
             mask-position: 100% 100%;
             //-webkit-mask-composite: xor, source-over;
-            border-bottom-right-radius: 0;
+            border-bottom-right-radius: 6px;
 
             &.has-inline-keyboard {
                 border-bottom-left-radius: 10px;
