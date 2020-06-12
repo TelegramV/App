@@ -310,10 +310,11 @@ class Connection {
             return;
         }
 
+        this.processor.pendingInvokations.delete(message_id);
+
         this.invokeMethod(invokation.name, invokation.params, {useSecondTransporter: invokation.useSecondTransporter})
             .then(invokation.resolve)
-            .catch(invokation.reject)
-            .finally(() => this.processor.pendingInvokations.delete(message_id));
+            .catch(invokation.reject);
     }
 
     processResponse(response: Uint8Array): void {

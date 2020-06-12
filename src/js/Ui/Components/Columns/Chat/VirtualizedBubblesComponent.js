@@ -516,15 +516,13 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         if (intersect > -1) {
             console.log("[show message] intersect found");
 
-            messages = messages.slice(intersect - 1);
+            messages = messages.slice(0, intersect - 1);
 
-            this.secondVirtual.messages.push(...messages);
-            this.mainVirtual.messages = [...this.secondVirtual.messages, ...this.mainVirtual.messages];
+            this.mainVirtual.messages = [...messages, ...this.mainVirtual.messages];
 
             this.isUsingSecondVirtual = false;
-            this.secondVirtual.refresh();
 
-            messages = this.mainVirtual.nextBottom();
+            this.mainVirtual.veryTopPage();
         } else {
             this.secondVirtual.messages.push(...messages);
             messages = this.secondVirtual.veryBottomPage();
@@ -688,7 +686,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         if (intersect > -1) {
             console.log("[bottom page] intersect found");
 
-            messages = messages.slice(intersect - 1);
+            messages = messages.slice(0, intersect - 1);
 
             this.mainVirtual.currentPage = this.secondVirtual.currentPage;
 
@@ -696,8 +694,6 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             this.mainVirtual.messages = [...this.secondVirtual.messages, ...this.mainVirtual.messages];
 
             this.isUsingSecondVirtual = false;
-
-            // console.log(this.mainVirtual.currentPage)
 
             this.secondVirtual.refresh();
         } else {

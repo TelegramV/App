@@ -35,6 +35,7 @@ function parse_rpc_error(rawError) {
 
 const ALWAYS_DO_RESEND_ON_FLOOD = [
     "messages.getHistory",
+    "upload.getFile",
 ]
 
 class MessagesProcessor {
