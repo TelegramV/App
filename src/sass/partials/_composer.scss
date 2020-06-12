@@ -52,9 +52,10 @@
         //border-top: 1px solid $lightgrey;
         box-shadow: 0px -1px 3px rgba(16, 35, 47, .15);
 
-        &>.item {
+        & > .item {
             padding: 10px 25px;
             cursor: pointer;
+
             .tgico {
                 color: #8d969c;
                 font-size: 25px;
@@ -87,7 +88,7 @@
             height: 100%;
             overflow: hidden;
 
-            &>* {
+            & > * {
                 display: none;
                 height: 100%;
                 grid-template-columns: repeat(9, 1fr);
@@ -154,7 +155,7 @@
 
     .emoji-wrapper {
         .emoji-table {
-            &>*.selected {
+            & > *.selected {
                 align-items: start;
                 height: auto;
                 max-height: 100%; //allow overflow
@@ -175,6 +176,7 @@
 
                 .sticker {
                     cursor: pointer;
+
                     img {
                         width: 100% !important;
                         height: auto !important;
@@ -207,7 +209,8 @@
     }
 
     .gif-wrapper {
-        //height: 100%;
+        max-height: 100%;
+        overflow-y: scroll;
 
         .gif-masonry {
             height: 100%;
