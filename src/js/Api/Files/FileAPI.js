@@ -414,7 +414,7 @@ export class FileAPI {
             }
         }
 
-        return (file.sizes || file.thumbs).filter(l => l.type !== "i").reduce(function (prev, current) {
+        return (file.sizes || file.thumbs).reduce(function (prev, current) {
             return (prev.w > current.w) ? prev : current
         })
     }
@@ -427,7 +427,7 @@ export class FileAPI {
             }
         }
 
-        return (file.sizes || file.thumbs).filter(l => l.type !== "i").reduce(function (prev, current) {
+        return (file.sizes || file.thumbs).reduce(function (prev, current) {
             return (prev.w < current.w) ? prev : current
         })
     }
