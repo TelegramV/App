@@ -29,6 +29,7 @@
             padding-left: 10px;
 
             border-top-right-radius: 15px;
+            border-top-left-radius: 6px;
             border-bottom-right-radius: 15px;
 
             figure.photo, figure.video {
@@ -129,6 +130,7 @@
             padding-left: 10px;
             padding-right: 10px;
 
+
             & ~ .inline-keyboard {
 	            margin-right: 11px;
 	        }
@@ -138,6 +140,7 @@
                 margin-right: -10px;
             }
 
+            border-top-right-radius: 6px;
             border-top-left-radius: 15px;
             border-bottom-left-radius: 15px;
         }
