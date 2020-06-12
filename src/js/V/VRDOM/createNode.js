@@ -38,7 +38,7 @@ function vrdom_createNode(tagName: VRTagName, props: VRNodeProps): VRNode {
             return new ComponentVRNode(tagName, {
                 attrs: props.attrs,
                 ref: props.ref
-            }, props.children)
+            }, props.children.length ? props.children : null)
 
         } else if (vrdom_isTagNameList(tagName)) {
 
@@ -54,13 +54,13 @@ function vrdom_createNode(tagName: VRTagName, props: VRNodeProps): VRNode {
                 if (props.ref.fragment) {
                     return props.ref.fragment({
                         ...props.attrs,
-                    }, props.children)
+                    }, props.children.length ? props.children : null)
                 } else {
                     props.ref.fragment = tagName
 
                     const node = tagName({
                         ...props.attrs,
-                    }, props.children)
+                    }, props.children.length ? props.children : null)
                     node.ref = props.ref
 
                     return node
@@ -69,7 +69,7 @@ function vrdom_createNode(tagName: VRTagName, props: VRNodeProps): VRNode {
 
                 return tagName({
                     ...props.attrs,
-                }, props.children)
+                }, props.children.length ? props.children : null)
 
             }
 

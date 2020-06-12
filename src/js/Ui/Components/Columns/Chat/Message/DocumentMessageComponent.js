@@ -38,7 +38,7 @@ const IconFragment = ({document, isDownloading, isDownloaded, color, ext, progre
                                     <i className={["tgico tgico-download"]}/>
                                 </div>
                             ) :
-                            <VSpinner white determinate progress={progress / 100}>
+                            <VSpinner mid white determinate progress={progress / 100}>
                                 <i className={["tgico tgico-close"]}/>
                             </VSpinner>
                         }

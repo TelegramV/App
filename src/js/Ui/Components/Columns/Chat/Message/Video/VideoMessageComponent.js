@@ -7,6 +7,7 @@ import BetterVideoComponent from "../../../../Basic/BetterVideoComponent"
 import DocumentParser from "../../../../../../Api/Files/DocumentParser"
 import {formatAudioTime} from "../../../../../Utils/utils"
 import {DocumentMessagesTool} from "../../../../../Utils/document"
+import VSpinner from "../../../../../Elements/VSpinner"
 
 class VideoMessageComponent extends GeneralMessageComponent {
 
@@ -39,7 +40,10 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                                           </div>
                                                       }
                                                       <div className="download">
-                                                          <i className="tgico tgico-clouddownload"/>
+                                                          <div class="icon">
+                                                              <i className="tgico tgico-clouddownload"/>
+                                                              {/*<VSpinner white strokeWidth={3}/>*/}
+                                                          </div>
                                                           <div className="info">
                                                               <span
                                                                   class="duration">{formatAudioTime(info.duration)}</span>

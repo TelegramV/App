@@ -72,9 +72,12 @@
             align-items: center;
             justify-content: center;
 
-            font-size: 13pt;
+            font-size: 12pt;
 
-            .tgico {
+            .icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
                 margin-right: 5px;
                 font-size: 25pt;
             }

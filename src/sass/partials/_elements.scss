@@ -87,11 +87,15 @@
 
         .extension {
             position: absolute;
-            top: 60%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
             font-size: 18px;
+
+            .pause-button {
+                margin-top: 5px;
+            }
         }
     }
 }

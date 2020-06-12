@@ -20,9 +20,8 @@
 function VSpinner(
     {
         big = false,
+        mid = false,
         white = false,
-        full = false,
-        show = true,
         background = false,
         loaderRef,
         determinate = false,
@@ -31,18 +30,17 @@ function VSpinner(
         paused = false,
         color,
         id,
+        strokeWidth = 2,
     }, slot
 ) {
     const wrapperClassName = {
-        // "full-size-loader": true,
-        // "height": !full,
         "v-spinner": true,
         "background": background,
         "big": big,
+        "mid": mid,
         "paused": paused
 
     }
-
 
     const progressClassName = {
         "new-progress": true,
@@ -50,27 +48,19 @@ function VSpinner(
         "white": white
     }
 
-    const size = big ? 170 : 79
-    return <div id={id} className={wrapperClassName} ref={loaderRef} onClick={onClick}>
-        {slot ? <div className="slot">{slot}</div> : ""}
-        <svg className={progressClassName}>
-            {!determinate ?
-                <circle className="path"/> :
-                <circle className="path" css-stroke-dashoffset={(1 - progress) * -size} css-stroke={color}/>}
-        </svg>
-    </div>
+    const size = big ? 170 : mid ? 118.5 : 79
 
-    // <div showIf={show} ref={loaderRef} id={id} className={wrapperClassName}>
-    //     {
-    //         background ? (
-    //             <div className="progress-background">
-    //                 <progress className={progressClassName}/>
-    //             </div>
-    //         ) : (
-    //             <progress className={progressClassName}/>
-    //         )
-    //     }
-    // </div>
+    return (
+        <div id={id} className={wrapperClassName} ref={loaderRef} onClick={onClick}>
+            {slot && <div className="slot">{slot}</div>}
+            <svg className={progressClassName}>
+                {!determinate ?
+                    <circle css-stroke-width={strokeWidth} className="path"/> :
+                    <circle css-stroke-width={strokeWidth} className="path"
+                            css-stroke-dashoffset={(1 - progress) * -size} css-stroke={color}/>}
+            </svg>
+        </div>
+    )
 }
 
 export default VSpinner
