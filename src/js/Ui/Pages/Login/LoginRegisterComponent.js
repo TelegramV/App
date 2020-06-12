@@ -140,12 +140,6 @@ class LoginRegisterComponent extends StatefulComponent {
                 });
             }
         });
-
-        this.withTimeout(() => {
-            this.setState({
-                isLoading: false,
-            });
-        }, 500);
     }
 
     addPicture = () => {
