@@ -24,7 +24,9 @@ export default class ComposerComponent extends StatelessComponent {
                     <GifsComposerComponent/>
                 </div>
                 <div className="composer-tab-selector">
-                    <div class="filler"/>
+                    <div css-visibility="hidden" id="composer-stickers-search-button" className="item rp rps">
+                        <i className="tgico tgico-search"/>
+                    </div>
                     <div class="filler"/>
                     <div data-tab-name="emoji" className="item rp rps selected" onClick={this.onClickOpenEmoji}>
                         <i class="tgico tgico-smile"/>
@@ -100,6 +102,12 @@ export default class ComposerComponent extends StatelessComponent {
     }
 
     togglePanel = (name: string) => {
+        document.getElementById("composer-stickers-search-button").style.visibility = "hidden";
+
+        if (name === "stickers") {
+            document.getElementById("composer-stickers-search-button").style.visibility = "visible";
+        }
+
         if (this.stateless.panel === name) {
             return;
         }

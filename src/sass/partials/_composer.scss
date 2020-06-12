@@ -1,13 +1,13 @@
 .composer {
     position: absolute;
-    width: 400px;
-    height: 400px;
+    width: 430px;
+    height: 430px;
     transform: scale(0, 0);
     transition: transform 250ms ease-in-out;
     transform-origin: left bottom;
     overflow: hidden;
 
-    box-shadow: 0 2px 3px 0 rgba(16, 35, 47, .15);
+    box-shadow: 0 4px 10px 0 rgba(16, 35, 47, .15);
 
     display: flex;
     background-color: white;
@@ -25,7 +25,7 @@
         width: 100%;
         height: 0;
         z-index: 100;
-        border-radius: 0px;
+        border-radius: 0;
         transform: none;
 
         &.visible {
@@ -48,15 +48,16 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 50px;
-        border-top: 1px solid $lightgrey;
+        //height: 60px;
+        //border-top: 1px solid $lightgrey;
+        box-shadow: 0px -1px 3px rgba(16, 35, 47, .15);
 
         &>.item {
-            padding: 0 15px;
+            padding: 10px 25px;
             cursor: pointer;
             .tgico {
-                color: $darkgrey;
-                font-size: 24px;
+                color: #8d969c;
+                font-size: 25px;
             }
 
             &.selected .tgico {
@@ -122,19 +123,20 @@
             align-self: flex-end;
             flex-shrink: 0;
             justify-content: space-around;
-            height: 40px;
+            height: 47px;
             align-items: center;
             background-color: white;
-            border-bottom: 1px solid $lightgrey;
+            //border-bottom: 1px solid $lightgrey;
+            box-shadow: 0 1px 3px rgba(16, 35, 47, .15);
 
             .emoji-type-item,
             .sticker-packs-item {
                 height: 40px;
                 width: 40px;
-                font-size: 24px;
+                font-size: 25px;
                 cursor: pointer;
                 position: relative;
-                color: $darkgrey;
+                color: #8d969c;
 
                 &.selected {
                     color: $blue;
@@ -149,6 +151,7 @@
             }
         }
     }
+
     .emoji-wrapper {
         .emoji-table {
             &>*.selected {
@@ -161,6 +164,8 @@
 
     .sticker-wrapper {
         .sticker-table {
+            margin: 5px;
+
             .selected {
                 grid-template-columns: repeat(5, 1fr);
                 grid-auto-rows: 75px;
@@ -202,13 +207,15 @@
     }
 
     .gif-wrapper {
-        height: 100%;
+        //height: 100%;
 
         .gif-masonry {
             height: 100%;
             display: flex;
             flex-wrap: wrap;
             overflow-x: hidden;
+
+            margin: 5px;
 
             .masonry-item {
                 flex: 1 0 auto;
