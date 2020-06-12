@@ -16,12 +16,12 @@
  */
 
 import {ModalHeaderFragment} from "./ModalHeaderFragment";
-import {InputComponent} from "../Elements/InputComponent";
 import VComponent from "../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../Reactive/SelectedChat";
-import VCheckbox from "../Elements/VCheckbox";
+import VCheckbox from "../../Elements/Input/VCheckbox";
 import VUI from "../../VUI"
 import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
+import VInput from "../../Elements/Input/VInput"
 
 class OptionsFragment extends StatelessComponent {
     init() {
@@ -36,7 +36,7 @@ class OptionsFragment extends StatelessComponent {
     }
 
     createOption(i) {
-        return <InputComponent label={`Option ${i}`} input={this.checkInput.bind(this)}/>
+        return <VInput label={`Option ${i}`} onInput={this.checkInput.bind(this)}/>
     }
 
     checkInput(ev) {
@@ -77,7 +77,7 @@ export class AttachPollModal extends StatelessComponent {
         return <div>
             <ModalHeaderFragment title="New Poll" close actionText="Create" action={this.create.bind(this)}/>
             <div className="padded">
-                <InputComponent ref={this.askQuestionRef} label="Ask a Question"/>
+                <VInput ref={this.askQuestionRef} label="Ask a Question"/>
             </div>
             <hr/>
             <div className="padded">

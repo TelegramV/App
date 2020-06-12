@@ -1,4 +1,4 @@
-import VCheckbox from "../../../../Elements/VCheckbox";
+import VCheckbox from "../../../../../Elements/Input/VCheckbox";
 
 export const DialogInfoDetailsCheckboxFragment = ({text, label, checked = false, onChange}) => {
     return (

@@ -22,7 +22,7 @@ import {VideoMessage} from "../../../Api/Messages/Objects/VideoMessage";
 import AvatarFragment from "../Basic/AvatarFragment";
 import SearchManager from "../../../Api/Search/SearchManager"
 import {MessageFactory} from "../../../Api/Messages/MessageFactory"
-import VSpinner from "../Elements/VSpinner"
+import VSpinner from "../../Elements/VSpinner"
 import FileManager from "../../../Api/Files/FileManager"
 import {DocumentMessagesTool} from "../../Utils/document"
 import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"

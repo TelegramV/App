@@ -1,4 +1,4 @@
-import VCheckbox from "../../Elements/VCheckbox";
+import VCheckbox from "../../../Elements/Input/VCheckbox";
 
 export const ButtonWithIconAndCheckmarkFragment = ({icon, name, onClick, blue = false, small = false, checked = false}, slot) => {
     let iconClasses = ["button-icon", "tgico", "tgico-" + icon]

@@ -20,6 +20,9 @@
 function __component_render(component) {
     const renderedVRNode = component.__.stateful ? component.render(component.props, component.state, component.globalState) : component.render(component.props);
     renderedVRNode.component = component;
+    if (renderedVRNode.tagName === VRDOM.Fragment) {
+        throw new Error("You can't use fragment as the first parent element in component.")
+    }
     return renderedVRNode;
 }
 

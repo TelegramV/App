@@ -1,4 +1,4 @@
-import VCheckbox from "../../Elements/VCheckbox";
+import VCheckbox from "../../../Elements/Input/VCheckbox";
 
 export const ButtonWithCheckboxFragment = ({name, onClick, checked = false}) => {
     return (

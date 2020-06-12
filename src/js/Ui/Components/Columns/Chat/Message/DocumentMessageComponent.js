@@ -3,7 +3,7 @@ import {DocumentMessagesTool} from "../../../../Utils/document"
 import FileManager from "../../../../../Api/Files/FileManager"
 import CardMessageWrapperFragment from "./Common/CardMessageWrapperFragment"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
-import VSpinner from "../../../Elements/VSpinner";
+import VSpinner from "../../../../Elements/VSpinner";
 import {FileAPI} from "../../../../../Api/Files/FileAPI"
 import DocumentParser from "../../../../../Api/Files/DocumentParser"
 

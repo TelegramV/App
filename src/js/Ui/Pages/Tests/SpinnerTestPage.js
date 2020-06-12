@@ -1,4 +1,4 @@
-import VSpinner from "../../Components/Elements/VSpinner";
+import VSpinner from "../../Elements/VSpinner";
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
 class TestDeterminateSpinner extends StatefulComponent {

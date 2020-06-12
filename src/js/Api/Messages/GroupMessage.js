@@ -42,7 +42,7 @@ class GroupMessage extends AbstractMessage {
     }
 
     get newest() {
-        return Array.from(this.messages).sort(compareFn("id", "desc"))[0].raw;
+        return Array.from(this.messages).sort(compareFn("id", "desc"))[0];
     }
 
     add(message: Message) {

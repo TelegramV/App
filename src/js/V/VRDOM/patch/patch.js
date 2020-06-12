@@ -27,7 +27,7 @@ import vrdom_deleteInner from "../deleteInner"
 import patch_Text_VRNode from "./patch_Text_VRNode"
 import patch_Node_VRNode from "./patch_Node_VRNode"
 import {initElement} from "../render/renderElement"
-import cleanElement from "../cleanElement"
+import cleanDOMElement from "../cleanDOMElement"
 import ComponentVRNode from "../component/ComponentVRNode"
 import patchComponentVRNode from "./patchAbstractComponentNRNode"
 import {__component_unmount} from "../component/__component_unmount"
@@ -91,7 +91,7 @@ const vrdom_patch = ($node, vRNode: VRNode | ComponentVRNode, options = {}): Nod
         }
 
         vrdom_deleteInner($node)
-        cleanElement($node, true)
+        cleanDOMElement($node, true)
 
         return vrdom_mount(vRNode, $node, options)
 

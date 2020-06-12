@@ -1,7 +1,7 @@
 import SettingsPane from "./SettingsPane"
 import {ButtonWithIconFragment} from "../../Fragments/ButtonWithIconFragment";
 import {SectionFragment} from "../../Fragments/SectionFragment";
-import VSlider from "../../../Elements/VSlider";
+import VSlider from "../../../../Elements/Input/VSlider";
 import VInput from "../../../../Elements/Input/VInput";
 import keval from "../../../../../Keval/keval";
 

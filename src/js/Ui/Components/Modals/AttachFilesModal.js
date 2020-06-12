@@ -17,12 +17,12 @@
 
 import VComponent from "../../../V/VRDOM/component/VComponent";
 import {ModalHeaderFragment} from "./ModalHeaderFragment";
-import {InputComponent} from "../Elements/InputComponent";
 import AppSelectedChat from "../../Reactive/SelectedChat";
 import {FileAPI} from "../../../Api/Files/FileAPI";
 import {DocumentMessagesTool} from "../../Utils/document";
 import VUI from "../../VUI"
 import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
+import VInput from "../../Elements/Input/VInput"
 
 class FileListFragment extends StatelessComponent {
     render() {
@@ -78,7 +78,7 @@ export class AttachFilesModal extends StatelessComponent {
             <ModalHeaderFragment title="Send Files" close actionText="Send" action={this.send.bind(this)}/>
             <div className="padded">
                 <FileListFragment ref={this.fileListRef} blobs={this.props.media}/>
-                <InputComponent ref={this.captionRef} label="Add a caption..."/>
+                <VInput ref={this.captionRef} label="Add a caption..."/>
             </div>
         </div>
     }

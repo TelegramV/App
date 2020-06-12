@@ -1,4 +1,4 @@
-import VCheckbox from "../../Elements/VCheckbox";
+import VCheckbox from "../../../Elements/Input/VCheckbox";
 import AvatarComponent from "../../Basic/AvatarComponent";
 
 export const ButtonWithPeerAndCheckmarkFragment = ({peer, onClick, blue = false, small = false, checked = false}, slot) => {

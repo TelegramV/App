@@ -39,9 +39,14 @@ class BetterVideoComponent extends StatefulComponent {
         this.state.thumbnailUrl = FileAPI.hasThumbnail(document) ? FileAPI.getThumbnail(document) : "";
     }
 
-    render({document, onClick, playOnHover, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
+    render({document, onClick, playOnHover, infoContainer, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
+        isLoading = true;
+
+        const InfoContainer = infoContainer
+
         return (
             <figure className={["video rp rps", isLoading && "thumbnail"]} onClick={onClick}>
+                {InfoContainer && <InfoContainer/>}
                 {
                     !isLoading ?
                         <video src={url}

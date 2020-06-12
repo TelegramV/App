@@ -40,8 +40,10 @@
 @import "partials/message/sticker";
 @import "partials/message/poll";
 @import "partials/message/audio";
+@import "partials/message/video";
 @import "partials/message/service";
-@import "partials/message/message"; //imported last
+@import "partials/message/message";
+//imported last
 
 @import "partials/loading";
 @import "partials/login";

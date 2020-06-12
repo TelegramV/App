@@ -18,7 +18,7 @@
  */
 
 import vrdom_createElement from "./createElement"
-import vrdom_jsx from "./jsx/jsx"
+import vrdom_createNode from "./createNode"
 import vrdom_render from "./render/render"
 import vrdom_mount from "./mount"
 import vrdom_delete from "./delete"
@@ -27,7 +27,7 @@ import vrdom_append from "./append"
 import vrdom_prepend from "./prepend"
 import vrdom_deleteInner from "./deleteInner"
 import vrdom_patchChildren from "./patch/patchChildren"
-import cleanElement from "./cleanElement"
+import cleanDOMElement from "./cleanDOMElement"
 import vrdom_isTagNameComponent from "./is/isTagNameComponent"
 import vrdom_isTagNameFragment from "./is/isTagNameFragment"
 import vrdom_isTagNameComponentOrFragment from "./is/isTagNameComponentOrFragment"
@@ -35,7 +35,7 @@ import vrdom_isTagNameList from "./is/isTagNameList"
 
 const VRDOM = {
     createElement: vrdom_createElement,
-    jsx: vrdom_jsx,
+    createNode: vrdom_createNode,
     render: vrdom_render,
     mount: vrdom_mount,
     patch: vrdom_patch,
@@ -45,7 +45,7 @@ const VRDOM = {
 
     delete: vrdom_delete,
     deleteInner: vrdom_deleteInner,
-    cleanElement: cleanElement,
+    cleanElement: cleanDOMElement,
 
     isTagNameComponent: vrdom_isTagNameComponent,
     isTagNameFragment: vrdom_isTagNameFragment,

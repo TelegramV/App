@@ -17,22 +17,29 @@
  *
  */
 
-import cleanDOMElement from "./cleanDOMElement"
+import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
+import valIf from "../../../V/VRDOM/jsx/helpers/valIf"
 
-function deepUnmount($el: HTMLElement) {
-    cleanDOMElement($el, true);
-
-    for (const $child of $el.childNodes) {
-        deepUnmount($child);
+function VCheckbox(
+    {
+        label = "",
+        checked,
+        input,
+        onClick,
+        circle = false
     }
+) {
+    return (
+        <div className={{"checkbox-input": true, circle}} onClick={input || onClick}>
+            <input type="checkbox" checked={valIf(checked, true)}/>
+
+            <div className="checkmark">
+                <span className="tgico tgico-check"/>
+            </div>
+
+            {label && <span className="checkbox-label">{label}</span>}
+        </div>
+    )
 }
 
-function vrdom_delete($el: HTMLElement) {
-    if ($el) {
-        deepUnmount($el);
-
-        $el.remove()
-    }
-}
-
-export default vrdom_delete
+export default VCheckbox

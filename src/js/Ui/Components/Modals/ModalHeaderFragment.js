@@ -17,6 +17,7 @@
 
 import VUI from "../../VUI"
 import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
+import VButton from "../../Elements/Button/VButton"
 
 export class ModalHeaderFragment extends StatelessComponent {
     render() {
@@ -26,8 +27,7 @@ export class ModalHeaderFragment extends StatelessComponent {
             }
             {this.props.title}
             {
-                this.props.actionText ? <div className="modal-action-btn rp rps"
-                                             onClick={this.props.action}>{this.props.actionText}</div> : ""
+                this.props.actionText && <VButton onClick={this.props.action}>{this.props.actionText}</VButton>
             }
         </div>
     }

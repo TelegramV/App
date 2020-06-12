@@ -20,10 +20,10 @@ import {GroupPeer} from "../../../../../Api/Peers/Objects/GroupPeer"
 import {SupergroupPeer} from "../../../../../Api/Peers/Objects/SupergroupPeer"
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer"
 import {DialogAvatarFragment} from "./Fragments/DialogAvatarFragment"
-import {FlatButtonComponent} from "../../../Elements/FlatButtonComponent"
 import {Dialog} from "../../../../../Api/Dialogs/Dialog"
 import VUI from "../../../../VUI"
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
+import VButton from "../../../../Elements/Button/VButton"
 
 export const dialogContextMenu = (dialog: Dialog, folderId) => {
     return VUI.ContextMenu.listener([
@@ -41,12 +41,12 @@ export const dialogContextMenu = (dialog: Dialog, folderId) => {
             }
         },
         () => {
-            const isPinned =  folderId === null ? dialog.isPinned : FoldersManager.isPinned(dialog.peer, folderId)
+            const isPinned = folderId === null ? dialog.isPinned : FoldersManager.isPinned(dialog.peer, folderId)
             return {
                 icon: isPinned ? "unpin" : "pin",
                 title: isPinned ? "Unpin from top" : "Pin to top",
                 onClick: _ => {
-                    if(folderId == null) {
+                    if (folderId == null) {
                         if (dialog.isPinned) {
                             dialog.api.setPinned(false)
                         } else {
@@ -98,9 +98,9 @@ export const dialogContextMenu = (dialog: Dialog, folderId) => {
                     <div className="delete-chat-body">
                                      <span
                                          className="text">Are you sure you want to delete chat with <b>{dialog.peer.name}</b>?</span>
-                        <FlatButtonComponent red label={`Delete for me and ${dialog.peer.name}`}/>
-                        <FlatButtonComponent red label="Delete just for me"/>
-                        <FlatButtonComponent label="Cancel"/>
+                        <VButton isFlat red label={`Delete for me and ${dialog.peer.name}`}/>
+                        <VButton isFlat red label="Delete just for me"/>
+                        <VButton isFlat label="Cancel"/>
                     </div>)
             }
         },

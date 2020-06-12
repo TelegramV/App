@@ -19,7 +19,7 @@
 
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import loginState from "./LoginState"
-import VSpinner from "../../Components/Elements/VSpinner"
+import VSpinner from "../../Elements/VSpinner"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import API from "../../../Api/Telegram/API"
 import MTProto from "../../../MTProto/External"
