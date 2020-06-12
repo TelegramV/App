@@ -34,7 +34,7 @@ class LoginQRComponent extends StatefulComponent {
         isLoading: true,
     };
 
-    containerRef = VComponent.createRef();
+    containerRef = VComponent.createRef(); // TODO: ref is not connecting, fix it!
 
     render(props, {isLoading}, {login}) {
         return (
@@ -55,7 +55,7 @@ class LoginQRComponent extends StatefulComponent {
                     </span>
                 </div>
 
-                <div ref={this.containerRef}>{isLoading && <VSpinner/>}</div>
+                <div id="qr-container" ref={this.containerRef}>{isLoading && <VSpinner/>}</div>
             </div>
         )
     }
@@ -123,8 +123,8 @@ class LoginQRComponent extends StatefulComponent {
     }
 
     setCanvas = ($canvas: HTMLCanvasElement) => {
-        this.containerRef.$el.firstElementChild?.remove();
-        this.containerRef.$el.appendChild($canvas);
+        document.getElementById("qr-container")?.firstElementChild?.remove();
+        document.getElementById("qr-container")?.appendChild($canvas);
     }
 
     createQrCanvas = (data): Promise<HTMLCanvasElement> => {

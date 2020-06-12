@@ -41,50 +41,67 @@ function vrdom_jsx(tagName: VRTagName, attributes: VRAttrs, ...children: Array<V
         console.warn("fragments are not fully implemented: patch is not working")
     }
 
-    children = children.flat(Infinity)
+    const flatten = []
 
-    if (!intercepted) {
+    const process = child => {
+        if (!child) {
+            return true
+        }
+
+        if (Array.isArray(child)) {
+            for (let j = 0; j < child.length; j++) {
+                if (child[j]) {
+                    flatten.push(child[j])
+                }
+            }
+
+            return true
+        }
+
+        if (typeof child === "object" && child.tagName === VRDOM.Fragment) {
+            for (let j = 0; j < child.children.length; j++) {
+                if (child.children[j]) {
+                    flatten.push(child.children[j])
+                }
+            }
+
+            return true
+        }
+
+        return false
+    }
+
+    if (intercepted) {
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+
+            if (!process(child)) {
+                flatten.push(child)
+            }
+        }
+    } else {
         intercepted = true
 
-        children = children.map(child => {
-            if (typeof child === "string") {
-                return text2emoji(child)
-            }
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
 
-            // basic <></> support
-            if (child && typeof child === "object" && child.tagName === VRDOM.Fragment) {
-                return child.children;
-            }
+            if (!process(child)) {
+                if (typeof child === "string") {
+                    const textchildren = text2emoji(child)
 
-            return child
-        }).flat(Infinity)
+                    for (let j = 0; j < textchildren.length; j++) {
+                        flatten.push(textchildren[j])
+                    }
+                } else {
+                    flatten.push(child)
+                }
+            }
+        }
 
         intercepted = false
     }
 
-    // if (intercepted) {
-    //     children = children.flatMap(value => value)
-    // } else {
-    //     intercepted = true
-    //
-    //     children = children.flatMap(child => {
-    //         if (Array.isArray(child)) {
-    //             return child.map(value => {
-    //                 if (typeof value === "string") {
-    //                     return text2emoji(value)
-    //                 }
-    //
-    //                 return value
-    //             })
-    //         } else if (typeof child === "string") {
-    //             return text2emoji(child)
-    //         }
-    //
-    //         return child
-    //     })
-    //
-    //     intercepted = false
-    // }
+    children = flatten
 
     const attrs: VRAttrs = Object.create(null)
     const events: VREvents = Object.create(null)
