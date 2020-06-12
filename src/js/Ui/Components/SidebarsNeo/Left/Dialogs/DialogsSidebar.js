@@ -225,14 +225,12 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
         return true
     }
 
-    get title(): string | * {
-        return  <div className="input-search">
-            <VSimpleLazyInput type="text" placeholder="Search"
-                              onFocus={this.openSearch}
-                              onInput={this.onSearchInputCapture}
-                              lazyLevel={200}/>
-            <span className="tgico tgico-search"/>
-        </div>
+    get searchLazyLevel(): number {
+        return 200
+    }
+
+    get isSearchAsTitle(): boolean {
+        return true
     }
 
     get classes() {

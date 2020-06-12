@@ -4,8 +4,12 @@ import FloatingActionButton from "./Fragments/FloatingActionButton";
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent";
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf";
 import UIEvents from "../../EventBus/UIEvents";
+import VSimpleLazyInput from "../../Elements/Input/VSimpleLazyInput";
+import VComponent from "../../../V/VRDOM/component/VComponent";
 
 export class GenericSidebar extends StatefulComponent {
+    searchInputRef = VComponent.createComponentRef()
+
     init() {
         super.init()
         if(this.state.hidden == null) {
@@ -37,7 +41,16 @@ export class GenericSidebar extends StatefulComponent {
             border: this.headerBorder
         }}>
             {nodeIf(<i className={"btn-icon rp rps tgico-" + this.leftButtonIcon} onClick={this.onLeftButtonPressed}/>, this.leftButtonIcon)}
-            <div className="title">{this.title}</div>
+            {nodeIf(<div className="title">{this.title}</div>, !this.isSearchAsTitle)}
+            {nodeIf(<div className="title search">
+                <div className="input-search">
+                    <VSimpleLazyInput type="text" placeholder="Search"
+                                      ref={this.searchInputRef}
+                                      onInput={this.onSearchInputUpdated}
+                                      lazyLevel={this.searchLazyLevel}/>
+                    <span className="tgico tgico-search"/>
+                </div>
+            </div>, this.isSearchAsTitle)}
             {this.rightButtons.map(l => {
                 return <i className={["btn-icon rp rps tgico-" + l.icon, l.blue ? "blue" : ""]} onClick={l.onClick}/>
             })}
@@ -117,6 +130,10 @@ export class GenericSidebar extends StatefulComponent {
         </div>
     }
 
+    onSearchInputUpdated = (event) => {
+
+    }
+
     onLeftButtonPressed = (event) => {
         UIEvents.Sidebars.fire("pop")
     }
@@ -148,6 +165,15 @@ export class GenericSidebar extends StatefulComponent {
      */
     get floatingActionButtonIcon() {
        return null
+    }
+
+
+    get searchLazyLevel() {
+        return 500
+    }
+
+    get isSearchAsTitle() {
+        return false
     }
 
 
