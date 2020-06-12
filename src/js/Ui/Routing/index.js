@@ -5,6 +5,7 @@ import MTProto from "../../MTProto/External"
 //import {ReactListPage} from "../Pages/Tests/ReactiveListPage"
 import VApp from "../../V/vapp"
 import {VideoStreamingPage} from "../Pages/Tests/VideoStreaming"
+import CalendarTestPage from "../Pages/Tests/CalendarTestPage"
 //import VirtualPage from "../Pages/Tests/VirtualPage"
 //import ElementsPage from "../Pages/Tests/Elements"
 //import ColumnsPage from "../Pages/Tests/Columns"
@@ -29,11 +30,19 @@ function AppRoutes(router) {
         }
     })
 
-    router.route("/video", "video", {
-        h() {
-            return VideoStreamingPage()
-        }
-    })
+    if (!__IS_PRODUCTION__) {
+	    router.route("/video", "video", {
+	        h() {
+	            return VideoStreamingPage()
+	        }
+	    })
+
+	    router.route("/calendar", "calendar", {
+	    	h() {
+	            return CalendarTestPage()
+	        }
+	    })
+	}
 
     /*if (!__IS_PRODUCTION__) {
         router.route("/test", "test", {

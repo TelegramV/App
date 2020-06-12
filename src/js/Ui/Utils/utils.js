@@ -19,27 +19,38 @@
     returns Lowercase OS name
 **/
 
+export function isDateEqual(one, two) {
+    if (!isValidDate(one) || !isValidDate(two)) return false;
+    return one.getDate() === two.getDate() &&
+        one.getMonth() === two.getMonth() &&
+        one.getFullYear() === two.getFullYear()
+}
+
+export function isValidDate(d) {
+  return d instanceof Date && !isNaN(d);
+}
+
 export function getOS() {
-  var userAgent = window.navigator.userAgent,
-      platform = window.navigator.platform,
-      macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
-      windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
-      iosPlatforms = ['iPhone', 'iPad', 'iPod'],
-      os = null;
+    var userAgent = window.navigator.userAgent,
+        platform = window.navigator.platform,
+        macosPlatforms = ['Macintosh', 'MacIntel', 'MacPPC', 'Mac68K'],
+        windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+        iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+        os = null;
 
-  if (macosPlatforms.indexOf(platform) !== -1) {
-    os = 'mac';
-  } else if (iosPlatforms.indexOf(platform) !== -1) {
-    os = 'ios';
-  } else if (windowsPlatforms.indexOf(platform) !== -1) {
-    os = 'windows';
-  } else if (/Android/.test(userAgent)) {
-    os = 'android';
-  } else if (!os && /Linux/.test(platform)) {
-    os = 'linux';
-  }
+    if (macosPlatforms.indexOf(platform) !== -1) {
+        os = 'mac';
+    } else if (iosPlatforms.indexOf(platform) !== -1) {
+        os = 'ios';
+    } else if (windowsPlatforms.indexOf(platform) !== -1) {
+        os = 'windows';
+    } else if (/Android/.test(userAgent)) {
+        os = 'android';
+    } else if (!os && /Linux/.test(platform)) {
+        os = 'linux';
+    }
 
-  return os;
+    return os;
 }
 
 export function askForFile(accept, callback, asBuffer = false, multiple = false) {

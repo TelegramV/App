@@ -1,0 +1,94 @@
+@import "../../../sass/partials/vars";
+
+.calendar {
+	display: flex;
+	flex-direction: column;
+	font-size: 14px;
+	--day-size: 36px;
+	--gap-size: 3px;
+	width: calc((var(--day-size) + var(--gap-size)) * 7 - var(--gap-size));
+
+	.month {
+		display: flex;
+		align-items: center;
+		margin-bottom: 10px;
+
+		.name {
+			flex-grow: 1;
+			text-align: center;
+			font-weight: 500;
+		}
+
+		.arrow {
+			padding: 5px;
+			border-radius: 50%;
+			cursor: pointer;
+
+			&.hidden {
+				visibility: hidden;
+			}
+
+			&:hover {
+				background: $light;
+			}
+
+			.tgico {
+				font-size: 24px;
+				color: $darkgrey;
+			}
+
+			&.prev {
+				transform: rotate(90deg);
+			}
+
+			&.next {
+				transform: rotate(-90deg);
+			}
+		}
+	}
+
+	.days {
+		display: grid;
+		grid-gap: var(--gap-size);
+		grid-template-columns: repeat(7, 1fr);
+
+		.weekday, .day {
+			width: var(--day-size);
+			height: var(--day-size);
+			line-height: var(--day-size);
+			text-align: center;
+			vertical-align: middle;
+
+			border-radius: 50%; 
+			
+			&.today {
+				color: $darkgreytext;
+			}
+
+			&.selected {
+				background: $blue;
+				color: white;
+			}
+
+			&.disabled {
+				color: $grey;
+			}
+		}
+
+		.weekday {
+			color: $darkgreytext;
+		}
+
+		.day:not(:empty):not(.disabled) {
+			cursor: pointer;
+			border-radius: 50%;
+			&:hover {
+				background: $light;
+			}
+
+			&.selected:hover {
+				background: $darkblue;
+			}
+		}
+	}
+}
