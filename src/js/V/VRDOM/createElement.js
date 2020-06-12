@@ -17,69 +17,150 @@
  *
  */
 
-import type {VRNodeProps, VRTagName} from "./types/types"
+import type {VRAttrs, VREvents, VRStyle, VRTagName} from "./types/types"
 import VRNode from "./VRNode"
-import VListVRNode from "./list/VListVRNode"
-import vrdom_isTagNameList from "./is/isTagNameList"
-import ComponentVRNode from "./component/ComponentVRNode"
-import VComponent from "./component/VComponent"
+import VRDOM from "./VRDOM"
+import {text2emoji} from "../../Ui/Plugins/EmojiTextInterceptor"
+import attrAliases from "./jsx/attrAliases"
+import vrdom_isTagNameComponentOrFragment from "./is/isTagNameComponentOrFragment"
+import attrProcessors from "./jsx/attrProcessors/attrProcessors"
+import postAttrProcessor from "./jsx/attrProcessors/postAttrProcessor"
+import vrdom_createNode from "./createNode"
 
-/**
- * Creates VRNode
- *
- * @param tagName
- *
- * @param props
- */
-function vrdom_createElement(tagName: VRTagName, props: VRNodeProps): VRNode {
-    if (typeof tagName === "function") {
+let intercepted = false
 
-        if (tagName.prototype instanceof VComponent) {
+const process = (flatten: Array, child) => {
+    if (!child) {
+        return true
+    }
 
-            // console.debug("[createElement] creating acomp node")
+    if (Array.isArray(child)) {
+        for (let j = 0; j < child.length; j++) {
+            if (child[j]) {
+                // if (!process(flatten, child[j])) {
+                flatten.push(child[j])
+                // }
+            }
+        }
 
-            return new ComponentVRNode(tagName, {
-                attrs: props.attrs,
-                ref: props.ref
-            }, props.children)
+        return true
+    }
 
-        } else if (vrdom_isTagNameList(tagName)) {
+    if (typeof child === "object" && child.tagName === VRDOM.Fragment) {
+        for (let j = 0; j < child.children.length; j++) {
+            if (child.children[j]) {
+                flatten.push(child.children[j])
+            }
+        }
 
-            // console.debug("[createElement] creating list node")
+        return true
+    }
 
-            return new VListVRNode(tagName, props.attrs)
+    return false
+}
 
-        } else {
-            if (props.ref && props.ref.__fragment_ref) {
-                props.ref.slot = props.children.length > 0 ? props.children : undefined
-                props.ref.props = props.attrs
+function vrdom_createElement(tagName: VRTagName, attributes: VRAttrs, ...children: Array<VRNode>) {
+    if (tagName === VRDOM.Fragment) {
+        console.warn("fragments are not fully supported")
+    }
 
-                if (props.ref.fragment) {
-                    return props.ref.fragment({
-                        ...props.attrs,
-                    }, props.children)
+    const flatten = []
+
+    if (intercepted) {
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+
+            if (!process(flatten, child)) {
+                flatten.push(child)
+            }
+        }
+    } else {
+        intercepted = true
+
+        for (let i = 0; i < children.length; i++) {
+            const child = children[i];
+
+            if (!process(flatten, child)) {
+                if (typeof child === "string") {
+                    const textchildren = text2emoji(child)
+
+                    for (let j = 0; j < textchildren.length; j++) {
+                        flatten.push(textchildren[j])
+                    }
                 } else {
-                    props.ref.fragment = tagName
-
-                    const node = tagName({
-                        ...props.attrs,
-                    }, props.children)
-                    node.ref = props.ref
-
-                    return node
+                    flatten.push(child)
                 }
-            } else {
+            }
+        }
 
-                return tagName({
-                    ...props.attrs,
-                }, props.children)
+        intercepted = false
+    }
 
+    children = flatten
+
+    const attrs: VRAttrs = Object.create(null)
+    const events: VREvents = Object.create(null)
+    const style: VRStyle = Object.create(null)
+
+    let ref = undefined
+    let dangerouslySetInnerHTML: boolean = false
+    let doNotTouchMyChildren: boolean = false
+
+    if (attributes) {
+        for (let [k, v] of Object.entries(attributes)) {
+            if (attrAliases.has(k)) {
+                k = attrAliases.get(k)
             }
 
+            const isComponentOrFragment = vrdom_isTagNameComponentOrFragment(tagName)
+            let key = isComponentOrFragment ? k : k.toLowerCase()
+
+            if (key.startsWith("on") && !isComponentOrFragment) {
+                events[key.substring(2).toLowerCase()] = v
+            } else if (k === "dangerouslySetInnerHTML") {
+                dangerouslySetInnerHTML = v
+                attrs["vr-dangerouslySetInnerHTML"] = true
+            } else if (k === "doNotTouchMyChildren" && !isComponentOrFragment) {
+                doNotTouchMyChildren = v
+            } else if (key.startsWith("css-") && !isComponentOrFragment) {
+                const styleKey = key.substring(4)
+                style[styleKey] = v
+            } else if (k === "showIf" && !isComponentOrFragment) {
+                style.display = v ? undefined : "none"
+            } else if (k === "hideIf" && !isComponentOrFragment) {
+                style.display = v ? "none" : undefined
+            } else if (key === "ref") {
+                ref = v
+            } else if (key === "style" && typeof v === "object" && !isComponentOrFragment) {
+                Object.assign(style, v)
+            } else {
+                if (attrAliases.has(k)) {
+                    key = attrAliases.get(k)
+                    attrs[key] = v
+                } else {
+                    attrs[key] = v
+                }
+            }
+
+            if (attrProcessors.has(key)) {
+                attrs[key] = attrProcessors.get(key)(v)
+            }
+
+            attrs[key] = postAttrProcessor(key, attrs[key])
         }
     }
 
-    return new VRNode(tagName, props)
+    return vrdom_createNode(tagName, {
+        attrs,
+        events,
+        children,
+        ref,
+        style,
+
+        dangerouslySetInnerHTML,
+        doNotTouchMyChildren,
+    })
 }
+
 
 export default vrdom_createElement

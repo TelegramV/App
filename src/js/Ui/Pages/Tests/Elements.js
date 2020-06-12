@@ -15,15 +15,12 @@
  *
  */
 
-import VButton from "../../Elements/Button/VButton"
 import {DocumentMessagesTool} from "../../Utils/document"
-import VInput from "../../Elements/Input/VInput"
-import VLazyInput from "../../Elements/Input/VLazyInput"
-import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
-class Icon extends StatelessComponent {
+class Icon extends StatefulComponent {
     state = {
-        isDownloaded: false
+        isDownloaded: true
     }
 
     render() {
@@ -33,30 +30,38 @@ class Icon extends StatelessComponent {
             </div>
         )
     }
+
+    componentDidMount() {
+        // this.withInterval(() => {
+        //     this.setState({
+        //         isDownloaded: !this.state.isDownloaded
+        //     })
+        // }, 100)
+    }
 }
 
 function ElementsPage() {
     return (
         <div>
-            {/*<Icon/>*/}
-            <VButton>
-                Subscribe
-            </VButton>
-            <br/>
-            <VButton isFlat>
-                Subscribe
-            </VButton>
-            <br/>
-            <VButton isRound>
-                +
-            </VButton>
-            <br/>
-            <VButton isFlat isRound>
-                +
-            </VButton>
-            <br/>
-            <VInput label="Search" onInput={event => console.log(event.target.value)}/>
-            <VLazyInput label="Lazy" onInput={event => console.log(event.target.value)} lazyLevel={300}/>
+            <Icon/>
+            {/*<VButton>*/}
+            {/*    Subscribe*/}
+            {/*</VButton>*/}
+            {/*<br/>*/}
+            {/*<VButton isFlat>*/}
+            {/*    Subscribe*/}
+            {/*</VButton>*/}
+            {/*<br/>*/}
+            {/*<VButton isRound>*/}
+            {/*    +*/}
+            {/*</VButton>*/}
+            {/*<br/>*/}
+            {/*<VButton isFlat isRound>*/}
+            {/*    +*/}
+            {/*</VButton>*/}
+            {/*<br/>*/}
+            {/*<VInput label="Search" onInput={event => console.log(event.target.value)}/>*/}
+            {/*<VLazyInput label="Lazy" onInput={event => console.log(event.target.value)} lazyLevel={300}/>*/}
         </div>
     );
 }

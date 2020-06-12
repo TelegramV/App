@@ -17,12 +17,12 @@
 
 import VComponent from "../../../V/VRDOM/component/VComponent";
 import {ModalHeaderFragment} from "./ModalHeaderFragment";
-import {InputComponent} from "../Elements/InputComponent";
 import AppSelectedChat from "../../Reactive/SelectedChat";
 import {FileAPI} from "../../../Api/Files/FileAPI";
 import {Layouter} from "../../Utils/layout";
 import VUI from "../../VUI"
 import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
+import VInput from "../../Elements/Input/VInput"
 
 class GalleryFragment extends StatelessComponent {
     render() {
@@ -57,7 +57,7 @@ export class AttachPhotosModal extends StatelessComponent {
             <ModalHeaderFragment title="Send Photos" close actionText="Send" action={this.send.bind(this)}/>
             <div className="padded">
                 <GalleryFragment ref={this.galleryRef} blobs={props.media}/>
-                <InputComponent ref={this.captionRef} label="Caption"/>
+                <VInput ref={this.captionRef} label="Caption"/>
             </div>
         </div>
     }

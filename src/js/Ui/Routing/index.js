@@ -1,11 +1,9 @@
 import LoginPage from "../Pages/Login/LoginPage"
 import {MainPage} from "../Pages/Main/MainPage"
 import MTProto from "../../MTProto/External"
-//import {NewComponentPage} from "../Pages/Tests/NewComponentTestPage"
-//import {ReactListPage} from "../Pages/Tests/ReactiveListPage"
 import VApp from "../../V/vapp"
-import {VideoStreamingPage} from "../Pages/Tests/VideoStreaming"
-import CalendarTestPage from "../Pages/Tests/CalendarTestPage"
+//import {VideoStreamingPage} from "../Pages/Tests/VideoStreaming"
+//import CalendarTestPage from "../Pages/Tests/CalendarTestPage"
 //import VirtualPage from "../Pages/Tests/VirtualPage"
 //import ElementsPage from "../Pages/Tests/Elements"
 //import ColumnsPage from "../Pages/Tests/Columns"
@@ -13,6 +11,8 @@ import CalendarTestPage from "../Pages/Tests/CalendarTestPage"
 //import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage";
 //import NextGenPage from "../Pages/Tests/NextGen"
 //import {StreamingPage} from "../Pages/Tests/Streaming"
+//import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage"
+//import ElementsPage from "../Pages/Tests/Elements"
 
 /**
  * @param {VFrameworkRouter} router
@@ -30,21 +30,35 @@ function AppRoutes(router) {
         }
     })
 
-    if (!__IS_PRODUCTION__) {
-	    router.route("/video", "video", {
-	        h() {
-	            return VideoStreamingPage()
-	        }
-	    })
-
+    /*if (!__IS_PRODUCTION__) {
 	    router.route("/calendar", "calendar", {
 	    	h() {
 	            return CalendarTestPage()
 	        }
 	    })
-	}
+    // router.route("/fff", "fff", {
+    //     h() {
+    //         return FragmentsPage()
+    //     }
+    // })
 
-    /*if (!__IS_PRODUCTION__) {
+    // router.route("/video", "video", {
+    //     h() {
+    //         return VideoStreamingPage()
+    //     }
+    // })
+
+    // router.route("/spinner", "spinner", {
+    //     h() {
+    //         return SpinnerTestPage()
+    //     }
+    // })
+    //
+    // router.route("/elements", "elements", {
+    //     h() {
+    //         return ElementsPage()
+    //     }
+    // })
         router.route("/test", "test", {
             h() {
                 return NewComponentPage()
@@ -72,12 +86,6 @@ function AppRoutes(router) {
         router.route("/columns", "elements", {
             h() {
                 return ColumnsPage()
-            }
-        })
-
-        router.route("/spinner", "spinner", {
-            h() {
-                return SpinnerTestPage()
             }
         })
 

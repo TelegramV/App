@@ -39,7 +39,7 @@ const vrdom_patchChildren = ($node: Element, vRNode: VRNode, options = {}) => {
 
     if (children.length > $children.length) {
         for (let i = $children.length; i < children.length; i++) {
-            vrdom_append(children[i], $node, {$parent: $node}, options)
+            vrdom_append(children[i], $node, {$parent: $node, ...options})
         }
     } else if (children.length < $children.length) {
         Array.from($children.values()).slice(children.length).forEach(($node: Node) => {

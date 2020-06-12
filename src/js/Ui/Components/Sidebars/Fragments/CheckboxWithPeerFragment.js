@@ -1,4 +1,4 @@
-import VCheckbox from "../../Elements/VCheckbox";
+import VCheckbox from "../../../Elements/Input/VCheckbox";
 import AvatarComponent from "../../Basic/AvatarComponent";
 import PeersStore from "../../../../Api/Store/PeersStore";
 import VComponent from "../../../../V/VRDOM/component/VComponent";

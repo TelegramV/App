@@ -472,7 +472,6 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 console.warn("No message to scroll found.")
             }
         } else {
-            console.log('NO SELECT!!!', event)
             const peer = AppSelectedChat.current;
 
             AppSelectedChat.select(message.to);

@@ -1,5 +1,5 @@
 import {PhotoFragment} from "./PhotoFragment"
-import VSpinner from "../../../../Elements/VSpinner";
+import VSpinner from "../../../../../Elements/VSpinner";
 
 export const LoadingFragment = ({show = true, loading = true, click = undefined, progress = 0.0}) => {
     return (

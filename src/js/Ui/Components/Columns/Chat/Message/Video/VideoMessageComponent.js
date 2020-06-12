@@ -4,20 +4,61 @@ import TextWrapperComponent from "../Common/TextWrapperComponent";
 import MessageTimeComponent from "../Common/MessageTimeComponent";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import BetterVideoComponent from "../../../../Basic/BetterVideoComponent"
+import DocumentParser from "../../../../../../Api/Files/DocumentParser"
+import {formatAudioTime} from "../../../../../Utils/utils"
+import {DocumentMessagesTool} from "../../../../../Utils/document"
+import VSpinner from "../../../../../Elements/VSpinner"
 
 class VideoMessageComponent extends GeneralMessageComponent {
 
-    render() {
-        const text = (this.props.message.text.length > 0) ? <TextWrapperComponent message={this.props.message}/> : ""
+    render({message}) {
+        const text = (message.text.length > 0) ? <TextWrapperComponent message={message}/> : ""
+        const info = DocumentParser.attributeVideo(message.raw.media.document)
+
         return (
-            <MessageWrapperFragment message={this.props.message} noPad showUsername={false} outerPad={text !== ""}
+            <MessageWrapperFragment message={message} noPad showUsername={false} outerPad={text !== ""}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
 
-                <BetterVideoComponent document={this.props.message.raw.media.document}
+                <BetterVideoComponent document={message.raw.media.document}
                                       onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: this.props.message})}
-                                      playOnHover/>
+                                      playOnHover
+                                      infoContainer={
+                                          () => (
+                                              <>
+                                                  <div className="play-button"
+                                                       onClick={event => event.stopPropagation()}>
+                                                      <i className="tgico tgico-play"/>
+                                                  </div>
+                                                  <div className="video-info"
+                                                       onClick={event => event.stopPropagation()}>
+                                                      {
+                                                          false
+                                                          &&
+                                                          <div className="done">
+                                                              {formatAudioTime(info.duration)}
+                                                              <i className="tgico tgico-nosound"/>
+                                                          </div>
+                                                      }
+                                                      <div className="download">
+                                                          <div class="icon">
+                                                              <i className="tgico tgico-clouddownload"/>
+                                                              {/*<VSpinner white strokeWidth={3}/>*/}
+                                                          </div>
+                                                          <div className="info">
+                                                              <span
+                                                                  class="duration">{formatAudioTime(info.duration)}</span>
+                                                              <span class="size">
+                                                              {DocumentMessagesTool.formatSize(message.raw.media.document.size)}
+                                                          </span>
+                                                          </div>
+                                                      </div>
+                                                  </div>
+                                              </>
+                                          )
+                                      }
+                                      muted/>
 
-                {!text ? <MessageTimeComponent message={this.props.message} bg={true}/> : ""}
+                {!text ? <MessageTimeComponent message={message} bg={true}/> : ""}
                 {text}
             </MessageWrapperFragment>
         )

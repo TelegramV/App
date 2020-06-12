@@ -24,7 +24,7 @@ import {__component_unmount} from "./component/__component_unmount"
  * @param unmount unmount component/list/ref if exist
  * @return {HTMLElement|Text}
  */
-const cleanElement = ($node: HTMLElement, unmount: boolean = false) => {
+const cleanDOMElement = ($node: HTMLElement, unmount: boolean = false) => {
     if ($node.__v) {
         if (unmount) {
             if ($node.__v.component) {
@@ -52,4 +52,4 @@ const cleanElement = ($node: HTMLElement, unmount: boolean = false) => {
     return $node
 }
 
-export default cleanElement
+export default cleanDOMElement

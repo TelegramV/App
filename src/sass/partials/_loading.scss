@@ -1,318 +1,356 @@
 .centered {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .v-spinner {
-  --size: 32px;
+    --size: 32px;
 
-  &.background {
-    width: var(--size);
     height: var(--size);
-    border-radius: 100%;
-    z-index: 1;
-    background: $semiblack;
-  }
 
-
-  &.paused {
-    .new-progress {
-      display: none;
+    &.background {
+        width: var(--size);
+        height: var(--size);
+        border-radius: 100%;
+        z-index: 1;
+        background: $semiblack;
     }
-  }
 
-  .slot {
-    position: absolute;
-    width: var(--size);
-    height: var(--size);
-    font-size: 1em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-  }
 
-  &.big {
-    --size: 64px;
+    &.paused {
+        .new-progress {
+            display: none;
+        }
+    }
 
     .slot {
-      font-size: 2em;
+        position: absolute;
+        width: var(--size);
+        height: var(--size);
+        font-size: 1em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
     }
 
-    .new-progress {
-      .path {
-        cx: 32;
-        cy: 32;
-        r: 27.6; // 25.6
-        animation: dash-big 1.5s ease-in-out infinite;
-      }
+    &.big {
+        --size: 64px;
 
-      &.determinate .path {
-        animation: none;
-      }
+        .slot {
+            font-size: 2em;
+        }
 
-      @keyframes dash-big {
-        0% {
-          stroke-dasharray: 1.38, 276;
-          stroke-dashoffset: 0;
+        .new-progress {
+            .path {
+                cx: 32;
+                cy: 32;
+                r: 27.6; // 25.6
+                //animation: dash-big 1.5s ease-in-out infinite;
+            }
+
+            &.determinate .path {
+                animation: none;
+            }
+
+            //@keyframes dash-big {
+            //    0% {
+            //        stroke-dasharray: 1.38, 276;
+            //        stroke-dashoffset: 0;
+            //    }
+            //    50% {
+            //        stroke-dasharray: 122.82, 276;
+            //        stroke-dashoffset: -48.3;
+            //    }
+            //    100% {
+            //        stroke-dasharray: 122.82, 276;
+            //        stroke-dashoffset: -171.12;
+            //    }
+            //}
         }
-        50% {
-          stroke-dasharray: 122.82, 276;
-          stroke-dashoffset: -48.3;
-        }
-        100% {
-          stroke-dasharray: 122.82, 276;
-          stroke-dashoffset: -171.12;
-        }
-      }
     }
-  }
 
-  &.big .new-progress .path {
-    stroke-dasharray: 240;
-  }
+    &.mid {
+        --size: 48px;
+
+        //.slot {
+        //    font-size: 2em;
+        //}
+
+        .new-progress {
+            .path {
+                cx: 24;
+                cy: 24;
+                r: 19.200000000000003; // 25.6
+                animation: dash-mid 1.5s ease-in-out infinite;
+            }
+
+            &.determinate .path {
+                animation: none;
+            }
+
+            @keyframes dash-mid {
+                0% {
+                    stroke-dasharray: 0.96, 192;
+                    stroke-dashoffset: 0;
+                }
+                50% {
+                    stroke-dasharray: 89.94, 192;
+                    stroke-dashoffset: -33.599999999999994;
+                }
+                100% {
+                    stroke-dasharray: 89.94, 192;
+                    stroke-dashoffset: -119.03999999999999;
+                }
+            }
+        }
+    }
+
+    &.big .new-progress .path {
+        stroke-dasharray: 240;
+    }
+
+    &.mid .new-progress .path {
+        stroke-dasharray: 180;
+    }
 }
-.new-progress{
-  animation: rotate 2s linear infinite;
-  height: var(--size);
-  width: var(--size);
-  position: relative;
 
+.new-progress {
+    animation: rotate 2s linear infinite;
+    height: var(--size);
+    width: var(--size);
+    position: relative;
 
-
-
-  .path {
-    cx: 16;
-    cy: 16;
-    r: 12.8;
-    fill: none;
-    stroke-width: 2;
-    stroke-miterlimit: 10;
-
-    stroke-dasharray: 0.64,128;
-    stroke-dashoffset: 0;
-    animation: dash 1.5s ease-in-out infinite;
-    stroke-linecap: round;
-    stroke: $blue;
-  }
-
-  &.determinate {
     .path {
-      transition: anim(stroke-dashoffset);
-      animation: none;
-      stroke-dasharray: 120;
-      stroke-dashoffset: 0;
+        cx: 16;
+        cy: 16;
+        r: 12.8;
+        fill: none;
+        stroke-width: 2;
+        stroke-miterlimit: 10;
+
+        stroke-dasharray: 0.64, 128;
+        stroke-dashoffset: 0;
+        animation: dash 1.5s ease-in-out infinite;
+        stroke-linecap: round;
+        stroke: $blue;
     }
-  }
 
-  &.white .path {
-    stroke: #ffffff;
-  }
+    &.determinate {
+        .path {
+            transition: stroke-dashoffset 250ms ease-in-out;
+            animation: none;
+            stroke-dasharray: 120;
+            stroke-dashoffset: 0;
+        }
+    }
 
-
+    &.white .path {
+        stroke: #ffffff;
+    }
 }
 
 
-
-
-@keyframes rotate{
-  100%{
-    transform: rotate(360deg);
-  }
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
 }
-@keyframes dash{
-  0%{
-    stroke-dasharray: 0.64,128;
-    stroke-dashoffset: 0;
-  }
-  50%{
-    stroke-dasharray: 59.96,128;
-    stroke-dashoffset: -22.4;
-  }
-  100%{
-    stroke-dasharray: 59.96,128;
-    stroke-dashoffset: -79.36;
-  }
+
+@keyframes dash {
+    0% {
+        stroke-dasharray: 0.64, 128;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 59.96, 128;
+        stroke-dashoffset: -22.4;
+    }
+    100% {
+        stroke-dasharray: 59.96, 128;
+        stroke-dashoffset: -79.36;
+    }
 }
 
 .progress-circular {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  box-sizing: border-box;
-  border: none;
-  border-radius: 50%;
-  padding: 0.25em;
-  width: 26px;
-  height: 26px;
-  color: rgb(33, 150, 243);
-  background-color: transparent;
-  font-size: 8px;
-  overflow: hidden;
-
-  &.white {
-    color: white
-  }
-
-  &.big {
-    width: 64px;
-    height: 64px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    border: none;
+    border-radius: 50%;
+    padding: 0.25em;
+    width: 26px;
+    height: 26px;
+    color: rgb(33, 150, 243);
+    background-color: transparent;
     font-size: 8px;
-  }
+    overflow: hidden;
 
-  &.paused {
-    &:indeterminate {
-      animation: none;
-
-      &::before {
-        animation: none;
-        border: none;
-      }
+    &.white {
+        color: white
     }
-  }
+
+    &.big {
+        width: 64px;
+        height: 64px;
+        font-size: 8px;
+    }
+
+    &.paused {
+        &:indeterminate {
+            animation: none;
+
+            &::before {
+                animation: none;
+                border: none;
+            }
+        }
+    }
 }
 
 .progress-background {
-  background-color: black;
-  border-radius: 100%;
-  width: 64px;
-  height: 64px;
-  z-index: 1;
-  background: $semiblack;
+    background-color: black;
+    border-radius: 100%;
+    width: 64px;
+    height: 64px;
+    z-index: 1;
+    background: $semiblack;
 }
 
 .full-size-loader {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 
-  &.height {
-    height: auto !important;
-  }
+    &.height {
+        height: auto !important;
+    }
 }
 
 .progress-circular::-webkit-progress-bar {
-  background-color: transparent;
+    background-color: transparent;
 }
 
 /* Indeterminate */
 .progress-circular:indeterminate {
-  -webkit-mask-image: linear-gradient(transparent 50%, black 50%), linear-gradient(to right, transparent 50%, black 50%);
-  mask-image: linear-gradient(transparent 50%, black 50%), linear-gradient(to right, transparent 50%, black 50%);
-  animation: progress-circular 6s infinite cubic-bezier(0.3, 0.6, 1, 1);
+    -webkit-mask-image: linear-gradient(transparent 50%, black 50%), linear-gradient(to right, transparent 50%, black 50%);
+    mask-image: linear-gradient(transparent 50%, black 50%), linear-gradient(to right, transparent 50%, black 50%);
+    animation: progress-circular 6s infinite cubic-bezier(0.3, 0.6, 1, 1);
 }
 
 :-ms-lang(x), .progress-circular:indeterminate {
-  animation: none;
+    animation: none;
 }
 
 .progress-circular:indeterminate::before,
 .progress-circular:indeterminate::-webkit-progress-value {
-  content: "";
-  display: block;
-  box-sizing: border-box;
-  margin-bottom: 0.25em;
-  border: solid 0.25em transparent;
-  border-top-color: currentColor;
-  border-radius: 50%;
-  width: 100% !important;
-  height: 100%;
-  background-color: transparent;
-  animation: progress-circular-pseudo 0.75s infinite linear alternate;
+    content: "";
+    display: block;
+    box-sizing: border-box;
+    margin-bottom: 0.25em;
+    border: solid 0.25em transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    width: 100% !important;
+    height: 100%;
+    background-color: transparent;
+    animation: progress-circular-pseudo 0.75s infinite linear alternate;
 }
 
 .progress-circular:indeterminate::-moz-progress-bar {
-  box-sizing: border-box;
-  border: solid 0.25em transparent;
-  border-top-color: currentColor;
-  border-radius: 50%;
-  width: 100%;
-  height: 100%;
-  background-color: transparent;
-  animation: progress-circular-pseudo 0.75s infinite linear alternate;
+    box-sizing: border-box;
+    border: solid 0.25em transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    animation: progress-circular-pseudo 0.75s infinite linear alternate;
 }
 
 .progress-circular:indeterminate::-ms-fill {
-  animation-name: -ms-ring;
+    animation-name: -ms-ring;
 }
 
 @keyframes progress-circular {
-  0% {
-    transform: rotate(0deg);
-  }
-  12.5% {
-    transform: rotate(180deg);
-    animation-timing-function: linear;
-  }
-  25% {
-    transform: rotate(630deg);
-  }
-  37.5% {
-    transform: rotate(810deg);
-    animation-timing-function: linear;
-  }
-  50% {
-    transform: rotate(1260deg);
-  }
-  62.5% {
-    transform: rotate(1440deg);
-    animation-timing-function: linear;
-  }
-  75% {
-    transform: rotate(1890deg);
-  }
-  87.5% {
-    transform: rotate(2070deg);
-    animation-timing-function: linear;
-  }
-  100% {
-    transform: rotate(2520deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
+    12.5% {
+        transform: rotate(180deg);
+        animation-timing-function: linear;
+    }
+    25% {
+        transform: rotate(630deg);
+    }
+    37.5% {
+        transform: rotate(810deg);
+        animation-timing-function: linear;
+    }
+    50% {
+        transform: rotate(1260deg);
+    }
+    62.5% {
+        transform: rotate(1440deg);
+        animation-timing-function: linear;
+    }
+    75% {
+        transform: rotate(1890deg);
+    }
+    87.5% {
+        transform: rotate(2070deg);
+        animation-timing-function: linear;
+    }
+    100% {
+        transform: rotate(2520deg);
+    }
 }
 
 @keyframes progress-circular-pseudo {
-  0% {
-    transform: rotate(-30deg);
-  }
-  29.4% {
-    border-left-color: transparent;
-  }
-  29.41% {
-    border-left-color: currentColor;
-  }
-  64.7% {
-    border-bottom-color: transparent;
-  }
-  64.71% {
-    border-bottom-color: currentColor;
-  }
-  100% {
-    border-left-color: currentColor;
-    border-bottom-color: currentColor;
-    transform: rotate(225deg);
-  }
+    0% {
+        transform: rotate(-30deg);
+    }
+    29.4% {
+        border-left-color: transparent;
+    }
+    29.41% {
+        border-left-color: currentColor;
+    }
+    64.7% {
+        border-bottom-color: transparent;
+    }
+    64.71% {
+        border-bottom-color: currentColor;
+    }
+    100% {
+        border-left-color: currentColor;
+        border-bottom-color: currentColor;
+        transform: rotate(225deg);
+    }
 }
 
 .progress-ring {
-  width: 64px;
-  height: 64px;
-  .progress-ring__circle{
-    $stroke: 4px;
-    cx: 50%;
-    cy: 50%;
-    r: calc(50% - #{$stroke});
+    width: 64px;
+    height: 64px;
 
-    stroke: white;
-    fill: transparent;
-    stroke-width: $stroke;
-    stroke-linecap: round;
-    transform-origin: center;
-    transform: rotate(-90deg);
-    transition: stroke-dashoffset 0.25s;
-  }
+    .progress-ring__circle {
+        $stroke: 4px;
+        cx: 50%;
+        cy: 50%;
+        r: calc(50% - #{$stroke});
+
+        stroke: white;
+        fill: transparent;
+        stroke-width: $stroke;
+        stroke-linecap: round;
+        transform-origin: center;
+        transform: rotate(-90deg);
+        transition: stroke-dashoffset 0.25s;
+    }
 }

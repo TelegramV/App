@@ -17,22 +17,29 @@
  *
  */
 
-import cleanDOMElement from "./cleanDOMElement"
+import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
+import valIf from "../../../V/VRDOM/jsx/helpers/valIf"
 
-function deepUnmount($el: HTMLElement) {
-    cleanDOMElement($el, true);
-
-    for (const $child of $el.childNodes) {
-        deepUnmount($child);
+function VRadio(
+    {
+        label,
+        checked,
+        name,
+        input
     }
+) {
+    return (
+        <div className="radio-input">
+            <label>
+                <input type="radio"
+                       name={name}
+                       onInput={input}
+                       checked={valIf(checked, true)}/>
+
+                {nodeIf(<span className="radio-label">{label}</span>, label)}
+            </label>
+        </div>
+    )
 }
 
-function vrdom_delete($el: HTMLElement) {
-    if ($el) {
-        deepUnmount($el);
-
-        $el.remove()
-    }
-}
-
-export default vrdom_delete
+export default VRadio;

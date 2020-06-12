@@ -24,7 +24,7 @@ import AppSelectedChat from "../../../Reactive/SelectedChat"
 import UIEvents from "../../../EventBus/UIEvents"
 import VComponent from "../../../../V/VRDOM/component/VComponent"
 import VApp from "../../../../V/vapp"
-import VSpinner from "../../Elements/VSpinner"
+import VSpinner from "../../../Elements/VSpinner"
 import VirtualizedBubblesComponent from "./VirtualizedBubblesComponent"
 import ChatInfoCallButtonComponent from "./ChatInfo/ChatInfoCallButtonComponent";
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"

@@ -19,7 +19,7 @@ class GroupedMessageComponent extends GeneralMessageComponent {
     }
 
     render({message: group}) {
-        const text = group.text.length > 0 ? <TextWrapperComponent message={group}/> : ""
+        const text = group.text.length && <TextWrapperComponent message={group}/>
 
         return (
             <MessageWrapperFragment message={group}
@@ -45,8 +45,8 @@ class GroupedMessageComponent extends GeneralMessageComponent {
                         })
                     }
                 </div>
-                {!text ? <MessageTimeComponent message={group} bg={true}/> : ""}
-                {text}
+                <TextWrapperComponent message={group}/>
+                {/*{text || <MessageTimeComponent message={group} bg={true}/>}*/}
             </MessageWrapperFragment>
         )
     }
