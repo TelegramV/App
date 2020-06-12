@@ -1,16 +1,9 @@
 import LoginPage from "../Pages/Login/LoginPage"
 import {MainPage} from "../Pages/Main/MainPage"
 import MTProto from "../../MTProto/External"
-//import {NewComponentPage} from "../Pages/Tests/NewComponentTestPage"
-//import {ReactListPage} from "../Pages/Tests/ReactiveListPage"
 import VApp from "../../V/vapp"
-//import VirtualPage from "../Pages/Tests/VirtualPage"
-//import ElementsPage from "../Pages/Tests/Elements"
-//import ColumnsPage from "../Pages/Tests/Columns"
-//import CryptoTestPage from "../Pages/Tests/Crypto"
-//import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage";
-//import NextGenPage from "../Pages/Tests/NextGen"
-//import {StreamingPage} from "../Pages/Tests/Streaming"
+import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage"
+import ElementsPage from "../Pages/Tests/Elements"
 
 /**
  * @param {VFrameworkRouter} router
@@ -37,6 +30,18 @@ function AppRoutes(router) {
     // router.route("/video", "video", {
     //     h() {
     //         return VideoStreamingPage()
+    //     }
+    // })
+
+    // router.route("/spinner", "spinner", {
+    //     h() {
+    //         return SpinnerTestPage()
+    //     }
+    // })
+    //
+    // router.route("/elements", "elements", {
+    //     h() {
+    //         return ElementsPage()
     //     }
     // })
 
@@ -68,12 +73,6 @@ function AppRoutes(router) {
         router.route("/columns", "elements", {
             h() {
                 return ColumnsPage()
-            }
-        })
-
-        router.route("/spinner", "spinner", {
-            h() {
-                return SpinnerTestPage()
             }
         })
 

@@ -39,10 +39,10 @@ class StatefulComponent<P, S> extends VComponent<P> {
     render(props, state, globalState) {
     }
 
-    componentWillUpdate(nextProps: P, nextState: S) {
+    componentWillUpdate(nextProps, nextState) {
     }
 
-    shouldComponentUpdate(nextProps: P, nextState: S) {
+    shouldComponentUpdate(nextProps, nextState) {
     }
 
     setState(nextState) {

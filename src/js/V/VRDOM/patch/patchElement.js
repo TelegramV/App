@@ -18,23 +18,24 @@
  */
 
 import patchAttrs from "./patchAttrs"
-import patchEvents from "./patchEvents"
-import patchStyle from "./patchStyle"
 import patchDangerouslySetInnerHTML from "./patchDangerouslySetInnerHTML"
 import vrdom_patchChildren from "./patchChildren"
 import VRNode from "../VRNode"
 import patch_Text_VRNode from "./patch_Text_VRNode"
 import {initElement} from "../render/renderElement"
 import VApp from "../../vapp"
-import vrdom_mount from "../mount"
+import patchEvents from "./patchEvents"
+import patchStyle from "./patchStyle"
 
 const recreateElementByTagName = ($node: HTMLElement, tagName: string, options = {}) => {
     const $newNode = options.xmlns ? document.createElementNS(options.xmlns, tagName) : document.createElement(tagName)
 
     initElement($newNode)
 
-    while ($node.childNodes.length > 0) {
-        $newNode.appendChild($node.childNodes[0])
+    if ($node.namespaceURI === $newNode.namespaceURI) {
+        while ($node.childNodes.length > 0) {
+            $newNode.appendChild($node.childNodes[0])
+        }
     }
 
     return $newNode
@@ -51,20 +52,36 @@ const patchElement = ($node: HTMLElement, vRNode: VRNode, options = {}) => {
         return patch_Text_VRNode($node, vRNode, options)
     }
 
-    if (vRNode.tagName.toLowerCase() === "svg") {
-        // options.xmlns = "http://www.w3.org/2000/svg"
-        return vrdom_mount(vRNode, $node, options)
-    }
+    options.xmlns = $node.namespaceURI
 
     if ($node.tagName.toLowerCase() !== vRNode.tagName.toLowerCase()) {
         const $oldNode = $node
         $node = recreateElementByTagName($node, vRNode.tagName, options)
-        $oldNode.replaceWith($node)
-    }
 
-    patchAttrs($node, vRNode.attrs, options)
-    patchEvents($node, vRNode.events)
-    patchStyle($node, vRNode.style)
+        for (let [k, v] of Object.entries(vRNode.attrs)) {
+            if (v != null) {
+                $node.setAttribute(k, v)
+            }
+        }
+
+        for (let [k, v] of Object.entries(vRNode.style)) {
+            if (v) {
+                $node.style.setProperty(k, v)
+                $node.__v.patched_styles.add(k)
+            }
+        }
+
+        for (const [k, v] of Object.entries(vRNode.events)) {
+            $node[`on${k}`] = v
+            $node.__v.patched_events.add(k)
+        }
+
+        $oldNode.replaceWith($node)
+    } else {
+        patchAttrs($node, vRNode.attrs, options)
+        patchEvents($node, vRNode.events)
+        patchStyle($node, vRNode.style)
+    }
 
     if (vRNode.dangerouslySetInnerHTML !== false) {
         patchDangerouslySetInnerHTML($node, vRNode.dangerouslySetInnerHTML)

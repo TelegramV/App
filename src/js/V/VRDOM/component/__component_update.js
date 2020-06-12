@@ -26,10 +26,7 @@ import __component_recreateReactiveObjects from "./__component_recreateReactiveO
 
 export function __component_update_props(component, nextProps) {
     if (nextProps) {
-        nextProps = __component_withDefaultProps(component, {
-            ...component.props,
-            ...nextProps
-        });
+        nextProps = __component_withDefaultProps(component, nextProps);
 
         let shouldUpdate = component.shouldComponentUpdate(nextProps, component.state);
 
@@ -58,11 +55,6 @@ export function __component_update_props(component, nextProps) {
 
 export function __component_update_state(component, nextState) {
     if (nextState) {
-        nextState = {
-            ...component.state,
-            ...nextState
-        };
-
         let shouldUpdate = component.shouldComponentUpdate(component.props, nextState);
 
         if (shouldUpdate === undefined) {
