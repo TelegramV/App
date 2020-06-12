@@ -115,6 +115,10 @@ class MessagesProcessor {
 
                     return setTimeout(() => connection.reinvoke(rpc_result.req_msg_id), (fwTime * 1000) + 1000);
                 }
+            } else if (error.code === 500) {
+                // next try in 1 second
+                console.error("will be reinvoked", error);
+                return setTimeout(() => connection.reinvoke(rpc_result.req_msg_id), 1000);
             }
 
             invokation.reject(error);
