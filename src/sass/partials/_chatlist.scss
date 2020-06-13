@@ -16,7 +16,7 @@
 
     &.responsive-selected-chatlist {
       display: none;
-    } 
+    }
   }
 
   /*&:before {
@@ -30,8 +30,8 @@
 }
 
 #dialogsWrapper {
-
   will-change: transform;
+  overflow: scroll;
 
   height: 100%;
 

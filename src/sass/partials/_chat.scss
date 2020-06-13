@@ -258,6 +258,7 @@
         #bubbles {
             will-change: transform;
             width: 100%;
+            overflow: scroll;
 
             #bubbles-inner {
                 //will-change: transform;
