@@ -98,7 +98,7 @@ export class MonkeyController {
 
     idle(start) {
         let that = this;
-        this.load(this.states.idle).then(function () {
+        this.load(this.states.idle).then(_ => {
             that.animation.setSpeed(1);
             if (start) {
                 that.animation.seek(start);
@@ -109,7 +109,7 @@ export class MonkeyController {
 
     track(start) {
         let that = this;
-        return this.load(this.states.tracking).then(function () {
+        return this.load(this.states.tracking).then(_ => {
             that.animation.setSpeed(1);
             if (start) {
                 that.animation.seek(start);
@@ -122,21 +122,28 @@ export class MonkeyController {
     close(start) {
         let that = this;
         this.closed = true;
-        this.load(this.states.close).then(function () {
-            that.animation.setSpeed(1);
-            if (start) {
-                that.animation.seek(start);
-            }
-            that.animation.play();
-            that.nextPauseFrame = 50;
-        });
+        if(this.peeking) {
+            this.animation.setSpeed(-1);
+            this.nextPauseFrame=99;
+            this.closed = true;
+            this.animation.play();
+        } else {
+            this.load(this.states.close).then(_ => {
+                that.animation.setSpeed(1);
+                if (start) {
+                    that.animation.seek(start);
+                }
+                that.animation.play();
+                that.nextPauseFrame = 50;
+            });
+        }
     }
 
     peek(start) {
         let that = this;
-        this.peeking = !this.peeking;
+        this.peeking = true;
         if (this.closed) {
-            this.load(this.states.peek, false).then(function () {
+            this.load(this.states.peek, false).then(_ => {
                 if (start) {
                     that.animation.seek(seek);
                 }
@@ -148,7 +155,7 @@ export class MonkeyController {
                 that.nextPauseFrame = 50;
             });
         } else {
-            this.load(this.states.closeAndPeek, false).then(function () {
+            this.load(this.states.closeAndPeek, false).then(_ => {
                 if (start) {
                     that.animation.seek(seek);
                 }
@@ -159,10 +166,9 @@ export class MonkeyController {
     }
 
     open() {
-        console.log("open")
         let that = this;
         if (this.peeking) {
-            this.load(this.states.closeAndPeekToIdle).then(function () {
+            this.load(this.states.closeAndPeekToIdle).then(_ => {
                 that.animation.play();
                 that.nextState = that.idle;
             });
