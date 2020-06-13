@@ -17,10 +17,10 @@
  *
  */
 
-import VFramework from "./VFramework"
+import Vee from "./Vee"
 import VFrameworkRouter from "./Router/VRouter"
 
-const VApp = new VFramework({
+const VApp = new Vee({
     router: new VFrameworkRouter()
 })
 

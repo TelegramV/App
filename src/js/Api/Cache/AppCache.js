@@ -5,7 +5,7 @@ class Cache {
     constructor() {
 
         /**
-         * @type {undefined}
+         * @type {IDBDatabase}
          * @private
          */
         this._db = undefined

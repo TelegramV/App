@@ -1,14 +1,12 @@
 import {EventBus} from "./EventBus"
-import {DialogsEventBus} from "./DialogsEventBus"
-import {PeersEventBus} from "./PeersEventBus"
 
 const AppEvents = {
     // we should leave a single bus,
     General: new EventBus(),
     Audio: new EventBus(),
 
-    Dialogs: new DialogsEventBus(),
-    Peers: new PeersEventBus(),
+    Dialogs: new EventBus(),
+    Peers: new EventBus(),
     Calls: new EventBus(),
     Files: new EventBus()
 }

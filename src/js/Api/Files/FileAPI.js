@@ -283,7 +283,7 @@ export class FileAPI {
         const bigFileLimit = 1024 * 1024 * 10
         const parts = Math.ceil(size / splitSize)
         const isBig = size >= bigFileLimit
-        const id = await MTProto.TimeManager.generateMessageId(AppConfiguration.mtproto.dataCenter.default)
+        const id = await MTProto.TimeManager.generateMessageId()
         const inputFile = {
             _: isBig ? "inputFileBig" : "inputFile",
             parts: parts,
@@ -432,18 +432,18 @@ export class FileAPI {
         })
     }
 
-    static getThumbSize(file) {
-        if (!file.thumbs) return undefined;
-        for (const thumb of file.thumbs) {
-            if (thumb._ !== "photoSize") continue;
-            return {
-                w: thumb.w,
-                h: thumb.h
-            }
-        }
-
-        return undefined;
-    }
+    // static getThumbSize(file) {
+    //     if (!file.thumbs) return undefined;
+    //     for (const thumb of file.thumbs) {
+    //         if (thumb._ !== "photoSize") continue;
+    //         return {
+    //             w: thumb.w,
+    //             h: thumb.h
+    //         }
+    //     }
+    //
+    //     return undefined;
+    // }
 
     static getAttribute(file, attribute) {
         return file.attributes && file.attributes.find(l => l._ === attribute)

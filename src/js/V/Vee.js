@@ -21,10 +21,7 @@ import VFrameworkRouter from "./Router/VRouter"
 import VRDOMPlugin from "./VRDOM/plugin/VRDOMPlugin"
 import VRDOMTextInterceptor from "./VRDOM/plugin/VRDOMTextInterceptor"
 
-/**
- * V Framework - tool for building SPA-like application. Written specially for Telegram V.
- */
-class VFramework {
+class Vee {
 
     latestInstantiatedComponent = 0
     latestInstantiatedRef = 0
@@ -93,4 +90,4 @@ class VFramework {
     }
 }
 
-export default VFramework
+export default Vee
