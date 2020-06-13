@@ -417,11 +417,13 @@ export class MediaViewerComponent extends StatefulComponent {
     }
 
     formatDate(date) {
-        return new Date(date * 1000).toLocaleString("en", {
+        let text = new Date().toLocaleString("en", {month: "short", day: "numeric"});
+        text += " at "
+        text += new Date(date * 1000).toLocaleString(navigator.language, {
             hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
+            minute: '2-digit'
         })
+        return text;
     }
 
     close = (event) => {

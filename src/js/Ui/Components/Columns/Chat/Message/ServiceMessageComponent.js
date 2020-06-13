@@ -120,7 +120,7 @@ class ServiceMessageComponent extends GeneralMessageComponent {
         if (type === "messageActionGameScore") {
             let game = AppSelectedChat.current.messages.getGamesById(action.game_id)[0];
             let append = [];
-            if (game) {
+            if (game[0]?.title) {
                 append = [" in ", game[0].title]
             }
             return [this.wrapPeerWithSelf(message.from),

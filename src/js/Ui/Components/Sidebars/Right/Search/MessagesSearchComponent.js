@@ -20,7 +20,7 @@ const MessageFragmentItemTemplate = (message) => {
                              fetchFull={false}
                              name={peer.name}
                              status={<span>{message.prefix}{highlightVRNodeWord(message.text, CURRENT_QUERY)}</span>}
-                             time={message.getFormattedDate()}
+                             time={message.getFormattedDateOrTime()}
                              onClick={() => UIEvents.General.fire("chat.showMessage", {message: message})}/>
 }
 

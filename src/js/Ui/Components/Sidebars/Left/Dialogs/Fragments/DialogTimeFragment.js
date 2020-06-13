@@ -4,7 +4,7 @@ export const DialogTimeFragment = ({id, dialog}) => {
     today.setMinutes(0);
     return (
         <div id={id} className="time">
-            {dialog.peer.messages.last.getFormattedDate()}
+            {dialog.peer.messages.last.getFormattedDateOrTime()}
         </div>
     )
 }

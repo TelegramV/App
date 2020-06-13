@@ -39,6 +39,7 @@ import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
 import IntersectionObserver from 'intersection-observer-polyfill';
 import GroupMessage from "../../../../Api/Messages/GroupMessage"
 import vrdom_patchChildren from "../../../../V/VRDOM/patch/patchChildren"
+import {isDateEqual} from "../../../Utils/utils"
 
 function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
@@ -149,7 +150,6 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         } else {
             message.tailsGroup = "m";
         }
-
         return <MessageComponent observer={this.observer} message={message}/>;
     }
 
@@ -181,6 +181,18 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         scrollBottom(this.$el, this.bubblesInnerRef.$el);
     }
 
+    renderDate(message, nextMessage) {
+        let date = message.jsDate;
+        let nextDate = nextMessage?.jsDate;
+        if(!isDateEqual(date, nextDate)) {
+            return vrdom_render(<div class="service">
+                <div class="service-msg">
+                    {`${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}`}
+                </div>
+            </div>);
+        }
+    }
+
     appendMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
         // messages = messages.slice().reverse();
 
@@ -209,6 +221,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             //[2,3,y]
             for (let i = 1; i < messages.length - 1; i++) {
                 $messages.push(this.renderMessage(messages[i], messages[i - 1], messages[i + 1]));
+                //let date = this.renderDate(messages[i],messages[i+1]);
+                //if(date) $messages.push(date);
             }
 
             if (messages.length > 1) {

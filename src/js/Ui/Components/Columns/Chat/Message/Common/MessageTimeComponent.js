@@ -22,11 +22,7 @@ const MessageTimeComponent = ({message, bg = false, color}) => {
             <div class="inner status tgico" css-color={color}>
             	{bg ? views : ""}
                 {edited}
-                {message.getDate('en', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                })}
+                {message.getFormattedTime()}
                 </div>
             </span>
     )

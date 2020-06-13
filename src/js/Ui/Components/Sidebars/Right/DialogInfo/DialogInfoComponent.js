@@ -302,10 +302,9 @@ export class DialogInfoComponent extends RightBarComponent {
         const time = formatAudioTime(audio.duration)
         const title = audio.title
         const performer = audio.performer
-        const date = new Date(rawMessage.date * 1000).toLocaleString("en", {
+        const date = new Date(rawMessage.date * 1000).toLocaleString(navigator.language, {
             hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
+            minute: '2-digit'
         })
 
         VRDOM.append(<DialogInfoAudioComponent title={title}

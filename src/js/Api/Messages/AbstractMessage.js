@@ -198,6 +198,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.raw.date
     }
 
+    get jsDate() {
+        return new Date(this.raw.date * 1000);
+    }
+
     get editDate() {
         return this.raw.edit_date
     }
@@ -207,10 +211,18 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     getDate(locale: any, format: any) {
-        return new Date(this.date * 1000).toLocaleString(locale, format)
+        return this.jsDate.toLocaleString(locale, format)
+    }
+
+    getFormattedTime() {
+        return this.getDate(navigator.language, DATE_FORMAT_TIME)
     }
 
     getFormattedDate() {
+        return this.getDate(navigator.language, DATE_FORMAT)
+    }
+
+    getFormattedDateOrTime() {
         return this.getDate(navigator.language, MTProto.TimeManager.now(true) - this.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)
     }
 
