@@ -19,13 +19,15 @@ class GroupedMessageComponent extends GeneralMessageComponent {
     }
 
     render({message: group}) {
-        const text = group.text.length && <TextWrapperComponent message={group}/>
+        const isText = group.text.length > 0;
+        console.log(group.first.text, group.first.parsed)
+        console.log(group.text, group.parsed)
 
         return (
             <MessageWrapperFragment message={group}
                                     noPad
                                     showUsername={false}
-                                    outerPad={text !== ""}
+                                    outerPad={false}
                                     bubbleRef={this.bubbleRef}>
                 <div className={["grouped", Layouter.getClass(group.messages.size)]}>
                     {
@@ -45,8 +47,7 @@ class GroupedMessageComponent extends GeneralMessageComponent {
                         })
                     }
                 </div>
-                <TextWrapperComponent message={group}/>
-                {/*{text || <MessageTimeComponent message={group} bg={true}/>}*/}
+                {isText ? <TextWrapperComponent message={group}/> : <MessageTimeComponent message={group} bg={true}/>}
             </MessageWrapperFragment>
         )
     }

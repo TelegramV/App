@@ -22,7 +22,6 @@
 @import "partials/media";
 @import "partials/inlineKeyboard";
 @import "partials/sidebar";
-@import "partials/grouped";
 @import "partials/fab";
 @import "partials/phoneCall";
 
@@ -42,8 +41,8 @@
 @import "partials/message/audio";
 @import "partials/message/video";
 @import "partials/message/service";
-@import "partials/message/message";
-//imported last
+@import "partials/message/grouped";
+@import "partials/message/message"; //imported last
 
 @import "partials/loading";
 @import "partials/login";
