@@ -26,3 +26,44 @@ export const callOrReturn = (value: any): any => {
         return value
     }
 }
+
+export const throttle = (callable, period: number, context = null) => {
+    let timeoutId
+    let time
+
+    return function () {
+        if (!context) {
+            context = this
+        }
+
+        if (time) {
+            clearTimeout(timeoutId)
+
+            timeoutId = setTimeout(() => {
+                if ((Date.now() - time) >= period) {
+                    callable.apply(context, arguments)
+
+                    time = Date.now()
+                }
+            }, period - (Date.now() - time))
+        } else {
+            callable.apply(context, arguments)
+
+            time = Date.now()
+        }
+    }
+}
+
+export const debounce = (callable, delay: number, context = null) => {
+    let timeoutId
+
+    return function () {
+        if (!context) {
+            context = this
+        }
+
+        clearTimeout(timeoutId)
+
+        timeoutId = setTimeout(() => callable.apply(context, arguments), delay)
+    }
+}
