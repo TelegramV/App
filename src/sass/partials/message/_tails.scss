@@ -109,7 +109,7 @@
                     padding-left: 21px;
                 }
 
-                .reply {
+                .reply, .text-wrapper {
                     margin-left: 21px;
                 }
 
@@ -183,6 +183,10 @@
 
                 .reply {
                     margin-left: 10px;
+                }
+
+                .text-wrapper {
+                    margin-right: 21px;
                 }
 
                 .fwd, .username {

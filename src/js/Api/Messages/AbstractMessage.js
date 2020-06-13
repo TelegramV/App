@@ -38,7 +38,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     forwardedType: string;
     forwardedMessageId: number;
 
-    parsed = "";
+    parsedText = "";
 
     _hideAvatar: boolean;
     _tailsGroup: string;
@@ -156,7 +156,11 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get text(): string {
-        return this.raw ? this.raw.message || "" : ""
+        return this.raw?.message ?? ""
+    }
+
+    get parsed() {
+        return this.parsedText;
     }
 
     get to(): Peer {
@@ -318,7 +322,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     // WARNING: always call super
     fillRaw(raw: Object): Message {
-        this.parsed = parseMessageEntities(raw.message || "", raw.entities)
+        this.parsedText = parseMessageEntities(raw.message || "", raw.entities)
 
         this.raw = raw
         this.prefix = MessageParser.getDialogPrefix(this)

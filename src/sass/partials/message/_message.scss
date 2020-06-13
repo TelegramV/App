@@ -168,12 +168,20 @@
                 margin-bottom: 5px;
             }
 
+            &.no-pad {
+                .text-wrapper {
+                    margin-left: 10px;
+                    margin-right: 10px;
+                }
+            }
+
             //not dependant
             @include game;
             @include map;
             @include sticker;
             @include figure;
             @include media-wrapper;
+            @include grouped;
 
             a:not(.button) {
                 color: $darkblue;
@@ -181,13 +189,6 @@
                 &:hover {
                     text-decoration: underline;
                 }
-            }
-
-            .grouped {
-                border-radius: 0;
-                grid-gap: 2px;
-                height: auto;
-                max-height: 640px;
             }
         }
     }

@@ -38,11 +38,19 @@ class GroupMessage extends AbstractMessage {
     }
 
     get raw() {
-        return Array.from(this.messages).sort(compareFn("id", "asc"))[0].raw;
+        return this.first?.raw;
+    }
+
+    get first() {
+        return Array.from(this.messages).sort(compareFn("id", "asc"))[0];
     }
 
     get newest() {
         return Array.from(this.messages).sort(compareFn("id", "desc"))[0];
+    }
+
+    get parsed() {
+        return this.first.parsed;
     }
 
     add(message: Message) {
