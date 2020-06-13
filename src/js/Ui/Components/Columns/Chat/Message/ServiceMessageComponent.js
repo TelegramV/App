@@ -9,9 +9,10 @@ import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
 class ServiceMessageComponent extends GeneralMessageComponent {
     render() {
         const photo = this.props.message?.action?.photo;
+        const message = this.prepare();
         return (
             <div className="service">
-                <div className="service-msg">{this.prepare()}</div>
+                <div className="service-msg">{Array.isArray(message) ? message.flat(Infinity) : message}</div>
                 {photo && <BetterPhotoComponent className="photo" photo={photo} wrapFigure={false}/>}
             </div>
         )
