@@ -14,7 +14,7 @@ class WebpageMessageComponent extends GeneralMessageComponent {
                 <TextWrapperComponent message={this.props.message}>
                     <a href={webpage.url} target="_blank" className="box web rp">
                         <div className="quote">
-                            {webpage.photo ? <BetterPhotoComponent photo={webpage.photo}/> : ""}
+                            {webpage.photo ? <BetterPhotoComponent photo={webpage.photo} calculateSize/> : ""}
                             {webpage.site_name ? <div className="name">{webpage.site_name}</div> : ""}
                             {webpage.title ? <div className="title">{webpage.title}</div> : ""}
                             {webpage.description ? <div className="text">{webpage.description}</div> : ""}

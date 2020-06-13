@@ -60,9 +60,9 @@ const process = (flatten: Array, child) => {
 }
 
 function vrdom_createElement(tagName: VRTagName, attributes: VRAttrs, ...children: Array<VRNode>) {
-    if (tagName === VRDOM.Fragment) {
-        console.warn("fragments are not fully supported")
-    }
+    // if (tagName === VRDOM.Fragment) {
+    //     console.warn("fragments are not fully supported")
+    // }
 
     const flatten = []
 

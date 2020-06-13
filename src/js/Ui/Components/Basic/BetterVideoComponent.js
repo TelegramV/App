@@ -19,6 +19,8 @@
 
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
+import DocumentParser from "../../../Api/Files/DocumentParser"
+import {PhotoFragment} from "../Columns/Chat/Message/Photo/PhotoFragment"
 
 class BetterVideoComponent extends StatefulComponent {
     state = {
@@ -33,20 +35,18 @@ class BetterVideoComponent extends StatefulComponent {
     init() {
         const {document} = this.props;
 
-        const maxSize = FileAPI.getMaxSize(document);
+        const maxSize = DocumentParser.attributeVideo(document);
         this.state.width = maxSize.w;
         this.state.height = maxSize.h;
-        this.state.thumbnailUrl = FileAPI.hasThumbnail(document) ? FileAPI.getThumbnail(document) : "";
+        this.state.thumbnailUrl = FileAPI.getThumbnail(document);
     }
 
     render({document, onClick, playOnHover, infoContainer, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
         isLoading = true;
 
-        const InfoContainer = infoContainer
-
         return (
             <figure className={["video rp rps", isLoading && "thumbnail"]} onClick={onClick}>
-                {InfoContainer && <InfoContainer/>}
+                {infoContainer && infoContainer({})}
                 {
                     !isLoading ?
                         <video src={url}
@@ -57,13 +57,17 @@ class BetterVideoComponent extends StatefulComponent {
                                {...otherArgs}
                         />
                         :
-                        (width > height ?
-                                <img src={thumbnailUrl} alt=""
-                                     width={width ? width + "px" : ""}/>
-                                :
-                                <img src={thumbnailUrl} alt=""
-                                     height={height ? height + "px" : ""}/>
-                        )
+                        <PhotoFragment document={document} url={thumbnailUrl}
+                                       width={width}
+                                       height={height}
+                                       calculateSize={true}/>
+                    // (width > height ?
+                    //         <img src={thumbnailUrl} alt=""
+                    //              width={width ? width + "px" : ""}/>
+                    //         :
+                    //         <img src={thumbnailUrl} alt=""
+                    //              height={height ? height + "px" : ""}/>
+                    // )
                 }
             </figure>
         )

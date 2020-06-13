@@ -21,6 +21,7 @@ import FoldersManager from "../../../Api/Dialogs/FolderManager";
 import ForwardBarComponent from "../../Components/Sidebars/Right/ForwardBarComponent";
 import Localization from "../../../Api/Localization/Localization";
 import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
+import {throttle} from "../../../Utils/func"
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -51,9 +52,9 @@ export function MainPage() {
     //TODO move this somewhere
     vhFix();
 
-    window.addEventListener('resize', () => {
+    window.addEventListener('resize', throttle(() => {
         vhFix();
-    });
+    }, 500));
 
     return (
         <div class="app">

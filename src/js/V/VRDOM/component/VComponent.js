@@ -25,6 +25,7 @@ import __component_withDefaultProps from "./__component_withDefaultProps"
 import {__component_update_force} from "./__component_update"
 import type {RORC} from "./__component_reactiveObjectEventsBuilder"
 import type {AE} from "./__component_appEventsBuilder"
+import {debounce, throttle} from "../../../Utils/func"
 
 export class ComponentDidNotMount {
 }
@@ -225,38 +226,11 @@ class VComponent<P> {
     }
 
     throttle(callable, period: number) {
-        let timeoutId
-        let time
-
-        return () => {
-            const args = arguments
-
-            if (time) {
-                this.clearTimeout(timeoutId)
-
-                timeoutId = this.withTimeout(() => {
-                    if ((Date.now() - time) >= period) {
-                        callable(args)
-
-                        time = Date.now()
-                    }
-                }, period - (Date.now() - time))
-            } else {
-                callable(args)
-
-                time = Date.now()
-            }
-        }
+        return throttle(callable, period, this)
     }
 
     debounce(callable, delay: number) {
-        let timeoutId
-
-        return () => {
-            this.clearTimeout(timeoutId)
-
-            timeoutId = this.withTimeout(() => callable(arguments), delay)
-        }
+        return debounce(callable, delay, this)
     }
 
     /**

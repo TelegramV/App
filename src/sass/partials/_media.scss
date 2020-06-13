@@ -32,36 +32,4 @@ figure.photo, figure.video, figure.round-video {
         max-width: 100%;
         object-fit: contain;
     }
-
-    > .progress {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-
-        > .pause-button {
-            background: $semiblack;
-            width: 64px;
-            height: 64px;
-            line-height: 62px;
-            position: absolute;
-            border-radius: 100%;
-            text-align: center;
-            cursor: pointer;
-
-
-            > .tgico {
-                position: relative;
-                color: white;
-                font-size: 32px;
-            }
-        }
-
-        > progress {
-            position: relative;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-        }
-    }
 }

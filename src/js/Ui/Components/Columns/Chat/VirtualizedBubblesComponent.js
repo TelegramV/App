@@ -110,7 +110,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         this.props.loaderRef.$el.style.display = "none";
 
-        this.$el.addEventListener("scroll", this.throttle(this.onScroll, 500), {
+        this.$el.addEventListener("scroll", this.throttle(this.onScroll, 300), {
             passive: true,
         });
     }
