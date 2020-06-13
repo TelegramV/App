@@ -127,19 +127,20 @@ class Connection {
     ping(check = true) {
         if (check && !this.doPinging) {
             if (this.pingingInvervalId) {
+                clearInterval(this.pingingInvervalId);
+                this.pingingInvervalId = null;
+
                 if (!this.withUpdates) {
                     this.ping(false);
                 }
-                clearInterval(this.pingingInvervalId);
-                this.pingingInvervalId = null;
                 return;
             }
         }
 
         const ping_serializer = TL.packer();
 
-        if (this.withUpdates === false) {
-            ping_serializer.int(AppConfiguration.mtproto.api.invokeWithoutUpdates, "invokeWithoutUpdates");
+        if (!this.withUpdates) {
+            ping_serializer.int(0xbf9459b7, "invokeWithoutUpdates");
         }
 
         const ping_id = new Uint8Array([Random.nextInteger(0xFFFFFFFF), Random.nextInteger(0xFFFFFFFF)]);
