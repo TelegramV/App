@@ -29,7 +29,7 @@ import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import UIEvents from "../../../../EventBus/UIEvents"
 import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
 
-const StickerSetItemFragment = ({setId, url, onClick}) => {
+const StickerSetItemFragment = ({ setId, url, onClick }) => {
     return (
         <div id={`composer-pack-thumb-${setId}`} class="sticker-packs-item rp rps" onClick={onClick}>
             <img src={url} alt="Sticker Pack"/>
@@ -68,16 +68,18 @@ class StickersComposerComponent extends StatelessComponent {
         )
     }
 
-    componentDidMount() {
-    }
+    componentDidMount() {}
 
     onComposerTogglePanel = event => {
         if (event.panel === "stickers" && !this.initialized) {
             API.messages.getAllStickers().then(AllStickers => {
                 this.allStickers = AllStickers;
 
-                AllStickers.sets.map(raw => new StickerSet(raw))
-                    .forEach(stickerSet => stickerSet.fetchThumb().then(() => {
+                let sets = AllStickers.sets.map(raw => new StickerSet(raw))
+                let promises = sets.map(stickerSet => stickerSet.fetchThumb());
+                //waits to fetch all thumbs, maybe rewrite to sorted append in future
+                Promise.all(promises).then(() => {
+                    sets.forEach(stickerSet => {
                         const onClick = () => this.openStickerSet(stickerSet);
 
                         if (stickerSet.raw.animated) {
@@ -105,7 +107,8 @@ class StickersComposerComponent extends StatelessComponent {
                                 this.stickerPacksRef.$el
                             );
                         }
-                    }));
+                    })
+                });
             });
 
             API.messages.getRecentStickers().then(RecentStickers => {

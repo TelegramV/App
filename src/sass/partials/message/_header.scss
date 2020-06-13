@@ -28,7 +28,7 @@
             cursor: pointer;
         }
 
-        & ~ figure {
+        & ~ figure, & ~ .grouped {
             margin-top: 10px;
         }
     }
