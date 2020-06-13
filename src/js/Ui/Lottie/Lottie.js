@@ -32,9 +32,11 @@ class Lottie extends StatefulComponent {
 
         this.options = {...this.options, ...options};
 
-        this.anim = lottie.loadAnimation(this.options);
-        this.anim.setSubframe(false);
-        this.registerEvents(eventListeners);
+        this.withTimeout( _ => {
+            this.anim = lottie.loadAnimation(this.options);
+            this.anim.setSubframe(false);
+            this.registerEvents(eventListeners);
+        }, 0)
     }
 
     componentWillUpdate(nextProps /* , nextState */) {
