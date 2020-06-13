@@ -89,6 +89,10 @@ const patchElement = ($node: HTMLElement, vRNode: VRNode, options = {}) => {
         vrdom_patchChildren($node, vRNode, options)
     }
 
+    if (vRNode.ref) {
+        vRNode.ref.$el = $node
+    }
+
     VApp.plugins.forEach(plugin => plugin.elementDidUpdate($node))
 
     return $node

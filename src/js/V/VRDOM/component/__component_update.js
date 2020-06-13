@@ -23,6 +23,7 @@ import __component_render from "./__component_render"
 import vrdom_patch from "../patch/patch"
 import __component_withDefaultProps from "./__component_withDefaultProps"
 import __component_recreateReactiveObjects from "./__component_recreateReactiveObjects"
+import patchElement from "../patch/patchElement"
 
 export function __component_update_props(component, nextProps) {
     if (nextProps) {
@@ -92,6 +93,16 @@ export function __component_update_global_state(component, globalState) {
             component.componentDidUpdate();
         }
     }
+}
+
+export function __component_patch(component) {
+    component.__.isUpdatingItSelf = true;
+    component.$el = vrdom_patch(component.$el, __component_render(component))
+    component.__.isUpdatingItSelf = false;
+}
+
+export function __component_just_patch_element(component, $el) {
+    component.$el = patchElement($el || component.$el, __component_render(component))
 }
 
 export function __component_update_force(component, nextProps, nextState) {

@@ -123,8 +123,8 @@ class LoginQRComponent extends StatefulComponent {
     }
 
     setCanvas = ($canvas: HTMLCanvasElement) => {
-        document.getElementById("qr-container")?.firstElementChild?.remove();
-        document.getElementById("qr-container")?.appendChild($canvas);
+        this.containerRef.$el?.firstElementChild?.remove();
+        this.containerRef.$el?.appendChild($canvas);
     }
 
     createQrCanvas = (data): Promise<HTMLCanvasElement> => {

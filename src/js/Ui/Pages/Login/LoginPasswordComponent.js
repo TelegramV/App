@@ -41,7 +41,7 @@ class LoginPasswordComponent extends StatefulComponent {
     render(props, {password, isLoading, passwordError}, {login}) {
         return (
             <div className="panel">
-                <div css-width="150px" css-height="150px" ref={this.monkeyRef} id="monkey" className="object"/>
+                <div id="monkey" css-width="150px" css-height="150px" ref={this.monkeyRef} className="object"/>
 
                 <div className="login-page-header">
                     <span className="login-page-header-title">

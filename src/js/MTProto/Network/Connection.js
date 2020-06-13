@@ -54,6 +54,8 @@ class Connection {
         this.transporter = new SocketTransporter(this);
 
         this.timezoneOffset = new Date().getTimezoneOffset() * 60; //seconds
+
+        this.doPinging = false;
     }
 
     get isMain() {
@@ -73,6 +75,8 @@ class Connection {
         const {
             doPinging = false,
         } = props;
+
+        this.doPinging = doPinging;
 
         if (this.isInitialized) {
             console.warn("already initialized");
@@ -120,7 +124,18 @@ class Connection {
         return this.authorization.authKey;
     }
 
-    ping() {
+    ping(check = true) {
+        if (check && !this.doPinging) {
+            if (this.pingingInvervalId) {
+                if (!this.withUpdates) {
+                    this.ping(false);
+                }
+                clearInterval(this.pingingInvervalId);
+                this.pingingInvervalId = null;
+                return;
+            }
+        }
+
         const ping_serializer = TL.packer();
 
         if (this.withUpdates === false) {

@@ -22,25 +22,19 @@ import type VRNode from "./VRNode"
 import type {VRenderProps} from "./types/types"
 import VApp from "../vapp"
 import __component_mount from "./component/__component_mount"
-import VComponent from "./component/VComponent"
+import cleanDOMElement from "./cleanDOMElement"
 
 export function vrdom_resolveMount($mounted: Element) {
     if ($mounted.__v) {
         if ($mounted.__v.component) {
-            const component = $mounted.__v.component
+            __component_mount($mounted.__v.component, $mounted)
+        }
 
-            // if (component instanceof VComponent) {
-            //     component.__mount.call(component, $mounted)
-            // } else
-
-            if (component instanceof VComponent) {
-                __component_mount(component, $mounted)
-            } else {
-                console.error("component was not found. it means that there is a potential bug in the vrdom")
-            }
-        } else if ($mounted.__v.ref && !$mounted.__v.ref.__component_ref) {
+        if ($mounted.__v.ref && !$mounted.__v.ref.__component_ref) {
             $mounted.__v.ref.$el = $mounted
-        } else if ($mounted.__list) {
+        }
+
+        if ($mounted.__list) {
             $mounted.__v.list.__mount($mounted)
         }
     }
@@ -60,6 +54,8 @@ export function vrdom_resolveMount($mounted: Element) {
  * @param options
  */
 function vrdom_mount(node: VRNode, $el: Element | Node | Text, options?: VRenderProps): Element | Node | Text {
+    cleanDOMElement($el, true);
+
     const $mounted = vrdom_realMount(vrdom_render(node, options), $el)
 
     vrdom_resolveMount($mounted)
@@ -68,10 +64,6 @@ function vrdom_mount(node: VRNode, $el: Element | Node | Text, options?: VRender
 }
 
 export function vrdom_realMount($el: Element | Node | Text, $target: Element | Node | Text): Element {
-    if (typeof $target === "string") {
-        $target = document.querySelector($target)
-    }
-
     $target.replaceWith($el)
 
     return $el

@@ -20,12 +20,12 @@
 import patch_Text_VRNode from "./patch_Text_VRNode"
 import {initElement} from "../render/renderElement"
 import ComponentVRNode from "../component/ComponentVRNode"
-import {__component_update_props} from "../component/__component_update"
+import {__component_just_patch_element, __component_update_props} from "../component/__component_update"
 import __component_unmount from "../component/__component_unmount"
 import __component_mount from "../component/__component_mount"
 import vrdom_renderComponentVNode from "../render/renderComponent"
 
-function patchAbstractComponentVRNode($node: Element, vRNode: ComponentVRNode) {
+function patchComponentVRNode($node: Element, vRNode: ComponentVRNode) {
 
     if ($node instanceof Text) {
         return patch_Text_VRNode($node, vRNode)
@@ -39,21 +39,23 @@ function patchAbstractComponentVRNode($node: Element, vRNode: ComponentVRNode) {
 
     if ($node.__v && $node.__v.component) {
         if ($node.__v.component.constructor === vRNode.componentClass) {
-            // console.warn("updating", $node.__v.component)
             __component_update_props($node.__v.component, vRNode.attrs)
         } else {
             __component_unmount($node.__v.component)
+
             $node = vrdom_renderComponentVNode(vRNode, $node)
+
+            __component_just_patch_element($node.__v.component, $node)
             __component_mount($node.__v.component, $node)
-            $node.__v.component.forceUpdate.call($node.__v.component)
         }
     } else {
         $node = vrdom_renderComponentVNode(vRNode, $node)
+
+        __component_just_patch_element($node.__v.component, $node)
         __component_mount($node.__v.component, $node)
-        $node.__v.component.forceUpdate.call($node.__v.component)
     }
 
     return $node
 }
 
-export default patchAbstractComponentVRNode
+export default patchComponentVRNode

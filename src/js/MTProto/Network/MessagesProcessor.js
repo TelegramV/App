@@ -55,7 +55,7 @@ class MessagesProcessor {
 
     process_bad_msg_notification = (connection: Connection, bad_msg_notification, message_id, session_id) => {
         // todo: reinvoke
-        console.warn("bad_msg_notification", bad_msg_notification, "todo: handle it by resending message");
+        console.warn("bad_msg_notification", bad_msg_notification, this.pendingInvokations.get(bad_msg_notification.bad_msg_id), "todo: handle it by resending message");
     }
 
     process_msg_detailed_info = (connection: Connection, msg_detailed_info, message_id, session_id) => {
@@ -120,6 +120,18 @@ class MessagesProcessor {
                 // next try in 1 second
                 console.error("will be reinvoked", error);
                 return setTimeout(() => connection.reinvoke(rpc_result.req_msg_id), 1000);
+            } else if (error.code === 303) {
+                const dcId = parseInt(error.type.match(/^(PHONE_MIGRATE_|NETWORK_MIGRATE_|USER_MIGRATE_)(\d+)/)[2]);
+
+                return this.connection.application.setMainConnection(dcId).then(connection => {
+                    this.pendingInvokations.delete(message_id);
+
+                    console.log("reset done", connection)
+
+                    return connection.invokeMethod(invokation.name, invokation.params, {useSecondTransporter: invokation.useSecondTransporter})
+                        .then(invokation.resolve)
+                        .catch(invokation.reject);
+                });
             }
 
             invokation.reject(error);

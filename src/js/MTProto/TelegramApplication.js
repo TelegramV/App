@@ -18,6 +18,8 @@
  */
 
 import Connection from "./Network/Connection";
+import AppConfiguration from "../Config/AppConfiguration"
+import keval from "../Keval/keval"
 
 const FILE_CONNECTION_METHODS = [
     "upload.getFile",
@@ -37,7 +39,6 @@ class TelegramApplication {
     connections: Map<number, Connection>;
 
     constructor() {
-        this.mainDcId = 2;
         this.connections = new Map();
         this.awaitingInvokes = [];
         this._isReady = false;
@@ -76,9 +77,18 @@ class TelegramApplication {
             return Promise.reject();
         }
 
+        const dcId = await keval.auth.getItem("dcId");
+
+        if (dcId) {
+            this.mainDcId = dcId;
+        } else {
+            this.mainDcId = AppConfiguration.mtproto.dataCenter.default;
+            await keval.auth.setItem("dcId", this.mainDcId);
+        }
+
         this.connections.set(this.mainDcId, new Connection(this.mainDcId, true, this));
 
-        this.mainConnection.init({
+        await this.mainConnection.init({
             doPinging: true,
         });
 
@@ -100,6 +110,31 @@ class TelegramApplication {
         this.resolveAwaiting();
 
         return this.user;
+    }
+
+    async setMainConnection(dcId): Promise<Connection> {
+        if (dcId !== this.mainConnection.dcId) {
+            await keval.auth.setItem("dcId", dcId);
+
+            this.mainConnection.withUpdates = false;
+            this.mainConnection.doPinging = false;
+
+            this.mainDcId = dcId;
+
+            let connection = this.connections.get(dcId);
+
+            if (!connection) {
+                connection = new Connection(dcId, true, this);
+
+                this.connections.set(dcId, connection);
+
+                await connection.init({
+                    doPinging: true,
+                });
+            }
+        }
+
+        return this.mainConnection;
     }
 
     invokeMethod<P = any, R = any>(name: string, params: P = {}, options: { dcId?: number, useSecondTransporter?: boolean; } = {}): Promise<R> {

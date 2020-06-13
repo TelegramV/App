@@ -34,9 +34,10 @@ const patch_Node_VRNode = ($node: HTMLElement, vRNode: VRNode, options = {}): HT
         if ($node.__v.component !== vRNode.component) {
             __component_unmount($node.__v.component)
         }
-    } else if (vRNode.component) {
-        console.error("BUG: unimplemented thing [vRNode.component]", $node, vRNode)
     }
+    // else if (vRNode.component) {
+    //     console.error("BUG: unimplemented thing [vRNode.component]", $node, vRNode)
+    // }
 
     if ($node.__v.list) {
         $node.__v.list.__unmount()
