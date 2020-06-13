@@ -224,6 +224,41 @@ class VComponent<P> {
         });
     }
 
+    throttle(callable, period: number) {
+        let timeoutId
+        let time
+
+        return () => {
+            const args = arguments
+
+            if (time) {
+                this.clearTimeout(timeoutId)
+
+                timeoutId = this.withTimeout(() => {
+                    if ((Date.now() - time) >= period) {
+                        callable(args)
+
+                        time = Date.now()
+                    }
+                }, period - (Date.now() - time))
+            } else {
+                callable(args)
+
+                time = Date.now()
+            }
+        }
+    }
+
+    debounce(callable, delay: number) {
+        let timeoutId
+
+        return () => {
+            this.clearTimeout(timeoutId)
+
+            timeoutId = this.withTimeout(() => callable(arguments), delay)
+        }
+    }
+
     /**
      * @param promise
      * @return {Promise<*>}

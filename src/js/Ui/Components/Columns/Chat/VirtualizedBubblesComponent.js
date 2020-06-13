@@ -109,7 +109,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         this.props.loaderRef.$el.style.display = "none";
 
-        this.$el.addEventListener("scroll", this.onScroll, {
+        this.$el.addEventListener("scroll", this.throttle(this.onScroll, 500), {
             passive: true,
         });
     }
@@ -344,7 +344,6 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
         const isAtBottom = scrollHeight - scrollTop === clientHeight;
         const isAtTop = scrollTop <= 400;
-        // const isAtTop = scrollTop === 0;
 
         // todo: may cause performance issues
         if (!isAtBottom) {

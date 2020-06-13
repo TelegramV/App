@@ -33,7 +33,7 @@ class VSimpleLazyInput extends StatefulComponent {
     }
 
     onInput = (event) => {
-        if (event.target.value === "") {
+        if (this.props.fireEmpty && event.target.value === "") {
             this.clearTimeouts();
 
             this.props.onInput(event);
@@ -52,7 +52,8 @@ class VSimpleLazyInput extends StatefulComponent {
 }
 
 VSimpleLazyInput.defaultProps = {
-    type: "text"
+    type: "text",
+    fireEmpty: true,
 }
 
 export default VSimpleLazyInput
