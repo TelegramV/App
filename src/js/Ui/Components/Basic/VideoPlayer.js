@@ -93,7 +93,7 @@ class VideoPlayer extends StatefulComponent {
         showControls: true,
     }
 
-    render({src, controls, containerWidth, containerHeight, bufferedSize, size, ...otherArgs}, {showControls}, globalState) {
+    render({src, controls, containerWidth, containerHeight, bufferedSize, size, thumbUrl, ...otherArgs}, {showControls}, globalState) {
         // https://ak.picdn.net/shutterstock/videos/31008538/preview/stock-footage-parrot-flies-alpha-matte-d-rendering-animation-animals.webm
         const isPaused = this.videoRef.$el?.paused ?? true;
         const time = this.videoRef.$el?.currentTime ?? 0;
@@ -109,15 +109,38 @@ class VideoPlayer extends StatefulComponent {
 
         const progress = bufferedEnd / duration * 100;
 
+        let styleSize = {
+            "width": containerWidth,
+            "height": containerHeight,
+        }
+
+        if (typeof containerWidth === "number" && typeof containerHeight === "number") {
+            if (containerWidth >= containerHeight) {
+                styleSize = {
+                    "width": `${containerWidth}px`,
+                    "max-height": `${containerHeight}px`,
+                }
+            } else {
+                styleSize = {
+                    "max-width": `${containerWidth}px`,
+                    "height": `${containerHeight}px`,
+                }
+            }
+        }
+
         return (
-            <div css-width={containerWidth}
-                 css-height={containerHeight}
+            <div style={styleSize}
                  className="VideoPlayer"
                  onMouseMove={this.onMouseMove}
                  onMouseOver={this.onMouseOver}
                  onMouseLeave={this.onMouseLeave}>
                 <div className="player">
-                    <video ref={this.videoRef}
+                    <img style={{
+                        "display": progress && "none",
+                    }} src={thumbUrl} alt="Preview"/>
+
+                    <video css-display={!progress && "none"}
+                           ref={this.videoRef}
                            src={src}
                            {...otherArgs}
                            onPlay={this.onPlay}
@@ -126,11 +149,12 @@ class VideoPlayer extends StatefulComponent {
                            onDurationChange={this.onDurationChange}
                            onProgress={this.onProgress}
                            onClick={this.onClickPause}
+                           onDoubleClick={this.onClickFull}
                     />
 
                     <div className={{
                         "controls": true,
-                        "hidden": !showControls
+                        "hidden": !buffered || !controls || !showControls
                     }}>
                         {/*<div className="frame">*/}
                         {/*    <img*/}
@@ -184,10 +208,14 @@ class VideoPlayer extends StatefulComponent {
 
     onPlay = () => {
         this.forceUpdate();
+
+        this.toggleControls();
     }
 
     onPause = () => {
         this.forceUpdate();
+
+        this.toggleControls();
     }
 
     onTimeUpdate = () => {
@@ -232,9 +260,13 @@ class VideoPlayer extends StatefulComponent {
         if (code === 39) {
             event.stopPropagation();
             this.videoRef.$el.currentTime += 5;
+
+            this.toggleControls();
         } else if (code === 37) {
             event.stopPropagation();
             this.videoRef.$el.currentTime -= 5;
+
+            this.toggleControls();
         } else if (code === 32) {
             event.stopPropagation();
             this.onClickPause();
@@ -242,23 +274,22 @@ class VideoPlayer extends StatefulComponent {
     }
 
     onMouseOver = (event: MouseEvent) => {
-        this.setState({
-            showControls: true,
-        });
-        this.hideControls();
+        this.toggleControls();
     }
 
     onMouseMove = (event: MouseEvent) => {
-        this.setState({
-            showControls: true,
-            x: event.x,
-            y: event.y,
-        });
-
-        this.hideControls();
+        this.toggleControls();
     }
 
     onMouseLeave = (event: MouseEvent) => {
+        this.hideControls();
+    }
+
+    toggleControls = () => {
+        this.setState({
+            showControls: true,
+        });
+
         this.hideControls();
     }
 

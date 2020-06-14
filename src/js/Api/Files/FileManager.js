@@ -1,6 +1,6 @@
 import {FileAPI} from "./FileAPI"
 import AppEvents from "../EventBus/AppEvents"
-import MP4StreamingFile from "../Media/MediaPlayer"
+import MP4StreamingFile from "../Media/MediaFile"
 
 class FilesManager {
 

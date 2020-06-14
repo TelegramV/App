@@ -19,7 +19,7 @@
 
 import DocumentParser from "../Files/DocumentParser";
 import AppEvents from "../EventBus/AppEvents"
-import MP4Box from "mp4box"
+import {concatUint8} from "../../Utils/byte"
 
 class MP4StreamingFile {
     url: string = "";
@@ -31,6 +31,7 @@ class MP4StreamingFile {
     mp4box: ISOFile;
 
     queues: Map<SourceBuffer, Array<Uint8Array>> = new Map();
+    parts: Uint8Array[] = [];
 
     constructor(document) {
         this.document = document;
@@ -45,36 +46,39 @@ class MP4StreamingFile {
 
     init = (): Promise => {
         return new Promise((resolve, reject) => {
+            if (this.canceled) {
+                return;
+            }
+
             this.mediaSource.onsourceclose = ev => reject(ev);
 
             this.mediaSource.onsourceopen = () => {
-                if (this.canceled) {
-                    return;
-                }
+                import("mp4box").then(({default: MP4Box}) => {
+                    if (this.canceled) {
+                        return;
+                    }
 
-                this.mp4box = MP4Box.createFile();
+                    this.mp4box = MP4Box.createFile();
 
-                this.mp4box.onSegment = (id, sourceBuffer, buffer, sampleNum, is_last) => {
-                    sourceBuffer.segmentIndex++;
-                    sourceBuffer.pendingAppends.push({id, buffer, sampleNum, is_last});
+                    this.mp4box.onSegment = (id, sourceBuffer, buffer, sampleNum, is_last) => {
+                        sourceBuffer.segmentIndex++;
+                        sourceBuffer.pendingAppends.push({id, buffer, sampleNum, is_last});
+                        this.onUpdateEnd(sourceBuffer, true, false);
+                    }
 
-                    // console.warn("Application", "Received new segment for track " + id + " up to sample #" + sampleNum + ", segments pending append: " + sourceBuffer.pendingAppends.length);
+                    this.mp4box.onReady = info => {
+                        this.mediaSource.duration = this.videoInfo.duration;
 
-                    this.onUpdateEnd(sourceBuffer, true, false);
-                }
+                        info.tracks.forEach(this.initTrack);
 
-                this.mp4box.onReady = info => {
-                    this.mediaSource.duration = this.videoInfo.duration;
+                        const initSegments = this.mp4box.initializeSegmentation();
+                        initSegments.forEach(this.initSegment);
 
-                    info.tracks.forEach(this.initTrack);
+                        this.mp4box.start();
+                    }
 
-                    const initSegments = this.mp4box.initializeSegmentation();
-                    initSegments.forEach(this.initSegment);
-
-                    this.mp4box.start();
-                }
-
-                resolve(this.mediaSource)
+                    resolve(this.mediaSource)
+                })
             }
         })
     }
@@ -128,10 +132,6 @@ class MP4StreamingFile {
         }
 
         if (isEndOfAppend === true) {
-            // if (isNotInit === true) {
-            //     console.log(sourceBuffer, "Update ended");
-            // }
-
             if (sourceBuffer.sampleNum) {
                 this.mp4box.releaseUsedSamples(sourceBuffer.id, sourceBuffer.sampleNum);
                 delete sourceBuffer.sampleNum;
@@ -156,16 +156,22 @@ class MP4StreamingFile {
             return;
         }
 
-        // console.warn("STREAMING: appendBuffer");
-
-        const part = newBytes.buffer;
-        part.fileStart = this.bufferOffset;
-
         if (this.mp4box) {
-            this.mp4box.appendBuffer(part);
+            if (this.parts.length) {
+                const all = concatUint8(...this.parts, newBytes).buffer;
+                all.fileStart = 0;
+                this.mp4box.appendBuffer(all);
+                this.parts = [];
+            } else {
+                const part = newBytes.buffer;
+                part.fileStart = this.bufferOffset;
+                this.mp4box.appendBuffer(part);
+            }
+        } else {
+            this.parts.push(newBytes);
         }
 
-        this.bufferOffset += part.byteLength;
+        this.bufferOffset += newBytes.byteLength;
     }
 
     onDownloadDone = ({blob, url}) => {
@@ -182,8 +188,6 @@ class MP4StreamingFile {
         });
 
         URL.revokeObjectURL(this.url);
-
-        console.warn("STREAMING: done")
     }
 
     cancel() {
