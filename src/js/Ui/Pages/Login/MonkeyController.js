@@ -123,10 +123,9 @@ export class MonkeyController {
         let that = this;
         this.closed = true;
         if(this.peeking) {
-            this.animation.setSpeed(-1);
-            this.nextPauseFrame=99;
             this.closed = true;
-            this.animation.play();
+            this.peeking = false;
+            this.animation.playSegments([20, 33], true)
         } else {
             this.load(this.states.close).then(_ => {
                 that.animation.setSpeed(1);
@@ -149,7 +148,7 @@ export class MonkeyController {
                 }
                 if (that.peeking) {
                     that.animation.playSegments([0, 20], true)
-                } else {
+                } else { // move that logic to close
                     that.animation.playSegments([20, 33], true)
                 }
                 that.nextPauseFrame = 50;
@@ -169,10 +168,12 @@ export class MonkeyController {
         let that = this;
         if (this.peeking) {
             this.load(this.states.closeAndPeekToIdle).then(_ => {
+                that.peeking = false;
                 that.animation.play();
                 that.nextState = that.idle;
             });
         } else { //close -> open
+            this.animation.setSpeed(1);
             this.animation.play();
             this.nextState = this.idle;
         }
