@@ -34,10 +34,18 @@ export class ForwardSidebar extends GenericSidebar {
 
     render(): * {
         return (
-            <div className={["forward-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.reallyHidden, "really-hidden")]}>
-                {super.render()}
+            <div className={["forward-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.reallyHidden, "really-hidden")]} onClick={this.onClickBehind}>
+                <div className={this.classes} onAnimationEnd={this.onTransitionEnd} onClick={event => event.stopPropagation()}>
+                    {this.header()}
+                    {this.content()}
+                    {nodeIf(<FloatingActionButton icon={this.floatingActionButtonIcon} hidden={this.isFloatingActionButtonHidden} onClick={this.onFloatingActionButtonPressed}/>, !!this.floatingActionButtonIcon)}
+                </div>
             </div>
         )
+    }
+
+    onClickBehind = (event) => {
+        this.hide()
     }
 
     // TODO move tags to title!
