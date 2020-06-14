@@ -17,6 +17,14 @@
  *
  */
 
+.global-grabbing {
+    cursor: grabbing;
+
+    * {
+        cursor: grabbing;
+    }
+}
+
 .VideoPlayer {
     position: relative;
     overflow: hidden;
@@ -94,6 +102,11 @@
                         width: 13px;
                         border-radius: 13px;
                         background-color: #50a2e9;
+                        cursor: grab;
+
+                        &:hover {
+                            transform: scale(1.1);
+                        }
                     }
                 }
 
@@ -112,6 +125,9 @@
             .buttons {
                 margin-top: 12px;
                 width: calc(100% + 40px);
+
+                background-color: rgba(black, .15);
+                border-radius: 5px;
 
                 display: flex;
                 justify-content: center;

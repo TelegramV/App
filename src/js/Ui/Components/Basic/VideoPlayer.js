@@ -55,6 +55,8 @@ function onDrag(target: HTMLElement, innerTarget: HTMLElement, dir, listener) {
 
         window.addEventListener(pointerMove, onpointermove);
         window.addEventListener(pointerUp, onpointerup);
+
+        document.body.classList.add("global-grabbing")
     }
 
     function onpointermove(event) {
@@ -69,11 +71,15 @@ function onDrag(target: HTMLElement, innerTarget: HTMLElement, dir, listener) {
 
         // call the listener with percentage
         listener(percentage);
+
+        document.body.classList.add("global-grabbing")
     }
 
     function onpointerup() {
         window.removeEventListener(pointerMove, onpointermove);
         window.removeEventListener(pointerUp, onpointerup);
+
+        document.body.classList.remove("global-grabbing")
     }
 }
 
