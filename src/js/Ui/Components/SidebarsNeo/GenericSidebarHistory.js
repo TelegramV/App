@@ -14,21 +14,20 @@ export class GenericSidebarHistory extends StatelessComponent {
     }
 
     pop(from) {
-        if(!this.bars.has(from) && !this.bars.has(from.constructor)) {
-            return
-        }
         const type = this.history[this.history.length - 1]
-        const bar = this.bars.get(type)
+        if(type === from || type === from.constructor) {
+            const bar = this.bars.get(type)
 
-        if(!bar) return
-        if(bar.isStatic) return
+            if (!bar) return
+            if (bar.isStatic) return
 
-        bar.hide()
-        this.history.pop()
+            bar.hide()
+            this.history.pop()
 
-        const last = this.bars.get(this.history[this.history.length - 1])
-        if(!last) return
-        last.show()
+            const last = this.bars.get(this.history[this.history.length - 1])
+            if (!last) return
+            last.show()
+        }
     }
 
     push(type) {

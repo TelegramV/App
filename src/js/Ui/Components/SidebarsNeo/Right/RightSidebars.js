@@ -1,6 +1,7 @@
 import {GenericSidebarHistory} from "../GenericSidebarHistory";
 import {SearchSidebar} from "./Search/SearchSidebar";
 import {DialogInfoSidebar} from "./DialogInfo/DialogInfoSidebar";
+import {RightSidebar} from "./RightSidebar";
 
 export class RightSidebars extends GenericSidebarHistory {
     render() {
@@ -45,25 +46,24 @@ export class RightSidebars extends GenericSidebarHistory {
     }
 
     pop(from) {
-        if(!this.bars.has(from) && !this.bars.has(from.constructor)) {
-            return
-        }
         const type = this.history[this.history.length - 1]
-        const bar = this.bars.get(type)
+        if(type === from || type === from.constructor || from === RightSidebar) {
+            const bar = this.bars.get(type)
 
-        if(!bar) return
-        if(bar.isStatic) return
+            if (!bar) return
+            if (bar.isStatic) return
 
-        this.history.pop()
-        bar.hide(this.history.length === 0)
+            this.history.pop()
+            bar.hide(this.history.length === 0)
 
-        const last = this.bars.get(this.history[this.history.length - 1])
+            const last = this.bars.get(this.history[this.history.length - 1])
 
-        if(this.history.length === 0) {
-            this.hide()
+            if (this.history.length === 0) {
+                this.hide()
+            }
+            if (!last) return
+            last.show()
         }
-        if(!last) return
-        last.show()
     }
 
     hide() {
