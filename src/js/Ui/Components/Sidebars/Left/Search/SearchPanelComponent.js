@@ -21,7 +21,7 @@ export class SearchPanelComponent extends LeftBarComponent {
 
     render() {
         return (
-            <div class="sidebar scrollable search hidden" onScroll={this.onScroll}>
+            <div class="sidebar scrollable search" onScroll={this.onScroll}>
                 <div ref={this.suggestionsRef} class="suggestions">
                     <CorrespondentsComponent/>
                     <RecentComponent ref={this.recentComponentRef}/>

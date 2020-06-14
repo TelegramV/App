@@ -21,6 +21,8 @@ export class DialogInfoSidebar extends RightSidebar {
 
         E.bus(UIEvents.General)
             .on("info.select", this.onInfoSelect)
+            .on("chat.select", this.onChatSelect)
+
 
         E.bus(AppEvents.Peers)
             .filter(event => AppSelectedInfoPeer.check(event.peer))
@@ -52,6 +54,12 @@ export class DialogInfoSidebar extends RightSidebar {
 
             <DialogInfoMaterials ref={this.materialsRef}/>
         </this.contentWrapper>
+    }
+
+    onChatSelect = (event) => {
+        if(!this.state.hidden) {
+            AppSelectedInfoPeer.select(event.peer)
+        }
     }
 
     onInfoSelect = () => {

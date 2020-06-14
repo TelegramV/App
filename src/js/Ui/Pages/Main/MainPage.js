@@ -80,7 +80,7 @@ export function MainPage() {
             {/*<SettingsComponent/>*/}
             <PhoneCallComponent/>
 
-            {/*<SearchPanelComponent/>*/}
+            <SearchPanelComponent/>
             {/*<CreateChannelBar/>*/}
             {/*<ArchivedDialogsBar/> /!* critical: archived bar should be always before dialogs bar *!/*/}
 
