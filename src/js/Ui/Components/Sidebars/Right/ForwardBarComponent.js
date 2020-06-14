@@ -131,10 +131,6 @@ class ForwardBarComponent extends OnTopRightBarComponent {
     }
 
     onForwardMessage = event => {
-        // DialogsStore.toSortedArray().forEach(l => {
-        //     VRDOM.append(, this.$el.querySelector(".peers-list"))
-        // })
-        // this.forceUpdate()
         this.state.selectedMessages = [event.message]
         this.state.selected = []
         this.state.from = event.from

@@ -21,6 +21,7 @@ import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent"
 import {throttle} from "../../../Utils/func"
 import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
 import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars";
+import {ForwardSidebar} from "../../Components/SidebarsNeo/Right/ForwardSidebar";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -86,6 +87,8 @@ export function MainPage() {
 
             {/*<DialogsBar/>*/}
             <ChatComponent/>
+
+            <ForwardSidebar/>
 
 
             {/*<DialogInfoComponent/>*/}
