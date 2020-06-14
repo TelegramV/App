@@ -131,32 +131,13 @@ class MediaDownloader {
         //     dl.callback(null, false, true);
         // }
 
+        dl.totalLength = this.document.size;
+
         promise.then(file => {
-            if (!dl.totalLength && file.bytes.length) {
-                var sizeIndex;
-                sizeIndex = rangeReceived.indexOf("/");
-                if (sizeIndex > -1) {
-                    dl.totalLength = +rangeReceived.slice(sizeIndex + 1);
-                }
-            }
+
         })
 
         xhr.onreadystatechange = function (e) {
-            // if (xhr.status === 404) {
-            //     dl.callback(null, false, true);
-            // }
-
-            // if ((xhr.status === 200 || xhr.status === 206 || xhr.status === 304 || xhr.status === 416) && xhr.readyState === this.DONE) {
-                var rangeReceived = xhr.getResponseHeader("Content-Range");
-                Log.info("Downloader", "Received data range: " + rangeReceived);
-                /* if the length of the file is not known, we get it from the response header */
-                if (!dl.totalLength && rangeReceived) {
-                    var sizeIndex;
-                    sizeIndex = rangeReceived.indexOf("/");
-                    if (sizeIndex > -1) {
-                        dl.totalLength = +rangeReceived.slice(sizeIndex + 1);
-                    }
-                }
 
                 dl.eof = (xhr.response.byteLength !== dl.chunkSize) || (xhr.response.byteLength === dl.totalLength);
                 var buffer = xhr.response;

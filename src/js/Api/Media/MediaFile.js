@@ -155,7 +155,7 @@ class MP4StreamingFile {
         if (this.canceled) {
             return;
         }
-        
+
         if (this.mp4box) {
             if (this.parts.length) {
                 const all = concatUint8(...this.parts, newBytes).buffer;
