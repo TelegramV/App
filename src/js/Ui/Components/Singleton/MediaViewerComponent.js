@@ -204,10 +204,10 @@ export class MediaViewerComponent extends StatefulComponent {
     }
 
     onKeyDown = event => {
-        if (!this.state.hidden && !document.getElementById("video-player-in-mw")) {
-            event.stopPropagation();
+        const code = event.keyCode || event.which;
 
-            const code = event.keyCode || event.which;
+        if ((!this.state.hidden && !document.getElementById("video-player-in-mw")) || code === 27) {
+            event.stopPropagation();
 
             if (code === 39) {
                 this.right(event);

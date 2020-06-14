@@ -89,7 +89,11 @@ class VideoPlayer extends StatefulComponent {
     timeWrapperRef = VComponent.createRef();
     timelineRef = VComponent.createRef();
 
-    render({src, controls, containerWidth, containerHeight, bufferedSize, size, ...otherArgs}, state, globalState) {
+    state = {
+        showControls: true,
+    }
+
+    render({src, controls, containerWidth, containerHeight, bufferedSize, size, ...otherArgs}, {showControls}, globalState) {
         // https://ak.picdn.net/shutterstock/videos/31008538/preview/stock-footage-parrot-flies-alpha-matte-d-rendering-animation-animals.webm
         const isPaused = this.videoRef.$el?.paused ?? true;
         const time = this.videoRef.$el?.currentTime ?? 0;
@@ -106,7 +110,12 @@ class VideoPlayer extends StatefulComponent {
         const progress = bufferedEnd / duration * 100;
 
         return (
-            <div css-width={containerWidth} css-height={containerHeight} className="VideoPlayer">
+            <div css-width={containerWidth}
+                 css-height={containerHeight}
+                 className="VideoPlayer"
+                 onMouseMove={this.onMouseMove}
+                 onMouseOver={this.onMouseOver}
+                 onMouseLeave={this.onMouseLeave}>
                 <div className="player">
                     <video ref={this.videoRef}
                            src={src}
@@ -119,7 +128,10 @@ class VideoPlayer extends StatefulComponent {
                            onClick={this.onClickPause}
                     />
 
-                    <div className="controls">
+                    <div className={{
+                        "controls": true,
+                        "hidden": !showControls
+                    }}>
                         {/*<div className="frame">*/}
                         {/*    <img*/}
                         {/*        src="https://12kanal.com/wp-content/uploads/2019/10/k-chemu-snitsya-popugay-zhenschine-ili-muzhchine-2.jpg"*/}
@@ -228,6 +240,33 @@ class VideoPlayer extends StatefulComponent {
             this.onClickPause();
         }
     }
+
+    onMouseOver = (event: MouseEvent) => {
+        this.setState({
+            showControls: true,
+        });
+        this.hideControls();
+    }
+
+    onMouseMove = (event: MouseEvent) => {
+        this.setState({
+            showControls: true,
+            x: event.x,
+            y: event.y,
+        });
+
+        this.hideControls();
+    }
+
+    onMouseLeave = (event: MouseEvent) => {
+        this.hideControls();
+    }
+
+    hideControls = this.debounce(() => {
+        this.setState({
+            showControls: false,
+        });
+    }, 4000);
 }
 
 export default VideoPlayer;

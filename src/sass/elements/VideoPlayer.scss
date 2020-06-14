@@ -47,6 +47,16 @@
             display: flex;
             flex-direction: column;
 
+            transition: height 250ms ease-in-out;
+
+            &.hidden {
+                height: 0;
+
+                .dot {
+                    display: none;
+                }
+            }
+
             .frame {
                 margin-left: calc(30% - calc(170px / 2));
                 position: absolute;
