@@ -29,7 +29,7 @@ export class GlobalChatsSearchComponent extends StatefulComponent {
     }
 
     appEvents(E) {
-        E.bus(UIEvents.LeftSidebar)
+        E.bus(UIEvents.Sidebars)
             .on("searchInputUpdated", this.onSearchInputUpdated)
     }
 

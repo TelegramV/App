@@ -49,7 +49,7 @@ export class GlobalMessagesSearchComponent extends StatefulComponent {
     }
 
     appEvents(E) {
-        E.bus(UIEvents.LeftSidebar)
+        E.bus(UIEvents.Sidebars)
             .on("searchInputUpdated", this.onSearchInputUpdated)
             .on("searchInputNextPage", this.onSearchBarNextPage)
     }

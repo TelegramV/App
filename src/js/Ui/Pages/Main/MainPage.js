@@ -9,7 +9,7 @@ import {InstantViewComponent} from "../../Components/Singleton/InstantViewCompon
 import {DialogsBar} from "../../Components/Sidebars/Left/Dialogs/DialogsBar"
 import ChatComponent from "../../Components/Columns/Chat/ChatComponent"
 import {SettingsComponent} from "../../Components/Sidebars/Left/Settings/SettingsComponent"
-import {SearchPanelComponent} from "../../Components/Sidebars/Left/Search/SearchPanelComponent"
+// import {SearchPanelComponent} from "../../Components/Sidebars/Left/Search/SearchPanelComponent"
 import MessagesSearchComponent from "../../Components/Sidebars/Right/Search/MessagesSearchComponent"
 import {DialogInfoComponent} from "../../Components/Sidebars/Right/DialogInfo/DialogInfoComponent"
 import TopPeers from "../../../Api/Peers/TopPeers"
@@ -81,7 +81,7 @@ export function MainPage() {
             {/*<SettingsComponent/>*/}
             <PhoneCallComponent/>
 
-            <SearchPanelComponent/>
+            {/*<SearchPanelComponent/>*/}
             {/*<CreateChannelBar/>*/}
             {/*<ArchivedDialogsBar/> /!* critical: archived bar should be always before dialogs bar *!/*/}
 

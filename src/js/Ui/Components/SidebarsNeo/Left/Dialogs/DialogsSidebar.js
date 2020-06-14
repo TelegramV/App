@@ -26,6 +26,7 @@ import {DialogListsComponent} from "./DialogListsComponent";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import {Folders} from "./Folders";
+import {SearchComponent} from "../Search/SearchComponent";
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -81,7 +82,10 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
     isLoadingMore = false
 
     loaderRef = VComponent.createRef()
+    searchRef = VComponent.createComponentRef()
     dialogsWrapperRef = VComponent.createRef()
+
+    searchOpen = false
 
 
     init() {
@@ -120,6 +124,8 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
 
                 <DialogListsComponent/>
             </div>
+
+            <SearchComponent ref={this.searchRef}/>
         </this.contentWrapper>
     }
 
@@ -167,23 +173,10 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
         }
     }
 
-    openSearch = () => {
-        console.warn("open")
-
-        UIEvents.LeftSidebar.fire("burger.changeToBack", {
-            id: "search"
-        })
-
-        UIEvents.LeftSidebar.fire("show", {
-            barName: "search"
-        })
-    }
-
-    _searchBackClick = (ev) => {
-        UIEvents.LeftSidebar.fire("show", {
-            barName: "dialogs"
-        })
-        UIEvents.LeftSidebar.fire("burger.changeToBurger", {})
+    onSearchInputFocus = (event) => {
+        this.$el.classList.toggle("back-button", true)
+        this.searchOpen = true
+        this.searchRef.component.open()
     }
 
     _scrollHandler = (event) => {
@@ -207,14 +200,20 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
         })
     }
 
-    onSearchInputCapture = event => {
-        UIEvents.LeftSidebar.fire("searchInputUpdated", {
+    onSearchInputUpdated = event => {
+        UIEvents.Sidebars.fire("searchInputUpdated", {
             string: event.target.value.trim()
         })
     }
 
     onLeftButtonPressed = (event) => {
-        DialogsBarContextMenu(event, DialogsManager.archivedMessagesCount)
+        if(this.searchOpen) {
+            this.$el.classList.toggle("back-button", false)
+            this.searchOpen = false
+            this.searchRef.component.close()
+        } else {
+            DialogsBarContextMenu(event, DialogsManager.archivedMessagesCount)
+        }
     }
 
     get leftButtonIcon(): string | null {

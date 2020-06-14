@@ -47,6 +47,7 @@ export class GenericSidebar extends StatefulComponent {
                     <VSimpleLazyInput type="text" placeholder="Search"
                                       ref={this.searchInputRef}
                                       onInput={this.onSearchInputUpdated}
+                                      onFocus={this.onSearchInputFocus}
                                       lazyLevel={this.searchLazyLevel}/>
                     <span className="tgico tgico-search"/>
                 </div>
@@ -131,6 +132,10 @@ export class GenericSidebar extends StatefulComponent {
     }
 
     onSearchInputUpdated = (event) => {
+
+    }
+
+    onSearchInputFocus = (event) => {
 
     }
 

@@ -6,7 +6,7 @@ import StatelessComponent from "../../../../../V/VRDOM/component/StatelessCompon
 export class SearchResultsComponent extends StatelessComponent {
 
     appEvents(E) {
-        E.bus(UIEvents.LeftSidebar)
+        E.bus(UIEvents.Sidebars)
             .on("searchInputUpdated", this.onSearchInputUpdated)
     }
 

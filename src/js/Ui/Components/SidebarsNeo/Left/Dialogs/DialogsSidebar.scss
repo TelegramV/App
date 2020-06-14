@@ -1,6 +1,80 @@
 @import "src/sass/partials/vars";
 
 .sidebar.dialogs {
+  >.header > .btn-icon {
+    transition: anim(transform);
+    transform: rotateZ(-180deg);
+  }
+
+  &.back-button > .header > .btn-icon {
+    transition: anim(transform);
+    transform: rotateZ(0deg);
+
+    &:before {
+      content: $tgico-back;
+    }
+  }
+
+  > .content > .search {
+    position: absolute;
+    height: 100%;
+    background-color: white;
+    transition: anim(opacity), anim(transform);
+    transform: scale(1, 1);
+    transform-origin: top;
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 2;
+
+    &.hidden {
+      pointer-events: none;
+      transform: scale(0.8, 0.8);
+      display: block;
+      width: 100%;
+      opacity: 0;
+    }
+
+    .people-list {
+      display: flex;
+      justify-content: space-between;
+
+      .people-list-item {
+        margin: 0 2px;
+        padding: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        &:hover {
+          background-color: $light;
+        }
+
+        .photo-container {
+          display: flex;
+          justify-content: center;
+
+          img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+          }
+        }
+
+        .name {
+          font-size: 14px;
+          text-align: center;
+          margin-top: 5px;
+        }
+      }
+    }
+
+    .column-list {
+      display: flex;
+      flex-direction: column;
+    }
+  }
 
 
 }

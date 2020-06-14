@@ -28,7 +28,8 @@ class VSimpleLazyInput extends StatefulComponent {
             <input type={this.props.type}
                    onInput={this.onInput}
                    onFocus={this.props.onFocus}
-                   placeholder={this.props.placeholder}/>
+                   placeholder={this.props.placeholder}
+            />
         );
     }
 

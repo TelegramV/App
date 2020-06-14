@@ -1,27 +1,23 @@
-import LeftBarComponent from "../LeftBarComponent"
-import {CorrespondentsComponent} from "./CorrespondentsComponent"
-import {RecentComponent} from "./RecentComponent"
-import {SearchResultsComponent} from "./SearchResultsComponent"
-import UIEvents from "../../../../EventBus/UIEvents"
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent";
+import VComponent from "../../../../../V/VRDOM/component/VComponent";
+import UIEvents from "../../../../EventBus/UIEvents";
+import {RecentComponent} from "./RecentComponent";
+import {SearchResultsComponent} from "./SearchResultsComponent";
+import {CorrespondentsComponent} from "./CorrespondentsComponent";
 
-export class SearchPanelComponent extends LeftBarComponent {
-
-    barName = "search"
-    barVisible = false
-
+export class SearchComponent extends StatelessComponent {
     suggestionsRef = VComponent.createRef()
     recentComponentRef = VComponent.createComponentRef()
 
     appEvents(E) {
         super.appEvents(E)
-        E.bus(UIEvents.LeftSidebar)
+        E.bus(UIEvents.Sidebars)
             .on("searchInputUpdated", this.onSearchInputUpdated)
     }
 
     render() {
         return (
-            <div class="sidebar scrollable search" onScroll={this.onScroll}>
+            <div class="search hidden" onScroll={this.onScroll}>
                 <div ref={this.suggestionsRef} class="suggestions">
                     <CorrespondentsComponent/>
                     <RecentComponent ref={this.recentComponentRef}/>
@@ -29,6 +25,14 @@ export class SearchPanelComponent extends LeftBarComponent {
                 <SearchResultsComponent/>
             </div>
         )
+    }
+
+    open() {
+        this.$el.classList.toggle("hidden", false)
+    }
+
+    close() {
+        this.$el.classList.toggle("hidden", true)
     }
 
     onSearchInputUpdated = event => {
@@ -43,7 +47,7 @@ export class SearchPanelComponent extends LeftBarComponent {
         const $element = event.target
 
         if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop) {
-            UIEvents.LeftSidebar.fire("searchInputNextPage")
+            UIEvents.Sidebars.fire("searchInputNextPage")
         }
     }
 
