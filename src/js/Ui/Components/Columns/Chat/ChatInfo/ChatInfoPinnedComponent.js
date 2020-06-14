@@ -20,7 +20,7 @@ import UIEvents from "../../../../EventBus/UIEvents";
 import {MessageParser} from "../../../../../Api/Messages/MessageParser";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
-import AudioPlayer from "../../../../../Api/Audio/AudioPlayer"
+import AudioPlayer from "../../../../../Api/Media/AudioPlayer"
 
 class ChatInfoPinnedComponent extends StatefulComponent {
     state = {

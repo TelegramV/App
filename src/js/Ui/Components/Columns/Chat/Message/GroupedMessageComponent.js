@@ -20,8 +20,6 @@ class GroupedMessageComponent extends GeneralMessageComponent {
 
     render({message: group}) {
         const isText = group.text.length > 0;
-        console.log(group.first.text, group.first.parsed)
-        console.log(group.text, group.parsed)
 
         return (
             <MessageWrapperFragment message={group}

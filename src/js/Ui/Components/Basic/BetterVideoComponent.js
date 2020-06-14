@@ -61,13 +61,6 @@ class BetterVideoComponent extends StatefulComponent {
                                        width={width}
                                        height={height}
                                        calculateSize={true}/>
-                    // (width > height ?
-                    //         <img src={thumbnailUrl} alt=""
-                    //              width={width ? width + "px" : ""}/>
-                    //         :
-                    //         <img src={thumbnailUrl} alt=""
-                    //              height={height ? height + "px" : ""}/>
-                    // )
                 }
             </figure>
         )
@@ -76,15 +69,15 @@ class BetterVideoComponent extends StatefulComponent {
     componentDidMount() {
         const {document} = this.props;
 
-        this.assure(FileAPI.downloadDocument(document))
-            .then(blob => {
-                const url = FileAPI.getUrl(blob);
-
-                this.setState({
-                    isLoading: false,
-                    url: url,
-                });
-            })
+        // this.assure(FileAPI.downloadDocument(document))
+        //     .then(blob => {
+        //         const url = FileAPI.getUrl(blob);
+        //
+        //         this.setState({
+        //             isLoading: false,
+        //             url: url,
+        //         });
+        //     })
     }
 
     onMouseOver = e => {

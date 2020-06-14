@@ -22,7 +22,7 @@ import FileManager from "../../../Api/Files/FileManager"
 import AppEvents from "../../../Api/EventBus/AppEvents"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import DocumentParser from "../../../Api/Files/DocumentParser"
-import AudioPlayer from "../../../Api/Audio/AudioPlayer"
+import AudioPlayer from "../../../Api/Media/AudioPlayer"
 
 let FILE;
 

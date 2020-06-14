@@ -23,7 +23,7 @@ import MessageWrapperFragment from "./Common/MessageWrapperFragment"
 import DocumentParser from "../../../../../Api/Files/DocumentParser"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import {formatAudioTime} from "../../../../Utils/utils"
-import AudioPlayer from "../../../../../Api/Audio/AudioPlayer"
+import AudioPlayer from "../../../../../Api/Media/AudioPlayer"
 
 class NewAudioMessageComponent extends GeneralMessageComponent {
     appEvents(E) {

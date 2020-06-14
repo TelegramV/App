@@ -3,7 +3,7 @@ import StatelessComponent from "../../../../../V/VRDOM/component/StatelessCompon
 import DocumentParser from "../../../../../Api/Files/DocumentParser"
 import TextWrapperComponent from "./Common/TextWrapperComponent"
 import MessageWrapperFragment from "./Common/MessageWrapperFragment"
-import AudioPlayer from "../../../../../Api/Audio/AudioPlayer"
+import AudioPlayer from "../../../../../Api/Media/AudioPlayer"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import FileManager from "../../../../../Api/Files/FileManager"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"

@@ -1,5 +1,6 @@
 import {FileAPI} from "./FileAPI"
 import AppEvents from "../EventBus/AppEvents"
+import MP4StreamingFile from "../Media/MediaPlayer"
 
 class FilesManager {
 
@@ -20,6 +21,10 @@ class FilesManager {
 
     getPendingSize(file, thumbOrSize) {
         return this.pending.get(this.id(file, thumbOrSize))?._downloadedBytes?.length ?? 0
+    }
+
+    getPending(file, thumbOrSize) {
+        return this.pending.get(this.id(file, thumbOrSize))
     }
 
     get(file, thumbOrSize) {
@@ -135,6 +140,36 @@ class FilesManager {
             .then(blob => this.internal_downloadDone(document, thumb, blob));
     }
 
+    downloadVideo(document, thumb, options): Promise<Blob> | any {
+        const id = this.id(document, thumb);
+
+        if (this.downloaded.has(id)) {
+            const downloaded = this.downloaded.get(id);
+
+            fetch(downloaded.url).then(r => r.blob()).then(blob => {
+                AppEvents.Files.fire("download.done", {
+                    file: document,
+                    blob: blob,
+                    url: downloaded.url,
+                    id,
+                });
+            });
+
+            return Promise.resolve(downloaded);
+        }
+
+        if (this.pending.has(id)) {
+            return this.pending.get(id)._promise;
+        }
+
+        document.__mp4file = new MP4StreamingFile(document);
+
+        this.internal_downloadStart(document, thumb);
+
+        return document._promise = document.__mp4file.init()
+            .then(() => FileAPI.downloadDocument(document, thumb, event => this.internal_downloadNewPart(document, thumb, event), options).then(blob => this.internal_downloadDone(document, thumb, blob)));
+    }
+
     id(file, thumb, options) {
         return thumb ? `${file.id}_${thumb.id}` : file.id;
     }
@@ -151,6 +186,10 @@ class FilesManager {
 
         this.pending.delete(id);
         this.downloaded.set(id, downloaded);
+
+        if (file.__mp4file) {
+            file.__mp4file = null;
+        }
 
         AppEvents.Files.fire("download.done", {
             file: file,
@@ -223,6 +262,10 @@ class FilesManager {
         a.download = fileName
         a.click()
         a.remove()
+    }
+
+    checkEvent(event, file, thumbOrSize = null) {
+        return event.id === this.id(file, thumbOrSize)
     }
 }
 

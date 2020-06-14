@@ -62,11 +62,4 @@ export class EventBus extends TypedPublisher {
 
         this._conditionalSubscriptions.get(type).set(subscription, condition)
     }
-
-    /**
-     * @deprecated
-     */
-    only(condition, type: string, subscription: BusEvent => any) {
-        this.withFilter(condition, type, subscription)
-    }
 }

@@ -4,6 +4,10 @@
     height: 100%;
     z-index: 9999;
 
+    .VideoPlayer {
+        width: 80vw;
+    }
+
     &.hidden {
         pointer-events: none;
 
