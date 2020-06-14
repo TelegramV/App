@@ -5,7 +5,8 @@
     z-index: 9999;
 
     .VideoPlayer {
-        width: 80vw;
+        max-width: 80vw;
+        max-height: 80vh;
     }
 
     &.hidden {
@@ -55,7 +56,8 @@
                         font-weight: 500;
                     }
 
-                    .time {}
+                    .time {
+                    }
                 }
             }
 
@@ -164,6 +166,7 @@
 
                     figure {
                         background-color: transparent;
+
                         img {
                             max-width: 100vw;
                             max-height: var(--vh100);

@@ -20,6 +20,7 @@
 import AppEvents from "../../../Api/EventBus/AppEvents"
 import FileManager from "../../../Api/Files/FileManager"
 import VideoPlayer from "./VideoPlayer"
+import DocumentParser from "../../../Api/Files/DocumentParser"
 
 class StreamingVideoComponent extends VideoPlayer {
     state = {
@@ -42,18 +43,26 @@ class StreamingVideoComponent extends VideoPlayer {
     }
 
     componentWillMount(props) {
-        if (FileManager.isPending(this.props.document)) {
-            this.state.url = FileManager.getPending(this.props.document)?.__mp4file.url;
+        const video = DocumentParser.attributeVideo(props.document);
+
+        if (video.supports_streaming) {
+            if (FileManager.isPending(this.props.document)) {
+                this.state.url = FileManager.getPending(this.props.document)?.__mp4file.url;
+            } else {
+                FileManager.downloadVideo(this.props.document);
+            }
         } else {
-            FileManager.downloadVideo(this.props.document);
+            console.warn("streaming is not supported for this video")
+            FileManager.downloadDocument(this.props.document);
         }
     }
 
     onDownloadStart = ({file}) => {
-        console.log("on download start")
-        this.setState({
-            url: file.__mp4file.url,
-        });
+        if (DocumentParser.attributeVideo(this.props.document).supports_streaming) {
+            this.setState({
+                url: file.__mp4file.url,
+            });
+        }
     }
 
     onDownloadDone = ({url}) => {

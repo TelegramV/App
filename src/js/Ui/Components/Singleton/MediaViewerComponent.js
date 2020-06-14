@@ -30,6 +30,7 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
 import BetterPhotoComponent from "../Basic/BetterPhotoComponent"
 import StreamingVideoComponent from "../Basic/StreamingVideoComponent"
+import DocumentParser from "../../../Api/Files/DocumentParser"
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -45,30 +46,35 @@ function MediaFragment({media, zoom, hidden}) {
         return <div/>
     }
 
-    const horizon = document.body.clientHeight > document.body.clientWidth
-
-    let style = {
-        "max-width": zoom ? "unset" : "60vw",
-        "max-height": zoom ? "unset" : "80vh",
-        "cursor": zoom ? "zoom-out" : "zoom-in",
-    };
-
-    if (zoom) {
-        if (horizon) {
-            style["height"] = "var(--vh100)"
-            style["width"] = ""
-        } else {
-            style["width"] = "100vw"
-            style["height"] = ""
-        }
-    }
+    // const horizon = document.body.clientHeight > document.body.clientWidth
+    //
+    // let style = {
+    //     "max-width": zoom ? "unset" : "60vw",
+    //     "max-height": zoom ? "unset" : "80vh",
+    //     "cursor": zoom ? "zoom-out" : "zoom-in",
+    // };
+    //
+    // if (zoom) {
+    //     if (horizon) {
+    //         style["height"] = "var(--vh100)"
+    //         style["width"] = ""
+    //     } else {
+    //         style["width"] = "100vw"
+    //         style["height"] = ""
+    //     }
+    // }
 
     if (media instanceof PhotoMessage) {
         return <BetterPhotoComponent photo={media.raw.media.photo} calculateSize maxHeight="70%"/>
     }
 
     if (media instanceof VideoMessage) {
-        return <StreamingVideoComponent document={media.raw.media.document} autoPlay/>
+        const video = DocumentParser.attributeVideo(media.raw.media.document)
+
+        return <StreamingVideoComponent containerWidth={`${video.w}px`}
+                                        containerHeight={`${video.h}px`}
+                                        document={media.raw.media.document}
+                                        autoPlay/>
     }
 
     if (!media) {
@@ -216,9 +222,9 @@ export class MediaViewerComponent extends StatefulComponent {
         if (!this.state.hidden) {
             event.stopPropagation();
 
-            if (event.which === 1) {
-                this.zoom(event);
-            }
+            // if (event.which === 1) {
+            //     this.zoom(event);
+            // }
         }
     }
 

@@ -82,7 +82,7 @@ class VideoPlayer extends StatefulComponent {
     timeWrapperRef = VComponent.createRef();
     timelineRef = VComponent.createRef();
 
-    render({src, controls, ...otherArgs}, state, globalState) {
+    render({src, controls, containerWidth, containerHeight, ...otherArgs}, state, globalState) {
         // https://ak.picdn.net/shutterstock/videos/31008538/preview/stock-footage-parrot-flies-alpha-matte-d-rendering-animation-animals.webm
         const isPaused = this.videoRef.$el?.paused ?? true;
         const time = this.videoRef.$el?.currentTime ?? 0;
@@ -99,7 +99,7 @@ class VideoPlayer extends StatefulComponent {
         const progress = bufferedEnd / duration * 100;
 
         return (
-            <div className="VideoPlayer">
+            <div css-width={containerWidth} css-height={containerHeight} className="VideoPlayer">
                 <div className="player">
                     <video ref={this.videoRef}
                            src={src}
