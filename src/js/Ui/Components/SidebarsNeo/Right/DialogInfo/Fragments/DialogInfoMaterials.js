@@ -56,6 +56,7 @@ export class DialogInfoMaterials extends StatelessComponent {
     defaultLimit = 33
 
     render(props) {
+        console.log("IM GONNA RENDER!")
         return <div className="materials">
 
             <TabSelectorComponent ref={this.tabSelectorRef} items={this.tabItems}/>

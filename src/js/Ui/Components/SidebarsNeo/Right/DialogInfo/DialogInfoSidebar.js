@@ -74,8 +74,8 @@ export class DialogInfoSidebar extends RightSidebar {
         this.materialsRef.component.update()
     }
 
-    forceUpdate() {
-        super.forceUpdate()
+    update() {
+        // this.forceUpdate()
         this.materialsRef.component.update()
     }
 
