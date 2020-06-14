@@ -23,8 +23,16 @@ export class RightSidebars extends GenericSidebarHistory {
 
         if(!bar) return
         if(this.history.includes(type)) {
-            bar.forceUpdate()
-            return
+            const indexOf = this.history.indexOf(type)
+            if(indexOf === this.history.length - 1) {
+                bar.forceUpdate()
+                return
+            } else {
+                for(let i = indexOf; i < this.history.length - 1; i++) {
+                    this.pop()
+                }
+                return
+            }
         }
         this.bars.get(this.history[this.history.length - 1])?.fadeOut()
         this.history.push(type)
