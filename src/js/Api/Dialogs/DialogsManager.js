@@ -255,7 +255,7 @@ class DialogManager extends Manager {
         return DialogsStore.toArray().filter(l => l.isArchived).length
     }
 
-    fetchNextPage({limit = 40}) {
+    fetchNextPage({limit = 30}) {
         if (this.allWasFetched || DialogsStore.count >= this.count) {
             this.allWasFetched = true
             AppEvents.Dialogs.fire("allWasFetched", {})
@@ -278,6 +278,7 @@ class DialogManager extends Manager {
     }
 
     fetchFirstPage() {
+        console.log("test!")
         if (this.isFetched) {
             AppEvents.Dialogs.fire("gotMany", {
                 dialogs: DialogsStore.toSortedArray(),

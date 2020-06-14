@@ -13,7 +13,7 @@ class RippleVRDOMPlugin extends VRDOMPlugin {
                 $rippleDiv.__ripple = true
 
                 $rippleDiv.classList.add("ripple")
-
+                //
                 $rippleDiv.style.top = `${Y}px`
                 $rippleDiv.style.left = `${X}px`
 

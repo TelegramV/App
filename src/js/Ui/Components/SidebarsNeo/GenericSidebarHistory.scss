@@ -1,0 +1,21 @@
+@import "src/sass/partials/vars";
+
+.sidebar-wrapper {
+  max-width: 423px;
+  height: 100%;
+  width: 100%;
+
+  position: relative;
+  overflow: hidden;
+  transition: width 250ms ease-in-out;
+
+  &.right {
+    right: 0;
+    z-index: 1;
+    position: relative;
+  }
+
+  &.hidden {
+    width: 0;
+  }
+}

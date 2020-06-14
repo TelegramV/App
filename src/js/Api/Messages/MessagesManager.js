@@ -60,7 +60,8 @@ class MessageManager extends Manager {
                 peer.dialog.removeAction(message.from)
             }
 
-            peer.fire("messages.new", {
+
+        peer.fire("messages.new", {
                 message,
             })
         }

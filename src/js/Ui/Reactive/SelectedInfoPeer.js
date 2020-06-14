@@ -1,4 +1,4 @@
-import UIEvents from "../EventBus/UIEvents"
+import UIEvents from "../EventBus/UIEvents";
 
 class SelectedInfoPeer {
     constructor() {
@@ -40,9 +40,7 @@ class SelectedInfoPeer {
         this._previous = this._peer
         this._peer = peer
 
-        UIEvents.General.fire("info.select", {
-            peer
-        })
+        UIEvents.General.fire("info.select")
     }
 
     /**

@@ -27,8 +27,15 @@ class GeneralEventBus extends EventBus {
 
 const UIEvents = {
     General: new GeneralEventBus(),
+    /**
+     * @deprecated Use UIEvents.Sidebars
+     */
     LeftSidebar: new EventBus(),
+    /**
+     * @deprecated Use UIEvents.Sidebars
+     */
     RightSidebar: new EventBus(),
+    Sidebars: new EventBus(),
     MediaViewer: new EventBus()
 }
 

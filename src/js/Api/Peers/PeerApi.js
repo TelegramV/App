@@ -103,11 +103,15 @@ export class PeerApi {
                 sound: sound
             }
         }).then(l => {
-            if (l._ === "boolTrue" && this.peer.full) {
-                if (mute_until !== undefined) this.peer.full.notify_settings.mute_until = mute_until
-                if (silent !== undefined) this.peer.full.notify_settings.silent = silent
-                if (sound !== undefined) this.peer.full.notify_settings.sound = sound
-                if (show_previews !== undefined) this.peer.full.notify_settings.show_previews = show_previews
+            if (l._ === "boolTrue") {
+                if(!this.peer.full) {
+                    this.peer.fetchFull()
+                } else {
+                    if (mute_until !== undefined) this.peer.full.notify_settings.mute_until = mute_until
+                    if (silent !== undefined) this.peer.full.notify_settings.silent = silent
+                    if (sound !== undefined) this.peer.full.notify_settings.sound = sound
+                    if (show_previews !== undefined) this.peer.full.notify_settings.show_previews = show_previews
+                }
             }
         })
     }
