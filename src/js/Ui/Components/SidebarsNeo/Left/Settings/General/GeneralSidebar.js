@@ -1,9 +1,9 @@
 import {Section} from "../../../Fragments/Section";
-import VSlider from "../../../../Elements/VSlider";
 import IconButton from "../../../Fragments/IconButton";
 import CheckboxButton from "../../../Fragments/CheckboxButton";
 import {RadioSection} from "../../../Fragments/RadioSection";
 import {LeftSidebar} from "../../LeftSidebar";
+import VSlider from "../../../../../Elements/Input/VSlider";
 
 export class GeneralSidebar extends LeftSidebar {
     content(): * {
