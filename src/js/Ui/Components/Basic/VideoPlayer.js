@@ -20,6 +20,7 @@
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import {formatAudioTime} from "../../Utils/utils"
+import {DocumentMessagesTool} from "../../Utils/document"
 
 function onDrag(target: HTMLElement, innerTarget: HTMLElement, dir, listener) {
     const hasPointerEvent = undefined !== target.onpointerup;
@@ -88,7 +89,7 @@ class VideoPlayer extends StatefulComponent {
     timeWrapperRef = VComponent.createRef();
     timelineRef = VComponent.createRef();
 
-    render({src, controls, containerWidth, containerHeight, ...otherArgs}, state, globalState) {
+    render({src, controls, containerWidth, containerHeight, bufferedSize, size, ...otherArgs}, state, globalState) {
         // https://ak.picdn.net/shutterstock/videos/31008538/preview/stock-footage-parrot-flies-alpha-matte-d-rendering-animation-animals.webm
         const isPaused = this.videoRef.$el?.paused ?? true;
         const time = this.videoRef.$el?.currentTime ?? 0;
@@ -144,9 +145,9 @@ class VideoPlayer extends StatefulComponent {
                             <div className="time">
                                 {formatAudioTime(time)} / {formatAudioTime(duration)}
                             </div>
-                            {/*<div className="bytes">*/}
-                            {/*    2.7 MB/9.2 MB*/}
-                            {/*</div>*/}
+                            {size && bufferedSize && <div className="bytes">
+                                {DocumentMessagesTool.formatSize(bufferedSize)}/{DocumentMessagesTool.formatSize(size)}
+                            </div>}
                             <div className="button full">
                                 <i className="tgico tgico-full_screen" onClick={this.onClickFull}/>
                             </div>

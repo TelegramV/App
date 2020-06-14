@@ -36,6 +36,8 @@ class StreamingVideoComponent extends VideoPlayer {
 
     render(props, state, globalState) {
         props = {...props};
+        props.size = props.document.size;
+        props.bufferedSize = props.document.__mp4file?.bufferOffset;
         delete props.document;
         props.src = state.url;
 
