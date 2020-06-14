@@ -49,6 +49,28 @@ export function bytesConcat(a, b) {
     return tmp
 }
 
+export function concatUint8(...uint8Arrays: Uint8Array[]): Uint8Array {
+    let length = 0;
+
+    for (let i = 0; i < uint8Arrays.length; i++) {
+        if (uint8Arrays[i] instanceof ArrayBuffer) {
+            uint8Arrays[i] = new Uint8Array(uint8Arrays[i])
+        }
+        length += uint8Arrays[i].length;
+    }
+
+    const uint8Array = new Uint8Array(length);
+
+    let offset = 0;
+
+    for (let i = 0; i < uint8Arrays.length; i++) {
+        uint8Array.set(uint8Arrays[i], offset);
+        offset += uint8Arrays[i].length;
+    }
+
+    return uint8Array;
+}
+
 /**
  *
  * @param {Array|ArrayLike|ArrayBufferLike} a
