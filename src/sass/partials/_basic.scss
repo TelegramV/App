@@ -30,8 +30,9 @@ img:not([src]) {
     display: flex;
     background-color: $lightblue;
     overflow: hidden;
-    // Only specific parts should be selectable
-    user-select: none;
+    height: 100%;
+  // Only specific parts should be selectable
+  user-select: none;
 }
 
 @media (min-width: 1922px) {

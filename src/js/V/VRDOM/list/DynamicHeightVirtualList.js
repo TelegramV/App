@@ -18,8 +18,11 @@
  */
 
 import StatefulComponent from "../component/StatefulComponent"
+import VComponent from "../component/VComponent";
 
-class SimpleVirtualList extends StatefulComponent {
+class DynamicHeightVirtualList extends StatefulComponent {
+    containerRef = VComponent.createRef()
+
     state = {
         start: 0,
         count: 0,
@@ -28,14 +31,15 @@ class SimpleVirtualList extends StatefulComponent {
     };
 
     render() {
-        const {containerHeight, items, template, itemHeight} = this.props;
+        const {items, template, itemHeight} = this.props;
         const {start, count, offsetY, totalHeight} = this.state;
+        const Template = template
 
         return (
             <div style={{
-                height: `${containerHeight}px`,
+                height: `100%`,
                 overflow: "auto"
-            }} css-will-change="transform">
+            }} css-will-change="transform" ref={this.containerRef}>
 
                 <div style={{
                     overflow: "hidden",
@@ -46,7 +50,7 @@ class SimpleVirtualList extends StatefulComponent {
                         // willChange: "transform",
                         transform: `translateY(${offsetY}px)`
                     }}>
-                        {items.slice(start, start + count).map(item => template(item))}
+                        {items.slice(start, start + count).map(item => <Template dialog={item}/>)}
                     </div>
                 </div>
             </div>
@@ -62,12 +66,22 @@ class SimpleVirtualList extends StatefulComponent {
         this.$el.removeEventListener("scroll", this.onScroll)
     }
 
-    onScroll = event => {
+    componentDidUpdate() {
+        super.componentDidUpdate();
         this.recalculate()
     }
 
+    onScroll = event => {
+        this.recalculate()
+
+        if(this.props.onScroll) {
+            this.props.onScroll(event)
+        }
+    }
+
     recalculate = () => {
-        const {containerHeight, items, itemHeight, renderAhread} = this.props;
+        const {items, itemHeight, renderAhread} = this.props;
+        const containerHeight = this.containerRef.$el.clientHeight
         const scrollTop = this.$el.scrollTop;
 
         let start = Math.floor(scrollTop / itemHeight) - renderAhread;
@@ -86,13 +100,14 @@ class SimpleVirtualList extends StatefulComponent {
             offsetY,
             totalHeight
         })
+
     }
 }
 
-SimpleVirtualList.defaultProps = {
+DynamicHeightVirtualList.defaultProps = {
     containerHeight: 100,
     renderAhread: 10,
     items: [],
 }
 
-export default SimpleVirtualList
+export default DynamicHeightVirtualList

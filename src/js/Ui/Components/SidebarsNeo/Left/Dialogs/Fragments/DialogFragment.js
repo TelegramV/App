@@ -18,6 +18,7 @@ export const DialogFragment = (
         unreadMentionsCountFragmentRef,
         unreadCountFragmentRef,
         unreadMarkFragmentRef,
+        ...otherArgs
     }
 ) => {
     const peer = dialog.peer

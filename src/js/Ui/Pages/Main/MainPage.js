@@ -12,16 +12,15 @@ import {SettingsComponent} from "../../Components/Sidebars/Left/Settings/Setting
 import {SearchPanelComponent} from "../../Components/Sidebars/Left/Search/SearchPanelComponent"
 import MessagesSearchComponent from "../../Components/Sidebars/Right/Search/MessagesSearchComponent"
 import {DialogInfoComponent} from "../../Components/Sidebars/Right/DialogInfo/DialogInfoComponent"
-import {ArchivedDialogsBar} from "../../Components/Sidebars/Left/Dialogs/ArchivedDialogsBar"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
-import CreateChannelBar from "../../Components/Sidebars/Left/Create/CreateChannelBar";
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
-import ForwardBarComponent from "../../Components/Sidebars/Right/ForwardBarComponent";
 import Localization from "../../../Api/Localization/Localization";
 import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
 import {throttle} from "../../../Utils/func"
+import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
+import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -62,20 +61,36 @@ export function MainPage() {
             <ModalContainer/>
             <MediaViewerComponent/>
             <InstantViewComponent/>
-            <SettingsComponent/>
+            {/*<SnackbarComponent/>*/}
+            {/*<SettingsComponent/>*/}
+
+            <LeftSidebars/>
+            {/*<div className="sidebar-wrapper left">*/}
+            {/*    <SettingsSidebar/>*/}
+            {/*    /!*<LanguageSidebar/>*!/*/}
+            {/*    /!*<GeneralSidebar/>*!/*/}
+            {/*    /!*<NotificationsSidebar/>*!/*/}
+            {/*    /!*<PrivacySidebar/>*!/*/}
+            {/*    /!*<ActiveSessionsSidebar/>*!/*/}
+            {/*    /!*<BlockedSidebar/>*!/*/}
+            {/*    <DialogsSidebar/>*/}
+            {/*</div>*/}
+
+
+            {/*<SettingsComponent/>*/}
             <PhoneCallComponent/>
-            {/*TODO move all settings inside it's component*/}
 
-            <SearchPanelComponent/>
-            <CreateChannelBar/>
-            <ArchivedDialogsBar/> {/* critical: archived bar should be always before dialogs bar */}
+            {/*<SearchPanelComponent/>*/}
+            {/*<CreateChannelBar/>*/}
+            {/*<ArchivedDialogsBar/> /!* critical: archived bar should be always before dialogs bar *!/*/}
 
-            <DialogsBar/>
+            {/*<DialogsBar/>*/}
             <ChatComponent/>
 
-            <DialogInfoComponent/>
-            <MessagesSearchComponent/>
-            <ForwardBarComponent/>
+
+            {/*<DialogInfoComponent/>*/}
+            {/*<MessagesSearchComponent/>*/}
+            {/*<ForwardBarComponent/>*/}
         </div>
     )
 }

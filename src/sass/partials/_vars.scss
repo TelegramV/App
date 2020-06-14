@@ -49,8 +49,8 @@ $instantview-light-blue: #F3F8FC;
 	align-items: center;
 }
 
-@function anim($elem) {
-	@return 150ms ease-in-out $elem;
+@function anim($elem, $time: 150ms) {
+	@return $time ease-in-out $elem;
 }
 
 @import "ico";

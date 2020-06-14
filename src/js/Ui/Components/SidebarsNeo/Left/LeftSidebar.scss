@@ -1,0 +1,8 @@
+@import "src/sass/partials/vars";
+
+.sidebar.left {
+  $border: 1px $lightgrey solid;
+  border-right: $border;
+  width: 100%;
+
+}
