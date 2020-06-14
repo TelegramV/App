@@ -25,6 +25,8 @@ export class RightSidebars extends GenericSidebarHistory {
         if(this.history.includes(type)) {
             const indexOf = this.history.indexOf(type)
             if(indexOf === this.history.length - 1) {
+                // TODO hack
+                bar.update && bar.update()
                 bar.forceUpdate()
                 return
             } else {
@@ -42,7 +44,10 @@ export class RightSidebars extends GenericSidebarHistory {
         }
     }
 
-    pop() {
+    pop(from) {
+        if(!this.bars.has(from) && !this.bars.has(from.constructor)) {
+            return
+        }
         const type = this.history[this.history.length - 1]
         const bar = this.bars.get(type)
 

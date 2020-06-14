@@ -135,7 +135,7 @@ export class GenericSidebar extends StatefulComponent {
     }
 
     onLeftButtonPressed = (event) => {
-        UIEvents.Sidebars.fire("pop")
+        UIEvents.Sidebars.fire("pop", this)
     }
 
     onFloatingActionButtonPressed = (event) => {

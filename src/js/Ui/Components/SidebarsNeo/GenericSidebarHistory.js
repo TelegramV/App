@@ -13,7 +13,10 @@ export class GenericSidebarHistory extends StatelessComponent {
             .on("pop", (e) => this.pop(e))
     }
 
-    pop() {
+    pop(from) {
+        if(!this.bars.has(from) && !this.bars.has(from.constructor)) {
+            return
+        }
         const type = this.history[this.history.length - 1]
         const bar = this.bars.get(type)
 

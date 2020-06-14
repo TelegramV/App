@@ -187,11 +187,16 @@ export class DialogListsComponent extends StatelessComponent {
             return component.folderId === this.selectedFolder
         }).component
         const a = FoldersManager.getFolder(this.selectedFolder)?.include_peers?.length || FoldersManager.getFolder(this.selectedFolder)?.pinned_peers?.length || 5
-        if(component.general.component.$el.childNodes.length + component.pinned.component.$el.childNodes.length >= a) {
+        const total = component.general.component.$el.childNodes.length + component.pinned.component.$el.childNodes.length
+        if(total >= a) {
             this.setLoading(false)
         } else {
             if(DialogsManager.allWasFetched) {
-                this.setNoChats()
+                if(total > 0) {
+                    this.setLoading(false)
+                } else {
+                    this.setNoChats()
+                }
             } else {
                 this.setLoading()
             }
