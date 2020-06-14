@@ -31,6 +31,7 @@ import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
 import BetterPhotoComponent from "../Basic/BetterPhotoComponent"
 import StreamingVideoComponent from "../Basic/StreamingVideoComponent"
 import DocumentParser from "../../../Api/Files/DocumentParser"
+import {FileAPI} from "../../../Api/Files/FileAPI"
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -70,12 +71,15 @@ function MediaFragment({media, zoom, hidden}) {
 
     if (media instanceof VideoMessage) {
         const video = DocumentParser.attributeVideo(media.raw.media.document)
+        const thumbUrl = FileAPI.getThumbnail(media.raw.media.document)
 
         return <StreamingVideoComponent id="video-player-in-mw"
-                                        containerWidth={`${video.w}px`}
-                                        containerHeight={`${video.h}px`}
+                                        containerWidth={video.w}
+                                        containerHeight={video.h}
                                         document={media.raw.media.document}
-                                        autoPlay/>
+                                        thumbUrl={thumbUrl}
+                                        autoPlay
+                                        controls/>
     }
 
     if (!media) {

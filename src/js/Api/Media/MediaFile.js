@@ -19,7 +19,6 @@
 
 import DocumentParser from "../Files/DocumentParser";
 import AppEvents from "../EventBus/AppEvents"
-import MP4Box from "mp4box"
 
 class MP4StreamingFile {
     url: string = "";
@@ -44,39 +43,42 @@ class MP4StreamingFile {
     }
 
     init = (): Promise => {
-        return new Promise((resolve, reject) => {
-            this.mediaSource.onsourceclose = ev => reject(ev);
+        return import("mp4box").then(({default: MP4Box}) => {
+            console.log(MP4Box)
+            return new Promise((resolve, reject) => {
+                this.mediaSource.onsourceclose = ev => reject(ev);
 
-            this.mediaSource.onsourceopen = () => {
-                if (this.canceled) {
-                    return;
+                this.mediaSource.onsourceopen = () => {
+                    if (this.canceled) {
+                        return;
+                    }
+
+                    this.mp4box = MP4Box.createFile();
+
+                    this.mp4box.onSegment = (id, sourceBuffer, buffer, sampleNum, is_last) => {
+                        sourceBuffer.segmentIndex++;
+                        sourceBuffer.pendingAppends.push({id, buffer, sampleNum, is_last});
+
+                        // console.warn("Application", "Received new segment for track " + id + " up to sample #" + sampleNum + ", segments pending append: " + sourceBuffer.pendingAppends.length);
+
+                        this.onUpdateEnd(sourceBuffer, true, false);
+                    }
+
+                    this.mp4box.onReady = info => {
+                        this.mediaSource.duration = this.videoInfo.duration;
+
+                        info.tracks.forEach(this.initTrack);
+
+                        const initSegments = this.mp4box.initializeSegmentation();
+                        initSegments.forEach(this.initSegment);
+
+                        this.mp4box.start();
+                    }
+
+                    resolve(this.mediaSource)
                 }
-
-                this.mp4box = MP4Box.createFile();
-
-                this.mp4box.onSegment = (id, sourceBuffer, buffer, sampleNum, is_last) => {
-                    sourceBuffer.segmentIndex++;
-                    sourceBuffer.pendingAppends.push({id, buffer, sampleNum, is_last});
-
-                    // console.warn("Application", "Received new segment for track " + id + " up to sample #" + sampleNum + ", segments pending append: " + sourceBuffer.pendingAppends.length);
-
-                    this.onUpdateEnd(sourceBuffer, true, false);
-                }
-
-                this.mp4box.onReady = info => {
-                    this.mediaSource.duration = this.videoInfo.duration;
-
-                    info.tracks.forEach(this.initTrack);
-
-                    const initSegments = this.mp4box.initializeSegmentation();
-                    initSegments.forEach(this.initSegment);
-
-                    this.mp4box.start();
-                }
-
-                resolve(this.mediaSource)
-            }
-        })
+            })
+        });
     }
 
     initTrack = track => {
@@ -161,6 +163,8 @@ class MP4StreamingFile {
         const part = newBytes.buffer;
         part.fileStart = this.bufferOffset;
 
+
+        // todo: handle if not
         if (this.mp4box) {
             this.mp4box.appendBuffer(part);
         }
