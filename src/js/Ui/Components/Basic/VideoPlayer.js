@@ -126,6 +126,7 @@ class VideoPlayer extends StatefulComponent {
                            onDurationChange={this.onDurationChange}
                            onProgress={this.onProgress}
                            onClick={this.onClickPause}
+                           onDoubleClick={this.onClickFull}
                     />
 
                     <div className={{
@@ -210,6 +211,8 @@ class VideoPlayer extends StatefulComponent {
         } else {
             $video.pause();
         }
+        
+        this.toggleControls();
     }
 
     onClickFull = () => {
@@ -232,33 +235,35 @@ class VideoPlayer extends StatefulComponent {
         if (code === 39) {
             event.stopPropagation();
             this.videoRef.$el.currentTime += 5;
+            this.toggleControls();
         } else if (code === 37) {
             event.stopPropagation();
             this.videoRef.$el.currentTime -= 5;
+            this.toggleControls();
         } else if (code === 32) {
             event.stopPropagation();
             this.onClickPause();
+            this.toggleControls();
         }
     }
 
     onMouseOver = (event: MouseEvent) => {
-        this.setState({
-            showControls: true,
-        });
-        this.hideControls();
+        this.toggleControls();
     }
 
     onMouseMove = (event: MouseEvent) => {
-        this.setState({
-            showControls: true,
-            x: event.x,
-            y: event.y,
-        });
-
-        this.hideControls();
+        this.toggleControls();
     }
 
     onMouseLeave = (event: MouseEvent) => {
+        this.hideControls();
+    }
+
+    toggleControls = () => {
+        this.setState({
+            showControls: true,
+        });
+
         this.hideControls();
     }
 
