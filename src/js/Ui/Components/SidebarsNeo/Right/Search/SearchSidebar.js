@@ -84,7 +84,7 @@ export class SearchSidebar extends RightSidebar {
             count: this.state.messagesCount
         })
 
-        UIEvents.Sidebars.fire("pop")
+        UIEvents.Sidebars.fire("pop", this)
     }
 
     onSearchNextPage = _ => {
