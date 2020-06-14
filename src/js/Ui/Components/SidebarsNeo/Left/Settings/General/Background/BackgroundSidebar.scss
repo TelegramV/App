@@ -1,0 +1,79 @@
+.content {
+    .grad {
+        border-radius: 12px;
+        position: relative;
+        height: 200px;
+        margin-top: 27px;
+
+        .bg1 {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #fff 0%, rgba(255, 255, 255, 0) 100%);
+            border-radius: 12px;
+        }
+
+        .bg2 {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 0%, #000 100%);
+            border-radius: 12px;
+        }
+    }
+
+    .grad-bottom {
+        margin-top: 32px;
+        margin-bottom: 28px;
+        height: 8px;
+        border-radius: 4px;
+        position: relative;
+
+        .bg {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+            border-radius: 4px;
+            background: linear-gradient(to right, red 0%, #ff0 17%, lime 33%, cyan 50%, blue 66%, #f0f 83%, red 100%);
+        }
+    }
+
+    .inputs {
+        display: flex;
+        margin: 10px;
+
+        .VInput {
+            margin: 5px;
+        }
+    }
+
+    .gallery { //hacks to make it square
+        display: grid;
+        grid-template-columns: repeat(3, minmax(8rem, 1fr));
+        grid-auto-rows: 1fr;
+
+        &::before {
+            content: '';
+            width: 0;
+            padding-bottom: 100%;
+            grid-row: 1 / 1;
+            grid-column: 1 / 1;
+        }
+
+        &>*:first-child {
+            grid-row: 1 / 1;
+            grid-column: 1 / 1;
+        }
+
+        .color-square,
+        .image-square {
+            margin: 2px;
+            cursor: pointer;
+        }
+
+        .image-square {
+            background-size: cover;
+            background-position: center center;
+        }
+    }
+}

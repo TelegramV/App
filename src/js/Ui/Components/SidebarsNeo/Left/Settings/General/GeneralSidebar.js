@@ -4,13 +4,15 @@ import CheckboxButton from "../../../Fragments/CheckboxButton";
 import {RadioSection} from "../../../Fragments/RadioSection";
 import {LeftSidebar} from "../../LeftSidebar";
 import VSlider from "../../../../../Elements/Input/VSlider";
+import {BackgroundImageSidebar} from "./Background/BackgroundImageSidebar"
+import UIEvents from "../../../../../EventBus/UIEvents";
 
 export class GeneralSidebar extends LeftSidebar {
     content(): * {
         return <this.contentWrapper>
             <Section title="Settings">
                 <VSlider label="Message Text Size" value={16} max={22} min={10}/>
-                <IconButton icon="photo" text="Chat Background"/>
+                <IconButton icon="photo" text="Chat Background" onClick={_ => UIEvents.Sidebars.fire("push", BackgroundImageSidebar)}/>
                 <CheckboxButton checked text="Enable Animations"/>
             </Section>
 
