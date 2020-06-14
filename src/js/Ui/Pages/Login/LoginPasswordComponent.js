@@ -134,6 +134,21 @@ class LoginPasswordComponent extends StatefulComponent {
                 switch (error.type) {
                     case "PASSWORD_HASH_INVALID":
                         errorText = "Wrong password";
+
+                        this.setGlobalState({
+                            login: {
+                                accountPassword: null,
+                            },
+                        });
+
+                        API.account.getPassword().then(Password => {
+                            this.setGlobalState({
+                                login: {
+                                    accountPassword: Password,
+                                },
+                            });
+                        });
+
                         break;
                     case "SRP_ID_INVALID":
                         errorText = "Invalid SRP ID provided";

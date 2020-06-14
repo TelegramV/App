@@ -289,10 +289,18 @@
         > .left {
           height: 24px;
           width: 24px;
+          display: flex;
+          flex-direction: row;
+          align-items: center;
 
           > .tgico {
             font-size: 24px;
             color: $darkgrey;
+          }
+
+          > .avatar {
+            --avatar-size: 48px;
+
           }
 
           margin-right: 32px;
