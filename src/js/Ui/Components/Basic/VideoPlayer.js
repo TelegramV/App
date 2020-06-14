@@ -162,6 +162,12 @@ class VideoPlayer extends StatefulComponent {
         onDrag(this.timeWrapperRef.$el, this.timelineRef.$el, "ltr", (percentage) => {
             this.videoRef.$el.currentTime = this.videoRef.$el.duration * Math.max(0, Math.min(1, percentage));
         });
+
+        window.addEventListener("keydown", this.onKeyDown);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("keydown", this.onKeyDown);
     }
 
     onPlay = () => {
@@ -205,6 +211,21 @@ class VideoPlayer extends StatefulComponent {
             $video.webkitRequestFullscreen();
         } else if ($video.msRequestFullscreen) { /* IE/Edge */
             $video.msRequestFullscreen();
+        }
+    }
+
+    onKeyDown = event => {
+        const code = event.keyCode || event.which;
+
+        if (code === 39) {
+            event.stopPropagation();
+            this.videoRef.$el.currentTime += 5;
+        } else if (code === 37) {
+            event.stopPropagation();
+            this.videoRef.$el.currentTime -= 5;
+        } else if (code === 32) {
+            event.stopPropagation();
+            this.onClickPause();
         }
     }
 }

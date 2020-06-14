@@ -71,7 +71,8 @@ function MediaFragment({media, zoom, hidden}) {
     if (media instanceof VideoMessage) {
         const video = DocumentParser.attributeVideo(media.raw.media.document)
 
-        return <StreamingVideoComponent containerWidth={`${video.w}px`}
+        return <StreamingVideoComponent id="video-player-in-mw"
+                                        containerWidth={`${video.w}px`}
                                         containerHeight={`${video.h}px`}
                                         document={media.raw.media.document}
                                         autoPlay/>
@@ -203,7 +204,7 @@ export class MediaViewerComponent extends StatefulComponent {
     }
 
     onKeyDown = event => {
-        if (!this.state.hidden) {
+        if (!this.state.hidden && !document.getElementById("video-player-in-mw")) {
             event.stopPropagation();
 
             const code = event.keyCode || event.which;
