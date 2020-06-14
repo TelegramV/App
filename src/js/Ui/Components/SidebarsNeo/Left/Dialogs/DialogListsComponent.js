@@ -186,7 +186,7 @@ export class DialogListsComponent extends StatelessComponent {
             const component: DialogFolderFragment = l.component
             return component.folderId === this.selectedFolder
         }).component
-        const a = FoldersManager.getFolder(this.selectedFolder).include_peers.length || FoldersManager.getFolder(this.selectedFolder).pinned_peers.length || 5
+        const a = FoldersManager.getFolder(this.selectedFolder)?.include_peers?.length || FoldersManager.getFolder(this.selectedFolder)?.pinned_peers?.length || 5
         if(component.general.component.$el.childNodes.length + component.pinned.component.$el.childNodes.length >= a) {
             this.setLoading(false)
         } else {
