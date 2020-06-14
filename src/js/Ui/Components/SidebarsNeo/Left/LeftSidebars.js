@@ -7,6 +7,8 @@ import {LanguageSidebar} from "./Settings/LanguageSidebar";
 import {ActiveSessionsSidebar} from "./Settings/Privacy/ActiveSessionsSidebar";
 import {BlockedSidebar} from "./Settings/Privacy/BlockedSidebar";
 import {GeneralSidebar} from "./Settings/General/GeneralSidebar";
+import {BackgroundImageSidebar} from "./Settings/General/Background/BackgroundImageSidebar";
+import {BackgroundColorSidebar} from "./Settings/General/Background/BackgroundColorSidebar";
 import {ArchivedSidebar} from "./Dialogs/ArchivedSidebar";
 
 export class LeftSidebars extends GenericSidebarHistory {
@@ -21,6 +23,8 @@ export class LeftSidebars extends GenericSidebarHistory {
 
 
                 <GeneralSidebar/>
+                <BackgroundImageSidebar/>
+                <BackgroundColorSidebar/>
 
                 <NotificationsSidebar/>
 
