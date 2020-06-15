@@ -21,6 +21,9 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 import DocumentParser from "../../../Api/Files/DocumentParser"
 import {PhotoFragment} from "../Columns/Chat/Message/Photo/PhotoFragment"
+import VComponent from "../../../V/VRDOM/component/VComponent"
+import FileManager from "../../../Api/Files/FileManager"
+import AppEvents from "../../../Api/EventBus/AppEvents"
 
 class BetterVideoComponent extends StatefulComponent {
     state = {
@@ -30,7 +33,10 @@ class BetterVideoComponent extends StatefulComponent {
         width: 0,
         height: 0,
         isHovered: false,
+        currentTime: 0,
     };
+
+    videoRef = VComponent.createRef();
 
     init() {
         const {document} = this.props;
@@ -41,29 +47,55 @@ class BetterVideoComponent extends StatefulComponent {
         this.state.thumbnailUrl = FileAPI.getThumbnail(document);
     }
 
-    render({document, onClick, playOnHover, infoContainer, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
-        isLoading = true;
+    appEvents(E: AE) {
+        E.bus(AppEvents.Files)
+            .filter(event => FileManager.checkEvent(event, this.props.document))
+            .on("download.done", this.onDownloadDone)
+    }
+
+    render({document, onClick, playOnHover, infoContainer, isRound, onPlay, onPause, onTimeUpdate, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
+        const streamable = DocumentParser.isVideoStreamable(document);
+
+        if (streamable) {
+            otherArgs.autoPlay = false;
+        }
 
         return (
-            <figure className={["video rp rps", isLoading && "thumbnail"]} onClick={onClick}>
-                {infoContainer && infoContainer({})}
+            <figure className={["video rp rps", isLoading && "thumbnail", isRound && "round"]} onClick={onClick}>
+                {infoContainer && infoContainer(this.state, this.videoRef.$el)}
                 {
                     !isLoading ?
-                        <video src={url}
+                        <video {...otherArgs}
+                               src={url}
                                type={document.mime_type}
                                onMouseOver={this.onMouseOver}
                                onMouseOut={this.onMouseOut}
                                onEnded={this.onEnded}
-                               {...otherArgs}
+                               onTimeUpdate={this.onTimeUpdate}
+                               onPause={this.onPause}
+                               onPlay={this.onPlay}
+                               ref={this.videoRef}
                         />
                         :
-                        <PhotoFragment document={document} url={thumbnailUrl}
+                        <PhotoFragment document={document}
+                                       url={thumbnailUrl}
                                        width={width}
                                        height={height}
                                        calculateSize={true}/>
                 }
             </figure>
         )
+    }
+
+    componentWillMount(props) {
+        FileManager.downloadVideo(props.document)
+    }
+
+    onDownloadDone = ({url}) => {
+        this.setState({
+            url,
+            isLoading: false,
+        });
     }
 
     onMouseOver = e => {
@@ -81,8 +113,42 @@ class BetterVideoComponent extends StatefulComponent {
     }
 
     onEnded = e => {
+        this.setState({
+            currentTime: DocumentParser.attributeVideo(this.props.document).duration,
+        });
+
         if (this.state.isHovered) {
             e.target.play();
+        }
+
+        if (this.props.onEnded) {
+            this.props.onEnded(e);
+        }
+    }
+
+    onTimeUpdate = (event: Event) => {
+        this.setState({
+            currentTime: event.target.currentTime,
+        });
+
+        if (this.props.onTimeUpdate) {
+            this.props.onTimeUpdate(event);
+        }
+    }
+
+    onPlay = (event) => {
+        this.forceUpdate();
+
+        if (this.props.onPlay) {
+            this.props.onPlay(event);
+        }
+    }
+
+    onPause = (event) => {
+        this.forceUpdate();
+
+        if (this.props.onPause) {
+            this.props.onPause(event);
         }
     }
 }

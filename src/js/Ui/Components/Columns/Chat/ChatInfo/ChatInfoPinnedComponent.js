@@ -60,7 +60,7 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                             className="description">{AudioPlayer.state.isVoice ? "Voice message" : AudioPlayer.state.audioInfo.performer}</div>
                     </div>
                     <div class="close">
-                        <i className="tgico tgico-close"/>
+                        <i className="tgico tgico-close" onClick={() => AudioPlayer.stop()}/>
                     </div>
                 </div>
             )

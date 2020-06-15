@@ -24,6 +24,7 @@ import DocumentParser from "../../../../../Api/Files/DocumentParser"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import {formatAudioTime} from "../../../../Utils/utils"
 import AudioPlayer from "../../../../../Api/Media/AudioPlayer"
+import FileManager from "../../../../../Api/Files/FileManager"
 
 class NewAudioMessageComponent extends GeneralMessageComponent {
     appEvents(E) {
@@ -42,21 +43,21 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
     render({message}, state) {
         const isPlaying = AudioPlayer.isCurrent(message);
         const audioInfo = DocumentParser.attributeAudio(message.media.document);
-        const {isPaused, currentTime, bufferedPercentage} = AudioPlayer.state;
+        const {isPaused, currentTime, bufferedPercentage, isSeeking} = AudioPlayer.state;
 
         this.isPlaying = isPlaying // dirty hack, do not repeat
 
         return (
             <MessageWrapperFragment message={message} showUsername={false}>
                 <div class="audio">
-                    <div
-                        class={`play tgico tgico-${isPlaying && !isPaused ? 'pause' : 'play'} rp rps rp-white`}
-                        onClick={this.onClickPlay}
-                        onDoubleClick={event => event.stopPropagation()}/>
-                    {/*<progress className={{*/}
-                    {/*    "progress-circular": true,*/}
-                    {/*    "visible": FileManager.isPending(message.media.document)*/}
-                    {/*}}/>*/}
+                    <div class={`play tgico tgico-${isPlaying && !isPaused ? 'pause' : 'play'} rp rps rp-white`}
+                         onClick={this.onClickPlay}
+                         onDoubleClick={event => event.stopPropagation()}>
+                        <progress className={{
+                            "progress-circular": true,
+                            "visible": !FileManager.getPercentage(message.media.document) || isSeeking,
+                        }}/>
+                    </div>
                     <div class="audio-wrapper rp rps">
                         <div className="controls">
                             <div className="audio-name">

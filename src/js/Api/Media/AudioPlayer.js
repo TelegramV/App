@@ -153,6 +153,7 @@ class AudioPlayer {
             audioInfo: info,
             isVoice,
             fileName,
+            isSeeking: this.audio.seeking,
         }
     }
 
