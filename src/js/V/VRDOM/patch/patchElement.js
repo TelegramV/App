@@ -26,6 +26,7 @@ import {initElement} from "../render/renderElement"
 import VApp from "../../vapp"
 import patchEvents from "./patchEvents"
 import patchStyle from "./patchStyle"
+import vrdom_mount from "../mount"
 
 const recreateElementByTagName = ($node: HTMLElement, tagName: string, options = {}) => {
     const $newNode = options.xmlns ? document.createElementNS(options.xmlns, tagName) : document.createElement(tagName)
@@ -53,6 +54,10 @@ const patchElement = ($node: HTMLElement, vRNode: VRNode, options = {}) => {
     }
 
     options.xmlns = $node.namespaceURI
+
+    if (vRNode.shouldRecreate) {
+        return vrdom_mount(vRNode, $node)
+    }
 
     if ($node.tagName.toLowerCase() !== vRNode.tagName.toLowerCase()) {
         const $oldNode = $node

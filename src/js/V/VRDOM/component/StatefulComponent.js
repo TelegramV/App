@@ -24,6 +24,7 @@ import VComponent from "./VComponent"
 class StatefulComponent<P, S> extends VComponent<P> {
     constructor(config) {
         super(config);
+        this.__update_strategy = VComponent.DEFAULT_STRATEGY;
         this.__.stateful = true;
     }
 
@@ -63,5 +64,8 @@ class StatefulComponent<P, S> extends VComponent<P> {
         }
     }
 }
+
+VComponent.DEFAULT_STRATEGY = 90;
+VComponent.RECREATE_STRATEGY = 91;
 
 export default StatefulComponent;

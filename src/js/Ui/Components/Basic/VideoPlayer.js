@@ -21,6 +21,7 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import {formatAudioTime} from "../../Utils/utils"
 import {DocumentMessagesTool} from "../../Utils/document"
+import VSpinner from "../../Elements/VSpinner"
 
 function onDrag(target: HTMLElement, innerTarget: HTMLElement, dir, listener) {
     const hasPointerEvent = undefined !== target.onpointerup;
@@ -93,12 +94,13 @@ class VideoPlayer extends StatefulComponent {
         showControls: true,
     }
 
-    render({src, controls, containerWidth, containerHeight, bufferedSize, size, thumbUrl, ...otherArgs}, {showControls}, globalState) {
+    render({src, controls, containerWidth, containerHeight, bufferedSize, isDownloaded, isStreamable, size, thumbUrl, ...otherArgs}, {showControls}, globalState) {
         // https://ak.picdn.net/shutterstock/videos/31008538/preview/stock-footage-parrot-flies-alpha-matte-d-rendering-animation-animals.webm
         const isPaused = this.videoRef.$el?.paused ?? true;
         const time = this.videoRef.$el?.currentTime ?? 0;
         const duration = this.videoRef.$el?.duration ?? 0;
         const buffered = this.videoRef.$el?.buffered;
+        const seeking = this.videoRef.$el?.seeking;
         let bufferedEnd
 
         try {
@@ -107,7 +109,11 @@ class VideoPlayer extends StatefulComponent {
             bufferedEnd = 0;
         }
 
-        const progress = bufferedEnd / duration * 100;
+        let progress = bufferedEnd / duration * 100;
+
+        if (this.videoRef.$el?.src !== src) {
+            progress = 0;
+        }
 
         let styleSize = {
             "width": containerWidth,
@@ -115,18 +121,28 @@ class VideoPlayer extends StatefulComponent {
         }
 
         if (typeof containerWidth === "number" && typeof containerHeight === "number") {
-            if (containerWidth >= containerHeight) {
+            if (containerWidth > containerHeight) {
                 styleSize = {
                     "width": `${containerWidth}px`,
                     "max-height": `${containerHeight}px`,
                 }
             } else {
-                styleSize = {
-                    "max-width": `${containerWidth}px`,
-                    "height": `${containerHeight}px`,
+                if (containerHeight > 800) {
+                    styleSize = {
+                        "width": `${containerWidth}px`,
+                        "max-height": `800px`,
+                    }
+                } else {
+                    styleSize = {
+                        "width": `${containerWidth}px`,
+                        "max-height": `${containerHeight}px`,
+                    }
                 }
             }
         }
+
+        const hideThumb = progress || (src && !isStreamable)
+        const hideLoading = hideThumb && !seeking
 
         return (
             <div style={styleSize}
@@ -136,20 +152,28 @@ class VideoPlayer extends StatefulComponent {
                  onMouseLeave={this.onMouseLeave}>
                 <div className="player">
                     <img style={{
-                        "display": progress && "none",
-                    }} src={thumbUrl} alt="Preview"/>
+                        "display": hideThumb && "none",
+                    }} className="thumbnail-img" src={thumbUrl} alt="Preview"/>
+
+                    <div style={{
+                        "display": hideLoading && "none",
+                    }} className="video-button">
+                        <div className="loading">
+                            <VSpinner white big background/>
+                        </div>
+                    </div>
 
                     <video css-display={!progress && "none"}
                            ref={this.videoRef}
                            src={src}
                            {...otherArgs}
                            onPlay={this.onPlay}
-                           onPaste={this.onPause}
-                           onTimeUpdate={this.onTimeUpdate}
+                           onPause={this.onPause}
                            onDurationChange={this.onDurationChange}
                            onProgress={this.onProgress}
                            onClick={this.onClickPause}
-                           onDoubleClick={this.onClickFull}
+                           onTimeUpdate={this.onTimeUpdate}
+                           $recreate={this.videoRef.$el?.src !== src /* THIS IS VERY BAD КОСТИЛЬ, but now idk how to do it better, NEVER REPEAT THIS!!!!*/}
                     />
 
                     <div className={{
@@ -181,8 +205,8 @@ class VideoPlayer extends StatefulComponent {
                             <div className="time">
                                 {formatAudioTime(time)} / {formatAudioTime(duration)}
                             </div>
-                            {size && bufferedSize && <div className="bytes">
-                                {DocumentMessagesTool.formatSize(bufferedSize)}/{DocumentMessagesTool.formatSize(size)}
+                            {size && !isDownloaded &&/*bufferedSize != null &&*/ <div className="bytes">
+                                {DocumentMessagesTool.formatSize(bufferedSize || 0)}/{DocumentMessagesTool.formatSize(size)}
                             </div>}
                             <div className="button full">
                                 <i className="tgico tgico-full_screen" onClick={this.onClickFull}/>
@@ -200,11 +224,83 @@ class VideoPlayer extends StatefulComponent {
         });
 
         window.addEventListener("keydown", this.onKeyDown);
+
+        // this.addListeners();
     }
 
     componentWillUnmount() {
         window.removeEventListener("keydown", this.onKeyDown);
+
+        // this.removeListeners();
     }
+
+    // removeListeners = () => {
+    //     this.state.isListen = false;
+    //
+    //     if (this.videoRef.$el) {
+    //         this.videoRef.$el.removeEventListener("play", this.onPlay);
+    //         this.videoRef.$el.removeEventListener("pause", this.onPause);
+    //         this.videoRef.$el.removeEventListener("durationchange", this.onDurationChange);
+    //         this.videoRef.$el.removeEventListener("progress", this.onProgress);
+    //         this.videoRef.$el.removeEventListener("click", this.onClickPause);
+    //         this.videoRef.$el.removeEventListener("dblclick", this.onClickFull);
+    //         this.videoRef.$el.removeEventListener("timeupdate", this.onTimeUpdate);
+    //     }
+    // }
+    //
+    // addListeners = () => {
+    //     if (this.videoRef.$el && !this.state.isListen) {
+    //         this.state.isListen = true;
+    //         this.videoRef.$el.addEventListener("play", this.onPlay);
+    //         this.videoRef.$el.addEventListener("pause", this.onPause);
+    //         this.videoRef.$el.addEventListener("durationchange", this.onDurationChange);
+    //         this.videoRef.$el.addEventListener("progress", this.onProgress);
+    //         this.videoRef.$el.addEventListener("click", this.onClickPause);
+    //         this.videoRef.$el.addEventListener("dblclick", this.onClickFull);
+    //         this.videoRef.$el.addEventListener("timeupdate", this.onTimeUpdate);
+    //     }
+    // }
+
+    componentWillUpdate(nextProps, nextState) {
+        // this.addListeners();
+
+        if (nextProps.src !== this.props.src) {
+            // console.log("Will update", nextProps, nextState, this);
+
+            if (nextProps.src) {
+                nextState.shouldRecreate = true;
+            }
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.state.shouldRecreate) {
+            this.state.shouldRecreate = false;
+
+            if (this.videoRef.$el) {
+                // this.videoRef.$el.load();
+                this.videoRef.$el.currentTime = 0;
+                // this.videoRef.$el.pause();
+            }
+        }
+    }
+
+    // recreateVideoFragment = ({src, ...otherArgs}) => {
+    //     this.videoRef.$el.replaceWith(vrdom_render(
+    //         <video css-display={"none"}
+    //                ref={this.videoRef}
+    //                src={src}
+    //                {...otherArgs}
+    //                onPlay={this.onPlay}
+    //                onPaste={this.onPause}
+    //                onTimeUpdate={this.onTimeUpdate}
+    //                onDurationChange={this.onDurationChange}
+    //                onProgress={this.onProgress}
+    //                onClick={this.onClickPause}
+    //                onDoubleClick={this.onClickFull}
+    //         />
+    //     ));
+    // }
 
     onPlay = () => {
         this.forceUpdate();

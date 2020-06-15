@@ -24,20 +24,24 @@ import DocumentParser from "../../../Api/Files/DocumentParser"
 
 class StreamingVideoComponent extends VideoPlayer {
     state = {
+        ...super.state,
         url: "",
-    }
+    };
 
     appEvents(E) {
         E.bus(AppEvents.Files)
             .filter(event => FileManager.checkEvent(event, this.props.document))
             .on("download.start", this.onDownloadStart)
+            .on("download.newPart", this.onDownloadNewPart)
             .on("download.done", this.onDownloadDone);
     }
 
     render(props, state, globalState) {
         props = {...props};
         props.size = props.document.size;
-        props.bufferedSize = props.document.__mp4file?.bufferOffset;
+        props.bufferedSize = props.document.__mp4file?.bufferOffset || FileManager.getPendingSize(props.document);
+        props.isDownloaded = FileManager.isDownloaded(props.document);
+        props.isStreamable = DocumentParser.isVideoStreamable(props.document);
         delete props.document;
         props.src = state.url;
 
@@ -45,30 +49,69 @@ class StreamingVideoComponent extends VideoPlayer {
     }
 
     componentWillMount(props) {
-        const video = DocumentParser.attributeVideo(props.document);
+        super.componentWillMount(props);
 
-        if (video.supports_streaming) {
+        if (DocumentParser.isVideoStreamable(props.document)) {
             if (FileManager.isPending(this.props.document)) {
                 this.state.url = FileManager.getPending(this.props.document)?.__mp4file.url;
             } else {
                 FileManager.downloadVideo(this.props.document);
             }
         } else {
-            console.warn("streaming is not supported for this video")
+            console.warn("streaming is not supported for this video");
             FileManager.downloadDocument(this.props.document);
         }
     }
 
+    componentWillUpdate(nextProps, nextState) {
+        super.componentWillUpdate(nextProps, nextState);
+
+        if (nextProps.document !== this.props.document || nextProps.document.id !== this.props.document.id) {
+            // console.warn("[S] Will update", nextProps, nextState, this);
+
+            this.state.url = "";
+
+            if (DocumentParser.isVideoStreamable(nextProps.document)) {
+                if (FileManager.isPending(nextProps.document)) {
+                    this.setState({
+                        url: FileManager.getPending(nextProps.document)?.__mp4file.url,
+                    });
+                } else {
+                    FileManager.downloadVideo(nextProps.document);
+                }
+            } else {
+                console.warn("streaming is not supported for this video");
+                FileManager.downloadDocument(nextProps.document);
+            }
+        }
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+
+        FileManager.cancel(this.props.document);
+    }
+
     onDownloadStart = ({file}) => {
-        if (DocumentParser.attributeVideo(this.props.document).supports_streaming) {
+        this.forceUpdate();
+
+        if (DocumentParser.isVideoStreamable(file)) {
             this.setState({
                 url: file.__mp4file.url,
+            });
+        } else {
+            this.setState({
+                url: "",
             });
         }
     }
 
+    onDownloadNewPart = () => {
+        this.forceUpdate();
+    }
+
     onDownloadDone = ({url}) => {
-        if (this.state.url === "") {
+        if (!this.state.url || !this.videoRef.$el?.currentTime) {
             this.setState({
                 url,
             });

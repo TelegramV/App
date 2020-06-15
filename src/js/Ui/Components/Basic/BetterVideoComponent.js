@@ -66,20 +66,6 @@ class BetterVideoComponent extends StatefulComponent {
         )
     }
 
-    componentDidMount() {
-        const {document} = this.props;
-
-        // this.assure(FileAPI.downloadDocument(document))
-        //     .then(blob => {
-        //         const url = FileAPI.getUrl(blob);
-        //
-        //         this.setState({
-        //             isLoading: false,
-        //             url: url,
-        //         });
-        //     })
-    }
-
     onMouseOver = e => {
         if (this.props.playOnHover) {
             this.state.isHovered = true;
