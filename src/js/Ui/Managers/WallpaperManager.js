@@ -93,7 +93,7 @@ class WallpaperManagerSingleton {
                     })
                 }
             }
-
+            if(!blob) return; //fail
             UIEvents.General.fire("wallpaper.fullReady", {
                 id: wallpaper.document.id,
                 wallpaperUrl: URL.createObjectURL(blob)
@@ -104,12 +104,11 @@ class WallpaperManagerSingleton {
 
     requestAndInstall(wallpaper) {
         this.requestFull(wallpaper).then(blob => {
-            this.setWallpaper(URL.createObjectURL(blob));
+            this.setWallpaper(URL.createObjectURL(blob), wallpaper.id);
         })
-        //this.currentWallpaper = wallpaper;
     }
 
-    setWallpaper(url) {
+    setWallpaper(url, wallpaperId = 0) {
         if (!url) {
             window.document.documentElement.style.setProperty("--chat-bg-image", `none`);
             return;
@@ -117,7 +116,7 @@ class WallpaperManagerSingleton {
         window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
         fetch(url).then(async response => {
             let blob = await response.blob();
-            keval.setItem("background", {blob: blob});
+            keval.setItem("background", {blob: blob, wallpaperId: wallpaperId});
         })
     }
 
