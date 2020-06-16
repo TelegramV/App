@@ -328,6 +328,45 @@ input[type="password"] {
     }
 }
 
+.input-search {
+    position: relative;
+    margin: 0 9px;
+
+    input[type="text"] {
+        background-color: $light;
+        border: 2px solid transparent;
+        height: 44px;
+        line-height: 36px;
+        border-radius: 22px;
+        box-sizing: border-box;
+        padding: 0 16px 0 40px;
+        transition: anim(all);
+    }
+
+    input[type="text"]:focus {
+        background-color: rgba($light, 0);
+        border: 2px solid $blue;
+        & + span.tgico {
+            color: $blue;
+            opacity: 1;
+        }
+    }
+
+    .tgico {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 48px;
+        height: 44px;
+        text-align: center;
+        line-height: 42px;
+        font-size: 24px;
+        color: $darkgrey;
+        opacity: 0.6;
+        transition: anim(all);
+    }
+}
+
 .dropdown-container {
     position: relative;
 

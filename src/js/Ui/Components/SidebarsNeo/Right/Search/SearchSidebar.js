@@ -1,3 +1,4 @@
+import "./SearchSidebar.scss";
 import {RightSidebar} from "../RightSidebar";
 import PeersStore from "../../../../../Api/Store/PeersStore";
 import ContactComponent from "../../../Basic/ContactComponent";
@@ -60,7 +61,7 @@ export class SearchSidebar extends RightSidebar {
     }
 
     appEvents(E: AE) {
-        E.bus(UIEvents.RightSidebar)
+        E.bus(UIEvents.Sidebars)
             .on("setSearchQuery", this.onSetSearchQuery)
 
         E.bus(UIEvents.General)
@@ -68,19 +69,28 @@ export class SearchSidebar extends RightSidebar {
     }
 
     content(): * {
-        return <this.contentWrapper>
+        return <this.contentWrapper onScroll={this.onScroll}>
             <Section title={<MessagesCountFragment ref={this.messagesCountRef} count={this.state.messagesCount}/>}>
                 <List list={this.state.messages}
                       template={MessageFragmentItemTemplate}
                       wrapper={<div/>}/>
             </Section>
-            <Footer ref={this.footerRef} left={<div className={["btn-icon rp rps tgico-calendar", classIf(this.searchInputRef?.component?.$el.value.length > 0, "hidden")]} onClick={this.onSelectDate}/>}
+            {/*<Footer ref={this.footerRef} left={<div className={["btn-icon rp rps tgico-calendar", classIf(this.searchInputRef?.component?.$el.value.length > 0, "hidden")]} onClick={this.onSelectDate}/>}*/}
 
-                    right={<>
-                        <div className={["btn-icon rp rps tgico-up"]} onClick/>
-                        <div className={["btn-icon rp rps tgico-up rotate-180"]} onClick/>
-                    </>}/>
+            {/*        right={<>*/}
+            {/*            <div className={["btn-icon rp rps tgico-up"]} onClick/>*/}
+            {/*            <div className={["btn-icon rp rps tgico-up rotate-180"]} onClick/>*/}
+            {/*        </>}/>*/}
         </this.contentWrapper>
+    }
+
+    get rightButtons(): *[] {
+        return [
+            {
+                icon: "calendar",
+                onClick: () => this.onSelectDate()
+            }
+        ]
     }
 
     onSelectDate = _ => {
@@ -186,13 +196,13 @@ export class SearchSidebar extends RightSidebar {
                 })
             }
         }
-        this.footerRef.patch({
-            left: <div className={["btn-icon rp rps tgico-calendar", classIf(this.searchInputRef?.component?.$el.value.length > 0, "hidden")]} onClick={this.onSelectDate}/>,
-            right: <>
-                <div className={["btn-icon rp rps tgico-up"]} onClick/>
-                <div className={["btn-icon rp rps tgico-up rotate-180"]} onClick/>
-            </>
-        })
+        // this.footerRef.patch({
+        //     left: <div className={["btn-icon rp rps tgico-calendar", classIf(this.searchInputRef?.component?.$el.value.length > 0, "hidden")]} onClick={this.onSelectDate}/>,
+        //     right: <>
+        //         <div className={["btn-icon rp rps tgico-up"]} onClick/>
+        //         <div className={["btn-icon rp rps tgico-up rotate-180"]} onClick/>
+        //     </>
+        // })
     }
 
     onSetSearchQuery = event => {
@@ -221,5 +231,11 @@ export class SearchSidebar extends RightSidebar {
 
     get isSearchAsTitle(): boolean {
         return true
+    }
+
+    get classes() {
+        const c = super.classes
+        c.push("search")
+        return c
     }
 }

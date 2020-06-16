@@ -15,6 +15,7 @@ import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 import ChatToBottomButtonComponent from "../ChatToBottomButtonComponent"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import {SearchSidebar} from "../../../SidebarsNeo/Right/Search/SearchSidebar";
 
 export let ChatInputManager
 
@@ -35,6 +36,12 @@ export class ChatInputComponent extends StatelessComponent {
 
     get isRecording() {
         return !!this.recorder
+    }
+
+    appEvents(E: AE) {
+        E.bus(UIEvents.General)
+            .on("search.open", this.onSearchOpened)
+            .on("search.close", this.onSearchClosed)
     }
 
     render() {
@@ -148,6 +155,14 @@ export class ChatInputComponent extends StatelessComponent {
 
     componentWillUnmount() {
         window.removeEventListener("keydown", this.onKeyDown);
+    }
+
+    onSearchOpened = () => {
+        this.$el.style.opacity = "0"
+    }
+
+    onSearchClosed = () => {
+        this.$el.style.opacity = "1"
     }
 
     onKeyDown = (event: Event) => {

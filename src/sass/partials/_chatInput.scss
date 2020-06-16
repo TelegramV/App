@@ -6,6 +6,9 @@
 
     .chat-input {
         margin: 5px 5px 20px 5px;
+        @include mobile {
+            margin: 5px 5px 8px 5px;
+        }
         position: relative;
 
         display: flex;

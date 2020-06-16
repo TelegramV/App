@@ -36,6 +36,7 @@ import {isDesktop, isMobile} from "../../../Utils/utils";
 import {Dialog} from "../../../../Api/Dialogs/Dialog";
 import {DialogInfoSidebar} from "../../SidebarsNeo/Right/DialogInfo/DialogInfoSidebar";
 import nodeIf from "../../../../V/VRDOM/jsx/helpers/nodeIf";
+import {SearchBarComponent} from "./Search/SearchBarComponent";
 
 const useVirtualized = true || Boolean(localStorage.getItem("settings.messages.virtualized"))
 
@@ -80,6 +81,7 @@ class ChatComponent extends StatelessComponent {
                 </div>
 
                 <div ref={this.chatRef} id="chat" css-display="none">
+                    <SearchBarComponent ref={this}/>
                     <div id="topbar">
                         <ChatInfoComponent/>
                         <ChatInfoCallButtonComponent/>
@@ -171,7 +173,11 @@ class ChatComponent extends StatelessComponent {
     }
 
     openSearch = () => {
-        UIEvents.Sidebars.fire("push", SearchSidebar)
+        if(isDesktop()) {
+            UIEvents.Sidebars.fire("push", SearchSidebar)
+        } else {
+            UIEvents.General.fire("search.open")
+        }
     }
 }
 

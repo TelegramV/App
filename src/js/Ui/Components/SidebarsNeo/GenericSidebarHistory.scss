@@ -6,6 +6,7 @@
   @include mobile {
     max-width: 100%;
   }
+  pointer-events: none;
   height: 100%;
   width: 100%;
 
