@@ -8,6 +8,7 @@ import {LeftSidebar} from "./LeftSidebar";
 export class UnpatchableLeftSidebar extends LeftSidebar {
     hide() {
         this.$el.classList.toggle("hidden", true)
+        this.$el.classList.toggle("fade-in", false)
     }
 
     fadeOut() {

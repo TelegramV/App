@@ -168,6 +168,8 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
                 this.fadeOut()
                 // this.$el.classList.add("fade-out")
             } else {
+                // UIEvents.Sidebars.fire("push", DialogsSidebar)
+
                 this.show()
                 // this.$el.classList.remove("responsive-selected-chatlist")
             }
