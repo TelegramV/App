@@ -51,7 +51,9 @@ class StatefulComponent<P, S> extends VComponent<P> {
             return;
         }
 
-        if (typeof nextState === "function") {
+        if (this.state.__state_custom) {
+            this.state.set(nextState);
+        } else if (typeof nextState === "function") {
             __component_update_state(this, nextState(this.state));
         } else {
             __component_update_state(this, nextState);

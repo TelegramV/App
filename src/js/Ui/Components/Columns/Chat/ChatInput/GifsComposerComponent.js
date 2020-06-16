@@ -64,6 +64,7 @@ class GifsComposerComponent extends StatelessComponent {
                                                       AppSelectedChat.current.api.sendExistingMedia(document);
                                                       VApp.mountedComponents.get("composer").hide();
                                                   }}
+                                                  autoDownload
                                                   playOnHover/>
                         </div>,
                         this.masonryRef.$el

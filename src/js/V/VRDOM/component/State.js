@@ -21,8 +21,11 @@ import StatefulComponent from "./StatefulComponent"
 import {__component_update_global_state} from "./__component_update"
 
 class State {
-    __global = true;
+    __state_custom = true;
+
+    __destroyed = false;
     __components: Set<StatefulComponent>;
+    __strategy = State.STAY_ALIVE;
 
     constructor() {
         this.__components = new Set();
@@ -44,5 +47,8 @@ class State {
         return state;
     }
 }
+
+State.STAY_ALIVE = 0; // state will be available even if there is no component which uses it
+State.DESTROY = 0; // state will be destroyed if no component references to it
 
 export default State;
