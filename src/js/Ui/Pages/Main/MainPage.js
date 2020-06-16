@@ -22,6 +22,8 @@ import {throttle} from "../../../Utils/func"
 import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
 import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars";
 import {ForwardSidebar} from "../../Components/SidebarsNeo/Right/ForwardSidebar";
+import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
+import {isMobile} from "../../Utils/utils";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -89,6 +91,8 @@ export function MainPage() {
             <ChatComponent/>
 
             <ForwardSidebar/>
+
+            {nodeIf(<RightSidebars/>, isMobile())}
 
 
             {/*<DialogInfoComponent/>*/}

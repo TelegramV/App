@@ -17,6 +17,10 @@
     right: 0;
     z-index: 1;
     position: relative;
+    @include mobile {
+      position: absolute;
+      z-index: 6;
+    }
   }
 
   &.hidden {

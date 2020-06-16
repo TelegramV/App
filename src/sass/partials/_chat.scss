@@ -44,10 +44,15 @@
         background-color: white;
         margin-left: 0;
         transform: translateX(100%);
-        transition: anim(transform, 250ms);
+        transition: anim(transform, 250ms), anim(filter, 250ms);
 
         &.shown {
             transform: translateX(0%);
+        }
+
+        &.fade-out {
+            transform: translateX(-80px);
+            filter: brightness(0.75);
         }
     }
 
