@@ -22,7 +22,7 @@ class LocationMessageComponent extends GeneralMessageComponent {
     render({message}) {
         let geo = message.geo;
         let venue = "";
-        console.log(message.type)
+        //console.log(message.type)
         if (message.type === MessageType.VENUE) {
             venue = (
                 <div class="venue">

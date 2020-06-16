@@ -48,6 +48,9 @@ class VRNode {
         this.doNotTouchMyChildren = props.doNotTouchMyChildren || false
         this.component = props.component
         this.list = props.list
+        this.shouldRecreate = props.attrs.$recreate ?? false
+
+        delete props.attrs.$recreate
     }
 }
 

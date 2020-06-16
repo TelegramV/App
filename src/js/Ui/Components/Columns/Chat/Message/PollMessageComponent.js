@@ -200,7 +200,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     showFullResults = () => {
-        //TODO implement me
+        UIEvents.General.fire("poll.showResults",{pollMessage: this.props.message})
     }
 }
 

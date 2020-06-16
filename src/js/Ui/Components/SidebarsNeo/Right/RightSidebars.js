@@ -1,6 +1,7 @@
 import {GenericSidebarHistory} from "../GenericSidebarHistory";
 import {SearchSidebar} from "./Search/SearchSidebar";
 import {DialogInfoSidebar} from "./DialogInfo/DialogInfoSidebar";
+import {PollResultsSidebar} from "./Poll/PollResultsSidebar";
 import {RightSidebar} from "./RightSidebar";
 
 export class RightSidebars extends GenericSidebarHistory {
@@ -8,6 +9,7 @@ export class RightSidebars extends GenericSidebarHistory {
         return (
             <div className="sidebar-wrapper right hidden">
                 <SearchSidebar/>
+                <PollResultsSidebar/>
                 <DialogInfoSidebar/>
             </div>
         )

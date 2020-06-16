@@ -6,9 +6,20 @@ import {askForFile} from "../../../../../../Utils/utils"
 import WallpaperManager from "../../../../../../Managers/WallpaperManager"
 import {BackgroundColorSidebar} from "./BackgroundColorSidebar"
 import UIEvents from "../../../../../../EventBus/UIEvents";
+import VComponent from "../../../../../../../V/VRDOM/component/VComponent"
 import "./BackgroundSidebar.scss"
 
 export class BackgroundImageSidebar extends LeftSidebar {
+
+	galleryRef = VComponent.createRef();
+
+	appEvents(E) {
+        super.appEvents(E);
+
+        E.bus(UIEvents.General)
+            .on("wallpaper.fetched", this.onWallpaperFetched)
+    }
+
 	content(): * {
         return <this.contentWrapper>
         	<Section>
@@ -16,12 +27,26 @@ export class BackgroundImageSidebar extends LeftSidebar {
 	        	<IconButton icon="colorize" text="Pick a Color" onClick={_ => UIEvents.Sidebars.fire("push", BackgroundColorSidebar)}/>
 	        	<CheckboxButton checked text="Blur Wallpaper Image" onClick={this.onBlurClick}/>
         	</Section>
-        	<div className="gallery background-list"/>
+        	<div ref={this.galleryRef} className="gallery background-list"/>
         </this.contentWrapper>
     }
 
     get title(): string | * {
         return "Chat Background"
+    }
+
+    onShown(params) {
+        WallpaperManager.fetchAllWallPapers();
+    }
+
+    onWallpaperFetched = event => {
+    	console.log("Fetched")
+        this.wallpapers = event.wallpapers;
+        for (let wallpaper of this.wallpapers) {
+            WallpaperManager.fetchPreview(wallpaper).then(url => {
+                VRDOM.append(<div class="image-square" onClick={_ => WallpaperManager.requestAndInstall(wallpaper)} css-background-image={`url(${url})`}/>, this.galleryRef.$el);
+            })
+        }
     }
 
     uploadBackground = () => {

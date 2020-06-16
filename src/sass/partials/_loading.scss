@@ -48,27 +48,27 @@
                 cx: 32;
                 cy: 32;
                 r: 27.6; // 25.6
-                //animation: dash-big 1.5s ease-in-out infinite;
+                animation: dash-big 1.5s ease-in-out infinite;
             }
 
             &.determinate .path {
                 animation: none;
             }
 
-            //@keyframes dash-big {
-            //    0% {
-            //        stroke-dasharray: 1.38, 276;
-            //        stroke-dashoffset: 0;
-            //    }
-            //    50% {
-            //        stroke-dasharray: 122.82, 276;
-            //        stroke-dashoffset: -48.3;
-            //    }
-            //    100% {
-            //        stroke-dasharray: 122.82, 276;
-            //        stroke-dashoffset: -171.12;
-            //    }
-            //}
+            @keyframes dash-big {
+                0% {
+                    stroke-dasharray: 1.38, 276;
+                    stroke-dashoffset: 0;
+                }
+                50% {
+                    stroke-dasharray: 122.82, 276;
+                    stroke-dashoffset: -48.3;
+                }
+                100% {
+                    stroke-dasharray: 122.82, 276;
+                    stroke-dashoffset: -171.12;
+                }
+            }
         }
     }
 

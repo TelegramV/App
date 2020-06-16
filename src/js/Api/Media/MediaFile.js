@@ -42,6 +42,7 @@ class MP4StreamingFile {
         const condition = event => event.file.id === this.document.id;
         AppEvents.Files.withFilter(condition, "download.done", this.onDownloadDone);
         AppEvents.Files.withFilter(condition, "download.newPart", this.onDownloadNewPart);
+        AppEvents.Files.withFilter(condition, "download.canceled", this.onDocumentCanceled);
     }
 
     init = (): Promise => {
@@ -159,7 +160,8 @@ class MP4StreamingFile {
         if (this.mp4box) {
             if (this.parts.length) {
                 const all = concatUint8(...this.parts, newBytes).buffer;
-                all.fileStart = 0;
+                console.log(all)
+                all.fileStart = this.bufferOffset;
                 this.mp4box.appendBuffer(all);
                 this.parts = [];
             } else {
@@ -171,7 +173,7 @@ class MP4StreamingFile {
             this.parts.push(newBytes);
         }
 
-        this.bufferOffset += newBytes.byteLength;
+        this.bufferOffset += newBytes.length;
     }
 
     onDownloadDone = ({blob, url}) => {
@@ -180,10 +182,17 @@ class MP4StreamingFile {
         }
 
         blob.arrayBuffer().then(buff => {
+            console.log(this)
+            // if (this.mp4box) {
             const lastPart = buff.slice(this.bufferOffset);
             lastPart.fileStart = this.bufferOffset;
             this.mp4box.appendBuffer(lastPart, true);
             this.mp4box.flush();
+            // } else {
+            //     buff.fileStart = this.bufferOffset;
+            //     this.parts = [new Uint8Array(buff)];
+            // }
+
             this.isDone = true;
         });
 
@@ -195,8 +204,13 @@ class MP4StreamingFile {
 
         AppEvents.Files.unsubscribe("download.done", this.onDownloadDone);
         AppEvents.Files.unsubscribe("download.newPart", this.onDownloadNewPart);
+        AppEvents.Files.unsubscribe("download.canceled", this.onDocumentCanceled);
 
         // todo: clean-up everything
+    }
+
+    onDocumentCanceled = () => {
+        this.cancel();
     }
 }
 

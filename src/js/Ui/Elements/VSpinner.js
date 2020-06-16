@@ -30,7 +30,7 @@ function VSpinner(
         paused = false,
         color,
         id,
-        strokeWidth = 2,
+        strokeWidth,
     }, slot
 ) {
     const wrapperClassName = {

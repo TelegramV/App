@@ -19,7 +19,7 @@ export class VideoMessage extends AbstractMessage {
 
     show() {
         super.show()
-        this.fetchThumb();
+        // this.fetchThumb();
     }
 
     get smallThumb() {
@@ -38,38 +38,38 @@ export class VideoMessage extends AbstractMessage {
         return this.videoInfo;
     }
 
-    fetchFullVideo() {
-        if (this.interrupted && this.loaded) {
-            this.interrupted = false
-            this.fire("videoDownloaded")
-            return
-        }
-
-        this.loaded = false
-        this.loading = true
-        return FileAPI.getFile(this.raw.media.document).then(url => {
-            this.videoUrl = url;
-
-            this.loaded = true
-            this.loading = false
-
-            if (!this.interrupted) {
-                this.interrupted = false
-                this.fire("videoDownloaded")
-            }
-        })
-    }
-
-    fetchThumb() {
-        FileAPI.getThumb(this.raw.media.document, FileAPI.getMaxSize(this.raw.media.document, true).type).then(url => {
-            this.thumbUrl = url;
-            this.fire("thumbDownloaded")
-        })
-    }
+    // fetchFullVideo() {
+    //     if (this.interrupted && this.loaded) {
+    //         this.interrupted = false
+    //         this.fire("videoDownloaded")
+    //         return
+    //     }
+    //
+    //     this.loaded = false
+    //     this.loading = true
+    //     return FileAPI.getFile(this.raw.media.document).then(url => {
+    //         this.videoUrl = url;
+    //
+    //         this.loaded = true
+    //         this.loading = false
+    //
+    //         if (!this.interrupted) {
+    //             this.interrupted = false
+    //             this.fire("videoDownloaded")
+    //         }
+    //     })
+    // }
+    //
+    // fetchThumb() {
+    //     FileAPI.getThumb(this.raw.media.document, FileAPI.getMaxSize(this.raw.media.document, true).type).then(url => {
+    //         this.thumbUrl = url;
+    //         this.fire("thumbDownloaded")
+    //     })
+    // }
 
     fillRaw(raw: Object) {
         super.fillRaw(raw);
-        this.videoInfo = FileAPI.getMaxSize(this.raw.media.document);
+        // this.videoInfo = FileAPI.getMaxSize(this.raw.media.document);
         return this;
     }
 }

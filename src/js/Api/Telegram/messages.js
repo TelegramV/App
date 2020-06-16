@@ -188,6 +188,14 @@ function getPollResults(message) {
     })
 }
 
+function getPollVotes(message) {
+    return MTProto.invokeMethod("messages.getPollVotes", {
+        peer: message.dialogPeer.inputPeer,
+        id: message.id,
+        limit: 100
+    })
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
@@ -203,6 +211,7 @@ const messages = {
     sendVote: sendVote,
     closePoll: closePoll,
     getPollResults: getPollResults,
+    getPollVotes: getPollVotes,
 }
 
 export default messages
