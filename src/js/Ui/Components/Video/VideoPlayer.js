@@ -88,14 +88,17 @@ function onDrag(target: HTMLElement, innerTarget: HTMLElement, dir, listener) {
 
 class VideoPlayer extends StatefulComponent {
     videoRef: { $el: HTMLVideoElement } = VComponent.createRef();
+    previewVideoRef: { $el: HTMLVideoElement } = VComponent.createRef();
     timeWrapperRef = VComponent.createRef();
     timelineRef = VComponent.createRef();
 
     state = {
         showControls: true,
+        showPreview: false,
+        previewPosition: 0,
     }
 
-    render({src, controls, containerWidth, containerHeight, bufferedSize, isDownloaded, isStreamable, size, thumbUrl, ...otherArgs}, {showControls}, globalState) {
+    render({src, previewSrc, controls, containerWidth, containerHeight, bufferedSize, isDownloaded, isStreamable, size, thumbUrl, ...otherArgs}, {showControls, previewPosition, showPreview}, globalState) {
         // https://ak.picdn.net/shutterstock/videos/31008538/preview/stock-footage-parrot-flies-alpha-matte-d-rendering-animation-animals.webm
         const isPaused = this.videoRef.$el?.paused ?? true;
         const time = this.videoRef.$el?.currentTime ?? 0;
@@ -184,14 +187,23 @@ class VideoPlayer extends StatefulComponent {
                         "controls": true,
                         "hidden": !buffered || !controls || !showControls
                     }}>
-                        {/*<div className="frame">*/}
-                        {/*    <img*/}
-                        {/*        src="https://12kanal.com/wp-content/uploads/2019/10/k-chemu-snitsya-popugay-zhenschine-ili-muzhchine-2.jpg"*/}
-                        {/*        alt="Frame"/>*/}
-                        {/*</div>*/}
-                        <div className="progress" ref={this.timeWrapperRef}>
+                        <div style={{
+                            "margin-left": `calc(${previewPosition}% - calc(170px / 2))`,
+                            "display": !showPreview && "none",
+                        }} className="frame">
+                            {/*<img*/}
+                            {/*    src="https://12kanal.com/wp-content/uploads/2019/10/k-chemu-snitsya-popugay-zhenschine-ili-muzhchine-2.jpg"*/}
+                            {/*    alt="Frame"/>*/}
+                            <video ref={this.previewVideoRef} src={previewSrc} autoPlay/>
+                        </div>
+                        <div className="progress"
+                             ref={this.timeWrapperRef}
+                             onMouseOver={this.onPreviewMouseOver}
+                             onMouseMove={this.onPreviewMouseMove}
+                             onMouseLeave={this.onPreviewMouseLeave}>
                             <div className="line"/>
-                            <div className="time-wrapper" ref={this.timelineRef}>
+                            <div className="time-wrapper"
+                                 ref={this.timelineRef}>
                                 <div className="time" style={{
                                     width: `${time / duration * 100}%`
                                 }}/>
@@ -264,8 +276,18 @@ class VideoPlayer extends StatefulComponent {
         this.toggleControls();
     }
 
-    onTimeUpdate = () => {
+    onTimeUpdate = (event) => {
         this.forceUpdate();
+    }
+
+    onPreviewMouseOver = (event: MouseEvent) => {
+        this.onMouseMove(event);
+    }
+
+    onPreviewMouseLeave = (event: MouseEvent) => {
+        this.setState({
+            showPreview: false,
+        });
     }
 
     onDurationChange = () => {

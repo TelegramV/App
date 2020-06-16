@@ -90,8 +90,9 @@
                 height: 100px;
 
                 box-shadow: 0 0 0 3px rgba(white, .10);
+                //box-shadow: 0 0 0 3px red;
 
-                img {
+                img, video {
                     border-radius: 5px;
                     object-fit: cover;
                     width: 100%;

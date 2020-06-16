@@ -29,11 +29,13 @@ const files = new Map();
 
 
 // if such file already exists - recreate it
-export function getMediaFile(document) {
-    files.get(document.id)?.cancel();
+export function getMediaFile(document, preview = false) {
+    const id = preview ? document.id + "_" : document.id;
 
-    const file = new MP4StreamingFile(document);
-    files.set(document.id, file);
+    files.get(id)?.cancel();
+
+    const file = new MP4StreamingFile(document, preview);
+    files.set(id, file);
     return file;
 }
 
@@ -48,8 +50,9 @@ class MP4StreamingFile {
     queues: Map<SourceBuffer, Array<Uint8Array>> = new Map();
     parts: Uint8Array[] = [];
 
-    constructor(document) {
+    constructor(document, preview = false) {
         this.document = document;
+        this.preview = preview;
         this.mediaSource = new MediaSource();
         this.videoInfo = DocumentParser.attributeVideo(document);
         this.url = URL.createObjectURL(this.mediaSource)
@@ -121,7 +124,7 @@ class MP4StreamingFile {
         const sourceBuffer = this.mediaSource.addSourceBuffer(mime);
         sourceBuffer.id = track.id;
 
-        this.mp4box.setSegmentOptions(track.id, sourceBuffer, {nbSamples: 100});
+        this.mp4box.setSegmentOptions(track.id, sourceBuffer, {nbSamples: 10});
 
         sourceBuffer.pendingAppends = [];
     }
@@ -220,25 +223,27 @@ class MP4StreamingFile {
     }
 
     seek = async (time: number) => {
-        this.seeked = true;
-        this.seekedTime = time;
+        if (!preview) {
+            this.seeked = true;
+            this.seekedTime = time;
 
-        const seekInfo = this.mp4box.seek(time, true);
+            const seekInfo = this.mp4box.seek(time, true);
 
-        const offset = seekInfo.offset;
-        let newOffset = seekInfo.offset;
-        let offsetDiff = offset - newOffset;
+            const offset = seekInfo.offset;
+            let newOffset = seekInfo.offset;
+            let offsetDiff = offset - newOffset;
 
-        while (newOffset % (1024 * 1024) !== 0.0) {
-            newOffset--;
+            while (newOffset % (1024 * 1024) !== 0.0) {
+                newOffset--;
+            }
+
+            this.bufferOffset = newOffset;
+
+            const file = await FileAPI.downloadDocumentPart(this.document, null, 1024 * 1024, newOffset);
+            this.onDownloadNewPart({newBytes: file.bytes.slice(offsetDiff)});
+
+            this.downloadNextPart(this.seekedTime);
         }
-
-        this.bufferOffset = newOffset;
-
-        const file = await FileAPI.downloadDocumentPart(this.document, null, 1024 * 1024, newOffset);
-        this.onDownloadNewPart({newBytes: file.bytes.slice(offsetDiff)});
-
-        this.downloadNextPart(this.seekedTime);
     }
 
     downloadNextPart = async (time) => {
@@ -277,6 +282,7 @@ class MP4StreamingFile {
         URL.revokeObjectURL(this.url);
 
         files.delete(this.document.id)
+        files.delete(this.document.id + "_")
         this.document = null;
     }
 

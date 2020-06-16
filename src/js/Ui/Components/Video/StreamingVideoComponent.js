@@ -47,6 +47,7 @@ class StreamingVideoComponent extends VideoPlayer {
         props.isStreamable = DocumentParser.isVideoStreamable(props.document);
         delete props.document;
         props.src = state.url;
+        props.previewSrc = state.previewSrc;
 
         return super.render(props, state, globalState);
     }
@@ -54,9 +55,11 @@ class StreamingVideoComponent extends VideoPlayer {
     componentWillMount(props) {
         super.componentWillMount(props);
 
-        if (DocumentParser.isVideoStreamable(props.document)) {
+        if (!FileManager.isDownloaded(this.props.document) && DocumentParser.isVideoStreamable(props.document)) {
             this.mp4file = getMediaFile(this.props.document);
+            this.mp4filePreview = getMediaFile(this.props.document, true);
             this.state.url = this.mp4file.url;
+            this.state.previewSrc = this.mp4filePreview.url;
         } else {
             console.warn("streaming is not supported for this video");
             FileManager.downloadDocument(this.props.document);
@@ -129,12 +132,47 @@ class StreamingVideoComponent extends VideoPlayer {
         }
     }
 
-    onDownloadDone = ({url}) => {
+    onPreviewMouseMove = this.throttle((event: MouseEvent) => {
+        const $video: HTMLVideoElement = this.previewVideoRef.$el;
+        // const $videO: HTMLVideoElement = this.videoRef.$el;
+
+        // console.log("move")
+
+        const box = (event.currentTarget || event.target).getBoundingClientRect();
+        const percentage = (event.pageX - box.x) / box.width;
+        $video.currentTime = $video.duration * Math.max(0, Math.min(1, percentage));
+        $video.pause();
+
+        this.setState({
+            showPreview: true,
+            previewPosition: percentage * 100,
+        });
+
+        // if ($video.lastSeekTime !== $video.currentTime) {
+        // for (let i = 0; i < $videO.buffered.length; i++) {
+        //     let start = $videO.buffered.start(i);
+        //     let end = $videO.buffered.end(i);
+        //
+        //     if ($videO.currentTime >= start && $videO.currentTime <= end) {
+        //         return;
+        //     }
+        // }
+
+        //     console.log("really move")
+        //
+        //     $video.lastSeekTime = $video.currentTime;
+        // }
+    }, 500)
+
+    onDownloadDone = ({blob, url}) => {
         if (!this.state.url || !this.videoRef.$el?.currentTime) {
             this.setState({
                 url,
+                previewSrc: URL.createObjectURL(blob),
             });
         }
+
+        this.previewVideoRef.$el.pause();
     }
 }
 
