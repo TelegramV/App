@@ -186,6 +186,12 @@ body,
         }
     }
 
+    @media screen and (max-width: 380px) {
+        .login-page-inputs {
+            width: 100%;
+        }
+    }
+
     .register-panel {
         .picture {
             border-radius: 50%;

@@ -35,8 +35,8 @@ class LoginCodeComponent extends StatefulComponent {
 
     monkeyRef = VComponent.createRef();
 
-    render(props, {codeError}, {login}) {
-        const {phone, code} = login;
+    render(props, {codeError, code}, {login}) {
+        const {phone} = login;
 
         return (
             <div className="panel">
