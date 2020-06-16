@@ -139,7 +139,7 @@
                 cursor: pointer;
                 position: relative;
                 color: #8d969c;
-                border-radius: 100%;
+                //border-radius: 100%;
 
                 &.selected {
                     color: $blue;
@@ -201,18 +201,14 @@
             .sticker-packs-item {
                 display: flex;
                 align-items: center;
+                justify-content: center;
                 flex-shrink: 0;
                 margin: 0 2px;
 
-                img {
-                    width: 35px;
-                    height: auto;
-                    object-fit: contain;
-                }
-
                 img, canvas {
-                    max-height: 35px;
-                    width: 35px;
+                    max-height: 30px;
+                    width: 30px;
+                    object-fit: contain;
                 }
 
                 &:first-child {

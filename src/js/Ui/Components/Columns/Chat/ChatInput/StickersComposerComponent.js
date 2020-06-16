@@ -85,7 +85,7 @@ class FavedStickers extends StatefulComponent {
                 {
                     documents.map(Document => (
                         <BetterStickerComponent
-                            onClick={() => this.sendSticker(Document)}
+                            onClick={() => props.sendSticker(Document)}
                             width={75}
                             document={Document}/>
                     ))
@@ -135,7 +135,7 @@ class StickersComposerComponent extends StatelessComponent {
                 </div>
                 <div ref={this.stickersTableRef} className="sticker-table">
                     <div id="composer-sticker-pack-recent" className="selected scrollable"/>
-                    <FavedStickers/>
+                    <FavedStickers sendSticker={this.sendSticker}/>
                 </div>
             </div>
         )
@@ -164,12 +164,12 @@ class StickersComposerComponent extends StatelessComponent {
                             };
 
                             VRDOM.append(
-                                <Lottie class="sticker-packs-item rp rps"
-                                        width={35}
-                                        height={35}
-                                        options={options}
-                                        onClick={onClick}
-                                        playOnHover/>,
+                                <div className="sticker-packs-item rp rps" onClick={onClick}>
+                                    <Lottie width={35}
+                                            height={35}
+                                            options={options}
+                                            playOnHover/>
+                                </div>,
                                 this.stickerPacksRef.$el);
                         } else if (stickerSet.thumbUrl) {
                             VRDOM.append(
