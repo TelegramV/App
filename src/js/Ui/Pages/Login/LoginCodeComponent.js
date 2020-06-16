@@ -95,6 +95,7 @@ class LoginCodeComponent extends StatefulComponent {
             }).catch(error => {
                 if (error.type === "SESSION_PASSWORD_NEEDED") {
                     loginState.setPasswordView();
+                    return;
                 }
 
                 let errorText = error.type;

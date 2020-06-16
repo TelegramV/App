@@ -30,7 +30,7 @@ img:not([src]) {
     content: url("data:image/gif;base64,R0lGODlhAQABAPAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==");
 }
 
-.app {
+#app, .app {
     display: flex;
     background-color: $lightblue;
     overflow: hidden;
@@ -102,6 +102,14 @@ img:not([src]) {
     &.native {
         display: inline-block;
     }
+}
+
+.d-none {
+    display: none;
+}
+
+.d-flex {
+    display: flex;
 }
 
 ::-webkit-scrollbar {

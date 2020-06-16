@@ -34,6 +34,7 @@ class WallpaperManagerSingleton {
         keval.getItem("background").then(data => {
             if (!data) {
                 this.setWallpaper("./static/images/default_bg.jpg")
+                return;
             }
             if (data.blob) {
                 let url = URL.createObjectURL(data.blob);
