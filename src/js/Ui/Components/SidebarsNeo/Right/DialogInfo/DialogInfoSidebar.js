@@ -40,7 +40,7 @@ export class DialogInfoSidebar extends RightSidebar {
         const peer = AppSelectedInfoPeer.Current
         const muted = !peer || !peer.full || !peer.full.notify_settings || peer.full.notify_settings.mute_until > 0 || peer.full.notify_settings.silent
 
-        return <this.contentWrapper>
+        return <this.contentWrapper onScroll={this.materialsRef.component?.onScroll}>
             <AvatarComponent peer={peer}/>
             <Header>{peer?.name}</Header>
             <Subheader isOnline={peer?.statusString.online}>{peer?.statusString.text}</Subheader>

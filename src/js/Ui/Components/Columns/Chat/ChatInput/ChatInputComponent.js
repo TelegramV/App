@@ -120,8 +120,7 @@ export class ChatInputComponent extends StatelessComponent {
                                     }
                                 },
                                 {
-                                    // TODO replace icon to calendar
-                                    icon: "recent",
+                                    icon: "calendar",
                                     title: "Schedule message",
                                     onClick: _ => {
                                     }

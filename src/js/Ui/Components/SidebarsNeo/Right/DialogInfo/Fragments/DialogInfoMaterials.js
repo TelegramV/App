@@ -56,7 +56,6 @@ export class DialogInfoMaterials extends StatelessComponent {
     defaultLimit = 33
 
     render(props) {
-        console.log("IM GONNA RENDER!")
         return <div className="materials">
 
             <TabSelectorComponent ref={this.tabSelectorRef} items={this.tabItems}/>
@@ -75,7 +74,7 @@ export class DialogInfoMaterials extends StatelessComponent {
     }
 
     update() {
-        const showMembers = AppSelectedInfoPeer.Current.type === "group" || (AppSelectedInfoPeer.Current.type === "channel" && AppSelectedInfoPeer.Current.isSupergroup)
+        const showMembers = AppSelectedInfoPeer.Current.type === "chat" || (AppSelectedInfoPeer.Current.type === "channel" && AppSelectedInfoPeer.Current.isSupergroup)
         this.tabItems = [
             {
                 text: "Members",

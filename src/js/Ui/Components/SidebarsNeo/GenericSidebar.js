@@ -122,11 +122,11 @@ export class GenericSidebar extends StatefulComponent {
      * @param slot
      * @return {*}
      */
-    contentWrapper({scrollable = true}, slot) {
+    contentWrapper({scrollable = true, onScroll}, slot) {
         return <div className={{
             content: true,
             scrollable
-        }}>
+        }} onScroll={onScroll}>
             {slot}
         </div>
     }
