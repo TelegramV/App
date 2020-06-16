@@ -2,6 +2,7 @@ import {PeopleListItemFragment} from "./PeopleListItemFragment"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import TopPeers from "../../../../../Api/Peers/TopPeers"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import {Section} from "../../Fragments/Section";
 
 export class CorrespondentsComponent extends StatelessComponent {
 
@@ -9,11 +10,11 @@ export class CorrespondentsComponent extends StatelessComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .on("gotCorrespondents")
+            .updateOn("gotCorrespondents")
 
         E.bus(AppEvents.Peers)
             .filter(event => TopPeers.correspondents.has(event.peer))
-            .on("updatePhotoSmall")
+            .updateOn("updatePhotoSmall")
     }
 
     render() {
@@ -24,8 +25,8 @@ export class CorrespondentsComponent extends StatelessComponent {
         }
 
         return (
-            <div className="people section">
-                <div className="section-title">People</div>
+            <div title="People" className="section">
+                <div className="title">People</div>
                 <div className="people-list">
                     {
                         Array.from(TopPeers.correspondents.values())

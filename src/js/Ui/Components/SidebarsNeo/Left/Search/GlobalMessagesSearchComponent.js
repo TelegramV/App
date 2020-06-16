@@ -23,6 +23,7 @@ import ContactComponent from "../../../Basic/ContactComponent"
 import VArray from "../../../../../V/VRDOM/list/VArray"
 import List from "../../../../../V/VRDOM/list/List"
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
+import {Section} from "../../Fragments/Section";
 
 const MessageFragmentItemTemplate = (message) => {
     const peer = message.to === PeersStore.self() ? message.from : message.to
@@ -45,7 +46,7 @@ export class GlobalMessagesSearchComponent extends StatefulComponent {
 
     state = {
         messages: new VArray(),
-        isSearching: false
+        isSearching: true
     }
 
     appEvents(E) {
@@ -56,12 +57,12 @@ export class GlobalMessagesSearchComponent extends StatefulComponent {
 
     render() {
         return (
-            <div className="global-messages section">
-                <div className="section-title">{this.state.isSearching ? "Searching messages..." : "Messages"}</div>
+            <Section title={this.state.isSearching ? "Searching messages..." : "Messages"} css-display={this.state.messages.size() === 0 && !this.state.isSearching ? "none" : undefined}>
+                {/*<div className="section-title">{this.state.isSearching ? "Searching messages..." : "Messages"}</div>*/}
                 <List list={this.state.messages}
                       template={MessageFragmentItemTemplate}
                       wrapper={<div className="column-list"/>}/>
-            </div>
+            </Section>
         )
     }
 

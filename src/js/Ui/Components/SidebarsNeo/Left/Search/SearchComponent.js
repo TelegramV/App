@@ -28,11 +28,15 @@ export class SearchComponent extends StatelessComponent {
     }
 
     open() {
-        this.$el.classList.toggle("hidden", false)
+        if (this.recentComponentRef.component) {
+            this.recentComponentRef.component.refreshRecent()
+        }
+
+        this.$el.classList.remove("hidden")
     }
 
     close() {
-        this.$el.classList.toggle("hidden", true)
+        this.$el.classList.add("hidden");
     }
 
     onSearchInputUpdated = event => {
@@ -49,17 +53,5 @@ export class SearchComponent extends StatelessComponent {
         if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop) {
             UIEvents.Sidebars.fire("searchInputNextPage")
         }
-    }
-
-    barOnShow = () => {
-        if (this.recentComponentRef.component) {
-            this.recentComponentRef.component.refreshRecent()
-        }
-
-        this.$el.classList.remove("hidden")
-    }
-
-    barOnHide = () => {
-        this.$el.classList.add("hidden");
     }
 }

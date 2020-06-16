@@ -17,7 +17,7 @@
 
   > .content > .search {
     position: absolute;
-    height: 100%;
+    height: calc(100% - 60px);
     width: 100%;
     background-color: white;
     transition: anim(opacity), anim(transform);
@@ -26,6 +26,7 @@
     opacity: 1;
     pointer-events: auto;
     z-index: 2;
+    overflow: auto;
 
     &.hidden {
       pointer-events: none;
@@ -33,6 +34,12 @@
       display: block;
       width: 100%;
       opacity: 0;
+    }
+
+    .search-results, .suggestions {
+      &.hidden {
+        display: none;
+      }
     }
 
     .people-list {

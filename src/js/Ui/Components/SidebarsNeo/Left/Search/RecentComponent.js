@@ -7,6 +7,7 @@ import ContactComponent from "../../../Basic/ContactComponent"
 import List from "../../../../../V/VRDOM/list/List"
 import VArray from "../../../../../V/VRDOM/list/VArray"
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
+import {Section} from "../../Fragments/Section";
 
 const ContactFragmentItemTemplate = (peer) => {
     return <ContactComponent peer={peer}
@@ -36,12 +37,11 @@ export class RecentComponent extends StatefulComponent {
 
     render() {
         return (
-            <div className="recent section">
-                <div className="section-title">Recent</div>
+            <Section title="Recent">
                 <List list={this.state.peers}
                       template={ContactFragmentItemTemplate}
                       wrapper={<div className="column-list"/>}/>
-            </div>
+            </Section>
         )
     }
 
