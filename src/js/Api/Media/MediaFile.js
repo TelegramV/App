@@ -223,7 +223,7 @@ class MP4StreamingFile {
     }
 
     seek = async (time: number) => {
-        if (!preview) {
+        if (!this.preview) {
             this.seeked = true;
             this.seekedTime = time;
 

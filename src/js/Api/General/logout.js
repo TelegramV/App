@@ -5,10 +5,7 @@ export function logout() {
     keval.auth.clear()
     keval.clear()
     if (AppCache.isReady) {
-        AppCache._sectorNames.forEach(sectorName => {
-            console.log("deleting object store", sectorName)
-            AppCache._db.deleteObjectStore(sectorName)
-        })
+        indexedDB.deleteDatabase("cache");
     }
     localStorage.clear()
     document.location.reload()
