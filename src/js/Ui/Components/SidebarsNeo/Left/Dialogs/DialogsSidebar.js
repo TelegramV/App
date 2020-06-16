@@ -27,6 +27,7 @@ import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import {Folders} from "./Folders";
 import {SearchComponent} from "../Search/SearchComponent";
+import {isMobile} from "../../../../Utils/utils";
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -142,6 +143,8 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
 
         E.bus(AppEvents.General)
             .on("selectFolder", this.onFolderSelect)
+
+        E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
 
 
@@ -160,10 +163,14 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
     }
 
     onChatSelect = _ => {
-        if (AppSelectedChat.isSelected) {
-            this.$el.classList.add("responsive-selected-chatlist")
-        } else {
-            this.$el.classList.remove("responsive-selected-chatlist")
+        if(isMobile()) {
+            if (AppSelectedChat.isSelected) {
+                this.fadeOut()
+                // this.$el.classList.add("fade-out")
+            } else {
+                this.show()
+                // this.$el.classList.remove("responsive-selected-chatlist")
+            }
         }
     }
 

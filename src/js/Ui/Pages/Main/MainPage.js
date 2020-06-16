@@ -18,6 +18,8 @@ import {throttle} from "../../../Utils/func"
 import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
 import {ForwardSidebar} from "../../Components/SidebarsNeo/Right/ForwardSidebar";
 import PiPContainer from "../../Components/Video/PiPContainer"
+import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
+import {isMobile} from "../../Utils/utils";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -86,6 +88,8 @@ export function MainPage() {
 
             <ForwardSidebar/>
             <PiPContainer/>
+
+            {nodeIf(<RightSidebars/>, isMobile())}
 
 
             {/*<DialogInfoComponent/>*/}

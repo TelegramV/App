@@ -32,6 +32,10 @@ import SnackbarComponent from "../../Singleton/SnackbarComponent"
 import {SearchSidebar} from "../../SidebarsNeo/Right/Search/SearchSidebar";
 import {RightSidebars} from "../../SidebarsNeo/Right/RightSidebars";
 import DefaultBubblesComponent from "./DefaultBubblesComponent"
+import {isDesktop, isMobile} from "../../../Utils/utils";
+import {Dialog} from "../../../../Api/Dialogs/Dialog";
+import {DialogInfoSidebar} from "../../SidebarsNeo/Right/DialogInfo/DialogInfoSidebar";
+import nodeIf from "../../../../V/VRDOM/jsx/helpers/nodeIf";
 
 const useVirtualized = true || Boolean(localStorage.getItem("settings.messages.virtualized"))
 
@@ -49,6 +53,11 @@ class ChatComponent extends StatelessComponent {
     appEvents(E) {
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
+
+        E.bus(UIEvents.Sidebars)
+            .filter(l => l === DialogInfoSidebar || l.constructor === DialogInfoSidebar)
+            .on("push", this.onInfoOpen)
+            .on("pop", this.onInfoClosed)
 
 
         // E.bus(UIEvents.Sidebars)
@@ -96,7 +105,7 @@ class ChatComponent extends StatelessComponent {
 
                 </div>
                 <SnackbarComponent/>
-                <RightSidebars/>
+                {nodeIf(<RightSidebars/>, isDesktop())}
 
             </div>
         )
@@ -124,17 +133,38 @@ class ChatComponent extends StatelessComponent {
         // this.rightSidebarOpen = false
     // }
 
+    onInfoOpen = () => {
+        console.log("OPEN")
+        if(isMobile()) {
+            this.$el.classList.toggle("fade-out", true)
+        }
+    }
+
+    onInfoClosed = () => {
+        console.log("closed")
+        if(isMobile()) {
+            this.$el.classList.toggle("fade-out", false)
+        }
+    }
+
     onChatSelect = _ => {
         this.chatLoaderRef.$el.style.display = "none"
 
         if (AppSelectedChat.isSelected) {
+            this.$el.classList.toggle("shown", true)
             this.noChatRef.$el.style.display = "none"
-            this.chatRef.$el.style.display = ""
-            this.chatRef.$el.classList.add("responsive-selected-chat")
+            // TODO delay for mobile
+            // if(isDesktop()) {
+                this.chatRef.$el.style.display = ""
+                this.chatRef.$el.classList.add("responsive-selected-chat")
+            // }
         } else {
+            this.$el.classList.toggle("shown", false)
             this.noChatRef.$el.style.display = ""
-            this.chatRef.$el.style.display = "none"
-            this.chatRef.$el.classList.remove("responsive-selected-chat")
+            if(isDesktop()) {
+                this.chatRef.$el.style.display = "none"
+                this.chatRef.$el.classList.remove("responsive-selected-chat")
+            }
         }
 
         this.chatLoaderRef.$el.style.display = "none"

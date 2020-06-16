@@ -31,14 +31,32 @@
 }
 
 .chat-wrapper {
+    margin-left: 423px;
     display: flex;
     flex-grow: 1;
     transition: anim(width, 250ms);
     overflow: hidden;
     position: relative;
     will-change: transform;
+    @include mobile {
+        //position: absolute;
+        z-index: 5;
+        background-color: white;
+        margin-left: 0;
+        transform: translateX(100%);
+        transition: anim(transform, 250ms), anim(filter, 250ms);
 
-    //&.right-bar-open #chat {
+        &.shown {
+            transform: translateX(0%);
+        }
+
+        &.fade-out {
+            transform: translateX(-80px);
+            filter: brightness(0.75);
+        }
+    }
+
+        //&.right-bar-open #chat {
     //    width: calc(100% - 422px);
     //}
 

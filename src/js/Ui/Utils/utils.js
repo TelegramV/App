@@ -30,6 +30,14 @@ export function isValidDate(d) {
   return d instanceof Date && !isNaN(d);
 }
 
+export function isMobile() {
+    return window.innerWidth < 991.98 // MAGIC NUMBER DO NOT CHANGE OR THE WORLD WILL COLLAPSE
+}
+
+export function isDesktop() {
+    return !isMobile()
+}
+
 export function getOS() {
     var userAgent = window.navigator.userAgent,
         platform = window.navigator.platform,
