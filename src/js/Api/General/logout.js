@@ -1,17 +1,18 @@
 import keval from "../../Keval/keval"
 import AppCache from "../Cache/AppCache"
+import API from "../Telegram/API"
 
 export function logout() {
+
     keval.auth.clear()
     keval.clear()
     if (AppCache.isReady) {
-        AppCache._sectorNames.forEach(sectorName => {
-            console.log("deleting object store", sectorName)
-            AppCache._db.deleteObjectStore(sectorName)
-        })
+        indexedDB.deleteDatabase("cache");
     }
     localStorage.clear()
-    document.location.reload()
+    API.auth.logOut().finally(() => {
+        document.location.reload()
+    })
     // return MTProto.logout().then(() => {
     //     for (const k of PeersStore.data.keys()) {
     //         PeersStore.data.get(k).clear()

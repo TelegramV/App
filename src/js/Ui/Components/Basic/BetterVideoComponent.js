@@ -96,6 +96,26 @@ class BetterVideoComponent extends StatefulComponent {
         }
     }
 
+    componentDidMount() {
+        if (this.videoRef.$el) {
+            if (this.props.muted) {
+                this.videoRef.$el.volume = 0;
+            } else {
+                this.videoRef.$el.volume = 1;
+            }
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.videoRef.$el) {
+            if (this.props.muted) {
+                this.videoRef.$el.volume = 0;
+            } else {
+                this.videoRef.$el.volume = 1;
+            }
+        }
+    }
+
     onDownloadDone = ({url}) => {
         this.setState({
             url,

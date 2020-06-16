@@ -110,10 +110,10 @@ class WallpaperManagerSingleton {
 
     setWallpaper(url, wallpaperId = 0) {
         if (!url) {
-            window.document.documentElement.style.setProperty("--chat-bg-image", `none`);
+            window.document.body.style.setProperty("--chat-bg-image", `none`); //html element changes with each resize, causing background flickering
             return;
         }
-        window.document.documentElement.style.setProperty("--chat-bg-image", `url(${url})`);
+        window.document.body.style.setProperty("--chat-bg-image", `url(${url})`);
         fetch(url).then(async response => {
             let blob = await response.blob();
             keval.setItem("background", {blob: blob, wallpaperId: wallpaperId});
@@ -122,11 +122,11 @@ class WallpaperManagerSingleton {
 
     setColor(hex) {
         if (!hex) {
-            window.document.documentElement.style.setProperty("--chat-bg-color", "none");
+            window.document.body.style.setProperty("--chat-bg-color", "none");
             return;
         }
         this.setWallpaper(undefined); //remove wallpaper
-        window.document.documentElement.style.setProperty("--chat-bg-color", hex);
+        window.document.body.style.setProperty("--chat-bg-color", hex);
         keval.setItem("background", {color: hex});
     }
 

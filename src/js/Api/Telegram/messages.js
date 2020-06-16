@@ -109,6 +109,14 @@ function getRecentStickers({hash = 0} = {hash: 0}) {
     return MTProto.invokeMethod("messages.getRecentStickers", {hash})
 }
 
+function getFeaturedStickers({hash = 0} = {hash: 0}) {
+    return MTProto.invokeMethod("messages.getFeaturedStickers", {hash})
+}
+
+function getFavedStickers({hash = 0} = {hash: 0}) {
+    return MTProto.invokeMethod("messages.getFavedStickers", {hash})
+}
+
 function getSavedGifs({hash = 0} = {hash: 0}) {
     return MTProto.invokeMethod("messages.getSavedGifs", {hash})
 }
@@ -188,11 +196,13 @@ function getPollResults(message) {
     })
 }
 
-function getPollVotes(message) {
+function getPollVotes(message, option = null, offset = null, limit = 42) {
     return MTProto.invokeMethod("messages.getPollVotes", {
         peer: message.dialogPeer.inputPeer,
         id: message.id,
-        limit: 100
+        option: option,
+        offset: offset,
+        limit: limit,
     })
 }
 
@@ -204,6 +214,8 @@ const messages = {
     getHistory: getHistory,
     getAllStickers: getAllStickers,
     getRecentStickers: getRecentStickers,
+    getFeaturedStickers: getFeaturedStickers,
+    getFavedStickers: getFavedStickers,
     getSavedGifs: getSavedGifs,
     getStickerSet: getStickerSet,
     deleteMessages: deleteMessages,

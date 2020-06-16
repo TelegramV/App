@@ -44,7 +44,7 @@ export class PollMessage extends AbstractMessage {
         }
         return best;
     }
-
+    // TODO replace object just to number
     calculateAbsolutePercent(pollAnswerVotes) {
         if(!pollAnswerVotes) return null;
         if(this.results.total_voters === 0) return 0;

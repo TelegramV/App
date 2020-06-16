@@ -30,7 +30,11 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
         initElement($el)
 
         if ($el instanceof HTMLInputElement) {
-            if (newAttrs.value && newAttrs.value !== $el.value) {
+            if (newAttrs.value !== $el.value) {
+                if (newAttrs.value == null) {
+                    newAttrs.value = ""
+                }
+
                 $el.value = newAttrs.value;
                 delete newAttrs.value;
             }

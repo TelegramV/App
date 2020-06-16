@@ -19,7 +19,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         super.init();
 
         let message = this.props.message;
-        console.log(message);
+        //console.log(message);
 
         this.timerRef = VComponent.createFragmentRef();
 
@@ -77,7 +77,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                         {message.poll.public_voters && <RecentVotersFragment recentVoters={message.results.recent_voters}/>}
                         <div class="filler"/>
                         {this.shouldShowTooltip() && <TipFragment click={_ => this.showSolution()}/>}
-                        {message.poll.close_period && <TimerFragment ref={this.timerRef} left={0} total={0}/>}
+                        {message.poll.close_period && !message.isVoted && <TimerFragment ref={this.timerRef} left={0} total={0}/>}
                     </div>
                     {this.makeAnswerBlock()}
                     <FooterFragment message={message} actionClick={this.onActionClick}/>
@@ -132,6 +132,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     onPollChange = () => {
         this.forceUpdate();
+        UIEvents.General.fire("pollUpdate", {message: this.props.message});
     }
 
     onActionClick = (event) => {

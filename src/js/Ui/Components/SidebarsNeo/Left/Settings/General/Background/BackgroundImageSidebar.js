@@ -6,12 +6,16 @@ import {askForFile} from "../../../../../../Utils/utils"
 import WallpaperManager from "../../../../../../Managers/WallpaperManager"
 import {BackgroundColorSidebar} from "./BackgroundColorSidebar"
 import UIEvents from "../../../../../../EventBus/UIEvents";
-import VComponent from "../../../../../../../V/VRDOM/component/VComponent"
+import BackgroundPreviewComponent from "./BackgroundPreviewComponent"
+import keval from "../../../../../../../Keval/keval"
 import "./BackgroundSidebar.scss"
 
 export class BackgroundImageSidebar extends LeftSidebar {
 
-	galleryRef = VComponent.createRef();
+    state = {
+        blur: true,
+        wallpapers: null
+    }
 
 	appEvents(E) {
         super.appEvents(E);
@@ -25,9 +29,11 @@ export class BackgroundImageSidebar extends LeftSidebar {
         	<Section>
 	        	<IconButton icon="cameraadd" text="Upload Wallpaper" onClick={_=>this.uploadBackground()}/>
 	        	<IconButton icon="colorize" text="Pick a Color" onClick={_ => UIEvents.Sidebars.fire("push", BackgroundColorSidebar)}/>
-	        	<CheckboxButton checked text="Blur Wallpaper Image" onClick={this.onBlurClick}/>
+	        	<CheckboxButton checked={this.state.blur} text="Blur Wallpaper Image" onClick={this.onBlurClick}/>
         	</Section>
-        	<div ref={this.galleryRef} className="gallery background-list"/>
+        	<div className="gallery background-list">
+                {this.generateWallpaperGrid()}
+            </div>
         </this.contentWrapper>
     }
 
@@ -35,18 +41,37 @@ export class BackgroundImageSidebar extends LeftSidebar {
         return "Chat Background"
     }
 
+    componentDidMount() {
+        keval.getItem("background.blur").then(data => {
+            if(!data) {
+                keval.setItem("background.blur", {blur: true})
+            } else {
+                this.setState({
+                    blur: !data.blur //dirty hack to set blur on load, replace this
+                })
+                this.onBlurClick();
+            }
+        })
+    }
+
     onShown(params) {
         WallpaperManager.fetchAllWallPapers();
     }
 
-    onWallpaperFetched = event => {
-    	console.log("Fetched")
-        this.wallpapers = event.wallpapers;
-        for (let wallpaper of this.wallpapers) {
-            WallpaperManager.fetchPreview(wallpaper).then(url => {
-                VRDOM.append(<div class="image-square" onClick={_ => WallpaperManager.requestAndInstall(wallpaper)} css-background-image={`url(${url})`}/>, this.galleryRef.$el);
-            })
+    generateWallpaperGrid = () => {
+        if(!this.state.wallpapers) return undefined;
+
+        let squares = [];
+        for(let wallpaper of this.state.wallpapers) {
+            squares.push(<BackgroundPreviewComponent click={this.previewClick} wallpaper={wallpaper}/>)
         }
+        return squares;
+    }
+
+    onWallpaperFetched = event => {
+        this.setState({
+            wallpapers: event.wallpapers
+        })
     }
 
     uploadBackground = () => {
@@ -57,13 +82,24 @@ export class BackgroundImageSidebar extends LeftSidebar {
         }, true)
     }
 
-    onBlurClick = (value) => {
-    	console.log(value)
+    onBlurClick = ev => {
+    	let value = !this.state.blur;
         const wallpaper = document.getElementById("wallpaper");
         if (value) {
             wallpaper.classList.add("blur");
         } else {
             wallpaper.classList.remove("blur");
         }
+
+        keval.setItem("background.blur", {blur: value})
+
+        this.setState({
+            blur: value
+        })
+    }
+
+    previewClick = (wallpaper) => {
+        WallpaperManager.requestAndInstall(wallpaper);
+        if(wallpaper.pattern && this.state.blur) this.onBlurClick(); //disable blur for patterns
     }
 }

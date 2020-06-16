@@ -1,0 +1,69 @@
+@import "../../../../../../sass/partials/vars";
+
+.poll-results {
+    .question {
+        //move to header?
+        font-size: 20px;
+        font-weight: 500;
+        margin: 24px;
+        margin-top: 16px;
+    }
+
+    .info {
+        font-size: 20px;
+        text-align: center;
+    }
+
+    .title {
+    	margin-bottom: 12px;
+	    .voters-header {
+	        display: flex;
+	        justify-content: space-between;
+	        margin: 0 10px;
+	        color: $darkgrey;
+	        font-weight: 500;
+	        font-size: 14px;
+
+	        .percent {
+	        	font-size: 16px;
+	        }
+	    }
+	}
+
+    .section {
+    	border-top: 1px solid $lightgrey;
+    	padding-top: 17px;
+    	padding-left: 4px;
+    	margin-top: 14px;
+    }
+
+    .voter,
+    .more {
+        display: flex;
+        align-items: center;
+        margin: 6px;
+        margin-left: 0px;
+        padding: 5px;
+        border-radius: 10px;
+        cursor: pointer;
+
+        &:hover {
+            background-color: $light;
+        }
+
+        .avatar {
+            --avatar-size: 33px;
+        }
+
+        .tgico {
+            font-size: 28px;
+            margin: 3px;
+            color: $darkgrey;
+        }
+
+        .text {
+            margin-left: 25px;
+            font-weight: 500;
+        }
+    }
+}
