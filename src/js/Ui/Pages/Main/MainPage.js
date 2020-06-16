@@ -20,6 +20,7 @@ import {ForwardSidebar} from "../../Components/SidebarsNeo/Right/ForwardSidebar"
 import PiPContainer from "../../Components/Video/PiPContainer"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
 import {isMobile} from "../../Utils/utils";
+import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars"
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
