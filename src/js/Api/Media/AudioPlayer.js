@@ -44,7 +44,7 @@ class AudioPlayer {
 
         AppEvents.Files.subscribe("download.start", event => {
             if (this.isCurrent(event.file)) {
-                if (this.state.isVoice) {
+                if (!this.state.supportStreaming) {
                     // this.audio.play();
                 } else {
                     let source = this.sources.get(event.file.id);
@@ -84,7 +84,7 @@ class AudioPlayer {
         });
 
         AppEvents.Files.subscribe("download.newPart", event => {
-            if (this.isCurrent(event.file) && !this.state.isVoice) {
+            if (this.isCurrent(event.file) && this.state.supportStreaming) {
                 const source = this.sources.get(event.file.id);
                 const {mediaSource, bufferQueue} = source;
                 const sourceBuffer = mediaSource.sourceBuffers[0];
@@ -103,7 +103,7 @@ class AudioPlayer {
 
         AppEvents.Files.subscribe("download.done", event => {
             if (this.isCurrent(event.file)) {
-                if (this.state.isVoice) {
+                if (!this.state.supportStreaming) {
                     this.audio.src = event.url;
                     this.audio.play();
                 } else {
@@ -154,6 +154,7 @@ class AudioPlayer {
             isVoice,
             fileName,
             isSeeking: this.audio.seeking,
+            supportStreaming: !isVoice && MediaSource.isTypeSupported(this.currentMessage?.media.document.mime_type)
         }
     }
 
@@ -185,7 +186,9 @@ class AudioPlayer {
                 this.pause();
                 this.audio.src = "";
 
-                FileManager.downloadDocument(message.media.document);
+                FileManager.downloadDocument(message.media.document, null, {
+                    limit: 512 * 512, // 256K
+                });
             }
         }
     }
