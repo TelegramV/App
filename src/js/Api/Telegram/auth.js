@@ -69,12 +69,17 @@ function exportLoginToken(props = {}) {
     });
 }
 
+function logOut() {
+    return MTProto.invokeMethod("auth.logOut;")
+}
+
 const auth = {
     sendCode: sendCode,
     signIn: signIn,
     signUp: signUp,
     checkPassword: checkPassword,
     exportLoginToken: exportLoginToken,
+    logOut: logOut,
 }
 
 export default auth
