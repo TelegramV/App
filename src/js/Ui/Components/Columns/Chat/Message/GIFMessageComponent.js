@@ -11,6 +11,8 @@ class GIFMessageComponent extends GeneralMessageComponent {
                                     bubbleRef={this.bubbleRef} outerPad={this.props.message.text.length > 0}>
                 <BetterVideoComponent document={this.props.message.raw.media.document}
                                       muted
+                                      autoDownload
+                                      autoPlay
                                       playOnHover/>
                 <MessageTimeComponent message={this.props.message} bg={true}/>
             </MessageWrapperFragment>

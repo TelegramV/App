@@ -19,6 +19,7 @@
 
 import {__component_appEventsBuilder} from "./__component_appEventsBuilder";
 import {__component_reactiveObjectEventsBuilder} from "./__component_reactiveObjectEventsBuilder";
+import {__state_register_component} from "./__component_state"
 
 export function __component_init(component) {
     if (!component.__.initialized) {
@@ -45,8 +46,12 @@ export function __component_init(component) {
 
             if (component.globalState) {
                 for (const state of Object.values(component.globalState)) {
-                    state.__components.add(component);
+                    __state_register_component(state, component);
                 }
+            }
+
+            if (component.state.__state_custom) {
+                __state_register_component(component.state, component);
             }
         }
 

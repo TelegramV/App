@@ -28,6 +28,72 @@ import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import UIEvents from "../../../../EventBus/UIEvents"
 import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
+import State from "../../../../../V/VRDOM/component/State"
+import UpdatesManager from "../../../../../Api/Updates/UpdatesManager"
+
+class FavedState extends State {
+    isRefreshing = false;
+    favedStickers = null;
+
+    constructor() {
+        super();
+
+        UpdatesManager.subscribe("updateFavedStickers", () => this.refresh(true));
+    }
+
+    refresh = (force = false) => {
+        if (this.favedStickers && !force) {
+            return;
+        }
+
+        if (this.isRefreshing && !force) {
+            return;
+        }
+
+        this.set({
+            isRefreshing: true,
+        });
+
+        API.messages.getFavedStickers().then(FavedStickers => {
+            if (FavedStickers._ === "messages.favedStickersNotModified") {
+                return;
+            }
+
+            this.set({
+                isRefreshing: true,
+                favedStickers: FavedStickers,
+            });
+        });
+    }
+
+    stateWillBeDestroyed() {
+        UpdatesManager.unsubscribe("updateFavedStickers", this.refresh);
+    }
+}
+
+const favedState = new FavedState();
+
+class FavedStickers extends StatefulComponent {
+    state = favedState;
+
+    render(props, {favedStickers}, {faved}) {
+        const documents = favedStickers?.stickers ?? [];
+
+        return (
+            <div id="composer-sticker-pack-trending" className="selected scrollable">
+                {
+                    documents.map(Document => (
+                        <BetterStickerComponent
+                            onClick={() => this.sendSticker(Document)}
+                            width={75}
+                            document={Document}/>
+                    ))
+                }
+            </div>
+        )
+    }
+}
 
 const StickerSetItemFragment = ({setId, url, onClick}) => {
     return (
@@ -69,7 +135,7 @@ class StickersComposerComponent extends StatelessComponent {
                 </div>
                 <div ref={this.stickersTableRef} className="sticker-table">
                     <div id="composer-sticker-pack-recent" className="selected scrollable"/>
-                    <div id="composer-sticker-pack-trending" className="selected scrollable"/>
+                    <FavedStickers/>
                 </div>
             </div>
         )
@@ -242,27 +308,7 @@ class StickersComposerComponent extends StatelessComponent {
         let $el = document.getElementById(`composer-sticker-pack-trending`);
         $el.classList.add("selected");
 
-        if (!this.favedStickers) {
-            API.messages.getFavedStickers().then(FavedStickers => {
-                console.warn(FavedStickers)
-
-                if (FavedStickers._ === "messages.favedStickersNotModified") {
-                    return;
-                }
-
-                this.favedStickers = FavedStickers;
-
-                FavedStickers.stickers.forEach(Document => {
-                    VRDOM.append(
-                        <BetterStickerComponent
-                            onClick={() => this.sendSticker(Document)}
-                            width={75}
-                            document={Document}/>,
-                        $el
-                    );
-                })
-            })
-        }
+        favedState.refresh();
     }
 }
 
