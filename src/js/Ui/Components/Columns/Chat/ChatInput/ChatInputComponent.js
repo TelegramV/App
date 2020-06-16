@@ -250,11 +250,13 @@ export class ChatInputComponent extends StatelessComponent {
 
     mouseClickEmoji = (ev) => {
         let composer = VApp.mountedComponents.get("composer");
-        if (composer.visible) {
+        if (composer.visible && this.composerClicked) {
+            this.composerClicked = false;
             composer.hide();
             ev.currentTarget.classList.add("tgico-smile");
             ev.currentTarget.classList.remove("tgico-keyboard");
         } else {
+            this.composerClicked=true;
             composer.show();
             ev.currentTarget.classList.remove("tgico-smile");
             ev.currentTarget.classList.add("tgico-keyboard");
@@ -263,7 +265,7 @@ export class ChatInputComponent extends StatelessComponent {
 
     planComposerClose = () => {
         this.withTimeout(() => {
-            if (this.hideComposer) {
+            if (this.hideComposer && !this.composerClicked) {
                 VApp.mountedComponents.get("composer").hide();
             }
         }, 250);
