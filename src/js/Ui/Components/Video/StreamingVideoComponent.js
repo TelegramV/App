@@ -134,9 +134,6 @@ class StreamingVideoComponent extends VideoPlayer {
 
     onPreviewMouseMove = this.throttle((event: MouseEvent) => {
         const $video: HTMLVideoElement = this.previewVideoRef.$el;
-        // const $videO: HTMLVideoElement = this.videoRef.$el;
-
-        // console.log("move")
 
         const box = (event.currentTarget || event.target).getBoundingClientRect();
         const percentage = (event.pageX - box.x) / box.width;
@@ -147,21 +144,6 @@ class StreamingVideoComponent extends VideoPlayer {
             showPreview: true,
             previewPosition: percentage * 100,
         });
-
-        // if ($video.lastSeekTime !== $video.currentTime) {
-        // for (let i = 0; i < $videO.buffered.length; i++) {
-        //     let start = $videO.buffered.start(i);
-        //     let end = $videO.buffered.end(i);
-        //
-        //     if ($videO.currentTime >= start && $videO.currentTime <= end) {
-        //         return;
-        //     }
-        // }
-
-        //     console.log("really move")
-        //
-        //     $video.lastSeekTime = $video.currentTime;
-        // }
     }, 500)
 
     onDownloadDone = ({blob, url}) => {

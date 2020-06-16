@@ -63,6 +63,8 @@ class BetterVideoComponent extends StatefulComponent {
             otherArgs.autoPlay = false;
         }
 
+        delete otherArgs.ref
+
         return (
             <figure className={["video rp rps", isLoading && "thumbnail", isRound && "round"]} onClick={onClick}>
                 {infoContainer && infoContainer(this.state, this.videoRef.$el)}
@@ -93,6 +95,26 @@ class BetterVideoComponent extends StatefulComponent {
     componentWillMount(props) {
         if (props.autoDownload) {
             FileManager.downloadVideo(props.document)
+        }
+    }
+
+    componentDidMount() {
+        if (this.videoRef.$el) {
+            if (this.props.muted) {
+                this.videoRef.$el.volume = 0;
+            } else {
+                this.videoRef.$el.volume = 1;
+            }
+        }
+    }
+
+    componentDidUpdate() {
+        if (this.videoRef.$el) {
+            if (this.props.muted) {
+                this.videoRef.$el.volume = 0;
+            } else {
+                this.videoRef.$el.volume = 1;
+            }
         }
     }
 
