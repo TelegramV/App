@@ -56,7 +56,7 @@ export function MainPage() {
     }, 500));
 
     return (
-        <div class="app">
+        <div id="app" class="app">
             <ContextMenuComponent/>
             <ModalContainer/>
             <MediaViewerComponent/>

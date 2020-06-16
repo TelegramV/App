@@ -65,7 +65,7 @@ class LoginQRComponent extends StatefulComponent {
     }
 
     componentWillMount(props) {
-        MTProto.UpdatesManager.subscribe("updateLoginToken", this.onUpdateLoginToken);
+        MTProto.UpdatesManager.subscribe("updateLoginToken", this.onUpdateLoginToken); //never invoked!?
     }
 
     componentWillUnmount() {
@@ -86,8 +86,6 @@ class LoginQRComponent extends StatefulComponent {
     }
 
     refreshToken = () => {
-        console.warn("[QR] refreshing token");
-
         this.setState({
             isLoading: true,
         });
@@ -110,6 +108,7 @@ class LoginQRComponent extends StatefulComponent {
         return API.auth.exportLoginToken().catch(error => {
             if (error.type === "SESSION_PASSWORD_NEEDED") {
                 loginState.setPasswordView();
+                return;
             }
 
             throw error;
