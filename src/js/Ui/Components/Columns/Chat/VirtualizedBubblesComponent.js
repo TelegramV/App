@@ -184,10 +184,10 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     renderDate(message, nextMessage) {
         let date = message.jsDate;
         let nextDate = nextMessage?.jsDate;
-        if(!isDateEqual(date, nextDate)) {
+        if (!isDateEqual(date, nextDate)) {
             return vrdom_render(<div class="service">
                 <div class="service-msg">
-                    {`${date.getDate()} ${date.toLocaleString('en', { month: 'long' })}`}
+                    {`${date.getDate()} ${date.toLocaleString('en', {month: 'long'})}`}
                 </div>
             </div>);
         }
@@ -273,12 +273,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
             }
 
-            this.bubblesInnerRef.$el.firstElementChild?.__v.component.domSiblingUpdated
-                .call(
-                    this.bubblesInnerRef.$el.firstElementChild?.__v.component,
-                    this.bubblesInnerRef.$el.firstElementChild?.nextElementSibling?.__v.component.props.message,
-                    messages[0],
-                );
+            this.bubblesInnerRef.$el.firstElementChild?.__v.component.domSiblingUpdated?.call(
+                this.bubblesInnerRef.$el.firstElementChild?.__v.component,
+                this.bubblesInnerRef.$el.firstElementChild?.nextElementSibling?.__v.component.props.message,
+                messages[0],
+            );
 
             vrdom_prependRealMany($messages, this.bubblesInnerRef.$el);
 
@@ -376,9 +375,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     }
 
     onPeerMessagesRecent = (event) => {
-        this.refresh();
+        if (!this.isRequestedShowMessage) {
+            this.refresh();
+        }
 
-        this.currentVirtual.hasMoreOnTopToDownload = true;
+        this.mainVirtual.hasMoreOnTopToDownload = true;
 
         this.mainVirtual.messages = this.fixMessages(event.messages.slice());
 
@@ -387,8 +388,10 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             AppSelectedChat.current.messages.fireAllRecent();
         }
 
-        this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
-        this.scrollBottom();
+        if (!this.isRequestedShowMessage) {
+            this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
+            this.scrollBottom();
+        }
     }
 
     onPeerMessagesAllRecent = event => {
@@ -396,10 +399,12 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         event.messages = this.fixMessages(event.messages.slice());
         const lenbeforefuck = this.mainVirtual.currentPage.length;
         this.mainVirtual.messages = [...event.messages, ...this.mainVirtual.messages];
-        this.currentVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
+        this.mainVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
         const vbp = this.mainVirtual.veryBottomPage();
-        this.appendMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.getVeryBottomOne());
-        this.scrollBottom();
+        if (!this.isRequestedShowMessage) {
+            this.appendMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.getVeryBottomOne());
+            this.scrollBottom();
+        }
         this.isLoadingRecent = false;
     }
 
@@ -486,9 +491,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             }
         } else {
             console.log('NO SELECT!!!', event)
-            const peer = AppSelectedChat.current;
+            const peer = message.to;
 
-            AppSelectedChat.select(message.to);
+            this.isRequestedShowMessage = true;
+
+            AppSelectedChat.select(peer);
 
             const actionCount = (++this.actionCount);
 
@@ -513,9 +520,9 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         //     return;
         // }
 
-        // if (this.actionCount > event.actionCount) {
-        //     return;
-        // }
+        if (this.actionCount > event.actionCount) {
+            return;
+        }
 
         this.cleanupTree();
         this.secondVirtual.refresh();
@@ -528,6 +535,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         if (intersect > -1) {
             console.log("[show message] intersect found");
+
+            this.isRequestedShowMessage = false;
 
             messages = messages.slice(0, intersect - 1);
 
@@ -698,6 +707,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         if (intersect > -1) {
             console.log("[bottom page] intersect found");
+
+            this.isRequestedShowMessage = false;
 
             messages = messages.slice(0, intersect - 1);
 
