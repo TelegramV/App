@@ -121,12 +121,15 @@ class MP4StreamingFile {
         }
 
         const mime = `${this.document.mime_type}; codecs="${track.codec}"`;
-        const sourceBuffer = this.mediaSource.addSourceBuffer(mime);
-        sourceBuffer.id = track.id;
 
-        this.mp4box.setSegmentOptions(track.id, sourceBuffer, {nbSamples: 10});
+        if (MediaSource.isTypeSupported(mime)) {
+            const sourceBuffer = this.mediaSource.addSourceBuffer(mime);
+            sourceBuffer.id = track.id;
 
-        sourceBuffer.pendingAppends = [];
+            this.mp4box.setSegmentOptions(track.id, sourceBuffer, {nbSamples: 10});
+
+            sourceBuffer.pendingAppends = [];
+        }
     }
 
     initSegment = segment => {

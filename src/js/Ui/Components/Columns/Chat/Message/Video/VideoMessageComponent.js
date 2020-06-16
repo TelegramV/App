@@ -11,68 +11,96 @@ import FileManager from "../../../../../../Api/Files/FileManager"
 import VSpinner from "../../../../../Elements/VSpinner"
 
 class VideoMessageComponent extends GeneralMessageComponent {
+    state = {
+        isMuted: true,
+    };
 
-    render({message}) {
+    render({message}, {isMuted}) {
         const document = message.raw.media.document;
         const text = message.parsed && <TextWrapperComponent message={message}/>;
         const info = DocumentParser.attributeVideo(document);
+        const isStreaming = DocumentParser.isVideoStreamable(document);
 
         return (
             <MessageWrapperFragment message={message} noPad showUsername={false} outerPad={text !== ""}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
 
                 <BetterVideoComponent document={message.raw.media.document}
-                                      onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: this.props.message})}
+                                      onClick={() => {
+                                          this.$el.querySelector("video")?.pause();
+                                          UIEvents.MediaViewer.fire("showMessage", {message: this.props.message});
+                                      }}
                                       autoPlay
                                       infoContainer={
-                                          ({currentTime}) => (
-                                              <>
-                                                  <div className="play-button"
-                                                       onClick={event => event.stopPropagation()}>
-                                                      <i className="tgico tgico-play"/>
-                                                  </div>
-                                                  <div className="video-info"
-                                                       onClick={event => {
-                                                           event.stopPropagation()
+                                          ({currentTime}, $el: HTMLVideoElement) => {
+                                              const isPlaying = $el && !$el.paused;
 
-                                                           if (!FileManager.isDownloaded(document)) {
-                                                               if (FileManager.isPending(document)) {
-                                                                   FileManager.cancel(document)
+                                              return (
+                                                  <>
+                                                      <div className="play-button"
+                                                           onClick={event => {
+                                                               event.stopPropagation();
+
+                                                               if (isStreaming) {
+                                                                   this.$el.querySelector("video")?.pause();
+                                                                   UIEvents.MediaViewer.fire("showMessage", {message});
                                                                } else {
-                                                                   FileManager.downloadVideo(document)
+                                                                   if (isPlaying) {
+                                                                       $el?.pause();
+                                                                   } else {
+                                                                       $el?.play();
+                                                                   }
                                                                }
-                                                           }
-                                                       }}>
-                                                      {
-                                                          FileManager.isDownloaded(document) ?
-                                                              <div className="done">
-                                                                  {formatAudioTime(info.duration - currentTime)}
-                                                                  <i className="tgico tgico-nosound"/>
-                                                              </div>
-                                                              :
-                                                              <div className="download">
-                                                                  <div class="icon">
-                                                                      {!FileManager.isPending(document) &&
-                                                                      <i className="tgico tgico-clouddownload"/>}
-                                                                      {FileManager.isPending(document) &&
-                                                                      <VSpinner white strokeWidth={3}/>}
+                                                           }}>
+                                                          <i className={`tgico tgico-${isPlaying ? "pause" : "play"}`}/>
+                                                      </div>
+                                                      <div className="video-info"
+                                                           onClick={event => {
+                                                               event.stopPropagation()
+
+                                                               if (!FileManager.isDownloaded(document)) {
+                                                                   if (FileManager.isPending(document)) {
+                                                                       FileManager.cancel(document)
+                                                                   } else {
+                                                                       FileManager.downloadVideo(document)
+                                                                   }
+                                                               } else {
+                                                                   this.setState({
+                                                                       isMuted: !isMuted,
+                                                                   });
+                                                               }
+                                                           }}>
+                                                          {
+                                                              FileManager.isDownloaded(document) ?
+                                                                  <div className="done">
+                                                                      {formatAudioTime(info.duration - currentTime)}
+                                                                      {isMuted && <i className="tgico tgico-nosound"/>}
                                                                   </div>
-                                                                  <div className="info">
+                                                                  :
+                                                                  <div className="download">
+                                                                      <div class="icon">
+                                                                          {!FileManager.isPending(document) &&
+                                                                          <i className="tgico tgico-clouddownload"/>}
+                                                                          {FileManager.isPending(document) &&
+                                                                          <VSpinner white strokeWidth={3}/>}
+                                                                      </div>
+                                                                      <div className="info">
                                                               <span class="duration">
                                                                   {formatAudioTime(info.duration)}
                                                               </span>
-                                                                      <span class="size">
+                                                                          <span class="size">
                                                                   {FileManager.isPending(document) && DocumentMessagesTool.formatSize(FileManager.getPendingSize(document)) + "/"}
-                                                                          {DocumentMessagesTool.formatSize(document.size)}
+                                                                              {DocumentMessagesTool.formatSize(document.size)}
                                                               </span>
+                                                                      </div>
                                                                   </div>
-                                                              </div>
-                                                      }
-                                                  </div>
-                                              </>
-                                          )
+                                                          }
+                                                      </div>
+                                                  </>
+                                              )
+                                          }
                                       }
-                                      muted/>
+                                      muted={isMuted}/>
 
                 {!text ? <MessageTimeComponent message={message} bg={true}/> : ""}
                 {text}

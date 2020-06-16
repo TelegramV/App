@@ -194,7 +194,9 @@ class VideoPlayer extends StatefulComponent {
                             {/*<img*/}
                             {/*    src="https://12kanal.com/wp-content/uploads/2019/10/k-chemu-snitsya-popugay-zhenschine-ili-muzhchine-2.jpg"*/}
                             {/*    alt="Frame"/>*/}
-                            <video ref={this.previewVideoRef} src={previewSrc} autoPlay/>
+                            <video ref={this.previewVideoRef}
+                                   src={previewSrc}
+                                   $recreate={this.videoRef.$el?.src !== src}/>
                         </div>
                         <div className="progress"
                              ref={this.timeWrapperRef}

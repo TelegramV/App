@@ -57,37 +57,31 @@ class StreamingVideoComponent extends VideoPlayer {
 
         if (!FileManager.isDownloaded(this.props.document) && DocumentParser.isVideoStreamable(props.document)) {
             this.mp4file = getMediaFile(this.props.document);
-            this.mp4filePreview = getMediaFile(this.props.document, true);
             this.state.url = this.mp4file.url;
-            this.state.previewSrc = this.mp4filePreview.url;
         } else {
             console.warn("streaming is not supported for this video");
             FileManager.downloadDocument(this.props.document);
         }
     }
 
-    // componentWillUpdate(nextProps, nextState) {
-    //     super.componentWillUpdate(nextProps, nextState);
-    //
-    //     if (nextProps.document !== this.props.document || nextProps.document.id !== this.props.document.id) {
-    //         // console.warn("[S] Will update", nextProps, nextState, this);
-    //
-    //         this.state.url = "";
-    //
-    //         if (DocumentParser.isVideoStreamable(nextProps.document)) {
-    //             if (FileManager.isPending(nextProps.document)) {
-    //                 this.setState({
-    //                     url: FileManager.getPending(nextProps.document)?.__mp4file.url,
-    //                 });
-    //             } else {
-    //                 FileManager.downloadVideo(nextProps.document);
-    //             }
-    //         } else {
-    //             console.warn("streaming is not supported for this video");
-    //             FileManager.downloadDocument(nextProps.document);
-    //         }
-    //     }
-    // }
+    componentWillUpdate(nextProps, nextState) {
+        super.componentWillUpdate(nextProps, nextState);
+
+        if (nextProps.document !== this.props.document || nextProps.document.id !== this.props.document.id) {
+            this.state.url = "";
+
+            if (!FileManager.isDownloaded(nextProps.document) && DocumentParser.isVideoStreamable(nextProps.document)) {
+                this.mp4file = getMediaFile(nextProps.document);
+
+                this.setState({
+                    url: this.mp4file.url,
+                });
+            } else {
+                console.warn("streaming is not supported for this video");
+                FileManager.downloadDocument(nextProps.document);
+            }
+        }
+    }
 
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -98,15 +92,15 @@ class StreamingVideoComponent extends VideoPlayer {
     onDownloadStart = ({file}) => {
         this.forceUpdate();
 
-        // if (DocumentParser.isVideoStreamable(file)) {
-        //     this.setState({
-        //         url: file.__mp4file.url,
-        //     });
-        // } else {
-        //     this.setState({
-        //         url: "",
-        //     });
-        // }
+        if (DocumentParser.isVideoStreamable(file)) {
+            // this.setState({
+            //     url: file.__mp4file.url,
+            // });
+        } else {
+            this.setState({
+                url: "",
+            });
+        }
     }
 
     onDownloadNewPart = () => {
@@ -133,24 +127,29 @@ class StreamingVideoComponent extends VideoPlayer {
     }
 
     onPreviewMouseMove = this.throttle((event: MouseEvent) => {
-        const $video: HTMLVideoElement = this.previewVideoRef.$el;
+        // currently we are ignoring previews for streaming videos
 
-        const box = (event.currentTarget || event.target).getBoundingClientRect();
-        const percentage = (event.pageX - box.x) / box.width;
-        $video.currentTime = $video.duration * Math.max(0, Math.min(1, percentage));
-        $video.pause();
+        if (this.state.downloaded) {
+            const $video: HTMLVideoElement = this.previewVideoRef.$el;
 
-        this.setState({
-            showPreview: true,
-            previewPosition: percentage * 100,
-        });
+            const box = (event.currentTarget || event.target).getBoundingClientRect();
+            const percentage = (event.pageX - box.x) / box.width;
+            $video.currentTime = $video.duration * Math.max(0, Math.min(1, percentage));
+            $video.pause();
+
+            this.setState({
+                showPreview: true,
+                previewPosition: percentage * 100,
+            });
+        }
     }, 500)
 
     onDownloadDone = ({blob, url}) => {
         if (!this.state.url || !this.videoRef.$el?.currentTime) {
             this.setState({
+                downloaded: true,
                 url,
-                previewSrc: URL.createObjectURL(blob),
+                previewSrc: url,
             });
         }
 

@@ -63,8 +63,6 @@ class BetterVideoComponent extends StatefulComponent {
             otherArgs.autoPlay = false;
         }
 
-        delete otherArgs.ref
-
         return (
             <figure className={["video rp rps", isLoading && "thumbnail", isRound && "round"]} onClick={onClick}>
                 {infoContainer && infoContainer(this.state, this.videoRef.$el)}
