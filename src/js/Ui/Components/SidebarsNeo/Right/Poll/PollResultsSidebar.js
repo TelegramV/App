@@ -1,6 +1,14 @@
 import { RightSidebar } from "../RightSidebar";
 import UIEvents from "../../../../EventBus/UIEvents";
-import { getPollVotes } from "../../../../../Api/Telegram/messages"
+import messages from "../../../../../Api/Telegram/messages"
+import { Section } from "../../Fragments/Section"
+import PeersStore from "../../../../../Api/Store/PeersStore"
+import PeersManager from "../../../../../Api/Peers/PeersManager"
+import AvatarComponent from "../../../Basic/AvatarComponent"
+import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer"
+import "./PollResultsSidebar.scss"
+
+const PREFETCH_COUNT = 5;
 
 export class PollResultsSidebar extends RightSidebar {
 
@@ -17,8 +25,11 @@ export class PollResultsSidebar extends RightSidebar {
     }
 
     content(): * {
-        return <this.contentWrapper>
-            {this.state.pollVotes ? this.generateVotes() : "Loading..."}
+        return <this.contentWrapper class="poll-results">
+        	<div class="poll-results">
+	        	<div class="question">{this.state.pollMessage?.poll?.question ?? "Loading..."}</div>
+	            {this.generateVotes()}
+            </div>
         </this.contentWrapper>
     }
 
@@ -27,27 +38,102 @@ export class PollResultsSidebar extends RightSidebar {
     }
 
     generateVotes = () => {
-        return (
-            <div>Fetched</div>
-        )
+        let options = [];
+        if(!this.state.pollVotes) {
+        	return <div class="loading">Loading...</div>;
+        }
+        for (let option of this.state.pollVotes) {
+            if (option.count === 0) continue;
+            options.push(
+                <VotersSection pollMessage={this.state.pollMessage} option={option} requestAll={this.fetchAllVotes}/>
+            )
+        }
+        if (options.length === 0 && this.state.pollVotes) {
+            return <div>Nobody voted yet!</div>
+        }
+        return options;
     }
 
     onPollResults = event => {
         UIEvents.Sidebars.fire("push", PollResultsSidebar);
-
+        console.log(event.pollMessage)
         this.setState({
             pollMessage: event.pollMessage,
             pollVotes: null
         })
+
+        this.fetchPollVotes(event.pollMessage);
     }
 
     fetchPollVotes = pollMessage => {
-        getPollResults(pollMessage).then(votes => {
-        	console.log("Got votes");
+        let promises = [];
+        pollMessage.poll.answers.forEach(answer => {
+            let option = answer.option[0];
+            let promise = messages.getPollVotes(pollMessage, option, null, PREFETCH_COUNT).then(votesList => {
+            	PeersManager.fillPeersFromUpdate(votesList);
+                return {
+                    option: option,
+                    count: votesList.count,
+                    voters: votesList.votes.map(userVote => userVote.user_id),
+                }
+            });
+            promises.push(promise);
+        })
+        Promise.all(promises).then(array => {
+        	array.sort((one, two) => two.count-one.count);
             this.setState({
-                pollMessage: event.pollMessage,
-                pollVotes: votes
+                pollVotes: array
             })
         })
     }
+
+    fetchAllVotes = option => {
+    	messages.getPollVotes(this.state.pollMessage, option.option, null, option.count).then(votesList => {
+    		let newVotes = this.state.pollVotes.filter(votes => votes.option!==option.option);
+    		newVotes.push({
+                    option: option.option,
+                    count: votesList.count,
+                    voters: votesList.votes.map(userVote => userVote.user_id),
+                });
+    		PeersManager.fillPeersFromUpdate(votesList);
+    		newVotes.sort((one, two) => two.count-one.count);
+    		this.setState({
+    			pollVotes: newVotes
+    		})
+    	})
+    }
+}
+
+const VotersSection = ({pollMessage, option, requestAll}) => {
+	//console.log(pollMessage)
+	let percent = pollMessage.calculateAbsolutePercent({voters: option.count});
+	let header = (
+		<div class="voters-header">
+		<div class="name">{pollMessage.poll.answers.find(answer => answer.option[0]===option.option).text}</div>
+		<div class="percent">{percent+"%"}</div>
+		</div>
+		)
+	let voters = [];
+	for(let userId of option.voters) {
+		if(option.voters.length===PREFETCH_COUNT && voters.length===(PREFETCH_COUNT-1) && option.count > PREFETCH_COUNT) {
+			voters.push(<div class="more" onClick={_ => requestAll(option)}>
+							<i class="tgico tgico-down"/>
+							<div class="text">Show {option.count-PREFETCH_COUNT+1} more voters</div>
+						</div>);
+			break;
+		}
+
+		let peer = PeersStore.get("user", userId);
+		if(peer) {
+			voters.push(<div class="voter rp" onClick={_=>AppSelectedInfoPeer.select(peer)}>
+							<AvatarComponent peer={peer}/>
+							<div class="text">{peer.name}</div>
+						</div>)
+		}
+	}
+    return (
+    	<Section title={header}>
+			{voters}
+		</Section>
+		)
 }

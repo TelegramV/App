@@ -8,8 +8,8 @@ export class RightSidebars extends GenericSidebarHistory {
     render() {
         return (
             <div className="sidebar-wrapper right hidden">
-                <SearchSidebar/>
                 <PollResultsSidebar/>
+                <SearchSidebar/>
                 <DialogInfoSidebar/>
             </div>
         )

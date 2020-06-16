@@ -188,11 +188,13 @@ function getPollResults(message) {
     })
 }
 
-function getPollVotes(message) {
+function getPollVotes(message, option = null, offset = null, limit = 42) {
     return MTProto.invokeMethod("messages.getPollVotes", {
         peer: message.dialogPeer.inputPeer,
         id: message.id,
-        limit: 100
+        option: option,
+        offset: offset,
+        limit: limit,
     })
 }
 

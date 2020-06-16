@@ -1,0 +1,46 @@
+@import "../../../../../../sass/partials/vars";
+.content {
+	.question { //move to header?
+		font-size: 20px;
+		font-weight: 500;
+		margin: 20px;
+	}
+
+	.loading {
+		font-size: 20px;
+		text-align: center;
+	}
+
+	.voters-header {
+		display: flex;
+		justify-content: space-between;
+		margin: 0 10px;
+	}
+
+	.voter, .more {
+		display: flex;
+		align-items: center;
+		margin: 5px 0px;
+		padding: 10px;
+		border-radius: 10px;
+		cursor: pointer;
+
+		&:hover {
+			background-color: $light;
+		}
+		.avatar {
+			--avatar-size: 36px;
+		}
+
+		.tgico {
+			font-size: 30px;
+    		margin: 3px;
+			color: $darkgrey;
+		}
+
+		.text {
+			margin-left: 20px;
+			font-weight: 500;
+		}
+	}
+}
