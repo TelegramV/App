@@ -32,6 +32,7 @@ import SnackbarComponent from "../../Singleton/SnackbarComponent"
 import {SearchSidebar} from "../../SidebarsNeo/Right/Search/SearchSidebar";
 import {RightSidebars} from "../../SidebarsNeo/Right/RightSidebars";
 import DefaultBubblesComponent from "./DefaultBubblesComponent"
+import {isDesktop, isMobile} from "../../../Utils/utils";
 
 const useVirtualized = true || Boolean(localStorage.getItem("settings.messages.virtualized"))
 
@@ -128,13 +129,20 @@ class ChatComponent extends StatelessComponent {
         this.chatLoaderRef.$el.style.display = "none"
 
         if (AppSelectedChat.isSelected) {
+            this.$el.classList.toggle("shown", true)
             this.noChatRef.$el.style.display = "none"
-            this.chatRef.$el.style.display = ""
-            this.chatRef.$el.classList.add("responsive-selected-chat")
+            // TODO delay for mobile
+            // if(isDesktop()) {
+                this.chatRef.$el.style.display = ""
+                this.chatRef.$el.classList.add("responsive-selected-chat")
+            // }
         } else {
+            this.$el.classList.toggle("shown", false)
             this.noChatRef.$el.style.display = ""
-            this.chatRef.$el.style.display = "none"
-            this.chatRef.$el.classList.remove("responsive-selected-chat")
+            if(isDesktop()) {
+                this.chatRef.$el.style.display = "none"
+                this.chatRef.$el.classList.remove("responsive-selected-chat")
+            }
         }
 
         this.chatLoaderRef.$el.style.display = "none"
