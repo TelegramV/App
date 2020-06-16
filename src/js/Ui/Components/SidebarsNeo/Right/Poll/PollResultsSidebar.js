@@ -22,6 +22,7 @@ export class PollResultsSidebar extends RightSidebar {
 
         E.bus(UIEvents.General)
             .on("poll.showResults", this.onPollResults)
+            .on("pollUpdate", this.onPollUpdate)
     }
 
     content(): * {
@@ -40,7 +41,7 @@ export class PollResultsSidebar extends RightSidebar {
     generateVotes = () => {
         let options = [];
         if(!this.state.pollVotes) {
-        	return <div class="loading">Loading...</div>;
+        	return <div class="info">Loading...</div>;
         }
         for (let option of this.state.pollVotes) {
             if (option.count === 0) continue;
@@ -49,14 +50,13 @@ export class PollResultsSidebar extends RightSidebar {
             )
         }
         if (options.length === 0 && this.state.pollVotes) {
-            return <div>Nobody voted yet!</div>
+            return <div class="info">Nobody voted yet!</div>
         }
         return options;
     }
 
     onPollResults = event => {
         UIEvents.Sidebars.fire("push", PollResultsSidebar);
-        console.log(event.pollMessage)
         this.setState({
             pollMessage: event.pollMessage,
             pollVotes: null
@@ -64,6 +64,25 @@ export class PollResultsSidebar extends RightSidebar {
 
         this.fetchPollVotes(event.pollMessage);
     }
+
+    // very stupid way to do this, TODO update that contains difference
+    onPollUpdate = event => {
+    	if(event.message === this.state.pollMessage && this.state.pollVotes) {
+    		let fetchedOptions = this.state.pollVotes.filter(voteList => voteList.voters.length > PREFETCH_COUNT);
+    		this.setState({
+    			pollVotes: null //reset
+    		})
+    		this.fetchPollVotes(this.state.pollMessage).then(_ => {
+    			for(let option of fetchedOptions) {
+	    			this.fetchAllVotes(option);
+	    		}
+    		});
+    	}
+    }
+
+    /**
+		Fetches PREFETCH_COUNT of voters for each options and updates state
+    **/
 
     fetchPollVotes = pollMessage => {
         let promises = [];
@@ -79,16 +98,19 @@ export class PollResultsSidebar extends RightSidebar {
             });
             promises.push(promise);
         })
-        Promise.all(promises).then(array => {
-        	array.sort((one, two) => two.count-one.count);
+        return Promise.all(promises).then(array => {
+        	array.sort((one, two) => one.option-two.option); //sort like in poll
             this.setState({
                 pollVotes: array
             })
         })
     }
-
+    /**
+		Fetches all voters for one option and updates state
+		TODO: test on big poll, maybe pagination is required
+    **/
     fetchAllVotes = option => {
-    	messages.getPollVotes(this.state.pollMessage, option.option, null, option.count).then(votesList => {
+    	return messages.getPollVotes(this.state.pollMessage, option.option, null, option.count).then(votesList => {
     		let newVotes = this.state.pollVotes.filter(votes => votes.option!==option.option);
     		newVotes.push({
                     option: option.option,
@@ -96,7 +118,7 @@ export class PollResultsSidebar extends RightSidebar {
                     voters: votesList.votes.map(userVote => userVote.user_id),
                 });
     		PeersManager.fillPeersFromUpdate(votesList);
-    		newVotes.sort((one, two) => two.count-one.count);
+    		newVotes.sort((one, two) => one.option-two.option);
     		this.setState({
     			pollVotes: newVotes
     		})

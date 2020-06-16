@@ -132,6 +132,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     onPollChange = () => {
         this.forceUpdate();
+        UIEvents.General.fire("pollUpdate", {message: this.props.message});
     }
 
     onActionClick = (event) => {
