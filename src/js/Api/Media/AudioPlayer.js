@@ -205,8 +205,8 @@ class AudioPlayer {
     stop() {
         this.currentMessage = null;
         this.audio.src = "";
-        this.audio.pause();
         this.internal_fireStop();
+        this.audio.pause();
     }
 
     updateTime(time: number) {

@@ -29,7 +29,7 @@ import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
 import BetterPhotoComponent from "../Basic/BetterPhotoComponent"
-import StreamingVideoComponent from "../Basic/StreamingVideoComponent"
+import StreamingVideoComponent from "../Video/StreamingVideoComponent"
 import DocumentParser from "../../../Api/Files/DocumentParser"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 

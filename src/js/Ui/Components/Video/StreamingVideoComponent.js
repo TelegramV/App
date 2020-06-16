@@ -21,12 +21,15 @@ import AppEvents from "../../../Api/EventBus/AppEvents"
 import FileManager from "../../../Api/Files/FileManager"
 import VideoPlayer from "./VideoPlayer"
 import DocumentParser from "../../../Api/Files/DocumentParser"
+import MP4StreamingFile, {getMediaFile} from "../../../Api/Media/MediaFile"
 
 class StreamingVideoComponent extends VideoPlayer {
     state = {
         ...super.state,
         url: "",
     };
+
+    mp4file: MP4StreamingFile;
 
     appEvents(E) {
         E.bus(AppEvents.Files)
@@ -52,62 +55,78 @@ class StreamingVideoComponent extends VideoPlayer {
         super.componentWillMount(props);
 
         if (DocumentParser.isVideoStreamable(props.document)) {
-            if (FileManager.isPending(this.props.document)) {
-                this.state.url = FileManager.getPending(this.props.document)?.__mp4file.url;
-            } else {
-                FileManager.downloadVideo(this.props.document);
-            }
+            this.mp4file = getMediaFile(this.props.document);
+            this.state.url = this.mp4file.url;
         } else {
             console.warn("streaming is not supported for this video");
             FileManager.downloadDocument(this.props.document);
         }
     }
 
-    componentWillUpdate(nextProps, nextState) {
-        super.componentWillUpdate(nextProps, nextState);
-
-        if (nextProps.document !== this.props.document || nextProps.document.id !== this.props.document.id) {
-            // console.warn("[S] Will update", nextProps, nextState, this);
-
-            this.state.url = "";
-
-            if (DocumentParser.isVideoStreamable(nextProps.document)) {
-                if (FileManager.isPending(nextProps.document)) {
-                    this.setState({
-                        url: FileManager.getPending(nextProps.document)?.__mp4file.url,
-                    });
-                } else {
-                    FileManager.downloadVideo(nextProps.document);
-                }
-            } else {
-                console.warn("streaming is not supported for this video");
-                FileManager.downloadDocument(nextProps.document);
-            }
-        }
-    }
+    // componentWillUpdate(nextProps, nextState) {
+    //     super.componentWillUpdate(nextProps, nextState);
+    //
+    //     if (nextProps.document !== this.props.document || nextProps.document.id !== this.props.document.id) {
+    //         // console.warn("[S] Will update", nextProps, nextState, this);
+    //
+    //         this.state.url = "";
+    //
+    //         if (DocumentParser.isVideoStreamable(nextProps.document)) {
+    //             if (FileManager.isPending(nextProps.document)) {
+    //                 this.setState({
+    //                     url: FileManager.getPending(nextProps.document)?.__mp4file.url,
+    //                 });
+    //             } else {
+    //                 FileManager.downloadVideo(nextProps.document);
+    //             }
+    //         } else {
+    //             console.warn("streaming is not supported for this video");
+    //             FileManager.downloadDocument(nextProps.document);
+    //         }
+    //     }
+    // }
 
     componentWillUnmount() {
         super.componentWillUnmount();
 
-        FileManager.cancel(this.props.document);
+        // FileManager.cancel(this.props.document);
     }
 
     onDownloadStart = ({file}) => {
         this.forceUpdate();
 
-        if (DocumentParser.isVideoStreamable(file)) {
-            this.setState({
-                url: file.__mp4file.url,
-            });
-        } else {
-            this.setState({
-                url: "",
-            });
-        }
+        // if (DocumentParser.isVideoStreamable(file)) {
+        //     this.setState({
+        //         url: file.__mp4file.url,
+        //     });
+        // } else {
+        //     this.setState({
+        //         url: "",
+        //     });
+        // }
     }
 
     onDownloadNewPart = () => {
         this.forceUpdate();
+    }
+
+    onSeeking = event => {
+        const $video: HTMLVideoElement = event.target;
+
+        if ($video.lastSeekTime !== $video.currentTime) {
+            for (let i = 0; i < $video.buffered.length; i++) {
+                let start = $video.buffered.start(i);
+                let end = $video.buffered.end(i);
+
+                if ($video.currentTime >= start && $video.currentTime <= end) {
+                    return;
+                }
+            }
+
+            this.mp4file.seek($video.currentTime);
+
+            $video.lastSeekTime = $video.currentTime;
+        }
     }
 
     onDownloadDone = ({url}) => {

@@ -1,7 +1,5 @@
 import {FileAPI} from "./FileAPI"
 import AppEvents from "../EventBus/AppEvents"
-import MP4StreamingFile from "../Media/MediaFile"
-import DocumentParser from "./DocumentParser"
 
 class FilesManager {
 
@@ -141,38 +139,40 @@ class FilesManager {
             .then(blob => this.internal_downloadDone(document, thumb, blob));
     }
 
-    downloadVideo(document, options): Promise<Blob> | any {
-        if (!DocumentParser.isVideoStreamable(document)) {
-            return this.downloadDocument(document, null, options);
-        }
+    downloadVideo(document, options = {}): Promise<Blob> | any {
+        // if (!DocumentParser.isVideoStreamable(document)) {
+        return this.downloadDocument(document, null, options);
+        // }
 
-        const id = this.id(document);
-
-        if (this.downloaded.has(id)) {
-            const downloaded = this.downloaded.get(id);
-
-            fetch(downloaded.url).then(r => r.blob()).then(blob => {
-                AppEvents.Files.fire("download.done", {
-                    file: document,
-                    blob: blob,
-                    url: downloaded.url,
-                    id,
-                });
-            });
-
-            return Promise.resolve(downloaded);
-        }
-
-        if (this.pending.has(id)) {
-            return this.pending.get(id)._promise;
-        }
-
-        document.__mp4file = new MP4StreamingFile(document);
-
-        this.internal_downloadStart(document);
-
-        return document._promise = document.__mp4file.init()
-            .then(() => FileAPI.downloadDocument(document, null, event => this.internal_downloadNewPart(document, null, event), options).then(blob => this.internal_downloadDone(document, null, blob)));
+        // options.limit = options.limit ?? 1024 * 1024;
+        //
+        // const id = this.id(document);
+        //
+        // if (this.downloaded.has(id)) {
+        //     const downloaded = this.downloaded.get(id);
+        //
+        //     fetch(downloaded.url).then(r => r.blob()).then(blob => {
+        //         AppEvents.Files.fire("download.done", {
+        //             file: document,
+        //             blob: blob,
+        //             url: downloaded.url,
+        //             id,
+        //         });
+        //     });
+        //
+        //     return Promise.resolve(downloaded);
+        // }
+        //
+        // if (this.pending.has(id)) {
+        //     return this.pending.get(id)._promise;
+        // }
+        //
+        // document.__mp4file = new MP4StreamingFile(document);
+        //
+        // this.internal_downloadStart(document);
+        //
+        // return document._promise = document.__mp4file.init()
+        //     .then(() => FileAPI.downloadDocument(document, null, event => this.internal_downloadNewPart(document, null, event), options).then(blob => this.internal_downloadDone(document, null, blob)));
     }
 
     id(file, thumb, options) {

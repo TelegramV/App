@@ -1,6 +1,6 @@
 /*
  * Telegram V
- * Copyright (C) 2020 original authors
+ * Copyright (C) 2020 Davyd Kohut
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,8 @@ export type ReactiveCallbackContext =
  * @param {function(function(*))} unsubscribe анонімна функція, приймає обробника (того самого що в попередньому параметрі) параметром, якого має видаляти з нижчого (чи вищого, я запутався) рівня і більше НІКОЛИ не виконувати. Викликається під час видалення компонента.
  * @return {{Default: ReactiveCallbackContext, FireOnly: FireOnlyReactiveCallbackContext, PatchOnly: PatchOnlyReactiveCallbackContext}}
  * @deprecated never use it
+ *
+ * UPD 2020: huh, it was funny to write this, even if this is completely useless now
  */
 function ReactiveCallback(subscribe: Subscribe, unsubscribe: Unsubscribe) {
     console.warn("reactive callbacks are deprecated")

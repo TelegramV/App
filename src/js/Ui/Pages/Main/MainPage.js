@@ -6,12 +6,8 @@ import ContextMenuComponent from "../../Components/Singleton/ContextMenuComponen
 import ModalContainer from "../../Components/Singleton/ModalContainer"
 import {MediaViewerComponent} from "../../Components/Singleton/MediaViewerComponent"
 import {InstantViewComponent} from "../../Components/Singleton/InstantViewComponent"
-import {DialogsBar} from "../../Components/Sidebars/Left/Dialogs/DialogsBar"
 import ChatComponent from "../../Components/Columns/Chat/ChatComponent"
-import {SettingsComponent} from "../../Components/Sidebars/Left/Settings/SettingsComponent"
 // import {SearchPanelComponent} from "../../Components/Sidebars/Left/Search/SearchPanelComponent"
-import MessagesSearchComponent from "../../Components/Sidebars/Right/Search/MessagesSearchComponent"
-import {DialogInfoComponent} from "../../Components/Sidebars/Right/DialogInfo/DialogInfoComponent"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
@@ -20,10 +16,11 @@ import Localization from "../../../Api/Localization/Localization";
 import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
 import {throttle} from "../../../Utils/func"
 import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
-import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars";
 import {ForwardSidebar} from "../../Components/SidebarsNeo/Right/ForwardSidebar";
+import PiPContainer from "../../Components/Video/PiPContainer"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
 import {isMobile} from "../../Utils/utils";
+import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars"
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -91,6 +88,7 @@ export function MainPage() {
             <ChatComponent/>
 
             <ForwardSidebar/>
+            <PiPContainer/>
 
             {nodeIf(<RightSidebars/>, isMobile())}
 

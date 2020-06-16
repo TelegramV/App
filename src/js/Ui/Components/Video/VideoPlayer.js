@@ -22,6 +22,7 @@ import VComponent from "../../../V/VRDOM/component/VComponent"
 import {formatAudioTime} from "../../Utils/utils"
 import {DocumentMessagesTool} from "../../Utils/document"
 import VSpinner from "../../Elements/VSpinner"
+import UIEvents from "../../EventBus/UIEvents"
 
 function onDrag(target: HTMLElement, innerTarget: HTMLElement, dir, listener) {
     const hasPointerEvent = undefined !== target.onpointerup;
@@ -173,6 +174,9 @@ class VideoPlayer extends StatefulComponent {
                            onProgress={this.onProgress}
                            onClick={this.onClickPause}
                            onTimeUpdate={this.onTimeUpdate}
+                           onEnterPictureInPicture={this.onEnterPictureInPicture}
+                           onLeavePictureInPicture={this.onLeavePictureInPicture}
+                           onSeeking={this.onSeeking}
                            $recreate={this.videoRef.$el?.src !== src /* THIS IS VERY BAD КОСТИЛЬ, but now idk how to do it better, NEVER REPEAT THIS!!!!*/}
                     />
 
@@ -224,49 +228,14 @@ class VideoPlayer extends StatefulComponent {
         });
 
         window.addEventListener("keydown", this.onKeyDown);
-
-        // this.addListeners();
     }
 
     componentWillUnmount() {
         window.removeEventListener("keydown", this.onKeyDown);
-
-        // this.removeListeners();
     }
 
-    // removeListeners = () => {
-    //     this.state.isListen = false;
-    //
-    //     if (this.videoRef.$el) {
-    //         this.videoRef.$el.removeEventListener("play", this.onPlay);
-    //         this.videoRef.$el.removeEventListener("pause", this.onPause);
-    //         this.videoRef.$el.removeEventListener("durationchange", this.onDurationChange);
-    //         this.videoRef.$el.removeEventListener("progress", this.onProgress);
-    //         this.videoRef.$el.removeEventListener("click", this.onClickPause);
-    //         this.videoRef.$el.removeEventListener("dblclick", this.onClickFull);
-    //         this.videoRef.$el.removeEventListener("timeupdate", this.onTimeUpdate);
-    //     }
-    // }
-    //
-    // addListeners = () => {
-    //     if (this.videoRef.$el && !this.state.isListen) {
-    //         this.state.isListen = true;
-    //         this.videoRef.$el.addEventListener("play", this.onPlay);
-    //         this.videoRef.$el.addEventListener("pause", this.onPause);
-    //         this.videoRef.$el.addEventListener("durationchange", this.onDurationChange);
-    //         this.videoRef.$el.addEventListener("progress", this.onProgress);
-    //         this.videoRef.$el.addEventListener("click", this.onClickPause);
-    //         this.videoRef.$el.addEventListener("dblclick", this.onClickFull);
-    //         this.videoRef.$el.addEventListener("timeupdate", this.onTimeUpdate);
-    //     }
-    // }
-
     componentWillUpdate(nextProps, nextState) {
-        // this.addListeners();
-
         if (nextProps.src !== this.props.src) {
-            // console.log("Will update", nextProps, nextState, this);
-
             if (nextProps.src) {
                 nextState.shouldRecreate = true;
             }
@@ -278,29 +247,10 @@ class VideoPlayer extends StatefulComponent {
             this.state.shouldRecreate = false;
 
             if (this.videoRef.$el) {
-                // this.videoRef.$el.load();
                 this.videoRef.$el.currentTime = 0;
-                // this.videoRef.$el.pause();
             }
         }
     }
-
-    // recreateVideoFragment = ({src, ...otherArgs}) => {
-    //     this.videoRef.$el.replaceWith(vrdom_render(
-    //         <video css-display={"none"}
-    //                ref={this.videoRef}
-    //                src={src}
-    //                {...otherArgs}
-    //                onPlay={this.onPlay}
-    //                onPaste={this.onPause}
-    //                onTimeUpdate={this.onTimeUpdate}
-    //                onDurationChange={this.onDurationChange}
-    //                onProgress={this.onProgress}
-    //                onClick={this.onClickPause}
-    //                onDoubleClick={this.onClickFull}
-    //         />
-    //     ));
-    // }
 
     onPlay = () => {
         this.forceUpdate();
@@ -381,6 +331,9 @@ class VideoPlayer extends StatefulComponent {
         this.hideControls();
     }
 
+    onSeeking = (event: Event) => {
+    }
+
     toggleControls = () => {
         this.setState({
             showControls: true,
@@ -394,6 +347,16 @@ class VideoPlayer extends StatefulComponent {
             showControls: false,
         });
     }, 4000);
+
+    onEnterPictureInPicture = (event) => {
+        console.log(event)
+        // cool feature, but no time to implement
+        UIEvents.General.fire("pip.show", {$el: this.$el});
+    }
+
+    onLeavePictureInPicture = (event) => {
+        console.log(event)
+    }
 }
 
 export default VideoPlayer;
