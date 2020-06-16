@@ -29,7 +29,7 @@ import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import UIEvents from "../../../../EventBus/UIEvents"
 import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
 
-const StickerSetItemFragment = ({ setId, url, onClick }) => {
+const StickerSetItemFragment = ({setId, url, onClick}) => {
     return (
         <div id={`composer-pack-thumb-${setId}`} class="sticker-packs-item rp rps" onClick={onClick}>
             <img src={url} alt="Sticker Pack"/>
@@ -40,6 +40,7 @@ const StickerSetItemFragment = ({ setId, url, onClick }) => {
 class StickersComposerComponent extends StatelessComponent {
     allStickers = {};
     recentStickers = {};
+    favedStickers = null;
 
     stickerPacksRef = VComponent.createRef();
     stickersTableRef = VComponent.createRef();
@@ -60,15 +61,22 @@ class StickersComposerComponent extends StatelessComponent {
                          onClick={this.openRecent}>
                         <i className="tgico tgico-sending"/>
                     </div>
+                    <div id="composer-pack-thumb-trending"
+                         className="rp sticker-packs-item"
+                         onClick={this.openTrending}>
+                        <i className="tgico tgico-favourites"/>
+                    </div>
                 </div>
                 <div ref={this.stickersTableRef} className="sticker-table">
                     <div id="composer-sticker-pack-recent" className="selected scrollable"/>
+                    <div id="composer-sticker-pack-trending" className="selected scrollable"/>
                 </div>
             </div>
         )
     }
 
-    componentDidMount() {}
+    componentDidMount() {
+    }
 
     onComposerTogglePanel = event => {
         if (event.panel === "stickers" && !this.initialized) {
@@ -90,14 +98,12 @@ class StickersComposerComponent extends StatelessComponent {
                             };
 
                             VRDOM.append(
-                                <div>
-                                    <Lottie class="sticker-packs-item rp rps"
-                                            width={35}
-                                            height={35}
-                                            options={options}
-                                            onClick={onClick}
-                                            playOnHover/>
-                                </div>,
+                                <Lottie class="sticker-packs-item rp rps"
+                                        width={35}
+                                        height={35}
+                                        options={options}
+                                        onClick={onClick}
+                                        playOnHover/>,
                                 this.stickerPacksRef.$el);
                         } else if (stickerSet.thumbUrl) {
                             VRDOM.append(
@@ -216,6 +222,47 @@ class StickersComposerComponent extends StatelessComponent {
 
         let $el = document.getElementById(`composer-sticker-pack-recent`);
         $el.classList.add("selected");
+    }
+
+    openTrending = () => {
+        const $selected = this.stickerPacksRef.$el.querySelector(".selected");
+        if ($selected) {
+            $selected.classList.remove("selected");
+        }
+        const $packThumb = document.getElementById(`composer-pack-thumb-trending`);
+        if ($packThumb) {
+            $packThumb.classList.add("selected")
+        }
+
+        const $selectedEl = this.stickersTableRef.$el.querySelector(".selected");
+        if ($selectedEl) {
+            $selectedEl.classList.remove("selected");
+        }
+
+        let $el = document.getElementById(`composer-sticker-pack-trending`);
+        $el.classList.add("selected");
+
+        if (!this.favedStickers) {
+            API.messages.getFavedStickers().then(FavedStickers => {
+                console.warn(FavedStickers)
+
+                if (FavedStickers._ === "messages.favedStickersNotModified") {
+                    return;
+                }
+
+                this.favedStickers = FavedStickers;
+
+                FavedStickers.stickers.forEach(Document => {
+                    VRDOM.append(
+                        <BetterStickerComponent
+                            onClick={() => this.sendSticker(Document)}
+                            width={75}
+                            document={Document}/>,
+                        $el
+                    );
+                })
+            })
+        }
     }
 }
 

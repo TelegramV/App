@@ -5,6 +5,7 @@ import EmojiComposerComponent from "./EmojiComposerComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import GifsComposerComponent from "./GifsComposerComponent"
 import {ChatInputManager} from "./ChatInputComponent"
+import StickersSearchComposerComponent from "./StickersSearchComposerComponent"
 
 export default class ComposerComponent extends StatelessComponent {
     identifier = "composer";
@@ -21,6 +22,7 @@ export default class ComposerComponent extends StatelessComponent {
                 <div class="content">
                     <EmojiComposerComponent/>
                     <StickersComposerComponent/>
+                    <StickersSearchComposerComponent/>
                     <GifsComposerComponent/>
                 </div>
                 <div className="composer-tab-selector">
@@ -49,6 +51,7 @@ export default class ComposerComponent extends StatelessComponent {
     componentDidMount() {
         this.$emojiPanel = this.$el.querySelector(".emoji-wrapper");
         this.$stickersPanel = this.$el.querySelector(".sticker-wrapper");
+        this.$stickersSearchPanel = this.$el.querySelector(".stickers-search");
         this.$gifPanel = this.$el.querySelector(".gif-wrapper");
     }
 
@@ -121,6 +124,7 @@ export default class ComposerComponent extends StatelessComponent {
         this.$emojiPanel.classList.add("hidden");
         this.$gifPanel.classList.add("hidden");
         this.$stickersPanel.classList.add("hidden");
+        this.$stickersSearchPanel.classList.add("hidden");
 
         this[`$${name}Panel`].classList.remove("hidden");
 
