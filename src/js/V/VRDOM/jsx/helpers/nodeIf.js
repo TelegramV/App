@@ -1,6 +1,6 @@
 /*
  * Telegram V
- * Copyright (C) 2020 original authors
+ * Copyright (C) 2020 Davyd Kohut
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,9 @@
 
 import {callOrReturn} from "../../../../Utils/func"
 
+/**
+ * @deprecated useless
+ */
 const nodeIf = (node, is) => {
     return callOrReturn(is) ? callOrReturn(node) : null
 }

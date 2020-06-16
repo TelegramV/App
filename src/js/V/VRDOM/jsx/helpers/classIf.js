@@ -1,6 +1,6 @@
 /*
  * Telegram V
- * Copyright (C) 2020 original authors
+ * Copyright (C) 2020 Davyd Kohut
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 import {callOrReturn} from "../../../../Utils/func"
 import classNames from "./classNames"
 
+/**
+ * @deprecated
+ */
 const classIf = (is, ...names) => {
     return callOrReturn(is) ? classNames(...names) : undefined
 }

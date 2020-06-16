@@ -36,7 +36,7 @@ class BetterVideoComponent extends StatefulComponent {
         currentTime: 0,
     };
 
-    videoRef = VComponent.createRef();
+    videoRef: { $el: HTMLVideoElement } = VComponent.createRef();
 
     init() {
         const {document} = this.props;
@@ -50,7 +50,10 @@ class BetterVideoComponent extends StatefulComponent {
     appEvents(E: AE) {
         E.bus(AppEvents.Files)
             .filter(event => FileManager.checkEvent(event, this.props.document))
+            .on("download.start", this.onDownloadStart)
+            .on("download.newPart", this.onDownloadNewPart)
             .on("download.done", this.onDownloadDone)
+            .on("download.canceled", this.onDownloadCanceled)
     }
 
     render({document, onClick, playOnHover, infoContainer, isRound, onPlay, onPause, onTimeUpdate, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
@@ -88,7 +91,9 @@ class BetterVideoComponent extends StatefulComponent {
     }
 
     componentWillMount(props) {
-        FileManager.downloadVideo(props.document)
+        if (props.autoDownload) {
+            FileManager.downloadVideo(props.document)
+        }
     }
 
     onDownloadDone = ({url}) => {
@@ -96,6 +101,22 @@ class BetterVideoComponent extends StatefulComponent {
             url,
             isLoading: false,
         });
+
+        if (!this.props.autoPlay) {
+            this.videoRef.$el.pause();
+        }
+    }
+
+    onDownloadStart = () => {
+        this.forceUpdate();
+    }
+
+    onDownloadNewPart = () => {
+        this.forceUpdate();
+    }
+
+    onDownloadCanceled = () => {
+        this.forceUpdate();
     }
 
     onMouseOver = e => {

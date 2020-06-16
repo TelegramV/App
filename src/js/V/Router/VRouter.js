@@ -1,6 +1,6 @@
 /*
  * Telegram V
- * Copyright (C) 2020 original authors
+ * Copyright (C) 2020 Davyd Kohut
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -271,13 +271,6 @@ export function parseQuery(queryString) {
     return queryParams
 }
 
-/**
- * stolen from stackoverflow
- *
- * @param string
- * @param character
- * @returns {*}
- */
 export function trimByChar(string, character) {
     const first = [...string].findIndex(char => char !== character);
     const last = [...string].reverse().findIndex(char => char !== character);
