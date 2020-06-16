@@ -11,6 +11,11 @@ import SearchManager from "../../../../../Api/Search/SearchManager";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import {SearchMessage} from "../../../../../Api/Messages/SearchMessage";
 import VSimpleLazyInput from "../../../../Elements/Input/VSimpleLazyInput";
+import VCalendar from "../../../../Elements/VCalendar";
+import Footer from "../../Fragments/Footer";
+import VUI from "../../../../VUI";
+import {SearchDateModal} from "./SearchDateModal";
+import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf";
 
 let CURRENT_QUERY = undefined
 
@@ -43,6 +48,7 @@ const MessagesCountFragment = ({count}) => {
 
 export class SearchSidebar extends RightSidebar {
     messagesCountRef = VComponent.createFragmentRef()
+    footerRef = VComponent.createFragmentRef()
 
     offsetId = 0
     allFetched = false
@@ -63,11 +69,22 @@ export class SearchSidebar extends RightSidebar {
 
     content(): * {
         return <this.contentWrapper>
-            <Section title={<MessagesCountFragment ref={this.messagesCountRef} count={this.state.messagesCount}/>}/>
+            <Section title={<MessagesCountFragment ref={this.messagesCountRef} count={this.state.messagesCount}/>}>
                 <List list={this.state.messages}
                       template={MessageFragmentItemTemplate}
                       wrapper={<div/>}/>
+            </Section>
+            <Footer ref={this.footerRef} left={<div className={["btn-icon rp rps tgico-calendar", classIf(this.searchInputRef?.component?.$el.value.length > 0, "hidden")]} onClick={this.onSelectDate}/>}
+
+                    right={<>
+                        <div className={["btn-icon rp rps tgico-up"]} onClick/>
+                        <div className={["btn-icon rp rps tgico-up rotate-180"]} onClick/>
+                    </>}/>
         </this.contentWrapper>
+    }
+
+    onSelectDate = _ => {
+        VUI.Modal.open(<SearchDateModal/>)
     }
 
     onChatSelect = _ => {
@@ -117,7 +134,6 @@ export class SearchSidebar extends RightSidebar {
     }
 
     onSearchInputUpdated = event => {
-        console.log("LOL?")
         const q = event.target.value.trim()
 
         if (q === "") {
@@ -170,6 +186,13 @@ export class SearchSidebar extends RightSidebar {
                 })
             }
         }
+        this.footerRef.patch({
+            left: <div className={["btn-icon rp rps tgico-calendar", classIf(this.searchInputRef?.component?.$el.value.length > 0, "hidden")]} onClick={this.onSelectDate}/>,
+            right: <>
+                <div className={["btn-icon rp rps tgico-up"]} onClick/>
+                <div className={["btn-icon rp rps tgico-up rotate-180"]} onClick/>
+            </>
+        })
     }
 
     onSetSearchQuery = event => {

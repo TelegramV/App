@@ -34,7 +34,8 @@ class ModalContainer extends StatefulComponent {
 
     render() {
         return (
-            <div css-display={this.state.hidden && "none"}
+            <div
+                css-display={this.state.hidden && "none"}
                  className={classNames("modal-wrapper", classIf(this.state.hidden, "hidden"))}>
                 <div className="modal" onClick={this.close}>
                     <div className="dialog" onClick={event => event.stopPropagation()}>

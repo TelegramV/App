@@ -24,6 +24,10 @@
 	cursor: pointer;
 	flex-shrink: 0;
 
+	&.rotate-180 {
+		transform: rotateZ(180deg);
+	}
+
 
 	&.hidden {
 		display: none;

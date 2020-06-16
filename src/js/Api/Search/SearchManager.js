@@ -7,10 +7,12 @@ import {SearchMessage} from "../Messages/SearchMessage"
 
 class SearchManagerSingleton extends Manager {
 
-    searchMessages(peer, {offsetId, filter, limit = 33, q = "", addOffset = 0}) {
+    searchMessages(peer, {offsetId, min_date, max_date, filter, limit = 33, q = "", addOffset = 0}) {
         return MTProto.invokeMethod("messages.search", {
             peer: peer.inputPeer,
             q: q,
+            min_date,
+            max_date,
             filter: filter || {
                 _: "inputMessagesFilterEmpty"
             },
