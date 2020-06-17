@@ -84,7 +84,7 @@ function __bus_filter_subscribe(component, bus: EventBus, filter: any, type: str
     let subscriptions = busContext.get(type)
 
     if (!subscriptions) {
-        subscriptions = new Set()
+        subscriptions = busContext.set(type, new Set()).get(type)
     }
 
     subscriptions.add(resolve)
