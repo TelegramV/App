@@ -15,6 +15,8 @@ import {DialogInfoLinkComponent} from "../../../../Sidebars/Right/DialogInfo/Fra
 import SearchManager from "../../../../../../Api/Search/SearchManager";
 import DialogInfoDocumentComponent from "../../../../Sidebars/Right/DialogInfo/Fragments/DialogInfoDocumentComponent";
 import VComponent from "../../../../../../V/VRDOM/component/VComponent";
+import {MessageType} from "../../../../../../Api/Messages/Message"
+import DocumentParser from "../../../../../../Api/Files/DocumentParser"
 
 export class DialogInfoMaterials extends StatelessComponent {
     contentRefs = {
@@ -156,7 +158,7 @@ export class DialogInfoMaterials extends StatelessComponent {
     }
 
     fetchMediaNextPage = () => {
-        this.fetchContentNextPage("media", "inputMessagesFilterPhotos", this.appendMediaMessage)
+        this.fetchContentNextPage("media", "inputMessagesFilterPhotoVideo", this.appendMediaMessage)
     }
 
     appendMediaMessage = rawMessage => {
@@ -166,11 +168,26 @@ export class DialogInfoMaterials extends StatelessComponent {
 
         const message = MessageFactory.fromRaw(AppSelectedInfoPeer.Current, rawMessage)
 
-        vrdom_append(
-            <BetterPhotoComponent photo={message.media}
-                                  onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>,
-            this.contentRefs.media.$el
-        )
+        if (message.type === MessageType.VIDEO) {
+            const video = DocumentParser.attributeVideo(message.raw.media.document)
+
+            vrdom_append(
+                <figure css-cursor="pointer" className="photo video-thumb rp thumbnail"
+                        onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}>
+                    <img src={FileAPI.getThumbnail(message.raw.media.document)} alt="video"/>
+                    <div className="video-info-bar">
+                        {formatAudioTime(video.duration)}
+                    </div>
+                </figure>,
+                this.contentRefs.media.$el
+            )
+        } else {
+            vrdom_append(
+                <BetterPhotoComponent photo={message.media}
+                                      onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>,
+                this.contentRefs.media.$el
+            )
+        }
     }
 
     openLinks = () => {

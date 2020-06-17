@@ -164,6 +164,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         this.isLoadingRecent = false;
         this.isUsingSecondVirtual = false;
+        // this.isRequestedShowMessage = false;
     }
 
     // first message must always be last
