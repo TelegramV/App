@@ -35,7 +35,6 @@ export class GlobalChatsSearchComponent extends StatefulComponent {
     }
 
     render() {
-        console.log(this.state.myPeers.size(), this.state.isSearching)
         return (
             <div>
                 <Section title={this.state.isSearching ? "Searching..." : "Contacts and Chats"} css-display={this.state.myPeers.size() === 0 && !this.state.isSearching ? "none" : undefined}>

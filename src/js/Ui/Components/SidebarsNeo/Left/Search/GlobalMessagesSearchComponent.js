@@ -68,7 +68,6 @@ export class GlobalMessagesSearchComponent extends StatefulComponent {
     }
 
     onSearchBarNextPage = _ => {
-        console.log("onSearchBarNextPage")
         if (!this.isFetching && CURRENT_QUERY !== "" && !this.allFetched && this.offsetRate) {
             this.isFetching = true
 

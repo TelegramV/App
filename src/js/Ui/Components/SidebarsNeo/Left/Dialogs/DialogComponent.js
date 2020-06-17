@@ -185,7 +185,7 @@ export class DialogComponent extends StatelessComponent {
 
     _patchStatus = () => {
         if (this.__.mounted) {
-            if (this.props.dialog.peer.statusString) {
+            if (this.props.dialog.peer.onlineStatus.online) {
                 this.$el.classList.add("online")
             } else {
                 this.$el.classList.remove("online")
