@@ -16,8 +16,9 @@
   }
 
   > .content > .search {
+    will-change: transform;
     position: absolute;
-    height: calc(100% - 60px);
+    height: calc(100% - 10px);
     width: 100%;
     background-color: white;
     transition: anim(opacity), anim(transform);

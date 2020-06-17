@@ -57,16 +57,18 @@ export class GlobalMessagesSearchComponent extends StatefulComponent {
 
     render() {
         return (
-            <Section title={this.state.isSearching ? "Searching messages..." : "Messages"} css-display={this.state.messages.size() === 0 && !this.state.isSearching ? "none" : undefined}>
+            <div className="section" css-display={this.state.messages.size() === 0 && !this.state.isSearching ? "none" : undefined}>
+                <div className="title">{this.state.isSearching ? "Searching messages..." : "Messages"}</div>
                 {/*<div className="section-title">{this.state.isSearching ? "Searching messages..." : "Messages"}</div>*/}
                 <List list={this.state.messages}
                       template={MessageFragmentItemTemplate}
                       wrapper={<div className="column-list"/>}/>
-            </Section>
+            </div>
         )
     }
 
     onSearchBarNextPage = _ => {
+        console.log("onSearchBarNextPage")
         if (!this.isFetching && CURRENT_QUERY !== "" && !this.allFetched && this.offsetRate) {
             this.isFetching = true
 
@@ -83,6 +85,7 @@ export class GlobalMessagesSearchComponent extends StatefulComponent {
                         this.offsetRate = 0
                         this.allFetched = true
                     }
+                    this.forceUpdate()
                 }
             })
         }
@@ -122,6 +125,7 @@ export class GlobalMessagesSearchComponent extends StatefulComponent {
                         if (Messages.count === 0) {
                             this.$el.classList.add("hidden")
                         }
+                        this.forceUpdate()
                     }
                 })
             }

@@ -163,6 +163,7 @@
     padding-top: 8px;
 
     &.scrollable {
+      will-change: transform;
       overflow-y: auto;
     }
 
