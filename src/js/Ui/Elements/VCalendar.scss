@@ -5,7 +5,7 @@
 	flex-direction: column;
 	font-size: 14px;
 	--day-size: 36px;
-	--gap-size: 3px;
+	--gap-size: 2px;
 	width: calc((var(--day-size) + var(--gap-size)) * 7 - var(--gap-size));
 	user-select: none;
 
@@ -60,6 +60,7 @@
 		}
 
 		.weekday, .day {
+			font-size: 12px;
 			width: var(--day-size);
 			height: var(--day-size);
 			line-height: var(--day-size);
