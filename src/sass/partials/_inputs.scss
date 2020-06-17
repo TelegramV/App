@@ -142,7 +142,7 @@ input[type="password"] {
     user-select: none;
     display: flex;
     align-items: center;
-    justify-content: center;
+    //justify-content: center;
 
 
     //width: 22px;
@@ -153,6 +153,18 @@ input[type="password"] {
     //
     //margin-top: 12px;
     //margin-bottom: 12px;
+
+    &.disabled   {
+        cursor: not-allowed;
+        & input  {
+
+            & ~ .checkmark {
+                cursor: not-allowed;
+
+                background-color: $lightgrey;
+            }
+        }
+    }
 
     input {
         display: none;
