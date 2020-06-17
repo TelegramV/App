@@ -77,7 +77,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                         {message.poll.public_voters && <RecentVotersFragment recentVoters={message.results.recent_voters}/>}
                         <div class="filler"/>
                         {this.shouldShowTooltip() && <TipFragment click={_ => this.showSolution()}/>}
-                        {message.poll.close_period && !message.isVoted && <TimerFragment ref={this.timerRef} left={0} total={0}/>}
+                        {(message.poll.close_period && !message.isVoted) && <TimerFragment ref={this.timerRef} left={0} total={0}/>}
                     </div>
                     {this.makeAnswerBlock()}
                     <FooterFragment message={message} actionClick={this.onActionClick}/>
@@ -189,7 +189,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     shouldShowTooltip = () => {
         let message = this.props.message;
-        return message.isQuiz && ((!message.isVoted && message.poll.closed) || (message.isVoted && !message.isVotedCorrectly))
+        return message.isQuiz && ((!message.isVoted && message.poll.closed) || message.isVoted)
     }
 
     cancelVote = () => {
@@ -253,7 +253,7 @@ const FooterFragment = ({ message, actionClick }) => {
     } else if (!message.isVoted && message.isMultiple) {
         return <div class="action-button disabled" onClick={actionClick}>Vote</div>;
     }
-    return <div class="stats">{message.results.total_voters + " voted"}</div>;
+    return <div class="stats">{message.results.total_voters + (message.isQuiz ? " answered" : " voted")}</div>;
 }
 
 const TipFragment = ({click}) => {

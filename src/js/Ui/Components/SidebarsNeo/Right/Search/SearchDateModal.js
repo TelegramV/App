@@ -10,6 +10,7 @@ import {SearchMessage} from "../../../../../Api/Messages/SearchMessage";
 import PeersManager from "../../../../../Api/Peers/PeersManager";
 import {MessageFactory} from "../../../../../Api/Messages/MessageFactory";
 import API from "../../../../../Api/Telegram/API";
+import "./SearchDateModal.scss"
 
 export class SearchDateModal extends StatefulComponent {
     state = {
@@ -18,7 +19,7 @@ export class SearchDateModal extends StatefulComponent {
 
     render() {
         return (
-            <div>
+            <div class="date-modal">
                 <ModalHeaderFragment title={this.state.date.toLocaleDateString("en", {
                     weekday: "short",
                     month: "long",
@@ -28,10 +29,12 @@ export class SearchDateModal extends StatefulComponent {
                 <ModalFooterFragment buttons={[
                     {
                         text: "Cancel",
+                        isFlat: true,
                         onClick: this.onCancel
                     },
                     {
                         text: "Jump to date",
+                        isFlat: true,
                         onClick: _ => this.onJumpToDate()
                     }
                 ]}/>

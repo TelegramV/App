@@ -6,7 +6,7 @@ export class ModalFooterFragment extends StatelessComponent {
     render() {
         return <div className="footer">
             {this.props.buttons.map(l => {
-                return <VButton onClick={l.onClick}>{l.text}</VButton>
+                return <VButton isFlat={l.isFlat} onClick={l.onClick}>{l.text}</VButton>
             })}
         </div>
     }
