@@ -26,7 +26,7 @@ function substr(bytes: Uint8Array, start: number, length: number): Uint8Array {
 
 function concat(...uint8Arrays: Uint8Array[]): Uint8Array {
     let length = 0;
-    
+
     for (let i = 0; i < uint8Arrays.length; i++) {
         if (uint8Arrays[i] instanceof ArrayBuffer) {
             uint8Arrays[i] = new Uint8Array(uint8Arrays[i])
@@ -119,16 +119,19 @@ function modPow(x: Uint8Array, y: Uint8Array, m: Uint8Array) {
     if (result.length > 256) {
         result = result.splice(result.length - 256);
     } else if (result.length < 256) {
-        return result.unshift(0);
+        const newResult = new Uint8Array(result.length + 1);
+        newResult.set([0], 0);
+        newResult.set(result, 1);
+        return newResult;
     }
 
     return result;
 }
 
 function fromBits(byteArr, endian = true) {
-    if(!endian) {
+    if (!endian) {
         let copy = new Uint8Array(byteArr.length);
-        copy.set(byteArr,0);
+        copy.set(byteArr, 0);
         byteArr = this.endian(copy);
     }
     /*const bytes = []
@@ -145,13 +148,13 @@ function endian(bytes) { //changes endian to opposite
     let len = bytes.length;
     let holder;
 
-    for (let i = 0; i<len; i+=4) {
+    for (let i = 0; i < len; i += 4) {
         holder = bytes[i];
-        bytes[i] = bytes[i+3];
-        bytes[i+3] = holder;
-        holder = bytes[i+1];
-        bytes[i+1] = bytes[i+2];
-        bytes[i+2] = holder;
+        bytes[i] = bytes[i + 3];
+        bytes[i + 3] = holder;
+        holder = bytes[i + 1];
+        bytes[i + 1] = bytes[i + 2];
+        bytes[i + 2] = holder;
     }
     return bytes; //idk why return, buffer already changed, maybe clone?
 }
@@ -169,13 +172,13 @@ function toBits(byteArr, endian = true) {
     }
 
     let bytes = new Uint8Array(new Int32Array(words).buffer);
-    if(!endian) return bytes;
+    if (!endian) return bytes;
     return this.endian(bytes);
 }
 
 function fromString(string, endian = true) {
     let bytes = new TextEncoder().encode(string);
-    if(endian) return bytes; //TextEncoder already encodes with endian
+    if (endian) return bytes; //TextEncoder already encodes with endian
     return this.endian(bytes);
 }
 

@@ -33,8 +33,6 @@ import patchComponentVRNode from "./patchAbstractComponentNRNode"
 import {__component_unmount} from "../component/__component_unmount"
 
 /**
- * Patches VRNode to Real DOM Element
- *
  * @param $node
  * @param vRNode
  * @param options

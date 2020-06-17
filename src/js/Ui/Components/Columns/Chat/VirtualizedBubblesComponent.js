@@ -167,7 +167,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         // this.isRequestedShowMessage = false;
     }
 
-    // first message must always be last
+    // oldest message must always be last
     fixMessages(messages: Message[]): Message[] {
         if (messages.length > 0 && messages[0].id > messages[messages.length - 1].id) {
             messages = messages.reverse();
@@ -324,8 +324,9 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         return [];
     }
 
-    onChatSelect = () => {
+    onChatSelect = (event) => {
         this.refresh();
+        // this.isRequestedShowMessage = event.message
 
         if (AppSelectedChat.isSelected) {
             this.isLoadingRecent = true;
@@ -444,6 +445,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     }
 
     onChatShowMessage = ({message}) => {
+        console.log("onChatSh")
         if (this.isLoadingRecent) {
             return;
         }
@@ -496,7 +498,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
             this.isRequestedShowMessage = true;
 
-            AppSelectedChat.select(peer);
+            AppSelectedChat.select(peer, message);
 
             const actionCount = (++this.actionCount);
 
@@ -517,9 +519,9 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     onChatShowMessageReady = event => {
         console.log('SHIWWWWWWW', event)
-        // if (this.isLoadingRecent) {
-        //     return;
-        // }
+        if (this.isLoadingRecent && !this.isRequestedShowMessage) {
+            return;
+        }
 
         if (this.actionCount > event.actionCount) {
             return;

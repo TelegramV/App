@@ -32,7 +32,7 @@ class DocumentParser {
 
     static isVideoStreamable(document) {
         const video = DocumentParser.attributeVideo(document);
-        return video.supports_streaming && document.size >= (1024 * 1024 * 4);
+        return !__IS_IOS__ && video.supports_streaming && document.size >= (1024 * 1024 * 4);
     }
 }
 

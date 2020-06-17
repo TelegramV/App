@@ -34,6 +34,11 @@ export function getMediaFile(document, preview = false) {
 
     files.get(id)?.cancel();
 
+    if (!preview) {
+        files.forEach(file => file.cancel());
+        files.clear();
+    }
+
     const file = new MP4StreamingFile(document, preview);
     files.set(id, file);
     return file;

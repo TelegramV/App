@@ -154,7 +154,7 @@ class AudioPlayer {
             isVoice,
             fileName,
             isSeeking: this.audio.seeking,
-            supportStreaming: !isVoice && MediaSource.isTypeSupported(this.currentMessage?.media.document.mime_type)
+            supportStreaming: !__IS_IOS__ && !isVoice && MediaSource.isTypeSupported(this.currentMessage?.media.document.mime_type)
         }
     }
 

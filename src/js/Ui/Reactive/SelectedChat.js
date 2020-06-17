@@ -64,6 +64,8 @@ class SelectedChat {
                 this._previousPeer = this._peer
                 this._peer = peer
 
+                this._message = null
+
                 this.fire(this._peer)
             }
         })
@@ -84,12 +86,16 @@ class SelectedChat {
                     this._previousPeer = this._peer
                     this._peer = peer
 
+                    this._message = null
+
                     this.fire(this._peer)
                 }
             } else {
                 if (peer.type === p.type && peer.id === p.id) {
                     this._previousPeer = this._peer
                     this._peer = peer
+
+                    this._message = null
 
                     this.fire(this._peer)
                 }
@@ -99,7 +105,8 @@ class SelectedChat {
 
     fire(peer = this._peer) {
         UIEvents.General.fire("chat.select", {
-            peer
+            peer,
+            message: this._message,
         })
     }
 
@@ -185,8 +192,11 @@ class SelectedChat {
 
     /**
      * @param {Peer} peer
+     * @param message
      */
-    select(peer) {
+    select(peer, message) {
+        this._message = message
+
         const p = peer.username ? `@${peer.username}` : `${peer.type}.${peer.id}`
 
         VApp.router.push("/", {
@@ -194,6 +204,13 @@ class SelectedChat {
                 p
             }
         })
+    }
+
+    /**
+     * @param {Message} message
+     */
+    showMessage(message) {
+        UIEvents.General.$chat.showMessage(message)
     }
 
     /**
@@ -205,11 +222,11 @@ class SelectedChat {
      * @return {boolean}
      */
     check(peer) {
-        if (!this.Current || !peer) {
+        if (!this.current || !peer) {
             return false
         }
 
-        return this.Current === peer || (this.Current.type === peer.type && this.Current.id === peer.id)
+        return this.current === peer || (this.current.type === peer.type && this.current.id === peer.id)
     }
 }
 

@@ -17,8 +17,6 @@
  *
  */
 
-// WARNING: DO NOT IMPORT ANYTHING HERE, BECAUSE IT ALSO IMPORTED IN WORKER
-
 if (!Blob.prototype.arrayBuffer) {
     Blob.prototype.arrayBuffer = function () {
         return new Promise((resolve, reject) => {

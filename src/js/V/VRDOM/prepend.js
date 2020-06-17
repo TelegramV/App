@@ -23,8 +23,6 @@ import vrdom_render from "./render/render"
 import {vrdom_resolveMount} from "./mount"
 
 /**
- * Prepends VRNode to Real DOM Element children
- *
  * @param node
  * @param $el
  * @param props
@@ -40,8 +38,6 @@ function vrdom_prepend(node: VRNode, $el: Element, props?: VRenderProps): Elemen
 }
 
 /**
- * Prepends VRNode to Real DOM Element children
- *
  * @param nodes
  * @param $el
  * @param props
@@ -59,8 +55,6 @@ export function vrdom_prependMany(nodes: VRNode, $el: Element, props?: VRenderPr
 }
 
 /**
- * Prepends VRNode to Real DOM Element children
- *
  * @param $nodes
  * @param $el
  * @param props
