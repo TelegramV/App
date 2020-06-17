@@ -1,5 +1,6 @@
 @mixin game($in: false, $transparent: false) {
     & .game {
+        margin-top: 5px;
         .title {
             font-weight: 500;
         }

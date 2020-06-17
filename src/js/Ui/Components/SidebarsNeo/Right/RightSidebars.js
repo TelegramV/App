@@ -3,12 +3,14 @@ import {SearchSidebar} from "./Search/SearchSidebar";
 import {DialogInfoSidebar} from "./DialogInfo/DialogInfoSidebar";
 import {PollResultsSidebar} from "./Poll/PollResultsSidebar";
 import {RightSidebar} from "./RightSidebar";
+import {StickerSearchSidebar} from "./StickerSearch/StickerSearchSidebar";
 
 export class RightSidebars extends GenericSidebarHistory {
     render() {
         return (
             <div className="sidebar-wrapper right hidden">
                 <PollResultsSidebar/>
+                <StickerSearchSidebar/>
                 <SearchSidebar/>
                 <DialogInfoSidebar/>
             </div>
