@@ -50,7 +50,7 @@ export function __component_init(component) {
                 }
             }
 
-            if (component.state.__state_custom) {
+            if (component.state.__state_shared) {
                 __state_register_component(component.state, component);
             }
         }

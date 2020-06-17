@@ -39,6 +39,18 @@ export function __component_update_props(component, nextProps) {
         if (shouldUpdate) {
             component.componentWillUpdate(nextProps, component.state);
 
+            if (component.__.stateful) {
+                const derivedState = component.constructor.getDerivedStateFromProps(nextProps, component.state);
+
+                if (derivedState) {
+                    if (derivedState.__state_shared) {
+                        derivedState.setExcluding(derivedState, component);
+                    } else {
+                        Object.assign(component.state, derivedState);
+                    }
+                }
+            }
+
             Object.assign(component.props, nextProps);
 
             __component_recreateReactiveObjects(component);
