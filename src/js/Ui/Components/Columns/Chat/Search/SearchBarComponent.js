@@ -143,7 +143,6 @@ export class SearchBarComponent extends StatefulComponent {
                             this.forceUpdate()
                             return
                         }
-                        console.log(Messages)
                         this.state.count = Messages.count || Messages.current_count
 
                         // this.state.messages.set(Messages.messages.map(m => new SearchMessage(AppSelectedChat.Current).fillRaw(m)))

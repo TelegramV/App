@@ -4,14 +4,39 @@
   height: 100%;
   z-index: 99999;
 
-  &.hidden {
-    //display: none;
-    pointer-events: none;
+  &.hidden .context-menu {
+    animation: hidden-context 150ms ease-in-out forwards;
+  }
 
-    .context-menu {
+
+  &.unhidden .context-menu {
+    animation: unhidden-context 150ms ease-in-out forwards;
+  }
+
+  @keyframes unhidden-context {
+    0% {
+      transform: scale(0, 0);
+    }
+
+    100% {
+      transform: scale(1, 1);
+    }
+  }
+
+  @keyframes hidden-context {
+    0% {
+      transform: scale(1, 1);
+    }
+
+    100% {
       transform: scale(0, 0);
     }
   }
+
+  &.really-hidden {
+    display: none;
+  }
+
 
   .context-menu {
     min-width: 220px;
@@ -22,8 +47,8 @@
     box-shadow: 3px 3px 15px rgba(0, 0, 0, .10);
     display: flex;
     flex-direction: column;
-    transition: anim(transform);
-    transform: scale(1, 1);
+    //transition: anim(transform);
+    //transform: scale(1, 1);
 
     &.left-top {
       transform-origin: left top;
