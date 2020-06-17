@@ -29,7 +29,7 @@ export class DialogInfoAudioComponent extends StatefulComponent {
         this.isPlaying = isPlaying // dirty hack, do not repeat
 
         return (
-            <div className="audio rp">
+            <div className="audio rp" onClick={this.onClick}>
                 <div className={`play tgico tgico-${isPlaying && !isPaused ? 'pause' : 'play'} rp rps rp-white`}
                      onClick={this.onClickPlay}>
                     <progress className={{
@@ -37,7 +37,7 @@ export class DialogInfoAudioComponent extends StatefulComponent {
                         "visible": !FileManager.getPercentage(message.media.document) || isSeeking,
                     }}/>
                 </div>
-                <div className="details" onClick={this.onClick}>
+                <div className="details">
                     <span className="title">
                         {audioInfo.title || DocumentParser.attributeFilename(message.media.document)}
                     </span>

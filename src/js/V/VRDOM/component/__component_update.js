@@ -44,7 +44,7 @@ export function __component_update_props(component, nextProps) {
 
                 if (derivedState) {
                     if (derivedState.__state_shared) {
-                        derivedState.setExcluding(derivedState, component);
+                        throw new Error("shared state cannot be used with getDerivedStateFromProps")
                     } else {
                         Object.assign(component.state, derivedState);
                     }
