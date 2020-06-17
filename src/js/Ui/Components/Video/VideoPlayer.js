@@ -145,8 +145,9 @@ class VideoPlayer extends StatefulComponent {
             }
         }
 
-        const hideThumb = progress || (src && !isStreamable)
-        const hideLoading = hideThumb && !seeking
+        const isBuffering = this.videoRef.$el?.readyState < this.videoRef.$el?.HAVE_FUTURE_DATA;
+        const hideThumb = progress || (src && !isStreamable);
+        const hideLoading = hideThumb && !seeking && !isBuffering;
 
         return (
             <div style={styleSize}
