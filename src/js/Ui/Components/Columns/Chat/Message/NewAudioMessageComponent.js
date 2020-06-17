@@ -40,7 +40,7 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
             .updateOn("audio.ended")
     }
 
-    render({message}, state) {
+    render({message, showDate}, state) {
         const isPlaying = AudioPlayer.isCurrent(message);
         const audioInfo = DocumentParser.attributeAudio(message.media.document);
         const {isPaused, currentTime, bufferedPercentage, isSeeking} = AudioPlayer.state;
@@ -48,7 +48,7 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
         this.isPlaying = isPlaying // dirty hack, do not repeat
 
         return (
-            <MessageWrapperFragment message={message} showUsername={false}>
+            <MessageWrapperFragment message={message} showUsername={false} showDate={showDate}>
                 <div class="audio">
                     <div class={`play tgico tgico-${isPlaying && !isPaused ? 'pause' : 'play'} rp rps rp-white`}
                          onClick={this.onClickPlay}

@@ -3,13 +3,14 @@ import CardMessageWrapperFragment from "./Common/CardMessageWrapperFragment"
 import AvatarComponent from "../../../Basic/AvatarComponent"
 
 class ContactMessageComponent extends GeneralMessageComponent {
-    render({message}) {
+    render({message, showDate}) {
         return (
             <CardMessageWrapperFragment message={message}
                                         icon={<AvatarComponent peer={message.contact}/>}
                                         title={message.raw.media.first_name + (message.raw.media.last_name ? (" " + message.raw.media.last_name) : "")}
                                         description={message.raw.media.phone_number}
-                                        bubbleRef={this.bubbleRef}/>
+                                        bubbleRef={this.bubbleRef}
+                                        showDate={showDate}/>
         )
     }
 }

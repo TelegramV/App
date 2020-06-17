@@ -62,14 +62,14 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         if(this.props.message.poll.close_date) this.withInterval(this.updateTimer, 500);
     }
 
-    render({ message }) {
+    render({ message, showDate }) {
         this.prepareContextMenu();
         let classes = {
             "poll": true,
             "voted": message.isVoted
         }
         return (
-            <MessageWrapperFragment message={message} contextActions={this.contextActions}>
+            <MessageWrapperFragment message={message} contextActions={this.contextActions} showDate={showDate}>
                 <div class={classes}>
                     <div class="question">{message.poll.question}</div>
                     <div class="subtitle">

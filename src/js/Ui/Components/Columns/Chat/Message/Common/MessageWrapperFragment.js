@@ -79,6 +79,7 @@ function MessageWrapperFragment(
         outerPad = true,
         contextActions,
         showUsername = true,
+        showDate = false
     },
     slot
 ) {
@@ -121,7 +122,7 @@ function MessageWrapperFragment(
         !message.isOut && !message.raw.reply_to_msg_id && !message.raw.fwd_from && !isPrivateMessages &&
         (message.tailsGroup === "s" || message.tailsGroup === "se")
 
-    return (
+    const messageNode = (
         <div className={topLevelClasses}
              id={`message-${message.id}`}
              onContextMenu={contextMenuHandler}
@@ -140,6 +141,24 @@ function MessageWrapperFragment(
             {inlineKeyboard}
         </div>
     )
+
+    if (showDate) {
+        return (
+            <div className="message-with-date">
+                <div className="service date-service">
+                    <div className="service-msg">{
+                        message.getDate("en", {
+                            month: 'long',
+                            day: 'numeric',
+                        })
+                    }</div>
+                </div>
+                {messageNode}
+            </div>
+        )
+    } else {
+        return messageNode
+    }
 }
 
 export default MessageWrapperFragment

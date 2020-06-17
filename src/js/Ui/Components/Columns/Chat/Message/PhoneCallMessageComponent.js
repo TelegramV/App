@@ -4,7 +4,7 @@ import {CallsManager} from "../../../../../Api/Calls/CallManager";
 import PeersStore from "../../../../../Api/Store/PeersStore";
 
 class PhoneCallMessageComponent extends GeneralMessageComponent {
-    render({message}) {
+    render({message, showDate}) {
         const peer = message.to === PeersStore.self() ? message.from : message.to
 
         let title = ""
@@ -31,7 +31,8 @@ class PhoneCallMessageComponent extends GeneralMessageComponent {
             <CardMessageWrapperFragment icon={icon} title={title}
                                         description={(message.raw.action.duration ?? 0) + " seconds"}
                                         message={message}
-                                        onClick={() => CallsManager.startCall(peer)}/>
+                                        onClick={() => CallsManager.startCall(peer)}
+                                        showDate={showDate}/>
         )
     }
 }

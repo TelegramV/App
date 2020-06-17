@@ -53,6 +53,19 @@ export function isGrouping(one: Message, two: Message) {
         && (Math.abs(one.date - two.date) < 5 * 60);
 }
 
+export function isSameDate(d1n, d2n) {
+    if (!d1n || !d2n) {
+        return true;
+    }
+
+    const d1 = new Date(d1n * 1000);
+    const d2 = new Date(d2n * 1000);
+
+    return d1.getFullYear() === d2.getFullYear() &&
+        d1.getMonth() === d2.getMonth() &&
+        d1.getDate() === d2.getDate();
+}
+
 // there is no possibility nor time to calculate each message size
 class VirtualizedBubblesComponent extends StatelessComponent {
     bubblesInnerRef = VComponent.createRef();
@@ -150,7 +163,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         } else {
             message.tailsGroup = "m";
         }
-        return <MessageComponent observer={this.observer} message={message}/>;
+
+        return <MessageComponent observer={this.observer} message={message} showDate={!isSameDate(message.date, prevMessage?.date)}/>;
     }
 
     cleanupTree = () => {

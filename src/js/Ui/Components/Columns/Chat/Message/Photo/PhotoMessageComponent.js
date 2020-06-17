@@ -6,7 +6,7 @@ import UIEvents from "../../../../../EventBus/UIEvents";
 import BetterPhotoComponent from "../../../../Basic/BetterPhotoComponent"
 
 class PhotoMessageComponent extends GeneralMessageComponent {
-    render() {
+    render({showDate}) {
         const text = this.props.message.text.length > 0 ? <TextWrapperComponent message={this.props.message}/> : ""
 
         return (
@@ -14,7 +14,8 @@ class PhotoMessageComponent extends GeneralMessageComponent {
                                     showUsername={false}
                                     outerPad={text !== ""}
                                     avatarRef={this.avatarRef}
-                                    bubbleRef={this.bubbleRef}>
+                                    bubbleRef={this.bubbleRef}
+                                    showDate={showDate}>
 
                 <BetterPhotoComponent calculateSize={true}
                                       photo={this.props.message.raw.media.photo}

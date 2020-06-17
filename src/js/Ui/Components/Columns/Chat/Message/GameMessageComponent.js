@@ -4,13 +4,14 @@ import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
 
 class GameMessageComponent extends GeneralMessageComponent {
 
-    render() {
+    render({showDate}) {
         let game = this.props.message.raw.media.game
 
         //DRAFT VERSION
         return (
             <MessageWrapperFragment message={this.props.message} showUsername={false} avatarRef={this.avatarRef}
-                                    bubbleRef={this.bubbleRef}>
+                                    bubbleRef={this.bubbleRef}
+                                    showDate={showDate}>
                 <div class="game">
                     <div class="title">{game.title}</div>
                     <div class="info">

@@ -60,7 +60,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
             .updateOn("download.canceled")
     }
 
-    render() {
+    render({showDate}) {
         const document = this.props.message.raw.media.document;
 
         const title = DocumentMessagesTool.getFilename(document.attributes);
@@ -88,11 +88,14 @@ class DocumentMessageComponent extends GeneralMessageComponent {
                                         title={title}
                                         description={size}
                                         bubbleRef={this.bubbleRef}
-                                        onClick={this.downloadDocument}/>
+                                        onClick={this.downloadDocument}
+                                        showDate={showDate}/>
         )
     }
 
     componentWillMount(props) {
+        super.componentWillMount(props);
+
         if (!FileManager.isDownloaded(this.props.message.raw.media.document)) {
             FileManager.checkCache(this.props.message.raw.media.document);
         }

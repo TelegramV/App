@@ -2,7 +2,7 @@ import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import type {BusEvent} from "../../../../../../Api/EventBus/EventBus"
 import type {Message} from "../../../../../../Api/Messages/Message"
 import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulComponent"
-import {isGrouping} from "../../VirtualizedBubblesComponent"
+import {isGrouping, isSameDate} from "../../VirtualizedBubblesComponent"
 
 type Props = {
     message: Message;
@@ -22,6 +22,10 @@ class GeneralMessageComponent extends StatefulComponent<Props> {
             .updateOn("edited")
             .updateOn("replyFound")
             .updateOn("forwardedFound")
+    }
+
+    componentWillMount(props) {
+
     }
 
     componentDidMount() {
@@ -74,6 +78,8 @@ class GeneralMessageComponent extends StatefulComponent<Props> {
         } else {
             message.tailsGroup = "m";
         }
+
+        this.state.showDate = !isSameDate(message.date, prevMessage?.date)
 
         this.forceUpdate();
     }

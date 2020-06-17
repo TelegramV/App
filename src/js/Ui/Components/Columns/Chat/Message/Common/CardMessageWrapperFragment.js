@@ -1,9 +1,9 @@
 import MessageWrapperFragment from "./MessageWrapperFragment";
 import TextWrapperComponent from "./TextWrapperComponent";
 
-const CardMessageWrapperFragment = ({message, icon, title, description, bubbleRef, onClick}) => {
+const CardMessageWrapperFragment = ({message, icon, title, description, bubbleRef, onClick, showDate}) => {
     return (
-        <MessageWrapperFragment message={message} showUsername={false} bubbleRef={bubbleRef}>
+        <MessageWrapperFragment message={message} showUsername={false} bubbleRef={bubbleRef} showDate={showDate}>
             <div class="card" css-cursor="pointer" onClick={onClick}>
                 <div class="card-icon rp rps rp-white" css-border-radius="5px">
                     {icon}

@@ -33,12 +33,13 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
     }
 
     state = {
+        ...super.state,
         isMuted: true,
     }
 
     videoComponentRef: { component: BetterVideoComponent } = VComponent.createComponentRef();
 
-    render({message}, {progress, isMuted}) {
+    render({message, showDate}, {progress, isMuted}) {
         const document = message.raw.media.document;
         const video = DocumentParser.attributeVideo(document);
 
@@ -47,7 +48,8 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
                                     transparent={true}
                                     noPad
                                     showUsername={false}
-                                    bubbleRef={this.bubbleRef}>
+                                    bubbleRef={this.bubbleRef}
+                                    showDate={showDate}>
 
                 <BetterVideoComponent isRound
                                       ref={this.videoComponentRef}

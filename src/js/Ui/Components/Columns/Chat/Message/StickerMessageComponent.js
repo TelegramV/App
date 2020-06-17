@@ -74,10 +74,11 @@ class StickerMessageComponent extends GeneralMessageComponent {
 }*/
 
 class StickerMessageComponent extends GeneralMessageComponent {
-    render() {
+    render({showDate}) {
         return (
             <MessageWrapperFragment message={this.props.message} transparent={true} noPad showUsername={false}
-                                    avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
+                                    avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}
+                                    showDate={showDate}>
 
                 <BetterStickerComponent isFull
                                         width={200}

@@ -5,21 +5,21 @@ import {FileAPI} from "../../../../../Api/Files/FileAPI";
 
 class LocationMessageComponent extends GeneralMessageComponent {
 
-	componentDidMount() {
-		super.componentDidMount();
-		let geo = this.props.message.geo;
-		const zoom = this.props.message.zoom;
-		const scale = 1;
+    componentDidMount() {
+        super.componentDidMount();
+        let geo = this.props.message.geo;
+        const zoom = this.props.message.zoom;
+        const scale = 1;
 
-		//TODO FileManager
-		let fl = FileAPI.prepareWebFileLocation(geo, 300, 300, zoom, scale);
-		this.assure(FileAPI.getWebFile(fl)).then(url => {
-			this.url = url;
-			this.forceUpdate();
-		})
-	}
+        //TODO FileManager
+        let fl = FileAPI.prepareWebFileLocation(geo, 300, 300, zoom, scale);
+        this.assure(FileAPI.getWebFile(fl)).then(url => {
+            this.url = url;
+            this.forceUpdate();
+        })
+    }
 
-    render({message}) {
+    render({message, showDate}) {
         let geo = message.geo;
         let venue = "";
         //console.log(message.type)
@@ -33,22 +33,22 @@ class LocationMessageComponent extends GeneralMessageComponent {
         }
 
         return (
-            <MessageWrapperFragment message={message} noPad showUsername={false} bubbleRef={this.bubbleRef}>
+            <MessageWrapperFragment message={message} noPad showUsername={false} bubbleRef={this.bubbleRef} showDate={showDate}>
                 {venue}
                 <div class="map-wrapper" onClick={this.openFullMap}>
-                	<img class="map" src={this.url}/>
-	                <div class="pin-point">
-		                <i class="tgico tgico-location"/>
-		            </div>
+                    <img class="map" src={this.url}/>
+                    <div class="pin-point">
+                        <i class="tgico tgico-location"/>
+                    </div>
                 </div>
             </MessageWrapperFragment>
         )
     }
 
     openFullMap = () => {
-    	let url = this.props.message.fullUrl;
-    	let win = window.open(url, '_blank');
-    	win.focus();
+        let url = this.props.message.fullUrl;
+        let win = window.open(url, '_blank');
+        win.focus();
     }
 }
 

@@ -16,6 +16,16 @@
         }
     }
 
+    .message-with-date {
+        display: flex;
+        flex-direction: column;
+
+        .service {
+            justify-self: center;
+            align-self: center;
+        }
+    }
+
     .message {
         display: grid;
         position: relative;

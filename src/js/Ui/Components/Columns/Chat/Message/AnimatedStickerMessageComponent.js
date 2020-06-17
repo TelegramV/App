@@ -5,13 +5,14 @@ import VUI from "../../../../VUI"
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 
 class AnimatedStickerMessageComponent extends GeneralMessageComponent {
-    render({message}) {
+    render({message, showDate}) {
         return (
             <MessageWrapperFragment message={message}
                                     transparent={true}
                                     noPad
                                     avatarRef={this.avatarRef}
-                                    bubbleRef={this.bubbleRef}>
+                                    bubbleRef={this.bubbleRef}
+                                    showDate={showDate}>
 
                 <BetterStickerComponent onClick={() => {
                     VUI.Modal.open(<div>TODO: implement me!</div>)

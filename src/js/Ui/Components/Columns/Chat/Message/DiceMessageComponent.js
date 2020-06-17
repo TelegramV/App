@@ -6,12 +6,13 @@ import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 
 class DiceMessageComponent extends GeneralMessageComponent {
     state = {
+        ...super.state,
         sticker: null
     }
 
-    render({message}, {sticker}) {
+    render({message, showDate}, {sticker}) {
         return (
-            <MessageWrapperFragment message={message} transparent={true} noPad>
+            <MessageWrapperFragment message={message} transparent={true} noPad showDate={showDate}>
 
                 {
                     this.sticker

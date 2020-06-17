@@ -7,7 +7,7 @@ import PeersStore from "../../../../../Api/Store/PeersStore"
 import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
 
 class ServiceMessageComponent extends GeneralMessageComponent {
-    render() {
+    render({showDate/*????*/}) {
         const photo = this.props.message?.action?.photo;
         const message = this.prepare();
         return (

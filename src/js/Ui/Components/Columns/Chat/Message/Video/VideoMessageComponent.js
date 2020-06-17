@@ -12,10 +12,11 @@ import VSpinner from "../../../../../Elements/VSpinner"
 
 class VideoMessageComponent extends GeneralMessageComponent {
     state = {
+        ...super.state,
         isMuted: true,
     };
 
-    render({message}, {isMuted}) {
+    render({message, showDate}, {isMuted}) {
         const document = message.raw.media.document;
         const text = message.parsed && <TextWrapperComponent message={message}/>;
         const info = DocumentParser.attributeVideo(document);
@@ -23,7 +24,8 @@ class VideoMessageComponent extends GeneralMessageComponent {
 
         return (
             <MessageWrapperFragment message={message} noPad showUsername={false} outerPad={text !== ""}
-                                    avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}>
+                                    avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}
+                                    showDate={showDate}>
 
                 <BetterVideoComponent document={message.raw.media.document}
                                       onClick={() => {

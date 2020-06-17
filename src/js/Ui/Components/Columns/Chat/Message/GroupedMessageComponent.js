@@ -18,7 +18,7 @@ class GroupedMessageComponent extends GeneralMessageComponent {
             .updateOn("groupUpdated")
     }
 
-    render({message: group}) {
+    render({message: group, showDate}) {
         const isText = group.text.length > 0;
 
         return (
@@ -26,7 +26,8 @@ class GroupedMessageComponent extends GeneralMessageComponent {
                                     noPad
                                     showUsername={false}
                                     outerPad={false}
-                                    bubbleRef={this.bubbleRef}>
+                                    bubbleRef={this.bubbleRef}
+                                    showDate={showDate}>
                 <div className={["grouped", Layouter.getClass(group.messages.size)]}>
                     {
                         Array.from(group.messages).reverse().map(message => {
