@@ -21,8 +21,10 @@
 		}
 
 		.arrow {
-			padding: 5px;
 			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			position: relative;
 			cursor: pointer;
 
             transition: all 150ms ease-in-out;
@@ -38,6 +40,10 @@
 			.tgico {
 				font-size: 24px;
 				color: $darkgrey;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
 			}
 
 			&.prev {

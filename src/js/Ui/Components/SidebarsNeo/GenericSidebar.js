@@ -87,6 +87,10 @@ export class GenericSidebar extends StatefulComponent {
         })
     }
 
+    onHide() {
+        
+    }
+
     fadeOut() {
         this.setState({
             fadeOut: true

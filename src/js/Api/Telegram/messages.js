@@ -117,6 +117,14 @@ function getFavedStickers({hash = 0} = {hash: 0}) {
     return MTProto.invokeMethod("messages.getFavedStickers", {hash})
 }
 
+function searchStickerSets(q, excludeFeatured = true, hash = 0) {
+    return MTProto.invokeMethod("messages.searchStickerSets", {
+        q: q,
+        exclude_featured: excludeFeatured,
+        hash: hash,
+    })
+}
+
 function getSavedGifs({hash = 0} = {hash: 0}) {
     return MTProto.invokeMethod("messages.getSavedGifs", {hash})
 }
@@ -216,6 +224,7 @@ const messages = {
     getRecentStickers: getRecentStickers,
     getFeaturedStickers: getFeaturedStickers,
     getFavedStickers: getFavedStickers,
+    searchStickerSets: searchStickerSets,
     getSavedGifs: getSavedGifs,
     getStickerSet: getStickerSet,
     deleteMessages: deleteMessages,

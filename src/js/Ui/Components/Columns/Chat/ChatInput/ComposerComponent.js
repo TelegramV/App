@@ -5,7 +5,7 @@ import EmojiComposerComponent from "./EmojiComposerComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import GifsComposerComponent from "./GifsComposerComponent"
 import {ChatInputManager} from "./ChatInputComponent"
-import StickersSearchComposerComponent from "./StickersSearchComposerComponent"
+import {StickerSearchSidebar} from "../../../SidebarsNeo/Right/StickerSearch/StickerSearchSidebar"
 
 export default class ComposerComponent extends StatelessComponent {
     identifier = "composer";
@@ -22,11 +22,11 @@ export default class ComposerComponent extends StatelessComponent {
                 <div class="content">
                     <EmojiComposerComponent/>
                     <StickersComposerComponent/>
-                    <StickersSearchComposerComponent/>
                     <GifsComposerComponent/>
                 </div>
                 <div className="composer-tab-selector">
-                    <div css-visibility="hidden" id="composer-stickers-search-button" className="item rp rps">
+                    <div css-visibility="hidden" id="composer-stickers-search-button" 
+                        className="item rp rps" onClick={this.onClickOpenStickerSearch}>
                         <i className="tgico tgico-search"/>
                     </div>
                     <div class="filler"/>
@@ -51,7 +51,6 @@ export default class ComposerComponent extends StatelessComponent {
     componentDidMount() {
         this.$emojiPanel = this.$el.querySelector(".emoji-wrapper");
         this.$stickersPanel = this.$el.querySelector(".sticker-wrapper");
-        this.$stickersSearchPanel = this.$el.querySelector(".stickers-search");
         this.$gifPanel = this.$el.querySelector(".gif-wrapper");
     }
 
@@ -91,7 +90,7 @@ export default class ComposerComponent extends StatelessComponent {
     }
 
     onShow = () => {
-        window.document.getElementById("chat").classList.add("composer-opened");
+        window.document.getElementById("chat").classList.add("composer-opened"); //for phones
 
         if (!this.paused) {
             return;
@@ -124,7 +123,6 @@ export default class ComposerComponent extends StatelessComponent {
         this.$emojiPanel.classList.add("hidden");
         this.$gifPanel.classList.add("hidden");
         this.$stickersPanel.classList.add("hidden");
-        this.$stickersSearchPanel.classList.add("hidden");
 
         this[`$${name}Panel`].classList.remove("hidden");
 
@@ -145,6 +143,10 @@ export default class ComposerComponent extends StatelessComponent {
 
     onClickOpenGif = () => {
         this.togglePanel("gif");
+    }
+
+    onClickOpenStickerSearch = () => {
+        UIEvents.Sidebars.fire("push", StickerSearchSidebar)
     }
 
     onBackspaceClick = () => {
