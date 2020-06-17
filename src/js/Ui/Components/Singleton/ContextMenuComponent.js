@@ -25,7 +25,9 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 class ContextMenuComponent extends StatefulComponent {
 
     state = {
-        hidden: true,
+        hidden: false,
+        unhidden: false,
+        reallyHidden: true,
         data: [],
         x: 0,
         y: 0,
@@ -38,9 +40,12 @@ class ContextMenuComponent extends StatefulComponent {
 
     render() {
         return (
-            <div css-display={this.state.hidden && "none"} className={classNames("context-menu-wrapper")}
+            <div
+                // css-display={this.state.hidden && "none"}
+                className={classNames("context-menu-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.unhidden, "unhidden"), classIf(this.state.reallyHidden, "really-hidden"))}
                  onClick={this.close}
-                 onContextMenu={this.close}>
+                 onContextMenu={this.close}
+                onAnimationEnd={this.onTransitionEnd}>
 
                 <div className={classNames("context-menu", this.state.animation)}
                      css-top={this.state.y + "px"}
@@ -72,6 +77,14 @@ class ContextMenuComponent extends StatefulComponent {
                 </div>
             </div>
         )
+    }
+
+    onTransitionEnd = (ev) => {
+        if(ev.animationName === "hidden-context") {
+            this.setState({
+                reallyHidden: true
+            })
+        }
     }
 
     componentDidMount() {
@@ -106,14 +119,17 @@ class ContextMenuComponent extends StatefulComponent {
 
     close = () => {
         this.setState({
-            hidden: true
+            hidden: true,
+            unhidden: false
         })
     }
 
     open = (data = []) => {
         this.setState({
             data,
-            hidden: false
+            hidden: false,
+            unhidden: true,
+            reallyHidden: false
         })
     }
 

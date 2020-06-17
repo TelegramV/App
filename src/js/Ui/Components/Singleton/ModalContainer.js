@@ -22,8 +22,10 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
 class ModalContainer extends StatefulComponent {
     state = {
-        hidden: true,
-        body: ""
+        hidden: false,
+        unhidden: false,
+        reallyHidden: true,
+        body: "",
     }
 
     init() {
@@ -35,8 +37,9 @@ class ModalContainer extends StatefulComponent {
     render() {
         return (
             <div
-                css-display={this.state.hidden && "none"}
-                 className={classNames("modal-wrapper", classIf(this.state.hidden, "hidden"))}>
+                // css-display={this.state.hidden && "none"}
+                 className={classNames("modal-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.unhidden, "unhidden"), classIf(this.state.reallyHidden, "really-hidden"))}
+            onAnimationEnd={this.onTransitionEnd}>
                 <div className="modal" onClick={this.close}>
                     <div className="dialog" onClick={event => event.stopPropagation()}>
                         {this.state.body}
@@ -46,16 +49,27 @@ class ModalContainer extends StatefulComponent {
         )
     }
 
+    onTransitionEnd = (ev) => {
+        if(ev.animationName === "hidden-modal") {
+            this.setState({
+                reallyHidden: true,
+                body: ""
+            })
+        }
+    }
+
     close = () => {
         this.setState({
             hidden: true,
-            body: ""
+            unhidden: false
         })
     }
 
     open = (body) => {
         this.setState({
+            reallyHidden: false,
             hidden: false,
+            unhidden: true,
             body: body
         })
     }
