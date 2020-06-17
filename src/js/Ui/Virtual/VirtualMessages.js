@@ -132,19 +132,16 @@ class VirtualMessages {
     }
 
     veryBottomPage() {
-        if (this.messages.length < this.size) {
+        if (this.messages.length <= this.size) {
             this.edges = [null, null];
             return this.currentPage = this.messages.slice();
         }
 
-        if (this.messages.length === this.size) {
-            this.edges = [null, null];
-        } else {
-            this.edges = [this.messages[this.messages.length - this.size - 1], null];
-            // console.log(this.edges);
-        }
+        this.currentPage = this.messages.slice(this.messages.length - this.size);
 
-        return this.currentPage = this.messages.slice(this.messages.length - this.size);
+        this.edges = [this.currentPage[0], this.currentPage[this.currentPage.length - 1]];
+
+        return this.currentPage;
     }
 
     getVeryTopOne(): Message {

@@ -38,6 +38,7 @@ import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
 import IntersectionObserver from 'intersection-observer-polyfill';
 import GroupMessage from "../../../../Api/Messages/GroupMessage"
 import vrdom_patchChildren from "../../../../V/VRDOM/patch/patchChildren"
+import vrdom_delete from "../../../../V/VRDOM/delete"
 
 function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
@@ -405,10 +406,10 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             const {scrollTop, scrollHeight, clientHeight} = this.$el;
             const isAtBottom = scrollHeight - scrollTop === clientHeight;
 
-            // if (this.mainVirtual.currentPage.length > this.mainVirtual.size) {
-            //     vrdom_delete(this.bubblesInnerRef.$el.firstChild);
-            //     this.dev_checkTree();
-            // }
+            if (this.mainVirtual.currentPage.length > this.mainVirtual.size) {
+                vrdom_delete(this.bubblesInnerRef.$el.lastElementChild);
+                this.dev_checkTree();
+            }
 
             this.mainVirtual.veryBottomPage();
 
