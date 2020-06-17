@@ -54,6 +54,10 @@ const messageObjects = new Map([
 
 export class MessageFactory {
 
+    static fromRawOrReturn(dialogPeer: Peer, raw: Object): Message {
+        return dialogPeer.messages.putRawMessage(raw);
+    }
+
     static fromRaw(dialogPeer: Peer, raw: Object): Message {
         const type = MessageParser.getType(raw)
 

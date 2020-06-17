@@ -166,7 +166,7 @@ export class DialogInfoMaterials extends StatelessComponent {
             this.contentPages.media.offsetId = rawMessage.id
         }
 
-        const message = MessageFactory.fromRaw(AppSelectedInfoPeer.Current, rawMessage)
+        const message = MessageFactory.fromRawOrReturn(AppSelectedInfoPeer.Current, rawMessage)
 
         if (message.type === MessageType.VIDEO) {
             const video = DocumentParser.attributeVideo(message.raw.media.document)
@@ -218,7 +218,7 @@ export class DialogInfoMaterials extends StatelessComponent {
         if (rawMessage.id < this.contentPages.audio.offsetId) {
             this.contentPages.audio.offsetId = rawMessage.id
         }
-        console.log(rawMessage)
+
         const audio = FileAPI.getAttribute(rawMessage.media.document, "documentAttributeAudio")
         const time = formatAudioTime(audio.duration)
         const title = audio.title
@@ -229,7 +229,10 @@ export class DialogInfoMaterials extends StatelessComponent {
             hour12: false
         })
 
-        VRDOM.append(<DialogInfoAudioComponent title={title}
+        const message = MessageFactory.fromRawOrReturn(AppSelectedInfoPeer.Current, rawMessage)
+
+        VRDOM.append(<DialogInfoAudioComponent message={message}
+                                               title={title}
                                                description={`${performer} · ${date}`}
                                                time={time}/>, this.contentRefs.audio.$el)
     }

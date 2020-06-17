@@ -19,7 +19,7 @@
 
 import VArray from "../../../V/VRDOM/list/VArray"
 import {countries} from "../../Utils/utils"
-import State from "../../../V/VRDOM/component/State"
+import SharedState from "../../../V/VRDOM/component/SharedState"
 import {MonkeyController} from "./MonkeyController"
 import VApp from "../../../V/vapp"
 
@@ -32,7 +32,7 @@ if (sentCodeFromStorage) {
     }
 }
 
-class LoginState extends State {
+class LoginState extends SharedState {
     stage = sentCodeFromStorage ? "code" : "phone";
 
     countries = new VArray(countries.map(country => {

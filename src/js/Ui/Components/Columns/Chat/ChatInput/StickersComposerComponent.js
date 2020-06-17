@@ -29,10 +29,10 @@ import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import UIEvents from "../../../../EventBus/UIEvents"
 import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
-import State from "../../../../../V/VRDOM/component/State"
+import SharedState from "../../../../../V/VRDOM/component/SharedState"
 import UpdatesManager from "../../../../../Api/Updates/UpdatesManager"
 
-class FavedState extends State {
+class FavedState extends SharedState {
     isRefreshing = false;
     favedStickers = null;
 

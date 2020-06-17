@@ -61,7 +61,7 @@ class MessageManager extends Manager {
             }
 
 
-        peer.fire("messages.new", {
+            peer.fire("messages.new", {
                 message,
             })
         }
@@ -90,36 +90,35 @@ class MessageManager extends Manager {
 
         // console.debug("no from peer, probably message sent to channel", rawMessage)
 
-        return this.getToPeerMessage(rawMessage)
+        return this.getToPeerMessage(rawMessage, true)
     }
 
-    getToPeerMessage(rawMessage) {
+    getToPeerMessage(rawMessage, isFrom) {
+        let to
+
         if (rawMessage.to_id && rawMessage.to_id._ === "peerChannel") {
-            return PeersStore.get("channel", rawMessage.to_id.channel_id)
+            to = PeersStore.get("channel", rawMessage.to_id.channel_id)
+        } else if (rawMessage.to_id && rawMessage.to_id._ === "peerChat") {
+            to = PeersStore.get("chat", rawMessage.to_id.chat_id)
+        } else if (rawMessage.to_id && rawMessage.to_id._ === "peerUser") {
+            to = PeersStore.get("user", rawMessage.to_id.user_id)
+        } else if (rawMessage.chat_id) {
+            to = PeersStore.get("chat", rawMessage.chat_id)
+        } else if (rawMessage.user_id) {
+            to = PeersStore.get("user", rawMessage.user_id)
+        } else if (rawMessage.channel_id) {        // probably redundant, but who knows telegram
+            to = PeersStore.get("channel", rawMessage.channel_id)
         }
 
-        if (rawMessage.to_id && rawMessage.to_id._ === "peerChat") {
-            return PeersStore.get("chat", rawMessage.to_id.chat_id)
-        }
+        if (!isFrom && to === PeersStore.self()) {
+            return this.getFromPeerMessage(rawMessage)
+        } else {
+            if (!to) {
+                console.error("oh shit", rawMessage)
+            }
 
-        if (rawMessage.to_id && rawMessage.to_id._ === "peerUser") {
-            return PeersStore.get("user", rawMessage.to_id.user_id)
+            return to
         }
-
-        if (rawMessage.chat_id) {
-            return PeersStore.get("chat", rawMessage.chat_id)
-        }
-
-        if (rawMessage.user_id) {
-            return PeersStore.get("user", rawMessage.user_id)
-        }
-
-        // probably redundant, but who knows telegram
-        if (rawMessage.channel_id) {
-            return PeersStore.get("channel", rawMessage.channel_id)
-        }
-
-        console.error("oh shit", rawMessage)
     }
 }
 

@@ -126,7 +126,7 @@ class BetterVideoComponent extends StatefulComponent {
         });
 
         if (!this.props.autoPlay) {
-            this.videoRef.$el.pause();
+            this.videoRef.$el?.pause();
         }
     }
 
@@ -145,14 +145,14 @@ class BetterVideoComponent extends StatefulComponent {
     onMouseOver = e => {
         if (this.props.playOnHover) {
             this.state.isHovered = true;
-            e.target.play();
+            e.currentTarget?.play();
         }
     }
 
     onMouseOut = e => {
         if (this.props.playOnHover) {
             this.state.isHovered = false;
-            e.target.pause();
+            e.currentTarget?.pause();
         }
     }
 
