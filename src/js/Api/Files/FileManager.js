@@ -176,7 +176,7 @@ class FilesManager {
     }
 
     id(file, thumb, options) {
-        return thumb ? `${file.id}_${thumb.id}` : file.id;
+        return thumb ? `${file.id}_${thumb.type}` : `${file.id}_`;
     }
 
     internal_downloadDone(file, thumbOrSize, blob) {

@@ -79,10 +79,15 @@ function __bus_filter_subscribe(component, bus: EventBus, filter: any, type: str
 
     if (!busContext) {
         busContext = component.__.appEventContexts.set(bus, new Map()).get(bus)
-        busContext.set(type, resolve)
-    } else {
-        busContext.set(type, resolve)
     }
+
+    let subscriptions = busContext.get(type)
+
+    if (!subscriptions) {
+        subscriptions = busContext.set(type, new Set()).get(type)
+    }
+
+    subscriptions.add(resolve)
 
     if (filter == null) {
         bus.subscribe(type, resolve)

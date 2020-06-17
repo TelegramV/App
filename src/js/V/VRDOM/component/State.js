@@ -21,7 +21,7 @@ import StatefulComponent from "./StatefulComponent"
 import {__component_update_global_state} from "./__component_update"
 
 class State {
-    __state_custom = true;
+    __state_shared = true;
 
     __destroyed = false;
     __components: Set<StatefulComponent>;
@@ -39,6 +39,16 @@ class State {
         Object.assign(this, nextState);
 
         this.__components.forEach(component => __component_update_global_state(component, this));
+    }
+
+    setExcluding(nextState, excludeComponent) {
+        if (typeof nextState === "function") {
+            nextState = nextState(this);
+        }
+
+        Object.assign(this, nextState);
+
+        this.__components.forEach(component => component !== excludeComponent && __component_update_global_state(component, this));
     }
 
     static create(defaultState) {

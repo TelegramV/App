@@ -37,6 +37,9 @@ class StatefulComponent<P, S> extends VComponent<P> {
      */
     globalState = {};
 
+    static getDerivedStateFromProps(nextProps, prevState) {
+    }
+
     render(props, state, globalState) {
     }
 
@@ -51,7 +54,7 @@ class StatefulComponent<P, S> extends VComponent<P> {
             return;
         }
 
-        if (this.state.__state_custom) {
+        if (this.state.__state_shared) {
             this.state.set(nextState);
         } else if (typeof nextState === "function") {
             __component_update_state(this, nextState(this.state));
