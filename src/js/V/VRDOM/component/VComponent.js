@@ -45,7 +45,7 @@ class VComponent<P> {
         isDeletingItself: false,
 
         /**
-         * @type {Map<EventBus, Map<string, function(BusEvent)>>}
+         * @type {Map<EventBus, Map<string, Set<function(BusEvent)>>>}
          */
         appEventContexts: new Map(),
 

@@ -39,10 +39,14 @@ class TypedPublisher<T: TypedSubscription | Function> {
      * @param {function(event: BusEvent)} subscription
      */
     unsubscribe(type: any, subscription: T) {
-        this._subscriptions.get("*").delete(subscription)
+        this._subscriptions
+            .get("*")
+            .delete(subscription)
 
         if (this._subscriptions.has(type)) {
-            this._subscriptions.get(type).delete(subscription)
+            this._subscriptions
+                .get(type)
+                .delete(subscription)
         }
     }
 

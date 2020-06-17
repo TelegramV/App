@@ -38,7 +38,9 @@ export class EventBus extends TypedPublisher {
         super.unsubscribe(type, subscription)
 
         if (this._conditionalSubscriptions.has(type)) {
-            this._conditionalSubscriptions.get(type).delete(subscription)
+            this._conditionalSubscriptions
+                .get(type)
+                .delete(subscription)
         }
     }
 

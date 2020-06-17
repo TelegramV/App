@@ -20,7 +20,7 @@
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 import DocumentParser from "../../../Api/Files/DocumentParser"
-import {PhotoFragment} from "../Columns/Chat/Message/Photo/PhotoFragment"
+import {PhotoFragment, VideoFragment} from "../Columns/Chat/Message/Photo/PhotoFragment"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import FileManager from "../../../Api/Files/FileManager"
 import AppEvents from "../../../Api/EventBus/AppEvents"
@@ -68,16 +68,19 @@ class BetterVideoComponent extends StatefulComponent {
                 {infoContainer && infoContainer(this.state, this.videoRef.$el)}
                 {
                     !isLoading ?
-                        <video {...otherArgs}
-                               src={url}
-                               type={document.mime_type}
-                               onMouseOver={this.onMouseOver}
-                               onMouseOut={this.onMouseOut}
-                               onEnded={this.onEnded}
-                               onTimeUpdate={this.onTimeUpdate}
-                               onPause={this.onPause}
-                               onPlay={this.onPlay}
-                               ref={this.videoRef}
+                        <VideoFragment {...otherArgs}
+                                       src={url}
+                                       type={document.mime_type}
+                                       onMouseOver={this.onMouseOver}
+                                       onMouseOut={this.onMouseOut}
+                                       onEnded={this.onEnded}
+                                       onTimeUpdate={this.onTimeUpdate}
+                                       onPause={this.onPause}
+                                       onPlay={this.onPlay}
+                                       width={width}
+                                       height={height}
+                                       ref={this.videoRef}
+                                       calculateSize={true}
                         />
                         :
                         <PhotoFragment document={document}
