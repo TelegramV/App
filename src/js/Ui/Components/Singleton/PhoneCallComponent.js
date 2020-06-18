@@ -77,6 +77,8 @@ export class PhoneCallComponent extends SingletonComponent {
                 return "is calling you"
             case CallState.Requesting:
                 return "requesting..."
+            case CallState.FailedToConnectToBridge:
+                return "failed to connect to bridge"
             default:
                 return formatAudioTime(this.state.seconds)
         }

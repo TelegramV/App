@@ -226,6 +226,11 @@
         margin-bottom: 20px;
       }
 
+      > .hint {
+        color: $darkgrey;
+        font-weight: 100;
+      }
+
       // Elements like buttons should always be in <Section>
       > .button {
         display: flex;
