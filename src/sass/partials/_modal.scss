@@ -55,12 +55,14 @@
             min-width: 280px;
             //width: 400px;
             min-height: 200px;
+            max-height: 90%;
             z-index: 10;
             //transition: anim(opacity);
 
             //padding: 18px;
             background-color: white;
             border-radius: 12px;
+            overflow: hidden;
 
             .header {
                 display: flex;

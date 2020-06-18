@@ -117,7 +117,7 @@ function getFavedStickers({hash = 0} = {hash: 0}) {
     return MTProto.invokeMethod("messages.getFavedStickers", {hash})
 }
 
-function searchStickerSets(q, excludeFeatured = true, hash = 0) {
+function searchStickerSets(q, excludeFeatured = false, hash = 0) {
     return MTProto.invokeMethod("messages.searchStickerSets", {
         q: q,
         exclude_featured: excludeFeatured,
