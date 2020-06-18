@@ -198,6 +198,10 @@
       --avatar-size: 120px;
     }
 
+    >.animated {
+      align-self: center;
+    }
+
     .section {
       border-bottom: $border;
       border-top: $border;
@@ -254,11 +258,19 @@
           }
         }
 
+        &.blue {
+          color: $blue;
+
+          > .left .tgico {
+            color: $blue;
+          }
+        }
+
         &.red {
           color: $red;
 
           > .left .tgico {
-            color: red;
+            color: $red;
           }
         }
 

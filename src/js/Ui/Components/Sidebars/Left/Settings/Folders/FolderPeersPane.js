@@ -56,12 +56,6 @@ export default class FolderPeersPane extends SettingsPane {
             pinned_peers: [],
             exclude_peers: []
         }
-        // this.name = this.state.currentFolder == null ? "New Folder" : "Edit Folder"
-
-        //this.state.selected.map(peer => {
-        //                             return <VTag peer={peer} onRemove={l => this.togglePeer(peer)}/>
-        //                         }
-        //                     )
         const tags = [
             nodeIf(<VTagIcon icon="newprivate" text="Contacts" onRemove={l => this.toggle("contacts")}/>, f.contacts),
             nodeIf(<VTagIcon icon="noncontacts" text="Non-Contacts" onRemove={l => this.toggle("non_contacts")}/>, f.non_contacts),

@@ -10,6 +10,9 @@ import {GeneralSidebar} from "./Settings/General/GeneralSidebar";
 import {BackgroundImageSidebar} from "./Settings/General/Background/BackgroundImageSidebar";
 import {BackgroundColorSidebar} from "./Settings/General/Background/BackgroundColorSidebar";
 import {ArchivedSidebar} from "./Dialogs/ArchivedSidebar";
+import {FoldersSidebar} from "./Settings/Folders/FoldersSidebar";
+import {CreateFolderSidebar} from "./Settings/Folders/CreateFolderSidebar";
+import {FolderPeersSidebar} from "./Settings/Folders/FolderPeersSidebar";
 
 export class LeftSidebars extends GenericSidebarHistory {
     render() {
@@ -23,6 +26,9 @@ export class LeftSidebars extends GenericSidebarHistory {
 
 
                 <GeneralSidebar/>
+                <FoldersSidebar/>
+                <CreateFolderSidebar/>
+                <FolderPeersSidebar/>
                 <BackgroundImageSidebar/>
                 <BackgroundColorSidebar/>
 
