@@ -87,7 +87,7 @@ class StickerMessageComponent extends GeneralMessageComponent {
                                         width={200}
                                         document={this.props.message.raw.media.document}
                                         onClick={() => {
-                                            VUI.Modal.open(<StickerSetModal set={null && stickerSet}/>)
+                                            VUI.Modal.open(<StickerSetModal set={stickerSet}/>)
                                         }}/>
 
                 <MessageTimeComponent message={this.props.message} bg={true}/>
