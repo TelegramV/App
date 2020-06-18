@@ -16,6 +16,7 @@ class Lottie extends StatefulComponent {
             loop,
             autoplay,
             animationData,
+            path,
             rendererSettings,
             segments,
         } = options;
@@ -27,24 +28,38 @@ class Lottie extends StatefulComponent {
             autoplay: autoplay !== false,
             segments: segments !== false,
             animationData,
+            path,
             rendererSettings,
         };
 
+        console.log(this.$el)
+
         this.options = {...this.options, ...options};
 
+        // this.anim = lottie.loadAnimation(this.options);
+        // this.anim.setSubframe(false);
+        // this.registerEvents(eventListeners);
+        
+        // this.withTimeout( _ => {
         this.anim = lottie.loadAnimation(this.options);
-        this.anim.setSubframe(false);
+        // this.anim.setSubframe(false);
         this.registerEvents(eventListeners);
+        // }, 0)
+
+        console.log("mounted??")
     }
 
     componentWillUpdate(nextProps /* , nextState */) {
         /* Recreate the animation handle if the data is changed */
-        if (!this.options || this.options.animationData !== nextProps.options.animationData) {
+        console.log(nextProps)
+        if (
+            this.options.animationData !== nextProps.options.animationData ||
+            this.options.path !== nextProps.options.path
+        ) {
             this.deRegisterEvents(this.props.eventListeners);
             this.destroy();
             this.options = {...this.options, ...nextProps.options};
             this.anim = lottie.loadAnimation(this.options);
-            this.anim.setSubframe(false);
             this.registerEvents(nextProps.eventListeners);
         }
     }
@@ -67,6 +82,7 @@ class Lottie extends StatefulComponent {
         this.deRegisterEvents(this.props.eventListeners);
         this.destroy();
         this.options.animationData = null;
+        this.options.path = null;
         this.anim = null;
     }
 
@@ -103,15 +119,24 @@ class Lottie extends StatefulComponent {
     }
 
     registerEvents = (eventListeners) => {
+        this.anim.addEventListener("DOMLoaded", this.onDOMLoaded)
+
         eventListeners.forEach((eventListener) => {
             this.anim.addEventListener(eventListener.eventName, eventListener.callback);
         });
     }
 
     deRegisterEvents = (eventListeners) => {
+        this.anim.removeEventListener("DOMLoaded", this.onDOMLoaded)
+
         eventListeners.forEach((eventListener) => {
             this.anim.removeEventListener(eventListener.eventName, eventListener.callback);
         });
+    }
+
+    onDOMLoaded = () => {
+        console.warn("LOADED")
+        // this.anim.play();
     }
 
     render() {
@@ -155,7 +180,6 @@ class Lottie extends StatefulComponent {
                  role={ariaRole}
                  aria-label={ariaLabel}
                  tabIndex="0"
-                // doNotTouchMyChildren={true}
                  onMouseOver={this.onMouseOver}
                  onMouseOut={this.onMouseOut}
             />

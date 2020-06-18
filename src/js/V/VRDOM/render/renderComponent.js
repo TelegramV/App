@@ -84,4 +84,32 @@ function vrdom_renderComponentVNode(componentNode, $node: HTMLElement = undefine
 }
 
 
+/**
+ * @param componentNode
+ */
+export function vrdom_renderComponentVNodeAsVRNode(componentNode) {
+    const componentInstance = vrdom_instantiateAbstractComponentVNode(componentNode)
+
+    if (componentInstance.__.stateful) {
+        const derivedState = componentInstance.constructor.getDerivedStateFromProps(componentInstance.props, componentInstance.state);
+
+        if (derivedState) {
+            if (derivedState.__state_shared) {
+                throw new Error("shared state cannot be used with getDerivedStateFromProps")
+            } else {
+                Object.assign(componentInstance.state, derivedState);
+            }
+        }
+    }
+
+    const renderedVRNode = __component_render(componentInstance)
+
+    if (renderedVRNode instanceof ComponentVRNode) {
+        throw new Error("Components on top level are forbidden.")
+    }
+
+    return renderedVRNode
+}
+
+
 export default vrdom_renderComponentVNode

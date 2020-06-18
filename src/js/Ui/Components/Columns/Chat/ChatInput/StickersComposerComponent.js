@@ -223,6 +223,12 @@ class StickersComposerComponent extends StatelessComponent {
                                 autoplay: false,
                             };
 
+                            // VRDOM.append(
+                            //     <StickerSetItemFragment setId={stickerSet.raw.id}
+                            //                             url={stickerSet.thumbUrl}
+                            //                             onClick={onClick}/>,
+                            //     this.stickerPacksRef.$el);
+
                             VRDOM.append(
                                 <div className="sticker-packs-item rp rps" onClick={onClick}>
                                     <Lottie width={35}
@@ -251,7 +257,8 @@ class StickersComposerComponent extends StatelessComponent {
                         <BetterStickerComponent id={`composer-sticker-recent-${Document.id}`}
                                                 width={75}
                                                 document={Document}
-                                                onClick={() => this.sendSticker(Document)}/>,
+                                                onClick={() => this.sendSticker(Document)}
+                                                hideAnimated/>,
                         $el
                     );
                 });
@@ -275,7 +282,8 @@ class StickersComposerComponent extends StatelessComponent {
                 <BetterStickerComponent id={`composer-sticker-recent-${Document.id}`}
                                         width={75}
                                         document={Document}
-                                        onClick={() => this.sendSticker(Document)}/>,
+                                        onClick={() => this.sendSticker(Document)}
+                                        hideAnimated/>,
                 $recent
             );
 
@@ -321,7 +329,8 @@ class StickersComposerComponent extends StatelessComponent {
                             onClick={() => this.sendSticker(Document)}
                             width={75}
                             document={Document}
-                            isAnimated={stickerSet.raw.animated}/>,
+                            // isAnimated={stickerSet.raw.animated}
+                            hideAnimated/>,
                         $el
                     );
                 })

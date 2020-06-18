@@ -27,7 +27,9 @@ import AppEvents from "../../../Api/EventBus/AppEvents"
 class BetterStickerComponent extends StatefulComponent {
     state = {
         isAnimated: false,
+        animationDataUrl: null,
         animationData: null,
+        showAnimation: !this.props.hideAnimated,
         url: null,
         thumbUrl: null,
         isDownloading: false,
@@ -46,11 +48,19 @@ class BetterStickerComponent extends StatefulComponent {
         const width = props.width || 250;
         const height = props.height || (sizeAttr ? sizeAttr.h / sizeAttr.w * width : width);
 
-        if (state.isAnimated) {
+
+        if ((!state.thumbUrl || state.showAnimation) && state.isAnimated) {
             const options = {
-                animationData: state.animationData,
+                path: state.animationDataUrl,
                 loop: props.loop ?? false,
                 autoplay: props.autoplay ?? false,
+                // rendererSettings: {
+                // preserveAspectRatio: "xMinYMin slice", // Supports the same options as the svg element's preserveAspectRatio property
+                // clearCanvas: false,
+                // progressiveLoad: true, // Boolean, only svg renderer, loads dom elements when needed. Might speed up initialization for large number of elements.
+                // hideOnTransparent: true, //Boolean, only svg renderer, hides elements when opacity reaches 0 (defaults to true)
+                // className: "lottie-svg"
+                // }
             };
 
             const playOnHover = props.playOnHover ?? true;
@@ -64,18 +74,27 @@ class BetterStickerComponent extends StatefulComponent {
                             height={height}
                             options={options}
                             playOnHover={playOnHover}
-                            isPaused={isPaused}/>
+                            isPaused={isPaused}
+                            eventListeners={[
+                                {
+                                    eventName: "complete",
+                                    callback: this.onAnimationStop
+                                }
+                            ]}
+                    />
                 </div>
             )
         } else {
             return (
                 <div id={props.id}
                      class="sticker"
-                     onClick={props.onClick}>
+                     onClick={props.onClick}
+                     onMouseOver={this.onMouseOver}>
                     <img class="loading"
-                         src={state.url || state.thumbUrl}
+                         src={state.thumbUrl || state.url}
                          css-width={`${width}px`}
-                         css-height={`${height}px`}/>
+                         css-height={`${height}px`}
+                         alt="Sticker"/>
                 </div>
             )
         }
@@ -88,6 +107,7 @@ class BetterStickerComponent extends StatefulComponent {
         this.setState({
             isDownloading: true,
             isAnimated,
+            thumbUrl: isAnimated && FileAPI.getAnimatedStickerThumbnail(document)
         });
 
         FileManager.downloadDocument(document, thumb);
@@ -101,8 +121,25 @@ class BetterStickerComponent extends StatefulComponent {
 
             nextState.isDownloading = true;
             nextState.isAnimated = isAnimated;
+            nextState.thumbUrl = isAnimated && FileAPI.getAnimatedStickerThumbnail(document);
 
             FileManager.downloadDocument(document, thumb);
+        }
+    }
+
+    onMouseOver = () => {
+        if (this.props.hideAnimated) {
+            this.setState({
+                showAnimation: true,
+            });
+        }
+    }
+
+    onAnimationStop = () => {
+        if (this.props.hideAnimated) {
+            this.setState({
+                showAnimation: false,
+            });
         }
     }
 
@@ -115,8 +152,15 @@ class BetterStickerComponent extends StatefulComponent {
     onDownloadDone = event => {
         if (this.state.isAnimated) {
             this.assure(FileAPI.decodeAnimatedSticker(event.blob)).then(json => {
+                const blob = new Blob([JSON.stringify(json)], {
+                    type: "application/json",
+                });
+
+                const url = URL.createObjectURL(blob);
+
                 this.setState({
                     animationData: json,
+                    animationDataUrl: url,
                     isDownloading: false,
                 });
             });

@@ -595,4 +595,11 @@ export class FileAPI {
             return URL.createObjectURL(new Blob([bytesConcatBuffer(bytesConcatBuffer(header, stripped.slice(3)), footer)], {type: "image/jpeg"}))
         }
     }
+
+    static getAnimatedStickerThumbnail(file) {
+        if ((file.sizes && file.sizes[0].bytes) || (file.thumbs && file.thumbs[0].bytes)) {
+            const stripped = (file.sizes || file.thumbs)[0].bytes
+            return URL.createObjectURL(new Blob([stripped]))
+        }
+    }
 }
