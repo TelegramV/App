@@ -419,9 +419,13 @@ export class ChatInputComponent extends StatelessComponent {
         this.$el.querySelector(".tgico-attach").classList.remove("hidden")
         this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
 
+        this.$el.querySelector(".send-button>.tgico-send").classList.add("hidden")
+        this.$el.querySelector(".send-button>.tgico-microphone2").classList.remove("hidden")
+
         this.recorder.stop()
-        this.microphone.getTracks().forEach(function (track) {
+        this.microphone.getTracks().forEach( (track) => {
             track.stop();
+            this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
         });
         this.microphone = null
         this.recorder = null
@@ -472,6 +476,8 @@ export class ChatInputComponent extends StatelessComponent {
 
     onMouseDown = (ev) => {
         if (!this.isVoiceMode) return
+        this.$el.querySelector(".send-button>.tgico-send").classList.remove("hidden")
+        this.$el.querySelector(".send-button>.tgico-microphone2").classList.add("hidden")
         if (!this.microphone) {
             navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
                 this.waveform = []

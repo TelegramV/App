@@ -463,42 +463,27 @@ class CallManager extends ReactiveObject {
             state: CallState.CallStarted,
             seconds: Math.floor((+new Date() - this.callStartTime)/1000)
         })
-//5760
-        // console.log(ev.inputBuffer.getChannelData(0))
         const pcm = ev.inputBuffer.getChannelData(0)
         let data = new Int16Array(pcm.length)
         for(let i = 0; i < pcm.length; i++) {
-            // data[i] = map(floats[i], -1, 1, 0, 1) * 256
             data[i] = pcm[i] * 256 * 256 / 2
         }
         data = new Uint8Array(data.buffer)
         const oldOffset = this.currentOffset
         this.currentOffset += data.length
-        // console.log(this.currentOffset)
         if(this.currentOffset >= this.buffer.length) {
 
             this.currentOffset -= this.buffer.length
-            // console.log("higher! current ", this.currentOffset, "cut data", data.length, "[0, length", this.buffer.length - oldOffset, "]")
-            // console.log("wow! new is ", new Uint8Array(data.buffer, 0, this.buffer.length - oldOffset).length, "bytes long", oldOffset)
             this.buffer.set(new Uint8Array(data.buffer, 0, this.buffer.length - oldOffset), oldOffset)
-            // console.log(this.buffer[this.buffer.length - 1])
             this.networker.sendStreamData(this.opus.encodeUint8(new Uint8Array(this.buffer)))
             this.buffer.fill(0, 0, this.buffer.length)
-            // console.log("sending!")
-            // console.log("new buffer filling from leftovers", this.buffer.length - oldOffset, data.length, data.length - (this.buffer.length - oldOffset))
 
             this.buffer.set(new Uint8Array(data.buffer, this.buffer.length - oldOffset, data.length - (this.buffer.length - oldOffset)), 0)
             this.currentOffset = data.length - (this.buffer.length - oldOffset)
 
-            // console.log(this.buffer)
-            // console.log("new offset", this.currentOffset)
             return
         }
         this.buffer.set(data, oldOffset)
-        // this.buffer.set(data, this.currentOffset)
-
-
-
     }
 
     decodeOpus(opusData) {
