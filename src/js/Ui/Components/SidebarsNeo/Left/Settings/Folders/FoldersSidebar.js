@@ -50,6 +50,7 @@ export class FoldersSidebar extends LeftSidebar {
     editFolder = (folderId) => {
         UIEvents.Sidebars.fire("push", {
             sidebar: CreateFolderSidebar,
+            isNewFolder: false,
             folderId
         })
     }
@@ -57,6 +58,7 @@ export class FoldersSidebar extends LeftSidebar {
     createFolder = (folder) => {
         UIEvents.Sidebars.fire("push", {
             sidebar: CreateFolderSidebar,
+            isNewFolder: true,
             folderId: null
         })
     }

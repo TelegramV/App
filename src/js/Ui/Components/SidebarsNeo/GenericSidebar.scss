@@ -188,6 +188,11 @@
       }
     }
 
+    >.VRoundButton {
+      width: auto;
+      align-self: center;
+    }
+
     > .hint {
       color: $darkgrey;
       font-weight: 100;
