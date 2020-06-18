@@ -75,8 +75,8 @@ export class AttachFilesModal extends StatelessComponent {
 
     render() {
         return <div className="attach-files-modal">
-            <ModalHeaderFragment title="Send Files" close actionText="Send" action={this.send.bind(this)}/>
             <div className="padded">
+                <ModalHeaderFragment title="Send Files" close actionText="Send" action={this.send.bind(this)}/>
                 <FileListFragment ref={this.fileListRef} blobs={this.props.media}/>
                 <VInput ref={this.captionRef} label="Add a caption..."/>
             </div>

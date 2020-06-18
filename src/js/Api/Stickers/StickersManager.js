@@ -1,11 +1,33 @@
 import {Manager} from "../Manager";
 import MTProto from "../../MTProto/External";
+import StickersState from "../../Ui/SharedStates/StickersState"
+import messages from "../Telegram/messages"
 
 class StickersManager extends Manager {
     constructor(props) {
         super(props);
         this.stickerSets = {}
         this.pendingSets = {}
+    }
+
+    //currently accepts only wrapped
+    installStickerSet(stickerSet, archive = false) {
+        messages.installStickerSet(stickerSet.input, archive).then(result => {
+            //success or archive, currently ignored
+            stickerSet.getStickerSet().then(set => {
+                StickersState.addSet(set.set)
+            })
+        })
+    }
+
+    uninstallStickerSet(stickerSet) {
+        messages.uninstallStickerSet(stickerSet.input).then(result => {
+            if(result) {
+                stickerSet.getStickerSet().then(set => {
+                    StickersState.removeSet(set.set)
+                })
+            }
+        })
     }
 
     fetchSpecialSets() {
@@ -21,54 +43,8 @@ class StickersManager extends Manager {
         })
     }
 
-    /**
-     * ой людоньки шо це робиться
-     * я це не видалятиму хай буде на пам'ять
-     *
-     * @deprecated
-     */
-    getInstalledStickerSets() {
-        let that = this;
-        return new Promise(async (resolve, reject) => {
-            MTProto.invokeMethod("messages.getAllStickers", {
-                hash: 0
-            }).then(async function (response) {
-                let sets = response.sets;
-                let parsed = [];
-                for (const set of sets) {
-                    if (set.archived) continue; //currently ignoring archived
-                    let st = await that.getStickerSet({
-                        _: "inputStickerSetID",
-                        id: set.id,
-                        access_hash: set.access_hash,
-                    });
-                    parsed.push(st);
-                }
-                resolve(parsed);
-            })
-        })
-    }
-
     getCachedStickerSet(id) {
         return this.stickerSets[id];
-    }
-
-    //do not call to get special set
-    async getStickerSet(stickerSet) {
-        if (this.stickerSets[stickerSet.id]) return this.stickerSets[stickerSet.id];
-
-        return MTProto.invokeMethod("messages.getStickerSet", {
-            stickerset: stickerSet
-        }).then(l => {
-            l.packs.forEach(q => {
-                q.document = l.documents.find(z => z.id === q.documents[0])
-            })
-
-            let id = l.set.id;
-            if (stickerSet._ === "inputStickerSetAnimatedEmoji") id = "inputStickerSetAnimatedEmoji"
-            //console.log(this.stickerSets)
-            return this.stickerSets[id] = l
-        })
     }
 
     getAnimatedEmojiSet() {
@@ -99,7 +75,7 @@ class StickersManager extends Manager {
         set = this.pendingSets[emoji] = MTProto.invokeMethod("messages.getStickerSet", {
             stickerset: {_: "inputStickerSetDice", emoticon: emoji}
         }).then(l => {
-            l.packs.forEach(q => {
+            l.packs.forEach(q => { //idk why it's here, but it works anyway
                 q.document = l.documents.find(z => z.id === q.documents[0])
             })
 

@@ -25,6 +25,7 @@ export default class CallMessageHandler {
     handleInit = (buf: BufferReader, pseq: number) => {
         console.log("got Init!")
         this.sendInitAck()
+        this.networker.init()
 
     }
 

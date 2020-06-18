@@ -198,6 +198,10 @@
       --avatar-size: 120px;
     }
 
+    >.animated {
+      align-self: center;
+    }
+
     .section {
       border-bottom: $border;
       border-top: $border;
@@ -226,6 +230,11 @@
         margin-bottom: 20px;
       }
 
+      > .hint {
+        color: $darkgrey;
+        font-weight: 100;
+      }
+
       // Elements like buttons should always be in <Section>
       > .button {
         display: flex;
@@ -249,11 +258,19 @@
           }
         }
 
+        &.blue {
+          color: $blue;
+
+          > .left .tgico {
+            color: $blue;
+          }
+        }
+
         &.red {
           color: $red;
 
           > .left .tgico {
-            color: red;
+            color: $red;
           }
         }
 

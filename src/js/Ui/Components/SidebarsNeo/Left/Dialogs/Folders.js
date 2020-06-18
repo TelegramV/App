@@ -4,6 +4,8 @@ import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBui
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VUI from "../../../../VUI";
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
+import UIEvents from "../../../../EventBus/UIEvents";
+import {CreateFolderSidebar} from "../Settings/Folders/CreateFolderSidebar";
 
 const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0}, selected = false, onClick}) => {
     return <div className={{
@@ -17,6 +19,10 @@ const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0
             icon: "edit",
             title: "Edit Folder",
             onClick: _ => {
+                UIEvents.Sidebars.fire("push", {
+                    sidebar: CreateFolderSidebar,
+                    folderId: folderId
+                })
                 // TODO edit folder
             }
         },

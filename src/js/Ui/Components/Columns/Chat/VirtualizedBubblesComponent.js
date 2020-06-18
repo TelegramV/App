@@ -46,9 +46,10 @@ function getMessageElementById(messageId: number): HTMLElement | null {
 }
 
 export function isGrouping(one: Message, two: Message) {
-    if (!one || !two || one.type === MessageType.GROUP || two.type === MessageType.GROUP) return false;
-    return (!(one.type instanceof ServiceMessage) && !(two.type instanceof ServiceMessage))
-        && (one.isPost || one.isOut === two.isOut)
+    if (!one || !two ||
+     one.type === MessageType.GROUP || two.type === MessageType.GROUP ||
+     one.type === MessageType.SERVICE || two.type === MessageType.SERVICE) return false;
+    return (one.isPost || one.isOut === two.isOut)
         && (one.from.id === two.from.id)
         && (Math.abs(one.date - two.date) < 5 * 60);
 }

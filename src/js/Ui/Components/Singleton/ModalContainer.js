@@ -41,7 +41,7 @@ class ModalContainer extends StatefulComponent {
                  className={classNames("modal-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.unhidden, "unhidden"), classIf(this.state.reallyHidden, "really-hidden"))}
             onAnimationEnd={this.onTransitionEnd}>
                 <div className="modal" onClick={this.close}>
-                    <div className="dialog" onClick={event => event.stopPropagation()}>
+                    <div className="dialog scrollable" onClick={event => event.stopPropagation()}>
                         {this.state.body}
                     </div>
                 </div>

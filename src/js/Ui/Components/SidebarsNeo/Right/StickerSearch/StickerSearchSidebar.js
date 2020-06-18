@@ -3,28 +3,35 @@ import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponen
 import messages from "../../../../../Api/Telegram/messages"
 import VButton from "../../../../Elements/Button/VButton"
 import StickerSet from "../../../../../Api/Stickers/StickerSet"
+import {StickerManager} from "../../../../../Api/Stickers/StickersManager"
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
+import StickersState from "../../../../SharedStates/StickersState"
 import "./StickerSearchSidebar.scss"
 
 export class StickerSearchSidebar extends RightSidebar {
     state = {
         query: "",
         featured: [], //push more sets while scrolling
-        found: []
+        found: [],
+    }
+
+    globalState = {
+      stickersState: StickersState
     }
 
     content(): * {
-    	console.log(this.state)
     	let sets = [];
     	if(this.state.query) {
-    		sets = this.state.found?.map(coveredSet => <StickerSetPreviewComponent set={new StickerSet(coveredSet.set)}/>);
+    		sets = this.state.found?.map(coveredSet => <StickerSetPreviewComponent set={new StickerSet(coveredSet.set)} added={this.globalState.stickersState.contains(coveredSet.set)}/>);
     	} else {
-    		sets = this.state.featured?.map(coveredSet => <StickerSetPreviewComponent set={new StickerSet(coveredSet.set)}/>);
+    		sets = this.state.featured?.map(coveredSet => <StickerSetPreviewComponent set={new StickerSet(coveredSet.set)} added={this.globalState.stickersState.contains(coveredSet.set)}/>);
     	}
+
+    	let emptyText = this.state.query? "Nothing found..." : "Loading...";
         return <this.contentWrapper>
         	<div class="sticker-set-search">
         		{sets}
-        		{sets.length===0 && <div class="nothing">Nothing found...</div>}
+        		{sets.length===0 && <div class="nothing">{emptyText}</div>}
         	</div>
         </this.contentWrapper>
     }
@@ -37,17 +44,24 @@ export class StickerSearchSidebar extends RightSidebar {
         return true
     }
 
+    get leftButtonIcon() {
+        return "back"
+    }
+
     onShown(params) {
-        messages.getFeaturedStickers().then(featured => {
-            this.setState({
-                featured: featured.sets
-            })
-        })
+    	if(this.state.featured.length === 0) {
+	        messages.getFeaturedStickers().then(featured => {
+	            this.setState({
+	                featured: featured.sets
+	            })
+	        })
+	    }
     }
 
     onHide() {
+    	this.searchInputRef.component.$el.value = "";
     	this.setState({
-    		query: "", //reset query
+    		query: "",
     		found: []
     	})
     }
@@ -88,6 +102,11 @@ class StickerSetPreviewComponent extends StatefulComponent {
     		}
     	}
 
+        let addClasses = {
+            addButton: true,
+            added: props.added
+        }
+
         return (
             <div class="set-preview">
 				<div class="header">
@@ -99,8 +118,10 @@ class StickerSetPreviewComponent extends StatefulComponent {
 							{props.set.raw.count} stickers
 						</div>
 					</div>
-					<div class="add">
-						<VButton onClick={_ => console.log("To be implemented...")}>Add</VButton>
+					<div class={addClasses}>
+						<VButton isUppercase={false} onClick={this.handleAddClick}>
+                            {props.added ? "Added" : "Add"}
+                        </VButton>
 					</div>
 				</div>
 				<div class="container">
@@ -124,5 +145,13 @@ class StickerSetPreviewComponent extends StatefulComponent {
 	    		this.forceUpdate();
 	    	})
 	    }
+    }
+
+    handleAddClick = () => {
+        if(this.props.added) {
+            StickerManager.uninstallStickerSet(this.props.set)
+        } else {
+            StickerManager.installStickerSet(this.props.set)
+        }
     }
 }

@@ -23,7 +23,6 @@ export class RightSidebar extends GenericSidebar {
     }
 
     hide(first = false) {
-        console.log("first?", first)
         if(first) {
             this.withTimeout(_ => {
                 this.setState({
@@ -31,6 +30,7 @@ export class RightSidebar extends GenericSidebar {
                     reallyHidden: true
                 })
             }, 250)
+            this.onHide();
         } else {
             super.hide()
         }

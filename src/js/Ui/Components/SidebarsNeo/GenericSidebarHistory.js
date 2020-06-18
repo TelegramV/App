@@ -33,10 +33,12 @@ export class GenericSidebarHistory extends StatelessComponent {
     push(type) {
         let params = []
         if(typeof(type) === "object") {
-            type = type.type
-            params = type
+            const t = type.sidebar
+            params = Object.assign([], type)
+            type = t
         }
         const bar = this.bars.get(type)
+
         if(!bar) return
         this.bars.get(this.history[this.history.length - 1])?.fadeOut()
         this.history.push(type)

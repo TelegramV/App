@@ -10,6 +10,11 @@ import Opus from "./Opus";
 import PeersManager from "../Peers/PeersManager";
 import FileManager from "../Files/FileManager";
 import PeersStore from "../Store/PeersStore";
+import keval from "../../Keval/keval";
+import VUI from "../../Ui/VUI";
+import Hint from "../../Ui/Components/SidebarsNeo/Fragments/Hint";
+import VButton from "../../Ui/Elements/Button/VButton";
+import {ModalHeaderFragment} from "../../Ui/Components/Modals/ModalHeaderFragment";
 
 export const CallState = {
     CallStarted: -1,
@@ -22,6 +27,7 @@ export const CallState = {
     Connecting: 6,
     Requesting: 7,
     ExchangingEncryption: 8,
+    FailedToConnectToBridge: 9,
 }
 
 class CallManager extends ReactiveObject {
@@ -200,6 +206,8 @@ class CallManager extends ReactiveObject {
     }
 
     async startCall(peer) {
+        if(!await this.showWarning(_ => this.startCall(peer))) return
+
         console.log("startCall")
         await this.initOpus()
         this.crypto = await MTProto.startCall(await this.dhConfig)
@@ -268,7 +276,30 @@ class CallManager extends ReactiveObject {
         // this.handleUpdate(response)
     }
 
-    acceptCall(peer) {
+    async showWarning(action) {
+        const phoneCallsWarningAccepted = await keval.getItem("phoneCallsWarning")
+        if(!phoneCallsWarningAccepted) {
+            const phoneCallsBridge = await keval.getItem("phoneCallsBridge")
+
+            VUI.Modal.open(<div>
+                <ModalHeaderFragment title="Warning!" close actionText="I'm cool with it" action={_ => {
+                    keval.setItem("phoneCallsWarning", true)
+                    action()
+                    VUI.Modal.close()
+                }}/>
+                <div className="padded">
+
+                Due to limitations of the web, all the data will be transferred through bridge {phoneCallsBridge}.<br/>
+                Don't worry though, data is encrypted at the client side, so no one can see anything but random data.
+                </div>
+            </div>)
+            return false
+        }
+        return true
+    }
+
+    async acceptCall(peer) {
+        if(!await this.showWarning(_ => this.acceptCall(peer))) return
         console.log("acceptCall")
         this.initOpus().then(async _ => {
 
@@ -407,6 +438,14 @@ class CallManager extends ReactiveObject {
                     state: CallState.CallStarted,
                     seconds: 0
                 })
+            }, 2000)
+        }).catch(l => {
+            this.fire("changeState", {
+                state: CallState.FailedToConnectToBridge,
+                seconds: 0
+            })
+            setTimeout(_ => {
+                this.hangUp()
             }, 2000)
         })
     }

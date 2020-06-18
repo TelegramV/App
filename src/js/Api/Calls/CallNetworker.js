@@ -81,6 +81,7 @@ export default class CallNetworker {
 
                 connection.socket.onerror = _ => {
                     console.error("onerror", _)
+                    reject()
                 }
             })
         })
