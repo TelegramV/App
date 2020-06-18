@@ -344,6 +344,7 @@ input[type="password"] {
 .input-search {
     position: relative;
     margin: 0 9px;
+    $p: &;
 
     input[type="text"] {
         background-color: $light;
@@ -356,6 +357,7 @@ input[type="password"] {
         transition: anim(all);
     }
 
+    
     input[type="text"]:focus {
         background-color: rgba($light, 0);
         border: 2px solid $blue;
@@ -365,7 +367,7 @@ input[type="password"] {
         }
     }
 
-    .tgico {
+    .tgico-search {
         position: absolute;
         left: 0;
         top: 0;
@@ -377,6 +379,28 @@ input[type="password"] {
         color: $darkgrey;
         opacity: 0.6;
         transition: anim(all);
+    }
+
+    .tgico-close {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 48px;
+        height: 44px;
+        text-align: center;
+        line-height: 42px;
+        font-size: 22px;
+        color: $darkgrey;
+        opacity: 1;
+        border-radius: 50%;
+        transition: anim(opacity);
+        cursor: pointer;
+
+        &.hidden {
+            opacity: 0;
+            pointer-events: none;
+            cursor: default;
+        }
     }
 }
 

@@ -101,6 +101,9 @@ export class CreateFolderSidebar extends LeftSidebar {
 
 
     get rightButtons(): *[] {
+        if(this.state.isNewFolder) {
+            return []
+        }
         return [
             {
                 icon: "more",
@@ -126,7 +129,16 @@ export class CreateFolderSidebar extends LeftSidebar {
 
     onShown(params) {
         this.setState({
-            currentFolder: FoldersManager.getFolder(params.folderId)
+            currentFolder: params.folderId == null ? {
+                // Get max id + 1
+                id: FoldersManager.folders.reduce((l, q) => {
+                    return l.id < q.id ? q : l
+                }).id + 1,
+                include_peers: [],
+                exclude_peers: [],
+                pinned_peers: []
+            } : FoldersManager.getFolder(params.folderId),
+            isNewFolder: params.isNewFolder
         })
     }
 
