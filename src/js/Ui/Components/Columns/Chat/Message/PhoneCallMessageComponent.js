@@ -27,9 +27,20 @@ class PhoneCallMessageComponent extends GeneralMessageComponent {
             color: message.raw.action.reason && message.raw.action.reason._ !== "phoneCallDiscardReasonHangup" && !message.raw.action.duration && "red"
         }} className="tgico tgico-phone" css-font-size="32px"/>
 
+        let time = message.raw.action.duration
+        let timeString = time + " seconds"
+        if(!time) {
+            timeString = ""
+        }
+        if(time >= 60) {
+            timeString = Math.floor(time / 60) + " min"
+            if(time % 60 !== 0) {
+                timeString += " " + (time - Math.floor(time / 60) * 60) + " s"
+            }
+        }
         return (
             <CardMessageWrapperFragment icon={icon} title={title}
-                                        description={(message.raw.action.duration ?? 0) + " seconds"}
+                                        description={timeString}
                                         message={message}
                                         onClick={() => CallsManager.startCall(peer)}
                                         showDate={showDate}/>

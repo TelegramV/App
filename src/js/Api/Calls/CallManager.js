@@ -34,11 +34,23 @@ class CallManager extends ReactiveObject {
 
     constructor(props) {
         super(props);
-        this.opus.init().then(l => {
+        // this.opus.init().then(l => {
+        //     this.opus.printVersion()
+        //     this.opus.createDecoder()
+        //     this.opus.createEncoder()
+        //
+        // })
+    }
+
+    initOpus() {
+        console.log(this.opus.initialized)
+        if(this.opus.initialized) {
+            return Promise.resolve()
+        }
+       return this.opus.init().then(l => {
             this.opus.printVersion()
             this.opus.createDecoder()
             this.opus.createEncoder()
-
         })
     }
 
@@ -108,25 +120,25 @@ class CallManager extends ReactiveObject {
     async phoneCallAccepted(phoneCall) {
         console.log("phoneCallAccepted")
 
-        this.fire("changeState", {
-            state: CallState.ExchangingEncryption
-        })
+            this.fire("changeState", {
+                state: CallState.ExchangingEncryption
+            })
 
 
-        const {authKey, fingerprint} = await MTProto.getAuthKey(phoneCall.g_b, this.crypto.random, this.crypto.p)
-        // const authKey = Bytes.modPow(phoneCall.g_b, this.crypto.random, this.crypto.p)
-        // const fingerprint = sha1(authKey)
+            const {authKey, fingerprint} = await MTProto.getAuthKey(phoneCall.g_b, this.crypto.random, this.crypto.p)
+            // const authKey = Bytes.modPow(phoneCall.g_b, this.crypto.random, this.crypto.p)
+            // const fingerprint = sha1(authKey)
 
-        this.crypto.authKey = authKey
+            this.crypto.authKey = authKey
 
-        const response = await MTProto.invokeMethod("phone.confirmCall", {
-            peer: this.inputPhoneCall,
-            g_a: this.crypto.gA,
-            key_fingerprint: fingerprint.slice(fingerprint.length - 8, fingerprint.length),
-            protocol: this.phoneCallProtocol
-        })
+            const response = await MTProto.invokeMethod("phone.confirmCall", {
+                peer: this.inputPhoneCall,
+                g_a: this.crypto.gA,
+                key_fingerprint: fingerprint.slice(fingerprint.length - 8, fingerprint.length),
+                protocol: this.phoneCallProtocol
+            })
 
-        this.handleUpdate(response)
+            this.handleUpdate(response)
     }
 
     phoneCallWaiting(phoneCall) {
@@ -173,8 +185,10 @@ class CallManager extends ReactiveObject {
             state: CallState.Connecting
         })
 
+        console.log("wow, initializng audio")
+
         this.initAudio().then(_ => {
-            // console.log("Sucess got audio!")
+            console.log("Sucess got audio!")
             this.openConnections(phoneCall.connections)
         }).catch(_ => this.hangUp())
 
@@ -187,6 +201,7 @@ class CallManager extends ReactiveObject {
 
     async startCall(peer) {
         console.log("startCall")
+        await this.initOpus()
         this.crypto = await MTProto.startCall(await this.dhConfig)
 
         this.fire("startedCall", {
@@ -253,30 +268,33 @@ class CallManager extends ReactiveObject {
         // this.handleUpdate(response)
     }
 
-    async acceptCall(peer) {
+    acceptCall(peer) {
         console.log("acceptCall")
+        this.initOpus().then(async _ => {
 
-        this.fire("changeState", {
-            state: CallState.ExchangingEncryption
+
+            this.fire("changeState", {
+                state: CallState.ExchangingEncryption
+            })
+
+            const dhConfig = await this.dhConfig
+            const crypto = await MTProto.startCall(dhConfig)
+
+            const response = await MTProto.invokeMethod("phone.acceptCall", {
+                g_b: crypto.gA,
+                peer: this.inputPhoneCall,
+                protocol: this.phoneCallProtocol
+            })
+
+            this.crypto = {
+                gAHash: this.currentPhoneCall.g_a_hash,
+                g: dhConfig.g,
+                random: dhConfig.random,
+                p: dhConfig.p
+            }
+
+            this.handleUpdate(response)
         })
-
-        const dhConfig = await this.dhConfig
-        const crypto = await MTProto.startCall(dhConfig)
-
-        const response = await MTProto.invokeMethod("phone.acceptCall", {
-            g_b: crypto.gA,
-            peer: this.inputPhoneCall,
-            protocol: this.phoneCallProtocol
-        })
-
-        this.crypto = {
-            gAHash: this.currentPhoneCall.g_a_hash,
-            g: dhConfig.g,
-            random: dhConfig.random,
-            p: dhConfig.p
-        }
-
-        this.handleUpdate(response)
     }
 
     async hangUp() {
@@ -398,20 +416,54 @@ class CallManager extends ReactiveObject {
     }
 
 
+    buffer = new Uint8Array(5760)
+    currentOffset = 0
     dataavailable = async (ev) => {
-        if (!this.networker || !this.audio || !this.audio.started) return
+        if(!this.networker || !this.audio || !this.audio.started) return
         this.fire("changeState", {
             state: CallState.CallStarted,
-            seconds: Math.floor((+new Date() - this.callStartTime) / 1000)
+            seconds: Math.floor((+new Date() - this.callStartTime)/1000)
         })
-
+//5760
+        // console.log(ev.inputBuffer.getChannelData(0))
         const pcm = ev.inputBuffer.getChannelData(0)
+        let data = new Int16Array(pcm.length)
+        for(let i = 0; i < pcm.length; i++) {
+            // data[i] = map(floats[i], -1, 1, 0, 1) * 256
+            data[i] = pcm[i] * 256 * 256 / 2
+        }
+        data = new Uint8Array(data.buffer)
+        const oldOffset = this.currentOffset
+        this.currentOffset += data.length
+        // console.log(this.currentOffset)
+        if(this.currentOffset >= this.buffer.length) {
 
-        const data = this.opus.encodeFloat32(pcm)
-        this.networker.sendStreamData(data)
+            this.currentOffset -= this.buffer.length
+            // console.log("higher! current ", this.currentOffset, "cut data", data.length, "[0, length", this.buffer.length - oldOffset, "]")
+            // console.log("wow! new is ", new Uint8Array(data.buffer, 0, this.buffer.length - oldOffset).length, "bytes long", oldOffset)
+            this.buffer.set(new Uint8Array(data.buffer, 0, this.buffer.length - oldOffset), oldOffset)
+            // console.log(this.buffer[this.buffer.length - 1])
+            this.networker.sendStreamData(this.opus.encodeUint8(new Uint8Array(this.buffer)))
+            this.buffer.fill(0, 0, this.buffer.length)
+            // console.log("sending!")
+            // console.log("new buffer filling from leftovers", this.buffer.length - oldOffset, data.length, data.length - (this.buffer.length - oldOffset))
+
+            this.buffer.set(new Uint8Array(data.buffer, this.buffer.length - oldOffset, data.length - (this.buffer.length - oldOffset)), 0)
+            this.currentOffset = data.length - (this.buffer.length - oldOffset)
+
+            // console.log(this.buffer)
+            // console.log("new offset", this.currentOffset)
+            return
+        }
+        this.buffer.set(data, oldOffset)
+        // this.buffer.set(data, this.currentOffset)
+
+
+
     }
 
     decodeOpus(opusData) {
+        // console.log("opusData", new Float32Array(this.opus.decode(opusData).buffer))
         this.audio.pcm.feed(new Float32Array(this.opus.decode(opusData).buffer))
     }
 }

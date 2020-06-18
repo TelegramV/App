@@ -358,19 +358,19 @@ export class ChatInputComponent extends StatelessComponent {
 
     pickPhoto = (blob) => {
         // TODO wtf?
-        if (VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachPhotosModal) {
-            VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component.addPhoto(blob)
-            return
-        }
+        // if (VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachPhotosModal) {
+        //     VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component.addPhoto(blob)
+        //     return
+        // }
         VUI.Modal.open(<AttachPhotosModal media={[blob]}/>)
     }
 
     pickFile = (blob, file) => {
         // TODO wtf?
-        if (VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachFilesModal) {
-            VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component.addFile(blob, file)
-            return
-        }
+        // if (VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachFilesModal) {
+        //     VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component.addFile(blob, file)
+        //     return
+        // }
         VUI.Modal.open(<AttachFilesModal media={[{
             blob: blob,
             file: file
