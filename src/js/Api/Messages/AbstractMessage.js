@@ -159,6 +159,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.raw?.message ?? ""
     }
 
+    get textPreview(): string {
+        return this.text;
+    }
+
     get parsed() {
         return this.parsedText;
     }

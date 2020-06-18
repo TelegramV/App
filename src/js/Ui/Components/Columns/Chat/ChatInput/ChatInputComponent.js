@@ -16,6 +16,7 @@ import VApp from "../../../../../V/vapp"
 import ChatToBottomButtonComponent from "../ChatToBottomButtonComponent"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 import {SearchSidebar} from "../../../SidebarsNeo/Right/Search/SearchSidebar";
+import {isMobile} from "../../../../Utils/utils"
 
 export let ChatInputManager
 
@@ -268,13 +269,17 @@ export class ChatInputComponent extends StatelessComponent {
         if (composer.visible && this.composerClicked) {
             this.composerClicked = false;
             composer.hide();
-            ev.currentTarget.classList.add("tgico-smile");
-            ev.currentTarget.classList.remove("tgico-keyboard");
+            if(isMobile()) {
+                ev.currentTarget.classList.add("tgico-smile");
+                ev.currentTarget.classList.remove("tgico-keyboard");
+            }
         } else {
             this.composerClicked=true;
             composer.show();
-            ev.currentTarget.classList.remove("tgico-smile");
-            ev.currentTarget.classList.add("tgico-keyboard");
+            if(isMobile()) {
+                ev.currentTarget.classList.remove("tgico-smile");
+                ev.currentTarget.classList.add("tgico-keyboard");
+            }
         }
     }
 

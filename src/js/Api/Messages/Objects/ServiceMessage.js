@@ -8,4 +8,8 @@ export class ServiceMessage extends AbstractMessage {
     get action(): string {
         return this.raw.action;
     }
+
+    get textPreview() {
+    	return "Service Message";
+    }
 }
