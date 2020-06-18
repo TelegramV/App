@@ -125,6 +125,19 @@ function searchStickerSets(q, excludeFeatured = false, hash = 0) {
     })
 }
 
+function installStickerSet(inputStickerSet, archive = false) {
+    return MTProto.invokeMethod("messages.installStickerSet", {
+        stickerset: inputStickerSet,
+        archived: archive
+    })
+}
+
+function uninstallStickerSet(inputStickerSet) {
+    return MTProto.invokeMethod("messages.uninstallStickerSet", {
+        stickerset: inputStickerSet
+    })
+}
+
 function getSavedGifs({hash = 0} = {hash: 0}) {
     return MTProto.invokeMethod("messages.getSavedGifs", {hash})
 }
@@ -225,6 +238,8 @@ const messages = {
     getFeaturedStickers: getFeaturedStickers,
     getFavedStickers: getFavedStickers,
     searchStickerSets: searchStickerSets,
+    installStickerSet: installStickerSet,
+    uninstallStickerSet: uninstallStickerSet,
     getSavedGifs: getSavedGifs,
     getStickerSet: getStickerSet,
     deleteMessages: deleteMessages,

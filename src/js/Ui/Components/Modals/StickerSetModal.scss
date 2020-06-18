@@ -1,3 +1,5 @@
+@import "src/sass/partials/vars";
+
 .sticker-set {
 	display: flex;
 	flex-direction: column;
@@ -14,6 +16,7 @@
 	.add {
 		display: flex;
 		justify-content: center;
-		padding: 5px;
+		padding: 10px;
+		border-top: 1px solid $lightgrey;
 	}
 }

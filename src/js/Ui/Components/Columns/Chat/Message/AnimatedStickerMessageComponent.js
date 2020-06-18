@@ -3,9 +3,12 @@ import MessageTimeComponent from "./Common/MessageTimeComponent"
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import VUI from "../../../../VUI"
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
+import StickerSet from "../../../../../Api/Stickers/StickerSet"
+import {StickerSetModal} from "../../../Modals/StickerSetModal"
 
 class AnimatedStickerMessageComponent extends GeneralMessageComponent {
     render({message, showDate}) {
+        let stickerSet = new StickerSet(message.raw.media.document.attributes.find(attr => attr._==="documentAttributeSticker").stickerset);
         return (
             <MessageWrapperFragment message={message}
                                     transparent={true}
@@ -15,7 +18,7 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
                                     showDate={showDate}>
 
                 <BetterStickerComponent onClick={() => {
-                    VUI.Modal.open(<div>TODO: implement me!</div>)
+                    VUI.Modal.open(<StickerSetModal set={stickerSet}/>)
                 }} width={200} document={message.media.document}/>
 
                 <MessageTimeComponent message={message} bg={true}/>
