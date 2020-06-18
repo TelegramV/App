@@ -3,6 +3,9 @@ import MessageTimeComponent from "./Common/MessageTimeComponent"
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import { StickerManager } from "../../../../../Api/Stickers/StickersManager"
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
+import UIEvents from "../../../../EventBus/UIEvents"
+import VButton from "../../../../Elements/Button/VButton"
+import AppSelectedChat from "../../../../Reactive/SelectedChat"
 
 class DiceMessageComponent extends GeneralMessageComponent {
     state = {
@@ -19,7 +22,8 @@ class DiceMessageComponent extends GeneralMessageComponent {
                         <BetterStickerComponent width={200} document={sticker}
                                                 autoplay={true}
                                                 playOnHover={false}
-                                                paused={false}/>
+                                                paused={false}
+                                                onClick={this.suggestToSend}/>
                         :
                         <div css-height={"200px"}/>)
                 }
@@ -47,6 +51,27 @@ class DiceMessageComponent extends GeneralMessageComponent {
             })
         }
     }
+
+    suggestToSend = () => {
+        UIEvents.General.fire("snackbar.show", {text: <SnackbarSuggestion emoji={this.props.message.emoji}/>, time: 5});
+    }
+}
+
+const SnackbarSuggestion = ({emoji}) => {
+    let chat = AppSelectedChat.current;
+    return (
+        <div class="emoji-suggestion">
+            Send a {emoji} emoji to any chat to try your luck.
+            <span class="send-button" onClick={_ => chat.api.sendMessage(
+                {
+                    text: "",
+                    media: {
+                        _:"inputMediaDice",
+                        emoticon: emoji
+                    }
+                 })}>SEND</span>
+        </div>
+        )
 }
 
 export default DiceMessageComponent

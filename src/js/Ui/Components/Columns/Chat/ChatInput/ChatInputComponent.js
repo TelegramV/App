@@ -64,7 +64,7 @@ export class ChatInputComponent extends StatelessComponent {
                             </div>
 
                             <div className="field">
-                                <div className="another-fucking-wrapper">
+                                <div className="another-wrapper">
                                     <div className="ico-wrapper">
                                         <i className="tgico tgico-smile btn-icon rp rps"
                                            onMouseEnter={this.mouseEnterEmoji.bind(this)}
@@ -255,11 +255,13 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     mouseEnterEmoji = () => {
+        if(isMobile()) return;
         VApp.mountedComponents.get("composer").show();
         this.hideComposer = false;
     }
 
     mouseLeaveEmoji = () => {
+        if(isMobile()) return;
         this.hideComposer = true;
         this.planComposerClose()
     }
