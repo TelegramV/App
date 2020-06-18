@@ -85,6 +85,8 @@ export class GenericSidebar extends StatefulComponent {
         this.setState({
             hidden: true
         })
+
+        this.onHide();
     }
 
     onHide() {

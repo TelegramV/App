@@ -38,11 +38,15 @@ class StickerSet {
     }
 
     get documents() {
-        return this.rawStickerSet.documents;
+        return this.rawStickerSet?.documents;
+    }
+
+    get set() {
+        return this.rawStickerSet?.set;
     }
 
     get isFetched() {
-        return this.rawStickerSet
+        return !!this.rawStickerSet
     }
 
     getStickerSet() {
@@ -50,11 +54,7 @@ class StickerSet {
             if(this.fetchingPromise) return this.fetchingPromise;
             
             return this.fetchingPromise = API.messages.getStickerSet({
-                stickerset: {
-                    _: "inputStickerSetID",
-                    id: this.raw.id,
-                    access_hash: this.raw.access_hash,
-                }
+                stickerset: this.input
             }).then(StickerSet => {
                 this.rawStickerSet = StickerSet;
                 return StickerSet;

@@ -30,6 +30,7 @@ import UIEvents from "../../../../EventBus/UIEvents"
 import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import SharedState from "../../../../../V/VRDOM/component/SharedState"
+import StickersState from "../../../../SharedStates/StickersState"
 import UpdatesManager from "../../../../../Api/Updates/UpdatesManager"
 
 class FavedState extends SharedState {
@@ -77,11 +78,11 @@ const favedState = new FavedState();
 class FavedStickers extends StatefulComponent {
     state = favedState;
 
-    render(props, {favedStickers}, {faved}) {
+    render(props, { favedStickers }, { faved }) {
         const documents = favedStickers?.stickers ?? [];
 
         return (
-            <div id="composer-sticker-pack-trending" className="selected scrollable">
+            <div id="composer-sticker-pack-favourite" className="scrollable">
                 {
                     documents.map(Document => (
                         <BetterStickerComponent
@@ -95,7 +96,7 @@ class FavedStickers extends StatefulComponent {
     }
 }
 
-const StickerSetItemFragment = ({setId, url, onClick}) => {
+const StickerSetItemFragment = ({ setId, url, onClick }) => {
     return (
         <div id={`composer-pack-thumb-${setId}`} class="sticker-packs-item rp rps" onClick={onClick}>
             <img src={url} alt="Sticker Pack"/>
@@ -103,8 +104,67 @@ const StickerSetItemFragment = ({setId, url, onClick}) => {
     )
 }
 
+class StickerSetThumbList extends StatefulComponent {
+    state = StickersState
+
+    render(props, state) {
+        return (
+            <div class="user-sets">
+                {state.sets?.map(set => <StickerSetThumb set={new StickerSet(set)} onClick={props.onClick}/>)}
+            </div>
+            )
+    }
+
+    componentDidMount() {
+        if (!this.state.isFetched) {
+            this.state.fetchStickers();
+        }
+    }
+}
+
+class StickerSetThumb extends StatefulComponent {
+    state = {
+        downloaded: false
+    }
+
+    render(props, state) {
+        let stickerSet = props.set;
+        if (stickerSet.raw.animated) {
+            const options = {
+                animationData: stickerSet.json,
+                loop: false,
+                autoplay: false,
+            };
+
+            return (
+                <div className="sticker-packs-item rp rps" onClick={_ => props.onClick(props.set)}>
+                    <Lottie width={35}
+                            height={35}
+                            options={options}
+                            playOnHover/>
+                </div>
+            )
+        } else if (this.state.downloaded) {
+            return (
+                <StickerSetItemFragment setId={stickerSet.raw.id}
+                                        url={stickerSet.thumbUrl}
+                                        onClick={_ => props.onClick(props.set)}/>
+            )
+        } else {
+            return <div class="loading"/>
+        }
+    }
+
+    componentDidMount() {
+        this.props.set.fetchThumb().then(_ => {
+            this.setState({
+                downloaded: true
+            })
+        })
+    }
+}
+
 class StickersComposerComponent extends StatelessComponent {
-    allStickers = {};
     recentStickers = {};
     favedStickers = null;
 
@@ -127,11 +187,12 @@ class StickersComposerComponent extends StatelessComponent {
                          onClick={this.openRecent}>
                         <i className="tgico tgico-sending"/>
                     </div>
-                    <div id="composer-pack-thumb-trending"
+                    <div id="composer-pack-thumb-favourite"
                          className="rp sticker-packs-item"
-                         onClick={this.openTrending}>
+                         onClick={this.openFavourites}>
                         <i className="tgico tgico-favourites"/>
                     </div>
+                    <StickerSetThumbList onClick={this.openStickerSet}/>
                 </div>
                 <div ref={this.stickersTableRef} className="sticker-table">
                     <div id="composer-sticker-pack-recent" className="selected scrollable"/>
@@ -141,12 +202,11 @@ class StickersComposerComponent extends StatelessComponent {
         )
     }
 
-    componentDidMount() {
-    }
+    componentDidMount() {}
 
     onComposerTogglePanel = event => {
         if (event.panel === "stickers" && !this.initialized) {
-            API.messages.getAllStickers().then(AllStickers => {
+            /*API.messages.getAllStickers().then(AllStickers => {
                 this.allStickers = AllStickers;
 
                 let sets = AllStickers.sets.map(raw => new StickerSet(raw))
@@ -181,7 +241,7 @@ class StickersComposerComponent extends StatelessComponent {
                         }
                     })
                 });
-            });
+            });*/
 
             API.messages.getRecentStickers().then(RecentStickers => {
                 const $el = document.getElementById("composer-sticker-pack-recent");
@@ -290,12 +350,12 @@ class StickersComposerComponent extends StatelessComponent {
         $el.classList.add("selected");
     }
 
-    openTrending = () => {
+    openFavourites = () => {
         const $selected = this.stickerPacksRef.$el.querySelector(".selected");
         if ($selected) {
             $selected.classList.remove("selected");
         }
-        const $packThumb = document.getElementById(`composer-pack-thumb-trending`);
+        const $packThumb = document.getElementById(`composer-pack-thumb-favourite`);
         if ($packThumb) {
             $packThumb.classList.add("selected")
         }
@@ -305,7 +365,7 @@ class StickersComposerComponent extends StatelessComponent {
             $selectedEl.classList.remove("selected");
         }
 
-        let $el = document.getElementById(`composer-sticker-pack-trending`);
+        let $el = document.getElementById(`composer-sticker-pack-favourite`);
         $el.classList.add("selected");
 
         favedState.refresh();

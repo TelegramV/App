@@ -38,6 +38,10 @@ export class PollResultsSidebar extends RightSidebar {
         return "Results"
     }
 
+    get leftButtonIcon() {
+        return "back"
+    }
+
     generateVotes = () => {
         let options = [];
         if(!this.state.pollVotes) {

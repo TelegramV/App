@@ -14,17 +14,18 @@ export class StickerSearchSidebar extends RightSidebar {
     }
 
     content(): * {
-    	console.log(this.state)
     	let sets = [];
     	if(this.state.query) {
     		sets = this.state.found?.map(coveredSet => <StickerSetPreviewComponent set={new StickerSet(coveredSet.set)}/>);
     	} else {
     		sets = this.state.featured?.map(coveredSet => <StickerSetPreviewComponent set={new StickerSet(coveredSet.set)}/>);
     	}
+
+    	let emptyText = this.state.query? "Nothing found..." : "Loading...";
         return <this.contentWrapper>
         	<div class="sticker-set-search">
         		{sets}
-        		{sets.length===0 && <div class="nothing">Nothing found...</div>}
+        		{sets.length===0 && <div class="nothing">{emptyText}</div>}
         	</div>
         </this.contentWrapper>
     }
@@ -37,17 +38,24 @@ export class StickerSearchSidebar extends RightSidebar {
         return true
     }
 
+    get leftButtonIcon() {
+        return "back"
+    }
+
     onShown(params) {
-        messages.getFeaturedStickers().then(featured => {
-            this.setState({
-                featured: featured.sets
-            })
-        })
+    	if(this.state.featured.length === 0) {
+	        messages.getFeaturedStickers().then(featured => {
+	            this.setState({
+	                featured: featured.sets
+	            })
+	        })
+	    }
     }
 
     onHide() {
+    	this.searchInputRef.component.$el.value = "";
     	this.setState({
-    		query: "", //reset query
+    		query: "",
     		found: []
     	})
     }

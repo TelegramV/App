@@ -178,7 +178,7 @@
                 grid-auto-rows: 75px;
                 gap: 5px;
                 padding: 0 5px;
-                align-items: flex-start;
+                //align-items: flex-start; //tested on wide stickers, looks bad
 
                 .sticker {
                     cursor: pointer;
@@ -197,6 +197,10 @@
             overflow-y: hidden;
             padding: 5px 0;
             justify-content: start;
+
+            .user-sets {
+                display: flex;
+            }
 
             .sticker-packs-item {
                 display: flex;
