@@ -30,6 +30,10 @@ class DocumentParser {
         return document?.attributes?.find(attr => attr._ === "documentAttributeVideo");
     }
 
+    static attributeSticker(document) {
+        return document?.attributes?.find(attr => attr._ === "documentAttributeSticker");
+    }
+
     static isVideoStreamable(document) {
         const video = DocumentParser.attributeVideo(document);
         return !__IS_IOS__ && video.supports_streaming && document.size >= (1024 * 1024 * 4);

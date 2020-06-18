@@ -15,9 +15,7 @@
  *
  */
 
-import VComponent from "../../../V/VRDOM/component/VComponent";
 import {ModalHeaderFragment} from "./ModalHeaderFragment";
-import AppSelectedChat from "../../Reactive/SelectedChat";
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import BetterStickerComponent from "../Basic/BetterStickerComponent"
 import VButton from "../../Elements/Button/VButton"
@@ -34,7 +32,8 @@ export class StickerSetModal extends StatefulComponent {
             <ModalHeaderFragment title={props.set.set?.title ?? "Loading..."} close/>
             <div class="scrollable">
                 <div class="container">
-                    {props.set?.documents?.map(sticker => <BetterStickerComponent width={75} document={sticker}/>)}
+                    {props.set?.documents?.map(sticker => <BetterStickerComponent width={75} document={sticker}
+                                                                                  hideAnimated/>)}
                 </div>
             </div>
             <div class="add">
@@ -44,7 +43,7 @@ export class StickerSetModal extends StatefulComponent {
     }
 
     componentDidMount() {
-        if(!this.props.set.isFetched) {
+        if (!this.props.set.isFetched) {
             this.props.set.getStickerSet().then(set => {
                 this.forceUpdate();
             })
@@ -53,13 +52,15 @@ export class StickerSetModal extends StatefulComponent {
 }
 
 const SetButton = ({set, installed}) => {
-    if(!set || !set.isFetched) {
+    if (!set || !set.isFetched) {
         return <VButton isUppercase={false}>Loading...</VButton>
     } else {
-        if(installed) {
-            return <VButton isUppercase={false} isFlat={true} onClick={_ => StickerManager.uninstallStickerSet(set)}>Remove stickers</VButton>
+        if (installed) {
+            return <VButton isUppercase={false} isFlat={true} onClick={_ => StickerManager.uninstallStickerSet(set)}>Remove
+                stickers</VButton>
         } else {
-            return <VButton isUppercase={false} onClick={_ => StickerManager.installStickerSet(set)}>Add {set.set.count} stickers</VButton>
+            return <VButton isUppercase={false}
+                            onClick={_ => StickerManager.installStickerSet(set)}>Add {set.set.count} stickers</VButton>
         }
     }
 }

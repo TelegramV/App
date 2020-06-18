@@ -37,9 +37,13 @@ class BetterStickerComponent extends StatefulComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Files)
-            .filter(event => event.file.id === this.props.document.id)
+            .filter(event => FileManager.checkEvent(event, this.props.document))
             .on("download.start", this.onDownloadStart)
             .on("download.done", this.onDownloadDone)
+
+        E.bus(AppEvents.Files)
+            .filter(event => FileManager.checkEvent(event, this.props.document, this.props.document.thumbs[0]))
+            .on("download.done", this.onAnimatedThumbDownloadDone)
     }
 
     render(props, state) {
@@ -104,24 +108,36 @@ class BetterStickerComponent extends StatefulComponent {
         const isAnimated = this.props.isAnimated != null ? this.props.isAnimated : document.mime_type === "application/x-tgsticker";
         const thumb = isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "";
 
+        const bytesThumb = FileAPI.getAnimatedStickerThumbnail(document)
+
         this.setState({
             isDownloading: true,
             isAnimated,
-            thumbUrl: isAnimated && FileAPI.getAnimatedStickerThumbnail(document)
+            thumbUrl: bytesThumb || FileManager.getUrl(document, document.thumbs[0])
         });
+
+        if (!bytesThumb) {
+            FileManager.downloadDocument(document, document.thumbs[0]);
+        }
 
         FileManager.downloadDocument(document, thumb);
     }
 
     componentWillUpdate(nextProps, nextState) {
         if (nextProps.document.id !== this.props.document.id) {
+            console.log(nextProps, nextState)
             const {document, isFull} = nextProps;
             const isAnimated = nextProps.isAnimated ?? document.mime_type === "application/x-tgsticker";
             const thumb = isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "";
+            const bytesThumb = FileAPI.getAnimatedStickerThumbnail(document)
 
             nextState.isDownloading = true;
             nextState.isAnimated = isAnimated;
-            nextState.thumbUrl = isAnimated && FileAPI.getAnimatedStickerThumbnail(document);
+            nextState.thumbUrl = bytesThumb || FileManager.getUrl(document, document.thumbs[0]);
+
+            if (!bytesThumb) {
+                FileManager.downloadDocument(document, document.thumbs[0]);
+            }
 
             FileManager.downloadDocument(document, thumb);
         }
@@ -170,6 +186,12 @@ class BetterStickerComponent extends StatefulComponent {
                 isDownloading: false,
             });
         }
+    }
+
+    onAnimatedThumbDownloadDone = ({url}) => {
+        this.setState({
+            thumbUrl: url,
+        });
     }
 }
 

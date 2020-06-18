@@ -16,7 +16,6 @@ class Lottie extends StatefulComponent {
             loop,
             autoplay,
             animationData,
-            path,
             rendererSettings,
             segments,
         } = options;
@@ -28,30 +27,29 @@ class Lottie extends StatefulComponent {
             autoplay: autoplay !== false,
             segments: segments !== false,
             animationData,
-            path,
             rendererSettings,
         };
 
-        console.log(this.$el)
+        // console.log(this.$el)
 
         this.options = {...this.options, ...options};
 
         // this.anim = lottie.loadAnimation(this.options);
         // this.anim.setSubframe(false);
         // this.registerEvents(eventListeners);
-        
-        // this.withTimeout( _ => {
+
+        // this.withTimeout(_ => {
         this.anim = lottie.loadAnimation(this.options);
-        // this.anim.setSubframe(false);
+        this.anim.setSubframe(false);
         this.registerEvents(eventListeners);
         // }, 0)
 
-        console.log("mounted??")
+        // console.log("mounted??")
     }
 
     componentWillUpdate(nextProps /* , nextState */) {
         /* Recreate the animation handle if the data is changed */
-        console.log(nextProps)
+        // console.log(nextProps)
         if (
             this.options.animationData !== nextProps.options.animationData ||
             this.options.path !== nextProps.options.path
@@ -135,7 +133,7 @@ class Lottie extends StatefulComponent {
     }
 
     onDOMLoaded = () => {
-        console.warn("LOADED")
+        // console.warn("LOADED")
         // this.anim.play();
     }
 

@@ -19,14 +19,18 @@
 
 import {FileAPI} from "../Files/FileAPI"
 import API from "../Telegram/API"
+import DocumentParser from "../Files/DocumentParser"
+
+const setsStore = new Map()
 
 class StickerSet {
     thumbUrl: string;
 
     rawStickerSet: Object;
 
-    constructor(raw) {
+    constructor(raw, isAnimated) {
         this.raw = raw;
+        this._isAnimated = isAnimated;
     }
 
     get input() {
@@ -51,12 +55,13 @@ class StickerSet {
 
     getStickerSet() {
         if (!this.isFetched) {
-            if(this.fetchingPromise) return this.fetchingPromise;
-            
+            if (this.fetchingPromise) return this.fetchingPromise;
+
             return this.fetchingPromise = API.messages.getStickerSet({
                 stickerset: this.input
             }).then(StickerSet => {
                 this.rawStickerSet = StickerSet;
+                this.raw = StickerSet.set;
                 return StickerSet;
             });
         }
@@ -65,16 +70,20 @@ class StickerSet {
     }
 
     fetchThumb(): Promise<string> {
-        if (this.json) {
-            return Promise.resolve(this.json);
-        } else if (this.thumbUrl) {
+        if (this.thumbUrl) {
             return Promise.resolve(this.thumbUrl);
         }
 
         const download = () => {
             return FileAPI.downloadStickerSetThumb(this).then(blob => {
                 if (this.raw.animated) {
-                    return FileAPI.decodeAnimatedSticker(blob).then(json => this.json = json)
+                    return FileAPI.decodeAnimatedSticker(blob).then(json => {
+                        const blob = new Blob([JSON.stringify(json)], {
+                            type: "application/json",
+                        });
+
+                        this.thumbUrl = URL.createObjectURL(blob);
+                    })
                 }
 
                 this.thumbUrl = FileAPI.getUrl(blob);
@@ -94,6 +103,44 @@ class StickerSet {
 
     fillRaw(raw): StickerSet {
         this.raw = raw;
+        return this;
+    }
+
+    static fromRaw(raw, isAnimated): StickerSet {
+        if (setsStore.has(raw.id)) {
+            const set = setsStore.get(raw.id);
+            set.fillRaw(raw);
+            return set;
+        } else {
+            const set = new StickerSet(raw, isAnimated);
+            setsStore.set(raw.id, set);
+            return set;
+        }
+    }
+
+    static fromSticker(document): StickerSet {
+        this.document = document;
+        this.sticker = DocumentParser.attributeSticker(document);
+
+        // if (setsStore.has(raw.id)) {
+        //     const set = setsStore.get(raw.id);
+        //     set.fillRaw(raw);
+        //     return set;
+        // } else {
+        //     const set = new StickerSet(raw, isAnimated);
+        //     setsStore.set(raw.id, set);
+        //     return set;
+        // }
+    }
+
+    isAnimated() {
+        return this.raw.animated;
+    }
+}
+
+class InputStickerSet {
+    constructor(input) {
+        this.input = input;
     }
 }
 
