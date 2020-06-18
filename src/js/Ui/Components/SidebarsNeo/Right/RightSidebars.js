@@ -51,7 +51,7 @@ export class RightSidebars extends GenericSidebarHistory {
 
     pop(from) {
         const type = this.history[this.history.length - 1]
-        if(type === from || type === from.constructor || from === RightSidebar) {
+        if(from == null || type === from || type === from.constructor || from === RightSidebar) {
             const bar = this.bars.get(type)
 
             if (!bar) return
