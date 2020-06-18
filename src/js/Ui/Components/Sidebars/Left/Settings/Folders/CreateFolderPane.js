@@ -72,7 +72,7 @@ export default class CreateFolderPane extends SettingsPane {
                     </InputHint>
                 </Center>
                 <BR20/>
-                <VInput label="Folder Name" value={f.title || ""}/>
+                <VInput label="Folder Name" value={f.title || ""} onInput={this.onChangeTitle}/>
 
 
                 <SectionFragment title="Included chats">
@@ -109,6 +109,12 @@ export default class CreateFolderPane extends SettingsPane {
                 </SectionFragment>
             </div>
         )
+    }
+
+    onChangeTitle = (event) => {
+        this.state.currentFolder.title = event.target.value
+        delete this.state.currentFolder.flags;
+        FoldersManager.updateFolder(this.state.currentFolder)
     }
 
     onFoldersUpdate = (event) => {
