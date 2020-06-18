@@ -156,11 +156,22 @@ class StickerSetThumb extends StatefulComponent {
     }
 
     componentDidMount() {
-        this.props.set.fetchThumb().then(_ => {
+        this.props.set.fetchThumb().then(() => {
             this.setState({
                 downloaded: true
             })
         })
+    }
+
+    componentWillUpdate(nextProps) {
+        if(this.props.set.raw.id !== nextProps.set.raw.id) {
+            this.state.downloaded = false;
+            nextProps.set.fetchThumb().then(() => {
+                this.setState({
+                    downloaded: true
+                })
+            })
+        }
     }
 }
 
