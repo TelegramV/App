@@ -61,6 +61,7 @@ export default class CallMessageHandler {
         }
         sdlen &= 0x7FF
         const actualData = buf.getBytes(sdlen)
+        console.log("handleStreamData")
         CallsManager.decodeOpus(actualData)
         // handle input
         // try {

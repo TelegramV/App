@@ -21,6 +21,7 @@ export default class Opus {
             return Promise.resolve()
         }
 
+
         if (!this.native) {
             return this.loadLibOpus().then(_ => {
                 this.memory = {
