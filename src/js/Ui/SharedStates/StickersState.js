@@ -23,7 +23,7 @@ class StickersState extends SharedState {
 
 	addSet(stickerSet) {
 		if(!this.contains(stickerSet)) {
-			let newSets = [...sets];
+			let newSets = [...this.sets];
 			newSets.unshift(stickerSet)
 			this.set({
 				sets: newSets
@@ -33,7 +33,7 @@ class StickersState extends SharedState {
 
 	removeSet(stickerSet) { //maybe change to just id?
 		if(this.contains(stickerSet)) {
-			let newSets = sets.filter(set => set.id !== stickerSet.id);
+			let newSets = this.sets.filter(set => set.id !== stickerSet.id);
 			this.set({
 				sets: newSets
 			})
@@ -41,6 +41,7 @@ class StickersState extends SharedState {
 	}
 
 	contains(stickerSet) {
+		if(!stickerSet) return false;
 		for(let set of this.sets) {
 			if(set.id === stickerSet.id) return true;
 		}

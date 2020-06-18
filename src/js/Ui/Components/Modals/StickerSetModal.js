@@ -21,9 +21,13 @@ import AppSelectedChat from "../../Reactive/SelectedChat";
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import BetterStickerComponent from "../Basic/BetterStickerComponent"
 import VButton from "../../Elements/Button/VButton"
+import StickersState from "../../SharedStates/StickersState"
+import {StickerManager} from "../../../Api/Stickers/StickersManager"
 import "./StickerSetModal.scss"
 
 export class StickerSetModal extends StatefulComponent {
+
+    state = StickersState
 
     render(props) {
         return <div className="sticker-set">
@@ -34,7 +38,7 @@ export class StickerSetModal extends StatefulComponent {
                 </div>
             </div>
             <div class="add">
-                <VButton>{props.set.set?.count ? `Add ${props.set.set.count} stickers` : "Loading..."}</VButton>
+                <SetButton set={props.set} installed={this.state.contains(props.set.set)}/>
             </div>
         </div>
     }
@@ -42,9 +46,20 @@ export class StickerSetModal extends StatefulComponent {
     componentDidMount() {
         if(!this.props.set.isFetched) {
             this.props.set.getStickerSet().then(set => {
-                console.log(set);
                 this.forceUpdate();
             })
+        }
+    }
+}
+
+const SetButton = ({set, installed}) => {
+    if(!set || !set.isFetched) {
+        return <VButton isUppercase={false}>Loading...</VButton>
+    } else {
+        if(installed) {
+            return <VButton isUppercase={false} isFlat={true} onClick={_ => StickerManager.uninstallStickerSet(set)}>Remove stickers</VButton>
+        } else {
+            return <VButton isUppercase={false} onClick={_ => StickerManager.installStickerSet(set)}>Add {set.set.count} stickers</VButton>
         }
     }
 }
