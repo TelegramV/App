@@ -169,7 +169,9 @@ export class MessageParser {
             case MessageType.WEB_PAGE:
                 return "";
             case MessageType.SERVICE:
-                return "Service message"
+                return "Service message" //somehow, not working from there
+            case MessageType.DICE:
+                return message.emoji;
             default:
                 return "Unsupported"
         }

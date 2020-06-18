@@ -11,6 +11,13 @@
 		grid-gap: 5px;
 		padding: 0 5px;
 		max-height: 300px;
+
+		img {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 75px;
+            object-fit: contain;
+        }
 	}
 
 	.add {
