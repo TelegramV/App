@@ -41,6 +41,9 @@ import processUpdateMessagePollVote from "./Update/Message/processUpdateMessageP
 import processUpdateEditChannelMessage from "./Update/Message/processUpdateEditChannelMessage"
 import processUpdateNewChannelMessage from "./Update/Message/processUpdateNewChannelMessage"
 import processUpdateDraftMessage from "./Update/processUpdateDraftMessage"
+import processUpdateNewStickerSet from "./Update/processUpdateNewStickerSet"
+import processUpdateStickerSets from "./Update/processUpdateStickerSets"
+import processUpdateStickerSetsOrder from "./Update/processUpdateStickerSetsOrder"
 
 export class UpdateManager extends Manager {
     constructor() {
@@ -90,6 +93,9 @@ export class UpdateManager extends Manager {
         this.subscribe("updateEditChannelMessage", processUpdateEditChannelMessage)
         this.subscribe("updateNewChannelMessage", processUpdateNewChannelMessage)
         this.subscribe("updateDraftMessage", processUpdateDraftMessage)
+        this.subscribe("updateNewStickerSet", processUpdateNewStickerSet)
+        this.subscribe("updateStickerSets", processUpdateStickerSets)
+        this.subscribe("updateStickerSetsOrder", processUpdateStickerSetsOrder)
 
         this.customUpdatesProcessors = new Map([
             ["updatesTooLong", processUpdatesTooLong],

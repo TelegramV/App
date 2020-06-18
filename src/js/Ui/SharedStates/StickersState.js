@@ -47,6 +47,19 @@ class StickersState extends SharedState {
 		}
 		return false;
 	}
+
+	updateOrder(order) {
+		let newSets = [];
+		for(let id of order) {
+			let set = this.sets.find(set => set.id === id);
+			if(set) {
+				newSets.push(set);
+			}
+		}
+		this.set({
+			sets: newSets
+		})
+	}
 }
 
 export default new StickersState();
