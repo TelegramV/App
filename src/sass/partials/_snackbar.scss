@@ -9,7 +9,7 @@
 
 .snackbar {
     min-width: 100px;
-    max-width: 300px;
+    max-width: 400px;
     background-color: rgba(black, 0.6);
     color: #fff;
     text-align: center;
@@ -37,6 +37,18 @@
         .text {
             text-align: left;
             padding-left: 10px;
+        }
+    }
+
+    .emoji-suggestion {
+        .send-button {
+            color: $blue;
+            font-weight: 500;
+            margin-left: 5px;
+            cursor: pointer;
+            &:hover {
+                text-decoration: underline;
+            }
         }
     }
 }

@@ -255,11 +255,13 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     mouseEnterEmoji = () => {
+        if(isMobile()) return;
         VApp.mountedComponents.get("composer").show();
         this.hideComposer = false;
     }
 
     mouseLeaveEmoji = () => {
+        if(isMobile()) return;
         this.hideComposer = true;
         this.planComposerClose()
     }
