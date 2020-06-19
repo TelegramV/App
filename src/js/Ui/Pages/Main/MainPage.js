@@ -7,7 +7,6 @@ import ModalContainer from "../../Components/Singleton/ModalContainer"
 import {MediaViewerComponent} from "../../Components/Singleton/MediaViewerComponent"
 import {InstantViewComponent} from "../../Components/Singleton/InstantViewComponent"
 import ChatComponent from "../../Components/Columns/Chat/ChatComponent"
-// import {SearchPanelComponent} from "../../Components/Sidebars/Left/Search/SearchPanelComponent"
 import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
