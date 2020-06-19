@@ -11,6 +11,7 @@ import classIf from "../../../../V/VRDOM/jsx/helpers/classIf";
 import CheckboxAvatarButton from "../Fragments/CheckboxAvatarButton";
 import AvatarButton from "../Fragments/AvatarButton";
 import {Section} from "../Fragments/Section";
+import AvatarCheckmarkButton from "../Fragments/AvatarCheckmarkButton";
 
 export class ForwardSidebar extends GenericSidebar {
     offsetId = 0
@@ -63,7 +64,7 @@ export class ForwardSidebar extends GenericSidebar {
                     DialogsStore.toSortedArray().map(dialog => {
                         if(!this.state.filter || dialog.peer.name.toLowerCase().includes(this.state.filter.toLowerCase())) {
                             if(dialog.peer.canSendMessage) {
-                                return <CheckboxAvatarButton peer={dialog.peer}
+                                return <AvatarCheckmarkButton peer={dialog.peer}
                                                      isNameAsText isStatusAsDescription
                                                                  checked={this.state.selected.includes(dialog.peer)}
                                                                  onClick={ev => {
