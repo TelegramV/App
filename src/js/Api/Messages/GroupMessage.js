@@ -53,6 +53,10 @@ class GroupMessage extends AbstractMessage {
         return this.first.parsed;
     }
 
+    get prefix() {
+        return this.first.prefix;
+    }
+
     add(message: Message) {
         this.messages.add(message);
         this.fire("groupUpdated");

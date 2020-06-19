@@ -90,7 +90,7 @@ class MP4StreamingFile {
             this.mediaSource.onsourceclose = ev => reject(ev);
 
             this.mediaSource.onsourceopen = () => {
-                import("mp4box").then(({default: MP4Box}) => {
+                import("../../../../vendor/mp4box.all.min").then(({default: MP4Box}) => {
                     if (this.canceled) {
                         return;
                     }
@@ -231,6 +231,10 @@ class MP4StreamingFile {
     }
 
     seek = async (time: number) => {
+        if (this.canceled) {
+            return;
+        }
+
         if (!this.preview) {
             this.seeked = true;
             this.seekedTime = time;
@@ -255,11 +259,19 @@ class MP4StreamingFile {
     }
 
     downloadNextPart = async (time) => {
+        if (this.canceled) {
+            return;
+        }
+
         if (time !== this.seekedTime) {
             throw new Error("canceled")
         }
 
         const file = await FileAPI.downloadDocumentPart(this.document, null, 1024 * 1024, this.bufferOffset);
+
+        if (this.canceled) {
+            return;
+        }
 
         if (time !== this.seekedTime) {
             throw new Error("canceled")
@@ -283,6 +295,7 @@ class MP4StreamingFile {
 
         this.mediaSource = new MediaSource()
         this.parts = null;
+        this.mp4box.stop();
         this.mp4box.stop();
         this.mp4box = null;
         this.queues = null;

@@ -8,6 +8,7 @@ import {ReactiveObject} from "../../../V/Reactive/ReactiveObject"
 import {PeerMessages} from "../PeerMessages"
 import DialogsStore from "../../Store/DialogsStore"
 import type {Message} from "../../Messages/Message";
+import API from "../../Telegram/API"
 
 export class Peer extends ReactiveObject {
 
@@ -55,6 +56,10 @@ export class Peer extends ReactiveObject {
         }
 
         return this._isAbleToHandleUpdates
+    }
+
+    get canPinMessages(): boolean {
+        return this.isSelf || this.type === "chat"
     }
 
     /**
@@ -242,8 +247,10 @@ export class Peer extends ReactiveObject {
     }
 
     set pinnedMessageId(value) {
-        this._pinnedMessage = null
         this._pinnedMessageId = value
+        if (this.full) {
+            this.full.pinned_msg_id = value
+        }
         this.findPinnedMessage()
     }
 
@@ -305,49 +312,29 @@ export class Peer extends ReactiveObject {
         })
     }
 
-    findPinnedMessage(fire = true) {
-        if (this.pinnedMessageId) {
-            if (this._pinnedMessage && fire) {
-                this.fire("pinnedMessageFound", {
-                    message: this._pinnedMessage
-                })
-                return
-            }
+    get pinnedMessage() {
+        return this.messages.getById(this.pinnedMessageId);
+    }
 
+    findPinnedMessage() {
+        if (this.pinnedMessageId) {
             const message = this.messages.getById(this.pinnedMessageId)
 
             if (message) {
-                this._pinnedMessage = message
-
-                if (fire) {
-                    this.fire("pinnedMessageFound", {
-                        message: this._pinnedMessage
-                    })
-                }
+                this.fire("messages.updatePin")
             } else {
-                // this.api.getHistory({
-                //     offset_id: this.pinnedMessageId, // ???
-                //     add_offset: -1,
-                //     limit: 1
-                // }).then(messages => {
-                //     if (messages.length && messages[0].id === this.pinnedMessageId) {
-                //         this.messages.putRawMessage(messages[0])
-                //         this._pinnedMessage = messages[0]
-                //
-                //         if (fire) {
-                //             this.fire("pinnedMessageFound", {
-                //                 message: this._pinnedMessage
-                //             })
-                //         }
-                //     } else {
-                //         console.log("no pinned!")
-                //     }
-                // })
+                API.messages.getHistory(this, {
+                    offset_id: this.pinnedMessageId, // ???
+                    add_offset: -1,
+                    limit: 1
+                }).then(Messages => {
+                    this.messages.putRawMessage(Messages.messages[0])
+
+                    this.fire("messages.updatePin")
+                })
             }
         } else {
-            this.fire("pinnedMessageFound", {
-                message: null
-            })
+            this.fire("messages.updatePin")
         }
     }
 

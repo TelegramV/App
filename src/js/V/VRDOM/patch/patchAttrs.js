@@ -31,7 +31,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
 
         if ($el instanceof HTMLInputElement) {
             if (newAttrs.value !== $el.value) {
-                if (newAttrs.value == null) {
+                if (!newAttrs.value) {
                     newAttrs.value = ""
                 }
 

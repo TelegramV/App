@@ -35,7 +35,7 @@ export class GroupPeer extends Peer {
 
     set participants(peers: Array<UserPeer>) {
         this._participants = peers
-        console.log(this._participants)
+        //console.log(this._participants)
         this._participants.forEach(p => p && p.participateIn.add(this))
         this.refreshOnlineCount()
     }

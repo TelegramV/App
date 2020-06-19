@@ -32,7 +32,7 @@ const VUI = {
     MediaViewer: undefined,
 
     /**
-     * @type {ModalComponent}
+     * @type {ModalContainer}
      */
     Modal: undefined,
 }

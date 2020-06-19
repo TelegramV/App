@@ -28,7 +28,7 @@ export const replaceEmoji = (element) => {
         ext: ".png",
         folder: "img-apple-64",
         callback: (icon, options) => {
-            if (isApple) return "#"; //cause error to not download emoji on Apple devices
+            //if (isApple) return "#"; //cause error to not download emoji on Apple devices //breaks listeners
 
             //there's a difference between twemoji and apple codes
             if (icon.length < 4) {

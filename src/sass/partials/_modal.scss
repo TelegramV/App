@@ -54,7 +54,7 @@
         .dialog {
             min-width: 280px;
             //width: 400px;
-            min-height: 200px;
+            min-height: 100px;
             max-height: 90%;
             z-index: 10;
             //transition: anim(opacity);
@@ -76,7 +76,7 @@
                     margin-right: 22px;
                 }
 
-                >.VButton {
+                > .VButton {
                     margin-left: auto;
                     margin-right: 16px;
                 }
@@ -143,6 +143,7 @@
                     padding-top: 16px;
                 }
             }
+
             //.content {
             //    padding: 18px;
             //    background-color: white;
@@ -172,20 +173,49 @@
             //        padding-top: 16px;
             //    }
             //}
+
+            .prompt {
+                .header {
+                    text-align: center;
+                    display: flex;
+                    justify-content: center;
+                    margin: 0 15px;
+                }
+
+                .content {
+                    text-align: center;
+                    display: flex;
+                    justify-content: center;
+                }
+
+                .buttons {
+                    display: flex;
+                    justify-content: flex-end;
+                    padding: 5px;
+                    margin-top: 15px;
+
+                    .VButton {
+                        margin-left: 5px;
+                    }
+                }
+            }
         }
     }
 }
 
 .attach-files-modal {
     min-width: 420px;
+
     .file-list {
-        >* {
+        > * {
             margin-bottom: 24px;
         }
     }
 }
+
 .attach-modal {
     width: 350px;
+
     .input-field {
         width: 100%;
         margin-block-end: 15px;
@@ -206,13 +236,16 @@
         margin-right: 14px;
     }
 }
+
 .delete-chat-body {
     display: flex;
     flex-direction: column;
+
     .text {
         margin-bottom: 10px;
         line-height: 1.5;
     }
+
     button {
         text-align: end;
     }

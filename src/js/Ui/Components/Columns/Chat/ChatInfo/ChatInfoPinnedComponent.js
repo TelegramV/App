@@ -21,18 +21,14 @@ import {MessageParser} from "../../../../../Api/Messages/MessageParser";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import AudioPlayer from "../../../../../Api/Media/AudioPlayer"
+import VUI from "../../../../VUI"
+import API from "../../../../../Api/Telegram/API"
 
 class ChatInfoPinnedComponent extends StatefulComponent {
-    state = {
-        audio: undefined,
-        pause: undefined,
-        meta: undefined,
-        message: undefined,
-    }
-
     appEvents(E) {
         E.bus(AppEvents.Peers)
-            .on("pinnedMessageFound", this.onPinnedMessageFound)
+            .filter(event => AppSelectedChat.check(event.peer))
+            .updateOn("messages.updatePin")
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelected)
@@ -45,6 +41,8 @@ class ChatInfoPinnedComponent extends StatefulComponent {
     }
 
     render() {
+        const pinned = AppSelectedChat.current?.pinnedMessage
+        
         if (AudioPlayer.state.message) {
             let playClasses = ["tgico", !AudioPlayer.state.isPaused ? "tgico-pause" : "tgico-play"];
             return (
@@ -64,17 +62,24 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                     </div>
                 </div>
             )
-        } else if (this.state.message) {
+        } else if (pinned) {
             return (
                 <div className="pin pinned-message"
-                     onClick={event => UIEvents.General.$chat.showMessage(this.state.message)}>
+                     onClick={event => UIEvents.General.$chat.showMessage(pinned)}>
                     <div class="message-info">
                         <div className="title">Pinned message</div>
-                        <div className="description">{MessageParser.getPrefixNoSender(this.state.message)}</div>
+                        <div className="description">{MessageParser.getPrefixNoSender(pinned)}</div>
                     </div>
-                    <div class="close">
-                        <i className="tgico tgico-close"/>
-                    </div>
+                    {
+                        pinned.dialogPeer.canPinMessages &&
+                        <div class="close"
+                             onClick={() => VUI.Modal.prompt("Would you like to unpin this message?", null, () => {
+                                 API.messages.updatePinnedMessage(pinned);
+                                 VUI.Modal.close();
+                             })}>
+                            <i className="tgico tgico-close"/>
+                        </div>
+                    }
                 </div>
             )
         } else {
@@ -88,41 +93,6 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                 message: AppSelectedChat.Current._pinnedMessage
             })
         }
-    }
-
-    onPinnedMessageFound = event => {
-        if (event.message && AppSelectedChat.check(event.message.to)) {
-            this.setState({
-                message: event.message
-            })
-        } else {
-            this.setState({
-                message: null
-            })
-        }
-    }
-
-    onAudioPlay = event => {
-        event.audio.getMeta().then(meta => {
-            this.setState({
-                audio: event.audio,
-                meta: meta,
-                pause: false
-            })
-        });
-    }
-
-    onAudioPause = event => {
-        this.setState({
-            pause: true
-        })
-    }
-
-    onAudioRemove = event => {
-        this.setState({
-            audio: undefined,
-            meta: undefined
-        })
     }
 }
 

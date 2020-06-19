@@ -14,7 +14,8 @@ export class BackgroundImageSidebar extends LeftSidebar {
 
     state = {
         blur: true,
-        wallpapers: null
+        wallpapers: null,
+        selected: 0
     }
 
 	appEvents(E) {
@@ -52,6 +53,14 @@ export class BackgroundImageSidebar extends LeftSidebar {
                 this.onBlurClick();
             }
         })
+
+        WallpaperManager.getSelectedId().then(id => {
+            if(id) {
+                this.setState({
+                    selected: id
+                })
+            }
+        })
     }
 
     onShown(params) {
@@ -63,7 +72,7 @@ export class BackgroundImageSidebar extends LeftSidebar {
 
         let squares = [];
         for(let wallpaper of this.state.wallpapers) {
-            squares.push(<BackgroundPreviewComponent click={this.previewClick} wallpaper={wallpaper}/>)
+            squares.push(<BackgroundPreviewComponent click={this.previewClick} wallpaper={wallpaper} selected={wallpaper.id===this.state.selected}/>)
         }
         return squares;
     }
@@ -100,6 +109,9 @@ export class BackgroundImageSidebar extends LeftSidebar {
 
     previewClick = (wallpaper) => {
         WallpaperManager.requestAndInstall(wallpaper);
+        this.setState({
+            selected: wallpaper.id
+        })
         if(wallpaper.pattern && this.state.blur) this.onBlurClick(); //disable blur for patterns
     }
 }

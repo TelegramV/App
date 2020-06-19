@@ -33,12 +33,12 @@ class WallpaperManagerSingleton {
 
         keval.getItem("background").then(data => {
             if (!data) {
-                this.setWallpaper("./static/images/default_bg.jpg")
+                this.setWallpaper("./static/images/default_bg.jpg", 0, false)
                 return;
             }
             if (data.blob) {
                 let url = URL.createObjectURL(data.blob);
-                this.setWallpaper(url);
+                this.setWallpaper(url, 0, false);
             } else if (data.color) {
                 this.setColor(data.color);
             }
@@ -70,6 +70,11 @@ class WallpaperManagerSingleton {
 
             return this.wallpapers;
         });
+    }
+
+    async getSelectedId() {
+        let data = await keval.getItem("background");
+        return data?.wallpaperId;
     }
 
     async fetchPreview(wallpaper) {
@@ -109,16 +114,18 @@ class WallpaperManagerSingleton {
         })
     }
 
-    setWallpaper(url, wallpaperId = 0) {
+    setWallpaper(url, wallpaperId = 0, save = true) {
         if (!url) {
             window.document.body.style.setProperty("--chat-bg-image", `none`); //html element changes with each resize, causing background flickering
             return;
         }
         window.document.body.style.setProperty("--chat-bg-image", `url(${url})`);
-        fetch(url).then(async response => {
-            let blob = await response.blob();
-            keval.setItem("background", {blob: blob, wallpaperId: wallpaperId});
-        })
+        if(save) {
+            fetch(url).then(async response => {
+                let blob = await response.blob();
+                keval.setItem("background", {blob: blob, wallpaperId: wallpaperId});
+            })
+        }
     }
 
     setColor(hex) {

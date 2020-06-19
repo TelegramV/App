@@ -33,7 +33,7 @@ class BetterPhotoComponent extends StatefulComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Files)
-            .filter(event => event.file.id === this.props.photo.id)
+            .filter(event => FileManager.checkEvent(event, this.props.photo))
             // .updateOn("download.start")
             // .on("download.newPart", this.onDownloadNewPart)
             .updateOn("download.done");
