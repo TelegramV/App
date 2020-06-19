@@ -56,6 +56,7 @@
         overflow-x: auto;
         height: 100%;
         user-select: text;
+        -webkit-user-select: text;
 
         & > * {
           margin-left: 16px;

@@ -51,8 +51,9 @@ img:not([src]) {
     background-color: $lightblue;
     overflow: hidden;
     height: 100%;
-  // Only specific parts should be selectable
-  user-select: none;
+    // Only specific parts should be selectable
+    user-select: none;
+    -webkit-user-select: none
 }
 
 @media (min-width: 1922px) {
@@ -113,6 +114,7 @@ img:not([src]) {
         margin: 0 .05em 0 .1em;
         vertical-align: -0.3em;
         user-select: all;
+        -webkit-user-select: all;
     }
 
     &.native {
@@ -126,6 +128,12 @@ img:not([src]) {
 
 .d-flex {
     display: flex;
+}
+
+.no-select {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-touch-callout: none !important;
 }
 
 ::-webkit-scrollbar {

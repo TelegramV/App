@@ -5,8 +5,9 @@ import AppCache from "./Api/Cache/AppCache"
 
 import VApp from "./V/vapp"
 import AppRoutes from "./Ui/Routing"
-import RippleVRDOMPlugin from "./Ui/Plugins/RipplePlugin"
 
+import RippleVRDOMPlugin from "./Ui/Plugins/RipplePlugin"
+import LongtapVRDOMPlugin from "./Ui/Plugins/LongtapPlugin"
 import HorizontalScrollVRDOMPlugin from "./Ui/Plugins/HorizontalScrollPlugin"
 
 import PeerFactory from "./Api/Peers/PeerFactory"
@@ -31,6 +32,7 @@ if (__IS_PRODUCTION__) {
 
 VApp.registerPlugin(RippleVRDOMPlugin)
 VApp.registerPlugin(HorizontalScrollVRDOMPlugin)
+VApp.registerPlugin(LongtapVRDOMPlugin)
 VApp.useRoutes(AppRoutes)
 
 if (document.getElementById("page-loader")) {
