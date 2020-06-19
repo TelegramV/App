@@ -22,7 +22,6 @@ import AppSelectedChat from "../../../Reactive/SelectedChat"
 import UIEvents from "../../../EventBus/UIEvents"
 import AppEvents from "../../../../Api/EventBus/AppEvents"
 import MessageComponent from "./MessageComponent"
-import {ServiceMessage} from "../../../../Api/Messages/Objects/ServiceMessage"
 import type {Message} from "../../../../Api/Messages/Message"
 import {MessageType} from "../../../../Api/Messages/Message"
 import vrdom_delete from "../../../../V/VRDOM/delete"
@@ -47,8 +46,8 @@ function getMessageElementById(messageId: number): HTMLElement | null {
 
 export function isGrouping(one: Message, two: Message) {
     if (!one || !two ||
-     one.type === MessageType.GROUP || two.type === MessageType.GROUP ||
-     one.type === MessageType.SERVICE || two.type === MessageType.SERVICE) return false;
+        one.type === MessageType.GROUP || two.type === MessageType.GROUP ||
+        one.type === MessageType.SERVICE || two.type === MessageType.SERVICE) return false;
     return (one.isPost || one.isOut === two.isOut)
         && (one.from.id === two.from.id)
         && (Math.abs(one.date - two.date) < 5 * 60);
@@ -165,7 +164,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             message.tailsGroup = "m";
         }
 
-        return <MessageComponent observer={this.observer} message={message} showDate={!isSameDate(message.date, prevMessage?.date)}/>;
+        return <MessageComponent observer={this.observer} message={message}
+                                 showDate={!isSameDate(message.date, prevMessage?.date)}/>;
     }
 
     cleanupTree = () => {
@@ -436,18 +436,17 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             const afterMessage = this.mainVirtual.getVeryBottomOne();
 
             this.mainVirtual.messages.push(message);
+            this.mainVirtual.veryBottomPage();
 
             const {scrollTop, scrollHeight, clientHeight} = this.$el;
             const isAtBottom = scrollHeight - scrollTop === clientHeight;
 
-            if (this.mainVirtual.currentPage.length > this.mainVirtual.size) {
-                vrdom_delete(this.bubblesInnerRef.$el.firstChild);
+            this.prependMessages([message], afterMessage, null);
+
+            if (this.bubblesInnerRef.$el.childElementCount > this.mainVirtual.size) {
+                vrdom_delete(this.bubblesInnerRef.$el.lastElementChild);
                 this.dev_checkTree();
             }
-
-            this.mainVirtual.veryBottomPage();
-
-            this.prependMessages([message], afterMessage, null);
 
             if (isAtBottom) {
                 this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;

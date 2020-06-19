@@ -186,8 +186,10 @@ class ContextMenuComponent extends StatefulComponent {
             };
         } // empty context menu blocks scroll
         return event => {
+            console.log(event)
+
             event.preventDefault()
-            this.openXY(callOrReturn(data), event.clientX, event.clientY);
+            this.openXY(callOrReturn(data), event.clientX - document.querySelector("#app").getBoundingClientRect().x, event.clientY);
         }
     }
 }

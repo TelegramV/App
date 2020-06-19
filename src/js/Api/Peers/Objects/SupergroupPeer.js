@@ -8,6 +8,9 @@ export class SupergroupPeer extends ChannelPeer {
         super(rawPeer)
     }
 
+    get canSendMessage() {
+        return this.canPostMessages || !this.bannedRights.send_messages
+    }
 
     /**
      * Get the type of peer

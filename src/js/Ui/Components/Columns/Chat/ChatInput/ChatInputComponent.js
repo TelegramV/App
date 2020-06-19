@@ -170,9 +170,9 @@ export class ChatInputComponent extends StatelessComponent {
      */
     onChatSelect = ({peer}) => {
         if (peer.canSendMessage ?? true) {
-            this.$el.style.display = "block"
+            this.show()
         } else {
-            this.$el.style.display = "none"
+            this.hide()
         }
     }
 
@@ -514,7 +514,7 @@ export class ChatInputComponent extends StatelessComponent {
 
                     return values / length;
                 }
-                
+
                 let AudioContext = window.AudioContext || window.webkitAudioContext;
                 this.audioContext = new AudioContext();
                 const input = this.audioContext.createMediaStreamSource(l);

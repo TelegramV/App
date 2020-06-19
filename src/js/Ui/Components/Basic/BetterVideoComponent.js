@@ -56,7 +56,7 @@ class BetterVideoComponent extends StatefulComponent {
             .on("download.canceled", this.onDownloadCanceled)
     }
 
-    render({document, onClick, playOnHover, infoContainer, isRound, onPlay, onPause, onTimeUpdate, showVideo, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
+    render({document, onClick, playOnHover, infoContainer, isRound, onPlay, onPause, onTimeUpdate, showVideo = true, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
         const streamable = DocumentParser.isVideoStreamable(document);
 
         if (streamable) {

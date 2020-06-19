@@ -41,6 +41,10 @@ export class ChannelPeer extends Peer {
         }
     }
 
+    get bannedRights() {
+        return this.raw.bannedRights || this.raw.bannedRights || {}
+    }
+
     get adminRights() {
         return (this.raw.admin_rights && this.raw.admin_rights) || {}
     }
