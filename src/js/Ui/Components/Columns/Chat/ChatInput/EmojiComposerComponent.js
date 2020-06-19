@@ -22,6 +22,8 @@ import {emojiCategories, replaceEmoji} from "../../../../Utils/replaceEmoji"
 import {ChatInputManager} from "./ChatInputComponent"
 import keval from "../../../../../Keval/keval"
 
+const DEFAULT_RECENT = "😀😂🤔";
+
 class EmojiComposerComponent extends StatelessComponent {
     emojiCategory = null
     emojiCategories = [
@@ -61,9 +63,9 @@ class EmojiComposerComponent extends StatelessComponent {
     componentDidMount() {
         keval.getItem("recentEmoji").then(recent => {
 
-            recent = recent || "";
+            recent = recent || DEFAULT_RECENT;
 
-            if (!recent.length) {
+            /*if (!recent.length) {
                 this.emojiCategory = "people";
                 const $selected = this.$el.querySelector(".emoji-table").querySelector(".people");
                 $selected.classList.add("selected");
@@ -73,7 +75,7 @@ class EmojiComposerComponent extends StatelessComponent {
                 this.$el.querySelector(".emoji-table > .selected").childNodes.forEach(node => {
                     node.addEventListener("click", this.onClickEmoji);
                 });
-            } else {
+            } else {*/
                 this.emojiCategory = "recent";
                 const $selected = this.$el.querySelector(".emoji-table").querySelector(".recent");
                 $selected.classList.add("selected");
@@ -83,9 +85,9 @@ class EmojiComposerComponent extends StatelessComponent {
                 this.$el.querySelector(`.emoji-types > [data-category=recent]`).classList.add("selected");
 
                 $selected.childNodes.forEach(node => {
-                    node.onclick = this.onClickEmoji;
+                    node.addEventListener("click", this.onClickEmoji);
                 });
-            }
+            //}
         });
     }
 
@@ -118,6 +120,7 @@ class EmojiComposerComponent extends StatelessComponent {
 
             replaceEmoji($emojiPanel);
 
+            console.log(this.$el.querySelector(".emoji-table > .selected").childNodes)
             this.$el.querySelector(".emoji-table > .selected").childNodes.forEach(node => {
                 node.addEventListener("click", this.onClickEmoji);
             });
@@ -131,7 +134,7 @@ class EmojiComposerComponent extends StatelessComponent {
         const $recentPanel = document.getElementById("composer-emoji-panel-recent");
 
         keval.getItem("recentEmoji").then((recent: string) => {
-            recent = recent || ""
+            recent = recent || DEFAULT_RECENT
 
             recent = alt + Array.from(recent).filter(c => c !== alt).join("")
 

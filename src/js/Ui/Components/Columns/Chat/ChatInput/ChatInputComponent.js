@@ -210,6 +210,7 @@ export class ChatInputComponent extends StatelessComponent {
 
     backspace = () => { //BUGGY!!!, REWRITE THIS
         let sel, range;
+        this.setEndOfContenteditable(this.textarea)
         if (window.getSelection) {
             sel = window.getSelection();
             if ((sel.baseNode?.parentElement === this.textarea || sel.baseNode === this.textarea)

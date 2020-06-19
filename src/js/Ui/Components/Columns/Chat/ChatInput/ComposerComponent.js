@@ -40,7 +40,7 @@ export default class ComposerComponent extends StatelessComponent {
                         <i class="tgico tgico-gifs"/>
                     </div>
                     <div class="filler"/>
-                    <div className="item rp rps" onClick={this.onBackspaceClick}>
+                    <div className="item rp rps" id="composer-emoji-backspace-button" onClick={this.onBackspaceClick}>
                         <i class="tgico tgico-deleteleft"/>
                     </div>
                 </div>
@@ -105,9 +105,14 @@ export default class ComposerComponent extends StatelessComponent {
 
     togglePanel = (name: string) => {
         document.getElementById("composer-stickers-search-button").style.visibility = "hidden";
+        document.getElementById("composer-emoji-backspace-button").style.visibility = "hidden";
 
         if (name === "stickers") {
             document.getElementById("composer-stickers-search-button").style.visibility = "visible";
+        }
+
+        if (name === "emoji") {
+            document.getElementById("composer-emoji-backspace-button").style.visibility = "visible";
         }
 
         if (this.stateless.panel === name) {

@@ -8,19 +8,23 @@
     &.group-s {
         border-top-left-radius: 15px;
         border-top-right-radius: 15px;
-        margin-top: 10px;
+        margin-top: 4px;
+        margin-bottom: 2px;
     }
 
     &.group-m {
-        margin-top: 5px;
+        margin-top: 2px;
+        margin-bottom: 2px;
     }
 
     &.group-e {
-        margin-top: 5px;
+        margin-top: 2px;
+        margin-bottom: 4px;
     }
 
     &.group-se {
-        margin-top: 10px;
+        margin-top: 4px;
+        margin-bottom: 4px;
     }
 
     @if $in {
