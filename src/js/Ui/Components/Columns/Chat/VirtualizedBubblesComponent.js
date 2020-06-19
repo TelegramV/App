@@ -436,18 +436,17 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             const afterMessage = this.mainVirtual.getVeryBottomOne();
 
             this.mainVirtual.messages.push(message);
+            this.mainVirtual.veryBottomPage();
 
             const {scrollTop, scrollHeight, clientHeight} = this.$el;
             const isAtBottom = scrollHeight - scrollTop === clientHeight;
 
-            if (this.mainVirtual.currentPage.length > this.mainVirtual.size) {
-                vrdom_delete(this.bubblesInnerRef.$el.firstChild);
+            this.prependMessages([message], afterMessage, null);
+
+            if (this.bubblesInnerRef.$el.childElementCount > this.mainVirtual.size) {
+                vrdom_delete(this.bubblesInnerRef.$el.lastElementChild);
                 this.dev_checkTree();
             }
-
-            this.mainVirtual.veryBottomPage();
-
-            this.prependMessages([message], afterMessage, null);
 
             if (isAtBottom) {
                 this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
