@@ -23,7 +23,9 @@ export default class SuggestionComponent extends StatelessComponent {
         }
         return (
             <div className={classes}>
-                {this.currentSuggestion}
+                <span>
+                    {this.currentSuggestion}
+                </span>
             </div>
         )
     }

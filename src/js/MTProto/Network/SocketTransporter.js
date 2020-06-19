@@ -84,11 +84,17 @@ export class SocketTransporter {
             this.isConnected = true;
             this.isConnecting = false;
 
-            for (const b of this.transportationQueue) {
+            while (this.transportationQueue.length) {
+                const b = this.transportationQueue.shift();
                 this.inob_send(b, b.byteLength);
             }
 
-            this.transportationQueue = [];
+            // may be bugs
+            // for (const b of this.transportationQueue) {
+            //     this.inob_send(b, b.byteLength);
+            // }
+            //
+            // this.transportationQueue = [];
 
             this.onConnect();
         }

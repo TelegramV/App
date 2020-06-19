@@ -27,7 +27,9 @@ import AppEvents from "../../../Api/EventBus/AppEvents"
 class BetterStickerComponent extends StatefulComponent {
     state = {
         isAnimated: false,
+        animationDataUrl: null,
         animationData: null,
+        showAnimation: !this.props.hideAnimated,
         url: null,
         thumbUrl: null,
         isDownloading: false,
@@ -35,9 +37,13 @@ class BetterStickerComponent extends StatefulComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Files)
-            .filter(event => event.file.id === this.props.document.id)
+            .filter(event => FileManager.checkEvent(event, this.props.document))
             .on("download.start", this.onDownloadStart)
             .on("download.done", this.onDownloadDone)
+
+        E.bus(AppEvents.Files)
+            .filter(event => FileManager.checkEvent(event, this.props.document, this.props.document.thumbs[0]))
+            .on("download.done", this.onAnimatedThumbDownloadDone)
     }
 
     render(props, state) {
@@ -46,11 +52,19 @@ class BetterStickerComponent extends StatefulComponent {
         const width = props.width || 250;
         const height = props.height || (sizeAttr ? sizeAttr.h / sizeAttr.w * width : width);
 
-        if (state.isAnimated) {
+
+        if ((!state.thumbUrl || state.showAnimation) && state.isAnimated) {
             const options = {
-                animationData: state.animationData,
+                path: state.animationDataUrl,
                 loop: props.loop ?? false,
                 autoplay: props.autoplay ?? false,
+                // rendererSettings: {
+                // preserveAspectRatio: "xMinYMin slice", // Supports the same options as the svg element's preserveAspectRatio property
+                // clearCanvas: false,
+                // progressiveLoad: true, // Boolean, only svg renderer, loads dom elements when needed. Might speed up initialization for large number of elements.
+                // hideOnTransparent: true, //Boolean, only svg renderer, hides elements when opacity reaches 0 (defaults to true)
+                // className: "lottie-svg"
+                // }
             };
 
             const playOnHover = props.playOnHover ?? true;
@@ -64,18 +78,27 @@ class BetterStickerComponent extends StatefulComponent {
                             height={height}
                             options={options}
                             playOnHover={playOnHover}
-                            isPaused={isPaused}/>
+                            isPaused={isPaused}
+                            eventListeners={[
+                                {
+                                    eventName: "complete",
+                                    callback: this.onAnimationStop
+                                }
+                            ]}
+                    />
                 </div>
             )
         } else {
             return (
                 <div id={props.id}
                      class="sticker"
-                     onClick={props.onClick}>
+                     onClick={props.onClick}
+                     onMouseOver={this.onMouseOver}>
                     <img class="loading"
-                         src={state.url || state.thumbUrl}
+                         src={state.thumbUrl || state.url}
                          css-width={`${width}px`}
-                         css-height={`${height}px`}/>
+                         css-height={`${height}px`}
+                         alt="Sticker"/>
                 </div>
             )
         }
@@ -85,24 +108,54 @@ class BetterStickerComponent extends StatefulComponent {
         const isAnimated = this.props.isAnimated != null ? this.props.isAnimated : document.mime_type === "application/x-tgsticker";
         const thumb = isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "";
 
+        const bytesThumb = FileAPI.getAnimatedStickerThumbnail(document)
+
         this.setState({
             isDownloading: true,
             isAnimated,
+            thumbUrl: bytesThumb || FileManager.getUrl(document, document.thumbs[0])
         });
+
+        if (!bytesThumb) {
+            FileManager.downloadDocument(document, document.thumbs[0]);
+        }
 
         FileManager.downloadDocument(document, thumb);
     }
 
     componentWillUpdate(nextProps, nextState) {
         if (nextProps.document.id !== this.props.document.id) {
+            console.log(nextProps, nextState)
             const {document, isFull} = nextProps;
             const isAnimated = nextProps.isAnimated ?? document.mime_type === "application/x-tgsticker";
             const thumb = isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "";
+            const bytesThumb = FileAPI.getAnimatedStickerThumbnail(document)
 
             nextState.isDownloading = true;
             nextState.isAnimated = isAnimated;
+            nextState.thumbUrl = bytesThumb || FileManager.getUrl(document, document.thumbs[0]);
+
+            if (!bytesThumb) {
+                FileManager.downloadDocument(document, document.thumbs[0]);
+            }
 
             FileManager.downloadDocument(document, thumb);
+        }
+    }
+
+    onMouseOver = () => {
+        if (this.props.hideAnimated) {
+            this.setState({
+                showAnimation: true,
+            });
+        }
+    }
+
+    onAnimationStop = () => {
+        if (this.props.hideAnimated) {
+            this.setState({
+                showAnimation: false,
+            });
         }
     }
 
@@ -115,8 +168,15 @@ class BetterStickerComponent extends StatefulComponent {
     onDownloadDone = event => {
         if (this.state.isAnimated) {
             this.assure(FileAPI.decodeAnimatedSticker(event.blob)).then(json => {
+                const blob = new Blob([JSON.stringify(json)], {
+                    type: "application/json",
+                });
+
+                const url = URL.createObjectURL(blob);
+
                 this.setState({
                     animationData: json,
+                    animationDataUrl: url,
                     isDownloading: false,
                 });
             });
@@ -126,6 +186,12 @@ class BetterStickerComponent extends StatefulComponent {
                 isDownloading: false,
             });
         }
+    }
+
+    onAnimatedThumbDownloadDone = ({url}) => {
+        this.setState({
+            thumbUrl: url,
+        });
     }
 }
 

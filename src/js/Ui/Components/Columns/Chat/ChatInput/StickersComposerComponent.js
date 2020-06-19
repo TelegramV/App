@@ -78,7 +78,7 @@ const favedState = new FavedState();
 class FavedStickers extends StatefulComponent {
     state = favedState;
 
-    render(props, { favedStickers }, { faved }) {
+    render(props, {favedStickers}, {faved}) {
         const documents = favedStickers?.stickers ?? [];
 
         return (
@@ -96,7 +96,7 @@ class FavedStickers extends StatefulComponent {
     }
 }
 
-const StickerSetItemFragment = ({ setId, url, onClick }) => {
+const StickerSetItemFragment = ({setId, url, onClick}) => {
     return (
         <div id={`composer-pack-thumb-${setId}`} class="sticker-packs-item rp rps" onClick={onClick}>
             <img src={url} alt="Sticker Pack"/>
@@ -110,15 +110,9 @@ class StickerSetThumbList extends StatefulComponent {
     render(props, state) {
         return (
             <div class="user-sets">
-                {state.sets?.map(set => <StickerSetThumb set={new StickerSet(set)} onClick={props.onClick}/>)}
+                {state.sets?.map(set => <StickerSetThumb set={StickerSet.fromRaw(set)} onClick={props.onClick}/>)}
             </div>
-            )
-    }
-
-    componentDidMount() {
-        if (!this.state.isFetched) {
-            this.state.fetchStickers();
-        }
+        )
     }
 }
 
@@ -131,7 +125,7 @@ class StickerSetThumb extends StatefulComponent {
         let stickerSet = props.set;
         if (stickerSet.raw.animated) {
             const options = {
-                animationData: stickerSet.json,
+                path: stickerSet.thumbUrl,
                 loop: false,
                 autoplay: false,
             };
@@ -156,7 +150,7 @@ class StickerSetThumb extends StatefulComponent {
     }
 
     componentDidMount() {
-        this.props.set.fetchThumb().then(() => {
+        this.assure(this.props.set.fetchThumb()).then(() => {
             this.setState({
                 downloaded: true
             })
@@ -164,7 +158,7 @@ class StickerSetThumb extends StatefulComponent {
     }
 
     componentWillUpdate(nextProps) {
-        if(this.props.set.raw.id !== nextProps.set.raw.id) {
+        if (this.props.set.raw.id !== nextProps.set.raw.id) {
             this.state.downloaded = false;
             nextProps.set.fetchThumb().then(() => {
                 this.setState({
@@ -213,46 +207,12 @@ class StickersComposerComponent extends StatelessComponent {
         )
     }
 
-    componentDidMount() {}
+    componentDidMount() {
+    }
 
     onComposerTogglePanel = event => {
         if (event.panel === "stickers" && !this.initialized) {
-            /*API.messages.getAllStickers().then(AllStickers => {
-                this.allStickers = AllStickers;
-
-                let sets = AllStickers.sets.map(raw => new StickerSet(raw))
-                let promises = sets.map(stickerSet => stickerSet.fetchThumb());
-                //waits to fetch all thumbs, maybe rewrite to sorted append in future
-                Promise.all(promises).then(() => {
-                    sets.forEach(stickerSet => {
-                        const onClick = () => this.openStickerSet(stickerSet);
-
-                        if (stickerSet.raw.animated) {
-                            const options = {
-                                animationData: stickerSet.json,
-                                loop: false,
-                                autoplay: false,
-                            };
-
-                            VRDOM.append(
-                                <div className="sticker-packs-item rp rps" onClick={onClick}>
-                                    <Lottie width={35}
-                                            height={35}
-                                            options={options}
-                                            playOnHover/>
-                                </div>,
-                                this.stickerPacksRef.$el);
-                        } else if (stickerSet.thumbUrl) {
-                            VRDOM.append(
-                                <StickerSetItemFragment setId={stickerSet.raw.id}
-                                                        url={stickerSet.thumbUrl}
-                                                        onClick={onClick}/>,
-                                this.stickerPacksRef.$el
-                            );
-                        }
-                    })
-                });
-            });*/
+            StickersState.fetchStickers();
 
             API.messages.getRecentStickers().then(RecentStickers => {
                 const $el = document.getElementById("composer-sticker-pack-recent");
@@ -262,7 +222,8 @@ class StickersComposerComponent extends StatelessComponent {
                         <BetterStickerComponent id={`composer-sticker-recent-${Document.id}`}
                                                 width={75}
                                                 document={Document}
-                                                onClick={() => this.sendSticker(Document)}/>,
+                                                onClick={() => this.sendSticker(Document)}
+                                                hideAnimated/>,
                         $el
                     );
                 });
@@ -286,7 +247,8 @@ class StickersComposerComponent extends StatelessComponent {
                 <BetterStickerComponent id={`composer-sticker-recent-${Document.id}`}
                                         width={75}
                                         document={Document}
-                                        onClick={() => this.sendSticker(Document)}/>,
+                                        onClick={() => this.sendSticker(Document)}
+                                        hideAnimated/>,
                 $recent
             );
 
@@ -332,7 +294,7 @@ class StickersComposerComponent extends StatelessComponent {
                             onClick={() => this.sendSticker(Document)}
                             width={75}
                             document={Document}
-                            isAnimated={stickerSet.raw.animated}/>,
+                            hideAnimated/>,
                         $el
                     );
                 })

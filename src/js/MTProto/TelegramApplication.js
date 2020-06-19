@@ -88,7 +88,7 @@ class TelegramApplication {
 
         this.connections.set(this.mainDcId, new Connection(this.mainDcId, true, this));
 
-        await this.mainConnection.init({
+        this.mainConnection.init({
             doPinging: true,
         });
 
@@ -183,6 +183,20 @@ class TelegramApplication {
             });
             this.awaitingInvokes = [];
         }
+    }
+
+    getConnection(dcId): Connection {
+        let connection = this.connections.get(dcId);
+
+        if (!connection) {
+            connection = new Connection(dcId, false, this);
+            this.connections.set(dcId, connection);
+            connection.init({
+                doPinging: false,
+            });
+        }
+
+        return connection;
     }
 }
 

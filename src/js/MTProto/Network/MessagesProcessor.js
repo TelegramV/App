@@ -121,17 +121,35 @@ class MessagesProcessor {
                 console.error("will be reinvoked", error);
                 return setTimeout(() => connection.reinvoke(rpc_result.req_msg_id), 1000);
             } else if (error.code === 303) {
-                const dcId = parseInt(error.type.match(/^(PHONE_MIGRATE_|NETWORK_MIGRATE_|USER_MIGRATE_)(\d+)/)[2]);
+                if (
+                    error.type.startsWith("PHONE_MIGRATE") ||
+                    error.type.startsWith("USER_MIGRATE") ||
+                    error.type.startsWith("NETWORK_MIGRATE")
+                ) {
+                    const dcId = parseInt(error.type.match(/^(PHONE_MIGRATE_|NETWORK_MIGRATE_|USER_MIGRATE_)(\d+)/)[2]);
 
-                return this.connection.application.setMainConnection(dcId).then(connection => {
+                    return this.connection.application.setMainConnection(dcId).then(connection => {
+                        this.pendingInvokations.delete(message_id);
+
+                        console.log("reset done", connection)
+
+                        return connection.invokeMethod(invokation.name, invokation.params, {useSecondTransporter: invokation.useSecondTransporter})
+                            .then(invokation.resolve)
+                            .catch(invokation.reject);
+                    });
+                } else if (error.type.startsWith("FILE_MIGRATE")) {
+                    const dcId = parseInt(error.type.match(/^(FILE_MIGRATE_)(\d+)/)[2]);
+
+                    const connection = this.connection.application.getConnection(dcId);
+
                     this.pendingInvokations.delete(message_id);
 
-                    console.log("reset done", connection)
+                    console.log(error.type, invokation)
 
                     return connection.invokeMethod(invokation.name, invokation.params, {useSecondTransporter: invokation.useSecondTransporter})
                         .then(invokation.resolve)
                         .catch(invokation.reject);
-                });
+                }
             }
 
             invokation.reject(error);
