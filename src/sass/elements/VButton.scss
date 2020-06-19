@@ -39,6 +39,15 @@
         background-color: lighten($blue, 10);
     }
 
+    &.danger {
+        cursor: default;
+        background-color: $red;
+
+        &:hover {
+            background-color: darken($red, 10);
+        }
+    }
+
     &.uppercase {
         text-transform: uppercase;
     }
