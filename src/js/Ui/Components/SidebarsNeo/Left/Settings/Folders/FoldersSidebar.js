@@ -15,6 +15,7 @@ export class FoldersSidebar extends LeftSidebar {
     appEvents(E) {
         super.appEvents(E)
         E.bus(AppEvents.General)
+            .updateOn("foldersUpdate")
             .updateOn("suggestedFoldersUpdate")
     }
 
@@ -31,7 +32,7 @@ export class FoldersSidebar extends LeftSidebar {
 
             <Section title="Folders">
                 {FoldersManager.folders.map(l => {
-                    return <Button text={l.title} description={"101 chats"} onClick={_ => this.editFolder(l.id)}/>
+                    return <Button text={l.title} description={FoldersManager.getBadgeCount(l.id).count + " chats"} onClick={_ => this.editFolder(l.id)}/>
                 })}
             </Section>
 
@@ -39,7 +40,7 @@ export class FoldersSidebar extends LeftSidebar {
                 <Section title="Recommended folders">
                     {suggested.map(l => {
                         return <IconButton icon="add" text={l.filter.title} description={l.description}
-                                                       onClick={l => this.addRecommendedFolder(l.filter)}/>
+                                                       onClick={_ => this.addRecommendedFolder(l)}/>
                     })}
                 </Section>
                 : ""}
@@ -63,7 +64,14 @@ export class FoldersSidebar extends LeftSidebar {
         })
     }
 
-    addRecommendedFolder = (filter) => {
+    addRecommendedFolder = (suggested) => {
+        const filter = suggested.filter
+        filter.id = FoldersManager.folders.length === 0 ? 2 : FoldersManager.folders.reduce((l, q) => {
+            return l.id < q.id ? q : l
+        }).id + 1
+        FoldersManager.suggestedFolders.splice(FoldersManager.suggestedFolders.indexOf(suggested), 1)
+
+        FoldersManager.updateFolder(filter)
 
     }
 

@@ -10,7 +10,7 @@ class FolderManager {
     folders = []
     selectedFolder = null
     MAX_FOLDERS = 10
-    suggestedFolders = null
+    suggestedFolders: [] = null
 
     constructor() {
         // макс чого воно при логіні показується????????????????????????????
@@ -129,7 +129,12 @@ class FolderManager {
             filter: filter
         })
         console.log(response)
-        this.folders[this.folders.findIndex(l => l.id === filter.id)] = filter
+        const index = this.folders.findIndex(l => l.id === filter.id)
+        if(index === -1) {
+            this.folders.push(filter)
+        } else {
+            this.folders[this.folders.findIndex(l => l.id === filter.id)] = filter
+        }
         this.fireUpdate()
         this.updateCache()
 

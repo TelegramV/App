@@ -131,7 +131,8 @@ export class CreateFolderSidebar extends LeftSidebar {
         this.setState({
             currentFolder: params.folderId == null ? {
                 // Get max id + 1
-                id: FoldersManager.folders.reduce((l, q) => {
+                _: "dialogFilter",
+                id: FoldersManager.folders.length === 0 ? 2 : FoldersManager.folders.reduce((l, q) => {
                     return l.id < q.id ? q : l
                 }).id + 1,
                 include_peers: [],
