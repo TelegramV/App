@@ -71,7 +71,16 @@ export function text2emoji(text) {
                 <img className="emoji"
                      draggable="false"
                      alt={emoji}
-                     src={src}/>
+                     src={src}
+                     onError={event => {
+                         const $el = event.currentTarget;
+                         const $newEl = document.createElement("div");
+                         $newEl.classList.add("emoji");
+                         $newEl.classList.add("native");
+                         $newEl.textContent = $el.alt;
+                         $el.parentNode.replaceChild($newEl, $el);
+                     }}
+                />
             );
         } else {
             nodes.push(emoji);

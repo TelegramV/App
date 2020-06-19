@@ -128,6 +128,7 @@ class StreamingVideoComponent extends VideoPlayer {
 
     onPreviewMouseMove = this.throttle((event: MouseEvent) => {
         // currently we are ignoring previews for streaming videos
+        // it is really hard for browsers to serve two ISOFiles
 
         if (this.state.downloaded) {
             const $video: HTMLVideoElement = this.previewVideoRef.$el;
