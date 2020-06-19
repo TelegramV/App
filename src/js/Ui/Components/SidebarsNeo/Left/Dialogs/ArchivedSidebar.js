@@ -7,11 +7,15 @@ import {isMobile} from "../../../../Utils/utils";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import UIEvents from "../../../../EventBus/UIEvents";
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
+import PinnedDialogListComponent from "./Lists/PinnedDialogListComponent";
 
 export class ArchivedSidebar extends UnpatchableLeftSidebar {
     content(): * {
         return <this.contentWrapper>
-            <ArchivedDialogListComponent/>
+            <div>
+                <PinnedDialogListComponent folderId="archive"/>
+                <ArchivedDialogListComponent/>
+            </div>
        </this.contentWrapper>
     }
 

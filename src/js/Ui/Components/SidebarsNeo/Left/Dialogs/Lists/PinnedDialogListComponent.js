@@ -7,6 +7,7 @@ import {GroupPeer} from "../../../../../../Api/Peers/Objects/GroupPeer";
 import {vrdom_resolveMount} from "../../../../../../V/VRDOM/mount";
 import DialogsStore from "../../../../../../Api/Store/DialogsStore";
 import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent"
+import classIf from "../../../../../../V/VRDOM/jsx/helpers/classIf";
 
 export default class PinnedDialogListComponent extends StatelessComponent {
 
@@ -30,13 +31,16 @@ export default class PinnedDialogListComponent extends StatelessComponent {
 
     render() {
         return (
-            <div id="dialogsPinned" className="list pinned hidden"/>
+            <div id="dialogsPinned" className={["list pinned hidden", classIf(this.folderId === "archive", "archive")]}/>
         )
     }
 
     applyFilter = (dialog) => {
         const f = this.filter
         const id = this.folderId
+        if(id === "archive") {
+            return dialog.isPinned && dialog.isArchived
+        }
         if (f == null || id == null) {
             return dialog.isPinned && !dialog.isArchived
         }
@@ -59,6 +63,7 @@ export default class PinnedDialogListComponent extends StatelessComponent {
     }
 
     updateFilter = (newFilter) => {
+        if(this.folderId === "archive") return
         this.filter = newFilter
         const $dialogs = this.$el
 

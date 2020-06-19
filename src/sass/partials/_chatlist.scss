@@ -137,6 +137,11 @@
   overflow: auto;
   padding: 8px;
 
+  &.archive {
+    height: auto;
+    overflow: hidden;
+  }
+
   * {
     user-select: none;
   }

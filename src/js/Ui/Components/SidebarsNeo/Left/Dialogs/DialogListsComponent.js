@@ -11,6 +11,7 @@ import Lottie from "../../../../Lottie/Lottie";
 import filterFilling from "../../../../../../../public/static/animated/filter_new.json";
 import filterNoChats from "../../../../../../../public/static/animated/filter_no_chats.json";
 import DialogsManager from "../../../../../Api/Dialogs/DialogsManager";
+import Animated from "../../Fragments/Animated";
 
 class DialogFolderFragment extends StatelessComponent {
 
@@ -46,8 +47,8 @@ export class DialogListsComponent extends StatelessComponent {
     folders = []
     selectedFolder = null
     folderRefs = [VComponent.createComponentRef()]
-    noChatsLottie = VComponent.createComponentRef()
-    loadingLottie = VComponent.createComponentRef()
+    noChatsLottie = VComponent.createFragmentRef()
+    loadingLottie = VComponent.createFragmentRef()
 
     appEvents(E: AE) {
         E.bus(AppEvents.General)
@@ -64,33 +65,36 @@ export class DialogListsComponent extends StatelessComponent {
     render() {
         return <div className="dialog-lists">
             <div className="folder-screen loading">
-                <Lottie
-                    ref={this.loadingLottie}
-                    width={100}
-                    height={100}
-                    options={{
-                        animationData: filterFilling,
-                        loop: true,
-                        autoplay: true,
-                    }}
-                    // onClick={onClick}
-                    />
+                <Animated width={100} height={100} hidden={this.$el == null ? true : this.$el.classList.contains("loading")} ref={this.loadingLottie} animationData={filterFilling} loop autoplay/>
+                {/*<Lottie*/}
+                {/*    ref={this.loadingLottie}*/}
+                {/*    width={100}*/}
+                {/*    height={100}*/}
+                {/*    options={{*/}
+                {/*        animationData: filterFilling,*/}
+                {/*        loop: true,*/}
+                {/*        autoplay: true,*/}
+                {/*    }}*/}
+                {/*    // onClick={onClick}*/}
+                {/*    />*/}
                 <div className="title">Adding chats</div>
                 <div className="description">Please wait a few moments while we fill this folder for you...</div>
             </div>
 
             <div className="folder-screen no-chats">
-                <Lottie
-                    ref={this.noChatsLottie}
-                    width={100}
-                    height={100}
-                    options={{
-                        animationData: filterNoChats,
-                        loop: false,
-                        autoplay: true,
-                    }}
-                    // onClick={onClick}
-                    playOnHover/>
+                <Animated width={100} height={100} hidden={this.$el == null ? true : this.$el.classList.contains("loading")} ref={this.noChatsLottie} animationData={filterNoChats} playOnHover autoplay/>
+
+                {/*<Lottie*/}
+                {/*    ref={this.noChatsLottie}*/}
+                {/*    width={100}*/}
+                {/*    height={100}*/}
+                {/*    options={{*/}
+                {/*        animationData: filterNoChats,*/}
+                {/*        loop: false,*/}
+                {/*        autoplay: true,*/}
+                {/*    }}*/}
+                {/*    // onClick={onClick}*/}
+                {/*    playOnHover/>*/}
                 <div className="title">No chats found</div>
                 <div className="description">No chats currently belong to this folder.</div>
             </div>
@@ -215,18 +219,26 @@ export class DialogListsComponent extends StatelessComponent {
         if(this.isNoChats()) {
             this.setNoChats(false)
         }
-        if(this.loadingLottie.component.anim) {
-            value ? this.loadingLottie.component.play() : this.loadingLottie.component.pause()
-        }
         this.$el.classList.toggle("loading", value)
+
+        this.loadingLottie.patch({
+            hidden: !value
+        })
+        // if(this.loadingLottie.component.anim) {
+            // value ? this.loadingLottie.component.play() : this.loadingLottie.component.pause()
+        // }
     }
 
     setNoChats = (value = true) => {
         if(this.isLoading()) {
             this.setLoading(false)
         }
-        value ? this.noChatsLottie.component.play() : this.noChatsLottie.component.pause()
+        // value ? this.noChatsLottie.component.play() : this.noChatsLottie.component.pause()
         this.$el.classList.toggle("no-chats", value)
+        this.noChatsLottie.patch({
+            hidden: !value
+        })
+
     }
 
     onSelectFolder = (event) => {
