@@ -13,6 +13,7 @@ import {ArchivedSidebar} from "./Dialogs/ArchivedSidebar";
 import {FoldersSidebar} from "./Settings/Folders/FoldersSidebar";
 import {CreateFolderSidebar} from "./Settings/Folders/CreateFolderSidebar";
 import {FolderPeersSidebar} from "./Settings/Folders/FolderPeersSidebar";
+import {SuperSecretSettingsSidebar} from "./Settings/SuperSecretSettingsSidebar";
 
 export class LeftSidebars extends GenericSidebarHistory {
     render() {
@@ -39,6 +40,8 @@ export class LeftSidebars extends GenericSidebarHistory {
                 <PrivacySidebar/>
                 <ActiveSessionsSidebar/>
                 <BlockedSidebar/>
+
+                <SuperSecretSettingsSidebar/>
             </div>
         )
     }

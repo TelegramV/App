@@ -16,6 +16,7 @@ import AppEvents from "../../../../../Api/EventBus/AppEvents";
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import {FoldersSidebar} from "./Folders/FoldersSidebar";
+import {SuperSecretSettingsSidebar} from "./SuperSecretSettingsSidebar";
 
 export class SettingsSidebar extends LeftSidebar {
 
@@ -75,6 +76,13 @@ export class SettingsSidebar extends LeftSidebar {
                 title: "Log out",
                 onClick: _ => {
                     logout()
+                }
+            },
+            {
+                icon: "eats",
+                title: "Super Secret Settings",
+                onClick: _ => {
+                    UIEvents.Sidebars.fire("push", SuperSecretSettingsSidebar)
                 }
             }
         ], ev.currentTarget, "right-top")

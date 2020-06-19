@@ -4,6 +4,10 @@
   justify-content: normal;
   overflow-y: hidden;
 
+  &.hidden {
+    display: none;
+  }
+
   .folder {
     flex-shrink: 0;
   }
