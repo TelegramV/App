@@ -513,7 +513,8 @@ export class ChatInputComponent extends StatelessComponent {
 
                     return values / length;
                 }
-
+                
+                let AudioContext = window.AudioContext || window.webkitAudioContext;
                 this.audioContext = new AudioContext();
                 const input = this.audioContext.createMediaStreamSource(l);
                 const analyser = this.audioContext.createAnalyser();

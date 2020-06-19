@@ -189,4 +189,10 @@ class ContextMenuComponent extends StatefulComponent {
     }
 }
 
+if(__IS_PRODUCTION__) {
+    window.oncontextmenu = function (ev) {
+        ev.preventDefault()
+    }
+}
+
 export default ContextMenuComponent
