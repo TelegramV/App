@@ -8,6 +8,7 @@ import {ReactiveObject} from "../../../V/Reactive/ReactiveObject"
 import {PeerMessages} from "../PeerMessages"
 import DialogsStore from "../../Store/DialogsStore"
 import type {Message} from "../../Messages/Message";
+import API from "../../Telegram/API"
 
 export class Peer extends ReactiveObject {
 
@@ -325,24 +326,28 @@ export class Peer extends ReactiveObject {
                     })
                 }
             } else {
-                // this.api.getHistory({
-                //     offset_id: this.pinnedMessageId, // ???
-                //     add_offset: -1,
-                //     limit: 1
-                // }).then(messages => {
-                //     if (messages.length && messages[0].id === this.pinnedMessageId) {
-                //         this.messages.putRawMessage(messages[0])
-                //         this._pinnedMessage = messages[0]
-                //
-                //         if (fire) {
-                //             this.fire("pinnedMessageFound", {
-                //                 message: this._pinnedMessage
-                //             })
-                //         }
-                //     } else {
-                //         console.log("no pinned!")
-                //     }
-                // })
+                API.messages.getHistory(this, {
+                    offset_id: this.pinnedMessageId, // ???
+                    add_offset: -1,
+                    limit: 1
+                }).then(Messages => {
+                    let messages = Messages.messages
+
+                    if (messages.length && messages[0].id === this.pinnedMessageId) {
+                        this._pinnedMessage = this.messages.putRawMessage(messages[0])
+
+                        if (fire) {
+                            this.fire("pinnedMessageFound", {
+                                message: this._pinnedMessage
+                            })
+                        }
+                    } else {
+                        console.log("no pinned!")
+                        this.fire("pinnedMessageFound", {
+                            message: null
+                        })
+                    }
+                })
             }
         } else {
             this.fire("pinnedMessageFound", {

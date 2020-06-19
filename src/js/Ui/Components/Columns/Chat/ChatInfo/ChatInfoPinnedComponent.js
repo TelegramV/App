@@ -32,6 +32,7 @@ class ChatInfoPinnedComponent extends StatefulComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Peers)
+            // .filter(event )
             .on("pinnedMessageFound", this.onPinnedMessageFound)
 
         E.bus(UIEvents.General)
@@ -100,29 +101,6 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                 message: null
             })
         }
-    }
-
-    onAudioPlay = event => {
-        event.audio.getMeta().then(meta => {
-            this.setState({
-                audio: event.audio,
-                meta: meta,
-                pause: false
-            })
-        });
-    }
-
-    onAudioPause = event => {
-        this.setState({
-            pause: true
-        })
-    }
-
-    onAudioRemove = event => {
-        this.setState({
-            audio: undefined,
-            meta: undefined
-        })
     }
 }
 

@@ -1,4 +1,4 @@
-import {askForFile, convertBits, formatAudioTime} from "../../../../Utils/utils";
+import {askForFile, convertBits, formatAudioTime, isMobile} from "../../../../Utils/utils";
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import ComposerComponent from "./ComposerComponent"
 import SuggestionComponent from "./SuggestionComponent"
@@ -15,8 +15,6 @@ import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 import ChatToBottomButtonComponent from "../ChatToBottomButtonComponent"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
-import {SearchSidebar} from "../../../SidebarsNeo/Right/Search/SearchSidebar";
-import {isMobile} from "../../../../Utils/utils"
 
 export let ChatInputManager
 
@@ -43,6 +41,7 @@ export class ChatInputComponent extends StatelessComponent {
         E.bus(UIEvents.General)
             .on("search.open", this.onSearchOpened)
             .on("search.close", this.onSearchClosed)
+            .on("chat.select", this.onChatSelect)
     }
 
     render() {
@@ -166,6 +165,17 @@ export class ChatInputComponent extends StatelessComponent {
         this.$el.style.opacity = "1"
     }
 
+    /**
+     * @param {Peer} peer
+     */
+    onChatSelect = ({peer}) => {
+        if (peer.canSendMessage ?? true) {
+            this.$el.style.display = "block"
+        } else {
+            this.$el.style.display = "none"
+        }
+    }
+
     onKeyDown = (event: Event) => {
         const code = event.keyCode || event.which;
 
@@ -255,13 +265,13 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     mouseEnterEmoji = () => {
-        if(isMobile()) return;
+        if (isMobile()) return;
         VApp.mountedComponents.get("composer").show();
         this.hideComposer = false;
     }
 
     mouseLeaveEmoji = () => {
-        if(isMobile()) return;
+        if (isMobile()) return;
         this.hideComposer = true;
         this.planComposerClose()
     }
@@ -271,14 +281,14 @@ export class ChatInputComponent extends StatelessComponent {
         if (composer.visible && this.composerClicked) {
             this.composerClicked = false;
             composer.hide();
-            if(isMobile()) {
+            if (isMobile()) {
                 ev.currentTarget.classList.add("tgico-smile");
                 ev.currentTarget.classList.remove("tgico-keyboard");
             }
         } else {
-            this.composerClicked=true;
+            this.composerClicked = true;
             composer.show();
-            if(isMobile()) {
+            if (isMobile()) {
                 ev.currentTarget.classList.remove("tgico-smile");
                 ev.currentTarget.classList.add("tgico-keyboard");
             }
@@ -425,7 +435,7 @@ export class ChatInputComponent extends StatelessComponent {
         this.$el.querySelector(".send-button>.tgico-microphone2").classList.remove("hidden")
 
         this.recorder.stop()
-        this.microphone.getTracks().forEach( (track) => {
+        this.microphone.getTracks().forEach((track) => {
             track.stop();
             this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
         });
