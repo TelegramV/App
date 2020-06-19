@@ -17,6 +17,8 @@ import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import {FoldersSidebar} from "./Folders/FoldersSidebar";
 import {SuperSecretSettingsSidebar} from "./SuperSecretSettingsSidebar";
+import Animated from "../../Fragments/Animated";
+import filterFilling from "../../../../../../../public/static/animated/filter_new";
 
 export class SettingsSidebar extends LeftSidebar {
 
@@ -27,6 +29,7 @@ export class SettingsSidebar extends LeftSidebar {
             <AvatarComponent peer={me}/>
             <Header isLoading={!me}>{me?.name}</Header>
             <Subheader isLoading={!me}>{me ? "+" + me.phone : ""}</Subheader>
+            <Animated width={100} height={100} r={this.loadingLottie} animationData={filterFilling} loop autoplay/>
 
             <Section>
                 <IconButton icon="edit" text="Edit Profile" onClick={_ => {}}/>
