@@ -20,7 +20,7 @@ export default class ArchivedDialogListComponent extends StatelessComponent {
 
     render() {
         return (
-            <div id="dialogsArchived" className="list"/>
+            <div id="dialogsArchived" className="list archive"/>
         )
     }
 
@@ -55,7 +55,7 @@ export default class ArchivedDialogListComponent extends StatelessComponent {
 
     onDialogsGotOne = event => {
         const dialog = event.dialog
-        if (!dialog.isArchived) return
+        if (!dialog.isArchived || dialog.isPinned) return
         const $insertBefore = this._findRenderedDialogToInsertBefore(dialog)
         this.insertBeforeDialog(dialog, $insertBefore)
 
@@ -63,13 +63,13 @@ export default class ArchivedDialogListComponent extends StatelessComponent {
 
     onDialogsGotMany = event => {
         event.dialogs
-            .filter(dialog => dialog.isArchived)
+            .filter(dialog => dialog.isArchived && !dialog.isPinned)
             .forEach(this.appendDialog)
     }
 
     onDialogsGotNewMany = event => {
         event.dialogs
-            .filter(dialog => dialog.isArchived)
+            .filter(dialog => dialog.isArchived && !dialog.isPinned)
             .forEach(this.prependDialog)
     }
 

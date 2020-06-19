@@ -94,7 +94,7 @@ export class DialogComponent extends StatelessComponent {
 
         this.$el.__dialog = this.props.dialog
         this.$el.__message = this.props.dialog.peer.messages.last
-        this.$el.__pinned = this.props.folderId == null ? this.props.dialog.pinned : FoldersManager.isPinned(this.props.dialog.peer, this.props.folderId)
+        this.$el.__pinned = this.props.folderId == null || this.props.folderId === "archive" ? this.props.dialog.pinned : FoldersManager.isPinned(this.props.dialog.peer, this.props.folderId)
         this.$el.__archived = this.props.dialog.isArchived
     }
 
@@ -245,16 +245,23 @@ export class DialogComponent extends StatelessComponent {
             $(this.$el).show()
         }
 
-        const isPinned = this.props.folderId == null ? dialog.pinned : FoldersManager.isPinned(dialog.peer, this.props.folderId)
+        const isPinned = this.props.folderId == null || this.props.folderId === "archive" ? dialog.pinned : FoldersManager.isPinned(dialog.peer, this.props.folderId)
+        console.log("RESORT", isPinned, dialog.isArchived)
+        console.log("pin ", this.$el.__pinned)
 
         if (isPinned !== this.$el.__pinned) {
+            console.log("pin !=")
             if (isPinned) {
+                console.log("now pinned")
+
                 this.__destroy()
 
                 this.Pinned.prependDialog(dialog)
 
                 return
             } else {
+                console.log("boom tetris for jeff")
+
                 this.__destroy()
 
                 AppEvents.Dialogs.fire("gotOne", {
