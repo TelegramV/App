@@ -87,7 +87,7 @@ function MessageWrapperFragment(
         return <div/> // we don't delete entire element because we need virtualization to continue to work..
     }
 
-    const contextMenuHandler = VUI.ContextMenu.listener(contextActions ? contextActions : createContextMenu(message));
+    const contextMenuHandler = VUI.ContextMenu.listener(contextActions ? () => contextActions : () => createContextMenu(message));
 
     const doubleClickHandler = _ => ChatInputManager.replyTo(message)
 

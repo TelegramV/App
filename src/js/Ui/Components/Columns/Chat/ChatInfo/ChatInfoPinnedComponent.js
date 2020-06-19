@@ -42,9 +42,7 @@ class ChatInfoPinnedComponent extends StatefulComponent {
 
     render() {
         const pinned = AppSelectedChat.current?.pinnedMessage
-
-        console.log(pinned)
-
+        
         if (AudioPlayer.state.message) {
             let playClasses = ["tgico", !AudioPlayer.state.isPaused ? "tgico-pause" : "tgico-play"];
             return (

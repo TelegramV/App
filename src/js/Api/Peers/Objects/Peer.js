@@ -328,11 +328,7 @@ export class Peer extends ReactiveObject {
                     add_offset: -1,
                     limit: 1
                 }).then(Messages => {
-                    let messages = Messages.messages
-
-                    if (messages.length && messages[0].id === this.pinnedMessageId) {
-                        this._pinnedMessageId = this.messages.putRawMessage(messages[0]).id
-                    }
+                    this.messages.putRawMessage(Messages.messages[0])
 
                     this.fire("messages.updatePin")
                 })

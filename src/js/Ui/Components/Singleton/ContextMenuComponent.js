@@ -43,8 +43,8 @@ class ContextMenuComponent extends StatefulComponent {
             <div
                 // css-display={this.state.hidden && "none"}
                 className={classNames("context-menu-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.unhidden, "unhidden"), classIf(this.state.reallyHidden, "really-hidden"))}
-                 onClick={this.close}
-                 onContextMenu={this.close}
+                onClick={this.close}
+                onContextMenu={this.close}
                 onAnimationEnd={this.onTransitionEnd}>
 
                 <div className={classNames("context-menu", this.state.animation)}
@@ -80,7 +80,7 @@ class ContextMenuComponent extends StatefulComponent {
     }
 
     onTransitionEnd = (ev) => {
-        if(ev.animationName === "hidden-context") {
+        if (ev.animationName === "hidden-context") {
             this.setState({
                 reallyHidden: true
             })
@@ -181,15 +181,18 @@ class ContextMenuComponent extends StatefulComponent {
     }
 
     listener = (data = []) => {
-        if(!data) return _ => {}; // empty context menu blocks scroll
+        if (!data) {
+            return () => {
+            };
+        } // empty context menu blocks scroll
         return event => {
             event.preventDefault()
-            this.openXY(data, event.clientX, event.clientY);
+            this.openXY(callOrReturn(data), event.clientX, event.clientY);
         }
     }
 }
 
-if(__IS_PRODUCTION__) {
+if (__IS_PRODUCTION__) {
     window.oncontextmenu = function (ev) {
         ev.preventDefault()
     }
