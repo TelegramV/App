@@ -26,6 +26,9 @@ function VButton(
         isStatic = false,
         isUppercase = true,
         useLoadingText = false,
+
+        isDanger = false,
+
         ...otherArgs
     },
     slot
@@ -40,6 +43,7 @@ function VButton(
             "block": isBlock,
             "static": isStatic,
             "uppercase": isUppercase,
+            "danger": isDanger,
             "rp": true,
             "rps": !isBlock,
         }} {...otherArgs}>

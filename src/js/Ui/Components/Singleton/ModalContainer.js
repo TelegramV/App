@@ -19,6 +19,7 @@ import VUI from "../../VUI"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import VButton from "../../Elements/Button/VButton"
 
 class ModalContainer extends StatefulComponent {
     state = {
@@ -38,8 +39,8 @@ class ModalContainer extends StatefulComponent {
         return (
             <div
                 // css-display={this.state.hidden && "none"}
-                 className={classNames("modal-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.unhidden, "unhidden"), classIf(this.state.reallyHidden, "really-hidden"))}
-            onAnimationEnd={this.onTransitionEnd}>
+                className={classNames("modal-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.unhidden, "unhidden"), classIf(this.state.reallyHidden, "really-hidden"))}
+                onAnimationEnd={this.onTransitionEnd}>
                 <div className="modal" onClick={this.close}>
                     <div className="dialog scrollable" onClick={event => event.stopPropagation()}>
                         {this.state.body}
@@ -50,7 +51,7 @@ class ModalContainer extends StatefulComponent {
     }
 
     onTransitionEnd = (ev) => {
-        if(ev.animationName === "hidden-modal") {
+        if (ev.animationName === "hidden-modal") {
             this.setState({
                 reallyHidden: true,
                 body: ""
@@ -72,6 +73,27 @@ class ModalContainer extends StatefulComponent {
             unhidden: true,
             body: body
         })
+    }
+
+    prompt = (header, content, yes, no) => {
+        no = no ? no : this.close();
+
+        this.open(
+            <div className="prompt">
+                <div className="header">
+                    {header}
+                </div>
+                <div class="content scrollable">
+                    <div class="container">
+                        {content}
+                    </div>
+                </div>
+                <div class="buttons">
+                    <VButton isFlat isUppercase={false} onClick={no}>No</VButton>
+                    <VButton isDanger isUppercase={false} onClick={yes}>Yes</VButton>
+                </div>
+            </div>
+        )
     }
 }
 

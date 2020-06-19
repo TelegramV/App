@@ -58,6 +58,10 @@ export class Peer extends ReactiveObject {
         return this._isAbleToHandleUpdates
     }
 
+    get canPinMessages(): boolean {
+        return this.isSelf
+    }
+
     /**
      * @return {PeerMessages}
      */
@@ -354,6 +358,11 @@ export class Peer extends ReactiveObject {
                 message: null
             })
         }
+    }
+
+    hidePinnedMessage() {
+        this.pinnedMessageHidden = true;
+        this.fire("hidePinnedMessage")
     }
 
     /**

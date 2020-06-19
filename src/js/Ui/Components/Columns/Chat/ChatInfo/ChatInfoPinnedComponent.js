@@ -21,6 +21,8 @@ import {MessageParser} from "../../../../../Api/Messages/MessageParser";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import AudioPlayer from "../../../../../Api/Media/AudioPlayer"
+import VUI from "../../../../VUI"
+import API from "../../../../../Api/Telegram/API"
 
 class ChatInfoPinnedComponent extends StatefulComponent {
     state = {
@@ -34,6 +36,7 @@ class ChatInfoPinnedComponent extends StatefulComponent {
         E.bus(AppEvents.Peers)
             // .filter(event )
             .on("pinnedMessageFound", this.onPinnedMessageFound)
+            .updateOn("hidePinnedMessage")
 
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelected)
@@ -65,7 +68,7 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                     </div>
                 </div>
             )
-        } else if (this.state.message) {
+        } else if (this.state.message && !this.state.message.dialogPeer.pinnedMessageHidden) {
             return (
                 <div className="pin pinned-message"
                      onClick={event => UIEvents.General.$chat.showMessage(this.state.message)}>
@@ -73,9 +76,16 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                         <div className="title">Pinned message</div>
                         <div className="description">{MessageParser.getPrefixNoSender(this.state.message)}</div>
                     </div>
-                    <div class="close">
-                        <i className="tgico tgico-close"/>
-                    </div>
+                    {
+                        this.state.message.dialogPeer.canPinMessages &&
+                        <div class="close"
+                             onClick={() => VUI.Modal.prompt("Would you like to unpin this message?", null, () => {
+                                 API.messages.updatePinnedMessage(this.state.message);
+                                 VUI.Modal.close();
+                             })}>
+                            <i className="tgico tgico-close"/>
+                        </div>
+                    }
                 </div>
             )
         } else {
