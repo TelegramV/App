@@ -125,11 +125,10 @@ function MessageWrapperFragment(
     const messageNode = (
         <div className={topLevelClasses}
              id={`message-${message.id}`}
-             onContextMenu={contextMenuHandler}
              onDblClick={doubleClickHandler}>
 
             <MessageAvatarComponent message={message} show={!message.hideAvatar}/>
-            <div className={contentClasses}>
+            <div className={contentClasses} onContextMenu={contextMenuHandler}>
                 <ReplyToMessageFragment message={message}/>
                 <ForwardedHeaderFragment message={message}/>
                 {username ? <PeerName peer={message.from} template={(peer) => {

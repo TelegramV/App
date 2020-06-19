@@ -33,6 +33,7 @@
             font-size: 15px;
             border-radius: 12px;
             user-select: text;
+            -webkit-user-select: text;
 
             .clickable {
                 cursor: pointer;
