@@ -18,14 +18,13 @@
  */
 
 import PeersStore from "../../Store/PeersStore"
-import {ChannelPeer} from "../../Peers/Objects/ChannelPeer"
-import {SupergroupPeer} from "../../Peers/Objects/SupergroupPeer"
 
 function processUpdateChannelPinnedMessage(update) {
     const peer = PeersStore.get("channel", update.channel_id)
 
-    if (peer instanceof ChannelPeer || peer instanceof SupergroupPeer) {
+    if (peer) {
         peer.pinnedMessageId = update.id
+        peer.fire("messages.updatePin")
     }
 }
 

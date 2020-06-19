@@ -18,13 +18,13 @@
  */
 
 import PeersStore from "../../Store/PeersStore"
-import {GroupPeer} from "../../Peers/Objects/GroupPeer"
 
 function processUpdateChatPinnedMessage(update) {
     const peer = PeersStore.get("chat", update.chat_id)
 
-    if (peer instanceof GroupPeer) {
+    if (peer) {
         peer.pinnedMessageId = update.id
+        peer.fire("messages.updatePin")
     }
 }
 

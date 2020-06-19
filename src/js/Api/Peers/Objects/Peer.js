@@ -59,7 +59,7 @@ export class Peer extends ReactiveObject {
     }
 
     get canPinMessages(): boolean {
-        return this.isSelf
+        return this.isSelf || this.type === "chat"
     }
 
     /**
@@ -247,8 +247,10 @@ export class Peer extends ReactiveObject {
     }
 
     set pinnedMessageId(value) {
-        this._pinnedMessage = null
         this._pinnedMessageId = value
+        if (this.full) {
+            this.full.pinned_msg_id = value
+        }
         this.findPinnedMessage()
     }
 
@@ -310,25 +312,16 @@ export class Peer extends ReactiveObject {
         })
     }
 
-    findPinnedMessage(fire = true) {
-        if (this.pinnedMessageId) {
-            if (this._pinnedMessage && fire) {
-                this.fire("pinnedMessageFound", {
-                    message: this._pinnedMessage
-                })
-                return
-            }
+    get pinnedMessage() {
+        return this.messages.getById(this.pinnedMessageId);
+    }
 
+    findPinnedMessage() {
+        if (this.pinnedMessageId) {
             const message = this.messages.getById(this.pinnedMessageId)
 
             if (message) {
-                this._pinnedMessage = message
-
-                if (fire) {
-                    this.fire("pinnedMessageFound", {
-                        message: this._pinnedMessage
-                    })
-                }
+                this.fire("messages.updatePin")
             } else {
                 API.messages.getHistory(this, {
                     offset_id: this.pinnedMessageId, // ???
@@ -338,31 +331,15 @@ export class Peer extends ReactiveObject {
                     let messages = Messages.messages
 
                     if (messages.length && messages[0].id === this.pinnedMessageId) {
-                        this._pinnedMessage = this.messages.putRawMessage(messages[0])
-
-                        if (fire) {
-                            this.fire("pinnedMessageFound", {
-                                message: this._pinnedMessage
-                            })
-                        }
-                    } else {
-                        console.log("no pinned!")
-                        this.fire("pinnedMessageFound", {
-                            message: null
-                        })
+                        this._pinnedMessageId = this.messages.putRawMessage(messages[0]).id
                     }
+
+                    this.fire("messages.updatePin")
                 })
             }
         } else {
-            this.fire("pinnedMessageFound", {
-                message: null
-            })
+            this.fire("messages.updatePin")
         }
-    }
-
-    hidePinnedMessage() {
-        this.pinnedMessageHidden = true;
-        this.fire("hidePinnedMessage")
     }
 
     /**

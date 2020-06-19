@@ -56,18 +56,20 @@ class BetterVideoComponent extends StatefulComponent {
             .on("download.canceled", this.onDownloadCanceled)
     }
 
-    render({document, onClick, playOnHover, infoContainer, isRound, onPlay, onPause, onTimeUpdate, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
+    render({document, onClick, playOnHover, infoContainer, isRound, onPlay, onPause, onTimeUpdate, showVideo, ...otherArgs}, {isLoading, url, thumbnailUrl, width, height}) {
         const streamable = DocumentParser.isVideoStreamable(document);
 
         if (streamable) {
             otherArgs.autoPlay = false;
+            otherArgs.showVideo = false;
         }
 
         return (
-            <figure className={["video rp rps", isLoading && "thumbnail", isRound && "round"]} onClick={onClick}>
+            <figure className={["video rp rps", (isLoading || !showVideo) && "thumbnail", isRound && "round"]}
+                    onClick={onClick}>
                 {infoContainer && infoContainer(this.state, this.videoRef.$el)}
                 {
-                    !isLoading ?
+                    !isLoading && showVideo ?
                         <VideoFragment {...otherArgs}
                                        src={url}
                                        type={document.mime_type}

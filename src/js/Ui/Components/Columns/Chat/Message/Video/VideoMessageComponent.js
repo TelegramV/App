@@ -20,7 +20,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
         const document = message.raw.media.document;
         const text = message.parsed && <TextWrapperComponent message={message}/>;
         const info = DocumentParser.attributeVideo(document);
-        const isStreaming = DocumentParser.isVideoStreamable(document);
+        const isStreamable = DocumentParser.isVideoStreamable(document);
 
         return (
             <MessageWrapperFragment message={message} noPad showUsername={false} outerPad={text !== ""}
@@ -43,7 +43,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                                            onClick={event => {
                                                                event.stopPropagation();
 
-                                                               if (isStreaming) {
+                                                               if (isStreamable) {
                                                                    this.$el.querySelector("video")?.pause();
                                                                    UIEvents.MediaViewer.fire("showMessage", {message});
                                                                } else {
@@ -67,16 +67,19 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                                                        FileManager.downloadVideo(document)
                                                                    }
                                                                } else {
-                                                                   this.setState({
-                                                                       isMuted: !isMuted,
-                                                                   });
+                                                                   if (!isStreamable) {
+                                                                       this.setState({
+                                                                           isMuted: !isMuted,
+                                                                       });
+                                                                   }
                                                                }
                                                            }}>
                                                           {
                                                               FileManager.isDownloaded(document) ?
                                                                   <div className="done">
                                                                       {formatAudioTime(info.duration - currentTime)}
-                                                                      {isMuted && <i className="tgico tgico-nosound"/>}
+                                                                      {isMuted && !isStreamable &&
+                                                                      <i className="tgico tgico-nosound"/>}
                                                                   </div>
                                                                   :
                                                                   <div className="download">
