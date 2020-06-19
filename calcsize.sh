@@ -22,6 +22,8 @@ printsize $CSSGZ '[CSS] GZIP: \t\t'
 printsize $CSSBR '[CSS] BROTLI: \t\t'
 
 echo ''
+echo 'some resources are downloaded asynchronously, thus the real transferred size is smaller'
+echo ''
 printsize "$CSS\|$JS" '[TOTAL] RAW: \t\t' '\t +100K schema'
 printsize "$CSSGZ\|$JSGZ" '[TOTAL] GZIP: \t\t' '\t +35K schema'
 printsize "$CSSBR\|$JSBR" '[TOTAL] BROTLI: \t' '\t +30K schema'

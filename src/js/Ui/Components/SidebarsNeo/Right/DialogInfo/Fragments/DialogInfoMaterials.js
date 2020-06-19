@@ -183,7 +183,7 @@ export class DialogInfoMaterials extends StatelessComponent {
             )
         } else {
             vrdom_append(
-                <BetterPhotoComponent photo={message.raw.media.photo}
+                <BetterPhotoComponent photo={message.raw.media.photo ? message.raw.media.photo : message.raw.media}
                                       onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>,
                 this.contentRefs.media.$el
             )
