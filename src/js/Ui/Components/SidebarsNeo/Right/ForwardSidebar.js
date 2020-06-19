@@ -1,15 +1,12 @@
 import "./ForwardSidebar.scss";
 import VTagsInput, {VTag} from "../../../Elements/Input/VTagsInput";
 import DialogsStore from "../../../../Api/Store/DialogsStore";
-import {CheckboxWithPeerFragment} from "../../Sidebars/Fragments/CheckboxWithPeerFragment";
 import VComponent from "../../../../V/VRDOM/component/VComponent";
 import UIEvents from "../../../EventBus/UIEvents";
 import {GenericSidebar} from "../GenericSidebar";
 import nodeIf from "../../../../V/VRDOM/jsx/helpers/nodeIf";
 import FloatingActionButton from "../Fragments/FloatingActionButton";
 import classIf from "../../../../V/VRDOM/jsx/helpers/classIf";
-import CheckboxAvatarButton from "../Fragments/CheckboxAvatarButton";
-import AvatarButton from "../Fragments/AvatarButton";
 import {Section} from "../Fragments/Section";
 import AvatarCheckmarkButton from "../Fragments/AvatarCheckmarkButton";
 

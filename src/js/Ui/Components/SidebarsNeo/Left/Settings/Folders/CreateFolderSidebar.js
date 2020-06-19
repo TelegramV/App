@@ -1,29 +1,17 @@
 import {LeftSidebar} from "../../LeftSidebar";
-import Lottie from "../../../../../Lottie/Lottie";
 import filtersNew from "../../../../../../../../public/static/animated/filter_new";
-import BR20 from "../../../../Sidebars/Fragments/BR20";
-import InputHint from "../../../../Sidebars/Fragments/InputHint";
-import Center from "../../../../Sidebars/Left/Fragments/Center";
 import Animated from "../../../Fragments/Animated";
 import Subheader from "../../../Fragments/Subheader";
 import VInput from "../../../../../Elements/Input/VInput";
 import {Section} from "../../../Fragments/Section";
 import IconButton from "../../../Fragments/IconButton";
 import nodeIf from "../../../../../../V/VRDOM/jsx/helpers/nodeIf";
-import {ButtonWithIconFragment} from "../../../../Sidebars/Fragments/ButtonWithIconFragment";
-import {SectionFragment} from "../../../../Sidebars/Fragments/SectionFragment";
 import PeersStore from "../../../../../../Api/Store/PeersStore";
-import {ButtonWithAvatarFragment} from "../../../../Sidebars/Fragments/ButtonWithAvatarFragment";
 import AvatarButton from "../../../Fragments/AvatarButton";
 import FoldersManager from "../../../../../../Api/Dialogs/FolderManager";
 import VUI from "../../../../../VUI";
 import UIEvents from "../../../../../EventBus/UIEvents";
-import {ArchivedSidebar} from "../../Dialogs/ArchivedSidebar";
-import VApp from "../../../../../../V/vapp";
-import {SettingsSidebar} from "../SettingsSidebar";
-import FolderPeersPane from "../../../../Sidebars/Left/Settings/Folders/FolderPeersPane";
 import {FolderPeersSidebar} from "./FolderPeersSidebar";
-import {Manager} from "../../../../../../Api/Manager";
 
 export class CreateFolderSidebar extends LeftSidebar {
     content(): * {

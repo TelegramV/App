@@ -3,20 +3,20 @@ import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessCom
 import TabSelectorComponent from "../../../../Tab/TabSelectorComponent";
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer";
 import PeersStore from "../../../../../../Api/Store/PeersStore";
-import {DialogInfoMemberComponent} from "../../../../Sidebars/Right/DialogInfo/Fragments/DialogInfoMemberComponent";
 import {MessageFactory} from "../../../../../../Api/Messages/MessageFactory";
 import vrdom_append from "../../../../../../V/VRDOM/append";
 import BetterPhotoComponent from "../../../../Basic/BetterPhotoComponent";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import {FileAPI} from "../../../../../../Api/Files/FileAPI";
 import {formatAudioTime} from "../../../../../Utils/utils";
-import {DialogInfoAudioComponent} from "../../../../Sidebars/Right/DialogInfo/Fragments/DialogInfoAudioComponent";
-import {DialogInfoLinkComponent} from "../../../../Sidebars/Right/DialogInfo/Fragments/DialogInfoLinkComponent";
 import SearchManager from "../../../../../../Api/Search/SearchManager";
-import DialogInfoDocumentComponent from "../../../../Sidebars/Right/DialogInfo/Fragments/DialogInfoDocumentComponent";
 import VComponent from "../../../../../../V/VRDOM/component/VComponent";
 import {MessageType} from "../../../../../../Api/Messages/Message"
 import DocumentParser from "../../../../../../Api/Files/DocumentParser"
+import {DialogInfoLinkComponent} from "./DialogInfoLinkComponent";
+import {DialogInfoAudioComponent} from "./DialogInfoAudioComponent";
+import DialogInfoDocumentComponent from "./DialogInfoDocumentComponent";
+import {DialogInfoMemberComponent} from "./DialogInfoMemberComponent";
 
 export class DialogInfoMaterials extends StatelessComponent {
     contentRefs = {
