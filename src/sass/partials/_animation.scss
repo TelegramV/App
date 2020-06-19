@@ -150,3 +150,14 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes rainbow {
+ from {
+    -webkit-filter:hue-rotate(1deg);
+            filter:hue-rotate(1deg);
+    }
+  to {
+    -webkit-filter:hue-rotate(360deg);
+            filter:hue-rotate(360deg);
+    }
+}

@@ -53,7 +53,11 @@ img:not([src]) {
     height: 100%;
     // Only specific parts should be selectable
     user-select: none;
-    -webkit-user-select: none
+    -webkit-user-select: none;
+
+    &.rainbow {
+        animation: rainbow 3s steps(36) infinite;
+    }
 }
 
 @media (min-width: 1922px) {
