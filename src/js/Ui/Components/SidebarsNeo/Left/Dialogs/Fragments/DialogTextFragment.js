@@ -63,9 +63,7 @@ export const DialogTextFragment = ({id, dialog}) => {
         }
     }
 
-    let text = dialog.peer.messages.last.text
-    if(text==="") text = dialog.peer.messages.last.textPreview
-
+    let text = dialog.peer.messages.last.text;
     return (
         <Text id={id}
               user={dialog.peer.messages.last.prefix}

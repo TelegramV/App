@@ -165,13 +165,15 @@ export class MessageParser {
                 return "Video"
             case MessageType.PHONE_CALL:
                 return "Phone call"
+            case MessageType.SERVICE:
+                return "Service message"
+            case MessageType.DICE:
+                return message.emoji;
+            case MessageType.GROUP:
+                return "Album"
             case MessageType.TEXT:
             case MessageType.WEB_PAGE:
                 return "";
-            case MessageType.SERVICE:
-                return "Service message" //somehow, not working from there
-            case MessageType.DICE:
-                return message.emoji;
             default:
                 return "Unsupported"
         }
@@ -179,12 +181,8 @@ export class MessageParser {
 
     static getPrefixNoSender(message) {
         const p = MessageParser.getMediaPreviewName(message)
-        if (message.raw.media) {
-            if (p.length > 0) {
-                return p + (message.text.length > 0 ? ", " + message.text : "")
-            } else {
-                return message.text
-            }
+        if (message.raw.media && p.length > 0) {
+            return p + (message.text.length > 0 ? ", " + message.text : "")
         } else {
             return message.text
         }
@@ -199,16 +197,15 @@ export class MessageParser {
 
         const p = MessageParser.getMediaPreviewName(message)
 
-        if (message.raw.media) {
-
-            if (p.length > 0) {
-                text = (showSender ? peerName + ": " : "") + p + (message.text.length > 0 ? ", " : "")
-            } else {
-                text = (showSender ? peerName + ": " : "")
-            }
-        } else if (message.text.length > 0 && showSender) {
-            text += peerName + ": "
+        //if (message.raw.media) { // p is not only media
+        if (p.length > 0) {
+            text = (showSender ? peerName + ": " : "") + p + (message.text.length > 0 ? ", " : "")
+        } else {
+            text = (showSender ? peerName + ": " : "")
         }
+        /*} else if (message.text.length > 0 && showSender) {
+            text += peerName + ": "
+        }*/
 
         return text
     }
