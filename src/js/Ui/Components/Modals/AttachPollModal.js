@@ -61,6 +61,11 @@ class OptionsFragment extends StatefulComponent {
     }
 
     checkInput = (i, ev) => {
+        if(ev.target.value.length === 0 && i === this.state.options.length - 2) {
+            this.state.options.splice(i, 1)
+            this.forceUpdate()
+            return
+        }
         this.state.options[i] = ev.target.value
         this.forceUpdate()
         // const index = Array.prototype.indexOf.call(this.$el.children, ev.target.parentNode.parentNode)
