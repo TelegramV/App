@@ -125,7 +125,6 @@ class BetterStickerComponent extends StatefulComponent {
 
     componentWillUpdate(nextProps, nextState) {
         if (nextProps.document.id !== this.props.document.id) {
-            console.log(nextProps, nextState)
             const {document, isFull} = nextProps;
             const isAnimated = nextProps.isAnimated ?? document.mime_type === "application/x-tgsticker";
             const thumb = isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "";

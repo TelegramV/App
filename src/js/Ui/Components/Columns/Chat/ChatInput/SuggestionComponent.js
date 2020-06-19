@@ -1,13 +1,16 @@
-import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import Localization from "../../../../../Api/Localization/Localization"
 import {ChatInputManager} from "./ChatInputComponent"
+import {text2emoji} from "../../../../Plugins/EmojiTextInterceptor"
 
-export default class SuggestionComponent extends StatelessComponent {
+export default class SuggestionComponent extends StatefulComponent {
     identifier = "suggestion";
 
-    stateless = {
+    state = {
         type: "emoji",
+        currentSuggestion: [],
+        visible: false
     };
 
     appEvents(E) {
@@ -18,31 +21,31 @@ export default class SuggestionComponent extends StatelessComponent {
     render() {
         let classes = {
             "suggestion": true,
-            "emoji-suggestion": this.stateless.type == "emoji",
-            "visible": this.visible
+            "scrollable-x": true,
+            "emoji-suggestion": this.state.type == "emoji",
+            "visible": this.state.visible
         }
         return (
             <div className={classes}>
-                <span>
-                    {this.currentSuggestion}
-                </span>
+                {this.state.currentSuggestion?.map(em => <span>{em}</span>)}
             </div>
         )
     }
 
     componentDidMount() {
-
     }
 
     show = () => {
-        this.visible = true;
-        this.forceUpdate();
+        this.setState({
+            visible: true
+        })
         this.onShow();
     }
 
     hide = () => {
-        this.visible = false;
-        this.forceUpdate();
+        this.setState({
+            visible: false
+        })
         this.onHide();
     }
 
@@ -51,7 +54,7 @@ export default class SuggestionComponent extends StatelessComponent {
     }
 
     onShow = () => {
-        if (this.stateless.type == "emoji") {
+        if (this.state.type == "emoji") {
             let emojis = this.$el.querySelectorAll(".emoji");
             emojis.forEach(emoji => {
                 emoji.addEventListener("click", this.onEmojiClick)
@@ -113,16 +116,23 @@ export default class SuggestionComponent extends StatelessComponent {
         if (key) {
             Localization.suggestEmojis(key).then(list => {
                 if (list.length == 0) {
-                    this.currentSuggestion = undefined;
+                    this.setState({
+                        currentSuggestion: []
+                    })
                     this.hide();
                 } else {
-                    if (this.currentSuggestion == list) return; //nothing changed
-                    this.currentSuggestion = list;
+                    if (this.state.currentSuggestion == list) return; //nothing changed
+                    this.setState({
+                        currentSuggestion: [] // hack, patcher replace img url, and previous emoji is visible while new loading
+                    })
+                    this.setState({
+                        currentSuggestion: list
+                    })
                     this.show();
                 }
             })
         } else {
-            if (this.visible) this.hide();
+            if (this.state.visible) this.hide();
         }
     }
 }

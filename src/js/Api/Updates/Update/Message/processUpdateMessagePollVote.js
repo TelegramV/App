@@ -23,7 +23,6 @@ function processUpdateMessagePollVote(update) {
     if (AppSelectedChat.isSelected) {
         // todo: @prettydude fix it pls
         const messages = AppSelectedChat.current.messages.getPollsById(update.poll_id);
-
         for (const message of messages) {
             message.fillPollVote(update.user_id, update.options);
             message.fire("pollVote");

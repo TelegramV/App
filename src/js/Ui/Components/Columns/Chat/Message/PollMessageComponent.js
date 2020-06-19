@@ -15,11 +15,14 @@ import {formatAudioTime} from "../../../../Utils/utils"
 
 export default class PollMessageComponent extends GeneralMessageComponent {
 
+    state = {
+        showingSolution: false
+    }
+
     init() {
         super.init();
 
         let message = this.props.message;
-        //console.log(message);
 
         this.timerRef = VComponent.createFragmentRef();
 
@@ -113,8 +116,15 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     showSolution = () => {
-        if(this.props.message.results?.solution) {
+        if(this.props.message.results?.solution && !this.state.showingSolution) {
             UIEvents.General.fire("snackbar.show", {text: <SnackbarSolutionFragment message={this.props.message}/>, time: 5});
+            this.setState({
+                showingSolution: true
+            })
+
+            this.withTimeout(_ => {
+                this.setState({showingSolution: false})
+            }, 5000);
         }
     }
 
@@ -132,7 +142,9 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     onPollChange = () => {
         this.forceUpdate();
-        UIEvents.General.fire("pollUpdate", {message: this.props.message});
+        UIEvents.General.fire("pollUpdate", {message: this.props.message}); //update sidebar
+
+        this.withTimeout(_ => this.forceUpdate(), 1000); // текст з обраного варіанту кудись зникає, дикий костиль, ДАВИД ФІКС!
     }
 
     onActionClick = (event) => {
@@ -189,7 +201,10 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     shouldShowTooltip = () => {
         let message = this.props.message;
-        return message.isQuiz && ((!message.isVoted && message.poll.closed) || message.isVoted)
+        return message.isQuiz &&
+         (message.poll.closed || message.isVoted) &&
+          !this.state.showingSolution &&
+          this.props.message.results?.solution
     }
 
     cancelVote = () => {

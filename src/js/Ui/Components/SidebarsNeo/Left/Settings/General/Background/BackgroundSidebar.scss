@@ -1,3 +1,5 @@
+@import "src/sass/partials/vars";
+
 .content {
     .pallete {
         padding: 10px;
@@ -78,6 +80,10 @@
         .image-square {
             background-size: cover;
             background-position: center center;
+
+            &.selected {
+                border: 4px solid $blue;
+            }
         }
     }
 }

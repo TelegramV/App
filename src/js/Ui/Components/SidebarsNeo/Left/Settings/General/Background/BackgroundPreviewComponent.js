@@ -8,8 +8,12 @@ export default class BackgroundPreviewComponent extends StatefulComponent {
 	}
 
 	render() {
+		let classes = {
+			"image-square": true,
+			selected: this.props.selected
+		}
 		return (
-        <div class="image-square" onClick={_ => this.props.click(this.props.wallpaper)} css-background-image={this.urlOrNone()}/>
+        <div class={classes} onClick={_ => this.props.click(this.props.wallpaper)} css-background-image={this.urlOrNone()}/>
         )
 	}
 
