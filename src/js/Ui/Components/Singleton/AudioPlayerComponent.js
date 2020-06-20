@@ -143,8 +143,8 @@ class AudioPlayerComponent extends StatefulComponent {
             message,
             isShown: true,
         });
-
-        this.requeue(message);
+        //
+        // this.requeue(message);
     }
 
     close = () => {
@@ -194,7 +194,7 @@ class AudioPlayerComponent extends StatefulComponent {
         });
     }
 
-    requeue(message ) {
+    requeue(message) {
         API.messages.getHistory(message.dialogPeer, {
             offset_id: AudioPlayer.state.message.id,
             limit: 100,
