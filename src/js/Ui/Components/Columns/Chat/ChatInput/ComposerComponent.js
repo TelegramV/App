@@ -76,31 +76,10 @@ export default class ComposerComponent extends StatelessComponent {
 
     onHide = () => {
         window.document.getElementById("chat").classList.remove("composer-opened");
-        this.$stickersPanel.querySelector(".selected").childNodes.forEach(node => {
-            if (node.id) {
-                lottie.pause(node.id);
-            }
-        });
-
-        this.$gifPanel.querySelectorAll("video").forEach(video => {
-            video.pause();
-        });
-
-        this.paused = true;
     }
 
     onShow = () => {
         window.document.getElementById("chat").classList.add("composer-opened"); //for phones
-
-        if (!this.paused) {
-            return;
-        }
-
-        this.$gifPanel.querySelectorAll("video").forEach(video => {
-            video.play();
-        });
-
-        this.paused = false;
     }
 
     togglePanel = (name: string) => {

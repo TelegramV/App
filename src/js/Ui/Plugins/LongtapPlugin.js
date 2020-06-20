@@ -7,14 +7,17 @@ class LongtapVRDOMPlugin extends VRDOMPlugin {
 
             ["mousedown", "touchstart"].forEach(ev => {
                 $el.addEventListener(ev, function(e) {
-                	if(e.which !== 1) return; //only left click
+                    console.log(e);
+                	if(e.which !== 1 && !e.isTrusted) return; //only left click
                     clearTimeout(timeout);
                     $el.classList.add("no-select");
 
+                    let rect = $el.getBoundingClientRect();
+
                     timeout = setTimeout(_ => {
                         let event = new MouseEvent('contextmenu', {
-                            clientX: e.clientX,
-                            clientY: e.clientY
+                            clientX: e.clientX || rect.left + rect.width / 2,
+                            clientY: e.clientY || rect.top + rect.height / 2,
                         });
                         $el.dispatchEvent(event);
                         $el.classList.remove("no-select");

@@ -9,18 +9,18 @@
         z-index: 100;
         color: white;
 
-        background-color: rgba(black, .40);
+        background-color: rgba(black, .30);
         border-radius: 50%;
         padding: 15px;
 
         &:hover {
-            background-color: rgba(black, .60);
+            background-color: rgba(black, .50);
         }
 
         transition: background-color 250ms ease-in-out;
 
         .tgico {
-            font-size: 35pt;
+            font-size: 35px;
             padding: 0;
             margin: 0;
         }
@@ -34,21 +34,17 @@
         position: absolute;
         z-index: 100;
 
-        @if $in {
-            left: 0;
-        } @else {
-            right: 0;
-        }
+        left: 0;
 
         &:hover {
-            background-color: rgba(black, .60);
+            background-color: rgba(black, .50);
         }
 
         transition: background-color 250ms ease-in-out;
 
         top: 0;
         color: white;
-        background-color: rgba(black, .40);
+        background-color: rgba(black, .30);
         padding: 2px 8px;
         margin: 5px 5px 5px 5px;
         border-radius: 12px;
@@ -62,11 +58,11 @@
             align-items: center;
             justify-content: center;
 
-            font-size: 13pt;
+            font-size: 14px;
 
             .tgico {
                 margin-left: 2px;
-                font-size: 15pt;
+                font-size: 15px;
             }
         }
 
@@ -75,14 +71,14 @@
             align-items: center;
             justify-content: center;
 
-            font-size: 12pt;
+            font-size: 14px;
 
             .icon {
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 margin-right: 5px;
-                font-size: 25pt;
+                font-size: 25px;
             }
 
             .info {

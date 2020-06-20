@@ -32,7 +32,7 @@ export class SettingsSidebar extends LeftSidebar {
 
             <Section>
                 <IconButton icon="edit" text="Edit Profile" onClick={_ => {}}/>
-                <IconButton icon="folder" text="Folders" onClick={_ => UIEvents.Sidebars.fire("push", FoldersSidebar)}/>
+                <IconButton icon="folder" text="Chat Folders" onClick={_ => UIEvents.Sidebars.fire("push", FoldersSidebar)}/>
                 <IconButton icon="settings" text="General Settings" onClick={_ => UIEvents.Sidebars.fire("push", GeneralSidebar)}/>
                 <IconButton icon="unmute" text="Notifications" onClick={_ => UIEvents.Sidebars.fire("push", NotificationsSidebar)}/>
                 <IconButton icon="lock" text="Privacy and Security" onClick={_ => UIEvents.Sidebars.fire("push", PrivacySidebar)}/>

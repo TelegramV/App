@@ -98,7 +98,7 @@
             @include iv-button($in: true);
             @include tails($in: true);
             @include poll($in: true);
-            @include video($in: true);
+            //@include video($in: true);
         }
 
         &.out > .message-content {
@@ -131,7 +131,7 @@
             @include iv-button($in: false);
             @include tails($in: false);
             @include poll($in: false);
-            @include video($in: false);
+            //@include video($in: false);
         }
 
         .message-content {
@@ -197,6 +197,7 @@
             @include figure;
             @include media-wrapper;
             @include grouped;
+            @include video;
 
             a:not(.button) {
                 color: $darkblue;
