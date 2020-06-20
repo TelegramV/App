@@ -112,6 +112,7 @@
 
         .content-wrapper {
             display: flex;
+            height: 100%;
 
             .navigation {
                 color: white;
@@ -174,12 +175,14 @@
                 display: flex;
                 flex-grow: 1;
                 flex-direction: column;
+                align-items: center;
+                justify-content: center;
 
                 .media {
-                    position: absolute;
+                    /*position: absolute;
                     top: 50%;
                     left: 50%;
-                    transform: translate(-50%, -50%);
+                    transform: translate(-50%, -50%);*/
                     max-height: 80%;
                     max-width: 80%;
                     display: flex;
@@ -188,6 +191,8 @@
 
                     figure {
                         background-color: transparent;
+                        max-height: 100%;
+                        max-width: 100%;
 
                         img {
                             max-width: 100vw;
@@ -197,13 +202,17 @@
                     }
                 }
 
-                .caption {
-                    margin-bottom: 58px;
+                .caption:not(:empty) {
+                    //margin-bottom: 58px;
+                    margin: 10px;
                     color: $darkgreyicon;
-                    bottom: 0;
+                    padding: 5px;
+                    border-radius: 10px;
+                    background-color: $semiblack;
+                    //bottom: 0;
                     text-align: center;
-                    width: 100%;
-                    position: absolute;
+                    //width: 100%;
+                    //position: absolute;
                 }
             }
         }

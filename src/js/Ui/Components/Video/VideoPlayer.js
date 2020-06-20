@@ -127,18 +127,18 @@ class VideoPlayer extends StatefulComponent {
         if (typeof containerWidth === "number" && typeof containerHeight === "number") {
             if (containerWidth > containerHeight) {
                 styleSize = {
-                    "width": `${containerWidth}px`,
+                    "max-width": `${containerWidth}px`,
                     "max-height": `${containerHeight}px`,
                 }
             } else {
                 if (containerHeight > 800) {
                     styleSize = {
-                        "width": `${containerWidth}px`,
+                        "max-width": `${containerWidth}px`,
                         "max-height": `800px`,
                     }
                 } else {
                     styleSize = {
-                        "width": `${containerWidth}px`,
+                        "max-width": `${containerWidth}px`,
                         "max-height": `${containerHeight}px`,
                     }
                 }
