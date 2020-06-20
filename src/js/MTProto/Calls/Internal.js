@@ -6,6 +6,7 @@ import BigInteger from "big-integer";
 import sha256 from "../Cryptography/sha256";
 import Uint8 from "../Utils/Uint8";
 import sha1 from "../Cryptography/sha1";
+import telegram_crypto from "../Cryptography/telegram_crypto";
 
 export const CallsInternal = {
     startCall(dhConfig) {
@@ -43,6 +44,18 @@ export const CallsInternal = {
             result.push(String.fromCharCode(...this.emojiData.subarray(offset, offset + size)));
         }
         return result
+    },
+
+    random(count) {
+        return Uint8.random(count)
+    },
+
+    decrypt_message(data: Uint8Array, auth_key: Uint8Array, msg_key: Uint8Array, x = 8) {
+        return telegram_crypto.decrypt_message(data, auth_key, msg_key, x)
+    },
+
+    encrypt_message(data: Uint8Array,  auth_key: Uint8Array, x = 0) {
+        return telegram_crypto.encrypt_message(data, auth_key, x)
     },
 
     computeEmojiIndex(bytes) {

@@ -1,10 +1,8 @@
 import {BufferReader, BufferWriter} from "../../Utils/buffer";
 import AppConfiguration from "../../Config/AppConfiguration";
-import telegram_crypto from "../../MTProto/Cryptography/telegram_crypto";
-import {bytesAsHex} from "../../Utils/byte";
 import CallMessageHandler from "./CallMessageHandler";
-import Uint8 from "../../MTProto/Utils/Uint8";
 import keval from "../../Keval/keval";
+import MTProto from "../../MTProto/External";
 
 
 
@@ -31,14 +29,14 @@ export default class CallNetworker {
         return this.mainConnection.socket
     }
 
-    sendPing(connection) {
+    async sendPing(connection) {
         const buf = new BufferWriter()
         buf.storeBytes(connection.peer_tag)
         buf.storeInt(-1)
         buf.storeInt(-1)
         buf.storeInt(-1)
         buf.storeInt(-2)
-        const rand = Uint8.random(8)
+        const rand = await MTProto.randomBytes(8)
         buf.storeBytes(rand)
 
         connection.socket.send(buf.getBytes(true))
@@ -129,7 +127,7 @@ export default class CallNetworker {
         return buf.getBytes()
     }
 
-    encryptPacket(id, packet) {
+    async encryptPacket(id, packet) {
         const buf = new BufferWriter()
 
         const wrapped = this.wrapPacket(id, packet)
@@ -139,13 +137,14 @@ export default class CallNetworker {
         let padLen = 16 - (2 + wrapped.length) % 16
         if(padLen < 16)
             padLen += 16;
-        const padding = Uint8.random(padLen)
+        const padding = await MTProto.randomBytes(padLen)
         buf.storeBytes(padding)
         const arr = buf.getBytes()
 
         const x = this.isOutgoing ? 0 : 8
 
-        const encrypted = telegram_crypto.encrypt_message(new Uint8Array(arr), this.authKey, x)
+        const encrypted = await MTProto.encryptMessage(new Uint8Array(arr), this.authKey, x)
+        console.log(encrypted)
 
         const lastBuf = new BufferWriter()
         lastBuf.storeBytes(encrypted.msg_key)
@@ -154,12 +153,12 @@ export default class CallNetworker {
         return lastBuf.getBytes()
     }
 
-    sendPacket(id, packet) {
+    async sendPacket(id, packet) {
         if(!this.mainConnection) {
             // TODO add to resend queue
             return
         }
-        const wrapped = this.encryptPacket(id, packet)
+        const wrapped = await this.encryptPacket(id, packet)
         const buf = new BufferWriter()
         buf.storeBytes(this.peerTag)
         buf.storeBytes(wrapped)
@@ -167,7 +166,7 @@ export default class CallNetworker {
         this.socket.send(new Uint8Array(buf.getBytes()))
     }
 
-    parseMessage(data: ArrayBuffer) {
+    async parseMessage(data: ArrayBuffer) {
         data = new Uint8Array(data.slice(16, data.byteLength)) // skip peer_tag
 
         const buf = new BufferReader(data.buffer)
@@ -199,7 +198,8 @@ export default class CallNetworker {
         const msgKey = buf.getBytes(16)
         const d = buf.getBytes(data.byteLength - 16)
         // TODO move crypto to worker
-        const decrypted = telegram_crypto.decrypt_message(d, this.authKey, msgKey, this.isOutgoing ? 8 : 0).bytes
+        const decrypted = (await MTProto.decryptMessage(d, this.authKey, msgKey, this.isOutgoing ? 8 : 0)).bytes
+        console.log(decrypted)
         if(decrypted.byteLength === 0) {
             throw new Error("Failed to decrypt packet")
         }

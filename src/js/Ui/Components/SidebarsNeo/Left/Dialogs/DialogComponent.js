@@ -246,13 +246,9 @@ export class DialogComponent extends StatelessComponent {
         }
 
         const isPinned = this.props.folderId == null || this.props.folderId === "archive" ? dialog.pinned : FoldersManager.isPinned(dialog.peer, this.props.folderId)
-        console.log("RESORT", isPinned, dialog.isArchived)
-        console.log("pin ", this.$el.__pinned)
 
         if (isPinned !== this.$el.__pinned) {
-            console.log("pin !=")
             if (isPinned) {
-                console.log("now pinned")
 
                 this.__destroy()
 
@@ -260,8 +256,6 @@ export class DialogComponent extends StatelessComponent {
 
                 return
             } else {
-                console.log("boom tetris for jeff")
-
                 this.__destroy()
 
                 AppEvents.Dialogs.fire("gotOne", {

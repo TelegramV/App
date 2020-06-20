@@ -154,6 +154,24 @@ class MTProtoBridge {
         })
     }
 
+    encryptMessage(data: Uint8Array,  auth_key: Uint8Array, x = 0) {
+        return performTask("encrypt_message", {
+            data, auth_key, x
+        })
+    }
+
+    decryptMessage(data: Uint8Array, auth_key: Uint8Array, msg_key: Uint8Array, x = 8) {
+        return performTask("decrypt_message", {
+            data, auth_key, msg_key, x
+        })
+    }
+
+    randomBytes(count) {
+        return performTask("random", {
+            count
+        })
+    }
+
     isUserAuthorized() {
         return !!localStorage.getItem("user")
     }
