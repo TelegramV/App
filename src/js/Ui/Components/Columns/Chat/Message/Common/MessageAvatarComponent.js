@@ -32,7 +32,7 @@ export class MessageAvatarComponent extends StatelessComponent {
             return <div className="avatar"/>
         }
 
-        const hasAvatar = !from.photo.isEmpty
+        const hasAvatar = !from.photo?.isEmpty ?? false
 
         const avatarClasses = `avatar` + (!hasAvatar ? ` placeholder-${from.photo.letter.num}` : "")
         const cssBackgroundImage = hasAvatar ? `url(${from.photo.smallUrl})` : undefined

@@ -180,22 +180,42 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             this.appendMessages(vbp, this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
             this.scrollBottom();
         } else if (event.messages.length >= 100) {
-            const actionCount = (++this.actionCount);
-
             const message = this.isRequestedShowMessage;
+            const messageIndex = this.mainVirtual.messages.findIndex(m => m.id === message.id);
 
-            API.messages.getHistory(message.dialogPeer, {
-                offset_id: message.id,
-                add_offset: -51,
-                limit: 100
-            }).then(Messages => {
-                AppEvents.Peers.fire("chat.showMessageReady", {
-                    peer: message.dialogPeer,
-                    messages: message.dialogPeer.messages.putRawMessages(Messages.messages),
+            if (messageIndex > -1) {
+                this.cleanupTree();
+
+                this.mainVirtual.currentPage = this.mainVirtual.messages
+                    .slice(Math.max(messageIndex - this.mainVirtual.edgeSize, 0), messageIndex + this.mainVirtual.edgeSize);
+
+                const messages = this.mainVirtual.currentPage;
+
+                this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
+
+                const $message = this.$el.querySelector(`#message-${message.id}`);
+
+                if ($message) {
+                    scrollToAndHighlight(this.$el, $message);
+                } else {
+                    console.warn("No message to scroll found.")
+                }
+            } else {
+                const actionCount = (++this.actionCount);
+
+                API.messages.getHistory(message.dialogPeer, {
                     offset_id: message.id,
-                    actionCount,
-                })
-            });
+                    add_offset: -51,
+                    limit: 100
+                }).then(Messages => {
+                    AppEvents.Peers.fire("chat.showMessageReady", {
+                        peer: message.dialogPeer,
+                        messages: message.dialogPeer.messages.putRawMessages(Messages.messages),
+                        offset_id: message.id,
+                        actionCount,
+                    })
+                });
+            }
         }
     }
 
@@ -210,23 +230,43 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             this.appendMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.getVeryBottomOne());
             this.scrollBottom();
         } else {
-            this.isLoadingRecent = false;
-            const actionCount = (++this.actionCount);
-
             const message = this.isRequestedShowMessage;
+            const messageIndex = this.mainVirtual.messages.findIndex(m => m.id === message.id);
 
-            API.messages.getHistory(message.dialogPeer, {
-                offset_id: message.id,
-                add_offset: -51,
-                limit: 100
-            }).then(Messages => {
-                AppEvents.Peers.fire("chat.showMessageReady", {
-                    peer: message.dialogPeer,
-                    messages: message.dialogPeer.messages.putRawMessages(Messages.messages),
+            if (messageIndex > -1) {
+                this.cleanupTree();
+
+                this.mainVirtual.currentPage = this.mainVirtual.messages
+                    .slice(Math.max(messageIndex - this.mainVirtual.edgeSize, 0), messageIndex + this.mainVirtual.edgeSize);
+
+                const messages = this.mainVirtual.currentPage;
+
+                this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
+
+                const $message = this.$el.querySelector(`#message-${message.id}`);
+
+                if ($message) {
+                    scrollToAndHighlight(this.$el, $message);
+                } else {
+                    console.warn("No message to scroll found.")
+                }
+            } else {
+                this.isLoadingRecent = false;
+                const actionCount = (++this.actionCount);
+
+                API.messages.getHistory(message.dialogPeer, {
                     offset_id: message.id,
-                    actionCount,
-                })
-            });
+                    add_offset: -51,
+                    limit: 100
+                }).then(Messages => {
+                    AppEvents.Peers.fire("chat.showMessageReady", {
+                        peer: message.dialogPeer,
+                        messages: message.dialogPeer.messages.putRawMessages(Messages.messages),
+                        offset_id: message.id,
+                        actionCount,
+                    })
+                });
+            }
         }
         this.isLoadingRecent = false;
     }
