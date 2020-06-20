@@ -178,6 +178,7 @@ export class PeerApi {
         UIEvents.General.fire("chat.scrollBottom")
 
         p.then(q => {
+            //console.log("q", q);
             MTProto.invokeMethod(media ? (multi ? "messages.sendMultiMedia" : "messages.sendMedia") : "messages.sendMessage", {
                 clear_draft: clearDraft,
                 silent: silent,

@@ -102,13 +102,13 @@ export class AttachFilesModal extends StatelessComponent {
 
     async send() {
         const media = await this.fileListRef.component.getMedia()
-        console.log(media)
+        const caption = this.captionRef.$el.querySelector("input").value.repeat(1);
+        VUI.Modal.close();
         media.forEach(l => {
             AppSelectedChat.Current.api.sendMessage({
-                text: this.captionRef.$el.querySelector("input").value,
+                text: caption,
                 media: l
             })
         })
-        VUI.Modal.close();
     }
 }

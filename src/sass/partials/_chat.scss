@@ -332,8 +332,8 @@
             }
 
             .close {
-                width: 20px;
-                height: 20px;
+                min-width: 20px;
+                min-height: 20px;
                 padding: 7px;
                 margin-right: 15px;
                 border-radius: 50%;
