@@ -36,8 +36,43 @@ import {isDesktop, isMobile} from "../../../Utils/utils";
 import {DialogInfoSidebar} from "../../SidebarsNeo/Right/DialogInfo/DialogInfoSidebar";
 import nodeIf from "../../../../V/VRDOM/jsx/helpers/nodeIf";
 import {SearchBarComponent} from "./Search/SearchBarComponent";
+import VButton from "../../../Elements/Button/VButton"
+import StatefulComponent from "../../../../V/VRDOM/component/StatefulComponent"
+import API from "../../../../Api/Telegram/API"
+import AppEvents from "../../../../Api/EventBus/AppEvents"
 
 const useVirtualized = true || Boolean(localStorage.getItem("settings.messages.virtualized"))
+
+class SubscribeButton extends StatefulComponent {
+    appEvents(E: AE) {
+        E.bus(UIEvents.General)
+            .updateOn("chat.select");
+
+        E.bus(AppEvents.Peers)
+            .filter(event => AppSelectedChat.check(event.peer))
+            .updateOn("peers.joinLeave");
+    }
+
+    render() {
+        if (AppSelectedChat.isNotSelected || AppSelectedChat.current.type !== "channel") {
+            return <div/>
+        }
+
+        if (!AppSelectedChat.current.isLeft) {
+            return (
+                <VButton isFlat onClick={() => {
+                    API.channels.leaveChannel(AppSelectedChat.current)
+                }}>Leave</VButton>
+            )
+        }
+
+        return (
+            <VButton onClick={() => {
+                API.channels.joinChannel(AppSelectedChat.current)
+            }}>Subscribe</VButton>
+        )
+    }
+}
 
 /**
  * CRITICAL: never rerender this component!
@@ -83,6 +118,7 @@ class ChatComponent extends StatelessComponent {
                     <SearchBarComponent ref={this}/>
                     <div id="topbar">
                         <ChatInfoComponent/>
+                        <SubscribeButton/>
                         <ChatInfoCallButtonComponent/>
                         <div className="btn-icon rp rps tgico-search" onClick={this.openSearch}/>
                         <div className="btn-icon rp rps tgico-more"/>

@@ -54,7 +54,7 @@ export class ChannelPeer extends Peer {
     }
 
     get canPostMessages(): boolean {
-        return this.isCreator || !!this.adminRights.post_messages
+        return (this.isCreator || !!this.adminRights.post_messages) && !this.isLeft
     }
 
     get canChangeInfo(): boolean {
