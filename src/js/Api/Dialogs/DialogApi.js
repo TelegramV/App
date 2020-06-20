@@ -20,7 +20,7 @@ export class DialogApi {
             peer: this._dialog.input,
             pinned
         }).then(Bool => {
-            console.log(Bool, pinned)
+            //console.log(Bool, pinned)
             if (Bool._ === "boolTrue") {
                 this._dialog.pinned = pinned
             }

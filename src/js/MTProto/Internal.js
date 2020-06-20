@@ -26,7 +26,7 @@ import TelegramApplication from "./TelegramApplication";
 export const MTProtoInternal = {
     application: new TelegramApplication(),
     updatesHandler: () => console.error("no updates handler"),
-    workerPostMessage: () => console.error("fuck we are in a very bad situation"),
+    workerPostMessage: () => console.error("this is a very bad situation"),
 
     syncTimeWithFrontend() {
         this.workerPostMessage({

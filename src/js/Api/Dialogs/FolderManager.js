@@ -61,7 +61,7 @@ class FolderManager {
 
     updateDialogFilters = (event) => {
         // Unknown
-        console.log("updateDialogFilters", event)
+        //console.log("updateDialogFilters", event)
     }
 
     async fetchFolders() {
@@ -123,12 +123,12 @@ class FolderManager {
     }
 
     async updateFolder(filter) {
-        console.log("updateFolder", filter)
+        //console.log("updateFolder", filter)
         const response = await MTProto.invokeMethod("messages.updateDialogFilter", {
             id: filter.id,
             filter: filter
         })
-        console.log(response)
+        //console.log(response)
         const index = this.folders.findIndex(l => l.id === filter.id)
         if(index === -1) {
             this.folders.push(filter)
@@ -144,7 +144,7 @@ class FolderManager {
         filter.id = this.folders.reduce((l, q) => {
             return l.id > q.id
         }).id + 1
-        console.log("creating foldder", filter, this.folders)
+        //console.log("creating folder", filter, this.folders)
         const response = await MTProto.invokeMethod("messages.updateDialogFilter", {
             id: filter.id,
             filter: filter

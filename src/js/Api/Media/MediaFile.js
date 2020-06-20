@@ -199,7 +199,7 @@ class MP4StreamingFile {
         if (this.mp4box) {
             if (this.parts.length) {
                 const all = concatUint8(...this.parts, newBytes).buffer;
-                console.log(all)
+                //console.log(all)
                 all.fileStart = this.bufferOffset;
                 this.mp4box.appendBuffer(all);
                 this.parts = [];

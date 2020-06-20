@@ -57,7 +57,6 @@ export class DialogInfoAudioComponent extends StatefulComponent {
     }
 
     onClickPlay = (event) => {
-        console.log("WAT THE FUCK")
         AudioPlayer.toggle(this.props.message);
     }
 }

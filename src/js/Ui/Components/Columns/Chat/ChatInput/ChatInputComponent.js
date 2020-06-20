@@ -521,7 +521,6 @@ export class ChatInputComponent extends StatelessComponent {
 
                     return values / length;
                 }
-
                 let AudioContext = window.AudioContext || window.webkitAudioContext;
                 this.audioContext = new AudioContext();
                 const input = this.audioContext.createMediaStreamSource(l);
@@ -538,7 +537,6 @@ export class ChatInputComponent extends StatelessComponent {
 
                 scriptProcessor.onaudioprocess = processInput;
 
-                console.log(l)
                 this.recorder = new MediaRecorder(l, {
                     mimeType: "audio/webm;codecs=opus"
                 });
