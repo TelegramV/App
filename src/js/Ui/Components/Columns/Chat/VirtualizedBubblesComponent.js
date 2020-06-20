@@ -336,9 +336,9 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     onScroll = () => {
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
-        const isAtBottom = scrollHeight - scrollTop === clientHeight;
+        const isAtBottom = Math.floor(scrollHeight - scrollTop) === clientHeight;
         const isAtTop = scrollTop <= 400;
-
+        
         // todo: may cause performance issues
         if (!isAtBottom) {
             UIEvents.General.fire("chat.scrollBottom.show");
