@@ -224,6 +224,10 @@
                 padding: 0px;
                 margin: 8px;
 
+                .responsive-only-mobile.btn-icon {
+                    margin-left: -15px;
+                }
+
                 &:hover {
                     background-color: transparent;
                 }
