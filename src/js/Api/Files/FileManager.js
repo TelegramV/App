@@ -248,8 +248,8 @@ class FilesManager {
         this.saveBlobOnPc(new Blob(data, {type: "octet/stream"}), fileName)
     }
 
-    save(fileId, fileName) {
-        const url = this.getById(fileId).url
+    save(file, fileName) {
+        const url = this.get(file).url
 
         this.saveBlobUrlOnPc(url, fileName)
     }

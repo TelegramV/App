@@ -63,12 +63,12 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                     }}>
                         <i className="tgico tgico-close"/>
                     </div>
-                    <div class="close rp rps" onClick={ev => {
-                        ev.stopPropagation();
-                        UIEvents.General.fire("audio.showPlayer")
-                    }}>
-                        <i className="tgico tgico-menu"/>
-                    </div>
+                    {/*<div class="close rp rps" onClick={ev => {*/}
+                    {/*    ev.stopPropagation();*/}
+                    {/*    UIEvents.General.fire("audio.showPlayer")*/}
+                    {/*}}>*/}
+                    {/*    <i className="tgico tgico-menu"/>*/}
+                    {/*</div>*/}
                 </div>
             )
         } else if (pinned) {
