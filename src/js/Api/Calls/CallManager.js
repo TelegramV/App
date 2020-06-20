@@ -286,6 +286,11 @@ class CallManager extends ReactiveObject {
 
                 Due to limitations of the web, all the data will be transferred through bridge {phoneCallsBridge}.<br/>
                 Don't worry though, data is encrypted at the client side, so no one can see anything but random data.
+<br/>
+<br/>
+                    You can run your own bridge using <a className="color-blue" target="_blank" href="https://github.com/TelegramV/CallsBridge"><b>this code</b></a> and change IP in the settings.
+                    <br/>
+
                 </div>
             </div>)
             return false
