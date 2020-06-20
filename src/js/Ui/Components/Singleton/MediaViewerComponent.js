@@ -201,10 +201,14 @@ export class MediaViewerComponent extends StatefulComponent {
 
     componentDidMount() {
         window.addEventListener("keydown", this.onKeyDown);
+        this.$el.addEventListener("swiped-left", this.right);
+        this.$el.addEventListener("swiped-right", this.left);
     }
 
     componentWillUnmount() {
         window.removeEventListener("keydown", this.onKeyDown);
+        this.$el.removeEventListener("swiped-left", this.right);
+        this.$el.removeEventListener("swiped-right", this.left);
     }
 
     onKeyDown = event => {

@@ -18,6 +18,7 @@ import keval from "./Keval/keval"
 import "./globals"
 import "./polyfills"
 
+import "../../vendor/swipes"
 
 if (__IS_PRODUCTION__) {
     document.title = "Connecting.."
