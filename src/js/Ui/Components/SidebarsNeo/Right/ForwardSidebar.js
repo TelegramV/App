@@ -49,7 +49,9 @@ export class ForwardSidebar extends GenericSidebar {
     // TODO move tags to title!
     content(): * {
         return <this.contentWrapper>
-            <div className="peers">
+            <div style={{
+                "margin-bottom": "10px",
+            }} className="peers">
                 <VTagsInput tags={this.state.selected.map(peer => {
                         return <VTag peer={peer} onRemove={l => this.togglePeer(peer)}/>
                     }
