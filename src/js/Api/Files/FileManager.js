@@ -11,6 +11,10 @@ class FilesManager {
     }
 
     isDownloaded(file, thumbOrSize) {
+        if (!file) {
+            return false
+        }
+
         return this.downloaded.has(this.id(file, thumbOrSize))
     }
 
@@ -192,9 +196,7 @@ class FilesManager {
         this.pending.delete(id);
         this.downloaded.set(id, downloaded);
 
-        if (file.__mp4file) {
-            file.__mp4file = null;
-        }
+        file._downloadedBytes = null;
 
         AppEvents.Files.fire("download.done", {
             file: file,
@@ -212,6 +214,7 @@ class FilesManager {
         const id = this.id(file, thumbOrSize)
 
         file._percentage = 0;
+        file._downloadedBytes = new Uint8Array();
 
         this.pending.set(id, file)
 

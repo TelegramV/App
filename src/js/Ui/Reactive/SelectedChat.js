@@ -50,7 +50,6 @@ class SelectedChat {
          */
         this._peer = undefined
 
-        // listen query changes
         VApp.router.onQueryChange(queryParams => {
             const p = parseHashQuery(queryParams)
             const peer = this.findFromQueryParams(p)
