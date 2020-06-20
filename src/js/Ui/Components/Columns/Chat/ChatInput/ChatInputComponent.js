@@ -375,29 +375,27 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     pickPhoto = (blob) => {
-        // TODO wtf?
-        // if (VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachPhotosModal) {
-        //     VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component.addPhoto(blob)
-        //     return
-        // }
-        VUI.Modal.open(<AttachPhotosModal media={[blob]}/>)
+        if(VUI.Modal.state.body.componentClass !== AttachPhotosModal) {
+            VUI.Modal.open(<AttachPhotosModal media={[blob]}/>)
+        } else {
+            UIEvents.General.fire("upload.addPhoto", {blob: blob})
+        }
     }
 
     pickFile = (blob, file) => {
-        // TODO wtf?
-        // if (VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component instanceof AttachFilesModal) {
-        //     VUI.Modal.$el.querySelector(".dialog").childNodes[0].__component.addFile(blob, file)
-        //     return
-        // }
-        VUI.Modal.open(<AttachFilesModal media={[{
-            blob: blob,
-            file: file
-        }]}/>)
+        if(VUI.Modal.state.body.componentClass !== AttachFilesModal) {
+            VUI.Modal.open(<AttachFilesModal media={[{
+                blob: blob,
+                file: file
+            }]}/>)
+        } else {
+            UIEvents.General.fire("upload.addFile", {blob: blob, file: file})
+        }
     }
 
     attachFile = () => {
         askForFile("", (bytes, file) => {
-            const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
+            const blob = new Blob(new Array(bytes)/*, {type: 'application/jpeg'}*/)
 
             this.pickFile(URL.createObjectURL(blob), file)
         }, true, true)

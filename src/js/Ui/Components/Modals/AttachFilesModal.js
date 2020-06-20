@@ -23,6 +23,7 @@ import {DocumentMessagesTool} from "../../Utils/document";
 import VUI from "../../VUI"
 import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 import VInput from "../../Elements/Input/VInput"
+import UIEvents from "../../EventBus/UIEvents"
 
 class FileListFragment extends StatelessComponent {
     render() {
@@ -70,8 +71,13 @@ class FileListFragment extends StatelessComponent {
 }
 
 export class AttachFilesModal extends StatelessComponent {
-    captionRef = VComponent.createComponentRef()
+    captionRef = VComponent.createFragmentRef()
     fileListRef = VComponent.createComponentRef()
+
+    appEvents(E) {
+        E.bus(UIEvents.General)
+        .on("upload.addFile", this.addFile)
+    }
 
     render() {
         return <div className="attach-files-modal">
@@ -83,7 +89,11 @@ export class AttachFilesModal extends StatelessComponent {
         </div>
     }
 
-    addFile = (blob, file) => {
+    componentDidMount() {
+        this.captionRef.$el.querySelector("input").focus();
+    }
+
+    addFile = ({blob, file}) => {
         this.fileListRef.component.addFile({
             blob: blob,
             file: file
@@ -91,13 +101,14 @@ export class AttachFilesModal extends StatelessComponent {
     }
 
     async send() {
-        VUI.Modal.close()
         const media = await this.fileListRef.component.getMedia()
+        console.log(media)
         media.forEach(l => {
             AppSelectedChat.Current.api.sendMessage({
-                text: this.captionRef.component.getValue(),
+                text: this.captionRef.$el.querySelector("input").value,
                 media: l
             })
         })
+        VUI.Modal.close();
     }
 }

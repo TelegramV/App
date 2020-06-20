@@ -278,16 +278,17 @@ class DialogManager extends Manager {
     }
 
     fetchFirstPage() {
-        console.log("test!")
         if (this.isFetched) {
             AppEvents.Dialogs.fire("gotMany", {
                 dialogs: DialogsStore.toSortedArray(),
             })
 
             return Promise.resolve(DialogsStore.toSortedArray())
+        } if(this.dialogsFetchingPromise) {
+            return this.dialogsFetchingPromise;
         }
 
-        return this.getDialogs().then(dialogs => {
+        return this.dialogsFetchingPromise = this.getDialogs().then(dialogs => {
             this.isFetched = true
 
             AppEvents.Dialogs.fire("gotMany", {

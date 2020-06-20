@@ -31,7 +31,7 @@ class ChatInfoPinnedComponent extends StatefulComponent {
             .updateOn("messages.updatePin")
 
         E.bus(UIEvents.General)
-            .on("chat.select", this.onChatSelected)
+            .updateOn("chat.select")
 
         E.bus(AppEvents.Audio)
             .updateOn("audio.play")
@@ -84,14 +84,6 @@ class ChatInfoPinnedComponent extends StatefulComponent {
             )
         } else {
             return <div className="pin"/>;
-        }
-    }
-
-    onChatSelected = _ => {
-        if (AppSelectedChat.isSelected) {
-            this.setState({
-                message: AppSelectedChat.Current._pinnedMessage
-            })
         }
     }
 }

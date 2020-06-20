@@ -32,6 +32,7 @@ import StreamingVideoComponent from "../Video/StreamingVideoComponent"
 import DocumentParser from "../../../Api/Files/DocumentParser"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 import {MessageType} from "../../../Api/Messages/Message"
+import VUI from "../../VUI"
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -137,11 +138,49 @@ export class MediaViewerComponent extends StatefulComponent {
             date = message.date;
         }
 
+        let contextActions = []
+        if (!!message) {
+            contextActions.push({
+                icon: "forward",
+                title: "Forward",
+                onClick: () => {
+                    UIEvents.General.fire("message.forward", {message, from: message.dialog.peer})
+                }
+            })
+        }
+
+        contextActions.push({
+            icon: "download",
+            title: "Download",
+            onClick: () => {
+                if (!downloaded) return;
+                let pfn = message.srcUrl.split("/");
+                pfn = pfn[pfn.length - 1];
+                const f = message.raw.media.photo || message.raw.media.video || message.raw.media.document || {};
+                FileManager.saveBlobUrlOnPc(
+                    message.srcUrl,
+                    DocumentMessagesTool.getFilename(f.attributes, pfn)
+                )
+            }
+        })
+
+        contextActions.push({
+            icon: "delete",
+            title: "Delete",
+            red: true,
+        })
+
+        let contextMenuHandler = VUI.ContextMenu.listener(contextActions);
+
         return (
-            <div css-display={this.state.hidden && "none"} className={["media-viewer-wrapper", hidden ? "hidden" : ""]}>
+            <div css-display={this.state.hidden && "none"}
+                 className={["media-viewer-wrapper", hidden ? "hidden" : "", message?.type === MessageType.VIDEO && "media-viewdeo"]}>
                 <div className="media-viewer" onClick={this.close}>
                     <div className="header">
-                        <div className="left" onClick={event => {
+                        <div class="close-button">
+                            <i className="tgico tgico-close rp rps"/>
+                        </div>
+                        <div className="user" onClick={event => {
                             event.stopPropagation();
                             AppSelectedInfoPeer.select(message.from);
                             this.close(event);
@@ -152,7 +191,8 @@ export class MediaViewerComponent extends StatefulComponent {
                                 <div className="time">{this.formatDate(date)}</div>
                             </div>
                         </div>
-                        <div className="right">
+                        <div class="filler"/>
+                        <div className="buttons">
                             <i className="tgico tgico-delete rp rps" onClick={event => {
                                 event.stopPropagation();
                             }}/>
@@ -182,6 +222,12 @@ export class MediaViewerComponent extends StatefulComponent {
                             }}/>
                             <i className="tgico tgico-close rp rps"/>
                         </div>
+                        <div class="more-button" onClick={event => {
+                            event.stopPropagation();
+                            contextMenuHandler(event);
+                        }}>
+                            <i className="tgico tgico-more rp rps"/>
+                        </div>
                     </div>
                     <div class="content-wrapper">
                         <NavigationButtonFragment onClick={this.left} hidden={!this.hasLeft() && !isLoadingPage}/>
@@ -201,10 +247,14 @@ export class MediaViewerComponent extends StatefulComponent {
 
     componentDidMount() {
         window.addEventListener("keydown", this.onKeyDown);
+        this.$el.addEventListener("swiped-left", this.right);
+        this.$el.addEventListener("swiped-right", this.left);
     }
 
     componentWillUnmount() {
         window.removeEventListener("keydown", this.onKeyDown);
+        this.$el.removeEventListener("swiped-left", this.right);
+        this.$el.removeEventListener("swiped-right", this.left);
     }
 
     onKeyDown = event => {

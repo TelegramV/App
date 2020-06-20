@@ -180,22 +180,24 @@ class AudioPlayer {
     get state() {
         const fileName = DocumentParser.attributeFilename(this.currentMessage?.media.document);
         const info = DocumentParser.attributeAudio(this.currentMessage?.media.document);
-        const source = this.useSource(this.currentMessage?.media.document);
         const isVoice = info?.voice;
+        const supportStreaming = !__IS_IOS__ && !isVoice && window.MediaSource && MediaSource.isTypeSupported(this.currentMessage?.media.document.mime_type);
+        const source = supportStreaming && this.useSource(this.currentMessage?.media.document);
+        const duration = info?.duration || this.audio?.duration;
 
         return {
             message: this.currentMessage,
-            isPaused: this.audio.paused || this.audio.ended || (info?.duration && this.audio.currentTime >= info?.duration),
-            isEnded: this.audio.ended || this.audio.currentTime >= info?.duration,
+            isPaused: this.audio.paused || this.audio.ended || (duration && this.audio.currentTime >= duration),
+            isEnded: this.audio.ended || this.audio.currentTime >= duration,
             isLoading: false,
             currentTime: this.audio.currentTime,
-            duration: info?.duration,
+            duration: duration,
             bufferedPercentage: isVoice || FileManager.isDownloaded(this.currentMessage?.media.document) ? 100 : source?.bufferedPercentage ?? 100,
             audioInfo: info,
             isVoice,
             fileName,
             isSeeking: this.audio.seeking,
-            supportStreaming: !__IS_IOS__ && !isVoice && MediaSource.isTypeSupported(this.currentMessage?.media.document.mime_type)
+            supportStreaming,
         }
     }
 
@@ -222,7 +224,7 @@ class AudioPlayer {
             } else {
                 this.internal_fireLoading();
 
-                if (FileManager.isPending(message.media.document)) {
+                if (FileManager.isPending(message.media.document) && this.state.supportStreaming) {
                     this.audio.src = this.useSource(message.media.document).url;
                     this.audio.currentTime = 0;
                     this.audio.play();

@@ -115,7 +115,7 @@ class NewVoiceMessageComponent extends StatelessComponent {
     render({message}) {
         const isPlaying = AudioPlayer.isCurrent(message);
         const audioInfo = DocumentParser.attributeAudio(message.media.document);
-        const {isPaused, currentTime} = AudioPlayer.state;
+        const {isPaused, currentTime, duration} = AudioPlayer.state;
 
         this.isPlaying = isPlaying;
 
@@ -176,13 +176,13 @@ class NewVoiceMessageComponent extends StatelessComponent {
                                     <rect className="progress"
                                           x="0"
                                           y="0"
-                                          width={`${(currentTime || 0) / (audioInfo.duration || 1) * 100}%`}
+                                          width={`${(currentTime || 0) / (duration || 1) * 100}%`}
                                           height="100%"
                                           mask={`url(#bars-${message.id})`}/>
                                 </svg>
                                 <div className="timer">
                                     <span
-                                        className="time-played">{isPlaying ? formatAudioTime(currentTime) + "/" : ""}{formatAudioTime(audioInfo.duration)}</span>
+                                        className="time-played">{isPlaying ? formatAudioTime(currentTime) + "/" : ""}{formatAudioTime(duration)}</span>
                                 </div>
                             </div>
                         </div>
@@ -222,7 +222,7 @@ class NewVoiceMessageComponent extends StatelessComponent {
         if (event.buttons === 1) {
             const box = event.target.getBoundingClientRect();
             const percent = (event.pageX - box.x) / box.width;
-            AudioPlayer.updateTime(DocumentParser.attributeAudio(this.props.message.media.document).duration * percent)
+            AudioPlayer.updateTime((DocumentParser.attributeAudio(this.props.message.media.document).duration || AudioPlayer.state.duration) * percent)
         }
     }
 }

@@ -177,6 +177,10 @@
                 margin-top: 10px;
                 padding-right: 10px;
                 margin-bottom: 5px;
+
+                & ~ .text-wrapper.empty {
+                    margin-top: -10px;
+                }
             }
 
             &.no-pad {

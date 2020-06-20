@@ -27,15 +27,21 @@ const processUpdateChannel = update => {
             AppEvents.Dialogs.fire("hideDialogByPeer", {
                 peer: update.__peer
             });
+
+            update.__peer.fire("peers.joinLeave");
         } else {
             if (dialogs[0].peer.isLeft) {
                 AppEvents.Dialogs.fire("hideDialogByPeer", {
                     peer: update.__peer
-                })
+                });
+
+                update.__peer.fire("peers.joinLeave");
             } else {
                 AppEvents.Dialogs.fire("gotNewMany", {
                     dialogs
-                })
+                });
+
+                update.__peer.fire("peers.joinLeave");
             }
         }
     })

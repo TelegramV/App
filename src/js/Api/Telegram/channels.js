@@ -39,8 +39,30 @@ function deleteMessages(peer: Peer, id: number[]) {
     })
 }
 
+function joinChannel(peer: Peer) {
+    return MTProto.invokeMethod("channels.joinChannel", {
+        channel: peer.input,
+    }).then(Updates => {
+        UpdatesManager.process(Updates);
+
+        return Updates;
+    })
+}
+
+function leaveChannel(peer: Peer) {
+    return MTProto.invokeMethod("channels.leaveChannel", {
+        channel: peer.input,
+    }).then(Updates => {
+        UpdatesManager.process(Updates);
+
+        return Updates;
+    })
+}
+
 const channels = {
     deleteMessages: deleteMessages,
+    joinChannel: joinChannel,
+    leaveChannel: leaveChannel,
 }
 
 export default channels
