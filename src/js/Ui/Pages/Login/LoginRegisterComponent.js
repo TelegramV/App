@@ -151,18 +151,18 @@ class LoginRegisterComponent extends StatefulComponent {
 
                 const onCroppieDone = () => {
                     this.state.cropper.result({
-                        type: "blob",
-                    }).then((blob: Blob) => {
+                        type: "base64",
+                    }).then((base) => {
+                        const bytes = Uint8Array.from(atob(base.split(",")[1]), c => c.charCodeAt(0));
+                        const blob = new Blob([bytes], {type: "image/png"});
                         const url = URL.createObjectURL(blob);
 
-                        blob.arrayBuffer().then(buffer => new Uint8Array(buffer)).then(bytes => {
-                            this.setState({
-                                avatarUrl: url,
-                                avatarBytes: bytes,
-                            });
-
-                            VUI.Modal.close();
+                        this.setState({
+                            avatarUrl: url,
+                            avatarBytes: bytes,
                         });
+
+                        VUI.Modal.close();
                     });
                 }
 
