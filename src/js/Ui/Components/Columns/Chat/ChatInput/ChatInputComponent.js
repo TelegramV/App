@@ -65,7 +65,7 @@ export class ChatInputComponent extends StatelessComponent {
                             <div className="field">
                                 <div className="another-wrapper">
                                     <div className="ico-wrapper">
-                                        <i className="tgico tgico-smile btn-icon rp rps"
+                                        <i className="tgico tgico-smile btn-icon rp rps composer-button"
                                            onMouseEnter={this.mouseEnterEmoji.bind(this)}
                                            onMouseLeave={this.mouseLeaveEmoji.bind(this)}
                                            onClick={this.mouseClickEmoji.bind(this)}/>
@@ -282,16 +282,24 @@ export class ChatInputComponent extends StatelessComponent {
         if (composer.visible && this.composerClicked) {
             this.composerClicked = false;
             composer.hide();
-            if (isMobile()) {
-                ev.currentTarget.classList.add("tgico-smile");
-                ev.currentTarget.classList.remove("tgico-keyboard");
-            }
+            this.updateEmojiButton();
         } else {
             this.composerClicked = true;
             composer.show();
-            if (isMobile()) {
-                ev.currentTarget.classList.remove("tgico-smile");
-                ev.currentTarget.classList.add("tgico-keyboard");
+            this.updateEmojiButton();
+        }
+    }
+
+    updateEmojiButton = () => {
+        let composer = VApp.mountedComponents.get("composer");
+        let button = this.$el.querySelector(".composer-button");
+        if (isMobile()) {
+            if (composer.visible) {
+                button.classList.remove("tgico-smile");
+                button.classList.add("tgico-keyboard");
+            } else {
+                button.classList.add("tgico-smile");
+                button.classList.remove("tgico-keyboard");
             }
         }
     }

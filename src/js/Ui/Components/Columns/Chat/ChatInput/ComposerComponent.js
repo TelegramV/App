@@ -76,10 +76,12 @@ export default class ComposerComponent extends StatelessComponent {
 
     onHide = () => {
         window.document.getElementById("chat").classList.remove("composer-opened");
+        ChatInputManager.updateEmojiButton();
     }
 
     onShow = () => {
         window.document.getElementById("chat").classList.add("composer-opened"); //for phones
+        ChatInputManager.updateEmojiButton();
     }
 
     togglePanel = (name: string) => {
