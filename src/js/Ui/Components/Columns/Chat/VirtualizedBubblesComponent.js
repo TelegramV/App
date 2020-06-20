@@ -459,12 +459,13 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             }
         }
 
+        let $first: HTMLElement = this.bubblesInnerRef.$el.lastElementChild;
+
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         this.dev_checkTree();
 
         if (this.$el.scrollTop === 0) {
-            let $first: HTMLElement = this.bubblesInnerRef.$el.childNodes[messages.length - 1];
 
             if ($first) {
                 // if ($first.nextElementSibling) {
