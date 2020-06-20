@@ -62,7 +62,16 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
         this.actionButton = this.$el.querySelector(".action-button");
 
-        if(this.props.message.poll.close_date) this.withInterval(this.updateTimer, 500);
+        
+    }
+
+    componentDidMount() {
+        if(this.props.message.poll.close_date && !this.props.message.isVoted) this.withInterval(this.updateTimer, 500);
+    }
+
+    componentDidUpdate() {
+        this.clearIntervals();
+        if(this.props.message.poll.close_date && !this.props.message.isVoted) this.withInterval(this.updateTimer, 500);
     }
 
     render({ message, showDate }) {
