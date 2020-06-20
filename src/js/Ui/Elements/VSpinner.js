@@ -50,6 +50,30 @@ function VSpinner(
 
     const size = big ? 170 : mid ? 118.5 : 79
 
+    const start = big ? 310 : mid ? 241 : 160; //just randomly got this numbers
+
+    const smallSvg = {
+        cx: 16,
+        cy: 16, 
+        r: 12.8
+    }
+
+    const midSvg = {
+        cx: 24,
+        cy: 24, 
+        r: 19.200000000000003
+    }
+
+    const bigSvg = {
+        cx: 32,
+        cy: 32, 
+        r: 27.6
+    }
+
+    let svgSize = big ? bigSvg : mid ? midSvg : smallSvg;
+
+    let offset = start + progress * size; //Safari doesn't support negative offset
+
     return (
         <div id={id} className={wrapperClassName} ref={loaderRef} onClick={onClick}>
             {slot && <div className="slot">{slot}</div>}
@@ -57,7 +81,8 @@ function VSpinner(
                 {!determinate ?
                     <circle css-stroke-width={strokeWidth} className="path"/> :
                     <circle css-stroke-width={strokeWidth} className="path"
-                            css-stroke-dashoffset={(1 - progress) * -size} css-stroke={color}/>}
+                            css-stroke-dashoffset={offset}
+                            css-stroke={color} cx={svgSize.cx} cy={svgSize.cy} r={svgSize.r}/>}
             </svg>
         </div>
     )

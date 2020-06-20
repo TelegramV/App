@@ -9,7 +9,7 @@ import {VideoPlayerPage} from "../Pages/Tests/VideoPlayerPage"
 //import ElementsPage from "../Pages/Tests/Elements"
 //import ColumnsPage from "../Pages/Tests/Columns"
 //import CryptoTestPage from "../Pages/Tests/Crypto"
-//import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage";
+import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage";
 //import NextGenPage from "../Pages/Tests/NextGen"
 //import {StreamingPage} from "../Pages/Tests/Streaming"
 //import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage"
