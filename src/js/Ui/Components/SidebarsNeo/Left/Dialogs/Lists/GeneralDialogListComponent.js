@@ -30,7 +30,13 @@ export default class GeneralDialogListComponent extends StatelessComponent {
 
     render() {
         return (
-            <div id="dialogs" className="list hidden"/>
+            <div id="dialogs" className="list hidden">
+                {DialogsStore.toSortedArray().filter(l => {
+                    return this.applyFilter(l)
+                }).map(dialog => {
+                    return <DialogComponent dialog={dialog} folderId={this.folderId} list={this}/>
+                })}
+            </div>
         )
     }
 
