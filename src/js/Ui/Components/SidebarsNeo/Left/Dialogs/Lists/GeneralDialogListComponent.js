@@ -129,31 +129,33 @@ export default class GeneralDialogListComponent extends StatelessComponent {
 
     update = () => {
         const $dialogs = this.$el
+        if(this.__.mounted) {
 
-        const renderedDialogs = $dialogs.childNodes
-        // console.log(newFilter.title, renderedDialogs, renderedDialogs.length)
-        //
-        // Remove all redundant
-        let i = 0
-        let toDestroy = []
-        renderedDialogs.forEach($rendered => {
-            const dialog = $rendered.__dialog
+            const renderedDialogs = $dialogs.childNodes
+            // console.log(newFilter.title, renderedDialogs, renderedDialogs.length)
+            //
+            // Remove all redundant
+            let i = 0
+            let toDestroy = []
+            renderedDialogs.forEach($rendered => {
+                const dialog = $rendered.__dialog
 
-            if (dialog && this.applyFilter(dialog)) {
+                if (dialog && this.applyFilter(dialog)) {
 
-            } else {
-                toDestroy.push($rendered.__v.component)
-            }
-            i++
-        })
+                } else {
+                    toDestroy.push($rendered.__v.component)
+                }
+                i++
+            })
 
-        toDestroy.forEach(component => {
-            component.__destroy()
-        })
-        // Add new
-        DialogsStore.toArray()
-            .filter(this.applyFilter)
-            .forEach(this.addNewDialog)
+            toDestroy.forEach(component => {
+                component.__destroy()
+            })
+            // Add new
+            DialogsStore.toArray()
+                .filter(this.applyFilter)
+                .forEach(this.addNewDialog)
+        }
     }
 
     updateFilter = (newFilter) => {
