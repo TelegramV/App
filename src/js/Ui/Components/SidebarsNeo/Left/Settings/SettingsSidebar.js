@@ -29,7 +29,6 @@ export class SettingsSidebar extends LeftSidebar {
             <AvatarComponent peer={me}/>
             <Header isLoading={!me}>{me?.name}</Header>
             <Subheader isLoading={!me}>{me ? "+" + me.phone : ""}</Subheader>
-            <Animated width={100} height={100} r={this.loadingLottie} animationData={filterFilling} loop autoplay/>
 
             <Section>
                 <IconButton icon="edit" text="Edit Profile" onClick={_ => {}}/>

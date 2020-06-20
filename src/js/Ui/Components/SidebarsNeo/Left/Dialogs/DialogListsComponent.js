@@ -27,7 +27,7 @@ class DialogFolderFragment extends StatelessComponent {
         const folderId = this.props.folderId
         const filter = this.props.filter
 
-        return <div class={classIf(!selected, "hidden")}>
+        return <div class={["folder-fragment", classIf(!selected, "hidden")]}>
             <PinnedDialogListComponent ref={this.pinned} folderId={folderId} filter={filter}/>
             <GeneralDialogListComponent ref={this.general} folderId={folderId} filter={filter}/>
         </div>

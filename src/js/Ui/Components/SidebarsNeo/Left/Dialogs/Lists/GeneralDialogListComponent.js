@@ -50,7 +50,8 @@ export default class GeneralDialogListComponent extends StatelessComponent {
         const isBot = peer instanceof BotPeer
         const isMuted = dialog.isMuted
         // TODO needs checking
-        const isRead = dialog.peer.messages.unreadCount === 0 || !dialog.unreadMark
+        const isRead = dialog.peer.messages.unreadCount === 0
+
 
         const isArchived = dialog.isArchived
 
@@ -64,7 +65,7 @@ export default class GeneralDialogListComponent extends StatelessComponent {
             return true
         }
 
-        if (exclude && include.some(l => {
+        if (exclude && exclude.some(l => {
             if (l._ === "inputPeerUser" && peer instanceof UserPeer && peer.id === l.user_id) return true
             if (l._ === "inputPeerChannel" && peer instanceof ChannelPeer && peer.id === l.channel_id) return true
             if (l._ === "inputPeerChat" && peer instanceof GroupPeer && peer.id === l.chat_id) return true
@@ -79,22 +80,27 @@ export default class GeneralDialogListComponent extends StatelessComponent {
         }
 
         if (!f.non_contacts && !isContact && isUser) {
+
             return false
         }
 
         if (!f.groups && isGroup) {
+
             return false
         }
 
         if (!f.broadcasts && isChannel) {
+
             return false
         }
 
         if (!f.bots && isBot) {
+
             return false
         }
 
         if (f.exclude_muted && isMuted) {
+
             return false
         }
 
@@ -103,6 +109,7 @@ export default class GeneralDialogListComponent extends StatelessComponent {
         }
 
         if (f.exclude_archived && isArchived) {
+
             return false
         }
 

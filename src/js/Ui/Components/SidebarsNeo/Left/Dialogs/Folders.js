@@ -23,7 +23,6 @@ const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0
                     sidebar: CreateFolderSidebar,
                     folderId: folderId
                 })
-                // TODO edit folder
             }
         },
         {

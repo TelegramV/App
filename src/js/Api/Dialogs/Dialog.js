@@ -130,7 +130,7 @@ export class Dialog extends ReactiveObject {
         const isBot = peer.type === "user" && peer.isBot
         const isMuted = dialog.isMuted
         // TODO needs checking
-        const isRead = dialog.peer.messages.unreadCount === 0 || !dialog.unreadMark
+        const isRead = dialog.peer.messages.unreadCount === 0
         const isArchived = dialog.isArchived
 
         if (include && include.some(l => {
@@ -143,7 +143,7 @@ export class Dialog extends ReactiveObject {
             return true
         }
 
-        if (exclude && include.some(l => {
+        if (exclude && exclude.some(l => {
             if (l._ === "inputPeerUser" && peer.type === "user" && peer.id === l.user_id) return true
             if (l._ === "inputPeerChannel" && peer.type === "channel" && peer.id === l.channel_id) return true
             if (l._ === "inputPeerChat" && peer.type === "chat" && peer.id === l.chat_id) return true
