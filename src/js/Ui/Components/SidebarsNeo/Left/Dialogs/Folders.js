@@ -55,6 +55,11 @@ export class Folders extends StatefulComponent {
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.updateCounters)
             .on("gotNewMany", this.updateCounters)
+
+        E.bus(AppEvents.Peers)
+            .on("messages.deleted", this.updateCounters)
+            .on("messages.readOut", this.updateCounters)
+            .on("messages.readIn", this.updateCounters)
     }
 
     init() {

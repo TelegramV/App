@@ -26,6 +26,11 @@ export default class GeneralDialogListComponent extends StatelessComponent {
             .on("gotArchived", this.onDialogsGotMany)
             .on("gotNewMany", this.onDialogsGotNewMany)
             .on("gotOne", this.onDialogsGotOne)
+
+        E.bus(AppEvents.Peers)
+            .on("messages.deleted", this.update)
+            // .on("messages.readOut", this.update)
+            .on("messages.readIn", this.update)
     }
 
     render() {
@@ -56,7 +61,7 @@ export default class GeneralDialogListComponent extends StatelessComponent {
         const isBot = peer instanceof BotPeer
         const isMuted = dialog.isMuted
         // TODO needs checking
-        const isRead = dialog.peer.messages.unreadCount === 0
+        const isRead = dialog.peer.messages.unreadCount === 0 && dialog.peer.messages.unreadMentionsCount === 0
 
 
         const isArchived = dialog.isArchived
@@ -122,8 +127,7 @@ export default class GeneralDialogListComponent extends StatelessComponent {
         return true
     }
 
-    updateFilter = (newFilter) => {
-        this.filter = newFilter
+    update = () => {
         const $dialogs = this.$el
 
         const renderedDialogs = $dialogs.childNodes
@@ -150,6 +154,37 @@ export default class GeneralDialogListComponent extends StatelessComponent {
         DialogsStore.toArray()
             .filter(this.applyFilter)
             .forEach(this.addNewDialog)
+    }
+
+    updateFilter = (newFilter) => {
+        this.filter = newFilter
+        this.update()
+        // const $dialogs = this.$el
+        //
+        // const renderedDialogs = $dialogs.childNodes
+        // // console.log(newFilter.title, renderedDialogs, renderedDialogs.length)
+        // //
+        // // Remove all redundant
+        // let i = 0
+        // let toDestroy = []
+        // renderedDialogs.forEach($rendered => {
+        //     const dialog = $rendered.__dialog
+        //
+        //     if (dialog && this.applyFilter(dialog)) {
+        //
+        //     } else {
+        //         toDestroy.push($rendered.__v.component)
+        //     }
+        //     i++
+        // })
+        //
+        // toDestroy.forEach(component => {
+        //     component.__destroy()
+        // })
+        // // Add new
+        // DialogsStore.toArray()
+        //     .filter(this.applyFilter)
+        //     .forEach(this.addNewDialog)
     }
 
     _findRenderedDialogToInsertBefore = (dialog) => {
