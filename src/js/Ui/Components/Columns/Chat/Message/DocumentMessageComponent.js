@@ -113,7 +113,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
         const document = this.props.message.raw.media.document;
 
         if (FileManager.isDownloaded(document)) {
-            FileManager.save(document.id, DocumentParser.attributeFilename(document))
+            FileManager.save(document, DocumentParser.attributeFilename(document))
         } else if (!FileManager.isPending(document)) {
             FileManager.downloadDocument(document)
         } else {
