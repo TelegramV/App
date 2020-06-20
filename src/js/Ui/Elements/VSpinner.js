@@ -79,7 +79,8 @@ function VSpinner(
             {slot && <div className="slot">{slot}</div>}
             <svg className={progressClassName}>
                 {!determinate ?
-                    <circle css-stroke-width={strokeWidth} className="path"/> :
+                    <circle css-stroke-width={strokeWidth} className="path"
+                            css-stroke={color} cx={svgSize.cx} cy={svgSize.cy} r={svgSize.r}/> :
                     <circle css-stroke-width={strokeWidth} className="path"
                             css-stroke-dashoffset={offset}
                             css-stroke={color} cx={svgSize.cx} cy={svgSize.cy} r={svgSize.r}/>}
