@@ -85,7 +85,8 @@ function MessageWrapperFragment(
         outerPad = true,
         contextActions,
         showUsername = true,
-        showDate = false
+        showDate = false,
+        isNewMessages = false,
     },
     slot
 ) {
@@ -147,16 +148,19 @@ function MessageWrapperFragment(
         </div>
     )
 
-    if (showDate) {
+    if (showDate || isNewMessages) {
         return (
             <div className="message-with-date">
                 <div className="service date-service">
-                    <div className="service-msg">{
-                        message.getDate("en", {
-                            month: 'long',
-                            day: 'numeric',
-                        })
-                    }</div>
+                    {showDate && <div className="service-msg">
+                        {
+                            message.getDate("en", {
+                                month: 'long',
+                                day: 'numeric',
+                            })
+                        }
+                    </div>}
+                    {isNewMessages && <div className="service-msg">New messages</div>}
                 </div>
                 {messageNode}
             </div>

@@ -40,6 +40,11 @@ export class StickerSearchSidebar extends RightSidebar {
         </this.contentWrapper>
     }
 
+    componentDidUpdate() {
+        super.componentDidUpdate();
+        this.searchInputRef.component.$el.value = this.state.query;
+    }
+
     get searchLazyLevel(): number {
         return 500
     }

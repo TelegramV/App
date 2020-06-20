@@ -84,7 +84,9 @@ export function renderVRMessage(message: Message, prevMessage: Message = null, n
 
     return <MessageComponent message={message}
                              observer={observer}
-                             showDate={!isSameDate(message.date, prevMessage?.date)}/>;
+                             showDate={!isSameDate(message.date, prevMessage?.date)}
+                             // isNewMessages={message.dialogPeer.messages.readInboxMaxId - 40 >= message.dialogPeer.messages.last?.id && message.dialogPeer.messages.readInboxMaxId === message.id}
+    />;
 }
 
 export function renderMessage(message: Message, prevMessage: Message = null, nextMessage: Message = null, observer): HTMLElement {

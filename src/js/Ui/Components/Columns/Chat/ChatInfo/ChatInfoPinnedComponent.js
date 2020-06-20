@@ -42,7 +42,7 @@ class ChatInfoPinnedComponent extends StatefulComponent {
 
     render() {
         const pinned = AppSelectedChat.current?.pinnedMessage
-        
+
         if (AudioPlayer.state.message) {
             let playClasses = ["tgico", !AudioPlayer.state.isPaused ? "tgico-pause" : "tgico-play"];
             return (
@@ -63,13 +63,19 @@ class ChatInfoPinnedComponent extends StatefulComponent {
                     }}>
                         <i className="tgico tgico-close"/>
                     </div>
+                    <div class="close rp rps" onClick={ev => {
+                        ev.stopPropagation();
+                        UIEvents.General.fire("audio.showPlayer")
+                    }}>
+                        <i className="tgico tgico-menu"/>
+                    </div>
                 </div>
             )
         } else if (pinned) {
             return (
-                <div className="pin pinned-message"
-                     onClick={event => UIEvents.General.$chat.showMessage(pinned)}>
-                    <div class="message-info">
+                <div className="pin pinned-message">
+                    <div class="message-info"
+                         onClick={event => UIEvents.General.$chat.showMessage(pinned)}>
                         <div className="title">Pinned message</div>
                         <div className="description">{MessageParser.getPrefixNoSender(pinned)}</div>
                     </div>
