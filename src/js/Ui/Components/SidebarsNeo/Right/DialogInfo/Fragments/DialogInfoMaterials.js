@@ -166,8 +166,8 @@ export class DialogInfoMaterials extends StatelessComponent {
             this.contentPages.media.offsetId = rawMessage.id
         }
 
-        const message = MessageFactory.fromRawOrReturn(AppSelectedInfoPeer.Current, rawMessage)
-
+        let message = MessageFactory.fromRawOrReturnNoGroup(AppSelectedInfoPeer.Current, rawMessage)
+        
         if (message.type === MessageType.VIDEO) {
             const video = DocumentParser.attributeVideo(message.raw.media.document)
 
@@ -184,7 +184,10 @@ export class DialogInfoMaterials extends StatelessComponent {
         } else {
             vrdom_append(
                 <BetterPhotoComponent photo={message.raw.media.photo ? message.raw.media.photo : message.raw.media}
-                                      onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}/>,
+                                      onClick={() => {
+                                          console.log(message)
+                                          UIEvents.MediaViewer.fire("showMessage", {message: message})
+                                      }}/>,
                 this.contentRefs.media.$el
             )
         }

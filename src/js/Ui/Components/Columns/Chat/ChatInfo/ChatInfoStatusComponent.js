@@ -20,6 +20,8 @@ class ChatInfoStatusComponent extends StatefulComponent {
             .updateOn("updateUserStatus")
             .updateOn("updateChatOnlineCount")
             .updateOn("fullLoaded")
+            .updateOn("messages.allRecent")
+            .updateOn("messages.recent")
 
         E.bus(UIEvents.General)
             .updateOn("chat.select")
@@ -27,6 +29,14 @@ class ChatInfoStatusComponent extends StatefulComponent {
     }
 
     render() {
+        if (AppSelectedChat.isSelected && AppSelectedChat.current.messages.isDownloadingRecent) {
+            return (
+                <div className="bottom">
+                    <div className="info loading-text">loading messages</div>
+                </div>
+            )
+        }
+
         const isOnline = this.statusLine.online;
         const isLoading = this.statusLine.isAction || this.statusLine.isLoading;
         const text = this.statusLine.text;

@@ -75,6 +75,8 @@ export class PeerMessages {
             return;
         }
 
+        this.isDownloadingRecent = true;
+
         API.messages.getHistory(this.peer, {limit: 100}).then(Messages => {
             this.isDownloadingRecent = false;
 
@@ -107,6 +109,8 @@ export class PeerMessages {
         if (this.isDownloadingRecent) {
             return;
         }
+
+        this.isDownloadingRecent = true;
 
         API.messages.getHistory(this.peer, {
             offset_id: this._recent[this._recent.length - 1].id,
@@ -174,6 +178,41 @@ export class PeerMessages {
             }
 
             return group;
+        }
+
+        this._heap.set(rawMessage.id, message);
+
+        return this._heap.get(rawMessage.id);
+    }
+
+    /**
+     * Store a message and do not return group.
+     *
+     * @param rawMessage
+     * @return {Message}
+     */
+    putRawMessageNoGroup = (rawMessage): Message => {
+        let message = this.getById(rawMessage.id);
+
+        if (message) {
+            message = message.fillRaw(rawMessage);
+
+            return message;
+        }
+
+        message = MessageFactory.fromRaw(this.peer, rawMessage);
+
+        if (message.groupedId) {
+            let group = this._groupsHeap.get(message.groupedId);
+
+            if (group) {
+                group.add(message);
+            } else {
+                group = new GroupMessage(message);
+                this._groupsHeap.set(message.groupedId, group);
+            }
+
+            return message;
         }
 
         this._heap.set(rawMessage.id, message);

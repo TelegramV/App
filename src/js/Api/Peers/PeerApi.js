@@ -58,7 +58,7 @@ export class PeerApi {
 
                     this.peer.messages.readInboxMaxId = maxId;
 
-                    peer.fire("messages.readIn", {
+                    this.peer.fire("messages.readIn", {
                         maxId: this.peer.messages.readInboxMaxId,
                         prevMaxId,
                     });
@@ -73,7 +73,7 @@ export class PeerApi {
 
                 this.peer.messages.readInboxMaxId = maxId;
 
-                peer.fire("messages.readIn", {
+                this.peer.fire("messages.readIn", {
                     maxId: this.peer.messages.readInboxMaxId,
                     prevMaxId,
                 });
@@ -104,7 +104,7 @@ export class PeerApi {
             }
         }).then(l => {
             if (l._ === "boolTrue") {
-                if(!this.peer.full) {
+                if (!this.peer.full) {
                     this.peer.fetchFull()
                 } else {
                     if (mute_until !== undefined) this.peer.full.notify_settings.mute_until = mute_until

@@ -26,6 +26,7 @@ import {ServiceMessage} from "./Objects/ServiceMessage"
 import {AnimatedStickerMessage} from "./Objects/AnimatedStickerMessage"
 import {DiceMessage} from "./Objects/DiceMessage"
 import {Peer} from "../Peers/Objects/Peer"
+import MessagesManager from "./MessagesManager"
 
 const messageObjects = new Map([
     [MessageType.TEXT, TextMessage],
@@ -55,7 +56,19 @@ const messageObjects = new Map([
 export class MessageFactory {
 
     static fromRawOrReturn(dialogPeer: Peer, raw: Object): Message {
+        if (!dialogPeer) {
+            dialogPeer = MessagesManager.getToPeerMessage(raw);
+        }
+
         return dialogPeer.messages.putRawMessage(raw);
+    }
+
+    static fromRawOrReturnNoGroup(dialogPeer: Peer, raw: Object): Message {
+        if (!dialogPeer) {
+            dialogPeer = MessagesManager.getToPeerMessage(raw);
+        }
+
+        return dialogPeer.messages.putRawMessageNoGroup(raw);
     }
 
     static fromRaw(dialogPeer: Peer, raw: Object): Message {

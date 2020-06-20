@@ -15,7 +15,6 @@
  *
  */
 
-import {PhotoMessage} from "../../../Api/Messages/Objects/PhotoMessage";
 import UIEvents from "../../EventBus/UIEvents";
 import type {AE} from "../../../V/VRDOM/component/__component_appEventsBuilder";
 import {VideoMessage} from "../../../Api/Messages/Objects/VideoMessage";
@@ -32,6 +31,7 @@ import BetterPhotoComponent from "../Basic/BetterPhotoComponent"
 import StreamingVideoComponent from "../Video/StreamingVideoComponent"
 import DocumentParser from "../../../Api/Files/DocumentParser"
 import {FileAPI} from "../../../Api/Files/FileAPI"
+import {MessageType} from "../../../Api/Messages/Message"
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -65,7 +65,7 @@ function MediaFragment({media, zoom, hidden}) {
     //     }
     // }
 
-    if (media instanceof PhotoMessage) {
+    if (media.type === MessageType.PHOTO) {
         return <BetterPhotoComponent photo={media.raw.media.photo} calculateSize maxHeight="70%"/>
     }
 

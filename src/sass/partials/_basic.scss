@@ -32,6 +32,11 @@ body {
     animation: loading-text 1s linear infinite;
 }
 
+.loading-text-fast::after {
+    content: "";
+    animation: loading-text 500ms linear infinite;
+}
+
 .loading-text-2::after {
     content: "";
     animation: loading-text-2 1s linear infinite;
