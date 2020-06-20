@@ -200,11 +200,9 @@ class AudioPlayerComponent extends StatefulComponent {
             limit: 100,
             add_offset: -50,
         }).then(Messages => {
-            console.log(Messages)
 
             if (this.state.message === message) {
                 const messages = message.dialogPeer.messages.putRawMessages(Messages.messages);
-                console.log(messages)
 
                 this.setState({
                     queue: messages,
