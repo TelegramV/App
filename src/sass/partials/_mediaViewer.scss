@@ -5,7 +5,9 @@
     z-index: 9999;
 
     .VideoPlayer {
-        video, img {
+
+        video,
+        img {
             width: 100%;
             height: 100%;
         }
@@ -29,14 +31,18 @@
         transition: anim(opacity);
 
         .header {
-            z-index: 10000;
+            z-index: 1000;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
 
             height: 44px;
             display: flex;
-            justify-content: space-between;
+            //justify-content: space-between;
             padding: 8px;
 
-            .left {
+            .user {
                 cursor: pointer;
                 color: $darkgreytext;
                 margin-left: 12px;
@@ -58,14 +64,15 @@
                         font-weight: 500;
                     }
 
-                    .time {
-                    }
+                    .time {}
                 }
             }
 
-            .right {
-                z-index: 10000;
+            .filler {
+                flex-grow: 1;
+            }
 
+            .close-button, .buttons, .more-button {
                 .tgico {
                     border-radius: 50%;
                     padding: 8px;
@@ -88,6 +95,10 @@
                         background-color: rgba(white, .1);
                     }
                 }
+            }
+
+            .more-button, .close-button {
+                display: none;
             }
         }
 
@@ -185,6 +196,33 @@
                     text-align: center;
                     width: 100%;
                     position: absolute;
+                }
+            }
+        }
+    }
+
+    @include mobile {
+        .media-viewer {
+            background-color: black;
+
+            .header {
+                background-color: black;
+                .avatar {
+                    display: none;
+                }
+
+                .buttons {
+                    display: none;
+                }
+
+                .more-button, .close-button {
+                    display: block;
+                }
+            }
+
+            .content-wrapper {
+                .navigation {
+                    display: none;
                 }
             }
         }
