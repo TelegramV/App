@@ -44,6 +44,7 @@ class FavedState extends SharedState {
     }
 
     refresh = (force = false) => {
+        console.log(this.favedStickers)
         if (this.favedStickers && !force) {
             return;
         }
@@ -78,21 +79,33 @@ const favedState = new FavedState();
 class FavedStickers extends StatefulComponent {
     state = favedState;
 
-    render(props, {favedStickers}, {faved}) {
+    render(props, {favedStickers, isShown}) {
         const documents = favedStickers?.stickers ?? [];
 
         return (
-            <div id="composer-sticker-pack-favourite" className="scrollable">
+            <div id="composer-sticker-pack-favourite" className={{
+                "scrollable": true,
+                "selected": isShown,
+            }}>
                 {
                     documents.map(Document => (
                         <BetterStickerComponent
                             onClick={() => props.sendSticker(Document)}
                             width={75}
-                            document={Document}/>
+                            document={Document}
+                            hideAnimated/>
                     ))
                 }
             </div>
         )
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if (this.$el.classList.contains("selected")) {
+            this.state.isShown = true;
+        } else {
+            this.state.isShown = false;
+        }
     }
 }
 

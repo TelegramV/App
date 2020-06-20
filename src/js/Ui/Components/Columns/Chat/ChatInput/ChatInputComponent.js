@@ -169,7 +169,7 @@ export class ChatInputComponent extends StatelessComponent {
      * @param {Peer} peer
      */
     onChatSelect = ({peer}) => {
-        if (peer.canSendMessage ?? true) {
+        if (peer?.canSendMessage ?? true) {
             this.show()
         } else {
             this.hide()

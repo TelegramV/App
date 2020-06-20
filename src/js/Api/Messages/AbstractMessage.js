@@ -271,7 +271,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
                             this.fire("replyFound")
                         }
                     } else {
-                        this.replyToMessageType = "replyFound"
+                        this.replyToMessageType = "replyNotFound"
 
                         if (fire) {
                             this.fire("replyFound")

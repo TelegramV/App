@@ -16,6 +16,10 @@ function ReplyToMessageFragment({message}) {
     if (!message.raw.reply_to_msg_id) {
         return null
     } else if (!message.replyToMessage) {
+        if (message.replyToMessageType === "replyNotFound") {
+            return <ReplyFragment show={true} name="Deleted message" text="Deleted message"/>
+        }
+
         return (
             <ReplyFragment show={true}/>
         )
