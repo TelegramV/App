@@ -78,10 +78,13 @@ export class AttachPhotosModal extends StatelessComponent {
 
     async send() {
         const media = await this.galleryRef.component.getMedia()
+        //console.log("media", media);
+        const caption = this.captionRef.$el.querySelector("input").value.repeat(1); //force string clone
+        VUI.Modal.close()
         AppSelectedChat.current.api.sendMessage({
-            text: this.captionRef.$el.querySelector("input").value,
+            text: caption,
             media: media
         })
-        VUI.Modal.close()
+        
     }
 }
