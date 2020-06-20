@@ -23,6 +23,7 @@ import {Layouter} from "../../Utils/layout";
 import VUI from "../../VUI"
 import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 import VInput from "../../Elements/Input/VInput"
+import UIEvents from "../../EventBus/UIEvents"
 
 class GalleryFragment extends StatelessComponent {
     render() {
@@ -43,14 +44,19 @@ class GalleryFragment extends StatelessComponent {
 
     getMedia = () => {
         return Promise.all(this.props.blobs.map(async l => {
-            return await FileAPI.uploadPhoto(await fetch(l).then(r => r.arrayBuffer()), "lol.jpg")
+            return await FileAPI.uploadPhoto(await fetch(l).then(r => r.arrayBuffer()), "telegramweb.jpg") // TODO: somehow get actual name
         }))
     }
 }
 
 export class AttachPhotosModal extends StatelessComponent {
-    captionRef = VComponent.createComponentRef()
+    captionRef = VComponent.createFragmentRef()
     galleryRef = VComponent.createComponentRef()
+
+    appEvents(E) {
+        E.bus(UIEvents.General)
+        .on("upload.addPhoto", this.addPhoto)
+    }
 
     render(props) {
         return <div>
@@ -62,16 +68,20 @@ export class AttachPhotosModal extends StatelessComponent {
         </div>
     }
 
-    addPhoto(blob) {
+    componentDidMount() {
+        this.captionRef.$el.querySelector("input").focus();
+    }
+
+    addPhoto = ({blob}) => {
         this.galleryRef.component.addPhoto(blob)
     }
 
     async send() {
-        VUI.Modal.close()
         const media = await this.galleryRef.component.getMedia()
         AppSelectedChat.current.api.sendMessage({
-            text: this.captionRef.component.getValue(),
+            text: this.captionRef.$el.querySelector("input").value,
             media: media
         })
+        VUI.Modal.close()
     }
 }
