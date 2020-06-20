@@ -93,7 +93,14 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                                                           {!FileManager.isPending(document) &&
                                                                           <i className="tgico tgico-clouddownload"/>}
                                                                           {FileManager.isPending(document) &&
-                                                                          <VSpinner white strokeWidth={3}/>}
+                                                                          <VSpinner white strokeWidth={3}>
+                                                                              <div style={{
+                                                                                  "width": "7px",
+                                                                                  "height": "7px",
+                                                                                  "background-color": "white",
+                                                                                  "border-radius": "1px"
+                                                                              }}/>
+                                                                          </VSpinner>}
                                                                       </div>
                                                                       <div className="info">
                                                               <span class="duration">
