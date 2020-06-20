@@ -16,24 +16,25 @@
  */
 
 import UIEvents from "../../EventBus/UIEvents";
-import type {AE} from "../../../V/VRDOM/component/__component_appEventsBuilder";
-import {VideoMessage} from "../../../Api/Messages/Objects/VideoMessage";
+import type { AE } from "../../../V/VRDOM/component/__component_appEventsBuilder";
+import { VideoMessage } from "../../../Api/Messages/Objects/VideoMessage";
 import AvatarFragment from "../Basic/AvatarFragment";
 import SearchManager from "../../../Api/Search/SearchManager"
-import {MessageFactory} from "../../../Api/Messages/MessageFactory"
+import { MessageFactory } from "../../../Api/Messages/MessageFactory"
 import VSpinner from "../../Elements/VSpinner"
 import FileManager from "../../../Api/Files/FileManager"
-import {DocumentMessagesTool} from "../../Utils/document"
+import { DocumentMessagesTool } from "../../Utils/document"
 import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
 import BetterPhotoComponent from "../Basic/BetterPhotoComponent"
 import StreamingVideoComponent from "../Video/StreamingVideoComponent"
 import DocumentParser from "../../../Api/Files/DocumentParser"
-import {FileAPI} from "../../../Api/Files/FileAPI"
-import {MessageType} from "../../../Api/Messages/Message"
+import { FileAPI } from "../../../Api/Files/FileAPI"
+import { MessageType } from "../../../Api/Messages/Message"
+import VUI from "../../VUI"
 
-function MediaSpinnerFragment({icon}) {
+function MediaSpinnerFragment({ icon }) {
     return <VSpinner white>
         {/*<i renderIf={icon}*/}
         {/*   css-font-size="15pt"*/}
@@ -42,7 +43,7 @@ function MediaSpinnerFragment({icon}) {
     </VSpinner>
 }
 
-function MediaFragment({media, zoom, hidden}) {
+function MediaFragment({ media, zoom, hidden }) {
     if (hidden) {
         return <div/>
     }
@@ -89,7 +90,7 @@ function MediaFragment({media, zoom, hidden}) {
     return <div/>
 }
 
-function NavigationButtonFragment({isNext, hidden, onClick}) {
+function NavigationButtonFragment({ isNext, hidden, onClick }) {
     return <div className={{
         "navigation": true,
         "prev": !isNext,
@@ -113,7 +114,7 @@ export class MediaViewerComponent extends StatefulComponent {
         zoom: false,
     };
 
-    defaultState = {...this.state};
+    defaultState = { ...this.state };
 
     appEvents(E: AE) {
         E.bus(UIEvents.MediaViewer)
@@ -122,7 +123,7 @@ export class MediaViewerComponent extends StatefulComponent {
     }
 
     render() {
-        const {message, hidden, isLoadingLeftPage, isLoadingRightPage, zoom} = this.state;
+        const { message, hidden, isLoadingLeftPage, isLoadingRightPage, zoom } = this.state;
 
         const isLoadingPage = isLoadingLeftPage || isLoadingRightPage;
 
@@ -137,11 +138,48 @@ export class MediaViewerComponent extends StatefulComponent {
             date = message.date;
         }
 
+        let contextActions = []
+        if (!!message) {
+            contextActions.push({
+                icon: "forward",
+                title: "Forward",
+                onClick: () => {
+                    UIEvents.General.fire("message.forward", { message, from: message.dialog.peer })
+                }
+            })
+        }
+
+        contextActions.push({
+            icon: "download",
+            title: "Download",
+            onClick: () => {
+                if(!downloaded) return;
+                let pfn = message.srcUrl.split("/");
+                pfn = pfn[pfn.length - 1];
+                const f = message.raw.media.photo || message.raw.media.video || message.raw.media.document || {};
+                FileManager.saveBlobUrlOnPc(
+                    message.srcUrl,
+                    DocumentMessagesTool.getFilename(f.attributes, pfn)
+                )
+            }
+        })
+
+        contextActions.push({
+            icon: "delete",
+            title: "Delete",
+            red: true,
+        })
+
+        let contextMenuHandler = VUI.ContextMenu.listener(contextActions);
+
         return (
             <div css-display={this.state.hidden && "none"} className={["media-viewer-wrapper", hidden ? "hidden" : ""]}>
                 <div className="media-viewer" onClick={this.close}>
                     <div className="header">
-                        <div className="left" onClick={event => {
+                        <div class="close-button">
+                            <i className="tgico tgico-close rp rps"/>
+                        </div>
+                        <div className="user" onClick={event => {
                             event.stopPropagation();
                             AppSelectedInfoPeer.select(message.from);
                             this.close(event);
@@ -152,7 +190,8 @@ export class MediaViewerComponent extends StatefulComponent {
                                 <div className="time">{this.formatDate(date)}</div>
                             </div>
                         </div>
-                        <div className="right">
+                        <div class="filler"/>
+                        <div className="buttons">
                             <i className="tgico tgico-delete rp rps" onClick={event => {
                                 event.stopPropagation();
                             }}/>
@@ -181,6 +220,12 @@ export class MediaViewerComponent extends StatefulComponent {
                                 )
                             }}/>
                             <i className="tgico tgico-close rp rps"/>
+                        </div>
+                        <div class="more-button" onClick={event => {
+                            event.stopPropagation();
+                            contextMenuHandler(event);
+                        }}>
+                            <i className="tgico tgico-more rp rps"/>
                         </div>
                     </div>
                     <div class="content-wrapper">
@@ -237,8 +282,8 @@ export class MediaViewerComponent extends StatefulComponent {
         }
     }
 
-    showMessage = ({message}) => {
-        this.state = {...this.defaultState};
+    showMessage = ({ message }) => {
+        this.state = { ...this.defaultState };
 
         console.log("show message")
 
@@ -432,7 +477,7 @@ export class MediaViewerComponent extends StatefulComponent {
     }
 
     formatDate(date) {
-        let text = new Date().toLocaleString("en", {month: "short", day: "numeric"});
+        let text = new Date().toLocaleString("en", { month: "short", day: "numeric" });
         text += " at "
         text += new Date(date * 1000).toLocaleString(navigator.language, {
             hour: '2-digit',
@@ -444,14 +489,14 @@ export class MediaViewerComponent extends StatefulComponent {
     close = (event) => {
         event.stopPropagation();
 
-        this.setState({...this.defaultState})
+        this.setState({ ...this.defaultState })
     }
 
     zoom = (event) => {
         event.stopPropagation();
         console.log("zoom")
 
-        this.setState({zoom: !this.state.zoom});
+        this.setState({ zoom: !this.state.zoom });
     }
 }
 
