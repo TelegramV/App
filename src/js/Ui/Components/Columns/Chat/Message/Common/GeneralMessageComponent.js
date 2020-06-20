@@ -3,6 +3,7 @@ import type {BusEvent} from "../../../../../../Api/EventBus/EventBus"
 import type {Message} from "../../../../../../Api/Messages/Message"
 import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulComponent"
 import {isGrouping, isSameDate} from "../../messagesUtils"
+import {isElementInViewport} from "../../../../../Utils/isElementInViewport"
 
 type Props = {
     message: Message;
@@ -51,7 +52,7 @@ class GeneralMessageComponent extends StatefulComponent<Props> {
     }
 
     onElementVisible() {
-        if (!this.props.message.isInRead) {
+        if (!this.props.message.isInRead && isElementInViewport(document.getElementById("bubbles-inner"), this.$el)) {
             this.props.message.dialogPeer.api.readHistory(this.props.message.id)
         }
     }
