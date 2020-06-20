@@ -62,7 +62,7 @@ class AudioPlayer {
                 const sourceBuffer = mediaSource.addSourceBuffer(document.mime_type);
                 mediaSource.duration = DocumentParser.attributeAudio(document).duration;
 
-                if (sourceBuffer.updating) {
+                if (!sourceBuffer.updating) {
                     if (source.bufferQueue.length) {
                         sourceBuffer.appendBuffer(source.bufferQueue.shift());
                     }
@@ -222,6 +222,7 @@ class AudioPlayer {
 
                 if (FileManager.isPending(message.media.document)) {
                     this.audio.src = this.useSource(message.media.document).url;
+                    this.audio.currentTime = 0;
                     this.audio.play();
                 } else {
                     this.pause();
