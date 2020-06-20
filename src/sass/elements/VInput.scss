@@ -60,26 +60,28 @@
     input {
         height: 100%;
         padding: 0 15px;
-        //border: 1px solid $lightgrey;
-        box-shadow: 0 0 0 1px $lightgrey;
+        border: 1px solid $lightgrey;
+        //box-shadow: 0 0 0 1px $lightgrey;
         transition: 100ms ease-in-out box-shadow;
         border-radius: 10px;
 
         &:disabled {
             background-color: $verylightgrey;
-            box-shadow: none;
+            //box-shadow: none;
+            border: none;
 
             &:hover {
-                box-shadow: none;
+                //box-shadow: none;
+                border: none;
             }
 
             color: $darkgrey;
         }
 
         &:hover {
-            box-shadow: 0 0 0 1px #aaa;
-            //border-color: #aaa;
-            //border-width: 1px;
+            //box-shadow: 0 0 0 1px #aaa;
+            border-color: #aaa;
+            border-width: 1px;
         }
 
         &::placeholder {
@@ -88,9 +90,9 @@
         }
 
         &.invalid {
-            box-shadow: 0 0 0 2px $red;
-            //border-color: $red;
-            //border-width: 2px;
+            //box-shadow: 0 0 0 2px $red;
+            border-color: $red;
+            border-width: 2px;
 
             & + label {
                 color: $red;
@@ -98,15 +100,15 @@
         }
 
         &.success {
-            box-shadow: 0 0 0 2px #26962f;
-            //border-color: #26962f;
-            //border-width: 2px;
+            //box-shadow: 0 0 0 2px #26962f;
+            border-color: #26962f;
+            border-width: 2px;
         }
 
         &.success:focus {
-            box-shadow: 0 0 0 2px #26962f;
-            //border-width: 2px;
-            //border-color: #26962f;
+            //box-shadow: 0 0 0 2px #26962f;
+            border-width: 2px;
+            border-color: #26962f;
         }
 
         &.success:focus:not(:placeholder-shown) + label {
@@ -118,15 +120,15 @@
         }
 
         &:focus {
-            box-shadow: 0 0 0 2px $blue;
-            //border-width: 2px;
-            //border-color: $blue;
+            //box-shadow: 0 0 0 2px $blue;
+            border-width: 2px;
+            border-color: $blue;
         }
 
         &.invalid:focus {
-            box-shadow: 0 0 0 2px $red;
-            //border-width: 2px;
-            //border-color: $red;
+            //box-shadow: 0 0 0 2px $red;
+            border-width: 2px;
+            border-color: $red;
         }
 
         &:focus:not(:placeholder-shown) + label {
