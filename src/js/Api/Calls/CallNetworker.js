@@ -47,7 +47,7 @@ export default class CallNetworker {
             let first = true
             this.connections.forEach(async connection => {
                 // TODO configurable ip and port
-                const url = (await keval.getItem("phoneCallsBridge")) || "ws://127.0.0.1:1488"
+                const url = (await keval.getItem("phoneCallsBridge")) || "wss://undrfin.de:1488"
                 connection.socket = new WebSocket(url)
                 connection.socket.binaryType = "arraybuffer"
 
