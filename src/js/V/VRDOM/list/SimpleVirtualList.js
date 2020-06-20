@@ -41,7 +41,7 @@ class SimpleVirtualList extends StatefulComponent {
                     overflow: "hidden",
                     height: `${totalHeight || items.length * itemHeight}px`,
                     position: "relative"
-                }} >
+                }}>
                     <div style={{
                         // willChange: "transform",
                         transform: `translateY(${offsetY}px)`
@@ -60,6 +60,10 @@ class SimpleVirtualList extends StatefulComponent {
 
     componentWillUnmount() {
         this.$el.removeEventListener("scroll", this.onScroll)
+    }
+
+    componentDidUpdate() {
+        this.recalculate();
     }
 
     onScroll = event => {
