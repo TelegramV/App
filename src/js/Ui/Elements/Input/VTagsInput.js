@@ -20,7 +20,7 @@
 import AvatarComponent from "../../Components/Basic/AvatarComponent";
 
 function VTagsInput(
-    {tags = [], onInput}
+    {tags = [], value, onInput}
 ) {
     return (
         <div className="VTagsInput" style={{
@@ -29,7 +29,7 @@ function VTagsInput(
             <div className="tags">
                 {tags}
                 <div className="input">
-                    <input type="text" placeholder="Select chat" onInput={onInput}/>
+                    <input type="text" placeholder="Select chat" onInput={onInput} value={value}/>
                 </div>
             </div>
         </div>

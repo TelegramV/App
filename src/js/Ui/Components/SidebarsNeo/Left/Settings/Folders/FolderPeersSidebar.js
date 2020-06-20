@@ -36,7 +36,7 @@ export class FolderPeersSidebar extends LeftSidebar {
             }
         })
         return <this.contentWrapper>
-            <VTagsInput tags={tags} onInput={this.onPeerNameInput}/>
+            <VTagsInput tags={tags} onInput={this.onPeerNameInput} value={this.state.filter}/>
             <Section title="Chat types">
                 {!this.state.exclude ?
                     <>
