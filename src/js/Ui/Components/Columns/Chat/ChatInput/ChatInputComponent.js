@@ -471,7 +471,7 @@ export class ChatInputComponent extends StatelessComponent {
                     mime_type: "audio/ogg",
                     attributes: [{
                         //flags: 1024,
-                        // duration: 100,
+                        duration: (+new Date() - this.recordingStarted)/1000,
                         _: "documentAttributeAudio",
                         voice: true,
                         waveform: convertBits(this.waveform, 8, 5)
@@ -544,6 +544,8 @@ export class ChatInputComponent extends StatelessComponent {
                 this.$el.querySelector(".delete-button").classList.add("open")
                 this.$el.querySelector(".voice-seconds").classList.remove("hidden")
                 this.$el.querySelector(".tgico-attach").classList.add("hidden")
+
+                this.recordingStarted = +new Date()
 
                 this.i = 0
                 this.tickTimer()
