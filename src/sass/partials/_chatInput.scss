@@ -212,6 +212,11 @@
                     align-self: start;
                     display: inline;
 
+                    /*.no-select {
+                        user-select: text !important;
+                        -webkit-user-select: text !important;
+                    }*/
+
                     a {
                         color: $darkblue;
                     }
