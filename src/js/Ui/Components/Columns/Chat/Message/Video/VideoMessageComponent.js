@@ -34,7 +34,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                       }}
                                       autoPlay
                                       infoContainer={
-                                          ({currentTime}, $el: HTMLVideoElement) => {
+                                          ({currentTime, isHovered}, $el: HTMLVideoElement) => {
                                               const isPlaying = $el && !$el.paused;
 
                                               return (
@@ -47,7 +47,9 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                                                    this.$el.querySelector("video")?.pause();
                                                                    UIEvents.MediaViewer.fire("showMessage", {message});
                                                                } else {
-                                                                   if (isPlaying) {
+                                                                   if (!FileManager.isDownloaded(document) && !FileManager.isPending(document)) {
+                                                                       FileManager.downloadVideo(document)
+                                                                   } else if (isPlaying) {
                                                                        $el?.pause();
                                                                    } else {
                                                                        $el?.play();

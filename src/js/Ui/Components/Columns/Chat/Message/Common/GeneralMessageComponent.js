@@ -51,7 +51,9 @@ class GeneralMessageComponent extends StatefulComponent<Props> {
     }
 
     onElementVisible() {
-        // console.log("visible", this)
+        if (!this.props.message.isInRead) {
+            this.props.message.dialogPeer.api.readHistory(this.props.message.id)
+        }
     }
 
     onElementHidden() {

@@ -44,7 +44,7 @@ export class GenericSidebar extends StatefulComponent {
             {nodeIf(<i className={"btn-icon rp rps tgico-" + this.leftButtonIcon} onClick={this.onLeftButtonPressed}/>, this.leftButtonIcon)}
             {nodeIf(<div className="title">{this.title}</div>, !this.isSearchAsTitle)}
             {nodeIf(<div className="title search">
-                <Search r={this.searchInputRef} onInput={this.onSearchInputUpdated} onFocus={this.onSearchInputFocus} lazyLevel={this.searchLazyLevel}/>
+                <Search r={this.searchInputRef} onInput={this.onSearchInputUpdated} onFocus={this.onSearchInputFocus} lazyLevel={this.searchLazyLevel} value={this.state.inputValue}/>
                 {/*<div className="input-search">*/}
                 {/*    <VSimpleLazyInput type="text" placeholder="Search"*/}
                 {/*                      ref={this.searchInputRef}*/}

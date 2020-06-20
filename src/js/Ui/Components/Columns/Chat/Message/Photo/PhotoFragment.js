@@ -40,7 +40,7 @@ export const PhotoFragment = ({id, url = "", width = 0, height = 0, maxWidth = 4
 export const VideoFragment = ({id, width = 0, height = 0, maxWidth = 470, maxHeight = 512, calculateSize = false, ...otherArgs}) => {
     if (!calculateSize) {
         return <img id={id}
-                    src={url}
+                    src={otherArgs.thumbUrl}
                     alt="Image"
                     {...otherArgs}/>
     }

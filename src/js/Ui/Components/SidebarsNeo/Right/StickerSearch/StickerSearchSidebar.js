@@ -86,10 +86,12 @@ export class StickerSearchSidebar extends RightSidebar {
         messages.searchStickerSets(q).then(found => {
             if (event.target.value.trim() !== q) return; //something changed while searching, cancel patch
             if (this.state.found === found.sets) return; //nothing changed, no need to patch
+
             this.setState({
                 query: q,
                 found: found.sets
             })
+            this.searchInputRef.component.$el.value = q
         })
 
     }

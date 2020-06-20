@@ -171,7 +171,9 @@ class AudioPlayer {
         });
 
         AppEvents.Files.subscribe("download.canceled", event => {
-            this.cleanSource(this.source) // todo: should probably clean sourceBuffer etc.
+            if (this.isCurrent(event.file)) {
+                this.cleanSource(this.source) // todo: should probably clean sourceBuffer etc.
+            }
         });
     }
 

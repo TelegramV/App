@@ -37,7 +37,6 @@ import {vrdom_appendRealMany} from "../../../../V/VRDOM/append"
 import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
 import IntersectionObserver from 'intersection-observer-polyfill';
 import GroupMessage from "../../../../Api/Messages/GroupMessage"
-import vrdom_patchChildren from "../../../../V/VRDOM/patch/patchChildren"
 import {isDateEqual} from "../../../Utils/utils"
 
 function getMessageElementById(messageId: number): HTMLElement | null {
@@ -179,7 +178,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         this.isLoadingRecent = false;
         this.isUsingSecondVirtual = false;
-        // this.isRequestedShowMessage = false;
+        this.isRequestedShowMessage = false;
     }
 
     // oldest message must always be last
@@ -303,45 +302,10 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         return [];
     }
 
-    patchMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
-
-        if (messages.length > 0) {
-            if (!__IS_PRODUCTION__) {
-                if (!beforeTopMessage) {
-                    console.log("[warn] patch no before message")
-                }
-                if (!afterBottomMessage) {
-                    console.log("[warn] patch no after message")
-                }
-                if (beforeTopMessage && messages[0].id < beforeTopMessage.id) {
-                    console.error("patch before", beforeTopMessage, messages)
-                }
-                if (afterBottomMessage && messages[messages.length - 1].id > afterBottomMessage.id) {
-                    console.error("patch after", afterBottomMessage, messages)
-                }
-            }
-
-            const messageVRNodes = [this.renderVRMessage(messages[0], beforeTopMessage, messages[1])];
-
-            for (let i = 1; i < messages.length - 1; i++) {
-                messageVRNodes.push(this.renderVRMessage(messages[i], messages[i - 1], messages[i + 1]));
-            }
-
-            if (messages.length > 1) {
-                messageVRNodes.push(this.renderVRMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
-            }
-
-            vrdom_patchChildren(this.bubblesInnerRef.$el, {children: messageVRNodes});
-
-            return messageVRNodes;
-        }
-
-        return [];
-    }
-
     onChatSelect = (event) => {
         this.refresh();
-        // this.isRequestedShowMessage = event.message
+        this.isRequestedShowMessage = event.message
+        console.warn(event.message)
 
         if (AppSelectedChat.isSelected) {
             this.isLoadingRecent = true;
@@ -508,13 +472,13 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             }
         } else {
             console.log('NO SELECT!!!', event)
-            const peer = message.to;
+            const peer = message.dialogPeer;
 
             this.isRequestedShowMessage = true;
 
-            AppSelectedChat.select(peer, message);
-
             const actionCount = (++this.actionCount);
+
+            AppSelectedChat.select(peer, message);
 
             API.messages.getHistory(peer, {
                 offset_id: message.id,

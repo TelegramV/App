@@ -36,7 +36,7 @@ class BetterVideoComponent extends StatefulComponent {
         currentTime: 0,
     };
 
-    videoRef: { $el: HTMLVideoElement } = VComponent.createRef();
+    videoRef: { $el: HTMLVideoElement } = VComponent.createFragmentRef();
 
     init() {
         const {document} = this.props;
@@ -61,7 +61,7 @@ class BetterVideoComponent extends StatefulComponent {
 
         if (streamable) {
             otherArgs.autoPlay = false;
-            otherArgs.showVideo = false;
+            showVideo = false;
         }
 
         return (

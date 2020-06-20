@@ -1,7 +1,7 @@
 import VSimpleLazyInput from "../../../Elements/Input/VSimpleLazyInput";
 
-function Search({onInput, onFocus, lazyLevel, r}, slot) {
-    return  <div className="input-search">
+function Search({onInput, onFocus, lazyLevel, r, value}, slot) {
+    return <div className="input-search">
         <VSimpleLazyInput type="text" placeholder="Search"
                           ref={r}
                           onInput={event => {
@@ -10,7 +10,8 @@ function Search({onInput, onFocus, lazyLevel, r}, slot) {
                           }
                           }
                           onFocus={onFocus}
-                          lazyLevel={lazyLevel}/>
+                          lazyLevel={lazyLevel}
+                          value/>
         <span className="tgico tgico-search"/>
         <div className="tgico tgico-close rp rps hidden" onClick={event => {
             event.target.parentNode.querySelector("input").value = ""

@@ -56,10 +56,14 @@ class StreamingVideoComponent extends VideoPlayer {
         super.componentWillMount(props);
 
         if (!FileManager.isDownloaded(this.props.document) && DocumentParser.isVideoStreamable(props.document)) {
-            this.mp4file = getMediaFile(this.props.document);
-            this.state.url = this.mp4file.url;
+            if (DocumentParser.isVideoStreamable(props.document)) {
+                this.mp4file = getMediaFile(this.props.document);
+                this.state.url = this.mp4file.url;
+            } else {
+                console.warn("streaming is not supported for this video");
+                FileManager.downloadDocument(this.props.document);
+            }
         } else {
-            console.warn("streaming is not supported for this video");
             FileManager.downloadDocument(this.props.document);
         }
     }
@@ -70,14 +74,18 @@ class StreamingVideoComponent extends VideoPlayer {
         if (nextProps.document !== this.props.document || nextProps.document.id !== this.props.document.id) {
             this.state.url = "";
 
-            if (!FileManager.isDownloaded(nextProps.document) && DocumentParser.isVideoStreamable(nextProps.document)) {
-                this.mp4file = getMediaFile(nextProps.document);
+            if (!FileManager.isDownloaded(nextProps.document)) {
+                if (DocumentParser.isVideoStreamable(nextProps.document)) {
+                    this.mp4file = getMediaFile(nextProps.document);
 
-                this.setState({
-                    url: this.mp4file.url,
-                });
+                    this.setState({
+                        url: this.mp4file.url,
+                    });
+                } else {
+                    console.warn("streaming is not supported for this video");
+                    FileManager.downloadDocument(nextProps.document);
+                }
             } else {
-                console.warn("streaming is not supported for this video");
                 FileManager.downloadDocument(nextProps.document);
             }
         }
@@ -129,6 +137,7 @@ class StreamingVideoComponent extends VideoPlayer {
     onPreviewMouseMove = this.throttle((event: MouseEvent) => {
         // currently we are ignoring previews for streaming videos
         // it is really hard for browsers to serve two ISOFiles
+        // (the feature is implemented anyway)
 
         if (this.state.downloaded) {
             const $video: HTMLVideoElement = this.previewVideoRef.$el;

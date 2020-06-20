@@ -195,6 +195,9 @@ class SelectedChat {
      */
     select(peer, message) {
         this._message = message
+        this._previousPeer = this._peer
+        this._peer = peer
+        this.fire(peer) // no time to do it better
 
         const p = peer.username ? `@${peer.username}` : `${peer.type}.${peer.id}`
 
