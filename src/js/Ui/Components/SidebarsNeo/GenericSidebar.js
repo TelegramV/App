@@ -11,6 +11,8 @@ import Search from "./Fragments/Search";
 export class GenericSidebar extends StatefulComponent {
     searchInputRef = VComponent.createComponentRef()
 
+    searchPlaceholder = "Search"
+
     init() {
         super.init()
         if(this.state.hidden == null) {
@@ -44,7 +46,7 @@ export class GenericSidebar extends StatefulComponent {
             {nodeIf(<i className={"btn-icon rp rps tgico-" + this.leftButtonIcon} onClick={this.onLeftButtonPressed}/>, this.leftButtonIcon)}
             {nodeIf(<div className="title">{this.title}</div>, !this.isSearchAsTitle)}
             {nodeIf(<div className="title search">
-                <Search r={this.searchInputRef} onInput={this.onSearchInputUpdated} onFocus={this.onSearchInputFocus} lazyLevel={this.searchLazyLevel} value={this.state.inputValue}/>
+                <Search placeholder={this.searchPlaceholder} r={this.searchInputRef} onInput={this.onSearchInputUpdated} onFocus={this.onSearchInputFocus} lazyLevel={this.searchLazyLevel} value={this.state.inputValue}/>
                 {/*<div className="input-search">*/}
                 {/*    <VSimpleLazyInput type="text" placeholder="Search"*/}
                 {/*                      ref={this.searchInputRef}*/}

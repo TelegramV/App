@@ -33,7 +33,7 @@ const TimeManager = {
     },
     generateMessageId() {
         return MTProto.performWorkerTask("time_generateMessageId").then(data => {
-            return data.messageId;
+            return data;
         })
     }
 }

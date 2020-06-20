@@ -42,10 +42,18 @@ class GalleryFragment extends StatelessComponent {
         this.forceUpdate()
     }
 
-    getMedia = () => {
-        return Promise.all(this.props.blobs.map(async l => {
-            return await FileAPI.uploadPhoto(await fetch(l).then(r => r.arrayBuffer()), "telegramweb.jpg") // TODO: somehow get actual name
-        }))
+    getMedia = async () => {
+        const a = []
+        let i = 0
+        for(let l of this.props.blobs) {
+            // TODO: somehow get actual name
+            a.push(await FileAPI.uploadPhoto(await fetch(l).then(r => r.arrayBuffer()), `photo${i++}.jpg`))
+        }
+        return a
+        // return Promise.all(this.props.blobs.map(async l => {
+        //     console.log("uploading")
+        //     return await FileAPI.uploadPhoto(await fetch(l).then(r => r.arrayBuffer()), "telegramweb.jpg") // TODO: somehow get actual name
+        // }))
     }
 }
 
@@ -59,7 +67,7 @@ export class AttachPhotosModal extends StatelessComponent {
     }
 
     render(props) {
-        return <div>
+        return <div className="attach-modal">
             <ModalHeaderFragment title="Send Photos" close actionText="Send" action={this.send.bind(this)}/>
             <div className="padded">
                 <GalleryFragment ref={this.galleryRef} blobs={props.media}/>
@@ -78,7 +86,7 @@ export class AttachPhotosModal extends StatelessComponent {
 
     async send() {
         const media = await this.galleryRef.component.getMedia()
-        //console.log("media", media);
+        // console.log(media)
         const caption = this.captionRef.$el.querySelector("input").value.repeat(1); //force string clone
         VUI.Modal.close()
         AppSelectedChat.current.api.sendMessage({

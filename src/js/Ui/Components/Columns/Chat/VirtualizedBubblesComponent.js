@@ -85,7 +85,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     componentDidMount() {
         this.observer = new IntersectionObserver(this.onIntersection, {
             root: this.$el,
-            rootMargin: "2000px 100px",
+            rootMargin: "2200px 100px",
             threshold: 1.0,
         });
 
@@ -115,6 +115,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     onChatSelect = (event) => {
         this.refresh();
+        // if (event.message) {
+
         this.isRequestedShowMessage = event.message
 
         if (AppSelectedChat.isSelected) {
@@ -122,6 +124,44 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
             AppSelectedChat.current.messages.fireRecent();
         }
+
+        // } else {
+        // if (AppSelectedChat.current.messages.readInboxMaxId > AppSelectedChat.current.messages.readOutboxMaxId && AppSelectedChat.current.messages.readInboxMaxId !== AppSelectedChat.current.messages.last?.id) {
+        //     const lastUnread = AppSelectedChat.current.messages.getById(AppSelectedChat.current.messages.readInboxMaxId)
+        //
+        //     if (lastUnread) {
+        //         this.isRequestedShowMessage = lastUnread
+        //     } else {
+        //         const peer = AppSelectedChat.current;
+        //         API.messages.getHistory(peer, {
+        //             offset_id: AppSelectedChat.current.messages.readInboxMaxId,
+        //             limit: 1,
+        //         }).then(Messages => {
+        //             if (!AppSelectedChat.check(peer)) {
+        //                 return;
+        //             }
+        //
+        //             if (Messages.messages.length) {
+        //                 const message = peer.messages.putRawMessage(Messages.messages[0]);
+        //
+        //                 this.isRequestedShowMessage = message;
+        //             }
+        //
+        //             if (AppSelectedChat.isSelected) {
+        //                 this.isLoadingRecent = true;
+        //
+        //                 AppSelectedChat.current.messages.fireRecent();
+        //             }
+        //
+        //         })
+        //     }
+        // } else {
+        //     if (AppSelectedChat.isSelected) {
+        //         this.isLoadingRecent = true;
+        //
+        //         AppSelectedChat.current.messages.fireRecent();
+        //     }
+        // }
     }
 
     onChatScrollBottomRequest = () => {
@@ -613,11 +653,25 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         scrollBottom(this.$el, this.bubblesInnerRef.$el);
     }
 
-    appendMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
+    appendMessages(messages
+                       :
+                       Message[], beforeTopMessage
+                       :
+                       Message = null, afterBottomMessage
+                       :
+                       Message = null
+    ) {
         return appendMessages(this.bubblesInnerRef.$el, messages, beforeTopMessage, afterBottomMessage, this.observer);
     }
 
-    prependMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
+    prependMessages(messages
+                        :
+                        Message[], beforeTopMessage
+                        :
+                        Message = null, afterBottomMessage
+                        :
+                        Message = null
+    ) {
         return prependMessages(this.bubblesInnerRef.$el, messages, beforeTopMessage, afterBottomMessage, this.observer);
     }
 }

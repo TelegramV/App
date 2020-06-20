@@ -152,11 +152,23 @@ export class PeerApi {
         const multi = Array.isArray(media)
         let p = Promise.resolve()
         if (multi) {
-            p = Promise.all(media.map(l => {
-                return FileAPI.uploadMediaToPeer(this.peer, l).then(q => {
-                    return q
-                })
-            }))
+            p = new Promise(async (resolve) => {
+                const a = []
+                for(let l of media) {
+                    console.log(l)
+                    a.push(await FileAPI.uploadMediaToPeer(this.peer, l))
+                }
+                console.log(a)
+                resolve(a)
+                return a
+            })
+            // p = Promise.all(media.map(l => {
+            //     console.log(l)
+            //     return FileAPI.uploadMediaToPeer(this.peer, l).then(q => {
+            //         console.log(q)
+            //         return q
+            //     })
+            // }))
         }
 
         // TODO fix albums
@@ -178,7 +190,9 @@ export class PeerApi {
         UIEvents.General.fire("chat.scrollBottom")
 
         p.then(q => {
-            //console.log("q", q);
+            console.log(q)
+
+            let msgId = 0
             MTProto.invokeMethod(media ? (multi ? "messages.sendMultiMedia" : "messages.sendMedia") : "messages.sendMessage", {
                 clear_draft: clearDraft,
                 silent: silent,
@@ -189,7 +203,7 @@ export class PeerApi {
                 schedule_date: scheduleDate,
                 peer: this.peer.inputPeer,
                 message: text,
-                media: media,
+                media: multi ? null : media,
                 multi_media: q && q.map((l, i) => {
                     return {
                         _: "inputSingleMedia",
@@ -204,11 +218,12 @@ export class PeerApi {
                         },
                         message: i === 0 ? text : null,
                         entities: i === 0 ? messageEntities : null,
-                        random_id: genMsgId()
+                        random_id: genMsgId() + msgId++
                     }
                 }),
                 random_id: randomId
             }).then(response => {
+                console.log(response)
                 if (response.updates) {
                     response.updates.forEach(l => {
                         if (l._ === "updateMessageID") l.peer = this.peer

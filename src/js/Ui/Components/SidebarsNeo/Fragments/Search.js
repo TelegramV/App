@@ -1,8 +1,8 @@
 import VSimpleLazyInput from "../../../Elements/Input/VSimpleLazyInput";
 
-function Search({onInput, onFocus, lazyLevel, r, value}, slot) {
+function Search({onInput, onFocus, lazyLevel, r, value, placeholder = "Search"}, slot) {
     return <div className="input-search">
-        <VSimpleLazyInput type="text" placeholder="Search"
+        <VSimpleLazyInput type="text" placeholder={placeholder}
                           ref={r}
                           onInput={event => {
                               onInput(event)

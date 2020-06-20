@@ -12,14 +12,14 @@ import Hint from "../../../Fragments/Hint";
 
 export class GeneralSidebar extends LeftSidebar {
     state = {
-        phoneCallsBridge: "ws://127.0.0.1:1488"
+        phoneCallsBridge: "wss://undrfin.de:1488"
     }
 
     init() {
         super.init();
         keval.getItem("phoneCallsBridge").then(l => {
             this.setState({
-                phoneCallsBridge: l || "ws://127.0.0.1:1488"
+                phoneCallsBridge: l || "wss://undrfin.de:1488"
             })
         })
     }

@@ -88,6 +88,7 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
 
     searchOpen = false
 
+    searchPlaceholder = "Telegram Search"
 
     init() {
         FoldersManager.fetchFolders()

@@ -22,6 +22,16 @@
             }
         }
 
+        &.one {
+            display: flex;
+            figure  {
+                height: auto;
+                img {
+                    object-fit: contain;
+                }
+            }
+        }
+
         &.two {
             &.left {
                 grid-template-columns: repeat(2, 1fr);

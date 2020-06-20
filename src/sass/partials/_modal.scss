@@ -214,7 +214,8 @@
 }
 
 .attach-modal {
-    width: 350px;
+    width: 650px;
+    @include grouped;
 
     .input-field {
         width: 100%;
