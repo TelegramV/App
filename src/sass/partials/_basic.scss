@@ -58,7 +58,7 @@ img:not([src]) {
     height: 100%;
     // Only specific parts should be selectable
     user-select: none;
-    -webkit-user-select: none;
+    //-webkit-user-select: none; // NO NO NO, BREAKS SAFARI ON IOS
 
     &.rainbow {
         animation: rainbow 3s steps(36) infinite;
