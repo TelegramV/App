@@ -53,7 +53,7 @@ export class ForwardSidebar extends GenericSidebar {
                 <VTagsInput tags={this.state.selected.map(peer => {
                         return <VTag peer={peer} onRemove={l => this.togglePeer(peer)}/>
                     }
-                )} onInput={this.onPeerNameInput}/>
+                )} onInput={this.onPeerNameInput} value={this.state.filter}/>
             </div>
 
             <Section>
