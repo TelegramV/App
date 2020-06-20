@@ -46,7 +46,6 @@ class ChatToBottomButtonComponent extends StatefulComponent {
             <div className="chat-scroll-bottom rp rps"
                  style={style}
                  onClick={this.onClick}>
-
                 <i className="tgico tgico-down"/>
             </div>
         );

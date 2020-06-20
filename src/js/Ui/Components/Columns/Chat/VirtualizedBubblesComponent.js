@@ -91,7 +91,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         this.props.loaderRef.$el.style.display = "none";
 
-        this.$el.addEventListener("scroll", this.throttle(this.onScroll, 300), {
+        this.$el.addEventListener("scroll", this.onScroll, {
             passive: true,
         });
     }
@@ -189,7 +189,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 this.mainVirtual.currentPage = this.mainVirtual.messages
                     .slice(Math.max(messageIndex - this.mainVirtual.edgeSize, 0), messageIndex + this.mainVirtual.edgeSize);
 
-                const messages = this.mainVirtual.currentPage;
+                let messages = this.mainVirtual.currentPage;
+
+                if (messages.length < this.mainVirtual.size) {
+                    messages = this.mainVirtual.veryBottomPage();
+                }
 
                 this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
@@ -239,7 +243,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 this.mainVirtual.currentPage = this.mainVirtual.messages
                     .slice(Math.max(messageIndex - this.mainVirtual.edgeSize, 0), messageIndex + this.mainVirtual.edgeSize);
 
-                const messages = this.mainVirtual.currentPage;
+                let messages = this.mainVirtual.currentPage;
+
+                if (messages.length < this.mainVirtual.size) {
+                    messages = this.mainVirtual.veryBottomPage();
+                }
 
                 this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
