@@ -404,6 +404,7 @@ export class ChatInputComponent extends StatelessComponent {
     attachPhoto = () => {
         askForFile("image/*,video/*", (bytes, file) => {
             const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
+            console.log(blob)
 
             this.pickPhoto(URL.createObjectURL(blob))
         }, true, true)
