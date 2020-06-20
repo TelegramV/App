@@ -283,7 +283,7 @@ export class MediaViewerComponent extends StatefulComponent {
             }
 
             const messages = [
-                ...Messages.messages.map(rawMessage => MessageFactory.fromRawOrReturn(message.to, rawMessage)).reverse(),
+                ...Messages.messages.map(rawMessage => MessageFactory.fromRawOrReturnNoGroup(message.to, rawMessage)).reverse(),
                 ...this.state.messages
             ];
 
@@ -331,7 +331,7 @@ export class MediaViewerComponent extends StatefulComponent {
 
             const messages = [
                 ...this.state.messages,
-                ...Messages.messages.map(rawMessage => MessageFactory.fromRawOrReturn(message.to, rawMessage)).reverse(),
+                ...Messages.messages.map(rawMessage => MessageFactory.fromRawOrReturnNoGroup(message.to, rawMessage)).reverse(),
             ];
 
             if (Messages.current_count < limit) {

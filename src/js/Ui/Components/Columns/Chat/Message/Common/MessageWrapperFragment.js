@@ -11,6 +11,7 @@ import VUI from "../../../../../VUI"
 import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer"
 import API from "../../../../../../Api/Telegram/API"
 import PeerName from "../../../../Reactive/PeerName"
+import AppSelectedChat from "../../../../../Reactive/SelectedChat"
 
 function ReplyToMessageFragment({message}) {
     if (!message.raw.reply_to_msg_id) {
@@ -30,7 +31,8 @@ function ReplyToMessageFragment({message}) {
                        text={MessageParser.getPrefixNoSender(message.replyToMessage)}
                        show={true}
                        onClick={() => {
-                           UIEvents.General.fire("chat.showMessage", {message: message.replyToMessage})
+                           AppSelectedChat.showMessage(message.replyToMessage)
+                           // UIEvents.General.fire("chat.showMessage", {message: message.replyToMessage})
                        }}
         />
     )

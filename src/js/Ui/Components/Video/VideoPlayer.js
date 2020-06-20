@@ -238,6 +238,7 @@ class VideoPlayer extends StatefulComponent {
     }
 
     componentDidMount() {
+        // console.log("did mount", this.$el)
         onDrag(this.timeWrapperRef.$el, this.timelineRef.$el, "ltr", (percentage) => {
             this.videoRef.$el.currentTime = this.videoRef.$el.duration * Math.max(0, Math.min(1, percentage));
         });
@@ -246,10 +247,14 @@ class VideoPlayer extends StatefulComponent {
     }
 
     componentWillUnmount() {
+        // console.warn("will unmount")
+
         window.removeEventListener("keydown", this.onKeyDown);
     }
 
     componentWillUpdate(nextProps, nextState) {
+        // console.warn("will update")
+
         if (nextProps.src !== this.props.src) {
             if (nextProps.src) {
                 nextState.shouldRecreate = true;
@@ -258,6 +263,8 @@ class VideoPlayer extends StatefulComponent {
     }
 
     componentDidUpdate() {
+        // console.warn("did unmount")
+
         if (this.state.shouldRecreate) {
             this.state.shouldRecreate = false;
 

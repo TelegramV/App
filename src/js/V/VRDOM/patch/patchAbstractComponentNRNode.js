@@ -20,10 +20,10 @@
 import patch_Text_VRNode from "./patch_Text_VRNode"
 import {initElement} from "../render/renderElement"
 import ComponentVRNode from "../component/ComponentVRNode"
-import {__component_just_patch_element, __component_update_props} from "../component/__component_update"
+import {__component_update_props} from "../component/__component_update"
 import __component_unmount from "../component/__component_unmount"
 import __component_mount from "../component/__component_mount"
-import vrdom_renderComponentVNode, {vrdom_renderComponentVNodeAsVRNode} from "../render/renderComponent"
+import {vrdom_renderComponentVNodeAsVRNode} from "../render/renderComponent"
 import patchElement from "./patchElement"
 
 function patchComponentVRNode($node: Element, vRNode: ComponentVRNode) {
@@ -43,16 +43,16 @@ function patchComponentVRNode($node: Element, vRNode: ComponentVRNode) {
             __component_update_props($node.__v.component, vRNode.attrs)
         } else {
             __component_unmount($node.__v.component)
+            const cVRNode = vrdom_renderComponentVNodeAsVRNode(vRNode);
+            const component = cVRNode.component;
+            $node = patchElement($node, cVRNode)
 
-            $node = vrdom_renderComponentVNode(vRNode, $node)
-
-            __component_just_patch_element($node.__v.component, $node)
-            __component_mount($node.__v.component, $node)
+            __component_mount(component, $node)
         }
     } else {
         const cVRNode = vrdom_renderComponentVNodeAsVRNode(vRNode)
         const component = cVRNode.component;
-        $node = patchElement($node, cVRNode)
+        $node = patchElement($node, cVRNode);
 
         __component_mount(component, $node)
     }

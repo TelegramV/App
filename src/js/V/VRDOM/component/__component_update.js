@@ -132,7 +132,9 @@ export function __component_just_patch_element(component, $el) {
 }
 
 export function __component_update_force(component, nextProps, nextState) {
-    component.componentWillUpdate(nextProps || component.props, nextState || component.state);
+    if (component.__.mounted) {
+        component.componentWillUpdate(nextProps || component.props, nextState || component.state);
+    }
 
     if (nextProps) {
         Object.assign(component.props, nextProps);

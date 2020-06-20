@@ -34,7 +34,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                       }}
                                       autoPlay
                                       infoContainer={
-                                          ({currentTime, isHovered}, $el: HTMLVideoElement) => {
+                                          ({currentTime, isHovered, url}, $el: HTMLVideoElement) => {
                                               const isPlaying = $el && !$el.paused;
 
                                               return (
@@ -47,12 +47,16 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                                                    this.$el.querySelector("video")?.pause();
                                                                    UIEvents.MediaViewer.fire("showMessage", {message});
                                                                } else {
-                                                                   if (!FileManager.isDownloaded(document) && !FileManager.isPending(document)) {
+                                                                   if (!FileManager.isPending(document)) {
                                                                        FileManager.downloadVideo(document)
-                                                                   } else if (isPlaying) {
-                                                                       $el?.pause();
-                                                                   } else {
-                                                                       $el?.play();
+                                                                   }
+
+                                                                   if (url) {
+                                                                       if (isPlaying) {
+                                                                           $el?.pause();
+                                                                       } else {
+                                                                           $el?.play();
+                                                                       }
                                                                    }
                                                                }
                                                            }}>

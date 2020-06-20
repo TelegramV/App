@@ -37,7 +37,9 @@ class ChatInfoComponent extends StatelessComponent {
     }
 
     onChatSelect = () => {
-        AppSelectedChat.current?.fetchFull()
+        if (!AppSelectedChat.current?.full) {
+            AppSelectedChat.current?.fetchFull()
+        }
     }
 
     openPeerInfo = () => {

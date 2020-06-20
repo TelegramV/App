@@ -23,7 +23,7 @@ import ContactComponent from "../../../Basic/ContactComponent"
 import VArray from "../../../../../V/VRDOM/list/VArray"
 import List from "../../../../../V/VRDOM/list/List"
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
-import {Section} from "../../Fragments/Section";
+import AppSelectedChat from "../../../../Reactive/SelectedChat"
 
 const MessageFragmentItemTemplate = (message) => {
     const peer = message.to === PeersStore.self() ? message.from : message.to
@@ -33,7 +33,10 @@ const MessageFragmentItemTemplate = (message) => {
                              name={peer.name}
                              status={<span>{message.prefix}{highlightVRNodeWord(message.text, CURRENT_QUERY)}</span>}
                              time={message.getFormattedDateOrTime()}
-                             onClick={() => UIEvents.General.fire("chat.showMessage", {message: message})}/>
+                             onClick={() => {
+                                 AppSelectedChat.showMessage(message)
+                                 // UIEvents.General.fire("chat.showMessage", {message: message})
+                             }}/>
 }
 
 let CURRENT_QUERY = undefined
@@ -57,7 +60,8 @@ export class GlobalMessagesSearchComponent extends StatefulComponent {
 
     render() {
         return (
-            <div className="section" css-display={this.state.messages.size() === 0 && !this.state.isSearching ? "none" : undefined}>
+            <div className="section"
+                 css-display={this.state.messages.size() === 0 && !this.state.isSearching ? "none" : undefined}>
                 <div className="title">{this.state.isSearching ? "Searching messages..." : "Messages"}</div>
                 {/*<div className="section-title">{this.state.isSearching ? "Searching messages..." : "Messages"}</div>*/}
                 <List list={this.state.messages}

@@ -63,8 +63,6 @@ class SelectedChat {
                 this._previousPeer = this._peer
                 this._peer = peer
 
-                this._message = null
-
                 this.fire(this._peer)
             }
         })
@@ -85,8 +83,6 @@ class SelectedChat {
                     this._previousPeer = this._peer
                     this._peer = peer
 
-                    this._message = null
-
                     this.fire(this._peer)
                 }
             } else {
@@ -94,18 +90,16 @@ class SelectedChat {
                     this._previousPeer = this._peer
                     this._peer = peer
 
-                    this._message = null
-
                     this.fire(this._peer)
                 }
             }
         })
     }
 
-    fire(peer = this._peer) {
+    fire(peer = this._peer, options = {}) {
         UIEvents.General.fire("chat.select", {
             peer,
-            message: this._message,
+            ...options
         })
     }
 
@@ -125,14 +119,6 @@ class SelectedChat {
                 }
             }
         }
-    }
-
-    /**
-     * @return {undefined|Peer}
-     * @deprecated
-     */
-    get Previous() {
-        return this._previousPeer
     }
 
     /**
@@ -191,13 +177,13 @@ class SelectedChat {
 
     /**
      * @param {Peer} peer
-     * @param message
+     * @param options
      */
-    select(peer, message) {
-        this._message = message
+    select(peer, options = {}) {
         this._previousPeer = this._peer
         this._peer = peer
-        this.fire(peer) // no time to do it better
+
+        this.fire(peer, options)
 
         const p = peer.username ? `@${peer.username}` : `${peer.type}.${peer.id}`
 

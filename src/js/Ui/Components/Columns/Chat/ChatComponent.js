@@ -33,7 +33,6 @@ import {SearchSidebar} from "../../SidebarsNeo/Right/Search/SearchSidebar";
 import {RightSidebars} from "../../SidebarsNeo/Right/RightSidebars";
 import DefaultBubblesComponent from "./DefaultBubblesComponent"
 import {isDesktop, isMobile} from "../../../Utils/utils";
-import {Dialog} from "../../../../Api/Dialogs/Dialog";
 import {DialogInfoSidebar} from "../../SidebarsNeo/Right/DialogInfo/DialogInfoSidebar";
 import nodeIf from "../../../../V/VRDOM/jsx/helpers/nodeIf";
 import {SearchBarComponent} from "./Search/SearchBarComponent";
@@ -130,21 +129,21 @@ class ChatComponent extends StatelessComponent {
 
     // onRightSidebarHide = l => {
     //     if(l.barName === "forward-message") return
-        //
-        // this.$el.classList.remove("right-bar-open")
-        // this.rightSidebarOpen = false
+    //
+    // this.$el.classList.remove("right-bar-open")
+    // this.rightSidebarOpen = false
     // }
 
     onInfoOpen = () => {
         console.log("OPEN")
-        if(isMobile()) {
+        if (isMobile()) {
             this.$el.classList.toggle("fade-out", true)
         }
     }
 
     onInfoClosed = () => {
         console.log("closed")
-        if(isMobile()) {
+        if (isMobile()) {
             this.$el.classList.toggle("fade-out", false)
         }
     }
@@ -157,13 +156,13 @@ class ChatComponent extends StatelessComponent {
             this.noChatRef.$el.style.display = "none"
             // TODO delay for mobile
             // if(isDesktop()) {
-                this.chatRef.$el.style.display = ""
-                this.chatRef.$el.classList.add("responsive-selected-chat")
+            this.chatRef.$el.style.display = ""
+            this.chatRef.$el.classList.add("responsive-selected-chat")
             // }
         } else {
             this.$el.classList.toggle("shown", false)
             this.noChatRef.$el.style.display = ""
-            if(isDesktop()) {
+            if (isDesktop()) {
                 this.chatRef.$el.style.display = "none"
                 this.chatRef.$el.classList.remove("responsive-selected-chat")
             }
@@ -173,7 +172,7 @@ class ChatComponent extends StatelessComponent {
     }
 
     openSearch = () => {
-        if(isDesktop()) {
+        if (isDesktop()) {
             UIEvents.Sidebars.fire("push", SearchSidebar)
         } else {
             UIEvents.General.fire("search.open")

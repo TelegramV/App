@@ -87,7 +87,7 @@ function getHistory(peer: Peer, params = {
     max_id: 0,
     min_id: 0,
     hash: 0,
-}): { messages: []; } {
+}): Promise<{ messages: []; }> {
     params.peer = peer.inputPeer;
 
     return MTProto.invokeMethod("messages.getHistory", params).then(Messages => {

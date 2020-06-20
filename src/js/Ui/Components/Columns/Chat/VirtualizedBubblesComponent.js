@@ -21,11 +21,8 @@ import VComponent from "../../../../V/VRDOM/component/VComponent"
 import AppSelectedChat from "../../../Reactive/SelectedChat"
 import UIEvents from "../../../EventBus/UIEvents"
 import AppEvents from "../../../../Api/EventBus/AppEvents"
-import MessageComponent from "./MessageComponent"
 import type {Message} from "../../../../Api/Messages/Message"
-import {MessageType} from "../../../../Api/Messages/Message"
 import vrdom_delete from "../../../../V/VRDOM/delete"
-import vrdom_render from "../../../../V/VRDOM/render/render"
 import scrollToAndHighlight from "../../../../Utils/scrollToAndHighlight"
 import findIntersection from "../../../Virtual/findIntersection"
 import vrdom_deleteInner from "../../../../V/VRDOM/deleteInner"
@@ -33,37 +30,9 @@ import VirtualMessages from "../../../Virtual/VirtualMessages"
 import scrollBottom from "../../../../Utils/scrollBottom"
 import API from "../../../../Api/Telegram/API"
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
-import {vrdom_appendRealMany} from "../../../../V/VRDOM/append"
-import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
 import IntersectionObserver from 'intersection-observer-polyfill';
 import GroupMessage from "../../../../Api/Messages/GroupMessage"
-import {isDateEqual} from "../../../Utils/utils"
-
-function getMessageElementById(messageId: number): HTMLElement | null {
-    return document.getElementById(`message-${messageId}`); // dunno better way, sorry
-}
-
-export function isGrouping(one: Message, two: Message) {
-    if (!one || !two ||
-        one.type === MessageType.GROUP || two.type === MessageType.GROUP ||
-        one.type === MessageType.SERVICE || two.type === MessageType.SERVICE) return false;
-    return (one.isPost || one.isOut === two.isOut)
-        && (one.from.id === two.from.id)
-        && (Math.abs(one.date - two.date) < 5 * 60);
-}
-
-export function isSameDate(d1n, d2n) {
-    if (!d1n || !d2n) {
-        return true;
-    }
-
-    const d1 = new Date(d1n * 1000);
-    const d2 = new Date(d2n * 1000);
-
-    return d1.getFullYear() === d2.getFullYear() &&
-        d1.getMonth() === d2.getMonth() &&
-        d1.getDate() === d2.getDate();
-}
+import {appendMessages, fixMessages, getMessageElement, prependMessages} from "./messagesUtils"
 
 // there is no possibility nor time to calculate each message size
 class VirtualizedBubblesComponent extends StatelessComponent {
@@ -127,185 +96,26 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         });
     }
 
-    onIntersection = (entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.style.visibility = "visible";
-                entry.target.__v?.component.onElementVisible.call(entry.target.__v.component);
-            } else {
-                entry.target.style.visibility = "hidden";
-                entry.target.__v?.component.onElementHidden.call(entry.target.__v.component);
-            }
-        })
-    }
-
-    renderMessage = (message: Message, prevMessage: Message = null, nextMessage: Message = null): HTMLElement => {
-        return vrdom_render(this.renderVRMessage(message, prevMessage, nextMessage));
-    }
-
-    renderVRMessage = (message: Message, prevMessage: Message = null, nextMessage: Message = null): HTMLElement => {
-        const isOut = !message.isPost && message.isOut;
-
-        message.hideAvatar = true;
-
-        let prevCurr = isGrouping(prevMessage, message);
-        let currNext = isGrouping(message, nextMessage);
-        if (!prevCurr && currNext) {
-            message.tailsGroup = "s";
-        } else if (!currNext) {
-            if (!prevCurr) {
-                message.tailsGroup = "se";
-            } else {
-                message.tailsGroup = "e";
-            }
-            if (!isOut) message.hideAvatar = false;
-        } else {
-            message.tailsGroup = "m";
-        }
-
-        return <MessageComponent observer={this.observer} message={message}
-                                 showDate={!isSameDate(message.date, prevMessage?.date)}/>;
-    }
-
     cleanupTree = () => {
         vrdom_deleteInner(this.bubblesInnerRef.$el);
     }
 
-    refresh = () => {
+    refresh = (clearShowMessage = true) => {
         this.cleanupTree();
         this.mainVirtual.refresh();
         this.secondVirtual.refresh();
 
         this.isLoadingRecent = false;
         this.isUsingSecondVirtual = false;
-        this.isRequestedShowMessage = false;
-    }
 
-    // oldest message must always be last
-    fixMessages(messages: Message[]): Message[] {
-        if (messages.length > 0 && messages[0].id > messages[messages.length - 1].id) {
-            messages = messages.reverse();
+        if (clearShowMessage) {
+            this.isRequestedShowMessage = false;
         }
-
-        messages = messages.filter(message => !document.getElementById(`message-${message.id}`));
-
-        return messages;
-    }
-
-    scrollBottom() {
-        scrollBottom(this.$el, this.bubblesInnerRef.$el);
-    }
-
-    renderDate(message, nextMessage) {
-        let date = message.jsDate;
-        let nextDate = nextMessage?.jsDate;
-        if (!isDateEqual(date, nextDate)) {
-            return vrdom_render(<div class="service">
-                <div class="service-msg">
-                    {`${date.getDate()} ${date.toLocaleString('en', {month: 'long'})}`}
-                </div>
-            </div>);
-        }
-    }
-
-    appendMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
-        // messages = messages.slice().reverse();
-
-        if (messages.length > 0) {
-            if (__IS_DEV__) {
-                if (!beforeTopMessage) {
-                    console.log("[warn] append no before message")
-                }
-                if (!afterBottomMessage) {
-                    console.log("[warn] append no after message")
-                }
-                if (beforeTopMessage && messages[0].id < beforeTopMessage.id) {
-                    console.error("append before", beforeTopMessage, messages)
-                }
-                if (afterBottomMessage && messages[messages.length - 1].id > afterBottomMessage.id) {
-                    console.error("append after", afterBottomMessage, messages)
-                }
-            }
-
-            const $messages = [this.renderMessage(messages[0], beforeTopMessage, messages[1])];
-
-            //[0,1,2,3]
-            //[x,0,1]
-            //[0,1,2] loop
-            //[1,2,3] loop
-            //[2,3,y]
-            for (let i = 1; i < messages.length - 1; i++) {
-                $messages.push(this.renderMessage(messages[i], messages[i - 1], messages[i + 1]));
-                //let date = this.renderDate(messages[i],messages[i+1]);
-                //if(date) $messages.push(date);
-            }
-
-            if (messages.length > 1) {
-                $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
-            }
-
-            // this.bubblesInnerRef.$el.lastElementChild?.__v.component.domSiblingUpdated
-            //     .call(
-            //         this.bubblesInnerRef.$el.lastElementChild?.__v.component,
-            //         this.bubblesInnerRef.$el.lastElementChild.previousElementSibling?.__v.component.props.message,
-            //         messages[messages.length - 1],
-            //     );
-
-            vrdom_appendRealMany($messages.reverse(), this.bubblesInnerRef.$el)
-
-            return $messages;
-        }
-
-        return [];
-    }
-
-    prependMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
-        // messages = messages.slice().reverse();
-
-        if (messages.length > 0) {
-            if (__IS_DEV__) {
-                if (!beforeTopMessage) {
-                    console.log("[warn] prepend no before message")
-                }
-                if (!afterBottomMessage) {
-                    console.log("[warn] prepend no after message")
-                }
-                if (beforeTopMessage && messages[0].id < beforeTopMessage.id) {
-                    console.error("prepend before", beforeTopMessage, messages)
-                }
-                if (afterBottomMessage && messages[messages.length - 1].id > afterBottomMessage.id) {
-                    console.error("prepend after", afterBottomMessage, messages)
-                }
-            }
-
-            const $messages = [this.renderMessage(messages[0], beforeTopMessage, messages[1])];
-
-            for (let i = 1; i < messages.length - 1; i++) {
-                $messages.push(this.renderMessage(messages[i], messages[i - 1], messages[i + 1]));
-            }
-
-            if (messages.length > 1) {
-                $messages.push(this.renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage));
-            }
-
-            this.bubblesInnerRef.$el.firstElementChild?.__v.component.domSiblingUpdated?.call(
-                this.bubblesInnerRef.$el.firstElementChild?.__v.component,
-                this.bubblesInnerRef.$el.firstElementChild?.nextElementSibling?.__v.component.props.message,
-                messages[0],
-            );
-
-            vrdom_prependRealMany($messages, this.bubblesInnerRef.$el);
-
-            return $messages;
-        }
-
-        return [];
     }
 
     onChatSelect = (event) => {
         this.refresh();
         this.isRequestedShowMessage = event.message
-        console.warn(event.message)
 
         if (AppSelectedChat.isSelected) {
             this.isLoadingRecent = true;
@@ -326,8 +136,6 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             this.cleanupTree();
             this.isUsingSecondVirtual = false;
             this.secondVirtual.refresh();
-            // patching is good idea, but it doesn't work properly
-            // vrdom_patch(this.bubblesInnerRef.$el, <div ref={this.bubblesInnerRef} id="bubbles-inner">{this.mainVirtual.veryBottomPage().map(m => this.renderVRNodeMessage(m))}</div>)
             this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
             this.scrollBottom();
             this.dev_checkTree();
@@ -338,46 +146,62 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
         const isAtBottom = Math.floor(scrollHeight - scrollTop) === clientHeight;
         const isAtTop = scrollTop <= 400;
-        
-        // todo: may cause performance issues
+
         if (!isAtBottom) {
             UIEvents.General.fire("chat.scrollBottom.show");
         }
 
         if (isAtTop) {
-            // console.log("on top")
             this.virtual_onScrolledTop();
         } else if (isAtBottom) {
             if (this.virtual_isCompletelyBottom() || (!this.mainVirtual.hasMoreOnTopToDownload && this.virtual_isCompletelyBottom())) {
                 UIEvents.General.fire("chat.scrollBottom.hide");
             }
+
             this.virtual_onScrolledBottom();
         }
     }
 
     onPeerMessagesRecent = (event) => {
-        if (!this.isRequestedShowMessage) {
-            this.refresh();
-        }
+        this.refresh(false);
 
         this.mainVirtual.hasMoreOnTopToDownload = true;
 
-        this.mainVirtual.messages = this.fixMessages(event.messages.slice());
+        this.mainVirtual.messages = fixMessages(event.messages.slice());
 
         if (event.messages.length < 100) {
             this.isLoadingRecent = true;
             AppSelectedChat.current.messages.fireAllRecent();
         }
 
+        const vbp = this.mainVirtual.veryBottomPage();
+
         if (!this.isRequestedShowMessage) {
-            this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
+            this.appendMessages(vbp, this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
             this.scrollBottom();
+        } else if (event.messages.length >= 100) {
+            const actionCount = (++this.actionCount);
+
+            const message = this.isRequestedShowMessage;
+
+            API.messages.getHistory(message.dialogPeer, {
+                offset_id: message.id,
+                add_offset: -51,
+                limit: 100
+            }).then(Messages => {
+                AppEvents.Peers.fire("chat.showMessageReady", {
+                    peer: message.dialogPeer,
+                    messages: message.dialogPeer.messages.putRawMessages(Messages.messages),
+                    offset_id: message.id,
+                    actionCount,
+                })
+            });
         }
     }
 
     onPeerMessagesAllRecent = event => {
         this.isLoadingRecent = true;
-        event.messages = this.fixMessages(event.messages.slice());
+        event.messages = fixMessages(event.messages.slice());
         const lenbeforefuck = this.mainVirtual.currentPage.length;
         this.mainVirtual.messages = [...event.messages, ...this.mainVirtual.messages];
         this.mainVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
@@ -385,6 +209,24 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         if (!this.isRequestedShowMessage) {
             this.appendMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.getVeryBottomOne());
             this.scrollBottom();
+        } else {
+            this.isLoadingRecent = false;
+            const actionCount = (++this.actionCount);
+
+            const message = this.isRequestedShowMessage;
+
+            API.messages.getHistory(message.dialogPeer, {
+                offset_id: message.id,
+                add_offset: -51,
+                limit: 100
+            }).then(Messages => {
+                AppEvents.Peers.fire("chat.showMessageReady", {
+                    peer: message.dialogPeer,
+                    messages: message.dialogPeer.messages.putRawMessages(Messages.messages),
+                    offset_id: message.id,
+                    actionCount,
+                })
+            });
         }
         this.isLoadingRecent = false;
     }
@@ -424,12 +266,15 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     onChatShowMessage = ({message}) => {
         console.log("onChatSh")
+
+        this.isRequestedShowMessage = null;
+
         if (this.isLoadingRecent) {
             return;
         }
 
         if (AppSelectedChat.check(message.to)) {
-            let $message = getMessageElementById(message.id);
+            let $message = getMessageElement(message);
 
             if (!$message) {
                 const messageIndex = this.mainVirtual.messages.findIndex(m => m.id === message.id);
@@ -474,30 +319,13 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             console.log('NO SELECT!!!', event)
             const peer = message.dialogPeer;
 
-            this.isRequestedShowMessage = true;
-
-            const actionCount = (++this.actionCount);
-
-            AppSelectedChat.select(peer, message);
-
-            API.messages.getHistory(peer, {
-                offset_id: message.id,
-                add_offset: -51,
-                limit: 100
-            }).then(Messages => {
-                AppEvents.Peers.fire("chat.showMessageReady", {
-                    peer,
-                    messages: peer.messages.putRawMessages(Messages.messages),
-                    offset_id: message.id,
-                    actionCount,
-                })
-            });
+            AppSelectedChat.select(peer, {message});
         }
     }
 
     onChatShowMessageReady = event => {
         console.log('SHIWWWWWWW', event)
-        if (this.isLoadingRecent && !this.isRequestedShowMessage) {
+        if (this.isLoadingRecent) {
             return;
         }
 
@@ -510,14 +338,12 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         this.isUsingSecondVirtual = true;
 
-        let messages = this.fixMessages(event.messages);
+        let messages = fixMessages(event.messages);
 
         const intersect = this.mainVirtual.isEmpty() ? -1 : findIntersection(messages, [this.mainVirtual.getVeryTopOne()]);
 
         if (intersect > -1) {
             console.log("[show message] intersect found");
-
-            this.isRequestedShowMessage = false;
 
             messages = messages.slice(0, intersect - 1);
 
@@ -525,7 +351,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
             this.isUsingSecondVirtual = false;
 
-            this.mainVirtual.veryTopPage();
+            messages = this.mainVirtual.veryTopPage();
         } else {
             this.secondVirtual.messages.push(...messages);
             messages = this.secondVirtual.veryBottomPage();
@@ -619,7 +445,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         this.currentVirtual.hasMoreOnTopToDownload = event.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
 
-        this.currentVirtual.messages = [...this.fixMessages(event.messages), ...this.currentVirtual.messages];
+        this.currentVirtual.messages = [...fixMessages(event.messages), ...this.currentVirtual.messages];
 
         if (ivt) {
             this.virtual_onScrolledTop();
@@ -681,15 +507,13 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         this.secondVirtual.isDownloading = false;
 
-        let messages = this.fixMessages(event.messages);
+        let messages = fixMessages(event.messages);
 
         const ivt = this.secondVirtual.isVeryBottom();
         const intersect = this.mainVirtual.isEmpty() ? -1 : findIntersection(messages, [this.mainVirtual.getVeryTopOne()]);
 
         if (intersect > -1) {
             console.log("[bottom page] intersect found");
-
-            this.isRequestedShowMessage = false;
 
             messages = messages.slice(0, intersect - 1);
 
@@ -722,6 +546,30 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 console.log("BUG: < 100 messages rendered!!!")
             }
         }
+    }
+
+    onIntersection = (entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.visibility = "visible";
+                entry.target.__v?.component.onElementVisible.call(entry.target.__v.component);
+            } else {
+                entry.target.style.visibility = "hidden";
+                entry.target.__v?.component.onElementHidden.call(entry.target.__v.component);
+            }
+        })
+    }
+
+    scrollBottom() {
+        scrollBottom(this.$el, this.bubblesInnerRef.$el);
+    }
+
+    appendMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
+        return appendMessages(this.bubblesInnerRef.$el, messages, beforeTopMessage, afterBottomMessage, this.observer);
+    }
+
+    prependMessages(messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) {
+        return prependMessages(this.bubblesInnerRef.$el, messages, beforeTopMessage, afterBottomMessage, this.observer);
     }
 }
 

@@ -2,7 +2,7 @@ import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import type {BusEvent} from "../../../../../../Api/EventBus/EventBus"
 import type {Message} from "../../../../../../Api/Messages/Message"
 import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulComponent"
-import {isGrouping, isSameDate} from "../../VirtualizedBubblesComponent"
+import {isGrouping, isSameDate} from "../../messagesUtils"
 
 type Props = {
     message: Message;
