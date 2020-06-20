@@ -180,8 +180,9 @@ class AudioPlayer {
     get state() {
         const fileName = DocumentParser.attributeFilename(this.currentMessage?.media.document);
         const info = DocumentParser.attributeAudio(this.currentMessage?.media.document);
-        const source = this.useSource(this.currentMessage?.media.document);
         const isVoice = info?.voice;
+        const supportStreaming = !__IS_IOS__ && !isVoice && window.MediaSource && MediaSource.isTypeSupported(this.currentMessage?.media.document.mime_type);
+        const source = supportStreaming && this.useSource(this.currentMessage?.media.document);
         const duration = info?.duration || this.audio?.duration;
 
         return {
@@ -196,7 +197,7 @@ class AudioPlayer {
             isVoice,
             fileName,
             isSeeking: this.audio.seeking,
-            supportStreaming: !__IS_IOS__ && !isVoice && MediaSource.isTypeSupported(this.currentMessage?.media.document.mime_type)
+            supportStreaming,
         }
     }
 
@@ -223,7 +224,7 @@ class AudioPlayer {
             } else {
                 this.internal_fireLoading();
 
-                if (FileManager.isPending(message.media.document)) {
+                if (FileManager.isPending(message.media.document) && this.state.supportStreaming) {
                     this.audio.src = this.useSource(message.media.document).url;
                     this.audio.currentTime = 0;
                     this.audio.play();

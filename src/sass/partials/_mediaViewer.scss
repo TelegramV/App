@@ -5,6 +5,13 @@
     z-index: 9999;
 
     .VideoPlayer {
+        height: 100%;
+        width: 100%;
+
+        .player {
+            height: 100%;
+            width: 100%;
+        }
 
         video,
         img {
@@ -64,7 +71,8 @@
                         font-weight: 500;
                     }
 
-                    .time {}
+                    .time {
+                    }
                 }
             }
 
@@ -207,6 +215,7 @@
 
             .header {
                 background-color: black;
+
                 .avatar {
                     display: none;
                 }
@@ -224,6 +233,21 @@
                 .navigation {
                     display: none;
                 }
+            }
+        }
+
+        &.media-viewdeo {
+            width: 100vw;
+            height: var(--vh100);
+
+            .media {
+                max-width: 100vw;
+                max-height: var(--vh100);
+            }
+
+            .VideoPlayer {
+                width: 100vw;
+                height: var(--vh100);
             }
         }
     }
