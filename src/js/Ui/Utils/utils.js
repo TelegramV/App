@@ -70,8 +70,9 @@ export function askForFile(accept, callback, asBuffer = false, multiple = false)
     input.type = 'file';
     input.accept = accept;
     input.multiple = multiple
-
-    input.onchange = e => {
+    input.style.visibility="hidden";
+    document.body.append(input);
+    input.addEventListener("change", e => {
         Array.from(e.target.files).forEach(file => {
             var reader = new FileReader();
             if (asBuffer) {
@@ -82,13 +83,13 @@ export function askForFile(accept, callback, asBuffer = false, multiple = false)
 
             reader.onload = readerEvent => {
                 input.remove()
+
                 callback(reader.result, file);
             }
         })
-
-    }
+    })
     input.click();
-    input.remove();
+    //input.remove(); //Safari
 }
 
 export function formatAudioTime(time) {
