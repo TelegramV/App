@@ -30,6 +30,10 @@ export function isValidDate(d) {
   return d instanceof Date && !isNaN(d);
 }
 
+export function isBullshitBrowser() {
+    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+}
+
 export function isMobile() {
     return window.innerWidth < 991.98 // MAGIC NUMBER DO NOT CHANGE OR THE WORLD WILL COLLAPSE
 }
