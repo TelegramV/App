@@ -345,6 +345,7 @@ class CallManager extends ReactiveObject {
         }
         return navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
 
+            let AudioContext = window.AudioContext || window.webkitAudioContext;
             const audioContext = new AudioContext({
                 sampleRate: 48000,
             })

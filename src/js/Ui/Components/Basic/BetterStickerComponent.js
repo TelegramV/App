@@ -22,6 +22,8 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 import FileManager from "../../../Api/Files/FileManager"
 import AppEvents from "../../../Api/EventBus/AppEvents"
+import {isBullshitBrowser} from "../../Utils/utils"
+import WebpHelper from "../../Utils/WebpHelper"
 
 // probably patch-compatible
 class BetterStickerComponent extends StatefulComponent {
@@ -95,7 +97,7 @@ class BetterStickerComponent extends StatefulComponent {
                      onClick={props.onClick}
                      onMouseOver={this.onMouseOver}>
                     <img class="loading"
-                         src={state.thumbUrl || state.url}
+                         src={state.url || state.thumbUrl}
                          css-width={`${width}px`}
                          css-height={`${height}px`}
                          alt="Sticker"/>
@@ -180,17 +182,34 @@ class BetterStickerComponent extends StatefulComponent {
                 });
             });
         } else {
-            this.setState({
-                url: FileAPI.getUrl(event.blob),
-                isDownloading: false,
-            });
+            if(WebpHelper.shouldConvert()) {
+                WebpHelper.convertToPng(event.blob).then(url => {
+                    this.setState({
+                        url: url,
+                        isDownloading: false,
+                    })
+                })   
+            } else {
+                this.setState({
+                    url: event.url,
+                    isDownloading: false,
+                });
+            }
         }
     }
 
-    onAnimatedThumbDownloadDone = ({url}) => {
-        this.setState({
-            thumbUrl: url,
-        });
+    onAnimatedThumbDownloadDone = (event) => {
+        if(WebpHelper.shouldConvert()) {
+            WebpHelper.convertToPng(event.blob).then(url => {
+                this.setState({
+                    thumbUrl: url
+                })
+            })
+        } else {
+            this.setState({
+                thumbUrl: event.url,
+            });
+        }
     }
 }
 
