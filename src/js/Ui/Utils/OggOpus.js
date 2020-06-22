@@ -43,7 +43,6 @@ export class OggOpus {
         // Copy paste from CallsMgr but who cares /shrug
         return navigator.mediaDevices.getUserMedia({audio: true}).then(stream => {
 
-        	let AudioContext = window.AudioContext || window.webkitAudioContext;
             const audioContext = new AudioContext({
                 sampleRate: 48000,
             })
