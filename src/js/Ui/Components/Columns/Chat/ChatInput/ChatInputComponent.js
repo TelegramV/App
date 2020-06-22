@@ -383,7 +383,7 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     pickPhoto = (blob) => {
-        if(VUI.Modal.state.body.componentClass !== AttachPhotosModal) {
+        if (VUI.Modal.state.body.componentClass !== AttachPhotosModal) {
             VUI.Modal.open(<AttachPhotosModal media={[blob]}/>)
         } else {
             UIEvents.General.fire("upload.addPhoto", {blob: blob})
@@ -391,7 +391,7 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     pickFile = (blob, file) => {
-        if(VUI.Modal.state.body.componentClass !== AttachFilesModal) {
+        if (VUI.Modal.state.body.componentClass !== AttachFilesModal) {
             VUI.Modal.open(<AttachFilesModal media={[{
                 blob: blob,
                 file: file
@@ -454,7 +454,7 @@ export class ChatInputComponent extends StatelessComponent {
 
     }
 
-    onRecordingReady = (ev) => {
+    onRecordingReady = (array) => {
 
         if (this.isRemoveVoice) {
             this.isRemoveVoice = false
@@ -462,35 +462,28 @@ export class ChatInputComponent extends StatelessComponent {
         }
         // TODO refactor sending
         MTProto.TimeManager.generateMessageId().then(id => {
-            let reader = new FileReader();
-            reader.readAsArrayBuffer(ev.data);
-            reader.onloadend = (event) => {
-                // The contents of the BLOB are in reader.result:
-
-                AppSelectedChat.Current.api.sendMedia("", reader.result, {
-                    _: "inputMediaUploadedDocument",
-                    file: {
-                        _: "inputFile",
-                        id: id,
-                        parts: 1,
-                        name: "audio.ogg"
-                    },
-                    mime_type: "audio/ogg",
-                    attributes: [{
-                        //flags: 1024,
-                        duration: (+new Date() - this.recordingStarted)/1000,
-                        _: "documentAttributeAudio",
-                        voice: true,
-                        waveform: convertBits(this.waveform, 8, 5)
-                    },
-                        {
-                            _: "documentAttributeFilename",
-                            file_name: ""
-                        }
-                    ]
-                })
-            }
-            console.log("onRecordingReady", ev)
+            AppSelectedChat.Current.api.sendMedia("", array, {
+                _: "inputMediaUploadedDocument",
+                file: {
+                    _: "inputFile",
+                    id: id,
+                    parts: 1,
+                    name: "audio.ogg"
+                },
+                mime_type: "audio/ogg",
+                attributes: [{
+                    //flags: 1024,
+                    duration: (+new Date() - this.recordingStarted) / 1000,
+                    _: "documentAttributeAudio",
+                    voice: true,
+                    waveform: convertBits(this.waveform, 8, 5)
+                },
+                    {
+                        _: "documentAttributeFilename",
+                        file_name: ""
+                    }
+                ]
+            })
         })
     }
 
@@ -498,66 +491,72 @@ export class ChatInputComponent extends StatelessComponent {
         if (!this.isVoiceMode) return
         this.$el.querySelector(".send-button>.tgico-send").classList.remove("hidden")
         this.$el.querySelector(".send-button>.tgico-microphone2").classList.add("hidden")
+
         if (!this.microphone) {
-            navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
-                this.waveform = []
-                const processInput = audioProcessingEvent => {
-                    // console.log(this.waveform)
-                    const tempArray = new Uint8Array(analyser.frequencyBinCount);
+            import("../../../../../Utils/Recorder/Recorder").then(({default: Recorder}) => {
+                navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
+                    this.waveform = []
+                    const processInput = audioProcessingEvent => {
+                        // console.log(this.waveform)
+                        const tempArray = new Uint8Array(analyser.frequencyBinCount);
 
-                    analyser.getByteFrequencyData(tempArray);
-                    this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray) / 255 * 25 + 1, 4)})`
-                    this.waveform.push(Math.floor(getAverageVolume(tempArray) / 255 * 32))
-                }
-
-                const getAverageVolume = array => {
-                    const length = array.length;
-                    let values = 0;
-                    let i = 0;
-
-                    for (; i < length; i++) {
-                        values += array[i];
+                        analyser.getByteFrequencyData(tempArray);
+                        this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray) / 255 * 25 + 1, 4)})`
+                        this.waveform.push(Math.floor(getAverageVolume(tempArray) / 255 * 32))
                     }
 
-                    return values / length;
-                }
-                let AudioContext = window.AudioContext || window.webkitAudioContext;
-                this.audioContext = new AudioContext();
-                const input = this.audioContext.createMediaStreamSource(l);
-                const analyser = this.audioContext.createAnalyser();
-                const scriptProcessor = this.audioContext.createScriptProcessor();
+                    const getAverageVolume = array => {
+                        const length = array.length;
+                        let values = 0;
+                        let i = 0;
 
-                // Some analyser setup
-                analyser.smoothingTimeConstant = 0.3;
-                analyser.fftSize = 1024;
+                        for (; i < length; i++) {
+                            values += array[i];
+                        }
 
-                input.connect(analyser);
-                analyser.connect(scriptProcessor);
-                scriptProcessor.connect(this.audioContext.destination);
+                        return values / length;
+                    }
+                    let AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.audioContext = new AudioContext();
+                    const input = this.audioContext.createMediaStreamSource(l);
+                    const analyser = this.audioContext.createAnalyser();
+                    const scriptProcessor = this.audioContext.createScriptProcessor();
 
-                scriptProcessor.onaudioprocess = processInput;
+                    // Some analyser setup
+                    analyser.smoothingTimeConstant = 0.3;
+                    analyser.fftSize = 1024;
 
-                this.recorder = new MediaRecorder(l, {
-                    mimeType: "audio/webm;codecs=opus"
-                });
+                    input.connect(analyser);
+                    analyser.connect(scriptProcessor);
+                    scriptProcessor.connect(this.audioContext.destination);
 
-                this.recorder.addEventListener('dataavailable', l => this.onRecordingReady(l));
-                this.recorder.start()
-                this.microphone = l
+                    scriptProcessor.onaudioprocess = processInput;
 
-                document.addEventListener("mouseup", l => this.onMouseUp(l))
-                this.$el.querySelector(".delete-button").classList.add("open")
-                this.$el.querySelector(".voice-seconds").classList.remove("hidden")
-                this.$el.querySelector(".tgico-attach").classList.add("hidden")
+                    this.recorder = new Recorder({
+                        monitorGain: parseInt(0, 10),
+                        recordingGain: parseInt(1, 10),
+                        numberOfChannels: parseInt(1, 10),
+                        wavBitDepth: parseInt(16, 10),
+                    });
 
-                this.recordingStarted = +new Date()
+                    this.recorder.ondataavailable = l => this.onRecordingReady(l);
+                    this.recorder.start()
+                    this.microphone = l
 
-                this.i = 0
-                this.tickTimer()
+                    document.addEventListener("mouseup", l => this.onMouseUp(l))
+                    this.$el.querySelector(".delete-button").classList.add("open")
+                    this.$el.querySelector(".voice-seconds").classList.remove("hidden")
+                    this.$el.querySelector(".tgico-attach").classList.add("hidden")
 
+                    this.recordingStarted = +new Date()
+
+                    this.i = 0
+                    this.tickTimer()
+
+                })
             })
-            return
         }
+        
         console.error("MouseDown")
     }
 

@@ -2,14 +2,12 @@ import LoginPage from "../Pages/Login/LoginPage"
 import {MainPage} from "../Pages/Main/MainPage"
 import MTProto from "../../MTProto/External"
 import VApp from "../../V/vapp"
-import {VideoPlayerPage} from "../Pages/Tests/VideoPlayerPage"
 //import {VideoStreamingPage} from "../Pages/Tests/VideoStreaming"
 //import CalendarTestPage from "../Pages/Tests/CalendarTestPage"
 //import VirtualPage from "../Pages/Tests/VirtualPage"
 //import ElementsPage from "../Pages/Tests/Elements"
 //import ColumnsPage from "../Pages/Tests/Columns"
 //import CryptoTestPage from "../Pages/Tests/Crypto"
-import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage";
 //import NextGenPage from "../Pages/Tests/NextGen"
 //import {StreamingPage} from "../Pages/Tests/Streaming"
 //import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage"
@@ -30,6 +28,12 @@ function AppRoutes(router) {
             return MainPage()
         }
     })
+
+    // router.route("/voicefuck", "voicefuck", {
+    //     h() {
+    //         return voicefuck()
+    //     }
+    // })
 
     // router.route("/videoplayer", "videoplayer", {
     //     h() {
