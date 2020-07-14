@@ -597,12 +597,16 @@ export class ChatInputComponent extends StatelessComponent {
 
         const {text, messageEntities} = domToMessageEntities(this.textarea)
 
-        AppSelectedChat.Current.api.sendMessage({
-            text: text,
-            messageEntities: messageEntities,
-            replyTo: reply,
-            silent: silent
-        })
+        if(text === "🎲" || text === "🎯" || text === "🏀" || text === "⚽") {
+            AppSelectedChat.Current.api.sendDice(text);
+        } else {
+            AppSelectedChat.Current.api.sendMessage({
+                text: text,
+                messageEntities: messageEntities,
+                replyTo: reply,
+                silent: silent
+            })
+        }
 
         this.textarea.innerHTML = ""
         this.closeReply()
