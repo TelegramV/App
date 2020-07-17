@@ -274,6 +274,17 @@ export class PeerApi {
         })
     }
 
+    sendRawMedia(media) {
+        MTProto.invokeMethod("messages.sendMedia", {
+            peer: this.peer.inputPeer,
+            message: "",
+            media,
+            random_id: genMsgId()
+        }).then(response => {
+            MTProto.UpdatesManager.process(response)
+        })
+    }
+
     sendDice(emoji) {
         MTProto.invokeMethod("messages.sendMedia", {
             peer: this.peer.inputPeer,

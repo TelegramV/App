@@ -19,13 +19,13 @@ class DiceMessageComponent extends GeneralMessageComponent {
 
                 {
                     (this.state.sticker ? 
-                        <BetterStickerComponent width={200} document={sticker}
+                        <BetterStickerComponent width={200*0.625 /*TODO get that ratio from TG settings*/} document={sticker}
                                                 autoplay={true}
                                                 playOnHover={false}
                                                 paused={false}
                                                 onClick={this.suggestToSend}/>
                         :
-                        <div css-height={"200px"}/>)
+                        <div css-height={"125px"}/>)
                 }
 
                 <MessageTimeComponent message={message} bg={true}/>
@@ -43,7 +43,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
     }
 
     componentWillUpdate(nextProps) {
-        if (this.props.message.emoji !== nextProps.message.emoji) {
+        if (this.props.message.emoji !== nextProps.message.emoji || this.props.message.value !== nextProps.message.value) {
             this.assure(StickerManager.getDice(nextProps.message.value, nextProps.message.emoji)).then(sticker => {
                 this.setState({
                     sticker: sticker
@@ -62,14 +62,7 @@ const SnackbarSuggestion = ({emoji}) => {
     return (
         <div class="emoji-suggestion">
             Send a {emoji} emoji to any chat to try your luck.
-            <span class="send-button" onClick={_ => chat.api.sendMessage(
-                {
-                    text: "",
-                    media: {
-                        _:"inputMediaDice",
-                        emoticon: emoji
-                    }
-                 })}>SEND</span>
+            <span class="send-button" onClick={_ => chat.api.sendDice(emoji)}>SEND</span>
         </div>
         )
 }

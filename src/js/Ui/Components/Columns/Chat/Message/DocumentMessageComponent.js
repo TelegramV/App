@@ -63,7 +63,7 @@ class DocumentMessageComponent extends GeneralMessageComponent {
     render({showDate}) {
         const document = this.props.message.raw.media.document;
 
-        const title = DocumentMessagesTool.getFilename(document.attributes);
+        const title = DocumentMessagesTool.getFilename(document.attributes) || "Unknown file";
         const ext = title.split(".")[title.split(".").length - 1];
 
         const isDownloading = FileManager.isPending(document);

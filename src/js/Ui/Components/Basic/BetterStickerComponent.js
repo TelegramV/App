@@ -72,9 +72,16 @@ class BetterStickerComponent extends StatefulComponent {
             const playOnHover = props.playOnHover ?? true;
             const isPaused = props.paused ?? true;
 
+            const classes = {
+                sticker: true,
+                rp: true,
+                rps: true,
+                clickable: props.clickable
+            }
+
             return (
                 <div id={props.id}
-                     class="sticker rp rps"
+                     class={classes}
                      onClick={props.onClick}>
                     <Lottie width={width}
                             height={height}

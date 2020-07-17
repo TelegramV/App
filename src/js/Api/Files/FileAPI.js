@@ -257,17 +257,21 @@ export class FileAPI {
         })
     }
 
-    static async uploadDocument(bytes, name = "") {
-        return {
+    static async uploadDocument(bytes, name = "", params={}) {
+        let media = {
             _: "inputMediaUploadedDocument",
             file: await this.uploadFile(bytes, name),
-            attributes: [
-                {
+            mime_type: "application/octet-stream",
+            attributes: []
+        }
+        media = {...media, ...params}
+        if(!media.attributes.find(attr => attr._==="documentAttributeFilename")) { //append name if not set
+            media.attributes.push({
                     _: "documentAttributeFilename",
                     file_name: name
-                }
-            ]
+                })
         }
+        return media
     }
 
     static async uploadPhoto(bytes, name = "") {

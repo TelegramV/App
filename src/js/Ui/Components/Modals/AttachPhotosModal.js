@@ -89,10 +89,31 @@ export class AttachPhotosModal extends StatelessComponent {
         // console.log(media)
         const caption = this.captionRef.$el.querySelector("input").value.repeat(1); //force string clone
         VUI.Modal.close()
+
         AppSelectedChat.current.api.sendMessage({
             text: caption,
             media: media
         })
+
+        // SENDS PHOTO AS STICKER
+        // MUST BE .WEBP and should have 512px side
+        /*let file = await fetch(this.galleryRef.component.props.blobs[0]).then(r => r.arrayBuffer());
+        FileAPI.uploadDocument(file, "sticker", {
+            mime_type: "image/webp",
+            attributes: [
+                {
+                    "_": "documentAttributeSticker",
+                    alt: "",
+                    stickerset: {
+                        _: "inputStickerSetEmpty"
+                    }
+                }
+            ]
+        }).then( media => {
+            console.log("Sending", media)
+            AppSelectedChat.current.api.sendRawMedia(media)
+        })*/
+        
         
     }
 }

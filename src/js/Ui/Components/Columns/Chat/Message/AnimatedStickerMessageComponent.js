@@ -18,9 +18,14 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
                                     bubbleRef={this.bubbleRef}
                                     showDate={showDate}>
 
-                <BetterStickerComponent onClick={() => {
-                    VUI.Modal.open(<StickerSetModal set={stickerSet}/>)
-                }} width={200} document={message.raw.media.document}/>
+                <BetterStickerComponent 
+                    clickable={!stickerSet.isEmpty()}
+                    onClick={() => {
+                        if(!stickerSet.isEmpty()) VUI.Modal.open(<StickerSetModal set={stickerSet}/>)
+                    }} 
+                    width={200} 
+                    document={message.raw.media.document}
+                />
 
                 <MessageTimeComponent message={message} bg={true}/>
 
