@@ -14,6 +14,35 @@ class WebpHelper {
 		}
     }
 
+    //TODO maybe polyfill for Apple devices?
+    //image - blob or url
+    makeSticker(image) {
+        return new Promise((resolve, reject) => {
+            let canvas = document.createElement('canvas');
+            let context = canvas.getContext("2d");
+
+            let img = new Image();
+
+            img.onload = function() {
+                let max = Math.max(img.width, img.height);
+                let size = 512 / max;
+                canvas.width = img.width * size;
+                canvas.height = img.height * size;
+                context.drawImage(img, 0, 0, img.width * size, img.height * size);
+                context.canvas.toBlob(blob => {
+                    resolve(blob);
+                    canvas.remove();
+                }, "image/webp", 1);
+            }
+
+            if(image instanceof Blob) {
+                img.src = URL.createObjectURL(image);
+            } else {
+                img.src = image;
+            }
+        });
+    }
+
     shouldConvert() {
     	return safari;
     }

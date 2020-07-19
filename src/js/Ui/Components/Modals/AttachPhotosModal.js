@@ -22,8 +22,11 @@ import {FileAPI} from "../../../Api/Files/FileAPI";
 import {Layouter} from "../../Utils/layout";
 import VUI from "../../VUI"
 import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import VInput from "../../Elements/Input/VInput"
+import VCheckbox from "../../Elements/Input/VCheckbox"
 import UIEvents from "../../EventBus/UIEvents"
+import WebpHelper from "../../Utils/WebpHelper"
 
 class GalleryFragment extends StatelessComponent {
     render() {
@@ -57,9 +60,13 @@ class GalleryFragment extends StatelessComponent {
     }
 }
 
-export class AttachPhotosModal extends StatelessComponent {
+export class AttachPhotosModal extends StatefulComponent {
     captionRef = VComponent.createFragmentRef()
     galleryRef = VComponent.createComponentRef()
+
+    state = {
+        asSticker: false
+    }
 
     appEvents(E) {
         E.bus(UIEvents.General)
@@ -72,6 +79,7 @@ export class AttachPhotosModal extends StatelessComponent {
             <div className="padded">
                 <GalleryFragment ref={this.galleryRef} blobs={props.media}/>
                 <VInput ref={this.captionRef} label="Caption"/>
+                <VCheckbox label="As sticker" checked={this.state.asSticker} onClick={() => {this.setState({asSticker: true})}}/>
             </div>
         </div>
     }
@@ -90,30 +98,33 @@ export class AttachPhotosModal extends StatelessComponent {
         const caption = this.captionRef.$el.querySelector("input").value.repeat(1); //force string clone
         VUI.Modal.close()
 
-        AppSelectedChat.current.api.sendMessage({
-            text: caption,
-            media: media
-        })
+        if(this.state.asSticker) {
+            this.sendAsSticker();
+        } else {
+            AppSelectedChat.current.api.sendMessage({
+                text: caption,
+                media: media
+            })
+        }
+    }
 
-        // SENDS PHOTO AS STICKER
-        // MUST BE .WEBP and should have 512px side
-        /*let file = await fetch(this.galleryRef.component.props.blobs[0]).then(r => r.arrayBuffer());
-        FileAPI.uploadDocument(file, "sticker", {
-            mime_type: "image/webp",
-            attributes: [
-                {
-                    "_": "documentAttributeSticker",
-                    alt: "",
-                    stickerset: {
-                        _: "inputStickerSetEmpty"
+    async sendAsSticker() {
+        for(let l of this.galleryRef.component.props.blobs) {
+            let file = await WebpHelper.makeSticker(l).then(blob => blob.arrayBuffer());
+            FileAPI.uploadDocument(file, "sticker.webp", {
+                mime_type: "image/webp",
+                attributes: [
+                    {
+                        _: "documentAttributeSticker",
+                        alt: "",
+                        stickerset: {
+                            _: "inputStickerSetEmpty"
+                        }
                     }
-                }
-            ]
-        }).then( media => {
-            console.log("Sending", media)
-            AppSelectedChat.current.api.sendRawMedia(media)
-        })*/
-        
-        
+                ]
+            }).then( media => {
+                AppSelectedChat.current.api.sendRawMedia(media)
+            })
+        }
     }
 }

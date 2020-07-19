@@ -12,6 +12,7 @@ import VApp from "../../V/vapp"
 //import {StreamingPage} from "../Pages/Tests/Streaming"
 //import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage"
 //import ElementsPage from "../Pages/Tests/Elements"
+//import CanvasTestPage from "../Pages/Tests/CanvasTest"
 
 /**
  * @param {VFrameworkRouter} router
@@ -28,6 +29,12 @@ function AppRoutes(router) {
             return MainPage()
         }
     })
+
+    //router.route("/canvas", "canvas", {
+    //    h() {
+    //        return CanvasTestPage()
+    //    }
+    //})
 
     // router.route("/voicefuck", "voicefuck", {
     //     h() {
