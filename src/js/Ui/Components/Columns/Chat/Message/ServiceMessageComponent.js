@@ -9,7 +9,6 @@ import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
 class ServiceMessageComponent extends GeneralMessageComponent {
     render() {
         const photo = this.props.message?.action?.photo;
-        console.log(photo)
         const message = this.prepare();
         return (
             <div className="service">

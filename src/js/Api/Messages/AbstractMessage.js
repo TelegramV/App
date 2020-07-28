@@ -163,6 +163,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.parsedText;
     }
 
+    get reactions() {
+        return this.raw?.reactions;
+    }
+
     get to(): Peer {
         if (this._to) {
             return this._to

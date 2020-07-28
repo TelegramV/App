@@ -55,6 +55,26 @@ function getPeerDialogs({peers}) {
     })
 }
 
+/*function getMessageReactionsList(inputPeer, msg_id, limit = 10, reaction = undefined, offset = undefined) {
+    return MTProto.invokeMethod("messages.getMessageReactionsList", {
+        peer: inputPeer,
+        id: msg_id,
+        reaction: reaction,
+        offset: offset,
+        limit: limit
+    })
+}*/
+
+function sendReaction(inputPeer, msg_id, reaction = undefined) {
+    return MTProto.invokeMethod("messages.sendReaction", {
+        peer: inputPeer,
+        msg_id: msg_id,
+        reaction: reaction,
+    }).then(updates => {
+        UpdatesManager.process(updates)
+    })
+}
+
 function searchGlobal(params) {
     return MTProto.invokeMethod("messages.searchGlobal", {
         q: params.q,
@@ -248,6 +268,8 @@ const messages = {
     closePoll: closePoll,
     getPollResults: getPollResults,
     getPollVotes: getPollVotes,
+    sendReaction: sendReaction,
+    //getMessageReactionsList: getMessageReactionsList,
 }
 
 export default messages

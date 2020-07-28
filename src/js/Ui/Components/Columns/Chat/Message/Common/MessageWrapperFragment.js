@@ -12,6 +12,7 @@ import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer"
 import API from "../../../../../../Api/Telegram/API"
 import PeerName from "../../../../Reactive/PeerName"
 import AppSelectedChat from "../../../../../Reactive/SelectedChat"
+import ReactionsAddModal from "../../../../Modals/ReactionsAddModal"
 
 function ReplyToMessageFragment({message}) {
     if (!message.raw.reply_to_msg_id) {
@@ -61,6 +62,13 @@ function createContextMenu(message) {
             title: "Forward",
             onClick: () => {
                 UIEvents.General.fire("message.forward", {message, from: message.dialog.peer})
+            }
+        },
+        {
+            icon: "smile",
+            title: "Add reaction",
+            onClick: () => {
+                VUI.Modal.open(<ReactionsAddModal message={message}/>);
             }
         },
         {
