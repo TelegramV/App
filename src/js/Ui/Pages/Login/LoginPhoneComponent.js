@@ -76,6 +76,11 @@ class LoginPhoneComponent extends StatefulComponent {
                     loginState.setQRView();
                 }} isFlat>Or try login using QR-code</VButton>
 
+                {false /*remove to enable*/ && <VButton isUppercase={false} onClick={event => {
+                    event.preventDefault();
+                    loginState.setBotView();
+                }} isFlat>Beep-boop, I am bot</VButton> }
+
                 <form onSubmit={canSubmit && this.onSendPhoneClick} className="login-page-inputs">
                     <VInputDropdown label="Country"
                                     items={countries}

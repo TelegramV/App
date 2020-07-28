@@ -35,6 +35,14 @@ const sendCode = (phoneNumber, dcId = null) => {
     }), dcId)
 }
 
+const importBotAuthorization = (token, dcId = null) => { //bot_auth_token
+    return MTProto.invokeMethod("auth.importBotAuthorization", Object.assign({
+        api_id: AppConfiguration.mtproto.api.api_id,
+        api_hash: AppConfiguration.mtproto.api.api_hash,
+        bot_auth_token: token
+    }), dcId)
+}
+
 const signIn = (phoneNumber, phoneCodeHash, phoneCode, dcId = null) => {
     return MTProto.invokeMethod("auth.signIn", Object.assign({
         phone_number: phoneNumber,
@@ -75,6 +83,7 @@ function logOut() {
 
 const auth = {
     sendCode: sendCode,
+    importBotAuthorization: importBotAuthorization,
     signIn: signIn,
     signUp: signUp,
     checkPassword: checkPassword,

@@ -7,8 +7,9 @@ import PeersStore from "../../../../../Api/Store/PeersStore"
 import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent"
 
 class ServiceMessageComponent extends GeneralMessageComponent {
-    render({showDate/*????*/}) {
+    render() {
         const photo = this.props.message?.action?.photo;
+        console.log(photo)
         const message = this.prepare();
         return (
             <div className="service">
@@ -55,11 +56,19 @@ class ServiceMessageComponent extends GeneralMessageComponent {
         }
 
         if (type === "messageActionChatEditPhoto") {
-            if (message.from.type === "channel") {
-                return "Channel photo updated";
+            if(action.photo?.video_sizes) {
+                if (message.from.type === "channel") {
+                    return "Channel video updated";
+                }
+                return [this.wrapPeer(message.from),
+                    " changed group video"]
+            } else {
+                if (message.from.type === "channel") {
+                    return "Channel photo updated";
+                }
+                return [this.wrapPeer(message.from),
+                    " changed group photo"]
             }
-            return [this.wrapPeer(message.from),
-                " updated group photo"]
         }
 
         if (type === "messageActionChatCreate") {

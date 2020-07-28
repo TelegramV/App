@@ -24,6 +24,7 @@ import LoginCodeComponent from "./LoginCodeComponent"
 import LoginPasswordComponent from "./LoginPasswordComponent"
 import LoginRegisterComponent from "./LoginRegisterComponent"
 import LoginQRComponent from "./LoginQRComponent"
+import LoginBotComponent from "./LoginBotComponent"
 
 class LoginPageComponent extends StatefulComponent {
     globalState = {
@@ -40,6 +41,7 @@ class LoginPageComponent extends StatefulComponent {
                 {stage === "password" && <LoginPasswordComponent/>}
                 {stage === "register" && <LoginRegisterComponent/>}
                 {stage === "qr" && <LoginQRComponent/>}
+                {stage === "bot" && <LoginBotComponent/>}
             </div>
         )
     }
