@@ -48,6 +48,7 @@ export class SupergroupPeer extends ChannelPeer {
      * @return {Promise<*>}
      */
     fetchFull() {
+        if(this._full) return Promise.resolve(this._full);
         return MTProto.invokeMethod("channels.getFullChannel", {
             channel: this.input
         }).then(channelFull => {
@@ -58,6 +59,9 @@ export class SupergroupPeer extends ChannelPeer {
             this.fire("fullLoaded")
 
             this.findPinnedMessage()
+            this._photo.fillFull(this._full.chat_photo);
+
+            return this._full;
         })
     }
 

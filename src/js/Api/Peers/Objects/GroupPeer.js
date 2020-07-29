@@ -44,6 +44,7 @@ export class GroupPeer extends Peer {
      * @return {Promise<*>}
      */
     fetchFull() {
+        if(this._full) return Promise.resolve(this._full);
         return MTProto.invokeMethod("messages.getFullChat", {
             chat_id: this.id
         }).then(chatFull => {
@@ -60,6 +61,9 @@ export class GroupPeer extends Peer {
             this.fire("fullLoaded")
 
             this.findPinnedMessage()
+            this._photo.fillFull(this._full.chat_photo);
+
+            return this._full;
         })
     }
 

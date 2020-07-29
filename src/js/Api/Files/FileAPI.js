@@ -74,7 +74,7 @@ export class FileAPI {
             const limit = options?.limit ?? DEFAULT_PART_SIZE;
 
             return FileAPI.downloadAllParts(location, size.size, limit, photo.dc_id, onPartDownloaded)
-                .then(file => FileAPI.getBlob(file, "image/jpeg"))
+                .then(file => FileAPI.getBlob(file, options?.type || "image/jpeg"))
                 .then(blob => FileAPI.putToCache(photo, blob, size))
         })
     }
@@ -410,15 +410,20 @@ export class FileAPI {
         return (file.sizes || file.thumbs) && (file.sizes || file.thumbs).some(l => l.type === "i")
     }
 
-    static getMaxSize(file, onlyThumb = false) {
+    static getMaxSize(file, onlyThumb = true) {
         if (!onlyThumb) {
             const video = FileAPI.getAttribute(file, "documentAttributeVideo")
             if (video) {
                 return video
             }
+            if(file.video_sizes) {
+                return file.video_sizes.reduce(function (prev, current) {
+                    return (prev.w > current.w) ? prev : current
+                })
+            }
         }
 
-        return (file.sizes || file.thumbs).reduce(function (prev, current) {
+        return (file.sizes || file.thumbs).filter(el => el._ === "photoSize").reduce(function (prev, current) {
             return (prev.w > current.w) ? prev : current
         })
     }
