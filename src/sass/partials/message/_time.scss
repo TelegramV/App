@@ -22,23 +22,30 @@
                 display: flex;
 
                 .reaction {
-                    position: relative;
-                    margin: 2px 5px;
+                    margin: 2px;
+                    display: flex;
 
                     .count {
-                        position: absolute;
                         border-radius: 50%;
                         padding: 2px;
-                        font-size: 9px;
+                        margin: 0 2px;
+                        font-size: 12px;
+                        line-height: 16px;
+                        min-width: 16px;
+                        min-height: 16px;
                         background-color: $verylightgrey;
-                        color: $darkgrey;
-                        right: 0;
-                        bottom: 0;
+                        color: $darkgreytext;
+                        font-weight: 500;
+                        text-align: center;
+
+                        &.chosen {
+                        	background-color: darken($lightgreen, 20);
+                        }
                     }
 
                     .emoji {
-                        height: 25px;
-                        width: 25px;
+                        height: 20px;
+                        width: 20px;
                     }
                 }
             }

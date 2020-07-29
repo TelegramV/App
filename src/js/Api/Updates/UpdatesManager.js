@@ -40,6 +40,7 @@ import processUpdateMessagePoll from "./Update/Message/processUpdateMessagePoll"
 import processUpdateMessagePollVote from "./Update/Message/processUpdateMessagePollVote"
 import processUpdateEditChannelMessage from "./Update/Message/processUpdateEditChannelMessage"
 import processUpdateNewChannelMessage from "./Update/Message/processUpdateNewChannelMessage"
+import processUpdateMessageReactions from "./Update/Message/processUpdateMessageReactions"
 import processUpdateDraftMessage from "./Update/processUpdateDraftMessage"
 import processUpdateNewStickerSet from "./Update/processUpdateNewStickerSet"
 import processUpdateStickerSets from "./Update/processUpdateStickerSets"
@@ -92,6 +93,7 @@ export class UpdateManager extends Manager {
         this.subscribe("updateMessagePollVote", processUpdateMessagePollVote)
         this.subscribe("updateEditChannelMessage", processUpdateEditChannelMessage)
         this.subscribe("updateNewChannelMessage", processUpdateNewChannelMessage)
+        this.subscribe("updateMessageReactions", processUpdateMessageReactions)
         this.subscribe("updateDraftMessage", processUpdateDraftMessage)
         this.subscribe("updateNewStickerSet", processUpdateNewStickerSet)
         this.subscribe("updateStickerSets", processUpdateStickerSets)

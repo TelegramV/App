@@ -18,7 +18,11 @@ const MessageTimeComponent = ({message, bg = false, color}) => {
     if(message.reactions) {
         //console.log(message.reactions);
         for(let count of message.reactions.results) {
-            reactions.push(<div class="reaction">{count.reaction}<div class="count">{count.count}</div></div>);
+        	let classes = {
+        		count: true,
+        		chosen: count.chosen
+        	}
+            reactions.push(<div class="reaction">{count.reaction}<div class={classes}>{count.count}</div></div>);
         }
     }
 
