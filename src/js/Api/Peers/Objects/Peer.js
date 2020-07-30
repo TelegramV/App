@@ -301,6 +301,7 @@ export class Peer extends ReactiveObject {
      * @return {Promise<*>}
      */
     fetchFull() {
+        if(this._full) return Promise.resolve(this._full);
         return MTProto.invokeMethod("users.getFullUser", {
             id: this.input
         }).then(userFull => {
@@ -309,6 +310,9 @@ export class Peer extends ReactiveObject {
             this.fire("fullLoaded")
 
             this.findPinnedMessage()
+            this._photo.fillFull(this._full.profile_photo);
+
+            return this._full;
         })
     }
 

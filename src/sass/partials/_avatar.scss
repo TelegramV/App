@@ -3,6 +3,7 @@
   width: var(--avatar-size);
   height: var(--avatar-size);
   border-radius: 50%;
+  overflow: hidden;
   background-repeat: no-repeat;
   background-size: contain;
   position: relative;
@@ -18,6 +19,11 @@
   span {
     position: absolute;
     z-index: 10;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
   }
 
   .avatar-outer {

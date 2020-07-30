@@ -2,9 +2,9 @@ import ChatInfoStatusComponent from "./ChatInfoStatusComponent"
 import ChatInfoNameComponent from "./ChatInfoNameComponent"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
-import ChatInfoAvatarComponent from "./ChatInfoAvatarComponent"
 import VApp from "../../../../../V/vapp"
 import UIEvents from "../../../../EventBus/UIEvents"
+import AvatarComponent from "../../../Basic/AvatarComponent"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
 class ChatInfoComponent extends StatelessComponent {
@@ -21,7 +21,7 @@ class ChatInfoComponent extends StatelessComponent {
 
                     <div class="responsive-only-mobile btn-icon tgico-back" onClick={this.backToMainPage}/>
 
-                    <ChatInfoAvatarComponent/>
+                    <AvatarComponent peer={AppSelectedChat.current}/>
 
                     <div className="content" onClick={this.openPeerInfo}>
 
@@ -40,6 +40,7 @@ class ChatInfoComponent extends StatelessComponent {
         if (!AppSelectedChat.current?.full) {
             AppSelectedChat.current?.fetchFull()
         }
+        this.forceUpdate();
     }
 
     openPeerInfo = () => {
