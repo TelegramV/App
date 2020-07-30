@@ -316,6 +316,25 @@ export class Peer extends ReactiveObject {
         })
     }
 
+    //from existing media
+    updateProfilePhoto(userPhoto) {
+        let photo = userPhoto.photo
+
+        return MTProto.invokeMethod("photos.updateProfilePhoto", {
+            id: {
+                _: "inputPhoto",
+                id: photo.id,
+                access_hash: photo.access_hash,
+                file_reference: photo.file_reference
+            }
+        }).then(userProfilePhoto => {
+            this._photo.fillRaw(userProfilePhoto);
+            this._full = null;
+            this.fetchFull();
+            return userProfilePhoto;
+        })
+    }
+
     get pinnedMessage() {
         return this.messages.getById(this.pinnedMessageId);
     }

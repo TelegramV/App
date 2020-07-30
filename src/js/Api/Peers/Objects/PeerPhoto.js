@@ -175,7 +175,7 @@ export class PeerPhoto {
      * @return {Promise<string>}
      */
     fetchSmall() {
-        if(this.smallUrl) return this.smallUrl
+        if(this._photoSmallUrl) return this._photoSmallUrl
         this._isFetchingSmall = true
 
         if (!this._photoSmall) {
@@ -190,10 +190,11 @@ export class PeerPhoto {
     }
 
     /**
+     * Fetching big from full user
      * @return {Promise<string>}
      */
     async fetchBig() {
-        if(this.bigUrl) return this.bigUrl;
+        if(this._photoBigUrl) return this._photoBigUrl;
         this._isFetchingBig = true
 
         if(!this._photo) {
