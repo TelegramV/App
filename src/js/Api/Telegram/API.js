@@ -23,6 +23,7 @@ import contacts from "./contacts"
 import upload from "./upload"
 import channels from "./channels"
 import account from "./account"
+import langpack from "./langpack"
 
 const API = {
     auth,
@@ -31,6 +32,7 @@ const API = {
     channels,
     contacts,
     upload,
+    lang: langpack
 }
 
 export default API

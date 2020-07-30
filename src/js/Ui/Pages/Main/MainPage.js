@@ -11,7 +11,8 @@ import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
-import Localization from "../../../Api/Localization/Localization";
+import EmojiLangpack from "../../../Api/Localization/EmojiLangpack";
+import Locale from "../../../Api/Localization/Locale";
 import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
 import {throttle} from "../../../Utils/func"
 import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
@@ -36,7 +37,8 @@ function initHighLevelManagers() {
     StickerManager.fetchSpecialSets();
     WallpaperManager.init();
     FoldersManager.init()
-    Localization.init();
+    EmojiLangpack.init();
+    Locale.init();
 }
 
 function vhFix() {

@@ -107,9 +107,9 @@ export class PeerPhoto {
                 this.fetchVideo()
                 return this._videoUrl
             }
-            let startTime = this._photo?.video_sizes[0]?.video_start_ts;
-            let suffix = startTime ? ("#t="+startTime) : ""
-            let url = suffix ? (this._videoUrl + suffix) : this._videoUrl;
+            let startTime = 0;
+            if(this._photo?.video_sizes) startTime = this._photo.video_sizes[0].video_start_ts
+            let url = this._videoUrl ? (this._videoUrl + "#t=" + startTime) : null
             return url;
         } else {
             return ""

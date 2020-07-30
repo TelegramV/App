@@ -28,23 +28,24 @@ import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import {Folders} from "./Folders";
 import {SearchComponent} from "../Search/SearchComponent";
 import {isMobile} from "../../../../Utils/utils";
+import Locale from "../../../../../Api/Localization/Locale"
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
         {
             icon: "newgroup",
-            title: "New group",
+            title: Locale.l("lng_create_group_title"),
             onClick: _ => {
             }
         },
         {
             icon: "newprivate",
-            title: "Contacts"
+            title: Locale.l("lng_menu_contacts"),
         },
         () => {
             return {
                 icon: "archive",
-                title: "Archived",
+                title: Locale.l("lng_archived_name"),
                 counter: archivedCount,
                 onClick: _ => {
                     UIEvents.Sidebars.fire("push", ArchivedSidebar)
@@ -54,7 +55,7 @@ export const DialogsBarContextMenu = (event, archivedCount) => {
         },
         {
             icon: "savedmessages",
-            title: "Saved",
+            title: Locale.l("lng_saved_messages"),
             onClick: _ => {
                 const p = PeersStore.self().username ? `@${PeersStore.self().username}` : `user.${PeersStore.self().id}`
 
@@ -67,14 +68,14 @@ export const DialogsBarContextMenu = (event, archivedCount) => {
         },
         {
             icon: "settings",
-            title: "Settings",
+            title: Locale.l("lng_menu_settings"),
             onClick: _ => {
                 UIEvents.Sidebars.fire("push", SettingsSidebar)
             }
         },
         {
             icon: "help",
-            title: "Help"
+            title: Locale.l("lng_linux_menu_help"), //idk why only on linux
         }
     ], event.target)
 }
