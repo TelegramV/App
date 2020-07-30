@@ -37,7 +37,7 @@ class AvatarComponent extends StatefulComponent {
         }
     }
 
-    componentWillUpdate(nextProps) {
+    componentWillUpdate(nextProps, nextState) {
         if(nextProps.alwaysPlay) {
             nextProps.peer?.photo.fetchVideo(); //preload if autoplay
         }

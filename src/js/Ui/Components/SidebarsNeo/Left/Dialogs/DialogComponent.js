@@ -21,7 +21,6 @@ export class DialogComponent extends StatelessComponent {
 
     timeFragmentRef = VComponent.createFragmentRef()
     textFragmentRef = VComponent.createFragmentRef()
-    avatarFragmentRef = VComponent.createFragmentRef()
     unreadCountFragmentRef = VComponent.createFragmentRef()
     unreadMentionsCountFragmentRef = VComponent.createFragmentRef()
     unreadMarkFragmentRef = VComponent.createFragmentRef()
@@ -67,8 +66,6 @@ export class DialogComponent extends StatelessComponent {
 
         R.object(this.props.dialog.peer)
             .on("messages.new", this.onDialogNewMessage)
-            .on("updatePhoto", this.onPeerUpdatePhoto)
-            .on("updatePhotoSmall", this.onPeerUpdatePhoto)
             .on("updateUserStatus", this.onPeerUpdateUserStatus)
     }
 
@@ -79,7 +76,6 @@ export class DialogComponent extends StatelessComponent {
                             contextMenu={dialogContextMenu(this.props.dialog, this.props.folderId)}
                             timeFragmentRef={this.timeFragmentRef}
                             textFragmentRef={this.textFragmentRef}
-                            avatarFragmentRef={this.avatarFragmentRef}
                             unreadCountFragmentRef={this.unreadCountFragmentRef}
                             unreadMentionsCountFragmentRef={this.unreadMentionsCountFragmentRef}
                             unreadMarkFragmentRef={this.unreadMarkFragmentRef}
@@ -160,10 +156,6 @@ export class DialogComponent extends StatelessComponent {
 
     onDialogUnreadMark = _ => {
         this.unreadMarkFragmentRef.patch()
-    }
-
-    onPeerUpdatePhoto = _ => {
-        this.avatarFragmentRef.patch()
     }
 
     onPeerUpdateUserStatus = _ => {

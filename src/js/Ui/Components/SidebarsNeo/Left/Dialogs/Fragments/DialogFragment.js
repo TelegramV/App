@@ -1,6 +1,6 @@
 import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer"
 import AppSelectedChat from "../../../../../Reactive/SelectedChat"
-import {DialogAvatarFragment} from "./DialogAvatarFragment"
+import AvatarComponent from "../../../../Basic/AvatarComponent"
 import {DialogTimeFragment} from "./DialogTimeFragment"
 import {DialogTextFragment} from "./DialogTextFragment"
 import {DialogUnreadMentionsCountBadge} from "./DialogUnreadMentionsCountBadge"
@@ -12,7 +12,6 @@ export const DialogFragment = (
         dialog,
         contextMenu,
         click,
-        avatarFragmentRef,
         timeFragmentRef,
         textFragmentRef,
         unreadMentionsCountFragmentRef,
@@ -48,8 +47,7 @@ export const DialogFragment = (
              onClick={click}
              onContextMenu={contextMenu}>
 
-            <DialogAvatarFragment ref={avatarFragmentRef}
-                                  peer={dialog.peer}/>
+            <AvatarComponent peer={dialog.peer}/>
 
             <div className="content">
 
