@@ -20,6 +20,7 @@ export class SupergroupPeer extends ChannelPeer {
         return "channel"
     }
 
+    // @deprecated
     get statusString() {
         let status = ""
         let isLoading = false
@@ -41,6 +42,42 @@ export class SupergroupPeer extends ChannelPeer {
             text: status,
             online: false,
             isLoading
+        }
+    }
+
+    get status() {
+        if (!this.full) {
+            return {
+                key: "lng_profile_loading",
+                //isLoading: true
+            }
+        }
+        const participantsCount = this.full.participants_count
+        const onlineCount = this.full.online_count
+        const members = {
+            key: "lng_chat_status_members",
+            count: participantsCount,
+            replaces: {
+                count: participantsCount
+            }
+        }
+
+        if (onlineCount > 0) {
+            return {
+                key: "lng_chat_status_members_online",
+                replaces: {
+                    members_count: members,
+                    online_count: {
+                        key: "lng_chat_status_online",
+                        count: onlineCount,
+                        replaces: {
+                            count: onlineCount
+                        }
+                    }
+                }
+            }
+        } else {
+            return members;
         }
     }
 

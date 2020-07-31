@@ -23,6 +23,7 @@ export class ChannelPeer extends Peer {
         return "channel"
     }
 
+    // @deprecated
     get statusString() {
         let status = ""
         let isLoading = false
@@ -39,6 +40,24 @@ export class ChannelPeer extends Peer {
             online: false,
             isLoading
         }
+    }
+
+    get status() {
+        if (!this.full) {
+            return {
+                key: "lng_profile_loading",
+                //isLoading: true
+            }
+        }
+        let subscribers = this.full.participants_count;
+        return {
+            key: "lng_chat_status_subscribers",
+            count: subscribers,
+            replaces: {
+                count: subscribers
+            }
+        }
+
     }
 
     get bannedRights() {

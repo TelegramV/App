@@ -47,17 +47,21 @@ class Locale {
 	/*
 		* Method for plural strings
 	*/
-	lp(key="NO_TRANSLATION_KEY_PROVIDED", count=1, replaces = []) {
+	lp(key="NO_TRANSLATION_KEY_PROVIDED", count=1, replaces = {}) {
+		if(key.key) return this.lp(key.key, key.count, key.replaces); //if object passed
+
 		let value = this.strings?.get(key);
 		if(!value) return key;
 		let found = key;
 		if(!value._plural) {
 			found = value;
 		} else {
-			found = value[this.countToPluralCode(count)] || key;
+			found = value[this.countToPluralCode(count)] || value.other; 
 		}
-		for(let replace of replaces) {
-			found = found.replace(`{${replace}}`);
+		for(let replace in replaces) {
+			let text = replaces[replace];
+			if(text.key) text = this.lp(text.key, text.count, text.replaces); //allow recursive replaces
+			found = found.replace(`{${replace}}`, text);
 		}
 		return found;
 	}

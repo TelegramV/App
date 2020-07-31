@@ -4,9 +4,23 @@ import {ReactiveObject} from "../../V/Reactive/ReactiveObject"
 import {Peer} from "../Peers/Objects/Peer"
 import PeersStore from "../Store/PeersStore"
 import AppEvents from "../EventBus/AppEvents"
-import {actionTypesMapping} from "../../Ui/Components/SidebarsNeo/Left/Dialogs/Fragments/DialogTextFragment"
 import DialogsManager from "./DialogsManager"
 import MTProto from "../../MTProto/External"
+
+export const actionTypesMapping = {
+    sendMessageTypingAction: ["lng_user_typing", "lng_users_typing", "lng_many_typing"],
+    sendMessageRecordVideoAction: "lng_send_action_record_video",
+    sendMessageUploadVideoAction: "lng_send_action_upload_video",
+    sendMessageRecordAudioAction: "lng_send_action_record_audio",
+    sendMessageUploadAudioAction: "lng_send_action_upload_audio",
+    sendMessageUploadPhotoAction: "lng_send_action_upload_photo",
+    sendMessageUploadDocumentAction: "lng_send_action_upload_file",
+    sendMessageGeoLocationAction: null, //idk, can't find those strings
+    sendMessageChooseContactAction: null,
+    sendMessageGamePlayAction: ["lng_user_playing_game", "lng_many_playing_game"],
+    sendMessageRecordRoundAction: "lng_send_action_record_round",
+    sendMessageUploadRoundAction: "lng_send_action_upload_round",
+}
 
 export class Dialog extends ReactiveObject {
 
@@ -47,7 +61,7 @@ export class Dialog extends ReactiveObject {
             if (peer) {
                 this._actions.set(peer, {
                     showUsername: peer !== this.peer,
-                    text: actionTypesMapping[rawUpdate.action._],
+                    key: actionTypesMapping[rawUpdate.action._],
                     time: MTProto.TimeManager.now(true)
                 })
             }
@@ -56,17 +70,20 @@ export class Dialog extends ReactiveObject {
         }
     }
 
-    get actionText() {
+    get action() {
         let typing = []
+        let gaming = []
         let other = []
 
         const mapped = Array.from(this.actions.entries()).map(([peer, action]) => {
-            const actionString = action.text
+            const actionKey = action.key
 
-            if (peer && actionString) {
+            if (peer && actionKey) {
                 if (action.showUsername) {
-                    if (actionString === actionTypesMapping.sendMessageTypingAction) {
+                    if (actionKey === actionTypesMapping.sendMessageTypingAction) {
                         typing.push(peer.firstName)
+                    } else if(actionKey === actionTypesMapping.sendMessageGamePlayAction) {
+                        gaming.push(peer.firstName)
                     } else {
                         other.push(peer.firstName)
                     }
@@ -74,28 +91,53 @@ export class Dialog extends ReactiveObject {
 
                 return {
                     user: action.showUsername ? peer.firstName : "",
-                    action: actionString
+                    action: Array.isArray(actionKey) ? actionKey[0] : actionKey
                 }
             }
 
             return false
         })
 
+        if(gaming.length > 1 && typing.length === 0 && other.length === 0) {
+            return {
+                key: actionTypesMapping.sendMessageGamePlayAction[1],
+                count: gaming.length,
+                replaces: {
+                    count: gaming.length
+                },
+                isAction: true
+            }
+        }
+
         if (typing.length === 2 && other.length === 0) {
             return {
-                user: `${typing[0]} and ${typing[1]} are typing`,
-                action: ""
+                key: actionTypesMapping.sendMessageTypingAction[1],
+                replaces: {
+                    user: typing[0],
+                    second_user: typing[1]
+                },
+                isAction: true
             }
         }
 
         if ((typing.length + other.length) >= 2) {
             return {
-                user: `${typing.length + other.length} members are typing`,
-                action: ""
+                key: actionTypesMapping.sendMessageTypingAction[2],
+                count: typing.length,
+                replaces: {
+                    count: typing.length
+                },
+                isAction: true
             }
         }
 
-        return mapped[0] || false
+        return {
+            key: mapped[0].action,
+            replaces: {
+                user: mapped[0].user
+            },
+            isAction: true
+        }
     }
 
     removeAction(peer) {

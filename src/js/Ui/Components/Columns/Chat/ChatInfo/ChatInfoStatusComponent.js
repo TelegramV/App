@@ -3,9 +3,9 @@ import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import UIEvents from "../../../../EventBus/UIEvents"
 import classNames from "../../../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf"
-import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
+import TranslatableStatefulComponent from "../../../../../V/VRDOM/component/TranslatableStatefulComponent"
 
-class ChatInfoStatusComponent extends StatefulComponent {
+class ChatInfoStatusComponent extends TranslatableStatefulComponent {
     state = {
         isLoading: false,
     };
@@ -37,19 +37,19 @@ class ChatInfoStatusComponent extends StatefulComponent {
             )
         }
 
-        const isOnline = this.statusLine.online;
-        const isLoading = this.statusLine.isAction || this.statusLine.isLoading;
-        const text = this.statusLine.text;
+        const status = this.status;
+
+        const isLoading = status.isAction || status.isLoading;
+        const text = status ? this.lp(status) : "";
 
         const classes = classNames(
             "info",
-            classIf(isOnline, "online"),
             classIf(isLoading, "loading-text"),
         )
 
         return (
             <div className="bottom">
-                <div hideIf={AppSelectedChat.isSelected && AppSelectedChat.Current.isSelf}
+                <div hideIf={AppSelectedChat.Current?.isSelf}
                      className={classes}>{text}</div>
             </div>
         )
@@ -57,28 +57,15 @@ class ChatInfoStatusComponent extends StatefulComponent {
 
     get action() {
         if (AppSelectedChat.Current && AppSelectedChat.Current.dialog && AppSelectedChat.Current.dialog.actions.size > 0) {
-            const action = AppSelectedChat.Current.dialog.actionText
-
-            if (action) {
-                return action.user + " " + action.action
-            }
+            return AppSelectedChat.Current.dialog.action
         }
-
-        return false
     }
 
-    get statusLine() {
+    get status() {
         if (AppSelectedChat.isNotSelected) {
             return {}
         }
-
-        const action = this.action
-
-        if (action) {
-            return {text: action, isAction: true, isLoading: false}
-        }
-
-        return AppSelectedChat.Current.statusString
+        return this.action ||AppSelectedChat.Current.status;
     }
 
     onChatLoading = ({isLoading}) => {
