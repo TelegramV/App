@@ -103,8 +103,8 @@ export function domToMessageEntities(elem) {
     }
 }
 
-function getNewlines(str, ignore = false) {
-    if (ignore) {
+export function getNewlines(str, ignore = false) {
+    if (!str || ignore) {
         return str
     }
     let elements = []

@@ -1,6 +1,6 @@
 import AppSelectedInfoPeer from "../../Reactive/SelectedInfoPeer"
 
-const AvatarFragment = ({peer, saved, showVideo, alwaysPlay, onClick, onMouseEnter, onMouseLeave}) => {
+const AvatarFragment = ({peer, noSaved, showVideo, alwaysPlay, onClick, onMouseEnter, onMouseLeave}) => {
     //console.log("onMouseEnter", onMouseEnter)
     if (!peer) {
         return (
@@ -19,7 +19,7 @@ const AvatarFragment = ({peer, saved, showVideo, alwaysPlay, onClick, onMouseEnt
         onClick = () => AppSelectedInfoPeer.select(peer)
     }
 
-    if (saved && peer.isSelf) {
+    if (!noSaved && peer.isSelf) {
         return (
             <div onClick={onClick}
                  className="avatar placeholder-saved placeholder-icon">

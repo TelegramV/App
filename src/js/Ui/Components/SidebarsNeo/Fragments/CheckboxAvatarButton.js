@@ -1,6 +1,7 @@
 import Button from "./Button";
 import AvatarComponent from "../../Basic/AvatarComponent";
 import VCheckbox from "../../../Elements/Input/VCheckbox";
+import Locale from "../../../../Api/Localization/Locale"
 
 function CheckboxAvatarButton({peer, checked = false, isNameAsText = false, isStatusAsDescription = false, ...otherArgs}) {
     return <Button left={<>
@@ -9,7 +10,7 @@ function CheckboxAvatarButton({peer, checked = false, isNameAsText = false, isSt
     </>} {...otherArgs}
                    text={isNameAsText ? peer.name : otherArgs.text}
                    // description={isNumberAsDescription ? "+" + peer.phone : otherArgs.description}
-                   description={isStatusAsDescription ? peer.statusString.text : otherArgs.description}
+                   description={isStatusAsDescription ? Locale.lp(peer.status) : otherArgs.description}
 
     />
 }

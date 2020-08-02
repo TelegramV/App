@@ -137,10 +137,14 @@ export class Peer extends ReactiveObject {
         return this.raw.username
     }
 
-    get statusString() {
-        return {
-            text: "...",
-            online: false
+    get status() {
+        return {}
+    }
+
+    get online() {
+        const now = MTProto.TimeManager.now(true);
+        if(this.raw?.status?._ === "userStatusOnline") {
+            return this.raw.status.expires > now
         }
     }
 

@@ -2,13 +2,13 @@ import {replaceEmoji} from "../../../../Utils/replaceEmoji";
 import {AttachLinkModal} from "../../../Modals/AttackLinkModal";
 import UIEvents from "../../../../EventBus/UIEvents"
 import VUI from "../../../../VUI"
-import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import TranslatableStatelessComponent from "../../../../../V/VRDOM/component/TranslatableStatelessComponent"
 
-export class TextareaFragment extends StatelessComponent {
+export class TextareaFragment extends TranslatableStatelessComponent {
 
     render() {
         return <div className="textarea empty"
-                    placeholder="Message"
+                    placeholder={this.l("lng_message_ph")}
                     contentEditable
                     onInput={this.onInput}
                     onKeyPress={this.onKeyPress}
@@ -163,37 +163,37 @@ export class TextareaFragment extends StatelessComponent {
         this.saveSelection()
         VUI.ContextMenu.listener([
             {
-                title: "Bold",
+                title: this.l("lng_menu_formatting_bold"),
                 after: "Ctrl+B",
                 onClick: this.bold
             },
             {
-                title: "Italic",
+                title: this.l("lng_menu_formatting_italic"),
                 after: "Ctrl+I",
                 onClick: this.italic
             },
             {
-                title: "Underline",
+                title: this.l("lng_menu_formatting_underline"),
                 after: "Ctrl+U",
                 onClick: this.underline
             },
             {
-                title: "Strikethrough",
+                title: this.l("lng_menu_formatting_strike_out"),
                 after: "Ctrl+Shift+X",
                 onClick: this.strikethrough
             },
             {
-                title: "Monospace",
+                title: this.l("lng_menu_formatting_monospace"),
                 after: "Ctrl+Shift+M",
                 onClick: this.monospace
             },
             {
-                title: "Create link",
+                title: this.l("lng_menu_formatting_link_create"),
                 after: "Ctrl+K",
                 onClick: this.createLink
             },
             {
-                title: "Normal text",
+                title: this.l("lng_menu_formatting_clear"),
                 after: "Alt+N",
                 onClick: this.clear
             }

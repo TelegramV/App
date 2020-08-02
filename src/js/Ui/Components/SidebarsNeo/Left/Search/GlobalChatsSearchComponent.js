@@ -7,6 +7,7 @@ import {highlightVRNodeWord} from "../../../../Utils/highlightVRNodeText"
 import ContactComponent from "../../../Basic/ContactComponent"
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import {Section} from "../../Fragments/Section";
+import Locale from "../../../../../Api/Localization/Locale"
 
 let CURRENT_QUERY = undefined
 
@@ -14,7 +15,7 @@ const ContactFragmentItemTemplate = (peer) => {
     return <ContactComponent peer={peer}
                              fetchFull={true}
                              name={highlightVRNodeWord(peer.name, CURRENT_QUERY)}
-                             status={() => peer.statusString.text}
+                             status={() => Locale.lp(peer.status)}
                              onClick={() => AppSelectedChat.select(peer)}/>
 }
 

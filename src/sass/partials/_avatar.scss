@@ -42,7 +42,7 @@
   }
 
   &.placeholder-icon {
-    font-size: 48px;
+    font-size: calc(var(--avatar-size) / 1.25)
   }
 
   &.placeholder-saved {

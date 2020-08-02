@@ -26,7 +26,7 @@ export class GroupPeer extends Peer {
     }
 
     refreshOnlineCount() {
-        this.onlineCount = this._participants.filter(peer => peer.statusString.online).length
+        this.onlineCount = this._participants.filter(peer => peer.online).length
     }
 
     get participants(): Array < Peer > {
@@ -65,34 +65,6 @@ export class GroupPeer extends Peer {
 
             return this._full;
         })
-    }
-
-    // @deprecated
-    get statusString() {
-        let status = ""
-        let isLoading = false
-        if (this.full) {
-            const participantsCount = this.full.participants.participants.length
-            const onlineCount = this.onlineCount
-
-            const user = participantsCount === 1 ? "member" : "members"
-
-            if (onlineCount > 0) {
-                status = `${participantsCount} ${user}, ${onlineCount} online`
-            } else {
-                status = `${participantsCount} ${user}`
-            }
-
-        } else {
-            status = "loading info"
-            isLoading = true
-        }
-
-        return {
-            text: status,
-            online: false,
-            isLoading
-        }
     }
 
     get status() {

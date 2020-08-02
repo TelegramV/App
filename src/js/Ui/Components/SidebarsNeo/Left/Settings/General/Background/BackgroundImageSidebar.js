@@ -39,7 +39,7 @@ export class BackgroundImageSidebar extends LeftSidebar {
     }
 
     get title(): string | * {
-        return "Chat Background"
+        return this.l("lng_settings_section_background")
     }
 
     componentDidMount() {

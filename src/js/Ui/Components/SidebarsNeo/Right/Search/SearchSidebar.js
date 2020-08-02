@@ -61,6 +61,7 @@ export class SearchSidebar extends RightSidebar {
     }
 
     appEvents(E: AE) {
+        super.appEvents(E);
         E.bus(UIEvents.Sidebars)
             .on("setSearchQuery", this.onSetSearchQuery)
 

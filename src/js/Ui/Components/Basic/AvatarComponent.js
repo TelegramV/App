@@ -19,7 +19,7 @@ class AvatarComponent extends StatefulComponent {
     /* peer can be null */
     render() {
         return <AvatarFragment peer={this.props.peer}
-                               saved={this.props.saved}
+                               noSaved={this.props.noSaved}
                                onClick={this.props.onClick}
                                showVideo={this.state.hover}
                                alwaysPlay={this.props.alwaysPlay}
@@ -45,7 +45,7 @@ class AvatarComponent extends StatefulComponent {
 }
 
 AvatarComponent.defaultProps = {
-    saved: false
+    noSaved: false
 };
 
 export default AvatarComponent

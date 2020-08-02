@@ -20,31 +20,6 @@ export class SupergroupPeer extends ChannelPeer {
         return "channel"
     }
 
-    // @deprecated
-    get statusString() {
-        let status = ""
-        let isLoading = false
-        if (this.full) {
-            const user = this.full.participants_count === 1 ? "member" : "members"
-
-            // if (this.full.online_count > 0) { // implement online later
-            //     status = `${this.full.participants_count} ${user}, ${this.full.online_count} online`
-            // } else {
-            status = `${this.full.participants_count} ${user}`
-            // }
-
-        } else {
-            status = "loading info"
-            isLoading = true
-        }
-
-        return {
-            text: status,
-            online: false,
-            isLoading
-        }
-    }
-
     get status() {
         if (!this.full) {
             return {

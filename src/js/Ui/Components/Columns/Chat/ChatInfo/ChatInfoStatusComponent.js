@@ -32,7 +32,7 @@ class ChatInfoStatusComponent extends TranslatableStatefulComponent {
         if (AppSelectedChat.isSelected && AppSelectedChat.current.messages.isDownloadingRecent) {
             return (
                 <div className="bottom">
-                    <div className="info loading-text">loading messages</div>
+                    <div className="info">{this.l("lng_profile_loading")}</div>
                 </div>
             )
         }

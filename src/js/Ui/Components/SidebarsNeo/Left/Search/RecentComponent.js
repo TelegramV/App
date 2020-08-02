@@ -8,12 +8,13 @@ import List from "../../../../../V/VRDOM/list/List"
 import VArray from "../../../../../V/VRDOM/list/VArray"
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import {Section} from "../../Fragments/Section";
+import Locale from "../../../../../Api/Localization/Locale"
 
 const ContactFragmentItemTemplate = (peer) => {
     return <ContactComponent peer={peer}
                              fetchFull={true}
                              name={peer.name}
-                             status={() => peer.statusString.text}
+                             status={() => Locale.lp(peer.status)}
                              onClick={() => AppSelectedChat.select(peer)}/>
 }
 
