@@ -15,6 +15,16 @@ export class RadioSection extends StatefulComponent {
         </Section>
     }
 
+    componentWillUpdate(nextProps, nextState) {
+        let list = this.props.radios
+        for(let i = 0; i<list.length; i++) {
+            if(list[i].checked) {
+                nextState.checked = i;
+                return;
+            }
+        }
+    }
+
     check(index) {
         this.setState({
             checked: index

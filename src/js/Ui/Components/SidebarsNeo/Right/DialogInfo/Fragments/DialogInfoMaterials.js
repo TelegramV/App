@@ -17,6 +17,7 @@ import {DialogInfoLinkComponent} from "./DialogInfoLinkComponent";
 import {DialogInfoAudioComponent} from "./DialogInfoAudioComponent";
 import DialogInfoDocumentComponent from "./DialogInfoDocumentComponent";
 import {DialogInfoMemberComponent} from "./DialogInfoMemberComponent";
+import Locale from "../../../../../../Api/Localization/Locale"
 
 export class DialogInfoMaterials extends StatelessComponent {
     contentRefs = {
@@ -79,26 +80,26 @@ export class DialogInfoMaterials extends StatelessComponent {
         const showMembers = AppSelectedInfoPeer.Current.type === "chat" || (AppSelectedInfoPeer.Current.type === "channel" && AppSelectedInfoPeer.Current.isSupergroup)
         this.tabItems = [
             {
-                text: "Members",
+                text: Locale.l("lng_profile_participants_section"),
                 hidden: !showMembers,
                 selected: showMembers,
                 click: this.openMembers,
             },
             {
-                text: "Media",
+                text: Locale.l("lng_info_tab_media"),
                 click: this.openMedia,
                 selected: !showMembers
             },
             {
-                text: "Docs",
+                text: Locale.l("lng_media_type_files"),
                 click: this.openDocs,
             },
             {
-                text: "Links",
+                text: Locale.l("lng_media_type_links"),
                 click: this.openLinks,
             },
             {
-                text: "Audio",
+                text: Locale.l("lng_media_type_songs"),
                 click: this.openAudio,
             }
         ]

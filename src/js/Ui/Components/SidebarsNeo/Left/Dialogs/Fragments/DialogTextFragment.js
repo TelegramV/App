@@ -1,17 +1,4 @@
-export const actionTypesMapping = {
-    sendMessageTypingAction: "is typing",
-    sendMessageRecordVideoAction: "is recording a video",
-    sendMessageUploadVideoAction: "is uploading a video",
-    sendMessageRecordAudioAction: "is recording a voice message",
-    sendMessageUploadAudioAction: "is uploading a voice message",
-    sendMessageUploadPhotoAction: "is uploading a photo",
-    sendMessageUploadDocumentAction: "is uploading a file",
-    sendMessageGeoLocationAction: "is selecting a location to share",
-    sendMessageChooseContactAction: "is selecting a contact to share",
-    sendMessageGamePlayAction: "is playing a game",
-    sendMessageRecordRoundAction: "is recording a round video to share",
-    sendMessageUploadRoundAction: "is uploading a round video",
-}
+import Locale from "../../../../../../Api/Localization/Locale"
 
 function Draft({id, text, entities}) {
     return (
@@ -22,11 +9,10 @@ function Draft({id, text, entities}) {
     )
 }
 
-function Action({id, user, action}) {
+function Action({id, text}) {
     return (
         <div id={id} className="message loading-text">
-            <span className="sender">{user}</span>
-            {" " + action}
+            {" "+text}
         </div>
     )
 }
@@ -56,10 +42,11 @@ export const DialogTextFragment = ({id, dialog}) => {
             <Draft id={id} text={dialog.draft.message} entities={dialog.draft.entities}/>
         )
     } else if (dialog.actions.size > 0) {
-        const action = dialog.actionText
+        const action = dialog.action
 
         if (action) {
-            return <Action user={action.user} action={action.action}/>
+            let actionText = Locale.lp(action);
+            return <Action text={actionText}/>
         }
     }
 

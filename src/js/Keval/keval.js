@@ -18,15 +18,21 @@ export function useKeval(dbPromise, storeName: string) {
     };
 }
 
-const DEFAULT_DB_PROMISE = openDB(defaultDbName, 1, {
-    upgrade(db) {
-        db.createObjectStore(defaultStoreName);
-        db.createObjectStore("authorization");
+const DEFAULT_DB_PROMISE = openDB(defaultDbName, 2, {
+    upgrade(db, oldVersion, newVersion, transaction) {
+        if(oldVersion < 1) {
+            db.createObjectStore(defaultStoreName);
+            db.createObjectStore("authorization");
+        }
+        if(oldVersion < 2) {
+            db.createObjectStore("localization");
+        }
     },
 });
 
 const keval = {
     auth: useKeval(DEFAULT_DB_PROMISE, "authorization"),
+    lang: useKeval(DEFAULT_DB_PROMISE, "localization"),
 
     keys: () => DEFAULT_DB_PROMISE.then(db => db.getAllKeys(defaultStoreName)),
     clear: () => DEFAULT_DB_PROMISE.then(db => db.clear(defaultStoreName)),

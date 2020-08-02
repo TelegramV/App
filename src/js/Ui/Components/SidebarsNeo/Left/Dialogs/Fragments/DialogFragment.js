@@ -6,6 +6,7 @@ import {DialogTextFragment} from "./DialogTextFragment"
 import {DialogUnreadMentionsCountBadge} from "./DialogUnreadMentionsCountBadge"
 import {DialogUnreadCountBadge} from "./DialogUnreadCountBadge"
 import {DialogUnreadMarkBadge} from "./DialogUnreadMarkBadge"
+import Locale from "../../../../../../Api/Localization/Locale"
 
 export const DialogFragment = (
     {
@@ -26,7 +27,7 @@ export const DialogFragment = (
     const personClasses = {
         "person": true,
         "rp": true,
-        "online": peer instanceof UserPeer && peer.onlineStatus.online,
+        "online": peer instanceof UserPeer && peer.online,
         "active": AppSelectedChat.check(dialog.peer),
         "unread": dialog.peer.messages.unreadMentionsCount > 0 || dialog.peer.messages.unreadCount > 0 || dialog.unreadMark,
         "muted": dialog.isMuted,
@@ -53,7 +54,7 @@ export const DialogFragment = (
 
                 <div className="top">
                     <div className="title">
-                        {peer.isSelf ? "Saved Messages" : peer.name}
+                        {peer.isSelf ? Locale.l("lng_saved_messages") : peer.name}
                     </div>
 
                     <div className="status tgico"/>

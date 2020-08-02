@@ -3,6 +3,7 @@ import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
 import UIEvents from "../../../../EventBus/UIEvents"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import Locale from "../../../../../Api/Localization/Locale"
 
 class ChatInfoNameComponent extends StatelessComponent {
 
@@ -22,7 +23,7 @@ class ChatInfoNameComponent extends StatelessComponent {
 
         return (
             <div className="title" onClick={this.openPeerInfo}>
-                {AppSelectedChat.current.isSelf ? "Saved Messages" : AppSelectedChat.Current.name}
+                {AppSelectedChat.current.isSelf ? Locale.l("lng_saved_messages") : AppSelectedChat.Current.name}
             </div>
         )
     }

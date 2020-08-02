@@ -1,17 +1,15 @@
 import "./GenericSidebar.scss";
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
 import FloatingActionButton from "./Fragments/FloatingActionButton";
-import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent";
+import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent";
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf";
 import UIEvents from "../../EventBus/UIEvents";
 import VSimpleLazyInput from "../../Elements/Input/VSimpleLazyInput";
 import VComponent from "../../../V/VRDOM/component/VComponent";
 import Search from "./Fragments/Search";
 
-export class GenericSidebar extends StatefulComponent {
+export class GenericSidebar extends TranslatableStatefulComponent {
     searchInputRef = VComponent.createComponentRef()
-
-    searchPlaceholder = "Search"
 
     init() {
         super.init()
@@ -22,6 +20,7 @@ export class GenericSidebar extends StatefulComponent {
         } else {
             this.state.reallyHidden = this.state.hidden
         }
+        this.searchPlaceholder = "Search";
     }
 
     compareWith(other) {

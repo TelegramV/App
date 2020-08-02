@@ -324,17 +324,15 @@ export class FileAPI {
         })
     }
 
-    static uploadProfilePhoto(name, bytes) {
-        const id = [Random.nextInteger(0xffffffff), Random.nextInteger(0xffffffff)]
+    static async uploadProfilePhoto(photoBytes, videoBytes, videoStart = 0) {
+        let photo = await this.uploadFile(photoBytes);
+        let video = await this.uploadFile(videoBytes);
 
-        return this.saveFilePart(id, bytes).then(MTProto.invokeMethod("photos.uploadProfilePhoto", {
-            file: {
-                _: "inputFile",
-                id,
-                parts: 1,
-                name: name
-            }
-        }))
+        return MTProto.invokeMethod("photos.uploadProfilePhoto", {
+            file: photo,
+            video,
+            video_start_ts: videoStart
+        })
     }
 
     static obsolete_getFileLocation(location, dcID = null, offset = 0) {

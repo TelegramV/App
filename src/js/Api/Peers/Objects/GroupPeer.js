@@ -1,14 +1,14 @@
-import {Peer} from "./Peer";
+import { Peer } from "./Peer";
 import MTProto from "../../../MTProto/External";
 import PeersStore from "../../Store/PeersStore"
-import {UserPeer} from "./UserPeer"
+import { UserPeer } from "./UserPeer"
 import PeersManager from "../PeersManager"
 
 export class GroupPeer extends Peer {
 
     _onlineCount = 0
 
-    _participants: Array<UserPeer> = []
+    _participants: Array < UserPeer > = []
 
     constructor(rawPeer, dialog = undefined) {
         super(rawPeer, dialog)
@@ -26,14 +26,14 @@ export class GroupPeer extends Peer {
     }
 
     refreshOnlineCount() {
-        this.onlineCount = this._participants.filter(peer => peer.statusString.online).length
+        this.onlineCount = this._participants.filter(peer => peer.online).length
     }
 
-    get participants(): Array<Peer> {
+    get participants(): Array < Peer > {
         return this._participants
     }
 
-    set participants(peers: Array<UserPeer>) {
+    set participants(peers: Array < UserPeer > ) {
         this._participants = peers
         //console.log(this._participants)
         this._participants.forEach(p => p && p.participateIn.add(this))
@@ -44,7 +44,7 @@ export class GroupPeer extends Peer {
      * @return {Promise<*>}
      */
     fetchFull() {
-        if(this._full) return Promise.resolve(this._full);
+        if (this._full) return Promise.resolve(this._full);
         return MTProto.invokeMethod("messages.getFullChat", {
             chat_id: this.id
         }).then(chatFull => {
@@ -67,30 +67,41 @@ export class GroupPeer extends Peer {
         })
     }
 
-    get statusString() {
-        let status = ""
-        let isLoading = false
-        if (this.full) {
-            const participantsCount = this.full.participants.participants.length
-            const onlineCount = this.onlineCount
-
-            const user = participantsCount === 1 ? "member" : "members"
-
-            if (onlineCount > 0) {
-                status = `${participantsCount} ${user}, ${onlineCount} online`
-            } else {
-                status = `${participantsCount} ${user}`
+    get status() {
+        if (!this.full) {
+            return {
+                key: "lng_profile_loading",
+                //isLoading: true
             }
+        }
+        const participantsCount = this.full.participants.participants.length
+        const onlineCount = this.onlineCount
 
-        } else {
-            status = "loading info"
-            isLoading = true
+        const members = {
+            key: "lng_chat_status_members",
+            count: participantsCount,
+            replaces: {
+                count: participantsCount
+            }
         }
 
-        return {
-            text: status,
-            online: false,
-            isLoading
+        if (onlineCount > 0) {
+            console.log(onlineCount)
+            return {
+                key: "lng_chat_status_members_online",
+                replaces: {
+                    members_count: members,
+                    online_count: {
+                        key: "lng_chat_status_online",
+                        count: onlineCount,
+                        replaces: {
+                            count: onlineCount
+                        }
+                    }
+                }
+            }
+        } else {
+            return members;
         }
     }
 

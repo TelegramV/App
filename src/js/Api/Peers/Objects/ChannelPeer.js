@@ -23,22 +23,22 @@ export class ChannelPeer extends Peer {
         return "channel"
     }
 
-    get statusString() {
-        let status = ""
-        let isLoading = false
-        if (this.full) {
-            const user = this.full.participants_count === 1 ? "member" : "members"
-            status = `${this.full.participants_count} ${user}`
-        } else {
-            status = "loading info"
-            isLoading = true
+    get status() {
+        if (!this.full) {
+            return {
+                key: "lng_profile_loading",
+                //isLoading: true
+            }
+        }
+        let subscribers = this.full.participants_count;
+        return {
+            key: "lng_chat_status_subscribers",
+            count: subscribers,
+            replaces: {
+                count: subscribers
+            }
         }
 
-        return {
-            text: status,
-            online: false,
-            isLoading
-        }
     }
 
     get bannedRights() {

@@ -8,10 +8,17 @@ export class BotPeer extends UserPeer {
         }
     }
 
+    // @deprecated
     get statusString() {
         return {
             text: "bot",
             online: false
+        }
+    }
+
+    get status() {
+        return {
+            key: "lng_status_bot"
         }
     }
 

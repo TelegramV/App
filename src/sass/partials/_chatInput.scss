@@ -238,7 +238,7 @@
                     }
 
                     &.empty::before {
-                        content: "Message";
+                        content: attr(placeholder);
                         display: inline-block;
                         color: $grey;
                         cursor: text;

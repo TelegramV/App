@@ -31,12 +31,12 @@ export class SettingsSidebar extends LeftSidebar {
             <Subheader isLoading={!me}>{me ? "+" + me.phone : ""}</Subheader>
 
             <Section>
-                <IconButton icon="edit" text="Edit Profile" onClick={_ => {}}/>
-                <IconButton icon="folder" text="Chat Folders" onClick={_ => UIEvents.Sidebars.fire("push", FoldersSidebar)}/>
-                <IconButton icon="settings" text="General Settings" onClick={_ => UIEvents.Sidebars.fire("push", GeneralSidebar)}/>
-                <IconButton icon="unmute" text="Notifications" onClick={_ => UIEvents.Sidebars.fire("push", NotificationsSidebar)}/>
-                <IconButton icon="lock" text="Privacy and Security" onClick={_ => UIEvents.Sidebars.fire("push", PrivacySidebar)}/>
-                <IconButton icon="language" text="Language" onClick={_ => UIEvents.Sidebars.fire("push", LanguageSidebar)}/>
+                <IconButton icon="edit" text={this.l("lng_settings_information")} onClick={_ => {}}/>
+                <IconButton icon="folder" text={this.l("lng_settings_section_filters")} onClick={_ => UIEvents.Sidebars.fire("push", FoldersSidebar)}/>
+                <IconButton icon="settings" text={this.l("lng_settings_section_general")} onClick={_ => UIEvents.Sidebars.fire("push", GeneralSidebar)}/>
+                <IconButton icon="unmute" text={this.l("lng_settings_section_notify")} onClick={_ => UIEvents.Sidebars.fire("push", NotificationsSidebar)}/>
+                <IconButton icon="lock" text={this.l("lng_settings_section_privacy")} onClick={_ => UIEvents.Sidebars.fire("push", PrivacySidebar)}/>
+                <IconButton icon="language" text={this.l("lng_settings_language")} onClick={_ => UIEvents.Sidebars.fire("push", LanguageSidebar)}/>
             </Section>
         </this.contentWrapper>
     }
@@ -67,7 +67,7 @@ export class SettingsSidebar extends LeftSidebar {
     }
 
     get title(): string | * {
-        return "Settings"
+        return this.l("lng_menu_settings")
     }
 
 
@@ -75,7 +75,7 @@ export class SettingsSidebar extends LeftSidebar {
         VUI.ContextMenu.openBelow([
             {
                 icon: "logout",
-                title: "Log out",
+                title: this.l("lng_settings_logout"),
                 onClick: _ => {
                     logout()
                 }

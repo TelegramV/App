@@ -1,6 +1,6 @@
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
-import Localization from "../../../../../Api/Localization/Localization"
+import EmojiLangpack from "../../../../../Api/Localization/EmojiLangpack"
 import {ChatInputManager} from "./ChatInputComponent"
 import {text2emoji} from "../../../../Plugins/EmojiTextInterceptor"
 
@@ -114,7 +114,7 @@ export default class SuggestionComponent extends StatefulComponent {
         }
 
         if (key) {
-            Localization.suggestEmojis(key).then(list => {
+            EmojiLangpack.suggestEmojis(key).then(list => {
                 if (list.length == 0) {
                     this.setState({
                         currentSuggestion: []
