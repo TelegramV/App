@@ -5,17 +5,15 @@ import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
 
 class GIFMessageComponent extends GeneralMessageComponent {
 
-    render({showDate}) {
+    render({message, showDate}) {
         return (
-            <MessageWrapperFragment message={this.props.message} showUsername={false}
-                                    bubbleRef={this.bubbleRef} outerPad={this.props.message.text.length > 0}
+            <MessageWrapperFragment message={message} showUsername={false}
+                                    bubbleRef={this.bubbleRef} outerPad={message.text.length > 0}
                                     showDate={showDate}>
-                <BetterVideoComponent document={this.props.message.raw.media.document}
-                                      muted
+                <BetterVideoComponent document={message.raw.media.document}
                                       autoDownload
-                                      autoPlay
                                       playOnHover/>
-                <MessageTimeComponent message={this.props.message} bg={true}/>
+                <MessageTimeComponent message={message} bg={true}/>
             </MessageWrapperFragment>
         )
     }
