@@ -15,6 +15,7 @@ import PeersStore from "./Api/Store/PeersStore"
 
 import keval from "./Keval/keval"
 import API from "./Api/Telegram/API"
+import {FileAPI} from "./Api/Files/FileAPI"
 
 import "./globals"
 import "./polyfills"
@@ -31,6 +32,7 @@ if (__IS_PRODUCTION__) {
     window.invoke = MTProto.invokeMethod
     window.devkeval = keval
     window.telegram = API
+    window.files = FileAPI
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)
