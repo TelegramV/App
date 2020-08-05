@@ -35,7 +35,7 @@ function getLastSeenKey(timestamp, now) {
         }
     }
 
-    let date = new Date(timestamp).toLocaleDateString("en", {year: "2-digit", month: "2-digit", day: "2-digit"});
+    let date = new Date(timestamp*1000).toLocaleDateString("en", {year: "2-digit", month: "2-digit", day: "2-digit"});
     return {
         key: "lng_status_lastseen_date",
         replaces: {
