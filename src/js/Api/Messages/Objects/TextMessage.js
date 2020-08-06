@@ -16,7 +16,7 @@ export class TextMessage extends AbstractMessage {
     			//check for gaps
     			let previousEnd = 0;
     			for(let emoji of emojis) {
-    				if(emoji.indices[0]-previousEnd > 1) return false;
+    				if(emoji.indices[0] - previousEnd > 0) return false;
     				previousEnd = emoji.indices[1];
     			}
     			return true;
