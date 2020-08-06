@@ -20,7 +20,6 @@ export class GenericSidebar extends TranslatableStatefulComponent {
         } else {
             this.state.reallyHidden = this.state.hidden
         }
-        this.searchPlaceholder = "Search";
     }
 
     compareWith(other) {
@@ -238,6 +237,9 @@ export class GenericSidebar extends TranslatableStatefulComponent {
         return true
     }
 
+    get searchPlaceholder() {
+        return this.l("lng_dlg_filter")
+    }
 
     get isStatic() {
         return false

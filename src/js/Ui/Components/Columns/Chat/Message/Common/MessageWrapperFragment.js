@@ -136,7 +136,7 @@ function MessageWrapperFragment(
 
             <MessageAvatarComponent message={message} show={!message.hideAvatar}/>
             <div className={contentClasses} onContextMenu={contextMenuHandler}>
-                <ReplyToMessageFragment message={message}/>
+                {!transparent && <ReplyToMessageFragment message={message}/>}
                 <ForwardedHeaderFragment message={message}/>
                 {username ? <PeerName peer={message.from} chat={message.to} template={(peer) => {
                     return <div class="peer-name"><div css-cursor="pointer" className="username"
@@ -145,6 +145,9 @@ function MessageWrapperFragment(
                 {slot}
             </div>
             {inlineKeyboard}
+            <div class="side">
+                {transparent && <ReplyToMessageFragment message={message}/>}
+            </div>
         </div>
     )
 

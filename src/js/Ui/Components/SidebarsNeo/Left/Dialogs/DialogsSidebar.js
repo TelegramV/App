@@ -89,8 +89,6 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
 
     searchOpen = false
 
-    searchPlaceholder = "Telegram Search"
-
     init() {
         FoldersManager.fetchFolders()
     }
@@ -261,4 +259,8 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
     get headerBorder(): boolean {
         return false
     }
+
+    /*get searchPlaceholder() {
+        return "Telegram Search"
+    }*/
 }

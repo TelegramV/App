@@ -34,11 +34,29 @@
     .message {
         display: grid;
         position: relative;
-        grid-template-areas: "avatar message" "empty keyboard";
-        grid-template-columns: min-content fit-content(480px);
+        grid-template-columns: min-content fit-content(480px) min-content;
 
         filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
         //filter: none;
+        &.in {
+            grid-template-areas: 
+                "avatar message side"
+                "empty keyboard e";
+
+            .side {
+                @include reply($in: true, $transparent: true);
+            }
+        }
+
+        &.out {
+            grid-template-areas: 
+                "side message avatar" 
+                "empty keyboard e";
+
+            .side {
+                @include reply($in: false, $transparent: true);
+            }
+        }
 
         @include mobile {
             grid-template-columns: min-content fit-content(90%);
@@ -88,7 +106,6 @@
 
             &.transparent {
                 @include header($in: true, $transparent: true);
-                @include reply($in: true, $transparent: true);
             }
 
             .text-wrapper {
@@ -121,7 +138,6 @@
                 padding-right: 0;
 
                 @include header($in: false, $transparent: true);
-                @include reply($in: false, $transparent: true);
             }
 
             a, a > span {
@@ -177,7 +193,7 @@
                 }
 
                 &.big {
-                    span {
+                    &>span:first-child {
                         line-height: 2em;
                         .emoji {
                             width: 2.5em;
@@ -226,6 +242,10 @@
                     text-decoration: underline;
                 }
             }
+        }
+
+        .side {
+            grid-area: side;
         }
     }
 }

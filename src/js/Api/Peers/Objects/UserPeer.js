@@ -1,6 +1,7 @@
 import { Peer } from "./Peer";
 import { GroupPeer } from "./GroupPeer"
 import MTProto from "../../../MTProto/External"
+import Locale from "../../Localization/Locale"
 
 
 function getLastSeenKey(timestamp, now) {
@@ -59,7 +60,7 @@ export class UserPeer extends Peer {
 
     get name() {
         if (this.isDeleted) {
-            return "Deleted Account"
+            return Locale.l("lng_deleted")
         }
 
         return this.firstName + (this.lastName.length > 0 ? " " + this.lastName : "")

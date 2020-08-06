@@ -16,7 +16,9 @@ const AvatarFragment = ({peer, noSaved, showVideo, alwaysPlay, onClick, onMouseE
     let hasAvatar = !photo.isEmpty //&& !photo._isFetchingSmall
 
     if (!onClick) {
-        onClick = () => AppSelectedInfoPeer.select(peer)
+        onClick = () => {
+            AppSelectedInfoPeer.select(peer)
+        }
     }
 
     if (!noSaved && peer.isSelf) {
