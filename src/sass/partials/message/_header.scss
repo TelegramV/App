@@ -1,10 +1,10 @@
 @mixin header($in: false, $transparent: false) {
 
-    & .username,
+    & .peer-name,
     & .fwd {
         font-weight: 500;
         font-size: 14px;
-        margin: 6px 11px -8px 0px;
+        margin: 6px 6px -8px 0px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -30,6 +30,23 @@
 
         & ~ figure, & ~ .grouped {
             margin-top: 10px;
+        }
+    }
+
+    & .peer-name {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        .username, .rank {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .rank {
+            padding-left: 10px;
+            color: $darkgreytext;
+            font-weight: normal;
         }
     }
 

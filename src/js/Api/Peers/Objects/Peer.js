@@ -281,6 +281,10 @@ export class Peer extends ReactiveObject {
         return this.raw._
     }
 
+    getPeerRank(peer) {
+        return "";
+    }
+
     /**
      * Fetches all peer photos
      */

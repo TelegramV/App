@@ -138,9 +138,9 @@ function MessageWrapperFragment(
             <div className={contentClasses} onContextMenu={contextMenuHandler}>
                 <ReplyToMessageFragment message={message}/>
                 <ForwardedHeaderFragment message={message}/>
-                {username ? <PeerName peer={message.from} template={(peer) => {
-                    return <div css-cursor="pointer" className="username"
-                                onClick={() => AppSelectedInfoPeer.select(peer)}>{peer.name}</div>
+                {username ? <PeerName peer={message.from} chat={message.to} template={(peer) => {
+                    return <div class="peer-name"><div css-cursor="pointer" className="username"
+                                onClick={() => AppSelectedInfoPeer.select(peer)}>{peer.name}</div> <div class="rank">{message.to.getPeerRank(message.from)}</div></div>
                 }}/> : ""}
                 {slot}
             </div>
