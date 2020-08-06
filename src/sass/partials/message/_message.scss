@@ -175,6 +175,21 @@
                     margin-bottom: 0;
                     margin-top: -25px; //TODO check for overlaping
                 }
+
+                &.big {
+                    span {
+                        line-height: 2em;
+                        .emoji {
+                            width: 2.5em;
+                            height: 2.5em;
+                            margin: 0 0.1em 0 0.2em;
+                            filter: drop-shadow(1px 1px 0 white)
+                                drop-shadow(-1px 1px 0 white)
+                                drop-shadow(1px -1px 0 white)
+                                drop-shadow(-1px -1px 0 white);
+                        }
+                    }
+                }
             }
 
             .card {

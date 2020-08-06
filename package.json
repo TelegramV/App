@@ -25,6 +25,7 @@
     "qr-code-styling": "^1.0.1",
     "rusha": "^0.8.13",
     "twemoji": "^13.0.0",
+    "twemoji-parser": "^13.0.0",
     "webp-hero": "0.0.0-dev.24"
   },
   "devDependencies": {
