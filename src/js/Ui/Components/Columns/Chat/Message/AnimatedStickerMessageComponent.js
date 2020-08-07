@@ -8,7 +8,7 @@ import StickerSet from "../../../../../Api/Stickers/StickerSet"
 
 class AnimatedStickerMessageComponent extends GeneralMessageComponent {
     render({message, showDate}) {
-        let stickerSet = new StickerSet(message.raw.media.document.attributes.find(attr => attr._ === "documentAttributeSticker").stickerset);
+        let stickerSet = new StickerSet(message.media.document.attributes.find(attr => attr._ === "documentAttributeSticker").stickerset);
 
         return (
             <MessageWrapperFragment message={message}

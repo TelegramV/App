@@ -150,7 +150,6 @@ export class MessageParser {
                 return "GIF"
             case MessageType.STICKER:
             case MessageType.ANIMATED_STICKER:
-            case MessageType.ANIMATED_EMOJI:
                 if (message.raw.media && message.raw.media.document) {
                     return MessageParser.getStickerEmoji(message.raw.media.document) + " Sticker"
                 } else {
@@ -171,6 +170,7 @@ export class MessageParser {
                 return message.emoji;
             case MessageType.GROUP:
                 return "Album"
+            case MessageType.ANIMATED_EMOJI:
             case MessageType.TEXT:
             case MessageType.WEB_PAGE:
                 return "";

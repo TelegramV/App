@@ -271,6 +271,10 @@ class Unpacker {
             }
 
             constructor = getConstructorById(int)
+
+            if (!constructor) {
+                throw new Error(`Constructor not found for id: ${int.toString(16)} (assumed type: ${type})`)
+            }
         }
 
 

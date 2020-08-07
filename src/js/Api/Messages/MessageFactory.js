@@ -24,6 +24,7 @@ import {RoundVideoMessage} from "./Objects/RoundVideoMessage"
 import {PhoneCallMessage} from "./Objects/PhoneCallMessage"
 import {ServiceMessage} from "./Objects/ServiceMessage"
 import {AnimatedStickerMessage} from "./Objects/AnimatedStickerMessage"
+import {AnimatedEmojiMessage} from "./Objects/AnimatedEmojiMessage"
 import {DiceMessage} from "./Objects/DiceMessage"
 import {Peer} from "../Peers/Objects/Peer"
 import MessagesManager from "./MessagesManager"
@@ -43,7 +44,7 @@ const messageObjects = new Map([
     [MessageType.GIF, GIFMessage],
     [MessageType.STICKER, StickerMessage],
     [MessageType.ANIMATED_STICKER, AnimatedStickerMessage],
-    [MessageType.ANIMATED_EMOJI, AnimatedStickerMessage],
+    [MessageType.ANIMATED_EMOJI, AnimatedEmojiMessage],
     [MessageType.DICE, DiceMessage],
     [MessageType.VOICE, VoiceMessage],
     [MessageType.AUDIO, AudioMessage],
