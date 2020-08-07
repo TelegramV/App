@@ -147,6 +147,10 @@ function MessageWrapperFragment(
             {inlineKeyboard}
             <div class="side">
                 {transparent && <ReplyToMessageFragment message={message}/>}
+                <div class="filler"/>
+                {message.isPost && <div class="share" onClick={() => {
+                    UIEvents.General.fire("message.forward", {message, from: message.dialog.peer})
+                }}><i class="tgico tgico-forward"/></div>}
             </div>
         </div>
     )

@@ -13,7 +13,7 @@
 
     .channel {
         &.message {
-            grid-template-columns: min-content fit-content(100%);
+            grid-template-columns: min-content fit-content(100%) min-content;
 
             & > .avatar {
                 display: none;
@@ -246,6 +246,29 @@
 
         .side {
             grid-area: side;
+            display: flex;
+            flex-direction: column;
+            .filler {
+                flex-grow: 1;
+            }
+
+            .share {
+                cursor: pointer;
+                position: relative;
+                width: 30px;
+                height: 30px;
+                background-color: $semiblack;
+                border-radius: 50%;
+                margin: 10px;
+                .tgico {
+                    font-size: 20px;
+                    color: white;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                }
+            }
         }
     }
 }
