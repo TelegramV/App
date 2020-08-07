@@ -83,6 +83,8 @@ export class SupergroupPeer extends ChannelPeer {
                 user: peer
             })
             return part.participant;
+        }).catch(ex => {
+            this.channelParticipants.set(peer.id, null); //user not participant
         })
     }
 

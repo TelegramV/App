@@ -60,7 +60,7 @@ export class UserPeer extends Peer {
 
     get name() {
         if (this.isDeleted) {
-            return Locale.l("lng_deleted")
+            return Locale.l("lng_deleted")[0]; //fix to return string, not array
         }
 
         return this.firstName + (this.lastName.length > 0 ? " " + this.lastName : "")

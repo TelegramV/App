@@ -38,6 +38,12 @@ class StickerSet {
     }
 
     get input() {
+        if(this.raw.short_name) {
+            return {
+                _: "inputStickerSetShortName",
+                short_name: this.raw.short_name
+            }
+        }
         return {
             _: "inputStickerSetID",
             id: this.raw.id,

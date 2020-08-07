@@ -125,7 +125,7 @@ function MessageWrapperFragment(
     }
 
     const isPrivateMessages = message.to instanceof UserPeer
-    const username = showUsername && message.from.name && !message.isPost &&
+    const username = showUsername && !transparent && message.from.name && !message.isPost && 
         !message.isOut && !message.raw.reply_to_msg_id && !message.raw.fwd_from && !isPrivateMessages &&
         (message.tailsGroup === "s" || message.tailsGroup === "se")
 
