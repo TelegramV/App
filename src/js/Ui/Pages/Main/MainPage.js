@@ -24,6 +24,7 @@ import {isBullshitBrowser, isMobile} from "../../Utils/utils";
 import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf";
 import AudioPlayerComponent from "../../Components/Singleton/AudioPlayerComponent"
+import ConfettiComponent from "../../Components/Singleton/ConfettiComponent"
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -66,6 +67,7 @@ export function MainPage() {
             <ModalContainer/>
             <MediaViewerComponent/>
             <InstantViewComponent/>
+            <ConfettiComponent/>
             {/*<SnackbarComponent/>*/}
             {/*<SettingsComponent/>*/}
             <AudioPlayerComponent/>

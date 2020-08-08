@@ -1,0 +1,8 @@
+.confetti-container {
+    position: fixed;
+    pointer-events: none;
+    z-index: 99999;
+    canvas {
+        position: fixed;
+    }
+}

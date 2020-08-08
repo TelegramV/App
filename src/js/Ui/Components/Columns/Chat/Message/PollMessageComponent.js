@@ -118,7 +118,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
             if(!message.isVotedCorrectly) {
                 this.showSolution();
             } else {
-                //fireworks?
+                UIEvents.General.fire("confetti.show");
             }
             this.answers = [];
         })
@@ -292,7 +292,7 @@ const RecentVotersFragment = ({recentVoters}) => {
     let avatars = [];
     for(let id of recentVoters) {
         let user = PeersStore.get("user", id);
-        avatars.push(<AvatarComponent peer={user}/>)
+        avatars.push(<AvatarComponent noSaved peer={user}/>)
     }
     return (
         <div class="recent-voters">
