@@ -1,6 +1,4 @@
 import "./DialogsSidebar.scss";
-import {LeftSidebar} from "../LeftSidebar";
-import VSimpleLazyInput from "../../../../Elements/Input/VSimpleLazyInput";
 import DialogsManager from "../../../../../Api/Dialogs/DialogsManager";
 import VUI from "../../../../VUI";
 import UIEvents from "../../../../EventBus/UIEvents";
@@ -8,27 +6,14 @@ import PeersStore from "../../../../../Api/Store/PeersStore";
 import VApp from "../../../../../V/vapp";
 import {SettingsSidebar} from "../Settings/SettingsSidebar";
 import {ArchivedSidebar} from "./ArchivedSidebar";
-import {Section} from "../../Fragments/Section";
-import VArray from "../../../../../V/VRDOM/list/VArray";
-import List from "../../../../../V/VRDOM/list/List";
-import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
-import AppEvents from "../../../../../Api/EventBus/AppEvents";
-import TabSelectorComponent from "../../../Tab/TabSelectorComponent";
-import {TabSelector} from "../../Fragments/TabSelector";
-import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
-import VButton from "../../../../Elements/Button/VButton";
-import SimpleVirtualList from "../../../../../V/VRDOM/list/SimpleVirtualList";
-import DynamicHeightVirtualList from "../../../../../V/VRDOM/list/DynamicHeightVirtualList";
-import {Dialog} from "../../../../../Api/Dialogs/Dialog";
 import {UnpatchableLeftSidebar} from "../UnpatchableLeftSidebar";
-import ConnectionStatusComponent from "./ConnectionStatusComponent";
-import {DialogListsComponent} from "./DialogListsComponent";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
-import {Folders} from "./Folders";
-import {SearchComponent} from "../Search/SearchComponent";
 import {isMobile} from "../../../../Utils/utils";
 import Locale from "../../../../../Api/Localization/Locale"
+import VirtualDialogsList from "./VirtualDialogsList"
+import {Folders} from "./Folders"
+import {SearchComponent} from "../Search/SearchComponent"
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -90,7 +75,7 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
     searchOpen = false
 
     init() {
-        FoldersManager.fetchFolders()
+        // FoldersManager.fetchFolders()
     }
 
     onFloatingActionButtonPressed = (event) => {
@@ -114,44 +99,51 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
     }
 
     content(): * {
-        return <this.contentWrapper>
-            <ConnectionStatusComponent/>
+        return <this.contentWrapper scrollable={false}>
             <Folders/>
-
-            <div ref={this.dialogsWrapperRef} id="dialogsWrapper" class={{"scrollable": true, "loading": true}}>
-                <div ref={this.loaderRef} className="full-size-loader" id="loader">
-                    <progress className="progress-circular big"/>
-                </div>
-
-                <DialogListsComponent/>
+            <div style={{
+                "height": "100%",
+                "will-change": "transform",
+            }}>
+                <VirtualDialogsList/>
             </div>
+
+            {/*<ConnectionStatusComponent/>*/}
+
+            {/*<div ref={this.dialogsWrapperRef} id="dialogsWrapper" class={{"scrollable": true, "loading": true}}>*/}
+            {/*    <div ref={this.loaderRef} className="full-size-loader" id="loader">*/}
+            {/*        <progress className="progress-circular big"/>*/}
+            {/*    </div>*/}
+
+            {/*    <DialogListsComponent/>*/}
+            {/*</div>*/}
 
             <SearchComponent ref={this.searchRef}/>
         </this.contentWrapper>
     }
 
     componentDidMount() {
-        this.Archived = VComponent.getComponentById(`dialogs-archived-list`)
-        this.dialogsWrapperRef.$el.addEventListener("scroll", this._scrollHandler, {passive: true})
+        // this.Archived = VComponent.getComponentById(`dialogs-archived-list`)
+        // this.dialogsWrapperRef.$el.addEventListener("scroll", this._scrollHandler, {passive: true})
     }
 
     appEvents(E) {
         super.appEvents(E)
 
-        E.bus(AppEvents.Dialogs)
-            .on("gotMany", this.onDialogsGotMany)
-
-        E.bus(AppEvents.General)
-            .on("selectFolder", this.onFolderSelect)
-
-        E.bus(UIEvents.General)
-            .on("chat.select", this.onChatSelect)
+        // E.bus(AppEvents.Dialogs)
+        //     .on("gotMany", this.onDialogsGotMany)
+        //
+        // E.bus(AppEvents.General)
+        //     .on("selectFolder", this.onFolderSelect)
+        //
+        // E.bus(UIEvents.General)
+        //     .on("chat.select", this.onChatSelect)
 
 
     }
 
     onDialogsGotMany = _ => {
-        if(this.loaderRef.$el.parentElement) this.loaderRef.$el.parentElement.removeChild(this.loaderRef.$el)
+        if (this.loaderRef.$el.parentElement) this.loaderRef.$el.parentElement.removeChild(this.loaderRef.$el)
         this.dialogsWrapperRef.$el.classList.remove("loading")
     }
 
@@ -163,7 +155,7 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
     }
 
     onChatSelect = _ => {
-        if(isMobile()) {
+        if (isMobile()) {
             if (AppSelectedChat.isSelected) {
                 this.fadeOut()
                 // this.$el.classList.add("fade-out")
@@ -217,7 +209,7 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
     }
 
     onLeftButtonPressed = (event) => {
-        if(this.searchOpen) {
+        if (this.searchOpen) {
             this.$el.classList.toggle("back-button", false)
             this.searchOpen = false
             this.searchRef.component.close()

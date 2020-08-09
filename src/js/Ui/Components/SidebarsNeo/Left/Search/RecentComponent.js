@@ -47,7 +47,7 @@ export class RecentComponent extends StatefulComponent {
     }
 
     getRecent = () => {
-        return DialogsStore.toSortedArray()
+        return DialogsStore.sort()
             .filter(dialog => dialog.peer instanceof UserPeer && !(dialog.peer instanceof BotPeer) && !dialog.peer.isSelf && dialog.peer.id !== 777000)
             .slice(0, 6)
             .map(dialog => dialog.peer)

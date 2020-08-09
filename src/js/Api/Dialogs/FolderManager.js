@@ -15,7 +15,7 @@ class FolderManager {
     constructor() {
         // макс чого воно при логіні показується????????????????????????????
         keval.getItem("foldersData").then(foldersData => {
-            if(!foldersData) return
+            if (!foldersData) return
             this.folders = foldersData.folders
             this.selectedFolder = foldersData.selected
 
@@ -130,7 +130,7 @@ class FolderManager {
         })
         //console.log(response)
         const index = this.folders.findIndex(l => l.id === filter.id)
-        if(index === -1) {
+        if (index === -1) {
             this.folders.push(filter)
         } else {
             this.folders[this.folders.findIndex(l => l.id === filter.id)] = filter
@@ -167,7 +167,7 @@ class FolderManager {
     }
 
     getSuggestedFolders() {
-        if(this.suggestedFolders == null) {
+        if (this.suggestedFolders == null) {
             this.fetchSuggestedFolders()
             return []
         }

@@ -99,6 +99,7 @@ class SelectedChat {
     fire(peer = this._peer, options = {}) {
         UIEvents.General.fire("chat.select", {
             peer,
+            prev: this._previousPeer,
             ...options
         })
     }

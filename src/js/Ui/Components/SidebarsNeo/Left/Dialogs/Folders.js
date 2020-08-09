@@ -6,6 +6,7 @@ import VUI from "../../../../VUI";
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import UIEvents from "../../../../EventBus/UIEvents";
 import {CreateFolderSidebar} from "../Settings/Folders/CreateFolderSidebar";
+import foldersState from "../../../foldersState"
 
 const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0}, selected = false, onClick}) => {
     return <div className={{
@@ -42,15 +43,12 @@ const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0
 }
 
 export class Folders extends StatefulComponent {
-    state = {
-        folders: [],
-        selectedFolder: null
-    }
+    state = foldersState;
 
     appEvents(E: AE) {
-        E.bus(AppEvents.General)
-            .on("foldersUpdate", this.onFoldersUpdate)
-            .on("selectFolder", this.onSelectFolder)
+        // E.bus(AppEvents.General)
+        //     .on("foldersUpdate", this.onFoldersUpdate)
+        //     .on("selectFolder", this.onSelectFolder)
         // TODO handle *seen* event to decrease number
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.updateCounters)
@@ -62,13 +60,7 @@ export class Folders extends StatefulComponent {
             .on("messages.readIn", this.updateCounters)
     }
 
-    init() {
-        super.init()
-        FoldersManager.fetchFolders()
-    }
-
-
-    render() {
+    render(props, {folders, current}) {
         return <div class={{
             "folder-list": true,
             "tab-selector": true,
@@ -76,19 +68,21 @@ export class Folders extends StatefulComponent {
             "scrollable-x": true,
             "hide-scroll": true
         }}>
-            {/*<BurgerAndBackComponent isMain/>*/}
-
-            <FolderFragment title="All" selected={this.state.selectedFolder == null}
+            <FolderFragment title="All"
+                            selected={current == null}
                             badge={FoldersManager.getBadgeCount(null)}
-                            onClick={_ => FoldersManager.selectFolder(null)}/>
-            {this.state.folders.map(l => {
-                return <FolderFragment title={l.title}
-                                       selected={l.id === this.state.selectedFolder}
-                                       badge={FoldersManager.getBadgeCount(l.id)} folderId={l.id}
-                                       onClick={_ => FoldersManager.selectFolder(l.id)}/>
+                            onClick={() => FoldersManager.selectFolder(null)}/>
+
+            {folders.map(folder => {
+                return <FolderFragment title={folder.title}
+                                       selected={folder === current}
+                                       badge={FoldersManager.getBadgeCount(folder.id)}
+                                       folderId={folder.id}
+                                       onClick={() => FoldersManager.selectFolder(folder.id)}/>
             })}
         </div>
     }
+
     //
     // componentDidMount() {
     //     super.componentDidMount();
