@@ -19,7 +19,7 @@ export class TextMessage extends AbstractMessage {
     				if(emoji.indices[0] - previousEnd > 0) return false;
     				previousEnd = emoji.indices[1];
     			}
-    			return true;
+    			if(this.text.length === previousEnd) return true;
     		}
     	}
     	return false;

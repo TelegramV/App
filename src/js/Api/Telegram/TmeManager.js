@@ -32,6 +32,8 @@ class TMeManager {
 					this.showStickerModal(split[1])
 					return true;
 					break;
+				case "s": //channel preview on web
+					return false;
 				default:
 					if(split[0].length === 0) return false;
 					if(split.length == 1) {
