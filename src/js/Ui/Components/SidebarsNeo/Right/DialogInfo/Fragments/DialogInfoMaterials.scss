@@ -180,13 +180,15 @@
         }
 
         > .member {
-            padding: 10px;
+            padding: 8px;
+            margin: 2px;
             display: flex;
             flex-direction: row;
             text-align: left;
             width: 100%;
             transition: anim(background-color);
             border-radius: 6px;
+            cursor: pointer;
 
             &:hover {
                 background-color: $light;

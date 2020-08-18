@@ -285,7 +285,6 @@ class StickersComposerComponent extends StatelessComponent {
                 }
             }
         }
-        VApp.mountedComponents.get("composer").hide(); //close composer after that
     }
 
     // DOM HELL
