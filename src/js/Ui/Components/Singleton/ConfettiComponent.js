@@ -31,7 +31,6 @@ class ConfettiComponent extends StatefulComponent {
     }
 
     render() {
-        window.show = this.show;
         return (
             <div className="confetti-container">
                 {Array.from(this.state.confetti.values())}
@@ -40,7 +39,6 @@ class ConfettiComponent extends StatefulComponent {
     }
 
     show = event => {
-        console.log(this.state.confetti)
         this.state.confetti.set(Date.now(), <ConfettiCanvasComponent/>)
         this.forceUpdate();
         this.withTimeout(this.removeOld, 11000);

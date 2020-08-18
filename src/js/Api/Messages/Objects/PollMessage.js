@@ -33,8 +33,18 @@ export class PollMessage extends AbstractMessage {
         return this.results?.results?.find(res => res.chosen)?.correct;
     }
 
+    get pollTypeKey() {
+        if(this.poll.closed) return "lng_polls_closed";
+
+        if(this.isPublic) {
+            return this.isQuiz ? "lng_polls_public_quiz" : "lng_polls_public";
+        } else {
+            return this.isQuiz ? "lng_polls_anonymous_quiz" : "lng_polls_anonymous";
+        }
+    }
+
     /**
-        returns first most popular answer
+        * @return first most popular answer
     **/
     get mostPopularAnswer() {
         if(!this.results.results) return null;
@@ -44,7 +54,7 @@ export class PollMessage extends AbstractMessage {
         }
         return best;
     }
-    // TODO replace object just to number
+    // TODO replace parameter object just to number
     calculateAbsolutePercent(pollAnswerVotes) {
         if(!pollAnswerVotes) return null;
         if(this.results.total_voters === 0) return 0;

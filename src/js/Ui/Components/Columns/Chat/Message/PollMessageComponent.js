@@ -85,7 +85,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                 <div class={classes}>
                     <div class="question">{message.poll.question}</div>
                     <div class="subtitle">
-                        <div class="poll-type">{this.getPollType()}</div>
+                        <div class="poll-type">{this.l(message.pollTypeKey)}</div>
                         {message.poll.public_voters && <RecentVotersFragment recentVoters={message.results.recent_voters}/>}
                         <div class="filler"/>
                         {this.shouldShowTooltip() && <TipFragment click={_ => this.showSolution()}/>}
@@ -97,18 +97,6 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                 <TextWrapperComponent message={message}/>
             </MessageWrapperFragment>
         )
-    }
-
-    getPollType = () => {
-        let message = this.props.message;
-
-        if(message.poll.closed) return "Final results";
-
-        if(message.isPublic) {
-            return message.isQuiz ? "Quiz" : "Public Poll";
-        } else {
-            return message.isQuiz ? "Anonymous Quiz" : "Anonymous Poll";
-        }
     }
 
     sendVote = () => {

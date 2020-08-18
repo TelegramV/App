@@ -4,6 +4,7 @@ import MTProto from "./MTProto/External"
 import AppCache from "./Api/Cache/AppCache"
 
 import VApp from "./V/vapp"
+import VRDOM from "./V/VRDOM/VRDOM"
 import AppRoutes from "./Ui/Routing"
 
 import RippleVRDOMPlugin from "./Ui/Plugins/RipplePlugin"
@@ -33,6 +34,7 @@ if (__IS_PRODUCTION__) {
     window.devkeval = keval
     window.telegram = API
     window.files = FileAPI
+    window.VRDOM = VRDOM
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)
