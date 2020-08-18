@@ -54,7 +54,7 @@ MTProto.connect().then(user => {
     }
 
     if (__IS_PRODUCTION__) {
-        document.title = "Telegram V"
+        document.title = "Telegram V (Beta)"
     } else {
         document.title = "[dev] Telegram V"
     }
