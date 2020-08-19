@@ -20,7 +20,7 @@
     border-radius: 50%;
     cursor: pointer;
     transition: bottom 500ms cubic-bezier(0.175, 0.885, 0.32, 1.0),
-                opacity 500ms ease-in;
+    opacity 500ms ease-in;
 
     i {
         position: absolute;
@@ -61,7 +61,7 @@
                 display: none;
             }
 
-            >.upper {
+            > .upper {
                 display: flex;
                 align-items: center;
 
@@ -79,7 +79,7 @@
                 z-index: 1;
                 height: 60px;
 
-                >.input-search {
+                > .input-search {
                     width: 100%;
                 }
 
@@ -101,7 +101,7 @@
                 background-color: #fff;
                 box-shadow: 0 -1px 2px 0 rgba(16, 35, 47, 0.07);
 
-                >.left {
+                > .left {
                     display: flex;
                     width: 100%;
 
@@ -112,11 +112,11 @@
                     }
                 }
 
-                >.right {
+                > .right {
                     display: flex;
                     flex-shrink: 0;
 
-                    >.btn-icon {
+                    > .btn-icon {
                         &.disabled {
                             color: $grey;
                         }
@@ -136,7 +136,7 @@
         }
     }
 
-        //&.right-bar-open #chat {
+    //&.right-bar-open #chat {
     //    width: calc(100% - 422px);
     //}
 
@@ -204,11 +204,13 @@
             box-shadow: 0 1px 2px 0 $semiblack;
             z-index: 2;
 
-            &>* {
+            position: relative;
+
+            & > * {
                 margin: 0 2px;
             }
 
-            >.hidden {
+            > .hidden {
                 display: none;
             }
 
@@ -267,6 +269,9 @@
             background-color: white;
             box-shadow: 0 1px 2px 0 $semiblack;
             z-index: 1;
+
+            position: absolute;
+            top: 56px;
 
             &:empty {
                 display: none;
