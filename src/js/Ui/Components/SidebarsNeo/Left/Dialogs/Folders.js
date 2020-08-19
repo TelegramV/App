@@ -14,8 +14,8 @@ const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0
     return <div className={{
         folder: true,
         item: true,
-        rp: true,
-        rps: true,
+        // rp: true,
+        // rps: true,
     }} onContextMenu={folderId && VUI.ContextMenu.listener([
         {
             icon: "edit",

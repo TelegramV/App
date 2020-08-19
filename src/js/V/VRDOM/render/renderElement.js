@@ -85,9 +85,22 @@ const renderElement = (node: VRNode, props: VRenderProps = {}): HTMLElement => {
         $el.dataset.vKey = node.key;
     }
 
-    for (let [k, v] of Object.entries(node.attrs)) {
-        if (v || v === 0) {
-            $el.setAttribute(k, v)
+    if ($el instanceof HTMLInputElement) {
+        for (let [k, v] of Object.entries(node.attrs)) {
+            if (
+                k === "checked" ||
+                k === "value"
+            ) {
+            } else if (v || v === 0) {
+                $el[k] = v;
+                delete node.attrs[k];
+            }
+        }
+    } else {
+        for (let [k, v] of Object.entries(node.attrs)) {
+            if (v || v === 0) {
+                $el.setAttribute(k, v)
+            }
         }
     }
 

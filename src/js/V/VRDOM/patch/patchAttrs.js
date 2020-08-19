@@ -33,6 +33,11 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
                 $el.value = newAttrs.value;
                 delete newAttrs.value;
             }
+
+            if (newAttrs.checked !== $el.checked) {
+                $el.checked = newAttrs.checked;
+                delete newAttrs.checked;
+            }
         }
 
         if (options.xmlns) {

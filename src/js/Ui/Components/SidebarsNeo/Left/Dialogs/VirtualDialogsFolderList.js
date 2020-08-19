@@ -203,7 +203,7 @@ class VirtualDialogsFolderList extends StatefulComponent {
     }
 
     componentDidMount() {
-        DialogsManager.fetchNextPage({limit: 50});
+        DialogsManager.fetchNextPage({limit: 100});
     }
 
     download = () => {

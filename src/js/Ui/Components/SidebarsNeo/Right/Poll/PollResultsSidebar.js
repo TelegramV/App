@@ -152,7 +152,7 @@ const VotersSection = ({pollMessage, option, requestAll}) => {
 		let peer = PeersStore.get("user", userId);
 		if(peer) {
 			voters.push(<div class="voter rp" onClick={_=>AppSelectedInfoPeer.select(peer)}>
-							<AvatarComponent peer={peer}/>
+							<AvatarComponent peer={peer} noSaved/>
 							<div class="text">{peer.name}</div>
 						</div>)
 		}

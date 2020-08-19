@@ -17,15 +17,13 @@
  *
  */
 
-import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
-import valIf from "../../../V/VRDOM/jsx/helpers/valIf"
-
 function VRadio(
     {
         label,
         checked,
         name,
-        input
+        onInput,
+        onClick,
     }
 ) {
     return (
@@ -33,10 +31,11 @@ function VRadio(
             <label>
                 <input type="radio"
                        name={name}
-                       onInput={input}
-                       checked={valIf(checked, true)}/>
+                       onInput={onInput}
+                       onClick={onClick}
+                       checked={checked}/>
 
-                {nodeIf(<span className="radio-label">{label}</span>, label)}
+                {label && <span className="radio-label">{label}</span>}
             </label>
         </div>
     )
