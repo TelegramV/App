@@ -15,14 +15,14 @@ class ConnectionStatusComponent extends TranslatableStatelessComponent {
             return <div/>
         }
 
-        let statusString = this.l("lng_connection")
+        let statusString = this.l("lng_connecting")
 
         if (AppConnectionStatus.Status === AppConnectionStatus.WAITING_FOR_NETWORK) {
             statusString = "Waiting for network"
         } else if (AppConnectionStatus.Status === AppConnectionStatus.FETCHING_DIFFERENCE) {
             statusString = "Fetching updates"
         } else if (AppConnectionStatus.Status === AppConnectionStatus.CONNECTING) {
-            statusString = this.l("lng_connection")
+            statusString = this.l("lng_connecting")
         }
 
         return (
