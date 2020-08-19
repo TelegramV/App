@@ -13,8 +13,12 @@ class DeepLinkManager {
 	processEvent = (ev) => {
 		let href = ev.srcElement?.closest("a")?.href;
 
-		if(this.isDeepLink(href) || (this.isTmeLink(href) && this.processTmeLink(href))) {
+		if(this.isTmeLink(href) && this.processTmeLink(href)) {
 		 	ev.preventDefault();
+		}
+		if(this.isDeepLink(href)) {
+			ev.preventDefault();
+			this.processDeepLink(href);
 		}
 	}
 

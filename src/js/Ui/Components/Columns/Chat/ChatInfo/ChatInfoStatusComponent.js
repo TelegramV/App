@@ -11,6 +11,7 @@ class ChatInfoStatusComponent extends TranslatableStatefulComponent {
     };
 
     appEvents(E) {
+        super.appEvents(E)
         E.bus(AppEvents.Dialogs)
             .filter(event => AppSelectedChat.check(event.dialog.peer))
             .updateOn("updateActions")
