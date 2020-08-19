@@ -25,8 +25,26 @@ export class LanguageSidebar extends LeftSidebar {
     }
 
     componentDidMount() {
-        Locale.getLanguages().then(languages => {
+        this.refreshLanguageList();
+    }
+
+    selectLanguage = (index) => {
+        let language = this.state.languages[index];
+        if(!language.checked) Locale.setLanguage(language.code)
+    }
+
+    onLanguageChange = (event) => {
+        this.refreshLanguageList().then(() => {
+            this.forceUpdate(); // radio buttons work strangely without forceUpdate
+        })
+    }
+
+    refreshLanguageList = () => {
+        return Locale.getLanguages().then(languages => {
             let langList = [];
+            if(!languages.find(e => e.lang_code === Locale.currentLanguageInfo.lang_code)) {
+                languages.unshift(Locale.currentLanguageInfo); // TG not returned our custom language
+            }
             for (let lang of languages) {
                 langList.push({
                     text: lang.native_name,
@@ -38,20 +56,6 @@ export class LanguageSidebar extends LeftSidebar {
             this.setState({
                 languages: langList
             })
-        })
-    }
-
-    selectLanguage = (index) => {
-        let language = this.state.languages[index];
-        if(!language.checked) Locale.setLanguage(language.code)
-    }
-
-    onLanguageChange = (event) => {
-        let newList = [...this.state.languages]
-        let lang = newList.find(el => el.code === event.code) 
-        if(lang) lang.checked = true;
-        this.setState({
-            languages: newList
         })
     }
 

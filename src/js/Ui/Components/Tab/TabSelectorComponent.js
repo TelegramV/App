@@ -9,6 +9,7 @@ export default class TabSelectorComponent extends StatefulComponent {
     };
 
     elRefs = []
+    underlineStyle = { left: '0', right: '100%' }
     selectorRef = StatefulComponent.createRef();
 
     render({items, scrollable, active, showScroll}) {
@@ -27,57 +28,51 @@ export default class TabSelectorComponent extends StatefulComponent {
                         this.elRefs.push(ref);
                         return <TabFragment text={item.text} selected={(i+1) === active} onClick={item.onClick} ref={ref}/>;
                     })}
-                    <div className="underline" style={this.getUnderlineStyle()} />
+                    <div className="underline" style={this.underlineStyle} />
                 </div>
             </div>
         );
     }
 
     componentDidMount() {
-        if(!this.props.active) this.props.active = 1;
-        this.updateSizes();
+        this.updateUnderline();
     }
 
-    componentDidUpdate(prevProps) {
-        if(!this.props.active) this.props.active = 1;
-        if (prevProps && prevProps.items !== this.props.items && prevProps.active !== this.props.active) {
-            this.updateSizes();
-        }
+    componentDidUpdate() {
+        this.updateUnderline();
     }
 
     setTab = (tab) => {
         this.props.active = tab;
-        this.updateSizes();
+        this.updateUnderline();
     }
 
-    updateSizes() {
+    updateUnderline = () => {
+        if(!this.props.active) {
+            this.underlineStyle = { left: '0', right: '100%' };
+            return;
+        }
         const rootBounds = this.selectorRef.$el.getBoundingClientRect();
-
-        const sizes = [];
-        for(let ref of this.elRefs) {
-            const bounds = ref.$el.getBoundingClientRect();
-
-            const left = bounds.left - rootBounds.left;
-            const right = rootBounds.right - bounds.right;
-
-            sizes.push({ left, right });
+        let ref = this.elRefs[this.props.active-1];
+        if(!ref) {
+            this.underlineStyle = { left: '0', right: '100%' };
+            return;
         }
 
-        this.setState({ sizes });
-        return sizes;
-    }
+        const bounds = ref.$el.getBoundingClientRect();
 
-    getUnderlineStyle() {
-        if (this.props.active == null || this.state.sizes.length === 0) {
-            return { left: '0', right: '100%' };
+        const left = bounds.left - rootBounds.left;
+        const right = rootBounds.right - bounds.right;
+
+        let newUnderlineStyle = {
+            left: `${left}px`,
+            right: `${right}px`,
         }
 
-        const size = this.state.sizes[Math.max(this.props.active, 1) - 1];
-        if(!size) return { left: '0', right: '100%' };
-
-        return {
-            left: `${size.left}px`,
-            right: `${size.right}px`,
+        if(newUnderlineStyle.left !== this.underlineStyle.left ||
+            newUnderlineStyle.right !== this.underlineStyle.right) {
+            this.underlineStyle = newUnderlineStyle;
+            this.forceUpdate();
         }
     }
 }

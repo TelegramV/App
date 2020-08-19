@@ -15,6 +15,7 @@ import {MainPage} from "../Pages/Main/MainPage"
 //import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage"
 //import ElementsPage from "../Pages/Tests/Elements"
 //import CanvasTestPage from "../Pages/Tests/CanvasTest"
+import RadioButtonPage from "../Pages/Tests/Radio"
 
 /**
  * @param {VFrameworkRouter} router
@@ -59,6 +60,12 @@ function AppRoutes(router) {
             return <div id="app">
                 <MyConfigurableExample/>
             </div>
+        }
+    })
+
+    router.route("/radio", "radio", {
+        h() {
+            return RadioButtonPage()
         }
     })
 

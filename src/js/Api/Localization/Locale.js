@@ -12,6 +12,7 @@ class Locale {
 	langPack = "tdesktop"
 	langCode = "en"
 	pluralCode = "en"
+	langInfo = null;
 
 	/*
 		contains key: value
@@ -30,6 +31,7 @@ class Locale {
 			if(!data) {
 				return this.downloadLanguage();
 			} else {
+				this.langInfo = data;
 				this.langCode = data.lang_code;
 				this.pluralCode = data.plural_code;
 			}
@@ -149,6 +151,10 @@ class Locale {
 
 	get currentLanguagePack() {
 		return this.langPack
+	}
+
+	get currentLanguageInfo() {
+		return this.langInfo
 	}
 
 	getLanguages() {
