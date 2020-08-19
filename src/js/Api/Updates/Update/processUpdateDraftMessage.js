@@ -18,6 +18,7 @@
  */
 
 import DialogsManager from "../../Dialogs/DialogsManager"
+import AppEvents from "../../EventBus/AppEvents"
 
 function processUpdateDraftMessage(update) {
     const dialog = DialogsManager.findByPeer(update.peer);
@@ -27,6 +28,8 @@ function processUpdateDraftMessage(update) {
     } else {
         console.warn("BUG: [processUpdateDraftMessage] no dialog found");
     }
+
+    AppEvents.Telegram.fire("updateDraftMessage", update);
 }
 
 export default processUpdateDraftMessage;

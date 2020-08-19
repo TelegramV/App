@@ -11,9 +11,10 @@ import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import {isMobile} from "../../../../Utils/utils";
 import Locale from "../../../../../Api/Localization/Locale"
-import VirtualDialogsList from "./VirtualDialogsList"
+import VirtualDialogsFolderList from "./VirtualDialogsFolderList"
 import {Folders} from "./Folders"
 import {SearchComponent} from "../Search/SearchComponent"
+import ConnectionStatusComponent from "./ConnectionStatusComponent"
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -100,15 +101,15 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
 
     content(): * {
         return <this.contentWrapper scrollable={false}>
+            <ConnectionStatusComponent/>
+
             <Folders/>
             <div style={{
                 "height": "100%",
-                "will-change": "transform",
             }}>
-                <VirtualDialogsList/>
+                <VirtualDialogsFolderList/>
             </div>
 
-            {/*<ConnectionStatusComponent/>*/}
 
             {/*<div ref={this.dialogsWrapperRef} id="dialogsWrapper" class={{"scrollable": true, "loading": true}}>*/}
             {/*    <div ref={this.loaderRef} className="full-size-loader" id="loader">*/}
@@ -180,27 +181,27 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
         this.searchRef.component.open()
     }
 
-    _scrollHandler = (event) => {
-        const $element = event.target
+    // _scrollHandler = (event) => {
+    //     const $element = event.target
+    //
+    //     if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.isLoadingMore) {
+    //         this.loadNextPage()
+    //     }
+    // }
 
-        if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.isLoadingMore) {
-            this.loadNextPage()
-        }
-    }
-
-    loadNextPage() {
-        if (this.isLoadingMore) return
-        this.isLoadingMore = true
-
-        DialogsManager.fetchNextPage({}).then(() => {
-            this.isLoadingMore = false
-            // TODO should also check if filter is fulfilled
-
-            if (this.$el.querySelector(".dialog-lists .folder-fragment:not(.hidden)").clientHeight < this.$el.clientHeight) {
-                this.loadNextPage()
-            }
-        })
-    }
+    // loadNextPage() {
+    //     if (this.isLoadingMore) return
+    //     this.isLoadingMore = true
+    //
+    //     DialogsManager.fetchNextPage({}).then(() => {
+    //         this.isLoadingMore = false
+    //         // TODO should also check if filter is fulfilled
+    //
+    //         if (this.$el.querySelector(".dialog-lists .folder-fragment:not(.hidden)").clientHeight < this.$el.clientHeight) {
+    //             this.loadNextPage()
+    //         }
+    //     })
+    // }
 
     onSearchInputUpdated = event => {
         UIEvents.Sidebars.fire("searchInputUpdated", {

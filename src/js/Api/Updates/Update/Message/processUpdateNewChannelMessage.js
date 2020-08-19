@@ -19,11 +19,14 @@
 
 import PeersStore from "../../../Store/PeersStore"
 import MessagesManager from "../../../Messages/MessagesManager"
+import AppEvents from "../../../EventBus/AppEvents"
 
 function processUpdateNewChannelMessage(update) {
     const peer = PeersStore.get("channel", update.message.to_id.channel_id);
 
     MessagesManager.processNewMessage(peer, update.message);
+
+    AppEvents.Telegram.fire("updateNewChannelMessage", update);
 }
 
 export default processUpdateNewChannelMessage;

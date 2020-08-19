@@ -102,6 +102,10 @@ class VComponent<P> {
     appEvents(E: AE) {
     }
 
+    /**
+     * @deprecated
+     * @param R
+     */
     reactive(R: RORC) {
     }
 
@@ -225,11 +229,11 @@ class VComponent<P> {
         });
     }
 
-    throttle(callable, period: number) {
+    throttle(callable, period: number = 100) {
         return throttle(callable, period, this)
     }
 
-    debounce(callable, delay: number) {
+    debounce(callable, delay: number = 100) {
         return debounce(callable, delay, this)
     }
 

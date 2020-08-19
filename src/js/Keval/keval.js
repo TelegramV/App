@@ -20,11 +20,12 @@ export function useKeval(dbPromise, storeName: string) {
 
 const DEFAULT_DB_PROMISE = openDB(defaultDbName, 2, {
     upgrade(db, oldVersion, newVersion, transaction) {
-        if(oldVersion < 1) {
+        if (oldVersion >= 1) {
             db.createObjectStore(defaultStoreName);
             db.createObjectStore("authorization");
         }
-        if(oldVersion < 2) {
+
+        if (oldVersion >= 2) {
             db.createObjectStore("localization");
         }
     },

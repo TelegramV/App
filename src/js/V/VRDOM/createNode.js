@@ -42,8 +42,6 @@ function vrdom_createNode(tagName: VRTagName, props: VRNodeProps): VRNode {
 
         } else if (vrdom_isTagNameList(tagName)) {
 
-            // console.debug("[createElement] creating list node")
-
             return new VListVRNode(tagName, props.attrs)
 
         } else {
@@ -67,9 +65,11 @@ function vrdom_createNode(tagName: VRTagName, props: VRNodeProps): VRNode {
                 }
             } else {
 
-                return tagName({
+                const node = tagName({
                     ...props.attrs,
                 }, props.children.length ? props.children : null)
+
+                return node
 
             }
 

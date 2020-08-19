@@ -29,7 +29,7 @@ const patchStyle = ($node: HTMLElement, style: VRAttrs) => {
         }
 
         for (const [k, v] of Object.entries(style)) {
-            if (!v) {
+            if (!v && v !== 0) {
                 $node.style.removeProperty(k)
                 $node.__v.patched_styles.delete(k)
             } else if ($node.style.getPropertyValue(k) !== v) {
@@ -39,7 +39,7 @@ const patchStyle = ($node: HTMLElement, style: VRAttrs) => {
         }
 
         for (const k of $node.__v.patched_styles) {
-            if (!style[k]) {
+            if (!style[k] && style[k] !== 0) {
                 $node.style.removeProperty(k)
                 $node.__v.patched_styles.delete(k)
             }

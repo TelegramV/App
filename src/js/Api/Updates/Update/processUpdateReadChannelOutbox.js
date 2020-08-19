@@ -18,6 +18,7 @@
  */
 
 import PeersStore from "../../Store/PeersStore"
+import AppEvents from "../../EventBus/AppEvents"
 
 const processUpdateReadChannelOutbox = update => {
     const peer = PeersStore.get("channel", update.channel_id);
@@ -34,6 +35,8 @@ const processUpdateReadChannelOutbox = update => {
     } else {
         console.warn("BUG: [processUpdateReadChannelOutbox] no peer found");
     }
+
+    AppEvents.Telegram.fire("updateReadChannelOutbox", update);
 }
 
 export default processUpdateReadChannelOutbox

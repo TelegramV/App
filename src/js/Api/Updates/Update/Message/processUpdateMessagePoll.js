@@ -19,6 +19,7 @@
 
 import AppSelectedChat from "../../../../Ui/Reactive/SelectedChat"
 import messagesApi from "../../../Telegram/messages"
+import AppEvents from "../../../EventBus/AppEvents"
 
 function processUpdateMessagePoll(update) {
     if (AppSelectedChat.isSelected) {
@@ -34,6 +35,8 @@ function processUpdateMessagePoll(update) {
             message.fire("pollEdit");
         }
     }
+
+    AppEvents.Telegram.fire("updateMessagePoll", update);
 }
 
 export default processUpdateMessagePoll;

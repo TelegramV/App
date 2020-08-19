@@ -20,6 +20,7 @@
 import PeersStore from "../../../Store/PeersStore";
 import API from "../../../Telegram/API";
 import MessagesManager from "../../../Messages/MessagesManager";
+import AppEvents from "../../../EventBus/AppEvents"
 
 function processUpdateShortChatMessage(update) {
     const chat = PeersStore.get("chat", update.chat_id)
@@ -31,6 +32,8 @@ function processUpdateShortChatMessage(update) {
     } else {
         MessagesManager.processNewMessage(chat, update);
     }
+
+    AppEvents.Telegram.fire("updateShortChatMessage", update);
 }
 
 export default processUpdateShortChatMessage;

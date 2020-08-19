@@ -19,6 +19,7 @@
 
 import PeersStore from "../../Store/PeersStore";
 import {UserPeer} from "../../Peers/Objects/UserPeer";
+import AppEvents from "../../EventBus/AppEvents"
 
 function processUpdateUserStatus(update) {
     const peer = PeersStore.get("user", update.user_id);
@@ -31,6 +32,8 @@ function processUpdateUserStatus(update) {
     if (peer instanceof UserPeer) {
         peer.status = update.status;
     }
+
+    AppEvents.Telegram.fire("updateUserStatus", update);
 }
 
 export default processUpdateUserStatus;

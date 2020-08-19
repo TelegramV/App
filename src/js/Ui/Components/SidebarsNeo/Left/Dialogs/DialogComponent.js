@@ -12,6 +12,9 @@ import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
+/**
+ * @deprecated DOES NOT WORK!
+ */
 export class DialogComponent extends StatelessComponent {
     dialog: Dialog
 

@@ -61,7 +61,19 @@ class StatefulComponent<P, S> extends VComponent<P> {
         } else {
             __component_update_state(this, nextState);
         }
+
+        // if (this.state.__state_shared) {
+        //     this.state.set(nextState);
+        // } else if (typeof nextState === "function") {
+        //     this.__update_state(nextState(this.state));
+        // } else {
+        //     this.__update_state(nextState);
+        // }
     }
+
+    // __update_state = this.throttle((nextState) => {
+    //     __component_update_state(this, nextState);
+    // }, 500);
 
     setGlobalState(nextState) {
         for (const [k, v] of Object.entries(nextState)) {

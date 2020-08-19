@@ -18,6 +18,7 @@
  */
 
 import PeersStore from "../../Store/PeersStore";
+import AppEvents from "../../EventBus/AppEvents"
 
 const processUpdateReadHistoryInbox = update => {
     const peer = PeersStore.getByPeerType(update.peer);
@@ -34,6 +35,8 @@ const processUpdateReadHistoryInbox = update => {
     } else {
         console.warn("BUG: [processUpdateReadHistoryInbox] no dialog found");
     }
+
+    AppEvents.Telegram.fire("updateReadHistoryInbox", update);
 }
 
 export default processUpdateReadHistoryInbox

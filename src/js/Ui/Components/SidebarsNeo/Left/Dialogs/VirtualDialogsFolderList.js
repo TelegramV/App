@@ -21,7 +21,6 @@ import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponen
 import {DialogFragment} from "./Fragments/DialogFragment"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import DialogsManager from "../../../../../Api/Dialogs/DialogsManager"
-import SimpleVirtualList from "../../../../../V/VRDOM/list/SimpleVirtualList"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import UIEvents from "../../../../EventBus/UIEvents"
 import DialogsStore from "../../../../../Api/Store/DialogsStore"
@@ -31,6 +30,8 @@ import {ChannelPeer} from "../../../../../Api/Peers/Objects/ChannelPeer"
 import {GroupPeer} from "../../../../../Api/Peers/Objects/GroupPeer"
 import {BotPeer} from "../../../../../Api/Peers/Objects/BotPeer"
 import {SupergroupPeer} from "../../../../../Api/Peers/Objects/SupergroupPeer"
+import {dialogContextMenu} from "./dialogContextMenu"
+import FastVirtualList from "../../../../../V/VRDOM/list/FastVirtualList"
 
 function folderFilter(filter) {
     return dialog => {
@@ -66,6 +67,7 @@ function folderFilter(filter) {
         const isChannel = peer instanceof ChannelPeer && !isGroup;
         const isBot = peer instanceof BotPeer;
         const isMuted = dialog.isMuted;
+        const isArchived = dialog.isArchived;
         // TODO needs checking
         const isRead = dialog.peer.messages.unreadCount === 0 && dialog.peer.messages.unreadMentionsCount === 0;
 
@@ -127,10 +129,21 @@ class Dialog extends StatefulComponent {
     }
 
     render({dialog}, state, globalState) {
+        // if (!this.dialog) {
+        //     this.dialog = dialog;
+        // }
+        //
+        // dialog = this.dialog;
+
         return (
             <DialogFragment dialog={dialog}
-                            click={this.onClick}/>
+                            click={this.onClick}
+                            contextMenu={dialogContextMenu(dialog)}/>
         );
+    }
+
+    componentDidMount() {
+        console.log("MOUNTED")
     }
 
     onClick = () => {
@@ -142,7 +155,7 @@ class Dialog extends StatefulComponent {
     }
 }
 
-class VirtualDialogsList extends StatefulComponent {
+class VirtualDialogsFolderList extends StatefulComponent {
     state = {
         dialogs: [],
     };
@@ -152,6 +165,9 @@ class VirtualDialogsList extends StatefulComponent {
     };
 
     appEvents(E) {
+        E.bus(AppEvents.General)
+            .on("foldersUpdate", this.update);
+
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.update);
 
@@ -166,21 +182,40 @@ class VirtualDialogsList extends StatefulComponent {
 
         return (
             <div style={{
-                "min-height": "100%",
                 "height": "100%",
-                "will-change": "transform",
             }}>
-                <SimpleVirtualList itemHeight={72 + 4}
-                                   items={dialogs}
-                                   template={dialog => <Dialog dialog={dialog}/>}
-                                   id="dialogs"
-                                   className="list"/>
+                <FastVirtualList itemHeight={72 + 4}
+                                 items={dialogs}
+                                 template={dialog => <Dialog dialog={dialog}/>}
+                                 scrollThrottle={250}
+                                 renderAhread={5}
+                                 onScroll={event => {
+                                     const $element = event.target;
+
+                                     if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop && !this.state.isLoading) {
+                                         this.download();
+                                     }
+                                 }}
+                                 id="dialogs"
+                                 className="list"/>
             </div>
         );
     }
 
-    async componentDidMount() {
-        await DialogsManager.fetchNextPage({limit: 100});
+    componentDidMount() {
+        DialogsManager.fetchNextPage({limit: 50});
+    }
+
+    download = () => {
+        if (this.state.isLoading) {
+            return;
+        }
+
+        this.state.isLoading = true;
+
+        DialogsManager.fetchNextPage({}).finally(() => {
+            this.state.isLoading = false;
+        });
     }
 
     update = () => {
@@ -192,8 +227,4 @@ class VirtualDialogsList extends StatefulComponent {
     }
 }
 
-VirtualDialogsList.defaultProps = {
-    sort: true,
-};
-
-export default VirtualDialogsList;
+export default VirtualDialogsFolderList;

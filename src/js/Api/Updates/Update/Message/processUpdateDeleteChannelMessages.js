@@ -18,6 +18,7 @@
  */
 
 import PeersStore from "../../../Store/PeersStore";
+import AppEvents from "../../../EventBus/AppEvents"
 
 function processUpdateDeleteChannelMessages(update) {
     let peer = PeersStore.get("channel", update.channel_id);
@@ -37,6 +38,8 @@ function processUpdateDeleteChannelMessages(update) {
     } else {
         console.log("BUG: [processUpdateDeleteChannelMessages] no dialog found");
     }
+
+    AppEvents.Telegram.fire("updateDeleteChannelMessages", update);
 }
 
 export default processUpdateDeleteChannelMessages;

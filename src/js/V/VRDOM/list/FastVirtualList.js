@@ -18,14 +18,19 @@
  */
 
 import StatefulComponent from "../component/StatefulComponent"
+import VComponent from "../component/VComponent"
+import vrdom_delete from "../delete"
+import vrdom_append from "../append"
 
-class SimpleVirtualList extends StatefulComponent {
+class FastVirtualList extends StatefulComponent {
     state = {
         start: 0,
         count: 0,
         offsetY: 0,
         totalHeight: null,
     };
+
+    offsetContainerRef = VComponent.createRef();
 
     render() {
         const {items, template, itemHeight, ...otherProps} = this.props;
@@ -44,12 +49,10 @@ class SimpleVirtualList extends StatefulComponent {
                     "overflow": "hidden",
                     "height": `${totalHeight || items.length * itemHeight}px`,
                     "position": "relative",
-                    "will-change": "transform",
                 }}>
                     <div style={{
-                        "will-change": "transform",
                         "transform": `translateY(${offsetY}px)`
-                    }}>
+                    }} ref={this.offsetContainerRef}>
                         {items.slice(start, start + count).map(item => template(item))}
                     </div>
                 </div>
@@ -58,11 +61,11 @@ class SimpleVirtualList extends StatefulComponent {
     }
 
     componentDidMount() {
-        console.log(this, "mounted")
         this.$el.addEventListener("scroll", this.onScroll, {
             passive: true,
         });
-        this.recalculate()
+
+        this.setState(this.calculate());
     }
 
     componentWillUnmount() {
@@ -70,17 +73,19 @@ class SimpleVirtualList extends StatefulComponent {
     }
 
     componentDidUpdate() {
-        this.recalculate();
+        this.setState(this.calculate());
     }
 
-    onScroll = this.props.scrollThrottle ? this.throttle(() => {
-        this.recalculate()
-    }, this.props.scrollThrottle) : () => {
-        this.recalculate()
+    onScroll = this.props.scrollThrottle ? this.throttle((event) => {
+        this.onScrollHandler();
+        this.props.onScroll(event);
+    }, this.props.scrollThrottle) : (event) => {
+        this.onScrollHandler(event);
+        this.props.onScroll(event);
     };
 
-    recalculate = () => {
-        let {items, itemHeight, renderAhread} = this.props;
+    calculate = () => {
+        let {items, itemHeight, renderAhread, template} = this.props;
 
         let containerHeight = this.props.containerHeight;
 
@@ -104,20 +109,73 @@ class SimpleVirtualList extends StatefulComponent {
 
         const totalHeight = items.length * itemHeight;
 
-        this.setState({
+        return {
             start,
             count,
             offsetY,
             totalHeight
-        })
+        };
+    }
+
+    onScrollHandler = () => {
+        this.setState(this.calculate());
+        return;
+
+        const {
+            start,
+            count,
+            offsetY,
+            totalHeight
+        } = this.calculate();
+
+        const {items, template} = this.props;
+
+        const startDiff = start - this.state.start;
+
+        if (startDiff === 0) {
+            return;
+        }
+
+        const currentItems = items.slice(start, start + count);
+
+        const $el = this.offsetContainerRef.$el;
+
+        console.log(start, count, this.state.start, this.state.count);
+
+        Object.assign({
+            start,
+            count,
+            offsetY,
+            totalHeight
+        });
+
+        // if (startDiff <= 0) {
+        // return this.setState({
+        //     start,
+        //     count,
+        //     offsetY,
+        //     totalHeight
+        // });
+        // } else {
+        for (let i = 0; i < start; i++) {
+            vrdom_delete($el.firstChild);
+            vrdom_append(template(currentItems[currentItems.length - 1 - i]), $el);
+        }
+
+        $el.style.transform = `translateY(${offsetY}px)`;
+        $el.parentElement.style.height = totalHeight;
+        // }
+
     }
 }
 
-SimpleVirtualList.defaultProps = {
+FastVirtualList.defaultProps = {
     containerHeight: null,
     renderAhread: 5,
     items: [],
     scrollThrottle: 50,
+    onScroll: () => {
+    },
 }
 
-export default SimpleVirtualList
+export default FastVirtualList;

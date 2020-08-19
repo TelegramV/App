@@ -44,9 +44,11 @@ export const DialogFragment = (
     return (
         <div data-message-id={lastMessage.id}
              className={personClasses}
-
              onClick={click}
-             onContextMenu={contextMenu}>
+             onContextMenu={contextMenu}
+             style={{
+                 // "height": "70px",
+             }}>
 
             <AvatarComponent peer={dialog.peer}/>
 

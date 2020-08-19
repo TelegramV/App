@@ -18,6 +18,7 @@
  */
 
 import DialogsManager from "../../Dialogs/DialogsManager"
+import AppEvents from "../../EventBus/AppEvents"
 
 function processUpdateFolderPeers(update) {
     update.folder_peers.forEach(FolderPeer => {
@@ -28,7 +29,9 @@ function processUpdateFolderPeers(update) {
         } else {
             console.error("BUG: whoa!!! this thing is not implemented yet");
         }
-    })
+    });
+
+    AppEvents.Telegram.fire("updateFolderPeers", update);
 }
 
 export default processUpdateFolderPeers
