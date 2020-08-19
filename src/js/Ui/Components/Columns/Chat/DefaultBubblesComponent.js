@@ -22,13 +22,11 @@ import AppSelectedChat from "../../../Reactive/SelectedChat"
 import UIEvents from "../../../EventBus/UIEvents"
 import AppEvents from "../../../../Api/EventBus/AppEvents"
 import MessageComponent from "./MessageComponent"
-import {ServiceMessage} from "../../../../Api/Messages/Objects/ServiceMessage"
 import type {Message} from "../../../../Api/Messages/Message"
 import {MessageType} from "../../../../Api/Messages/Message"
 import vrdom_render from "../../../../V/VRDOM/render/render"
 import scrollToAndHighlight from "../../../../Utils/scrollToAndHighlight"
 import findIntersection from "../../../Virtual/findIntersection"
-import vrdom_deleteInner from "../../../../V/VRDOM/deleteInner"
 import VirtualMessages from "../../../Virtual/VirtualMessages"
 import scrollBottom from "../../../../Utils/scrollBottom"
 import API from "../../../../Api/Telegram/API"
@@ -39,6 +37,7 @@ import IntersectionObserver from 'intersection-observer-polyfill';
 import GroupMessage from "../../../../Api/Messages/GroupMessage"
 import vrdom_patchChildren from "../../../../V/VRDOM/patch/patchChildren"
 import vrdom_delete from "../../../../V/VRDOM/delete"
+import vrdom_deleteInner from "../../../../V/VRDOM/deleteInner"
 
 function getMessageElementById(messageId: number): HTMLElement | null {
     return document.getElementById(`message-${messageId}`); // dunno better way, sorry
@@ -46,8 +45,8 @@ function getMessageElementById(messageId: number): HTMLElement | null {
 
 export function isGrouping(one: Message, two: Message) {
     if (!one || !two ||
-     one.type === MessageType.GROUP || two.type === MessageType.GROUP ||
-     one.type === MessageType.SERVICE || two.type === MessageType.SERVICE) return false;
+        one.type === MessageType.GROUP || two.type === MessageType.GROUP ||
+        one.type === MessageType.SERVICE || two.type === MessageType.SERVICE) return false;
     return (one.isPost || one.isOut === two.isOut)
         && (one.from.id === two.from.id)
         && (Math.abs(one.date - two.date) < 5 * 60);
@@ -156,6 +155,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     cleanupTree = () => {
         vrdom_deleteInner(this.bubblesInnerRef.$el);
+        // this.bubblesInnerRef.$el.replaceWith(vrdom_render(this.render()));
     }
 
     refresh = () => {

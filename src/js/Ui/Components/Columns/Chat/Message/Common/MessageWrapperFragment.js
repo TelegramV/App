@@ -125,7 +125,7 @@ function MessageWrapperFragment(
     }
 
     const isPrivateMessages = message.to instanceof UserPeer
-    const username = showUsername && message.from.name && !message.isPost &&
+    const username = showUsername && !transparent && message.from.name && !message.isPost && 
         !message.isOut && !message.raw.reply_to_msg_id && !message.raw.fwd_from && !isPrivateMessages &&
         (message.tailsGroup === "s" || message.tailsGroup === "se")
 
@@ -136,15 +136,22 @@ function MessageWrapperFragment(
 
             <MessageAvatarComponent message={message} show={!message.hideAvatar}/>
             <div className={contentClasses} onContextMenu={contextMenuHandler}>
-                <ReplyToMessageFragment message={message}/>
+                {!transparent && <ReplyToMessageFragment message={message}/>}
                 <ForwardedHeaderFragment message={message}/>
-                {username ? <PeerName peer={message.from} template={(peer) => {
-                    return <div css-cursor="pointer" className="username"
-                                onClick={() => AppSelectedInfoPeer.select(peer)}>{peer.name}</div>
+                {username ? <PeerName peer={message.from} chat={message.to} template={(peer) => {
+                    return <div class="peer-name"><div css-cursor="pointer" className="username"
+                                onClick={() => AppSelectedInfoPeer.select(peer)}>{peer.name}</div> <div class="rank">{message.to.getPeerRank(message.from)}</div></div>
                 }}/> : ""}
                 {slot}
             </div>
             {inlineKeyboard}
+            <div class="side">
+                {transparent && <ReplyToMessageFragment message={message}/>}
+                <div class="filler"/>
+                {message.isPost && <div class="share" onClick={() => {
+                    UIEvents.General.fire("message.forward", {message, from: message.dialog.peer})
+                }}><i class="tgico tgico-forward"/></div>}
+            </div>
         </div>
     )
 

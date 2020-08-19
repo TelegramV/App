@@ -57,7 +57,7 @@ class TopPeersManager extends Manager {
             topPeers.categories.forEach(TopPeerCategoryPeers => {
                 if (TopPeerCategoryPeers.category._ === "topPeerCategoryCorrespondents") {
                     TopPeerCategoryPeers.peers.map(TopPeer => PeersStore.getByPeerType(TopPeer.peer))
-                        .forEach(peer => this.correspondents.add(peer));
+                        .forEach(peer => {if(peer) this.correspondents.add(peer)});
 
                     AppEvents.Peers.fire("gotCorrespondents", {
                         correspondents: this.correspondents

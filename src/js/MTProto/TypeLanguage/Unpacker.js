@@ -192,6 +192,27 @@ class Unpacker {
         return bytes
     }
 
+    json(type) {
+        switch(type) {
+        	case "jsonBool":
+        		return this.bool()
+        	case "jsonNumber":
+        		return this.double();
+        	case "jsonString":
+        		return this.string();
+        	case "jsonArray":
+        		return this.vector("Vector<JSONValue>");
+        	case "jsonObject":
+        		let obj = Object.create(null);
+        		this.vector("Vector<JSONObjectValue>").forEach(objValue => {
+        			obj[objValue.key] = objValue.value
+        		});
+        		return obj
+        	default:
+        		return this.object();
+        }
+    }
+
     object(type = "Object"): any {
         switch (type) {
             case "#":
@@ -250,6 +271,10 @@ class Unpacker {
             }
 
             constructor = getConstructorById(int)
+
+            if (!constructor) {
+                throw new Error(`Constructor not found for id: ${int.toString(16)} (assumed type: ${type})`)
+            }
         }
 
 
@@ -258,6 +283,9 @@ class Unpacker {
         }
 
         const predicate = constructor.predicate
+        if(["jsonBool","jsonNumber", "jsonString", "jsonArray", "jsonObject"].includes(predicate)) {
+        	return this.json(predicate)
+        }
 
         // HACK!
         // For some reason it finds vector in constructors
@@ -268,7 +296,7 @@ class Unpacker {
             return this.vector("Vector<T>");
         }
 
-        const result = Object.create(null)
+        let result = Object.create(null)
         result._ = predicate
 
         if (this.overriders.has(type)) {

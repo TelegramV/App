@@ -8,15 +8,17 @@ import VCheckbox from "../../../../Elements/Input/VCheckbox"
 import messages from "../../../../../Api/Telegram/messages"
 import UIEvents from "../../../../EventBus/UIEvents"
 import PeersStore from "../../../../../Api/Store/PeersStore"
-import {parseMessageEntities} from "../../../../../Utils/htmlHelpers"
+import { parseMessageEntities } from "../../../../../Utils/htmlHelpers"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import VSpinner from "../../../../Elements/VSpinner"
-import {formatAudioTime} from "../../../../Utils/utils"
+import { formatAudioTime } from "../../../../Utils/utils"
+import Locale from "../../../../../Api/Localization/Locale"
 
 export default class PollMessageComponent extends GeneralMessageComponent {
 
     state = {
-        showingSolution: false
+        showingSolution: false,
+        answers: []
     }
 
     init() {
@@ -25,8 +27,6 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         let message = this.props.message;
 
         this.timerRef = VComponent.createFragmentRef();
-
-        this.answers = [];
 
         this.prepareContextMenu()
     }
@@ -62,16 +62,16 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
         this.actionButton = this.$el.querySelector(".action-button");
 
-        
+
     }
 
     componentDidMount() {
-        if(this.props.message.poll.close_date && !this.props.message.isVoted) this.withInterval(this.updateTimer, 500);
+        if (this.props.message.poll.close_date && !this.props.message.isVoted) this.withInterval(this.updateTimer, 500);
     }
 
     componentDidUpdate() {
         this.clearIntervals();
-        if(this.props.message.poll.close_date && !this.props.message.isVoted) this.withInterval(this.updateTimer, 500);
+        if (this.props.message.poll.close_date && !this.props.message.isVoted) this.withInterval(this.updateTimer, 500);
     }
 
     render({ message, showDate }) {
@@ -85,7 +85,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                 <div class={classes}>
                     <div class="question">{message.poll.question}</div>
                     <div class="subtitle">
-                        <div class="poll-type">{this.getPollType()}</div>
+                        <div class="poll-type">{this.l(message.pollTypeKey)}</div>
                         {message.poll.public_voters && <RecentVotersFragment recentVoters={message.results.recent_voters}/>}
                         <div class="filler"/>
                         {this.shouldShowTooltip() && <TipFragment click={_ => this.showSolution()}/>}
@@ -99,59 +99,53 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         )
     }
 
-    getPollType = () => {
-        let message = this.props.message;
-
-        if(message.poll.closed) return "Final results";
-
-        if(message.isPublic) {
-            return message.isQuiz ? "Quiz" : "Public Poll";
-        } else {
-            return message.isQuiz ? "Anonymous Quiz" : "Anonymous Poll";
-        }
-    }
-
     sendVote = () => {
         let message = this.props.message;
-        if (this.answers.length == 0) return;
-        messages.sendVote(message, this.answers).then(response => {
-            if(!message.isVotedCorrectly) {
+        if (this.state.answers.length == 0) return;
+        messages.sendVote(message, this.state.answers).then(response => {
+            if (!message.isVotedCorrectly) {
                 this.showSolution();
             } else {
-                //fireworks?
+                UIEvents.General.fire("confetti.show");
             }
-            this.answers = [];
+            console.log(this.state.answers)
+            this.setState({
+                answers: []
+            })
         })
     }
 
     showSolution = () => {
-        if(this.props.message.results?.solution && !this.state.showingSolution) {
-            UIEvents.General.fire("snackbar.show", {text: <SnackbarSolutionFragment message={this.props.message}/>, time: 5});
+        if (this.props.message.results?.solution && !this.state.showingSolution) {
+            UIEvents.General.fire("snackbar.show", { text: <SnackbarSolutionFragment message={this.props.message}/>, time: 5 });
             this.setState({
                 showingSolution: true
             })
 
             this.withTimeout(_ => {
-                this.setState({showingSolution: false})
+                this.setState({ showingSolution: false })
             }, 5000);
         }
     }
 
     addAnswer = (option) => {
         if (!option && option !== 0) return; //idk if this byte can be 0, but better be prepared
-        this.answers.push(Number.parseInt(option));
+        this.state.answers.push(Number.parseInt(option));
+        this.forceUpdate();
         if (!this.props.message.isMultiple) this.sendVote();
     }
 
     cancelAnswer = (option) => {
         if (!option && option !== 0) return;
         option = Number.parseInt(option);
-        this.answers = this.answers.filter(item => (item !== option)); //delete element from array
+        this.setState({
+            answers: this.state.answers.filter(item => (item !== option))
+        })
     }
 
     onPollChange = () => {
         this.forceUpdate();
-        UIEvents.General.fire("pollUpdate", {message: this.props.message}); //update sidebar
+        UIEvents.General.fire("pollUpdate", { message: this.props.message }); //update sidebar
 
         this.withTimeout(_ => this.forceUpdate(), 1000); // текст з обраного варіанту кудись зникає, дикий костиль, ДАВИД ФІКС!
     }
@@ -168,7 +162,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     makeAnswerBlock = () => {
         let answers = [];
         for (const answer of this.props.message.poll.answers) {
-            answers.push(<AnswerFragment message={this.props.message} option={answer.option[0]} click={this.onAnswerClick}/>)
+            answers.push(<AnswerFragment message={this.props.message} option={answer.option[0]} click={this.onAnswerClick} chosen={this.state.answers.includes(answer.option[0])}/>)
         }
         return answers;
     }
@@ -189,18 +183,18 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     updateAction = () => {
         if (this.actionButton) {
             if (this.props.message.isMultiple && !this.props.message.isVoted) {
-                this.actionButton.classList.toggle("disabled", this.answers.length === 0);
-                this.actionButton.classList.toggle("rp", this.answers.length === 0);
+                this.actionButton.classList.toggle("disabled", this.state.answers.length === 0);
+                this.actionButton.classList.toggle("rp", this.state.answers.length === 0);
             }
         }
     }
 
     updateTimer = () => {
         let message = this.props.message;
-        let left = message.poll.close_date - Date.now()/1000;
-        if(left < 0) {
+        let left = message.poll.close_date - Date.now() / 1000;
+        if (left < 0) {
             this.clearIntervals();
-            this.withTimeout(_=>messages.getPollResults(message), 1000);
+            this.withTimeout(_ => messages.getPollResults(message), 1000);
         }
         this.timerRef.update({
             left: left,
@@ -211,9 +205,9 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     shouldShowTooltip = () => {
         let message = this.props.message;
         return message.isQuiz &&
-         (message.poll.closed || message.isVoted) &&
-          !this.state.showingSolution &&
-          this.props.message.results?.solution
+            (message.poll.closed || message.isVoted) &&
+            !this.state.showingSolution &&
+            this.props.message.results?.solution
     }
 
     cancelVote = () => {
@@ -225,25 +219,25 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     showFullResults = () => {
-        UIEvents.General.fire("poll.showResults",{pollMessage: this.props.message})
+        UIEvents.General.fire("poll.showResults", { pollMessage: this.props.message })
     }
 }
 
-const AnswerFragment = ({message, option, click}) => {
+const AnswerFragment = ({ message, option, chosen, click }) => {
     let answer = message.poll.answers.find(answ => answ.option[0] === option);
     let result = message.results?.results?.find(res => res.option[0] === option);
 
-    if(!message.isVoted && !message.poll.closed) {
+    if (!message.isVoted && !message.poll.closed) {
         return (
             <div class="answer voting rp" option={answer.option} onClick={click}>
-                <div class="vote">{message.isMultiple ? <VCheckbox/> : <VRadio/>}</div>
+                <div class="vote">{message.isMultiple ? <VCheckbox checked={chosen}/> : <VRadio checked={chosen}/>}</div>
                 <div class="answer-text">{answer.text}</div>
             </div>
         )
     } else {
         let relPercent = Math.max(message.calculateRelativePercent(result), 1); //0% doesn't show a bar
         let absPercent = message.calculateAbsolutePercent(result);
-        if(absPercent === null) return undefined;
+        if (absPercent === null) return undefined;
 
         let votedClass = {
             "tgico": true,
@@ -273,35 +267,55 @@ const AnswerFragment = ({message, option, click}) => {
 
 const FooterFragment = ({ message, actionClick }) => {
     if (message.isVoted && message.isPublic) {
-        return <div class="action-button" onClick={actionClick}>View results</div>;
+        return <div class="action-button" onClick={actionClick}>{Locale.l("lng_polls_view_results")}</div>;
     } else if (!message.isVoted && message.isMultiple) {
-        return <div class="action-button disabled" onClick={actionClick}>Vote</div>;
+        return <div class="action-button disabled" onClick={actionClick}>{Locale.l("lng_polls_submit_votes")}</div>;
     }
-    return <div class="stats">{message.results.total_voters + (message.isQuiz ? " answered" : " voted")}</div>;
+
+    let voted = "";
+    if (message.isQuiz) {
+        if (message.results.total_voters > 0) {
+            voted = Locale.lp("lng_polls_answers_count", message.results.total_voters, {
+                count: message.results.total_voters
+            })
+        } else {
+            Locale.l("lng_polls_answers_none");
+        }
+    } else {
+        if (message.results.total_voters > 0) {
+            voted = Locale.lp("lng_polls_votes_count", message.results.total_voters, {
+                count: message.results.total_voters
+            })
+        } else {
+            Locale.l("lng_polls_votes_none");
+        }
+    }
+
+    return <div class="stats">{voted}</div>;
 }
 
-const TipFragment = ({click}) => {
+const TipFragment = ({ click }) => {
     return (
         <div class="tip" onClick={click}>
             <i class="tgico tgico-tip"/>
         </div>
-        )
+    )
 }
 
-const RecentVotersFragment = ({recentVoters}) => {
+const RecentVotersFragment = ({ recentVoters }) => {
     let avatars = [];
-    for(let id of recentVoters) {
+    for (let id of recentVoters) {
         let user = PeersStore.get("user", id);
-        avatars.push(<AvatarComponent peer={user}/>)
+        avatars.push(<AvatarComponent noSaved peer={user}/>)
     }
     return (
         <div class="recent-voters">
             {avatars}
         </div>
-        )
+    )
 }
 
-const SnackbarSolutionFragment = ({message}) => {
+const SnackbarSolutionFragment = ({ message }) => {
     let text = parseMessageEntities(message.results.solution, message.results.solution_entities);
     return (
         <div class="solution">
@@ -310,21 +324,21 @@ const SnackbarSolutionFragment = ({message}) => {
                 {text}
             </div>
         </div>
-        )
+    )
 }
 
-const TimerFragment = ({left, total}) => {
-    if(total === 0) return <div class="timer"/>;
-    if(left < 0) left = 0;
+const TimerFragment = ({ left, total }) => {
+    if (total === 0) return <div class="timer"/>;
+    if (left < 0) left = 0;
     let percent = left / total;
     left = Math.floor(left);
     let formatted = formatAudioTime(left);
     let color;
-    if(left < 6) color = "#DF3F40";
+    if (left < 6) color = "#DF3F40";
     return (
         <div class="timer">
             <span class="time-left" css-color={color}>{formatted}</span>
             <VSpinner progress={percent} determinate={true} color={color}/>
         </div>
-        )
+    )
 }

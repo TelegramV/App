@@ -25,7 +25,7 @@ export class ModalHeaderFragment extends StatelessComponent {
             {
                 this.props.close ? <i className="tgico tgico-close btn-icon" onClick={_ => VUI.Modal.close()}/> : ""
             }
-            {this.props.title}
+            <div class="title">{this.props.title}</div>
             {
                 this.props.actionText && <VButton onClick={this.props.action}>{this.props.actionText}</VButton>
             }

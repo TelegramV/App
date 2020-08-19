@@ -1,5 +1,5 @@
 import "./DialogInfoMaterials.scss";
-import StatelessComponent from "../../../../../../V/VRDOM/component/StatelessComponent";
+import TranslatableStatelessComponent from "../../../../../../V/VRDOM/component/TranslatableStatelessComponent";
 import TabSelectorComponent from "../../../../Tab/TabSelectorComponent";
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer";
 import PeersStore from "../../../../../../Api/Store/PeersStore";
@@ -17,8 +17,9 @@ import {DialogInfoLinkComponent} from "./DialogInfoLinkComponent";
 import {DialogInfoAudioComponent} from "./DialogInfoAudioComponent";
 import DialogInfoDocumentComponent from "./DialogInfoDocumentComponent";
 import {DialogInfoMemberComponent} from "./DialogInfoMemberComponent";
+import Locale from "../../../../../../Api/Localization/Locale"
 
-export class DialogInfoMaterials extends StatelessComponent {
+export class DialogInfoMaterials extends TranslatableStatelessComponent {
     contentRefs = {
         media: VComponent.createRef(),
         members: VComponent.createRef(),
@@ -51,6 +52,7 @@ export class DialogInfoMaterials extends StatelessComponent {
     }
 
     tabItems = []
+    currentTab = 1;
 
     loadingRef = VComponent.createRef()
     tabSelectorRef = VComponent.createComponentRef()
@@ -60,7 +62,7 @@ export class DialogInfoMaterials extends StatelessComponent {
     render(props) {
         return <div className="materials">
 
-            <TabSelectorComponent ref={this.tabSelectorRef} items={this.tabItems}/>
+            <TabSelectorComponent ref={this.tabSelectorRef} items={this.makeTabs()} active={this.currentTab} scrollable/>
 
             <div ref={this.contentRefs.members} className="content hidden member-list"/>
             <div ref={this.contentRefs.media} className="content"/>
@@ -75,38 +77,58 @@ export class DialogInfoMaterials extends StatelessComponent {
         </div>
     }
 
-    update() {
-        const showMembers = AppSelectedInfoPeer.Current.type === "chat" || (AppSelectedInfoPeer.Current.type === "channel" && AppSelectedInfoPeer.Current.isSupergroup)
-        this.tabItems = [
-            {
-                text: "Members",
-                hidden: !showMembers,
-                selected: showMembers,
-                click: this.openMembers,
-            },
-            {
-                text: "Media",
-                click: this.openMedia,
-                selected: !showMembers
-            },
-            {
-                text: "Docs",
-                click: this.openDocs,
-            },
-            {
-                text: "Links",
-                click: this.openLinks,
-            },
-            {
-                text: "Audio",
-                click: this.openAudio,
-            }
-        ]
-        this.tabSelectorRef.component.updateFragments(this.tabItems)
+    componentDidMount() {
+        if(this.showMembers()) {
+            this.showing = "members"
+        } else {
+            this.showing = "media"
+        }
+    }
 
+    update() {
+        this.tabSelectorRef.component.updateProps({items: this.makeTabs()})
+        this.tabSelectorRef.component.setTab(this.currentTab);
         if (!AppSelectedInfoPeer.check(AppSelectedInfoPeer.Previous) && AppSelectedInfoPeer.Current !== undefined) {
             this.refreshContent()
         }
+    }
+
+    showMembers = () => {
+        return AppSelectedInfoPeer.Current?.type === "chat" || (AppSelectedInfoPeer.Current?.type === "channel" && AppSelectedInfoPeer.Current?.isSupergroup)
+    }
+
+    makeTabs = () => {
+        let tabItems = [
+            {
+                text: this.l("lng_info_tab_media"),
+                onClick: this.openMedia,
+                key: "media"
+            },
+            {
+                text: this.l("lng_media_type_files"),
+                onClick: this.openDocs,
+                key: "docs"
+            },
+            {
+                text: this.l("lng_media_type_links"),
+                onClick: this.openLinks,
+                key: "links"
+            },
+            {
+                text: this.l("lng_media_type_songs"),
+                onClick: this.openAudio,
+                key: "audio"
+            }
+        ]
+        if(this.showMembers()) {
+            tabItems.unshift({
+                text: this.l("lng_profile_participants_section"),
+                onClick: this.openMembers,
+                key: "members"
+            });
+        }
+
+        return tabItems;
     }
 
     openMembers = () => {
@@ -337,7 +359,6 @@ export class DialogInfoMaterials extends StatelessComponent {
         this.nullContentPages()
         this.clearContent()
         this.toggleContentLoading(true)
-        this.tabItems.find(l => !l.hidden).click()
         this.toggleContentLoading(false)
     }
 
@@ -352,6 +373,8 @@ export class DialogInfoMaterials extends StatelessComponent {
         this.contentRefs[refName].$el.classList.add("content")
         this.contentRefs[refName].$el.classList.remove("hidden")
         this.showing = refName
+        this.currentTab = this.makeTabs().findIndex(el => el.key === refName)+1;
+        this.tabSelectorRef.component.setTab(this.currentTab);
     }
 
     toggleContentLoading = (enable = false) => {

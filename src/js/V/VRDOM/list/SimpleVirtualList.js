@@ -28,23 +28,27 @@ class SimpleVirtualList extends StatefulComponent {
     };
 
     render() {
-        const {containerHeight, items, template, itemHeight} = this.props;
+        const {items, template, itemHeight, ...otherProps} = this.props;
         const {start, count, offsetY, totalHeight} = this.state;
+
+        const containerHeight = this.props.containerHeight || this.state.containerHeight;
 
         return (
             <div style={{
-                height: `${containerHeight}px`,
-                overflow: "auto"
-            }} css-will-change="transform">
+                "height": `${containerHeight}px`,
+                "overflow": "auto",
+                "will-change": "transform",
+            }} {...otherProps}>
 
                 <div style={{
-                    overflow: "hidden",
-                    height: `${totalHeight || items.length * itemHeight}px`,
-                    position: "relative"
+                    "overflow": "hidden",
+                    "height": `${totalHeight || items.length * itemHeight}px`,
+                    "position": "relative",
+                    "will-change": "transform",
                 }}>
                     <div style={{
-                        // willChange: "transform",
-                        transform: `translateY(${offsetY}px)`
+                        "will-change": "transform",
+                        "transform": `translateY(${offsetY}px)`
                     }}>
                         {items.slice(start, start + count).map(item => template(item))}
                     </div>
@@ -54,7 +58,10 @@ class SimpleVirtualList extends StatefulComponent {
     }
 
     componentDidMount() {
-        this.$el.addEventListener("scroll", this.onScroll)
+        console.log(this, "mounted")
+        this.$el.addEventListener("scroll", this.onScroll, {
+            passive: true,
+        });
         this.recalculate()
     }
 
@@ -66,12 +73,25 @@ class SimpleVirtualList extends StatefulComponent {
         this.recalculate();
     }
 
-    onScroll = event => {
+    onScroll = this.props.scrollThrottle ? this.throttle(() => {
         this.recalculate()
-    }
+    }, this.props.scrollThrottle) : () => {
+        this.recalculate()
+    };
 
     recalculate = () => {
-        const {containerHeight, items, itemHeight, renderAhread} = this.props;
+        let {items, itemHeight, renderAhread} = this.props;
+
+        let containerHeight = this.props.containerHeight;
+
+        if (!containerHeight) {
+            if (!this.state.containerHeight) {
+                this.state.containerHeight = this.$el.parentElement.clientHeight;
+            }
+
+            containerHeight = this.state.containerHeight;
+        }
+
         const scrollTop = this.$el.scrollTop;
 
         let start = Math.floor(scrollTop / itemHeight) - renderAhread;
@@ -94,9 +114,10 @@ class SimpleVirtualList extends StatefulComponent {
 }
 
 SimpleVirtualList.defaultProps = {
-    containerHeight: 100,
-    renderAhread: 10,
+    containerHeight: null,
+    renderAhread: 5,
     items: [],
+    scrollThrottle: 50,
 }
 
 export default SimpleVirtualList

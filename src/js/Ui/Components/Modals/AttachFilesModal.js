@@ -57,15 +57,17 @@ class FileListFragment extends StatelessComponent {
         </div>
     }
 
-    addFile = (blob) => {
+    addFile = (obj) => {
         if (this.props.blobs.length >= 10) return
-        this.props.blobs.push(blob)
+        this.props.blobs.push(obj)
         this.forceUpdate()
     }
 
     getMedia = () => {
         return Promise.all(this.props.blobs.map(async l => {
-            return await FileAPI.uploadDocument(await fetch(l.blob).then(r => r.arrayBuffer()), l.file.name)
+            return await FileAPI.uploadDocument(await l.blob.arrayBuffer(), l.file.name, {
+                mime_type: l.file.type
+            })
         }))
     }
 }

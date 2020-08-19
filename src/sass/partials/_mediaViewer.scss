@@ -57,7 +57,7 @@
                 flex-direction: row;
 
                 .avatar {
-                    filter: brightness(50%);
+                    filter: brightness(75%);
                     --avatar-size: 44px;
                 }
 
@@ -121,7 +121,7 @@
                 position: absolute;
                 filter: drop-shadow(0px 0px 3px rgba(16, 35, 47, 0.35));
                 font-size: 48px;
-                opacity: 0;
+                opacity: 50%;
                 transition: anim(opacity);
                 z-index: 2;
 

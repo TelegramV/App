@@ -8,12 +8,12 @@ export class PeerPhoto {
      */
     constructor(peer, rawPhoto) {
         this._peer = peer
-        this._rawPhoto = rawPhoto
+        this._photo = peer?._full?.photo
 
         this._type = "chatPhotoEmpty"
 
         this._photoSmall = undefined
-        this._photoBig = undefined
+        //this._photoBig = undefined
         this._dcId = -1
 
         this._photoSmallUrl = ""
@@ -38,14 +38,17 @@ export class PeerPhoto {
         return this._peer
     }
 
+    get hasVideo() {
+        return this.rawPhoto.has_video
+    }
+
     /**
      * @return {string}
      */
     get smallUrl() {
         if (!this.isEmpty) {
-            if (this._photoSmallUrl === "" && !this._isFetchingSmall) {
+            if (!this._photoSmallUrl === "" && !this._isFetchingSmall) {
                 this.fetchSmall()
-                return this._photoSmallUrl
             }
 
             return this._photoSmallUrl
@@ -96,6 +99,33 @@ export class PeerPhoto {
     }
 
     /**
+     * @return {string}
+     */
+    get videoUrl() {
+        if (!this.isEmpty) {
+            if (this._videoUrl === "" && !this._isFetchingVideo) {
+                this.fetchVideo()
+                return this._videoUrl
+            }
+            let startTime = 0;
+            if(this._photo?.video_sizes) startTime = this._photo.video_sizes[0].video_start_ts
+            let url = this._videoUrl ? (this._videoUrl + "#t=" + startTime) : null
+            return url;
+        } else {
+            return ""
+        }
+    }
+
+    /**
+     * @param videoUrl
+     */
+    set videoUrl(videoUrl) {
+        this._videoUrl = videoUrl
+
+        this._peer.fire("updateProfileVideo")
+    }
+
+    /**
      * @return {{num: number, text: string}}
      */
     get letter() {
@@ -116,11 +146,12 @@ export class PeerPhoto {
      * @param rawPhoto
      */
     fillRaw(rawPhoto) {
+        this.rawPhoto = rawPhoto;
         if (rawPhoto && rawPhoto._ !== "chatPhotoEmpty" && rawPhoto._ !== "userProfilePhotoEmpty") {
             this._type = rawPhoto._
 
             this._dcId = rawPhoto.dc_id
-            this._photoBig = rawPhoto.photo_big
+            //this._photoBig = rawPhoto.photo_big
 
             if (!this._photoSmall || this._photoSmall.volume_id !== rawPhoto.photo_small.volume_id || this._photoSmall.local_id !== rawPhoto.photo_small.local_id) {
                 this._photoSmall = rawPhoto.photo_small
@@ -136,10 +167,15 @@ export class PeerPhoto {
         }
     }
 
+    fillFull(photo) {
+        this._photo = photo;
+    }
+
     /**
      * @return {Promise<string>}
      */
     fetchSmall() {
+        if(this._photoSmallUrl) return this._photoSmallUrl
         this._isFetchingSmall = true
 
         if (!this._photoSmall) {
@@ -154,19 +190,39 @@ export class PeerPhoto {
     }
 
     /**
+     * Fetching big from full user
      * @return {Promise<string>}
      */
-    fetchBig() {
+    async fetchBig() {
+        if(this._photoBigUrl) return this._photoBigUrl;
         this._isFetchingBig = true
 
-        if (!this._photoBig) {
-            return Promise.reject("no big photo found")
+        if(!this._photo) {
+            await this._peer.fetchFull();
         }
 
-        return FileAPI.getPeerPhoto(this._photoBig, this._dcId, this._peer, true).then(url => {
+        return FileAPI.downloadPhoto(this._photo, FileAPI.getMaxSize(this._photo), null, {type: "image/png"}).then(blob => {
             this._isFetchingBig = false
 
-            return this.bigUrl = url
+            return this.bigUrl = URL.createObjectURL(blob);
         })
+    }
+
+    async fetchVideo() {
+        if(this.videoUrl) return this.videoUrl;
+        this._isFetchingVideo = true;
+
+        if(!this._photo) {
+            await this._peer.fetchFull();
+        }
+
+        if(!this._photo?.video_sizes) return null;
+
+        return FileAPI.downloadPhoto(this._photo, FileAPI.getMaxSize(this._photo, false), null, {"type": "video/mp4"}).then(blob => {
+            this._isFetchingVideo = false;
+
+            return this.videoUrl = URL.createObjectURL(blob);
+        })
+
     }
 }

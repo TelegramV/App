@@ -12,13 +12,8 @@ import {GeneralSidebar} from "./General/GeneralSidebar";
 import {NotificationsSidebar} from "./Notifications/NotificationsSidebar";
 import {PrivacySidebar} from "./Privacy/PrivacySidebar";
 import {LanguageSidebar} from "./LanguageSidebar";
-import AppEvents from "../../../../../Api/EventBus/AppEvents";
-import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
-import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import {FoldersSidebar} from "./Folders/FoldersSidebar";
 import {SuperSecretSettingsSidebar} from "./SuperSecretSettingsSidebar";
-import Animated from "../../Fragments/Animated";
-import filterFilling from "../../../../../../../public/static/animated/filter_new";
 
 export class SettingsSidebar extends LeftSidebar {
 
@@ -26,34 +21,26 @@ export class SettingsSidebar extends LeftSidebar {
         const me = PeersStore.self()
 
         return <this.contentWrapper>
-            <AvatarComponent peer={me}/>
+            <AvatarComponent noSaved peer={me}/>
             <Header isLoading={!me}>{me?.name}</Header>
             <Subheader isLoading={!me}>{me ? "+" + me.phone : ""}</Subheader>
 
             <Section>
-                <IconButton icon="edit" text="Edit Profile" onClick={_ => {}}/>
-                <IconButton icon="folder" text="Chat Folders" onClick={_ => UIEvents.Sidebars.fire("push", FoldersSidebar)}/>
-                <IconButton icon="settings" text="General Settings" onClick={_ => UIEvents.Sidebars.fire("push", GeneralSidebar)}/>
-                <IconButton icon="unmute" text="Notifications" onClick={_ => UIEvents.Sidebars.fire("push", NotificationsSidebar)}/>
-                <IconButton icon="lock" text="Privacy and Security" onClick={_ => UIEvents.Sidebars.fire("push", PrivacySidebar)}/>
-                <IconButton icon="language" text="Language" onClick={_ => UIEvents.Sidebars.fire("push", LanguageSidebar)}/>
+                <IconButton icon="edit" text={this.l("lng_settings_information")} onClick={_ => {
+                }}/>
+                <IconButton icon="folder" text={this.l("lng_settings_section_filters")}
+                            onClick={_ => UIEvents.Sidebars.fire("push", FoldersSidebar)}/>
+                <IconButton icon="settings" text={this.l("lng_settings_section_general")}
+                            onClick={_ => UIEvents.Sidebars.fire("push", GeneralSidebar)}/>
+                <IconButton icon="unmute" text={this.l("lng_settings_section_notify")}
+                            onClick={_ => UIEvents.Sidebars.fire("push", NotificationsSidebar)}/>
+                <IconButton icon="lock" text={this.l("lng_settings_section_privacy")}
+                            onClick={_ => UIEvents.Sidebars.fire("push", PrivacySidebar)}/>
+                <IconButton icon="language" text={this.l("lng_settings_language")}
+                            onClick={_ => UIEvents.Sidebars.fire("push", LanguageSidebar)}/>
             </Section>
         </this.contentWrapper>
     }
-
-    reactive(R) {
-        PeersStore.onSet(({peer}) => {
-            if (peer.isSelf) {
-                R.object(peer)
-                    .on("updatePhotoSmall", this.forceUpdate)
-                    .on("updatePhoto", this.forceUpdate)
-
-                this.forceUpdate()
-            }
-        })
-    }
-
-
 
     get rightButtons(): *[] {
         return [{
@@ -67,7 +54,7 @@ export class SettingsSidebar extends LeftSidebar {
     }
 
     get title(): string | * {
-        return "Settings"
+        return this.l("lng_menu_settings")
     }
 
 
@@ -75,7 +62,7 @@ export class SettingsSidebar extends LeftSidebar {
         VUI.ContextMenu.openBelow([
             {
                 icon: "logout",
-                title: "Log out",
+                title: this.l("lng_settings_logout"),
                 onClick: _ => {
                     logout()
                 }

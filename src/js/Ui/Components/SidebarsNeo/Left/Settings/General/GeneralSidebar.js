@@ -26,11 +26,11 @@ export class GeneralSidebar extends LeftSidebar {
 
     content(): * {
         return <this.contentWrapper>
-            <Section title="Settings">
+            <Section title={this.l("lng_menu_settings")}>
                 <VSlider label="Message Text Size" value={16} max={22} min={10}/>
-                <IconButton icon="photo" text="Chat Background"
+                <IconButton icon="photo" text={this.l("lng_settings_section_background")}
                             onClick={_ => UIEvents.Sidebars.fire("push", BackgroundImageSidebar)}/>
-                <CheckboxButton checked text="Enable Animations"/>
+                <CheckboxButton checked text={this.l("lng_settings_enable_animations")}/>
                 <VInput label="Phone calls bridge" value={this.state.phoneCallsBridge}
                         onInput={this.changePhoneCallsBridge}/>
                 <Hint>Currently phone calls can only be used with either TCP or UDP protocol. In web we can't use neither of these,
@@ -54,14 +54,14 @@ export class GeneralSidebar extends LeftSidebar {
                 },
             ]}/>
 
-            <Section title="Auto-Download Media">
+            <Section title={this.l("lng_media_auto_settings")}>
                 <CheckboxButton checked text="Contacts"/>
                 <CheckboxButton checked text="Private Chats"/>
                 <CheckboxButton checked text="Group Chats"/>
                 <CheckboxButton checked text="Channels"/>
             </Section>
 
-            <Section title="Auto-Play Media">
+            <Section title={this.l("lng_media_auto_play")}>
                 <CheckboxButton checked text="GIFs"/>
                 <CheckboxButton checked text="Videos"/>
             </Section>
@@ -83,6 +83,6 @@ export class GeneralSidebar extends LeftSidebar {
     }
 
     get title(): string | * {
-        return "General"
+        return this.l("lng_settings_section_general")
     }
 }

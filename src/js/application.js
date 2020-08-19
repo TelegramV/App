@@ -4,6 +4,7 @@ import MTProto from "./MTProto/External"
 import AppCache from "./Api/Cache/AppCache"
 
 import VApp from "./V/vapp"
+import VRDOM from "./V/VRDOM/VRDOM"
 import AppRoutes from "./Ui/Routing"
 
 import RippleVRDOMPlugin from "./Ui/Plugins/RipplePlugin"
@@ -12,8 +13,11 @@ import HorizontalScrollVRDOMPlugin from "./Ui/Plugins/HorizontalScrollPlugin"
 
 import PeerFactory from "./Api/Peers/PeerFactory"
 import PeersStore from "./Api/Store/PeersStore"
+import Locale from "./Api/Localization/Locale"
 
 import keval from "./Keval/keval"
+import API from "./Api/Telegram/API"
+import {FileAPI} from "./Api/Files/FileAPI"
 
 import "./globals"
 import "./polyfills"
@@ -29,6 +33,10 @@ if (__IS_PRODUCTION__) {
     document.title = "[dev] Connecting.."
     window.invoke = MTProto.invokeMethod
     window.devkeval = keval
+    window.telegram = API
+    window.files = FileAPI
+    window.VRDOM = VRDOM
+    window.locale = Locale
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)
@@ -48,8 +56,26 @@ MTProto.connect().then(user => {
     }
 
     if (__IS_PRODUCTION__) {
-        document.title = "Telegram V"
+        document.title = "Telegram V (Beta)"
     } else {
         document.title = "[dev] Telegram V"
     }
 })
+
+// const a = ["1", "2", "3", "4", "5", "6"];
+// const b = ["1", "3", "9", "5", "6", "7", "8"];
+//
+// const diff = {};
+//
+// for (let i = 0; i < b.length; i++) {
+//     const bi = b[i];
+//     const abi = a.findIndex(it => it === bi);
+//
+//     if (abi > 0) {
+//         diff[i] = abi;
+//     } else {
+//         diff[i] = bi;
+//     }
+// }
+//
+// console.log(diff);

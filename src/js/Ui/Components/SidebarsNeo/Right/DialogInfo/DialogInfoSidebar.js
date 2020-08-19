@@ -11,6 +11,7 @@ import IconText from "../../Fragments/IconText";
 import CheckboxButton from "../../Fragments/CheckboxButton";
 import {DialogInfoMaterials} from "./Fragments/DialogInfoMaterials";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
+import {getNewlines} from "../../../../../Utils/htmlHelpers"
 
 export class DialogInfoSidebar extends RightSidebar {
 
@@ -40,16 +41,17 @@ export class DialogInfoSidebar extends RightSidebar {
         const peer = AppSelectedInfoPeer.Current
         const muted = !peer || !peer.full || !peer.full.notify_settings || peer.full.notify_settings.mute_until > 0 || peer.full.notify_settings.silent
 
+        let bio = getNewlines(peer?.full?.about);
         return <this.contentWrapper onScroll={this.materialsRef.component?.onScroll}>
-            <AvatarComponent peer={peer}/>
-            <Header>{peer?.name}</Header>
-            <Subheader isOnline={peer?.statusString.online}>{peer?.statusString.text}</Subheader>
+            <AvatarComponent peer={peer} alwaysPlay/>
+            <Header>{peer?.isSelf ? this.l("lng_saved_messages") : peer?.name}</Header>
+            <Subheader>{this.lp(peer?.status)}</Subheader>
 
             <Section>
-                <IconText icon="info" text={peer?.full?.about} description="Bio"/>
-                <IconText icon="username" text={peer?.username} description="Username"/>
-                <IconText icon="phone" text={peer?.phone} description="Phone"/>
-                <CheckboxButton checked={!muted} text="Notifications" isDescriptionAsState onClick={this.changeNotificationsStatus}/>
+                <IconText icon="info" text={bio} description={this.l("lng_info_bio_label")}/>
+                <IconText icon="username" text={peer?.username} description={this.l("lng_info_username_label")}/>
+                <IconText icon="phone" text={peer?.phone} description={this.l("lng_info_mobile_label")}/>
+                <CheckboxButton checked={!muted} text={this.l("lng_profile_enable_notifications")} isDescriptionAsState onClick={this.changeNotificationsStatus}/>
             </Section>
 
             <DialogInfoMaterials ref={this.materialsRef}/>
@@ -92,6 +94,6 @@ export class DialogInfoSidebar extends RightSidebar {
     }
 
     get title(): string | * {
-        return "Info"
+        return this.l("lng_profile_info_section")
     }
 }

@@ -12,6 +12,9 @@ import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import __component_destroy from "../../../../../V/VRDOM/component/__component_destroy"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
+/**
+ * @deprecated DOES NOT WORK!
+ */
 export class DialogComponent extends StatelessComponent {
     dialog: Dialog
 
@@ -21,7 +24,6 @@ export class DialogComponent extends StatelessComponent {
 
     timeFragmentRef = VComponent.createFragmentRef()
     textFragmentRef = VComponent.createFragmentRef()
-    avatarFragmentRef = VComponent.createFragmentRef()
     unreadCountFragmentRef = VComponent.createFragmentRef()
     unreadMentionsCountFragmentRef = VComponent.createFragmentRef()
     unreadMarkFragmentRef = VComponent.createFragmentRef()
@@ -67,8 +69,6 @@ export class DialogComponent extends StatelessComponent {
 
         R.object(this.props.dialog.peer)
             .on("messages.new", this.onDialogNewMessage)
-            .on("updatePhoto", this.onPeerUpdatePhoto)
-            .on("updatePhotoSmall", this.onPeerUpdatePhoto)
             .on("updateUserStatus", this.onPeerUpdateUserStatus)
     }
 
@@ -79,7 +79,6 @@ export class DialogComponent extends StatelessComponent {
                             contextMenu={dialogContextMenu(this.props.dialog, this.props.folderId)}
                             timeFragmentRef={this.timeFragmentRef}
                             textFragmentRef={this.textFragmentRef}
-                            avatarFragmentRef={this.avatarFragmentRef}
                             unreadCountFragmentRef={this.unreadCountFragmentRef}
                             unreadMentionsCountFragmentRef={this.unreadMentionsCountFragmentRef}
                             unreadMarkFragmentRef={this.unreadMarkFragmentRef}
@@ -162,10 +161,6 @@ export class DialogComponent extends StatelessComponent {
         this.unreadMarkFragmentRef.patch()
     }
 
-    onPeerUpdatePhoto = _ => {
-        this.avatarFragmentRef.patch()
-    }
-
     onPeerUpdateUserStatus = _ => {
         this._patchStatus()
     }
@@ -185,7 +180,7 @@ export class DialogComponent extends StatelessComponent {
 
     _patchStatus = () => {
         if (this.__.mounted) {
-            if (this.props.dialog.peer.onlineStatus.online) {
+            if (this.props.dialog.peer.online) {
                 this.$el.classList.add("online")
             } else {
                 this.$el.classList.remove("online")

@@ -19,7 +19,7 @@ import {ChannelPeer} from "../../../../../Api/Peers/Objects/ChannelPeer"
 import {GroupPeer} from "../../../../../Api/Peers/Objects/GroupPeer"
 import {SupergroupPeer} from "../../../../../Api/Peers/Objects/SupergroupPeer"
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer"
-import {DialogAvatarFragment} from "./Fragments/DialogAvatarFragment"
+import AvatarComponent from "../../../Basic/AvatarComponent"
 import {Dialog} from "../../../../../Api/Dialogs/Dialog"
 import VUI from "../../../../VUI"
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
@@ -92,7 +92,7 @@ export const dialogContextMenu = (dialog: Dialog, folderId) => {
             red: true,
             onClick: _ => {
                 VUI.Modal.open(<div className="delete-chat-title">
-                        <DialogAvatarFragment peer={dialog.peer}/>
+                        <AvatarComponent peer={dialog.peer}/>
                         Delete Chat?
                     </div>,
                     <div className="delete-chat-body">

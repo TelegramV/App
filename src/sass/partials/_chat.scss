@@ -19,7 +19,8 @@
     font-size: 30px;
     border-radius: 50%;
     cursor: pointer;
-    transition: bottom 500ms cubic-bezier(0.175, 0.885, 0.32, 1.0);
+    transition: bottom 500ms cubic-bezier(0.175, 0.885, 0.32, 1.0),
+                opacity 500ms ease-in;
 
     i {
         position: absolute;
@@ -193,7 +194,7 @@
 
         #topbar {
             width: 100%;
-            min-height: 60px;
+            min-height: 56px;
             background-color: #fff;
             padding: 0 9px;
             box-sizing: border-box;
@@ -259,7 +260,7 @@
             display: flex;
             align-items: center;
             width: 100%;
-            min-height: 60px;
+            min-height: 52px;
             max-height: 60px;
             box-sizing: border-box;
             font-size: 14px;

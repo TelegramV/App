@@ -27,6 +27,10 @@ class PeerName extends StatelessComponent {
             .filter(event => event.peer === this.props.peer)
             .updateOn("peer.updateName")
             .updateOn("peer.update");
+        E.bus(AppEvents.Peers)
+            .filter(event => event.peer === this.props.chat 
+                && event.user === this.props.peer)
+            .updateOn("peer.updateRank")
     }
 
     render({template, peer}) {

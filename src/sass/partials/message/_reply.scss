@@ -1,6 +1,27 @@
 @mixin reply($in: false, $transparent: false) {
     & .reply {
+        font-size: 14px;
+
+        &:hover {
+            cursor: pointer;
+            @if $in {
+                background-color: $lightgrey;
+            } 
+            @if $in == false {
+                background-color: mix($lightgreen, $lightgrey, 40%);
+            }
+        }
+        //TODO duplicate of code from box, refractor it
         .quote {
+            padding-left: 8px;
+            .name {
+                font-weight: 500;
+                margin-top: 5px;
+
+                &:first-child {
+                    margin-top: 0px;
+                }
+            }
             .name, .text {
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -9,15 +30,6 @@
         }
 
         @if $transparent {
-            position: absolute;
-            @if $in {
-                right: 0;
-                transform: translateX(calc(100% + 10px));
-            }
-            @if $in == false {
-                left: 0;
-                transform: translateX(calc(-100% - 10px));
-            }
             background-color: white;
             border-radius: 10px;
             padding: 8px;

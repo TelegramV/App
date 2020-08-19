@@ -27,7 +27,7 @@ export class FolderPeersSidebar extends LeftSidebar {
             nodeIf(<VTagIcon icon="bots" text="Bots" onRemove={l => this.toggle("bots")}/>, f.bots),
         ]
 
-        DialogsStore.toSortedArray().forEach(dialog => {
+        DialogsStore.sort().forEach(dialog => {
             const exists = this.state.selectedChats.has(dialog.peer)
             if(exists) {
                 tags.push(<VTag peer={dialog.peer} onRemove={ev => {
@@ -64,7 +64,7 @@ export class FolderPeersSidebar extends LeftSidebar {
 
             <Section title="Chats">
             {
-                DialogsStore.toSortedArray().map(dialog => {
+                DialogsStore.sort().map(dialog => {
 
                     if(!this.state.filter || dialog.peer.name.toLowerCase().includes(this.state.filter.toLowerCase())) {
                         const exists = this.state.selectedChats.has(dialog.peer)

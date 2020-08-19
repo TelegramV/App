@@ -108,6 +108,44 @@ function x(arrayBuffer) {
 }
 
 export function loadSchema() {
+    return fetch(`static/schema${AppConfiguration.mtproto.api.layer}.dat`).then(response => {
+        if(response.ok) {
+            return response.arrayBuffer();
+        } else {
+            throw new Error(`Failed to fetch schema for layer ${AppConfiguration.mtproto.api.layer}`)
+        }
+    }).then(buffer => {
+        x(buffer)
+        schema.indexes = {
+            constructors: {
+                ids: {},
+                types: {},
+                predicates: {},
+            },
+            methods: {
+                ids: {},
+                names: {},
+            },
+        }
+
+        for (let i = 0; i < schema.constructors.length; i++) {
+            const {id, type, predicate} = schema.constructors[i]
+            schema.indexes.constructors.ids[id] = i
+            schema.indexes.constructors.types[type] = i
+            schema.indexes.constructors.predicates[predicate] = i
+        }
+
+        for (let i = 0; i < schema.methods.length; i++) {
+            const {id, method} = schema.methods[i]
+            schema.indexes.methods.ids[id] = i
+            schema.indexes.methods.names[method] = i
+        }
+
+        return xSchema;
+    })
+}
+
+/*export function loadSchemaOld() {
     return new Promise(resolve => {
         // console.time("schema")
         const xhr = new XMLHttpRequest()
@@ -151,4 +189,4 @@ export function loadSchema() {
 
         xhr.send(null);
     })
-}
+}*/

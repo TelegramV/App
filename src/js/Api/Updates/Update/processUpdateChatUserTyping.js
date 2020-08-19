@@ -18,6 +18,7 @@
  */
 
 import PeersStore from "../../Store/PeersStore";
+import AppEvents from "../../EventBus/AppEvents"
 
 const processUpdateChatUserTyping = update => {
     let peer = PeersStore.get("chat", update.chat_id) || PeersStore.get("channel", update.chat_id);
@@ -27,6 +28,8 @@ const processUpdateChatUserTyping = update => {
     } else {
         peer.dialog.addAction(update);
     }
+
+    AppEvents.Telegram.fire("updateChatUserTyping", update);
 }
 
 export default processUpdateChatUserTyping

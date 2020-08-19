@@ -40,6 +40,8 @@ const processUpdateDialogPinned = update => {
     }
 
     peer.dialog.pinned = update.pinned || false;
+
+    AppEvents.Telegram.fire("updateDialogPinned", update);
 }
 
 export default processUpdateDialogPinned

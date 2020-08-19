@@ -18,6 +18,7 @@
  */
 
 import PeersStore from "../../Store/PeersStore"
+import AppEvents from "../../EventBus/AppEvents"
 
 function processUpdateNotifySettings(update) {
     if (update.peer._ === "notifyPeer") {
@@ -37,6 +38,8 @@ function processUpdateNotifySettings(update) {
             });
         }
     }
+
+    AppEvents.Telegram.fire("updateNotifySettings", update);
 }
 
 export default processUpdateNotifySettings

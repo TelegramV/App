@@ -4,8 +4,11 @@
         max-width: 512px;
         height: auto;
         max-height: 512px;
-        cursor: pointer;
         display: block;
+
+        &.clickable {
+            cursor: pointer;
+        }
 
         img {
             border-radius: 8px; // DENYS, DO NOT TOUCH IT!!!(((

@@ -22,6 +22,7 @@ import processUpdateReadChannelOutbox from "./Update/processUpdateReadChannelOut
 import processUpdateFolderPeers from "./Update/processUpdateFolderPeers"
 import processUpdateDialogPinned from "./Update/processUpdateDialogPinned"
 import processUpdateUserStatus from "./Update/processUpdateUserStatus"
+import processUpdateServiceNotification from "./Update/processUpdateServiceNotification"
 import processUpdateUserPinnedMessage from "./Update/processUpdateUserPinnedMessage"
 import processUpdateChatPinnedMessage from "./Update/processUpdateChatPinnedMessage"
 import processUpdateChannelPinnedMessage from "./Update/processUpdateChannelPinnedMessage"
@@ -96,6 +97,7 @@ export class UpdateManager extends Manager {
         this.subscribe("updateNewStickerSet", processUpdateNewStickerSet)
         this.subscribe("updateStickerSets", processUpdateStickerSets)
         this.subscribe("updateStickerSetsOrder", processUpdateStickerSetsOrder)
+        this.subscribe("updateServiceNotification", processUpdateServiceNotification)
 
         this.customUpdatesProcessors = new Map([
             ["updatesTooLong", processUpdatesTooLong],

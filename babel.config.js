@@ -1,4 +1,4 @@
-{
+module.exports = {
   "presets": [
     [
       "@babel/preset-env",
@@ -25,5 +25,10 @@
         "pragmaFrag": "VRDOM.Fragment"
       }
     ]
-  ]
+  ],
+  "env": {
+    "test": {
+      "plugins": ["@babel/plugin-transform-modules-commonjs"]
+    }
+  }
 }

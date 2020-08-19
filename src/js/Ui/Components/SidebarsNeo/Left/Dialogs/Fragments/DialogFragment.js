@@ -1,18 +1,18 @@
 import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer"
 import AppSelectedChat from "../../../../../Reactive/SelectedChat"
-import {DialogAvatarFragment} from "./DialogAvatarFragment"
+import AvatarComponent from "../../../../Basic/AvatarComponent"
 import {DialogTimeFragment} from "./DialogTimeFragment"
 import {DialogTextFragment} from "./DialogTextFragment"
 import {DialogUnreadMentionsCountBadge} from "./DialogUnreadMentionsCountBadge"
 import {DialogUnreadCountBadge} from "./DialogUnreadCountBadge"
 import {DialogUnreadMarkBadge} from "./DialogUnreadMarkBadge"
+import Locale from "../../../../../../Api/Localization/Locale"
 
 export const DialogFragment = (
     {
         dialog,
         contextMenu,
         click,
-        avatarFragmentRef,
         timeFragmentRef,
         textFragmentRef,
         unreadMentionsCountFragmentRef,
@@ -27,7 +27,7 @@ export const DialogFragment = (
     const personClasses = {
         "person": true,
         "rp": true,
-        "online": peer instanceof UserPeer && peer.onlineStatus.online,
+        "online": peer instanceof UserPeer && peer.online,
         "active": AppSelectedChat.check(dialog.peer),
         "unread": dialog.peer.messages.unreadMentionsCount > 0 || dialog.peer.messages.unreadCount > 0 || dialog.unreadMark,
         "muted": dialog.isMuted,
@@ -44,18 +44,19 @@ export const DialogFragment = (
     return (
         <div data-message-id={lastMessage.id}
              className={personClasses}
-
              onClick={click}
-             onContextMenu={contextMenu}>
+             onContextMenu={contextMenu}
+             style={{
+                 // "height": "70px",
+             }}>
 
-            <DialogAvatarFragment ref={avatarFragmentRef}
-                                  peer={dialog.peer}/>
+            <AvatarComponent peer={dialog.peer}/>
 
             <div className="content">
 
                 <div className="top">
                     <div className="title">
-                        {peer.isSelf ? "Saved Messages" : peer.name}
+                        {peer.isSelf ? Locale.l("lng_saved_messages") : peer.name}
                     </div>
 
                     <div className="status tgico"/>

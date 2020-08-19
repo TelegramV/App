@@ -16,14 +16,15 @@
  */
 
 import {ModalHeaderFragment} from "./ModalHeaderFragment";
-import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent"
 import BetterStickerComponent from "../Basic/BetterStickerComponent"
 import VButton from "../../Elements/Button/VButton"
 import StickersState from "../../SharedStates/StickersState"
 import {StickerManager} from "../../../Api/Stickers/StickersManager"
+import VUI from "../../VUI"
 import "./StickerSetModal.scss"
 
-export class StickerSetModal extends StatefulComponent {
+export class StickerSetModal extends TranslatableStatefulComponent {
 
     state = StickersState
 
@@ -43,9 +44,12 @@ export class StickerSetModal extends StatefulComponent {
     }
 
     componentDidMount() {
+        // TODO: catch if set is invalid
         if (!this.props.set.isFetched) {
             this.props.set.getStickerSet().then(set => {
                 this.forceUpdate();
+            }).catch(ex => {
+                VUI.Modal.popup(this.l("lng_stickers_not_found"));
             })
         }
     }

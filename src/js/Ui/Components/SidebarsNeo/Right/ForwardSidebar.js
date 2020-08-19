@@ -32,11 +32,16 @@ export class ForwardSidebar extends GenericSidebar {
 
     render(): * {
         return (
-            <div className={["forward-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.reallyHidden, "really-hidden")]} onClick={this.onClickBehind}>
-                <div className={this.classes} onAnimationEnd={this.onTransitionEnd} onClick={event => event.stopPropagation()}>
+            <div
+                className={["forward-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.reallyHidden, "really-hidden")]}
+                onClick={this.onClickBehind}>
+                <div className={this.classes} onAnimationEnd={this.onTransitionEnd}
+                     onClick={event => event.stopPropagation()}>
                     {this.header()}
                     {this.content()}
-                    {nodeIf(<FloatingActionButton icon={this.floatingActionButtonIcon} hidden={this.isFloatingActionButtonHidden} onClick={this.onFloatingActionButtonPressed}/>, !!this.floatingActionButtonIcon)}
+                    {nodeIf(<FloatingActionButton icon={this.floatingActionButtonIcon}
+                                                  hidden={this.isFloatingActionButtonHidden}
+                                                  onClick={this.onFloatingActionButtonPressed}/>, !!this.floatingActionButtonIcon)}
                 </div>
             </div>
         )
@@ -60,15 +65,15 @@ export class ForwardSidebar extends GenericSidebar {
 
             <Section>
                 {
-                    DialogsStore.toSortedArray().map(dialog => {
-                        if(!this.state.filter || dialog.peer.name.toLowerCase().includes(this.state.filter.toLowerCase())) {
-                            if(dialog.peer.canSendMessage) {
+                    DialogsStore.sort().map(dialog => {
+                        if (!this.state.filter || dialog.peer.name.toLowerCase().includes(this.state.filter.toLowerCase())) {
+                            if (dialog.peer.canSendMessage) {
                                 return <AvatarCheckmarkButton peer={dialog.peer}
-                                                     isNameAsText isStatusAsDescription
-                                                                 checked={this.state.selected.includes(dialog.peer)}
-                                                                 onClick={ev => {
-                                                                     this.togglePeer(dialog.peer)
-                                                                 }}/>
+                                                              isNameAsText isStatusAsDescription
+                                                              checked={this.state.selected.includes(dialog.peer)}
+                                                              onClick={ev => {
+                                                                  this.togglePeer(dialog.peer)
+                                                              }}/>
                             }
                         }
                         return ""
@@ -101,7 +106,7 @@ export class ForwardSidebar extends GenericSidebar {
 
     onPeerNameInput = (event) => {
         const text = event.target.value.trim()
-        if(text.length === 0) {
+        if (text.length === 0) {
             this.state.filter = null
         } else {
             this.state.filter = text
@@ -111,7 +116,7 @@ export class ForwardSidebar extends GenericSidebar {
     }
 
     togglePeer = (peer) => {
-        if(this.state.selected.includes(peer)) {
+        if (this.state.selected.includes(peer)) {
             this.state.selected = this.state.selected.filter(l => l !== peer)
         } else {
             this.state.selected.push(peer)

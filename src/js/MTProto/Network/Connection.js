@@ -212,17 +212,7 @@ class Connection {
         method_serializer.string(navigator.language || "en"); // system_lang_code
         method_serializer.string(""); // lang_pack
         method_serializer.string(navigator.language || "en"); // lang_code
-        method_serializer.object({
-            _: "jsonObject",
-            value: [{
-                _: "jsonObjectValue",
-                key: "tz_offset",
-                value: {
-                    _: "jsonNumber",
-                    value: this.timezoneOffset
-                }
-            }]
-        }, "Object"); //FIXME JSON Packer
+        method_serializer.object({tz_offset: this.timezoneOffset}, "JSONValue");
         // this.initConnection = true;
         // }
 

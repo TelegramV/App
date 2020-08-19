@@ -18,6 +18,7 @@
  */
 
 import MessagesManager from "../../../Messages/MessagesManager"
+import AppEvents from "../../../EventBus/AppEvents"
 
 function processUpdateEditMessage(update) {
     const dialogPeer = MessagesManager.getToPeerMessage(update.message);
@@ -31,6 +32,8 @@ function processUpdateEditMessage(update) {
     } else {
         console.log("BUG: [processUpdateEditMessage] no peer found");
     }
+
+    AppEvents.Telegram.fire("updateEditMessage", update);
 }
 
 export default processUpdateEditMessage;

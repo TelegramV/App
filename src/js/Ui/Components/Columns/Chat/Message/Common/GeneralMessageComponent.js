@@ -1,7 +1,7 @@
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import type {BusEvent} from "../../../../../../Api/EventBus/EventBus"
 import type {Message} from "../../../../../../Api/Messages/Message"
-import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulComponent"
+import TranslatableStatefulComponent from "../../../../../../V/VRDOM/component/TranslatableStatefulComponent"
 import {isGrouping, isSameDate} from "../../messagesUtils"
 import {isElementInViewport} from "../../../../../Utils/isElementInViewport"
 
@@ -10,7 +10,7 @@ type Props = {
     observer: IntersectionObserver;
 }
 
-class GeneralMessageComponent extends StatefulComponent<Props> {
+class GeneralMessageComponent extends TranslatableStatefulComponent<Props> {
     appEvents(E) {
         E.bus(AppEvents.Peers)
             .filter(event => event.peer === this.props.message.dialogPeer)

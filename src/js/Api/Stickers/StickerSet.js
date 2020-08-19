@@ -33,7 +33,17 @@ class StickerSet {
         this._isAnimated = isAnimated;
     }
 
+    isEmpty() {
+        return this.raw._ === "inputStickerSetEmpty";
+    }
+
     get input() {
+        if(this.raw.short_name) {
+            return {
+                _: "inputStickerSetShortName",
+                short_name: this.raw.short_name
+            }
+        }
         return {
             _: "inputStickerSetID",
             id: this.raw.id,

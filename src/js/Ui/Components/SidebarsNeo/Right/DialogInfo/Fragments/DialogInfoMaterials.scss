@@ -1,12 +1,10 @@
 @import "src/sass/partials/vars";
 
 .materials {
-    margin-top: 60px;
     position: relative;
 
-    .tab-selector {
+    .tab-selector-wrapper {
         position: sticky;
-        justify-content: space-around;
         top: -8px;
         z-index: 5;
     }
@@ -180,13 +178,15 @@
         }
 
         > .member {
-            padding: 10px;
+            padding: 8px;
+            margin: 2px;
             display: flex;
             flex-direction: row;
             text-align: left;
             width: 100%;
             transition: anim(background-color);
             border-radius: 6px;
+            cursor: pointer;
 
             &:hover {
                 background-color: $light;
@@ -208,6 +208,7 @@
                     text-overflow: ellipsis;
                     white-space: nowrap;
                     margin-bottom: 3px;
+                    font-weight: 500;
                 }
 
                 .status {

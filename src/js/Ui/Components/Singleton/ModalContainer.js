@@ -31,6 +31,8 @@ class ModalContainer extends StatefulComponent {
 
     init() {
         VUI.Modal = this
+
+        window.popup = this.popup;
     }
 
     // TODO fix loginscreen modal
@@ -42,7 +44,7 @@ class ModalContainer extends StatefulComponent {
                 className={classNames("modal-wrapper", classIf(this.state.hidden, "hidden"), classIf(this.state.unhidden, "unhidden"), classIf(this.state.reallyHidden, "really-hidden"))}
                 onAnimationEnd={this.onTransitionEnd}>
                 <div className="modal" onClick={this.close}>
-                    <div className="dialog scrollable" onClick={event => event.stopPropagation()}>
+                    <div className="dialog" onClick={event => event.stopPropagation()}>
                         {this.state.body}
                     </div>
                 </div>
@@ -75,9 +77,7 @@ class ModalContainer extends StatefulComponent {
         })
     }
 
-    prompt = (header, content, yes, no) => {
-        no = no ? no : this.close();
-
+    prompt = (header, content, yes = this.close, no = this.close) => {
         this.open(
             <div className="prompt">
                 <div className="header">
@@ -94,6 +94,21 @@ class ModalContainer extends StatefulComponent {
                 </div>
             </div>
         )
+    }
+
+    popup = (text, ok = this.close) => {
+    	this.open(
+    		<div className="popup">
+    			<div class="content scrollable">
+                    <div class="container">
+                        {text}
+                    </div>
+                </div>
+                <div class="buttons">
+                    <VButton isFlat isUppercase onClick={ok}>OK</VButton>
+                </div>
+    		</div>
+    		)
     }
 }
 

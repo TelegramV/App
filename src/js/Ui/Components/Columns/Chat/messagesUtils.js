@@ -43,6 +43,8 @@ export function isGrouping(one: Message, two: Message) {
     if (!one || !two ||
         one.type === MessageType.GROUP || two.type === MessageType.GROUP ||
         one.type === MessageType.SERVICE || two.type === MessageType.SERVICE) return false;
+    if (one.type === MessageType.TEXT && one.isBigEmojis ||
+        two.type === MessageType.TEXT && two.isBigEmojis) return false;
     return (one.isPost || one.isOut === two.isOut)
         && (one.from.id === two.from.id)
         && (Math.abs(one.date - two.date) < 5 * 60);
@@ -85,7 +87,7 @@ export function renderVRMessage(message: Message, prevMessage: Message = null, n
     return <MessageComponent message={message}
                              observer={observer}
                              showDate={!isSameDate(message.date, prevMessage?.date)}
-                             // isNewMessages={message.dialogPeer.messages.readInboxMaxId - 40 >= message.dialogPeer.messages.last?.id && message.dialogPeer.messages.readInboxMaxId === message.id}
+        // isNewMessages={message.dialogPeer.messages.readInboxMaxId - 40 >= message.dialogPeer.messages.last?.id && message.dialogPeer.messages.readInboxMaxId === message.id}
     />;
 }
 

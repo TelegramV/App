@@ -103,8 +103,8 @@ export function domToMessageEntities(elem) {
     }
 }
 
-function getNewlines(str, ignore = false) {
-    if (ignore) {
+export function getNewlines(str, ignore = false) {
+    if (!str || ignore) {
         return str
     }
     let elements = []
@@ -139,9 +139,9 @@ const handlersLinks = {
     }}>{a}</a>,
     messageEntityBotCommand: (l, a) => <a>{a}</a>,
     // TODO can be problems when protocol is not specified
-    messageEntityUrl: (l, a, q) => <a target="_blank" href={q}>{a}</a>,
+    messageEntityUrl: (l, a, q) => <a target="_blank" href={q.match(/^http[s]?:\/\//) ? q : 'https://' + q}>{a}</a>,
     messageEntityEmail: (l, a, q) => <a href={`mailto:${q}`}>{a}</a>,
-    messageEntityTextUrl: (l, a) => <a target="_blank" href={l.url}>{a}</a>,
+    messageEntityTextUrl: (l, a) => <a target="_blank" href={l.url.match(/^http[s]?:\/\//) ? l.url : 'https://' + l.url}>{a}</a>,
     messageEntityMentionName: (l, a) => <a onClick={e => {
         e.preventDefault()
         AppSelectedInfoPeer.select(PeersStore.get("user", l.user_id))

@@ -8,7 +8,7 @@ import StickerSet from "../../../../../Api/Stickers/StickerSet"
 
 class AnimatedStickerMessageComponent extends GeneralMessageComponent {
     render({message, showDate}) {
-        let stickerSet = new StickerSet(message.raw.media.document.attributes.find(attr => attr._ === "documentAttributeSticker").stickerset);
+        let stickerSet = new StickerSet(message.media.document.attributes.find(attr => attr._ === "documentAttributeSticker").stickerset);
 
         return (
             <MessageWrapperFragment message={message}
@@ -18,9 +18,14 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
                                     bubbleRef={this.bubbleRef}
                                     showDate={showDate}>
 
-                <BetterStickerComponent onClick={() => {
-                    VUI.Modal.open(<StickerSetModal set={stickerSet}/>)
-                }} width={200} document={message.raw.media.document}/>
+                <BetterStickerComponent 
+                    clickable={!stickerSet.isEmpty()}
+                    onClick={() => {
+                        if(!stickerSet.isEmpty()) VUI.Modal.open(<StickerSetModal set={stickerSet}/>)
+                    }} 
+                    width={200} 
+                    document={message.raw.media.document}
+                />
 
                 <MessageTimeComponent message={message} bg={true}/>
 

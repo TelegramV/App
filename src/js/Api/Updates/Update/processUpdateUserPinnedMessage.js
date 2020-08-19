@@ -19,6 +19,7 @@
 
 import PeersStore from "../../Store/PeersStore";
 import {UserPeer} from "../../Peers/Objects/UserPeer";
+import AppEvents from "../../EventBus/AppEvents"
 
 function processUpdateUserPinnedMessage(update) {
     const peer = PeersStore.get("user", update.user_id);
@@ -31,6 +32,8 @@ function processUpdateUserPinnedMessage(update) {
     if (peer instanceof UserPeer) {
         peer.pinnedMessageId = update.id;
     }
+
+    AppEvents.Telegram.fire("updateUserPinnedMessage", update);
 }
 
 export default processUpdateUserPinnedMessage;

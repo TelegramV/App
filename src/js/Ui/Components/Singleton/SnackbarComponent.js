@@ -50,6 +50,7 @@ class SnackbarComponent extends StatefulComponent {
     }
 
     show = event => {
+        if(!event.keepOther) this.close(); //close other snackbars by default
         let timeout; // pizda kostyl'
         timeout = this.withTimeout(() => {
             this.clearTimeout(timeout);

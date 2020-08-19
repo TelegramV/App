@@ -74,7 +74,7 @@ export class FileAPI {
             const limit = options?.limit ?? DEFAULT_PART_SIZE;
 
             return FileAPI.downloadAllParts(location, size.size, limit, photo.dc_id, onPartDownloaded)
-                .then(file => FileAPI.getBlob(file, "image/jpeg"))
+                .then(file => FileAPI.getBlob(file, options?.type || "image/jpeg"))
                 .then(blob => FileAPI.putToCache(photo, blob, size))
         })
     }
@@ -257,17 +257,21 @@ export class FileAPI {
         })
     }
 
-    static async uploadDocument(bytes, name = "") {
-        return {
+    static async uploadDocument(bytes, name = "", params={}) {
+        let media = {
             _: "inputMediaUploadedDocument",
             file: await this.uploadFile(bytes, name),
-            attributes: [
-                {
+            mime_type: "application/octet-stream",
+            attributes: []
+        }
+        media = {...media, ...params}
+        if(!media.attributes.find(attr => attr._==="documentAttributeFilename")) { //append name if not set
+            media.attributes.push({
                     _: "documentAttributeFilename",
                     file_name: name
-                }
-            ]
+                })
         }
+        return media
     }
 
     static async uploadPhoto(bytes, name = "") {
@@ -320,17 +324,15 @@ export class FileAPI {
         })
     }
 
-    static uploadProfilePhoto(name, bytes) {
-        const id = [Random.nextInteger(0xffffffff), Random.nextInteger(0xffffffff)]
+    static async uploadProfilePhoto(photoBytes, videoBytes, videoStart = 0) {
+        let photo = await this.uploadFile(photoBytes);
+        let video = await this.uploadFile(videoBytes);
 
-        return this.saveFilePart(id, bytes).then(MTProto.invokeMethod("photos.uploadProfilePhoto", {
-            file: {
-                _: "inputFile",
-                id,
-                parts: 1,
-                name: name
-            }
-        }))
+        return MTProto.invokeMethod("photos.uploadProfilePhoto", {
+            file: photo,
+            video,
+            video_start_ts: videoStart
+        })
     }
 
     static obsolete_getFileLocation(location, dcID = null, offset = 0) {
@@ -406,15 +408,20 @@ export class FileAPI {
         return (file.sizes || file.thumbs) && (file.sizes || file.thumbs).some(l => l.type === "i")
     }
 
-    static getMaxSize(file, onlyThumb = false) {
+    static getMaxSize(file, onlyThumb = true) {
         if (!onlyThumb) {
             const video = FileAPI.getAttribute(file, "documentAttributeVideo")
             if (video) {
                 return video
             }
+            if(file.video_sizes) {
+                return file.video_sizes.reduce(function (prev, current) {
+                    return (prev.w > current.w) ? prev : current
+                })
+            }
         }
 
-        return (file.sizes || file.thumbs).reduce(function (prev, current) {
+        return (file.sizes || file.thumbs).filter(el => el._ === "photoSize").reduce(function (prev, current) {
             return (prev.w > current.w) ? prev : current
         })
     }

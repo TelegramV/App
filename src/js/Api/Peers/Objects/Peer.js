@@ -137,10 +137,14 @@ export class Peer extends ReactiveObject {
         return this.raw.username
     }
 
-    get statusString() {
-        return {
-            text: "...",
-            online: false
+    get status() {
+        return {}
+    }
+
+    get online() {
+        const now = MTProto.TimeManager.now(true);
+        if(this.raw?.status?._ === "userStatusOnline") {
+            return this.raw.status.expires > now
         }
     }
 
@@ -277,6 +281,10 @@ export class Peer extends ReactiveObject {
         return this.raw._
     }
 
+    getPeerRank(peer) {
+        return "";
+    }
+
     /**
      * Fetches all peer photos
      */
@@ -301,6 +309,7 @@ export class Peer extends ReactiveObject {
      * @return {Promise<*>}
      */
     fetchFull() {
+        if(this._full) return Promise.resolve(this._full);
         return MTProto.invokeMethod("users.getFullUser", {
             id: this.input
         }).then(userFull => {
@@ -309,6 +318,28 @@ export class Peer extends ReactiveObject {
             this.fire("fullLoaded")
 
             this.findPinnedMessage()
+            this._photo.fillFull(this._full.profile_photo);
+
+            return this._full;
+        })
+    }
+
+    //from existing media
+    updateProfilePhoto(userPhoto) {
+        let photo = userPhoto.photo
+
+        return MTProto.invokeMethod("photos.updateProfilePhoto", {
+            id: {
+                _: "inputPhoto",
+                id: photo.id,
+                access_hash: photo.access_hash,
+                file_reference: photo.file_reference
+            }
+        }).then(userProfilePhoto => {
+            this._photo.fillRaw(userProfilePhoto);
+            this._full = null;
+            this.fetchFull();
+            return userProfilePhoto;
         })
     }
 

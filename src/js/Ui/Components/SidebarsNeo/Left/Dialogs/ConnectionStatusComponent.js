@@ -1,8 +1,9 @@
 import AppConnectionStatus from "../../../../Reactive/ConnectionStatus"
 import UIEvents from "../../../../EventBus/UIEvents"
-import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import TranslatableStatelessComponent from "../../../../../V/VRDOM/component/TranslatableStatelessComponent"
+import Locale from "../../../../../Api/Localization/Locale"
 
-class ConnectionStatusComponent extends StatelessComponent {
+class ConnectionStatusComponent extends TranslatableStatelessComponent {
 
     appEvents(E) {
         E.bus(UIEvents.General)
@@ -14,14 +15,14 @@ class ConnectionStatusComponent extends StatelessComponent {
             return <div/>
         }
 
-        let statusString = "Connecting"
+        let statusString = this.l("lng_connecting")
 
         if (AppConnectionStatus.Status === AppConnectionStatus.WAITING_FOR_NETWORK) {
             statusString = "Waiting for network"
         } else if (AppConnectionStatus.Status === AppConnectionStatus.FETCHING_DIFFERENCE) {
             statusString = "Fetching updates"
         } else if (AppConnectionStatus.Status === AppConnectionStatus.CONNECTING) {
-            statusString = "Connecting"
+            statusString = this.l("lng_connecting")
         }
 
         return (

@@ -32,6 +32,7 @@ import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponen
 import SharedState from "../../../../../V/VRDOM/component/SharedState"
 import StickersState from "../../../../SharedStates/StickersState"
 import UpdatesManager from "../../../../../Api/Updates/UpdatesManager"
+import WebpHelper from "../../../../Utils/WebpHelper"
 
 class FavedState extends SharedState {
     isRefreshing = false;
@@ -131,7 +132,8 @@ class StickerSetThumbList extends StatefulComponent {
 
 class StickerSetThumb extends StatefulComponent {
     state = {
-        downloaded: false
+        downloaded: false,
+        url: undefined
     }
 
     render(props, state) {
@@ -154,7 +156,7 @@ class StickerSetThumb extends StatefulComponent {
         } else if (this.state.downloaded) {
             return (
                 <StickerSetItemFragment setId={stickerSet.raw.id}
-                                        url={stickerSet.thumbUrl}
+                                        url={this.state.url}
                                         onClick={_ => props.onClick(props.set)}/>
             )
         } else {
@@ -164,9 +166,21 @@ class StickerSetThumb extends StatefulComponent {
 
     componentDidMount() {
         this.assure(this.props.set.fetchThumb()).then(() => {
-            this.setState({
-                downloaded: true
-            })
+            if(WebpHelper.shouldConvert()) {
+                fetch(this.props.set.thumbUrl).then(blob => {
+                    return WebpHelper.convertToPng(blob);
+                }).then(url => {
+                    this.setState({
+                        downloaded: true,
+                        url: url
+                    })
+                })
+            } else {
+                this.setState({
+                    downloaded: true,
+                    url: this.props.set.thumbUrl
+                })
+            }
         })
     }
 
@@ -271,7 +285,6 @@ class StickersComposerComponent extends StatelessComponent {
                 }
             }
         }
-        VApp.mountedComponents.get("composer").hide(); //close composer after that
     }
 
     // DOM HELL

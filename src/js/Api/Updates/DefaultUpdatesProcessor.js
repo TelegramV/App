@@ -47,7 +47,6 @@ export class DefaultUpdatesProcessor extends UpdatesProcessor {
                 this.customUpdateTypeProcessors.get(rawUpdate._)(rawUpdate)
                 return
             }
-
             this.processWithValidation(queue, rawUpdate, this.updatesManager.State.pts)
         }
     }

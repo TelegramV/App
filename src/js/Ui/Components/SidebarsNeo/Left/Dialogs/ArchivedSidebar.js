@@ -43,7 +43,7 @@ export class ArchivedSidebar extends UnpatchableLeftSidebar {
 
 
     get title(): string | * {
-        return "Archived Chats"
+        return this.l("lng_archived_name")
     }
 
     get headerBorder(): boolean {

@@ -18,9 +18,12 @@
  */
 
 import StickersState from "../../../Ui/SharedStates/StickersState"
+import AppEvents from "../../EventBus/AppEvents"
 
 function processUpdateStickerSets(update) {
     StickersState.refetchStickers();
+
+    AppEvents.Telegram.fire("updateStickerSets", update);
 }
 
 export default processUpdateStickerSets;

@@ -1,10 +1,10 @@
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
-import AvatarFragment from "../../../Basic/AvatarFragment"
+import AvatarComponent from "../../../Basic/AvatarComponent"
 
 export const PeopleListItemFragment = ({name, peer}) => {
     return (
         <div class="people-list-item" onClick={() => selectPeer(peer)}>
-            <AvatarFragment peer={peer}/>
+            <AvatarComponent peer={peer} noSaved={true}/>
             <div class="name">{name}</div>
         </div>
     )

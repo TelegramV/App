@@ -18,7 +18,7 @@
 import UIEvents from "../../EventBus/UIEvents";
 import type {AE} from "../../../V/VRDOM/component/__component_appEventsBuilder";
 import {VideoMessage} from "../../../Api/Messages/Objects/VideoMessage";
-import AvatarFragment from "../Basic/AvatarFragment";
+import AvatarComponent from "../Basic/AvatarComponent";
 import SearchManager from "../../../Api/Search/SearchManager"
 import {MessageFactory} from "../../../Api/Messages/MessageFactory"
 import VSpinner from "../../Elements/VSpinner"
@@ -185,7 +185,7 @@ export class MediaViewerComponent extends StatefulComponent {
                             AppSelectedInfoPeer.select(message.from);
                             this.close(event);
                         }}>
-                            <AvatarFragment peer={from}/>
+                            <AvatarComponent noSaved peer={from}/>
                             <div className="text">
                                 <div className="name">{name}</div>
                                 <div className="time">{this.formatDate(date)}</div>

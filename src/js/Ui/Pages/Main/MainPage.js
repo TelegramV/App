@@ -11,7 +11,9 @@ import TopPeers from "../../../Api/Peers/TopPeers"
 import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
-import Localization from "../../../Api/Localization/Localization";
+import EmojiLangpack from "../../../Api/Localization/EmojiLangpack";
+import Locale from "../../../Api/Localization/Locale";
+import DeepLinkManager from "../../../Api/Telegram/DeepLinkManager";
 import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
 import {throttle} from "../../../Utils/func"
 import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
@@ -22,6 +24,7 @@ import {isBullshitBrowser, isMobile} from "../../Utils/utils";
 import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf";
 import AudioPlayerComponent from "../../Components/Singleton/AudioPlayerComponent"
+import ConfettiComponent from "../../Components/Singleton/ConfettiComponent"
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -36,7 +39,9 @@ function initHighLevelManagers() {
     StickerManager.fetchSpecialSets();
     WallpaperManager.init();
     FoldersManager.init()
-    Localization.init();
+    EmojiLangpack.init();
+    Locale.init();
+    DeepLinkManager.init();
 }
 
 function vhFix() {
@@ -62,6 +67,7 @@ export function MainPage() {
             <ModalContainer/>
             <MediaViewerComponent/>
             <InstantViewComponent/>
+            <ConfettiComponent/>
             {/*<SnackbarComponent/>*/}
             {/*<SettingsComponent/>*/}
             <AudioPlayerComponent/>

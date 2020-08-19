@@ -20,6 +20,12 @@
     z-index: 10;
   }
 
+  video {
+  	border-radius: 50%;
+    width: 100%;
+    height: 100%;
+  }
+
   .avatar-outer {
     z-index: 11;
     opacity: 0;
@@ -36,7 +42,7 @@
   }
 
   &.placeholder-icon {
-    font-size: 48px;
+    font-size: calc(var(--avatar-size) / 1.25)
   }
 
   &.placeholder-saved {

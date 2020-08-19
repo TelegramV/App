@@ -91,6 +91,15 @@ class LoginState extends SharedState {
         });
     }
 
+    setBotView() {
+        sentCodeFromStorage = null;
+        localStorage.removeItem("auth.sentCode"); //хз нащо це, але скопіюю
+
+        this.set({
+            stage: "bot",
+        });
+    }
+
     setCodeView() {
         sentCodeFromStorage = null;
         localStorage.removeItem("auth.sentCode");

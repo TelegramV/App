@@ -13,7 +13,7 @@
 
     .channel {
         &.message {
-            grid-template-columns: min-content fit-content(100%);
+            grid-template-columns: min-content fit-content(100%) min-content;
 
             & > .avatar {
                 display: none;
@@ -34,11 +34,29 @@
     .message {
         display: grid;
         position: relative;
-        grid-template-areas: "avatar message" "empty keyboard";
-        grid-template-columns: min-content fit-content(480px);
+        grid-template-columns: min-content fit-content(480px) min-content;
 
         filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
         //filter: none;
+        &.in {
+            grid-template-areas: 
+                "avatar message side"
+                "empty keyboard e";
+
+            .side {
+                @include reply($in: true, $transparent: true);
+            }
+        }
+
+        &.out {
+            grid-template-areas: 
+                "side message avatar" 
+                "empty keyboard e";
+
+            .side {
+                @include reply($in: false, $transparent: true);
+            }
+        }
 
         @include mobile {
             grid-template-columns: min-content fit-content(90%);
@@ -88,7 +106,6 @@
 
             &.transparent {
                 @include header($in: true, $transparent: true);
-                @include reply($in: true, $transparent: true);
             }
 
             .text-wrapper {
@@ -121,7 +138,6 @@
                 padding-right: 0;
 
                 @include header($in: false, $transparent: true);
-                @include reply($in: false, $transparent: true);
             }
 
             a, a > span {
@@ -175,6 +191,21 @@
                     margin-bottom: 0;
                     margin-top: -25px; //TODO check for overlaping
                 }
+
+                &.big {
+                    &>span:first-child {
+                        line-height: 2em;
+                        .emoji {
+                            width: 2.5em;
+                            height: 2.5em;
+                            margin: 0 0.1em 0 0.2em;
+                            filter: drop-shadow(1px 1px 0 white)
+                                drop-shadow(-1px 1px 0 white)
+                                drop-shadow(1px -1px 0 white)
+                                drop-shadow(-1px -1px 0 white);
+                        }
+                    }
+                }
             }
 
             .card {
@@ -209,6 +240,33 @@
 
                 &:hover {
                     text-decoration: underline;
+                }
+            }
+        }
+
+        .side {
+            grid-area: side;
+            display: flex;
+            flex-direction: column;
+            .filler {
+                flex-grow: 1;
+            }
+
+            .share {
+                cursor: pointer;
+                position: relative;
+                width: 30px;
+                height: 30px;
+                background-color: $semiblack;
+                border-radius: 50%;
+                margin: 10px;
+                .tgico {
+                    font-size: 20px;
+                    color: white;
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
                 }
             }
         }

@@ -227,6 +227,29 @@ class Packer {
         this.offset += length
     }
 
+    json(object) {
+        if(object === null || object === undefined) return {_:"jsonNull"};
+        if(object._) return object; //already parsed
+        if(typeof object === "number") return {_:"jsonNumber", value: object}
+        if(typeof object === "string") return {_:"jsonString", value: object}
+        if(typeof object === "boolean") return {_:"jsonBool", value: object}
+        if(Array.isArray(object)) return {_:"jsonArray", value: object.map(this.json)}
+
+        let wrapped = Object.create(null);
+        wrapped._="jsonObject"
+        let values = [];
+        for(let key in object) {
+            let objectValue = Object.create(null);
+            objectValue._="jsonObjectValue";
+            objectValue.key = key;
+            objectValue.value = this.json(object[key]);
+            values.push(objectValue);
+        }
+        wrapped.value = values;
+
+        return wrapped
+    }
+
     method(name, params) {
         const method = getMethodByName(name)
 
@@ -285,6 +308,9 @@ class Packer {
                 return this.double(constructor)
             case "Bool":
                 return this.bool(constructor)
+            case "JSONValue":
+                constructor = this.json(constructor)
+                break;
             case "true":
                 return
         }
