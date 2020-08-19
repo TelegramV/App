@@ -1,0 +1,47 @@
+@import "src/sass/partials/vars";
+
+.tab-selector-wrapper {
+  background-color: white;
+  border-bottom: 1px solid #d8dade;
+
+    .tab-selector {
+        $transitionTime: 200ms;
+
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding: 0 5px;
+
+        .tab {
+            padding: 8px;
+            margin: 2px;
+            border-radius: 5px;
+            color: $darkgreytext;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+            flex-shrink: 0;
+            max-width: 100px;
+
+            &:hover,
+            &.selected {
+                background: $light;
+            }
+
+            &.selected {
+                color: $blue;
+            }
+        }
+
+        .underline {
+            position: absolute;
+            top: calc(100% - 3px);
+            left: 0;
+            right: 0;
+            border-top: 3px solid #4ea4f6;
+            height: 6px;
+            border-radius: 3px;
+            transition: left $transitionTime, right $transitionTime;
+        }
+    }
+}

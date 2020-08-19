@@ -1,12 +1,10 @@
 @import "src/sass/partials/vars";
 
 .materials {
-    margin-top: 60px;
     position: relative;
 
-    .tab-selector {
+    .tab-selector-wrapper {
         position: sticky;
-        justify-content: space-around;
         top: -8px;
         z-index: 5;
     }

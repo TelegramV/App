@@ -3,22 +3,23 @@ import AppEvents from "../../../../../Api/EventBus/AppEvents";
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VUI from "../../../../VUI";
-import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
+import TranslatableStatefulComponent from "../../../../../V/VRDOM/component/TranslatableStatefulComponent"
 import UIEvents from "../../../../EventBus/UIEvents";
 import {CreateFolderSidebar} from "../Settings/Folders/CreateFolderSidebar";
 import foldersState from "../../../foldersState"
+import TabSelectorComponent from "../../../Tab/TabSelectorComponent"
+import Locale from "../../../../../Api/Localization/Locale"
 
-const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0}, selected = false, onClick}) => {
+const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0}}) => {
     return <div className={{
         folder: true,
         item: true,
         rp: true,
         rps: true,
-        selected,
-    }} onClick={onClick} onContextMenu={folderId && VUI.ContextMenu.listener([
+    }} onContextMenu={folderId && VUI.ContextMenu.listener([
         {
             icon: "edit",
-            title: "Edit Folder",
+            title: Locale.l("lng_filters_context_edit"),
             onClick: _ => {
                 UIEvents.Sidebars.fire("push", {
                     sidebar: CreateFolderSidebar,
@@ -28,7 +29,7 @@ const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0
         },
         {
             icon: "delete",
-            title: "Remove",
+            title: Locale.l("lng_filters_context_remove"),
             red: true,
             onClick: _ => {
                 FoldersManager.deleteFolder(folderId)
@@ -42,7 +43,7 @@ const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0
     </div>
 }
 
-export class Folders extends StatefulComponent {
+export class Folders extends TranslatableStatefulComponent {
     state = foldersState;
 
     appEvents(E: AE) {
@@ -60,35 +61,48 @@ export class Folders extends StatefulComponent {
             .on("messages.readIn", this.updateCounters)
     }
 
-    render(props, {folders, current}) {
+    render(props) {
         return <div class={{
             "folder-list": true,
-            "tab-selector": true,
             "hidden": !FoldersManager.hasFolders(),
-            "scrollable-x": true,
-            "hide-scroll": true
         }}>
-            <FolderFragment title="All"
-                            selected={current == null}
-                            badge={FoldersManager.getBadgeCount(null)}
-                            onClick={() => FoldersManager.selectFolder(null)}/>
 
-            {folders.map(folder => {
-                return <FolderFragment title={folder.title}
-                                       selected={folder === current}
-                                       badge={FoldersManager.getBadgeCount(folder.id)}
-                                       folderId={folder.id}
-                                       onClick={() => FoldersManager.selectFolder(folder.id)}/>
-            })}
+        <TabSelectorComponent items={this.tabs} active={this.findSelected()} scrollable/>
         </div>
     }
 
-    //
-    // componentDidMount() {
-    //     super.componentDidMount();
-    //
-    //     this.$el.addEventListener('wheel', this.transformScroll);
-    // }
+    componentWillMount() {
+        this.tabs = this.makeTabs(this.state.folders);
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        this.tabs = this.makeTabs(nextState.folders);
+    }
+
+    makeTabs = (folders) => {
+        const tabs = [{
+            text: <FolderFragment title={this.l("lng_filters_all")} badge={FoldersManager.getBadgeCount(null)}/>,
+            onClick: () => FoldersManager.selectFolder(null),
+            key: "all"
+        }]
+
+        folders.forEach(folder => {
+            tabs.push({
+                text: <FolderFragment title={folder.title}
+                                       badge={FoldersManager.getBadgeCount(folder.id)}
+                                       folderId={folder.id}/>,
+                onClick: () => FoldersManager.selectFolder(folder.id),
+                key: folder.id
+            })
+        })
+        return tabs;
+    }
+
+    findSelected = () => {
+        if(!this.tabs) return 1;
+        let selected = this.tabs.findIndex(el => el.key===(this.state.currentId)) + 1;
+        return selected || 1;
+    }
 
     editFolders = () => {
 
@@ -110,7 +124,7 @@ export class Folders extends StatefulComponent {
 
     onSelectFolder = (event) => {
         this.setState({
-            selectedFolder: event.folderId
+            currentId: event.folderId
         })
     }
 

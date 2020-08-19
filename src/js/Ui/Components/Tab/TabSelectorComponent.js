@@ -1,89 +1,99 @@
-/*
- * Copyright 2020 Telegram V authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
-import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
-import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
+import './TabSelectorComponent.scss';
+
 export default class TabSelectorComponent extends StatefulComponent {
-    componentDidMount() {
-        this.updateFragments(this.props.items)
-    }
 
-    updateFragments = (items) => {
-        this.props.items = items
-        this.fragments = [];
+    state = {
+        sizes: [],
+    };
 
-        for (let i = 0; i < items.length; i++) {
-            let item = items[i];
+    elRefs = []
+    selectorRef = StatefulComponent.createRef();
 
-            if (item.selected) {
-                this.state.selected = i;
-            }
+    render({items, scrollable, active, showScroll}) {
+        this.elRefs = []
 
-            this.fragments.push(<TabSelectorItemFragment tabIndex={i} text={item.text}
-                                                         click={this.itemClick}
-                                                         hidden={!!item.hidden}
-                                                         selected={!!item.selected}/>)
+        const wrapperClasses = {
+            "tab-selector-wrapper": true,
+            "scrollable-x": scrollable,
+            "hide-scroll": scrollable || !showScroll
         }
-
-        this.forceUpdate()
-    }
-
-    render = () => {
         return (
-            <div className="tab-selector">
-                {this.fragments}
+            <div className={wrapperClasses}>
+                <div className="tab-selector" ref={this.selectorRef}>
+                    {items.map((item, i) => {
+                        const ref = StatefulComponent.createFragmentRef();
+                        this.elRefs.push(ref);
+                        return <TabFragment text={item.text} selected={(i+1) === active} onClick={item.onClick} ref={ref}/>;
+                    })}
+                    <div className="underline" style={this.getUnderlineStyle()} />
+                </div>
             </div>
-        )
+        );
     }
 
-    itemClick = (ev) => {
-        let el = ev.currentTarget;
-        let index = el.getAttribute("tab-index");
-        this.state.selected = index;
-        this.removeSelected();
-        this.$el.childNodes[index].classList.add("selected");
-        let callback = this.props.items[index].click;
-        if (callback) {
-            callback();
+    componentDidMount() {
+        if(!this.props.active) this.props.active = 1;
+        this.updateSizes();
+    }
+
+    componentDidUpdate(prevProps) {
+        if(!this.props.active) this.props.active = 1;
+        if (prevProps && prevProps.items !== this.props.items && prevProps.active !== this.props.active) {
+            this.updateSizes();
         }
     }
 
-    removeSelected = () => {
-        for (const item of this.$el.childNodes) {
-            item.classList.remove("selected");
+    setTab = (tab) => {
+        this.props.active = tab;
+        this.updateSizes();
+    }
+
+    updateSizes() {
+        const rootBounds = this.selectorRef.$el.getBoundingClientRect();
+
+        const sizes = [];
+        for(let ref of this.elRefs) {
+            const bounds = ref.$el.getBoundingClientRect();
+
+            const left = bounds.left - rootBounds.left;
+            const right = rootBounds.right - bounds.right;
+
+            sizes.push({ left, right });
+        }
+
+        this.setState({ sizes });
+        return sizes;
+    }
+
+    getUnderlineStyle() {
+        if (this.props.active == null || this.state.sizes.length === 0) {
+            return { left: '0', right: '100%' };
+        }
+
+        const size = this.state.sizes[Math.max(this.props.active, 1) - 1];
+        if(!size) return { left: '0', right: '100%' };
+
+        return {
+            left: `${size.left}px`,
+            right: `${size.right}px`,
         }
     }
 }
 
-const TabSelectorItemFragment = ({selected = false, text, hidden = false, tabIndex = -1, click}) => {
-    const classes = classNames(
-        "item", "rp rps",
-        classIf(selected, "selected"),
-        classIf(hidden, "hidden")
-    )
+const TabFragment = ({text, selected, onClick}) => {
+
+    const classes = {
+        tab: true,
+        rp: true,
+        rps: true,
+        selected: selected
+    }
 
     return (
-        <div tab-index={tabIndex}
-             className={classes}
-             onClick={click}>
-
-            <span>{text}</span>
+        <div class={classes} onClick={onClick}>
+            {text}
         </div>
     )
 }
