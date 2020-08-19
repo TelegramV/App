@@ -18,6 +18,7 @@
  */
 
 import PeersStore from "../../Store/PeersStore"
+import AppEvents from "../../EventBus/AppEvents"
 
 function processUpdateChannelPinnedMessage(update) {
     const peer = PeersStore.get("channel", update.channel_id)
@@ -26,6 +27,8 @@ function processUpdateChannelPinnedMessage(update) {
         peer.pinnedMessageId = update.id
         peer.fire("messages.updatePin")
     }
+
+    AppEvents.Telegram.fire("updateChannelPinnedMessage", update);
 }
 
 export default processUpdateChannelPinnedMessage

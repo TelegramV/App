@@ -44,7 +44,9 @@ const processUpdateChannel = update => {
                 update.__peer.fire("peers.joinLeave");
             }
         }
-    })
+    });
+
+    AppEvents.Telegram.fire("updateChannel", update);
 }
 
 export default processUpdateChannel

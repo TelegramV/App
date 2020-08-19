@@ -36,7 +36,7 @@ export default class GeneralDialogListComponent extends StatelessComponent {
     render() {
         return (
             <div id="dialogs" className="list hidden">
-                {DialogsStore.toSortedArray().filter(l => {
+                {DialogsStore.sort().filter(l => {
                     return this.applyFilter(l)
                 }).map(dialog => {
                     return <DialogComponent dialog={dialog} folderId={this.folderId} list={this}/>
@@ -129,7 +129,7 @@ export default class GeneralDialogListComponent extends StatelessComponent {
 
     update = () => {
         const $dialogs = this.$el
-        if(this.__.mounted) {
+        if (this.__.mounted) {
 
             const renderedDialogs = $dialogs.childNodes
             // console.log(newFilter.title, renderedDialogs, renderedDialogs.length)

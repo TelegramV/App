@@ -17,8 +17,12 @@
  *
  */
 
+import AppEvents from "../../../EventBus/AppEvents"
+
 function processUpdateMessageID(update) {
     update.dialog && update.dialog.handleUpdateMessageID(update.id, update.random_id);
+
+    AppEvents.Telegram.fire("updateMessageID", update);
 }
 
 export default processUpdateMessageID;

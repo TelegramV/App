@@ -19,6 +19,7 @@
 
 import PeersStore from "../../Store/PeersStore";
 import {UserPeer} from "../../Peers/Objects/UserPeer";
+import AppEvents from "../../EventBus/AppEvents"
 
 function processUpdateUserPhoto(update) {
     const peer = PeersStore.get("user", update.user_id);
@@ -31,6 +32,8 @@ function processUpdateUserPhoto(update) {
     if (peer instanceof UserPeer) {
         peer.photo.fillRaw(update.photo);
     }
+
+    AppEvents.Telegram.fire("updateUserPhoto", update);
 }
 
 export default processUpdateUserPhoto

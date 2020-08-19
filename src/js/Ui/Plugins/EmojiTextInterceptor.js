@@ -78,7 +78,7 @@ export function text2emoji(text) {
                          $newEl.classList.add("emoji");
                          $newEl.classList.add("native");
                          $newEl.textContent = $el.alt;
-                         $el.parentNode.replaceChild($newEl, $el);
+                         $el.replaceWith($newEl);
                      }}
                 />
             );

@@ -20,11 +20,6 @@
 import type {VRAttrs} from "../types/types"
 import {initElement} from "../render/renderElement"
 
-const ignoringAttributes = new Set([
-    "style",
-    // "class"
-])
-
 const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
     if ($el.nodeType !== Node.TEXT_NODE) {
         initElement($el)
@@ -42,7 +37,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
 
         if (options.xmlns) {
             for (const [k, v] of Object.entries(newAttrs)) {
-                if (ignoringAttributes.has(k)) {
+                if (k === "style") {
                     continue
                 }
 
@@ -54,7 +49,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
             }
 
             for (const name of $el.getAttributeNames()) {
-                if (ignoringAttributes.has(name)) {
+                if (name === "style") {
                     continue
                 }
 
@@ -64,7 +59,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
             }
         } else {
             for (const [k, v] of Object.entries(newAttrs)) {
-                if (ignoringAttributes.has(k)) {
+                if (k === "style") {
                     continue
                 }
 
@@ -76,7 +71,7 @@ const patchAttrs = ($el: Element, newAttrs: VRAttrs, options = {}) => {
             }
 
             for (const name of $el.getAttributeNames()) {
-                if (ignoringAttributes.has(name)) {
+                if (name === "style") {
                     continue
                 }
 

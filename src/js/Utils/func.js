@@ -21,15 +21,15 @@
  */
 export const callOrReturn = (value: any): any => {
     if (typeof value === "function") {
-        return value()
+        return value();
     } else {
-        return value
+        return value;
     }
 }
 
 export const throttle = (callable, period: number, context = null) => {
-    let timeoutId
-    let time
+    let timeoutId;
+    let time;
 
     return function () {
         if (!context) {
@@ -37,33 +37,49 @@ export const throttle = (callable, period: number, context = null) => {
         }
 
         if (time) {
-            clearTimeout(timeoutId)
+            clearTimeout(timeoutId);
 
             timeoutId = setTimeout(() => {
                 if ((Date.now() - time) >= period) {
-                    callable.apply(context, arguments)
+                    callable.apply(context, arguments);
 
-                    time = Date.now()
+                    time = Date.now();
                 }
-            }, period - (Date.now() - time))
+            }, period - (Date.now() - time));
         } else {
-            callable.apply(context, arguments)
+            callable.apply(context, arguments);
 
-            time = Date.now()
+            time = Date.now();
         }
     }
 }
 
+export const throttleWithRAF = (callable) => {
+    let running = false;
+
+    return () => {
+        if (running) return;
+
+        running = true;
+
+        window.requestAnimationFrame(() => {
+            callable.apply(this, arguments);
+
+            running = false;
+        });
+    };
+};
+
 export const debounce = (callable, delay: number, context = null) => {
-    let timeoutId
+    let timeoutId;
 
     return function () {
         if (!context) {
-            context = this
+            context = this;
         }
 
-        clearTimeout(timeoutId)
+        clearTimeout(timeoutId);
 
-        timeoutId = setTimeout(() => callable.apply(context, arguments), delay)
+        timeoutId = setTimeout(() => callable.apply(context, arguments), delay);
     }
 }

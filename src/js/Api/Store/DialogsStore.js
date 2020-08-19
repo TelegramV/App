@@ -18,6 +18,7 @@
  */
 
 import MappedStore from "./MappedStore"
+import {Dialog} from "../Dialogs/Dialog"
 
 class DialogsMapStore extends MappedStore {
     constructor() {
@@ -28,10 +29,9 @@ class DialogsMapStore extends MappedStore {
                 ["channel", new Map()],
                 ["user", new Map()],
             ])
-        })
+        });
 
-        this._sortedArray = []
-        this._alreadySorted = false
+        const jsSet = new Set();
     }
 
     /**
@@ -39,19 +39,6 @@ class DialogsMapStore extends MappedStore {
      */
     get data() {
         return super.data
-    }
-
-    /**
-     * @return {Array<Dialog>}
-     */
-    toSortedArray() {
-        if (!this._alreadySorted) {
-            this._sortedArray = this._sortDialogsArray(this.toArray())
-
-            this._alreadySorted = true
-        }
-
-        return this._sortedArray
     }
 
     /**
@@ -74,6 +61,44 @@ class DialogsMapStore extends MappedStore {
             }
         })
     }
+
+    sort(): Dialog[] {
+        return this._sortDialogsArray(this.toArray());
+    }
+
+    sortWithPinnedOnTop(): Dialog[] {
+        return this.toArray().sort(this.sortWithPinnedOnTopCompareFn);
+    }
+
+    sortWithPinnedOnTopCompareFn = (a, b) => {
+        if (!b.isPinned && !a.isPinned) {
+            if (!a.messages.last) {
+                return 1
+            }
+
+            if (!b.messages.last) {
+                return -1
+            }
+
+            if (a.messages.last.date > b.messages.last.date) {
+                return -1
+            }
+
+            if (a.messages.last.date < b.messages.last.date) {
+                return 1
+            }
+        } else {
+            if (a.isPinned) {
+                return -1
+            }
+
+            if (b.isPinned) {
+                return 1
+            }
+        }
+
+        return 0
+    };
 
     /**
      * @return {number}
@@ -105,13 +130,13 @@ class DialogsMapStore extends MappedStore {
      * @return {Array<Dialog>}
      */
     toArray() {
-        const array = []
+        const array = [];
         for (const [_, data] of this.data.entries()) {
             for (const [_, dialog] of data.entries()) {
                 array.push(dialog)
             }
         }
-        return array
+        return array;
     }
 
     /**
@@ -141,8 +166,9 @@ class DialogsMapStore extends MappedStore {
         }
 
         if (this.data.has(dialog.peer.type)) {
-            this._alreadySorted = false
-            this.data.get(dialog.peer.type).set(dialog.peer.id, dialog)
+            this.data
+                .get(dialog.peer.type)
+                .set(dialog.peer.id, dialog)
             this.fire("set", {dialog})
             return this
         } else {

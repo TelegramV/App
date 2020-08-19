@@ -653,25 +653,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         scrollBottom(this.$el, this.bubblesInnerRef.$el);
     }
 
-    appendMessages(messages
-                       :
-                       Message[], beforeTopMessage
-                       :
-                       Message = null, afterBottomMessage
-                       :
-                       Message = null
-    ) {
+    appendMessages = (messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) => {
         return appendMessages(this.bubblesInnerRef.$el, messages, beforeTopMessage, afterBottomMessage, this.observer);
     }
 
-    prependMessages(messages
-                        :
-                        Message[], beforeTopMessage
-                        :
-                        Message = null, afterBottomMessage
-                        :
-                        Message = null
-    ) {
+    prependMessages = (messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) => {
         return prependMessages(this.bubblesInnerRef.$el, messages, beforeTopMessage, afterBottomMessage, this.observer);
     }
 }

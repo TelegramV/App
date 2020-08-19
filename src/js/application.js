@@ -59,3 +59,21 @@ MTProto.connect().then(user => {
         document.title = "[dev] Telegram V"
     }
 })
+
+// const a = ["1", "2", "3", "4", "5", "6"];
+// const b = ["1", "3", "9", "5", "6", "7", "8"];
+//
+// const diff = {};
+//
+// for (let i = 0; i < b.length; i++) {
+//     const bi = b[i];
+//     const abi = a.findIndex(it => it === bi);
+//
+//     if (abi > 0) {
+//         diff[i] = abi;
+//     } else {
+//         diff[i] = bi;
+//     }
+// }
+//
+// console.log(diff);

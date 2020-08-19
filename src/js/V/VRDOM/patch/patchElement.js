@@ -18,7 +18,6 @@
  */
 
 import patchAttrs from "./patchAttrs"
-import patchDangerouslySetInnerHTML from "./patchDangerouslySetInnerHTML"
 import vrdom_patchChildren from "./patchChildren"
 import VRNode from "../VRNode"
 import patch_Text_VRNode from "./patch_Text_VRNode"
@@ -64,13 +63,13 @@ const patchElement = ($node: HTMLElement, vRNode: VRNode, options = {}) => {
         $node = recreateElementByTagName($node, vRNode.tagName, options)
 
         for (let [k, v] of Object.entries(vRNode.attrs)) {
-            if (v != null) {
+            if (v || v === 0) {
                 $node.setAttribute(k, v)
             }
         }
 
         for (let [k, v] of Object.entries(vRNode.style)) {
-            if (v) {
+            if (v || v === 0) {
                 $node.style.setProperty(k, v)
                 $node.__v.patched_styles.add(k)
             }
@@ -88,9 +87,7 @@ const patchElement = ($node: HTMLElement, vRNode: VRNode, options = {}) => {
         patchStyle($node, vRNode.style)
     }
 
-    if (vRNode.dangerouslySetInnerHTML !== false) {
-        patchDangerouslySetInnerHTML($node, vRNode.dangerouslySetInnerHTML)
-    } else if (!vRNode.doNotTouchMyChildren) {
+    if (!vRNode.doNotTouchMyChildren) {
         vrdom_patchChildren($node, vRNode, options)
     }
 

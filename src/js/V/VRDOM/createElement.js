@@ -103,6 +103,7 @@ function vrdom_createElement(tagName: VRTagName, attributes: VRAttrs, ...childre
     const style: VRStyle = Object.create(null)
 
     let ref = undefined
+    let key = undefined
     let dangerouslySetInnerHTML: boolean = false
     let doNotTouchMyChildren: boolean = false
 
@@ -129,6 +130,8 @@ function vrdom_createElement(tagName: VRTagName, attributes: VRAttrs, ...childre
                 style.display = v ? undefined : "none"
             } else if (k === "hideIf" && !isComponentOrFragment) {
                 style.display = v ? "none" : undefined
+            } else if (key === "key") {
+                key = v
             } else if (key === "ref") {
                 ref = v
             } else if (key === "style" && typeof v === "object" && !isComponentOrFragment) {
@@ -155,6 +158,7 @@ function vrdom_createElement(tagName: VRTagName, attributes: VRAttrs, ...childre
         events,
         children,
         ref,
+        key,
         style,
 
         dangerouslySetInnerHTML,

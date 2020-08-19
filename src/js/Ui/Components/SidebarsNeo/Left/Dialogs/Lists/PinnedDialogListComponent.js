@@ -32,7 +32,7 @@ export default class PinnedDialogListComponent extends StatelessComponent {
     render() {
         return (
             <div id="dialogsPinned" className={["list pinned hidden", classIf(this.folderId === "archive", "archive")]}>
-                {DialogsStore.toSortedArray().filter(l => {
+                {DialogsStore.sort().filter(l => {
                     return this.applyFilter(l)
                 }).map(dialog => {
                     return <DialogComponent dialog={dialog} folderId={this.folderId} isPin list={this}/>

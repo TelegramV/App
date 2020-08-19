@@ -25,6 +25,20 @@ import __component_withDefaultProps from "./__component_withDefaultProps"
 import __component_recreateReactiveObjects from "./__component_recreateReactiveObjects"
 import patchElement from "../patch/patchElement"
 
+const patch = component =>
+    // throttle(
+    () => {
+        if (component.__.mounted) {
+            component.__.isUpdatingItSelf = true;
+            component.$el = vrdom_patch(component.$el, __component_render(component))
+            component.__.isUpdatingItSelf = false;
+
+            component.componentDidUpdate();
+        }
+    }
+
+// , 100, component);
+
 export function __component_update_props(component, nextProps) {
     if (nextProps) {
         nextProps = __component_withDefaultProps(component, nextProps);
@@ -55,13 +69,7 @@ export function __component_update_props(component, nextProps) {
 
             __component_recreateReactiveObjects(component);
 
-            if (component.__.mounted) {
-                component.__.isUpdatingItSelf = true;
-                component.$el = vrdom_patch(component.$el, __component_render(component))
-                component.__.isUpdatingItSelf = false;
-            }
-
-            component.componentDidUpdate();
+            patch(component)();
         }
     }
 }
@@ -82,13 +90,7 @@ export function __component_update_state(component, nextState) {
 
             __component_recreateReactiveObjects(component);
 
-            if (component.__.mounted) {
-                component.__.isUpdatingItSelf = true;
-                component.$el = vrdom_patch(component.$el, __component_render(component))
-                component.__.isUpdatingItSelf = false;
-
-                component.componentDidUpdate();
-            }
+            patch(component)();
         }
     }
 }
@@ -97,13 +99,7 @@ export function __component_update_shared_state(component, globalState) {
     if (globalState) {
         component.componentWillUpdate(component.props, component.state);
 
-        if (component.__.mounted) {
-            component.__.isUpdatingItSelf = true;
-            component.$el = vrdom_patch(component.$el, __component_render(component))
-            component.__.isUpdatingItSelf = false;
-
-            component.componentDidUpdate();
-        }
+        patch(component)();
     }
 }
 
@@ -146,11 +142,5 @@ export function __component_update_force(component, nextProps, nextState) {
 
     __component_recreateReactiveObjects(component);
 
-    if (component.__.mounted) {
-        component.__.isUpdatingItSelf = true;
-        component.$el = vrdom_patch(component.$el, __component_render(component))
-        component.__.isUpdatingItSelf = false;
-
-        component.componentDidUpdate();
-    }
+    patch(component)();
 }

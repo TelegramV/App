@@ -38,32 +38,17 @@ const vrdom_append = (node: VRNode, $parent: HTMLElement, options?: VRenderProps
 }
 
 /**
- * @param nodes
- * @param $parent
- * @param props
- */
-export function vrdom_appendMany(nodes: VRNode[], $parent: HTMLElement, props?: VRenderProps) {
-    return nodes.map(node => {
-        const $node = vrdom_render(node, props)
-
-        $parent.appendChild($node)
-
-        vrdom_resolveMount($node)
-
-        return $node
-    })
-}
-
-/**
  * @param $nodes
  * @param $parent
  */
 export function vrdom_appendRealMany($nodes: Node[], $parent: HTMLElement) {
-    return $nodes.forEach($node => {
-        $parent.appendChild($node)
+    $parent.append(...$nodes);
 
+    $nodes.forEach($node => {
         vrdom_resolveMount($node)
-    })
+    });
+
+    return $nodes;
 }
 
 export default vrdom_append

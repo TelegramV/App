@@ -18,9 +18,12 @@
  */
 
 import MessagesManager from "../../Messages/MessagesManager"
+import AppEvents from "../../EventBus/AppEvents"
 
 function processUpdateShortSentMessage(update) {
     MessagesManager.processNewMessage(update.peer, update);
+
+    AppEvents.Telegram.fire("updateShortSentMessage", update);
 }
 
 export default processUpdateShortSentMessage;

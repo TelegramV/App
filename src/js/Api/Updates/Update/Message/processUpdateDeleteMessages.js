@@ -19,6 +19,7 @@
 
 import PeersStore from "../../../Store/PeersStore";
 import {ChannelPeer} from "../../../Peers/Objects/ChannelPeer"
+import AppEvents from "../../../EventBus/AppEvents"
 
 function processUpdateDeleteMessages(update) {
     PeersStore.toArray().forEach(peer => {
@@ -32,6 +33,8 @@ function processUpdateDeleteMessages(update) {
             });
         }
     });
+
+    AppEvents.Telegram.fire("updateDeleteMessages", update);
 }
 
 export default processUpdateDeleteMessages;

@@ -35,6 +35,8 @@ class VRNode {
     component = undefined
     list: List = undefined
 
+    key: string
+
     constructor(tagName: VRTagName, props: VRNodeProps) {
         this.tagName = tagName
 
@@ -43,6 +45,7 @@ class VRNode {
         this.children = props.children || []
         this.style = props.style || {}
         this.ref = props.ref
+        this.key = props.key
 
         this.dangerouslySetInnerHTML = props.dangerouslySetInnerHTML || false
         this.doNotTouchMyChildren = props.doNotTouchMyChildren || false

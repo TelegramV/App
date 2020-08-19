@@ -18,9 +18,12 @@
  */
 
 import StickersState from "../../../Ui/SharedStates/StickersState"
+import AppEvents from "../../EventBus/AppEvents"
 
 function processUpdateStickerSetsOrder(update) {
     StickersState.updateOrder(update.order);
+
+    AppEvents.Telegram.fire("updateStickerSetsOrder", update);
 }
 
 export default processUpdateStickerSetsOrder;

@@ -20,6 +20,7 @@
 import PeersStore from "../../../Store/PeersStore";
 import UpdatesManager from "../../UpdatesManager";
 import MessagesManager from "../../../Messages/MessagesManager";
+import AppEvents from "../../../EventBus/AppEvents"
 
 function processUpdateShortMessage(update) {
     const user = PeersStore.get("user", update.user_id);
@@ -33,6 +34,8 @@ function processUpdateShortMessage(update) {
     } else {
         MessagesManager.processNewMessage(user, update);
     }
+
+    AppEvents.Telegram.fire("updateShortMessage", update);
 }
 
 export default processUpdateShortMessage;

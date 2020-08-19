@@ -81,8 +81,12 @@ const renderElement = (node: VRNode, props: VRenderProps = {}): HTMLElement => {
         }
     }
 
+    if (node.key) {
+        $el.dataset.vKey = node.key;
+    }
+
     for (let [k, v] of Object.entries(node.attrs)) {
-        if (v != null) {
+        if (v || v === 0) {
             $el.setAttribute(k, v)
         }
     }

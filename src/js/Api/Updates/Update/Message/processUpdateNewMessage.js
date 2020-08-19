@@ -21,6 +21,7 @@ import {getPeerTypeFromType} from "../../../Dialogs/util";
 import PeersStore from "../../../Store/PeersStore";
 import MTProto from "../../../../MTProto/External";
 import MessagesManager from "../../../Messages/MessagesManager";
+import AppEvents from "../../../EventBus/AppEvents"
 
 function processUpdateNewMessage(update) {
     let peer;
@@ -36,6 +37,8 @@ function processUpdateNewMessage(update) {
     }
 
     MessagesManager.processNewMessage(peer, update.message);
+
+    AppEvents.Telegram.fire("updateNewMessage", update);
 }
 
 export default processUpdateNewMessage;
