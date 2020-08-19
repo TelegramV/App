@@ -39,6 +39,11 @@
             font-size: 28px;
             right: 10px;
             top: 10%;
+            transition: anim(transform);
+
+            &.rotate180 {
+                transform: rotate(180deg);
+            }
         }
     }
 

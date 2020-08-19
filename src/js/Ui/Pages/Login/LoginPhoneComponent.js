@@ -217,7 +217,12 @@ class LoginPhoneComponent extends StatefulComponent {
     }
 
     countryFilter = (input, country) => {
+        const code = country.code.substring(1).replace(/\s/, "")
         country = country.name;
+
+        if(code.startsWith(input) || code.startsWith(input.substring(1))) {
+            return true
+        }
 
         if (country.toLowerCase().includes(input.toLowerCase())) {
             return true;

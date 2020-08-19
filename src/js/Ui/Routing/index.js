@@ -4,6 +4,7 @@ import MTProto from "../../MTProto/External"
 import VApp from "../../V/vapp"
 import {ConfigurableExample} from "../Components/AnotherVirtualList"
 import {MainPage} from "../Pages/Main/MainPage"
+import LoginPage from "../Pages/Login/LoginPage";
 //import {VideoStreamingPage} from "../Pages/Tests/VideoStreaming"
 //import CalendarTestPage from "../Pages/Tests/CalendarTestPage"
 //import VirtualPage from "../Pages/Tests/VirtualPage"
@@ -20,12 +21,12 @@ import {MainPage} from "../Pages/Main/MainPage"
  * @param {VFrameworkRouter} router
  */
 function AppRoutes(router) {
-    // router.route("/login", "login", {
-    //     h() {
-    //         return LoginPage()
-    //     }
-    // })
-    //
+    router.route("/login", "login", {
+        h() {
+            return LoginPage()
+        }
+    })
+
     router.route("/", "main", {
         h() {
             return MainPage()

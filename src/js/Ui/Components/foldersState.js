@@ -31,7 +31,9 @@ class FoldersState extends SharedState {
         AppEvents.General.subscribe("foldersUpdate", this.onFoldersUpdate);
         AppEvents.General.subscribe("selectFolder", this.onSelectFolder);
 
-        FoldersManager.fetchFolders();
+
+        // TODO fetch only when needed
+        //FoldersManager.fetchFolders();
     }
 
     get current() {

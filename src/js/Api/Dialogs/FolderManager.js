@@ -14,7 +14,7 @@ class FolderManager {
 
     constructor() {
         // макс чого воно при логіні показується????????????????????????????
-        keval.getItem("foldersData").then(foldersData => {
+        /*keval.getItem("foldersData").then(foldersData => {
             if (!foldersData) return
             this.folders = foldersData.folders
             this.selectedFolder = foldersData.selected
@@ -24,7 +24,7 @@ class FolderManager {
                 folder: this.getFolder(this.selectedFolder),
                 folderId: this.selectedFolder
             })
-        })
+        })*/
     }
 
     init() {

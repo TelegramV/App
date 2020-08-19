@@ -20,6 +20,7 @@
 import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import List from "../../../V/VRDOM/list/List"
+import classIf from "../../../V/VRDOM/jsx/helpers/classIf";
 
 function VInput(
     {
@@ -37,6 +38,7 @@ function VInput(
         error,
         success,
         disabled = false,
+        rotate180 = false,
         onButtonClick,
         withButton = false,
         buttonIcon = "eye1",
@@ -59,7 +61,7 @@ function VInput(
             "withButton": withButton,
         }} css-width={width}>
             {
-                withButton && <i className={`btn-icon rp rps tgico tgico-${buttonIcon}`} onClick={onButtonClick}/>
+                withButton && <i className={`btn-icon rp rps tgico tgico-${buttonIcon} ` + (rotate180 ? "rotate180" : "")} onClick={onButtonClick}/>
             }
 
             <input id={id}
@@ -158,7 +160,9 @@ export class VInputDropdown extends StatefulComponent {
     render(props, {isShown, inputValue}) {
         props = {
             ...props,
-            buttonIcon: isShown ? "up" : "down",
+            // buttonIcon: isShown ? "up" : "down",
+            buttonIcon: "down",
+            rotate180: !!isShown,
             withButton: true,
             onFocus: this.onFocus,
             onBlur: this.onBlur,
