@@ -185,7 +185,7 @@ export class MediaViewerComponent extends StatefulComponent {
                             AppSelectedInfoPeer.select(message.from);
                             this.close(event);
                         }}>
-                            <AvatarComponent peer={from}/>
+                            <AvatarComponent noSaved peer={from}/>
                             <div className="text">
                                 <div className="name">{name}</div>
                                 <div className="time">{this.formatDate(date)}</div>

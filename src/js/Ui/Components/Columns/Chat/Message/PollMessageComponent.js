@@ -16,7 +16,8 @@ import {formatAudioTime} from "../../../../Utils/utils"
 export default class PollMessageComponent extends GeneralMessageComponent {
 
     state = {
-        showingSolution: false
+        showingSolution: false,
+        answers: []
     }
 
     init() {
@@ -25,8 +26,6 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         let message = this.props.message;
 
         this.timerRef = VComponent.createFragmentRef();
-
-        this.answers = [];
 
         this.prepareContextMenu()
     }
@@ -85,7 +84,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                 <div class={classes}>
                     <div class="question">{message.poll.question}</div>
                     <div class="subtitle">
-                        <div class="poll-type">{this.getPollType()}</div>
+                        <div class="poll-type">{this.l(message.pollTypeKey)}</div>
                         {message.poll.public_voters && <RecentVotersFragment recentVoters={message.results.recent_voters}/>}
                         <div class="filler"/>
                         {this.shouldShowTooltip() && <TipFragment click={_ => this.showSolution()}/>}
@@ -99,28 +98,19 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         )
     }
 
-    getPollType = () => {
-        let message = this.props.message;
-
-        if(message.poll.closed) return "Final results";
-
-        if(message.isPublic) {
-            return message.isQuiz ? "Quiz" : "Public Poll";
-        } else {
-            return message.isQuiz ? "Anonymous Quiz" : "Anonymous Poll";
-        }
-    }
-
     sendVote = () => {
         let message = this.props.message;
-        if (this.answers.length == 0) return;
-        messages.sendVote(message, this.answers).then(response => {
+        if (this.state.answers.length == 0) return;
+        messages.sendVote(message, this.state.answers).then(response => {
             if(!message.isVotedCorrectly) {
                 this.showSolution();
             } else {
                 UIEvents.General.fire("confetti.show");
             }
-            this.answers = [];
+            console.log(this.state.answers)
+            this.setState({
+                answers: []
+            })
         })
     }
 
@@ -139,14 +129,17 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     addAnswer = (option) => {
         if (!option && option !== 0) return; //idk if this byte can be 0, but better be prepared
-        this.answers.push(Number.parseInt(option));
+        this.state.answers.push(Number.parseInt(option));
+        this.forceUpdate();
         if (!this.props.message.isMultiple) this.sendVote();
     }
 
     cancelAnswer = (option) => {
         if (!option && option !== 0) return;
         option = Number.parseInt(option);
-        this.answers = this.answers.filter(item => (item !== option)); //delete element from array
+        this.setState({
+            answers: this.state.answers.filter(item => (item !== option))
+        })
     }
 
     onPollChange = () => {
@@ -168,7 +161,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     makeAnswerBlock = () => {
         let answers = [];
         for (const answer of this.props.message.poll.answers) {
-            answers.push(<AnswerFragment message={this.props.message} option={answer.option[0]} click={this.onAnswerClick}/>)
+            answers.push(<AnswerFragment message={this.props.message} option={answer.option[0]} click={this.onAnswerClick} chosen={this.state.answers.includes(answer.option[0])}/>)
         }
         return answers;
     }
@@ -189,8 +182,8 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     updateAction = () => {
         if (this.actionButton) {
             if (this.props.message.isMultiple && !this.props.message.isVoted) {
-                this.actionButton.classList.toggle("disabled", this.answers.length === 0);
-                this.actionButton.classList.toggle("rp", this.answers.length === 0);
+                this.actionButton.classList.toggle("disabled", this.state.answers.length === 0);
+                this.actionButton.classList.toggle("rp", this.state.answers.length === 0);
             }
         }
     }
@@ -229,14 +222,14 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 }
 
-const AnswerFragment = ({message, option, click}) => {
+const AnswerFragment = ({message, option, chosen, click}) => {
     let answer = message.poll.answers.find(answ => answ.option[0] === option);
     let result = message.results?.results?.find(res => res.option[0] === option);
 
     if(!message.isVoted && !message.poll.closed) {
         return (
             <div class="answer voting rp" option={answer.option} onClick={click}>
-                <div class="vote">{message.isMultiple ? <VCheckbox/> : <VRadio/>}</div>
+                <div class="vote">{message.isMultiple ? <VCheckbox checked={chosen}/> : <VRadio checked={chosen}/>}</div>
                 <div class="answer-text">{answer.text}</div>
             </div>
         )

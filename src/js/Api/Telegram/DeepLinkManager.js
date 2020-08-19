@@ -2,7 +2,7 @@ import VUI from "../../Ui/VUI"
 import {StickerSetModal} from "../../Ui/Components/Modals/StickerSetModal"
 import StickerSet from "../Stickers/StickerSet"
 
-class TMeManager {
+class DeepLinkManager {
 
 	init() {
 		window.onclick = this.processEvent
@@ -21,6 +21,7 @@ class TMeManager {
 		if(!href) return false;
 		let url = new URL(href);
 		if(url.protocol === "tg:") { // process deep link
+			// help.getDeepLinkInfo if we don't know what to do with link
 			return true;
 		}
 
@@ -32,6 +33,10 @@ class TMeManager {
 					this.showStickerModal(split[1])
 					return true;
 					break;
+				case "c":
+					this.changeLocation("/#/?p=channel."+split[1]);
+					return true;
+				// todo: joinchat
 				case "s": //channel preview on web
 					return false;
 				default:
@@ -58,7 +63,7 @@ class TMeManager {
 	}
 
 	changeLocation(newHref) {
-		window.location = newHref;
+		window.location = newHref; //TODO replace with history api, or proper method?
 	}
 
 	isDeepLink(text) {
@@ -82,4 +87,4 @@ class TMeManager {
 
 }
 
-export default new TMeManager();
+export default new DeepLinkManager();

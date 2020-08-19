@@ -13,7 +13,7 @@ import WallpaperManager from "../../Managers/WallpaperManager";
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
 import EmojiLangpack from "../../../Api/Localization/EmojiLangpack";
 import Locale from "../../../Api/Localization/Locale";
-import TmeManager from "../../../Api/Telegram/TmeManager";
+import DeepLinkManager from "../../../Api/Telegram/DeepLinkManager";
 import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
 import {throttle} from "../../../Utils/func"
 import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
@@ -41,7 +41,7 @@ function initHighLevelManagers() {
     FoldersManager.init()
     EmojiLangpack.init();
     Locale.init();
-    TmeManager.init();
+    DeepLinkManager.init();
 }
 
 function vhFix() {

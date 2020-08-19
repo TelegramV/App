@@ -79,7 +79,7 @@ export class AttachPhotosModal extends StatefulComponent {
             <div className="padded">
                 <GalleryFragment ref={this.galleryRef} blobs={props.media}/>
                 <VInput ref={this.captionRef} label="Caption"/>
-                <VCheckbox label="As sticker" checked={this.state.asSticker} onClick={() => {this.setState({asSticker: true})}}/>
+                {/*<VCheckbox label="As sticker" checked={this.state.asSticker} onClick={() => {this.setState({asSticker: true})}}/>*/}
             </div>
         </div>
     }
@@ -108,6 +108,7 @@ export class AttachPhotosModal extends StatefulComponent {
         }
     }
 
+    // disabled, waiting for ios 14...
     async sendAsSticker() {
         for(let l of this.galleryRef.component.props.blobs) {
             let file = await WebpHelper.makeSticker(l).then(blob => blob.arrayBuffer());

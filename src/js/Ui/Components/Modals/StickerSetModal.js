@@ -43,6 +43,7 @@ export class StickerSetModal extends StatefulComponent {
     }
 
     componentDidMount() {
+        // TODO: catch if set is invalid
         if (!this.props.set.isFetched) {
             this.props.set.getStickerSet().then(set => {
                 this.forceUpdate();

@@ -17,9 +17,17 @@
  *
  */
 
-global.$ = require("./Ui/Utils/$").default
+import VUI from "../../../Ui/VUI"
+import {parseMessageEntities} from "../../../Utils/htmlHelpers"
 
-global.__IS_PRODUCTION__ = __IS_PRODUCTION__
-global.__IS_DEV__ = __IS_DEV__
-global.__IS_SAFARI__ = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
-global.__IS_IOS__ = !!navigator.platform.match(/iPhone|iPod|iPad/)
+function processUpdateServerNotification(update) {
+    if(update.inbox_date) {
+    	// add to service chat
+    }
+
+    if(popup) {
+    	VUI.Modal.popup(parseMessageEntities(update.message, update.entities));
+    }
+}
+
+export default processUpdateServerNotification;
