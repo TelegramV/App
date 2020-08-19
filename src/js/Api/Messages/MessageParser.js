@@ -178,7 +178,7 @@ export class MessageParser {
             case MessageType.WEB_PAGE:
                 return "";
             case MessageType.TTL:
-                return "Self-destroying message"
+                return "Self-destruct message"
             default:
                 return "Unsupported"
         }

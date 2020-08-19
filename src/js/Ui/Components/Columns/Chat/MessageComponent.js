@@ -82,7 +82,6 @@ const MessageComponent = ({message, ...attrs}) => {
     if (Handler) {
         return <Handler message={message} {...attrs}/>
     } else {
-        console.log(message.type)
         return (
             <UnsupportedMessageComponent message={message} {...attrs}/>
         )
