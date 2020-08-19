@@ -139,6 +139,10 @@ class ContextMenuComponent extends StatefulComponent {
         const height = data.length * 64
         const windowWidth = window.innerWidth
         const windowHeight = window.innerHeight
+        const clientWidth = document.querySelector("#app").clientWidth
+        const clientHeight = document.querySelector("#app").clientHeight
+        x -= (windowWidth - clientWidth) / 2
+        y -= (windowHeight - clientHeight) / 2
 
         this.state.animation = origin
         if (x + width >= windowWidth) {
