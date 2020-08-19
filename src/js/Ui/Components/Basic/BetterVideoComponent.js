@@ -82,6 +82,7 @@ class BetterVideoComponent extends StatefulComponent {
                                        width={width}
                                        height={height}
                                        ref={this.videoRef}
+                                       playsinline={otherArgs.playsinline}
                                        calculateSize={true}
                         />
                         :

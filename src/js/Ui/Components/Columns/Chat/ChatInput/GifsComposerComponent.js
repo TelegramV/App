@@ -17,20 +17,21 @@
  *
  */
 
-import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
-import {FileAPI} from "../../../../../Api/Files/FileAPI"
+import { FileAPI } from "../../../../../Api/Files/FileAPI"
 import VRDOM from "../../../../../V/VRDOM/VRDOM"
 import VApp from "../../../../../V/vapp"
 import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
 import API from "../../../../../Api/Telegram/API"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 
-class GifsComposerComponent extends StatelessComponent {
-    masonryRef = VComponent.createRef();
+class GifsComposerComponent extends StatefulComponent {
 
-    initialized = false;
+    state = {
+        gifs: []
+    }
 
     appEvents(E: AE) {
         E.bus(UIEvents.General)
@@ -40,7 +41,22 @@ class GifsComposerComponent extends StatelessComponent {
     render(props) {
         return (
             <div className="gif-wrapper hidden">
-                <div ref={this.masonryRef} className="gif-masonry scrollable"/>
+                <div className="gif-table scrollable">
+                    {this.state.gifs.length > 0 && this.state.gifs.map(document => {
+                    return (
+                        <div class="gif">
+                            <BetterVideoComponent document={document}
+                                                  onClick={() => {
+                                                      AppSelectedChat.current.api.sendExistingMedia(document);
+                                                      VApp.mountedComponents.get("composer").hide();
+                                                  }}
+                                                  autoDownload
+                                                  playsinline
+                                                  playOnHover/>
+                        </div>
+                    )
+                })}
+                </div>
             </div>
         )
     }
@@ -50,29 +66,12 @@ class GifsComposerComponent extends StatelessComponent {
     }
 
     onComposerTogglePanel = event => {
-        if (event.panel === "gif" && !this.initialized) {
+        if (event.panel === "gif" && this.state.gifs.length === 0) {
             API.messages.getSavedGifs().then(SavedGifs => {
-                SavedGifs.gifs.forEach(document => {
-                    const size = FileAPI.getMaxSize(document);
-                    const height = 100;
-                    const width = Math.max((size.w / size.h) * height, 40);
-
-                    VRDOM.append(
-                        <div class="masonry-item" css-width={width + "px"}>
-                            <BetterVideoComponent document={document}
-                                                  onClick={() => {
-                                                      AppSelectedChat.current.api.sendExistingMedia(document);
-                                                      VApp.mountedComponents.get("composer").hide();
-                                                  }}
-                                                  autoDownload
-                                                  playOnHover/>
-                        </div>,
-                        this.masonryRef.$el
-                    );
+                this.setState({
+                    gifs: SavedGifs.gifs
                 })
-            });
-
-            this.initialized = true;
+            })
         }
     }
 }

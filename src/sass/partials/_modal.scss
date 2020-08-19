@@ -59,6 +59,7 @@
 
             .header {
                 display: flex;
+                flex-shrink: 0;
                 flex-direction: row;
                 height: 60px;
                 font-weight: 500;

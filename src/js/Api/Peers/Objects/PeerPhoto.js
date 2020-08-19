@@ -18,6 +18,7 @@ export class PeerPhoto {
 
         this._photoSmallUrl = ""
         this._photoBigUrl = ""
+        this._videoUrl = ""
 
         this._letter = {
             num: Math.abs(this._peer.id) % 8,
@@ -103,13 +104,14 @@ export class PeerPhoto {
      */
     get videoUrl() {
         if (!this.isEmpty) {
-            if (this._videoUrl === "" && !this._isFetchingVideo) {
-                this.fetchVideo()
-                return this._videoUrl
-            }
+            // uncomenting lines below causes really bad consequences
+            /*//if (this._videoUrl === "" && !this._isFetchingVideo) {
+              //  this.fetchVideo()
+              //  return this._videoUrl
+            }*/
             let startTime = 0;
             if(this._photo?.video_sizes) startTime = this._photo.video_sizes[0].video_start_ts
-            let url = this._videoUrl ? (this._videoUrl + "#t=" + startTime) : null
+            let url = startTime ? (this._videoUrl + "#t=" + startTime) : this._videoUrl
             return url;
         } else {
             return ""
@@ -121,7 +123,7 @@ export class PeerPhoto {
      */
     set videoUrl(videoUrl) {
         this._videoUrl = videoUrl
-
+        console.log(videoUrl)
         this._peer.fire("updateProfileVideo")
     }
 
