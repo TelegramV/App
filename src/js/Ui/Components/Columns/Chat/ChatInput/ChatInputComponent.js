@@ -15,6 +15,7 @@ import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 import ChatToBottomButtonComponent from "../ChatToBottomButtonComponent"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import {UserPeer} from "../../../../../Api/Peers/Objects/UserPeer";
 
 export let ChatInputManager
 
@@ -79,27 +80,7 @@ export class ChatInputComponent extends StatelessComponent {
                                     <div className="ico-wrapper">
 
                                         <i className="tgico tgico-attach btn-icon rp rps"
-                                           onClick={
-                                               l => VUI.ContextMenu.openAbove([
-                                                   {
-                                                       icon: "poll",
-                                                       title: "Poll",
-                                                       onClick: _ => {
-                                                           this.pickPoll()
-                                                       }
-                                                   },
-                                                   {
-                                                       icon: "photo",
-                                                       title: "Photo or Video",
-                                                       onClick: this.attachMedia
-                                                   },
-                                                   {
-                                                       icon: "document",
-                                                       title: "Document",
-                                                       onClick: this.attachFile
-                                                   },
-                                               ], l.target)
-                                           }/>
+                                           onClick={this.openAttachContext}/>
                                     </div>
 
                                     <div className="voice-seconds hidden"/>
@@ -186,6 +167,32 @@ export class ChatInputComponent extends StatelessComponent {
                 this.closeReply();
             }
         }
+    }
+
+    openAttachContext = (event) => {
+        const items = [
+
+            {
+                icon: "photo",
+                title: "Photo or Video",
+                onClick: this.attachMedia
+            },
+            {
+                icon: "document",
+                title: "Document",
+                onClick: this.attachFile
+            },
+        ]
+        if(!(AppSelectedChat.current instanceof UserPeer)) {
+            items.push({
+                icon: "poll",
+                title: "Poll",
+                onClick: _ => {
+                    this.pickPoll()
+                }
+            })
+        }
+        VUI.ContextMenu.openAbove(items, event.target)
     }
 
     appendText = (text) => {
