@@ -36,6 +36,10 @@ class FoldersState extends SharedState {
         //FoldersManager.fetchFolders();
     }
 
+    init() {
+        FoldersManager.fetchFolders();
+    }
+
     get current() {
         return this.folders.find(folder => folder.id === this.currentId)
     }

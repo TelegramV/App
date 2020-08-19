@@ -5,6 +5,7 @@ import DialogsStore from "../Store/DialogsStore";
 import {Peer} from "../Peers/Objects/Peer";
 import {isEquivalent} from "../../Utils/array";
 import keval from "../../Keval/keval";
+import foldersState from "../../Ui/Components/foldersState";
 
 class FolderManager {
     folders = []
@@ -28,6 +29,20 @@ class FolderManager {
     }
 
     init() {
+        keval.getItem("foldersData").then(foldersData => {
+            if (!foldersData) return
+            this.folders = foldersData.folders
+            this.selectedFolder = foldersData.selected
+
+            this.fireUpdate()
+            AppEvents.General.fire("selectFolder", {
+                folder: this.getFolder(this.selectedFolder),
+                folderId: this.selectedFolder
+            })
+        })
+
+        foldersState.init()
+
         // should be separated in different files and moved to Api/Updates/Update
         UpdatesManager.subscribe("updateDialogFilter", this.updateDialogFilter)
         UpdatesManager.subscribe("updateDialogFilterOrder", this.updateDialogFilterOrder)
