@@ -26,6 +26,8 @@ export const MessageType = {
     GROUP: 20,
     ANIMATED_STICKER: 21,
     DICE: 22,
+
+    TTL: 100,
 }
 
 export interface Message {

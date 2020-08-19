@@ -37,6 +37,7 @@ import DiceMessageComponent from "./Message/DiceMessageComponent"
 import GroupedMessageComponent from "./Message/GroupedMessageComponent";
 import NewAudioMessageComponent from "./Message/NewAudioMessageComponent"
 import NewVoiceMessageComponent from "./Message/NewVoiceMessageComponent"
+import TTLMessageComponent from "./Message/TTLMessageComponent";
 
 /**
  * @type {Map<number, function({message: *}): *>}
@@ -64,7 +65,9 @@ const handlers = new Map([
     [MessageType.PHONE_CALL, PhoneCallMessageComponent],
     [MessageType.SERVICE, ServiceMessageComponent],
     [MessageType.ANIMATED_EMOJI, AnimatedStickerMessageComponent],
-    [MessageType.GROUP, GroupedMessageComponent]
+    [MessageType.GROUP, GroupedMessageComponent],
+
+    [MessageType.TTL, TTLMessageComponent],
 ])
 
 /**
@@ -79,6 +82,7 @@ const MessageComponent = ({message, ...attrs}) => {
     if (Handler) {
         return <Handler message={message} {...attrs}/>
     } else {
+        console.log(message.type)
         return (
             <UnsupportedMessageComponent message={message} {...attrs}/>
         )

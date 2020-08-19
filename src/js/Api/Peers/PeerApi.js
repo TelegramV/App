@@ -158,7 +158,7 @@ export class PeerApi {
                     console.log(l)
                     a.push(await FileAPI.uploadMediaToPeer(this.peer, l))
                 }
-                console.log(a)
+                //console.log(a)
                 resolve(a)
                 return a
             })
@@ -190,7 +190,7 @@ export class PeerApi {
         UIEvents.General.fire("chat.scrollBottom")
 
         p.then(q => {
-            console.log(q)
+            //console.log(q)
 
             let msgId = 0
             MTProto.invokeMethod(media ? (multi ? "messages.sendMultiMedia" : "messages.sendMedia") : "messages.sendMessage", {
@@ -207,15 +207,7 @@ export class PeerApi {
                 multi_media: q && q.map((l, i) => {
                     return {
                         _: "inputSingleMedia",
-                        media: {
-                            _: "inputMediaPhoto",
-                            id: {
-                                _: "inputPhoto",
-                                id: l.photo.id,
-                                access_hash: l.photo.access_hash,
-                                file_reference: l.photo.file_reference
-                            }
-                        },
+                        media: this.toInputMedia(l),
                         message: i === 0 ? text : null,
                         entities: i === 0 ? messageEntities : null,
                         random_id: genMsgId() + msgId++
@@ -223,7 +215,7 @@ export class PeerApi {
                 }),
                 random_id: randomId
             }).then(response => {
-                console.log(response)
+                //console.log(response)
                 if (response.updates) {
                     response.updates.forEach(l => {
                         if (l._ === "updateMessageID") l.peer = this.peer
@@ -240,6 +232,32 @@ export class PeerApi {
                 MTProto.UpdatesManager.process(response)
             })
         })
+    }
+
+    toInputMedia(media) {
+        if(media._ === "messageMediaPhoto") {
+            return {
+                _: "inputMediaPhoto",
+                id: {
+                    _: "inputPhoto",
+                    id: media.photo.id,
+                    access_hash: media.photo.access_hash,
+                    file_reference: media.photo.file_reference
+                }
+            }
+        }
+        if(media._ === "messageMediaDocument") {
+            return {
+                _: "inputMediaDocument",
+                id: {
+                    _: "inputDocument",
+                    id: media.document.id,
+                    access_hash: media.document.access_hash,
+                    file_reference: media.document.file_reference
+                }
+            }
+        }
+        return {}
     }
 
     sendMedia(text, file, f) {

@@ -31,15 +31,27 @@ import WebpHelper from "../../Utils/WebpHelper"
 class GalleryFragment extends StatelessComponent {
     render() {
         return <div className={["grouped", Layouter.getClass(this.props.blobs.length)]}>
-            {this.props.blobs.map(l => {
-                return <figure>
-                    <img src={l}/>
-                </figure>
-            })}
+            {this.props.blobs.map(this.makeFigure)}
         </div>
     }
 
-    addPhoto = (blob) => {
+    makeFigure = (blob) => {
+        if(this.isVideo(blob)) { 
+            return <figure>
+                    <video controls src={URL.createObjectURL(blob)}/>
+                </figure>
+        } else {
+            return <figure>
+                    <img src={URL.createObjectURL(blob)}/>
+                </figure>
+        }
+    }
+
+    isVideo = (blob) => {
+        return blob.type.includes("video"); // TODO better testing for other video formats
+    }
+
+    addMedia = (blob) => {
         if (this.props.blobs.length >= 10) return
         this.props.blobs.push(blob)
         this.forceUpdate()
@@ -49,14 +61,18 @@ class GalleryFragment extends StatelessComponent {
         const a = []
         let i = 0
         for(let l of this.props.blobs) {
-            // TODO: somehow get actual name
-            a.push(await FileAPI.uploadPhoto(await fetch(l).then(r => r.arrayBuffer()), `photo${i++}.jpg`))
+            let file;
+            // I don't think it's good to assume that all videos are mp4 and images are jpeg
+            if(this.isVideo(l)) {
+                file = FileAPI.uploadDocument(await l.arrayBuffer(), `video${i++}.mp4`, {
+                    mime_type: l.type
+                })
+            } else {
+                file = FileAPI.uploadPhoto(await l.arrayBuffer(), `photo${i++}.jpg`)
+            }
+            a.push(await file);
         }
         return a
-        // return Promise.all(this.props.blobs.map(async l => {
-        //     console.log("uploading")
-        //     return await FileAPI.uploadPhoto(await fetch(l).then(r => r.arrayBuffer()), "telegramweb.jpg") // TODO: somehow get actual name
-        // }))
     }
 }
 
@@ -70,12 +86,12 @@ export class AttachPhotosModal extends StatefulComponent {
 
     appEvents(E) {
         E.bus(UIEvents.General)
-        .on("upload.addPhoto", this.addPhoto)
+        .on("upload.addMedia", this.addMedia)
     }
 
     render(props) {
         return <div className="attach-modal">
-            <ModalHeaderFragment title="Send Photos" close actionText="Send" action={this.send.bind(this)}/>
+            <ModalHeaderFragment title="Send Media" close actionText="Send" action={this.send}/>
             <div className="padded">
                 <GalleryFragment ref={this.galleryRef} blobs={props.media}/>
                 <VInput ref={this.captionRef} label="Caption"/>
@@ -88,24 +104,24 @@ export class AttachPhotosModal extends StatefulComponent {
         this.captionRef.$el.querySelector("input").focus();
     }
 
-    addPhoto = ({blob}) => {
-        this.galleryRef.component.addPhoto(blob)
+    addMedia = ({blob}) => {
+        this.galleryRef.component.addMedia(blob)
     }
 
-    async send() {
-        const media = await this.galleryRef.component.getMedia()
+    send = async () => {
+        const media = await this.galleryRef.component.getMedia();
         // console.log(media)
         const caption = this.captionRef.$el.querySelector("input").value.repeat(1); //force string clone
         VUI.Modal.close()
 
-        if(this.state.asSticker) {
+        /*if(this.state.asSticker) {
             this.sendAsSticker();
-        } else {
-            AppSelectedChat.current.api.sendMessage({
-                text: caption,
-                media: media
-            })
-        }
+        } else {*/
+        AppSelectedChat.current.api.sendMessage({
+            text: caption,
+            media: media
+        })
+        //}
     }
 
     // disabled, waiting for ios 14...

@@ -3,6 +3,7 @@
 import {MessageParser} from "./MessageParser"
 import {TextMessage} from "./Objects/TextMessage"
 import {UnsupportedMessage} from "./UnsupportedMessage"
+import {TTLMessage} from "./Objects/TTLMessage"
 import {PhotoMessage} from "./Objects/PhotoMessage"
 import type {Message} from "./Message"
 import {MessageType} from "./Message"
@@ -37,7 +38,7 @@ const messageObjects = new Map([
     [MessageType.VENUE, VenueMessage],
     [MessageType.GAME, GameMessage],
     [MessageType.POLL, PollMessage],
-    [MessageType.INVOICE, InvoiceMessage], //requires encryption, component just tells to use other app
+    [MessageType.INVOICE, InvoiceMessage],
     [MessageType.WEB_PAGE, WebpageMessage],
     [MessageType.CONTACT, ContactMessage],
     [MessageType.DOCUMENT, DocumentMessage],
@@ -52,6 +53,9 @@ const messageObjects = new Map([
     [MessageType.VIDEO, VideoMessage],
     [MessageType.PHONE_CALL, PhoneCallMessage],
     [MessageType.SERVICE, ServiceMessage],
+
+    [MessageType.TTL, TTLMessage],
+    [MessageType.UNSUPPORTED, UnsupportedMessage],
 ])
 
 export class MessageFactory {

@@ -10,6 +10,9 @@ export class MessageParser {
         const media = message.media
 
         if (media) {
+            if(media.ttl_seconds) {
+                return MessageType.TTL; // TODO remove special type when properly implemented
+            }
             switch (media._) {
                 case "messageMediaPhoto":
                     type = MessageType.PHOTO
@@ -174,6 +177,8 @@ export class MessageParser {
             case MessageType.TEXT:
             case MessageType.WEB_PAGE:
                 return "";
+            case MessageType.TTL:
+                return "Self-destroying message"
             default:
                 return "Unsupported"
         }

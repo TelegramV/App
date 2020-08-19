@@ -91,7 +91,7 @@ export class ChatInputComponent extends StatelessComponent {
                                                    {
                                                        icon: "photo",
                                                        title: "Photo or Video",
-                                                       onClick: this.attachPhoto
+                                                       onClick: this.attachMedia
                                                    },
                                                    {
                                                        icon: "document",
@@ -382,11 +382,11 @@ export class ChatInputComponent extends StatelessComponent {
         VUI.Modal.open(<AttachPollModal/>)
     }
 
-    pickPhoto = (blob) => {
+    pickMedia = (blob) => {
         if (VUI.Modal.state.body.componentClass !== AttachPhotosModal) {
             VUI.Modal.open(<AttachPhotosModal media={[blob]}/>)
         } else {
-            UIEvents.General.fire("upload.addPhoto", {blob: blob})
+            UIEvents.General.fire("upload.addMedia", {blob: blob})
         }
     }
 
@@ -403,18 +403,17 @@ export class ChatInputComponent extends StatelessComponent {
 
     attachFile = () => {
         askForFile("", (bytes, file) => {
-            const blob = new Blob(new Array(bytes)/*, {type: 'application/jpeg'}*/)
+            const blob = new Blob(new Array(bytes), {type: file.type})
 
-            this.pickFile(URL.createObjectURL(blob), file)
+            this.pickFile(blob, file)
         }, true, true)
     }
 
-    attachPhoto = () => {
+    attachMedia = () => {
         askForFile("image/*,video/*", (bytes, file) => {
-            const blob = new Blob(new Array(bytes), {type: 'application/jpeg'})
-            console.log(blob)
+            const blob = new Blob(new Array(bytes), {type: file.type})
 
-            this.pickPhoto(URL.createObjectURL(blob))
+            this.pickMedia(blob)
         }, true, true)
     }
 
