@@ -29,22 +29,30 @@ export default function RadioButtonPage() {
 
 class RadioTest extends StatefulComponent {
 
-	state = {
-		checked: false
-	}
+    state = {
+        checked: false
+    }
 
-	render({}, {checked}) {
-		return (
-			<div>
-				<VRadio checked={checked}/>
-				<VButton onClick={() => {this.setState({
-					checked: true
-				})}}>Checked: true</VButton>
-				<VButton onClick={() => {this.setState({
-					checked: false
-				})}}>Checked: false</VButton>
-				<VButton onClick={() => {this.forceUpdate()}}>forceUpdate</VButton>
-			</div>
-		)
-	}
+    render({}, {checked}) {
+        return (
+            <div>
+                <VRadio checked={checked} onClick={event => {
+                    event.preventDefault();
+                }}/>
+                <VButton onClick={() => {
+                    this.setState({
+                        checked: true
+                    })
+                }}>Checked: true</VButton>
+                <VButton onClick={() => {
+                    this.setState({
+                        checked: false
+                    })
+                }}>Checked: false</VButton>
+                <VButton onClick={() => {
+                    this.forceUpdate()
+                }}>forceUpdate</VButton>
+            </div>
+        )
+    }
 }
