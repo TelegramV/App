@@ -122,7 +122,7 @@ class NewVoiceMessageComponent extends StatelessComponent {
         let waveform = audioInfo.waveform;
 
         if (!waveform) {
-            waveform = [].fill(0, 0, 99);
+            waveform = new Array(100).fill(0);
         }
 
         let heights = convertBits(waveform, 8, 5);

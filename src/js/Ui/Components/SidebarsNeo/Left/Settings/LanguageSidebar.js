@@ -48,7 +48,8 @@ export class LanguageSidebar extends LeftSidebar {
 
     onLanguageChange = (event) => {
         let newList = [...this.state.languages]
-        newList.find(el => el.code === event.code).checked = true;
+        let lang = newList.find(el => el.code === event.code) 
+        if(lang) lang.checked = true;
         this.setState({
             languages: newList
         })

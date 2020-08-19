@@ -3,6 +3,7 @@
 .tab-selector-wrapper {
   background-color: white;
   border-bottom: 1px solid #d8dade;
+  overflow-y: hidden;
 
     .tab-selector {
         $transitionTime: 200ms;

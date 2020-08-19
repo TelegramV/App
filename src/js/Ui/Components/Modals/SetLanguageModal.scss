@@ -1,0 +1,21 @@
+@import "src/sass/partials/vars";
+
+.set-language {
+    display: flex;
+    flex-direction: column;
+
+    .container {
+        max-width: 400px;
+        padding: 0 20px;
+    }
+
+    .buttons {
+        display: flex;
+        justify-content: flex-end;
+        padding: 5px 10px;
+
+        .VButton:hover {
+            color: $darkblue;
+        }
+    }
+}

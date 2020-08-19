@@ -2,12 +2,13 @@ import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
 import UIEvents from "../../../../EventBus/UIEvents"
-import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import TranslatableStatelessComponent from "../../../../../V/VRDOM/component/TranslatableStatelessComponent"
 import Locale from "../../../../../Api/Localization/Locale"
 
-class ChatInfoNameComponent extends StatelessComponent {
+class ChatInfoNameComponent extends TranslatableStatelessComponent {
 
     appEvents(E) {
+        super.appEvents(E)
         E.bus(AppEvents.Peers)
             .filter(event => AppSelectedChat.check(event.peer))
             .updateOn("updateName")

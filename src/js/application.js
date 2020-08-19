@@ -13,6 +13,7 @@ import HorizontalScrollVRDOMPlugin from "./Ui/Plugins/HorizontalScrollPlugin"
 
 import PeerFactory from "./Api/Peers/PeerFactory"
 import PeersStore from "./Api/Store/PeersStore"
+import Locale from "./Api/Localization/Locale"
 
 import keval from "./Keval/keval"
 import API from "./Api/Telegram/API"
@@ -35,6 +36,7 @@ if (__IS_PRODUCTION__) {
     window.telegram = API
     window.files = FileAPI
     window.VRDOM = VRDOM
+    window.locale = Locale
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)

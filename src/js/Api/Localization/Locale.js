@@ -4,12 +4,15 @@ import keval from "../../Keval/keval";
 import UIEvents from "../../Ui/EventBus/UIEvents"
 import VRNode from "../../V/VRDOM/VRNode"
 import VRDOM from "../../V/VRDOM/VRDOM"
+import {getNewlines} from "../../Utils/htmlHelpers"
 import * as makePlural from "make-plural"
 
 class Locale {
 
 	langPack = "tdesktop"
 	langCode = "en"
+	pluralCode = "en"
+
 	/*
 		contains key: value
 		value:
@@ -19,12 +22,16 @@ class Locale {
 	*/
 	strings = null;
 
+	// fallback strings
+	englishStrings = null;
+
 	async init() {
-		await keval.lang.getItem("lang_code").then(data => {
+		await keval.lang.getItem("current_language").then(data => {
 			if(!data) {
-				return keval.lang.setItem("lang_code", this.langCode);
+				return this.downloadLanguage();
 			} else {
-				return this.langCode = data;
+				this.langCode = data.lang_code;
+				this.pluralCode = data.plural_code;
 			}
 		})
 		await keval.lang.getItem("strings_"+this.langCode).then(data => {
@@ -35,7 +42,16 @@ class Locale {
 			}
 		})
 
+		await keval.lang.getItem("strings_en").then(data => {
+			if(data) {
+				return this.englishStrings = data;
+			} else {
+				return this.downloadLanguage("en");
+			}
+		})
+
 		await this.checkUpdates();
+		await this.checkUpdates("en");
 		UIEvents.General.fire("language.ready");
 	}
 
@@ -55,6 +71,7 @@ class Locale {
 		if(key.key) return this.lp(key.key, key.count, key.replaces); //if object passed
 
 		let value = this.strings?.get(key);
+		if(!value) value = this.englishStrings?.get(key);
 		if(!value) return key;
 
 		let found = key;
@@ -71,16 +88,34 @@ class Locale {
 			found = this._replace(found, replace, replacement);
 		}
 
+		found = this._replaceNewlines(found);
+
 		if(!Array.isArray(found)) {
 			found = [found] //wrap in Array, for return consistency 
 		}
 
-		return found;
+		return found.flat();
+	}
+
+	_replaceNewlines(where) {
+		if(!Array.isArray(where)) where = [where];
+
+		let replaced = [];
+
+		for(let part of where) {
+			if(typeof part !== "string" || !part.includes("\n")) {
+				replaced.push(part);
+				continue;
+			}
+			replaced.push(getNewlines(part));
+		}
+		return replaced.flat(Infinity);
 	}
 
 	_replace(where, what, to) {
 		if(!Array.isArray(where)) where = [where];
 		if(!Array.isArray(to)) to = [to];
+		const rwhat = `{${what}}`;
 
 		let replaced = [];
 
@@ -92,15 +127,15 @@ class Locale {
 
 			for(let replacement of to) {
 				if(replacement instanceof VRNode) {
-					const position = part.indexOf(`{${what}}`);
+					const position = part.indexOf(rwhat);
 					if(position === -1) continue;
 					let split = [];
 					split[0] = part.substring(0, position);
 					split[1] = to;
-					split[2] = part.substring(position + `{${what}}`.length);
+					split[2] = part.substring(position + rwhat.length);
 					part = split;
 				} else {
-					part = part.replace(`{${what}}`, replacement)
+					part = part.replace(rwhat, replacement)
 				}
 			}
 			replaced.push(part);
@@ -120,34 +155,41 @@ class Locale {
 		return API.lang.getLanguages();
 	}
 
+	getLanguageInfo(code) {
+		return API.lang.getLanguage(this.langPack, code);
+	}
+
 	async setLanguage(langCode) {
 		this.langCode = langCode;
 		await this.downloadLanguage();
 		UIEvents.General.fire("language.changed", {code: this.langCode});
 	}
 
-	downloadLanguage() {
-		API.lang.getLanguage(this.langPack, this.langCode).then(language => {
+	downloadLanguage(optionalCode) {
+		let code = optionalCode ? optionalCode : this.langCode
+		API.lang.getLanguage(this.langPack, code).then(language => {
 			keval.lang.setItem("current_language", language);
 		})
-		return API.lang.getLangPack(this.langPack, this.langCode).catch(error => {
+		return API.lang.getLangPack(this.langPack, code).catch(error => {
+			code = "en";
 			this.langCode = "en"; //reset values
+			this.pluralCode = "en";
 			this.langPack = "tdesktop";
-			return API.lang.getLangPack(this.langPack, this.langCode)
+			return API.lang.getLangPack(this.langPack, code)
 		}).then(diff => {
 			let strings = new Map();
 			for(let item of diff.strings) {
 				let wrapped = this.wrapString(item);
 				strings.set(wrapped.key, wrapped.value);
 			}
-			keval.lang.setItem("lang_code", this.langCode);
 			return this.saveMap(strings, diff.version)
 		})
 	}
 
-	async checkUpdates() {
-		let savedVersion = await keval.lang.getItem("strings_version_"+this.langCode);
-		let diff = await API.lang.getDifference(this.langPack, this.langCode, savedVersion);
+	async checkUpdates(optionalCode) {
+		let code = optionalCode ? optionalCode : this.langCode
+		let savedVersion = await keval.lang.getItem("strings_version_"+code);
+		let diff = await API.lang.getDifference(this.langPack, code, savedVersion);
 		if(savedVersion === diff.version) return this.strings;
 		//change updated strings
 		for(let item of diff.strings) {
@@ -179,8 +221,7 @@ class Locale {
     }
 
     countToPluralCode(count) {
-    	let pluralCode = this.langCode; //usually true, fix it if something went wrong
-    	return makePlural[pluralCode](count);
+    	return makePlural[this.pluralCode](count);
     }
 
 }
