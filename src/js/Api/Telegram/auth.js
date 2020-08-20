@@ -78,7 +78,7 @@ function exportLoginToken(props = {}) {
 }
 
 function logOut() {
-    return MTProto.invokeMethod("auth.logOut;")
+    return MTProto.invokeMethod("auth.logOut")
 }
 
 const auth = {
