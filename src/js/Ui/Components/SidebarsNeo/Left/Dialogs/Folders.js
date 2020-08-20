@@ -81,7 +81,7 @@ export class Folders extends TranslatableStatefulComponent {
 
     makeTabs = (folders) => {
         const tabs = [{
-            text: <FolderFragment title={this.l("lng_filters_all")} badge={FoldersManager.getBadgeCount(null)}/>,
+            text: <FolderFragment title={this.l("lng_filters_all", {}, "All chats")} badge={FoldersManager.getBadgeCount(null)}/>,
             onClick: () => FoldersManager.selectFolder(null),
             key: "all"
         }]

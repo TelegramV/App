@@ -61,20 +61,22 @@ class Locale {
 		Method for non-plural strings
 		@returns Array of String or VRNode, if any VRNode passed as replacement
 	*/
-	l(key, replaces) {
-		return this.lp(key, 1, replaces); //return string for one, if plural key passed
+	l(key, replaces, defaultValue) {
+		return this.lp(key, 1, replaces, defaultValue); //return string for one, if plural key passed
 	}
 
 	/**
 		Method for plural strings
 		@returns Array of String or VRNode, if any VRNode passed as replacement
 	*/
-	lp(key="NO_TRANSLATION_KEY_PROVIDED", count=1, replaces = {}) {
-		if(key.key) return this.lp(key.key, key.count, key.replaces); //if object passed
+	lp(key="NO_TRANSLATION_KEY_PROVIDED", count=1, replaces = {}, defaultValue) {
+		if(key.key) return this.lp(key.key, key.count, key.replaces, key.defaultValue); //if object passed
 
 		let value = this.strings?.get(key);
 		if(!value) value = this.englishStrings?.get(key);
-		if(!value) return key;
+		if(!value) {
+			return [defaultValue || key];
+		}
 
 		let found = key;
 		if(!value._plural) {

@@ -25,6 +25,8 @@ import VCheckbox from "../../Elements/Input/VCheckbox"
 import VButton from "../../Elements/Button/VButton"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import API from "../../../Api/Telegram/API"
+import AppEvents from "../../../Api/EventBus/AppEvents"
+import Settings from "../../../Api/Settings/Settings"
 
 const CountryDropdownItemFragment = ({flag, name, code, onMouseDown}) => {
     return <div className="dropdown-item rp" onMouseDown={onMouseDown}>
@@ -50,6 +52,12 @@ class LoginPhoneComponent extends StatefulComponent {
 
     countryTemplate = country => {
         return <CountryDropdownItemFragment {...country} onMouseDown={() => this.onCountryClick(country)}/>
+    }
+
+    appEvents(E) {
+        super.appEvents(E);
+        E.bus(AppEvents.General)
+            .on("settings.ready", this.onSettingsReady);
     }
 
     render(props, {isLoading, phoneError}, {login}) {
@@ -200,6 +208,11 @@ class LoginPhoneComponent extends StatefulComponent {
             for (const country of loginState.countries.items) {
                 if (phone.replace(" ", "").startsWith(country.code.replace(" ", ""))) {
                     this.countryDropdownRef.component.setCurrent(country);
+                    this.setGlobalState({
+                        login: {
+                            country,
+                        }
+                    });
                     break;
                 }
             }
@@ -247,6 +260,20 @@ class LoginPhoneComponent extends StatefulComponent {
                 country,
             }
         });
+    }
+
+    onSettingsReady = () => {
+        const country = Settings.get("nearest_dc.country")?.toLowerCase();
+        const item = loginState.countries.items.find(item => item.short_code === country);
+        if(item && !loginState.country) {
+            this.countryDropdownRef.component.setCurrent(item);
+            this.setGlobalState({
+                login: {
+                    phone: item.code,
+                    country: item,
+                }
+            });
+        }
     }
 
     isPhoneValid = phone => {

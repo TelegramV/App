@@ -48,7 +48,7 @@ export class PeerPhoto {
      */
     get smallUrl() {
         if (!this.isEmpty) {
-            if (!this._photoSmallUrl === "" && !this._isFetchingSmall) {
+            if (this._photoSmallUrl === "" && !this._isFetchingSmall) {
                 this.fetchSmall()
             }
 
@@ -123,7 +123,6 @@ export class PeerPhoto {
      */
     set videoUrl(videoUrl) {
         this._videoUrl = videoUrl
-        console.log(videoUrl)
         this._peer.fire("updateProfileVideo")
     }
 
@@ -153,11 +152,12 @@ export class PeerPhoto {
             this._type = rawPhoto._
 
             this._dcId = rawPhoto.dc_id
-            //this._photoBig = rawPhoto.photo_big
 
             if (!this._photoSmall || this._photoSmall.volume_id !== rawPhoto.photo_small.volume_id || this._photoSmall.local_id !== rawPhoto.photo_small.local_id) {
                 this._photoSmall = rawPhoto.photo_small
-                this.fetchSmall()
+                this._photoSmallUrl = ""; // reset photo
+                // Fetch avatar only when you need to show it!
+                // this.fetchSmall()
             }
         } else {
             this._type = this._peer.type === "user" ? "userProfilePhotoEmpty" : "chatPhotoEmpty"

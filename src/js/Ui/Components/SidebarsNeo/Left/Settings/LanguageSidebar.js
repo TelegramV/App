@@ -59,7 +59,7 @@ export class LanguageSidebar extends LeftSidebar {
     refreshLanguageList = (newLang) => {
         return Locale.getLanguages().then(languages => {
             let langList = [];
-            if(!languages.find(e => e.lang_code === Locale.currentLanguageInfo.lang_code)) {
+            if(Locale.currentLanguageInfo && !languages.find(e => e.lang_code === Locale.currentLanguageInfo.lang_code)) {
                 languages.unshift(Locale.currentLanguageInfo); // TG not returning our custom language
             }
             for (let lang of languages) {

@@ -11,12 +11,12 @@ class TranslatableStatelessComponent<P> extends StatelessComponent<P> {
 		.updateOn("language.ready")
 	}
 
-	l(key, replaces) {
-		return Locale.l(key, replaces);
+	l(key, replaces, defaultValue) {
+		return Locale.l(key, replaces, defaultValue);
 	}
 
-	lp(key, count, replaces) {
-		return Locale.lp(key, count, replaces);
+	lp(key, count, replaces, defaultValue) {
+		return Locale.lp(key, count, replaces, defaultValue);
 	}
 }
 

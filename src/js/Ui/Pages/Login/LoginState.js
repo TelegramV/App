@@ -39,7 +39,8 @@ class LoginState extends SharedState {
         return {
             flag: country[3],
             name: country[1],
-            code: country[0]
+            code: country[0],
+            short_code: country[2]?.toLowerCase()
         }
     }));
 

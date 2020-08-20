@@ -12,7 +12,6 @@ import {StickerManager} from "../../../Api/Stickers/StickersManager";
 import WallpaperManager from "../../Managers/WallpaperManager";
 import FoldersManager from "../../../Api/Dialogs/FolderManager";
 import EmojiLangpack from "../../../Api/Localization/EmojiLangpack";
-import Locale from "../../../Api/Localization/Locale";
 import DeepLinkManager from "../../../Api/Telegram/DeepLinkManager";
 import {PhoneCallComponent} from "../../Components/Singleton/PhoneCallComponent";
 import {throttle} from "../../../Utils/func"
@@ -36,11 +35,11 @@ function initHighLevelManagers() {
             TopPeers.init()
         })
     })
+
     StickerManager.fetchSpecialSets();
     WallpaperManager.init();
     FoldersManager.init()
     EmojiLangpack.init();
-    Locale.init();
     DeepLinkManager.init();
 }
 
