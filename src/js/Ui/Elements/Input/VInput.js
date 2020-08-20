@@ -85,6 +85,8 @@ function VInput(
 }
 
 export class VInputValidate extends StatelessComponent {
+    value = this.props.value;
+
     render(props) {
         const onInput = props.onInput;
 
@@ -106,18 +108,22 @@ export class VInputValidate extends StatelessComponent {
         );
     }
 
+    componentDidUpdate() {
+        this.value = this.props.value
+    }
+
     onInput = (event: { target: HTMLInputElement; }) => {
         const filter = this.props.filter;
 
         if (filter) {
             const value = event.target.value;
-            const previousValue = event.target.previousValue || "";
+            const previousValue = this.value || "";
 
             if (filter(value)) {
-                event.target.previousValue = value;
+                this.value = value;
                 return event;
             } else {
-                event.target.value = previousValue;
+                event.target.value = this.value;
                 return false;
             }
         }

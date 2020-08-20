@@ -238,7 +238,7 @@ export class GenericSidebar extends TranslatableStatefulComponent {
     }
 
     get searchPlaceholder() {
-        return this.l("lng_dlg_filter")
+        return this.l("lng_dlg_filter", {}, "Search");
     }
 
     get isStatic() {

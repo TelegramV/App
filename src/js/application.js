@@ -14,6 +14,7 @@ import HorizontalScrollVRDOMPlugin from "./Ui/Plugins/HorizontalScrollPlugin"
 import PeerFactory from "./Api/Peers/PeerFactory"
 import PeersStore from "./Api/Store/PeersStore"
 import Locale from "./Api/Localization/Locale"
+import Settings from "./Api/Settings/Settings"
 
 import keval from "./Keval/keval"
 import API from "./Api/Telegram/API"
@@ -37,6 +38,7 @@ if (__IS_PRODUCTION__) {
     window.files = FileAPI
     window.VRDOM = VRDOM
     window.locale = Locale
+    window.settings = Settings
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin)
@@ -55,27 +57,12 @@ MTProto.connect().then(user => {
         PeersStore.set(PeerFactory.fromRaw(user));
     }
 
+    Settings.init();
+    Locale.init();
+
     if (__IS_PRODUCTION__) {
         document.title = "Telegram V (Beta)"
     } else {
         document.title = "[dev] Telegram V"
     }
 })
-
-// const a = ["1", "2", "3", "4", "5", "6"];
-// const b = ["1", "3", "9", "5", "6", "7", "8"];
-//
-// const diff = {};
-//
-// for (let i = 0; i < b.length; i++) {
-//     const bi = b[i];
-//     const abi = a.findIndex(it => it === bi);
-//
-//     if (abi > 0) {
-//         diff[i] = abi;
-//     } else {
-//         diff[i] = bi;
-//     }
-// }
-//
-// console.log(diff);
