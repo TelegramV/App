@@ -141,8 +141,8 @@ class StickerSetThumb extends StatefulComponent {
         if (stickerSet.raw.animated) {
             const options = {
                 path: stickerSet.thumbUrl,
-                loop: false,
-                autoplay: false,
+                loop: true,
+                autoplay: true,
             };
 
             return (

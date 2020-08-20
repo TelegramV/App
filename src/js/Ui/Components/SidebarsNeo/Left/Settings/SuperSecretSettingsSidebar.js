@@ -1,16 +1,22 @@
 import {LeftSidebar} from "../LeftSidebar";
 import {Section} from "../../Fragments/Section";
 import IconButton from "../../Fragments/IconButton";
+import UIEvents from "../../../../EventBus/UIEvents"
 
 export class SuperSecretSettingsSidebar extends LeftSidebar {
     content(): * {
         return <this.contentWrapper>
             <Section title="Filters">
-                <IconButton icon="avatar_deletedaccount" text="RIP filter" description="For those who will lose cause of bundle size (me)" onClick={this.ripFilter}/>
+                <IconButton icon="avatar_deletedaccount" text="RIP filter" description="When you can't reproduce 2FA bugs" onClick={this.ripFilter}/>
                 <IconButton icon="animals" text="Random filter" description="Telegram with filters. Just like the other ...gram" onClick={this.randomFilter}/>
                 <IconButton icon="colorize" text="Rainbow filter" description="20% cooler Telegram" onClick={this.rainbowFilter}/>
+                <IconButton icon="smile" text="Special occasion button" description="Use only on special occasions" onClick={this.showConfetti}/>
             </Section>
         </this.contentWrapper>
+    }
+
+    showConfetti = () => {
+        UIEvents.General.fire("confetti.show")
     }
 
     ripFilter = () => {

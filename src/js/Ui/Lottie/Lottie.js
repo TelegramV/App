@@ -164,6 +164,8 @@ class Lottie extends StatefulComponent {
             height: getSize(height),
             overflow: 'hidden',
             outline: 'none',
+            display: 'flex',
+            'align-items': 'center',
             ...this.props.style,
         };
         const onClickHandler = onClick ? onClick : () => null;

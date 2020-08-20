@@ -2,28 +2,28 @@ import MessageWrapperFragment from "./Common/MessageWrapperFragment";
 import MessageTimeComponent from "./Common/MessageTimeComponent";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
-import {formatAudioTime} from "../../../../Utils/utils"
+import { formatAudioTime } from "../../../../Utils/utils"
 import DocumentParser from "../../../../../Api/Files/DocumentParser"
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
-/**
- * @param {number} progress
- * @param {SVGElement} $el
- */
-function ProgressCircle({progress}) {
-    const radius = 190 / 2;
+const ProgressLoaderFragment = ({ progress = 0, radius = 0, hidden=false, strokeWidth=4}) => {
     const circumference = 2 * Math.PI * radius;
+    const offset = circumference - progress * circumference;
 
-    const style = {
-        "stroke-dasharray": `${circumference} ${circumference}`,
-        "stroke-dashoffset": circumference - progress / 103 * circumference,
+    const classes = {
+      "progress-ring": true,
+      hidden
     }
 
     return (
-        <svg className="progress-ring">
-            <circle style={style} className="progress-ring__circle"/>
-        </svg>
-    );
+        <svg className={classes}>
+                <circle
+                css-stroke-dashoffset={offset}
+                css-stroke-dasharray={`${circumference} ${circumference}`}
+                css-stroke-width={`${strokeWidth}px`}
+                cx={radius} cy={radius} r={radius-strokeWidth}/>
+            </svg>
+    )
 }
 
 class RoundVideoMessageComponent extends GeneralMessageComponent {
@@ -37,9 +37,9 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
         isMuted: true,
     }
 
-    videoComponentRef: { component: BetterVideoComponent } = VComponent.createComponentRef();
+    videoComponentRef: { component: BetterVideoComponent } = StatelessComponent.createComponentRef();
 
-    render({message, showDate}, {progress, isMuted}) {
+    render({ message, showDate }, { progress, isMuted }) {
         const document = message.raw.media.document;
         const video = DocumentParser.attributeVideo(document);
 
@@ -77,10 +77,14 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
                                           }
                                       }}
                                       onTimeUpdate={() => this.forceUpdate()}
+                                      onEnded={() => {this.setState({isMuted: true})}}
                                       infoContainer={({currentTime}) => {
                                           return (
                                               <div className="round-overlay">
-                                                  <ProgressCircle progress={currentTime / video.duration * 100}/>
+                                                  <ProgressLoaderFragment radius={95} 
+                                                                          progress={currentTime / video.duration} 
+                                                                          hidden={this.state.isMuted}
+                                                  />
                                               </div>
                                           )
                                       }}/>

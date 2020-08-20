@@ -151,6 +151,25 @@
   }
 }
 
+@keyframes opacity-fade-in {
+  from {
+    opacity: 0
+  }
+
+  to {
+    opacity: 1
+  }
+}
+
+@keyframes translate-in-60px {
+  from {
+    transform: translateY(-60px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 @keyframes rainbow {
  from {
     -webkit-filter:hue-rotate(1deg);

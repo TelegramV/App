@@ -38,13 +38,16 @@ const AvatarFragment = ({peer, noSaved, showVideo, alwaysPlay, onClick, onMouseE
         )
     }
 
+    const url = photo.smallUrl;
+
     if (hasAvatar) {
         return (
             <div onClick={onClick}
                  onMouseEnter={onMouseEnter}
                  onMouseLeave={onMouseLeave}
                  className="avatar"
-                 css-background-image={`url(${photo.smallUrl})`}>
+                 css-opacity={url ? "1" : "0"}
+                 css-background-image={`url(${url})`}>
                  { photo.hasVideo && photo.videoUrl && <video autoplay loop playsinline
                     src={(showVideo || alwaysPlay) ? photo.videoUrl : ""} // hide src if not playing
                     css-opacity={showVideo || alwaysPlay ? "1" : "0"}

@@ -7,9 +7,9 @@ export class RadioSection extends StatefulComponent {
         checked: 0
     }
 
-    render(props) {
-        return <Section {...props}>
-            {props.radios.map((l, index) => {
+    render({radios, ...other}) {
+        return <Section {...other}>
+            {radios.map((l, index) => {
                 return <RadioButton {...l} checked={this.state.checked === index} onClick={_ => this.check(index)}/>
             })}
         </Section>

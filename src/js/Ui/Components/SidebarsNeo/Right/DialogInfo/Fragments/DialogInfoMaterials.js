@@ -77,17 +77,14 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
         </div>
     }
 
-    componentDidMount() {
+    update() {
+        this.tabSelectorRef.component.updateProps({items: this.makeTabs()})
         if(this.showMembers()) {
             this.showing = "members"
         } else {
             this.showing = "media"
         }
-    }
-
-    update() {
-        this.tabSelectorRef.component.updateProps({items: this.makeTabs()})
-        this.tabSelectorRef.component.setTab(this.currentTab);
+        //this.tabSelectorRef.component.setTab(this.currentTab);
         if (!AppSelectedInfoPeer.check(AppSelectedInfoPeer.Previous) && AppSelectedInfoPeer.Current !== undefined) {
             this.refreshContent()
         }

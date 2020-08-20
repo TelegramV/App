@@ -222,6 +222,7 @@
     border-radius: 10px;
     background-color: #fff;
     padding: 9px;
+    animation: opacity-fade-in 0.3s ease;
     //transition: anim(background-color);
 
     display: flex;
@@ -282,11 +283,12 @@
         color: #fff;
         box-sizing: border-box;
         font-weight: 500;
+        margin: 0 2px;
     }
 
-    &.unread .badge {
+    /*&.unread .badge {
         padding: 0 8px;
-    }
+    }*/
 
     .status {
         color: $darkgreen;
