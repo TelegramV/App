@@ -4,7 +4,9 @@ import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
 
 class GIFMessageComponent extends GeneralMessageComponent {
-
+    state = {
+        paused: true
+    }
     render({message, showDate}) {
         return (
             <MessageWrapperFragment message={message} showUsername={false}
@@ -14,11 +16,29 @@ class GIFMessageComponent extends GeneralMessageComponent {
                                       autoDownload
                                       playsinline
                                       loop
+                                      paused={this.state.paused}
                                       autoplay
                                       muted/>
                 <MessageTimeComponent message={message} bg={true}/>
             </MessageWrapperFragment>
         )
+    }
+
+    onElementHidden() {
+        super.onElementHidden();
+        console.log("autoplay = false")
+        this.setState({
+            paused: true
+        })
+    }
+
+    onElementVisible() {
+        super.onElementVisible();
+        console.log("autoplay = true")
+
+        this.setState({
+            paused: false
+        })
     }
 }
 

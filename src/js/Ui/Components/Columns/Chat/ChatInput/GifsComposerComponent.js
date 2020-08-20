@@ -26,16 +26,25 @@ import VApp from "../../../../../V/vapp"
 import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
 import API from "../../../../../Api/Telegram/API"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
+import IntersectionObserver from "intersection-observer-polyfill";
+import FileManager from "../../../../../Api/Files/FileManager";
 
 class GifsComposerComponent extends StatefulComponent {
 
+    observer: IntersectionObserver
+
     state = {
-        gifs: []
+        gifs: [],
+        pausedAll: true,
+        paused: {}
     }
+
 
     appEvents(E: AE) {
         E.bus(UIEvents.General)
             .on("composer.togglePanel", this.onComposerTogglePanel)
+            .on("composer.hide", this.onComposerHide)
+            .on("composer.show", this.onComposerShow)
     }
 
     render(props) {
@@ -50,8 +59,10 @@ class GifsComposerComponent extends StatefulComponent {
                                                       AppSelectedChat.current.api.sendExistingMedia(document);
                                                       VApp.mountedComponents.get("composer").hide();
                                                   }}
-                                                  autoDownload
+                                                  // autoDownload
                                                   playsinline
+                                                  paused={this.state.pausedAll || this.state.paused[document.id]}
+                                                  observer={this.observer}
                                                   loop
                                                   muted
                                                   autoplay
@@ -65,15 +76,70 @@ class GifsComposerComponent extends StatefulComponent {
     }
 
     componentDidMount() {
+        this.observer = new IntersectionObserver(this.onIntersection, {
+            root: this.$el,
+            // rootMargin: "0p",
+            threshold: 0.2,
+        });
+    }
 
+
+    onIntersection = (entries) => {
+        entries.forEach(entry => {
+            const component = entry.target.__v?.component
+            const document = component.props.document
+            const id = document.id
+            if (entry.isIntersecting) {
+                delete this.state.paused[id]
+                FileManager.downloadVideo(document)
+
+                // entry.target.style.visibility = "visible";
+                // component.play();
+            } else {
+                this.state.paused[id] = true
+                // entry.target.style.visibility = "hidden";
+
+                // component.pause();
+                // entry.target.__v?.component.onElementHidden.call(entry.target.__v.component);
+            }
+        })
+        this.forceUpdate()
+    }
+
+    onComposerHide = event => {
+        if(event.panel === "gif") {
+            this.setState({
+                pausedAll: true
+            })
+        }
+    }
+
+    onComposerShow = event => {
+        if(event.panel === "gif") {
+            this.setState({
+                pausedAll: false
+            })
+        }
     }
 
     onComposerTogglePanel = event => {
-        if (event.panel === "gif" && this.state.gifs.length === 0) {
-            API.messages.getSavedGifs().then(SavedGifs => {
-                this.setState({
-                    gifs: SavedGifs.gifs
+        console.log("onComposerTogglePanel", event.panel)
+        if (event.panel === "gif") {
+            if(this.state.gifs.length === 0) {
+                API.messages.getSavedGifs().then(SavedGifs => {
+                    this.setState({
+                        gifs: SavedGifs.gifs,
+                        pausedAll: false,
+                    })
                 })
+            } else {
+                this.setState({
+                    pausedAll: false
+                })
+            }
+        } else {
+            this.setState({
+                pausedAll: true
             })
         }
     }

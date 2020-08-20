@@ -111,6 +111,16 @@ class BetterVideoComponent extends StatefulComponent {
             } else {
                 this.videoRef.$el.volume = 1;
             }
+
+            if(this.props.paused) {
+                this.pause()
+            } else {
+                this.play()
+            }
+        }
+
+        if(this.props.observer) {
+            this.props.observer.observe(this.$el)
         }
     }
 
@@ -121,7 +131,26 @@ class BetterVideoComponent extends StatefulComponent {
             } else {
                 this.videoRef.$el.volume = 1;
             }
+
+            if(this.props.paused) {
+                this.pause()
+            } else {
+                this.play()
+            }
         }
+    }
+
+    pause() {
+        // this.videoRef.$el?.pause()
+        if(this.playPromise) {
+            this.playPromise.then(() => {this.videoRef.$el?.pause()});
+        } else {
+            this.videoRef.$el?.pause()
+        }
+    }
+
+    play() {
+        this.playPromise = this.videoRef.$el?.play()
     }
 
     onDownloadDone = ({url}) => {
@@ -177,6 +206,7 @@ class BetterVideoComponent extends StatefulComponent {
     }
 
     onTimeUpdate = (event: Event) => {
+        // console.log("onTimeUpdate")
         this.setState({
             currentTime: event.target.currentTime,
         });
