@@ -12,7 +12,6 @@ export default class ConfettiCanvasComponent extends StatelessComponent {
     }
 
     componentDidMount() {
-        this.canvas = this.canvasRef.$el;
         this.start();
     }
 
@@ -21,10 +20,14 @@ export default class ConfettiCanvasComponent extends StatelessComponent {
         this.ended = true;
     }
 
-    start() {
-        this.ctx = this.canvas.getContext("2d");
-        this.canvas.width = window.innerWidth; // TODO catch resizes?
-        this.canvas.height = window.innerHeight;
+    shouldComponentUpdate() {
+        return false;
+    }
+
+    start = () => {
+        this.ctx = this.canvasRef.$el.getContext("2d");
+        this.canvasRef.$el.width = window.innerWidth; // TODO catch resizes?
+        this.canvasRef.$el.height = window.innerHeight;
 
         this.confetti = this.generateConfetti();
 
@@ -33,7 +36,7 @@ export default class ConfettiCanvasComponent extends StatelessComponent {
 
     draw = () => {
         if(this.unmounting) return;
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, this.canvasRef.$el.width, this.canvasRef.$el.height);
 
         for (let item of this.confetti) {
             item.draw(this.ctx);
@@ -47,9 +50,9 @@ export default class ConfettiCanvasComponent extends StatelessComponent {
         window.requestAnimationFrame(this.draw);
     }
 
-    generateConfetti() {
-        let width = this.canvas.width;
-        let height = this.canvas.height;
+    generateConfetti = () => {
+        let width = this.canvasRef.$el.width;
+        let height = this.canvasRef.$el.height;
         let colors = ['#E8BC2C', '#D0049E', '#02CBFE', '#5723FD', '#FE8C27', '#6CB859']
         let confetti = [];
 
@@ -77,9 +80,9 @@ export default class ConfettiCanvasComponent extends StatelessComponent {
         return confetti;
     }
 
-    checkConfetti() {
+    checkConfetti = () => {
         for (let item of this.confetti) {
-            if (item.pos.y < this.canvas.height+item.size) return false;
+            if (item.pos.y < this.canvasRef.$el.height+item.size) return false;
         }
         return true;
     }

@@ -5,30 +5,34 @@
   z-index: 99999;
 
   &.hidden .context-menu {
-    animation: hidden-context 150ms ease-in-out forwards;
+    animation: hidden-context 250ms ease-in-out forwards;
   }
 
 
   &.unhidden .context-menu {
-    animation: unhidden-context 150ms ease-in-out forwards;
+    animation: unhidden-context 250ms ease-in-out forwards;
   }
 
   @keyframes unhidden-context {
     0% {
+      opacity: 0;
       transform: scale(0, 0);
     }
 
     100% {
+      opacity: 1;
       transform: scale(1, 1);
     }
   }
 
   @keyframes hidden-context {
     0% {
+      opacity: 1;
       transform: scale(1, 1);
     }
 
     100% {
+      opacity: 0;
       transform: scale(0, 0);
     }
   }
