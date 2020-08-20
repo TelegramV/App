@@ -214,16 +214,28 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.jsDate.toLocaleString(locale, format)
     }
 
+    formattedTime = null
     getFormattedTime() {
-        return this.getDate(navigator.language, DATE_FORMAT_TIME)
+        if(this.formattedTime === null) {
+            this.formattedTime = this.getDate(navigator.language, DATE_FORMAT_TIME)
+        }
+        return this.formattedTime
     }
 
+    formattedDate = null
     getFormattedDate() {
-        return this.getDate(navigator.language, DATE_FORMAT)
+        if(this.formattedDate === null) {
+            this.formattedDate = this.getDate(navigator.language, DATE_FORMAT)
+        }
+        return this.formattedDate
     }
 
     getFormattedDateOrTime() {
-        return this.getDate(navigator.language, MTProto.TimeManager.now(true) - this.date > 86400 ? DATE_FORMAT : DATE_FORMAT_TIME)
+        if(MTProto.TimeManager.now(true) - this.date > 86400) {
+            return this.getFormattedDate()
+        } else {
+            return this.getFormattedTime()
+        }
     }
 
     // always call super
