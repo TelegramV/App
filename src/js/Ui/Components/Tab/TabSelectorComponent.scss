@@ -22,7 +22,7 @@
             cursor: pointer;
             text-align: center;
             flex-shrink: 0;
-            max-width: 100px;
+            //max-width: 100px; // two-line tab looks bad
 
             &.selected {
                 color: $blue;

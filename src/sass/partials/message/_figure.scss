@@ -24,6 +24,15 @@
                     &.hidden {
                         opacity: 0;
                     }
+
+                    circle {
+                        stroke: white;
+                        fill: transparent;
+                        stroke-linecap: round;
+                        transform-origin: center;
+                        transform: rotate(-90deg);
+                        transition: stroke-dashoffset 0.25s;
+                    }
                 }
             }
 
