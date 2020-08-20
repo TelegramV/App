@@ -52,7 +52,10 @@ class GifsComposerComponent extends StatefulComponent {
                                                   }}
                                                   autoDownload
                                                   playsinline
-                                                  playOnHover/>
+                                                  loop
+                                                  muted
+                                                  autoplay
+                                                  />
                         </div>
                     )
                 })}
