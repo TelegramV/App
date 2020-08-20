@@ -24,11 +24,6 @@
             flex-shrink: 0;
             max-width: 100px;
 
-            &:hover,
-            &.selected {
-                background: $light;
-            }
-
             &.selected {
                 color: $blue;
             }

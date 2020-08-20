@@ -80,6 +80,7 @@ function MediaFragment({media, zoom, hidden}) {
                                         document={media.raw.media.document}
                                         thumbUrl={thumbUrl}
                                         autoPlay
+                                        playsinline
                                         controls/>
     }
 

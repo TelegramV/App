@@ -45,7 +45,10 @@ export class SetLanguageModal extends TranslatableStatefulComponent {
             </div>
             <div class="buttons">
                 <VButton isFlat isUppercase onClick={VUI.Modal.close}>{this.l("lng_cancel")}</VButton>
-                <VButton isFlat isUppercase onClick={() => Locale.setLanguage(code)}>{this.l("lng_language_switch_apply")}</VButton>
+                <VButton isFlat isUppercase onClick={() => {
+                    Locale.setLanguage(code);
+                    VUI.Modal.close();
+                }}>{this.l("lng_language_switch_apply")}</VButton>
             </div>
         </div>
     }

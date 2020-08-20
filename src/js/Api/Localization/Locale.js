@@ -165,6 +165,7 @@ class Locale {
 		return API.lang.getLanguage(this.langPack, code);
 	}
 
+	// TODO check local storage before fetching
 	async setLanguage(langCode) {
 		this.langCode = langCode;
 		await this.downloadLanguage();
@@ -174,6 +175,7 @@ class Locale {
 	downloadLanguage(optionalCode) {
 		let code = optionalCode ? optionalCode : this.langCode
 		API.lang.getLanguage(this.langPack, code).then(language => {
+			this.langInfo = language;
 			keval.lang.setItem("current_language", language);
 		})
 		return API.lang.getLangPack(this.langPack, code).catch(error => {

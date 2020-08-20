@@ -181,6 +181,7 @@ class VideoPlayer extends StatefulComponent {
                            onEnterPictureInPicture={this.onEnterPictureInPicture}
                            onLeavePictureInPicture={this.onLeavePictureInPicture}
                            onSeeking={this.onSeeking}
+                           playsinline={otherArgs.playsinline}
                            $recreate={this.videoRef.$el?.src !== src /* THIS IS VERY BAD КОСТИЛЬ, but now idk how to do it better, NEVER REPEAT THIS!!!!*/}
                     />
 

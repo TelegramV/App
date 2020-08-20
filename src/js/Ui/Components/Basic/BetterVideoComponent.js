@@ -38,6 +38,8 @@ class BetterVideoComponent extends StatefulComponent {
 
     videoRef: { $el: HTMLVideoElement } = VComponent.createFragmentRef();
 
+    playPromise = Promise.resolve()
+
     init() {
         const {document} = this.props;
 
@@ -60,7 +62,7 @@ class BetterVideoComponent extends StatefulComponent {
         const streamable = DocumentParser.isVideoStreamable(document);
 
         if (streamable) {
-            otherArgs.autoPlay = false;
+            otherArgs.autoplay = false;
             showVideo = false;
         }
 
@@ -83,6 +85,7 @@ class BetterVideoComponent extends StatefulComponent {
                                        height={height}
                                        ref={this.videoRef}
                                        calculateSize={true}
+                                       preload="metadata"
                         />
                         :
                         <PhotoFragment document={document}
@@ -127,7 +130,7 @@ class BetterVideoComponent extends StatefulComponent {
             isLoading: false,
         });
 
-        if (!this.props.autoPlay) {
+        if (!this.props.autoplay) {
             this.videoRef.$el?.pause();
         }
     }
@@ -147,14 +150,15 @@ class BetterVideoComponent extends StatefulComponent {
     onMouseOver = e => {
         if (this.props.playOnHover) {
             this.state.isHovered = true;
-            e.currentTarget?.play();
+            this.playPromise = e.currentTarget?.play();
         }
     }
 
     onMouseOut = e => {
         if (this.props.playOnHover) {
             this.state.isHovered = false;
-            e.currentTarget?.pause();
+            // Fixes most of DOMException: The play() request was interrupted by a call to pause().
+            this.playPromise.then(() => {e.currentTarget?.pause()});
         }
     }
 
@@ -164,7 +168,7 @@ class BetterVideoComponent extends StatefulComponent {
         });
 
         if (this.state.isHovered) {
-            e.target.play();
+            this.playPromise.then(() => {e.target?.pause()});
         }
 
         if (this.props.onEnded) {

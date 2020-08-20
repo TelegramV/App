@@ -1,0 +1,5 @@
+@import "src/sass/partials/vars";
+.language-selection.backdrop {
+    pointer-events: none;
+    background-color: $semiblack;
+}

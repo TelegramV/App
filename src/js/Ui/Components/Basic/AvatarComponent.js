@@ -24,7 +24,7 @@ class AvatarComponent extends StatefulComponent {
                                showVideo={this.state.hover}
                                alwaysPlay={this.props.alwaysPlay}
                                onMouseEnter={() => {
-                                    this.props.peer?.photo.fetchVideo(); //start fetching only on hover
+                                    this.props.peer?.photo?.fetchVideo(); //start fetching only on hover
                                     this.setState({hover: true})
                                 }}
                                onMouseLeave={() => this.setState({hover: false})}
@@ -33,13 +33,13 @@ class AvatarComponent extends StatefulComponent {
 
     componentDidMount() {
         if(this.props.alwaysPlay) {
-            this.props.peer?.photo.fetchVideo(); //preload if autoplay
+            this.props.peer?.photo?.fetchVideo(); //preload if autoplay
         }
     }
 
     componentWillUpdate(nextProps, nextState) {
         if(nextProps.alwaysPlay) {
-            nextProps.peer?.photo.fetchVideo(); //preload if autoplay
+            nextProps.peer?.photo?.fetchVideo(); //preload if autoplay
         }
     }
 }

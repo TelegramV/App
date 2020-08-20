@@ -4,12 +4,17 @@ import RadioButton from "../../Fragments/RadioButton";
 import { RadioSection } from "../../Fragments/RadioSection";
 import Locale from "../../../../../Api/Localization/Locale"
 import UIEvents from "../../../../EventBus/UIEvents";
+import VComponent from "../../../../../V/VRDOM/component/VComponent"
+import "./LanguageSidebar.scss"
 
 export class LanguageSidebar extends LeftSidebar {
 
     state = {
-        languages: []
+        languages: [],
+        backdrop: false
     }
+
+    radiosRef = VComponent.createComponentRef();
 
     appEvents(E) {
         super.appEvents(E);
@@ -19,8 +24,14 @@ export class LanguageSidebar extends LeftSidebar {
     }
 
     content(): * {
+        const classes = {
+            "language-selection": true,
+            "backdrop": this.state.backdrop
+        }
         return <this.contentWrapper>
-            <RadioSection radios={this.state.languages} onSelect={this.selectLanguage}/>
+            <div className={classes}>
+                <RadioSection radios={this.state.languages} onSelect={this.selectLanguage} ref={this.radiosRef}/>
+            </div>
         </this.contentWrapper>
     }
 
@@ -30,32 +41,38 @@ export class LanguageSidebar extends LeftSidebar {
 
     selectLanguage = (index) => {
         let language = this.state.languages[index];
-        if(!language.checked) Locale.setLanguage(language.code)
+        if(language?.lang_code && language.lang_code !== Locale.currentLanguageCode) {
+            Locale.setLanguage(language.lang_code)
+            this.setState({
+                backdrop: true
+            })
+        }
     }
 
     onLanguageChange = (event) => {
-        this.refreshLanguageList().then(() => {
-            this.forceUpdate(); // radio buttons work strangely without forceUpdate
+        this.refreshLanguageList(event.code);
+        this.setState({
+            backdrop: false
         })
     }
 
-    refreshLanguageList = () => {
+    refreshLanguageList = (newLang) => {
         return Locale.getLanguages().then(languages => {
             let langList = [];
             if(!languages.find(e => e.lang_code === Locale.currentLanguageInfo.lang_code)) {
-                languages.unshift(Locale.currentLanguageInfo); // TG not returned our custom language
+                languages.unshift(Locale.currentLanguageInfo); // TG not returning our custom language
             }
             for (let lang of languages) {
                 langList.push({
                     text: lang.native_name,
                     description: lang.name,
-                    code: lang.lang_code,
-                    checked: Locale.currentLanguageCode === lang.lang_code
+                    lang_code: lang.lang_code
                 })
             }
             this.setState({
-                languages: langList
+                languages: langList,
             })
+            this.radiosRef.component.check(languages.findIndex(l => l.lang_code === Locale.currentLanguageCode));
         })
     }
 

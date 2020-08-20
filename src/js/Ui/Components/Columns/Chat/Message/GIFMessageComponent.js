@@ -12,7 +12,10 @@ class GIFMessageComponent extends GeneralMessageComponent {
                                     showDate={showDate}>
                 <BetterVideoComponent document={message.raw.media.document}
                                       autoDownload
-                                      playOnHover/>
+                                      playsinline
+                                      loop
+                                      autoplay
+                                      muted/>
                 <MessageTimeComponent message={message} bg={true}/>
             </MessageWrapperFragment>
         )

@@ -59,6 +59,7 @@
 
             .header {
                 display: flex;
+                flex-shrink: 0;
                 flex-direction: row;
                 height: 60px;
                 font-weight: 500;
@@ -204,7 +205,7 @@
                 .content {
                     flex-grow: 1;
                     padding: 30px 20px 0px 20px;
-                    word-break: break-all;
+                    word-break: break-word;
                 }
 
                 .buttons {
