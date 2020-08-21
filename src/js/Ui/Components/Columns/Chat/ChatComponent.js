@@ -30,7 +30,7 @@ import ChatInfoCallButtonComponent from "./ChatInfo/ChatInfoCallButtonComponent"
 import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
 import SnackbarComponent from "../../Singleton/SnackbarComponent"
 import {SearchSidebar} from "../../SidebarsNeo/Right/Search/SearchSidebar";
-import {RightSidebars} from "../../SidebarsNeo/Right/RightSidebars";
+import {openedRightSidebars, RightSidebars} from "../../SidebarsNeo/Right/RightSidebars";
 import {isDesktop, isMobile} from "../../../Utils/utils";
 import {DialogInfoSidebar} from "../../SidebarsNeo/Right/DialogInfo/DialogInfoSidebar";
 import nodeIf from "../../../../V/VRDOM/jsx/helpers/nodeIf";
@@ -39,6 +39,7 @@ import VButton from "../../../Elements/Button/VButton"
 import StatefulComponent from "../../../../V/VRDOM/component/StatefulComponent"
 import API from "../../../../Api/Telegram/API"
 import AppEvents from "../../../../Api/EventBus/AppEvents"
+import {RightSidebar} from "../../SidebarsNeo/Right/RightSidebar";
 
 const useVirtualized = true || Boolean(localStorage.getItem("settings.messages.virtualized"))
 
@@ -94,6 +95,11 @@ class ChatComponent extends StatelessComponent {
             .on("push", this.onInfoOpen)
             .on("pop", this.onInfoClosed)
 
+        E.bus(UIEvents.Sidebars)
+            // .filter(l => l instanceof RightSidebar || l.constructor instanceof RightSidebar)
+            .on("push", this.onRightSidebarOpen)
+            .on("pop", this.onRightSidebarClosed)
+
 
         // E.bus(UIEvents.Sidebars)
         //     .on("rightSidebarHidden", this.onRightSidebarHidden)
@@ -139,7 +145,7 @@ class ChatComponent extends StatelessComponent {
 
                 </div>
                 <SnackbarComponent/>
-                {nodeIf(<RightSidebars/>, isDesktop())}
+                {/*{nodeIf(<RightSidebars/>, isDesktop())}*/}
 
             </div>
         )
@@ -150,6 +156,22 @@ class ChatComponent extends StatelessComponent {
         if (!VApp.router.activeRoute.queryParams.p) {
             this.noChatRef.$el.style.display = ""
             this.chatLoaderRef.$el.style.display = "none"
+        }
+    }
+
+    onRightSidebarOpen = () => {
+        console.log("onRightSidebarOpen")
+        if(isDesktop()) {
+            this.chatRef.$el.classList.add("right-sidebar-open")
+        }
+    }
+
+    onRightSidebarClosed = () => {
+        console.log("onRightSidebarClosed")
+        if(isDesktop()) {
+            if(openedRightSidebars === 1) {
+                this.chatRef.$el.classList.remove("right-sidebar-open")
+            }
         }
     }
 

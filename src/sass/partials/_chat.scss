@@ -183,13 +183,17 @@
         overflow: hidden;
         flex-direction: column;
         position: relative;
-        transition: anim(width);
+        transition: 250ms ease-in-out margin-right;
         animation: opacity-fade-in 0.3s ease;
 
         #messages-wrapper-messages-loader {
             top: 50%;
             transform: translateY(-50%);
             position: absolute;
+        }
+
+        &.right-sidebar-open {
+            margin-right: 420px;
         }
 
         @include mobile {

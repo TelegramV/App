@@ -4,7 +4,9 @@ import {DialogInfoSidebar} from "./DialogInfo/DialogInfoSidebar";
 import {PollResultsSidebar} from "./Poll/PollResultsSidebar";
 import {RightSidebar} from "./RightSidebar";
 import {StickerSearchSidebar} from "./StickerSearch/StickerSearchSidebar";
+import UIEvents from "../../../EventBus/UIEvents";
 
+export let openedRightSidebars = 0
 export class RightSidebars extends GenericSidebarHistory {
     render() {
         return (
@@ -42,6 +44,7 @@ export class RightSidebars extends GenericSidebarHistory {
             }
         }
         this.bars.get(this.history[this.history.length - 1])?.fadeOut()
+        openedRightSidebars++
         this.history.push(type)
         bar.show(this.history.length === 1, params)
         if(this.history.length === 1) {
@@ -57,7 +60,9 @@ export class RightSidebars extends GenericSidebarHistory {
             if (!bar) return
             if (bar.isStatic) return
 
+            openedRightSidebars--
             this.history.pop()
+
             bar.hide(this.history.length === 0)
 
             const last = this.bars.get(this.history[this.history.length - 1])
