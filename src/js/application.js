@@ -36,7 +36,6 @@ if (__IS_PRODUCTION__) {
     window.devkeval = keval
     window.telegram = API
     window.files = FileAPI
-    window.VRDOM = VRDOM
     window.locale = Locale
     window.settings = Settings
 }

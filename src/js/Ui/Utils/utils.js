@@ -30,7 +30,7 @@ export function isValidDate(d) {
   return d instanceof Date && !isNaN(d);
 }
 
-export function isBullshitBrowser() {
+export function isSafari() {
     return /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
 }
 

@@ -8,12 +8,15 @@ import {SearchDateModal} from "../../../SidebarsNeo/Right/Search/SearchDateModal
 import SearchManager from "../../../../../Api/Search/SearchManager";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import {SearchMessage} from "../../../../../Api/Messages/SearchMessage";
+import {isSafari} from "../../../../Utils/utils"
 
 let CURRENT_QUERY = undefined
-
+const KEYBOARD_DELAY = isSafari() ? 100 : 500;
 // Only for mobile
 export class SearchBarComponent extends StatefulComponent {
     searchInputRef = VComponent.createComponentRef()
+    footerRef = VComponent.createRef();
+    upperRef = VComponent.createRef();
 
     state = {
         hidden: true,
@@ -31,17 +34,19 @@ export class SearchBarComponent extends StatefulComponent {
     render() {
         return (
             <div className={["search-bar", classIf(this.state.hidden, "hidden")]}>
-                <div className="upper">
+                <div className="upper" ref={this.upperRef}>
                     <div className="responsive-only-mobile btn-icon tgico-back" onClick={this.close}/>
                     <div className="input-search">
                         <VSimpleLazyInput type="text" placeholder="Search"
                                           ref={this.searchInputRef}
                                           onInput={this.onSearchInputUpdated}
+                                          onFocus={this.onFocus}
+                                          onBlur={this.updateSearchPosition}
                                           lazyLevel={500}/>
                         <span className="tgico tgico-search"/>
                     </div>
                 </div>
-                <div className="search-footer">
+                <div className="search-footer" ref={this.footerRef}>
                     <div className="left">
                         <div className={["btn-icon rp rps tgico-calendar", classIf(this.searchInputRef?.component?.$el.value.length > 0, "hidden")]} onClick={this.onSelectDate}/>
                         <div className="counter">{this.counterText}</div>
@@ -54,6 +59,32 @@ export class SearchBarComponent extends StatefulComponent {
                 </div>
             </div>
         )
+    }
+
+    componentDidMount() {
+        window.visualViewport.addEventListener("resize", this.updateSearchPosition);
+    }
+
+    componentWillUnmount() {
+        window.visualViewport.removeEventListener("resize", this.updateSearchPosition);
+    }
+
+    onFocus = (ev) => {
+        ev.preventDefault();
+        this.upperRef.$el.style.transform = `translateY(0)`; // input should be on bottom of the page
+        this.searchInputRef.component.$el.focus();
+
+        this.withTimeout(() => {
+            this.updateSearchPosition();
+        }, KEYBOARD_DELAY)
+    }
+
+    updateSearchPosition = () => {
+        const upper = this.upperRef.$el;
+        const upperHeight = upper.getBoundingClientRect().height;
+        const height = window.visualViewport.height;
+        const top = height-upperHeight;
+        upper.style.transform = `translateY(${-top}px)`;
     }
 
     get counterText() {

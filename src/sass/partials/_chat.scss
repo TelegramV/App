@@ -10,6 +10,7 @@
 .chat-scroll-bottom {
     position: absolute !important;
     top: 0;
+    right: 0;
     opacity: 0;
     height: 50px;
     width: 50px;
@@ -71,7 +72,7 @@
                 position: absolute;
                 /* width: 100%; */
                 /* opacity: 0.5; */
-                top: 0;
+                bottom: 0;
                 left: 0;
                 width: 100%;
                 background: white;
@@ -210,7 +211,7 @@
             box-shadow: 0 1px 2px 0 $semiblack;
             z-index: 2;
 
-            position: relative;
+            //position: relative;
 
             & > * {
                 margin: 0 2px;
@@ -277,8 +278,9 @@
             z-index: 1;
             animation: translate-in-60px 0.3s ease;
 
-            position: absolute;
-            top: 56px;
+            // Why?
+            //position: absolute;
+            //top: 56px;
 
             &:empty {
                 display: none;

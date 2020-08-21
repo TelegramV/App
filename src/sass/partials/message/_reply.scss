@@ -36,6 +36,9 @@
 
             .quote {
                 max-width: 250px;
+                @include mobile {
+                    max-width: 125px;
+                }
             }
         }
 

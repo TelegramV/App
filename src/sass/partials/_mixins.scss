@@ -1,0 +1,21 @@
+@mixin mobile {
+    @media only screen and (max-width: 991.98px) {
+        @content;
+    }
+}
+
+@mixin desktop {
+    @media (min-width: 992px) {
+        @content;
+    }
+}
+
+@mixin flexcenter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+@function anim($elem, $time: 150ms) {
+    @return $time ease-in-out $elem;
+}

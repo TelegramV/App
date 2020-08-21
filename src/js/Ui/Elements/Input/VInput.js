@@ -80,6 +80,7 @@ function VInput(
                    autoFocus={autoFocus}
                    maxLength={maxLength}
                    onKeyDown={onKeyDown}
+                   tabindex="-1"
             />
 
             <label htmlFor={name}>{(value && filledText) ? filledText : text}</label>

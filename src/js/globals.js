@@ -18,6 +18,7 @@
  */
 
 global.$ = require("./Ui/Utils/$").default
+global.VRDOM = require("./V/VRDOM/VRDOM").default
 
 global.__IS_PRODUCTION__ = __IS_PRODUCTION__
 global.__IS_DEV__ = __IS_DEV__
