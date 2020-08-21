@@ -215,7 +215,7 @@
             box-shadow: 0 1px 2px 0 $semiblack;
             z-index: 2;
 
-            //position: relative;
+            position: relative;
 
             & > * {
                 margin: 0 2px;
@@ -282,9 +282,8 @@
             z-index: 1;
             animation: translate-in-60px 0.3s ease;
 
-            // Why?
-            //position: absolute;
-            //top: 56px;
+            position: absolute;
+            top: 56px;
 
             &:empty {
                 display: none;
