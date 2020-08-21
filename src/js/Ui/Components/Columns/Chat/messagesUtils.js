@@ -69,7 +69,7 @@ export function renderVRMessage(message: Message, prevMessage: Message = null, n
     message.hideAvatar = true;
 
     let prevCurr = isGrouping(prevMessage, message);
-    let currNext = isGrouping(message, nextMessage);
+    let currNext = isGrouping(message, nextMessage) && nextMessage !== message;
 
     if (!prevCurr && currNext) {
         message.tailsGroup = "s";
@@ -83,6 +83,7 @@ export function renderVRMessage(message: Message, prevMessage: Message = null, n
     } else {
         message.tailsGroup = "m";
     }
+    // if (!isOut && nextMessage === message) message.hideAvatar = false;
 
     return <MessageComponent message={message}
                              observer={observer}

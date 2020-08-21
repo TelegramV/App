@@ -68,9 +68,12 @@ class GeneralMessageComponent extends TranslatableStatefulComponent<Props> {
         message.hideAvatar = true;
 
         let prevCurr = isGrouping(prevMessage, message);
-        let currNext = isGrouping(message, nextMessage);
+        let currNext = isGrouping(message, nextMessage) && nextMessage !== message;
         if (!prevCurr && currNext) {
             message.tailsGroup = "s";
+            // if (!isOut && nextMessage == null) message.hideAvatar = false;
+
+            // if (!isOut) message.hideAvatar = false;
         } else if (!currNext) {
             if (!prevCurr) {
                 message.tailsGroup = "se";
@@ -81,6 +84,7 @@ class GeneralMessageComponent extends TranslatableStatefulComponent<Props> {
         } else {
             message.tailsGroup = "m";
         }
+        if (!isOut && nextMessage === message) message.hideAvatar = false;
 
         this.state.showDate = !isSameDate(message.date, prevMessage?.date)
 
