@@ -16,6 +16,7 @@ class GIFMessageComponent extends GeneralMessageComponent {
                                       autoDownload
                                       playsinline
                                       loop
+                                      alwaysShowVideo
                                       paused={this.state.paused}
                                       autoplay
                                       muted/>
