@@ -105,9 +105,7 @@ export class GenericSidebar extends TranslatableStatefulComponent {
         this.reallyHidden = false
 
         // this.withTimeout(_ => {
-        if(!this.state.fadeOut) {
-            this.onShown(params)
-        }
+
 
 
         this.setState({
@@ -116,6 +114,10 @@ export class GenericSidebar extends TranslatableStatefulComponent {
             fadeIn: this.state.fadeOut,
             fadeOut: false
         })
+
+        if(!this.state.fadeOut) {
+            this.onShown(params)
+        }
 
         // }, 0)
     }

@@ -33,6 +33,7 @@ import {SupergroupPeer} from "../../../../../Api/Peers/Objects/SupergroupPeer"
 import {dialogContextMenu} from "./dialogContextMenu"
 import FastVirtualList from "../../../../../V/VRDOM/list/FastVirtualList"
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
+import VComponent from "../../../../../V/VRDOM/component/VComponent";
 
 function folderFilter(filter) {
     return dialog => {
@@ -158,6 +159,8 @@ class Dialog extends StatefulComponent {
 }
 
 class VirtualDialogsFolderList extends StatefulComponent {
+    fastVirtualListRef = VComponent.createComponentRef()
+
     state = {
         dialogs: [],
     };
@@ -173,7 +176,11 @@ class VirtualDialogsFolderList extends StatefulComponent {
 
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.update)
+            .on("gotArchived", this.update)
             .on("updatePinned", this.update)
+
+        E.bus(AppEvents.Telegram)
+            .on("updateFolderPeers", this.update)
 
         E.bus(AppEvents.Peers)
             .on("messages.new", this.update)
@@ -182,8 +189,11 @@ class VirtualDialogsFolderList extends StatefulComponent {
     }
 
     render(props, {dialogs}, globalState) {
-        if (foldersState.current) {
+        if (!props.archived && foldersState.current) {
             dialogs = dialogs.filter(folderFilter(foldersState.current));
+        }
+        if(!props.archived && foldersState.current == null) {
+            dialogs = dialogs.filter(dialog => !dialog.isArchived);
         }
 
         return (
@@ -195,6 +205,7 @@ class VirtualDialogsFolderList extends StatefulComponent {
                                  template={dialog => <Dialog dialog={dialog}/>}
                                  scrollThrottle={250}
                                  renderAhread={5}
+                                 ref={this.fastVirtualListRef}
                                  onScroll={event => {
                                      const $element = event.target;
 
@@ -208,11 +219,15 @@ class VirtualDialogsFolderList extends StatefulComponent {
         );
     }
 
-    sortWithPinnedOnTop(folderId = null): Dialog[] {
-        return DialogsStore.toArray().sort(this.sortWithPinnedOnTopCompareFnGenerator(folderId));
+    sortWithPinnedOnTop = (folderId = null): Dialog[] => {
+        if(this.props?.archived) {
+            return DialogsStore.getAllInFolder(1).sort(this.sortWithPinnedOnTopCompareFnGenerator(null));
+        } else {
+            return DialogsStore.toArray().sort(this.sortWithPinnedOnTopCompareFnGenerator(folderId));
+        }
     }
 
-    sortWithPinnedOnTopCompareFnGenerator(folderId = null) {
+    sortWithPinnedOnTopCompareFnGenerator = (folderId = null) => {
         return (a, b) => {
             let aPinned = folderId == null ? a.isPinned : FoldersManager.isPinned(a.peer, folderId)
             let bPinned = folderId == null ? b.isPinned : FoldersManager.isPinned(b.peer, folderId)

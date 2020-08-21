@@ -112,11 +112,13 @@ class DialogsMapStore extends MappedStore {
     getAllInFolder(folderId) {
         const folder = []
 
-        this.data.forEach(type => type.forEach(dialog => {
-            if (dialog.folderId === folderId) {
-                folder.push(dialog)
-            }
-        }))
+        this.data.forEach(type => {
+            type.forEach(dialog => {
+                if (dialog.folderId === folderId) {
+                    folder.push(dialog)
+                }
+            })
+        })
 
         return folder
     }
