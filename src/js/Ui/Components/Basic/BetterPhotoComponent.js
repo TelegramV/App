@@ -35,7 +35,7 @@ class BetterPhotoComponent extends StatefulComponent {
         E.bus(AppEvents.Files)
             .filter(event => FileManager.checkEvent(event, this.props.photo))
             // .updateOn("download.start")
-            // .on("download.newPart", this.onDownloadNewPart)
+            .on("download.newPart", this.onDownloadNewPart)
             .updateOn("download.done");
     }
 
@@ -62,8 +62,15 @@ class BetterPhotoComponent extends StatefulComponent {
         }
 
         return (
-            <figure css-cursor="pointer" className={["photo rp", isLoading && "thumbnail"]}
+            <figure css-cursor="pointer"
+                    className={["photo rp", isLoading && "thumbnail"]}
                     onClick={onClick} {...otherArgs}>
+
+                <div style={{
+                    display: isLoading ? "block" : "none",
+                }} className="photo-info">{String(Math.floor(FileManager.getPercentage(photo, size)))}%
+                </div>
+
                 {
                     !isLoading ?
                         <PhotoFragment calculateSize={calculateSize}

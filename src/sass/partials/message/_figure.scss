@@ -60,6 +60,7 @@
         &.video {
             max-height: 512px;
             cursor: pointer;
+            position: relative;
 
             img,
             video {
@@ -68,6 +69,18 @@
                 //height: 100%;
                 //object-fit: cover;
             }
+        }
+
+        .photo-info {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            z-index: 1000;
+
+            border-radius: 12px;
+            color: white;
+            background-color: rgba(black, .30);
+            padding: 2px 8px;
         }
     }
 }
