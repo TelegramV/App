@@ -2,11 +2,13 @@ import MessageWrapperFragment from "./Common/MessageWrapperFragment";
 import MessageTimeComponent from "./Common/MessageTimeComponent";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
+import FileManager from "../../../../../Api/Files/FileManager"
 
 class GIFMessageComponent extends GeneralMessageComponent {
     state = {
         paused: true
     }
+
     render({message, showDate}) {
         return (
             <MessageWrapperFragment message={message} showUsername={false}
@@ -18,6 +20,16 @@ class GIFMessageComponent extends GeneralMessageComponent {
                                       loop
                                       paused={this.state.paused}
                                       autoplay
+                                      streamable
+                                      infoContainer={() => {
+                                          return (
+                                              <div style={{
+                                                  display: FileManager.isPending(message.raw.media.document) ? "block" : "none",
+                                              }}
+                                                   className="photo-info">{String(Math.floor(FileManager.getPercentage(message.raw.media.document)))}%
+                                              </div>
+                                          )
+                                      }}
                                       muted/>
                 <MessageTimeComponent message={message} bg={true}/>
             </MessageWrapperFragment>
