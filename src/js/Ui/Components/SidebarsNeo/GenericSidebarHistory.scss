@@ -12,19 +12,26 @@
 
   position: absolute;
   overflow: hidden;
-  transition: width 250ms ease-in-out;
 
   &.right {
+    transition: 250ms ease-in-out margin-right;
+
     right: 0;
     z-index: 1;
-    position: relative;
+    position: absolute;
     @include mobile {
       position: absolute;
       z-index: 6;
     }
+
+
+    &.hidden {
+      margin-right: -420px;//: translateX(420px);
+      @include mobile {
+        margin-right: -100%;//: translateX(420px);
+
+      }
+    }
   }
 
-  &.hidden {
-    width: 0;
-  }
 }

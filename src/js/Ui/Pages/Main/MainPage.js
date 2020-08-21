@@ -97,7 +97,8 @@ export function MainPage() {
             <ForwardSidebar/>
             <PiPContainer/>
 
-            {nodeIf(<RightSidebars/>, isMobile())}
+            <RightSidebars/>
+            {/*{nodeIf(<RightSidebars/>, isMobile())}*/}
 
 
             {/*<DialogInfoComponent/>*/}
