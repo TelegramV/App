@@ -75,6 +75,7 @@ class FileListFragment extends StatelessComponent {
 export class AttachFilesModal extends StatelessComponent {
     captionRef = VComponent.createFragmentRef()
     fileListRef = VComponent.createComponentRef()
+    headerRef = VComponent.createComponentRef()
 
     appEvents(E) {
         E.bus(UIEvents.General)
@@ -84,7 +85,7 @@ export class AttachFilesModal extends StatelessComponent {
     render() {
         return <div className="attach-files-modal">
             <div className="padded">
-                <ModalHeaderFragment title="Send Files" close actionText="Send" action={this.send.bind(this)}/>
+                <ModalHeaderFragment title="Send Files" ref={this.headerRef} close actionText="Send" action={this.send.bind(this)}/>
                 <FileListFragment ref={this.fileListRef} blobs={this.props.media}/>
                 <VInput ref={this.captionRef} label="Add a caption..."/>
             </div>
@@ -103,6 +104,9 @@ export class AttachFilesModal extends StatelessComponent {
     }
 
     async send() {
+        this.headerRef.component.props.actionText = " "
+        this.headerRef.component.props.loading = true
+        this.headerRef.component.forceUpdate()
         const media = await this.fileListRef.component.getMedia()
         const caption = this.captionRef.$el.querySelector("input").value.repeat(1);
         VUI.Modal.close();

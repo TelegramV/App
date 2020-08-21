@@ -61,6 +61,7 @@ class GifsComposerComponent extends StatefulComponent {
                                                   }}
                                                   // autoDownload
                                                   playsinline
+                                                  alwaysShowVideo
                                                   paused={this.state.pausedAll || this.state.paused[document.id]}
                                                   observer={this.observer}
                                                   loop

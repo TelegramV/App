@@ -87,6 +87,7 @@ class ChatComponent extends StatelessComponent {
     appEvents(E) {
         E.bus(UIEvents.General)
             .on("chat.select", this.onChatSelect)
+            .on("chat.deselectMobile", this.onChatDeselectMobile)
 
         E.bus(UIEvents.Sidebars)
             .filter(l => l === DialogInfoSidebar || l.constructor === DialogInfoSidebar)
@@ -100,7 +101,7 @@ class ChatComponent extends StatelessComponent {
 
     render() {
         return (
-            <div class="chat-wrapper">
+            <div class="chat-wrapper" onTransitionEnd={this.onTransitionEnd}>
                 <div id="wallpaper" class="wallpaper"/>
 
                 <div ref={this.noChatRef} id="noChat">
@@ -161,6 +162,27 @@ class ChatComponent extends StatelessComponent {
     onInfoClosed = () => {
         if (isMobile()) {
             this.$el.classList.toggle("fade-out", false)
+        }
+    }
+
+    onTransitionEnd = event => {
+        if(event.target === this.$el && event.propertyName === "transform") {
+            if(this.deselecting) {
+                this.deselecting = false
+                VApp.router.replace("/")
+            }
+        }
+
+    }
+
+    onChatDeselectMobile = _ => {
+        // VApp.router.replace("/")
+        this.deselecting = true
+        this.$el.classList.toggle("shown", false)
+        this.noChatRef.$el.style.display = ""
+        if (isDesktop()) {
+            this.chatRef.$el.style.display = "none"
+            this.chatRef.$el.classList.remove("responsive-selected-chat")
         }
     }
 

@@ -20,14 +20,14 @@ import StatelessComponent from "../../../V/VRDOM/component/StatelessComponent"
 import VButton from "../../Elements/Button/VButton"
 
 export class ModalHeaderFragment extends StatelessComponent {
-    render() {
+    render({loading = false}) {
         return <div className="header">
             {
                 this.props.close ? <i className="tgico tgico-close btn-icon" onClick={_ => VUI.Modal.close()}/> : ""
             }
             <div class="title">{this.props.title}</div>
             {
-                this.props.actionText && <VButton onClick={this.props.action}>{this.props.actionText}</VButton>
+                this.props.actionText && <VButton onClick={this.props.action} isLoading={loading} disabled={loading}>{this.props.actionText}</VButton>
             }
         </div>
     }
