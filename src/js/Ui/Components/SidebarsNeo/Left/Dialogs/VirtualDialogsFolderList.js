@@ -70,7 +70,7 @@ function folderFilter(filter) {
         const isMuted = dialog.isMuted;
         const isArchived = dialog.isArchived;
         // TODO needs checking
-        const isRead = dialog.peer.messages.unreadCount === 0 && dialog.peer.messages.unreadMentionsCount === 0;
+        const isRead = dialog.peer.messages.unreadCount <= 0 && dialog.peer.messages.unreadMentionsCount <= 0;
 
         if (!filter.contacts && isContact) {
             return false;
@@ -176,11 +176,13 @@ class VirtualDialogsFolderList extends StatefulComponent {
             .on("updatePinned", this.update)
 
         E.bus(AppEvents.Peers)
-            .on("messages.new", this.update);
+            .on("messages.new", this.update)
+            // .on("messages.deleted", this.update)
+            .on("messages.readIn", this.update)
     }
 
     render(props, {dialogs}, globalState) {
-        if (foldersState.current && foldersState.currentId) {
+        if (foldersState.current) {
             dialogs = dialogs.filter(folderFilter(foldersState.current));
         }
 

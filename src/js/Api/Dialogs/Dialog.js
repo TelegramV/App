@@ -173,7 +173,7 @@ export class Dialog extends ReactiveObject {
         const isBot = peer.type === "user" && peer.isBot
         const isMuted = dialog.isMuted
         // TODO needs checking
-        const isRead = dialog.peer.messages.unreadCount === 0 && dialog.peer.messages.unreadMentionsCount === 0
+        const isRead = dialog.peer.messages.unreadCount <= 0 && dialog.peer.messages.unreadMentionsCount <= 0
         const isArchived = dialog.isArchived
 
         if (exclude && exclude.some(l => {
