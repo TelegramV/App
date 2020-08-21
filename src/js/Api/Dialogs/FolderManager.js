@@ -199,16 +199,17 @@ class FolderManager {
         return this.suggestedFolders
     }
 
-    getBadgeCount(folderId) {
+    getBadgeCount(folderId, includeOnlyUnread = true) {
         if (folderId === null) {
-            const found = DialogsStore.toArray().filter(l => !l.isArchived && (l.peer.messages.unreadCount > 0 || l.peer.messages.unreadMentionsCount > 0))
+            const found = DialogsStore.toArray().filter(l => !l.isArchived && (!includeOnlyUnread || l.peer.messages.unreadCount > 0 || l.peer.messages.unreadMentionsCount > 0))
             return {
                 count: found.length,
                 active: found.some(l => !l.isMuted)
             }
         } else {
             const filter = this.folders.find(l => l.id === folderId)
-            const found = DialogsStore.toArray().filter(l => l.matchesFilter(filter) && (l.peer.messages.unreadCount > 0 || l.peer.messages.unreadMentionsCount > 0))
+
+            const found = DialogsStore.toArray().filter(l => l.matchesFilter(filter) && (!includeOnlyUnread || (l.peer.messages.unreadCount > 0 || l.peer.messages.unreadMentionsCount > 0)))
             return {
                 count: found.length,
                 active: found.some(l => !l.isMuted)

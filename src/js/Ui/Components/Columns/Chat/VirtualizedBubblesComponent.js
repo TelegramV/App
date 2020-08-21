@@ -199,7 +199,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         }
     }
 
-    onScroll = () => {
+    onScroll = (e) => {
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
         const isAtBottom = Math.floor(scrollHeight - scrollTop) === clientHeight;
         const isAtTop = scrollTop <= 400;

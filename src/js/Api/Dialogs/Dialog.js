@@ -176,6 +176,16 @@ export class Dialog extends ReactiveObject {
         const isRead = dialog.peer.messages.unreadCount === 0 && dialog.peer.messages.unreadMentionsCount === 0
         const isArchived = dialog.isArchived
 
+        if (exclude && exclude.some(l => {
+            if (l._ === "inputPeerUser" && peer.type === "user" && peer.id === l.user_id) return true
+            if (l._ === "inputPeerChannel" && peer.type === "channel" && peer.id === l.channel_id) return true
+            if (l._ === "inputPeerChat" && peer.type === "chat" && peer.id === l.chat_id) return true
+            if (l._ === "inputPeerSelf" && peer.type === "user" && peer.isSelf) return true
+            return false
+        })) {
+            return false
+        }
+
         if (include && include.some(l => {
             if (l._ === "inputPeerUser" && peer.type === "user" && peer.id === l.user_id) return true
             if (l._ === "inputPeerChannel" && peer.type === "channel" && peer.id === l.channel_id) return true
@@ -186,15 +196,7 @@ export class Dialog extends ReactiveObject {
             return true
         }
 
-        if (exclude && exclude.some(l => {
-            if (l._ === "inputPeerUser" && peer.type === "user" && peer.id === l.user_id) return true
-            if (l._ === "inputPeerChannel" && peer.type === "channel" && peer.id === l.channel_id) return true
-            if (l._ === "inputPeerChat" && peer.type === "chat" && peer.id === l.chat_id) return true
-            if (l._ === "inputPeerSelf" && peer.type === "user" && peer.isSelf) return true
-            return false
-        })) {
-            return false
-        }
+
 
         if (!f.contacts && isContact) {
             return false

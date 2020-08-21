@@ -32,7 +32,7 @@ export class FoldersSidebar extends LeftSidebar {
 
             <Section title="Folders">
                 {FoldersManager.folders.map(l => {
-                    return <Button text={l.title} description={FoldersManager.getBadgeCount(l.id).count + " chats"} onClick={_ => this.editFolder(l.id)}/>
+                    return <Button text={l.title} description={FoldersManager.getBadgeCount(l.id, false).count + " chats"} onClick={_ => this.editFolder(l.id)}/>
                 })}
             </Section>
 

@@ -22,6 +22,7 @@ import ConfettiCanvasComponent from "../Basic/ConfettiCanvasComponent"
 class ConfettiComponent extends StatefulComponent {
     state = {
         confetti: new Map(),
+        shown: false
     };
 
     appEvents(E: AE) {
@@ -32,7 +33,9 @@ class ConfettiComponent extends StatefulComponent {
 
     render() {
         return (
-            <div className="confetti-container">
+            <div className="confetti-container" css-display={
+                this.state.shown ? "block" : "none"
+            }>
                 {Array.from(this.state.confetti.values())}
             </div>
         );
@@ -40,6 +43,7 @@ class ConfettiComponent extends StatefulComponent {
 
     show = event => {
         this.state.confetti.set(Date.now(), <ConfettiCanvasComponent/>)
+        this.state.shown = true
         this.forceUpdate();
         this.withTimeout(this.removeOld, 11000);
     }
@@ -49,11 +53,13 @@ class ConfettiComponent extends StatefulComponent {
         for (let k of this.state.confetti.keys()) {
           if (now - k > 10000) this.state.confetti.delete(k);
         }
+        this.state.shown = false
         this.forceUpdate();
     }
 
     removeAll = () => {
         this.state.confetti.clear();
+        this.state.shown = false
         this.forceUpdate();
     }
 }
