@@ -79,9 +79,10 @@ class GalleryFragment extends StatelessComponent {
 export class AttachPhotosModal extends StatefulComponent {
     captionRef = VComponent.createFragmentRef()
     galleryRef = VComponent.createComponentRef()
+    headerRef = VComponent.createComponentRef()
 
     state = {
-        asSticker: false
+        asSticker: false,
     }
 
     appEvents(E) {
@@ -91,7 +92,7 @@ export class AttachPhotosModal extends StatefulComponent {
 
     render(props) {
         return <div className="attach-modal">
-            <ModalHeaderFragment title="Send Media" close actionText="Send" action={this.send}/>
+            <ModalHeaderFragment ref={this.headerRef} title="Send Media" close actionText="Send" action={this.send}/>
             <div className="padded">
                 <GalleryFragment ref={this.galleryRef} blobs={props.media}/>
                 <VInput ref={this.captionRef} label="Caption"/>
@@ -109,6 +110,9 @@ export class AttachPhotosModal extends StatefulComponent {
     }
 
     send = async () => {
+        this.headerRef.component.props.actionText = " "
+        this.headerRef.component.props.loading = true
+        this.headerRef.component.forceUpdate()
         const media = await this.galleryRef.component.getMedia();
         // console.log(media)
         const caption = this.captionRef.$el.querySelector("input").value.repeat(1); //force string clone
