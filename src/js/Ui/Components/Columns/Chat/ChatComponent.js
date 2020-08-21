@@ -102,7 +102,7 @@ class ChatComponent extends StatelessComponent {
     render() {
         return (
             <div class="chat-wrapper">
-                <div id="wallpaper" class="wallpaper blur"/>
+                <div id="wallpaper" class="wallpaper"/>
 
                 <div ref={this.noChatRef} id="noChat">
                     <VSpinner loaderRef={this.chatLoaderRef}
