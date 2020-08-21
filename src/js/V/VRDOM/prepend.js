@@ -43,7 +43,7 @@ function vrdom_prepend(node: VRNode, $el: Element, props?: VRenderProps): Elemen
  * @param props
  */
 export function vrdom_prependRealMany($nodes: Node[], $el: Element, props?: VRenderProps): Element | HTMLElement {
-    $el.prepend(...$nodes);
+    $el.prepend(...$nodes.reverse());
 
     $nodes.forEach($node => {
         vrdom_resolveMount($node);
