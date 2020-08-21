@@ -13,7 +13,7 @@ import "./BackgroundSidebar.scss"
 export class BackgroundImageSidebar extends LeftSidebar {
 
     state = {
-        blur: true,
+        blur: false,
         wallpapers: null,
         selected: 0
     }
