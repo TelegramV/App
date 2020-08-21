@@ -24,10 +24,13 @@ class GIFMessageComponent extends GeneralMessageComponent {
                                       streamable
                                       infoContainer={() => {
                                           return (
-                                              <div style={{
-                                                  display: FileManager.isPending(message.raw.media.document) ? "block" : "none",
-                                              }}
-                                                   className="photo-info">{String(Math.floor(FileManager.getPercentage(message.raw.media.document)))}%
+                                              <div className="photo-info">
+                                                  <span style={{
+                                                      "margin-right": FileManager.isPending(message.raw.media.document) ? "5px" : "0"
+                                                  }}>GIF</span>
+                                                  <span style={{
+                                                      "display": FileManager.isPending(message.raw.media.document) ? "block" : "none",
+                                                  }}>{String(Math.floor(FileManager.getPercentage(message.raw.media.document)))}%</span>
                                               </div>
                                           )
                                       }}
