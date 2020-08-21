@@ -21,7 +21,7 @@ export class SettingsSidebar extends LeftSidebar {
         const me = PeersStore.self()
 
         return <this.contentWrapper>
-            <AvatarComponent noSaved peer={me}/>
+            <AvatarComponent noSaved alwaysPlay peer={me}/>
             <Header isLoading={!me}>{me?.name}</Header>
             <Subheader isLoading={!me}>{me ? "+" + me.phone : ""}</Subheader>
 

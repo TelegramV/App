@@ -24,6 +24,8 @@ class SnackbarComponent extends StatefulComponent {
         hidden: true,
     };
 
+    lastId = 0;
+
     appEvents(E: AE) {
         E.bus(UIEvents.General)
             .on("snackbar.show", this.show)
@@ -38,7 +40,8 @@ class SnackbarComponent extends StatefulComponent {
                 {Array.from(snackbars.values()).map(snackbar => (
                     <div className={{
                         "snackbar": true,
-                        "show": true,
+                        "show": !snackbar.isHiding,
+                        "hide": snackbar.isHiding,
                         "success": snackbar.success,
                         "error": snackbar.error,
                     }}>
@@ -49,26 +52,47 @@ class SnackbarComponent extends StatefulComponent {
         );
     }
 
-    show = event => {
-        if(!event.keepOther) this.close(); //close other snackbars by default
-        let timeout; // pizda kostyl'
-        timeout = this.withTimeout(() => {
-            this.clearTimeout(timeout);
-            this.state.snackbars.delete(timeout);
-            this.forceUpdate();
-        }, event.time * 1000);
-        this.state.snackbars.set(timeout, {
+    show = async (event) => {
+        if(!event.keepOther) await this.close(); //close other snackbars by default
+        this.lastId++;
+        this.state.snackbars.set(this.lastId, {
             text: event.text,
             success: event.success,
             fail: event.fail,
         });
         this.forceUpdate();
+
+        this.withTimeout(() => {
+            this.hideSnackbar(this.lastId);
+        }, event.time * 1000);
+    }
+
+    hideSnackbar = (id) => {
+        const snack = this.state.snackbars.get(id);
+        console.log(snack)
+        if(!snack) return;
+        snack.isHiding = true;
+        this.forceUpdate();
+        this.withTimeout(() => {
+            this.state.snackbars.delete(id);
+            this.forceUpdate();
+        }, 250)
     }
 
     close = () => {
-        this.clearTimeouts();
-        this.state.snackbars.clear();
-        this.forceUpdate();
+        return new Promise((resolve, reject) => {
+            this.clearTimeouts();
+            Array.from(this.state.snackbars.values()).forEach(snack => {
+                snack.isHiding = true;
+            })
+            this.forceUpdate();
+
+            this.withTimeout(() => {
+                this.state.snackbars.clear();
+                this.forceUpdate();
+                resolve();
+            }, 250)
+        })
     }
 }
 

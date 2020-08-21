@@ -13,7 +13,7 @@
     &.background {
         width: var(--size);
         height: var(--size);
-        border-radius: 100%;
+        border-radius: 50%;
         z-index: 1;
         background: $semiblack;
     }
@@ -199,28 +199,6 @@
                 border: none;
             }
         }
-    }
-}
-
-.progress-background {
-    background-color: black;
-    border-radius: 100%;
-    width: 64px;
-    height: 64px;
-    z-index: 1;
-    background: $semiblack;
-}
-
-.full-size-loader {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-
-    &.height {
-        height: auto !important;
     }
 }
 

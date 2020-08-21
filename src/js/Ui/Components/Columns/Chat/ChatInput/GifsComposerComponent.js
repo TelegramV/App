@@ -55,10 +55,7 @@ class GifsComposerComponent extends StatefulComponent {
                     return (
                         <div class="gif">
                             <BetterVideoComponent document={document}
-                                                  onClick={() => {
-                                                      AppSelectedChat.current.api.sendExistingMedia(document);
-                                                      VApp.mountedComponents.get("composer").hide();
-                                                  }}
+                                                  onClick={() => AppSelectedChat.current.api.sendExistingMedia(document)}
                                                   // autoDownload
                                                   playsinline
                                                   alwaysShowVideo

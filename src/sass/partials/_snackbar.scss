@@ -54,42 +54,9 @@
 }
 
 .snackbar.show {
-    -webkit-animation: fadein 250ms;
-    animation: fadein 250ms;
+    animation: opacity-fade-in 250ms;
 }
 
-@-webkit-keyframes fadein {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes fadein {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@-webkit-keyframes fadeout {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes fadeout {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+.snackbar.hide {
+    animation: opacity-fade-out 250ms;
 }

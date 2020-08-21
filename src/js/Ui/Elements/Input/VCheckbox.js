@@ -32,7 +32,7 @@ function VCheckbox(
 ) {
     return (
         <div className={{"checkbox-input": true, circle, disabled}} onClick={disabled ? null : (input || onClick)}>
-            <input type="checkbox" checked={valIf(checked, true)}/>
+            <input type="checkbox" checked={checked}/>
 
             <div className="checkmark">
                 <span className="tgico tgico-check"/>

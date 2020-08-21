@@ -1,0 +1,57 @@
+.polls-modal {
+    display: flex;
+    flex-direction: column;
+
+    .header {
+        position: sticky;
+        .title {
+            font-size: 18px;
+            margin-right: 20px;
+        }
+    }
+
+    .VInput {
+        //min-width: min(400px, 100%);
+        width: calc(min(400px, 100%));
+    }
+
+    .options {
+        min-height: 125px;
+
+        .option {
+            display: flex;
+            transform-origin: top;
+            animation: opacity-fade-in 0.3s ease, expand-in 0.3s ease;
+
+            @keyframes expand-in {
+                from {
+                    transform: scaleY(0);
+                }
+
+                to {
+                    transform: scaleY(1);
+                }
+            }
+
+            .checkbox-input {
+                margin-right: 10px;
+            }
+        }
+    }
+
+    .checkboxes {
+        .checkbox-input {
+            margin-bottom: 5px;
+        }
+    }
+
+    .timer {
+        .checkbox-input {
+            margin-bottom: 15px;
+        }
+
+        .slider-input {
+            animation: opacity-fade-in 250ms ease;
+        }
+    }
+}

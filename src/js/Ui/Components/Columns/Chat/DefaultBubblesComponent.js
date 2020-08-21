@@ -378,6 +378,7 @@
 //
 //         this.appendMessages(this.mainVirtual.veryBottomPage(), this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
 //         this.scrollBottom();
+//         if(!AppSelectedChat.current.pinnedMessage) AppSelectedChat.current.findPinnedMessage(); // Можливо десь видалився пін, спробуємо знайти...
 //     }
 //
 //     onPeerMessagesAllRecent = event => {

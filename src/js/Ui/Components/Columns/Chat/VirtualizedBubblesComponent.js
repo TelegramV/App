@@ -261,6 +261,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 });
             }
         }
+        if(!AppSelectedChat.current.pinnedMessage) AppSelectedChat.current.findPinnedMessage(); // Можливо десь видалився пін, спробуємо знайти...
     }
 
     onPeerMessagesAllRecent = event => {

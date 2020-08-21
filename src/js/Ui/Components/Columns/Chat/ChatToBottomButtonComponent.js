@@ -30,16 +30,11 @@ class ChatToBottomButtonComponent extends StatefulComponent {
     }
 
     render() {
-        let style = {
-            "bottom": "0px",
-            "box-shadow": "none",
-            "opacity": "0"
-        };
+        let style = {};
 
         if (this.state.isShown) {
             style = {
-                "bottom": "70px",
-                "box-shadow": "0 2px 3px 0 rgba(16, 35, 47, .15)",
+                "top": "-70px",
                 "opacity": "1"
             };
         }

@@ -317,7 +317,6 @@ export class Peer extends ReactiveObject {
 
             this.fire("fullLoaded")
 
-            this.findPinnedMessage()
             this._photo.fillFull(this._full.profile_photo);
 
             return this._full;

@@ -21,48 +21,34 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         answers: []
     }
 
-    init() {
-        super.init();
+    footerRef = VComponent.createFragmentRef();
+    timerRef = VComponent.createFragmentRef();
 
+    makeContextMenu = () => {
         let message = this.props.message;
-
-        this.timerRef = VComponent.createFragmentRef();
-
-        this.prepareContextMenu()
-    }
-
-    prepareContextMenu = () => {
-        let message = this.props.message;
-        this.contextActions = [];
+        const contextActions = [];
         if (!message.isQuiz && message.isVoted && !message.poll.closed) {
-            this.contextActions.push({
+            contextActions.push({
                 icon: "revote",
-                title: "Revote",
+                title: this.l("lng_polls_retract"),
                 onClick: _ => this.cancelVote()
             })
         }
 
         if (message.isOut && !message.poll.closed) {
-            this.contextActions.push({
+            contextActions.push({
                 icon: "close",
-                title: "Close voting",
+                title: this.l("lng_polls_stop"),
                 onClick: _ => this.closePoll()
             })
         }
+        return contextActions;
     }
 
     reactive(R) {
         R.object(this.props.message)
             .on("pollEdit", this.onPollChange)
             .on("pollVote", this.onPollChange)
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
-
-        this.actionButton = this.$el.querySelector(".action-button");
-
-
     }
 
     componentDidMount() {
@@ -75,13 +61,12 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     render({ message, showDate }) {
-        this.prepareContextMenu();
         let classes = {
             "poll": true,
             "voted": message.isVoted
         }
         return (
-            <MessageWrapperFragment message={message} contextActions={this.contextActions} showDate={showDate}>
+            <MessageWrapperFragment message={message} contextActions={this.makeContextMenu()} showDate={showDate}>
                 <div class={classes}>
                     <div class="question">{message.poll.question}</div>
                     <div class="subtitle">
@@ -92,7 +77,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                         {(message.poll.close_period && !message.isVoted) && <TimerFragment ref={this.timerRef} left={0} total={0}/>}
                     </div>
                     {this.makeAnswerBlock()}
-                    <FooterFragment message={message} actionClick={this.onActionClick}/>
+                    <FooterFragment message={message} actionClick={this.onActionClick} answers={this.state.answers}/>
                 </div>
                 <TextWrapperComponent message={message}/>
             </MessageWrapperFragment>
@@ -108,7 +93,6 @@ export default class PollMessageComponent extends GeneralMessageComponent {
             } else {
                 UIEvents.General.fire("confetti.show");
             }
-            console.log(this.state.answers)
             this.setState({
                 answers: []
             })
@@ -175,17 +159,6 @@ export default class PollMessageComponent extends GeneralMessageComponent {
             this.addAnswer(option);
         } else {
             this.cancelAnswer(option);
-        }
-
-        this.updateAction();
-    }
-
-    updateAction = () => {
-        if (this.actionButton) {
-            if (this.props.message.isMultiple && !this.props.message.isVoted) {
-                this.actionButton.classList.toggle("disabled", this.state.answers.length === 0);
-                this.actionButton.classList.toggle("rp", this.state.answers.length === 0);
-            }
         }
     }
 
@@ -265,11 +238,16 @@ const AnswerFragment = ({ message, option, chosen, click }) => {
     }
 }
 
-const FooterFragment = ({ message, actionClick }) => {
+const FooterFragment = ({ message, actionClick, answers }) => {
     if (message.isVoted && message.isPublic) {
         return <div class="action-button" onClick={actionClick}>{Locale.l("lng_polls_view_results")}</div>;
     } else if (!message.isVoted && message.isMultiple) {
-        return <div class="action-button disabled" onClick={actionClick}>{Locale.l("lng_polls_submit_votes")}</div>;
+        const classes = {
+            "action-button": true,
+            disabled: answers.length === 0,
+            rp: answers.length === 0
+        }
+        return <div class={classes} onClick={actionClick}>{Locale.l("lng_polls_submit_votes")}</div>;
     }
 
     let voted = "";

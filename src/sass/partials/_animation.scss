@@ -161,6 +161,16 @@
   }
 }
 
+@keyframes opacity-fade-out {
+  from {
+    opacity: 1
+  }
+
+  to {
+    opacity: 0
+  }
+}
+
 @keyframes translate-in-60px {
   from {
     transform: translateY(-60px);

@@ -60,6 +60,11 @@ img:not([src]) {
     user-select: none;
     //-webkit-user-select: none; // NO NO NO, BREAKS SAFARI ON IOS
 
+    #page-loader {
+        align-self: center;
+        margin: 0 auto;
+    }
+
     &.rainbow {
         animation: rainbow 3s steps(36) infinite;
     }
@@ -157,7 +162,7 @@ img:not([src]) {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba($darkgrey, .3);
+    background: rgba(black, .4);
     border: solid 3px transparent;
     border-radius: 5px;
     min-height: 50px;
@@ -166,7 +171,7 @@ img:not([src]) {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba($darkgrey, .5);
+    background: rgba(black, .6);
 }
 
 body {

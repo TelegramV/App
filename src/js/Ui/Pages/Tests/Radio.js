@@ -16,6 +16,7 @@
  */
 
 import VRadio from "../../Elements/Input/VRadio"
+import VCheckbox from "../../Elements/Input/VCheckbox"
 import VButton from "../../Elements/Button/VButton"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
@@ -30,13 +31,16 @@ export default function RadioButtonPage() {
 class RadioTest extends StatefulComponent {
 
     state = {
-        checked: false
+        checked: true
     }
 
     render({}, {checked}) {
         return (
             <div>
                 <VRadio checked={checked} onClick={event => {
+                    event.preventDefault();
+                }}/>
+                <VCheckbox checked={checked} input={event => {
                     event.preventDefault();
                 }}/>
                 <VButton onClick={() => {

@@ -37,9 +37,11 @@ function VInput(
         autoFocus,
         error,
         success,
+        filledText, // shows on top when something is in input
         disabled = false,
         rotate180 = false,
         onButtonClick,
+        onKeyDown,
         withButton = false,
         buttonIcon = "eye1",
         maxLength,
@@ -77,9 +79,10 @@ function VInput(
                    onFocus={onFocus}
                    autoFocus={autoFocus}
                    maxLength={maxLength}
+                   onKeyDown={onKeyDown}
             />
 
-            <label htmlFor={name}>{text}</label>
+            <label htmlFor={name}>{(value && filledText) ? filledText : text}</label>
         </div>
     );
 }

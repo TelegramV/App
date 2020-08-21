@@ -120,12 +120,13 @@ export class Dialog extends ReactiveObject {
             }
         }
 
-        if ((typing.length + other.length) >= 2) {
+        const actionsCount = typing.length + other.length+gaming.length
+        if (actionsCount >= 2) {
             return {
                 key: actionTypesMapping.sendMessageTypingAction[2],
-                count: typing.length,
+                count: actionsCount,
                 replaces: {
-                    count: typing.length
+                    count: actionsCount
                 },
                 isAction: true
             }

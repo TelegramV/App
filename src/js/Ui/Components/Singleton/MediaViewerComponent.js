@@ -287,7 +287,7 @@ export class MediaViewerComponent extends StatefulComponent {
     showMessage = ({message}) => {
         this.state = {...this.defaultState};
 
-        console.log("show message")
+        //console.log("show message")
 
         this.state.peer = message.to;
         this.state.messages = [message];
@@ -420,7 +420,7 @@ export class MediaViewerComponent extends StatefulComponent {
             this.downloadLeftPage();
         }
 
-        console.log("left", index)
+        //console.log("left", index)
 
         if (index > 0) {
             const leftMessage = this.state.messages[index - 1];
@@ -453,7 +453,7 @@ export class MediaViewerComponent extends StatefulComponent {
         }
 
         const index = this.state.messages.findIndex(m => m === this.state.message);
-        console.log("right", index)
+        //console.log("right", index)
 
         if (index >= this.state.messages.length - 5) {
             this.downloadRightPage();

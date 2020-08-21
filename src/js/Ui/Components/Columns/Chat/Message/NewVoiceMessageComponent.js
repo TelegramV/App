@@ -1,12 +1,12 @@
 import {convertBits, formatAudioTime} from "../../../../Utils/utils"
-import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import DocumentParser from "../../../../../Api/Files/DocumentParser"
 import TextWrapperComponent from "./Common/TextWrapperComponent"
 import MessageWrapperFragment from "./Common/MessageWrapperFragment"
 import AudioPlayer from "../../../../../Api/Media/AudioPlayer"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import FileManager from "../../../../../Api/Files/FileManager"
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
+import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 
 function largestTriangleThreeBuckets(data, threshold) {
     const data_length = data.length
@@ -95,8 +95,14 @@ function heightToPx(height) {
     return Math.max(2, height * (25 / 32)) + "px";
 }
 
-class NewVoiceMessageComponent extends StatelessComponent {
+class NewVoiceMessageComponent extends GeneralMessageComponent {
     svgRef = VComponent.createRef();
+    controlsRef = VComponent.createRef();
+
+    bars = []
+    barsWidth = 0
+    barsCount = 0
+    recalculatingWidth = false
 
     appEvents(E) {
         super.appEvents(E)
@@ -114,34 +120,10 @@ class NewVoiceMessageComponent extends StatelessComponent {
 
     render({message}) {
         const isPlaying = AudioPlayer.isCurrent(message);
-        const audioInfo = DocumentParser.attributeAudio(message.media.document);
         const {isPaused, currentTime, duration} = AudioPlayer.state;
-
         this.isPlaying = isPlaying;
 
-        let waveform = audioInfo.waveform;
-
-        if (!waveform) {
-            waveform = new Array(100).fill(0);
-        }
-
-        let heights = convertBits(waveform, 8, 5);
-        heights = smooth(heights, 0.05);
-        heights = largestTriangleThreeBuckets(heights, 50);
-
-        const width = heights.length * 4 + 4;
-
-        const bars = [];
-        for (let i = 0, x = 2; i < heights.length; i++, x += 4) {
-            bars.push(
-                <rect x={`${x}px`}
-                      rx={`2px`}
-                      ry={`2px`}
-                      width={`2px`}
-                      height={heightToPx(heights[i])}
-                      fill="white"/>
-            );
-        }
+        
 
         return (
             <MessageWrapperFragment message={message} showUsername={false}>
@@ -155,8 +137,8 @@ class NewVoiceMessageComponent extends StatelessComponent {
                     }}/>
                     <div class="audio-wrapper">
                         <div className="controls">
-                            <div className="controls rp rps" style={{cursor: "pointer"}}>
-                                <svg css-width={`${width}px`}
+                            <div className="controls rp rps" style={{cursor: "pointer"}} ref={this.controlsRef}>
+                                <svg css-width={`${this.barsWidth}px`}
                                      css-transform="scaleY(-1)"
                                      onMouseEnter={this.onMouseEnter}
                                      onMouseLeave={this.onMouseLeave}
@@ -164,13 +146,13 @@ class NewVoiceMessageComponent extends StatelessComponent {
 
                                     <defs>
                                         <mask id={`bars-${message.id}`}>
-                                            {bars}
+                                            {this.bars}
                                         </mask>
                                     </defs>
                                     <rect className="back"
                                           x="0"
                                           y="0"
-                                          width={`${width}px`}
+                                          width={`${this.barsWidth}px`}
                                           height="100%"
                                           mask={`url(#bars-${message.id})`}/>
                                     <rect className="progress"
@@ -192,6 +174,66 @@ class NewVoiceMessageComponent extends StatelessComponent {
                 <TextWrapperComponent message={message}/>
             </MessageWrapperFragment>
         );
+    }
+
+    componentDidMount() {
+        this.generateBars(this.calculateBarsCount());
+        this.forceUpdate();
+    }
+
+    componentDidUpdate() {
+        const currentCount = this.barsCount;
+        const newCount = this.calculateBarsCount();
+        if(newCount !== currentCount) {
+            this.generateBars(newCount);
+            this.forceUpdate();
+        } else {
+            if(this.recalculatingWidth) { // recalculation happens higher
+                this.recalculatingWidth = false;
+                return;
+            }
+            this.recalculatingWidth = true //try to shunk
+            if(this.prevBarsCount !== 1){
+                this.generateBars(1); 
+                this.forceUpdate();
+            }
+        }
+    }
+
+    calculateBarsCount = () => {
+        const el = this.controlsRef.$el;
+        if(!el) return 50;
+        let width = el.getBoundingClientRect().width;
+        return Math.floor((width-4)/4);
+    }
+
+    generateBars = (barsCount = 50) => {
+        let waveform = DocumentParser.attributeAudio(this.props.message.media.document).waveform;
+
+        if (!waveform) {
+            waveform = new Array(100).fill(0);
+        }
+
+        let heights = convertBits(waveform, 8, 5);
+        heights = smooth(heights, 0.05);
+        heights = largestTriangleThreeBuckets(heights, barsCount);
+
+        const width = heights.length * 4 + 4;
+
+        const bars = [];
+        for (let i = 0, x = 2; i < heights.length; i++, x += 4) {
+            bars.push(
+                <rect x={`${x}px`}
+                      rx={`2px`}
+                      ry={`2px`}
+                      width={`2px`}
+                      height={heightToPx(heights[i])}
+                      fill="white"/>
+            );
+        }
+        this.bars = bars;
+        this.barsWidth = width;
+        this.barsCount = barsCount;
     }
 
     onClickPlay = () => {

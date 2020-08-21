@@ -1,5 +1,8 @@
 @import "src/sass/partials/vars";
-.language-selection.backdrop {
-    pointer-events: none;
-    background-color: $semiblack;
+.language-selection {
+    transition: anim(background-color);
+    &.backdrop {
+        pointer-events: none;
+        background-color: $semiblack;
+    }
 }

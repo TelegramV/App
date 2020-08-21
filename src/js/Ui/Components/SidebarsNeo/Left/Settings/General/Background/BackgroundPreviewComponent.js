@@ -10,6 +10,7 @@ export default class BackgroundPreviewComponent extends StatefulComponent {
 	render() {
 		let classes = {
 			"image-square": true,
+			empty: !this.state.url,
 			selected: this.props.selected
 		}
 		return (

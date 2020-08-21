@@ -75,6 +75,12 @@
         .image-square {
             margin: 2px;
             cursor: pointer;
+            opacity: 1;
+            transition: anim(opacity, 300ms);
+        }
+
+        .image-square.empty {
+            opacity: 0;
         }
 
         .image-square {
