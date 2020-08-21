@@ -1,6 +1,6 @@
-import {isBullshitBrowser} from "./utils"
+import {isSafari} from "./utils"
 
-const safari = isBullshitBrowser();
+const safari = isSafari();
 
 class WebpHelper {
     webp = null;

@@ -91,9 +91,10 @@ const renderElement = (node: VRNode, props: VRenderProps = {}): HTMLElement => {
                 k === "checked" ||
                 k === "value"
             ) {
-            } else if (v || v === 0) {
                 $el[k] = v;
                 delete node.attrs[k];
+            } else if (v || v === 0) {
+                $el.setAttribute(k, v);
             }
         }
     } else {

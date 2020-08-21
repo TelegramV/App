@@ -8,13 +8,14 @@ export class TextareaFragment extends TranslatableStatelessComponent {
 
     render() {
         return <div className="textarea empty"
-                    placeholder={this.l("lng_message_ph", {}, "Message")}
+                    placeholder={this.l("lng_message_ph", {}, "Write a message...")}
                     contentEditable
                     onInput={this.onInput}
                     onKeyPress={this.onKeyPress}
                     onKeyDown={this.onKeyDown}
                     onContextMenu={this.contextMenu}
-                    onPaste={this.onPaste}>
+                    onPaste={this.onPaste}
+                    tabindex="-1">
         </div>
     }
 

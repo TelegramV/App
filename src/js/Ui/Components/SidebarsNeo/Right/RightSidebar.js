@@ -29,7 +29,7 @@ export class RightSidebar extends GenericSidebar {
                     hidden: true,
                     reallyHidden: true
                 })
-            }, 250)
+            }, 150)
             this.onHide();
         } else {
             super.hide()

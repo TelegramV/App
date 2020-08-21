@@ -10,6 +10,7 @@
 .chat-scroll-bottom {
     position: absolute !important;
     top: 0;
+    right: 0;
     opacity: 0;
     height: 50px;
     width: 50px;
@@ -34,7 +35,6 @@
     margin-left: 423px;
     display: flex;
     flex-grow: 1;
-    transition: anim(width, 250ms);
     overflow: hidden;
     position: relative;
     will-change: transform;
@@ -71,7 +71,7 @@
                 position: absolute;
                 /* width: 100%; */
                 /* opacity: 0.5; */
-                top: 0;
+                bottom: 0;
                 left: 0;
                 width: 100%;
                 background: white;
@@ -183,7 +183,7 @@
         overflow: hidden;
         flex-direction: column;
         position: relative;
-        transition: 250ms ease-in-out margin-right;
+        transition: 150ms ease-in-out margin-right;
         animation: opacity-fade-in 0.3s ease;
 
         #messages-wrapper-messages-loader {
