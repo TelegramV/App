@@ -186,6 +186,12 @@
         transition: anim(width);
         animation: opacity-fade-in 0.3s ease;
 
+        #message-wrapper-messages-loader {
+            top: 50%;
+            transform: translateY(-50%);
+            position: absolute;
+        }
+
         @include mobile {
             &.composer-opened {
                 height: calc(var(--vh100) * 0.6);

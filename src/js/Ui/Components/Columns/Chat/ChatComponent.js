@@ -170,6 +170,10 @@ class ChatComponent extends StatelessComponent {
             if(this.deselecting) {
                 this.deselecting = false
                 VApp.router.replace("/")
+            } else if(this.opening) {
+                this.opening = false
+                UIEvents.General.fire("chat.openedMobile", {})
+                this.messagesLoaderRef.$el.style.display = "none"
             }
         }
 
@@ -192,6 +196,11 @@ class ChatComponent extends StatelessComponent {
         if (AppSelectedChat.isSelected) {
             this.$el.classList.toggle("shown", true)
             this.noChatRef.$el.style.display = "none"
+            if(isMobile()) {
+                this.opening = true
+                this.messagesLoaderRef.$el.style.display = "block"
+                // AppSelectedChat.
+            }
             // TODO delay for mobile
             // if(isDesktop()) {
             this.chatRef.$el.style.display = ""

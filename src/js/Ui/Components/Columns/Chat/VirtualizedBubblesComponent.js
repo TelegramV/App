@@ -33,6 +33,7 @@ import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent
 import IntersectionObserver from 'intersection-observer-polyfill';
 import GroupMessage from "../../../../Api/Messages/GroupMessage"
 import {appendMessages, fixMessages, getMessageElement, prependMessages} from "./messagesUtils"
+import {isDesktop, isMobile} from "../../../Utils/utils";
 
 // there is no possibility nor time to calculate each message size
 class VirtualizedBubblesComponent extends StatelessComponent {
@@ -71,7 +72,9 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             .on("chat.select", this.onChatSelect)
             .on("chat.topMessagesReady", this.onTopPageMessagesReady)
             .on("chat.showMessage", this.onChatShowMessage)
-            .on("chat.scrollBottom", this.onChatScrollBottomRequest);
+            .on("chat.scrollBottom", this.onChatScrollBottomRequest)
+            .on("chat.openedMobile", this.onChatOpenedMobile)
+
     }
 
     render() {
@@ -113,16 +116,30 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         }
     }
 
+    onChatOpenedMobile = (event) => {
+        if(isMobile()) {
+            this.isRequestedShowMessage = event.message
+
+            if (AppSelectedChat.isSelected) {
+                this.isLoadingRecent = true;
+
+                AppSelectedChat.current.messages.fireRecent();
+            }
+        }
+    }
+
     onChatSelect = (event) => {
         this.refresh();
         // if (event.message) {
 
-        this.isRequestedShowMessage = event.message
+        if(isDesktop()) {
+            this.isRequestedShowMessage = event.message
 
-        if (AppSelectedChat.isSelected) {
-            this.isLoadingRecent = true;
+            if (AppSelectedChat.isSelected) {
+                this.isLoadingRecent = true;
 
-            AppSelectedChat.current.messages.fireRecent();
+                AppSelectedChat.current.messages.fireRecent();
+            }
         }
 
         // } else {
