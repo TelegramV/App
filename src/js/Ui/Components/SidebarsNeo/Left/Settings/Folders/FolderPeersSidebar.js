@@ -19,13 +19,23 @@ export class FolderPeersSidebar extends LeftSidebar {
             pinned_peers: [],
             exclude_peers: []
         }
-        const tags = [
-            nodeIf(<VTagIcon icon="newprivate" text="Contacts" onRemove={l => this.toggle("contacts")}/>, f.contacts),
-            nodeIf(<VTagIcon icon="noncontacts" text="Non-Contacts" onRemove={l => this.toggle("non_contacts")}/>, f.non_contacts),
-            nodeIf(<VTagIcon icon="newgroup" text="Groups" onRemove={l => this.toggle("groups")}/>, f.groups),
-            nodeIf(<VTagIcon icon="newchannel" text="Channels" onRemove={l => this.toggle("broadcasts")}/>, f.broadcasts),
-            nodeIf(<VTagIcon icon="bots" text="Bots" onRemove={l => this.toggle("bots")}/>, f.bots),
-        ]
+        console.log("isExclude", this.state.exclude)
+        let tags = null
+        if(!this.state.exclude) {
+            tags = [
+                nodeIf(<VTagIcon icon="newprivate" text="Contacts" onRemove={l => this.toggle("contacts")}/>, f.contacts),
+                nodeIf(<VTagIcon icon="noncontacts" text="Non-Contacts" onRemove={l => this.toggle("non_contacts")}/>, f.non_contacts),
+                nodeIf(<VTagIcon icon="newgroup" text="Groups" onRemove={l => this.toggle("groups")}/>, f.groups),
+                nodeIf(<VTagIcon icon="newchannel" text="Channels" onRemove={l => this.toggle("broadcasts")}/>, f.broadcasts),
+                nodeIf(<VTagIcon icon="bots" text="Bots" onRemove={l => this.toggle("bots")}/>, f.bots),
+            ]
+        } else {
+            tags = [
+                nodeIf(<VTagIcon icon="mute" text="Muted" onRemove={l => this.toggle("exclude_muted")}/>, f.exclude_muted),
+                nodeIf(<VTagIcon icon="readchats" text="Read" onRemove={l => this.toggle("exclude_read")}/>, f.exclude_read),
+                nodeIf(<VTagIcon icon="archive" text="Archived" onRemove={l => this.toggle("exclude_archived")}/>, f.exclude_archived),
+            ]
+        }
 
         DialogsStore.sort().forEach(dialog => {
             const exists = this.state.selectedChats.has(dialog.peer)
@@ -107,6 +117,7 @@ export class FolderPeersSidebar extends LeftSidebar {
     }
 
     apply = () => {
+        console.log("apply")
         const c = []
         this.state.selectedChats.forEach(l => {
             c.push(l.inputPeer)
@@ -117,7 +128,11 @@ export class FolderPeersSidebar extends LeftSidebar {
             this.state.folder.include_peers = c
         }
         delete this.state.folder.flags;
-        FoldersManager.updateFolder(this.state.folder)
+        UIEvents.General.fire("folderPeersChanged", {
+            exclude: this.state.exclude,
+            folder: this.state.folder
+        })
+        // FoldersManager.updateFolder(this.state.folder)
         UIEvents.Sidebars.fire("pop", this)
     }
 
@@ -140,8 +155,10 @@ export class FolderPeersSidebar extends LeftSidebar {
             })
         }
 
+        console.log("shown", params.exclude)
+
         this.setState({
-            folder: params.folder,
+            folder: Object.assign({}, params.folder),
             exclude: params.exclude,
             selectedChats: selectedChats
         })

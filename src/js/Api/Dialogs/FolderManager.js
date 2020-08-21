@@ -6,6 +6,7 @@ import {Peer} from "../Peers/Objects/Peer";
 import {isEquivalent} from "../../Utils/array";
 import keval from "../../Keval/keval";
 import foldersState from "../../Ui/Components/foldersState";
+import UIEvents from "../../Ui/EventBus/UIEvents";
 
 class FolderManager {
     folders = []
@@ -139,20 +140,29 @@ class FolderManager {
 
     async updateFolder(filter) {
         //console.log("updateFolder", filter)
-        const response = await MTProto.invokeMethod("messages.updateDialogFilter", {
-            id: filter.id,
-            filter: filter
-        })
-        //console.log(response)
-        const index = this.folders.findIndex(l => l.id === filter.id)
-        if (index === -1) {
-            this.folders.push(filter)
-        } else {
-            this.folders[this.folders.findIndex(l => l.id === filter.id)] = filter
-        }
-        this.fireUpdate()
-        this.updateCache()
+        try {
+            const response = await MTProto.invokeMethod("messages.updateDialogFilter", {
+                id: filter.id,
+                filter: filter
+            })
 
+            //console.log(response)
+            const index = this.folders.findIndex(l => l.id === filter.id)
+            if (index === -1) {
+                this.folders.push(filter)
+            } else {
+                this.folders[this.folders.findIndex(l => l.id === filter.id)] = filter
+            }
+            this.fireUpdate()
+            this.updateCache()
+            AppEvents.General.fire("folderUpdateSuccess")
+        } catch (e) {
+            // "FILTER_INCLUDE_EMPTY"
+            AppEvents.General.fire("folderUpdateFailed", {
+                filter,
+                error: e
+            })
+        }
     }
 
     async createFolder(filter) {

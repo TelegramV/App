@@ -12,6 +12,7 @@ import FoldersManager from "../../../../../../Api/Dialogs/FolderManager";
 import VUI from "../../../../../VUI";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import {FolderPeersSidebar} from "./FolderPeersSidebar";
+import AppEvents from "../../../../../../Api/EventBus/AppEvents";
 
 export class CreateFolderSidebar extends LeftSidebar {
     content(): * {
@@ -65,10 +66,35 @@ export class CreateFolderSidebar extends LeftSidebar {
         </this.contentWrapper>
     }
 
+    appEvents(E) {
+        super.appEvents(E);
+        E.bus(AppEvents.General)
+            .on("folderUpdateFailed", this.onError)
+            .on("folderUpdateSuccess", this.onSuccess)
+        E.bus(UIEvents.General)
+            .on("folderPeersChanged", this.onFolderPeersChanged)
+    }
+
+    onError = (event) => {
+        if(event.error.type === "FILTER_INCLUDE_EMPTY") {
+            UIEvents.General.fire("snackbar.show", {text: "There are no included chats in a folder", time: 5});
+        }
+    }
+
+    onFolderPeersChanged = (event) => {
+        this.setState({
+            currentFolder: event.folder
+        })
+    }
+
+    onSuccess = (event) => {
+        UIEvents.Sidebars.fire("pop", this)
+    }
+
     onChangeTitle = (event) => {
         this.state.currentFolder.title = event.target.value
-        delete this.state.currentFolder.flags;
-        FoldersManager.updateFolder(this.state.currentFolder)
+        this.forceUpdate()
+
     }
 
     includeChats = () => {
@@ -87,28 +113,41 @@ export class CreateFolderSidebar extends LeftSidebar {
         })
     }
 
+    apply = () => {
+        delete this.state.currentFolder.flags;
+        FoldersManager.updateFolder(this.state.currentFolder)
+    }
+
 
     get rightButtons(): *[] {
-        if(this.state.isNewFolder) {
-            return []
+        const buttons = []
+        if(this.state.currentFolder && this.state.currentFolder.title) {
+            buttons.push({
+                    icon: "check",
+                    blue: true,
+                    onClick: _ => this.apply()
+                })
         }
-        return [
-            {
-                icon: "more",
-                onClick: event => VUI.ContextMenu.openBelow([
-                    {
-                        icon: "delete",
-                        title: "Delete Folder",
-                        red: true,
-                        onClick: this.deleteFolder
-                    }
-                ], event.target)
-            }
-        ]
+        if(this.state.isNewFolder) {
+            return buttons
+        }
+        buttons.push({
+            icon: "more",
+            onClick: event => VUI.ContextMenu.openBelow([
+                {
+                    icon: "delete",
+                    title: "Delete Folder",
+                    red: true,
+                    onClick: this.deleteFolder
+                }
+            ], event.target)
+        })
+        return buttons
     }
 
     deleteFolder = () => {
         FoldersManager.deleteFolder(this.state.currentFolder.id)
+        UIEvents.Sidebars.fire("pop", this)
     }
 
     get headerBorder(): boolean {
@@ -126,7 +165,7 @@ export class CreateFolderSidebar extends LeftSidebar {
                 include_peers: [],
                 exclude_peers: [],
                 pinned_peers: []
-            } : FoldersManager.getFolder(params.folderId),
+            } : Object.assign({}, FoldersManager.getFolder(params.folderId)),
             isNewFolder: params.isNewFolder
         })
     }

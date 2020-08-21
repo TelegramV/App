@@ -6,7 +6,6 @@ import PeersStore from "../../../../../Api/Store/PeersStore";
 import VApp from "../../../../../V/vapp";
 import {SettingsSidebar} from "../Settings/SettingsSidebar";
 import {ArchivedSidebar} from "./ArchivedSidebar";
-import {UnpatchableLeftSidebar} from "../UnpatchableLeftSidebar";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import {isMobile} from "../../../../Utils/utils";
@@ -15,6 +14,8 @@ import VirtualDialogsFolderList from "./VirtualDialogsFolderList"
 import {Folders} from "./Folders"
 import {SearchComponent} from "../Search/SearchComponent"
 import ConnectionStatusComponent from "./ConnectionStatusComponent"
+import AppEvents from "../../../../../Api/EventBus/AppEvents";
+import {LeftSidebar} from "../LeftSidebar";
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -66,10 +67,14 @@ export const DialogsBarContextMenu = (event, archivedCount) => {
     ], event.target)
 }
 
-export class DialogsSidebar extends UnpatchableLeftSidebar {
+export class DialogsSidebar extends LeftSidebar {
+    state = {
+        loading: true
+    }
+
     isLoadingMore = false
 
-    loaderRef = VComponent.createRef()
+    // loaderRef = VComponent.createRef()
     searchRef = VComponent.createComponentRef()
     dialogsWrapperRef = VComponent.createRef()
 
@@ -104,9 +109,24 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
             <ConnectionStatusComponent/>
 
             <Folders/>
+
+
+
             <div style={{
                 "height": "100%",
             }}>
+                {
+                    this.state.loading ?
+                        <div ref={this.loaderRef} className="full-size-loader" id="loader" style={{
+                            "height": "100%",
+                            "width": "100%",
+                            "display": "flex",
+                            "align-items": "center",
+                            "justify-content": "center",
+                        }}>
+                            <progress className="progress-circular big"/>
+                        </div> : ""
+                }
                 <VirtualDialogsFolderList/>
             </div>
 
@@ -131,9 +151,9 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
     appEvents(E) {
         super.appEvents(E)
 
-        // E.bus(AppEvents.Dialogs)
-        //     .on("gotMany", this.onDialogsGotMany)
-        //
+        E.bus(AppEvents.Dialogs)
+             .on("gotMany", this.onDialogsGotMany)
+
         // E.bus(AppEvents.General)
         //     .on("selectFolder", this.onFolderSelect)
         //
@@ -144,16 +164,20 @@ export class DialogsSidebar extends UnpatchableLeftSidebar {
     }
 
     onDialogsGotMany = _ => {
-        if (this.loaderRef.$el.parentElement) this.loaderRef.$el.parentElement.removeChild(this.loaderRef.$el)
-        this.dialogsWrapperRef.$el.classList.remove("loading")
+        this.setState({
+            loading: false
+        })
+        // console.log("got many", this.loaderRef.$el, this.loaderRef.$el.parentNode)
+        // if (this.loaderRef.$el && this.loaderRef.$el.parentNode) this.loaderRef.$el.parentNode.removeChild(this.loaderRef.$el)
+        // this.dialogsWrapperRef.$el.classList.remove("loading")
     }
 
-    onFolderSelect = _ => {
-        this.dialogsWrapperRef.$el.scrollTop = 0
-        if (this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
-            this.loadNextPage()
-        }
-    }
+    // onFolderSelect = _ => {
+    //     this.dialogsWrapperRef.$el.scrollTop = 0
+    //     if (this.$el.querySelector(".dialog-lists").clientHeight < this.$el.clientHeight) {
+    //         this.loadNextPage()
+    //     }
+    // }
 
     onChatSelect = _ => {
         if (isMobile()) {

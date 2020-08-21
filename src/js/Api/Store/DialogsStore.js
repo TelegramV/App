@@ -66,40 +66,6 @@ class DialogsMapStore extends MappedStore {
         return this._sortDialogsArray(this.toArray());
     }
 
-    sortWithPinnedOnTop(): Dialog[] {
-        return this.toArray().sort(this.sortWithPinnedOnTopCompareFn);
-    }
-
-    sortWithPinnedOnTopCompareFn = (a, b) => {
-        if (!b.isPinned && !a.isPinned) {
-            if (!a.messages.last) {
-                return 1
-            }
-
-            if (!b.messages.last) {
-                return -1
-            }
-
-            if (a.messages.last.date > b.messages.last.date) {
-                return -1
-            }
-
-            if (a.messages.last.date < b.messages.last.date) {
-                return 1
-            }
-        } else {
-            if (a.isPinned) {
-                return -1
-            }
-
-            if (b.isPinned) {
-                return 1
-            }
-        }
-
-        return 0
-    };
-
     /**
      * @return {number}
      */

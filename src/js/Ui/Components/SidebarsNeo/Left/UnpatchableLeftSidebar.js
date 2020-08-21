@@ -4,7 +4,8 @@ import {LeftSidebar} from "./LeftSidebar";
 // dialog list without lags with virtualization. Due to this, I, @undrfined, created this monster.
 // Basically just a sidebar that should never ever ever (!) be patched, with dialogs added via real DOM.
 // That's it. Deal with it!
-// TODO get rid of this bs..
+
+// 8/21/2020 - RIP
 export class UnpatchableLeftSidebar extends LeftSidebar {
     hide() {
         this.$el.classList.toggle("hidden", true)

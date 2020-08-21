@@ -7,6 +7,8 @@ import {DialogUnreadMentionsCountBadge} from "./DialogUnreadMentionsCountBadge"
 import {DialogUnreadCountBadge} from "./DialogUnreadCountBadge"
 import {DialogUnreadMarkBadge} from "./DialogUnreadMarkBadge"
 import Locale from "../../../../../../Api/Localization/Locale"
+import foldersState from "../../../../foldersState";
+import FoldersManager from "../../../../../../Api/Dialogs/FolderManager";
 
 export const DialogFragment = (
     {
@@ -41,6 +43,8 @@ export const DialogFragment = (
         }
     }
 
+    const pinned = foldersState.current == null ? dialog.pinned : FoldersManager.isPinned(peer, foldersState.current.id)
+    const showPin = pinned && dialog.peer.messages.unreadMentionsCount === 0 && dialog.peer.messages.unreadCount === 0 && !dialog.unreadMark
     return (
         <div data-message-id={lastMessage.id}
              className={personClasses}
@@ -73,6 +77,7 @@ export const DialogFragment = (
                     <DialogUnreadCountBadge ref={unreadCountFragmentRef} dialog={dialog}/>
 
                     <DialogUnreadMarkBadge ref={unreadMarkFragmentRef} dialog={dialog}/>
+                    <div showIf={showPin} className="badge tgico pin"/>
                 </div>
             </div>
         </div>

@@ -277,6 +277,9 @@ export class Dialog extends ReactiveObject {
         this.raw.pinned = pinned || false
 
         this.fire("updatePinned")
+        AppEvents.Dialogs.fire("updatePinned", {
+            dialog: this
+        })
     }
 
     get draft(): DraftMessage {

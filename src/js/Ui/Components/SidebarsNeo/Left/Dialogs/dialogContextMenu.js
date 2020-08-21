@@ -41,7 +41,7 @@ export const dialogContextMenu = (dialog: Dialog, folderId) => {
             }
         },
         () => {
-            const isPinned = folderId === null || folderId === "archive" ? dialog.isPinned : FoldersManager.isPinned(dialog.peer, folderId)
+            const isPinned = folderId == null || folderId === "archive" ? dialog.isPinned : FoldersManager.isPinned(dialog.peer, folderId)
             return {
                 icon: isPinned ? "unpin" : "pin",
                 title: isPinned ? "Unpin from top" : "Pin to top",

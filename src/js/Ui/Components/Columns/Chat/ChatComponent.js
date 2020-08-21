@@ -97,8 +97,8 @@ class ChatComponent extends StatelessComponent {
 
         E.bus(UIEvents.Sidebars)
             // .filter(l => l instanceof RightSidebar || l.constructor instanceof RightSidebar)
-            .on("push", this.onRightSidebarOpen)
-            .on("pop", this.onRightSidebarClosed)
+            .on("openRightWrapper", this.onRightSidebarOpen)
+            .on("closeRightWrapper", this.onRightSidebarClosed)
 
 
         // E.bus(UIEvents.Sidebars)
@@ -160,18 +160,14 @@ class ChatComponent extends StatelessComponent {
     }
 
     onRightSidebarOpen = () => {
-        console.log("onRightSidebarOpen")
         if(isDesktop()) {
             this.chatRef.$el.classList.add("right-sidebar-open")
         }
     }
 
     onRightSidebarClosed = () => {
-        console.log("onRightSidebarClosed")
         if(isDesktop()) {
-            if(openedRightSidebars === 1) {
-                this.chatRef.$el.classList.remove("right-sidebar-open")
-            }
+            this.chatRef.$el.classList.remove("right-sidebar-open")
         }
     }
 

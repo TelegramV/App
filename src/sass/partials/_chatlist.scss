@@ -154,21 +154,7 @@
             padding: 0;
         }
 
-        .person {
-            .badge:empty {
-                display: block;
-                background-color: $grey;
-                width: 24px;
-                height: 24px;
-                padding: 0;
-                font-size: 24px;
 
-                &:before {
-                    font-family: "#{$tgico-font-family}" !important;
-                    content: $tgico-pinnedchat;
-                }
-            }
-        }
     }
 }
 
@@ -284,6 +270,21 @@
         box-sizing: border-box;
         font-weight: 500;
         margin: 0 2px;
+    }
+
+
+    .badge.pin {
+        display: block;
+        background-color: $grey;
+        width: 24px;
+        height: 24px;
+        padding: 0;
+        font-size: 24px;
+
+        &:before {
+            font-family: "#{$tgico-font-family}" !important;
+            content: $tgico-pinnedchat;
+        }
     }
 
     /*&.unread .badge {
