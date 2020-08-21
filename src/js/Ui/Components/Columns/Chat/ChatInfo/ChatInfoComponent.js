@@ -48,7 +48,8 @@ class ChatInfoComponent extends StatelessComponent {
     }
 
     backToMainPage = () => {
-        VApp.router.replace("/")
+        UIEvents.General.fire("chat.deselectMobile", {})
+        // VApp.router.replace("/")
     }
 }
 
