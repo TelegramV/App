@@ -42,7 +42,7 @@ const vrdom_patch = ($node, vRNode: VRNode | ComponentVRNode, options = {}): Nod
         console.error("BUG: `undefined` was passed as $node ")
         return $node
     }
-
+    
     initElement($node)
 
     if (vRNode instanceof VRNode) {

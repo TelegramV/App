@@ -34,7 +34,8 @@ class VirtualMessages {
     isDownloading = false;
 
     constructor(options) {
-        this.size = options?.size ?? 100;
+        this.size = options?.size ?? 40;
+        this.edgeSize = 3;
     }
 
     refresh() {

@@ -31,7 +31,6 @@ import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent
 import SnackbarComponent from "../../Singleton/SnackbarComponent"
 import {SearchSidebar} from "../../SidebarsNeo/Right/Search/SearchSidebar";
 import {RightSidebars} from "../../SidebarsNeo/Right/RightSidebars";
-import DefaultBubblesComponent from "./DefaultBubblesComponent"
 import {isDesktop, isMobile} from "../../../Utils/utils";
 import {DialogInfoSidebar} from "../../SidebarsNeo/Right/DialogInfo/DialogInfoSidebar";
 import nodeIf from "../../../../V/VRDOM/jsx/helpers/nodeIf";
@@ -131,12 +130,9 @@ class ChatComponent extends StatelessComponent {
                               show={true}
                               background={true}/>
 
-                    {
-                        useVirtualized ?
-                            <VirtualizedBubblesComponent loaderRef={this.messagesLoaderRef}/>
-                            :
-                            <DefaultBubblesComponent loaderRef={this.messagesLoaderRef}/>
-                    }
+
+                    <div id="virt-el"/>
+                    <VirtualizedBubblesComponent loaderRef={this.messagesLoaderRef}/>
 
                     <ChatInputComponent ref={this.chatInputRef}/>
 
@@ -156,29 +152,13 @@ class ChatComponent extends StatelessComponent {
         }
     }
 
-
-    // onRightSidebarHidden = l => {
-    //     // if(l.barName === "forward-message") return
-    //     this.$el.classList.toggle("right-bar-open", !l.hidden)
-    //     this.rightSidebarOpen = true
-    // }
-
-    // onRightSidebarHide = l => {
-    //     if(l.barName === "forward-message") return
-    //
-    // this.$el.classList.remove("right-bar-open")
-    // this.rightSidebarOpen = false
-    // }
-
     onInfoOpen = () => {
-        console.log("OPEN")
         if (isMobile()) {
             this.$el.classList.toggle("fade-out", true)
         }
     }
 
     onInfoClosed = () => {
-        console.log("closed")
         if (isMobile()) {
             this.$el.classList.toggle("fade-out", false)
         }
