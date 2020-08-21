@@ -1,4 +1,4 @@
-import * as twemojiRegExp from "twemoji-parser/dist/lib/regex"
+const regExp = require("twemoji-parser/dist/lib/regex").default
 
 const UFE0Fg = /\uFE0F/g;
 const U200D = String.fromCharCode(0x200D);
@@ -30,8 +30,6 @@ function grabTheRightIcon(rawText) {
         rawText
     );
 }
-
-const regExp = twemojiRegExp.default;
 
 function getEmojiUrl(icon) {
     if (icon.length < 4) {
