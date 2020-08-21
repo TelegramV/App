@@ -58,12 +58,12 @@ class LoginPasswordComponent extends StatefulComponent {
                                     onInput={this.onInputPassword}
                                     onShownUpdate={this.onShownUpdate}
                                     error={passwordError}
-                                    disabled={!login.accountPassword}/>
+                                    disabled={!login.accountPassword || isLoading}/>
 
                     <VButton isBlock
                              isLoading={isLoading}
                              type="submit"
-                             disabled={!login.accountPassword}>
+                             disabled={!login.accountPassword || isLoading}>
                         {isLoading ? "Please wait..." : "Next"}
                     </VButton>
                 </form>
@@ -111,6 +111,7 @@ class LoginPasswordComponent extends StatefulComponent {
             isLoading: true,
         });
 
+        const password = this.state.password
         MTProto.performWorkerTask("mt_srp_check_password", {
             g,
             p,
@@ -118,8 +119,9 @@ class LoginPasswordComponent extends StatefulComponent {
             salt2,
             srp_id,
             srp_B,
-            password: this.state.password,
+            password: password,
         }).then(srp_ret => {
+            console.log("srp_ret", srp_ret)
             API.auth.checkPassword({
                 _: "inputCheckPasswordSRP",
                 srp_id: srp_ret.srp_id,
@@ -129,6 +131,7 @@ class LoginPasswordComponent extends StatefulComponent {
                 loginState.authorization = Authorization;
                 loginState.authorized();
             }).catch(error => {
+                console.log(error)
                 let errorText = error.type;
 
                 switch (error.type) {
