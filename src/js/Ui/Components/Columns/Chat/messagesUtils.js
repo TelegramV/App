@@ -50,13 +50,13 @@ export function isGrouping(one: Message, two: Message) {
         && (Math.abs(one.date - two.date) < 5 * 60);
 }
 
-export function isSameDate(d1n, d2n) {
-    if (!d1n || !d2n) {
+export function isSameDate(d1, d2) {
+    if (!d1 || !d2) {
         return true;
     }
 
-    const d1 = new Date(d1n * 1000);
-    const d2 = new Date(d2n * 1000);
+    // const d1 = new Date(d1n * 1000);
+    // const d2 = new Date(d2n * 1000);
 
     return d1.getFullYear() === d2.getFullYear() &&
         d1.getMonth() === d2.getMonth() &&
@@ -87,13 +87,16 @@ export function renderVRMessage(message: Message, prevMessage: Message = null, n
 
     return <MessageComponent message={message}
                              observer={observer}
-                             showDate={!isSameDate(message.date, prevMessage?.date)}
+                             showDate={!isSameDate(message.jsDate, prevMessage?.jsDate)}
         // isNewMessages={message.dialogPeer.messages.readInboxMaxId - 40 >= message.dialogPeer.messages.last?.id && message.dialogPeer.messages.readInboxMaxId === message.id}
     />;
 }
 
 export function renderMessage(message: Message, prevMessage: Message = null, nextMessage: Message = null, observer): HTMLElement {
+    // var z = performance.now()
     return vrdom_render(renderVRMessage(message, prevMessage, nextMessage, observer));
+    // console.log("message " + message.constructor.name, Math.round(performance.now() - z) + "ms")
+    // return a
 }
 
 export function appendMessages($container: HTMLElement, messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null, observer) {
@@ -112,6 +115,7 @@ export function appendMessages($container: HTMLElement, messages: Message[], bef
                 console.error("append after", afterBottomMessage, messages)
             }
         }
+        // let z = performance.now()
 
         const $messages = [renderMessage(messages[0], beforeTopMessage, messages[1], observer)];
 
@@ -127,8 +131,14 @@ export function appendMessages($container: HTMLElement, messages: Message[], bef
         if (messages.length > 1) {
             $messages.push(renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage, observer));
         }
+        // console.log("render", Math.round(total) + "ms")
+
+        // console.log("vrrender + render() " + $messages.length, Math.round(performance.now() - z) + "ms")
+
+        // z = performance.now()
 
         vrdom_appendRealMany($messages.reverse(), $container)
+        // console.log("append " + $messages.length, Math.round(performance.now() - z) + "ms")
 
         return $messages;
     }

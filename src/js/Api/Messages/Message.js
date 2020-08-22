@@ -65,6 +65,7 @@ export interface Message {
     +forwarded?: any;
     +forwardedMessageId?: number;
     +editDate?: number;
+    +jsDate?: Date;
     +isDisplayedInMediaViewer: boolean;
     // It's actually long?
     +groupedId?: string;

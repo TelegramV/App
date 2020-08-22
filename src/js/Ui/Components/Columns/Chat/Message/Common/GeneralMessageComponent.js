@@ -30,7 +30,7 @@ class GeneralMessageComponent extends TranslatableStatefulComponent<Props> {
     }
 
     componentDidMount() {
-        this.props.message.show()
+        // this.props.message.show()
 
         if (this.props.observer) {
             this.props.observer.observe(this.$el)
@@ -52,6 +52,8 @@ class GeneralMessageComponent extends TranslatableStatefulComponent<Props> {
     }
 
     onElementVisible() {
+        this.props.message.show()
+
         if (!this.props.message.isInRead && isElementInViewport(document.getElementById("bubbles-inner"), this.$el)) {
             this.props.message.dialogPeer.api.readHistory(this.props.message.id)
         }

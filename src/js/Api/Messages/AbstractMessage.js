@@ -198,10 +198,6 @@ export class AbstractMessage extends ReactiveObject implements Message {
         return this.raw.date
     }
 
-    get jsDate() {
-        return new Date(this.raw.date * 1000);
-    }
-
     get editDate() {
         return this.raw.edit_date
     }
@@ -216,9 +212,6 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     formattedTime = null
     getFormattedTime() {
-        if(this.formattedTime === null) {
-            this.formattedTime = this.getDate(navigator.language, DATE_FORMAT_TIME)
-        }
         return this.formattedTime
     }
 
@@ -241,7 +234,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     // always call super
     show() {
         this.findReplyTo()
-        this.findForwarded()
+        // this.findForwarded()
     }
 
     get groupedId() {
@@ -349,6 +342,8 @@ export class AbstractMessage extends ReactiveObject implements Message {
         this.parsedText = parseMessageEntities(raw.message || "", raw.entities)
 
         this.raw = raw
+        this.jsDate = new Date(this.raw.date * 1000)
+        this.formattedTime = this.getDate(navigator.language, DATE_FORMAT_TIME)
         this.prefix = MessageParser.getDialogPrefix(this)
 
         if (this.dialogPeer) {
