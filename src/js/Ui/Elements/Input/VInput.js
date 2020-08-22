@@ -72,7 +72,7 @@ function VInput(
                    type={type}
                    placeholder={text}
                    name={name}
-                   value={value}
+                   value={value || null}
                    onInput={onInput}
                    onKeyPress={onKeyPress}
                    onBlur={onBlur}
