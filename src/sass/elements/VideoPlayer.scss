@@ -31,9 +31,11 @@
     user-select: none;
 
     .player {
+        display: flex;
+        justify-content: center;
         video {
             width: 100%;
-            max-width: 100%;
+            //max-width: 100%;
             max-height: 100%;
         }
 
@@ -61,6 +63,7 @@
             width: 100%;
             max-width: 100%;
             bottom: 0;
+            transform: translateY(0);
             padding: 0 20px;
 
             display: flex;
@@ -68,12 +71,12 @@
 
             box-sizing: border-box;
 
-            transition: height 250ms ease-in-out;
+            transition: anim(transform);
 
             background: linear-gradient(rgba(0, 0, 0, 0.01), rgba(0, 0, 0, 0.5));
 
             &.hidden {
-                height: 0;
+                transform: translateY(100%);
 
                 .dot {
                     display: none;

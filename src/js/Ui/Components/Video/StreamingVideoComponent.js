@@ -163,7 +163,7 @@ class StreamingVideoComponent extends VideoPlayer {
             });
         }
 
-        this.pause();
+        //this.pause();
     }
 }
 

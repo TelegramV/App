@@ -80,7 +80,7 @@ function MediaFragment({media, zoom, hidden}) {
                                         containerHeight={video.h}
                                         document={media.raw.media.document}
                                         thumbUrl={thumbUrl}
-                                        autoPlay
+                                        autoplay
                                         playsinline
                                         controls/>
     }
@@ -131,8 +131,6 @@ export class MediaViewerComponent extends StatefulComponent {
 
         let from, name, text, date;
 
-        let downloaded = message && FileManager.isDownloaded(message.raw.media.photo || message.raw.media.document)
-
         if (message) {
             from = message.from;
             name = from.name;
@@ -154,16 +152,7 @@ export class MediaViewerComponent extends StatefulComponent {
         contextActions.push({
             icon: "download",
             title: "Download",
-            onClick: () => {
-                if (!downloaded) return;
-                let pfn = message.srcUrl.split("/");
-                pfn = pfn[pfn.length - 1];
-                const f = message.raw.media.photo || message.raw.media.video || message.raw.media.document || {};
-                FileManager.saveBlobUrlOnPc(
-                    message.srcUrl,
-                    DocumentMessagesTool.getFilename(f.attributes, pfn)
-                )
-            }
+            onClick: this.downloadMedia
         })
 
         contextActions.push({
@@ -206,21 +195,10 @@ export class MediaViewerComponent extends StatefulComponent {
                             }
 
                             <i style={{
-                                "cursor": !downloaded ? "default" : "pointer",
+                                "cursor": "pointer",
                             }} className="tgico tgico-download rp rps" onClick={event => {
                                 event.stopPropagation();
-
-                                if (!downloaded) {
-                                    return;
-                                }
-
-                                let pfn = message.srcUrl.split("/");
-                                pfn = pfn[pfn.length - 1];
-                                const f = message.raw.media.photo || message.raw.media.video || message.raw.media.document || {};
-                                FileManager.saveBlobUrlOnPc(
-                                    message.srcUrl,
-                                    DocumentMessagesTool.getFilename(f.attributes, pfn)
-                                )
+                                this.downloadMedia();
                             }}/>
                             <i className="tgico tgico-close rp rps"/>
                         </div>
@@ -238,7 +216,7 @@ export class MediaViewerComponent extends StatefulComponent {
                                 "media": true,
                                 "appear-next": !!this.state.previousMessage,
                                 "appear-previous": !!this.state.nextMessage,
-                            }} onClick={this.onMediaClick}>
+                            }} onClick={this.onMediaClick} onContextMenu={contextMenuHandler}>
                                 <MediaFragment media={message} zoom={zoom} hidden={hidden}/>
                             </div>
 
@@ -288,6 +266,23 @@ export class MediaViewerComponent extends StatefulComponent {
         window.removeEventListener("keydown", this.onKeyDown);
         this.$el.removeEventListener("swiped-left", this.right);
         this.$el.removeEventListener("swiped-right", this.left);
+    }
+
+    downloadMedia = () => {
+        const message = this.state.message;
+        if(!message) return;
+
+        const f = message.raw.media.photo || message.raw.media.video || message.raw.media.document || {};
+        const downloaded = message && FileManager.isDownloaded(f)
+        if (!downloaded) return;
+
+        const url = FileManager.getUrl(f.document || f);
+        let uid = url.split("/");
+        uid = uid[uid.length-1];
+        FileManager.saveBlobUrlOnPc(
+            url,
+            DocumentMessagesTool.getFilename(f.attributes, uid)
+        )
     }
 
     onKeyDown = event => {

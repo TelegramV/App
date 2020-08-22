@@ -186,6 +186,10 @@
             margin-right: 0;
             padding-right: 21px;
 
+            figure.photo, figure.video {
+                margin-right: -16px;
+            }
+
             /*&~.inline-keyboard {
                 margin-right: 11px;
             }*/

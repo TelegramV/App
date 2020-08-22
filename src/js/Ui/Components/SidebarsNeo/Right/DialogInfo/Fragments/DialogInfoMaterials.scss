@@ -2,6 +2,9 @@
 
 .materials {
     position: relative;
+    &>div:empty {
+        margin-bottom: var(--vh100);
+    }
 
     .tab-selector-wrapper {
         position: sticky;
