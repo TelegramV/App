@@ -183,6 +183,9 @@
                     transform: translate(-50%, -50%);
                     height: 80%;
                     max-width: 80%;
+                    @include mobile {
+                        max-width: 100%;
+                    }
                     display: flex;
                     justify-content: center;
                     align-items: center;
