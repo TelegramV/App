@@ -135,10 +135,14 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         if(isDesktop()) {
             this.isRequestedShowMessage = event.message
 
-            if (AppSelectedChat.isSelected) {
-                this.isLoadingRecent = true;
+            if(!this.isRequestedShowMessage) {
+                if (AppSelectedChat.isSelected) {
+                    this.isLoadingRecent = true;
 
-                AppSelectedChat.current.messages.fireRecent();
+                    AppSelectedChat.current.messages.fireRecent();
+                }
+            } else {
+                this.onChatShowMessage({message: event.message})
             }
         }
 
