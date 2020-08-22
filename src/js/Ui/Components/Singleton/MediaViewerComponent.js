@@ -233,9 +233,31 @@ export class MediaViewerComponent extends StatefulComponent {
                     <div class="content-wrapper">
                         <NavigationButtonFragment onClick={this.left} hidden={!this.hasLeft() && !isLoadingPage}/>
                         <div class="content">
-                            <div className="media" onClick={this.onMediaClick}>
+                            <div className={{
+                                "media": true,
+                                "appear-next": !!this.state.previousMessage,
+                                "appear-previous": !!this.state.nextMessage,
+                            }} onClick={this.onMediaClick}>
                                 <MediaFragment media={message} zoom={zoom} hidden={hidden}/>
                             </div>
+
+                            {
+                                this.state.previousMessage ?
+
+                                    <div className="media previous" onAnimationEnd={this.onAnimationEnd}>
+                                        <MediaFragment media={this.state.previousMessage} zoom={zoom} hidden={hidden}/>
+                                    </div>
+                                    : ""
+                            }
+
+                            {
+                                this.state.nextMessage ?
+
+                                    <div className="media next" onAnimationEnd={this.onAnimationEnd}>
+                                        <MediaFragment media={this.state.nextMessage} zoom={zoom} hidden={hidden}/>
+                                    </div>
+                                    : ""
+                            }
                             <div className="caption">{text}</div>
                         </div>
                         <NavigationButtonFragment onClick={this.right} isNext
@@ -244,6 +266,15 @@ export class MediaViewerComponent extends StatefulComponent {
                 </div>
             </div>
         )
+    }
+
+    onAnimationEnd = (event) => {
+        // this.state.nextMessage = null
+        // this.state.previousMessage = null
+        this.setState({
+            nextMessage: null,
+            previousMessage: null
+        })
     }
 
     componentDidMount() {
@@ -410,7 +441,7 @@ export class MediaViewerComponent extends StatefulComponent {
     left = event => {
         event.stopPropagation();
 
-        if (!this.hasLeft()) {
+        if (!this.hasLeft() || this.state.previousMessage || this.state.nextMessage) {
             return;
         }
 
@@ -426,6 +457,7 @@ export class MediaViewerComponent extends StatefulComponent {
             const leftMessage = this.state.messages[index - 1];
 
             this.setState({
+                nextMessage: this.state.message,
                 message: leftMessage,
                 zoom: false,
             })
@@ -448,7 +480,7 @@ export class MediaViewerComponent extends StatefulComponent {
     right = event => {
         event.stopPropagation();
 
-        if (!this.hasRight()) {
+        if (!this.hasRight() || this.state.previousMessage || this.state.nextMessage) {
             return;
         }
 
@@ -463,6 +495,7 @@ export class MediaViewerComponent extends StatefulComponent {
             const rightMessage = this.state.messages[index + 1];
 
             this.setState({
+                previousMessage: this.state.message,
                 message: rightMessage,
                 zoom: false,
             })

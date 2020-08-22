@@ -186,6 +186,62 @@
                     justify-content: center;
                     align-items: center;
 
+                    &.appear-previous {
+                        animation: mediaviewer-appear-previous 2500ms ease-in-out forwards;
+                    }
+
+
+                    &.appear-next {
+                        animation: mediaviewer-appear-next 2500ms ease-in-out forwards;
+                    }
+
+
+                    @keyframes mediaviewer-appear-next {
+                        0% {
+                            transform: translate(100vw, -50%);
+                        }
+                        100% {
+                            transform: translate(-50%, -50%);
+                        }
+                    }
+                    @keyframes mediaviewer-appear-previous {
+                        0% {
+                            transform: translate(-200vw, -50%);
+                        }
+                        100% {
+                            transform: translate(-50%, -50%);
+                        }
+                    }
+
+
+                    @keyframes mediaviewer-previous {
+                        0% {
+                            transform: translate(-50%, -50%);
+                        }
+                        100% {
+                            transform: translate(-200vw, -50%);
+                        }
+                    }
+
+                    &.previous {
+                        animation: mediaviewer-previous 2500ms ease-in-out forwards;
+                        //transform: translate(-50vw, -50%);
+                    }
+
+                    @keyframes mediaviewer-next {
+                        0% {
+                            transform: translate(-50%, -50%);
+                        }
+                        100% {
+                            transform: translate(100vw, -50%);
+                        }
+                    }
+
+                    &.next {
+                        animation: mediaviewer-next 2500ms ease-in-out forwards;
+                        //transform: translate(50vw, -50%);
+                    }
+
                     figure {
                         background-color: transparent;
 
