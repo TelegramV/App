@@ -7,6 +7,7 @@ import WallpaperManager from "../../../../../../Managers/WallpaperManager"
 import {BackgroundColorSidebar} from "./BackgroundColorSidebar"
 import UIEvents from "../../../../../../EventBus/UIEvents";
 import BackgroundPreviewComponent from "./BackgroundPreviewComponent"
+import Settings from "../../../../../../../Api/Settings/Settings"
 import keval from "../../../../../../../Keval/keval"
 import "./BackgroundSidebar.scss"
 
@@ -43,15 +44,15 @@ export class BackgroundImageSidebar extends LeftSidebar {
     }
 
     componentDidMount() {
-        keval.getItem("background.blur").then(data => {
-            if(!data) {
-                keval.setItem("background.blur", {blur: true})
-            } else {
-                this.setState({
-                    blur: !data.blur //dirty hack to set blur on load, replace this
-                })
-                this.onBlurClick();
+        Settings.initPromise.then(() => {
+            const blur = Settings.get("background.blur");
+            if(blur === undefined) {
+                Settings.set("background.blur", false);
+                blur = false;
             }
+            this.setState({
+                blur
+            })
         })
 
         WallpaperManager.getSelectedId().then(id => {
@@ -61,6 +62,12 @@ export class BackgroundImageSidebar extends LeftSidebar {
                 })
             }
         })
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if(nextState.blur !== undefined && nextState.blur !== this.state.blur) {
+            document.getElementById("wallpaper").classList.toggle("blur", nextState.blur);
+        }
     }
 
     onShown(params) {
@@ -93,14 +100,7 @@ export class BackgroundImageSidebar extends LeftSidebar {
 
     onBlurClick = ev => {
     	let value = !this.state.blur;
-        const wallpaper = document.getElementById("wallpaper");
-        if (value) {
-            wallpaper.classList.add("blur");
-        } else {
-            wallpaper.classList.remove("blur");
-        }
-
-        keval.setItem("background.blur", {blur: value})
+        Settings.set("background.blur", value)
 
         this.setState({
             blur: value
@@ -110,8 +110,8 @@ export class BackgroundImageSidebar extends LeftSidebar {
     previewClick = (wallpaper) => {
         WallpaperManager.requestAndInstall(wallpaper);
         this.setState({
-            selected: wallpaper.id
+            selected: wallpaper.id,
+            blur: !wallpaper.pattern // disable blur for patterns
         })
-        if(wallpaper.pattern && this.state.blur) this.onBlurClick(); //disable blur for patterns
     }
 }

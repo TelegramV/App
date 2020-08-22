@@ -174,13 +174,14 @@
                 display: flex;
                 flex-grow: 1;
                 flex-direction: column;
+                align-items: center;
 
                 .media {
                     position: absolute;
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
-                    max-height: 80%;
+                    height: 80%;
                     max-width: 80%;
                     display: flex;
                     justify-content: center;
@@ -253,13 +254,17 @@
                     }
                 }
 
-                .caption {
-                    margin-bottom: 58px;
-                    color: $darkgreyicon;
+                .caption:not(:empty) {
+                    margin-bottom: 30px;
+                    color: $lightgrey;
+                    background-color: $semiblack;
                     bottom: 0;
                     text-align: center;
-                    width: 100%;
+                    max-width: 90%;
                     position: absolute;
+                    max-height: 30%;
+                    border-radius: 5px;
+                    padding: 5px;
                 }
             }
         }

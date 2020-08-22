@@ -92,6 +92,8 @@ class VideoPlayer extends StatefulComponent {
     timeWrapperRef = VComponent.createRef();
     timelineRef = VComponent.createRef();
 
+    playPromise = Promise.resolve(); // avoid DOMException: The play() request was interrupted by a call to pause().
+
     state = {
         showControls: true,
         showPreview: false,
@@ -313,10 +315,20 @@ class VideoPlayer extends StatefulComponent {
         const $video = this.videoRef.$el;
 
         if ($video.paused) {
-            $video.play();
+            this.play();
         } else {
-            $video.pause();
+            this.pause();
         }
+    }
+
+    play() {
+        this.playPromise = this.videoRef.$el.play();
+    }
+
+    pause() {
+        this.playPromise.then(() => {
+            this.videoRef.$el.pause();
+        })
     }
 
     onClickFull = () => {
@@ -378,6 +390,7 @@ class VideoPlayer extends StatefulComponent {
     hideControls = this.debounce(() => {
         this.setState({
             showControls: false,
+            showPreview: false
         });
     }, 4000);
 

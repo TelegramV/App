@@ -145,7 +145,7 @@ class StreamingVideoComponent extends VideoPlayer {
             const box = (event.currentTarget || event.target).getBoundingClientRect();
             const percentage = (event.pageX - box.x) / box.width;
             $video.currentTime = $video.duration * Math.max(0, Math.min(1, percentage));
-            $video.pause();
+            this.pause();
 
             this.setState({
                 showPreview: true,
@@ -163,7 +163,7 @@ class StreamingVideoComponent extends VideoPlayer {
             });
         }
 
-        this.previewVideoRef.$el.pause();
+        this.pause();
     }
 }
 

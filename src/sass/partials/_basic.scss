@@ -162,7 +162,7 @@ img:not([src]) {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(black, .4);
+    background: rgba(black, .3);
     border: solid 3px transparent;
     border-radius: 5px;
     min-height: 50px;
@@ -171,7 +171,7 @@ img:not([src]) {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(black, .6);
+    background: rgba(black, .5);
 }
 
 body {

@@ -23,6 +23,7 @@ import MTProto from "../../MTProto/External"
 import AppEvents from "../../Api/EventBus/AppEvents"
 import UIEvents from "../../Ui/EventBus/UIEvents"
 import keval from "../../Keval/keval";
+import Settings from "../../Api/Settings/Settings"
 
 class WallpaperManagerSingleton {
     wallpapers = [];
@@ -31,17 +32,20 @@ class WallpaperManagerSingleton {
     init() {
         //AppEvents.Files.subscribe("download.done", this.onFileDownloaded);
 
-        keval.getItem("background").then(data => {
-            if (!data) {
+        Settings.initPromise.then(() => {
+            const background = Settings.get("background");
+            if (!background) {
                 this.setWallpaper("./static/images/default_bg.jpg", 0, false)
                 return;
             }
-            if (data.blob) {
-                let url = URL.createObjectURL(data.blob);
-                this.setWallpaper(url, 0, false);
-            } else if (data.color) {
-                this.setColor(data.color);
+            if (background.color) {
+                this.setColor(background.color);
             }
+            if (background.blob) {
+                let url = URL.createObjectURL(background.blob);
+                this.setWallpaper(url, 0, false);
+            }
+            
         })
     }
 
@@ -72,9 +76,11 @@ class WallpaperManagerSingleton {
         });
     }
 
-    async getSelectedId() {
-        let data = await keval.getItem("background");
-        return data?.wallpaperId;
+    getSelectedId() {
+        Settings.initPromise.then(() => {
+            return Promise.resolve(Settings.get("background.wallpaper_id"));
+        })
+        return Promise.resolve();
     }
 
     async fetchPreview(wallpaper) {
@@ -123,7 +129,8 @@ class WallpaperManagerSingleton {
         if(save) {
             fetch(url).then(async response => {
                 let blob = await response.blob();
-                keval.setItem("background", {blob: blob, wallpaperId: wallpaperId});
+                Settings.set("background.blob", blob)
+                Settings.set("background.wallpaper_id", wallpaperId);
             })
         }
     }
@@ -135,7 +142,7 @@ class WallpaperManagerSingleton {
         }
         this.setWallpaper(undefined); //remove wallpaper
         window.document.body.style.setProperty("--chat-bg-color", hex);
-        keval.setItem("background", {color: hex});
+        Settings.set("background.color", hex);
     }
 
     /*onFileDownloaded = event => {

@@ -45,7 +45,7 @@ class ConfettiComponent extends StatefulComponent {
         this.state.confetti.set(Date.now(), <ConfettiCanvasComponent/>)
         this.state.shown = true
         this.forceUpdate();
-        this.withTimeout(this.removeOld, 11000);
+        this.withTimeout(this.removeOld, 10000);
     }
 
     removeOld = () => {

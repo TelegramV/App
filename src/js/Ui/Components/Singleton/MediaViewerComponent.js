@@ -33,6 +33,7 @@ import DocumentParser from "../../../Api/Files/DocumentParser"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 import {MessageType} from "../../../Api/Messages/Message"
 import VUI from "../../VUI"
+import {getNewlines} from "../../../Utils/htmlHelpers"
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -258,7 +259,7 @@ export class MediaViewerComponent extends StatefulComponent {
                                     </div>
                                     : ""
                             }
-                            <div className="caption">{text}</div>
+                            <div className="caption scrollable">{getNewlines(text)}</div>
                         </div>
                         <NavigationButtonFragment onClick={this.right} isNext
                                                   hidden={!this.hasRight() && !isLoadingPage}/>

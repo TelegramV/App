@@ -226,6 +226,11 @@ export class SearchSidebar extends RightSidebar {
         }
     }
 
+    onHide() {
+        this.state.messages.set([])
+        this.state.messagesCount = -2
+    }
+
     get searchLazyLevel(): number {
         return 500
     }

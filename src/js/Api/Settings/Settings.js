@@ -5,6 +5,9 @@ import AppEvents from "../EventBus/AppEvents"
 class Settings {
 
     settings = {}
+    initPromise = new Promise((resolve, reject) => {
+        this._initPromiseResolve = resolve;
+    });
 
     async init() {
     	const now = performance.now();
@@ -26,6 +29,7 @@ class Settings {
 	        return Promise.all(promises);
         })
         AppEvents.General.fire("settings.ready");
+        this._initPromiseResolve(this.settings);
         return this.settings;
     }
 
@@ -64,6 +68,11 @@ class Settings {
 
     save() {
     	return keval.setItem("settings", this.settings);
+    }
+
+    fullClear() {
+        this.settings = {}
+        this.save();
     }
 
 }

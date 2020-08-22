@@ -16,8 +16,12 @@
  */
 
 function scrollToAndHighlight($container: HTMLElement, $el: HTMLElement, behavior = "auto") {
+	let top = $el.offsetTop;
+	if($el.clientHeight < $container.clientHeight) { // try to center message, if it can fit fully in container
+		top += $el.clientHeight / 2 -  $container.clientHeight / 2;
+	}
     $container.scrollTo({
-        top: $el.offsetTop + ($el.clientHeight / 2 - $container.clientHeight / 2),
+        top: top,
         behavior,
     })
 
