@@ -28,9 +28,9 @@ export const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAge
 export const IS_MOBILE_SCREEN = window.innerWidth < 991.98
 export const IS_DESKTOP_SCREEN = !IS_MOBILE_SCREEN;
 
-export const IS_VOICE_RECORDING_SUPPORTED = (navigator.mediaDevices && 'getUserMedia' in navigator.mediaDevices && (
-  window.AudioContext || (window).webkitAudioContext
-));
+export const IS_VOICE_RECORDING_SUPPORTED = navigator.mediaDevices && 'getUserMedia' in navigator.mediaDevices && (
+  window.AudioContext || window.webkitAudioContext
+);
 
 export const IS_STREAMING_SUPPORTED = 'MediaSource' in window;
 export const IS_OPUS_SUPPORTED = Boolean((new Audio()).canPlayType('audio/ogg; codecs=opus'));
