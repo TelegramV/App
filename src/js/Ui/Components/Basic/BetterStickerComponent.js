@@ -22,7 +22,6 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 import FileManager from "../../../Api/Files/FileManager"
 import AppEvents from "../../../Api/EventBus/AppEvents"
-import {isBullshitBrowser} from "../../Utils/utils"
 import WebpHelper from "../../Utils/WebpHelper"
 
 // probably patch-compatible

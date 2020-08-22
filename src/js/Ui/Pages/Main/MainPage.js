@@ -19,7 +19,7 @@ import {LeftSidebars} from "../../Components/SidebarsNeo/Left/LeftSidebars";
 import {ForwardSidebar} from "../../Components/SidebarsNeo/Right/ForwardSidebar";
 import PiPContainer from "../../Components/Video/PiPContainer"
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
-import {isSafari, isMobile} from "../../Utils/utils";
+import {IS_SAFARI, IS_MOBILE_SCREEN} from "../../../Utils/browser";
 import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf";
 import AudioPlayerComponent from "../../Components/Singleton/AudioPlayerComponent"
@@ -61,7 +61,7 @@ export function MainPage() {
     }, 500));
 
     return (
-        <div id="app" class={["app", classIf(isSafari(), "safari")]}>
+        <div id="app" class={["app", classIf(IS_SAFARI, "safari")]}>
             <ContextMenuComponent/>
             <ModalContainer/>
             <MediaViewerComponent/>
@@ -98,7 +98,7 @@ export function MainPage() {
             <PiPContainer/>
 
             <RightSidebars/>
-            {/*{nodeIf(<RightSidebars/>, isMobile())}*/}
+            {/*{nodeIf(<RightSidebars/>, IS_MOBILE_SCREEN)}*/}
 
 
             {/*<DialogInfoComponent/>*/}

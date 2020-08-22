@@ -47,7 +47,7 @@ class FilesManager {
             case "photo":
                 return this.downloadPhoto(file, thumbOrSize, options);
             case "document":
-                return this.downloadPhoto(file, thumbOrSize, options);
+                return this.downloadDocument(file, thumbOrSize, options);
 
             default:
                 return Promise.reject("Unsupported type: ", file._);
@@ -121,16 +121,15 @@ class FilesManager {
         if (this.downloaded.has(id)) {
             const downloaded = this.downloaded.get(id);
 
-            fetch(downloaded.url).then(r => r.blob()).then(blob => {
+            return fetch(downloaded.url).then(r => r.blob()).then(blob => {
                 AppEvents.Files.fire("download.done", {
                     file: document,
                     blob: blob,
                     url: downloaded.url,
                     id,
                 });
+                return Promise.resolve({...downloaded, blob});
             });
-
-            return Promise.resolve(downloaded);
         }
 
         if (this.pending.has(id)) {

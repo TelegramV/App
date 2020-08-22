@@ -31,7 +31,7 @@ import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent
 import SnackbarComponent from "../../Singleton/SnackbarComponent"
 import {SearchSidebar} from "../../SidebarsNeo/Right/Search/SearchSidebar";
 import {openedRightSidebars, RightSidebars} from "../../SidebarsNeo/Right/RightSidebars";
-import {isDesktop, isMobile} from "../../../Utils/utils";
+import {IS_DESKTOP_SCREEN, IS_MOBILE_SCREEN} from "../../../../Utils/browser";
 import {DialogInfoSidebar} from "../../SidebarsNeo/Right/DialogInfo/DialogInfoSidebar";
 import nodeIf from "../../../../V/VRDOM/jsx/helpers/nodeIf";
 import {SearchBarComponent} from "./Search/SearchBarComponent";
@@ -145,7 +145,7 @@ class ChatComponent extends StatelessComponent {
 
                 </div>
                 <SnackbarComponent/>
-                {/*{nodeIf(<RightSidebars/>, isDesktop())}*/}
+                {/*{nodeIf(<RightSidebars/>, IS_DESKTOP_SCREEN}*/}
 
             </div>
         )
@@ -160,25 +160,25 @@ class ChatComponent extends StatelessComponent {
     }
 
     onRightSidebarOpen = () => {
-        if(isDesktop()) {
+        if(IS_DESKTOP_SCREEN) {
             this.chatRef.$el.classList.add("right-sidebar-open")
         }
     }
 
     onRightSidebarClosed = () => {
-        if(isDesktop()) {
+        if(IS_DESKTOP_SCREEN) {
             this.chatRef.$el.classList.remove("right-sidebar-open")
         }
     }
 
     onInfoOpen = () => {
-        if (isMobile()) {
+        if (IS_MOBILE_SCREEN) {
             this.$el.classList.toggle("fade-out", true)
         }
     }
 
     onInfoClosed = () => {
-        if (isMobile()) {
+        if (IS_MOBILE_SCREEN) {
             this.$el.classList.toggle("fade-out", false)
         }
     }
@@ -202,7 +202,7 @@ class ChatComponent extends StatelessComponent {
         this.deselecting = true
         this.$el.classList.toggle("shown", false)
         this.noChatRef.$el.style.display = ""
-        if (isDesktop()) {
+        if (IS_DESKTOP_SCREEN) {
             this.chatRef.$el.style.display = "none"
             this.chatRef.$el.classList.remove("responsive-selected-chat")
         }
@@ -214,20 +214,20 @@ class ChatComponent extends StatelessComponent {
         if (AppSelectedChat.isSelected) {
             this.$el.classList.toggle("shown", true)
             this.noChatRef.$el.style.display = "none"
-            if(isMobile()) {
+            if(IS_MOBILE_SCREEN) {
                 this.opening = true
                 this.messagesLoaderRef.$el.style.display = "block"
                 // AppSelectedChat.
             }
             // TODO delay for mobile
-            // if(isDesktop()) {
+            // if(IS_DESKTOP_SCREEN) {
             this.chatRef.$el.style.display = ""
             this.chatRef.$el.classList.add("responsive-selected-chat")
             // }
         } else {
             this.$el.classList.toggle("shown", false)
             this.noChatRef.$el.style.display = ""
-            if (isDesktop()) {
+            if (IS_DESKTOP_SCREEN) {
                 this.chatRef.$el.style.display = "none"
                 this.chatRef.$el.classList.remove("responsive-selected-chat")
             }
@@ -237,7 +237,7 @@ class ChatComponent extends StatelessComponent {
     }
 
     openSearch = () => {
-        if (isDesktop()) {
+        if (IS_DESKTOP_SCREEN) {
             UIEvents.Sidebars.fire("push", SearchSidebar)
         } else {
             UIEvents.General.fire("search.open")

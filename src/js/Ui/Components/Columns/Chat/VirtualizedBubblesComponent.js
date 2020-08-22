@@ -33,7 +33,7 @@ import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent
 import IntersectionObserver from 'intersection-observer-polyfill';
 import GroupMessage from "../../../../Api/Messages/GroupMessage"
 import {appendMessages, fixMessages, getMessageElement, prependMessages} from "./messagesUtils"
-import {isDesktop, isMobile} from "../../../Utils/utils";
+import {IS_DESKTOP_SCREEN, IS_MOBILE_SCREEN} from "../../../../Utils/browser";
 
 // there is no possibility nor time to calculate each message size
 class VirtualizedBubblesComponent extends StatelessComponent {
@@ -117,7 +117,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     }
 
     onChatOpenedMobile = (event) => {
-        if(isMobile()) {
+        if(IS_MOBILE_SCREEN) {
             this.isRequestedShowMessage = event.message
 
             if (AppSelectedChat.isSelected) {
@@ -132,7 +132,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         this.refresh();
         // if (event.message) {
 
-        if(isDesktop()) {
+        if(IS_DESKTOP_SCREEN) {
             this.isRequestedShowMessage = event.message
 
             if(!this.isRequestedShowMessage) {

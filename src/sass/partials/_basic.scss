@@ -58,6 +58,7 @@ img:not([src]) {
     height: 100%;
     // Only specific parts should be selectable
     user-select: none;
+    //-webkit-touch-callout: none;
     //-webkit-user-select: none; // NO NO NO, BREAKS SAFARI ON IOS
 
     #page-loader {
@@ -147,7 +148,7 @@ img:not([src]) {
 .no-select {
     user-select: none !important;
     -webkit-user-select: none !important;
-    -webkit-touch-callout: none !important;
+    //-webkit-touch-callout: none !important;
 }
 
 ::-webkit-scrollbar {
@@ -181,6 +182,7 @@ body {
 
 .scrollable {
     overflow-y: hidden;
+    pointer-events: auto;
 
     @media (max-width: 1000px) {
         overflow-y: auto;
@@ -199,6 +201,7 @@ body {
 
 .scrollable-x {
     overflow-x: hidden;
+    pointer-events: auto;
 
     @media (max-width: 1000px) {
         overflow-x: auto;

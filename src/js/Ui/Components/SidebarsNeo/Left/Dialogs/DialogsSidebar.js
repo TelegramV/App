@@ -8,7 +8,7 @@ import {SettingsSidebar} from "../Settings/SettingsSidebar";
 import {ArchivedSidebar} from "./ArchivedSidebar";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
-import {isMobile} from "../../../../Utils/utils";
+import {IS_MOBILE_SCREEN} from "../../../../../Utils/browser";
 import Locale from "../../../../../Api/Localization/Locale"
 import VirtualDialogsFolderList from "./VirtualDialogsFolderList"
 import {Folders} from "./Folders"
@@ -180,7 +180,7 @@ export class DialogsSidebar extends LeftSidebar {
     // }
 
     onChatSelect = _ => {
-        if (isMobile()) {
+        if (IS_MOBILE_SCREEN) {
             if (AppSelectedChat.isSelected) {
                 this.fadeOut()
                 // this.$el.classList.add("fade-out")
