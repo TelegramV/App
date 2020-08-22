@@ -235,6 +235,13 @@ export class DialogsSidebar extends LeftSidebar {
 
     onLeftButtonPressed = (event) => {
         if (this.searchOpen) {
+            this.setState({
+                inputValue: ""
+            })
+            UIEvents.Sidebars.fire("searchInputUpdated", {
+                string: ""
+            })
+            this.forceUpdate()
             this.$el.classList.toggle("back-button", false)
             this.searchOpen = false
             this.searchRef.component.close()

@@ -11,7 +11,7 @@ function Search({onInput, onFocus, lazyLevel, r, value, placeholder = "Search"},
                           }
                           onFocus={onFocus}
                           lazyLevel={lazyLevel}
-                          value/>
+                          value={value}/>
         <span className="tgico tgico-search"/>
         <div className="tgico tgico-close rp rps hidden" onClick={event => {
             event.target.parentNode.querySelector("input").value = ""
