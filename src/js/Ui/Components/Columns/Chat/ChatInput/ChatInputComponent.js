@@ -448,15 +448,16 @@ export class ChatInputComponent extends StatelessComponent {
         this.$el.querySelector(".send-button>.tgico-send").classList.add("hidden")
         this.$el.querySelector(".send-button>.tgico-microphone2").classList.remove("hidden")
 
+        // this.recorder.stop()
+        // this.microphone.getTracks().forEach((track) => {
+        //     track.stop();
+        //     this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
+        // });
+        // this.microphone = null
         this.recorder.stop()
-        this.microphone.getTracks().forEach((track) => {
-            track.stop();
-            this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
-        });
-        this.microphone = null
         this.recorder = null
-        this.audioContext.close()
-        this.audioContext = null
+        // this.audioContext.close()
+        // this.audioContext = null
 
     }
 
@@ -482,7 +483,7 @@ export class ChatInputComponent extends StatelessComponent {
                     duration: (+new Date() - this.recordingStarted) / 1000,
                     _: "documentAttributeAudio",
                     voice: true,
-                    waveform: convertBits(this.waveform, 8, 5)
+                    // waveform: convertBits(this.waveform, 8, 5)
                 },
                     {
                         _: "documentAttributeFilename",
@@ -498,45 +499,45 @@ export class ChatInputComponent extends StatelessComponent {
         this.$el.querySelector(".send-button>.tgico-send").classList.remove("hidden")
         this.$el.querySelector(".send-button>.tgico-microphone2").classList.add("hidden")
 
-        if (!this.microphone) {
+        if (!this.recorder) {
             import("../../../../../Utils/Recorder/Recorder").then(({default: Recorder}) => {
-                navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
-                    this.waveform = []
-                    const processInput = audioProcessingEvent => {
-                        // console.log(this.waveform)
-                        const tempArray = new Uint8Array(analyser.frequencyBinCount);
-
-                        analyser.getByteFrequencyData(tempArray);
-                        this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray) / 255 * 25 + 1, 4)})`
-                        this.waveform.push(Math.floor(getAverageVolume(tempArray) / 255 * 32))
-                    }
-
-                    const getAverageVolume = array => {
-                        const length = array.length;
-                        let values = 0;
-                        let i = 0;
-
-                        for (; i < length; i++) {
-                            values += array[i];
-                        }
-
-                        return values / length;
-                    }
-                    let AudioContext = window.AudioContext || window.webkitAudioContext;
-                    this.audioContext = new AudioContext();
-                    const input = this.audioContext.createMediaStreamSource(l);
-                    const analyser = this.audioContext.createAnalyser();
-                    const scriptProcessor = this.audioContext.createScriptProcessor();
-
-                    // Some analyser setup
-                    analyser.smoothingTimeConstant = 0.3;
-                    analyser.fftSize = 1024;
-
-                    input.connect(analyser);
-                    analyser.connect(scriptProcessor);
-                    scriptProcessor.connect(this.audioContext.destination);
-
-                    scriptProcessor.onaudioprocess = processInput;
+                // navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
+                //     this.waveform = []
+                    // const processInput = audioProcessingEvent => {
+                    //     // console.log(this.waveform)
+                    //     const tempArray = new Uint8Array(analyser.frequencyBinCount);
+                    //
+                    //     analyser.getByteFrequencyData(tempArray);
+                    //     this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray) / 255 * 25 + 1, 4)})`
+                    //     this.waveform.push(Math.floor(getAverageVolume(tempArray) / 255 * 32))
+                    // }
+                    //
+                    // const getAverageVolume = array => {
+                    //     const length = array.length;
+                    //     let values = 0;
+                    //     let i = 0;
+                    //
+                    //     for (; i < length; i++) {
+                    //         values += array[i];
+                    //     }
+                    //
+                    //     return values / length;
+                    // }
+                    // let AudioContext = window.AudioContext || window.webkitAudioContext;
+                    // this.audioContext = new AudioContext();
+                    // const input = this.audioContext.createMediaStreamSource(l);
+                    // const analyser = this.audioContext.createAnalyser();
+                    // const scriptProcessor = this.audioContext.createScriptProcessor();
+                    //
+                    // // Some analyser setup
+                    // analyser.smoothingTimeConstant = 0.3;
+                    // analyser.fftSize = 1024;
+                    //
+                    // input.connect(analyser);
+                    // analyser.connect(scriptProcessor);
+                    // scriptProcessor.connect(this.audioContext.destination);
+                    //
+                    // scriptProcessor.onaudioprocess = processInput;
 
                     this.recorder = new Recorder({
                         monitorGain: parseInt(0, 10),
@@ -547,7 +548,7 @@ export class ChatInputComponent extends StatelessComponent {
 
                     this.recorder.ondataavailable = l => this.onRecordingReady(l);
                     this.recorder.start()
-                    this.microphone = l
+                    // this.microphone = l
 
                     document.addEventListener("mouseup", l => this.onMouseUp(l))
                     this.$el.querySelector(".delete-button").classList.add("open")
@@ -559,7 +560,7 @@ export class ChatInputComponent extends StatelessComponent {
                     this.i = 0
                     this.tickTimer()
 
-                })
+                // })
             })
         }
         
