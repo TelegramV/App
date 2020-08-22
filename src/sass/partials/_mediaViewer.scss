@@ -187,12 +187,12 @@
                     align-items: center;
 
                     &.appear-previous {
-                        animation: mediaviewer-appear-previous 2500ms ease-in-out forwards;
+                        animation: mediaviewer-appear-previous 250ms ease-in-out forwards;
                     }
 
 
                     &.appear-next {
-                        animation: mediaviewer-appear-next 2500ms ease-in-out forwards;
+                        animation: mediaviewer-appear-next 250ms ease-in-out forwards;
                     }
 
 
@@ -224,7 +224,7 @@
                     }
 
                     &.previous {
-                        animation: mediaviewer-previous 2500ms ease-in-out forwards;
+                        animation: mediaviewer-previous 250ms ease-in-out forwards;
                         //transform: translate(-50vw, -50%);
                     }
 
@@ -238,7 +238,7 @@
                     }
 
                     &.next {
-                        animation: mediaviewer-next 2500ms ease-in-out forwards;
+                        animation: mediaviewer-next 250ms ease-in-out forwards;
                         //transform: translate(50vw, -50%);
                     }
 
