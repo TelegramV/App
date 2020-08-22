@@ -30,6 +30,7 @@ class GroupMessage extends AbstractMessage {
     constructor(message: Message) {
         super(message.dialogPeer);
 
+        this.jsDate = message.jsDate
         this.messages = new Set([message]);
     }
 

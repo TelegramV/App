@@ -201,8 +201,18 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     onScroll = (e) => {
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
-        const isAtBottom = Math.floor(scrollHeight - scrollTop) === clientHeight;
+        // +400 because otherwise it would load only 2 messages when scrolling down, which is weird
+        const isAtBottom = Math.floor(scrollHeight - scrollTop) <= clientHeight + 400;
         const isAtTop = scrollTop <= 400;
+
+        //
+        // if(this.smoothScrollingTo != null) {
+        //     if(Math.abs(this.smoothScrollingTo - scrollTop) <= 10) {
+        //         this.smoothScrollingTo = null
+        //     } else {
+        //         return
+        //     }
+        // }
 
         if (!isAtBottom) {
             UIEvents.General.fire("chat.scrollBottom.show");
@@ -403,8 +413,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
                     API.messages.getHistory(peer, {
                         offset_id: message.id,
-                        add_offset: -51,
-                        limit: 100
+                        add_offset: -21,
+                        limit: 40
                     }).then(Messages => {
                         AppEvents.Peers.fire("chat.showMessageReady", {
                             peer,
@@ -417,6 +427,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             }
 
             if ($message) {
+                // this.smoothScrollingTo = $message.offsetTop + ($message.clientHeight / 2 - this.$el.clientHeight / 2)
                 scrollToAndHighlight(this.$el, $message);
             } else {
                 console.warn("No message to scroll found.")

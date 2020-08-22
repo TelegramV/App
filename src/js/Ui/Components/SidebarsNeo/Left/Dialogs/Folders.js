@@ -38,7 +38,7 @@ const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0
     ])}>
         <span className="title">
             {title}
-            <span className={{"badge": true, "active": badge.active}}>{badge.count <= 0 ? "" : badge.count}</span>
+            <span className={{"badge": true, "active": badge.active}}>{badge.count <= 0 ? "" : (badge.count > 99 ? "99+" : badge.count)}</span>
         </span>
     </div>
 }

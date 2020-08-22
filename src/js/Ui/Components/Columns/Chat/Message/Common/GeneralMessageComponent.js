@@ -88,7 +88,7 @@ class GeneralMessageComponent extends TranslatableStatefulComponent<Props> {
         }
         if (!isOut && nextMessage === message) message.hideAvatar = false;
 
-        this.state.showDate = !isSameDate(message.date, prevMessage?.date)
+        this.state.showDate = !isSameDate(message.jsDate, prevMessage?.jsDate)
 
         this.forceUpdate();
     }
