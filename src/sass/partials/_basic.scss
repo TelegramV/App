@@ -148,6 +148,10 @@ img:not([src]) {
 .no-select {
     user-select: none !important;
     -webkit-user-select: none !important;
+    & * {
+        user-select: none !important;
+        -webkit-user-select: none !important;
+    }
     //-webkit-touch-callout: none !important;
 }
 
