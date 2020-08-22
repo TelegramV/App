@@ -3,7 +3,7 @@ import VSimpleLazyInput from "../../../../Elements/Input/VSimpleLazyInput";
 import DialogsManager from "../../../../../Api/Dialogs/DialogsManager";
 import {UnpatchableLeftSidebar} from "../UnpatchableLeftSidebar";
 import ArchivedDialogListComponent from "./Lists/ArchivedDialogListComponent";
-import {isMobile} from "../../../../Utils/utils";
+import {IS_MOBILE_SCREEN} from "../../../../../Utils/browser";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import UIEvents from "../../../../EventBus/UIEvents";
 import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
@@ -42,7 +42,7 @@ export class ArchivedSidebar extends LeftSidebar {
     }
 
     onChatSelect = _ => {
-        if(isMobile()) {
+        if(IS_MOBILE_SCREEN) {
             if (AppSelectedChat.isSelected && !this.$el.classList.contains("hidden")) {
                 console.log("fade out")
                 this.fadeOut()

@@ -1,6 +1,4 @@
-import {isSafari} from "./utils"
-
-const safari = isSafari();
+import {isWebpSupported} from "../../Utils/browser"
 
 class WebpHelper {
     webp = null;
@@ -9,7 +7,7 @@ class WebpHelper {
     pendingPromise = false;
 
     constructor() {
-    	if(safari) {
+    	if(!isWebpSupported()) {
 			import("webp-hero").then(({WebpMachine}) => this.webp = new WebpMachine());
 		}
     }
@@ -44,7 +42,7 @@ class WebpHelper {
     }
 
     shouldConvert() {
-    	return safari;
+    	return !isWebpSupported();
     }
 
     convertToPng(blob) {

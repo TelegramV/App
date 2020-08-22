@@ -8,10 +8,10 @@ import {SearchDateModal} from "../../../SidebarsNeo/Right/Search/SearchDateModal
 import SearchManager from "../../../../../Api/Search/SearchManager";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import {SearchMessage} from "../../../../../Api/Messages/SearchMessage";
-import {isSafari} from "../../../../Utils/utils"
+import {IS_SAFARI} from "../../../../../Utils/browser"
 
 let CURRENT_QUERY = undefined
-const KEYBOARD_DELAY = isSafari() ? 100 : 500;
+const KEYBOARD_DELAY = IS_SAFARI ? 100 : 500;
 // Only for mobile
 export class SearchBarComponent extends StatefulComponent {
     searchInputRef = VComponent.createComponentRef()

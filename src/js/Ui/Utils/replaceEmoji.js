@@ -7,9 +7,9 @@
 // const fa = BigInteger(Array.from(new Uint8Array(8)), 256)
 
 import twemoji from "twemoji"
-import { getOS } from "./utils"
+import { PLATFORM } from "../../Utils/browser"
 
-const isApple = ["mac", "ios"].includes(getOS());
+const isApple = ["mac", "ios"].includes(PLATFORM);
 
 //wrap emoji to allow styling
 twemoji.onerror = function() {

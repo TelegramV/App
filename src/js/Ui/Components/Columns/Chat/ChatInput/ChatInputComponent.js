@@ -1,4 +1,5 @@
-import {askForFile, convertBits, formatAudioTime, isMobile} from "../../../../Utils/utils";
+import {askForFile, convertBits, formatAudioTime} from "../../../../Utils/utils";
+import {IS_MOBILE_SCREEN} from "../../../../../Utils/browser"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import ComposerComponent from "./ComposerComponent"
 import SuggestionComponent from "./SuggestionComponent"
@@ -273,13 +274,13 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     mouseEnterEmoji = () => {
-        if (isMobile()) return;
+        if (IS_MOBILE_SCREEN) return;
         VApp.mountedComponents.get("composer").show();
         this.hideComposer = false;
     }
 
     mouseLeaveEmoji = () => {
-        if (isMobile()) return;
+        if (IS_MOBILE_SCREEN) return;
         this.hideComposer = true;
         this.planComposerClose()
     }
@@ -300,7 +301,7 @@ export class ChatInputComponent extends StatelessComponent {
     updateEmojiButton = () => {
         let composer = VApp.mountedComponents.get("composer");
         let button = this.$el.querySelector(".composer-button");
-        if (isMobile()) {
+        if (IS_MOBILE_SCREEN) {
             if (composer.visible) {
                 button.classList.remove("tgico-smile");
                 button.classList.add("tgico-keyboard");
