@@ -402,10 +402,13 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 if (messageIndex > -1) {
                     this.cleanupTree();
 
+                    const edgeSize = 20
+                    // console.log(messageIndex, messageIndex - this.mainVirtual.edgeSize, messageIndex + this.mainVirtual.edgeSize)
                     this.mainVirtual.currentPage = this.mainVirtual.messages
-                        .slice(Math.max(messageIndex - this.mainVirtual.edgeSize, 0), messageIndex + this.mainVirtual.edgeSize);
+                        .slice(Math.max(messageIndex - edgeSize, 0), messageIndex + edgeSize);
 
                     const messages = this.mainVirtual.currentPage;
+                    // console.log(messages)
 
                     this.prependMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
@@ -429,7 +432,9 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                     });
                 }
             }
-
+            // console.log($message, $message.getBoundingClientRect(), $message.nextSibling, $message.previousSibling)
+            // const messageIndex = this.mainVirtual.messages.findIndex(m => m.id === message.id);
+            // console.log("lol!", messageIndex, this.mainVirtual.currentPage.length)
             if ($message) {
                 // this.smoothScrollingTo = $message.offsetTop + ($message.clientHeight / 2 - this.$el.clientHeight / 2)
                 scrollToAndHighlight(this.$el, $message);
