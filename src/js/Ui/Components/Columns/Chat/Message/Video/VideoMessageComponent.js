@@ -14,6 +14,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
     state = {
         ...super.state,
         isMuted: true,
+        paused: true
     };
 
     render({message, showDate}, {isMuted}) {
@@ -33,6 +34,8 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                           UIEvents.MediaViewer.fire("showMessage", {message: this.props.message});
                                       }}
                                       autoPlay
+                                      paused={this.state.paused}
+                                      alwaysShowVideo
                                       infoContainer={
                                           ({currentTime, isHovered, url}, $el: HTMLVideoElement) => {
                                               const isPlaying = $el && !$el.paused;
@@ -126,6 +129,25 @@ class VideoMessageComponent extends GeneralMessageComponent {
         )
     }
 
+    onElementHidden() {
+        super.onElementHidden();
+        this.setState({
+            paused: true
+        })
+    }
+
+    onElementVisible() {
+        super.onElementVisible();
+        const document = this.props.message.raw.media.document
+        if(!FileManager.isDownloaded(document)) {
+            FileManager.downloadVideo(document)
+        }
+
+        this.setState({
+            paused: false
+        })
+
+    }
 }
 
 export default VideoMessageComponent;
