@@ -81,6 +81,7 @@ Recorder.prototype.initAudioContext = function (sourceNode) {
         this.closeAudioContext = true;
     }
 
+
     return this.audioContext;
 };
 
@@ -201,7 +202,7 @@ Recorder.prototype.setMonitorGain = function (gain) {
     }
 };
 
-Recorder.prototype.start = function (sourceNode) {
+Recorder.prototype.start = function (sourceNode, processInput = null) {
     if (this.state === "inactive") {
         this.initAudioContext(sourceNode);
         this.initAudioGraph();
@@ -210,6 +211,16 @@ Recorder.prototype.start = function (sourceNode) {
 
         return Promise.all([this.initSourceNode(sourceNode), this.initWorker()]).then((results) => {
             this.sourceNode = results[0];
+
+            this.analyser = this.audioContext.createAnalyser()
+            this.scriptProcessor = this.audioContext.createScriptProcessor();
+            this.analyser.smoothingTimeConstant = 0.3;
+            this.analyser.fftSize = 1024;
+            this.sourceNode.connect(this.analyser)
+            this.analyser.connect(this.scriptProcessor)
+            this.scriptProcessor.connect(this.audioContext.destination);
+            this.scriptProcessor.onaudioprocess = (a) => processInput(a, this.analyser);
+
             this.state = "recording";
             this.onstart();
             this.encoder.postMessage({command: 'getHeaderPages'});

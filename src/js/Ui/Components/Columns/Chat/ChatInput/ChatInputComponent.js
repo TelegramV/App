@@ -503,27 +503,26 @@ export class ChatInputComponent extends StatelessComponent {
         if (!this.recorder) {
             import("../../../../../Utils/Recorder/Recorder").then(({default: Recorder}) => {
                 // navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
-                //     this.waveform = []
-                    // const processInput = audioProcessingEvent => {
-                    //     // console.log(this.waveform)
-                    //     const tempArray = new Uint8Array(analyser.frequencyBinCount);
+                    this.waveform = []
+                    const processInput = (audioProcessingEvent, analyser) => {
+                        const tempArray = new Uint8Array(analyser.frequencyBinCount);
+
+                        analyser.getByteFrequencyData(tempArray);
+                        this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray) / 255 * 25 + 1, 4)})`
+                        this.waveform.push(Math.floor(getAverageVolume(tempArray) / 255 * 32))
+                    }
                     //
-                    //     analyser.getByteFrequencyData(tempArray);
-                    //     this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray) / 255 * 25 + 1, 4)})`
-                    //     this.waveform.push(Math.floor(getAverageVolume(tempArray) / 255 * 32))
-                    // }
-                    //
-                    // const getAverageVolume = array => {
-                    //     const length = array.length;
-                    //     let values = 0;
-                    //     let i = 0;
-                    //
-                    //     for (; i < length; i++) {
-                    //         values += array[i];
-                    //     }
-                    //
-                    //     return values / length;
-                    // }
+                    const getAverageVolume = array => {
+                        const length = array.length;
+                        let values = 0;
+                        let i = 0;
+
+                        for (; i < length; i++) {
+                            values += array[i];
+                        }
+
+                        return values / length;
+                    }
                     // let AudioContext = window.AudioContext || window.webkitAudioContext;
                     // this.audioContext = new AudioContext();
                     // const input = this.audioContext.createMediaStreamSource(l);
@@ -548,7 +547,7 @@ export class ChatInputComponent extends StatelessComponent {
                     });
 
                     this.recorder.ondataavailable = l => this.onRecordingReady(l);
-                    this.recorder.start()
+                    this.recorder.start(null, processInput)
                     // this.microphone = l
 
                     document.addEventListener("mouseup", l => this.onMouseUp(l))
