@@ -12,6 +12,7 @@ import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer"
 import API from "../../../../../../Api/Telegram/API"
 import PeerName from "../../../../Reactive/PeerName"
 import AppSelectedChat from "../../../../../Reactive/SelectedChat"
+import {copyTextToClipboard} from "../../../../../../Utils/clipboard"
 
 function ReplyToMessageFragment({message}) {
     if (!message.raw.reply_to_msg_id) {
@@ -47,7 +48,10 @@ function createContextMenu(message) {
         },
         {
             icon: "copy",
-            title: "Copy"
+            title: "Copy",
+            onClick: _ => {
+                copyTextToClipboard(message.text)
+            }
         },
         {
             icon: _ => message.isPinned ? "unpin" : "pin",

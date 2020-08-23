@@ -34,6 +34,7 @@ import {FileAPI} from "../../../Api/Files/FileAPI"
 import {MessageType} from "../../../Api/Messages/Message"
 import VUI from "../../VUI"
 import {getNewlines} from "../../../Utils/htmlHelpers"
+import {copyBlobToClipboard} from "../../../Utils/clipboard"
 
 function MediaSpinnerFragment({icon}) {
     return <VSpinner white>
@@ -146,6 +147,14 @@ export class MediaViewerComponent extends StatefulComponent {
                 onClick: () => {
                     UIEvents.General.fire("message.forward", {message, from: message.dialog.peer})
                 }
+            })
+        }
+
+        if(message?.media?._ === "photo" && window.navigator.clipboard) {
+            contextActions.push({
+                icon: "copy",
+                title: "Copy",
+                onClick: this.copyMedia
             })
         }
 
@@ -283,6 +292,20 @@ export class MediaViewerComponent extends StatefulComponent {
             url,
             DocumentMessagesTool.getFilename(f.attributes, uid)
         )
+    }
+
+    copyMedia = () => {
+        const message = this.state.message;
+        if(!message) return;
+
+        const image = message.raw.media.photo;
+        if(!image) return;
+
+        const downloaded = FileManager.isDownloaded(image)
+        if (!downloaded) return;
+
+        const url = FileManager.getUrl(image);
+        fetch(url).then(response => response.blob()).then(blob => copyBlobToClipboard(blob));
     }
 
     onKeyDown = event => {

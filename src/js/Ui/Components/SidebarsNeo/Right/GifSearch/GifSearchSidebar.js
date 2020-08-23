@@ -61,11 +61,9 @@ export class GifSearchSidebar extends RightSidebar {
     }
 
     loadMore = () => {
-    	console.log("scroll", this.loadingMore, this.state.nextOffset)
     	if(this.loadingMore || this.state.nextOffset === undefined) return; // no next offset
 
     	this.loadingMore = true;
-    	console.log("loading more")
     	InlineBotManager.searchGifs(AppSelectedChat.current.inputPeer, this.state.query, this.state.nextOffset).then(found => {
     		if(this.state.query === "") {
     			this.setState({

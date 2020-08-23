@@ -27,7 +27,7 @@ class LongtapVRDOMPlugin extends VRDOMPlugin {
                 let timeout = setTimeout(_ => {
                     // cancel next click, to fix Android
                     $el.addEventListener('touchend', function cancelClick(e) {
-                        element.removeEventListener('touchend', cancelClick, true);
+                        $el.removeEventListener('touchend', cancelClick, true);
                         e.stopImmediatePropagation();
                         e.preventDefault();
                         e.stopPropagation();
