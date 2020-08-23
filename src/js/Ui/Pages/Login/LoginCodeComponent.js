@@ -17,13 +17,13 @@
  *
  */
 
-import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent"
 import loginState from "./LoginState"
 import {VInputValidate} from "../../Elements/Input/VInput"
 import VComponent from "../../../V/VRDOM/component/VComponent"
 import API from "../../../Api/Telegram/API"
 
-class LoginCodeComponent extends StatefulComponent {
+class LoginCodeComponent extends TranslatableStatefulComponent {
     globalState = {
         login: loginState,
     };
@@ -38,6 +38,17 @@ class LoginCodeComponent extends StatefulComponent {
     render(props, {codeError, code}, {login}) {
         const {phone} = login;
 
+        const codeType = loginState.sentCode.type;
+        let sentCodeText = "We have sent you the code"
+        switch(codeType._) {
+            case "auth.sentCodeTypeApp":
+                sentCodeText = this.l("lng_code_telegram")
+            break;
+            case "auth.sentCodeTypeSms":
+                sentCodeText = this.l("lng_code_desc")
+                break;
+        }
+
         return (
             <div className="panel">
                 <div id="monkey" css-width="150px" css-height="150px" ref={this.monkeyRef} className="object"/>
@@ -48,13 +59,15 @@ class LoginCodeComponent extends StatefulComponent {
                         <i className="btn-icon rp rps tgico tgico-edit" onClick={this.setPhoneState}/>
                     </span>
                     <span className="login-page-header-subtitle">
-                        We have sent you an SMS with the code.
+                        {sentCodeText}
                     </span>
                 </div>
 
                 <form className="login-page-inputs">
-                    <VInputValidate label="Code"
-                                    type="number"
+                    <VInputValidate label={this.l("lng_code_ph")}
+                                    type="text"
+                                    inputmode="numeric"
+                                    pattern="[0-9]*"
                                     value={code}
                                     filter={this.filterCode}
                                     error={codeError}

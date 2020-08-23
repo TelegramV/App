@@ -17,7 +17,7 @@
  *
  */
 
-import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent"
 import loginState from "./LoginState"
 import {VInputPassword} from "../../Elements/Input/VInput"
 import VComponent from "../../../V/VRDOM/component/VComponent"
@@ -25,7 +25,7 @@ import API from "../../../Api/Telegram/API"
 import VButton from "../../Elements/Button/VButton"
 import MTProto from "../../../MTProto/External"
 
-class LoginPasswordComponent extends StatefulComponent {
+class LoginPasswordComponent extends TranslatableStatefulComponent {
     globalState = {
         login: loginState,
     };
@@ -39,21 +39,25 @@ class LoginPasswordComponent extends StatefulComponent {
     monkeyRef = VComponent.createRef();
 
     render(props, {password, isLoading, passwordError}, {login}) {
+        const label = login.accountPassword?.hint ? 
+                this.l("lng_signin_hint", {password_hint: login.accountPassword?.hint}) 
+                : 
+                this.l("lng_signin_password")
         return (
             <div className="panel">
                 <div id="monkey" css-width="150px" css-height="150px" ref={this.monkeyRef} className="object"/>
 
                 <div className="login-page-header">
                     <span className="login-page-header-title">
-                        Enter a Password
+                        {this.l("lng_signin_title")}
                     </span>
                     <span className="login-page-header-subtitle">
-                        Your account is protected with an additional password.
+                        {this.l("lng_signin_desc")}
                     </span>
                 </div>
 
                 <form onSubmit={login.accountPassword && this.onSubmitPassword} className="login-page-inputs">
-                    <VInputPassword label={login.accountPassword?.hint || "Password"}
+                    <VInputPassword label={label}
                                     value={password}
                                     onInput={this.onInputPassword}
                                     onShownUpdate={this.onShownUpdate}
@@ -64,7 +68,7 @@ class LoginPasswordComponent extends StatefulComponent {
                              isLoading={isLoading}
                              type="submit"
                              disabled={!login.accountPassword || isLoading}>
-                        {isLoading ? "Please wait..." : "Next"}
+                        {isLoading ? "Please wait..." : this.l("lng_intro_submit")}
                     </VButton>
                 </form>
             </div>

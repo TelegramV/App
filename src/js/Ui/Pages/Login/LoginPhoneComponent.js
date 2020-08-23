@@ -17,7 +17,7 @@
  *
  */
 
-import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent"
 import loginState from "./LoginState"
 import logo from "../../../../../public/static/images/loginlogo.svg"
 import {VInputDropdown, VInputValidate} from "../../Elements/Input/VInput"
@@ -36,7 +36,7 @@ const CountryDropdownItemFragment = ({flag, name, code, onMouseDown}) => {
     </div>
 }
 
-class LoginPhoneComponent extends StatefulComponent {
+class LoginPhoneComponent extends TranslatableStatefulComponent {
     globalState = {
         login: loginState,
     };
@@ -75,14 +75,14 @@ class LoginPhoneComponent extends StatefulComponent {
                 <div className="login-page-header">
                     <span className="login-page-header-title">Sign in to Telegram</span>
                     <span className="login-page-header-subtitle">
-                        Please confirm your country and enter your phone number.
+                        {this.l("lng_phone_desc", {}, "Please confirm your country and enter your phone number.")}
                     </span>
                 </div>
 
                 <VButton isUppercase={false} onClick={event => {
                     event.preventDefault();
                     loginState.setQRView();
-                }} isFlat>Or try login using QR-code</VButton>
+                }} isFlat>{this.l("lng_phone_to_qr", {}, "Quick log in using QR code")}</VButton>
 
                 {false /*remove to enable*/ && <VButton isUppercase={false} onClick={event => {
                     event.preventDefault();
@@ -90,14 +90,14 @@ class LoginPhoneComponent extends StatefulComponent {
                 }} isFlat>Beep-boop, I am bot</VButton> }
 
                 <form onSubmit={canSubmit && this.onSendPhoneClick} className="login-page-inputs">
-                    <VInputDropdown label="Country"
+                    <VInputDropdown label={this.l("lng_country_select", {}, "Select Country")}
                                     items={countries}
                                     filter={this.countryFilter}
                                     template={this.countryTemplate}
                                     currentValue={country?.name}
                                     ref={this.countryDropdownRef}/>
 
-                    <VInputValidate label="Phone number"
+                    <VInputValidate label={this.l("lng_phone_title", {}, "Your Phone Number")}
                                     type="tel"
                                     onInput={this.onPhoneInput}
                                     value={phone}
@@ -115,7 +115,7 @@ class LoginPhoneComponent extends StatefulComponent {
                              type="submit"
                              css-opacity={!isValid && "0"}
                              disabled={!canSubmit}>
-                        {isLoading ? "Please wait..." : "Next"}
+                        {isLoading ? "Please wait..." : this.l("lng_intro_next", {}, "Next")}
                     </VButton>
                 </form>
             </div>

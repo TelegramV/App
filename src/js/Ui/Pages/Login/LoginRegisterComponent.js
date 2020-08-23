@@ -17,7 +17,7 @@
  *
  */
 
-import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent"
 import loginState from "./LoginState"
 import VInput from "../../Elements/Input/VInput"
 import VButton from "../../Elements/Button/VButton"
@@ -26,7 +26,7 @@ import VUI from "../../VUI"
 import API from "../../../Api/Telegram/API"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 
-class LoginRegisterComponent extends StatefulComponent {
+class LoginRegisterComponent extends TranslatableStatefulComponent {
     globalState = {
         login: loginState,
     };
@@ -56,20 +56,20 @@ class LoginRegisterComponent extends StatefulComponent {
 
                 <div className="login-page-header">
                     <span className="login-page-header-title">
-                        Your name
+                        {this.l("lng_signup_title")}
                     </span>
                     <span className="login-page-header-subtitle">
-                        Enter your name and add a profile picture
+                        {this.l("lng_signup_desc")}
                     </span>
                 </div>
 
                 <form onSubmit={event => event.preventDefault()} className="login-page-inputs">
-                    <VInput label="Name"
+                    <VInput label={this.l("lng_signup_firstname")}
                             value={name}
                             error={nameError}
                             onInput={this.onInputName}/>
 
-                    <VInput label="Last Name (optional)"
+                    <VInput label={this.l("lng_signup_lastname")}
                             value={lastName}
                             error={lastNameError}
                             onInput={this.onInputLastName}/>
@@ -79,7 +79,7 @@ class LoginRegisterComponent extends StatefulComponent {
                              disabled={isLoading || null}
                              type="submit"
                              onClick={this.onClickSignUp}>
-                        {isLoading ? "Please wait..." : "Start messaging"}
+                        {isLoading ? "Please wait..." : this.l("lng_start_msgs")}
                     </VButton>
                 </form>
             </div>

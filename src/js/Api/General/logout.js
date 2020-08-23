@@ -1,11 +1,13 @@
 import keval from "../../Keval/keval"
 import AppCache from "../Cache/AppCache"
 import API from "../Telegram/API"
+import Settings from "../Settings/Settings"
 
 export function logout() {
 
     keval.auth.clear()
     keval.clear()
+    Settings.clear()
     if (AppCache.isReady) {
         indexedDB.deleteDatabase("cache");
     }

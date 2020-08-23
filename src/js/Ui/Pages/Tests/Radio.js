@@ -18,6 +18,7 @@
 import VRadio from "../../Elements/Input/VRadio"
 import VCheckbox from "../../Elements/Input/VCheckbox"
 import VButton from "../../Elements/Button/VButton"
+import {VInputValidate} from "../../Elements/Input/VInput"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 
 export default function RadioButtonPage() {
@@ -43,6 +44,13 @@ class RadioTest extends StatefulComponent {
                 <VCheckbox checked={checked} input={event => {
                     event.preventDefault();
                 }}/>
+
+                <VInputValidate label="testing"
+                                type="text"
+                                inputmode="numeric"
+                                pattern="[0-9]*"
+                                value={123}/>
+
                 <VButton onClick={() => {
                     this.setState({
                         checked: true

@@ -32,6 +32,7 @@ function VInput(
         onInput,
         onKeyPress,
         onFocus,
+        pattern,
         onBlur,
         value,
         autoFocus,
@@ -80,6 +81,7 @@ function VInput(
                    autoFocus={autoFocus}
                    maxLength={maxLength}
                    onKeyDown={onKeyDown}
+                   pattern={pattern}
                    tabindex="-1"
             />
 

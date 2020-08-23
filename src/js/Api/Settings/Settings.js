@@ -70,7 +70,7 @@ class Settings {
     	return keval.setItem("settings", this.settings);
     }
 
-    fullClear() {
+    clear() {
         this.settings = {}
         this.save();
     }

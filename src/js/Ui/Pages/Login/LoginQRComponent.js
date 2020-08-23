@@ -17,7 +17,7 @@
  *
  */
 
-import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent"
 import loginState from "./LoginState"
 import VSpinner from "../../Elements/VSpinner"
 import VComponent from "../../../V/VRDOM/component/VComponent"
@@ -25,7 +25,7 @@ import API from "../../../Api/Telegram/API"
 import MTProto from "../../../MTProto/External"
 import VButton from "../../Elements/Button/VButton"
 
-class LoginQRComponent extends StatefulComponent {
+class LoginQRComponent extends TranslatableStatefulComponent {
     globalState = {
         login: loginState,
     };
@@ -36,26 +36,27 @@ class LoginQRComponent extends StatefulComponent {
 
     containerRef = VComponent.createRef(); // TODO: ref is not connecting, fix it!
 
-    render(props, {isLoading}, {login}) {
+    render(props, { isLoading }, { login }) {
         return (
             <div className="panel fading-block fade-in">
-                <div className="login-page-header">
+                <div className="qr-back-button">
                     <VButton isRound
                              isStatic
                              onClick={() => loginState.setPhoneInputView()}>
                         <i class="tgico tgico-back"/>
                     </VButton>
-
-                    <span className="login-page-header-subtitle" style="text-align: left;">
-                        <ol>
-                            <li>Open Telegram on your phone</li>
-                            <li>Go to <b>Settings -> Devices -> Scan QR Code</b></li>
-                            <li>Scan this image to Log In</li>
-                        </ol>
-                    </span>
                 </div>
 
                 <div id="qr-container" ref={this.containerRef}>{isLoading && <VSpinner/>}</div>
+
+                <span className="qr-login-header">{this.l("lng_intro_qr_title", {}, "Scan From Mobile Telegram")}</span>
+                <span className="login-page-header-subtitle" style="text-align: left;">
+                    <ol>
+                        <li>{this.l("lng_intro_qr_step1", {}, "Open Telegram on your phone")}</li>
+                        <li>{this.l("lng_intro_qr_step2", {}, "Go to Settings > Devices > Scan QR")}</li>
+                        <li>{this.l("lng_intro_qr_step3", {}, "Scan this image to Log In")}</li>
+                    </ol>
+                </span>
             </div>
         )
     }
@@ -126,7 +127,7 @@ class LoginQRComponent extends StatefulComponent {
         this.containerRef.$el?.appendChild($canvas);
     }
 
-    createQrCanvas = (data): Promise<HTMLCanvasElement> => {
+    createQrCanvas = (data): Promise < HTMLCanvasElement > => {
         return import("qr-code-styling").then(QRCodeStyling => {
             return new QRCodeStyling.default({
                 width: 240,

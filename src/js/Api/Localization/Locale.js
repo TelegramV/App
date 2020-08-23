@@ -85,6 +85,8 @@ class Locale {
 			found = value[this.countToPluralCode(count)] || value.other; 
 		}
 
+		found = found.split(/ *\[[^\]]*]/).join(" "); // FIXME We don't support HTML tags in [], removing them
+
 		for(let replace in replaces) {
 			//replacement could be: String, Replacement, VRNode
 			let replacement = replaces[replace];
