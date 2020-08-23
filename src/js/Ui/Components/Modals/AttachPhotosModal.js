@@ -48,7 +48,7 @@ class GalleryFragment extends StatelessComponent {
     }
 
     isVideo = (blob) => {
-        return blob.type.includes("video"); // TODO better testing for other video formats
+        return blob.type?.includes("video"); // TODO better testing for other video formats
     }
 
     addMedia = (blob) => {

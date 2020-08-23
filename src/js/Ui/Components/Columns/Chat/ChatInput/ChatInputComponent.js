@@ -246,7 +246,7 @@ export class ChatInputComponent extends StatelessComponent {
                 const k = ev.dataTransfer.items[i]
                 // console.log(k)
                 if (k.type.indexOf("image") === -1) continue
-                this.pickPhoto(URL.createObjectURL(k.getAsFile()))
+                this.pickMedia(k.getAsFile())
             }
             ev.preventDefault()
         })

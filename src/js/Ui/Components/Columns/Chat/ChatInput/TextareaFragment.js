@@ -131,8 +131,6 @@ export class TextareaFragment extends TranslatableStatelessComponent {
 
 
     onPaste = (ev) => {
-
-
         // this.$el.focus()
 
         if (this.$el === document.activeElement) {
@@ -142,13 +140,13 @@ export class TextareaFragment extends TranslatableStatelessComponent {
 
             document.execCommand("insertText", false, text)
         }
-
-        for (let i = 0; i < ev.clipboardData.items.length; i++) {
+        const item = Array.from(ev.clipboardData.items).find(el => el.type.includes("image"));
+        if(item) this.parent.pickMedia(item.getAsFile())
+        /*for (let i = 0; i < ev.clipboardData.items.length; i++) {
             const k = ev.clipboardData.items[i]
-            console.log(k.type)
             if (k.type.indexOf("image") === -1) continue
-            this.parent.pickPhoto(URL.createObjectURL(k.getAsFile()))
-        }
+            this.parent.pickMedia(k.getAsFile())
+        }*/
     }
 
 
