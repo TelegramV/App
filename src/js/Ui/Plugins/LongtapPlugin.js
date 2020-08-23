@@ -58,7 +58,6 @@ class LongtapVRDOMPlugin extends VRDOMPlugin {
     }
 
     cancel = ($el) => {
-        console.log("cancel")
         const timeout = $el.getAttribute("longtap-timeout");
         if (timeout) {
             clearTimeout(Number.parseInt(timeout));
