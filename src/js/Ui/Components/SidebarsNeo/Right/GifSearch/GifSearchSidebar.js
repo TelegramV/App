@@ -6,6 +6,7 @@ import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
 import InlineBotManager from "../../../../../Api/Bots/InlineBotManager"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import FileManager from "../../../../../Api/Files/FileManager";
+import Settings from "../../../../../Api/Settings/Settings"
 import "./GifSearchSidebar.scss"
 
 export class GifSearchSidebar extends RightSidebar {
@@ -18,6 +19,8 @@ export class GifSearchSidebar extends RightSidebar {
         found: [],
         nextOffset: "",
 
+        suggestions: [],
+
         paused: []
     }
 
@@ -26,13 +29,20 @@ export class GifSearchSidebar extends RightSidebar {
         let emptyText = this.state.query && !this.loading ? "Nothing found..." : "Loading...";
         return <this.contentWrapper onScroll={this.onScroll}>
             <div class="gif-search">
-            	<div class="gif-grid">
-	                {sets?.map(searchResult => <GifFragment document={searchResult.document} 
-							                	observer={this.observer} 
-							                	paused={this.state.pausedAll || this.state.paused[searchResult.document.id]}
-							                	/>
-					)}
-				</div>
+                <div class="gif-suggestions scrollable-x hide-scroll">
+                    {this.state.suggestions.map(emoji => <div class="gif-suggestion rp" onClick={() => {
+                        this.fetchGifs(emoji)
+                    }}>{emoji}</div>)}
+                </div>
+                <div class="scrollable">
+                	<div class="gif-grid">
+    	                {sets?.map(searchResult => <GifFragment document={searchResult.document} 
+    							                	observer={this.observer} 
+    							                	paused={this.state.pausedAll || this.state.paused[searchResult.document.id]}
+    							                	/>
+    					)}
+    				</div>
+                </div>
                 {sets.length === 0 && <div class="nothing">{emptyText}</div>}
             </div>
         </this.contentWrapper>
@@ -45,6 +55,12 @@ export class GifSearchSidebar extends RightSidebar {
             // rootMargin: "0p",
             threshold: 0.2,
         });
+        Settings.initPromise.then(() => {
+            this.setState({
+                suggestions: Settings.get("app_config.gif_search_emojies")
+            })
+        })
+
     }
 
     componentDidUpdate() {
@@ -137,27 +153,29 @@ export class GifSearchSidebar extends RightSidebar {
 
         if (q === this.state.query) return;
 
+        this.fetchGifs(q);
+    }
+
+    fetchGifs(query) {
         this.loading = true;
         // gifs have patch bugs, better to reset them
         this.setState({
             query: "",
             nextOffset: "",
             found: [],
-            query: q,
+            query: query,
         })
 
-        InlineBotManager.searchGifs(AppSelectedChat.current.inputPeer, q, this.state.nextOffset).then(found => {
-            if (event.target.value.trim() !== q) return; //something changed while searching, cancel patch
+        InlineBotManager.searchGifs(AppSelectedChat.current.inputPeer, query, this.state.nextOffset).then(found => {
+            if (this.state.query !== query) return; //something changed while searching, cancel patch
 
             this.setState({
-                query: q,
                 found: found.results,
                 nextOffset: found.next_offset
             })
-            this.searchInputRef.component.$el.value = q
+            this.searchInputRef.component.$el.value = query
             this.loading = false;
         })
-
     }
 }
 
