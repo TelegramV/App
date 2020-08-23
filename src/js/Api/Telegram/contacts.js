@@ -20,7 +20,7 @@
 import MTProto from "../../MTProto/External"
 import PeersManager from "../Peers/PeersManager"
 
-const getTopPeers = (params = {}) => {
+function getTopPeers(params = {}) {
     return MTProto.invokeMethod("contacts.getTopPeers", params).then(TopPeers => {
         PeersManager.fillPeersFromUpdate(TopPeers)
 
@@ -28,8 +28,18 @@ const getTopPeers = (params = {}) => {
     })
 }
 
+function resolveUsername(username) {
+	return MTProto.invokeMethod("contacts.resolveUsername",{
+		username
+	}).then(resolved => {
+        return PeersManager.fillPeersFromUpdate(resolved)
+    })
+	
+}
+
 const contacts = {
-    getTopPeers: getTopPeers
+    getTopPeers,
+    resolveUsername,
 }
 
 export default contacts

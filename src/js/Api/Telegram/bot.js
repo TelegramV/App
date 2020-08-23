@@ -17,24 +17,20 @@
  *
  */
 
-import auth from "./auth"
-import messages from "./messages"
-import contacts from "./contacts"
-import upload from "./upload"
-import channels from "./channels"
-import account from "./account"
-import langpack from "./langpack"
-import bot from "./bot"
+import MTProto from "../../MTProto/External"
 
-const API = {
-    auth,
-    account,
-    messages,
-    channels,
-    contacts,
-    upload,
-    lang: langpack,
-    bot,
+function getInlineBotResults(bot, chatPeer, query="", offset=0, geo_point = null) {
+    return MTProto.invokeMethod("messages.getInlineBotResults", {
+        bot,
+        peer: chatPeer,
+        query, 
+        geo_point,
+        offset
+    })
 }
 
-export default API
+const bot = {
+    getInlineBotResults,
+}
+
+export default bot

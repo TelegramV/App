@@ -4,6 +4,7 @@ import {DialogInfoSidebar} from "./DialogInfo/DialogInfoSidebar";
 import {PollResultsSidebar} from "./Poll/PollResultsSidebar";
 import {RightSidebar} from "./RightSidebar";
 import {StickerSearchSidebar} from "./StickerSearch/StickerSearchSidebar";
+import {GifSearchSidebar} from "./GifSearch/GifSearchSidebar";
 import UIEvents from "../../../EventBus/UIEvents";
 
 export class RightSidebars extends GenericSidebarHistory {
@@ -12,6 +13,7 @@ export class RightSidebars extends GenericSidebarHistory {
             <div className="sidebar-wrapper right hidden">
                 <PollResultsSidebar/>
                 <StickerSearchSidebar/>
+                <GifSearchSidebar/>
                 <SearchSidebar/>
                 <DialogInfoSidebar/>
             </div>

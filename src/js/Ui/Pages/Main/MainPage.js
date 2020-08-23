@@ -24,6 +24,7 @@ import {RightSidebars} from "../../Components/SidebarsNeo/Right/RightSidebars"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf";
 import AudioPlayerComponent from "../../Components/Singleton/AudioPlayerComponent"
 import ConfettiComponent from "../../Components/Singleton/ConfettiComponent"
+import InlineBotApi from "../../../Api/Bots/InlineBotManager"
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -37,6 +38,7 @@ function initHighLevelManagers() {
     })
 
     StickerManager.fetchSpecialSets();
+    InlineBotApi.init();
     WallpaperManager.init();
     FoldersManager.init()
     EmojiLangpack.init();

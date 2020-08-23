@@ -6,6 +6,7 @@ import UIEvents from "../../../../EventBus/UIEvents"
 import GifsComposerComponent from "./GifsComposerComponent"
 import {ChatInputManager} from "./ChatInputComponent"
 import {StickerSearchSidebar} from "../../../SidebarsNeo/Right/StickerSearch/StickerSearchSidebar"
+import {GifSearchSidebar} from "../../../SidebarsNeo/Right/GifSearch/GifSearchSidebar"
 
 export default class ComposerComponent extends StatelessComponent {
     identifier = "composer";
@@ -26,7 +27,7 @@ export default class ComposerComponent extends StatelessComponent {
                 </div>
                 <div className="composer-tab-selector">
                     <div css-visibility="hidden" id="composer-stickers-search-button" 
-                        className="item rp rps" onClick={this.onClickOpenStickerSearch}>
+                        className="item rp rps" onClick={this.openSearch}>
                         <i className="tgico tgico-search"/>
                     </div>
                     <div class="filler"/>
@@ -90,7 +91,7 @@ export default class ComposerComponent extends StatelessComponent {
         document.getElementById("composer-stickers-search-button").style.visibility = "hidden";
         document.getElementById("composer-emoji-backspace-button").style.visibility = "hidden";
 
-        if (name === "stickers") {
+        if (name === "stickers" || name === "gif") {
             document.getElementById("composer-stickers-search-button").style.visibility = "visible";
         }
 
@@ -133,8 +134,14 @@ export default class ComposerComponent extends StatelessComponent {
         this.togglePanel("gif");
     }
 
-    onClickOpenStickerSearch = () => {
-        UIEvents.Sidebars.fire("push", StickerSearchSidebar)
+    openSearch = () => {
+        const name = this.stateless.panel;
+        if(name === "stickers") {
+            UIEvents.Sidebars.fire("push", StickerSearchSidebar)
+        }
+        if(name === "gif") {
+            UIEvents.Sidebars.fire("push", GifSearchSidebar)
+        }
     }
 
     onBackspaceClick = () => {

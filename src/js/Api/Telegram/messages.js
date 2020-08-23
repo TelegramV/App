@@ -227,6 +227,13 @@ function getPollVotes(message, option = null, offset = null, limit = 42) {
     })
 }
 
+function saveGif(document, unsafe=false) {
+    return MTProto.invokeMethod("messages.saveGif", {
+        id: document,
+        unsafe
+    });
+}
+
 const messages = {
     getDialogs: getDialogs,
     getPeerDialogs: getPeerDialogs,
@@ -248,6 +255,7 @@ const messages = {
     closePoll: closePoll,
     getPollResults: getPollResults,
     getPollVotes: getPollVotes,
+    saveGif: saveGif,
 }
 
 export default messages
