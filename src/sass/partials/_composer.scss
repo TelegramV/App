@@ -110,6 +110,7 @@
                     padding: 5px;
                     margin: 0 -5px;
                     border-radius: 5px;
+                    user-select: none;
 
                     &:hover {
                         background-color: $light;

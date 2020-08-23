@@ -58,6 +58,9 @@ img:not([src]) {
     height: 100%;
     // Only specific parts should be selectable
     user-select: none;
+    * {
+        cursor: pointer;
+    }
     //-webkit-touch-callout: none;
     //-webkit-user-select: none; // NO NO NO, BREAKS SAFARI ON IOS
 
@@ -148,11 +151,10 @@ img:not([src]) {
 .no-select {
     user-select: none !important;
     -webkit-user-select: none !important;
-    & * {
-        user-select: none !important;
-        -webkit-user-select: none !important;
+    -webkit-user-callout: none !important;
+    img {
+        pointer-events: none; // disable image context menu on IOS
     }
-    //-webkit-touch-callout: none !important;
 }
 
 ::-webkit-scrollbar {

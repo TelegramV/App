@@ -16,6 +16,12 @@
     align-items: center;
 }
 
+@mixin user-select($value) {
+    user-select: $value;
+    -webkit-user-select: $value;
+    -moz-user-select: $value;
+}
+
 @function anim($elem, $time: 150ms) {
     @return $time ease-in-out $elem;
 }
