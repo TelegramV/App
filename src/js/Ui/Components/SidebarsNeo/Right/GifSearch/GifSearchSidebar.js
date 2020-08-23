@@ -60,12 +60,15 @@ export class GifSearchSidebar extends RightSidebar {
     }
 
     loadMore = () => {
+    	if(this.loadingMore || this.state.nextOffset === undefined) return; // no next offset
+    	this.loadingMore = true;
     	InlineBotManager.searchGifs(AppSelectedChat.current.inputPeer, this.state.query, this.state.nextOffset).then(found => {
     		this.setState({
     			found: this.state.found.concat(found.results),
     			nextOffset: found.nextOffset,
     			pausedAll: false
     		})
+    		this.loadingMore = false;
     	})
     }
 
@@ -124,14 +127,13 @@ export class GifSearchSidebar extends RightSidebar {
 
         if (q === this.state.query) return;
 
-        if (q === "" && this.state.query !== "") { //reset to featured
-            this.setState({
-                query: "",
-                next_offset: 0,
-                found: []
-            })
-            return;
-        }
+        // gifs have patch bugs, better to reset them
+        this.setState({
+            query: "",
+            next_offset: 0,
+            found: [],
+            query: q,
+        })
 
         InlineBotManager.searchGifs(AppSelectedChat.current.inputPeer, q, this.state.nextOffset).then(found => {
             if (event.target.value.trim() !== q) return; //something changed while searching, cancel patch

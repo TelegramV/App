@@ -1,9 +1,9 @@
-import {RightSidebar} from "../RightSidebar";
+import { RightSidebar } from "../RightSidebar";
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import messages from "../../../../../Api/Telegram/messages"
 import VButton from "../../../../Elements/Button/VButton"
 import StickerSet from "../../../../../Api/Stickers/StickerSet"
-import {StickerManager} from "../../../../../Api/Stickers/StickersManager"
+import { StickerManager } from "../../../../../Api/Stickers/StickersManager"
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 import StickersState from "../../../../SharedStates/StickersState"
 import "./StickerSearchSidebar.scss"
@@ -11,8 +11,10 @@ import "./StickerSearchSidebar.scss"
 export class StickerSearchSidebar extends RightSidebar {
     state = {
         query: "",
-        featured: [], //push more sets while scrolling
+        featured: [],
         found: [],
+        nextHash: 0,
+        loadMore: true,
     }
 
     globalState = {
@@ -22,17 +24,17 @@ export class StickerSearchSidebar extends RightSidebar {
     content() {
         let sets = [];
         if (this.state.query) {
-            sets = this.state.found?.map(coveredSet => <StickerSetPreviewComponent
+            sets = this.state.found ?.map(coveredSet => <StickerSetPreviewComponent
                 set={StickerSet.fromRaw(coveredSet.set)}
                 added={this.globalState.stickersState.contains(coveredSet.set)}/>);
         } else {
-            sets = this.state.featured?.map(coveredSet => <StickerSetPreviewComponent
+            sets = this.state.featured ?.map(coveredSet => <StickerSetPreviewComponent
                 set={StickerSet.fromRaw(coveredSet.set)}
                 added={this.globalState.stickersState.contains(coveredSet.set)}/>);
         }
 
         let emptyText = this.state.query ? "Nothing found..." : "Loading...";
-        return <this.contentWrapper>
+        return <this.contentWrapper onScroll={this.onScroll}>
             <div class="sticker-set-search">
                 {sets}
                 {sets.length === 0 && <div class="nothing">{emptyText}</div>}
@@ -43,6 +45,53 @@ export class StickerSearchSidebar extends RightSidebar {
     componentDidUpdate() {
         super.componentDidUpdate();
         this.searchInputRef.component.$el.value = this.state.query;
+    }
+
+    onScroll = event => {
+        const $element = event.target
+
+        if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop) {
+            this.loadMore();
+        }
+    }
+
+    loadMore = () => {
+        if (this.loadingMore || !this.state.loadMore) return;
+        this.loadingMore = true;
+        const q = this.state.query;
+        if (q) {
+            messages.searchStickerSets(q, false, this.state.nextHash).then(found => {
+                if (found._ === "messages.foundStickerSetsNotModified") {
+                    this.setState({
+                        loadMore: false
+                    })
+                    return;
+                }
+
+                this.setState({
+                    found: this.state.found.concat(found.sets),
+                    nextHash: found.hash
+                })
+
+                this.loadingMore = false;
+            })
+        } else {
+            messages.getFeaturedStickers(this.state.nextHash).then(featured => {
+                if (featured._ === "messages.featuredStickersNotModified") {
+                    this.setState({
+                        loadMore: false
+                    })
+                    return;
+                }
+
+                this.setState({
+                    featured: this.state.featured.concat(featured.sets),
+                    nextHash: featured.hash
+                })
+
+                this.loadingMore = false;
+            })
+        }
     }
 
     get searchLazyLevel(): number {
@@ -61,7 +110,8 @@ export class StickerSearchSidebar extends RightSidebar {
         if (this.state.featured.length === 0) {
             messages.getFeaturedStickers().then(featured => {
                 this.setState({
-                    featured: featured.sets
+                    featured: featured.sets,
+                    nextHash: featured.hash
                 })
             })
         }
@@ -83,7 +133,8 @@ export class StickerSearchSidebar extends RightSidebar {
         if (q === "" && this.state.query !== "") { //reset to featured
             this.setState({
                 query: "",
-                found: []
+                found: [],
+                nextHash: 0
             })
             return;
         }
@@ -94,7 +145,8 @@ export class StickerSearchSidebar extends RightSidebar {
 
             this.setState({
                 query: q,
-                found: found.sets
+                found: found.sets,
+                nextHash: found.hash,
             })
             this.searchInputRef.component.$el.value = q
         })
