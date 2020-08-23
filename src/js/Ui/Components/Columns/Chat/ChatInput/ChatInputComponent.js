@@ -115,7 +115,10 @@ export class ChatInputComponent extends StatelessComponent {
                                     }
                                 },
                             ], l.target)}>
-                                <i className="tgico tgico-send hidden"/>
+                                <i className="tgico tgico-send hidden" onClick={() => {
+                                    this.recorder.stop()
+                                    this.recorder = null
+                                }}/>
                                 <i className="tgico tgico-microphone2"/>
                             </div>
                             <div className="voice-circle"/>
