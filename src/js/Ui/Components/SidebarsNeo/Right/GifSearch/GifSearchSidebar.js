@@ -6,7 +6,6 @@ import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
 import InlineBotManager from "../../../../../Api/Bots/InlineBotManager"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import FileManager from "../../../../../Api/Files/FileManager";
-import API from "../../../../../Api/Telegram/API"
 import "./GifSearchSidebar.scss"
 
 export class GifSearchSidebar extends RightSidebar {
@@ -17,22 +16,24 @@ export class GifSearchSidebar extends RightSidebar {
         featured: [], //idk how to get them, query "" returns 0 results
 
         found: [],
-        nextOffset: 0,
+        nextOffset: "",
 
         paused: []
     }
 
     content() {
         let sets = this.state.query ? this.state.found : this.state.featured;
-        //let emptyText = this.state.query ? "Nothing found..." : "Loading...";
+        let emptyText = this.state.query && !this.loading ? "Nothing found..." : "Loading...";
         return <this.contentWrapper onScroll={this.onScroll}>
             <div class="gif-search">
-                {sets?.map(searchResult => <GifFragment document={searchResult.document} 
-						                	observer={this.observer} 
-						                	paused={this.state.pausedAll || this.state.paused[searchResult.document.id]}
-						                	/>
-				)}
-                {/*sets.length === 0 && <div class="nothing">{emptyText}</div>*/}
+            	<div class="gif-grid">
+	                {sets?.map(searchResult => <GifFragment document={searchResult.document} 
+							                	observer={this.observer} 
+							                	paused={this.state.pausedAll || this.state.paused[searchResult.document.id]}
+							                	/>
+					)}
+				</div>
+                {sets.length === 0 && <div class="nothing">{emptyText}</div>}
             </div>
         </this.contentWrapper>
     }
@@ -60,14 +61,25 @@ export class GifSearchSidebar extends RightSidebar {
     }
 
     loadMore = () => {
+    	console.log("scroll", this.loadingMore, this.state.nextOffset)
     	if(this.loadingMore || this.state.nextOffset === undefined) return; // no next offset
+
     	this.loadingMore = true;
+    	console.log("loading more")
     	InlineBotManager.searchGifs(AppSelectedChat.current.inputPeer, this.state.query, this.state.nextOffset).then(found => {
-    		this.setState({
-    			found: this.state.found.concat(found.results),
-    			nextOffset: found.nextOffset,
-    			pausedAll: false
-    		})
+    		if(this.state.query === "") {
+    			this.setState({
+	    			featured: this.state.featured.concat(found.results),
+	    			nextOffset: found.next_offset,
+	    			pausedAll: false
+	    		})
+    		} else {
+	    		this.setState({
+	    			found: this.state.found.concat(found.results),
+	    			nextOffset: found.next_offset,
+	    			pausedAll: false
+	    		})
+	    	}
     		this.loadingMore = false;
     	})
     }
@@ -117,7 +129,7 @@ export class GifSearchSidebar extends RightSidebar {
         this.setState({
             query: "",
             found: [],
-            next_offset: 0,
+            nextOffset: "",
             pausedAll: true
         })
     }
@@ -127,10 +139,11 @@ export class GifSearchSidebar extends RightSidebar {
 
         if (q === this.state.query) return;
 
+        this.loading = true;
         // gifs have patch bugs, better to reset them
         this.setState({
             query: "",
-            next_offset: 0,
+            nextOffset: "",
             found: [],
             query: q,
         })
@@ -144,6 +157,7 @@ export class GifSearchSidebar extends RightSidebar {
                 nextOffset: found.next_offset
             })
             this.searchInputRef.component.$el.value = q
+            this.loading = false;
         })
 
     }
@@ -153,15 +167,7 @@ const GifFragment = ({document, paused, observer}) => {
 	return (
 		<div class="gif">
 			<BetterVideoComponent document={document}
-                                  onClick={() => {
-                                  	AppSelectedChat.current.api.sendExistingMedia(document);
-                                  	API.messages.saveGif({
-                                  		_: "inputDocument",
-                                  		id: document.id,
-                                  		access_hash: document.access_hash,
-                                  		file_reference: document.file_reference,
-                                  	})
-                                  }}
+                                  onClick={() => AppSelectedChat.current.api.sendExistingMedia(document)}
                                   // autoDownload
                                   playsinline
                                   alwaysShowVideo

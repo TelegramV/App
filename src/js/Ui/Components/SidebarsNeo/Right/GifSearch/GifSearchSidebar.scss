@@ -1,33 +1,45 @@
 @import "src/sass/partials/vars";
 
 .gif-search {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-gap: 5px;
-    padding: 0 5px;
+    .nothing {
+        color: $darkgreytext;
+        font-size: 20px;
+        width: 100%;
+        text-align: center;
+        margin-top: 20px;
+    }
 
-    .gif {
-        &::before {
-            content: "";
-            padding-bottom: 100%;
-            display: inline-block;
-            vertical-align: top;
-        }
+    .gif-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 5px;
+        padding: 0 5px;
 
-        position: relative;
-        cursor: pointer;
+        .gif {
+            &::before {
+                content: "";
+                padding-bottom: 100%;
+                display: inline-block;
+                vertical-align: top;
+            }
 
-        figure {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 100%;
+            animation: opacity-fade-in 300ms ease;
 
-            video {
-                object-fit: cover;
-                height: 100% !important;
-                width: 100% !important;
+            position: relative;
+            cursor: pointer;
+
+            figure {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                width: 100%;
+
+                video {
+                    object-fit: cover;
+                    height: 100% !important;
+                    width: 100% !important;
+                }
             }
         }
     }

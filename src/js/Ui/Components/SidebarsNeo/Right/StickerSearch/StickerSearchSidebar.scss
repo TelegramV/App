@@ -13,6 +13,7 @@
 		display: flex;
 		flex-direction: column;
 		padding: 5px;
+		animation: opacity-fade-in 300ms ease;
 
 		.header {
 			display: flex;
