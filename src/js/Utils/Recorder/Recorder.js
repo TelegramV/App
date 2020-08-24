@@ -109,10 +109,12 @@ Recorder.prototype.initAudioGraph = function () {
 
 Recorder.prototype.initSourceNode = function (sourceNode) {
     if (sourceNode && sourceNode.context) {
+        console.log("we already have source node")
         return global.Promise.resolve(sourceNode);
     }
-
+    console.log("creating new sourceNode")
     return global.navigator.mediaDevices.getUserMedia({audio: this.config.mediaTrackConstraints}).then((stream) => {
+        console.log("got stream!", stream)
         this.stream = stream;
         return this.audioContext.createMediaStreamSource(stream);
     });
@@ -130,8 +132,10 @@ Recorder.prototype.initWorker = function () {
     this.recordedPages = [];
     this.totalLength = 0;
     this.loadWorker();
+    console.log("loaded worker")
 
     return new Promise((resolve, reject) => {
+        console.log("inside worker promise")
         var callback = (e) => {
             switch (e['data']['message']) {
                 case 'ready':
@@ -203,13 +207,9 @@ Recorder.prototype.setMonitorGain = function (gain) {
 };
 
 Recorder.prototype.start = function (sourceNode, processInput = null) {
-    console.log("checking state")
     if (this.state === "inactive") {
-        console.log("inactive")
         this.initAudioContext(sourceNode);
-        console.log("initied audio context");
         this.initAudioGraph();
-        console.log("inited audio graph");
 
         this.encodedSamplePosition = 0;
         console.log("creating promise")
