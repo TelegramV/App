@@ -8,9 +8,8 @@ class WebpageMessageComponent extends GeneralMessageComponent {
 
     render({showDate}) {
         let webpage = this.props.message.raw.media.webpage;
-
         return (
-            <MessageWrapperFragment message={this.props.message} showUsername={false} bubbleRef={this.bubbleRef} showDate={showDate}>
+            <MessageWrapperFragment message={this.props.message} bubbleRef={this.bubbleRef} showDate={showDate}>
                 <TextWrapperComponent message={this.props.message}>
                     {webpage.url && <a href={webpage.url} target="_blank" className="box web rp">
                         <div className="quote">

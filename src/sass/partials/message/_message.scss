@@ -113,6 +113,10 @@
                 margin-right: 3px;
             }
 
+            a, a > span {
+                color: $darkblue;
+            }
+
             @include time($in: true);
             @include box($in: true);
             @include header($in: true, $transparent: false);
@@ -235,12 +239,8 @@
             @include grouped;
             @include video;
 
-            a:not(.button) {
-                color: $darkblue;
-
-                &:hover {
-                    text-decoration: underline;
-                }
+            a:not(.button):hover {
+                text-decoration: underline;
             }
         }
 

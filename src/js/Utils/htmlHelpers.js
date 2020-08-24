@@ -123,7 +123,7 @@ const handlersText = {
     messageEntityBold: (l, a) => <b class="fw-500">{a}</b>,
     messageEntityItalic: (l, a) => <i>{a}</i>,
     messageEntityCode: (l, a) => <code>{a}</code>,
-    messageEntityPre: (l, a) => <code>{a}</code>,
+    messageEntityPre: (l, a) => <pre>{a}</pre>,
     messageEntityUnderline: (l, a) => <u>{a}</u>,
     messageEntityStrike: (l, a) => <s>{a}</s>,
     messageEntityBlockquote: (l, a) => <blockquote>{a}</blockquote>
