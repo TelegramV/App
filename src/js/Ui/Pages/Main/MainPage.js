@@ -25,6 +25,7 @@ import classIf from "../../../V/VRDOM/jsx/helpers/classIf";
 import AudioPlayerComponent from "../../Components/Singleton/AudioPlayerComponent"
 import ConfettiComponent from "../../Components/Singleton/ConfettiComponent"
 import InlineBotApi from "../../../Api/Bots/InlineBotManager"
+import BlockedManager from "../../../Api/Contacts/BlockedManager"
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -43,6 +44,7 @@ function initHighLevelManagers() {
     FoldersManager.init()
     EmojiLangpack.init();
     DeepLinkManager.init();
+    BlockedManager.init();
 }
 
 export function MainPage() {

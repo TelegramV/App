@@ -29,17 +29,41 @@ function getTopPeers(params = {}) {
 }
 
 function resolveUsername(username) {
-	return MTProto.invokeMethod("contacts.resolveUsername",{
-		username
-	}).then(resolved => {
+    return MTProto.invokeMethod("contacts.resolveUsername", {
+        username
+    }).then(resolved => {
         return PeersManager.fillPeersFromUpdate(resolved)
     })
-	
+}
+
+function getBlocked(limit = 20, offset = 0) {
+    return MTProto.invokeMethod("contacts.getBlocked", {
+        offset,
+        limit
+    }).then(blocked => {
+        PeersManager.fillPeersFromUpdate(blocked)
+        return blocked
+    })
+}
+
+function block(inputUser) {
+    return MTProto.invokeMethod("contacts.block", {
+        id: inputUser
+    });
+}
+
+function unblock(inputUser) {
+    return MTProto.invokeMethod("contacts.unblock", {
+        id: inputUser
+    });
 }
 
 const contacts = {
     getTopPeers,
     resolveUsername,
+    getBlocked,
+    block,
+    unblock,
 }
 
 export default contacts

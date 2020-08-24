@@ -5,7 +5,7 @@ import {PrivacySidebar} from "./Settings/Privacy/PrivacySidebar";
 import {NotificationsSidebar} from "./Settings/Notifications/NotificationsSidebar";
 import {LanguageSidebar} from "./Settings/LanguageSidebar";
 import {ActiveSessionsSidebar} from "./Settings/Privacy/ActiveSessionsSidebar";
-import {BlockedSidebar} from "./Settings/Privacy/BlockedSidebar";
+import {BlockedUsersSidebar} from "./Settings/Privacy/BlockedUsersSidebar";
 import {GeneralSidebar} from "./Settings/General/GeneralSidebar";
 import {BackgroundImageSidebar} from "./Settings/General/Background/BackgroundImageSidebar";
 import {BackgroundColorSidebar} from "./Settings/General/Background/BackgroundColorSidebar";
@@ -39,7 +39,7 @@ export class LeftSidebars extends GenericSidebarHistory {
 
                 <PrivacySidebar/>
                 <ActiveSessionsSidebar/>
-                <BlockedSidebar/>
+                <BlockedUsersSidebar/>
 
                 <SuperSecretSettingsSidebar/>
             </div>

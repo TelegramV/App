@@ -25,7 +25,7 @@ export class ActiveSessionsSidebar extends LeftSidebar {
                 <Section title="Other Sessions">
                     {this.state.authorizations?.map(auth => <SessionFragment authorization={auth} 
                                                                             terminatable 
-                                                                            onClick={() => this.onSessionFragmentClick(auth)}/>)}
+                                                                            onContextClick={() => this.onSessionFragmentClick(auth)}/>)}
                 </Section>
             </div>
         </this.contentWrapper>
@@ -54,6 +54,7 @@ export class ActiveSessionsSidebar extends LeftSidebar {
     terminateAll = () => {
         VUI.Modal.prompt("",this.l("lng_settings_reset_sure"), () => {
             API.auth.resetAuthorizations().then(() => {
+                this.refetchAuthorizations();
                 // should we re-register device?
             })
         });
@@ -64,7 +65,7 @@ export class ActiveSessionsSidebar extends LeftSidebar {
     }
 }
 
-const SessionFragment = ({ authorization, terminatable , onClick}) => {
+const SessionFragment = ({ authorization, terminatable , onContextClick}) => {
     if(!authorization) return null;
     const {
         hash,
@@ -84,7 +85,7 @@ const SessionFragment = ({ authorization, terminatable , onClick}) => {
         {
             icon: "stop",
             title: Locale.l("lng_settings_reset_button"),
-            onClick: onClick
+            onClick: onContextClick
         }
     ]
 
@@ -92,5 +93,6 @@ const SessionFragment = ({ authorization, terminatable , onClick}) => {
                     subtext={`${device_model}, ${platform} ${system_version}`}
                     description={`${ip} - ${country}`} 
                     right={!current && <div className="time">{formatDate(date_active)}</div>}
+                    onClick={terminatable && VUI.ContextMenu.listener(contextMenuActions)}
                     onContextMenu={terminatable && VUI.ContextMenu.listener(contextMenuActions)}/>
 }

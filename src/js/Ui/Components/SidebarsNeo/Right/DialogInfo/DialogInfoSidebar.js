@@ -1,17 +1,21 @@
-import {RightSidebar} from "../RightSidebar";
+import { RightSidebar } from "../RightSidebar";
 import AvatarComponent from "../../../Basic/AvatarComponent";
 import Header from "../../Fragments/Header";
 import Subheader from "../../Fragments/Subheader";
-import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
+import type { AE } from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import UIEvents from "../../../../EventBus/UIEvents";
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
 import AppSelectedInfoPeer from "../../../../Reactive/SelectedInfoPeer";
-import {Section} from "../../Fragments/Section";
+import { Section } from "../../Fragments/Section";
 import IconText from "../../Fragments/IconText";
 import CheckboxButton from "../../Fragments/CheckboxButton";
-import {DialogInfoMaterials} from "./Fragments/DialogInfoMaterials";
+import { DialogInfoMaterials } from "./Fragments/DialogInfoMaterials";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
-import {getNewlines} from "../../../../../Utils/htmlHelpers"
+import { getNewlines } from "../../../../../Utils/htmlHelpers"
+import VUI from "../../../../VUI"
+import { UserPeer } from "../../../../../Api/Peers/Objects/UserPeer";
+import PeersStore from "../../../../../Api/Store/PeersStore"
+import BlockedManager from "../../../../../Api/Contacts/BlockedManager"
 
 export class DialogInfoSidebar extends RightSidebar {
 
@@ -34,6 +38,7 @@ export class DialogInfoSidebar extends RightSidebar {
             .updateOn("updateUsername")
             .updateOn("updateNotificationStatus")
             .updateOn("fullLoaded")
+            .updateOn("contacts.blocked")
     }
 
 
@@ -59,7 +64,7 @@ export class DialogInfoSidebar extends RightSidebar {
     }
 
     onChatSelect = (event) => {
-        if(!this.state.hidden) {
+        if (!this.state.hidden) {
             AppSelectedInfoPeer.select(event.peer)
         }
     }
@@ -71,7 +76,7 @@ export class DialogInfoSidebar extends RightSidebar {
     changeNotificationsStatus = () => {
         const peer = AppSelectedInfoPeer.Current
         const nowMuted = !peer || !peer.full || !peer.full.notify_settings || peer.full.notify_settings.mute_until > 0 || peer.full.notify_settings.silent
-        peer.api.updateNotifySettings({mute_until: nowMuted ? 0 : 2147483647}).then(_ => {
+        peer.api.updateNotifySettings({ mute_until: nowMuted ? 0 : 2147483647 }).then(_ => {
             this.forceUpdate()
         })
     }
@@ -89,11 +94,42 @@ export class DialogInfoSidebar extends RightSidebar {
         this.materialsRef.component.update()
     }
 
+    makeMoreButton = () => {
+        const contextMenuActions = [];
+        const current = AppSelectedInfoPeer.Current;
+        if (current && current != PeersStore.self()) {
+            if (current instanceof UserPeer) {
+                if (BlockedManager.isBlocked(current)) {
+                    contextMenuActions.push({
+                        icon: "unlock",
+                        title: this.l("lng_blocked_list_unblock"),
+                        onClick: () => BlockedManager.unblock(current)
+                    })
+                } else {
+                    contextMenuActions.push({
+                        icon: "lock",
+                        title: this.l("lng_blocked_list_confirm_ok"),
+                        onClick: () => BlockedManager.block(current)
+                    })
+                }
+            }
+        }
+
+        return VUI.ContextMenu.listener(contextMenuActions);
+    }
+
     get headerBorder(): boolean {
         return false
     }
 
     get title(): string | * {
         return this.l("lng_profile_info_section")
+    }
+
+    get rightButtons() {
+        return [{
+            icon: "more",
+            onClick: this.makeMoreButton()
+        }]
     }
 }
