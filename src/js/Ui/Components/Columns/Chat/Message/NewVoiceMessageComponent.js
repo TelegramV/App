@@ -1,4 +1,5 @@
-import {convertBits, formatAudioTime} from "../../../../Utils/utils"
+import {convertBits} from "../../../../Utils/utils"
+import {formatTime} from "../../../../../Utils/date"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import DocumentParser from "../../../../../Api/Files/DocumentParser"
 import TextWrapperComponent from "./Common/TextWrapperComponent"
@@ -163,8 +164,7 @@ class NewVoiceMessageComponent extends GeneralMessageComponent {
                                           mask={`url(#bars-${message.id})`}/>
                                 </svg>
                                 <div className="timer">
-                                    <span
-                                        className="time-played">{isPlaying ? formatAudioTime(currentTime) + "/" : ""}{formatAudioTime(duration)}</span>
+                                    <span className="time-played">{isPlaying && `${formatTime(currentTime)}/`}{formatTime(duration)}</span>
                                 </div>
                             </div>
                         </div>

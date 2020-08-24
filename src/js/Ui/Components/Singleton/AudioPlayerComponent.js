@@ -20,7 +20,7 @@
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import UIEvents from "../../EventBus/UIEvents"
 import SimpleVirtualList from "../../../V/VRDOM/list/SimpleVirtualList"
-import {formatAudioTime} from "../../Utils/utils"
+import {formatTime} from "../../../Utils/date"
 import AudioPlayer from "../../../Api/Media/AudioPlayer"
 import AppEvents from "../../../Api/EventBus/AppEvents"
 import DocumentParser from "../../../Api/Files/DocumentParser"
@@ -115,7 +115,7 @@ class AudioPlayerComponent extends StatefulComponent {
                                         <div className="timer">
                                         <span className="played-wrapper">
                                             <span className="time-played">
-                                                {isPlaying ? formatAudioTime(currentTime) : formatAudioTime(audioInfo.duration)}
+                                                {formatAudioTime(isPlaying ? currentTime : audioInfo.duration)}
                                             </span>
                                         </span>
                                         </div>

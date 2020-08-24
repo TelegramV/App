@@ -8,7 +8,7 @@ import vrdom_append from "../../../../../../V/VRDOM/append";
 import BetterPhotoComponent from "../../../../Basic/BetterPhotoComponent";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import {FileAPI} from "../../../../../../Api/Files/FileAPI";
-import {formatAudioTime} from "../../../../../Utils/utils";
+import {formatTime} from "../../../../../../Utils/date";
 import SearchManager from "../../../../../../Api/Search/SearchManager";
 import VComponent from "../../../../../../V/VRDOM/component/VComponent";
 import {MessageType} from "../../../../../../Api/Messages/Message"
@@ -199,7 +199,7 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
                         onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}>
                     <img src={FileAPI.getThumbnail(message.raw.media.document)} alt="video"/>
                     <div className="video-info-bar">
-                        {formatAudioTime(video.duration)}
+                        {formatTime(video.duration)}
                     </div>
                 </figure>,
                 this.contentRefs.media.$el
@@ -246,7 +246,7 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
         }
 
         const audio = FileAPI.getAttribute(rawMessage.media.document, "documentAttributeAudio")
-        const time = formatAudioTime(audio.duration)
+        const time = formatTime(audio.duration)
         const title = audio.title
         const performer = audio.performer
         const date = new Date(rawMessage.date * 1000).toLocaleString("en", {

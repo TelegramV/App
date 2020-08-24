@@ -1,8 +1,8 @@
 import nodeIf from "../../../../V/VRDOM/jsx/helpers/nodeIf";
 import classIf from "../../../../V/VRDOM/jsx/helpers/classIf";
 
-function Button({text, subtext, description, left, right, onClick, red = false, blue = false}) {
-    return <div className={["button", classIf(!!onClick, "rp"), classIf(red, "red"), classIf(blue, "blue")]} onClick={onClick}>
+function Button({text, subtext, description, left, right, onClick, red = false, blue = false, ...otherArgs}) {
+    return <div className={["button", classIf(!!onClick, "rp"), classIf(red, "red"), classIf(blue, "blue")]} onClick={onClick} {...otherArgs}>
         {nodeIf(<div className="left">{left}</div>, left)}
         <div className="middle">
             <div className="text">{text}</div>

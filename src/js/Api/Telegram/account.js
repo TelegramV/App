@@ -20,11 +20,23 @@
 import MTProto from "../../MTProto/External"
 
 function getPassword() {
-    return MTProto.invokeMethod("account.getPassword", {});
+    return MTProto.invokeMethod("account.getPassword");
+}
+
+function getAuthorizations() {
+	return MTProto.invokeMethod("account.getAuthorizations");
+}
+
+function resetAuthorization(hash) {
+	return MTProto.invokeMethod("account.resetAuthorization", {
+		hash
+	});
 }
 
 const account = {
-    getPassword: getPassword,
+    getPassword,
+    getAuthorizations,
+    resetAuthorization,
 };
 
 export default account;

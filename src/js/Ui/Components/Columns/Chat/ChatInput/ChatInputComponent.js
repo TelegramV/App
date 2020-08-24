@@ -1,4 +1,5 @@
-import {askForFile, convertBits, formatAudioTime} from "../../../../Utils/utils";
+import {askForFile, convertBits} from "../../../../Utils/utils";
+import {formatTime} from "../../../../../Utils/date"
 import {IS_MOBILE_SCREEN} from "../../../../../Utils/browser"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import ComposerComponent from "./ComposerComponent"
@@ -426,7 +427,7 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     tickTimer = () => {
-        const time = formatAudioTime(this.i / 100) + "," + this.i % 100;
+        const time = formatTime(this.i / 100) + "," + this.i % 100;
         this.$el.querySelector(".voice-seconds").innerHTML = time
         this.i++
         if (this.isRecording)

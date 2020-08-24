@@ -22,6 +22,7 @@ import API from "./Api/Telegram/API"
 import {FileAPI} from "./Api/Files/FileAPI"
 
 import {throttle} from "./Utils/func"
+import {getBrowser} from "./Utils/browser"
 
 import "./globals"
 import "./polyfills"
@@ -53,7 +54,7 @@ if (document.getElementById("page-loader")) {
 }
 
 VApp.mount("#app")
-
+getBrowser(); //detect browser before making requests
 MTProto.connect().then(user => {
     if (user) {
         PeersStore.set(PeerFactory.fromRaw(user));

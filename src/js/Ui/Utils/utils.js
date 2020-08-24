@@ -57,21 +57,6 @@ export function askForFile(accept, callback, asBuffer = false, multiple = false)
     //input.remove(); //Safari
 }
 
-export function formatAudioTime(time) {
-    if (!time) return "0:00";
-    time = Math.floor(time);
-    let hours = Math.floor(time / 3600)
-    let minutes = Math.floor(time / 60) % 60
-    let seconds = time % 60
-
-    let formatted = [hours, minutes, seconds]
-        .map(v => v < 10 ? "0" + v : v)
-        .filter((v, i) => v !== "00" || i > 0)
-        .join(":");
-    if (formatted.startsWith("0")) formatted = formatted.substr(1);
-    return formatted;
-}
-
 export function convertBits(array, fromBits, toBits) {
     let buf = "";
     let arr = [];

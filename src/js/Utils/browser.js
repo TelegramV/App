@@ -21,6 +21,34 @@ export function getOS() {
     return os;
 }
 
+export function getBrowser() {
+    // Opera 8.0+
+    var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+    if(isOpera) return "Opera"
+    // Firefox 1.0+
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    if(isFirefox) return "Firefox"
+    if(IS_SAFARI) return "Safari";
+    // Internet Explorer 6-11
+    var isIE = /*@cc_on!@*/false || !!document.documentMode;
+    if(isIE) return "Internet Explorer (pls, update)"
+    // Edge 20+
+    var isEdge = !isIE && !!window.StyleMedia;
+    if(isEdge) return "Microsoft Edge"
+
+    // Chrome 1 - 79
+    var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+    if(isChrome) return "Chrome"
+
+    // Edge (based on chromium) detection
+    var isEdgeChromium = isChrome && (navigator.userAgent.indexOf("Edg") != -1);
+    if(isEdgeChromium) return "Chromium Edge"
+
+    return "Browser"
+}
+
+export const BROWSER = getBrowser();
+
 export const PLATFORM = getOS();
 
 export const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)

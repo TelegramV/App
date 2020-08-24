@@ -19,7 +19,7 @@ import AppEvents from "../../../Api/EventBus/AppEvents";
 import AvatarComponent from "../Basic/AvatarComponent";
 import {CallsManager, CallState} from "../../../Api/Calls/CallManager";
 import AudioManager from "../../Managers/AudioManager";
-import {formatAudioTime} from "../../Utils/utils";
+import {formatTime} from "../../../Utils/date";
 import SingletonComponent from "../../../V/VRDOM/component/SingletonComponent"
 
 export class PhoneCallComponent extends SingletonComponent {
@@ -80,7 +80,7 @@ export class PhoneCallComponent extends SingletonComponent {
             case CallState.FailedToConnectToBridge:
                 return "failed to connect to bridge"
             default:
-                return formatAudioTime(this.state.seconds)
+                return formatTime(this.state.seconds)
         }
     }
 

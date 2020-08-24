@@ -2,13 +2,18 @@ import {Section} from "../../../Fragments/Section";
 import IconButton from "../../../Fragments/IconButton";
 import Button from "../../../Fragments/Button";
 import {LeftSidebar} from "../../LeftSidebar";
+import {ActiveSessionsSidebar} from "./ActiveSessionsSidebar"
+import UIEvents from "../../../../../EventBus/UIEvents";
 
 export class PrivacySidebar extends LeftSidebar {
     content(): * {
         return <this.contentWrapper>
             <Section>
                 <IconButton icon="deleteuser" text="Blocked Users" description="6 users"/>
-                <IconButton icon="activesessions" text="Active Sessions" description="3 devices"/>
+                <IconButton icon="activesessions" 
+                            text="Active Sessions" 
+                            description="3 devices" 
+                            onClick={() => UIEvents.Sidebars.fire("push", ActiveSessionsSidebar)}/>
             </Section>
 
 

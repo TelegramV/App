@@ -2,7 +2,7 @@ import MessageWrapperFragment from "./Common/MessageWrapperFragment";
 import MessageTimeComponent from "./Common/MessageTimeComponent";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
-import { formatAudioTime } from "../../../../Utils/utils"
+import { formatTime } from "../../../../../Utils/date"
 import DocumentParser from "../../../../../Api/Files/DocumentParser"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 
@@ -93,7 +93,7 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
                     <span style={{
                         "display": !isMuted && "none"
                     }} className="pl-time tgico nosound"/>
-                    {this.videoComponentRef.component?.state.currentTime && formatAudioTime(this.videoComponentRef.component?.state.currentTime)}
+                    {this.videoComponentRef.component?.state.currentTime && formatTime(this.videoComponentRef.component?.state.currentTime)}
                 </div>
 
 

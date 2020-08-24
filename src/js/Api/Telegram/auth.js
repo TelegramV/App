@@ -81,14 +81,19 @@ function logOut() {
     return MTProto.invokeMethod("auth.logOut")
 }
 
+function resetAuthorizations() {
+    return MTProto.invokeMethod("auth.resetAuthorizations");
+}
+
 const auth = {
-    sendCode: sendCode,
-    importBotAuthorization: importBotAuthorization,
-    signIn: signIn,
-    signUp: signUp,
-    checkPassword: checkPassword,
-    exportLoginToken: exportLoginToken,
-    logOut: logOut,
+    sendCode,
+    importBotAuthorization,
+    signIn,
+    signUp,
+    checkPassword,
+    exportLoginToken,
+    logOut,
+    resetAuthorizations,
 }
 
 export default auth

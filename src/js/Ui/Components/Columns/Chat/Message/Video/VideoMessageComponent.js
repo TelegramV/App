@@ -5,7 +5,7 @@ import MessageTimeComponent from "../Common/MessageTimeComponent";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import BetterVideoComponent from "../../../../Basic/BetterVideoComponent"
 import DocumentParser from "../../../../../../Api/Files/DocumentParser"
-import {formatAudioTime} from "../../../../../Utils/utils"
+import {formatTime} from "../../../../../../Utils/date"
 import {DocumentMessagesTool} from "../../../../../Utils/document"
 import FileManager from "../../../../../../Api/Files/FileManager"
 import VSpinner from "../../../../../Elements/VSpinner"
@@ -86,7 +86,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                                           {
                                                               FileManager.isDownloaded(document) ?
                                                                   <div className="done">
-                                                                      {formatAudioTime(info.duration - currentTime)}
+                                                                      {formatTime(info.duration - currentTime)}
                                                                       {isMuted && !isStreamable &&
                                                                       <i className="tgico tgico-nosound"/>}
                                                                   </div>
@@ -107,7 +107,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                                                       </div>
                                                                       <div className="info">
                                                               <span class="duration">
-                                                                  {formatAudioTime(info.duration)}
+                                                                  {formatTime(info.duration)}
                                                               </span>
                                                                           <span class="size">
                                                                   {FileManager.isPending(document) && DocumentMessagesTool.formatSize(FileManager.getPendingSize(document)) + "/"}

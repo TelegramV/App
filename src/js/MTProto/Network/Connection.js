@@ -206,11 +206,11 @@ class Connection {
         method_serializer.int(0xc1cd5ea9); // initConnection
         method_serializer.int(2); //flags
         method_serializer.int(AppConfiguration.mtproto.api.api_id); // api_id
-        method_serializer.string(navigator.userAgent || "Unknown UserAgent"); // device_model
+        method_serializer.string("Browser"); // device_model
         method_serializer.string(navigator.platform || "Unknown Platform"); // system_version
         method_serializer.string(AppConfiguration.mtproto.api.app_version); // app_version
         method_serializer.string(navigator.language || "en"); // system_lang_code
-        method_serializer.string(""); // lang_pack
+        method_serializer.string("tdesktop"); // lang_pack
         method_serializer.string(navigator.language || "en"); // lang_code
         method_serializer.object({tz_offset: this.timezoneOffset}, "JSONValue");
         // this.initConnection = true;

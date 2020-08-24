@@ -19,7 +19,7 @@
 
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import VComponent from "../../../V/VRDOM/component/VComponent"
-import {formatAudioTime} from "../../Utils/utils"
+import {formatTime} from "../../../Utils/date"
 import {DocumentMessagesTool} from "../../Utils/document"
 import VSpinner from "../../Elements/VSpinner"
 import UIEvents from "../../EventBus/UIEvents"
@@ -225,7 +225,7 @@ class VideoPlayer extends StatefulComponent {
                                    onClick={this.onClickPause}/>
                             </div>
                             <div className="time">
-                                {formatAudioTime(time)} / {formatAudioTime(duration)}
+                                {formatTime(time)} / {formatTime(duration)}
                             </div>
                             {size && !isDownloaded &&/*bufferedSize != null &&*/ <div className="bytes">
                                 {DocumentMessagesTool.formatSize(bufferedSize || 0)}/{DocumentMessagesTool.formatSize(size)}

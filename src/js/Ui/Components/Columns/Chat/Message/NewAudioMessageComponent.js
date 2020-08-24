@@ -22,7 +22,7 @@ import TextWrapperComponent from "./Common/TextWrapperComponent"
 import MessageWrapperFragment from "./Common/MessageWrapperFragment"
 import DocumentParser from "../../../../../Api/Files/DocumentParser"
 import AppEvents from "../../../../../Api/EventBus/AppEvents"
-import {formatAudioTime} from "../../../../Utils/utils"
+import {formatTime} from "../../../../../Utils/date"
 import AudioPlayer from "../../../../../Api/Media/AudioPlayer"
 import FileManager from "../../../../../Api/Files/FileManager"
 
@@ -82,10 +82,10 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
                             </div>
                             <div className="timer">
                                 {isPlaying && <span className="played-wrapper">
-                                    <span className="time-played">{formatAudioTime(currentTime)}</span>
+                                    <span className="time-played">{formatTime(currentTime)}</span>
                                     /
                                 </span>}
-                                {formatAudioTime(audioInfo.duration)}
+                                {formatTime(audioInfo.duration)}
                             </div>
                         </div>
 

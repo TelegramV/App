@@ -80,9 +80,9 @@ class ModalContainer extends StatefulComponent {
     prompt = (header, content, yes = this.close, no = this.close) => {
         this.open(
             <div className="prompt">
-                <div className="header">
+                {header && <div className="header">
                     {header}
-                </div>
+                </div>}
                 <div class="content scrollable">
                     <div class="container">
                         {content}

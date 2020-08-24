@@ -11,7 +11,7 @@ import PeersStore from "../../../../../Api/Store/PeersStore"
 import { parseMessageEntities } from "../../../../../Utils/htmlHelpers"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import VSpinner from "../../../../Elements/VSpinner"
-import { formatAudioTime } from "../../../../Utils/utils"
+import { formatTime } from "../../../../../Utils/date"
 import Locale from "../../../../../Api/Localization/Locale"
 
 export default class PollMessageComponent extends GeneralMessageComponent {
@@ -310,7 +310,7 @@ const TimerFragment = ({ left, total }) => {
     if (left < 0) left = 0;
     let percent = left / total;
     left = Math.floor(left);
-    let formatted = formatAudioTime(left);
+    let formatted = formatTime(left);
     let color;
     if (left < 6) color = "#DF3F40";
     return (

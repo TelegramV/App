@@ -2,7 +2,7 @@ import StatefulComponent from "../../../../../../V/VRDOM/component/StatefulCompo
 import AppEvents from "../../../../../../Api/EventBus/AppEvents"
 import AudioPlayer from "../../../../../../Api/Media/AudioPlayer"
 import DocumentParser from "../../../../../../Api/Files/DocumentParser"
-import {formatAudioTime} from "../../../../../Utils/utils"
+import {formatTime} from "../../../../../../Utils/date"
 import FileManager from "../../../../../../Api/Files/FileManager"
 import AppSelectedChat from "../../../../../Reactive/SelectedChat"
 
@@ -43,7 +43,7 @@ export class DialogInfoAudioComponent extends StatefulComponent {
                     </span>
                     <span className="description">{audioInfo.performer}</span>
                     <span className="time">
-                        {isPlaying ? formatAudioTime(currentTime) : formatAudioTime(audioInfo.duration)}
+                        {formatTime(isPlaying ? currentTime : audioInfo.duration)}
                     </span>
                 </div>
             </div>

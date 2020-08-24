@@ -10,18 +10,8 @@ import API from "../Telegram/API"
 import type {BusEvent} from "../EventBus/EventBus"
 import AppEvents from "../EventBus/AppEvents"
 import {parseMessageEntities} from "../../Utils/htmlHelpers"
-
-export const DATE_FORMAT_TIME = {
-    hour: '2-digit',
-    minute: '2-digit',
-    //hour12: false //support USA
-}
-
-export const DATE_FORMAT = {
-    year: '2-digit',
-    month: '2-digit',
-    day: '2-digit',
-}
+import {DATE_FORMAT, TIME_FORMAT} from "../../Utils/date"
+import Locale from "../../Api/Localization/Locale"
 
 export class AbstractMessage extends ReactiveObject implements Message {
 
@@ -218,7 +208,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     formattedDate = null
     getFormattedDate() {
         if(this.formattedDate === null) {
-            this.formattedDate = this.getDate(navigator.language, DATE_FORMAT)
+            this.formattedDate = this.getDate(Locale.currentLanguageCode, DATE_FORMAT)
         }
         return this.formattedDate
     }
@@ -343,7 +333,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
         this.raw = raw
         this.jsDate = new Date(this.raw.date * 1000)
-        this.formattedTime = this.getDate(navigator.language, DATE_FORMAT_TIME)
+        this.formattedTime = this.getDate(Locale.currentLanguageCode, TIME_FORMAT)
         this.prefix = MessageParser.getDialogPrefix(this)
 
         if (this.dialogPeer) {
