@@ -230,7 +230,7 @@ class AudioPlayer {
                     this.audio.play();
                 } else {
                     this.pause();
-                    this.audio.src = null;
+                    this.audio.src = "";
                 }
 
                 FileManager.downloadDocument(message.media.document, null, {

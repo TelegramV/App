@@ -455,6 +455,7 @@ export class ChatInputComponent extends StatelessComponent {
         //     this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
         // });
         // this.microphone = null
+        if(!this.recorder) return;
         this.recorder.stop()
         this.recorder = null
         // this.audioContext.close()
