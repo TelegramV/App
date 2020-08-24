@@ -6,6 +6,7 @@ import AppCache from "./Api/Cache/AppCache"
 import VApp from "./V/vapp"
 import VRDOM from "./V/VRDOM/VRDOM"
 import AppRoutes from "./Ui/Routing"
+import UIEvents from "./Ui/EventBus/UIEvents"
 
 import RippleVRDOMPlugin from "./Ui/Plugins/RipplePlugin"
 import LongtapVRDOMPlugin from "./Ui/Plugins/LongtapPlugin"
@@ -19,6 +20,8 @@ import Settings from "./Api/Settings/Settings"
 import keval from "./Keval/keval"
 import API from "./Api/Telegram/API"
 import {FileAPI} from "./Api/Files/FileAPI"
+
+import {throttle} from "./Utils/func"
 
 import "./globals"
 import "./polyfills"
@@ -65,3 +68,20 @@ MTProto.connect().then(user => {
         document.title = "[dev] Telegram V"
     }
 })
+
+
+//TODO move this somewhere
+vhFix();
+
+window.addEventListener('resize', throttle(() => {
+    UIEvents.General.fire("window.resize", {
+        width: window.innerWidth,
+        height: window.innerHeight
+    })
+    vhFix();
+}, 500));
+
+function vhFix() {
+    let vh = window.innerHeight;
+    document.documentElement.style.setProperty('--vh100', `${vh}px`);
+}

@@ -12,8 +12,14 @@ class ServiceMessageComponent extends GeneralMessageComponent {
         const message = this.prepare();
         return (
             <div className="service">
-                <div className="service-msg">{Array.isArray(message) ? message.flat(Infinity) : message}</div>
-                {photo && <BetterPhotoComponent className="photo" photo={photo} wrapFigure={false}/>/* TODO: Video*/}
+                <div className="service-msg">{message}</div>
+                {photo && <BetterPhotoComponent className="photo" 
+                                                autoplay
+                                                muted
+                                                loop
+                                                photo={photo} 
+                                                wrapFigure={false} 
+                                                size={photo.video_sizes && photo.video_sizes[0]}/>}
             </div>
         )
     }

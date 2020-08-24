@@ -186,6 +186,9 @@ class VirtualDialogsFolderList extends StatefulComponent {
             .on("messages.new", this.update)
             // .on("messages.deleted", this.update)
             .on("messages.readIn", this.update)
+
+        E.bus(UIEvents.General)
+            .updateOn("window.resize")
     }
 
     render(props, {dialogs}, globalState) {
@@ -195,7 +198,7 @@ class VirtualDialogsFolderList extends StatefulComponent {
         if(!props.archived && foldersState.current == null) {
             dialogs = dialogs.filter(dialog => !dialog.isArchived);
         }
-
+        
         return (
             <div style={{
                 "height": "100%",

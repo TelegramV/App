@@ -1,4 +1,4 @@
-export const PhotoFragment = ({id, url = "", width = 0, height = 0, maxWidth = 470, maxHeight = 512, calculateSize = false, ...otherArgs}) => {
+export const PhotoFragment = ({ id, url = "", width = 0, height = 0, maxWidth = 470, maxHeight = 512, calculateSize = false, ...otherArgs }) => {
     if (!calculateSize) {
         return <img id={id}
                     src={url}
@@ -37,19 +37,34 @@ export const PhotoFragment = ({id, url = "", width = 0, height = 0, maxWidth = 4
     // }
 }
 
-export const VideoFragment = ({id, width = 0, height = 0, maxWidth = 470, maxHeight = 512, calculateSize = false, ...otherArgs}) => {
+export const VideoFragment = ({ id, url = "", width = 0, height = 0, maxWidth = 470, maxHeight = 512, calculateSize = false, ...otherArgs }) => {
     if (!calculateSize) {
-        return <img id={id}
+        if (url) {
+            return <video id={id}
+                  src={url}
+                  {...otherArgs}/>
+
+        } else {
+            return <img id={id}
                     src={otherArgs.thumbUrl}
                     alt="Image"
                     {...otherArgs}/>
+        }
+
     }
 
     const calculatedWidth = maxWidth === 0 ? width : Math.floor(Math.min(1, maxHeight / height) * width)
     const calculatedHeight = maxHeight === 0 ? height : Math.floor(Math.min(1, maxWidth / width) * height)
 
-    return <video id={id}
+    if (url) {
+        return <video id={id}
+                  src={url}
                   css-width={calculatedWidth && `${calculatedWidth}px`}
                   css-height={calculatedHeight && `${calculatedHeight}px`}
                   {...otherArgs}/>
+    } else {
+        return <img id={id}
+                src={otherArgs.thumbUrl}
+                alt="Image"/>
+    }
 }

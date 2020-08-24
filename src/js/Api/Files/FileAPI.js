@@ -67,7 +67,7 @@ export class FileAPI {
 
         return FileAPI.tryFromCache(photo).catch(() => {
             if (!size) {
-                size = photo.sizes[photo.sizes.length - 1]
+                size = this.getMaxSize(photo) /*|| (photo.video_sizes && photo.video_sizes[photo.video_sizes.length - 1])*/
             }
 
             const location = this.makePhotoLocation(photo, size);
@@ -141,7 +141,7 @@ export class FileAPI {
 
     static makePhotoLocation(photo, size) {
         if (!size) {
-            size = photo.sizes[photo.sizes.length - 1];
+            size = photo.sizes[photo.sizes.length - 1]; // maybe try video first... or not?
         }
 
         return {
@@ -432,6 +432,12 @@ export class FileAPI {
             if (video) {
                 return video
             }
+
+            if(file.video_sizes) {
+                return file.video_sizes.reduce(function (prev, current) {
+                    return (prev.w < current.w) ? prev : current
+                })
+            }
         }
 
         return (file.sizes || file.thumbs).reduce(function (prev, current) {
@@ -559,11 +565,11 @@ export class FileAPI {
 
     static getPhoto(file, thumb_size = "", onProgress = undefined) {
         return this.tryCache(file).catch(async _ => {
-            if (!file.sizes) throw new Error("No sizes specified for file", file)
+            if (!file.sizes && !file.video_sizes) throw new Error("No sizes specified for file", file)
 
             thumb_size = this.parseThumbSize(file, thumb_size)
             const size = file.sizes.find(l => l.type === thumb_size).size
-            return this.createBlobFromParts(file, "image/jpeg", await this.getAllParts(file, size, thumb_size, onProgress))
+            return this.createBlobFromParts(file, thumb_size.type==="u" ? "video/mp4" : "image/jpeg", await this.getAllParts(file, size, thumb_size, onProgress))
         })
     }
 

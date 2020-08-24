@@ -19,7 +19,7 @@
 
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
-import {PhotoFragment} from "../Columns/Chat/Message/Photo/PhotoFragment"
+import {PhotoFragment, VideoFragment} from "../Columns/Chat/Message/Photo/PhotoFragment"
 import AppEvents from "../../../Api/EventBus/AppEvents"
 import FileManager from "../../../Api/Files/FileManager"
 
@@ -33,81 +33,78 @@ class BetterPhotoComponent extends StatefulComponent {
 
     appEvents(E) {
         E.bus(AppEvents.Files)
-            .filter(event => FileManager.checkEvent(event, this.props.photo))
+            .filter(event => FileManager.checkEvent(event, this.props.photo, this.props.size))
             // .updateOn("download.start")
-            .on("download.newPart", this.onDownloadNewPart)
+            .updateOn("download.newPart")
             .updateOn("download.done");
     }
 
-    render({photo, size, onClick, maxWidth, maxHeight, calculateSize = false, wrapFigure = true, ...otherArgs}, {url, thumbnailUrl, width, height}) {
+    render({photo, size, onClick, maxWidth, maxHeight, calculateSize = false, wrapFigure = true, disableVideo = false, ...otherArgs}, {thumbnailUrl, width, height}) {
         const isLoading = FileManager.isPending(photo, size);
 
+        let fragment = null
+
+        const url = isLoading ? thumbnailUrl : FileManager.getUrl(photo, size);
+
+        if(size?.type === "u") {
+          fragment = <VideoFragment calculateSize={calculateSize}
+                         url={url}
+                         width={width}
+                         height={height}
+                         maxWidth={maxWidth || width}
+                         maxHeight={maxHeight || height}
+                         {...otherArgs}/>
+        } else {
+          fragment = <PhotoFragment calculateSize={calculateSize}
+                         url={url}
+                         width={width}
+                         height={height}
+                         maxWidth={maxWidth || width}
+                         maxHeight={maxHeight || height}
+                         {...otherArgs}/>
+        }
+
         if (!wrapFigure) {
-            return !isLoading ?
-                <PhotoFragment calculateSize={calculateSize}
-                               url={FileManager.getUrl(photo, size)}
-                               width={width}
-                               height={height}
-                               maxWidth={maxWidth || width}
-                               maxHeight={maxHeight || height}
-                               {...otherArgs}/>
-                :
-                <PhotoFragment calculateSize={calculateSize}
-                               url={thumbnailUrl}
-                               width={width}
-                               height={height}
-                               maxWidth={maxWidth || width}
-                               maxHeight={maxHeight || height}
-                               {...otherArgs}/>;
+            return fragment;
+        }
+
+        const figureClasses = {
+          photo: true,
+          video: size?.type === "u",
+          rp: true,
+          thumbnail: isLoading
         }
 
         return (
             <figure css-cursor="pointer"
-                    className={["photo rp", isLoading && "thumbnail"]}
+                    className={figureClasses}
                     onClick={onClick} {...otherArgs}>
 
                 <div style={{
                     display: isLoading ? "block" : "none",
                 }} className="photo-info">{String(Math.floor(FileManager.getPercentage(photo, size)))}%
                 </div>
-
-                {
-                    !isLoading ?
-                        <PhotoFragment calculateSize={calculateSize}
-                                       url={FileManager.getUrl(photo, size)}
-                                       width={width}
-                                       height={height}
-                                       maxWidth={maxWidth || width}
-                                       maxHeight={maxHeight || height}/>
-                        :
-                        <PhotoFragment calculateSize={calculateSize}
-                                       url={thumbnailUrl}
-                                       width={width}
-                                       height={height}
-                                       maxWidth={maxWidth || width}
-                                       maxHeight={maxHeight || height}/>
-                }
+                {fragment}
             </figure>
         )
     }
 
     componentWillMount() {
         this.calculateState(this.props);
-
-        FileManager.downloadPhoto(this.props.photo);
+        FileManager.downloadPhoto(this.props.photo, this.props.size, {type: this.props.size?.type === "u" && "video/mp4"});
     }
 
     componentWillUpdate(nextProps, nextState) {
         if (nextProps.photo.id !== this.props.photo.id) {
             this.calculateState(nextProps);
 
-            FileManager.downloadPhoto(nextProps.photo);
+            FileManager.downloadPhoto(nextProps.photo, nextProps.size, {type: nextProps.size?.type === "u" && "video/mp4"});
         }
     }
 
     calculateState = props => {
         if (props.calculateSize) {
-            const maxSize = FileAPI.getMaxSize(props.photo);
+            const maxSize = FileAPI.getMaxSize(props.photo, this.props.size?.type !=="u");
             this.state.width = maxSize.w;
             this.state.height = maxSize.h;
         }

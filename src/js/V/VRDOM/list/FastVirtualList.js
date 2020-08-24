@@ -90,9 +90,9 @@ class FastVirtualList extends StatefulComponent {
         let containerHeight = this.props.containerHeight;
 
         if (!containerHeight) {
-            if (!this.state.containerHeight) {
+            //if (!this.state.containerHeight) { // Doesn't react on parent element resize
                 this.state.containerHeight = this.$el.parentElement.clientHeight;
-            }
+            //}
 
             containerHeight = this.state.containerHeight;
         }

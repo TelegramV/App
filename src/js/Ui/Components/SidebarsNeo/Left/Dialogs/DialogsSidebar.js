@@ -21,18 +21,18 @@ export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
         {
             icon: "newgroup",
-            title: Locale.l("lng_create_group_title"),
+            title: Locale.l("lng_create_group_title", {}, "New Group"),
             onClick: _ => {
             }
         },
         {
             icon: "newprivate",
-            title: Locale.l("lng_menu_contacts"),
+            title: Locale.l("lng_menu_contacts", {}, "Contacts"),
         },
         () => {
             return {
                 icon: "archive",
-                title: Locale.l("lng_archived_name"),
+                title: Locale.l("lng_archived_name", {}, "Archived chats"),
                 counter: archivedCount,
                 onClick: _ => {
                     UIEvents.Sidebars.fire("push", ArchivedSidebar)
@@ -42,7 +42,7 @@ export const DialogsBarContextMenu = (event, archivedCount) => {
         },
         {
             icon: "savedmessages",
-            title: Locale.l("lng_saved_messages"),
+            title: Locale.l("lng_saved_messages", {}, "Saved Messages"),
             onClick: _ => {
                 const p = PeersStore.self().username ? `@${PeersStore.self().username}` : `user.${PeersStore.self().id}`
 
@@ -55,14 +55,14 @@ export const DialogsBarContextMenu = (event, archivedCount) => {
         },
         {
             icon: "settings",
-            title: Locale.l("lng_menu_settings"),
+            title: Locale.l("lng_menu_settings", {} , "Settings"),
             onClick: _ => {
                 UIEvents.Sidebars.fire("push", SettingsSidebar)
             }
         },
         {
             icon: "help",
-            title: Locale.l("lng_linux_menu_help"), //idk why only on linux
+            title: Locale.l("lng_linux_menu_help", {}, "Help"), //idk why only on linux
         }
     ], event.target)
 }

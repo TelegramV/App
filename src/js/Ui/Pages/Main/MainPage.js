@@ -45,22 +45,10 @@ function initHighLevelManagers() {
     DeepLinkManager.init();
 }
 
-function vhFix() {
-    let vh = window.innerHeight;
-    document.documentElement.style.setProperty('--vh100', `${vh}px`);
-}
-
 export function MainPage() {
     initHighLevelManagers();
 
-    window.document.body.classList.remove("scrollable"); //remove scrollability from login
-
-    //TODO move this somewhere
-    vhFix();
-
-    window.addEventListener('resize', throttle(() => {
-        vhFix();
-    }, 500));
+    window.document.body.classList.remove("scrollable"); //remove scrollability after login
 
     return (
         <div id="app" class={["app", classIf(IS_SAFARI, "safari")]}>
