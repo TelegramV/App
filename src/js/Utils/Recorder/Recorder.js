@@ -130,7 +130,7 @@ Recorder.prototype.initWorker = function () {
     this.recordedPages = [];
     this.totalLength = 0;
     this.loadWorker();
-
+    console.log("inited worker")
     return new Promise((resolve, reject) => {
         var callback = (e) => {
             switch (e['data']['message']) {
@@ -226,6 +226,7 @@ Recorder.prototype.start = function (sourceNode, processInput = null) {
             this.encoder.postMessage({command: 'getHeaderPages'});
             this.sourceNode.connect(this.monitorGainNode);
             this.sourceNode.connect(this.recordingGainNode);
+            console.log("started recording")
         });
     }
 };
@@ -238,7 +239,7 @@ Recorder.prototype.stop = function () {
         this.recordingGainNode.disconnect();
         this.sourceNode.disconnect();
         this.clearStream();
-
+        console.log("stopped recording")
         var encoder = this.encoder;
         return new Promise((resolve) => {
             var callback = (e) => {

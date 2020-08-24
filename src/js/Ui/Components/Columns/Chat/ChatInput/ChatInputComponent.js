@@ -455,6 +455,8 @@ export class ChatInputComponent extends StatelessComponent {
         //     this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
         // });
         // this.microphone = null
+        if(!this.recorder) return;
+        console.log("recorder stopped")
         this.recorder.stop()
         this.recorder = null
         // this.audioContext.close()
@@ -468,6 +470,8 @@ export class ChatInputComponent extends StatelessComponent {
             this.isRemoveVoice = false
             return
         }
+
+        console.log("recording ready")
         // TODO refactor sending
         MTProto.TimeManager.generateMessageId().then(id => {
             AppSelectedChat.Current.api.sendMedia("", array, {
@@ -501,6 +505,7 @@ export class ChatInputComponent extends StatelessComponent {
         this.$el.querySelector(".send-button>.tgico-microphone2").classList.add("hidden")
 
         if (!this.recorder) {
+        	console.log("downloading recoder...")
             import("../../../../../Utils/Recorder/Recorder").then(({default: Recorder}) => {
                 // navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
                     this.waveform = []
@@ -545,9 +550,11 @@ export class ChatInputComponent extends StatelessComponent {
                         numberOfChannels: parseInt(1, 10),
                         wavBitDepth: parseInt(16, 10),
                     });
+                    console.log("recorder inited")
 
                     this.recorder.ondataavailable = l => this.onRecordingReady(l);
                     this.recorder.start(null, processInput)
+                    console.log("recorder started")
                     // this.microphone = l
 
                     document.addEventListener("mouseup", l => this.onMouseUp(l))
