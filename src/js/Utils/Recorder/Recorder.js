@@ -203,29 +203,39 @@ Recorder.prototype.setMonitorGain = function (gain) {
 };
 
 Recorder.prototype.start = function (sourceNode, processInput = null) {
+    console.log("checking state")
     if (this.state === "inactive") {
+        console.log("inactive")
         this.initAudioContext(sourceNode);
+        console.log("initied audio context");
         this.initAudioGraph();
+        console.log("inited audio graph");
 
         this.encodedSamplePosition = 0;
-
+        console.log("creating promise")
         return Promise.all([this.initSourceNode(sourceNode), this.initWorker()]).then((results) => {
+            console.log("inside promise")
             this.sourceNode = results[0];
 
             this.analyser = this.audioContext.createAnalyser()
+            console.log("created analizer")
             this.scriptProcessor = this.audioContext.createScriptProcessor();
+            console.log("created scriptProcessor")
             this.analyser.smoothingTimeConstant = 0.3;
             this.analyser.fftSize = 1024;
             this.sourceNode.connect(this.analyser)
             this.analyser.connect(this.scriptProcessor)
             this.scriptProcessor.connect(this.audioContext.destination);
+            console.log("connected")
             this.scriptProcessor.onaudioprocess = (a) => processInput(a, this.analyser);
 
             this.state = "recording";
             this.onstart();
             this.encoder.postMessage({command: 'getHeaderPages'});
+            console.log("post message")
             this.sourceNode.connect(this.monitorGainNode);
             this.sourceNode.connect(this.recordingGainNode);
+            console.log("connected more")
         });
     }
 };
