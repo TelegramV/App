@@ -114,7 +114,7 @@ Recorder.prototype.initSourceNode = function (sourceNode) {
     return global.navigator.mediaDevices.getUserMedia({audio: this.config.mediaTrackConstraints}).then((stream) => {
         this.stream = stream;
         const mediaStreamSource = this.audioContext.createMediaStreamSource(stream);
-        console.log("got mediaStreamsource", mediaStream)
+        console.log("got mediaStreamsource", mediaStreamSource)
         return mediaStreamSource;
     });
 };
