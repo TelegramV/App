@@ -10,13 +10,13 @@ import LoginPage from "../Pages/Login/LoginPage";
 //import VirtualPage from "../Pages/Tests/VirtualPage"
 //import ElementsPage from "../Pages/Tests/Elements"
 //import ColumnsPage from "../Pages/Tests/Columns"
-//import CryptoTestPage from "../Pages/Tests/Crypto"
 //import NextGenPage from "../Pages/Tests/NextGen"
 //import {StreamingPage} from "../Pages/Tests/Streaming"
 //import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage"
 //import ElementsPage from "../Pages/Tests/Elements"
 //import CanvasTestPage from "../Pages/Tests/CanvasTest"
 import RadioButtonPage from "../Pages/Tests/Radio"
+import IGEPage from "../Pages/Tests/IGE"
 
 /**
  * @param {VFrameworkRouter} router
@@ -67,6 +67,12 @@ function AppRoutes(router) {
     router.route("/radio", "radio", {
         h() {
             return RadioButtonPage()
+        }
+    })
+
+    router.route("/ige", "ige", {
+        h() {
+            return IGEPage()
         }
     })
 
@@ -144,12 +150,6 @@ function AppRoutes(router) {
         router.route("/columns", "elements", {
             h() {
                 return ColumnsPage()
-            }
-        })
-
-        router.route("/crypto", "crypto", {
-            h() {
-                return CryptoTestPage()
             }
         })
 
