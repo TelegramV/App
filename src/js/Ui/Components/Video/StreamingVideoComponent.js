@@ -145,14 +145,14 @@ class StreamingVideoComponent extends VideoPlayer {
             const box = (event.currentTarget || event.target).getBoundingClientRect();
             const percentage = (event.pageX - box.x) / box.width;
             $video.currentTime = $video.duration * Math.max(0, Math.min(1, percentage));
-            this.pause();
+            //this.pause();
 
             this.setState({
                 showPreview: true,
                 previewPosition: percentage * 100,
             });
         }
-    }, 500)
+    }, 150)
 
     onDownloadDone = ({blob, url}) => {
         if (!this.state.url || !this.videoRef.$el?.currentTime) {

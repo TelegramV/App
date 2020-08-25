@@ -34,7 +34,8 @@ class WallpaperManagerSingleton {
 
         Settings.initPromise.then(() => {
             const background = Settings.get("background");
-            if (!background) {
+            if (!background || !(background.color || background.blob)) {
+                console.log("setting camomile")
                 this.setWallpaper("./static/images/default_bg.jpg", 0, false)
                 return;
             }

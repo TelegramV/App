@@ -45,7 +45,7 @@ export class BackgroundImageSidebar extends LeftSidebar {
 
     componentDidMount() {
         Settings.initPromise.then(() => {
-            const blur = Settings.get("background.blur");
+            let blur = Settings.get("background.blur");
             if(blur === undefined) {
                 Settings.set("background.blur", false);
                 blur = false;

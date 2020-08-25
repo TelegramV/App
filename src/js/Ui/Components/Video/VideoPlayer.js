@@ -293,6 +293,8 @@ class VideoPlayer extends StatefulComponent {
         this.forceUpdate();
     }
 
+    onPreviewMouseMove = () => {}
+
     onPreviewMouseOver = (event: MouseEvent) => {
         this.onMouseMove(event);
     }

@@ -150,7 +150,7 @@
         background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
-        transition: anim(filter);
+        transition: anim(filter), background-image 0.3s ease-in-out;
 
         &.blur {
             filter: blur(5px) /*brightness(90%)*/;
