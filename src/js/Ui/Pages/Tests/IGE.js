@@ -18,15 +18,13 @@
 import VButton from "../../Elements/Button/VButton"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import aes_ige_encrypt from "../../../MTProto/Cryptography/aes_ige_encrypt"
-import {IGE} from "@cryptography/aes"
+import {IGE, CTR} from "@cryptography/aes"
+//import aesjs from "../../../../../vendor/aes"
 import Uint8 from "../../../MTProto/Utils/Uint8"
 import sha1 from "../../../MTProto/Cryptography/sha1"
 import sha256 from "../../../MTProto/Cryptography/sha256"
-import cryptoSha512 from "@cryptography/sha512"
 import cryptoSha256 from "@cryptography/sha256"
-import cryptoSha1 from "@cryptography/sha1"
-import {pbkdf2_sha512} from "../../../MTProto/Cryptography/mt_srp"
-import pbkdf2 from "@cryptography/pbkdf2"
+//import cryptoSha1 from "@cryptography/sha1"
 import Rusha from "rusha";
 
 export default function IGEPage() {
@@ -47,9 +45,9 @@ class IGETest extends StatefulComponent {
         const testCases = 10;
         for(let i = 0; i< testCases; i++) {
             this.testData.push([
-                new Uint8Array(this.randomArray(64)),
                 new Uint8Array(this.randomArray(32)),
-                new Uint8Array(this.randomArray(32))
+                new Uint8Array(this.randomArray(16)),
+                new Uint8Array(this.randomArray(64))
                 ])
         }
 
@@ -60,9 +58,8 @@ class IGETest extends StatefulComponent {
 
     render({}, {checked}) {
         window.test = this
-        window.rusha = this.rusha
-        window.sha1 = cryptoSha1
-        window.Uint8 = Uint8
+        window.ctr = CTR
+        window.aes = aesjs
         return (
             <div>
                 <VButton onClick={() => {
@@ -71,13 +68,6 @@ class IGETest extends StatefulComponent {
                 <VButton onClick={() => {
                     this.testCryptographyIGE();
                 }}>Start cryptography IGE encrypt</VButton>
-                <br/>
-                <VButton onClick={() => {
-                    this.testOurSHA512()
-                }}>Start our SHA512</VButton>
-                <VButton onClick={() => {
-                    this.testCryptographySHA512();
-                }}>Start cryptography SHA512</VButton>
                 <br/>
                 <VButton onClick={() => {
                     this.testOurSHA256()
@@ -90,18 +80,38 @@ class IGETest extends StatefulComponent {
                     this.testOurSHA1()
                 }}>Start our SHA1</VButton>
                 <VButton onClick={() => {
-                    this.testCryptographySHA1();
-                }}>Start cryptography SHA1</VButton>
-
+                    this.testWebSHA1();
+                }}>Start Web SHA1</VButton>
                 <br/>
                 <VButton onClick={() => {
-                    this.testOurPasscheck()
-                }}>Start our Passcheck</VButton>
+                    this.testAes()
+                }}>Start our AESCTR</VButton>
                 <VButton onClick={() => {
-                    this.testCryptographyPasscheck();
-                }}>Start cryptography Passcheck</VButton>
+                    this.testCryptographyAes();
+                }}>Start Cryptography AESCTR</VButton>
             </div>
         )
+    }
+
+    testAes() {
+    	const results = [];
+        const now = performance.now();
+    	for(let params of this.testData) {
+	    	let aes_encryptor = new aesjs.ModeOfOperation.ctr(params[0], new aesjs.Counter(params[1]));
+	    	results.push(aes_encryptor.encrypt(params[2]));
+		}
+		console.log("Our AES ", performance.now()-now)
+        console.log(results)
+    }
+
+    async testCryptographyAes() {
+    	const results = [];
+        const now = performance.now();
+    	for(let params of this.testData) {
+	    	results.push(Uint8.endian(new CTR(params[0],params[1]).encrypt(params[2]).buffer))
+		}
+		console.log("Cryptography AES ", performance.now()-now)
+        console.log(results)
     }
 
     testOurSHA256() {
@@ -134,33 +144,13 @@ class IGETest extends StatefulComponent {
         console.log(results)
     }
 
-    testCryptographySHA1() {
+    async testWebSHA1() {
         const results = [];
         const now = performance.now();
         for(let data of this.randomStrings) {
-            results.push(Uint8.endian(cryptoSha1(Uint8.toWords(data)).buffer))
+            results.push(await crypto.subtle.digest("SHA-1", data))
         }
-        console.log("Cryptography SHA1 ", performance.now()-now)
-        console.log(results)
-    }
-
-    testOurSHA512() {
-        const results = [];
-        const now = performance.now();
-        for(let data of this.randomStrings) {
-            results.push(sha512(data, "array"))
-        }
-        console.log("Our SHA512 ", performance.now()-now)
-        console.log(results)
-    }
-
-    testCryptographySHA512() {
-        const results = [];
-        const now = performance.now();
-        for(let data of this.randomStrings) {
-            results.push(cryptoSha512(data, "array"))
-        }
-        console.log("Cryptography SHA512 ", performance.now()-now)
+        console.log("Web SHA1 ", performance.now()-now)
         console.log(results)
     }
 

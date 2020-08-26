@@ -18,8 +18,10 @@
  */
 
 import {mt_get_random_num_secure, mt_write_bytes, mt_write_uint32} from "../Cryptography/mt_inob_codec"
-import aesjs from "../../../../vendor/aes"
+//import aesjs from "../../../../vendor/aes"
+import {CTR} from "@cryptography/aes"
 import Connection from "./Connection"
+import Uint8 from "../Utils/Uint8"
 
 export class SocketTransporter {
     constructor(connection: Connection) {
@@ -176,8 +178,9 @@ export class SocketTransporter {
 
         const obfuscation_buffer_u8arr = new Uint8Array(obfuscation_buffer)
 
-        this.aes_encryptor = new aesjs.ModeOfOperation.ctr(obf_key_256, new aesjs.Counter(obf_vector_128));
-        const encryptedBytes = this.aes_encryptor.encrypt(obfuscation_buffer_u8arr)
+        //this.aes_encryptor = new aesjs.ModeOfOperation.ctr(obf_key_256, new aesjs.Counter(obf_vector_128));
+        this.aes_encryptor = new CTR(obf_key_256, obf_vector_128);
+        const encryptedBytes = Uint8.endian(this.aes_encryptor.encrypt(obfuscation_buffer_u8arr).buffer)
 
         for (let i = 56; i < 64; ++i) {
             out_buffer_view.setUint8(out_buffer_offset, encryptedBytes[i]);
@@ -189,7 +192,8 @@ export class SocketTransporter {
         const deobf_key_256 = new Uint8Array(obfuscation_buffer_reverse.slice(8, 40))
         const deobf_vector_128 = new Uint8Array(obfuscation_buffer_reverse.slice(40, 56))
 
-        this.aes_decryptor = new aesjs.ModeOfOperation.ctr(deobf_key_256, new aesjs.Counter(deobf_vector_128));
+        //this.aes_decryptor = new aesjs.ModeOfOperation.ctr(deobf_key_256, new aesjs.Counter(deobf_vector_128));
+        this.aes_decryptor = new CTR(deobf_key_256, deobf_vector_128)
     }
 
     inob_send_init() {
@@ -213,7 +217,7 @@ export class SocketTransporter {
         mt_write_uint32(0, buffer_len, out_buffer_view);
         mt_write_bytes(4, buffer_len, new Uint8Array(buffer), out_buffer_view);
 
-        const encrypted_buffer = this.aes_encryptor.encrypt(new Uint8Array(out_buffer));
+        const encrypted_buffer = Uint8.endian(this.aes_encryptor.encrypt(new Uint8Array(out_buffer)).buffer);
 
         this.transportationSocket.send(encrypted_buffer);
     }
@@ -223,7 +227,7 @@ export class SocketTransporter {
             return null;
         }
 
-        const decrypted_buffer = this.aes_decryptor.decrypt(new Uint8Array(ev.data));
+        const decrypted_buffer = Uint8.endian(this.aes_decryptor.decrypt(new Uint8Array(ev.data)).buffer);
         return decrypted_buffer.slice(4);
     }
 
