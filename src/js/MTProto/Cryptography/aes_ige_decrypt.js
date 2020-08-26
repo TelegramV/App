@@ -17,17 +17,20 @@
  *
  */
 
-import Bytes from "../Utils/Bytes";
-import CryptoJS from "../../../../vendor/CryptoJS";
+/*import Bytes from "../Utils/Bytes";
+import CryptoJS from "../../../../vendor/CryptoJS";*/
+import {IGE} from "@cryptography/aes"
+import Uint8 from "../Utils/Uint8"
 
 function aes_ige_decrypt(data: Uint8Array, key: Uint8Array, iv: Uint8Array): Uint8Array {
-    const decrypted = CryptoJS.AES.decrypt({ciphertext: Bytes.toWords(data)}, Bytes.toWords(key), {
+    /*const decrypted = CryptoJS.AES.decrypt({ciphertext: Bytes.toWords(data)}, Bytes.toWords(key), {
         iv: Bytes.toWords(iv),
         padding: CryptoJS.pad.NoPadding,
         mode: CryptoJS.mode.IGE
     });
 
-    return new Uint8Array(Bytes.fromWords(decrypted));
+    return new Uint8Array(Bytes.fromWords(decrypted));*/
+    return Uint8.endian(new IGE(key, iv).decrypt(data).buffer);
 }
 
 export default aes_ige_decrypt;

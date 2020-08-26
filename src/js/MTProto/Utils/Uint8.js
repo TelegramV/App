@@ -145,6 +145,10 @@ function fromBits(byteArr, endian = true) {
 }
 
 function endian(bytes) { //changes endian to opposite
+    if (bytes instanceof ArrayBuffer) {
+        bytes = new Uint8Array(bytes)
+    }
+
     let len = bytes.length;
     let holder;
 
@@ -161,7 +165,7 @@ function endian(bytes) { //changes endian to opposite
 
 function toBits(byteArr, endian = true) {
     if (byteArr instanceof ArrayBuffer) {
-        byteArr = new Uint8Array(bytes)
+        byteArr = new Uint8Array(byteArr)
     }
 
     const len = byteArr.length
@@ -182,21 +186,50 @@ function fromString(string, endian = true) {
     return this.endian(bytes);
 }
 
+function fromWords(wordsArray: Uint32Array) {
+    const words = Array.from(wordsArray)
+    const sigBytes = wordsArray.length
+    const bytes = []
+
+    for (let i = 0; i < sigBytes; i++) {
+        bytes.push((words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff)
+    }
+
+    return new Uint8Array(bytes)
+}
+
+function toWords(bytes) {
+    if (bytes instanceof ArrayBuffer) {
+        bytes = new Uint8Array(bytes)
+    }
+
+    const len = bytes.length
+    const words = []
+
+    for (let i = 0; i < len; i++) {
+        words[i >>> 2] |= bytes[i] << (24 - (i % 4) * 8)
+    }
+
+    return new Uint32Array(words)
+}
+
 const Uint8 = {
-    substr: substr,
-    concat: concat,
-    random: random,
-    compare: compare,
-    fromHex: fromHex,
-    toHex: toHex,
-    xor: xor,
-    fromBigInteger: fromBigInteger,
-    toBigInteger: toBigInteger,
-    modPow: modPow,
-    toBits: toBits,
-    endian: endian,
-    fromBits: fromBits,
-    fromString: fromString,
+    substr,
+    concat,
+    random,
+    compare,
+    fromHex,
+    toHex,
+    xor,
+    fromBigInteger,
+    toBigInteger,
+    modPow,
+    toBits,
+    endian,
+    fromBits,
+    fromString,
+    fromWords,
+    toWords
 };
 
 export default Uint8;

@@ -18,7 +18,6 @@
  */
 
 import crypto from "crypto"
-import CryptoJS from "../../../../vendor/CryptoJS"
 import Uint8 from "./Uint8"
 
 /**
@@ -64,40 +63,11 @@ function concatBuffer(a, b) {
     return Uint8.concat(a, b).buffer
 }
 
-function fromWords(wordArray) {
-    const words = wordArray.words
-    const sigBytes = wordArray.sigBytes
-    const bytes = []
-
-    for (let i = 0; i < sigBytes; i++) {
-        bytes.push((words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff)
-    }
-
-    return bytes
-}
-
-function toWords(bytes) {
-    if (bytes instanceof ArrayBuffer) {
-        bytes = new Uint8Array(bytes)
-    }
-
-    const len = bytes.length
-    const words = []
-
-    for (let i = 0; i < len; i++) {
-        words[i >>> 2] |= bytes[i] << (24 - (i % 4) * 8)
-    }
-
-    return new CryptoJS.lib.WordArray.init(words, len)
-}
-
 /**
  * @deprecated треба переписати все під Uint8Array, я цим вже займаюсь (Uint8.js)
  */
 const Bytes = {
     addPadding: addPadding,
-    fromWords: fromWords,
-    toWords: toWords,
     concatBuffer: concatBuffer,
 }
 

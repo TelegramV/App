@@ -17,13 +17,20 @@
  *
  */
 
-import CryptoJS from "../../../../vendor/CryptoJS";
+/*import CryptoJS from "../../../../vendor/CryptoJS";
 import Bytes from "../Utils/Bytes";
 
 function sha256(data: Uint8Array): Uint8Array {
     const hashWords = CryptoJS.SHA256(Bytes.toWords(data))
 
     return Bytes.fromWords(hashWords)
+}*/
+
+import cryptographySha256 from "@cryptography/sha256"
+import Uint8 from "../Utils/Uint8"
+
+function sha256(data: Uint8Array): Uint8Array {
+    return Array.from(Uint8.endian(cryptographySha256(Uint8.toWords(data)).buffer));
 }
 
 export default sha256;
