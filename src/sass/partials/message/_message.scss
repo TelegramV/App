@@ -8,7 +8,6 @@
     padding-bottom: 5px;
     -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) calc(100% - 16px), rgba(0, 0, 0, 0));
     mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) calc(100% - 16px), rgba(0, 0, 0, 0));
-    //scroll-behavior: smooth;
 
     @include service;
 
@@ -36,17 +35,7 @@
         display: grid;
         position: relative;
         grid-template-columns: min-content fit-content(480px) min-content;
-        transform-origin: bottom;
         animation: opacity-fade-in 0.3s ease;
-
-        &:first-child {
-            &.in .message-content {
-                animation: message-in-fade-in 0.3s ease;
-            }
-            &.out .message-content {
-                animation: message-out-fade-in 0.3s ease;
-            }
-        }
 
         filter: drop-shadow(0 1px 2px rgba(16, 35, 47, 0.15));
         //filter: none;

@@ -1,87 +1,76 @@
 @keyframes rippleEffect {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    30% {
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(400);
-        opacity: 0;
-    }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(400);
+    opacity: 0;
+  }
 }
 
 @keyframes rippleEffectLight {
-    0% {
-        transform: scale(1);
-        opacity: .7;
-    }
-
-    30% {
-        opacity: .6;
-    }
-
-    100% {
-        transform: scale(400);
-        opacity: 0;
-    }
+  0% {
+    transform: scale(1);
+    opacity: .7;
+  }
+  30% {
+    opacity: .6;
+  }
+  100% {
+    transform: scale(400);
+    opacity: 0;
+  }
 }
 
 @keyframes rippleEffectSmall {
-    0% {
-        transform: scale(1);
-        opacity: 1;
-    }
-
-    30% {
-        opacity: 1;
-    }
-
-    100% {
-        transform: scale(100);
-        opacity: 0;
-    }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(100);
+    opacity: 0;
+  }
 }
 
 @keyframes rippleEffectLightSmall {
-    0% {
-        transform: scale(1);
-        opacity: .7;
-    }
-
-    30% {
-        opacity: .6;
-    }
-
-    100% {
-        transform: scale(100);
-        opacity: 0;
-    }
+  0% {
+    transform: scale(1);
+    opacity: .7;
+  }
+  30% {
+    opacity: .6;
+  }
+  100% {
+    transform: scale(100);
+    opacity: 0;
+  }
 }
 
 @keyframes slide-up-message {
-    0% {
-        transform: translateY(1px);
-    }
-
-    100% {
-        transform: translateY(0);
-    }
+  0% {
+    transform: translateY(1px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
 
 @keyframes slide-up-dialog {
-    0% {
-        transform: translateY(1px);
-    }
-
-    100% {
-        transform: translateY(0);
-    }
+  0% {
+    transform: translateY(1px);
+  }
+  100% {
+    transform: translateY(0);
+  }
 }
-
 //
 //@keyframes tag-appear {
 //  0% {
@@ -92,150 +81,112 @@
 //  }
 //}
 
-@keyframes scale-in {
-    from {
-        transform: scaleY(0);
-    }
-
-    to {
-        transform: scaleY(1);
-    }
-}
-
-@keyframes message-out-fade-in {
-    from {
-        transform: scaleY(0) translateX(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: scaleY(1) translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes message-in-fade-in {
-    from {
-        transform: /*scaleY(0)*/ translateX(-100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: /*scaleY(1)*/ translateX(0);
-        opacity: 1;
-    }
-}
-
 @keyframes jump-in {
-    0% {
-        max-height: 10px;
-        transform: translateY(100%);
-        opacity: 0.4;
-    }
-
-    100% {
-        max-height: 1000px;
-        transform: translateY(0);
-        opacity: 1;
-    }
+  0% {
+    max-height: 10px;
+    transform: translateY(100%);
+    opacity: 0.4;
+  }
+  100% {
+    max-height: 1000px;
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 @keyframes arrow-to-menu {
-    0% {
-        content: $tgico-next;
-        transform: rotate(180deg);
-    }
+  0% {
+    content: $tgico-next;
+    transform: rotate(180deg);
+  }
 
-    100% {
-        content: $tgico-menu;
-        transform: rotate(0deg);
-    }
+  100% {
+    content: $tgico-menu;
+    transform: rotate(0deg);
+  }
 }
-
 @keyframes menu-to-arrow {
-    0% {
-        content: $tgico-next;
-        transform: rotate(60deg);
-    }
+  0% {
+    content: $tgico-next;
+    transform: rotate(60deg);
+  }
 
-    100% {
-        content: $tgico-next;
-        transform: rotate(180deg);
-    }
+  100% {
+    content: $tgico-next;
+    transform: rotate(180deg);
+  }
 }
 
 @keyframes loading-text {
-    0% {
-        content: "";
-    }
+  0% {
+    content: "";
+  }
 
-    33% {
-        content: ".";
-    }
+  33% {
+    content: ".";
+  }
 
-    66% {
-        content: "..";
-    }
+  66% {
+    content: "..";
+  }
 
-    100% {
-        content: "...";
-    }
+  100% {
+    content: "...";
+  }
 }
 
 @keyframes loading-text-2 {
-    50% {
-        content: ".";
-    }
+  50% {
+    content: ".";
+  }
 
-    100% {
-        content: "..";
-    }
+  100% {
+    content: "..";
+  }
 }
 
 @keyframes roll {
-    100% {
-        transform: rotate(360deg);
-    }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes opacity-fade-in {
-    from {
-        opacity: 0
-    }
+  from {
+    opacity: 0
+  }
 
-    to {
-        opacity: 1
-    }
+  to {
+    opacity: 1
+  }
 }
 
 @keyframes opacity-fade-out {
-    from {
-        opacity: 1
-    }
+  from {
+    opacity: 1
+  }
 
-    to {
-        opacity: 0
-    }
+  to {
+    opacity: 0
+  }
 }
 
 @keyframes translate-in-60px {
-    from {
-        transform: translateY(-60px);
-    }
-
-    to {
-        transform: translateY(0);
-    }
+  from {
+    transform: translateY(-60px);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 
 @keyframes rainbow {
-    from {
-        -webkit-filter: hue-rotate(1deg);
-        filter: hue-rotate(1deg);
+ from {
+    -webkit-filter:hue-rotate(1deg);
+            filter:hue-rotate(1deg);
     }
-
-    to {
-        -webkit-filter: hue-rotate(360deg);
-        filter: hue-rotate(360deg);
+  to {
+    -webkit-filter:hue-rotate(360deg);
+            filter:hue-rotate(360deg);
     }
 }
