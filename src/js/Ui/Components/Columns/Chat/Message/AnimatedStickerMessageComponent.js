@@ -5,11 +5,15 @@ import VUI from "../../../../VUI"
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 import {StickerSetModal} from "../../../Modals/StickerSetModal"
 import StickerSet from "../../../../../Api/Stickers/StickerSet"
+import {MessageType} from "../../../../../Api/Messages/Message"
+import Settings from "../../../../../Api/Settings/Settings"
 
 class AnimatedStickerMessageComponent extends GeneralMessageComponent {
     render({message, showDate}) {
         let stickerSet = new StickerSet(message.media.document.attributes.find(attr => attr._ === "documentAttributeSticker").stickerset);
-
+        let isEmoji = message.type === MessageType.ANIMATED_EMOJI;
+        const width = 200 * (isEmoji ? Settings.get("app_config.emojies_animated_zoom", 1) : 1)
+        
         return (
             <MessageWrapperFragment message={message}
                                     transparent={true}
@@ -21,9 +25,9 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
                 <BetterStickerComponent 
                     clickable={!stickerSet.isEmpty()}
                     onClick={() => {
-                        if(!stickerSet.isEmpty()) VUI.Modal.open(<StickerSetModal set={stickerSet}/>)
+                        if(!stickerSet.isEmpty() && !isEmoji) VUI.Modal.open(<StickerSetModal set={stickerSet}/>)
                     }} 
-                    width={200} 
+                    width={width} 
                     document={message.raw.media.document}
                 />
 

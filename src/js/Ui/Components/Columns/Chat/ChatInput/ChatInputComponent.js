@@ -18,6 +18,7 @@ import VApp from "../../../../../V/vapp"
 import ChatToBottomButtonComponent from "../ChatToBottomButtonComponent"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 import {UserPeer} from "../../../../../Api/Peers/Objects/UserPeer";
+import Settings from "../../../../../Api/Settings/Settings";
 
 export let ChatInputManager
 
@@ -606,7 +607,7 @@ export class ChatInputComponent extends StatelessComponent {
 
         const {text, messageEntities} = domToMessageEntities(this.textarea)
 
-        if(text === "🎲" || text === "🎯" || text === "🏀" || text === "⚽") {
+        if(Settings.get("app_config.emojies_send_dice")?.includes(text)) {
             AppSelectedChat.Current.api.sendDice(text);
         } else {
             AppSelectedChat.Current.api.sendMessage({

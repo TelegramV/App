@@ -4,14 +4,16 @@
         max-width: 512px;
         height: auto;
         max-height: 512px;
-        display: block;
+        display: flex;
+        flex-direction: row-reverse;
 
         &.clickable {
             cursor: pointer;
         }
 
         img {
-            border-radius: 8px; // DENYS, DO NOT TOUCH IT!!!(((
+            border-radius: 8px; // DENIS, DO NOT TOUCH IT!!!(((
+                                // Ok.
         }
 
         &.emoji {

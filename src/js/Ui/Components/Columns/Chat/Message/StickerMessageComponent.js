@@ -76,22 +76,22 @@ class StickerMessageComponent extends GeneralMessageComponent {
 }*/
 
 class StickerMessageComponent extends GeneralMessageComponent {
-    render({showDate}) {
-        let stickerSet = new StickerSet(this.props.message.raw.media.document.attributes.find(attr => attr._ === "documentAttributeSticker").stickerset);
+    render({message, showDate}) {
+        let stickerSet = new StickerSet(message.raw.media.document.attributes.find(attr => attr._ === "documentAttributeSticker").stickerset);
         return (
-            <MessageWrapperFragment message={this.props.message} transparent={true} noPad showUsername={false}
+            <MessageWrapperFragment message={message} transparent={true} noPad showUsername={false}
                                     avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}
                                     showDate={showDate}>
 
                 <BetterStickerComponent isFull
                                         width={200}
                                         clickable={!stickerSet.isEmpty()}
-                                        document={this.props.message.raw.media.document}
+                                        document={message.raw.media.document}
                                         onClick={() => {
                                             if(!stickerSet.isEmpty()) VUI.Modal.open(<StickerSetModal set={stickerSet}/>)
                                         }}/>
 
-                <MessageTimeComponent message={this.props.message} bg={true}/>
+                <MessageTimeComponent message={message} bg={true}/>
 
             </MessageWrapperFragment>
         )

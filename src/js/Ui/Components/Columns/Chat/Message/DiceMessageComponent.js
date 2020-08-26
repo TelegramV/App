@@ -6,6 +6,7 @@ import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
 import VButton from "../../../../Elements/Button/VButton"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
+import Settings from "../../../../../Api/Settings/Settings"
 
 class DiceMessageComponent extends GeneralMessageComponent {
     state = {
@@ -19,7 +20,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
 
                 {
                     (this.state.sticker ? 
-                        <BetterStickerComponent width={200*0.625 /*TODO get that ratio from TG settings*/} document={sticker}
+                        <BetterStickerComponent width={200*Settings.get("app_config.emojies_animated_zoom", 1)} document={sticker}
                                                 autoplay={true}
                                                 playOnHover={false}
                                                 paused={false}
