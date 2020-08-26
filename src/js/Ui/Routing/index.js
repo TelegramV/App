@@ -16,7 +16,7 @@ import LoginPage from "../Pages/Login/LoginPage";
 //import ElementsPage from "../Pages/Tests/Elements"
 //import CanvasTestPage from "../Pages/Tests/CanvasTest"
 import RadioButtonPage from "../Pages/Tests/Radio"
-import IGEPage from "../Pages/Tests/IGE"
+//import IGEPage from "../Pages/Tests/IGE"
 
 /**
  * @param {VFrameworkRouter} router
@@ -70,11 +70,11 @@ function AppRoutes(router) {
         }
     })
 
-    router.route("/ige", "ige", {
+    /*router.route("/ige", "ige", {
         h() {
             return IGEPage()
         }
-    })
+    })*/
 
     //router.route("/canvas", "canvas", {
     //    h() {
