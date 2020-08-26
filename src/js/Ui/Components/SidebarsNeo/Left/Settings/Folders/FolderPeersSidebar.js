@@ -19,21 +19,21 @@ export class FolderPeersSidebar extends LeftSidebar {
             pinned_peers: [],
             exclude_peers: []
         }
-        console.log("isExclude", this.state.exclude)
+        //console.log("isExclude", this.state.exclude)
         let tags = null
         if(!this.state.exclude) {
             tags = [
-                nodeIf(<VTagIcon icon="newprivate" text="Contacts" onRemove={l => this.toggle("contacts")}/>, f.contacts),
-                nodeIf(<VTagIcon icon="noncontacts" text="Non-Contacts" onRemove={l => this.toggle("non_contacts")}/>, f.non_contacts),
-                nodeIf(<VTagIcon icon="newgroup" text="Groups" onRemove={l => this.toggle("groups")}/>, f.groups),
-                nodeIf(<VTagIcon icon="newchannel" text="Channels" onRemove={l => this.toggle("broadcasts")}/>, f.broadcasts),
-                nodeIf(<VTagIcon icon="bots" text="Bots" onRemove={l => this.toggle("bots")}/>, f.bots),
+                nodeIf(<VTagIcon icon="newprivate" text={this.l("lng_filters_include_contacts")} onRemove={l => this.toggle("contacts")}/>, f.contacts),
+                nodeIf(<VTagIcon icon="noncontacts" text={this.l("lng_filters_include_non_contacts")} onRemove={l => this.toggle("non_contacts")}/>, f.non_contacts),
+                nodeIf(<VTagIcon icon="newgroup" text={this.l("lng_filters_include_groups")} onRemove={l => this.toggle("groups")}/>, f.groups),
+                nodeIf(<VTagIcon icon="newchannel" text={this.l("lng_filters_include_channels")} onRemove={l => this.toggle("broadcasts")}/>, f.broadcasts),
+                nodeIf(<VTagIcon icon="bots" text={this.l("lng_filters_include_bots")} onRemove={l => this.toggle("bots")}/>, f.bots),
             ]
         } else {
             tags = [
-                nodeIf(<VTagIcon icon="mute" text="Muted" onRemove={l => this.toggle("exclude_muted")}/>, f.exclude_muted),
-                nodeIf(<VTagIcon icon="readchats" text="Read" onRemove={l => this.toggle("exclude_read")}/>, f.exclude_read),
-                nodeIf(<VTagIcon icon="archive" text="Archived" onRemove={l => this.toggle("exclude_archived")}/>, f.exclude_archived),
+                nodeIf(<VTagIcon icon="mute" text={this.l("lng_filters_exclude_muted")} onRemove={l => this.toggle("exclude_muted")}/>, f.exclude_muted),
+                nodeIf(<VTagIcon icon="readchats" text={this.l("lng_filters_exclude_read")} onRemove={l => this.toggle("exclude_read")}/>, f.exclude_read),
+                nodeIf(<VTagIcon icon="archive" text={this.l("lng_filters_exclude_archived")} onRemove={l => this.toggle("exclude_archived")}/>, f.exclude_archived),
             ]
         }
 
@@ -46,33 +46,35 @@ export class FolderPeersSidebar extends LeftSidebar {
             }
         })
         return <this.contentWrapper>
-            <VTagsInput tags={tags} onInput={this.onPeerNameInput} value={this.state.filter}/>
-            <Section title="Chat types">
+            <Section>
+                <VTagsInput tags={tags} onInput={this.onPeerNameInput} value={this.state.filter}/>
+            </Section>
+            <Section title={this.l("lng_filters_edit_types")}>
                 {!this.state.exclude ?
                     <>
-                        <IconCheckmarkButton icon="newprivate" text="Contacts" checked={f.contacts}
+                        <IconCheckmarkButton icon="newprivate" text={this.l("lng_filters_include_contacts")} checked={f.contacts}
                                              onClick={l => this.toggle("contacts")}/>
-                        <IconCheckmarkButton icon="noncontacts" text="Non-Contacts" checked={f.non_contacts}
+                        <IconCheckmarkButton icon="noncontacts" text={this.l("lng_filters_include_non_contacts")} checked={f.non_contacts}
                                              onClick={l => this.toggle("non_contacts")}/>
-                        <IconCheckmarkButton icon="newgroup" text="Groups" checked={f.groups}
+                        <IconCheckmarkButton icon="newgroup" text={this.l("lng_filters_include_groups")} checked={f.groups}
                                              onClick={l => this.toggle("groups")}/>
-                        <IconCheckmarkButton icon="newchannel" text="Channels" checked={f.broadcasts}
+                        <IconCheckmarkButton icon="newchannel" text={this.l("lng_filters_include_channels")} checked={f.broadcasts}
                                              onClick={l => this.toggle("broadcasts")}/>
-                        <IconCheckmarkButton icon="bots" text="Bots" checked={f.bots}
+                        <IconCheckmarkButton icon="bots" text={this.l("lng_filters_include_bots")} checked={f.bots}
                                              onClick={l => this.toggle("bots")}/>
                     </> :
                     <>
-                        <IconCheckmarkButton icon="mute" text="Muted" checked={f.exclude_muted}
+                        <IconCheckmarkButton icon="mute" text={this.l("lng_filters_exclude_muted")} checked={f.exclude_muted}
                                              onClick={l => this.toggle("exclude_muted")}/>
-                        <IconCheckmarkButton icon="readchats" text="Read" checked={f.exclude_read}
+                        <IconCheckmarkButton icon="readchats" text={this.l("lng_filters_exclude_read")} checked={f.exclude_read}
                                              onClick={l => this.toggle("exclude_read")}/>
-                        <IconCheckmarkButton icon="archive" text="Archived" checked={f.exclude_archived}
+                        <IconCheckmarkButton icon="archive" text={this.l("lng_filters_exclude_archived")} checked={f.exclude_archived}
                                              onClick={l => this.toggle("exclude_archived")}/>
                     </>
                 }
             </Section>
 
-            <Section title="Chats">
+            <Section title={this.l("lng_filters_edit_chats")}>
             {
                 DialogsStore.sort().map(dialog => {
 
@@ -98,6 +100,7 @@ export class FolderPeersSidebar extends LeftSidebar {
         } else {
             this.state.selectedChats.delete(peer)
         }
+        this.state.filter = ""
         this.forceUpdate()
     }
 
@@ -165,6 +168,6 @@ export class FolderPeersSidebar extends LeftSidebar {
     }
 
     get title(): string | * {
-        return this.state.exclude ? "Excluded Chats" : "Included Chats"
+        return this.state.exclude ? this.l("lng_filters_exclude") : this.l("lng_filters_include")
     }
 }

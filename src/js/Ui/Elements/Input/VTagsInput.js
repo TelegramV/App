@@ -23,9 +23,7 @@ function VTagsInput(
     {tags = [], value, onInput}
 ) {
     return (
-        <div className="VTagsInput" style={{
-            "margin-left": "15px"
-        }}>
+        <div className="VTagsInput">
             <div className="tags">
                 {tags}
                 <div className="input">

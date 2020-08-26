@@ -25,21 +25,21 @@ export class CreateFolderSidebar extends LeftSidebar {
         return <this.contentWrapper>
             <Animated animationData={filtersNew} hidden={this.state.reallyHidden}/>
             <Subheader>
-                Choose chats and type of chats that will appear and never appear in this folder.
+                {this.l("lng_filters_include_about")}
             </Subheader>
 
             <Section>
-                <VInput label="Folder Name" value={f.title || ""} onInput={this.onChangeTitle}/>
+                <VInput label={this.l("lng_filters_new_name")} value={f.title || ""} onInput={this.onChangeTitle}/>
             </Section>
 
 
-            <Section title="Included chats">
-                <IconButton icon="add" text="Add Chats" blue onClick={this.includeChats}/>
-                {nodeIf(<IconButton icon="newprivate" text="Contacts"/>, f.contacts)}
-                {nodeIf(<IconButton icon="noncontacts" text="Non-Contacts"/>, f.non_contacts)}
-                {nodeIf(<IconButton icon="newgroup" text="Groups"/>, f.groups)}
-                {nodeIf(<IconButton icon="newchannel" text="Channels"/>, f.broadcasts)}
-                {nodeIf(<IconButton icon="bots" text="Bots"/>, f.bots)}
+            <Section title={this.l("lng_filters_include")}>
+                <IconButton icon="add" text={this.l("lng_filters_add_chats")} blue onClick={this.includeChats}/>
+                {nodeIf(<IconButton icon="newprivate" text={this.l("lng_filters_include_contacts")}/>, f.contacts)}
+                {nodeIf(<IconButton icon="noncontacts" text={this.l("lng_filters_include_non_contacts")}/>, f.non_contacts)}
+                {nodeIf(<IconButton icon="newgroup" text={this.l("lng_filters_include_groups")}/>, f.groups)}
+                {nodeIf(<IconButton icon="newchannel" text={this.l("lng_filters_include_channels")}/>, f.broadcasts)}
+                {nodeIf(<IconButton icon="bots" text={this.l("lng_filters_include_bots")}/>, f.bots)}
 
                 {f.pinned_peers.map(inputPeer => {
                     const peer = PeersStore.getByPeerType(inputPeer)
@@ -52,11 +52,11 @@ export class CreateFolderSidebar extends LeftSidebar {
                 })}
             </Section>
 
-            <Section title="Excluded chats">
-                <IconButton icon="minus" text="Remove Chats" blue onClick={this.excludeChats}/>
-                {nodeIf(<IconButton icon="mute" text="Muted"/>, f.exclude_muted)}
-                {nodeIf(<IconButton icon="readchats" text="Read"/>, f.exclude_read)}
-                {nodeIf(<IconButton icon="archive" text="Archived"/>, f.exclude_archived)}
+            <Section title={this.l("lng_filters_exclude")}>
+                <IconButton icon="minus" text={this.l("lng_filters_remove_chats")} blue onClick={this.excludeChats}/>
+                {nodeIf(<IconButton icon="mute" text={this.l("lng_filters_exclude_muted")}/>, f.exclude_muted)}
+                {nodeIf(<IconButton icon="readchats" text={this.l("lng_filters_exclude_read")}/>, f.exclude_read)}
+                {nodeIf(<IconButton icon="archive" text={this.l("lng_filters_exclude_archived")}/>, f.exclude_archived)}
 
                 {f.exclude_peers.map(inputPeer => {
                     const peer = PeersStore.getByPeerType(inputPeer)
@@ -171,6 +171,6 @@ export class CreateFolderSidebar extends LeftSidebar {
     }
 
     get title(): string | * {
-        return this.state.currentFolder == null ? "New Folder" : "Edit Folder"
+        return this.state.currentFolder == null ? this.l("lng_filters_new") : this.l("lng_filters_edit")
     }
 }

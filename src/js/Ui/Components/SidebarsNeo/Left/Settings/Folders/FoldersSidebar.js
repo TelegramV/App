@@ -26,18 +26,19 @@ export class FoldersSidebar extends LeftSidebar {
             <Animated animationData={filters} hidden={this.state.reallyHidden}/>
 
             <Subheader>
-                Create folders for different groups of chats and quickly switch between them.
+                {this.l("lng_filters_about")}
             </Subheader>
-            <VButton isRound onClick={this.createFolder}><i className="tgico-add"/>Create Folder</VButton>
+            <VButton isRound onClick={this.createFolder}><i className="tgico-add"/>{this.l("lng_filters_create")}</VButton>
 
-            <Section title="Folders">
+            <Section title={this.l("lng_filters_title")}>
                 {FoldersManager.folders.map(l => {
-                    return <Button text={l.title} description={FoldersManager.getBadgeCount(l.id, false).count + " chats"} onClick={_ => this.editFolder(l.id)}/>
+                    const count = FoldersManager.getBadgeCount(l.id, false).count;
+                    return <Button text={l.title} description={this.lp("lng_filters_chats_count", count, {count: count})} onClick={_ => this.editFolder(l.id)}/>
                 })}
             </Section>
 
             {suggested.length > 0 ?
-                <Section title="Recommended folders">
+                <Section title={this.l("lng_filters_recommended")}>
                     {suggested.map(l => {
                         return <IconButton icon="add" text={l.filter.title} description={l.description}
                                                        onClick={_ => this.addRecommendedFolder(l)}/>
@@ -80,7 +81,7 @@ export class FoldersSidebar extends LeftSidebar {
     }
 
     get title(): string | * {
-        return "Folders"
+        return this.l("lng_filters_title")
     }
 
 }
