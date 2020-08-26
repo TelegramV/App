@@ -53,7 +53,7 @@ export class FileAPI {
         const limit = options?.limit ?? DEFAULT_PART_SIZE;
 
         return FileAPI.downloadAllParts(location, size, limit, document.dc_id, onPartDownloaded)
-            .then(file => FileAPI.getBlob(file, options?.mime_type || document.mime_type))
+            .then(file => FileAPI.getBlob(file, options?.type || document.mime_type))
             .then(blob => FileAPI.putToCache(document, blob));
     }
 

@@ -8,7 +8,7 @@ export const DialogInfoMemberComponent = ({peer}) => {
         <AvatarComponent peer={peer} noSaved/>
         <div className="details">
             <div className="name">{peer.name}</div>
-            <div className="status">{Locale.lp(peer.status)}</div>
+            <div className={["status", peer.online && "online"]}>{Locale.lp(peer.status)}</div>
         </div>
     </div>
 }

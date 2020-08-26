@@ -62,7 +62,8 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                                                        }
                                                                    }
                                                                }
-                                                           }}>
+                                                           }}
+                                                           css-display={isHovered ? "block" : "none"}>
                                                           <i className={`tgico tgico-${isPlaying ? "pause" : "play"}`}/>
                                                       </div>
                                                       <div className="video-info"

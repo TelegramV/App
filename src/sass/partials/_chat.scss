@@ -260,7 +260,7 @@
                         white-space: nowrap;
                         overflow: hidden;
 
-                        .online {
+                        &.online {
                             color: $blueonline;
                         }
                     }

@@ -45,6 +45,7 @@ class ChatInfoStatusComponent extends TranslatableStatefulComponent {
 
         const classes = classNames(
             "info",
+            classIf(AppSelectedChat.Current?.online, "online"),
             classIf(isLoading, "loading-text"),
         )
 

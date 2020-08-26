@@ -2,7 +2,7 @@
 
 .materials {
     position: relative;
-    &>div:empty {
+    &>div:empty { //fix for jumping up
         margin-bottom: var(--vh100);
     }
 
