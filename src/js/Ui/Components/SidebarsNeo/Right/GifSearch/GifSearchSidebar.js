@@ -27,14 +27,14 @@ export class GifSearchSidebar extends RightSidebar {
     content() {
         let sets = this.state.query ? this.state.found : this.state.featured;
         let emptyText = this.state.query && !this.loading ? "Nothing found..." : "Loading...";
-        return <this.contentWrapper onScroll={this.onScroll}>
+        return <this.contentWrapper>
             <div class="gif-search">
                 <div class="gif-suggestions scrollable-x hide-scroll">
                     {this.state.suggestions.map(emoji => <div class="gif-suggestion rp" onClick={() => {
                         this.fetchGifs(emoji)
                     }}>{emoji}</div>)}
                 </div>
-                <div class="scrollable">
+                <div class="scrollable" onScroll={this.onScroll}>
                 	<div class="gif-grid">
     	                {sets?.map(searchResult => <GifFragment document={searchResult.document} 
     							                	observer={this.observer} 
@@ -52,7 +52,7 @@ export class GifSearchSidebar extends RightSidebar {
     	super.componentDidMount();
     	this.observer = new IntersectionObserver(this.onIntersection, {
             root: this.$el,
-            // rootMargin: "0p",
+            rootMargin: "100px",
             threshold: 0.2,
         });
         Settings.initPromise.then(() => {
@@ -70,7 +70,6 @@ export class GifSearchSidebar extends RightSidebar {
 
     onScroll = event => {
     	const $element = event.target
-
         if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop) {
             this.loadMore();
         }
@@ -135,6 +134,10 @@ export class GifSearchSidebar extends RightSidebar {
                     pausedAll: false
                 })
             })
+        } else {
+        	this.setState({
+        		pausedAll: false
+        	})
         }
     }
 
@@ -144,7 +147,8 @@ export class GifSearchSidebar extends RightSidebar {
             query: "",
             found: [],
             nextOffset: "",
-            pausedAll: true
+            pausedAll: true,
+            paused: []
         })
     }
 
@@ -160,7 +164,6 @@ export class GifSearchSidebar extends RightSidebar {
         this.loading = true;
         // gifs have patch bugs, better to reset them
         this.setState({
-            query: "",
             nextOffset: "",
             found: [],
             query: query,
@@ -170,6 +173,7 @@ export class GifSearchSidebar extends RightSidebar {
             if (this.state.query !== query) return; //something changed while searching, cancel patch
 
             this.setState({
+            	paused: [], // clear paused in case same gif is found in new query
                 found: found.results,
                 nextOffset: found.next_offset
             })

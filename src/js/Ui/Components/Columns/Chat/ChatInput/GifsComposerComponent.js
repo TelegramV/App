@@ -76,7 +76,7 @@ class GifsComposerComponent extends StatefulComponent {
     componentDidMount() {
         this.observer = new IntersectionObserver(this.onIntersection, {
             root: this.$el,
-            // rootMargin: "0p",
+            rootMargin: "100px",
             threshold: 0.2,
         });
     }

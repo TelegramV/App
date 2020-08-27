@@ -122,18 +122,6 @@ class BetterVideoComponent extends StatefulComponent {
         if(this.props.observer) {
             this.props.observer.observe(this.$el)
         }
-
-        // load max thumb
-        if(this.props.document.thumbs) {
-            FileManager.downloadDocument(this.props.document,
-                                        FileAPI.getMaxSize(this.props.document),
-                                        {type: "image/jpeg"}
-            ).then(({url}) => {
-                this.setState({
-                    thumbnailUrl: url
-                })
-            });
-        }
     }
 
     componentDidUpdate() {
