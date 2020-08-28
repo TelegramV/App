@@ -17,7 +17,7 @@ import {DialogInfoLinkComponent} from "./DialogInfoLinkComponent";
 import {DialogInfoAudioComponent} from "./DialogInfoAudioComponent";
 import DialogInfoDocumentComponent from "./DialogInfoDocumentComponent";
 import {DialogInfoMemberComponent} from "./DialogInfoMemberComponent";
-import Locale from "../../../../../../Api/Localization/Locale"
+import DialogInfoMediaComponent from "./DialogInfoMediaComponent"
 
 export class DialogInfoMaterials extends TranslatableStatelessComponent {
     contentRefs = {
@@ -190,30 +190,10 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
         }
 
         let message = MessageFactory.fromRawOrReturnNoGroup(AppSelectedInfoPeer.Current, rawMessage)
-        
-        if (message.type === MessageType.VIDEO) {
-            const video = DocumentParser.attributeVideo(message.raw.media.document)
-
-            vrdom_append(
-                <figure css-cursor="pointer" className="photo video-thumb rp thumbnail"
-                        onClick={() => UIEvents.MediaViewer.fire("showMessage", {message: message})}>
-                    <img src={FileAPI.getThumbnail(message.raw.media.document)} alt="video"/>
-                    <div className="video-info-bar">
-                        {formatTime(video.duration)}
-                    </div>
-                </figure>,
-                this.contentRefs.media.$el
-            )
-        } else {
-            vrdom_append(
-                <BetterPhotoComponent photo={message.raw.media.photo ? message.raw.media.photo : message.raw.media}
-                                      onClick={() => {
-                                          console.log(message)
-                                          UIEvents.MediaViewer.fire("showMessage", {message: message})
-                                      }}/>,
-                this.contentRefs.media.$el
-            )
-        }
+        vrdom_append(
+            <DialogInfoMediaComponent message={message}/>,
+            this.contentRefs.media.$el
+        )
     }
 
     openLinks = () => {

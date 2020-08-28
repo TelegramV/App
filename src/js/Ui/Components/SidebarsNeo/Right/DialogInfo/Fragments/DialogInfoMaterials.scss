@@ -285,45 +285,55 @@
             }
         }
 
-        > .photo {
+        > .media-wrapper {
             // P R E C I S E
             flex: 1 0 calc(33.3333333333333333% - 4px);
 
             margin-left: 4px;
             margin-bottom: 4px;
 
-            img {
-                width: 100%;
-                max-height: 100%;
-            }
-
-            .video-info-bar {
-                position: absolute;
-                //width: 20px;
-                //height: 15px;
-                color: white;
-                margin: 10px;
-                padding: 2px 6px;
-                left: 0;
-                top: 0;
-                //max-width: 50px;
-                //max-height: 10px;
-                background-color: rgba(black, .40);
-                border-radius: 3px;
-                z-index: 2;
-            }
-
-            flex-grow: 0;
-
-            > img {
-                background-repeat: no-repeat;
-                background-position: center;
-                background-size: cover;
+            .photo {
                 width: 100%;
                 height: 100%;
+                position: relative;
+                &.video-thumb {
 
-                position: absolute;
-                object-fit: cover;
+                    img {
+                        &.blur {
+                            filter: blur(3px);
+                            transform: scale(1.2);
+                        }
+                    }
+
+                    .video-info-bar {
+                        position: absolute;
+                        //width: 20px;
+                        //height: 15px;
+                        color: white;
+                        margin: 10px;
+                        padding: 2px 6px;
+                        left: 0;
+                        top: 0;
+                        //max-width: 50px;
+                        //max-height: 10px;
+                        background-color: rgba(black, .40);
+                        border-radius: 3px;
+                        z-index: 2;
+                    }
+                }
+
+                flex-grow: 0;
+
+                > img {
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    background-size: cover;
+                    width: 100%;
+                    height: 100%;
+
+                    position: absolute;
+                    object-fit: cover;
+                }
             }
 
             &:before {
