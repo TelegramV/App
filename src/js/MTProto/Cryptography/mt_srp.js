@@ -20,7 +20,6 @@
 import {mt_write_bytes} from "./mt_inob_codec"
 import BigInteger from "big-integer"
 import Uint8 from "../Utils/Uint8"
-import sha256 from "./sha256"
 
 async function H(data) {
     //console.log(new Uint8Array(await crypto.subtle.digest("SHA-256", data)), data)
