@@ -46,6 +46,7 @@ import processUpdateNewStickerSet from "./Update/processUpdateNewStickerSet"
 import processUpdateStickerSets from "./Update/processUpdateStickerSets"
 import processUpdateStickerSetsOrder from "./Update/processUpdateStickerSetsOrder"
 import processUpdateUserBlocked from "./Update/processUpdateUserBlocked"
+import processUpdateWebPage from "./Update/processUpdateWebPage"
 
 export class UpdateManager extends Manager {
     constructor() {
@@ -100,6 +101,7 @@ export class UpdateManager extends Manager {
         this.subscribe("updateStickerSetsOrder", processUpdateStickerSetsOrder)
         this.subscribe("updateServiceNotification", processUpdateServiceNotification)
         this.subscribe("updateUserBlocked", processUpdateUserBlocked)
+        this.subscribe("updateWebPage", processUpdateWebPage)
 
         this.customUpdatesProcessors = new Map([
             ["updatesTooLong", processUpdatesTooLong],
