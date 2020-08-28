@@ -23,8 +23,10 @@ import Uint8 from "../Utils/Uint8"
 import sha256 from "./sha256"
 
 async function H(data) {
-    //return new Uint8Array(await crypto.subtle.digest("SHA-256", data));
-    return new Uint8Array(sha256(data))
+    //console.log(new Uint8Array(await crypto.subtle.digest("SHA-256", data)), data)
+    //console.log(new Uint8Array(sha256(data)), data)
+    return new Uint8Array(await crypto.subtle.digest("SHA-256", data));
+    //return new Uint8Array(sha256(data))
 }
 
 async function SH(data, salt) {
