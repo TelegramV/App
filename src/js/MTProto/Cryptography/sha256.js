@@ -26,11 +26,10 @@ function sha256(data: Uint8Array): Uint8Array {
     return Bytes.fromWords(hashWords)
 }*/
 
-import cryptographySha256 from "@cryptography/sha256"
-import Uint8 from "../Utils/Uint8"
+import jsSha256 from "js-sha256"
 
-function sha256(data: Uint8Array): Uint8Array {
-    return Array.from(Uint8.endian(cryptographySha256(Uint8.toWords(data)).buffer));
+function sha256(data: Uint8Array): Array {
+	return jsSha256.sha256.array(data);
 }
 
 export default sha256;
