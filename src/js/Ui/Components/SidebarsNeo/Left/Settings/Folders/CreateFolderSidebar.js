@@ -155,6 +155,10 @@ export class CreateFolderSidebar extends LeftSidebar {
     }
 
     onShown(params) {
+        if (params === null) {
+            this.forceUpdate()
+            return
+        }
         this.setState({
             currentFolder: params.folderId == null ? {
                 // Get max id + 1
