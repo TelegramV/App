@@ -12,7 +12,7 @@ function Draft({id, text, entities}) {
 function Action({id, text}) {
     return (
         <div id={id} className="message loading-text">
-            {" "+text}
+            {text}
         </div>
     )
 }

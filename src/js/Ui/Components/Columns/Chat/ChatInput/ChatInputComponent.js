@@ -1,15 +1,15 @@
-import {askForFile, convertBits} from "../../../../Utils/utils";
-import {formatTime} from "../../../../../Utils/date"
-import {IS_MOBILE_SCREEN} from "../../../../../Utils/browser"
+import { askForFile, convertBits } from "../../../../Utils/utils";
+import { formatTime } from "../../../../../Utils/date"
+import { IS_MOBILE_SCREEN, IS_VOICE_RECORDING_SUPPORTED } from "../../../../../Utils/browser"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import ComposerComponent from "./ComposerComponent"
 import SuggestionComponent from "./SuggestionComponent"
-import {MessageParser} from "../../../../../Api/Messages/MessageParser";
-import {domToMessageEntities} from "../../../../../Utils/htmlHelpers";
-import {AttachFilesModal} from "../../../Modals/AttachFilesModal";
-import {AttachPollModal} from "../../../Modals/AttachPollModal";
-import {TextareaFragment} from "./TextareaFragment";
-import {AttachPhotosModal} from "../../../Modals/AttachPhotosModal";
+import { MessageParser } from "../../../../../Api/Messages/MessageParser";
+import { domToMessageEntities } from "../../../../../Utils/htmlHelpers";
+import { AttachFilesModal } from "../../../Modals/AttachFilesModal";
+import { AttachPollModal } from "../../../Modals/AttachPollModal";
+import { TextareaFragment } from "./TextareaFragment";
+import { AttachPhotosModal } from "../../../Modals/AttachPhotosModal";
 import UIEvents from "../../../../EventBus/UIEvents";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import MTProto from "../../../../../MTProto/External"
@@ -17,8 +17,9 @@ import VUI from "../../../../VUI"
 import VApp from "../../../../../V/vapp"
 import ChatToBottomButtonComponent from "../ChatToBottomButtonComponent"
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
-import {UserPeer} from "../../../../../Api/Peers/Objects/UserPeer";
+import { UserPeer } from "../../../../../Api/Peers/Objects/UserPeer";
 import Settings from "../../../../../Api/Settings/Settings";
+import * as voiceRecorder from "../../../../../Utils/voiceRecorder"
 
 export let ChatInputManager
 
@@ -35,10 +36,6 @@ export class ChatInputComponent extends StatelessComponent {
 
     get isVoiceMode() {
         return this.textarea && this.textarea.childNodes.length === 0
-    }
-
-    get isRecording() {
-        return !!this.recorder
     }
 
     appEvents(E: AE) {
@@ -95,9 +92,7 @@ export class ChatInputComponent extends StatelessComponent {
                         <div className="round-button-wrapper">
                             <ChatToBottomButtonComponent/>
 
-                            <div className="round-button delete-button rp rps" onClick={l => this.onSend(l)}
-                                 onMouseEnter={l => this.mouseEnterRemoveVoice(l)}
-                                 onMouseLeave={l => this.mouseLeaveRemoveVoice(l)}>
+                            <div className="round-button delete-button rp rps" onClick={this.cancelVoiceRecording.bind(this)}>
                                 <i className="tgico tgico-delete"/>
                             </div>
 
@@ -152,7 +147,7 @@ export class ChatInputComponent extends StatelessComponent {
     /**
      * @param {Peer} peer
      */
-    onChatSelect = ({peer}) => {
+    onChatSelect = ({ peer }) => {
         if (peer?.canSendMessage ?? true) {
             this.show()
         } else {
@@ -186,7 +181,7 @@ export class ChatInputComponent extends StatelessComponent {
                 onClick: this.attachFile
             },
         ]
-        if(!(AppSelectedChat.current instanceof UserPeer)) {
+        if (!(AppSelectedChat.current instanceof UserPeer)) {
             items.push({
                 icon: "poll",
                 title: "Poll",
@@ -223,8 +218,8 @@ export class ChatInputComponent extends StatelessComponent {
         this.setEndOfContenteditable(this.textarea)
         if (window.getSelection) {
             sel = window.getSelection();
-            if ((sel.baseNode?.parentElement === this.textarea || sel.baseNode === this.textarea)
-                && sel.getRangeAt && sel.rangeCount) {
+            if ((sel.baseNode?.parentElement === this.textarea || sel.baseNode === this.textarea) &&
+                sel.getRangeAt && sel.rangeCount) {
                 range = sel.getRangeAt(0);
                 if (range.collapsed) { //no selection
                     if (range.startOffset > 0) {
@@ -322,14 +317,6 @@ export class ChatInputComponent extends StatelessComponent {
         }, 250);
     }
 
-    mouseEnterRemoveVoice = () => {
-        this.isRemoveVoice = true
-    }
-
-    mouseLeaveRemoveVoice = () => {
-        this.isRemoveVoice = false
-    }
-
     hide = () => {
         this.$el.style.display = "none"
     }
@@ -346,7 +333,7 @@ export class ChatInputComponent extends StatelessComponent {
 
     navigateToReplied = () => {
         if (this.reply) {
-            UIEvents.General.fire("chat.showMessage", {message: this.reply.message})
+            UIEvents.General.fire("chat.showMessage", { message: this.reply.message })
         }
     }
 
@@ -396,7 +383,7 @@ export class ChatInputComponent extends StatelessComponent {
         if (VUI.Modal.state.body.componentClass !== AttachPhotosModal) {
             VUI.Modal.open(<AttachPhotosModal media={[blob]}/>)
         } else {
-            UIEvents.General.fire("upload.addMedia", {blob: blob})
+            UIEvents.General.fire("upload.addMedia", { blob: blob })
         }
     }
 
@@ -407,13 +394,13 @@ export class ChatInputComponent extends StatelessComponent {
                 file: file
             }]}/>)
         } else {
-            UIEvents.General.fire("upload.addFile", {blob: blob, file: file})
+            UIEvents.General.fire("upload.addFile", { blob: blob, file: file })
         }
     }
 
     attachFile = () => {
         askForFile("", (bytes, file) => {
-            const blob = new Blob(new Array(bytes), {type: file.type})
+            const blob = new Blob(new Array(bytes), { type: file.type })
 
             this.pickFile(blob, file)
         }, true, true)
@@ -421,28 +408,39 @@ export class ChatInputComponent extends StatelessComponent {
 
     attachMedia = () => {
         askForFile("image/*,video/*", (bytes, file) => {
-            const blob = new Blob(new Array(bytes), {type: file.type})
+            const blob = new Blob(new Array(bytes), { type: file.type })
 
             this.pickMedia(blob)
         }, true, true)
     }
 
-    tickTimer = () => {
-        const time = formatTime(this.i / 100) + "," + this.i % 100;
+    updateTimer = () => {
+        const now = Date.now();
+        const diff = now - this.recordingStarted;
+        const time = formatTime(diff/1000) + "," + diff % 1000;
         this.$el.querySelector(".voice-seconds").innerHTML = time
-        this.i++
-        if (this.isRecording)
-            this.withTimeout(l => this.tickTimer(), 10)
     }
 
     onSend = (ev) => {
-        if (this.isVoiceMode) return
-        this.send()
+        if(!this.isVoiceMode){
+            this.send()
+        }
     }
 
-    onMouseUp = (ev) => {
-        if (!this.isVoiceMode) return
+    cancelVoiceRecording = (ev) => {
+        this.isRemoveVoice = true;        
+        this.stopRecording();
+    }
 
+    sendVoice = ({blob, duration, waveform}) => {
+        if(this.isRemoveVoice) {
+            this.isRemoveVoice = false;
+            return;
+        }
+        AppSelectedChat.Current.api.sendVoice(blob, duration, waveform)
+    }
+
+    stopRecording = () => {
         this.$el.querySelector(".delete-button").classList.remove("open")
         this.$el.querySelector(".voice-seconds").classList.add("hidden")
         this.$el.querySelector(".tgico-attach").classList.remove("hidden")
@@ -450,124 +448,46 @@ export class ChatInputComponent extends StatelessComponent {
 
         this.$el.querySelector(".send-button>.tgico-send").classList.add("hidden")
         this.$el.querySelector(".send-button>.tgico-microphone2").classList.remove("hidden")
-
-        // this.recorder.stop()
-        // this.microphone.getTracks().forEach((track) => {
-        //     track.stop();
-        //     this.$el.querySelector(".voice-circle").style.transform = `scale(1)`
-        // });
-        // this.microphone = null
-        if(!this.recorder) return;
-        this.recorder.stop()
-        this.recorder = null
-        // this.audioContext.close()
-        // this.audioContext = null
-
+        this.isRecording = false;
+        this.recorderStop().then(this.sendVoice)
     }
 
-    onRecordingReady = (array) => {
-
-        if (this.isRemoveVoice) {
-            this.isRemoveVoice = false
-            return
-        }
-        // TODO refactor sending
-        MTProto.TimeManager.generateMessageId().then(id => {
-            AppSelectedChat.Current.api.sendMedia("", array, {
-                _: "inputMediaUploadedDocument",
-                file: {
-                    _: "inputFile",
-                    id: id,
-                    parts: 1,
-                    name: "audio.ogg"
-                },
-                mime_type: "audio/ogg",
-                attributes: [{
-                    //flags: 1024,
-                    duration: (+new Date() - this.recordingStarted) / 1000,
-                    _: "documentAttributeAudio",
-                    voice: true,
-                    // waveform: convertBits(this.waveform, 8, 5)
-                },
-                    {
-                        _: "documentAttributeFilename",
-                        file_name: ""
-                    }
-                ]
+    onMouseDown = async (ev) => {
+        if(!IS_VOICE_RECORDING_SUPPORTED) {
+            UIEvents.General.fire("snackbar.show", {
+                text: "Voice recording is not supported in your browser!",
+                time: 5
             })
-        })
-    }
-
-    onMouseDown = (ev) => {
-        if (!this.isVoiceMode) return
-        this.$el.querySelector(".send-button>.tgico-send").classList.remove("hidden")
-        this.$el.querySelector(".send-button>.tgico-microphone2").classList.add("hidden")
-
-        if (!this.recorder) {
-            import("../../../../../Utils/Recorder/Recorder").then(({default: Recorder}) => {
-                // navigator.mediaDevices.getUserMedia({audio: true, video: false}).then(l => {
-                    this.waveform = []
-                    const processInput = (audioProcessingEvent, analyser) => {
-                        const tempArray = new Uint8Array(analyser.frequencyBinCount);
-
-                        analyser.getByteFrequencyData(tempArray);
-                        this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min(getAverageVolume(tempArray) / 255 * 25 + 1, 4)})`
-                        this.waveform.push(Math.floor(getAverageVolume(tempArray) / 255 * 32))
-                    }
-                    //
-                    const getAverageVolume = array => {
-                        const length = array.length;
-                        let values = 0;
-                        let i = 0;
-
-                        for (; i < length; i++) {
-                            values += array[i];
-                        }
-
-                        return values / length;
-                    }
-                    // let AudioContext = window.AudioContext || window.webkitAudioContext;
-                    // this.audioContext = new AudioContext();
-                    // const input = this.audioContext.createMediaStreamSource(l);
-                    // const analyser = this.audioContext.createAnalyser();
-                    // const scriptProcessor = this.audioContext.createScriptProcessor();
-                    //
-                    // // Some analyser setup
-                    // analyser.smoothingTimeConstant = 0.3;
-                    // analyser.fftSize = 1024;
-                    //
-                    // input.connect(analyser);
-                    // analyser.connect(scriptProcessor);
-                    // scriptProcessor.connect(this.audioContext.destination);
-                    //
-                    // scriptProcessor.onaudioprocess = processInput;
-
-                    this.recorder = new Recorder({
-                        monitorGain: parseInt(0, 10),
-                        recordingGain: parseInt(1, 10),
-                        numberOfChannels: parseInt(1, 10),
-                        wavBitDepth: parseInt(16, 10),
-                    });
-
-                    this.recorder.ondataavailable = l => this.onRecordingReady(l);
-                    this.recorder.start(null, processInput)
-                    // this.microphone = l
-
-                    document.addEventListener("mouseup", l => this.onMouseUp(l))
-                    this.$el.querySelector(".delete-button").classList.add("open")
-                    this.$el.querySelector(".voice-seconds").classList.remove("hidden")
-                    this.$el.querySelector(".tgico-attach").classList.add("hidden")
-
-                    this.recordingStarted = +new Date()
-
-                    this.i = 0
-                    this.tickTimer()
-
-                // })
-            })
+            return;
         }
-        
-        console.error("MouseDown")
+        if (this.isRecording) {
+            this.stopRecording();
+        } else {
+            this.$el.querySelector(".send-button>.tgico-send").classList.remove("hidden")
+            this.$el.querySelector(".send-button>.tgico-microphone2").classList.add("hidden")
+            this.recorderStop = await voiceRecorder.start((volume) => {
+                this.$el.querySelector(".voice-circle").style.transform = `scale(${Math.min((volume-128)/7, 4)})`
+                this.updateTimer();
+            })
+            this.recordingStarted = Date.now()
+            this.isRecording = true
+
+            const statusTimer = this.withInterval(() => {
+                    if(!this.isRecording) {
+                        this.clearInterval(statusTimer)
+                        return;
+                    }
+
+                    AppSelectedChat.Current.api.sendMessageAction({
+                        _: "sendMessageRecordAudioAction"
+                    })
+                }, 1000)
+
+
+            this.$el.querySelector(".delete-button").classList.add("open")
+            this.$el.querySelector(".voice-seconds").classList.remove("hidden")
+            this.$el.querySelector(".tgico-attach").classList.add("hidden")
+        }
     }
 
 
@@ -605,9 +525,9 @@ export class ChatInputComponent extends StatelessComponent {
         this.convertEmojiToText(this.textarea)
         let reply = this.reply ? this.reply.message.id : null
 
-        const {text, messageEntities} = domToMessageEntities(this.textarea)
+        const { text, messageEntities } = domToMessageEntities(this.textarea)
 
-        if(Settings.get("app_config.emojies_send_dice")?.includes(text)) {
+        if (Settings.get("app_config.emojies_send_dice")?.includes(text)) {
             AppSelectedChat.Current.api.sendDice(text);
         } else {
             AppSelectedChat.Current.api.sendMessage({

@@ -35,6 +35,10 @@ const config = {
                 },
             },
             {
+                test: /encoderWorker\.min\.js$/,
+                use: [{ loader: 'file-loader' }]
+              },
+            {
                 test: /\.js$/,
                 use: [
                     "babel-loader",
