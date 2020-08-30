@@ -321,6 +321,9 @@ export class PeerApi {
 
     sendVoice(blob, duration = 1, waveform = []) {
         blob.arrayBuffer().then(buffer => {
+            this.sendMessageAction({
+                _: "sendMessageUploadAudioAction"
+            })
             return FileAPI.uploadFile(buffer, "voice.ogg")
         }).then(inputFile => {
             MTProto.invokeMethod("messages.sendMedia", {
@@ -346,6 +349,7 @@ export class PeerApi {
             }).then(response => {
                 MTProto.UpdatesManager.process(response)
             })
+            this.cancelSendMessageActions();
         })
     }
 
@@ -353,6 +357,12 @@ export class PeerApi {
         MTProto.invokeMethod("messages.setTyping", {
             peer: this.peer.inputPeer,
             action
+        })
+    }
+
+    cancelSendMessageActions() {
+        this.sendMessageAction({
+            _: "sendMessageCancelAction"
         })
     }
 }

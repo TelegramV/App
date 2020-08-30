@@ -23,10 +23,19 @@ import StickersState from "../../SharedStates/StickersState"
 import {StickerManager} from "../../../Api/Stickers/StickersManager"
 import VUI from "../../VUI"
 import "./StickerSetModal.scss"
+import {IS_MOBILE_SCREEN} from "../../../Utils/browser"
 
 export class StickerSetModal extends TranslatableStatefulComponent {
 
     state = StickersState
+
+    stickerProps = IS_MOBILE_SCREEN ? {} : {
+        autoplay: true,
+        loop: true,
+        paused: false,
+        playOnHover: false,
+        hideAnimated: false
+    }
 
     render(props) {
         return <div className="sticker-set">
@@ -34,7 +43,7 @@ export class StickerSetModal extends TranslatableStatefulComponent {
             <div class="scrollable">
                 <div class="container">
                     {props.set?.documents?.map(sticker => <BetterStickerComponent width={75} document={sticker}
-                                                                                  hideAnimated/>)}
+                                                                                  hideAnimated {...this.stickerProps}/>)}
                 </div>
             </div>
             <div class="add">

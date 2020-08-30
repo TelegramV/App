@@ -453,6 +453,7 @@ export class ChatInputComponent extends StatelessComponent {
     }
 
     onMouseDown = async (ev) => {
+        if(!this.isVoiceMode) return;
         if(!IS_VOICE_RECORDING_SUPPORTED) {
             UIEvents.General.fire("snackbar.show", {
                 text: "Voice recording is not supported in your browser!",

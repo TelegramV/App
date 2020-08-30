@@ -150,6 +150,7 @@ class StickerSetThumb extends StatefulComponent {
                     <Lottie width={35}
                             height={35}
                             options={options}
+                            autoplay={false}
                             playOnHover/>
                 </div>
             )
