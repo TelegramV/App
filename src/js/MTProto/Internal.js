@@ -46,6 +46,11 @@ export const MTProtoInternal = {
     processUpdate(update) {
         this.updatesHandler(update);
     },
+    authKeyUnregistered() {
+        this.workerPostMessage({
+            type: "authKeyUnregistered"
+        });
+    },
     connect() {
         return this.application.start();
     },

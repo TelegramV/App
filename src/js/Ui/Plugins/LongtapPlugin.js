@@ -1,11 +1,11 @@
 import VRDOMPlugin from "../../V/VRDOM/plugin/VRDOMPlugin"
-import { IS_MOBILE_SCREEN, IS_SAFARI } from "../../Utils/browser"
+import { PLATFORM } from "../../Utils/browser"
 
 const LONG_TAP_DURATION_MS = 500;
 
 class LongtapVRDOMPlugin extends VRDOMPlugin {
     elementDidMount($el) {
-        if (!(IS_MOBILE_SCREEN && IS_SAFARI)) return;
+        if (PLATFORM !== "ios") return;
 
         if ($el.nodeType !== Node.TEXT_NODE && $el.oncontextmenu && !$el.isContentEditable) { // we don't support contenteditable elements
             ["mousedown", "touchstart"].forEach(this.handleStart($el));

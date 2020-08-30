@@ -22,6 +22,7 @@
 import MobileProtoWorker from "./Worker/MTProto.worker"
 import UpdatesManager from "../Api/Updates/UpdatesManager"
 import AppEvents from "../Api/EventBus/AppEvents"
+import {logout} from "../Api/General/logout"
 
 // USE THIS THING ONLY OUTSIDE AND NEVER INSIDE mtproto FOLDER
 const TimeManager = {
@@ -69,6 +70,9 @@ MTProtoWorker.addEventListener("message", event => {
             TimeManager.lastMessageID = event.data.time.lastMessageID
             TimeManager.timeOffset = event.data.time.timeOffset
             break
+        case "authKeyUnregistered":
+            logout();
+            break;
     }
 
     if (event.data.taskId) {

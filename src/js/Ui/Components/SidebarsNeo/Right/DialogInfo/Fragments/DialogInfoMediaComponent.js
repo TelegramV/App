@@ -51,7 +51,6 @@ export default class DialogInfoMediaComponent extends StatefulComponent {
             FileManager.downloadDocument(document,
                 FileAPI.getMaxSize(document), { type: "image/jpeg" }
             ).then(({ url }) => {
-                console.log("video preview", url)
                 this.setState({
                     thumbUrl: url,
                     maxThumb: true
