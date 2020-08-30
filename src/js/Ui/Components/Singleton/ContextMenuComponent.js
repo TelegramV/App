@@ -21,6 +21,7 @@ import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf"
 import classNames from "../../../V/VRDOM/jsx/helpers/classNames"
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import UIEvents from "../../EventBus/UIEvents"
 
 class ContextMenuComponent extends StatefulComponent {
 
@@ -122,6 +123,8 @@ class ContextMenuComponent extends StatefulComponent {
             hidden: true,
             unhidden: false
         })
+
+        UIEvents.General.fire("context.close");
     }
 
     open = (data = []) => {

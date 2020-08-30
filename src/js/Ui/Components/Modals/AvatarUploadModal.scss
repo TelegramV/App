@@ -1,0 +1,38 @@
+@import "src/sass/partials/vars";
+
+.avatar-upload-modal {
+    display: flex;
+    flex-direction: column;
+
+    .cropper {
+        min-width: 200px;
+        min-height: 200px;
+    }
+
+    .footer {
+         align-self: flex-end;
+         padding: 0 5px 5px 0;
+         z-index: 1;
+        .done-button {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: $blue;
+            color: white;
+            cursor: pointer;
+            position: relative;
+
+            &:hover {
+                background-color: $darkblue;
+            }
+
+            .tgico {
+                font-size: 20px;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
+    }
+}

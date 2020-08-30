@@ -107,7 +107,7 @@ export class DialogInfoSidebar extends RightSidebar {
                     })
                 } else {
                     contextMenuActions.push({
-                        icon: "lock",
+                        icon: "stop",
                         title: this.l("lng_blocked_list_confirm_ok"),
                         onClick: () => BlockedManager.block(current)
                     })

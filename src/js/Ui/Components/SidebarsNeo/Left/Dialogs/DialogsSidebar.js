@@ -16,6 +16,7 @@ import {SearchComponent} from "../Search/SearchComponent"
 import ConnectionStatusComponent from "./ConnectionStatusComponent"
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
 import {LeftSidebar} from "../LeftSidebar";
+import {CreateChannelSidebar} from "../NewChats/CreateChannelSidebar"
 
 export const DialogsBarContextMenu = (event, archivedCount) => {
     VUI.ContextMenu.openBelow([
@@ -79,29 +80,32 @@ export class DialogsSidebar extends LeftSidebar {
     dialogsWrapperRef = VComponent.createRef()
 
     searchOpen = false
+    fixedFab = false
 
     init() {
         // FoldersManager.fetchFolders()
     }
 
     onFloatingActionButtonPressed = (event) => {
+        this.fixedFab = true;
         VUI.ContextMenu.openAbove([
             {
                 icon: "channel",
-                title: "New Channel",
+                title: this.l("lng_create_channel_title", {} , "New Channel"),
                 onClick: () => {
-                    // UIEvents.LeftSidebar.fire("show", {barName: "create-channel"})
+                    UIEvents.Sidebars.fire("push", CreateChannelSidebar)
                 }
             },
             {
                 icon: "group",
-                title: "New Group"
+                title: this.l("lng_create_group_title", {}, "New Group"),
             },
             {
                 icon: "user",
                 title: "New Private Chat"
             }
         ], event.target)
+        this.forceUpdate();
     }
 
     content(): * {
@@ -153,6 +157,12 @@ export class DialogsSidebar extends LeftSidebar {
 
         E.bus(AppEvents.Dialogs)
              .on("gotMany", this.onDialogsGotMany)
+
+        E.bus(UIEvents.General)
+            .on("context.close", (ev) => {
+                this.fixedFab = false;
+                this.forceUpdate();
+            })
 
         // E.bus(AppEvents.General)
         //     .on("selectFolder", this.onFolderSelect)
@@ -273,11 +283,15 @@ export class DialogsSidebar extends LeftSidebar {
     }
 
     get floatingActionButtonIcon(): string | null {
-        return "newchat_filled"
+        return this.fixedFab ? "close" : "newchat_filled"
     }
 
     get isFloatingActionButtonOnHover(): boolean {
         return true
+    }
+
+    get isFloatingActionButtonFixed() {
+        return this.fixedFab
     }
 
     get headerBorder(): boolean {

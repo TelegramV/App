@@ -1,0 +1,27 @@
+@import "src/sass/partials/vars";
+
+.avatar-upload {
+    --size: 125px;
+    .image-container {
+        width: var(--size);
+        height: var(--size);
+        border-radius: 50%;
+        background-color: $blue;
+        color: white;
+        position: relative;
+        cursor: pointer;
+        background-size: contain;
+
+        &:hover {
+            background-color: $darkblue;
+        }
+
+        .tgico {
+            font-size: calc(var(--size) / 3);
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    }
+}

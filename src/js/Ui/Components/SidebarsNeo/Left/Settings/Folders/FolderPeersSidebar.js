@@ -167,6 +167,10 @@ export class FolderPeersSidebar extends LeftSidebar {
         })
     }
 
+    get headerBorder(): boolean {
+        return false
+    }
+
     get title(): string | * {
         return this.state.exclude ? this.l("lng_filters_exclude") : this.l("lng_filters_include")
     }

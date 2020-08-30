@@ -59,10 +59,39 @@ function leaveChannel(peer: Peer) {
     })
 }
 
+function createChannel(title = "", about = "", broadcast, megagroup, geo_point, address) {
+    return MTProto.invokeMethod("channels.createChannel", {
+        title,
+        about,
+        broadcast,
+        megagroup,
+        geo_point,
+        address
+    }).then(Updates => {
+        UpdatesManager.process(Updates);
+
+        return Updates;
+    })
+}
+
+function editPhoto(inputChannel, inputChatPhoto) {
+    console.log("editPhoto", inputChannel, inputChatPhoto)
+    return MTProto.invokeMethod("channels.editPhoto", {
+        channel: inputChannel,
+        photo: inputChatPhoto
+    }).then(Updates => {
+        UpdatesManager.process(Updates);
+
+        return Updates;
+    })
+}
+
 const channels = {
-    deleteMessages: deleteMessages,
-    joinChannel: joinChannel,
-    leaveChannel: leaveChannel,
+    deleteMessages,
+    joinChannel,
+    leaveChannel,
+    createChannel,
+    editPhoto
 }
 
 export default channels
