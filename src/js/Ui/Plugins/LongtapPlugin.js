@@ -25,7 +25,7 @@ class LongtapVRDOMPlugin extends VRDOMPlugin {
                 const loc = e.touches ? e.touches[0] : e;
 
                 let timeout = setTimeout(_ => {
-                    const pageTop = window.visualViewport.pageTop // fix for open keyboard on IOS
+                    const pageTop = window.visualViewport ? window.visualViewport.pageTop : document.body.clientTop // fix for open keyboard on IOS
 
                     let event = new MouseEvent('contextmenu', {
                         clientX: loc.clientX || rect.left + rect.width / 2,
