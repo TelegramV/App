@@ -33,9 +33,9 @@ import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent
 import IntersectionObserver from 'intersection-observer-polyfill';
 import GroupMessage from "../../../../Api/Messages/GroupMessage"
 import {appendMessages, fixMessages, getMessageElement, prependMessages} from "./messagesUtils"
-import {IS_DESKTOP_SCREEN, IS_MOBILE_SCREEN} from "../../../../Utils/browser";
+import {IS_DESKTOP_SCREEN, IS_MOBILE_SCREEN, IS_SAFARI} from "../../../../Utils/browser";
 
-const useIntersectVirtualization = true
+const useIntersectVirtualization = !IS_SAFARI
 
 // there is no possibility nor time to calculate each message size
 class VirtualizedBubblesComponent extends StatelessComponent {
