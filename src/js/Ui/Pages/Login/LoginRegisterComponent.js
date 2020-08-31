@@ -152,6 +152,7 @@ class LoginRegisterComponent extends TranslatableStatefulComponent {
                 const onCroppieDone = () => {
                     this.state.cropper.result({
                         type: "base64",
+                        size: "original"
                     }).then((base) => {
                         const bytes = Uint8Array.from(atob(base.split(",")[1]), c => c.charCodeAt(0));
                         const blob = new Blob([bytes], {type: "image/png"});

@@ -135,6 +135,8 @@
                     padding: 0 10px;
                     font-size: 14px;
                     margin-left: 5px;
+                    width: 100%;
+                    overflow: hidden;
 
                     display: flex;
                     flex-direction: row;
@@ -156,6 +158,8 @@
 
                         display: flex;
                         flex-direction: column;
+                        width: 100%;
+                        overflow: hidden;
 
                         .title {
                             color: $blue;

@@ -65,7 +65,7 @@ class LoginCodeComponent extends TranslatableStatefulComponent {
 
                 <form className="login-page-inputs">
                     <VInputValidate label={this.l("lng_code_ph")}
-                                    type="text"
+                                    type="number"
                                     inputmode="numeric"
                                     pattern="[0-9]*"
                                     value={code}

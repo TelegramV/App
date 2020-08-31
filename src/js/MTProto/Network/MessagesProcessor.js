@@ -107,8 +107,9 @@ class MessagesProcessor {
                 dcId: this.connection.dcId,
                 ...parse_rpc_error(rpc_result.result)
             };
-
-            if (error.type && error.type.startsWith("FLOOD_WAIT_")) {
+            if(error.type === "AUTH_KEY_UNREGISTERED" && error.method !== "users.getUsers") { // WTF, why are we checking if user logged in by this method?
+                MTProtoInternal.authKeyUnregistered();
+            } else if (error.type && error.type.startsWith("FLOOD_WAIT_")) {
                 const fwTime = parseInt(error.type.substring("FLOOD_WAIT_".length));
 
                 if (fwTime <= 30 || ALWAYS_DO_RESEND_ON_FLOOD.includes(invokation.name)) {

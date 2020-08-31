@@ -64,7 +64,7 @@ export class SettingsSidebar extends LeftSidebar {
                 icon: "logout",
                 title: this.l("lng_settings_logout"),
                 onClick: _ => {
-                    logout()
+                    VUI.Modal.prompt("Logout", "Do you want to logout?", () => logout());
                 }
             },
             {

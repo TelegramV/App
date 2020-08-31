@@ -1,11 +1,11 @@
 import VRDOMPlugin from "../../V/VRDOM/plugin/VRDOMPlugin"
-import { IS_MOBILE_SCREEN } from "../../Utils/browser"
+import { PLATFORM } from "../../Utils/browser"
 
 const LONG_TAP_DURATION_MS = 500;
 
 class LongtapVRDOMPlugin extends VRDOMPlugin {
     elementDidMount($el) {
-        if (!IS_MOBILE_SCREEN) return;
+        if (PLATFORM !== "ios") return;
 
         if ($el.nodeType !== Node.TEXT_NODE && $el.oncontextmenu && !$el.isContentEditable) { // we don't support contenteditable elements
             ["mousedown", "touchstart"].forEach(this.handleStart($el));
@@ -19,20 +19,12 @@ class LongtapVRDOMPlugin extends VRDOMPlugin {
             $el.addEventListener(ev, e => {
                 cancel($el);
 
-                document.getElementById("app").classList.add("no-select");
+                document.body.classList.add("no-select");
 
                 let rect = $el.getBoundingClientRect();
                 const loc = e.touches ? e.touches[0] : e;
 
                 let timeout = setTimeout(_ => {
-                    // cancel next click, to fix Android
-                    $el.addEventListener('touchend', function cancelClick(e) {
-                        $el.removeEventListener('touchend', cancelClick, true);
-                        e.stopImmediatePropagation();
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }, true);
-
                     const pageTop = window.visualViewport.pageTop // fix for open keyboard on IOS
 
                     let event = new MouseEvent('contextmenu', {
@@ -41,7 +33,7 @@ class LongtapVRDOMPlugin extends VRDOMPlugin {
                     });
                     $el.dispatchEvent(event);
 
-                    document.getElementById("app").classList.remove("no-select");
+                    document.body.classList.remove("no-select");
                 }, LONG_TAP_DURATION_MS)
                 $el.setAttribute("longtap-timeout", timeout);
                 return true;
@@ -62,7 +54,7 @@ class LongtapVRDOMPlugin extends VRDOMPlugin {
         if (timeout) {
             clearTimeout(Number.parseInt(timeout));
         }
-        document.getElementById("app").classList.remove("no-select");
+        document.body.classList.remove("no-select");
     }
 }
 

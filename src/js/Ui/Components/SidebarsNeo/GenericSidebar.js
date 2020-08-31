@@ -31,7 +31,7 @@ export class GenericSidebar extends TranslatableStatefulComponent {
             <div className={this.classes} onAnimationEnd={this.onTransitionEnd}>
                 {this.header()}
                 {this.content()}
-                {nodeIf(<FloatingActionButton icon={this.floatingActionButtonIcon} hidden={this.isFloatingActionButtonHidden} onClick={this.onFloatingActionButtonPressed}/>, !!this.floatingActionButtonIcon)}
+                {nodeIf(<FloatingActionButton icon={this.floatingActionButtonIcon} fixed={this.isFloatingActionButtonFixed} hidden={this.isFloatingActionButtonHidden} onClick={this.onFloatingActionButtonPressed}/>, !!this.floatingActionButtonIcon)}
             </div>
         )
     }
@@ -204,6 +204,14 @@ export class GenericSidebar extends TranslatableStatefulComponent {
      * @return {boolean}
      */
     get isFloatingActionButtonHidden() {
+        return false
+    }
+
+    /**
+     * Fix FAB to not hide if not hovered
+     * @return {boolean}
+     */
+    get isFloatingActionButtonFixed() {
         return false
     }
 

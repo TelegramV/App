@@ -17,19 +17,21 @@
  *
  */
 
-/*import CryptoJS from "../../../../vendor/CryptoJS";
-import Bytes from "../Utils/Bytes";
+import MessagesManager from "../../Messages/MessagesManager"
+import AppEvents from "../../EventBus/AppEvents"
+import AppSelectedChat from "../../../Ui/Reactive/SelectedChat"
 
-function sha256(data: Uint8Array): Uint8Array {
-    const hashWords = CryptoJS.SHA256(Bytes.toWords(data))
+function processUpdateWebPage(update) {
+    if (AppSelectedChat.isSelected) {
+        // todo: @prettydude fix it pls
+        const messages = AppSelectedChat.current.messages.getByWebPageId(update.webpage.id);
 
-    return Bytes.fromWords(hashWords)
-}*/
+        for(let message of messages) {
+            message.fillWebPage(update.webpage);
+        }
+    }
 
-import jsSha256 from "js-sha256"
-
-function sha256(data: Uint8Array): Array {
-	return jsSha256.sha256.array(data);
+    AppEvents.Telegram.fire("updateWebPage", update);
 }
 
-export default sha256;
+export default processUpdateWebPage;

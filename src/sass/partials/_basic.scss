@@ -145,13 +145,14 @@ img:not([src]) {
     display: flex;
 }
 
-.no-select {
+.no-select * {
     user-select: none !important;
     -webkit-user-select: none !important;
     -webkit-user-callout: none !important;
-    img {
+    // requires doubletab to view images, uncomment if found fix
+    /*img {
         pointer-events: none; // disable image context menu on IOS
-    }
+    }*/
 }
 
 ::-webkit-scrollbar {

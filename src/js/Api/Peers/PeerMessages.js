@@ -284,6 +284,13 @@ export class PeerMessages {
         )
     }
 
+    getByWebPageId(webpage_id: number): Array<Message> {
+        return (
+            [...this._heap.values()]
+                .filter(msg => msg.raw?.media?.webpage?.id === webpage_id)
+        )
+    }
+
     getGamesById(game_id: number): Array<Message> {
         return (
             [...this._heap.values()]

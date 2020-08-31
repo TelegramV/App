@@ -1,9 +1,11 @@
 import MTProto from "../../MTProto/External"
 import PeersManager from "./PeersManager"
-import {getInputFromPeer, getInputPeerFromPeer} from "../Dialogs/util"
-import {FileAPI} from "../Files/FileAPI"
-import {TextMessage} from "../Messages/Objects/TextMessage";
+import { getInputFromPeer, getInputPeerFromPeer } from "../Dialogs/util"
+import { FileAPI } from "../Files/FileAPI"
+import { TextMessage } from "../Messages/Objects/TextMessage";
 import UIEvents from "../../Ui/EventBus/UIEvents";
+import {largestTriangleThreeBuckets} from "../../Utils/audio"
+import {convertBits} from "../../Ui/Utils/utils"
 
 const genMsgId = () => (new Date).getTime()
 
@@ -88,13 +90,13 @@ export class PeerApi {
     }
 
     updateNotifySettings({
-                             show_previews,
-                             silent,
-                             mute_until,
-                             sound
-                         }) {
+        show_previews,
+        silent,
+        mute_until,
+        sound
+    }) {
         return MTProto.invokeMethod("account.updateNotifySettings", {
-            peer: {_: "inputNotifyPeer", peer: this.peer.inputPeer},
+            peer: { _: "inputNotifyPeer", peer: this.peer.inputPeer },
             settings: {
                 _: "inputPeerNotifySettings",
                 silent: silent,
@@ -117,9 +119,9 @@ export class PeerApi {
     }
 
     async forwardMessages({
-                              messages = [],
-                              to = null,
-                          }) {
+        messages = [],
+        to = null,
+    }) {
         let randomId = genMsgId()
         const randomIds = messages.map(l => randomId++)
         const response = await MTProto.invokeMethod("messages.forwardMessages", {
@@ -136,16 +138,16 @@ export class PeerApi {
     }
 
     sendMessage({
-                    text,
-                    media = null,
-                    messageEntities = [],
-                    replyTo = null,
-                    silent = false,
-                    clearDraft = true,
-                    noWebpage = false,
-                    background = false,
-                    scheduleDate = null
-                }) {
+        text,
+        media = null,
+        messageEntities = [],
+        replyTo = null,
+        silent = false,
+        clearDraft = true,
+        noWebpage = false,
+        background = false,
+        scheduleDate = null
+    }) {
         if (Array.isArray(media) && media.length === 1) {
             media = media[0]
         }
@@ -154,7 +156,7 @@ export class PeerApi {
         if (multi) {
             p = new Promise(async (resolve) => {
                 const a = []
-                for(let l of media) {
+                for (let l of media) {
                     console.log(l)
                     a.push(await FileAPI.uploadMediaToPeer(this.peer, l))
                 }
@@ -235,7 +237,7 @@ export class PeerApi {
     }
 
     toInputMedia(media) {
-        if(media._ === "messageMediaPhoto") {
+        if (media._ === "messageMediaPhoto") {
             return {
                 _: "inputMediaPhoto",
                 id: {
@@ -246,7 +248,7 @@ export class PeerApi {
                 }
             }
         }
-        if(media._ === "messageMediaDocument") {
+        if (media._ === "messageMediaDocument") {
             return {
                 _: "inputMediaDocument",
                 id: {
@@ -314,6 +316,53 @@ export class PeerApi {
             random_id: genMsgId()
         }).then(response => {
             MTProto.UpdatesManager.process(response)
+        })
+    }
+
+    sendVoice(blob, duration = 1, waveform = []) {
+        blob.arrayBuffer().then(buffer => {
+            this.sendMessageAction({
+                _: "sendMessageUploadAudioAction"
+            })
+            return FileAPI.uploadFile(buffer, "voice.ogg")
+        }).then(inputFile => {
+            MTProto.invokeMethod("messages.sendMedia", {
+                peer: this.peer.inputPeer,
+                message: "",
+                media: {
+                    _: "inputMediaUploadedDocument",
+                    file: inputFile,
+                    mime_type: "audio/ogg",
+                    attributes: [{
+                            _: "documentAttributeAudio",
+                            duration: duration,
+                            voice: true,
+                            waveform: largestTriangleThreeBuckets(waveform, 100) //convertBits(this.waveform, 8, 5)
+                        },
+                        {
+                            _: "documentAttributeFilename",
+                            file_name: ""
+                        }
+                    ]
+                },
+                random_id: genMsgId()
+            }).then(response => {
+                MTProto.UpdatesManager.process(response)
+            })
+            this.cancelSendMessageActions();
+        })
+    }
+
+    sendMessageAction(action) {
+        MTProto.invokeMethod("messages.setTyping", {
+            peer: this.peer.inputPeer,
+            action
+        })
+    }
+
+    cancelSendMessageActions() {
+        this.sendMessageAction({
+            _: "sendMessageCancelAction"
         })
     }
 }

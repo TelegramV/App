@@ -16,7 +16,7 @@ export const AppConfiguration = {
             layer: 117,
             api_id: 1147988,
             api_hash: "4acddf30a6113bfe220f7fd67ab7f468",
-            app_version: "0.2.0",
+            app_version: "0.4.0",
         },
     },
     calls: {
