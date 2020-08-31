@@ -18,6 +18,8 @@
  */
 
 import MTProto from "../../MTProto/External"
+import PeersStore from "../Store/PeersStore"
+import AppEvents from "../EventBus/AppEvents"
 
 function getPassword() {
     return MTProto.invokeMethod("account.getPassword");
@@ -33,10 +35,67 @@ function resetAuthorization(hash) {
 	});
 }
 
+function updateProfile(first_name="", last_name="", about="") {
+	return MTProto.invokeMethod("account.updateProfile", {
+		first_name,
+		last_name,
+		about
+	}).then(user => {
+		const self = PeersStore.self()
+		if(self) {
+			self.fillRaw(user);
+			AppEvents.Peers.fire("updateName", {peer: self})
+			AppEvents.Peers.fire("peer.update", {peer: self})
+			AppEvents.Peers.fire("peer.updateName", {peer: self})
+			AppEvents.Peers.fire("peer.updateBio", {peer: self})
+		}
+	})
+}
+
+function uploadProfilePhoto(file, video = null, videoStart = null) {
+	return MTProto.invokeMethod("photos.uploadProfilePhoto", {
+		file,
+		video,
+		video_start_ts: videoStart
+	}).then(photo => {
+		const self = PeersStore.self();
+		if(self) {
+			self._full = null
+			self.fetchFull();
+			self.photo.clearCache();
+			self.photo.fillFull(photo);
+			AppEvents.Peers.fire("updatePhoto", {peer: self})
+		}
+	})
+}
+
+function checkUsername(username) {
+	return MTProto.invokeMethod("account.checkUsername", {
+		username
+	})
+}
+
+function updateUsername(username) {
+	return MTProto.invokeMethod("account.updateUsername", {
+		username
+	}).then(user => {
+		const self = PeersStore.self()
+		if(self) {
+			self.fillRaw(user);
+			AppEvents.Peers.fire("peer.update", {peer: self})
+			AppEvents.Peers.fire("peer.updateUsername", {peer: self})
+		}
+	})
+}
+
 const account = {
     getPassword,
     getAuthorizations,
     resetAuthorization,
+    updateProfile,
+    uploadProfilePhoto,
+    checkUsername,
+    updateUsername
 };
 
 export default account;

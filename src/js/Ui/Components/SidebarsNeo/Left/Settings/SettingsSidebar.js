@@ -14,8 +14,17 @@ import {PrivacySidebar} from "./Privacy/PrivacySidebar";
 import {LanguageSidebar} from "./LanguageSidebar";
 import {FoldersSidebar} from "./Folders/FoldersSidebar";
 import {SuperSecretSettingsSidebar} from "./SuperSecretSettingsSidebar";
+import {EditProfileSidebar} from "./EditProfileSidebar"
+import AppEvents from "../../../../../Api/EventBus/AppEvents"
 
 export class SettingsSidebar extends LeftSidebar {
+
+    appEvents(E) {
+        E.bus(AppEvents.Peers)
+            .updateOn("updatePhoto")
+            .updateOn("peer.updateName")
+            .updateOn("peer.update")
+    }
 
     content() {
         const me = PeersStore.self()
@@ -26,8 +35,8 @@ export class SettingsSidebar extends LeftSidebar {
             <Subheader isLoading={!me}>{me ? "+" + me.phone : ""}</Subheader>
 
             <Section>
-                <IconButton icon="edit" text={this.l("lng_settings_information")} onClick={_ => {
-                }}/>
+                <IconButton icon="edit" text={this.l("lng_settings_information")} 
+                            onClick={_ => UIEvents.Sidebars.fire("push", EditProfileSidebar)}/>
                 <IconButton icon="folder" text={this.l("lng_settings_section_filters")}
                             onClick={_ => UIEvents.Sidebars.fire("push", FoldersSidebar)}/>
                 <IconButton icon="settings" text={this.l("lng_settings_section_general")}
