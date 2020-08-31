@@ -8,7 +8,7 @@ import FoldersManager from "../../../../../../Api/Dialogs/FolderManager";
 function Text({dialog}) {
     if (dialog.draft.isPresent) {
         return (
-            <div id={id} className="message">
+            <div className="message">
                 <span className="draft">Draft: </span>
                 {dialog.draft.message}
             </div>
@@ -18,7 +18,7 @@ function Text({dialog}) {
 
         if (action) {
             return (
-                <div id={id} className="message loading-text">
+                <div className="message loading-text">
                     {Locale.lp(action)}
                 </div>
             );
