@@ -36,6 +36,7 @@ import {appendMessages, fixMessages, getMessageElement, prependMessages} from ".
 import {IS_DESKTOP_SCREEN, IS_MOBILE_SCREEN, IS_SAFARI} from "../../../../Utils/browser";
 
 const useIntersectVirtualization = false//!IS_SAFARI
+const useScrollTopHack = IS_SAFARI
 
 // there is no possibility nor time to calculate each message size
 class VirtualizedBubblesComponent extends StatelessComponent {
@@ -81,7 +82,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     render() {
         return (
-            <div id="bubbles" className="scrollable">
+            <div id="bubbles" className="scrollable" css-overflow-anchor={useScrollTopHack ? "none" : "auto"}>
                 <div ref={this.bubblesInnerRef} id="bubbles-inner"/>
             </div>
         );
@@ -222,9 +223,10 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             return
         }
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
+        const magicNumber = useScrollTopHack ? 0 : 400
         // +400 because otherwise it would load only 2 messages when scrolling down, which is weird
-        const isAtBottom = Math.floor(scrollHeight - scrollTop) <= clientHeight;
-        const isAtTop = scrollTop <= 0;
+        const isAtBottom = Math.floor(scrollHeight - scrollTop) <= clientHeight + magicNumber;
+        const isAtTop = scrollTop <= magicNumber;
 
         //
         // if(this.smoothScrollingTo != null) {
@@ -561,25 +563,37 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         let $first: HTMLElement = this.bubblesInnerRef.$el.lastElementChild;
 
-        const k = $first.offsetTop
+        let k = 0
+        if(useScrollTopHack) {
+            k = $first.offsetTop
+        }
         // this.$el.style.setProperty("-webkit-overflow-scrolling", "auto")
 
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
-        const delta = $first.offsetTop - k
+        let delta = 0
+        if(useScrollTopHack) {
+            delta = $first.offsetTop - k
+        }
 
         this.dev_checkTree();
 
-        if (this.$el.scrollTop <= 0) {
+        if(useScrollTopHack) {
+            if (this.$el.scrollTop <= 0) {
 
-            if ($first) {
-                const zz = this.$el.scrollTop
+                if ($first) {
+                    const zz = this.$el.scrollTop
 
-                // this.$el.style.setProperty("-webkit-overflow-scrolling", "auto")
-                this.$el.style.setProperty("overflow", "hidden")
-                this.$el.scrollTop = zz + delta
-                this.$el.style.setProperty("overflow", "")
+                    // this.$el.style.setProperty("-webkit-overflow-scrolling", "auto")
+                    this.$el.style.setProperty("overflow", "hidden")
+                    this.$el.scrollTop = zz + delta
+                    this.$el.style.setProperty("overflow", "")
 
-                this.justChangedScrollTop = true
+                    this.justChangedScrollTop = true
+                }
+            }
+        } else if($first) {
+            if(this.$el.scrollTop <= 0) {
+                this.$el.scrollTop = $first.offsetTop
             }
         }
     }
@@ -643,16 +657,22 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             vrdom_delete(this.bubblesInnerRef.$el.lastChild);
         }
 
+        let k
         let $first: HTMLElement = this.bubblesInnerRef.$el.lastElementChild;
-        const k = $first.offsetTop
 
+        if(useScrollTopHack) {
+
+            k = $first.offsetTop
+        }
         this.prependMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         this.dev_checkTree();
 
-        const delta = $first.offsetTop - k
+        if(useScrollTopHack) {
 
-        // if (this.$el.scrollTop <= 0) {
+            const delta = $first.offsetTop - k
+
+            // if (this.$el.scrollTop <= 0) {
 
             if ($first) {
                 const zz = this.$el.scrollTop
@@ -664,6 +684,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
                 this.justChangedScrollTop = true
             }
+        }
         // }
 
     }

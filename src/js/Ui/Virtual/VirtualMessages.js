@@ -18,6 +18,7 @@
  */
 
 import type {Message} from "../../Api/Messages/Message";
+import {IS_SAFARI} from "../../Utils/browser";
 
 class VirtualMessages {
     // oldest first
@@ -35,7 +36,7 @@ class VirtualMessages {
 
     constructor(options) {
         this.size = options?.size ?? 40;
-        this.edgeSize = 20;
+        this.edgeSize = IS_SAFARI ? 20 : 2;
     }
 
     refresh() {
