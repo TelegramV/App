@@ -179,7 +179,7 @@ class Lottie extends StatefulComponent {
                  title={title}
                  role={ariaRole}
                  aria-label={ariaLabel}
-                 tabIndex="0"
+                 tabindex="-1"
                  onMouseOver={this.onMouseOver}
                  onMouseOut={this.onMouseOut}
             />

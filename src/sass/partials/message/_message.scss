@@ -255,7 +255,6 @@
             }
 
             .share {
-                opacity: 0;
                 cursor: pointer;
                 position: relative;
                 width: 30px;
@@ -272,14 +271,6 @@
                     transform: translate(-50%, -50%);
                 }
                 transition: opacity 150ms ease;
-            }
-        }
-
-        &:hover {
-            .side {
-                .share {
-                    opacity: 1;
-                }
             }
         }
     }
