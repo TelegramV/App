@@ -44,7 +44,7 @@ class GroupedMessageComponent extends GeneralMessageComponent {
                         }
                     </div>
                     {isText ? TextWrapperFragment({message: group}) :
-                        MessageTimeFragment({group, bg: true})}
+                        MessageTimeFragment({message: group, bg: true})}
                 </>
             )
         );
