@@ -1,30 +1,30 @@
 import {ChatInputManager} from "../../ChatInput/ChatInputComponent";
 import {InlineKeyboardComponent} from "./InlineKeyboardComponent";
 import {MessageAvatarComponent} from "./MessageAvatarComponent";
-import {ReplyFragment} from "./ReplyFragment"
-import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment"
+import {ReplyFragment} from "./ReplyFragment";
+import {ForwardedHeaderFragment} from "./ForwardedHeaderFragment";
 import {MessageParser} from "../../../../../../Api/Messages/MessageParser";
 import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer";
 import UIEvents from "../../../../../EventBus/UIEvents";
-import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer"
-import VUI from "../../../../../VUI"
-import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer"
-import API from "../../../../../../Api/Telegram/API"
-import PeerName from "../../../../Reactive/PeerName"
-import AppSelectedChat from "../../../../../Reactive/SelectedChat"
-import {copyTextToClipboard} from "../../../../../../Utils/clipboard"
+import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer";
+import VUI from "../../../../../VUI";
+import {ChannelPeer} from "../../../../../../Api/Peers/Objects/ChannelPeer";
+import API from "../../../../../../Api/Telegram/API";
+import PeerName from "../../../../Reactive/PeerName";
+import AppSelectedChat from "../../../../../Reactive/SelectedChat";
+import {copyTextToClipboard} from "../../../../../../Utils/clipboard";
 
 function ReplyToMessageFragment({message}) {
     if (!message.raw.reply_to_msg_id) {
-        return null
+        return null;
     } else if (!message.replyToMessage) {
         if (message.replyToMessageType === "replyNotFound") {
-            return <ReplyFragment show={true} name="Deleted message" text="Deleted message"/>
+            return <ReplyFragment show={true} name="Deleted message" text="Deleted message"/>;
         }
 
         return (
             <ReplyFragment show={true}/>
-        )
+        );
     }
 
     return (
@@ -32,11 +32,11 @@ function ReplyToMessageFragment({message}) {
                        text={MessageParser.getPrefixNoSender(message.replyToMessage)}
                        show={true}
                        onClick={() => {
-                           AppSelectedChat.showMessage(message.replyToMessage)
+                           AppSelectedChat.showMessage(message.replyToMessage);
                            // UIEvents.General.fire("chat.showMessage", {message: message.replyToMessage})
                        }}
         />
-    )
+    );
 }
 
 function createContextMenu(message) {
@@ -50,21 +50,21 @@ function createContextMenu(message) {
             icon: "copy",
             title: "Copy",
             onClick: _ => {
-                copyTextToClipboard(message.text)
+                copyTextToClipboard(message.text);
             }
         },
         {
             icon: _ => message.isPinned ? "unpin" : "pin",
             title: _ => message.isPinned ? "Unpin" : "Pin",
             onClick: _ => {
-                API.messages.updatePinnedMessage(message)
+                API.messages.updatePinnedMessage(message);
             }
         },
         {
             icon: "forward",
             title: "Forward",
             onClick: () => {
-                UIEvents.General.fire("message.forward", {message, from: message.dialog.peer})
+                UIEvents.General.fire("message.forward", {message, from: message.dialog.peer});
             }
         },
         {
@@ -95,22 +95,22 @@ function MessageWrapperFragment(
     slot
 ) {
     if (message.isDeleted) {
-        return <div/> // we don't delete entire element because we need virtualization to continue to work..
+        return <div/>; // we don't delete entire element because we need virtualization to continue to work..
     }
 
     const contextMenuHandler = VUI.ContextMenu.listener(contextActions ? () => contextActions : () => createContextMenu(message));
 
-    const doubleClickHandler = _ => ChatInputManager.replyTo(message)
+    const doubleClickHandler = _ => ChatInputManager.replyTo(message);
 
     const topLevelClasses = {
         "message": true,
         "channel": message.isPost,
         "out": !message.isPost && message.isOut,
         "in": message.isPost || !message.isOut,
-    }
+    };
 
     const inlineKeyboard = message.replyMarkup && message.replyMarkup._ === "replyInlineMarkup" ?
-        <InlineKeyboardComponent message={message}/> : ""
+        <InlineKeyboardComponent message={message}/> : "";
 
     let contentClasses = {
         "message-content": true,
@@ -120,18 +120,18 @@ function MessageWrapperFragment(
         "no-pad": !outerPad,
         "sent": !message.isSending && !message.isRead, //TODO more convenient method to do this
         "has-inline-keyboard": !!inlineKeyboard
-    }
+    };
     contentClasses["group-" + message.tailsGroup] = true;
 
     if (message.raw.fwd_from && (message.raw.fwd_from.saved_from_peer || message.raw.fwd_from.saved_from_msg_id)) {
-        topLevelClasses["out"] = false
-        topLevelClasses["in"] = true
+        topLevelClasses["out"] = false;
+        topLevelClasses["in"] = true;
     }
 
-    const isPrivateMessages = message.to instanceof UserPeer
-    const username = showUsername && !transparent && message.from.name && !message.isPost && 
+    const isPrivateMessages = message.to instanceof UserPeer;
+    const username = showUsername && !transparent && message.from.name && !message.isPost &&
         !message.isOut && !message.raw.reply_to_msg_id && !message.raw.fwd_from && !isPrivateMessages &&
-        (message.tailsGroup === "s" || message.tailsGroup === "se")
+        (message.tailsGroup === "s" || message.tailsGroup === "se");
 
     const messageNode = (
         <div className={topLevelClasses}
@@ -143,8 +143,11 @@ function MessageWrapperFragment(
                 {!transparent && <ReplyToMessageFragment message={message}/>}
                 <ForwardedHeaderFragment message={message}/>
                 {username ? <PeerName peer={message.from} chat={message.to} template={(peer) => {
-                    return <div class="peer-name"><div css-cursor="pointer" className="username"
-                                onClick={() => AppSelectedInfoPeer.select(peer)}>{peer.name}</div> <div class="rank">{message.to.getPeerRank(message.from)}</div></div>
+                    return <div class="peer-name">
+                        <div css-cursor="pointer" className="username"
+                             onClick={() => AppSelectedInfoPeer.select(peer)}>{peer.name}</div>
+                        <div class="rank">{message.to.getPeerRank(message.from)}</div>
+                    </div>;
                 }}/> : ""}
                 {slot}
             </div>
@@ -153,11 +156,11 @@ function MessageWrapperFragment(
                 {transparent && <ReplyToMessageFragment message={message}/>}
                 <div class="filler"/>
                 {message.isPost && <div class="share" onClick={() => {
-                    UIEvents.General.fire("message.forward", {message, from: message.dialog.peer})
+                    UIEvents.General.fire("message.forward", {message, from: message.dialog.peer});
                 }}><i class="tgico tgico-forward"/></div>}
             </div>
         </div>
-    )
+    );
 
     if (showDate || isNewMessages) {
         return (
@@ -175,10 +178,10 @@ function MessageWrapperFragment(
                 </div>
                 {messageNode}
             </div>
-        )
+        );
     } else {
-        return messageNode
+        return messageNode;
     }
 }
 
-export default MessageWrapperFragment
+export default MessageWrapperFragment;

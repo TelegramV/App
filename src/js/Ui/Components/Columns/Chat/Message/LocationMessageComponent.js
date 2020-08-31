@@ -1,6 +1,6 @@
-import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import {MessageType} from "../../../../../Api/Messages/Message"
-import MessageWrapperFragment from "./Common/MessageWrapperFragment"
+import GeneralMessageComponent from "./Common/GeneralMessageComponent";
+import {MessageType} from "../../../../../Api/Messages/Message";
+import MessageWrapperFragment from "./Common/MessageWrapperFragment";
 import {FileAPI} from "../../../../../Api/Files/FileAPI";
 
 class LocationMessageComponent extends GeneralMessageComponent {
@@ -16,7 +16,7 @@ class LocationMessageComponent extends GeneralMessageComponent {
         this.assure(FileAPI.getWebFile(fl)).then(url => {
             this.url = url;
             this.forceUpdate();
-        })
+        });
     }
 
     render({message, showDate}) {
@@ -29,27 +29,30 @@ class LocationMessageComponent extends GeneralMessageComponent {
                     <div class="title">{message.raw.media.title}</div>
                     <div class="address">{message.raw.media.address}</div>
                 </div>
-            )
+            );
         }
 
         return (
-            <MessageWrapperFragment message={message} noPad showUsername={false} bubbleRef={this.bubbleRef} showDate={showDate}>
-                {venue}
-                <div class="map-wrapper" onClick={this.openFullMap}>
-                    <img class="map" src={this.url}/>
-                    <div class="pin-point">
-                        <i class="tgico tgico-location"/>
+            MessageWrapperFragment(
+                {message, showDate, showUsername: false},
+                <>
+                    {venue}
+                    <div class="map-wrapper" onClick={this.openFullMap}>
+                        <img class="map" src={this.url}/>
+                        <div class="pin-point">
+                            <i class="tgico tgico-location"/>
+                        </div>
                     </div>
-                </div>
-            </MessageWrapperFragment>
-        )
+                </>
+            )
+        );
     }
 
     openFullMap = () => {
         let url = this.props.message.fullUrl;
         let win = window.open(url, '_blank');
         win.focus();
-    }
+    };
 }
 
 export default LocationMessageComponent;

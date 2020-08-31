@@ -1,30 +1,30 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
 import MessageTimeComponent from "./Common/MessageTimeComponent";
-import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import BetterVideoComponent from "../../../Basic/BetterVideoComponent"
-import { formatTime } from "../../../../../Utils/date"
-import DocumentParser from "../../../../../Api/Files/DocumentParser"
-import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
+import GeneralMessageComponent from "./Common/GeneralMessageComponent";
+import BetterVideoComponent from "../../../Basic/BetterVideoComponent";
+import {formatTime} from "../../../../../Utils/date";
+import DocumentParser from "../../../../../Api/Files/DocumentParser";
+import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent";
 
-const ProgressLoaderFragment = ({ progress = 0, radius = 0, hidden=false, strokeWidth=4}) => {
+const ProgressLoaderFragment = ({progress = 0, radius = 0, hidden = false, strokeWidth = 4}) => {
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - progress * circumference;
 
     const classes = {
-      "progress-ring": true,
-      hidden
-    }
+        "progress-ring": true,
+        hidden
+    };
 
     return (
         <svg className={classes}>
-                <circle
+            <circle
                 css-stroke-dashoffset={offset}
                 css-stroke-dasharray={`${circumference} ${circumference}`}
                 css-stroke-width={`${strokeWidth}px`}
-                cx={radius} cy={radius} r={radius-strokeWidth}/>
-            </svg>
-    )
-}
+                cx={radius} cy={radius} r={radius - strokeWidth}/>
+        </svg>
+    );
+};
 
 class RoundVideoMessageComponent extends GeneralMessageComponent {
 
@@ -35,71 +35,70 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
     state = {
         ...super.state,
         isMuted: true,
-    }
+    };
 
     videoComponentRef: { component: BetterVideoComponent } = StatelessComponent.createComponentRef();
 
-    render({ message, showDate }, { progress, isMuted }) {
+    render({message, showDate}, {progress, isMuted}) {
         const document = message.raw.media.document;
         const video = DocumentParser.attributeVideo(document);
 
         return (
-            <MessageWrapperFragment message={message}
-                                    transparent={true}
-                                    noPad
-                                    showUsername={false}
-                                    bubbleRef={this.bubbleRef}
-                                    showDate={showDate}>
+            MessageWrapperFragment(
+                {message, showDate, transparent: true, showUsername: false},
+                <>
+                    <BetterVideoComponent isRound
+                                          ref={this.videoComponentRef}
+                                          document={document}
+                                          round
+                                          autoDownload
+                                          autoPlay
+                                          muted={isMuted}
+                                          onClick={(event: MouseEvent) => {
+                                              const $video = event.currentTarget.querySelector("video");
 
-                <BetterVideoComponent isRound
-                                      ref={this.videoComponentRef}
-                                      document={document}
-                                      round
-                                      autoDownload
-                                      autoPlay
-                                      muted={isMuted}
-                                      onClick={(event: MouseEvent) => {
-                                          const $video = event.currentTarget.querySelector("video")
+                                              if ($video.paused) {
+                                                  this.setState({
+                                                      isMuted: false,
+                                                  });
 
-                                          if ($video.paused) {
-                                              this.setState({
-                                                  isMuted: false,
-                                              });
+                                                  $video.volume = 1;
+                                                  $video.play();
+                                              } else {
+                                                  $video.volume = isMuted ? 1 : 0;
 
-                                              $video.volume = 1;
-                                              $video.play();
-                                          } else {
-                                              $video.volume = isMuted ? 1 : 0;
+                                                  this.setState({
+                                                      isMuted: !isMuted,
+                                                  });
+                                              }
+                                          }}
+                                          onTimeUpdate={() => this.forceUpdate()}
+                                          onEnded={() => {
+                                              this.setState({isMuted: true});
+                                          }}
+                                          infoContainer={({currentTime}) => {
+                                              return (
+                                                  <div className="round-overlay">
+                                                      <ProgressLoaderFragment radius={95}
+                                                                              progress={currentTime / video.duration}
+                                                                              hidden={this.state.isMuted}
+                                                      />
+                                                  </div>
+                                              );
+                                          }}/>
 
-                                              this.setState({
-                                                  isMuted: !isMuted,
-                                              });
-                                          }
-                                      }}
-                                      onTimeUpdate={() => this.forceUpdate()}
-                                      onEnded={() => {this.setState({isMuted: true})}}
-                                      infoContainer={({currentTime}) => {
-                                          return (
-                                              <div className="round-overlay">
-                                                  <ProgressLoaderFragment radius={95} 
-                                                                          progress={currentTime / video.duration} 
-                                                                          hidden={this.state.isMuted}
-                                                  />
-                                              </div>
-                                          )
-                                      }}/>
-
-                <div className="playback">
+                    <div className="playback">
                     <span style={{
                         "display": !isMuted && "none"
                     }} className="pl-time tgico nosound"/>
-                    {this.videoComponentRef.component?.state.currentTime && formatTime(this.videoComponentRef.component?.state.currentTime)}
-                </div>
+                        {this.videoComponentRef.component?.state.currentTime && formatTime(this.videoComponentRef.component?.state.currentTime)}
+                    </div>
 
 
-                <MessageTimeComponent message={this.props.message} bg={true}/>
-            </MessageWrapperFragment>
-        )
+                    <MessageTimeComponent message={this.props.message} bg={true}/>
+                </>
+            )
+        );
     }
 
     // reactive(R) {
@@ -170,4 +169,4 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
     // }
 }
 
-export default RoundVideoMessageComponent
+export default RoundVideoMessageComponent;

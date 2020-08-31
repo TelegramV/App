@@ -1,38 +1,50 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
-import MessageTimeComponent from "./Common/MessageTimeComponent"
-import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import { StickerManager } from "../../../../../Api/Stickers/StickersManager"
-import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
-import UIEvents from "../../../../EventBus/UIEvents"
-import VButton from "../../../../Elements/Button/VButton"
-import AppSelectedChat from "../../../../Reactive/SelectedChat"
-import Settings from "../../../../../Api/Settings/Settings"
+import MessageTimeComponent from "./Common/MessageTimeComponent";
+import GeneralMessageComponent from "./Common/GeneralMessageComponent";
+import {StickerManager} from "../../../../../Api/Stickers/StickersManager";
+import BetterStickerComponent from "../../../Basic/BetterStickerComponent";
+import UIEvents from "../../../../EventBus/UIEvents";
+import AppSelectedChat from "../../../../Reactive/SelectedChat";
+import Settings from "../../../../../Api/Settings/Settings";
 
 class DiceMessageComponent extends GeneralMessageComponent {
     state = {
         ...super.state,
         sticker: null
-    }
+    };
 
-    render({ message, showDate }, { sticker }) {
+    render({message, showDate}, {sticker}) {
+        /*
         return (
-            <MessageWrapperFragment message={message} transparent={true} noPad showDate={showDate}>
+            MessageWrapperFragment(
+                {message, showDate},
+                <>
 
-                {
-                    (this.state.sticker ? 
-                        <BetterStickerComponent width={200*Settings.get("app_config.emojies_animated_zoom", 1)} document={sticker}
-                                                autoplay={true}
-                                                playOnHover={false}
-                                                paused={false}
-                                                onClick={this.suggestToSend}/>
-                        :
-                        <div css-height={"125px"}/>)
-                }
+                </>
+            )
+        );
+*/
 
-                <MessageTimeComponent message={message} bg={true}/>
+        return (
+            MessageWrapperFragment(
+                {message, showDate, transparent: true},
+                <>
+                    {
+                        (this.state.sticker ?
+                            <BetterStickerComponent width={200 * Settings.get("app_config.emojies_animated_zoom", 1)}
+                                                    document={sticker}
+                                                    autoplay={true}
+                                                    playOnHover={false}
+                                                    paused={false}
+                                                    onClick={this.suggestToSend}/>
+                            :
+                            <div css-height={"125px"}/>)
+                    }
 
-            </MessageWrapperFragment>
-        )
+                    <MessageTimeComponent message={message} bg={true}/>
+                </>
+            )
+        );
     }
 
     componentDidMount() {
@@ -40,7 +52,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
             this.setState({
                 sticker: sticker
             });
-        })
+        });
     }
 
     componentWillUpdate(nextProps) {
@@ -49,13 +61,13 @@ class DiceMessageComponent extends GeneralMessageComponent {
                 this.setState({
                     sticker: sticker
                 });
-            })
+            });
         }
     }
 
     suggestToSend = () => {
         UIEvents.General.fire("snackbar.show", {text: <SnackbarSuggestion emoji={this.props.message.emoji}/>, time: 5});
-    }
+    };
 }
 
 const SnackbarSuggestion = ({emoji}) => {
@@ -65,7 +77,7 @@ const SnackbarSuggestion = ({emoji}) => {
             Send a {emoji} emoji to any chat to try your luck.
             <span class="send-button" onClick={_ => chat.api.sendDice(emoji)}>SEND</span>
         </div>
-        )
-}
+    );
+};
 
-export default DiceMessageComponent
+export default DiceMessageComponent;
