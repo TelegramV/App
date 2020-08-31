@@ -159,6 +159,10 @@ class ContextMenuComponent extends StatefulComponent {
             } else {
                 this.state.animation = "left-bottom"
             }
+
+            if(y <= 0) {
+                y = 0
+            }
         }
         this.state.x = x
         this.state.y = y
