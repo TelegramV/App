@@ -6,6 +6,7 @@ import {RightSidebar} from "./RightSidebar";
 import {StickerSearchSidebar} from "./StickerSearch/StickerSearchSidebar";
 import {GifSearchSidebar} from "./GifSearch/GifSearchSidebar";
 import UIEvents from "../../../EventBus/UIEvents";
+import {GroupEditSidebar} from "./GroupEdit/GroupEditSidebar"
 
 export class RightSidebars extends GenericSidebarHistory {
     render() {
@@ -16,6 +17,8 @@ export class RightSidebars extends GenericSidebarHistory {
                 <GifSearchSidebar/>
                 <SearchSidebar/>
                 <DialogInfoSidebar/>
+
+                <GroupEditSidebar/>
             </div>
         )
     }

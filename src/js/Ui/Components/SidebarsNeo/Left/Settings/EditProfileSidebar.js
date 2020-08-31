@@ -24,6 +24,8 @@ export class EditProfileSidebar extends LeftSidebar {
     }
 
     appEvents(E) {
+        super.appEvents(E);
+        
         E.bus(AppEvents.Peers)
             .filter(event => event.peer === PeersStore.self())
             .on("updatePhoto", this.serverAvatarUpdated)
