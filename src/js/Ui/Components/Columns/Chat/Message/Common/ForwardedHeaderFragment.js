@@ -1,11 +1,11 @@
 import AppSelectedInfoPeer from "../../../../../Reactive/SelectedInfoPeer";
 
 export const ForwardedHeaderFragment = ({message}) => {
-    if (!message.raw.fwd_from) {
+    if (!message.raw.fwd_from || !message.forwarded) {
         return <div/>
-    } else if (!message.forwarded) {
+    } /*else if (!message.forwarded) {
         return <div id={`message-${message.id}-fwd`} className="fwd">...</div>
-    }
+    }*/
 
     if (typeof message.forwarded === "string") {
         return <div id={`message-${message.id}-fwd`} className="fwd">

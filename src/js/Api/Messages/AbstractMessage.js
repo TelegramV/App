@@ -202,6 +202,9 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     formattedTime = null
     getFormattedTime() {
+        if(this.formattedTime === null) {
+            this.formattedTime = this.getDate(Locale.currentLanguageCode, TIME_FORMAT)
+        }
         return this.formattedTime
     }
 
@@ -333,7 +336,6 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
         this.raw = raw
         this.jsDate = new Date(this.raw.date * 1000)
-        this.formattedTime = this.getDate(Locale.currentLanguageCode, TIME_FORMAT)
         this.prefix = MessageParser.getDialogPrefix(this)
 
         if (this.dialogPeer) {

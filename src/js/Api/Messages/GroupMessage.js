@@ -58,6 +58,10 @@ class GroupMessage extends AbstractMessage {
         return this.first.prefix;
     }
 
+    getDate(locale: any, format: any) {
+        return this.first.jsDate.toLocaleString(locale, format)
+    }
+
     add(message: Message) {
         this.messages.add(message);
         this.fire("groupUpdated");
