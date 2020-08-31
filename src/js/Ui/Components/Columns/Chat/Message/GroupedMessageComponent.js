@@ -23,7 +23,7 @@ class GroupedMessageComponent extends GeneralMessageComponent {
 
         return (
             MessageWrapperFragment(
-                {message, showDate, outerPad: false},
+                {message: group, showDate, outerPad: false},
                 <>
                     <div className={["grouped", Layouter.getClass(group.messages.size)]}>
                         {
