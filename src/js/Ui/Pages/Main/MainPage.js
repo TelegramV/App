@@ -26,6 +26,7 @@ import AudioPlayerComponent from "../../Components/Singleton/AudioPlayerComponen
 import ConfettiComponent from "../../Components/Singleton/ConfettiComponent"
 import InlineBotApi from "../../../Api/Bots/InlineBotManager"
 import BlockedManager from "../../../Api/Contacts/BlockedManager"
+import {OnTopConsole} from "../../Components/Debug/OnTopConsole";
 
 function initHighLevelManagers() {
     DialogsManager.fetchFirstPage().then(() => {
@@ -90,6 +91,7 @@ export function MainPage() {
             <PiPContainer/>
 
             <RightSidebars/>
+            {nodeIf(<OnTopConsole/>, IS_SAFARI)}
             {/*{nodeIf(<RightSidebars/>, IS_MOBILE_SCREEN)}*/}
 
 
