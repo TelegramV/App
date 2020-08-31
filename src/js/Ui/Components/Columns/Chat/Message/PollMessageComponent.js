@@ -1,25 +1,24 @@
-import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import MTProto from "../../../../../MTProto/External"
-import MessageWrapperFragment from "./Common/MessageWrapperFragment"
-import TextWrapperComponent from "./Common/TextWrapperComponent"
-import AvatarComponent from "../../../Basic/AvatarComponent"
-import VRadio from "../../../../Elements/Input/VRadio"
-import VCheckbox from "../../../../Elements/Input/VCheckbox"
-import messages from "../../../../../Api/Telegram/messages"
-import UIEvents from "../../../../EventBus/UIEvents"
-import PeersStore from "../../../../../Api/Store/PeersStore"
-import { parseMessageEntities } from "../../../../../Utils/htmlHelpers"
-import VComponent from "../../../../../V/VRDOM/component/VComponent"
-import VSpinner from "../../../../Elements/VSpinner"
-import { formatTime } from "../../../../../Utils/date"
-import Locale from "../../../../../Api/Localization/Locale"
+import GeneralMessageComponent from "./Common/GeneralMessageComponent";
+import MessageWrapperFragment from "./Common/MessageWrapperFragment";
+import TextWrapperFragment from "./Common/TextWrapperFragment";
+import AvatarComponent from "../../../Basic/AvatarComponent";
+import VRadio from "../../../../Elements/Input/VRadio";
+import VCheckbox from "../../../../Elements/Input/VCheckbox";
+import messages from "../../../../../Api/Telegram/messages";
+import UIEvents from "../../../../EventBus/UIEvents";
+import PeersStore from "../../../../../Api/Store/PeersStore";
+import {parseMessageEntities} from "../../../../../Utils/htmlHelpers";
+import VComponent from "../../../../../V/VRDOM/component/VComponent";
+import VSpinner from "../../../../Elements/VSpinner";
+import {formatTime} from "../../../../../Utils/date";
+import Locale from "../../../../../Api/Localization/Locale";
 
 export default class PollMessageComponent extends GeneralMessageComponent {
 
     state = {
         showingSolution: false,
         answers: []
-    }
+    };
 
     footerRef = VComponent.createFragmentRef();
     timerRef = VComponent.createFragmentRef();
@@ -32,7 +31,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                 icon: "revote",
                 title: this.l("lng_polls_retract"),
                 onClick: _ => this.cancelVote()
-            })
+            });
         }
 
         if (message.isOut && !message.poll.closed) {
@@ -40,15 +39,15 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                 icon: "close",
                 title: this.l("lng_polls_stop"),
                 onClick: _ => this.closePoll()
-            })
+            });
         }
         return contextActions;
-    }
+    };
 
     reactive(R) {
         R.object(this.props.message)
             .on("pollEdit", this.onPollChange)
-            .on("pollVote", this.onPollChange)
+            .on("pollVote", this.onPollChange);
     }
 
     componentDidMount() {
@@ -60,28 +59,36 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         if (this.props.message.poll.close_date && !this.props.message.isVoted) this.withInterval(this.updateTimer, 500);
     }
 
-    render({ message, showDate }) {
+    render({message, showDate}) {
         let classes = {
             "poll": true,
             "voted": message.isVoted
-        }
+        };
+
         return (
-            <MessageWrapperFragment message={message} contextActions={this.makeContextMenu()} showDate={showDate}>
-                <div class={classes}>
-                    <div class="question">{message.poll.question}</div>
-                    <div class="subtitle">
-                        <div class="poll-type">{this.l(message.pollTypeKey)}</div>
-                        {message.poll.public_voters && <RecentVotersFragment recentVoters={message.results.recent_voters}/>}
-                        <div class="filler"/>
-                        {this.shouldShowTooltip() && <TipFragment click={_ => this.showSolution()}/>}
-                        {(message.poll.close_period && !message.isVoted) && <TimerFragment ref={this.timerRef} left={0} total={0}/>}
+            MessageWrapperFragment(
+                {message, showDate, contextActions: this.makeContextMenu()},
+                <>
+                    <div className={classes}>
+                        <div className="question">{message.poll.question}</div>
+                        <div className="subtitle">
+                            <div className="poll-type">{this.l(message.pollTypeKey)}</div>
+                            {message.poll.public_voters &&
+                            <RecentVotersFragment recentVoters={message.results.recent_voters}/>}
+                            <div className="filler"/>
+                            {this.shouldShowTooltip() && <TipFragment click={_ => this.showSolution()}/>}
+                            {(message.poll.close_period && !message.isVoted) &&
+                            <TimerFragment ref={this.timerRef} left={0} total={0}/>}
+                        </div>
+                        {this.makeAnswerBlock()}
+                        <FooterFragment message={message} actionClick={this.onActionClick}
+                                        answers={this.state.answers}/>
                     </div>
-                    {this.makeAnswerBlock()}
-                    <FooterFragment message={message} actionClick={this.onActionClick} answers={this.state.answers}/>
-                </div>
-                <TextWrapperComponent message={message}/>
-            </MessageWrapperFragment>
-        )
+
+                    {TextWrapperFragment({message})}
+                </>
+            )
+        );
     }
 
     sendVote = () => {
@@ -95,44 +102,47 @@ export default class PollMessageComponent extends GeneralMessageComponent {
             }
             this.setState({
                 answers: []
-            })
-        })
-    }
+            });
+        });
+    };
 
     showSolution = () => {
         if (this.props.message.results?.solution && !this.state.showingSolution) {
-            UIEvents.General.fire("snackbar.show", { text: <SnackbarSolutionFragment message={this.props.message}/>, time: 5 });
+            UIEvents.General.fire("snackbar.show", {
+                text: <SnackbarSolutionFragment message={this.props.message}/>,
+                time: 5
+            });
             this.setState({
                 showingSolution: true
-            })
+            });
 
             this.withTimeout(_ => {
-                this.setState({ showingSolution: false })
+                this.setState({showingSolution: false});
             }, 5000);
         }
-    }
+    };
 
     addAnswer = (option) => {
         if (!option && option !== 0) return; //idk if this byte can be 0, but better be prepared
         this.state.answers.push(Number.parseInt(option));
         this.forceUpdate();
         if (!this.props.message.isMultiple) this.sendVote();
-    }
+    };
 
     cancelAnswer = (option) => {
         if (!option && option !== 0) return;
         option = Number.parseInt(option);
         this.setState({
             answers: this.state.answers.filter(item => (item !== option))
-        })
-    }
+        });
+    };
 
     onPollChange = () => {
         this.forceUpdate();
-        UIEvents.General.fire("pollUpdate", { message: this.props.message }); //update sidebar
+        UIEvents.General.fire("pollUpdate", {message: this.props.message}); //update sidebar
 
         this.withTimeout(_ => this.forceUpdate(), 1000); // текст з обраного варіанту кудись зникає, дикий костиль, ДАВИД ФІКС!
-    }
+    };
 
     onActionClick = (event) => {
         if (event.currentTarget.classList.contains("disabled")) return;
@@ -141,15 +151,17 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         } else {
             this.showFullResults(); // Results
         }
-    }
+    };
 
     makeAnswerBlock = () => {
         let answers = [];
         for (const answer of this.props.message.poll.answers) {
-            answers.push(<AnswerFragment message={this.props.message} option={answer.option[0]} click={this.onAnswerClick} chosen={this.state.answers.includes(answer.option[0])}/>)
+            answers.push(<AnswerFragment message={this.props.message} option={answer.option[0]}
+                                         click={this.onAnswerClick}
+                                         chosen={this.state.answers.includes(answer.option[0])}/>);
         }
         return answers;
-    }
+    };
 
     onAnswerClick = (event) => {
         let option = event.currentTarget.getAttribute("option");
@@ -160,7 +172,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         } else {
             this.cancelAnswer(option);
         }
-    }
+    };
 
     updateTimer = () => {
         let message = this.props.message;
@@ -172,41 +184,42 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         this.timerRef.update({
             left: left,
             total: message.poll.close_period
-        })
-    }
+        });
+    };
 
     shouldShowTooltip = () => {
         let message = this.props.message;
         return message.isQuiz &&
             (message.poll.closed || message.isVoted) &&
             !this.state.showingSolution &&
-            this.props.message.results?.solution
-    }
+            this.props.message.results?.solution;
+    };
 
     cancelVote = () => {
         messages.sendVote(this.props.message, []);
-    }
+    };
 
     closePoll = () => {
         messages.closePoll(this.props.message);
-    }
+    };
 
     showFullResults = () => {
-        UIEvents.General.fire("poll.showResults", { pollMessage: this.props.message })
-    }
+        UIEvents.General.fire("poll.showResults", {pollMessage: this.props.message});
+    };
 }
 
-const AnswerFragment = ({ message, option, chosen, click }) => {
+const AnswerFragment = ({message, option, chosen, click}) => {
     let answer = message.poll.answers.find(answ => answ.option[0] === option);
     let result = message.results?.results?.find(res => res.option[0] === option);
 
     if (!message.isVoted && !message.poll.closed) {
         return (
             <div class="answer voting rp" option={answer.option} onClick={click}>
-                <div class="vote">{message.isMultiple ? <VCheckbox checked={chosen}/> : <VRadio checked={chosen}/>}</div>
+                <div class="vote">{message.isMultiple ? <VCheckbox checked={chosen}/> :
+                    <VRadio checked={chosen}/>}</div>
                 <div class="answer-text">{answer.text}</div>
             </div>
-        )
+        );
     } else {
         let relPercent = Math.max(message.calculateRelativePercent(result), 1); //0% doesn't show a bar
         let absPercent = message.calculateAbsolutePercent(result);
@@ -216,29 +229,29 @@ const AnswerFragment = ({ message, option, chosen, click }) => {
             "tgico": true,
             "tgico-check": result.chosen || (message.isQuiz && result.correct),
             "tgico-close": (message.isQuiz && !result.correct)
-        }
+        };
 
         let answerClasses = {
             answer: true,
             wrong: message.isQuiz && !result.correct && !message.isVotedCorrectly && result.chosen,
             right: message.isQuiz && result.correct,
             chosen: result.chosen
-        }
+        };
 
         return (
             <div class={answerClasses} option={answer.option}>
-                <div class="percent">{absPercent+"%"}</div>
+                <div class="percent">{absPercent + "%"}</div>
                 <div class="voted"><span class={votedClass}/></div>
                 <div class="answer-text">{answer.text}</div>
                 <div class="progress-wrapper">
-                    <div class="progress" css-width={relPercent+"%"}></div>
+                    <div class="progress" css-width={relPercent + "%"}></div>
                 </div>
             </div>
-        )
+        );
     }
-}
+};
 
-const FooterFragment = ({ message, actionClick, answers }) => {
+const FooterFragment = ({message, actionClick, answers}) => {
     if (message.isVoted && message.isPublic) {
         return <div class="action-button" onClick={actionClick}>{Locale.l("lng_polls_view_results")}</div>;
     } else if (!message.isVoted && message.isMultiple) {
@@ -246,7 +259,7 @@ const FooterFragment = ({ message, actionClick, answers }) => {
             "action-button": true,
             disabled: answers.length === 0,
             rp: answers.length === 0
-        }
+        };
         return <div class={classes} onClick={actionClick}>{Locale.l("lng_polls_submit_votes")}</div>;
     }
 
@@ -255,7 +268,7 @@ const FooterFragment = ({ message, actionClick, answers }) => {
         if (message.results.total_voters > 0) {
             voted = Locale.lp("lng_polls_answers_count", message.results.total_voters, {
                 count: message.results.total_voters
-            })
+            });
         } else {
             Locale.l("lng_polls_answers_none");
         }
@@ -263,37 +276,37 @@ const FooterFragment = ({ message, actionClick, answers }) => {
         if (message.results.total_voters > 0) {
             voted = Locale.lp("lng_polls_votes_count", message.results.total_voters, {
                 count: message.results.total_voters
-            })
+            });
         } else {
             Locale.l("lng_polls_votes_none");
         }
     }
 
     return <div class="stats">{voted}</div>;
-}
+};
 
-const TipFragment = ({ click }) => {
+const TipFragment = ({click}) => {
     return (
         <div class="tip" onClick={click}>
             <i class="tgico tgico-tip"/>
         </div>
-    )
-}
+    );
+};
 
-const RecentVotersFragment = ({ recentVoters }) => {
+const RecentVotersFragment = ({recentVoters}) => {
     let avatars = [];
     for (let id of recentVoters) {
         let user = PeersStore.get("user", id);
-        avatars.push(<AvatarComponent noSaved peer={user}/>)
+        avatars.push(<AvatarComponent noSaved peer={user}/>);
     }
     return (
         <div class="recent-voters">
             {avatars}
         </div>
-    )
-}
+    );
+};
 
-const SnackbarSolutionFragment = ({ message }) => {
+const SnackbarSolutionFragment = ({message}) => {
     let text = parseMessageEntities(message.results.solution, message.results.solution_entities);
     return (
         <div class="solution">
@@ -302,10 +315,10 @@ const SnackbarSolutionFragment = ({ message }) => {
                 {text}
             </div>
         </div>
-    )
-}
+    );
+};
 
-const TimerFragment = ({ left, total }) => {
+const TimerFragment = ({left, total}) => {
     if (total === 0) return <div class="timer"/>;
     if (left < 0) left = 0;
     let percent = left / total;
@@ -318,5 +331,5 @@ const TimerFragment = ({ left, total }) => {
             <span class="time-left" css-color={color}>{formatted}</span>
             <VSpinner progress={percent} determinate={true} color={color}/>
         </div>
-    )
-}
+    );
+};

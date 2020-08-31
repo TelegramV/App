@@ -21,12 +21,12 @@ export class CreateChannelSidebar extends LeftSidebar {
 			<this.contentWrapper>
 				<AvatarUploadComponent onAvatarUpdated={this.onAvatarUpdate} url={this.state.avatarUrl}/>
 				<Section>
-					<VInput label="Channel Name" onInput={(event) => {
+					<VInput label={this.l("lng_dlg_new_channel_name")} onInput={(event) => {
 						this.setState({
 							name: event.target.value
 						})
 					}} value={this.state.name}/>
-					<VInput label="Description (optional)" onInput={(event) => {
+					<VInput label={this.l("lng_create_group_description")} onInput={(event) => {
 						this.setState({
 							description: event.target.value
 						})

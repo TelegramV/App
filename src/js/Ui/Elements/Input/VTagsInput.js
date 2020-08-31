@@ -27,7 +27,7 @@ function VTagsInput(
             <div className="tags">
                 {tags}
                 <div className="input">
-                    <input type="text" placeholder="Select chat" onInput={onInput} value={value}/>
+                    <input type="text" placeholder="Select chat" onInput={onInput} value={value} tabindex="-1"/>
                 </div>
             </div>
         </div>

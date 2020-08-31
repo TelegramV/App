@@ -324,17 +324,6 @@ export class FileAPI {
         })
     }
 
-    static async uploadProfilePhoto(photoBytes, videoBytes, videoStart = 0) {
-        let photo = await this.uploadFile(photoBytes);
-        let video = await this.uploadFile(videoBytes);
-
-        return MTProto.invokeMethod("photos.uploadProfilePhoto", {
-            file: photo,
-            video,
-            video_start_ts: videoStart
-        })
-    }
-
     static obsolete_getFileLocation(location, dcID = null, offset = 0) {
         return MTProto.invokeMethod("upload.getFile", {
             location: location,

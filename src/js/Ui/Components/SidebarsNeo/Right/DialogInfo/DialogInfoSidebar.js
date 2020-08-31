@@ -16,6 +16,8 @@ import VUI from "../../../../VUI"
 import { UserPeer } from "../../../../../Api/Peers/Objects/UserPeer";
 import PeersStore from "../../../../../Api/Store/PeersStore"
 import BlockedManager from "../../../../../Api/Contacts/BlockedManager"
+import {SupergroupPeer} from "../../../../../Api/Peers/Objects/SupergroupPeer"
+import {GroupEditSidebar} from "../GroupEdit/GroupEditSidebar"
 
 export class DialogInfoSidebar extends RightSidebar {
 
@@ -127,9 +129,28 @@ export class DialogInfoSidebar extends RightSidebar {
     }
 
     get rightButtons() {
-        return [{
-            icon: "more",
-            onClick: this.makeMoreButton()
-        }]
+        const buttons = []
+
+        const current = AppSelectedInfoPeer.Current;
+        if(current) {
+            if(current.type==="chat") {
+                buttons.push({
+                    icon: "newchat_filled",
+                    onClick: () => UIEvents.Sidebars.fire("push", GroupEditSidebar)
+                })
+            } else if(current instanceof SupergroupPeer && (current.raw.creator || current.raw.admin_rights)) {
+                buttons.push({
+                    icon: "newchat_filled",
+                    onClick: () => UIEvents.Sidebars.fire("push", GroupEditSidebar)
+                })
+            }
+
+            buttons.push({
+                icon: "more",
+                onClick: this.makeMoreButton()
+            })
+        }
+
+        return buttons;
     }
 }

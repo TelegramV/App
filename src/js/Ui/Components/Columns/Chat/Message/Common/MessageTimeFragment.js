@@ -1,6 +1,6 @@
 import {ChatInputManager} from "../../ChatInput/ChatInputComponent"
 
-const MessageTimeComponent = ({message, bg = false, color}) => {
+const MessageTimeFragment = ({message, bg = false, color}) => {
     let classes = "time" + (bg ? " bg" : "");
     const ondblclick = () => ChatInputManager.replyTo(message)
 
@@ -47,4 +47,4 @@ function numberFormat(num) {
     return (num / si[i].value).toFixed(digits).replace(rx, "$1") + si[i].symbol;
 }
 
-export default MessageTimeComponent
+export default MessageTimeFragment

@@ -40,6 +40,7 @@ import StatefulComponent from "../../../../V/VRDOM/component/StatefulComponent"
 import API from "../../../../Api/Telegram/API"
 import AppEvents from "../../../../Api/EventBus/AppEvents"
 import {RightSidebar} from "../../SidebarsNeo/Right/RightSidebar";
+import ChatMoreButtonFragment from "./ChatMoreButtonFragment"
 
 const useVirtualized = true || Boolean(localStorage.getItem("settings.messages.virtualized"))
 
@@ -84,6 +85,7 @@ class ChatComponent extends StatelessComponent {
     chatLoaderRef = VComponent.createRef()
     messagesLoaderRef = VComponent.createRef()
     chatInputRef = VComponent.createComponentRef()
+    chatMoreRef = VComponent.createFragmentRef()
 
     appEvents(E) {
         E.bus(UIEvents.General)
@@ -124,10 +126,10 @@ class ChatComponent extends StatelessComponent {
                     <SearchBarComponent ref={this}/>
                     <div id="topbar">
                         <ChatInfoComponent/>
-                        <SubscribeButton/>
-                        <ChatInfoCallButtonComponent/>
-                        <div className="btn-icon rp rps tgico-search" onClick={this.openSearch}/>
-                        <div className="btn-icon rp rps tgico-more"/>
+                        {!IS_MOBILE_SCREEN && <SubscribeButton/>}
+                        {!IS_MOBILE_SCREEN && <ChatInfoCallButtonComponent/>}
+                        {!IS_MOBILE_SCREEN && <div className="btn-icon rp rps tgico-search" onClick={this.openSearch}/>}
+                        <ChatMoreButtonFragment ref={this.chatMoreRef}/>
                     </div>
                     <ChatInfoPinnedComponent/>
 
@@ -209,6 +211,7 @@ class ChatComponent extends StatelessComponent {
     }
 
     onChatSelect = _ => {
+        this.chatMoreRef.patch();
         this.chatLoaderRef.$el.style.display = "none"
 
         if (AppSelectedChat.isSelected) {

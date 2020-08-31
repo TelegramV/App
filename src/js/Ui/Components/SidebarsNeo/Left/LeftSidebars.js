@@ -15,6 +15,7 @@ import {CreateFolderSidebar} from "./Settings/Folders/CreateFolderSidebar";
 import {FolderPeersSidebar} from "./Settings/Folders/FolderPeersSidebar";
 import {SuperSecretSettingsSidebar} from "./Settings/SuperSecretSettingsSidebar";
 import {CreateChannelSidebar} from "./NewChats/CreateChannelSidebar"
+import {EditProfileSidebar} from "./Settings/EditProfileSidebar"
 
 export class LeftSidebars extends GenericSidebarHistory {
     render() {
@@ -28,6 +29,7 @@ export class LeftSidebars extends GenericSidebarHistory {
 
 
                 <GeneralSidebar/>
+                <EditProfileSidebar/>
                 <FoldersSidebar/>
                 <CreateFolderSidebar/>
                 <FolderPeersSidebar/>

@@ -1,41 +1,20 @@
 import "./Folders.scss";
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
-import type {AE} from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
+import type { AE } from "../../../../../V/VRDOM/component/__component_appEventsBuilder";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VUI from "../../../../VUI";
 import TranslatableStatefulComponent from "../../../../../V/VRDOM/component/TranslatableStatefulComponent"
 import UIEvents from "../../../../EventBus/UIEvents";
-import {CreateFolderSidebar} from "../Settings/Folders/CreateFolderSidebar";
+import { CreateFolderSidebar } from "../Settings/Folders/CreateFolderSidebar";
 import foldersState from "../../../foldersState"
 import TabSelectorComponent from "../../../Tab/TabSelectorComponent"
 import Locale from "../../../../../Api/Localization/Locale"
 
-const FolderFragment = ({folderId, icon, title, badge = {active: false, count: 0}}) => {
+const FolderFragment = ({ folderId, icon, title, badge = { active: false, count: 0 } }) => {
     return <div className={{
-        folder: true,
-        item: true,
-        // rp: true,
-        // rps: true,
-    }} onContextMenu={folderId && VUI.ContextMenu.listener([
-        {
-            icon: "edit",
-            title: Locale.l("lng_filters_context_edit"),
-            onClick: _ => {
-                UIEvents.Sidebars.fire("push", {
-                    sidebar: CreateFolderSidebar,
-                    folderId: folderId
-                })
-            }
-        },
-        {
-            icon: "delete",
-            title: Locale.l("lng_filters_context_remove"),
-            red: true,
-            onClick: _ => {
-                FoldersManager.deleteFolder(folderId)
-            }
-        },
-    ])}>
+                            folder: true,
+                            item: true,
+                        }}>
         <span className="title">
             {title}
             <span className={{"badge": true, "active": badge.active}}>{badge.count <= 0 ? "" : (badge.count > 99 ? "99+" : badge.count)}</span>
@@ -92,15 +71,34 @@ export class Folders extends TranslatableStatefulComponent {
                                        badge={FoldersManager.getBadgeCount(folder.id)}
                                        folderId={folder.id}/>,
                 onClick: () => FoldersManager.selectFolder(folder.id),
-                key: folder.id
+                key: folder.id,
+                onContextMenu: folder.id && VUI.ContextMenu.listener([{
+                        icon: "edit",
+                        title: Locale.l("lng_filters_context_edit"),
+                        onClick: _ => {
+                            UIEvents.Sidebars.fire("push", {
+                                sidebar: CreateFolderSidebar,
+                                folderId: folder.id
+                            })
+                        }
+                    },
+                    {
+                        icon: "delete",
+                        title: Locale.l("lng_filters_context_remove"),
+                        red: true,
+                        onClick: _ => {
+                            FoldersManager.deleteFolder(folder.id)
+                        }
+                    },
+                ])
             })
         })
         return tabs;
     }
 
     findSelected = () => {
-        if(!this.tabs) return 1;
-        let selected = this.tabs.findIndex(el => el.key===(this.state.currentId)) + 1;
+        if (!this.tabs) return 1;
+        let selected = this.tabs.findIndex(el => el.key === (this.state.currentId)) + 1;
         return selected || 1;
     }
 

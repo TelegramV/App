@@ -9,9 +9,13 @@ export default class AvatarUploadComponent extends StatefulComponent {
     }
 
     render({}, {avatarUrl}) {
+        const containerClasses = {
+            "image-container": true,
+            "tint": !!avatarUrl
+        }
         return (<div class="avatar-upload" onClick={this.openUploadModal}>
-            <div class="image-container" css-background-image={`url(${avatarUrl})`}>
-                {!avatarUrl && <i class="tgico tgico-cameraadd"/>}
+            <div class={containerClasses} css-background-image={`url(${avatarUrl})`}>
+                <i class="tgico tgico-cameraadd"/>
             </div>
         </div>)
     }
@@ -21,7 +25,7 @@ export default class AvatarUploadComponent extends StatefulComponent {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        if(!this.state.avatarUrl && nextProps.url) {
+        if(this.state.avatarUrl !== nextProps.url) {
             this.state.avatarUrl = nextProps.url
         }
     }

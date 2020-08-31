@@ -2,6 +2,7 @@
 
 .avatar-upload {
     --size: 125px;
+
     .image-container {
         width: var(--size);
         height: var(--size);
@@ -14,6 +15,17 @@
 
         &:hover {
             background-color: $darkblue;
+        }
+
+        &.tint::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: $semiblack;
+            border-radius: 50%;
         }
 
         .tgico {

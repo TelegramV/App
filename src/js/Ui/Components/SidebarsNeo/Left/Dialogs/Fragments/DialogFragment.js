@@ -1,30 +1,47 @@
-import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer"
-import AppSelectedChat from "../../../../../Reactive/SelectedChat"
-import AvatarComponent from "../../../../Basic/AvatarComponent"
-import {DialogTimeFragment} from "./DialogTimeFragment"
-import {DialogTextFragment} from "./DialogTextFragment"
-import {DialogUnreadMentionsCountBadge} from "./DialogUnreadMentionsCountBadge"
-import {DialogUnreadCountBadge} from "./DialogUnreadCountBadge"
-import {DialogUnreadMarkBadge} from "./DialogUnreadMarkBadge"
-import Locale from "../../../../../../Api/Localization/Locale"
+import {UserPeer} from "../../../../../../Api/Peers/Objects/UserPeer";
+import AppSelectedChat from "../../../../../Reactive/SelectedChat";
+import AvatarComponent from "../../../../Basic/AvatarComponent";
+import Locale from "../../../../../../Api/Localization/Locale";
 import foldersState from "../../../../foldersState";
 import FoldersManager from "../../../../../../Api/Dialogs/FolderManager";
+
+function Text({dialog}) {
+    if (dialog.draft.isPresent) {
+        return (
+            <div className="message">
+                <span className="draft">Draft: </span>
+                {dialog.draft.message}
+            </div>
+        );
+    } else if (dialog.actions.size > 0) {
+        const action = dialog.action;
+
+        if (action) {
+            return (
+                <div className="message loading-text">
+                    {Locale.lp(action)}
+                </div>
+            );
+        }
+    }
+
+    return (
+        <div className="message">
+            <span className="sender">{dialog.peer.messages.last.prefix}</span>
+            {dialog.peer.messages.last.text.substring(0, 100)}
+        </div>
+    );
+}
 
 export const DialogFragment = (
     {
         dialog,
         contextMenu,
         click,
-        timeFragmentRef,
-        textFragmentRef,
-        unreadMentionsCountFragmentRef,
-        unreadCountFragmentRef,
-        unreadMarkFragmentRef,
-        ...otherArgs
     }
 ) => {
-    const peer = dialog.peer
-    let lastMessage = dialog.peer.messages.last
+    const peer = dialog.peer;
+    let lastMessage = dialog.peer.messages.last;
 
     const personClasses = {
         "person": true,
@@ -33,26 +50,24 @@ export const DialogFragment = (
         "active": AppSelectedChat.check(dialog.peer),
         "unread": dialog.peer.messages.unreadMentionsCount > 0 || dialog.peer.messages.unreadCount > 0 || dialog.unreadMark,
         "muted": dialog.isMuted,
-    }
+    };
 
     if (lastMessage && lastMessage.isOut && !dialog.peer.isSelf) {
-        personClasses["sent"] = true
+        personClasses["sent"] = true;
 
         if (lastMessage.isRead) {
-            personClasses["read"] = true
+            personClasses["read"] = true;
         }
     }
 
-    const pinned = foldersState.current == null ? dialog.pinned : FoldersManager.isPinned(peer, foldersState.current.id)
-    const showPin = pinned && dialog.peer.messages.unreadMentionsCount === 0 && dialog.peer.messages.unreadCount === 0 && !dialog.unreadMark
+    const pinned = foldersState.current == null ? dialog.pinned : FoldersManager.isPinned(peer, foldersState.current.id);
+    const showPin = pinned && dialog.peer.messages.unreadMentionsCount === 0 && dialog.peer.messages.unreadCount === 0 && !dialog.unreadMark;
+
     return (
         <div data-message-id={lastMessage.id}
              className={personClasses}
              onClick={click}
-             onContextMenu={contextMenu}
-             style={{
-                 // "height": "70px",
-             }}>
+             onContextMenu={contextMenu}>
 
             <AvatarComponent peer={dialog.peer}/>
 
@@ -65,21 +80,35 @@ export const DialogFragment = (
 
                     <div className="status tgico"/>
 
-                    <DialogTimeFragment ref={timeFragmentRef}
-                                        dialog={dialog}/>
+                    <div className="time">
+                        {dialog.peer.messages.last.getFormattedDateOrTime()}
+                    </div>
                 </div>
 
                 <div className="bottom">
-                    <DialogTextFragment ref={textFragmentRef}
-                                        dialog={dialog}/>
+                    {Text({dialog})}
 
-                    <DialogUnreadMentionsCountBadge ref={unreadMentionsCountFragmentRef} dialog={dialog}/>
-                    <DialogUnreadCountBadge ref={unreadCountFragmentRef} dialog={dialog}/>
+                    {dialog.peer.messages.unreadMentionsCount > 0
+                        ? <div className="badge tgico">
+                            @
+                        </div>
+                        : ""}
 
-                    <DialogUnreadMarkBadge ref={unreadMarkFragmentRef} dialog={dialog}/>
-                    <div showIf={showPin} className="badge tgico pin"/>
+                    {dialog.peer.messages.unreadCount > 0
+                        ? <div className="badge tgico">
+                            {dialog.peer.messages.unreadCount}
+                        </div>
+                        : ""}
+
+                    {dialog.unreadMark
+                        ? <div className="badge tgico">
+                            {" "}
+                        </div>
+                        : ""}
+
+                    {showPin && <div className="badge tgico pin"/>}
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};

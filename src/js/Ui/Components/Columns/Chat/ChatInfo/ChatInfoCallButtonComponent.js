@@ -14,7 +14,6 @@ class ChatInfoCallButtonComponent extends StatelessComponent {
 
     render() {
         const canCall = AppSelectedChat.current instanceof UserPeer && !AppSelectedChat.current.isBot
-        console.log("CAN CALL", canCall)
         return (
             <div className={{"btn-icon rp rps tgico-phone": true, "hidden": !canCall}} onClick={this.callContact}/>
         )

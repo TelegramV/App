@@ -17,46 +17,54 @@
  *
  */
 
-import type {VRAttrs, VREvents, VRStyle, VRTagName} from "./types/types"
-import VRNode from "./VRNode"
-import VRDOM from "./VRDOM"
-import {text2emoji} from "../../Ui/Plugins/EmojiTextInterceptor"
-import attrAliases from "./jsx/attrAliases"
-import vrdom_isTagNameComponentOrFragment from "./is/isTagNameComponentOrFragment"
-import attrProcessors from "./jsx/attrProcessors/attrProcessors"
-import postAttrProcessor from "./jsx/attrProcessors/postAttrProcessor"
-import vrdom_createNode from "./createNode"
+import type {VRAttrs, VREvents, VRStyle, VRTagName} from "./types/types";
+import VRNode from "./VRNode";
+import VRDOM from "./VRDOM";
+import {text2emoji} from "../../Ui/Plugins/EmojiTextInterceptor";
+import attrAliases from "./jsx/attrAliases";
+import vrdom_isTagNameComponentOrFragment from "./is/isTagNameComponentOrFragment";
+import attrProcessors from "./jsx/attrProcessors/attrProcessors";
+import postAttrProcessor from "./jsx/attrProcessors/postAttrProcessor";
+import vrdom_createNode from "./createNode";
 
-let intercepted = false
+let intercepted = false;
 
 const process = (flatten: Array, child) => {
     if (!child) {
-        return true
+        return true;
     }
 
     if (Array.isArray(child)) {
         for (let j = 0; j < child.length; j++) {
             if (child[j]) {
                 // if (!process(flatten, child[j])) {
-                flatten.push(child[j])
+                flatten.push(child[j]);
                 // }
             }
         }
 
-        return true
+        return true;
     }
 
     if (typeof child === "object" && child.tagName === VRDOM.Fragment) {
         for (let j = 0; j < child.children.length; j++) {
             if (child.children[j]) {
-                flatten.push(child.children[j])
+                flatten.push(child.children[j]);
             }
         }
 
-        return true
+        return true;
     }
 
-    return false
+    return false;
+};
+
+function isUndefinedNode(value) {
+    return !(value || value === 0 || value === "");
+}
+
+function isFragment(vNode) {
+    return vNode && typeof vNode === "object" && vNode.tagName === VRDOM.Fragment;
 }
 
 function vrdom_createElement(tagName: VRTagName, attributes: VRAttrs, ...children: Array<VRNode>) {
@@ -64,92 +72,121 @@ function vrdom_createElement(tagName: VRTagName, attributes: VRAttrs, ...childre
     //     console.warn("fragments are not fully supported")
     // }
 
-    const flatten = []
+    const flatten = [];
 
-    if (intercepted) {
-        for (let i = 0; i < children.length; i++) {
-            const child = children[i];
+    // if (intercepted) {
+    //     for (let i = 0; i < children.length; i++) {
+    //         const child = children[i];
+    //
+    //         if (!process(flatten, child)) {
+    //             flatten.push(child)
+    //         }
+    //     }
+    // } else {
+    //     intercepted = true
+    //
+    //     for (let i = 0; i < children.length; i++) {
+    //         const child = children[i];
+    //
+    //         if (!process(flatten, child)) {
+    //             if (typeof child === "string") {
+    //                 const textchildren = text2emoji(child)
+    //
+    //                 for (let j = 0; j < textchildren.length; j++) {
+    //                     flatten.push(textchildren[j])
+    //                 }
+    //             } else {
+    //                 flatten.push(child)
+    //             }
+    //         }
+    //     }
+    //
+    //     intercepted = false
+    // }
+    for (let i = 0; i < children.length; i++) {
+        const child = children[i];
 
-            if (!process(flatten, child)) {
-                flatten.push(child)
-            }
+        if (isUndefinedNode(child)) {
+            continue;
         }
-    } else {
-        intercepted = true
 
-        for (let i = 0; i < children.length; i++) {
-            const child = children[i];
-
-            if (!process(flatten, child)) {
-                if (typeof child === "string") {
-                    const textchildren = text2emoji(child)
-
-                    for (let j = 0; j < textchildren.length; j++) {
-                        flatten.push(textchildren[j])
-                    }
-                } else {
-                    flatten.push(child)
+        if (Array.isArray(child)) {
+            for (let j = 0; j < child.length; j++) {
+                if (!isUndefinedNode(child[j])) {
+                    flatten.push(child[j]);
                 }
             }
-        }
+        } else if (isFragment(child)) {
+            for (let j = 0; j < child.children.length; j++) {
+                if (!isUndefinedNode(child.children[j])) {
+                    flatten.push(child.children[j]);
+                }
+            }
+        } else if (typeof child === "string") {
+            const textchildren = text2emoji(child);
 
-        intercepted = false
+            for (let j = 0; j < textchildren.length; j++) {
+                flatten.push(textchildren[j]);
+            }
+        } else {
+            flatten.push(child);
+        }
     }
 
-    children = flatten
+    children = flatten;
 
-    const attrs: VRAttrs = Object.create(null)
-    const events: VREvents = Object.create(null)
-    const style: VRStyle = Object.create(null)
+    const attrs: VRAttrs = Object.create(null);
+    const events: VREvents = Object.create(null);
+    const style: VRStyle = Object.create(null);
 
-    let ref = undefined
-    let key = undefined
-    let dangerouslySetInnerHTML: boolean = false
-    let doNotTouchMyChildren: boolean = false
+    let ref = undefined;
+    let key = undefined;
+    let dangerouslySetInnerHTML: boolean = false;
+    let doNotTouchMyChildren: boolean = false;
 
     if (attributes) {
         for (let [k, v] of Object.entries(attributes)) {
             if (attrAliases.has(k)) {
-                k = attrAliases.get(k)
+                k = attrAliases.get(k);
             }
 
-            const isComponentOrFragment = vrdom_isTagNameComponentOrFragment(tagName)
-            let key = isComponentOrFragment ? k : k.toLowerCase()
+            const isComponentOrFragment = vrdom_isTagNameComponentOrFragment(tagName);
+            let key = isComponentOrFragment ? k : k.toLowerCase();
 
             if (key.startsWith("on") && !isComponentOrFragment) {
-                events[key.substring(2).toLowerCase()] = v
+                events[key.substring(2).toLowerCase()] = v;
             } else if (k === "dangerouslySetInnerHTML") {
-                dangerouslySetInnerHTML = v
-                attrs["vr-dangerouslySetInnerHTML"] = true
+                dangerouslySetInnerHTML = v;
+                attrs["vr-dangerouslySetInnerHTML"] = true;
             } else if (k === "doNotTouchMyChildren" && !isComponentOrFragment) {
-                doNotTouchMyChildren = v
+                doNotTouchMyChildren = v;
             } else if (key.startsWith("css-") && !isComponentOrFragment) {
-                const styleKey = key.substring(4)
-                style[styleKey] = v
+                const styleKey = key.substring(4);
+                style[styleKey] = v;
             } else if (k === "showIf" && !isComponentOrFragment) {
-                style.display = v ? undefined : "none"
+                style.display = v ? undefined : "none";
             } else if (k === "hideIf" && !isComponentOrFragment) {
-                style.display = v ? "none" : undefined
+                style.display = v ? "none" : undefined;
             } else if (key === "key") {
-                key = v
+                key = v;
             } else if (key === "ref") {
-                ref = v
+                ref = v;
             } else if (key === "style" && typeof v === "object" && !isComponentOrFragment) {
-                Object.assign(style, v)
+                Object.assign(style, v);
             } else {
                 if (attrAliases.has(k)) {
-                    key = attrAliases.get(k)
-                    attrs[key] = v
+                    key = attrAliases.get(k);
+                    attrs[key] = v;
                 } else {
-                    attrs[key] = v
+                    attrs[key] = v;
                 }
             }
 
             if (attrProcessors.has(key)) {
-                attrs[key] = attrProcessors.get(key)(v)
+                attrs[key] = attrProcessors.get(key)(v);
             }
 
-            attrs[key] = postAttrProcessor(key, attrs[key])
+            attrs[key] = postAttrProcessor(key, attrs[key]);
         }
     }
 
@@ -163,8 +200,8 @@ function vrdom_createElement(tagName: VRTagName, attributes: VRAttrs, ...childre
 
         dangerouslySetInnerHTML,
         doNotTouchMyChildren,
-    })
+    });
 }
 
 
-export default vrdom_createElement
+export default vrdom_createElement;

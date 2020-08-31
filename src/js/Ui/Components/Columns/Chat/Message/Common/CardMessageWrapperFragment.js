@@ -1,25 +1,28 @@
 import MessageWrapperFragment from "./MessageWrapperFragment";
-import TextWrapperComponent from "./TextWrapperComponent";
+import TextWrapperFragment from "./TextWrapperFragment";
 
 const CardMessageWrapperFragment = ({message, icon, title, description, bubbleRef, onClick, showDate}) => {
     return (
-        <MessageWrapperFragment message={message} showUsername={false} bubbleRef={bubbleRef} showDate={showDate}>
-            <div class="card" css-cursor="pointer" onClick={onClick}>
-                <div class="card-icon rp rps rp-white" css-border-radius="5px">
-                    {icon}
-                </div>
-                <div class="card-info">
-                    <div class="title">
-                        {title}
+        MessageWrapperFragment(
+            {message, showDate, showUsername: false},
+            <>
+                <div className="card" css-cursor="pointer" onClick={onClick}>
+                    <div className="card-icon rp rps rp-white" css-border-radius="5px">
+                        {icon}
                     </div>
-                    <div class="description">
-                        {description}
+                    <div className="card-info">
+                        <div className="title">
+                            {title}
+                        </div>
+                        <div className="description">
+                            {description}
+                        </div>
                     </div>
                 </div>
-            </div>
-            <TextWrapperComponent message={message}/>
-        </MessageWrapperFragment>
-    )
-}
+                {TextWrapperFragment({message})}
+            </>
+        )
+    );
+};
 
 export default CardMessageWrapperFragment;

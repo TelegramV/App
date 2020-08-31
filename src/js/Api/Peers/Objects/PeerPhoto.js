@@ -155,7 +155,8 @@ export class PeerPhoto {
 
             if (!this._photoSmall || this._photoSmall.volume_id !== rawPhoto.photo_small.volume_id || this._photoSmall.local_id !== rawPhoto.photo_small.local_id) {
                 this._photoSmall = rawPhoto.photo_small
-                this._photoSmallUrl = ""; // reset photo
+                // reset photo
+                this.clearCache();
                 // Fetch avatar only when you need to show it!
                 // this.fetchSmall()
             }
@@ -167,6 +168,12 @@ export class PeerPhoto {
             num: Math.abs(this._peer.id) % 8,
             text: this._peer.name.split(" ")[0].match(/./ug)[0]
         }
+    }
+
+    clearCache() {
+        this._photoSmallUrl = ""; 
+        this._photoBigUrl = "";
+        this._videoUrl = "";
     }
 
     fillFull(photo) {
