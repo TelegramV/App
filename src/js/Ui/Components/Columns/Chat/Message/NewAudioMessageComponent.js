@@ -17,18 +17,18 @@
  *
  */
 
-import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import TextWrapperComponent from "./Common/TextWrapperComponent"
-import MessageWrapperFragment from "./Common/MessageWrapperFragment"
-import DocumentParser from "../../../../../Api/Files/DocumentParser"
-import AppEvents from "../../../../../Api/EventBus/AppEvents"
-import {formatTime} from "../../../../../Utils/date"
-import AudioPlayer from "../../../../../Api/Media/AudioPlayer"
-import FileManager from "../../../../../Api/Files/FileManager"
+import GeneralMessageComponent from "./Common/GeneralMessageComponent";
+import TextWrapperComponent from "./Common/TextWrapperComponent";
+import MessageWrapperFragment from "./Common/MessageWrapperFragment";
+import DocumentParser from "../../../../../Api/Files/DocumentParser";
+import AppEvents from "../../../../../Api/EventBus/AppEvents";
+import {formatTime} from "../../../../../Utils/date";
+import AudioPlayer from "../../../../../Api/Media/AudioPlayer";
+import FileManager from "../../../../../Api/Files/FileManager";
 
 class NewAudioMessageComponent extends GeneralMessageComponent {
     appEvents(E) {
-        super.appEvents(E)
+        super.appEvents(E);
 
         E.bus(AppEvents.Audio)
             .filter(event => event.state.message === this.props.message || this.isPlaying)
@@ -37,7 +37,7 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
             .updateOn("audio.loading")
             .updateOn("audio.buffered")
             .updateOn("audio.timeUpdate")
-            .updateOn("audio.ended")
+            .updateOn("audio.ended");
     }
 
     render({message, showDate}, state) {
@@ -45,77 +45,80 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
         const audioInfo = DocumentParser.attributeAudio(message.media.document);
         const {isPaused, currentTime, bufferedPercentage, isSeeking} = AudioPlayer.state;
 
-        this.isPlaying = isPlaying // dirty hack, do not repeat
+        this.isPlaying = isPlaying; // dirty hack, do not repeat
 
         return (
-            <MessageWrapperFragment message={message} showUsername={false} showDate={showDate}>
-                <div class="audio">
-                    <div class={`play tgico tgico-${isPlaying && !isPaused ? 'pause' : 'play'} rp rps rp-white`}
-                         onClick={this.onClickPlay}
-                         onDoubleClick={event => event.stopPropagation()}>
-                        <progress className={{
-                            "progress-circular": true,
-                            "visible": !FileManager.getPercentage(message.media.document) || isSeeking,
-                        }}/>
-                    </div>
-                    <div class="audio-wrapper rp rps">
-                        <div className="controls">
-                            <div className="audio-name">
-                                {audioInfo.title || DocumentParser.attributeFilename(message.media.document)}
-                            </div>
-                            <div className="audio-artist">{audioInfo.performer}</div>
-
-                            <div className={[`progress-wrapper`, isPlaying || `hidden`]}
-                                 onMouseEnter={this.onMouseEnter}
-                                 onMouseLeave={this.onMouseLeave}
-                                 onMouseDown={this.onMouseDown}>
-                                <div style={{
-                                    width: `${bufferedPercentage}%`
-                                }} className="buffered"/>
-                                <div className="progress-line"/>
-                                <div className="listened-wrapper">
-                                    <div style={{
-                                        width: `${currentTime / audioInfo.duration * 100}%`
-                                    }} className="listened"/>
-                                    <div className="control-ball"/>
+            MessageWrapperFragment(
+                {message, showDate, showUsername: false},
+                <>
+                    <div className="audio">
+                        <div className={`play tgico tgico-${isPlaying && !isPaused ? 'pause' : 'play'} rp rps rp-white`}
+                             onClick={this.onClickPlay}
+                             onDoubleClick={event => event.stopPropagation()}>
+                            <progress className={{
+                                "progress-circular": true,
+                                "visible": !FileManager.getPercentage(message.media.document) || isSeeking,
+                            }}/>
+                        </div>
+                        <div className="audio-wrapper rp rps">
+                            <div className="controls">
+                                <div className="audio-name">
+                                    {audioInfo.title || DocumentParser.attributeFilename(message.media.document)}
                                 </div>
-                            </div>
-                            <div className="timer">
-                                {isPlaying && <span className="played-wrapper">
+                                <div className="audio-artist">{audioInfo.performer}</div>
+
+                                <div className={[`progress-wrapper`, isPlaying || `hidden`]}
+                                     onMouseEnter={this.onMouseEnter}
+                                     onMouseLeave={this.onMouseLeave}
+                                     onMouseDown={this.onMouseDown}>
+                                    <div style={{
+                                        width: `${bufferedPercentage}%`
+                                    }} className="buffered"/>
+                                    <div className="progress-line"/>
+                                    <div className="listened-wrapper">
+                                        <div style={{
+                                            width: `${currentTime / audioInfo.duration * 100}%`
+                                        }} className="listened"/>
+                                        <div className="control-ball"/>
+                                    </div>
+                                </div>
+                                <div className="timer">
+                                    {isPlaying && <span className="played-wrapper">
                                     <span className="time-played">{formatTime(currentTime)}</span>
                                     /
                                 </span>}
-                                {formatTime(audioInfo.duration)}
+                                    {formatTime(audioInfo.duration)}
+                                </div>
                             </div>
+
                         </div>
-
                     </div>
-                </div>
 
-                <TextWrapperComponent message={message}/>
-            </MessageWrapperFragment>
-        )
+                    <TextWrapperComponent message={message}/>
+                </>
+            )
+        );
     }
 
     onClickPlay = () => {
-        AudioPlayer.toggle(this.props.message)
-    }
+        AudioPlayer.toggle(this.props.message);
+    };
 
     onMouseEnter = event => {
         event.target.addEventListener("mousemove", this.onMouseDown);
-    }
+    };
 
     onMouseLeave = event => {
         event.target.removeEventListener("mousemove", this.onMouseDown);
-    }
+    };
 
     onMouseDown = (event: MouseEvent) => {
         if (event.buttons === 1) {
             const box = event.target.getBoundingClientRect();
             const percent = (event.pageX - box.x) / box.width;
-            AudioPlayer.updateTime(DocumentParser.attributeAudio(this.props.message.media.document).duration * percent)
+            AudioPlayer.updateTime(DocumentParser.attributeAudio(this.props.message.media.document).duration * percent);
         }
-    }
+    };
 }
 
-export default NewAudioMessageComponent
+export default NewAudioMessageComponent;

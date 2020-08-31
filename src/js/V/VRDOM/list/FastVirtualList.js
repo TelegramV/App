@@ -17,10 +17,10 @@
  *
  */
 
-import StatefulComponent from "../component/StatefulComponent"
-import VComponent from "../component/VComponent"
-import vrdom_delete from "../delete"
-import vrdom_append from "../append"
+import StatefulComponent from "../component/StatefulComponent";
+import VComponent from "../component/VComponent";
+import vrdom_delete from "../delete";
+import vrdom_append from "../append";
 
 class FastVirtualList extends StatefulComponent {
     state = {
@@ -57,7 +57,7 @@ class FastVirtualList extends StatefulComponent {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 
     componentDidMount() {
@@ -69,7 +69,7 @@ class FastVirtualList extends StatefulComponent {
     }
 
     componentWillUnmount() {
-        this.$el.removeEventListener("scroll", this.onScroll)
+        this.$el.removeEventListener("scroll", this.onScroll);
     }
 
     componentDidUpdate() {
@@ -91,7 +91,7 @@ class FastVirtualList extends StatefulComponent {
 
         if (!containerHeight) {
             //if (!this.state.containerHeight) { // Doesn't react on parent element resize
-                this.state.containerHeight = this.$el.parentElement.clientHeight;
+            this.state.containerHeight = this.$el.parentElement.clientHeight;
             //}
 
             containerHeight = this.state.containerHeight;
@@ -115,7 +115,7 @@ class FastVirtualList extends StatefulComponent {
             offsetY,
             totalHeight
         };
-    }
+    };
 
     onScrollHandler = () => {
         this.setState(this.calculate());
@@ -166,7 +166,7 @@ class FastVirtualList extends StatefulComponent {
         $el.parentElement.style.height = totalHeight;
         // }
 
-    }
+    };
 }
 
 FastVirtualList.defaultProps = {
@@ -176,6 +176,6 @@ FastVirtualList.defaultProps = {
     scrollThrottle: 50,
     onScroll: () => {
     },
-}
+};
 
 export default FastVirtualList;

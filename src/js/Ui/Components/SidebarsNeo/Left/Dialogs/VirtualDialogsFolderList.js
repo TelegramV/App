@@ -17,21 +17,21 @@
  *
  */
 
-import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
-import {DialogFragment} from "./Fragments/DialogFragment"
-import AppEvents from "../../../../../Api/EventBus/AppEvents"
-import DialogsManager from "../../../../../Api/Dialogs/DialogsManager"
-import AppSelectedChat from "../../../../Reactive/SelectedChat"
-import UIEvents from "../../../../EventBus/UIEvents"
-import DialogsStore from "../../../../../Api/Store/DialogsStore"
-import foldersState from "../../../foldersState"
-import {UserPeer} from "../../../../../Api/Peers/Objects/UserPeer"
-import {ChannelPeer} from "../../../../../Api/Peers/Objects/ChannelPeer"
-import {GroupPeer} from "../../../../../Api/Peers/Objects/GroupPeer"
-import {BotPeer} from "../../../../../Api/Peers/Objects/BotPeer"
-import {SupergroupPeer} from "../../../../../Api/Peers/Objects/SupergroupPeer"
-import {dialogContextMenu} from "./dialogContextMenu"
-import FastVirtualList from "../../../../../V/VRDOM/list/FastVirtualList"
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent";
+import {DialogFragment} from "./Fragments/DialogFragment";
+import AppEvents from "../../../../../Api/EventBus/AppEvents";
+import DialogsManager from "../../../../../Api/Dialogs/DialogsManager";
+import AppSelectedChat from "../../../../Reactive/SelectedChat";
+import UIEvents from "../../../../EventBus/UIEvents";
+import DialogsStore from "../../../../../Api/Store/DialogsStore";
+import foldersState from "../../../foldersState";
+import {UserPeer} from "../../../../../Api/Peers/Objects/UserPeer";
+import {ChannelPeer} from "../../../../../Api/Peers/Objects/ChannelPeer";
+import {GroupPeer} from "../../../../../Api/Peers/Objects/GroupPeer";
+import {BotPeer} from "../../../../../Api/Peers/Objects/BotPeer";
+import {SupergroupPeer} from "../../../../../Api/Peers/Objects/SupergroupPeer";
+import {dialogContextMenu} from "./dialogContextMenu";
+import FastVirtualList from "../../../../../V/VRDOM/list/FastVirtualList";
 import FoldersManager from "../../../../../Api/Dialogs/FolderManager";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 
@@ -106,7 +106,7 @@ function folderFilter(filter) {
         }
 
         return true;
-    }
+    };
 }
 
 class Dialog extends StatefulComponent {
@@ -114,7 +114,7 @@ class Dialog extends StatefulComponent {
         E.bus(AppEvents.Dialogs)
             .filter(event => event.dialog === this.props.dialog)
             .updateOn("updateActions")
-            .updateOn("updatePinned")
+            .updateOn("updatePinned");
 
         E.bus(AppEvents.Peers)
             .filter(event => event.message && event.message === this.props.dialog.peer.messages.last)
@@ -146,20 +146,20 @@ class Dialog extends StatefulComponent {
     }
 
     componentDidMount() {
-        console.log("MOUNTED")
+        console.log("MOUNTED");
     }
 
     onClick = () => {
         if (AppSelectedChat.check(this.props.dialog.peer)) {
-            UIEvents.General.fire("chat.scrollBottom")
+            UIEvents.General.fire("chat.scrollBottom");
         } else {
-            AppSelectedChat.select(this.props.dialog.peer)
+            AppSelectedChat.select(this.props.dialog.peer);
         }
-    }
+    };
 }
 
 class VirtualDialogsFolderList extends StatefulComponent {
-    fastVirtualListRef = VComponent.createComponentRef()
+    fastVirtualListRef = VComponent.createComponentRef();
 
     state = {
         dialogs: [],
@@ -172,33 +172,34 @@ class VirtualDialogsFolderList extends StatefulComponent {
     appEvents(E) {
         E.bus(AppEvents.General)
             .on("foldersUpdate", this.update)
-            .on("selectFolder", this.update)
+            .on("selectFolder", this.update);
 
         E.bus(AppEvents.Dialogs)
             .on("gotMany", this.update)
             .on("gotArchived", this.update)
-            .on("updatePinned", this.update)
+            .on("updatePinned", this.update);
 
         E.bus(AppEvents.Telegram)
-            .on("updateFolderPeers", this.update)
+            .on("updateFolderPeers", this.update);
 
         E.bus(AppEvents.Peers)
             .on("messages.new", this.update)
             // .on("messages.deleted", this.update)
-            .on("messages.readIn", this.update)
+            .on("messages.readIn", this.update);
 
         E.bus(UIEvents.General)
-            .updateOn("window.resize")
+            .updateOn("window.resize");
     }
 
     render(props, {dialogs}, globalState) {
         if (!props.archived && foldersState.current) {
             dialogs = dialogs.filter(folderFilter(foldersState.current));
         }
-        if(!props.archived && foldersState.current == null) {
+
+        if (!props.archived && foldersState.current == null) {
             dialogs = dialogs.filter(dialog => !dialog.isArchived);
         }
-        
+
         return (
             <div style={{
                 "height": "100%",
@@ -206,7 +207,7 @@ class VirtualDialogsFolderList extends StatefulComponent {
                 <FastVirtualList itemHeight={72 + 4}
                                  items={dialogs}
                                  template={dialog => <Dialog dialog={dialog}/>}
-                                 scrollThrottle={250}
+                                 scrollThrottle={150}
                                  renderAhread={5}
                                  ref={this.fastVirtualListRef}
                                  onScroll={event => {
@@ -223,46 +224,46 @@ class VirtualDialogsFolderList extends StatefulComponent {
     }
 
     sortWithPinnedOnTop = (folderId = null): Dialog[] => {
-        if(this.props?.archived) {
+        if (this.props?.archived) {
             return DialogsStore.getAllInFolder(1).sort(this.sortWithPinnedOnTopCompareFnGenerator(null));
         } else {
             return DialogsStore.toArray().sort(this.sortWithPinnedOnTopCompareFnGenerator(folderId));
         }
-    }
+    };
 
     sortWithPinnedOnTopCompareFnGenerator = (folderId = null) => {
         return (a, b) => {
-            let aPinned = folderId == null ? a.isPinned : FoldersManager.isPinned(a.peer, folderId)
-            let bPinned = folderId == null ? b.isPinned : FoldersManager.isPinned(b.peer, folderId)
+            let aPinned = folderId == null ? a.isPinned : FoldersManager.isPinned(a.peer, folderId);
+            let bPinned = folderId == null ? b.isPinned : FoldersManager.isPinned(b.peer, folderId);
             if (!bPinned && !aPinned) {
                 if (!a.messages.last) {
-                    return 1
+                    return 1;
                 }
 
                 if (!b.messages.last) {
-                    return -1
+                    return -1;
                 }
 
                 if (a.messages.last.date > b.messages.last.date) {
-                    return -1
+                    return -1;
                 }
 
                 if (a.messages.last.date < b.messages.last.date) {
-                    return 1
+                    return 1;
                 }
             } else {
                 if (aPinned) {
-                    return -1
+                    return -1;
                 }
 
                 if (bPinned) {
-                    return 1
+                    return 1;
                 }
             }
 
-            return 0
+            return 0;
         };
-    }
+    };
 
     componentDidMount() {
         DialogsManager.fetchNextPage({limit: 100});
@@ -279,8 +280,8 @@ class VirtualDialogsFolderList extends StatefulComponent {
 
         }).finally(() => {
             this.state.isLoading = false;
-        })
-    }
+        });
+    };
 
     update = () => {
         let dialogs = this.sortWithPinnedOnTop(foldersState.current?.id);
@@ -288,7 +289,7 @@ class VirtualDialogsFolderList extends StatefulComponent {
         this.setState({
             dialogs,
         });
-    }
+    };
 }
 
 export default VirtualDialogsFolderList;

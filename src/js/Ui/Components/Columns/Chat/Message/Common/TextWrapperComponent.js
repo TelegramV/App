@@ -1,20 +1,23 @@
 import MessageTimeComponent from "./MessageTimeComponent";
 
-const TextWrapperComponent = ({message, time = true, color, big=false, transparent=false}, slot) => {
+const TextWrapperComponent = ({message, time = true, color, big = false, transparent = false}, slot) => {
     let text = message.parsed;
-    if (!text) return "";
-    let classes = {
-    	"text-wrapper": true,
-    	"empty": text.length === 0,
-        "big": big,
+
+    if (!text) {
+        return "";
     }
+
     return (
-        <div class={classes} css-color={color} ondblclick={event => event.stopPropagation()}>
+        <div class={{
+            "text-wrapper": true,
+            "empty": text.length === 0,
+            "big": big,
+        }} css-color={color} ondblclick={event => event.stopPropagation()}>
             {text}
             {slot}
-            {time ? <MessageTimeComponent color={color} message={message} bg={transparent}/> : ""}
+            {time ? MessageTimeComponent({color, message, bg: transparent}) : ""}
         </div>
-    )
-}
+    );
+};
 
-export default TextWrapperComponent
+export default TextWrapperComponent;

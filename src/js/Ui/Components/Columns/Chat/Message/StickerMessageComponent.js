@@ -1,10 +1,10 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
-import MessageTimeComponent from "./Common/MessageTimeComponent"
-import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
-import VUI from "../../../../VUI"
-import StickerSet from "../../../../../Api/Stickers/StickerSet"
-import {StickerSetModal} from "../../../Modals/StickerSetModal"
+import MessageTimeComponent from "./Common/MessageTimeComponent";
+import GeneralMessageComponent from "./Common/GeneralMessageComponent";
+import BetterStickerComponent from "../../../Basic/BetterStickerComponent";
+import VUI from "../../../../VUI";
+import StickerSet from "../../../../../Api/Stickers/StickerSet";
+import {StickerSetModal} from "../../../Modals/StickerSetModal";
 /*import {StickerMessage} from "../../../../../../api/messages/objects/StickerMessage"
 import VRDOM from "../../../../../v/vrdom/VRDOM"*/
 
@@ -78,24 +78,25 @@ class StickerMessageComponent extends GeneralMessageComponent {
 class StickerMessageComponent extends GeneralMessageComponent {
     render({message, showDate}) {
         let stickerSet = new StickerSet(message.raw.media.document.attributes.find(attr => attr._ === "documentAttributeSticker").stickerset);
+
         return (
-            <MessageWrapperFragment message={message} transparent={true} noPad showUsername={false}
-                                    avatarRef={this.avatarRef} bubbleRef={this.bubbleRef}
-                                    showDate={showDate}>
+            MessageWrapperFragment(
+                {message, showDate, transparent: true},
+                <>
+                    <BetterStickerComponent isFull
+                                            width={200}
+                                            clickable={!stickerSet.isEmpty()}
+                                            document={message.raw.media.document}
+                                            onClick={() => {
+                                                if (!stickerSet.isEmpty()) VUI.Modal.open(<StickerSetModal
+                                                    set={stickerSet}/>);
+                                            }}/>
 
-                <BetterStickerComponent isFull
-                                        width={200}
-                                        clickable={!stickerSet.isEmpty()}
-                                        document={message.raw.media.document}
-                                        onClick={() => {
-                                            if(!stickerSet.isEmpty()) VUI.Modal.open(<StickerSetModal set={stickerSet}/>)
-                                        }}/>
-
-                <MessageTimeComponent message={message} bg={true}/>
-
-            </MessageWrapperFragment>
-        )
+                    <MessageTimeComponent message={message} bg={true}/>
+                </>
+            )
+        );
     }
 }
 
-export default StickerMessageComponent
+export default StickerMessageComponent;
