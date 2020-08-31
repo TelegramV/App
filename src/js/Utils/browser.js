@@ -61,7 +61,7 @@ export const IS_VOICE_RECORDING_SUPPORTED = navigator.mediaDevices && 'getUserMe
 );
 
 export const IS_STREAMING_SUPPORTED = 'MediaSource' in window;
-export const IS_OPUS_SUPPORTED = Boolean((new Audio()).canPlayType('audio/ogg; codecs=opus'));
+export const IS_OPUS_SUPPORTED = Boolean((new Audio).canPlayType('audio/ogg; codecs=opus'));
 
 let isWebpSupportedCache;
 export function isWebpSupported() {
