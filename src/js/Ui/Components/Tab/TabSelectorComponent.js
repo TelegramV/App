@@ -26,7 +26,11 @@ export default class TabSelectorComponent extends StatefulComponent {
                     {items.map((item, i) => {
                         const ref = StatefulComponent.createFragmentRef();
                         this.elRefs.push(ref);
-                        return <TabFragment text={item.text} selected={(i+1) === active} onClick={item.onClick} ref={ref}/>;
+                        return <TabFragment text={item.text} 
+                                            selected={(i+1) === active} 
+                                            onClick={item.onClick} 
+                                            onContextMenu={item.onContextMenu} 
+                                            ref={ref}/>;
                     })}
                     <div className="underline" style={this.underlineStyle} />
                 </div>
@@ -77,7 +81,7 @@ export default class TabSelectorComponent extends StatefulComponent {
     }
 }
 
-const TabFragment = ({text, selected, onClick}) => {
+const TabFragment = ({text, selected, onClick, onContextMenu}) => {
 
     const classes = {
         tab: true,
@@ -87,7 +91,7 @@ const TabFragment = ({text, selected, onClick}) => {
     }
 
     return (
-        <div class={classes} onClick={onClick}>
+        <div class={classes} onClick={onClick} onContextMenu={onContextMenu}>
             {text}
         </div>
     )

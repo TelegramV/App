@@ -23,6 +23,8 @@ import classIf from "../../../V/VRDOM/jsx/helpers/classIf"
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import UIEvents from "../../EventBus/UIEvents"
 
+const CONTEXT_MENU_WIDTH = 220
+
 class ContextMenuComponent extends StatefulComponent {
 
     state = {
@@ -138,7 +140,6 @@ class ContextMenuComponent extends StatefulComponent {
 
     openXY = (data, x, y, origin = "left-top") => {
         // TODO replace that with not hardcoded values
-        const width = 220
         const height = data.length * 64
         const windowWidth = window.innerWidth
         const windowHeight = window.innerHeight
@@ -148,8 +149,8 @@ class ContextMenuComponent extends StatefulComponent {
         y -= (windowHeight - clientHeight) / 2
 
         this.state.animation = origin
-        if (x + width >= windowWidth) {
-            x = x - width
+        if (x + CONTEXT_MENU_WIDTH >= windowWidth) {
+            x = x - CONTEXT_MENU_WIDTH
             this.state.animation = "right-top"
         }
         if (y + height >= windowHeight) {
@@ -180,7 +181,7 @@ class ContextMenuComponent extends StatefulComponent {
         let x = rect.x;
         let y = rect.y;
         if (origin && origin.includes("right")) {
-            x = x - 220 + rect.width; //Макс, винеси довжину в змінну
+            x = x - CONTEXT_MENU_WIDTH + rect.width;
         }
         this.openXY(data, x, y + rect.height + 10, origin)
     }
@@ -198,7 +199,7 @@ class ContextMenuComponent extends StatefulComponent {
         } // empty context menu blocks scroll
         return event => {
             event.preventDefault()
-            this.openXY(callOrReturn(data), event.clientX - document.querySelector("#app").getBoundingClientRect().x, event.clientY);
+            this.openXY(callOrReturn(data), event.clientX, event.clientY);
         }
     }
 }
