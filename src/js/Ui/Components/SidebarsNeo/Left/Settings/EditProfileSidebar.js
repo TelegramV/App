@@ -115,6 +115,9 @@ export class EditProfileSidebar extends LeftSidebar {
             }
             UIEvents.Sidebars.fire("pop", this)
             API.account.updateProfile(this.state.name, this.state.lastName, this.state.bio);
+            if(PeersStore.self()?.username !== this.state.username) {
+                API.account.updateUsername(this.state.username);
+            }
             if (this.state.avatarBlob) {
                 this.state.avatarBlob.arrayBuffer().then(buffer => {
                     return FileAPI.uploadFile(buffer)
