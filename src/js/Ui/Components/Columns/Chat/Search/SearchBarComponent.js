@@ -62,21 +62,27 @@ export class SearchBarComponent extends StatefulComponent {
     }
 
     componentDidMount() {
-        window.visualViewport.addEventListener("resize", this.updateSearchPosition);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener("resize", this.updateSearchPosition);
+        }
     }
 
     componentWillUnmount() {
-        window.visualViewport.removeEventListener("resize", this.updateSearchPosition);
+        if (window.visualViewport) {
+            window.visualViewport.removeEventListener("resize", this.updateSearchPosition);
+        }
     }
 
     onFocus = (ev) => {
-        ev.preventDefault();
-        this.upperRef.$el.style.transform = `translateY(0)`; // input should be on bottom of the page
-        this.searchInputRef.component.$el.focus();
+        if (window.visualViewport) {
+            ev.preventDefault();
+            this.upperRef.$el.style.transform = `translateY(0)`; // input should be on bottom of the page
+            this.searchInputRef.component.$el.focus();
 
-        this.withTimeout(() => {
-            this.updateSearchPosition();
-        }, KEYBOARD_DELAY)
+            this.withTimeout(() => {
+                this.updateSearchPosition();
+            }, KEYBOARD_DELAY)
+        }
     }
 
     updateSearchPosition = () => {

@@ -179,7 +179,7 @@ img:not([src]) {
     background: rgba(black, .5);
 }
 
-body {
+* {
     scrollbar-color: rgba($darkgrey, .3) transparent;
     scrollbar-width: thin;
 }
