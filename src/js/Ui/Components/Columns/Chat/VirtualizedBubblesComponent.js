@@ -35,6 +35,8 @@ import GroupMessage from "../../../../Api/Messages/GroupMessage"
 import {appendMessages, fixMessages, getMessageElement, prependMessages} from "./messagesUtils"
 import {IS_DESKTOP_SCREEN, IS_MOBILE_SCREEN} from "../../../../Utils/browser";
 
+const useIntersectVirtualization = true
+
 // there is no possibility nor time to calculate each message size
 class VirtualizedBubblesComponent extends StatelessComponent {
     bubblesInnerRef = VComponent.createRef();
@@ -86,17 +88,27 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     }
 
     componentDidMount() {
-        this.observer = new IntersectionObserver(this.onIntersection, {
-            root: this.$el,
-            rootMargin: "2200px 100px",
-            threshold: 1.0,
-        });
+        if(useIntersectVirtualization) {
+            this.observer = new IntersectionObserver(this.onIntersection, {
+                root: this.$el,
+                // rootMargin: "2200px 100px",
+                threshold: 0,
+            });
+        } else {
+            this.observer = new IntersectionObserver(this.onIntersection, {
+                root: this.$el,
+                rootMargin: "2200px 100px",
+                threshold: 1.0,
+            });
+        }
 
         this.props.loaderRef.$el.style.display = "none";
 
-        this.$el.addEventListener("scroll", this.onScroll, {
-            passive: true,
-        });
+        if(!useIntersectVirtualization) {
+            this.$el.addEventListener("scroll", this.onScroll, {
+                passive: true,
+            });
+        }
     }
 
     cleanupTree = () => {
@@ -676,7 +688,31 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     }
 
     onIntersection = (entries) => {
+        let isAtBottom = false
+        let isAtTop = false
+
         entries.forEach(entry => {
+            if(useIntersectVirtualization) {
+                const $target = entry.target
+                // console.log($target.offsetTop, entry.isIntersecting)
+
+
+                if(entry.isIntersecting) {
+                    const children = [...$target.parentElement.children]
+                    const length = children.length
+                    const edge = 8
+                    const index = children.findIndex($elem => $target === $elem)
+                    if(index >= length - edge) {
+                        isAtTop = true
+                    }
+
+                    // const w = Math.floor(this.$el.scrollHeight - offset);
+
+                    if(index <= edge) {
+                        isAtBottom = true
+                    }
+                }
+            }
             if (entry.isIntersecting) {
                 entry.target.style.visibility = "visible";
                 entry.target.__v?.component.onElementVisible.call(entry.target.__v.component);
@@ -685,6 +721,27 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 entry.target.__v?.component.onElementHidden.call(entry.target.__v.component);
             }
         })
+        // if(isAtBottom) {
+        //     console.log("BOTTOM")
+        // }
+        // if(isAtTop) {
+        //     console.log("TOP")
+        // }
+        if(useIntersectVirtualization) {
+            if (!isAtBottom) {
+                UIEvents.General.fire("chat.scrollBottom.show");
+            }
+
+            if (isAtTop) {
+                this.virtual_onScrolledTop();
+            } else if (isAtBottom) {
+                if (this.virtual_isCompletelyBottom() || (!this.mainVirtual.hasMoreOnTopToDownload && this.virtual_isCompletelyBottom())) {
+                    UIEvents.General.fire("chat.scrollBottom.hide");
+                }
+
+                this.virtual_onScrolledBottom();
+            }
+        }
     }
 
     scrollBottom() {
