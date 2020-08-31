@@ -1,6 +1,6 @@
-import MessageTimeComponent from "./MessageTimeComponent";
+import MessageTimeFragment from "./MessageTimeFragment";
 
-const TextWrapperComponent = ({message, time = true, color, big = false, transparent = false}, slot) => {
+const TextWrapperFragment = ({message, time = true, color, big = false, transparent = false}, slot) => {
     let text = message.parsed;
 
     if (!text) {
@@ -15,9 +15,9 @@ const TextWrapperComponent = ({message, time = true, color, big = false, transpa
         }} css-color={color} ondblclick={event => event.stopPropagation()}>
             {text}
             {slot}
-            {time ? MessageTimeComponent({color, message, bg: transparent}) : ""}
+            {time ? MessageTimeFragment({color, message, bg: transparent}) : ""}
         </div>
     );
 };
 
-export default TextWrapperComponent;
+export default TextWrapperFragment;

@@ -1,7 +1,7 @@
 import GeneralMessageComponent from "../Common/GeneralMessageComponent";
 import MessageWrapperFragment from "../Common/MessageWrapperFragment";
-import TextWrapperComponent from "../Common/TextWrapperComponent";
-import MessageTimeComponent from "../Common/MessageTimeComponent";
+import TextWrapperFragment from "../Common/TextWrapperFragment";
+import MessageTimeFragment from "../Common/MessageTimeFragment";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import BetterVideoComponent from "../../../../Basic/BetterVideoComponent";
 import DocumentParser from "../../../../../../Api/Files/DocumentParser";
@@ -19,7 +19,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
 
     render({message, showDate}, {isMuted}) {
         const document = message.raw.media.document;
-        const text = message.parsed && <TextWrapperComponent message={message}/>;
+        const text = message.parsed && TextWrapperFragment({message});
         const info = DocumentParser.attributeVideo(document);
         const isStreamable = DocumentParser.isVideoStreamable(document);
 
@@ -123,7 +123,8 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                           }
                                           muted={isMuted}/>
 
-                    {!text ? <MessageTimeComponent message={message} bg={true}/> : ""}
+                    {!text ? MessageTimeFragment({message, bg: true}) : ""}
+
                     {text}
                 </>
             )

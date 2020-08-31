@@ -4,8 +4,8 @@ import {Layouter} from "../../../../Utils/layout";
 import BetterVideoComponent from "../../../Basic/BetterVideoComponent";
 import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent";
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
-import TextWrapperComponent from "./Common/TextWrapperComponent";
-import MessageTimeComponent from "./Common/MessageTimeComponent";
+import TextWrapperFragment from "./Common/TextWrapperFragment";
+import MessageTimeFragment from "./Common/MessageTimeFragment";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent";
 import UIEvents from "../../../../EventBus/UIEvents";
 
@@ -43,8 +43,8 @@ class GroupedMessageComponent extends GeneralMessageComponent {
                             })
                         }
                     </div>
-                    {isText ? <TextWrapperComponent message={group}/> :
-                        <MessageTimeComponent message={group} bg={true}/>}
+                    {isText ? TextWrapperFragment({message: group}) :
+                        MessageTimeFragment({group, bg: true})}
                 </>
             )
         );

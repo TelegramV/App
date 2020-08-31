@@ -17,12 +17,12 @@
  *
  */
 
-import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
-import VComponent from "../../../V/VRDOM/component/VComponent"
-import {formatTime} from "../../../Utils/date"
-import {DocumentMessagesTool} from "../../Utils/document"
-import VSpinner from "../../Elements/VSpinner"
-import UIEvents from "../../EventBus/UIEvents"
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent";
+import VComponent from "../../../V/VRDOM/component/VComponent";
+import {formatTime} from "../../../Utils/date";
+import {DocumentMessagesTool} from "../../Utils/document";
+import VSpinner from "../../Elements/VSpinner";
+import UIEvents from "../../EventBus/UIEvents";
 
 function onDrag(target: HTMLElement, innerTarget: HTMLElement, dir, listener) {
     const hasPointerEvent = undefined !== target.onpointerup;
@@ -59,7 +59,7 @@ function onDrag(target: HTMLElement, innerTarget: HTMLElement, dir, listener) {
         window.addEventListener(pointerMove, onpointermove);
         window.addEventListener(pointerUp, onpointerup);
 
-        document.body.classList.add("global-grabbing")
+        document.body.classList.add("global-grabbing");
     }
 
     function onpointermove(event) {
@@ -75,14 +75,14 @@ function onDrag(target: HTMLElement, innerTarget: HTMLElement, dir, listener) {
         // call the listener with percentage
         listener(percentage);
 
-        document.body.classList.add("global-grabbing")
+        document.body.classList.add("global-grabbing");
     }
 
     function onpointerup() {
         window.removeEventListener(pointerMove, onpointermove);
         window.removeEventListener(pointerUp, onpointerup);
 
-        document.body.classList.remove("global-grabbing")
+        document.body.classList.remove("global-grabbing");
     }
 }
 
@@ -98,7 +98,7 @@ class VideoPlayer extends StatefulComponent {
         showControls: true,
         showPreview: false,
         previewPosition: 0,
-    }
+    };
 
     render({src, previewSrc, controls, containerWidth, containerHeight, bufferedSize, isDownloaded, isStreamable, size, thumbUrl, ...otherArgs}, {showControls, previewPosition, showPreview}, globalState) {
         // https://ak.picdn.net/shutterstock/videos/31008538/preview/stock-footage-parrot-flies-alpha-matte-d-rendering-animation-animals.webm
@@ -107,7 +107,7 @@ class VideoPlayer extends StatefulComponent {
         const duration = this.videoRef.$el?.duration ?? 0;
         const buffered = this.videoRef.$el?.buffered;
         const seeking = this.videoRef.$el?.seeking;
-        let bufferedEnd
+        let bufferedEnd;
 
         try {
             bufferedEnd = buffered?.end(0);
@@ -124,25 +124,25 @@ class VideoPlayer extends StatefulComponent {
         let styleSize = {
             "width": containerWidth,
             "height": containerHeight,
-        }
+        };
 
         if (typeof containerWidth === "number" && typeof containerHeight === "number") {
             if (containerWidth > containerHeight) {
                 styleSize = {
                     "width": `${containerWidth}px`,
                     "max-height": `${containerHeight}px`,
-                }
+                };
             } else {
                 if (containerHeight > 800) {
                     styleSize = {
                         "width": `${containerWidth}px`,
                         "max-height": `800px`,
-                    }
+                    };
                 } else {
                     styleSize = {
                         "width": `${containerWidth}px`,
                         "max-height": `${containerHeight}px`,
-                    }
+                    };
                 }
             }
         }
@@ -183,7 +183,6 @@ class VideoPlayer extends StatefulComponent {
                            onEnterPictureInPicture={this.onEnterPictureInPicture}
                            onLeavePictureInPicture={this.onLeavePictureInPicture}
                            onSeeking={this.onSeeking}
-                           playsinline={otherArgs.playsinline ?? true}
                            $recreate={this.videoRef.$el?.src !== src /* THIS IS VERY BAD КОСТИЛЬ, but now idk how to do it better, NEVER REPEAT THIS!!!!*/}
                     />
 
@@ -237,7 +236,7 @@ class VideoPlayer extends StatefulComponent {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 
     componentDidMount() {
@@ -281,37 +280,38 @@ class VideoPlayer extends StatefulComponent {
         this.forceUpdate();
 
         this.toggleControls();
-    }
+    };
 
     onPause = () => {
         this.forceUpdate();
 
         this.toggleControls();
-    }
+    };
 
     onTimeUpdate = (event) => {
         this.forceUpdate();
-    }
+    };
 
-    onPreviewMouseMove = () => {}
+    onPreviewMouseMove = () => {
+    };
 
     onPreviewMouseOver = (event: MouseEvent) => {
         this.onMouseMove(event);
-    }
+    };
 
     onPreviewMouseLeave = (event: MouseEvent) => {
         this.setState({
             showPreview: false,
         });
-    }
+    };
 
     onDurationChange = () => {
         this.forceUpdate();
-    }
+    };
 
     onProgress = () => {
         this.forceUpdate();
-    }
+    };
 
     onClickPause = () => {
         const $video = this.videoRef.$el;
@@ -321,7 +321,7 @@ class VideoPlayer extends StatefulComponent {
         } else {
             this.pause();
         }
-    }
+    };
 
     play() {
         this.playPromise = this.videoRef.$el.play();
@@ -330,7 +330,7 @@ class VideoPlayer extends StatefulComponent {
     pause() {
         this.playPromise.then(() => {
             this.videoRef.$el.pause();
-        })
+        });
     }
 
     onClickFull = () => {
@@ -345,7 +345,7 @@ class VideoPlayer extends StatefulComponent {
         } else if ($video.msRequestFullscreen) { /* IE/Edge */
             $video.msRequestFullscreen();
         }
-    }
+    };
 
     onKeyDown = event => {
         const code = event.keyCode || event.which;
@@ -364,22 +364,22 @@ class VideoPlayer extends StatefulComponent {
             event.stopPropagation();
             this.onClickPause();
         }
-    }
+    };
 
     onMouseOver = (event: MouseEvent) => {
         this.toggleControls();
-    }
+    };
 
     onMouseMove = (event: MouseEvent) => {
         this.toggleControls();
-    }
+    };
 
     onMouseLeave = (event: MouseEvent) => {
         this.hideControls();
-    }
+    };
 
     onSeeking = (event: Event) => {
-    }
+    };
 
     toggleControls = () => {
         this.setState({
@@ -387,7 +387,7 @@ class VideoPlayer extends StatefulComponent {
         });
 
         this.hideControls();
-    }
+    };
 
     hideControls = this.debounce(() => {
         this.setState({
@@ -397,14 +397,14 @@ class VideoPlayer extends StatefulComponent {
     }, 4000);
 
     onEnterPictureInPicture = (event) => {
-        console.log(event)
+        console.log(event);
         // cool feature, but no time to implement
         UIEvents.General.fire("pip.show", {$el: this.$el});
-    }
+    };
 
     onLeavePictureInPicture = (event) => {
-        console.log(event)
-    }
+        console.log(event);
+    };
 }
 
 export default VideoPlayer;

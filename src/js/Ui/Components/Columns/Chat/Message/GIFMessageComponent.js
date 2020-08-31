@@ -1,5 +1,5 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
-import MessageTimeComponent from "./Common/MessageTimeComponent";
+import MessageTimeFragment from "./Common/MessageTimeFragment";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent";
 import BetterVideoComponent from "../../../Basic/BetterVideoComponent";
 import FileManager from "../../../../../Api/Files/FileManager";
@@ -35,7 +35,7 @@ class GIFMessageComponent extends GeneralMessageComponent {
                                               );
                                           }}
                                           muted/>
-                    <MessageTimeComponent message={message} bg={true}/>
+                    {MessageTimeFragment({message, bg: true})}
                 </>
             )
         );

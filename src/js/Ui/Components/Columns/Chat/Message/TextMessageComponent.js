@@ -1,5 +1,5 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
-import TextWrapperComponent from "./Common/TextWrapperComponent";
+import TextWrapperFragment from "./Common/TextWrapperFragment";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent";
 
 
@@ -10,9 +10,7 @@ class TextMessageComponent extends GeneralMessageComponent {
         return (
             MessageWrapperFragment(
                 {message, showDate, transparent, isNewMessages},
-                <>
-                    <TextWrapperComponent message={message} big={transparent} transparent={transparent}/>
-                </>
+                TextWrapperFragment({message, big: transparent, transparent})
             )
         );
     }

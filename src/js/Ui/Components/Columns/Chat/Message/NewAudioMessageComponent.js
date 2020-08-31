@@ -18,7 +18,7 @@
  */
 
 import GeneralMessageComponent from "./Common/GeneralMessageComponent";
-import TextWrapperComponent from "./Common/TextWrapperComponent";
+import TextWrapperFragment from "./Common/TextWrapperFragment";
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
 import DocumentParser from "../../../../../Api/Files/DocumentParser";
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
@@ -94,7 +94,7 @@ class NewAudioMessageComponent extends GeneralMessageComponent {
                         </div>
                     </div>
 
-                    <TextWrapperComponent message={message}/>
+                    {TextWrapperFragment({message})}
                 </>
             )
         );

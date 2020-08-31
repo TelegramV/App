@@ -3,6 +3,7 @@
         filter: none !important;
     }
 }
+
 #bubbles {
     height: 100%;
     padding-bottom: 5px;
@@ -197,16 +198,14 @@
                 }
 
                 &.big {
-                    &>span:first-child {
+                    & > span:first-child {
                         line-height: 2em;
+
                         .emoji {
                             width: 2.5em;
                             height: 2.5em;
                             margin: 0 0.1em 0 0.2em;
-                            filter: drop-shadow(1px 1px 0 white)
-                                drop-shadow(-1px 1px 0 white)
-                                drop-shadow(1px -1px 0 white)
-                                drop-shadow(-1px -1px 0 white);
+                            filter: drop-shadow(1px 1px 0 white) drop-shadow(-1px 1px 0 white) drop-shadow(1px -1px 0 white) drop-shadow(-1px -1px 0 white);
                         }
                     }
                 }
@@ -262,6 +261,7 @@
                 background-color: $semiblack;
                 border-radius: 50%;
                 margin: 5px 10px;
+
                 .tgico {
                     font-size: 20px;
                     color: white;
@@ -270,6 +270,7 @@
                     left: 50%;
                     transform: translate(-50%, -50%);
                 }
+
                 transition: opacity 150ms ease;
             }
         }

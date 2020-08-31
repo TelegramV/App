@@ -1,4 +1,4 @@
-import MessageTimeComponent from "./Common/MessageTimeComponent";
+import MessageTimeFragment from "./Common/MessageTimeFragment";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent";
 import VUI from "../../../../VUI";
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent";
@@ -34,7 +34,7 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
                         playOnHover={false}
                         paused={paused}
                         document={message.raw.media.document}
-                    /> <MessageTimeComponent message={message} bg={true}/>
+                    /> {MessageTimeFragment({message, bg: true})}
                 </>
             )
         );

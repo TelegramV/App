@@ -1,6 +1,6 @@
 import GeneralMessageComponent from "./Common/GeneralMessageComponent";
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
-import TextWrapperComponent from "./Common/TextWrapperComponent";
+import TextWrapperFragment from "./Common/TextWrapperFragment";
 import AvatarComponent from "../../../Basic/AvatarComponent";
 import VRadio from "../../../../Elements/Input/VRadio";
 import VCheckbox from "../../../../Elements/Input/VCheckbox";
@@ -85,7 +85,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                                         answers={this.state.answers}/>
                     </div>
 
-                    <TextWrapperComponent message={message}/>
+                    {TextWrapperFragment({message})}
                 </>
             )
         );

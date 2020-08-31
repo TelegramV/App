@@ -139,8 +139,9 @@ function MessageWrapperFragment(
              onDblClick={doubleClickHandler}>
 
             <MessageAvatarComponent message={message} show={!message.hideAvatar}/>
+
             <div className={contentClasses} onContextMenu={contextMenuHandler}>
-                {!transparent && <ReplyToMessageFragment message={message}/>}
+                {!transparent && ReplyToMessageFragment({message})}
                 <ForwardedHeaderFragment message={message}/>
                 {username ? <PeerName peer={message.from} chat={message.to} template={(peer) => {
                     return <div class="peer-name">
@@ -153,7 +154,7 @@ function MessageWrapperFragment(
             </div>
             {inlineKeyboard}
             <div class="side">
-                {transparent && <ReplyToMessageFragment message={message}/>}
+                {transparent && ReplyToMessageFragment({message})}
                 <div class="filler"/>
                 {message.isPost && <div class="share" onClick={() => {
                     UIEvents.General.fire("message.forward", {message, from: message.dialog.peer});

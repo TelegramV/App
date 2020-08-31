@@ -2,7 +2,7 @@ import {convertBits} from "../../../../Utils/utils";
 import {formatTime} from "../../../../../Utils/date";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import DocumentParser from "../../../../../Api/Files/DocumentParser";
-import TextWrapperComponent from "./Common/TextWrapperComponent";
+import TextWrapperFragment from "./Common/TextWrapperFragment";
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
 import AudioPlayer from "../../../../../Api/Media/AudioPlayer";
 import AppEvents from "../../../../../Api/EventBus/AppEvents";
@@ -90,7 +90,7 @@ class NewVoiceMessageComponent extends GeneralMessageComponent {
                         </div>
                     </div>
 
-                    <TextWrapperComponent message={message}/>
+                    {TextWrapperFragment({message})}
                 </>
             )
         );

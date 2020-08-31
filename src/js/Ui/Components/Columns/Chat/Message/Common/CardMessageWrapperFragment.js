@@ -1,9 +1,5 @@
 import MessageWrapperFragment from "./MessageWrapperFragment";
-import TextWrapperComponent from "./TextWrapperComponent";
-import BetterStickerComponent from "../../../../Basic/BetterStickerComponent";
-import VUI from "../../../../../VUI";
-import {StickerSetModal} from "../../../../Modals/StickerSetModal";
-import MessageTimeComponent from "./MessageTimeComponent";
+import TextWrapperFragment from "./TextWrapperFragment";
 
 const CardMessageWrapperFragment = ({message, icon, title, description, bubbleRef, onClick, showDate}) => {
     return (
@@ -23,10 +19,10 @@ const CardMessageWrapperFragment = ({message, icon, title, description, bubbleRe
                         </div>
                     </div>
                 </div>
-                <TextWrapperComponent message={message}/>
+                {TextWrapperFragment({message})}
             </>
         )
     );
-}
+};
 
 export default CardMessageWrapperFragment;

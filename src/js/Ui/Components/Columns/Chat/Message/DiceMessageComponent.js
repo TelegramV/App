@@ -1,5 +1,5 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
-import MessageTimeComponent from "./Common/MessageTimeComponent";
+import MessageTimeFragment from "./Common/MessageTimeFragment";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent";
 import {StickerManager} from "../../../../../Api/Stickers/StickersManager";
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent";
@@ -41,7 +41,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
                             <div css-height={"125px"}/>)
                     }
 
-                    <MessageTimeComponent message={message} bg={true}/>
+                    {MessageTimeFragment({message, bg: true})}
                 </>
             )
         );

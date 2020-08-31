@@ -1,5 +1,5 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
-import MessageTimeComponent from "./Common/MessageTimeComponent";
+import MessageTimeFragment from "./Common/MessageTimeFragment";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent";
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent";
 import VUI from "../../../../VUI";
@@ -92,7 +92,7 @@ class StickerMessageComponent extends GeneralMessageComponent {
                                                     set={stickerSet}/>);
                                             }}/>
 
-                    <MessageTimeComponent message={message} bg={true}/>
+                    {MessageTimeFragment({message, bg: true})}
                 </>
             )
         );

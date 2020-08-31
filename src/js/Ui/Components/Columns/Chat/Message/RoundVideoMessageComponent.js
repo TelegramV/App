@@ -1,5 +1,5 @@
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
-import MessageTimeComponent from "./Common/MessageTimeComponent";
+import MessageTimeFragment from "./Common/MessageTimeFragment";
 import GeneralMessageComponent from "./Common/GeneralMessageComponent";
 import BetterVideoComponent from "../../../Basic/BetterVideoComponent";
 import {formatTime} from "../../../../../Utils/date";
@@ -95,7 +95,7 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
                     </div>
 
 
-                    <MessageTimeComponent message={this.props.message} bg={true}/>
+                    {MessageTimeFragment({message, bg: true})}
                 </>
             )
         );

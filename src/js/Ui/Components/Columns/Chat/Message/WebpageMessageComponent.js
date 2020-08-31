@@ -1,6 +1,6 @@
 import GeneralMessageComponent from "./Common/GeneralMessageComponent";
 import MessageWrapperFragment from "./Common/MessageWrapperFragment";
-import TextWrapperComponent from "./Common/TextWrapperComponent";
+import TextWrapperFragment from "./Common/TextWrapperFragment";
 import VUI from "../../../../VUI";
 import BetterPhotoComponent from "../../../Basic/BetterPhotoComponent";
 
@@ -12,8 +12,8 @@ class WebpageMessageComponent extends GeneralMessageComponent {
         return (
             MessageWrapperFragment(
                 {message, showDate},
-                <>
-                    <TextWrapperComponent message={message}>
+                TextWrapperFragment({message},
+                    <>
                         {webpage.url && <a href={webpage.url} target="_blank" className="box web rp">
                             <div className="quote">
                                 {webpage.photo ? <BetterPhotoComponent photo={webpage.photo} calculateSize/> : ""}
@@ -30,9 +30,7 @@ class WebpageMessageComponent extends GeneralMessageComponent {
                                 Instant View
                             </div>
                         }
-
-                    </TextWrapperComponent>
-                </>
+                    </>),
             )
         );
     }
