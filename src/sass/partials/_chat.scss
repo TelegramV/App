@@ -386,6 +386,7 @@
             will-change: transform;
             width: 100%;
             overflow: scroll;
+            overflow-anchor: none;
 
             #bubbles-inner {
                 //will-change: transform;
@@ -399,7 +400,7 @@
                 margin: 0 auto;
                 box-sizing: border-box;
                 overflow: hidden;
-                -webkit-overflow-scrolling: auto;
+                -webkit-overflow-scrolling: touch;
             }
         }
     }

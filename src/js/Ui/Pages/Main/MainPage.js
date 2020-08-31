@@ -91,7 +91,7 @@ export function MainPage() {
             <PiPContainer/>
 
             <RightSidebars/>
-            {nodeIf(<OnTopConsole/>, IS_SAFARI)}
+            {/*{nodeIf(<OnTopConsole/>, IS_SAFARI)}*/}
             {/*{nodeIf(<RightSidebars/>, IS_MOBILE_SCREEN)}*/}
 
 

@@ -35,7 +35,7 @@ import GroupMessage from "../../../../Api/Messages/GroupMessage"
 import {appendMessages, fixMessages, getMessageElement, prependMessages} from "./messagesUtils"
 import {IS_DESKTOP_SCREEN, IS_MOBILE_SCREEN, IS_SAFARI} from "../../../../Utils/browser";
 
-const useIntersectVirtualization = !IS_SAFARI
+const useIntersectVirtualization = false//!IS_SAFARI
 
 // there is no possibility nor time to calculate each message size
 class VirtualizedBubblesComponent extends StatelessComponent {
@@ -88,7 +88,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     }
 
     componentDidMount() {
-        if(useIntersectVirtualization) {
+        if (useIntersectVirtualization) {
             this.observer = new IntersectionObserver(this.onIntersection, {
                 root: this.$el,
                 // rootMargin: "2200px 100px",
@@ -104,10 +104,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         this.props.loaderRef.$el.style.display = "none";
 
-        if(!useIntersectVirtualization) {
+        if (!useIntersectVirtualization) {
             this.$el.addEventListener("scroll", this.onScroll, {
                 passive: true,
             });
+
         }
     }
 
@@ -129,7 +130,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     }
 
     onChatOpenedMobile = (event) => {
-        if(IS_MOBILE_SCREEN) {
+        if (IS_MOBILE_SCREEN) {
             this.isRequestedShowMessage = event.message
 
             if (AppSelectedChat.isSelected) {
@@ -144,10 +145,10 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         this.refresh();
         // if (event.message) {
 
-        if(IS_DESKTOP_SCREEN) {
+        if (IS_DESKTOP_SCREEN) {
             this.isRequestedShowMessage = event.message
 
-            if(!this.isRequestedShowMessage) {
+            if (!this.isRequestedShowMessage) {
                 if (AppSelectedChat.isSelected) {
                     this.isLoadingRecent = true;
 
@@ -216,10 +217,14 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     }
 
     onScroll = (e) => {
+        if (this.justChangedScrollTop) {
+            this.justChangedScrollTop = false
+            return
+        }
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
         // +400 because otherwise it would load only 2 messages when scrolling down, which is weird
-        const isAtBottom = Math.floor(scrollHeight - scrollTop) <= clientHeight + 400;
-        const isAtTop = scrollTop <= 400;
+        const isAtBottom = Math.floor(scrollHeight - scrollTop) <= clientHeight;
+        const isAtTop = scrollTop <= 0;
 
         //
         // if(this.smoothScrollingTo != null) {
@@ -304,7 +309,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 });
             }
         }
-        if(!AppSelectedChat.current.pinnedMessage) AppSelectedChat.current.findPinnedMessage(); // Можливо десь видалився пін, спробуємо знайти...
+        if (!AppSelectedChat.current.pinnedMessage) AppSelectedChat.current.findPinnedMessage(); // Можливо десь видалився пін, спробуємо знайти...
     }
 
     onPeerMessagesAllRecent = event => {
@@ -386,11 +391,16 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 this.dev_checkTree();
             }
 
+            this.justChangedScrollTop = true
+            this.$el.style.setProperty("overflow", "hidden")
+
             if (isAtBottom) {
                 this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
             } else {
                 this.$el.scrollTop = scrollTop;
             }
+            this.$el.style.setProperty("overflow", "")
+
         } else {
             this.mainVirtual.messages.push(message);
         }
@@ -551,18 +561,25 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         let $first: HTMLElement = this.bubblesInnerRef.$el.lastElementChild;
 
+        const k = $first.offsetTop
+        // this.$el.style.setProperty("-webkit-overflow-scrolling", "auto")
+
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
+        const delta = $first.offsetTop - k
 
         this.dev_checkTree();
 
-        if (this.$el.scrollTop === 0) {
+        if (this.$el.scrollTop <= 0) {
 
             if ($first) {
-                // if ($first.nextElementSibling) {
-                //     this.$el.scrollTop = $first.nextElementSibling.offsetTop;
-                // } else {
-                this.$el.scrollTop = $first.offsetTop;
-                // }
+                const zz = this.$el.scrollTop
+
+                // this.$el.style.setProperty("-webkit-overflow-scrolling", "auto")
+                this.$el.style.setProperty("overflow", "hidden")
+                this.$el.scrollTop = zz + delta
+                this.$el.style.setProperty("overflow", "")
+
+                this.justChangedScrollTop = true
             }
         }
     }
@@ -626,9 +643,29 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             vrdom_delete(this.bubblesInnerRef.$el.lastChild);
         }
 
+        let $first: HTMLElement = this.bubblesInnerRef.$el.lastElementChild;
+        const k = $first.offsetTop
+
         this.prependMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         this.dev_checkTree();
+
+        const delta = $first.offsetTop - k
+
+        // if (this.$el.scrollTop <= 0) {
+
+            if ($first) {
+                const zz = this.$el.scrollTop
+
+                // this.$el.style.setProperty("-webkit-overflow-scrolling", "auto")
+                this.$el.style.setProperty("overflow", "hidden")
+                this.$el.scrollTop = zz + delta
+                this.$el.style.setProperty("overflow", "")
+
+                this.justChangedScrollTop = true
+            }
+        // }
+
     }
 
     onBottomPageMessagesReady = (event) => {
@@ -692,23 +729,23 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         let isAtTop = false
 
         entries.forEach(entry => {
-            if(useIntersectVirtualization) {
+            if (useIntersectVirtualization) {
                 const $target = entry.target
                 // console.log($target.offsetTop, entry.isIntersecting)
 
 
-                if(entry.isIntersecting) {
+                if (entry.isIntersecting) {
                     const children = [...$target.parentElement.children]
                     const length = children.length
                     const edge = 8
                     const index = children.findIndex($elem => $target === $elem)
-                    if(index >= length - edge) {
+                    if (index >= length - edge) {
                         isAtTop = true
                     }
 
                     // const w = Math.floor(this.$el.scrollHeight - offset);
 
-                    if(index <= edge) {
+                    if (index <= edge) {
                         isAtBottom = true
                     }
                 }
@@ -727,7 +764,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         // if(isAtTop) {
         //     console.log("TOP")
         // }
-        if(useIntersectVirtualization) {
+        if (useIntersectVirtualization) {
             if (!isAtBottom) {
                 UIEvents.General.fire("chat.scrollBottom.show");
             }

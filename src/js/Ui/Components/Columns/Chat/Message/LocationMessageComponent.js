@@ -36,7 +36,7 @@ class LocationMessageComponent extends GeneralMessageComponent {
             <MessageWrapperFragment message={message} noPad showUsername={false} bubbleRef={this.bubbleRef} showDate={showDate}>
                 {venue}
                 <div class="map-wrapper" onClick={this.openFullMap}>
-                    <img class="map" src={this.url}/>
+                    <img class="map" src={this.url} css-width="300px" css-height="300px"/>
                     <div class="pin-point">
                         <i class="tgico tgico-location"/>
                     </div>

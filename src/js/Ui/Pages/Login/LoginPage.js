@@ -15,6 +15,7 @@ const LoginPage = () => {
         	</div>
             <ModalContainer/>
             <LoginPageComponent/>
+
         </div>
     )
 }
