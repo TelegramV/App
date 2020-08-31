@@ -8,8 +8,8 @@ class LongtapVRDOMPlugin extends VRDOMPlugin {
         if (PLATFORM !== "ios") return;
 
         if ($el.nodeType !== Node.TEXT_NODE && $el.oncontextmenu && !$el.isContentEditable) { // we don't support contenteditable elements
-            ["mousedown", "touchstart"].forEach(this.handleStart($el));
-            ["mousemove", "mouseup", "touchmove", "touchcancel", "touchend"].forEach(this.cancelTimer($el));
+            ["touchstart"].forEach(this.handleStart($el));
+            ["touchmove", "touchcancel", "touchend"].forEach(this.cancelTimer($el));
         }
     }
 
