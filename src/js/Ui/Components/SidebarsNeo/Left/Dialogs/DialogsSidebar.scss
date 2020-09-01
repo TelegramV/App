@@ -1,4 +1,5 @@
 @import "src/sass/partials/vars";
+@import "src/sass/partials/mixins";
 
 .sidebar.dialogs {
   >.header > .btn-icon {
@@ -18,7 +19,7 @@
   > .content > .search {
     will-change: transform;
     position: absolute;
-    height: calc(100% - 10px);
+    height: calc(100% - 40px);
     width: 100%;
     background-color: white;
     transition: anim(opacity), anim(transform);

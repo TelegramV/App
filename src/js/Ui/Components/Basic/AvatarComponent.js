@@ -16,11 +16,11 @@ class AvatarComponent extends StatefulComponent {
     }
 
     /* peer can be null */
-    render({peer, noSaved, hover: showVideo, alwaysPlay}) {
+    render({peer, noSaved, alwaysPlay}, {hover}) {
         return AvatarFragment({
             peer,
             noSaved,
-            showVideo,
+            showVideo: hover,
             alwaysPlay,
             onMouseEnter: () => {
                 this.props.peer?.photo?.fetchVideo(); //start fetching only on hover

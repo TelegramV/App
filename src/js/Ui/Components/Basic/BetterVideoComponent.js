@@ -66,9 +66,16 @@ class BetterVideoComponent extends StatefulComponent {
             showVideo = false;
         }
 
+        const figureClasses = {
+            video: true,
+            rp: !isRound,
+            rps: !isRound,
+            thumbnail: isLoading || !showVideo,
+            round: isRound
+        }
+
         return (
-            <figure className={["video rp rps", (isLoading || !showVideo) && "thumbnail", isRound && "round"]}
-                    onClick={onClick}>
+            <figure className={figureClasses} onClick={onClick}>
                 {infoContainer && infoContainer(this.state, this.videoRef.$el)}
                 {
                     !isLoading && showVideo ?
