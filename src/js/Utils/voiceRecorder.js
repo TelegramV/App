@@ -1,4 +1,4 @@
-import encoderPath from 'file-loader!opus-recorder/dist/encoderWorker.min';
+import encoderPath from 'opus-recorder/dist/encoderWorker.min';
 
 const MIN_RECORDING_TIME = 1000;
 const RECORDER_OPTIONS = {reuseWorker: true, encoderPath};

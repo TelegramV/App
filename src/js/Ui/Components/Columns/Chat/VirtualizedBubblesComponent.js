@@ -538,7 +538,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             }
 
             if (this.currentVirtual.hasMoreOnTopToDownload && !this.currentVirtual.isDownloading) {
-                //console.log(this.currentVirtual.isEmpty());
+                console.log(this.currentVirtual.isEmpty());
                 if (!this.currentVirtual.isEmpty()) {
                     this.currentVirtual.isDownloading = true;
 

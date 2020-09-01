@@ -24,7 +24,7 @@
     "idb": "^5.0.4",
     "js-sha256": "^0.9.0",
     "make-plural": "^6.2.1",
-    "opus-recorder": "^6.2.0",
+    "opus-recorder": "^8.0.3",
     "qr-code-styling": "^1.0.1",
     "rusha": "^0.8.13",
     "twemoji": "^13.0.0",
