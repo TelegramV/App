@@ -24,6 +24,7 @@
 
     &.really-hidden {
         pointer-events: none;
+        display: none;
     }
 
     &.hidden {

@@ -134,7 +134,8 @@ class VideoMessageComponent extends GeneralMessageComponent {
 
     videoClick = () => {
       this.$el.querySelector("video")?.pause();
-      mediaViewerOpen(this.videoRef.component.$el, this.props.message)
+      //mediaViewerOpen(this.videoRef.component.$el, this.props.message)
+      UIEvents.MediaViewer.fire("showMessage", {message: this.props.message});
     }
 
     onElementHidden() {
