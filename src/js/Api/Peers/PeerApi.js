@@ -161,9 +161,9 @@ export class PeerApi {
         if (multi) {
             p = async () => {
                 const a = [];
-                for (let l of media) {
-                    console.log(l);
-                    a.push(await FileAPI.uploadMediaToPeer(this.peer, l));
+                for (let m of media) {
+                    console.log(m);
+                    a.push(await FileAPI.uploadMediaToPeer(this.peer, m));
                 }
                 return a;
             };

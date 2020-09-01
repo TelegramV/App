@@ -18,7 +18,7 @@
  */
 
 import {FileAPI} from "./Api/Files/FileAPI";
-import registerServiceWorker, {ServiceWorkerNoSupportError} from "service-worker-loader!../js/Api/downloadServiceWorker";
+import {scriptUrl} from "service-worker-loader!../js/Api/downloadServiceWorker";
 
 global.$ = require("./Ui/Utils/$").default;
 global.VRDOM = require("./V/VRDOM/VRDOM").default;
@@ -29,37 +29,50 @@ global.__IS_SAFARI__ = /^((?!chrome|android).)*safari/i.test(navigator.userAgent
 global.__IS_IOS__ = !!navigator.platform.match(/iPhone|iPod|iPad/);
 global.__DOCUMENTS__ = new Map();
 
-registerServiceWorker({scope: "/"}).then((registration: ServiceWorkerRegistration) => {
-    console.log("Success!");
-    console.log(registration, navigator.serviceWorker.controller);
+window.addEventListener('load', async () => {
+    try {
+        await navigator.serviceWorker.register(scriptUrl);
 
-    navigator.serviceWorker.addEventListener("message", (e: MessageEvent) => {
-        // console.log("FROM SW", e);
+        await navigator.serviceWorker.ready;
 
-        if (e.data.taskId) {
-            const {taskId, fileId, start, end} = e.data;
-            const document = global.__DOCUMENTS__.get(fileId);
+        navigator.serviceWorker.addEventListener("message", (e: MessageEvent) => {
+            // console.log("FROM SW", e);
 
-            // console.log(fileId, document);
+            if (e.data.taskId) {
+                const {taskId, fileId, start, end} = e.data;
+                const document = global.__DOCUMENTS__.get(fileId);
 
-            FileAPI.downloadDocumentPart(document, null, end - start, start)
-                .then(({bytes}) => {
-                    navigator.serviceWorker.controller.postMessage({
-                        taskId: e.data.taskId,
-                        result: {
-                            bytes,
-                            documentSize: document.size,
-                            mimeType: document.mime_type,
-                        },
+                // console.log(fileId, document);
+
+                FileAPI.downloadDocumentPart(document, null, end - start, start)
+                    .then(({bytes}) => {
+                        navigator.serviceWorker.controller.postMessage({
+                            taskId: e.data.taskId,
+                            result: {
+                                bytes,
+                                documentSize: document.size,
+                                mimeType: document.mime_type,
+                            },
+                        });
                     });
-                });
-        }
-    });
-}).catch((err) => {
-
-    if (err instanceof ServiceWorkerNoSupportError) {
-        console.log("Service worker is not supported.");
-    } else {
-        console.log("Error!");
+            }
+        });
+    } catch (err) {
+        console.error('pizda', err);
     }
 });
+
+
+// registerServiceWorker({scope: "/"}).then((registration: ServiceWorkerRegistration) => {
+//     console.log("Success!");
+//     console.log(registration, navigator.serviceWorker.controller);
+//
+//
+// }).catch((err) => {
+//
+//     if (err instanceof ServiceWorkerNoSupportError) {
+//         console.log("Service worker is not supported.");
+//     } else {
+//         console.log("Error!");
+//     }
+// });
