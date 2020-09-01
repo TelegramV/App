@@ -17,26 +17,26 @@
  *
  */
 
-import VComponent from "../../../../V/VRDOM/component/VComponent"
-import AppSelectedChat from "../../../Reactive/SelectedChat"
-import UIEvents from "../../../EventBus/UIEvents"
-import AppEvents from "../../../../Api/EventBus/AppEvents"
-import type {Message} from "../../../../Api/Messages/Message"
-import vrdom_delete from "../../../../V/VRDOM/delete"
-import scrollToAndHighlight from "../../../../Utils/scrollToAndHighlight"
-import findIntersection from "../../../Virtual/findIntersection"
-import vrdom_deleteInner from "../../../../V/VRDOM/deleteInner"
-import VirtualMessages from "../../../Virtual/VirtualMessages"
-import scrollBottom from "../../../../Utils/scrollBottom"
-import API from "../../../../Api/Telegram/API"
-import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent"
+import VComponent from "../../../../V/VRDOM/component/VComponent";
+import AppSelectedChat from "../../../Reactive/SelectedChat";
+import UIEvents from "../../../EventBus/UIEvents";
+import AppEvents from "../../../../Api/EventBus/AppEvents";
+import type {Message} from "../../../../Api/Messages/Message";
+import vrdom_delete from "../../../../V/VRDOM/delete";
+import scrollToAndHighlight from "../../../../Utils/scrollToAndHighlight";
+import findIntersection from "../../../Virtual/findIntersection";
+import vrdom_deleteInner from "../../../../V/VRDOM/deleteInner";
+import VirtualMessages from "../../../Virtual/VirtualMessages";
+import scrollBottom from "../../../../Utils/scrollBottom";
+import API from "../../../../Api/Telegram/API";
+import StatelessComponent from "../../../../V/VRDOM/component/StatelessComponent";
 import IntersectionObserver from 'intersection-observer-polyfill';
-import GroupMessage from "../../../../Api/Messages/GroupMessage"
-import {appendMessages, fixMessages, getMessageElement, prependMessages} from "./messagesUtils"
+import GroupMessage from "../../../../Api/Messages/GroupMessage";
+import {appendMessages, fixMessages, getMessageElement, prependMessages} from "./messagesUtils";
 import {IS_DESKTOP_SCREEN, IS_MOBILE_SCREEN, IS_SAFARI} from "../../../../Utils/browser";
 
-const useIntersectVirtualization = false//!IS_SAFARI
-const useScrollTopHack = IS_SAFARI
+const useIntersectVirtualization = false;//!IS_SAFARI
+const useScrollTopHack = IS_SAFARI;
 
 // there is no possibility nor time to calculate each message size
 class VirtualizedBubblesComponent extends StatelessComponent {
@@ -76,7 +76,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             .on("chat.topMessagesReady", this.onTopPageMessagesReady)
             .on("chat.showMessage", this.onChatShowMessage)
             .on("chat.scrollBottom", this.onChatScrollBottomRequest)
-            .on("chat.openedMobile", this.onChatOpenedMobile)
+            .on("chat.openedMobile", this.onChatOpenedMobile);
 
     }
 
@@ -115,7 +115,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     cleanupTree = () => {
         vrdom_deleteInner(this.bubblesInnerRef.$el);
-    }
+    };
 
     refresh = (clearShowMessage = true) => {
         this.cleanupTree();
@@ -128,11 +128,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         if (clearShowMessage) {
             this.isRequestedShowMessage = false;
         }
-    }
+    };
 
     onChatOpenedMobile = (event) => {
         if (IS_MOBILE_SCREEN) {
-            this.isRequestedShowMessage = event.message
+            this.isRequestedShowMessage = event.message;
 
             if (AppSelectedChat.isSelected) {
                 this.isLoadingRecent = true;
@@ -140,14 +140,14 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 AppSelectedChat.current.messages.fireRecent();
             }
         }
-    }
+    };
 
     onChatSelect = (event) => {
         this.refresh();
         // if (event.message) {
 
         if (IS_DESKTOP_SCREEN) {
-            this.isRequestedShowMessage = event.message
+            this.isRequestedShowMessage = event.message;
 
             if (!this.isRequestedShowMessage) {
                 if (AppSelectedChat.isSelected) {
@@ -156,7 +156,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                     AppSelectedChat.current.messages.fireRecent();
                 }
             } else {
-                this.onChatShowMessage({message: event.message})
+                this.onChatShowMessage({message: event.message});
             }
         }
 
@@ -197,7 +197,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         //         AppSelectedChat.current.messages.fireRecent();
         //     }
         // }
-    }
+    };
 
     onChatScrollBottomRequest = () => {
         if (this.isLoadingRecent) {
@@ -215,15 +215,15 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             this.scrollBottom();
             this.dev_checkTree();
         }
-    }
+    };
 
     onScroll = (e) => {
         if (this.justChangedScrollTop) {
-            this.justChangedScrollTop = false
-            return
+            this.justChangedScrollTop = false;
+            return;
         }
         const {scrollTop, scrollHeight, clientHeight} = this.$el;
-        const magicNumber = useScrollTopHack ? 0 : 400
+        const magicNumber = useScrollTopHack ? 0 : 400;
         // +400 because otherwise it would load only 2 messages when scrolling down, which is weird
         const isAtBottom = Math.floor(scrollHeight - scrollTop) <= clientHeight + magicNumber;
         const isAtTop = scrollTop <= magicNumber;
@@ -250,7 +250,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
             this.virtual_onScrolledBottom();
         }
-    }
+    };
 
     onPeerMessagesRecent = (event) => {
         this.refresh(false);
@@ -292,7 +292,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 if ($message) {
                     scrollToAndHighlight(this.$el, $message);
                 } else {
-                    console.warn("No message to scroll found.")
+                    console.warn("No message to scroll found.");
                 }
             } else {
                 const actionCount = (++this.actionCount);
@@ -307,12 +307,12 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                         messages: message.dialogPeer.messages.putRawMessages(Messages.messages),
                         offset_id: message.id,
                         actionCount,
-                    })
+                    });
                 });
             }
         }
         if (!AppSelectedChat.current.pinnedMessage) AppSelectedChat.current.findPinnedMessage(); // Можливо десь видалився пін, спробуємо знайти...
-    }
+    };
 
     onPeerMessagesAllRecent = event => {
         this.isLoadingRecent = true;
@@ -347,7 +347,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 if ($message) {
                     scrollToAndHighlight(this.$el, $message);
                 } else {
-                    console.warn("No message to scroll found.")
+                    console.warn("No message to scroll found.");
                 }
             } else {
                 this.isLoadingRecent = false;
@@ -363,12 +363,12 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                         messages: message.dialogPeer.messages.putRawMessages(Messages.messages),
                         offset_id: message.id,
                         actionCount,
-                    })
+                    });
                 });
             }
         }
         this.isLoadingRecent = false;
-    }
+    };
 
     onNewMessage = (event) => {
         const message = event.message;
@@ -393,23 +393,23 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 this.dev_checkTree();
             }
 
-            this.justChangedScrollTop = true
-            this.$el.style.setProperty("overflow", "hidden")
+            this.justChangedScrollTop = true;
+            this.$el.style.setProperty("overflow", "hidden");
 
             if (isAtBottom) {
                 this.$el.scrollTop = this.bubblesInnerRef.$el.clientHeight;
             } else {
                 this.$el.scrollTop = scrollTop;
             }
-            this.$el.style.setProperty("overflow", "")
+            this.$el.style.setProperty("overflow", "");
 
         } else {
             this.mainVirtual.messages.push(message);
         }
-    }
+    };
 
     onChatShowMessage = ({message}) => {
-        console.log("onChatSh")
+        console.log("onChatSh");
 
         this.isRequestedShowMessage = null;
 
@@ -426,7 +426,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 if (messageIndex > -1) {
                     this.cleanupTree();
 
-                    const edgeSize = 20
+                    const edgeSize = 20;
                     // console.log(messageIndex, messageIndex - this.mainVirtual.edgeSize, messageIndex + this.mainVirtual.edgeSize)
                     this.mainVirtual.currentPage = this.mainVirtual.messages
                         .slice(Math.max(messageIndex - edgeSize, 0), messageIndex + edgeSize);
@@ -452,7 +452,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                             messages: peer.messages.putRawMessages(Messages.messages),
                             offset_id: message.id,
                             actionCount,
-                        })
+                        });
                     });
                 }
             }
@@ -463,18 +463,18 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 // this.smoothScrollingTo = $message.offsetTop + ($message.clientHeight / 2 - this.$el.clientHeight / 2)
                 scrollToAndHighlight(this.$el, $message);
             } else {
-                console.warn("No message to scroll found.")
+                console.warn("No message to scroll found.");
             }
         } else {
-            console.log('NO SELECT!!!', event)
+            console.log('NO SELECT!!!', event);
             const peer = message.dialogPeer;
 
             AppSelectedChat.select(peer, {message});
         }
-    }
+    };
 
     onChatShowMessageReady = event => {
-        console.log('SHIWWWWWWW', event)
+        console.log('SHIWWWWWWW', event);
         if (this.isLoadingRecent) {
             return;
         }
@@ -519,7 +519,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         } else {
             console.error("BUG: no message found to scroll");
         }
-    }
+    };
 
     virtual_onScrolledTop = () => {
         if (this.isLoadingRecent || this.isBlockingScroll) {
@@ -538,7 +538,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             }
 
             if (this.currentVirtual.hasMoreOnTopToDownload && !this.currentVirtual.isDownloading) {
-                console.log(this.currentVirtual.isEmpty())
+                console.log(this.currentVirtual.isEmpty());
                 if (!this.currentVirtual.isEmpty()) {
                     this.currentVirtual.isDownloading = true;
 
@@ -563,40 +563,40 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         let $first: HTMLElement = this.bubblesInnerRef.$el.lastElementChild;
 
-        let k = 0
-        if(useScrollTopHack) {
-            k = $first.offsetTop
+        let k = 0;
+        if (useScrollTopHack) {
+            k = $first.offsetTop;
         }
         // this.$el.style.setProperty("-webkit-overflow-scrolling", "auto")
 
         this.appendMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
-        let delta = 0
-        if(useScrollTopHack) {
-            delta = $first.offsetTop - k
+        let delta = 0;
+        if (useScrollTopHack) {
+            delta = $first.offsetTop - k;
         }
 
         this.dev_checkTree();
 
-        if(useScrollTopHack) {
+        if (useScrollTopHack) {
             if (this.$el.scrollTop <= 0) {
 
                 if ($first) {
-                    const zz = this.$el.scrollTop
+                    const zz = this.$el.scrollTop;
 
                     // this.$el.style.setProperty("-webkit-overflow-scrolling", "auto")
-                    this.$el.style.setProperty("overflow", "hidden")
-                    this.$el.scrollTop = zz + delta
-                    this.$el.style.setProperty("overflow", "")
+                    this.$el.style.setProperty("overflow", "hidden");
+                    this.$el.scrollTop = zz + delta;
+                    this.$el.style.setProperty("overflow", "");
 
-                    this.justChangedScrollTop = true
+                    this.justChangedScrollTop = true;
                 }
             }
-        } else if($first) {
-            if(this.$el.scrollTop <= 0) {
-                this.$el.scrollTop = $first.offsetTop
+        } else if ($first) {
+            if (this.$el.scrollTop <= 0) {
+                this.$el.scrollTop = $first.offsetTop;
             }
         }
-    }
+    };
 
     onTopPageMessagesReady = (event) => {
         if (this.isLoadingRecent) {
@@ -606,7 +606,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         this.currentVirtual.isDownloading = false;
 
         if (event.context.isUsingSecondVirtual && !this.isUsingSecondVirtual) {
-            console.log("wat")
+            console.log("wat");
             this.secondVirtual.refresh();
             return;
         }
@@ -620,7 +620,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         if (ivt) {
             this.virtual_onScrolledTop();
         }
-    }
+    };
 
     virtual_onScrolledBottom = () => {
         if (this.isLoadingRecent) {
@@ -657,37 +657,37 @@ class VirtualizedBubblesComponent extends StatelessComponent {
             vrdom_delete(this.bubblesInnerRef.$el.lastChild);
         }
 
-        let k
+        let k;
         let $first: HTMLElement = this.bubblesInnerRef.$el.lastElementChild;
 
-        if(useScrollTopHack) {
+        if (useScrollTopHack) {
 
-            k = $first.offsetTop
+            k = $first.offsetTop;
         }
         this.prependMessages(messages, this.currentVirtual.getBeforePageTopOne(), this.currentVirtual.getAfterPageBottomOne());
 
         this.dev_checkTree();
 
-        if(useScrollTopHack) {
+        if (useScrollTopHack) {
 
-            const delta = $first.offsetTop - k
+            const delta = $first.offsetTop - k;
 
             // if (this.$el.scrollTop <= 0) {
 
             if ($first) {
-                const zz = this.$el.scrollTop
+                const zz = this.$el.scrollTop;
 
                 // this.$el.style.setProperty("-webkit-overflow-scrolling", "auto")
-                this.$el.style.setProperty("overflow", "hidden")
-                this.$el.scrollTop = zz + delta
-                this.$el.style.setProperty("overflow", "")
+                this.$el.style.setProperty("overflow", "hidden");
+                this.$el.scrollTop = zz + delta;
+                this.$el.style.setProperty("overflow", "");
 
-                this.justChangedScrollTop = true
+                this.justChangedScrollTop = true;
             }
         }
         // }
 
-    }
+    };
 
     onBottomPageMessagesReady = (event) => {
         if (this.isLoadingRecent) {
@@ -731,43 +731,43 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         if (ivt) {
             this.virtual_onScrolledBottom();
         }
-    }
+    };
 
     virtual_isCompletelyBottom = () => {
         return !this.isUsingSecondVirtual && this.mainVirtual.isVeryBottom();
-    }
+    };
 
     dev_checkTree = () => {
         if (__IS_DEV__) {
             if (this.bubblesInnerRef.$el.childElementCount < 100) {
-                console.log("BUG: < 100 messages rendered!!!")
+                console.log("BUG: < 100 messages rendered!!!");
             }
         }
-    }
+    };
 
     onIntersection = (entries) => {
-        let isAtBottom = false
-        let isAtTop = false
+        let isAtBottom = false;
+        let isAtTop = false;
 
         entries.forEach(entry => {
             if (useIntersectVirtualization) {
-                const $target = entry.target
+                const $target = entry.target;
                 // console.log($target.offsetTop, entry.isIntersecting)
 
 
                 if (entry.isIntersecting) {
-                    const children = [...$target.parentElement.children]
-                    const length = children.length
-                    const edge = 8
-                    const index = children.findIndex($elem => $target === $elem)
+                    const children = [...$target.parentElement.children];
+                    const length = children.length;
+                    const edge = 8;
+                    const index = children.findIndex($elem => $target === $elem);
                     if (index >= length - edge) {
-                        isAtTop = true
+                        isAtTop = true;
                     }
 
                     // const w = Math.floor(this.$el.scrollHeight - offset);
 
                     if (index <= edge) {
-                        isAtBottom = true
+                        isAtBottom = true;
                     }
                 }
             }
@@ -778,7 +778,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 entry.target.style.visibility = "hidden";
                 entry.target.__v?.component.onElementHidden.call(entry.target.__v.component);
             }
-        })
+        });
         // if(isAtBottom) {
         //     console.log("BOTTOM")
         // }
@@ -800,7 +800,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 this.virtual_onScrolledBottom();
             }
         }
-    }
+    };
 
     scrollBottom() {
         scrollBottom(this.$el, this.bubblesInnerRef.$el);
@@ -808,11 +808,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     appendMessages = (messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) => {
         return appendMessages(this.bubblesInnerRef.$el, messages, beforeTopMessage, afterBottomMessage, this.observer);
-    }
+    };
 
     prependMessages = (messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null) => {
         return prependMessages(this.bubblesInnerRef.$el, messages, beforeTopMessage, afterBottomMessage, this.observer);
-    }
+    };
 }
 
 export default VirtualizedBubblesComponent;

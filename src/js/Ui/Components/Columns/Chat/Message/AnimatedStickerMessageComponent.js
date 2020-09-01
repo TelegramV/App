@@ -15,7 +15,7 @@ class AnimatedStickerMessageComponent extends GeneralMessageComponent {
     };
 
     render({message, showDate}, {paused}) {
-        let stickerSet = new StickerSet(message.media.document.attributes.find(attr => attr._ === "documentAttributeSticker").stickerset);
+        let stickerSet = new StickerSet(message.raw.media.document.attributes.find(attr => attr._ === "documentAttributeSticker").stickerset);
         let isEmoji = message.type === MessageType.ANIMATED_EMOJI;
         const width = 200 * (isEmoji ? Settings.get("app_config.emojies_animated_zoom", 1) : 1);
 

@@ -36,7 +36,7 @@ class VirtualMessages {
 
     constructor(options) {
         this.size = options?.size ?? 40;
-        this.edgeSize = IS_SAFARI ? 20 : 2;
+        this.edgeSize = IS_SAFARI ? 20 : 3;
     }
 
     refresh() {
