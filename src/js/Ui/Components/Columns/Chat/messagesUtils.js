@@ -22,8 +22,6 @@ import type {Message} from "../../../../Api/Messages/Message"
 import {MessageType} from "../../../../Api/Messages/Message"
 import MessageComponent from "./MessageComponent"
 import vrdom_render from "../../../../V/VRDOM/render/render"
-import {vrdom_appendRealMany} from "../../../../V/VRDOM/append"
-import {vrdom_prependRealMany} from "../../../../V/VRDOM/prepend"
 
 export function getMessageElement(message: number): HTMLElement | null {
     return document.getElementById(`message-${message.id}`); // dunno better way, sorry
@@ -92,14 +90,16 @@ export function renderVRMessage(message: Message, prevMessage: Message = null, n
     />;
 }
 
-export function renderMessage(message: Message, prevMessage: Message = null, nextMessage: Message = null, observer): HTMLElement {
+export function renderMessage(message: Message, prevMessage: Message = null, nextMessage: Message = null, observer, componentCallbacks): HTMLElement {
     // var z = performance.now()
-    return vrdom_render(renderVRMessage(message, prevMessage, nextMessage, observer));
+    return vrdom_render(renderVRMessage(message, prevMessage, nextMessage, observer), {componentCallbacks});
     // console.log("message " + message.constructor.name, Math.round(performance.now() - z) + "ms")
     // return a
 }
 
 export function appendMessages($container: HTMLElement, messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null, observer) {
+    const componentCallbacks = []
+
     if (messages.length > 0) {
         if (__IS_DEV__) {
             if (!beforeTopMessage) {
@@ -117,7 +117,7 @@ export function appendMessages($container: HTMLElement, messages: Message[], bef
         }
         // let z = performance.now()
 
-        const $messages = [renderMessage(messages[0], beforeTopMessage, messages[1], observer)];
+        const $messages = [renderMessage(messages[0], beforeTopMessage, messages[1], observer, componentCallbacks)];
 
         //[0,1,2,3]
         //[x,0,1]
@@ -125,11 +125,11 @@ export function appendMessages($container: HTMLElement, messages: Message[], bef
         //[1,2,3] loop
         //[2,3,y]
         for (let i = 1; i < messages.length - 1; i++) {
-            $messages.push(renderMessage(messages[i], messages[i - 1], messages[i + 1], observer));
+            $messages.push(renderMessage(messages[i], messages[i - 1], messages[i + 1], observer, componentCallbacks));
         }
 
         if (messages.length > 1) {
-            $messages.push(renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage, observer));
+            $messages.push(renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage, observer, componentCallbacks));
         }
         // console.log("render", Math.round(total) + "ms")
 
@@ -137,8 +137,9 @@ export function appendMessages($container: HTMLElement, messages: Message[], bef
 
         // z = performance.now()
 
-        vrdom_appendRealMany($messages.reverse(), $container)
+        $container.append(...$messages.reverse());
         // console.log("append " + $messages.length, Math.round(performance.now() - z) + "ms")
+        componentCallbacks.forEach(fn => fn())
 
         return $messages;
     }
@@ -147,6 +148,8 @@ export function appendMessages($container: HTMLElement, messages: Message[], bef
 }
 
 export function prependMessages($container: HTMLElement, messages: Message[], beforeTopMessage: Message = null, afterBottomMessage: Message = null, observer) {
+    const componentCallbacks = []
+
     if (messages.length > 0) {
         if (__IS_DEV__) {
             if (!beforeTopMessage) {
@@ -155,6 +158,7 @@ export function prependMessages($container: HTMLElement, messages: Message[], be
             if (!afterBottomMessage) {
                 console.log("[warn] prepend no after message")
             }
+            ``
             if (beforeTopMessage && messages[0].id < beforeTopMessage.id) {
                 console.error("prepend before", beforeTopMessage, messages)
             }
@@ -163,14 +167,14 @@ export function prependMessages($container: HTMLElement, messages: Message[], be
             }
         }
 
-        const $messages = [renderMessage(messages[0], beforeTopMessage, messages[1], observer)];
+        const $messages = [renderMessage(messages[0], beforeTopMessage, messages[1], observer, componentCallbacks)];
 
         for (let i = 1; i < messages.length - 1; i++) {
-            $messages.push(renderMessage(messages[i], messages[i - 1], messages[i + 1], observer));
+            $messages.push(renderMessage(messages[i], messages[i - 1], messages[i + 1], observer, componentCallbacks));
         }
 
         if (messages.length > 1) {
-            $messages.push(renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage, observer));
+            $messages.push(renderMessage(messages[messages.length - 1], messages[messages.length - 2], afterBottomMessage, observer, componentCallbacks));
         }
 
         $container.firstElementChild?.__v.component.domSiblingUpdated?.call(
@@ -179,7 +183,9 @@ export function prependMessages($container: HTMLElement, messages: Message[], be
             messages[0],
         );
 
-        vrdom_prependRealMany($messages, $container);
+        $container.prepend(...$messages.reverse());
+
+        componentCallbacks.forEach(fn => fn())
 
         return $messages;
     }

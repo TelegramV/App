@@ -1,4 +1,3 @@
-import List from "../../../V/VRDOM/list/List"
 import VArray from "../../../V/VRDOM/list/VArray"
 
 import "./ReactiveListPage.scss"
@@ -36,9 +35,9 @@ class ReactiveListComponent extends StatefulComponent {
     render() {
         return (
             <div>
-                <List list={this.state.data} template={IF} wrapper={<div class="reactive-list"/>}/>
+                {/*<List list={this.state.data} template={IF} wrapper={<div class="reactive-list"/>}/>*/}
 
-                <List list={this.state.data} template={IF} wrapper={<div/>}/>
+                {/*<List list={this.state.data} template={IF} wrapper={<div/>}/>*/}
 
                 <div>
                     <button onClick={() => this.state.data.add(++this.c)}>Push</button>

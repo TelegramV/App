@@ -19,7 +19,6 @@
 
 import VRNode from "./VRNode"
 import type {VRenderProps} from "./types/types"
-import {vrdom_resolveMount} from "./mount"
 import vrdom_render from "./render/render"
 
 /**
@@ -32,23 +31,9 @@ const vrdom_append = (node: VRNode, $parent: HTMLElement, options?: VRenderProps
 
     $parent.appendChild($node)
 
-    vrdom_resolveMount($node)
+    // vrdom_resolveMount($node)
 
     return $node
-}
-
-/**
- * @param $nodes
- * @param $parent
- */
-export function vrdom_appendRealMany($nodes: Node[], $parent: HTMLElement) {
-    $parent.append(...$nodes);
-
-    $nodes.forEach($node => {
-        vrdom_resolveMount($node)
-    });
-
-    return $nodes;
 }
 
 export default vrdom_append

@@ -17,16 +17,16 @@
  *
  */
 
-import {__component_update_state} from "./__component_update";
 import VComponent from "./VComponent"
+import {shallowCompare} from "../xpatch/xutils"
 
 // wip
 class StatefulComponent<P, S> extends VComponent<P> {
-    constructor(config) {
-        super(config);
-        this.__update_strategy = VComponent.DEFAULT_STRATEGY;
-        this.__.stateful = true;
-    }
+    // constructor(config) {
+    //     super(config);
+    //     this.__update_strategy = VComponent.DEFAULT_STRATEGY;
+    //     this.__.stateful = true;
+    // }
 
     state: S = {};
 
@@ -50,17 +50,33 @@ class StatefulComponent<P, S> extends VComponent<P> {
     }
 
     setState(nextState) {
-        if (this.__.destroyed) {
-            return;
-        }
+        nextState = typeof nextState === "function" ? nextState(this.state) : nextState;
 
-        if (this.state.__state_shared) {
-            this.state.set(nextState);
-        } else if (typeof nextState === "function") {
-            __component_update_state(this, nextState(this.state));
+        if (!this.__.mounted) {
+            if (this.__.destroyed) {
+                console.error("BUG: already destroyed")
+            } else {
+                Object.assign(this.state, nextState);
+            }
         } else {
-            __component_update_state(this, nextState);
+            if (shallowCompare(this.state, nextState)) {
+                Object.assign(this.state, nextState);
+
+                this.forceUpdate();
+            }
         }
+        // if (this.__.destroyed) {
+        //     return;
+        // }
+        //
+        // if (this.state.__state_shared) {
+        //     this.state.set(nextState);
+        // } else if (typeof nextState === "function") {
+        //     __component_update_state(this, nextState(this.state));
+        // } else {
+        //     __component_update_state(this, nextState);
+        // }
+
 
         // if (this.state.__state_shared) {
         //     this.state.set(nextState);
@@ -76,6 +92,7 @@ class StatefulComponent<P, S> extends VComponent<P> {
     // }, 500);
 
     setGlobalState(nextState) {
+        throw new Error("fck")
         for (const [k, v] of Object.entries(nextState)) {
             this.globalState[k].set(v);
         }

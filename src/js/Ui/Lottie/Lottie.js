@@ -145,6 +145,7 @@ class Lottie extends StatefulComponent {
             ariaLabel,
             onClick,
             title,
+            display,
         } = this.props;
 
         const getSize = (initial) => {
@@ -164,7 +165,7 @@ class Lottie extends StatefulComponent {
             height: getSize(height),
             overflow: 'hidden',
             outline: 'none',
-            display: 'flex',
+            display: display || 'flex',
             'align-items': 'center',
             ...this.props.style,
         };

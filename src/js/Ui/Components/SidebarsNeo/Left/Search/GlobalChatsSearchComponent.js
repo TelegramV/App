@@ -1,7 +1,6 @@
 import UIEvents from "../../../../EventBus/UIEvents"
 import SearchManager from "../../../../../Api/Search/SearchManager"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
-import List from "../../../../../V/VRDOM/list/List"
 import VArray from "../../../../../V/VRDOM/list/VArray"
 import {highlightVRNodeWord} from "../../../../Utils/highlightVRNodeText"
 import ContactComponent from "../../../Basic/ContactComponent"
@@ -38,15 +37,17 @@ export class GlobalChatsSearchComponent extends StatefulComponent {
     render() {
         return (
             <div>
-                <Section title={this.state.isSearching ? "Searching..." : "Contacts and Chats"} css-display={this.state.myPeers.size() === 0 && !this.state.isSearching ? "none" : undefined}>
-                    <List list={this.state.myPeers}
-                          template={ContactFragmentItemTemplate}
-                          wrapper={<div className="column-list"/>}/>
+                <Section title={this.state.isSearching ? "Searching..." : "Contacts and Chats"}
+                         css-display={this.state.myPeers.size() === 0 && !this.state.isSearching ? "none" : undefined}>
+                    {/*<List list={this.state.myPeers}*/}
+                    {/*      template={ContactFragmentItemTemplate}*/}
+                    {/*      wrapper={<div className="column-list"/>}/>*/}
                 </Section>
-                <Section title={this.state.isSearching ? "Searching..." : "Global search"} css-display={this.state.peers.size() === 0 && !this.state.isSearching ? "none" : undefined}>
-                    <List list={this.state.peers}
-                          template={ContactFragmentItemTemplate}
-                          wrapper={<div className="column-list"/>}/>
+                <Section title={this.state.isSearching ? "Searching..." : "Global search"}
+                         css-display={this.state.peers.size() === 0 && !this.state.isSearching ? "none" : undefined}>
+                    {/*<List list={this.state.peers}*/}
+                    {/*      template={ContactFragmentItemTemplate}*/}
+                    {/*      wrapper={<div className="column-list"/>}/>*/}
                 </Section>
                 {/*<div className="contacts-and-chats section"*/}
                 {/*     css-display={this.state.myPeers.size() === 0 && !this.state.isSearching ? "none" : undefined}>*/}

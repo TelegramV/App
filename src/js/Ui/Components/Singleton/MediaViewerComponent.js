@@ -124,6 +124,7 @@ export class MediaViewerComponent extends StatefulComponent {
     }
 
     render() {
+        // return <div></div>
         const {message, hidden, isLoadingLeftPage, isLoadingRightPage, zoom} = this.state;
 
         const isLoadingPage = isLoadingLeftPage || isLoadingRightPage;

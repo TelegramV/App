@@ -17,11 +17,15 @@
  *
  */
 
-import vrdom_delete from "./delete"
+import {deepUnmount} from "./delete"
 
-const vrdom_deleteInner = ($el: Element) => {
+const vrdom_deleteInner = ($el: HTMLElement) => {
+    for (const $child of $el.childNodes) {
+        deepUnmount($child);
+    }
+
     while ($el.firstChild) {
-        vrdom_delete($el.firstChild)
+        $el.firstChild.remove();
     }
 }
 

@@ -91,9 +91,11 @@ class BetterPhotoComponent extends StatefulComponent {
         )
     }
 
-    componentWillMount() {
+    componentWillMount(props) {
         this.calculateState(this.props);
+    }
 
+    componentDidMount() {
         FileManager.downloadPhoto(this.props.photo);
     }
 

@@ -16,20 +16,28 @@ class GeneralMessageComponent extends TranslatableStatefulComponent<Props> {
             .filter(event => event.peer === this.props.message.dialogPeer)
             .on("messages.deleted", this.onMessagesDeleted)
             .on("messages.readOut", this.onMessagesReadOut)
-    }
 
-    reactive(R) {
-        R.object(this.props.message)
+        E.bus(AppEvents.Messages)
+            .filter(event => event.message === this.props.message)
             .updateOn("edited")
             .updateOn("replyFound")
             .updateOn("forwardedFound")
+            .updateOn("groupUpdated")
     }
+
+    // reactive(R) {
+    //     R.object(this.props.message)
+    //         .updateOn("edited")
+    //         .updateOn("replyFound")
+    //         .updateOn("forwardedFound")
+    // }
 
     componentWillMount(props) {
 
     }
 
     componentDidMount() {
+        console.warn("MESSAGE MOUNTED")
         // this.props.message.show()
 
         if (this.props.observer) {

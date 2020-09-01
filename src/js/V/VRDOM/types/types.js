@@ -26,7 +26,6 @@ import ElementRef from "../ref/ElementRef"
 import ComponentRef from "../ref/ComponentRef"
 import FragmentRef from "../ref/FragmentRef"
 import VCollection from "../list/VCollection"
-import List from "../list/List"
 
 export type VRTagName = string | number | function | Class<VComponent>
 
@@ -64,7 +63,6 @@ export type VRNodeProps = {
     dangerouslySetInnerHTML: any | boolean,
     children: Array<VRNodeProps | VRNode>,
     component?: VComponent,
-    list?: List,
     style: any,
 }
 

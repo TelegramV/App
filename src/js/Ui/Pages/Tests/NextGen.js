@@ -47,25 +47,25 @@ Title.defaultProps = {
     title: "Click `Increment`"
 };
 
-class Counter extends StatefulComponent {
-    counter = new ReactiveCounter()
-
-    reactive(R) {
-        R.object(this.counter)
-            .on("increment", this.forceUpdate)
-    }
-
-    render(props, state) {
-        return (
-            <div>
-                <Title title={this.counter.count}/>
-                {this.counter.count}
-
-                <Button onClick={() => this.counter.increment()}>Increment</Button>
-            </div>
-        );
-    }
-}
+// class Counter extends StatefulComponent {
+//     counter = new ReactiveCounter()
+//
+//     reactive(R) {
+//         R.object(this.counter)
+//             .on("increment", this.forceUpdate)
+//     }
+//
+//     render(props, state) {
+//         return (
+//             <div>
+//                 <Title title={this.counter.count}/>
+//                 {this.counter.count}
+//
+//                 <Button onClick={() => this.counter.increment()}>Increment</Button>
+//             </div>
+//         );
+//     }
+// }
 
 class TransitionLoop extends StatefulComponent {
     constructor(props) {

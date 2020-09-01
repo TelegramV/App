@@ -30,10 +30,6 @@ class ComponentRef {
         this.identifier = ++(VApp.latestInstantiatedRef)
     }
 
-    update(props = {}) {
-        this.component.updateProps(props);
-    }
-
     unmount() {
         this.component && this.component.__unmount()
         this.component = undefined

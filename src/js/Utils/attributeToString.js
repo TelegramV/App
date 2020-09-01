@@ -1,6 +1,6 @@
 /*
  * Telegram V
- * Copyright (C) 2020 Davyd Kohut
+ * Copyright (C) 2020 original authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,23 @@
  *
  */
 
-import type {VRTagName} from "../types/types"
-import VComponent from "../component/VComponent"
+const attributeToString = value => {
+    if (!value) {
+        return value;
+    }
 
-const vrdom_isTagNameComponent = (tagName: VRTagName) => {
-    return tagName.prototype instanceof VComponent
+    if (Array.isArray(value)) {
+        return value.join(" ");
+    }
+
+    if (typeof value === "object") {
+        return Object.entries(value)
+            .filter(attr => attr[1])
+            .map(attr => attr[0])
+            .join(" ");
+    }
+
+    return value;
 }
 
-export default vrdom_isTagNameComponent
+export default attributeToString

@@ -24,27 +24,27 @@ import VApp from "../vapp"
 import __component_mount from "./component/__component_mount"
 import cleanDOMElement from "./cleanDOMElement"
 
-export function vrdom_resolveMount($mounted: Element) {
-    if ($mounted.__v) {
-        if ($mounted.__v.component) {
-            __component_mount($mounted.__v.component, $mounted)
-        }
-
-        if ($mounted.__v.ref && !$mounted.__v.ref.__component_ref) {
-            $mounted.__v.ref.$el = $mounted
-        }
-
-        if ($mounted.__list) {
-            $mounted.__v.list.__mount($mounted)
-        }
-    }
-
-    if ($mounted instanceof Text) {
-        VApp.plugins.forEach(plugin => plugin.textDidMount($mounted))
-    } else {
-        VApp.plugins.forEach(plugin => plugin.elementDidMount($mounted))
-    }
-}
+// export function vrdom_resolveMount($mounted: Element) {
+//     if ($mounted.__v) {
+//         if ($mounted.__v.component) {
+//             __component_mount($mounted.__v.component, $mounted)
+//         }
+//
+//         if ($mounted.__v.ref && !$mounted.__v.ref.__component_ref) {
+//             $mounted.__v.ref.$el = $mounted
+//         }
+//
+//         if ($mounted.__list) {
+//             $mounted.__v.list.__mount($mounted)
+//         }
+//     }
+//
+//     if ($mounted instanceof Text) {
+//         VApp.plugins.forEach(plugin => plugin.textDidMount($mounted))
+//     } else {
+//         VApp.plugins.forEach(plugin => plugin.elementDidMount($mounted))
+//     }
+// }
 
 /**
  * Mounts VRNode to Real DOM Element
@@ -58,7 +58,7 @@ function vrdom_mount(node: VRNode, $el: Element | Node | Text, options?: VRender
 
     const $mounted = vrdom_realMount(vrdom_render(node, options), $el)
 
-    vrdom_resolveMount($mounted)
+    // vrdom_resolveMount($mounted)
 
     return $mounted
 }

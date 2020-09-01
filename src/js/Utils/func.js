@@ -54,21 +54,56 @@ export const throttle = (callable, period: number, context = null) => {
     }
 }
 
-export const throttleWithRAF = (callable) => {
-    let running = false;
+export const throttleWithRAF = callable => {
+    return throttleWith(fastRaf, callable);
+
+    let waiting = false;
 
     return () => {
-        if (running) return;
+        if (!waiting) {
+            waiting = true;
 
-        running = true;
-
-        window.requestAnimationFrame(() => {
-            callable.apply(this, arguments);
-
-            running = false;
-        });
+            requestAnimationFrame(() => {
+                waiting = false;
+                callable(...arguments);
+            });
+        }
     };
 };
+
+export function throttleWith(schedulerFn, fn) {
+    let waiting = false;
+    let args;
+
+    return (..._args) => {
+        args = _args;
+
+        if (!waiting) {
+            waiting = true;
+
+            schedulerFn(() => {
+                waiting = false;
+                fn(...args);
+            });
+        }
+    };
+}
+
+let fastRafCallbacks;
+
+export function fastRaf(callback) {
+    if (!fastRafCallbacks) {
+        fastRafCallbacks = [callback];
+
+        requestAnimationFrame(() => {
+            const currentCallbacks = fastRafCallbacks;
+            fastRafCallbacks = undefined;
+            currentCallbacks.forEach((cb) => cb());
+        });
+    } else {
+        fastRafCallbacks.push(callback);
+    }
+}
 
 export const debounce = (callable, delay: number, context = null) => {
     let timeoutId;

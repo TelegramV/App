@@ -17,39 +17,35 @@
  *
  */
 
-import {__component_unmount} from "./component/__component_unmount"
+import unmountComponent from "./xpatch/xunmountComponent"
 
 /**
- * @param {HTMLElement|Text} $node
+ * @param {HTMLElement|Text} $el
  * @param unmount unmount component/list/ref if exist
  * @return {HTMLElement|Text}
  */
-const cleanDOMElement = ($node: HTMLElement, unmount: boolean = false) => {
-    if ($node.__v) {
+const cleanDOMElement = ($el: HTMLElement, unmount: boolean = false) => {
+    if ($el.__v) {
         if (unmount) {
-            if ($node.__v.component) {
-                __component_unmount($node.__v.component)
+            if ($el.__v.component) {
+                unmountComponent($el.__v.component)
             }
 
-            if ($node.__v.list) {
-                $node.__v.list.__unmount()
-            }
-
-            if ($node.__v.ref) {
-                $node.__v.ref.__unmount()
+            if ($el.__v.ref) {
+                $el.__v.ref.__unmount()
             }
         }
 
-        $node.__v.component = null
-        $node.__v.ref = null
-        $node.__v.patched_styles.forEach(k => $node.style.removeProperty(k))
-        $node.__v.patched_events.forEach(k => $node[`on${k}`] = null)
-        $node.__v.patched_styles = null
-        $node.__v.patched_events = null
-        $node.__v = null
+        $el.__v.component = null
+        $el.__v.ref = null
+        // $node.__v.patched_styles.forEach(k => $node.style.removeProperty(k))
+        // $node.__v.patched_events.forEach(k => $node[`on${k}`] = null)
+        $el.__v.patched_styles = null
+        $el.__v.patched_events = null
+        $el.__v = null
     }
 
-    return $node
+    return $el
 }
 
 export default cleanDOMElement

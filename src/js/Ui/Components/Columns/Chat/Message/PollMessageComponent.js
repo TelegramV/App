@@ -1,5 +1,4 @@
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
-import MTProto from "../../../../../MTProto/External"
 import MessageWrapperFragment from "./Common/MessageWrapperFragment"
 import TextWrapperComponent from "./Common/TextWrapperComponent"
 import AvatarComponent from "../../../Basic/AvatarComponent"
@@ -8,11 +7,12 @@ import VCheckbox from "../../../../Elements/Input/VCheckbox"
 import messages from "../../../../../Api/Telegram/messages"
 import UIEvents from "../../../../EventBus/UIEvents"
 import PeersStore from "../../../../../Api/Store/PeersStore"
-import { parseMessageEntities } from "../../../../../Utils/htmlHelpers"
+import {parseMessageEntities} from "../../../../../Utils/htmlHelpers"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import VSpinner from "../../../../Elements/VSpinner"
-import { formatAudioTime } from "../../../../Utils/utils"
+import {formatAudioTime} from "../../../../Utils/utils"
 import Locale from "../../../../../Api/Localization/Locale"
+import AppEvents from "../../../../../Api/EventBus/AppEvents"
 
 export default class PollMessageComponent extends GeneralMessageComponent {
 
@@ -21,8 +21,8 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         answers: []
     }
 
-    footerRef = VComponent.createFragmentRef();
-    timerRef = VComponent.createFragmentRef();
+    footerRef = VComponent.createRef();
+    timerRef = VComponent.createRef();
 
     makeContextMenu = () => {
         let message = this.props.message;
@@ -45,10 +45,14 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         return contextActions;
     }
 
-    reactive(R) {
-        R.object(this.props.message)
+    appEvents(E) {
+        super.appEvents(E);
+
+        E.bus(AppEvents.Messages)
+            .filter(event => event.message === this.props.message)
             .on("pollEdit", this.onPollChange)
             .on("pollVote", this.onPollChange)
+
     }
 
     componentDidMount() {
@@ -60,7 +64,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
         if (this.props.message.poll.close_date && !this.props.message.isVoted) this.withInterval(this.updateTimer, 500);
     }
 
-    render({ message, showDate }) {
+    render({message, showDate}) {
         let classes = {
             "poll": true,
             "voted": message.isVoted
@@ -71,10 +75,12 @@ export default class PollMessageComponent extends GeneralMessageComponent {
                     <div class="question">{message.poll.question}</div>
                     <div class="subtitle">
                         <div class="poll-type">{this.l(message.pollTypeKey)}</div>
-                        {message.poll.public_voters && <RecentVotersFragment recentVoters={message.results.recent_voters}/>}
+                        {message.poll.public_voters &&
+                        <RecentVotersFragment recentVoters={message.results.recent_voters}/>}
                         <div class="filler"/>
                         {this.shouldShowTooltip() && <TipFragment click={_ => this.showSolution()}/>}
-                        {(message.poll.close_period && !message.isVoted) && <TimerFragment ref={this.timerRef} left={0} total={0}/>}
+                        {(message.poll.close_period && !message.isVoted) &&
+                        <TimerFragment ref={this.timerRef} left={0} total={0}/>}
                     </div>
                     {this.makeAnswerBlock()}
                     <FooterFragment message={message} actionClick={this.onActionClick} answers={this.state.answers}/>
@@ -101,13 +107,16 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     showSolution = () => {
         if (this.props.message.results?.solution && !this.state.showingSolution) {
-            UIEvents.General.fire("snackbar.show", { text: <SnackbarSolutionFragment message={this.props.message}/>, time: 5 });
+            UIEvents.General.fire("snackbar.show", {
+                text: <SnackbarSolutionFragment message={this.props.message}/>,
+                time: 5
+            });
             this.setState({
                 showingSolution: true
             })
 
             this.withTimeout(_ => {
-                this.setState({ showingSolution: false })
+                this.setState({showingSolution: false})
             }, 5000);
         }
     }
@@ -129,7 +138,7 @@ export default class PollMessageComponent extends GeneralMessageComponent {
 
     onPollChange = () => {
         this.forceUpdate();
-        UIEvents.General.fire("pollUpdate", { message: this.props.message }); //update sidebar
+        UIEvents.General.fire("pollUpdate", {message: this.props.message}); //update sidebar
 
         this.withTimeout(_ => this.forceUpdate(), 1000); // текст з обраного варіанту кудись зникає, дикий костиль, ДАВИД ФІКС!
     }
@@ -146,7 +155,9 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     makeAnswerBlock = () => {
         let answers = [];
         for (const answer of this.props.message.poll.answers) {
-            answers.push(<AnswerFragment message={this.props.message} option={answer.option[0]} click={this.onAnswerClick} chosen={this.state.answers.includes(answer.option[0])}/>)
+            answers.push(<AnswerFragment message={this.props.message} option={answer.option[0]}
+                                         click={this.onAnswerClick}
+                                         chosen={this.state.answers.includes(answer.option[0])}/>)
         }
         return answers;
     }
@@ -169,10 +180,10 @@ export default class PollMessageComponent extends GeneralMessageComponent {
             this.clearIntervals();
             this.withTimeout(_ => messages.getPollResults(message), 1000);
         }
-        this.timerRef.update({
-            left: left,
-            total: message.poll.close_period
-        })
+        // this.timerRef.update({
+        //     left: left,
+        //     total: message.poll.close_period
+        // })
     }
 
     shouldShowTooltip = () => {
@@ -192,18 +203,19 @@ export default class PollMessageComponent extends GeneralMessageComponent {
     }
 
     showFullResults = () => {
-        UIEvents.General.fire("poll.showResults", { pollMessage: this.props.message })
+        UIEvents.General.fire("poll.showResults", {pollMessage: this.props.message})
     }
 }
 
-const AnswerFragment = ({ message, option, chosen, click }) => {
+const AnswerFragment = ({message, option, chosen, click}) => {
     let answer = message.poll.answers.find(answ => answ.option[0] === option);
     let result = message.results?.results?.find(res => res.option[0] === option);
 
     if (!message.isVoted && !message.poll.closed) {
         return (
             <div class="answer voting rp" option={answer.option} onClick={click}>
-                <div class="vote">{message.isMultiple ? <VCheckbox checked={chosen}/> : <VRadio checked={chosen}/>}</div>
+                <div class="vote">{message.isMultiple ? <VCheckbox checked={chosen}/> :
+                    <VRadio checked={chosen}/>}</div>
                 <div class="answer-text">{answer.text}</div>
             </div>
         )
@@ -227,18 +239,18 @@ const AnswerFragment = ({ message, option, chosen, click }) => {
 
         return (
             <div class={answerClasses} option={answer.option}>
-                <div class="percent">{absPercent+"%"}</div>
+                <div class="percent">{absPercent + "%"}</div>
                 <div class="voted"><span class={votedClass}/></div>
                 <div class="answer-text">{answer.text}</div>
                 <div class="progress-wrapper">
-                    <div class="progress" css-width={relPercent+"%"}></div>
+                    <div class="progress" css-width={relPercent + "%"}></div>
                 </div>
             </div>
         )
     }
 }
 
-const FooterFragment = ({ message, actionClick, answers }) => {
+const FooterFragment = ({message, actionClick, answers}) => {
     if (message.isVoted && message.isPublic) {
         return <div class="action-button" onClick={actionClick}>{Locale.l("lng_polls_view_results")}</div>;
     } else if (!message.isVoted && message.isMultiple) {
@@ -272,7 +284,7 @@ const FooterFragment = ({ message, actionClick, answers }) => {
     return <div class="stats">{voted}</div>;
 }
 
-const TipFragment = ({ click }) => {
+const TipFragment = ({click}) => {
     return (
         <div class="tip" onClick={click}>
             <i class="tgico tgico-tip"/>
@@ -280,7 +292,7 @@ const TipFragment = ({ click }) => {
     )
 }
 
-const RecentVotersFragment = ({ recentVoters }) => {
+const RecentVotersFragment = ({recentVoters}) => {
     let avatars = [];
     for (let id of recentVoters) {
         let user = PeersStore.get("user", id);
@@ -293,7 +305,7 @@ const RecentVotersFragment = ({ recentVoters }) => {
     )
 }
 
-const SnackbarSolutionFragment = ({ message }) => {
+const SnackbarSolutionFragment = ({message}) => {
     let text = parseMessageEntities(message.results.solution, message.results.solution_entities);
     return (
         <div class="solution">
@@ -305,7 +317,7 @@ const SnackbarSolutionFragment = ({ message }) => {
     )
 }
 
-const TimerFragment = ({ left, total }) => {
+const TimerFragment = ({left, total}) => {
     if (total === 0) return <div class="timer"/>;
     if (left < 0) left = 0;
     let percent = left / total;

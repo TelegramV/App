@@ -1,6 +1,6 @@
 /*
  * Telegram V
- * Copyright (C) 2020 Davyd Kohut
+ * Copyright (C) 2020 original authors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +17,6 @@
  *
  */
 
-import VComponent from "../component/VComponent"
 
-const vrdom_isComponent = (obj: Object) => {
-    return obj instanceof VComponent
-}
 
-export default vrdom_isComponent
+export default shallowCompare;

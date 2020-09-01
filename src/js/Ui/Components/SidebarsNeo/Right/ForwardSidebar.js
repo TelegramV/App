@@ -14,7 +14,6 @@ export class ForwardSidebar extends GenericSidebar {
     offsetId = 0
     allFetched = false
     isFetching = false
-    tagsRef = VComponent.createFragmentRef()
 
     state = {
         from: null,

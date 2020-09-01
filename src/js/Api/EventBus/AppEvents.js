@@ -8,6 +8,7 @@ const AppEvents = {
 
     Dialogs: new EventBus(),
     Peers: new EventBus(),
+    Messages: new EventBus(),
     Calls: new EventBus(),
     Files: new EventBus()
 }

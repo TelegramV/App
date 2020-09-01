@@ -4,7 +4,6 @@ import MTProto from "./MTProto/External"
 import AppCache from "./Api/Cache/AppCache"
 
 import VApp from "./V/vapp"
-import VRDOM from "./V/VRDOM/VRDOM"
 import AppRoutes from "./Ui/Routing"
 
 import RippleVRDOMPlugin from "./Ui/Plugins/RipplePlugin"
@@ -65,3 +64,85 @@ MTProto.connect().then(user => {
         document.title = "[dev] Telegram V"
     }
 })
+
+// import xcreateElement from "./V/VRDOM/xpatch/xcreateElement"
+// import diff from "./V/VRDOM/xpatch/xdiff"
+// import Component from "./V/VRDOM/xpatch/xComponent"
+//
+// global.VRDOM = {
+//     createElement: xcreateElement,
+// }
+//
+// const $app = document.getElementById("app");
+//
+// function Button(props) {
+//     return <button {...props}>Increment</button>
+// }
+//
+// class IN extends Component {
+//     render() {
+//         return <div>kek {JSON.stringify(this.props)}</div>
+//     }
+// }
+//
+// class Win extends Component {
+//     state = {
+//         value: "",
+//     }
+//
+//     render(props) {
+//         // props.kek = Math.random();
+//         // return <IN {...props}/>
+//         return <div>kek
+//             <br/>
+//             {this.state.value}
+//             <br/>
+//             <input value={this.state.value} type="text" onInput={event => {
+//                 this.setState({
+//                     value: event.target.value,
+//                 })
+//             }}/></div>
+//     }
+//
+//     // componentDidMount() {
+//     //     console.warn("WIN MOUNTED")
+//     // }
+//     //
+//     // componentWillUnmount() {
+//     //     console.warn("WIN WILL UNMOUNT")
+//     // }
+//     //
+//     // componentDidUpdate() {
+//     //     console.warn("WIN UPDATED")
+//     // }
+// }
+//
+// Win.defaultProps = {
+//     kek: "lol"
+// }
+//
+// let i = 1;
+//
+// const render = () => (
+//     <div>
+//         test
+//         {String(i)}
+//         <button onClick={() => {
+//             i++;
+//             diffdom()();
+//         }}>Increment
+//         </button>
+//         <Button onClick={() => {
+//             i++;
+//             diffdom()();
+//         }}/>
+//         <Win/>
+//         {/*{i % 2 === 0 && <Win/>}*/}
+//     </div>
+// )
+//
+// console.log(render())
+//
+// const diffdom = () => diff($app, render());
+//
+// diffdom()();

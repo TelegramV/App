@@ -23,7 +23,7 @@ class VirtualMessages {
     // oldest first
     messages: Message[] = [];
 
-    size = 100;
+    size = 60;
     edgeSize = this.size / 2;
 
     currentPage = [];
@@ -34,8 +34,8 @@ class VirtualMessages {
     isDownloading = false;
 
     constructor(options) {
-        this.size = options?.size ?? 40;
-        this.edgeSize = 2;
+        // this.size = options?.size ?? 40;
+        // this.edgeSize = 2;
     }
 
     refresh() {

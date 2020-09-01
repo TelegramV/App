@@ -17,15 +17,13 @@
  *
  */
 
-import FragmentRef from "../ref/FragmentRef"
 import ComponentRef from "../ref/ComponentRef"
 import ElementRef from "../ref/ElementRef"
 import VApp from "../../vapp"
 import __component_withDefaultProps from "./__component_withDefaultProps"
-import {__component_update_force} from "./__component_update"
-import type {RORC} from "./__component_reactiveObjectEventsBuilder"
 import type {AE} from "./__component_appEventsBuilder"
 import {debounce, throttle} from "../../../Utils/func"
+import diff from "../xpatch/xdiff"
 
 export class ComponentDidNotMount {
 }
@@ -35,9 +33,9 @@ export class ComponentWasDestroyed {
 
 
 // abstract stateless component
-class VComponent<P> {
+class VComponent<P, S> {
     __ = {
-        stateful: false,
+        stateful: true,
         initialized: false,
         mounted: false,
         destroyed: false,
@@ -65,8 +63,9 @@ class VComponent<P> {
         timeouts: new Set(),
     }
 
+    state: S = {};
+
     static defaultProps: any = null;
-    static displayName: string = "VComponent";
 
     props: P = {};
     slot: any = null;
@@ -102,13 +101,6 @@ class VComponent<P> {
     appEvents(E: AE) {
     }
 
-    /**
-     * @deprecated
-     * @param R
-     */
-    reactive(R: RORC) {
-    }
-
     render(props) {
     }
 
@@ -135,15 +127,15 @@ class VComponent<P> {
     }
 
     forceUpdate() {
-        __component_update_force(this);
-    }
+        // this.componentWillUpdate(this.props);
 
-    /**
-     * @deprecated never use it (but sometimes you can)
-     * @param nextProps
-     */
-    updateProps(nextProps) {
-        __component_update_force(this, nextProps);
+        this.$el = diff(
+            this.$el,
+            this.render(this.props, this.state ?? {}, this.globalState),
+            true,
+        )(this.$el);
+
+        this.componentDidUpdate();
     }
 
     // Intervals and Timeouts
@@ -265,23 +257,11 @@ class VComponent<P> {
         });
     }
 
-    toString() {
-        return `${this.constructor.displayName}#${this.identifier}`
-    }
-
     /**
      * Create ref for a simple node.
      */
     static createRef() {
         return new ElementRef()
-    }
-
-    /**
-     * Create ref for a fragment.
-     * @return {FragmentRef}
-     */
-    static createFragmentRef() {
-        return new FragmentRef()
     }
 
     /**

@@ -72,7 +72,7 @@ export class LanguageSidebar extends LeftSidebar {
             this.setState({
                 languages: langList,
             })
-            this.radiosRef.component.check(languages.findIndex(l => l.lang_code === Locale.currentLanguageCode));
+            // this.radiosRef.component.check(languages.findIndex(l => l.lang_code === Locale.currentLanguageCode));
         })
     }
 

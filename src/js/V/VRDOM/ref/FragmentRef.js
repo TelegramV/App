@@ -21,15 +21,15 @@ import type {VRAttrs, VRSlot} from "../types/types"
 import VRDOM from "../VRDOM"
 import VApp from "../../vapp"
 
-const __fragment_ref_update = (ref: FragmentRef, props = {}) => {
-    if (ref.$el) {
-        Object.assign(ref.props, props)
-
-        return ref.$el = VRDOM.patch(ref.$el, ref.fragment({...ref.props, slot: ref.slot}))
-    } else {
-        console.warn("$el not found", ref)
-    }
-}
+// const __fragment_ref_update = (ref: FragmentRef, props = {}) => {
+//     if (ref.$el) {
+//         Object.assign(ref.props, props)
+//
+//         return ref.$el = VRDOM.patch(ref.$el, ref.fragment({...ref.props, slot: ref.slot}))
+//     } else {
+//         console.warn("$el not found", ref)
+//     }
+// }
 
 const __fragment_ref_unmount = (ref: FragmentRef) => {
     ref.fragment = undefined
@@ -50,14 +50,6 @@ class FragmentRef {
 
     constructor() {
         this.identifier = ++(VApp.latestInstantiatedRef)
-    }
-
-    patch = (props) => {
-        return this.update(props)
-    }
-
-    update = (props) => {
-        return __fragment_ref_update(this, props)
     }
 
     unmount = () => {

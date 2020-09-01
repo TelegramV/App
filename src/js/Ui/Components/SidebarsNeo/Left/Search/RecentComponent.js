@@ -4,7 +4,6 @@ import AppEvents from "../../../../../Api/EventBus/AppEvents"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 import {BotPeer} from "../../../../../Api/Peers/Objects/BotPeer"
 import ContactComponent from "../../../Basic/ContactComponent"
-import List from "../../../../../V/VRDOM/list/List"
 import VArray from "../../../../../V/VRDOM/list/VArray"
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import {Section} from "../../Fragments/Section";
@@ -39,9 +38,9 @@ export class RecentComponent extends StatefulComponent {
     render() {
         return (
             <Section title="Recent">
-                <List list={this.state.peers}
-                      template={ContactFragmentItemTemplate}
-                      wrapper={<div className="column-list"/>}/>
+                {/*<List list={this.state.peers}*/}
+                {/*      template={ContactFragmentItemTemplate}*/}
+                {/*      wrapper={<div className="column-list"/>}/>*/}
             </Section>
         )
     }

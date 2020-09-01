@@ -9,7 +9,7 @@ export default class TabSelectorComponent extends StatefulComponent {
     };
 
     elRefs = []
-    underlineStyle = { left: '0', right: '100%' }
+    underlineStyle = {left: '0', right: '100%'}
     selectorRef = StatefulComponent.createRef();
 
     render({items, scrollable, active, showScroll}) {
@@ -24,11 +24,12 @@ export default class TabSelectorComponent extends StatefulComponent {
             <div className={wrapperClasses}>
                 <div className="tab-selector" ref={this.selectorRef}>
                     {items.map((item, i) => {
-                        const ref = StatefulComponent.createFragmentRef();
+                        const ref = StatefulComponent.createRef();
                         this.elRefs.push(ref);
-                        return <TabFragment text={item.text} selected={(i+1) === active} onClick={item.onClick} ref={ref}/>;
+                        return <TabFragment text={item.text} selected={(i + 1) === active} onClick={item.onClick}
+                                            ref={ref}/>;
                     })}
-                    <div className="underline" style={this.underlineStyle} />
+                    <div className="underline" style={this.underlineStyle}/>
                 </div>
             </div>
         );
@@ -48,14 +49,14 @@ export default class TabSelectorComponent extends StatefulComponent {
     }
 
     updateUnderline = () => {
-        if(!this.props.active) {
-            this.underlineStyle = { left: '0', right: '100%' };
+        if (!this.props.active) {
+            this.underlineStyle = {left: '0', right: '100%'};
             return;
         }
         const rootBounds = this.selectorRef.$el.getBoundingClientRect();
-        let ref = this.elRefs[this.props.active-1];
-        if(!ref) {
-            this.underlineStyle = { left: '0', right: '100%' };
+        let ref = this.elRefs[this.props.active - 1];
+        if (!ref) {
+            this.underlineStyle = {left: '0', right: '100%'};
             return;
         }
 
@@ -69,7 +70,7 @@ export default class TabSelectorComponent extends StatefulComponent {
             right: `${right}px`,
         }
 
-        if(newUnderlineStyle.left !== this.underlineStyle.left ||
+        if (newUnderlineStyle.left !== this.underlineStyle.left ||
             newUnderlineStyle.right !== this.underlineStyle.right) {
             this.underlineStyle = newUnderlineStyle;
             this.forceUpdate();

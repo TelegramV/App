@@ -36,7 +36,7 @@ class BetterVideoComponent extends StatefulComponent {
         currentTime: 0,
     };
 
-    videoRef: { $el: HTMLVideoElement } = VComponent.createFragmentRef();
+    videoRef: { $el: HTMLVideoElement } = VComponent.createRef();
 
     playPromise = Promise.resolve()
 

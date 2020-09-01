@@ -100,7 +100,11 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     }
 
     cleanupTree = () => {
+        // vrdom_delete(this.bubblesInnerRef.$el);
+        // this.$el.style.display = "none";
         vrdom_deleteInner(this.bubblesInnerRef.$el);
+        // this.$el.style.display = "block";
+        // this.forceUpdate();
     }
 
     refresh = (clearShowMessage = true) => {
@@ -117,13 +121,13 @@ class VirtualizedBubblesComponent extends StatelessComponent {
     }
 
     onChatOpenedMobile = (event) => {
-        if(isMobile()) {
+        if (isMobile()) {
             this.isRequestedShowMessage = event.message
 
             if (AppSelectedChat.isSelected) {
                 this.isLoadingRecent = true;
 
-                AppSelectedChat.current.messages.fireRecent();
+                AppSelectedChat.current.messages.fireRecent({}, this.currentVirtual.size);
             }
         }
     }
@@ -132,14 +136,14 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         this.refresh();
         // if (event.message) {
 
-        if(isDesktop()) {
+        if (isDesktop()) {
             this.isRequestedShowMessage = event.message
 
-            if(!this.isRequestedShowMessage) {
+            if (!this.isRequestedShowMessage) {
                 if (AppSelectedChat.isSelected) {
                     this.isLoadingRecent = true;
 
-                    AppSelectedChat.current.messages.fireRecent();
+                    AppSelectedChat.current.messages.fireRecent({}, this.currentVirtual.size);
                 }
             } else {
                 this.onChatShowMessage({message: event.message})
@@ -240,9 +244,9 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         this.mainVirtual.messages = fixMessages(event.messages.slice());
 
-        if (event.messages.length < 100) {
+        if (event.messages.length < this.currentVirtual.size) {
             this.isLoadingRecent = true;
-            AppSelectedChat.current.messages.fireAllRecent();
+            AppSelectedChat.current.messages.fireAllRecent({}, this.currentVirtual.size);
         }
 
         const vbp = this.mainVirtual.veryBottomPage();
@@ -250,7 +254,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         if (!this.isRequestedShowMessage) {
             this.appendMessages(vbp, this.mainVirtual.getBeforePageTopOne(), this.mainVirtual.getAfterPageBottomOne());
             this.scrollBottom();
-        } else if (event.messages.length >= 100) {
+        } else if (event.messages.length >= this.currentVirtual.size) {
             const message = this.isRequestedShowMessage;
             const messageIndex = this.mainVirtual.messages.findIndex(m => m.id === message.id);
 
@@ -281,7 +285,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 API.messages.getHistory(message.dialogPeer, {
                     offset_id: message.id,
                     add_offset: -51,
-                    limit: 100
+                    limit: this.currentVirtual.size
                 }).then(Messages => {
                     AppEvents.Peers.fire("chat.showMessageReady", {
                         peer: message.dialogPeer,
@@ -292,7 +296,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 });
             }
         }
-        if(!AppSelectedChat.current.pinnedMessage) AppSelectedChat.current.findPinnedMessage(); // Можливо десь видалився пін, спробуємо знайти...
+        if (!AppSelectedChat.current.pinnedMessage) AppSelectedChat.current.findPinnedMessage(); // Можливо десь видалився пін, спробуємо знайти...
     }
 
     onPeerMessagesAllRecent = event => {
@@ -300,7 +304,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
         event.messages = fixMessages(event.messages.slice());
         const lenbeforefuck = this.mainVirtual.currentPage.length;
         this.mainVirtual.messages = [...event.messages, ...this.mainVirtual.messages];
-        this.mainVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
+        this.mainVirtual.hasMoreOnTopToDownload = this.mainVirtual.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= this.currentVirtual.size;
         const vbp = this.mainVirtual.veryBottomPage();
         if (!this.isRequestedShowMessage) {
             this.appendMessages(vbp.slice(0, vbp.length - lenbeforefuck), null, this.mainVirtual.getVeryBottomOne());
@@ -337,7 +341,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
                 API.messages.getHistory(message.dialogPeer, {
                     offset_id: message.id,
                     add_offset: -51,
-                    limit: 100
+                    limit: this.currentVirtual.size
                 }).then(Messages => {
                     AppEvents.Peers.fire("chat.showMessageReady", {
                         peer: message.dialogPeer,
@@ -517,7 +521,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
                     AppSelectedChat.current.messages.downloadNextTopPage(this.currentVirtual.getVeryTopOne().id, {
                         isUsingSecondVirtual: this.isUsingSecondVirtual
-                    });
+                    }, this.currentVirtual.size);
                 }
             }
 
@@ -565,7 +569,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
         const ivt = this.currentVirtual.isVeryTop();
 
-        this.currentVirtual.hasMoreOnTopToDownload = event.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= 100;
+        this.currentVirtual.hasMoreOnTopToDownload = event.messages.flatMap(message => message instanceof GroupMessage ? Array.from(message.messages) : [message]).length >= this.currentVirtual.size;
 
         this.currentVirtual.messages = [...fixMessages(event.messages), ...this.currentVirtual.messages];
 
@@ -590,7 +594,7 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
                     AppSelectedChat.current.messages.downloadNextBottomPage(this.currentVirtual.getVeryBottomOne().id, {
                         isUsingSecondVirtual: this.isUsingSecondVirtual
-                    });
+                    }, this.currentVirtual.size);
                 }
             }
 
@@ -664,8 +668,8 @@ class VirtualizedBubblesComponent extends StatelessComponent {
 
     dev_checkTree = () => {
         if (__IS_DEV__) {
-            if (this.bubblesInnerRef.$el.childElementCount < 100) {
-                console.log("BUG: < 100 messages rendered!!!")
+            if (this.bubblesInnerRef.$el.childElementCount < this.currentVirtual.size) {
+                console.log(`BUG: < ${this.currentVirtual.size} messages rendered!!!`)
             }
         }
     }

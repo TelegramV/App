@@ -17,7 +17,7 @@ import {DialogInfoLinkComponent} from "./DialogInfoLinkComponent";
 import {DialogInfoAudioComponent} from "./DialogInfoAudioComponent";
 import DialogInfoDocumentComponent from "./DialogInfoDocumentComponent";
 import {DialogInfoMemberComponent} from "./DialogInfoMemberComponent";
-import Locale from "../../../../../../Api/Localization/Locale"
+import vrdom_deleteInner from "../../../../../../V/VRDOM/deleteInner"
 
 export class DialogInfoMaterials extends TranslatableStatelessComponent {
     contentRefs = {
@@ -62,7 +62,8 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
     render(props) {
         return <div className="materials">
 
-            <TabSelectorComponent ref={this.tabSelectorRef} items={this.makeTabs()} active={this.currentTab} scrollable/>
+            <TabSelectorComponent ref={this.tabSelectorRef} items={this.makeTabs()} active={this.currentTab}
+                                  scrollable/>
 
             <div ref={this.contentRefs.members} className="content hidden member-list"/>
             <div ref={this.contentRefs.media} className="content"/>
@@ -78,14 +79,14 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
     }
 
     update() {
-        this.tabSelectorRef.component.updateProps({items: this.makeTabs()})
+        // this.tabSelectorRef.component.updateProps({items: this.makeTabs()})
 
         //this.tabSelectorRef.component.setTab(this.currentTab);
         if (!AppSelectedInfoPeer.check(AppSelectedInfoPeer.Previous) && AppSelectedInfoPeer.Current !== undefined) {
             this.refreshContent()
         }
 
-        if(this.showMembers()) {
+        if (this.showMembers()) {
             // this.showRef("members")// = "members"
             this.openMembers()
         } else {
@@ -121,7 +122,7 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
                 key: "audio"
             }
         ]
-        if(this.showMembers()) {
+        if (this.showMembers()) {
             tabItems.unshift({
                 text: this.l("lng_profile_participants_section"),
                 onClick: this.openMembers,
@@ -169,7 +170,7 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
         //     this.contentPages.media.offsetId = rawMessage.id
         // }
 
-        VRDOM.append(<DialogInfoMemberComponent peer={peer}/>, this.contentRefs.members.$el)
+        vrdom_append(<DialogInfoMemberComponent peer={peer}/>, this.contentRefs.members.$el)
     }
 
     openMedia = () => {
@@ -190,7 +191,7 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
         }
 
         let message = MessageFactory.fromRawOrReturnNoGroup(AppSelectedInfoPeer.Current, rawMessage)
-        
+
         if (message.type === MessageType.VIDEO) {
             const video = DocumentParser.attributeVideo(message.raw.media.document)
 
@@ -257,7 +258,7 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
 
         const message = MessageFactory.fromRawOrReturn(AppSelectedInfoPeer.Current, rawMessage)
 
-        VRDOM.append(<DialogInfoAudioComponent message={message}
+        vrdom_append(<DialogInfoAudioComponent message={message}
                                                title={title}
                                                description={`${performer} · ${date}`}
                                                time={time}/>, this.contentRefs.audio.$el)
@@ -291,7 +292,7 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
         title = title || "No title"
         displayUrl = displayUrl || url
 
-        VRDOM.append(<DialogInfoLinkComponent letter={letter}
+        vrdom_append(<DialogInfoLinkComponent letter={letter}
                                               photo={photo}
                                               title={title}
                                               description={description}
@@ -352,7 +353,7 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
         }
 
         if (rawMessage.media && rawMessage.media.document) {
-            VRDOM.append(<DialogInfoDocumentComponent document={rawMessage.media.document}/>, this.contentRefs.docs.$el)
+            vrdom_append(<DialogInfoDocumentComponent document={rawMessage.media.document}/>, this.contentRefs.docs.$el)
         }
     }
 
@@ -374,7 +375,7 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
         this.contentRefs[refName].$el.classList.add("content")
         this.contentRefs[refName].$el.classList.remove("hidden")
         this.showing = refName
-        this.currentTab = this.makeTabs().findIndex(el => el.key === refName)+1;
+        this.currentTab = this.makeTabs().findIndex(el => el.key === refName) + 1;
         this.tabSelectorRef.component.setTab(this.currentTab);
     }
 
@@ -388,7 +389,7 @@ export class DialogInfoMaterials extends TranslatableStatelessComponent {
 
     clearContent = () => {
         for (const v of Object.values(this.contentRefs)) {
-            VRDOM.deleteInner(v.$el)
+            vrdom_deleteInner(v.$el)
         }
     }
 

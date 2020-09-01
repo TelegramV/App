@@ -21,7 +21,6 @@ import PeersStore from "../../../../../Api/Store/PeersStore"
 import {highlightVRNodeWord} from "../../../../Utils/highlightVRNodeText"
 import ContactComponent from "../../../Basic/ContactComponent"
 import VArray from "../../../../../V/VRDOM/list/VArray"
-import List from "../../../../../V/VRDOM/list/List"
 import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
 import AppSelectedChat from "../../../../Reactive/SelectedChat"
 
@@ -64,9 +63,9 @@ export class GlobalMessagesSearchComponent extends StatefulComponent {
                  css-display={this.state.messages.size() === 0 && !this.state.isSearching ? "none" : undefined}>
                 <div className="title">{this.state.isSearching ? "Searching messages..." : "Messages"}</div>
                 {/*<div className="section-title">{this.state.isSearching ? "Searching messages..." : "Messages"}</div>*/}
-                <List list={this.state.messages}
-                      template={MessageFragmentItemTemplate}
-                      wrapper={<div className="column-list"/>}/>
+                {/*<List list={this.state.messages}*/}
+                {/*      template={MessageFragmentItemTemplate}*/}
+                {/*      wrapper={<div className="column-list"/>}/>*/}
             </div>
         )
     }

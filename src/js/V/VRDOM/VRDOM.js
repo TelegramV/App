@@ -17,40 +17,11 @@
  *
  */
 
-import vrdom_createElement from "./createElement"
-import vrdom_createNode from "./createNode"
-import vrdom_render from "./render/render"
-import vrdom_mount from "./mount"
-import vrdom_delete from "./delete"
-import vrdom_patch from "./patch/patch"
-import vrdom_append from "./append"
-import vrdom_prepend from "./prepend"
 import vrdom_deleteInner from "./deleteInner"
-import vrdom_patchChildren from "./patch/patchChildren"
-import cleanDOMElement from "./cleanDOMElement"
-import vrdom_isTagNameComponent from "./is/isTagNameComponent"
-import vrdom_isTagNameFragment from "./is/isTagNameFragment"
-import vrdom_isTagNameComponentOrFragment from "./is/isTagNameComponentOrFragment"
-import vrdom_isTagNameList from "./is/isTagNameList"
+import xcreateElement from "./xpatch/xcreateElement"
 
 const VRDOM = {
-    createElement: vrdom_createElement,
-    createNode: vrdom_createNode,
-    render: vrdom_render,
-    mount: vrdom_mount,
-    patch: vrdom_patch,
-    patchChildren: vrdom_patchChildren,
-    append: vrdom_append,
-    prepend: vrdom_prepend,
-
-    delete: vrdom_delete,
-    deleteInner: vrdom_deleteInner,
-    cleanElement: cleanDOMElement,
-
-    isTagNameComponent: vrdom_isTagNameComponent,
-    isTagNameFragment: vrdom_isTagNameFragment,
-    isTagNameList: vrdom_isTagNameList,
-    isTagNameComponentOrFragment: vrdom_isTagNameComponentOrFragment,
+    createElement: xcreateElement,
 
     Fragment: 69
 }

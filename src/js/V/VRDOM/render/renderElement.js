@@ -17,10 +17,6 @@
  *
  */
 
-import VRNode from "../VRNode"
-import type {VRenderProps} from "../types/types"
-import vrdom_append from "../append"
-
 const SVG_W3 = "http://www.w3.org/2000/svg"
 const XML_NAMESPACES = new Map([
     ["svg", SVG_W3],
@@ -42,90 +38,90 @@ export function initElement($el: HTMLElement) {
     }
 }
 
-const renderElement = (node: VRNode, props: VRenderProps = {}): HTMLElement => {
-    let $el: HTMLElement
+// const renderElement = (node: VRNode, props: VRenderProps = {}): HTMLElement => {
+//     let $el: HTMLElement
+//
+//     let xmlns = props.xmlns
+//
+//     if (node.attrs.xmlns) {
+//         xmlns = node.attrs.xmlns
+//         $el = document.createElementNS(xmlns, node.tagName)
+//     } else if (XML_NAMESPACES.has(node.tagName)) {
+//         xmlns = XML_NAMESPACES.get(node.tagName)
+//         $el = document.createElementNS(xmlns || "http://www.w3.org/2000/html", node.tagName)
+//     } else if (xmlns) {
+//         $el = document.createElementNS(xmlns, node.tagName)
+//     } else {
+//         $el = document.createElement(node.tagName)
+//     }
+//
+//     initElement($el)
+//
+//     if (node.dangerouslySetInnerHTML !== false) {
+//         if (Array.isArray(node.children)) {
+//             if (node.children.length > 0) {
+//                 console.error(node)
+//                 throw new Error("Element with `dangerouslySetInnerHTML` must not have children.")
+//             }
+//         } else if (node.children) {
+//             console.error(node)
+//             throw new Error("Element with `dangerouslySetInnerHTML` must not have children.")
+//         }
+//
+//         $el.innerHTML = node.dangerouslySetInnerHTML
+//     }
+//
+//     if (node.ref) {
+//         if (node.ref.__ref || node.ref.__fragment_ref) {
+//             node.ref.$el = $el
+//         }
+//     }
+//
+//     if (node.key) {
+//         $el.dataset.vKey = node.key;
+//     }
+//
+//     if ($el instanceof HTMLInputElement) {
+//         for (let [k, v] of Object.entries(node.attrs)) {
+//             if (
+//                 k === "checked" ||
+//                 k === "value"
+//             ) {
+//                 $el[k] = v;
+//                 delete node.attrs[k];
+//             } else if (v || v === 0) {
+//                 $el.setAttribute(k, v);
+//             }
+//         }
+//     } else {
+//         for (let [k, v] of Object.entries(node.attrs)) {
+//             if (v || v === 0) {
+//                 $el.setAttribute(k, v)
+//             }
+//         }
+//     }
+//
+//     for (let [k, v] of Object.entries(node.style)) {
+//         if (v) {
+//             $el.style.setProperty(k, v)
+//             $el.__v.patched_styles.add(k)
+//         }
+//     }
+//
+//     for (const [k, v] of Object.entries(node.events)) {
+//         $el[`on${k}`] = v
+//         $el.__v.patched_events.add(k)
+//     }
+//
+//     for (let child of node.children) {
+//         if (!child) {
+//             vrdom_append("", $el, {xmlns})
+//         } else {
+//             vrdom_append(child, $el, {xmlns, $parent: $el})
+//         }
+//     }
+//
+//     return $el
+// }
 
-    let xmlns = props.xmlns
-
-    if (node.attrs.xmlns) {
-        xmlns = node.attrs.xmlns
-        $el = document.createElementNS(xmlns, node.tagName)
-    } else if (XML_NAMESPACES.has(node.tagName)) {
-        xmlns = XML_NAMESPACES.get(node.tagName)
-        $el = document.createElementNS(xmlns || "http://www.w3.org/2000/html", node.tagName)
-    } else if (xmlns) {
-        $el = document.createElementNS(xmlns, node.tagName)
-    } else {
-        $el = document.createElement(node.tagName)
-    }
-
-    initElement($el)
-
-    if (node.dangerouslySetInnerHTML !== false) {
-        if (Array.isArray(node.children)) {
-            if (node.children.length > 0) {
-                console.error(node)
-                throw new Error("Element with `dangerouslySetInnerHTML` must not have children.")
-            }
-        } else if (node.children) {
-            console.error(node)
-            throw new Error("Element with `dangerouslySetInnerHTML` must not have children.")
-        }
-
-        $el.innerHTML = node.dangerouslySetInnerHTML
-    }
-
-    if (node.ref) {
-        if (node.ref.__ref || node.ref.__fragment_ref) {
-            node.ref.$el = $el
-        }
-    }
-
-    if (node.key) {
-        $el.dataset.vKey = node.key;
-    }
-
-    if ($el instanceof HTMLInputElement) {
-        for (let [k, v] of Object.entries(node.attrs)) {
-            if (
-                k === "checked" ||
-                k === "value"
-            ) {
-                $el[k] = v;
-                delete node.attrs[k];
-            } else if (v || v === 0) {
-                $el.setAttribute(k, v);
-            }
-        }
-    } else {
-        for (let [k, v] of Object.entries(node.attrs)) {
-            if (v || v === 0) {
-                $el.setAttribute(k, v)
-            }
-        }
-    }
-
-    for (let [k, v] of Object.entries(node.style)) {
-        if (v) {
-            $el.style.setProperty(k, v)
-            $el.__v.patched_styles.add(k)
-        }
-    }
-
-    for (const [k, v] of Object.entries(node.events)) {
-        $el[`on${k}`] = v
-        $el.__v.patched_events.add(k)
-    }
-
-    for (let child of node.children) {
-        if (!child) {
-            vrdom_append("", $el, {xmlns})
-        } else {
-            vrdom_append(child, $el, {xmlns, $parent: $el})
-        }
-    }
-
-    return $el
-}
-
-export default renderElement
+// export default renderElement

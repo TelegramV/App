@@ -18,10 +18,8 @@
  */
 
 import type {Ref, VRAttrs, VREvents, VRNodeProps, VRTagName} from "./types/types"
-import List from "./list/List"
 
 class VRNode {
-
     tagName: VRTagName
 
     attrs: VRAttrs = {}
@@ -33,7 +31,7 @@ class VRNode {
     dangerouslySetInnerHTML: any | boolean = false
     doNotTouchMyChildren: any | boolean = false
     component = undefined
-    list: List = undefined
+    list = undefined
 
     key: string
 

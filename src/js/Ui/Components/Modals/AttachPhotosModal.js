@@ -77,7 +77,7 @@ class GalleryFragment extends StatelessComponent {
 }
 
 export class AttachPhotosModal extends StatefulComponent {
-    captionRef = VComponent.createFragmentRef()
+    captionRef = VComponent.createRef()
     galleryRef = VComponent.createComponentRef()
     headerRef = VComponent.createComponentRef()
 

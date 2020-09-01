@@ -17,83 +17,71 @@
  *
  */
 
-import vrdom_mount from "../mount"
-import VRNode from "../VRNode"
-import patchVRNodeNull from "./patchNull"
-import patchNodeText from "./patchText"
-import VListVRNode from "../list/VListVRNode"
-import patchList from "./patchList"
-import vrdom_deleteInner from "../deleteInner"
-import patch_Text_VRNode from "./patch_Text_VRNode"
-import patch_Node_VRNode from "./patch_Node_VRNode"
-import {initElement} from "../render/renderElement"
-import cleanDOMElement from "../cleanDOMElement"
-import ComponentVRNode from "../component/ComponentVRNode"
-import patchComponentVRNode from "./patchAbstractComponentNRNode"
-import {__component_unmount} from "../component/__component_unmount"
+import diff from "../xpatch/xdiff"
 
 /**
  * @param $node
- * @param vRNode
+ * @param vNode
  * @param options
  */
-const vrdom_patch = ($node, vRNode: VRNode | ComponentVRNode, options = {}): Node => {
-    if ($node === undefined) {
-        console.error("BUG: `undefined` was passed as $node ")
-        return $node
-    }
-    
-    initElement($node)
-
-    if (vRNode instanceof VRNode) {
-        if ($node instanceof Text) {
-            return patch_Text_VRNode($node, vRNode, options)
-        }
-
-        return patch_Node_VRNode($node, vRNode, options)
-
-    } else if (vRNode instanceof ComponentVRNode) {
-        // console.log("[patch] VComponent")
-
-        return patchComponentVRNode($node, vRNode, options)
-
-    } else if (vRNode instanceof VListVRNode) {
-        // console.log("[patch] List")
-
-        return patchList($node, vRNode, options)
-
-    } else if (vRNode === undefined) {
-        // console.log("[patch] undefined")
-
-        return patchVRNodeNull($node, options)
-
-    } else if (vRNode === null) {
-        // console.log("[patch] null")
-
-        return patchVRNodeNull($node, options)
-
-    } else if (!vRNode) {
-        // console.log("[patch] false")
-
-        return patchVRNodeNull($node, options)
-
-    } else {
-        // console.log("[patch] unexpected", $node, vRNode)
-
-        if ($node.__v && $node.__v.component) {
-            __component_unmount($node.__v.component)
-        }
-
-        if ($node instanceof Text) {
-            return patchNodeText($node, vRNode, options)
-        }
-
-        vrdom_deleteInner($node)
-        cleanDOMElement($node, true)
-
-        return vrdom_mount(vRNode, $node, options)
-
-    }
+const vrdom_patch = ($node, vNode, options = {}): Node => {
+    return diff($node, vNode, false, options)($node);
+    // if ($node === undefined) {
+    //     console.error("BUG: `undefined` was passed as $node ")
+    //     return $node
+    // }
+    //
+    // initElement($node)
+    //
+    // if (vRNode instanceof VRNode) {
+    //     if ($node instanceof Text) {
+    //         return patch_Text_VRNode($node, vRNode, options)
+    //     }
+    //
+    //     return patch_Node_VRNode($node, vRNode, options)
+    //
+    // } else if (vRNode instanceof ComponentVRNode) {
+    //     // console.log("[patch] VComponent")
+    //
+    //     return patchComponentVRNode($node, vRNode, options)
+    //
+    // } else if (vRNode instanceof VListVRNode) {
+    //     // console.log("[patch] List")
+    //
+    //     return patchList($node, vRNode, options)
+    //
+    // } else if (vRNode === undefined) {
+    //     // console.log("[patch] undefined")
+    //
+    //     return patchVRNodeNull($node, options)
+    //
+    // } else if (vRNode === null) {
+    //     // console.log("[patch] null")
+    //
+    //     return patchVRNodeNull($node, options)
+    //
+    // } else if (!vRNode) {
+    //     // console.log("[patch] false")
+    //
+    //     return patchVRNodeNull($node, options)
+    //
+    // } else {
+    //     // console.log("[patch] unexpected", $node, vRNode)
+    //
+    //     if ($node.__v && $node.__v.component) {
+    //         __component_unmount($node.__v.component)
+    //     }
+    //
+    //     if ($node instanceof Text) {
+    //         return patchNodeText($node, vRNode, options)
+    //     }
+    //
+    //     vrdom_deleteInner($node)
+    //     cleanDOMElement($node, true)
+    //
+    //     return vrdom_mount(vRNode, $node, options)
+    //
+    // }
 }
 
 export default vrdom_patch

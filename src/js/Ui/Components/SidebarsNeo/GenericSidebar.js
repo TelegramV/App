@@ -4,7 +4,6 @@ import FloatingActionButton from "./Fragments/FloatingActionButton";
 import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent";
 import classIf from "../../../V/VRDOM/jsx/helpers/classIf";
 import UIEvents from "../../EventBus/UIEvents";
-import VSimpleLazyInput from "../../Elements/Input/VSimpleLazyInput";
 import VComponent from "../../../V/VRDOM/component/VComponent";
 import Search from "./Fragments/Search";
 
@@ -13,7 +12,7 @@ export class GenericSidebar extends TranslatableStatefulComponent {
 
     init() {
         super.init()
-        if(this.state.hidden == null) {
+        if (this.state.hidden == null) {
             this.state.hidden = true
             this.state.fadeOut = false
             this.state.reallyHidden = true
@@ -31,7 +30,9 @@ export class GenericSidebar extends TranslatableStatefulComponent {
             <div className={this.classes} onAnimationEnd={this.onTransitionEnd}>
                 {this.header()}
                 {this.content()}
-                {nodeIf(<FloatingActionButton icon={this.floatingActionButtonIcon} hidden={this.isFloatingActionButtonHidden} onClick={this.onFloatingActionButtonPressed}/>, !!this.floatingActionButtonIcon)}
+                {nodeIf(<FloatingActionButton icon={this.floatingActionButtonIcon}
+                                              hidden={this.isFloatingActionButtonHidden}
+                                              onClick={this.onFloatingActionButtonPressed}/>, !!this.floatingActionButtonIcon)}
             </div>
         )
     }
@@ -41,10 +42,13 @@ export class GenericSidebar extends TranslatableStatefulComponent {
             header: true,
             border: this.headerBorder
         }}>
-            {nodeIf(<i className={"btn-icon rp rps tgico-" + this.leftButtonIcon} onClick={this.onLeftButtonPressed}/>, this.leftButtonIcon)}
+            {nodeIf(<i className={"btn-icon rp rps tgico-" + this.leftButtonIcon}
+                       onClick={this.onLeftButtonPressed}/>, this.leftButtonIcon)}
             {nodeIf(<div className="title">{this.title}</div>, !this.isSearchAsTitle)}
             {nodeIf(<div className="title search">
-                <Search placeholder={this.searchPlaceholder} r={this.searchInputRef} onInput={this.onSearchInputUpdated} onFocus={this.onSearchInputFocus} lazyLevel={this.searchLazyLevel} value={this.state.inputValue}/>
+                <Search placeholder={this.searchPlaceholder} r={this.searchInputRef} onInput={this.onSearchInputUpdated}
+                        onFocus={this.onSearchInputFocus} lazyLevel={this.searchLazyLevel}
+                        value={this.state.inputValue}/>
                 {/*<div className="input-search">*/}
                 {/*    <VSimpleLazyInput type="text" placeholder="Search"*/}
                 {/*                      ref={this.searchInputRef}*/}
@@ -61,20 +65,20 @@ export class GenericSidebar extends TranslatableStatefulComponent {
     }
 
     onTransitionEnd = (ev) => {
-        if(ev.animationName === "fade-in") {
+        if (ev.animationName === "fade-in") {
             this.setState({
                 fadeIn: false
             })
             return
         }
 
-        if(ev.animationName === "unhidden") {
+        if (ev.animationName === "unhidden") {
             this.setState({
                 unhidden: false
             })
             return
         }
-        if((this.state.hidden || this.state.fadeOut) && !this.state.reallyHidden) {
+        if ((this.state.hidden || this.state.fadeOut) && !this.state.reallyHidden) {
             this.reallyHidden = true
         }
     }
@@ -92,7 +96,7 @@ export class GenericSidebar extends TranslatableStatefulComponent {
     }
 
     onHide() {
-        
+
     }
 
     fadeOut() {
@@ -106,6 +110,7 @@ export class GenericSidebar extends TranslatableStatefulComponent {
 
         // this.withTimeout(_ => {
 
+        console.log(this)
 
 
         this.setState({
@@ -115,7 +120,7 @@ export class GenericSidebar extends TranslatableStatefulComponent {
             fadeOut: false
         })
 
-        if(!this.state.fadeOut) {
+        if (!this.state.fadeOut) {
             this.onShown(params)
         }
 
@@ -182,7 +187,7 @@ export class GenericSidebar extends TranslatableStatefulComponent {
      * @return {string|null}
      */
     get floatingActionButtonIcon() {
-       return null
+        return null
     }
 
 

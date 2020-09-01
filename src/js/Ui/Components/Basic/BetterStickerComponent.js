@@ -22,7 +22,6 @@ import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
 import {FileAPI} from "../../../Api/Files/FileAPI"
 import FileManager from "../../../Api/Files/FileManager"
 import AppEvents from "../../../Api/EventBus/AppEvents"
-import {isBullshitBrowser} from "../../Utils/utils"
 import WebpHelper from "../../Utils/WebpHelper"
 
 // probably patch-compatible
@@ -55,34 +54,45 @@ class BetterStickerComponent extends StatefulComponent {
         const height = props.height || (sizeAttr ? sizeAttr.h / sizeAttr.w * width : width);
 
 
-        if ((!state.thumbUrl || state.showAnimation) && state.isAnimated) {
-            const options = {
-                path: state.animationDataUrl,
-                loop: props.loop ?? false,
-                autoplay: props.autoplay ?? false,
-                // rendererSettings: {
-                // preserveAspectRatio: "xMinYMin slice", // Supports the same options as the svg element's preserveAspectRatio property
-                // clearCanvas: false,
-                // progressiveLoad: true, // Boolean, only svg renderer, loads dom elements when needed. Might speed up initialization for large number of elements.
-                // hideOnTransparent: true, //Boolean, only svg renderer, hides elements when opacity reaches 0 (defaults to true)
-                // className: "lottie-svg"
-                // }
-            };
+        const anima = (!state.thumbUrl || state.showAnimation) && state.isAnimated;
+        const options = {
+            path: state.animationDataUrl,
+            loop: props.loop ?? false,
+            autoplay: props.autoplay ?? false,
+            // rendererSettings: {
+            // preserveAspectRatio: "xMinYMin slice", // Supports the same options as the svg element's preserveAspectRatio property
+            // clearCanvas: false,
+            // progressiveLoad: true, // Boolean, only svg renderer, loads dom elements when needed. Might speed up initialization for large number of elements.
+            // hideOnTransparent: true, //Boolean, only svg renderer, hides elements when opacity reaches 0 (defaults to true)
+            // className: "lottie-svg"
+            // }
+        };
 
-            const playOnHover = props.playOnHover ?? true;
-            const isPaused = props.paused ?? true;
+        const playOnHover = props.playOnHover ?? true;
+        const isPaused = props.paused ?? true;
 
-            const classes = {
-                sticker: true,
-                rp: true,
-                rps: true,
-                clickable: props.clickable
-            }
+        const classes = {
+            // sticker: true,
+            rp: true,
+            rps: true,
+            clickable: props.clickable
+        }
 
-            return (
-                <div id={props.id}
-                     class={classes}
-                     onClick={props.onClick}>
+        return (
+            <div id={props.id}
+                 class={classes}
+                 onClick={props.onClick}
+                 onMouseOver={this.onMouseOver}>
+
+                <img className="loading"
+                     src={state.url || state.thumbUrl}
+                     css-width={`${width}px`}
+                     css-height={`${height}px`}
+                     css-display={anima && "none"}
+                     alt="Sticker"/>
+
+                {
+                    anima &&
                     <Lottie width={width}
                             height={height}
                             options={options}
@@ -95,22 +105,9 @@ class BetterStickerComponent extends StatefulComponent {
                                 }
                             ]}
                     />
-                </div>
-            )
-        } else {
-            return (
-                <div id={props.id}
-                     class="sticker"
-                     onClick={props.onClick}
-                     onMouseOver={this.onMouseOver}>
-                    <img class="loading"
-                         src={state.url || state.thumbUrl}
-                         css-width={`${width}px`}
-                         css-height={`${height}px`}
-                         alt="Sticker"/>
-                </div>
-            )
-        }
+                }
+            </div>
+        )
     }
 
     componentWillMount({document, isFull}) {
@@ -157,6 +154,10 @@ class BetterStickerComponent extends StatefulComponent {
                 showAnimation: true,
             });
         }
+
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 1);
     }
 
     onAnimationStop = () => {
@@ -189,13 +190,13 @@ class BetterStickerComponent extends StatefulComponent {
                 });
             });
         } else {
-            if(WebpHelper.shouldConvert()) {
+            if (WebpHelper.shouldConvert()) {
                 WebpHelper.convertToPng(event.blob).then(url => {
                     this.setState({
                         url: url,
                         isDownloading: false,
                     })
-                })   
+                })
             } else {
                 this.setState({
                     url: event.url,
@@ -206,7 +207,7 @@ class BetterStickerComponent extends StatefulComponent {
     }
 
     onAnimatedThumbDownloadDone = (event) => {
-        if(WebpHelper.shouldConvert()) {
+        if (WebpHelper.shouldConvert()) {
             WebpHelper.convertToPng(event.blob).then(url => {
                 this.setState({
                     thumbUrl: url

@@ -20,8 +20,6 @@
 import StatelessComponent from "../../../../../V/VRDOM/component/StatelessComponent"
 import API from "../../../../../Api/Telegram/API"
 import StickerSet from "../../../../../Api/Stickers/StickerSet"
-import VRDOM from "../../../../../V/VRDOM/VRDOM"
-import VApp from "../../../../../V/vapp"
 import Lottie from "../../../../Lottie/Lottie"
 import VComponent from "../../../../../V/VRDOM/component/VComponent"
 import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
@@ -33,6 +31,8 @@ import SharedState from "../../../../../V/VRDOM/component/SharedState"
 import StickersState from "../../../../SharedStates/StickersState"
 import UpdatesManager from "../../../../../Api/Updates/UpdatesManager"
 import WebpHelper from "../../../../Utils/WebpHelper"
+import vrdom_append from "../../../../../V/VRDOM/append"
+import vrdom_prepend from "../../../../../V/VRDOM/prepend"
 
 class FavedState extends SharedState {
     isRefreshing = false;
@@ -166,7 +166,7 @@ class StickerSetThumb extends StatefulComponent {
 
     componentDidMount() {
         this.assure(this.props.set.fetchThumb()).then(() => {
-            if(WebpHelper.shouldConvert()) {
+            if (WebpHelper.shouldConvert()) {
                 fetch(this.props.set.thumbUrl).then(blob => {
                     return WebpHelper.convertToPng(blob);
                 }).then(url => {
@@ -245,7 +245,7 @@ class StickersComposerComponent extends StatelessComponent {
                 const $el = document.getElementById("composer-sticker-pack-recent");
 
                 RecentStickers.stickers.slice(0, 50).forEach(Document => {
-                    VRDOM.append(
+                    vrdom_append(
                         <BetterStickerComponent id={`composer-sticker-recent-${Document.id}`}
                                                 width={75}
                                                 document={Document}
@@ -270,7 +270,7 @@ class StickersComposerComponent extends StatelessComponent {
         if ($stickerOnRecent) {
             $recent.prepend($stickerOnRecent);
         } else {
-            VRDOM.prepend(
+            vrdom_prepend(
                 <BetterStickerComponent id={`composer-sticker-recent-${Document.id}`}
                                         width={75}
                                         document={Document}
@@ -308,14 +308,14 @@ class StickersComposerComponent extends StatelessComponent {
         let $el = document.getElementById(`composer-sticker-pack-${id}`);
 
         if (!$el) {
-            $el = VRDOM.append(
+            $el = vrdom_append(
                 <div id={`composer-sticker-pack-${id}`} className="selected scrollable"/>,
                 this.stickersTableRef.$el
             );
 
             stickerSet.getStickerSet().then(StickerSet => {
                 StickerSet.documents.forEach(Document => {
-                    VRDOM.append(
+                    vrdom_append(
                         <BetterStickerComponent
                             onClick={() => this.sendSticker(Document)}
                             width={75}

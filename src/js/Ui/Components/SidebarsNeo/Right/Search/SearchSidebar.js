@@ -6,17 +6,12 @@ import {highlightVRNodeWord} from "../../../../Utils/highlightVRNodeText";
 import UIEvents from "../../../../EventBus/UIEvents";
 import VComponent from "../../../../../V/VRDOM/component/VComponent";
 import VArray from "../../../../../V/VRDOM/list/VArray";
-import List from "../../../../../V/VRDOM/list/List";
 import {Section} from "../../Fragments/Section";
 import SearchManager from "../../../../../Api/Search/SearchManager";
 import AppSelectedChat from "../../../../Reactive/SelectedChat";
 import {SearchMessage} from "../../../../../Api/Messages/SearchMessage";
-import VSimpleLazyInput from "../../../../Elements/Input/VSimpleLazyInput";
-import VCalendar from "../../../../Elements/VCalendar";
-import Footer from "../../Fragments/Footer";
 import VUI from "../../../../VUI";
 import {SearchDateModal} from "./SearchDateModal";
-import classIf from "../../../../../V/VRDOM/jsx/helpers/classIf";
 
 let CURRENT_QUERY = undefined
 
@@ -48,8 +43,7 @@ const MessagesCountFragment = ({count}) => {
 }
 
 export class SearchSidebar extends RightSidebar {
-    messagesCountRef = VComponent.createFragmentRef()
-    footerRef = VComponent.createFragmentRef()
+    messagesCountRef = VComponent.createRef()
 
     offsetId = 0
     allFetched = false
@@ -72,9 +66,9 @@ export class SearchSidebar extends RightSidebar {
     content(): * {
         return <this.contentWrapper onScroll={this.onScroll}>
             <Section title={<MessagesCountFragment ref={this.messagesCountRef} count={this.state.messagesCount}/>}>
-                <List list={this.state.messages}
-                      template={MessageFragmentItemTemplate}
-                      wrapper={<div/>}/>
+                {/*<List list={this.state.messages}*/}
+                {/*      template={MessageFragmentItemTemplate}*/}
+                {/*      wrapper={<div/>}/>*/}
             </Section>
             {/*<Footer ref={this.footerRef} left={<div className={["btn-icon rp rps tgico-calendar", classIf(this.searchInputRef?.component?.$el.value.length > 0, "hidden")]} onClick={this.onSelectDate}/>}*/}
 
@@ -108,9 +102,9 @@ export class SearchSidebar extends RightSidebar {
 
         this.state.messages.set([])
         this.state.messagesCount = -2
-        this.messagesCountRef.patch({
-            count: this.state.messagesCount
-        })
+        // this.messagesCountRef.patch({
+        //     count: this.state.messagesCount
+        // })
 
         UIEvents.Sidebars.fire("pop", this)
     }
@@ -152,9 +146,9 @@ export class SearchSidebar extends RightSidebar {
 
             CURRENT_QUERY = undefined
             this.state.messagesCount = -2
-            this.messagesCountRef.patch({
-                count: this.state.messagesCount
-            })
+            // this.messagesCountRef.patch({
+            //     count: this.state.messagesCount
+            // })
             this.state.messages.clear()
         } else if (q !== CURRENT_QUERY) {
             this.state.messages.clear()
@@ -165,9 +159,9 @@ export class SearchSidebar extends RightSidebar {
             this.isFetching = true
 
             if (!this.allFetched) {
-                this.messagesCountRef.patch({
-                    count: -1
-                })
+                // this.messagesCountRef.patch({
+                //     count: -1
+                // })
 
                 SearchManager.searchMessages(AppSelectedChat.Current, {
                     q,
@@ -179,9 +173,9 @@ export class SearchSidebar extends RightSidebar {
 
                         this.state.messages.set(Messages.messages.map(m => new SearchMessage(AppSelectedChat.Current).fillRaw(m)))
                         this.state.messagesCount = Messages.count || Messages.current_count
-                        this.messagesCountRef.patch({
-                            count: this.state.messagesCount
-                        })
+                        // this.messagesCountRef.patch({
+                        //     count: this.state.messagesCount
+                        // })
 
                         if (Messages.current_count > 0) {
                             this.offsetId = Messages.messages[Messages.messages.length - 1].id

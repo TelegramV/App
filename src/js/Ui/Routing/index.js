@@ -17,6 +17,7 @@ import LoginPage from "../Pages/Login/LoginPage";
 //import ElementsPage from "../Pages/Tests/Elements"
 //import CanvasTestPage from "../Pages/Tests/CanvasTest"
 import RadioButtonPage from "../Pages/Tests/Radio"
+import {XDiffPage} from "../Pages/Tests/XDiffPage"
 
 /**
  * @param {VFrameworkRouter} router
@@ -31,6 +32,12 @@ function AppRoutes(router) {
     router.route("/", "main", {
         h() {
             return MainPage()
+        }
+    })
+
+    router.route("/xdiff", "main", {
+        h() {
+            return XDiffPage()
         }
     })
 

@@ -80,10 +80,6 @@ export class DialogsSidebar extends LeftSidebar {
 
     searchOpen = false
 
-    init() {
-        // FoldersManager.fetchFolders()
-    }
-
     onFloatingActionButtonPressed = (event) => {
         VUI.ContextMenu.openAbove([
             {
@@ -109,8 +105,6 @@ export class DialogsSidebar extends LeftSidebar {
             <ConnectionStatusComponent/>
 
             <Folders/>
-
-
 
             <div style={{
                 "height": "100%",
@@ -152,7 +146,7 @@ export class DialogsSidebar extends LeftSidebar {
         super.appEvents(E)
 
         E.bus(AppEvents.Dialogs)
-             .on("gotMany", this.onDialogsGotMany)
+            .on("gotMany", this.onDialogsGotMany)
 
         // E.bus(AppEvents.General)
         //     .on("selectFolder", this.onFolderSelect)

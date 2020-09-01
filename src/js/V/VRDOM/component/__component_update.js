@@ -17,130 +17,96 @@
  *
  */
 
-import __component_diffProps from "./__component_diffProps"
-import __diffObjects from "./__diffObjects"
-import __component_render from "./__component_render"
-import vrdom_patch from "../patch/patch"
-import __component_withDefaultProps from "./__component_withDefaultProps"
-import __component_recreateReactiveObjects from "./__component_recreateReactiveObjects"
-import patchElement from "../patch/patchElement"
+// const patch = component => () => component.__patch();
 
-const patch = component =>
-    // throttle(
-    () => {
-        if (component.__.mounted) {
-            component.__.isUpdatingItSelf = true;
-            component.$el = vrdom_patch(component.$el, __component_render(component))
-            component.__.isUpdatingItSelf = false;
+export const __component_update_props = (component, nextProps) => {
+    throw new Error("props")
+    // if (nextProps) {
+    //     nextProps = __component_withDefaultProps(component, nextProps);
+    //
+    //     let shouldUpdate = component.shouldComponentUpdate(nextProps, component.state);
+    //
+    //     if (shouldUpdate === undefined) {
+    //         const diffProps = __component_diffProps(component, nextProps);
+    //         shouldUpdate = diffProps !== false;
+    //     }
+    //
+    //     if (shouldUpdate) {
+    //         component.componentWillUpdate(nextProps, component.state);
+    //
+    //         if (component.__.stateful) {
+    //             const derivedState = component.constructor.getDerivedStateFromProps(nextProps, component.state);
+    //
+    //             if (derivedState) {
+    //                 if (derivedState.__state_shared) {
+    //                     throw new Error("shared state cannot be used with getDerivedStateFromProps")
+    //                 } else {
+    //                     Object.assign(component.state, derivedState);
+    //                 }
+    //             }
+    //         }
+    //
+    //         Object.assign(component.props, nextProps);
+    //
+    //         __component_recreateReactiveObjects(component);
+    //
+    //         patch(component)();
+    //
+    //         component.componentDidUpdate();
+    //     }
+    // }
+};
 
-            component.componentDidUpdate();
-        }
-    }
-
-// , 100, component);
-
-export function __component_update_props(component, nextProps) {
-    if (nextProps) {
-        nextProps = __component_withDefaultProps(component, nextProps);
-
-        let shouldUpdate = component.shouldComponentUpdate(nextProps, component.state);
-
-        if (shouldUpdate === undefined) {
-            const diffProps = __component_diffProps(component, nextProps);
-            shouldUpdate = diffProps !== false;
-        }
-
-        if (shouldUpdate) {
-            component.componentWillUpdate(nextProps, component.state);
-
-            if (component.__.stateful) {
-                const derivedState = component.constructor.getDerivedStateFromProps(nextProps, component.state);
-
-                if (derivedState) {
-                    if (derivedState.__state_shared) {
-                        throw new Error("shared state cannot be used with getDerivedStateFromProps")
-                    } else {
-                        Object.assign(component.state, derivedState);
-                    }
-                }
-            }
-
-            Object.assign(component.props, nextProps);
-
-            __component_recreateReactiveObjects(component);
-
-            patch(component)();
-        }
-    }
-}
-
-export function __component_update_state(component, nextState) {
-    if (nextState) {
-        let shouldUpdate = component.shouldComponentUpdate(component.props, nextState);
-
-        if (shouldUpdate === undefined) {
-            const diffState = __diffObjects(component.state, nextState);
-            shouldUpdate = diffState !== false;
-        }
-
-        if (shouldUpdate) {
-            component.componentWillUpdate(component.props, nextState);
-
-            Object.assign(component.state, nextState);
-
-            __component_recreateReactiveObjects(component);
-
-            patch(component)();
-        }
-    }
-}
+// export function __component_update_state(component, nextState) {
+//     if (nextState) {
+//         let shouldUpdate = component.shouldComponentUpdate(component.props, nextState);
+//
+//         if (shouldUpdate === undefined) {
+//             const diffState = __diffObjects(component.state, nextState);
+//             shouldUpdate = diffState !== false;
+//         }
+//
+//         if (shouldUpdate) {
+//             component.componentWillUpdate(component.props, nextState);
+//
+//             Object.assign(component.state, nextState);
+//
+//             __component_recreateReactiveObjects(component);
+//
+//             patch(component)();
+//
+//             component.componentDidUpdate();
+//         }
+//     }
+// }
 
 export function __component_update_shared_state(component, globalState) {
     if (globalState) {
         component.componentWillUpdate(component.props, component.state);
 
-        patch(component)();
+        // patch(component)();
+        component.forceUpdate();
+
+        component.componentDidUpdate();
     }
 }
 
-export function __component_update_custom_state(component, state) {
-    if (state) {
-        component.componentWillUpdate(component.props, component.state);
-
-        if (component.__.mounted) {
-            component.__.isUpdatingItSelf = true;
-            component.$el = vrdom_patch(component.$el, __component_render(component))
-            component.__.isUpdatingItSelf = false;
-
-            component.componentDidUpdate();
-        }
-    }
-}
-
-export function __component_patch(component) {
-    component.__.isUpdatingItSelf = true;
-    component.$el = vrdom_patch(component.$el, __component_render(component))
-    component.__.isUpdatingItSelf = false;
-}
-
-export function __component_just_patch_element(component, $el) {
-    component.$el = patchElement($el || component.$el, __component_render(component))
-}
-
-export function __component_update_force(component, nextProps, nextState) {
-    if (component.__.mounted) {
-        component.componentWillUpdate(nextProps || component.props, nextState || component.state);
-    }
-
-    if (nextProps) {
-        Object.assign(component.props, nextProps);
-    }
-
-    if (nextState) {
-        Object.assign(component.state, nextState);
-    }
-
-    __component_recreateReactiveObjects(component);
-
-    patch(component)();
-}
+// export function __component_update_force(component, nextProps, nextState) {
+//     if (component.__.mounted) {
+//         component.componentWillUpdate(nextProps || component.props, nextState || component.state);
+//     }
+//
+//     if (nextProps) {
+//         Object.assign(component.props, nextProps);
+//     }
+//
+//     if (nextState) {
+//         Object.assign(component.state, nextState);
+//     }
+//
+//     __component_recreateReactiveObjects(component);
+//
+//     patch(component)();
+//
+//     component.componentDidUpdate();
+// }

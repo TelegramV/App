@@ -73,19 +73,20 @@ class FileListFragment extends StatelessComponent {
 }
 
 export class AttachFilesModal extends StatelessComponent {
-    captionRef = VComponent.createFragmentRef()
+    captionRef = VComponent.createRef()
     fileListRef = VComponent.createComponentRef()
     headerRef = VComponent.createComponentRef()
 
     appEvents(E) {
         E.bus(UIEvents.General)
-        .on("upload.addFile", this.addFile)
+            .on("upload.addFile", this.addFile)
     }
 
     render() {
         return <div className="attach-files-modal">
             <div className="padded">
-                <ModalHeaderFragment title="Send Files" ref={this.headerRef} close actionText="Send" action={this.send.bind(this)}/>
+                <ModalHeaderFragment title="Send Files" ref={this.headerRef} close actionText="Send"
+                                     action={this.send.bind(this)}/>
                 <FileListFragment ref={this.fileListRef} blobs={this.props.media}/>
                 <VInput ref={this.captionRef} label="Add a caption..."/>
             </div>
@@ -97,6 +98,7 @@ export class AttachFilesModal extends StatelessComponent {
     }
 
     addFile = ({blob, file}) => {
+        // todo vdom: remove ref
         this.fileListRef.component.addFile({
             blob: blob,
             file: file

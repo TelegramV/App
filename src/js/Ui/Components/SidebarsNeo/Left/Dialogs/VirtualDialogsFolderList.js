@@ -192,7 +192,7 @@ class VirtualDialogsFolderList extends StatefulComponent {
         if (!props.archived && foldersState.current) {
             dialogs = dialogs.filter(folderFilter(foldersState.current));
         }
-        if(!props.archived && foldersState.current == null) {
+        if (!props.archived && foldersState.current == null) {
             dialogs = dialogs.filter(dialog => !dialog.isArchived);
         }
 
@@ -220,7 +220,7 @@ class VirtualDialogsFolderList extends StatefulComponent {
     }
 
     sortWithPinnedOnTop = (folderId = null): Dialog[] => {
-        if(this.props?.archived) {
+        if (this.props?.archived) {
             return DialogsStore.getAllInFolder(1).sort(this.sortWithPinnedOnTopCompareFnGenerator(null));
         } else {
             return DialogsStore.toArray().sort(this.sortWithPinnedOnTopCompareFnGenerator(folderId));

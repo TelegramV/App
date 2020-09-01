@@ -25,6 +25,8 @@ export const DATE_FORMAT = {
 
 export class AbstractMessage extends ReactiveObject implements Message {
 
+    eventBus = AppEvents.Messages;
+
     type = MessageType.UNSUPPORTED;
 
     _dialog: Dialog;

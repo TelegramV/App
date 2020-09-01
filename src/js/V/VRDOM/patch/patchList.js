@@ -17,12 +17,11 @@
  *
  */
 
-import VListVRNode from "../list/VListVRNode"
 import vrdom_render from "../render/render"
 import {initElement} from "../render/renderElement"
 import VApp from "../../vapp"
 
-const patchList = ($node, node: VListVRNode) => {
+const patchList = ($node, listNode) => {
     initElement($node)
 
     if ($node.__v.component) {
@@ -30,21 +29,21 @@ const patchList = ($node, node: VListVRNode) => {
     }
 
     if ($node.__v.list) {
-        if ($node.__v.list.constructor === node.tag) {
+        if ($node.__v.list.constructor === listNode.tag) {
             $node.__v.list.__update({
-                list: node.list,
-                template: node.template,
+                list: listNode.list,
+                template: listNode.template,
             })
         } else {
-            console.error("BUG: unimplemented thing [patchList -> vListVRNode]", $node, node)
+            console.error("BUG: unimplemented thing [patchList -> vListVRNode]", $node, listNode)
         }
 
         return $node
     } else {
-        const list = new (node.tag)({list: node.list, template: node.template})
+        const list = new (listNode.tag)({list: listNode.list, template: listNode.template})
         list.identifier = VApp.uniqueComponentId()
 
-        list.$el = vrdom_render(node.wrapper)
+        list.$el = vrdom_render(listNode.wrapper)
         list.$el.__v.list = list
 
         while ($node.childNodes.length > 0) {

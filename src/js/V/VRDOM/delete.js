@@ -19,7 +19,7 @@
 
 import cleanDOMElement from "./cleanDOMElement"
 
-function deepUnmount($el: HTMLElement) {
+export function deepUnmount($el: HTMLElement) {
     cleanDOMElement($el, true);
 
     for (const $child of $el.childNodes) {

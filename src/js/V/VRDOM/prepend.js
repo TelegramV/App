@@ -17,39 +17,21 @@
  *
  */
 
-import type VRNode from "./VRNode"
-import type {VRenderProps} from "./types/types"
 import vrdom_render from "./render/render"
-import {vrdom_resolveMount} from "./mount"
 
 /**
  * @param node
  * @param $el
  * @param props
  */
-function vrdom_prepend(node: VRNode, $el: Element, props?: VRenderProps): Element | HTMLElement {
+function vrdom_prepend(node , $el: Element, props): Element | HTMLElement {
     const $node = vrdom_render(node, props)
 
     $el.prepend($node)
 
-    vrdom_resolveMount($node)
+    // vrdom_resolveMount($node)
 
     return $node
-}
-
-/**
- * @param $nodes
- * @param $el
- * @param props
- */
-export function vrdom_prependRealMany($nodes: Node[], $el: Element, props?: VRenderProps): Element | HTMLElement {
-    $el.prepend(...$nodes.reverse());
-
-    $nodes.forEach($node => {
-        vrdom_resolveMount($node);
-    });
-
-    return $nodes;
 }
 
 export default vrdom_prepend

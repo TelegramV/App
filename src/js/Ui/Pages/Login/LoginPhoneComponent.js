@@ -48,7 +48,6 @@ class LoginPhoneComponent extends StatefulComponent {
     }
 
     countryDropdownRef: { component: VInputDropdown } = VComponent.createComponentRef();
-    phoneRef = VComponent.createFragmentRef();
 
     countryTemplate = country => {
         return <CountryDropdownItemFragment {...country} onMouseDown={() => this.onCountryClick(country)}/>
@@ -87,7 +86,7 @@ class LoginPhoneComponent extends StatefulComponent {
                 {false /*remove to enable*/ && <VButton isUppercase={false} onClick={event => {
                     event.preventDefault();
                     loginState.setBotView();
-                }} isFlat>Beep-boop, I am bot</VButton> }
+                }} isFlat>Beep-boop, I am bot</VButton>}
 
                 <form onSubmit={canSubmit && this.onSendPhoneClick} className="login-page-inputs">
                     <VInputDropdown label="Country"
@@ -103,8 +102,7 @@ class LoginPhoneComponent extends StatefulComponent {
                                     value={phone}
                                     error={phoneError}
                                     maxLength={24}
-                                    filter={this.filterPhone}
-                                    ref={this.phoneRef}/>
+                                    filter={this.filterPhone}/>
 
                     <VCheckbox label="Keep me signed in"
                                checked={keepMeSignedIn}
@@ -233,7 +231,7 @@ class LoginPhoneComponent extends StatefulComponent {
         const code = country.code.substring(1).replace(/\s/, "")
         country = country.name;
 
-        if(code.startsWith(input) || code.startsWith(input.substring(1))) {
+        if (code.startsWith(input) || code.startsWith(input.substring(1))) {
             return true
         }
 
@@ -265,7 +263,7 @@ class LoginPhoneComponent extends StatefulComponent {
     onSettingsReady = () => {
         const country = Settings.get("nearest_dc.country")?.toLowerCase();
         const item = loginState.countries.items.find(item => item.short_code === country);
-        if(item && !loginState.country) {
+        if (item && !loginState.country) {
             this.countryDropdownRef.component.setCurrent(item);
             this.setGlobalState({
                 login: {

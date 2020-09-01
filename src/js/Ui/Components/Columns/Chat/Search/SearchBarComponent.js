@@ -62,11 +62,15 @@ export class SearchBarComponent extends StatefulComponent {
     }
 
     componentDidMount() {
-        window.visualViewport.addEventListener("resize", this.updateSearchPosition);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener("resize", this.updateSearchPosition);
+        }
     }
 
     componentWillUnmount() {
-        window.visualViewport.removeEventListener("resize", this.updateSearchPosition);
+        if (window.visualViewport) {
+            window.visualViewport.removeEventListener("resize", this.updateSearchPosition);
+        }
     }
 
     onFocus = (ev) => {
@@ -80,11 +84,13 @@ export class SearchBarComponent extends StatefulComponent {
     }
 
     updateSearchPosition = () => {
-        const upper = this.upperRef.$el;
-        const upperHeight = upper.getBoundingClientRect().height;
-        const height = window.visualViewport.height;
-        const top = height-upperHeight;
-        upper.style.transform = `translateY(${-top}px)`;
+        if (window.visualViewport) {
+            const upper = this.upperRef.$el;
+            const upperHeight = upper.getBoundingClientRect().height;
+            const height = window.visualViewport.height;
+            const top = height - upperHeight;
+            upper.style.transform = `translateY(${-top}px)`;
+        }
     }
 
     get counterText() {

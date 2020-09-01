@@ -17,8 +17,7 @@
  *
  */
 
-import VRDOM from "../VRDOM/VRDOM"
-import VRNode from "../VRDOM/VRNode"
+import diff from "../VRDOM/xpatch/xdiff"
 
 /**
  * WARNING: legacy code
@@ -94,14 +93,7 @@ class VFrameworkRouter {
                     this.activeRoute.queryParams = newQueryParams
                     h(newQueryParams)
                 })
-                // }
             } else {
-                // console.log("[router] triggering replace")
-                // todo: patch tree not delete it
-                // VF.mountedComponents.forEach(c => {
-                //     VRDOM.delete(c.$el)
-                // })
-
                 this.renderActive()
             }
         })
@@ -144,10 +136,11 @@ class VFrameworkRouter {
             // console.log("[router] rendering new")
             const vNode = route.page.h()
 
-            if (vNode instanceof VRNode) {
-                VRDOM.patch(this.$mountElement, vNode, {
-                    touchAll: true
-                })
+            if (vNode) {
+                diff(this.$mountElement, vNode)(this.$mountElement);
+                // VRDOM.patch(this.$mountElement, vNode, {
+                //     touchAll: true
+                // })
             } else {
                 throw new Error("page first parent cannot be component for some reason")
             }

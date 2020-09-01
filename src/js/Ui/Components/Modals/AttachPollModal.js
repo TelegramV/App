@@ -20,13 +20,10 @@ import VComponent from "../../../V/VRDOM/component/VComponent";
 import AppSelectedChat from "../../Reactive/SelectedChat";
 import VCheckbox from "../../Elements/Input/VCheckbox";
 import VUI from "../../VUI"
-import TranslatableStatelessComponent from "../../../V/VRDOM/component/TranslatableStatelessComponent"
 import VInput from "../../Elements/Input/VInput"
 import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent";
 import VSlider from "../../Elements/Input/VSlider";
-import {Section} from "../SidebarsNeo/Fragments/Section";
 import nodeIf from "../../../V/VRDOM/jsx/helpers/nodeIf";
-import VRadio from "../../Elements/Input/VRadio";
 import "./AttachPollModal.scss"
 
 class OptionsFragment extends TranslatableStatefulComponent {
@@ -42,7 +39,7 @@ class OptionsFragment extends TranslatableStatefulComponent {
     }
 
     render() {
-        if(this.state.options[this.state.options.length - 1].length > 0 && this.state.options.length < 10) {
+        if (this.state.options[this.state.options.length - 1].length > 0 && this.state.options.length < 10) {
             this.state.options.push("")
         }
         this.refs = [];
@@ -52,13 +49,13 @@ class OptionsFragment extends TranslatableStatefulComponent {
     }
 
     createOption(option, i) {
-        const inputRef = TranslatableStatefulComponent.createFragmentRef();
+        const inputRef = TranslatableStatefulComponent.createRef();
         this.refs[i] = inputRef;
         return <div class="option">
             {nodeIf(<VCheckbox checked={i === this.state.selected} onClick={_ => this.select(i)}/>, this.props.quiz)}
-            <VInput label={this.l("lng_polls_create_option_add")} 
-                    filledText={`Option ${i + 1}`} 
-                    onInput={ev => this.checkInput(i, ev)} 
+            <VInput label={this.l("lng_polls_create_option_add")}
+                    filledText={`Option ${i + 1}`}
+                    onInput={ev => this.checkInput(i, ev)}
                     value={option}
                     width={null}
                     withButton={!!option}
@@ -80,10 +77,10 @@ class OptionsFragment extends TranslatableStatefulComponent {
     }
 
     checkInput = (i, ev) => {
-        if(ev.target.value.length === 0) { // not the best UX, but honest work
+        if (ev.target.value.length === 0) { // not the best UX, but honest work
             this.state.options.splice(i, 1)
             this.forceUpdate()
-            this.focus(i-1);
+            this.focus(i - 1);
             return
         }
         this.state.options[i] = ev.target.value
@@ -92,15 +89,15 @@ class OptionsFragment extends TranslatableStatefulComponent {
     }
 
     onKeyDown = (i, ev) => {
-        if(ev.keyCode == 13) {
-            this.focus(i+1);
+        if (ev.keyCode == 13) {
+            this.focus(i + 1);
             ev.preventDefault();
         }
     }
 
     focus(i) {
         const input = this.refs[i]?.$el?.querySelector("input");
-        if(!input) return;
+        if (!input) return;
         input.focus();
         // DO NOT TOUCH! Focus on the end of input
         const value = input.value;
@@ -114,7 +111,7 @@ class OptionsFragment extends TranslatableStatefulComponent {
 
     getAnswersInput() {
         return this.state.options.map((l, i) => {
-            if(l === "") return null
+            if (l === "") return null
             return {
                 _: "pollAnswer",
                 text: l,
@@ -125,7 +122,6 @@ class OptionsFragment extends TranslatableStatefulComponent {
 }
 
 export class AttachPollModal extends TranslatableStatefulComponent {
-    askQuestionRef = VComponent.createFragmentRef()
     optionsRef = VComponent.createComponentRef()
 
     state = {
@@ -140,10 +136,12 @@ export class AttachPollModal extends TranslatableStatefulComponent {
 
     render() {
         return <div class="polls-modal">
-            <ModalHeaderFragment title={this.l("lng_polls_create_title")} close actionText={this.l("lng_polls_create_button")} action={this.create.bind(this)}/>
+            <ModalHeaderFragment title={this.l("lng_polls_create_title")} close
+                                 actionText={this.l("lng_polls_create_button")} action={this.create.bind(this)}/>
             <div class="scrollable">
                 <div className="padded">
-                    <VInput ref={this.askQuestionRef} label={this.l("lng_polls_create_question_placeholder")} onInput={this.onInputQuestion} value={this.state.question}/>
+                    <VInput label={this.l("lng_polls_create_question_placeholder")} onInput={this.onInputQuestion}
+                            value={this.state.question}/>
                 </div>
                 <hr/>
                 <div className="padded options scrollable">
@@ -152,21 +150,28 @@ export class AttachPollModal extends TranslatableStatefulComponent {
                 </div>
                 <hr/>
                 <div className="checkboxes padded bottom">
-                    <VCheckbox label={this.l("lng_polls_create_anonymous")} checked={this.state.anon} input={this.toggleAnon}/>
-                    <VCheckbox label={this.l("lng_polls_create_multiple_choice")} disabled={this.state.quiz} checked={this.state.multiple} onClick={this.toggleMultiple}/>
-                    <VCheckbox label={this.l("lng_polls_create_quiz_mode")} checked={this.state.quiz} input={this.toggleQuiz}/>
+                    <VCheckbox label={this.l("lng_polls_create_anonymous")} checked={this.state.anon}
+                               input={this.toggleAnon}/>
+                    <VCheckbox label={this.l("lng_polls_create_multiple_choice")} disabled={this.state.quiz}
+                               checked={this.state.multiple} onClick={this.toggleMultiple}/>
+                    <VCheckbox label={this.l("lng_polls_create_quiz_mode")} checked={this.state.quiz}
+                               input={this.toggleQuiz}/>
                 </div>
                 {this.state.quiz && <>
                     <div class="padded timer">
                         <h5>Set a timer</h5>
-                        <VCheckbox label="Quiz timer" input={() => this.setState({timer: !this.state.timer})} checked={this.state.timer}/>
-                        {this.state.timer && <VSlider label="Seconds before closing" onInput={(event) => {this.setState({
-                            timerSeconds: event.currentTarget.value
-                        })}} value={this.state.timerSeconds} max={600} min={5} step={5}/>}
+                        <VCheckbox label="Quiz timer" input={() => this.setState({timer: !this.state.timer})}
+                                   checked={this.state.timer}/>
+                        {this.state.timer && <VSlider label="Seconds before closing" onInput={(event) => {
+                            this.setState({
+                                timerSeconds: event.currentTarget.value
+                            })
+                        }} value={this.state.timerSeconds} max={600} min={5} step={5}/>}
                     </div>
                     <div class="padded">
                         <h5>{this.l("lng_polls_solution_title")}</h5>
-                        <VInput label={this.l("lng_polls_solution_placeholder")} width="100%" onInput={this.onInputSolution} value={this.state.solution}/>
+                        <VInput label={this.l("lng_polls_solution_placeholder")} width="100%"
+                                onInput={this.onInputSolution} value={this.state.solution}/>
                     </div>
                 </>}
             </div>

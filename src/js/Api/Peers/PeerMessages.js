@@ -65,39 +65,39 @@ export class PeerMessages {
         return message;
     }
 
-    fireRecent = (context = {}): void => {
+    fireRecent = (context = {}, limit = 100): void => {
         if (this.isDownloadingRecent) {
             return;
         }
 
         if (this._recent.length > 0) {
-            this.peer.fire("messages.recent", {messages: this._recent});
+            this.peer.fire("messages.recent", {messages: this._recent.slice(0, limit)});
             return;
         }
 
         this.isDownloadingRecent = true;
 
-        API.messages.getHistory(this.peer, {limit: 100}).then(Messages => {
+        API.messages.getHistory(this.peer, {limit}).then(Messages => {
             this.isDownloadingRecent = false;
 
             this._recent = this.putRawMessages(Messages.messages);
 
             this.peer.fire("messages.recent", {
-                messages: this._recent.slice(),
+                messages: this._recent.slice(0, limit),
                 context
             });
         });
     }
 
-    downloadNextTopPage = (offsetId: number, context = {}) => {
+    downloadNextTopPage = (offsetId: number, context = {}, limit = 100) => {
         return API.messages.getHistory(this.peer, {
             offset_id: offsetId,
-            limit: 100
+            limit,
         }).then(Messages => {
             const messages = this.putRawMessages(Messages.messages);
 
             this.peer.fire("messages.nextTopPageDownloaded", {
-                messages: messages,
+                messages: messages.slice(0, limit),
                 context,
             });
 
@@ -105,7 +105,7 @@ export class PeerMessages {
         });
     }
 
-    fireAllRecent = (context = {}) => {
+    fireAllRecent = (context = {}, limit = 100) => {
         if (this.isDownloadingRecent) {
             return;
         }
@@ -114,7 +114,7 @@ export class PeerMessages {
 
         API.messages.getHistory(this.peer, {
             offset_id: this._recent[this._recent.length - 1].id,
-            limit: 100 - this._recent.length,
+            limit: limit - this._recent.length,
             add_offset: 0,
         }).then(Messages => {
             this.isDownloadingRecent = false;
@@ -123,22 +123,22 @@ export class PeerMessages {
             this._recent = [...this._recent, ...messages];
 
             this.peer.fire("messages.allRecent", {
-                messages: messages.slice(),
+                messages: messages.slice(0, limit),
                 context,
             });
         });
     }
 
-    downloadNextBottomPage = (offsetId: number, context = {}) => {
+    downloadNextBottomPage = (offsetId: number, context = {}, limit = 100) => {
         return API.messages.getHistory(this.peer, {
             offset_id: offsetId,
             limit: 99,
-            add_offset: -100
+            add_offset: -limit
         }).then(Messages => {
             const messages = this.putRawMessages(Messages.messages);
 
             this.peer.fire("messages.nextBottomPageDownloaded", {
-                messages: messages,
+                messages: messages.slice(0, limit),
                 context,
             });
 

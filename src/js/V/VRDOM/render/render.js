@@ -17,44 +17,46 @@
  *
  */
 
-import VRNode from "../VRNode"
-import type {VRenderProps} from "../types/types"
-import renderElement from "./renderElement"
-import renderText from "./renderText"
-import VListVRNode from "../list/VListVRNode"
-import vrdom_renderVListVRNode from "./renderVList"
-import ComponentVRNode from "../component/ComponentVRNode"
-import vrdom_renderComponentVNode from "./renderComponent"
+import render from "../xpatch/xrender"
 
 /**
  * Creates Real DOM Element from VRNode
  *
- * @param node
- * @param props
+ * @param vNode
+ * @param options
  */
-function vrdom_render(node: VRNode, props: VRenderProps = {}): HTMLElement | Element | Node | Text {
-    try {
-        if (node instanceof ComponentVRNode) {
-            return vrdom_renderComponentVNode(node)
-        } else if (node instanceof VListVRNode && props.$parent) {
-            return vrdom_renderVListVRNode(node, props)
-        }
-
-        if (node instanceof VRNode) {
-            return renderElement(node, props)
-        } else if (!node) {
-            return renderText(node)
-        } else {
-            if (typeof node === "object") {
-                return renderText(JSON.stringify(node))
-            } else {
-                return renderText(node)
-            }
-        }
-    } catch (e) {
-        console.error(e)
-        return document.createTextNode(e.toString())
+function vrdom_render(vNode, options): HTMLElement | Element | Node | Text {
+    const shouldFire = options.componentCallbacks;
+    if (!options.componentCallbacks) {
+        options.componentCallbacks = []
     }
+    const $el = render(vNode, options);
+    if (!shouldFire) {
+        options.componentCallbacks.forEach(fn => fn())
+    }
+    return $el;
+    // try {
+    //     if (node instanceof ComponentVRNode) {
+    //         return vrdom_renderComponentVNode(node)
+    //     } else if (node instanceof VListVRNode && props.$parent) {
+    //         return vrdom_renderVListVRNode(node, props)
+    //     }
+    //
+    //     if (node instanceof VRNode) {
+    //         return renderElement(node, props)
+    //     } else if (!node) {
+    //         return renderText(node)
+    //     } else {
+    //         if (typeof node === "object") {
+    //             return renderText(JSON.stringify(node))
+    //         } else {
+    //             return renderText(node)
+    //         }
+    //     }
+    // } catch (e) {
+    //     console.error(e)
+    //     return document.createTextNode(e.toString())
+    // }
 }
 
 export default vrdom_render

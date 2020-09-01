@@ -8,15 +8,9 @@ import TextWrapperComponent from "./Common/TextWrapperComponent"
 import MessageTimeComponent from "./Common/MessageTimeComponent"
 import GeneralMessageComponent from "./Common/GeneralMessageComponent"
 import UIEvents from "../../../../EventBus/UIEvents"
+import AppEvents from "../../../../../Api/EventBus/AppEvents"
 
 class GroupedMessageComponent extends GeneralMessageComponent {
-
-    reactive(R) {
-        super.reactive(R);
-
-        R.object(this.props.message)
-            .updateOn("groupUpdated")
-    }
 
     render({message: group, showDate}) {
         const isText = group.text.length > 0;
