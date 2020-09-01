@@ -65,6 +65,4 @@ class FoldersState extends SharedState {
     }
 }
 
-const foldersState = new FoldersState();
-
-export default foldersState;
+export default new FoldersState();

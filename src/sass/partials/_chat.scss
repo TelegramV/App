@@ -239,6 +239,21 @@
 
                 .responsive-only-mobile.btn-icon {
                     margin-left: -10px;
+                    position: relative;
+                    .unread-badge {
+                        position: absolute;
+                        background-color: $blue;
+                        color: white;
+                        padding: 3px 3px;
+                        min-width: 12px;
+                        height: 12px;
+                        line-height: 12px;
+                        font-size: 12px;
+                        border-radius: 12px;
+                        font-weight: 500;
+                        top: 0;
+                        right: 0;
+                    }
                 }
 
                 &:hover {

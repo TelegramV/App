@@ -170,6 +170,8 @@ class VirtualDialogsFolderList extends StatefulComponent {
     // };
 
     appEvents(E) {
+        super.appEvents(E);
+
         E.bus(AppEvents.General)
             .on("foldersUpdate", this.update)
             .on("selectFolder", this.update);
@@ -186,9 +188,6 @@ class VirtualDialogsFolderList extends StatefulComponent {
             .on("messages.new", this.update)
             // .on("messages.deleted", this.update)
             .on("messages.readIn", this.update);
-
-        E.bus(UIEvents.General)
-            .updateOn("window.resize");
     }
 
     render(props, {dialogs}, globalState) {
@@ -201,9 +200,7 @@ class VirtualDialogsFolderList extends StatefulComponent {
         }
 
         return (
-            <div style={{
-                "height": "100%",
-            }}>
+            <div css-flex-grow="1" css-height="100%">
                 <FastVirtualList itemHeight={72 + 4}
                                  items={dialogs}
                                  template={dialog => <Dialog dialog={dialog}/>}
@@ -284,7 +281,7 @@ class VirtualDialogsFolderList extends StatefulComponent {
     };
 
     update = () => {
-        let dialogs = this.sortWithPinnedOnTop(foldersState.current?.id);
+        let dialogs = this.sortWithPinnedOnTop(foldersState.currentId);
 
         this.setState({
             dialogs,

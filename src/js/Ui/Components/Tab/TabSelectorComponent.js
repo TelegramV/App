@@ -1,4 +1,5 @@
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
+import UIEvents from "../../EventBus/UIEvents"
 
 import './TabSelectorComponent.scss';
 
@@ -11,6 +12,11 @@ export default class TabSelectorComponent extends StatefulComponent {
     elRefs = []
     underlineStyle = { left: '0', right: '100%' }
     selectorRef = StatefulComponent.createRef();
+
+    appEvents(E) {
+        E.bus(UIEvents.General)
+            .updateOn("window.resize")
+    }
 
     render({items, scrollable, active, showScroll}) {
         this.elRefs = []

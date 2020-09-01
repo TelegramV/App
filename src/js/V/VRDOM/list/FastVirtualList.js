@@ -21,6 +21,7 @@ import StatefulComponent from "../component/StatefulComponent";
 import VComponent from "../component/VComponent";
 import vrdom_delete from "../delete";
 import vrdom_append from "../append";
+import {throttle} from "../../../Utils/func"
 
 class FastVirtualList extends StatefulComponent {
     state = {
@@ -66,10 +67,14 @@ class FastVirtualList extends StatefulComponent {
         });
 
         this.setState(this.calculate());
+
+        this.parentResizeObserver = new ResizeObserver(throttle(this.recalculateParentHeight, 200))
+        this.parentResizeObserver.observe(this.$el.parentElement)
     }
 
     componentWillUnmount() {
         this.$el.removeEventListener("scroll", this.onScroll);
+        this.parentResizeObserver.disconnect();
     }
 
     componentDidUpdate() {
@@ -90,9 +95,9 @@ class FastVirtualList extends StatefulComponent {
         let containerHeight = this.props.containerHeight;
 
         if (!containerHeight) {
-            //if (!this.state.containerHeight) { // Doesn't react on parent element resize
-            this.state.containerHeight = this.$el.parentElement.clientHeight;
-            //}
+            if (!this.state.containerHeight) {
+                this.state.containerHeight = this.$el.parentElement.clientHeight;
+            }
 
             containerHeight = this.state.containerHeight;
         }
@@ -116,6 +121,12 @@ class FastVirtualList extends StatefulComponent {
             totalHeight
         };
     };
+
+    recalculateParentHeight = () => {
+        this.setState({
+            containerHeight: this.$el.parentElement.clientHeight
+        })
+    }
 
     onScrollHandler = () => {
         this.setState(this.calculate());
