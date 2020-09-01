@@ -141,7 +141,7 @@ class FilesManager {
         this.internal_downloadStart(document, thumb);
 
         return document._promise = FileAPI.downloadDocument(document, thumb, event => this.internal_downloadNewPart(document, thumb, event), options)
-            .then(blob => this.convertToWavIfNeeded(blob, options.type || document.mime_type))
+            .then(blob => this.convertToWavIfNeeded(blob, options?.type || document.mime_type))
             .then(blob => this.internal_downloadDone(document, thumb, blob));
     }
 
