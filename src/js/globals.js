@@ -18,7 +18,7 @@
  */
 
 import {FileAPI} from "./Api/Files/FileAPI";
-import {scriptUrl} from "service-worker-loader!../js/Api/downloadServiceWorker";
+import registerServiceWorker, {ServiceWorkerNoSupportError} from "service-worker-loader!../js/Api/downloadServiceWorker";
 
 global.$ = require("./Ui/Utils/$").default;
 global.VRDOM = require("./V/VRDOM/VRDOM").default;
@@ -29,50 +29,57 @@ global.__IS_SAFARI__ = /^((?!chrome|android).)*safari/i.test(navigator.userAgent
 global.__IS_IOS__ = !!navigator.platform.match(/iPhone|iPod|iPad/);
 global.__DOCUMENTS__ = new Map();
 
-window.addEventListener('load', async () => {
-    try {
-        await navigator.serviceWorker.register(scriptUrl);
-
-        await navigator.serviceWorker.ready;
-
-        navigator.serviceWorker.addEventListener("message", (e: MessageEvent) => {
-            // console.log("FROM SW", e);
-
-            if (e.data.taskId) {
-                const {taskId, fileId, start, end} = e.data;
-                const document = global.__DOCUMENTS__.get(fileId);
-
-                // console.log(fileId, document);
-
-                FileAPI.downloadDocumentPart(document, null, end - start, start)
-                    .then(({bytes}) => {
-                        navigator.serviceWorker.controller.postMessage({
-                            taskId: e.data.taskId,
-                            result: {
-                                bytes,
-                                documentSize: document.size,
-                                mimeType: document.mime_type,
-                            },
-                        });
-                    });
-            }
-        });
-    } catch (err) {
-        console.error('pizda', err);
-    }
-});
-
-
-// registerServiceWorker({scope: "/"}).then((registration: ServiceWorkerRegistration) => {
-//     console.log("Success!");
-//     console.log(registration, navigator.serviceWorker.controller);
+// window.addEventListener('load', async () => {
+//     try {
+//         await navigator.serviceWorker.register(scriptUrl);
+//
+//         await navigator.serviceWorker.ready;
 //
 //
-// }).catch((err) => {
-//
-//     if (err instanceof ServiceWorkerNoSupportError) {
-//         console.log("Service worker is not supported.");
-//     } else {
-//         console.log("Error!");
+//     } catch (err) {
+//         console.error('pizda', err);
 //     }
 // });
+
+
+registerServiceWorker({scope: "/"}).then((registration: ServiceWorkerRegistration) => {
+    console.log("Success!");
+    console.log(registration, navigator.serviceWorker.controller);
+
+    navigator.serviceWorker.addEventListener("message", (e: MessageEvent) => {
+        // console.log("FROM SW", e);
+
+        if (e.data.taskId) {
+            let {taskId, fileId, start, end} = e.data;
+            const document = global.__DOCUMENTS__.get(fileId);
+
+            let limit = end - start;
+
+            // WHY LIMIT_INVALIDA>>>>>>?????????
+            while (limit % 4096 !== 0.0 || 1048576 % limit !== 0.0) {
+                limit++;
+            }
+
+            // console.log(fileId, document);
+
+            FileAPI.downloadDocumentPart(document, null, limit, start)
+                .then(({bytes}) => {
+                    navigator.serviceWorker.controller.postMessage({
+                        taskId: e.data.taskId,
+                        result: {
+                            bytes,
+                            documentSize: document.size,
+                            mimeType: document.mime_type,
+                        },
+                    });
+                });
+        }
+    });
+}).catch((err) => {
+
+    if (err instanceof ServiceWorkerNoSupportError) {
+        console.log("Service worker is not supported.");
+    } else {
+        console.log("Error!");
+    }
+});

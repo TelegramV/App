@@ -4,8 +4,8 @@ import {getInputFromPeer, getInputPeerFromPeer} from "../Dialogs/util";
 import {FileAPI} from "../Files/FileAPI";
 import UIEvents from "../../Ui/EventBus/UIEvents";
 import {largestTriangleThreeBuckets} from "../../Utils/audio";
-import {MessageType} from "../Messages/Message";
 import {MessageParser} from "../Messages/MessageParser";
+import {MessageType} from "../Messages/Message";
 
 const genMsgId = () => (new Date).getTime();
 
@@ -150,6 +150,39 @@ export class PeerApi {
             scheduleDate = null
         }
     ) {
+        if (!media || !media.length) {
+            if (!text.trim()) {
+                return;
+            }
+        }
+
+        let randomId = genMsgId();
+
+        let sendingMessage;
+
+        if (
+            MessageParser.getType({
+                message: text,
+                entities: messageEntities,
+                media: multi ? null : media,
+            }) === MessageType.TEXT
+        ) {
+            sendingMessage = this.peer.messages.putNewRawMessage({
+                id: randomId,
+                _sending: true,
+                out: true,
+                date: Math.floor(+new Date() / 1000),
+                message: text,
+                entities: messageEntities,
+                random_id: randomId,
+                reply_to_msg_id: replyTo
+            });
+
+            this.peer.fire("messages.new", {
+                message: sendingMessage,
+            });
+        }
+
         if (Array.isArray(media) && media.length === 1) {
             media = media[0];
         }
@@ -170,34 +203,6 @@ export class PeerApi {
         }
 
         const method = media ? (multi ? "messages.sendMultiMedia" : "messages.sendMedia") : "messages.sendMessage";
-
-        let randomId = genMsgId();
-
-        let sendingMessage;
-
-        if (
-            MessageParser.getType({
-                message: text,
-                entities: messageEntities,
-                media: multi ? null : media,
-            }) === MessageType.TEXT &&
-            method === "messages.sendMessage"
-        ) {
-            sendingMessage = this.peer.messages.putNewRawMessage({
-                id: randomId,
-                _sending: true,
-                out: true,
-                date: Math.floor(+new Date() / 1000),
-                message: text,
-                entities: messageEntities,
-                random_id: randomId,
-                reply_to_msg_id: replyTo
-            });
-
-            this.peer.fire("messages.new", {
-                message: sendingMessage,
-            });
-        }
 
         UIEvents.General.fire("chat.scrollBottom");
 
