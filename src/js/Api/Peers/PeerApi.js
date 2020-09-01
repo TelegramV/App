@@ -4,6 +4,8 @@ import {getInputFromPeer, getInputPeerFromPeer} from "../Dialogs/util";
 import {FileAPI} from "../Files/FileAPI";
 import UIEvents from "../../Ui/EventBus/UIEvents";
 import {largestTriangleThreeBuckets} from "../../Utils/audio";
+import {MessageType} from "../Messages/Message";
+import {MessageParser} from "../Messages/MessageParser";
 
 const genMsgId = () => (new Date).getTime();
 
@@ -173,7 +175,14 @@ export class PeerApi {
 
         let sendingMessage;
 
-        if (method === "messages.sendMessage") {
+        if (
+            MessageParser.getType({
+                message: text,
+                entities: messageEntities,
+                media: multi ? null : media,
+            }) === MessageType.TEXT &&
+            method === "messages.sendMessage"
+        ) {
             sendingMessage = this.peer.messages.putNewRawMessage({
                 id: randomId,
                 _sending: true,
@@ -217,19 +226,23 @@ export class PeerApi {
                 }),
                 random_id: randomId
             }).then(Update => {
-                console.log(Update);
+                // console.log(Update);
 
                 if (Update.updates) {
                     Update.updates.forEach(update => {
                         if (update._ === "updateMessageID") {
-                            sendingMessage.raw.id = update.id;
-                            sendingMessage.raw.random_id = update.random_id;
+                            if (sendingMessage) {
+                                sendingMessage.raw.id = update.id;
+                                sendingMessage.raw.random_id = update.random_id;
+                            }
                             update.peer = this.peer;
                         }
                     });
                 } else {
-                    sendingMessage.raw.random_id = sendingMessage.raw.id;
-                    sendingMessage.raw.id = Update.id;
+                    if (sendingMessage) {
+                        sendingMessage.raw.random_id = sendingMessage.raw.id;
+                        sendingMessage.raw.id = Update.id;
+                    }
                 }
 
                 Update.peer = this.peer;

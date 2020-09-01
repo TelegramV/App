@@ -18,10 +18,10 @@
  */
 
 import DocumentParser from "../Files/DocumentParser";
-import AppEvents from "../EventBus/AppEvents"
-import {concatUint8} from "../../Utils/byte"
-import FileManager from "../Files/FileManager"
-import {FileAPI} from "../Files/FileAPI"
+import AppEvents from "../EventBus/AppEvents";
+import {concatUint8} from "../../Utils/byte";
+import FileManager from "../Files/FileManager";
+import {FileAPI} from "../Files/FileAPI";
 
 
 // currently there can be only one file per document
@@ -60,7 +60,7 @@ class MP4StreamingFile {
         this.preview = preview;
         this.mediaSource = new MediaSource();
         this.videoInfo = DocumentParser.attributeVideo(document);
-        this.url = URL.createObjectURL(this.mediaSource)
+        this.url = URL.createObjectURL(this.mediaSource);
 
         if (FileManager.isPending(document) && FileManager.getPending(document)?._downloadedBytes) {
             this.parts = [FileManager.getPending(document)?._downloadedBytes];
@@ -101,7 +101,7 @@ class MP4StreamingFile {
                         sourceBuffer.segmentIndex++;
                         sourceBuffer.pendingAppends.push({id, buffer, sampleNum, is_last});
                         this.onUpdateEnd(sourceBuffer, true, false);
-                    }
+                    };
 
                     this.mp4box.onReady = info => {
                         this.mediaSource.duration = this.videoInfo.duration;
@@ -112,13 +112,13 @@ class MP4StreamingFile {
                         initSegments.forEach(this.initSegment);
 
                         this.mp4box.start();
-                    }
+                    };
 
-                    resolve(this.mediaSource)
-                })
-            }
-        })
-    }
+                    resolve(this.mediaSource);
+                });
+            };
+        });
+    };
 
     initTrack = track => {
         if (this.canceled) {
@@ -135,7 +135,7 @@ class MP4StreamingFile {
 
             sourceBuffer.pendingAppends = [];
         }
-    }
+    };
 
     initSegment = segment => {
         if (this.canceled) {
@@ -148,7 +148,7 @@ class MP4StreamingFile {
         sourceBuffer.appendBuffer(buffer);
 
         sourceBuffer.segmentIndex = 0;
-    }
+    };
 
     onInitAppended = event => {
         if (this.canceled) {
@@ -164,7 +164,7 @@ class MP4StreamingFile {
 
             this.onUpdateEnd(sourceBuffer, false, true);
         }
-    }
+    };
 
     onUpdateEnd = (sourceBuffer, isNotInit, isEndOfAppend) => {
         if (this.canceled) {
@@ -189,7 +189,7 @@ class MP4StreamingFile {
             sourceBuffer.is_last = part.is_last;
             sourceBuffer.appendBuffer(part.buffer);
         }
-    }
+    };
 
     onDownloadNewPart = ({newBytes}) => {
         if (this.canceled) {
@@ -199,7 +199,6 @@ class MP4StreamingFile {
         if (this.mp4box) {
             if (this.parts.length) {
                 const all = concatUint8(...this.parts, newBytes).buffer;
-                //console.log(all)
                 all.fileStart = this.bufferOffset;
                 this.mp4box.appendBuffer(all);
                 this.parts = [];
@@ -213,7 +212,7 @@ class MP4StreamingFile {
         }
 
         this.bufferOffset += newBytes.length;
-    }
+    };
 
     onDownloadDone = ({blob}) => {
         if (this.canceled || this.isDone) {
@@ -228,7 +227,7 @@ class MP4StreamingFile {
 
             this.isDone = true;
         });
-    }
+    };
 
     seek = async (time: number) => {
         if (this.canceled) {
@@ -256,7 +255,7 @@ class MP4StreamingFile {
 
             this.downloadNextPart(this.seekedTime);
         }
-    }
+    };
 
     downloadNextPart = async (time) => {
         if (this.canceled) {
@@ -264,7 +263,7 @@ class MP4StreamingFile {
         }
 
         if (time !== this.seekedTime) {
-            throw new Error("canceled")
+            throw new Error("canceled");
         }
 
         const file = await FileAPI.downloadDocumentPart(this.document, null, 1024 * 1024, this.bufferOffset);
@@ -274,7 +273,7 @@ class MP4StreamingFile {
         }
 
         if (time !== this.seekedTime) {
-            throw new Error("canceled")
+            throw new Error("canceled");
         }
 
         if (file.bytes.length + this.bufferOffset === this.document.size) {
@@ -284,7 +283,7 @@ class MP4StreamingFile {
         }
 
         await this.downloadNextPart(time);
-    }
+    };
 
     cancel() {
         this.canceled = true;
@@ -293,7 +292,7 @@ class MP4StreamingFile {
         AppEvents.Files.unsubscribe("download.newPart", this.onDownloadNewPart);
         AppEvents.Files.unsubscribe("download.canceled", this.onDocumentCanceled);
 
-        this.mediaSource = new MediaSource()
+        this.mediaSource = new MediaSource();
         this.parts = null;
         this.mp4box.stop();
         this.mp4box.stop();
@@ -302,14 +301,14 @@ class MP4StreamingFile {
         this.videoInfo = null;
         URL.revokeObjectURL(this.url);
 
-        files.delete(this.document.id)
-        files.delete(this.document.id + "_")
+        files.delete(this.document.id);
+        files.delete(this.document.id + "_");
         this.document = null;
     }
 
     onDocumentCanceled = () => {
         this.cancel();
-    }
+    };
 }
 
 export default MP4StreamingFile;

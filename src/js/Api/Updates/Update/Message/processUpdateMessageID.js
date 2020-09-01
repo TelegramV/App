@@ -24,7 +24,7 @@ function processUpdateMessageID(update) {
     if (update.dialog) {
         const message = update.dialog.peer.messages.getById(update.random_id);
 
-        console.log("XXX", message);
+        // console.log("XXX", message);
 
         if (message) {
             message.raw.id = update.id;

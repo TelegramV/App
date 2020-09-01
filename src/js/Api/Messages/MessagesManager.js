@@ -41,24 +41,9 @@ class MessageManager extends Manager {
 
         const sendingMessage = peer.messages.getById(rawMessage.id);
 
-        console.log(sendingMessage, rawMessage);
-
         if (sendingMessage) {
             sendingMessage.fillRaw(rawMessage);
         } else {
-
-            // if (peer.messages._sendingMessages.has(rawMessage.id)) {
-            //     const randomId = peer.messages._sendingMessages.get(rawMessage.id)
-            //     peer.messages._sendingMessages.delete(rawMessage.id)
-            //     rawMessage.random_id = randomId
-            //     AppEvents.Dialogs.fire("messageSent", {
-            //         rawMessage: rawMessage,
-            //         dialog: peer.dialog
-            //     })
-            //
-            //     return
-            // }
-
             const message = peer.messages.putNewRawMessage(rawMessage);
 
             if (message) {
