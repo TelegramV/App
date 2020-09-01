@@ -50,6 +50,7 @@ export const DialogFragment = (
         "active": AppSelectedChat.check(dialog.peer),
         "unread": dialog.peer.messages.unreadMentionsCount > 0 || dialog.peer.messages.unreadCount > 0 || dialog.unreadMark,
         "muted": dialog.isMuted,
+        "sending": lastMessage && lastMessage.isSending,
     };
 
     if (lastMessage && lastMessage.isOut && !dialog.peer.isSelf) {

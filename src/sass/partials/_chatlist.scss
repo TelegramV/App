@@ -333,7 +333,8 @@
     }
 
     &.sent,
-    &.read {
+    &.read,
+    &.sending {
         .status {
             display: block;
         }
@@ -342,6 +343,12 @@
     &.sent {
         .status:before {
             content: $tgico-check;
+        }
+    }
+
+    &.sending {
+        .status:before {
+            content: $tgico-sending;
         }
     }
 
