@@ -17,10 +17,20 @@
  *
  */
 
-import AppEvents from "../../../EventBus/AppEvents"
+import AppEvents from "../../../EventBus/AppEvents";
 
 function processUpdateMessageID(update) {
-    update.dialog && update.dialog.handleUpdateMessageID(update.id, update.random_id);
+    // update.dialog && update.dialog.handleUpdateMessageID(update.id, update.random_id);
+    if (update.dialog) {
+        const message = update.dialog.peer.messages.getById(update.random_id);
+
+        console.log("XXX", message);
+
+        if (message) {
+            message.raw.id = update.id;
+            message.raw.random_id = update.random_id;
+        }
+    }
 
     AppEvents.Telegram.fire("updateMessageID", update);
 }

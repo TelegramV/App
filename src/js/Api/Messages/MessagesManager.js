@@ -1,127 +1,135 @@
-import {Manager} from "../Manager"
-import PeersStore from "../Store/PeersStore"
-import DialogsManager from "../Dialogs/DialogsManager"
-import AppEvents from "../EventBus/AppEvents"
-import {Peer} from "../Peers/Objects/Peer"
+import {Manager} from "../Manager";
+import PeersStore from "../Store/PeersStore";
+import DialogsManager from "../Dialogs/DialogsManager";
+import AppEvents from "../EventBus/AppEvents";
+import {Peer} from "../Peers/Objects/Peer";
 
 class MessageManager extends Manager {
     init() {
         if (this._inited) {
-            return Promise.resolve()
+            return Promise.resolve();
         }
 
-        this._inited = true
+        this._inited = true;
     }
 
     processNewMessage(peer: Peer, rawMessage) {
         if (rawMessage._ === "messageEmpty") {
-            console.log(rawMessage)
-            return
+            console.log(rawMessage);
+            return;
         }
 
         if (!peer) {
-            console.error("BUG: processNewMessage peer was not found", rawMessage)
-            return
+            console.error("BUG: processNewMessage peer was not found", rawMessage);
+            return;
         }
 
 
         if (peer.isAbleToHandleUpdates) {
             if (!peer.dialog) {
-                console.log("BUG: processNewMessage no dialog", peer, peer.dialog)
+                console.log("BUG: processNewMessage no dialog", peer, peer.dialog);
 
                 DialogsManager.getPeerDialogs(peer).then(dialogs => {
                     AppEvents.Dialogs.fire("gotNewMany", {
                         dialogs
-                    })
-                })
+                    });
+                });
 
-                return
+                return;
             }
         }
 
-        if (peer.messages._sendingMessages.has(rawMessage.id)) {
-            const randomId = peer.messages._sendingMessages.get(rawMessage.id)
-            peer.messages._sendingMessages.delete(rawMessage.id)
-            rawMessage.random_id = randomId
-            AppEvents.Dialogs.fire("messageSent", {
-                rawMessage: rawMessage,
-                dialog: peer.dialog
-            })
+        const sendingMessage = peer.messages.getById(rawMessage.id);
 
-            return
-        }
+        console.log(sendingMessage, rawMessage);
 
-        const message = peer.messages.putNewRawMessage(rawMessage)
+        if (sendingMessage) {
+            sendingMessage.fillRaw(rawMessage);
+        } else {
 
-        if (message) {
-            message.init()
+            // if (peer.messages._sendingMessages.has(rawMessage.id)) {
+            //     const randomId = peer.messages._sendingMessages.get(rawMessage.id)
+            //     peer.messages._sendingMessages.delete(rawMessage.id)
+            //     rawMessage.random_id = randomId
+            //     AppEvents.Dialogs.fire("messageSent", {
+            //         rawMessage: rawMessage,
+            //         dialog: peer.dialog
+            //     })
+            //
+            //     return
+            // }
 
-            if (message.from && message.from.type === "user") {
-                peer.dialog.removeAction(message.from)
+            const message = peer.messages.putNewRawMessage(rawMessage);
+
+            if (message) {
+                message.init();
+
+                if (message.from && message.from.type === "user") {
+                    peer.dialog.removeAction(message.from);
+                }
+
+                peer.fire("messages.new", {
+                    message,
+                });
             }
-
-
-            peer.fire("messages.new", {
-                message,
-            })
         }
     }
 
     getFromPeerMessage(rawMessage) {
         if (rawMessage.out) {
-            return PeersStore.self()
+            return PeersStore.self();
         }
 
         if (rawMessage.from_id) {
-            return PeersStore.get("user", rawMessage.from_id)
+            return PeersStore.get("user", rawMessage.from_id);
         }
 
         if (rawMessage.user_id) {
-            return PeersStore.get("user", rawMessage.user_id)
+            return PeersStore.get("user", rawMessage.user_id);
         }
 
         if (rawMessage.channel_id) {
-            return PeersStore.get("channel", rawMessage.channel_id)
+            return PeersStore.get("channel", rawMessage.channel_id);
         }
 
         if (rawMessage.chat_id) {
-            return PeersStore.get("chat", rawMessage.chat_id)
+            return PeersStore.get("chat", rawMessage.chat_id);
         }
 
         // console.debug("no from peer, probably message sent to channel", rawMessage)
 
-        return this.getToPeerMessage(rawMessage, true)
+        return this.getToPeerMessage(rawMessage, true);
     }
 
     getToPeerMessage(rawMessage, isFrom) {
-        let to
+        let to;
 
         if (rawMessage.to_id && rawMessage.to_id._ === "peerChannel") {
-            to = PeersStore.get("channel", rawMessage.to_id.channel_id)
+            to = PeersStore.get("channel", rawMessage.to_id.channel_id);
         } else if (rawMessage.to_id && rawMessage.to_id._ === "peerChat") {
-            to = PeersStore.get("chat", rawMessage.to_id.chat_id)
+            to = PeersStore.get("chat", rawMessage.to_id.chat_id);
         } else if (rawMessage.to_id && rawMessage.to_id._ === "peerUser") {
-            to = PeersStore.get("user", rawMessage.to_id.user_id)
+            to = PeersStore.get("user", rawMessage.to_id.user_id);
         } else if (rawMessage.chat_id) {
-            to = PeersStore.get("chat", rawMessage.chat_id)
+            to = PeersStore.get("chat", rawMessage.chat_id);
         } else if (rawMessage.user_id) {
-            to = PeersStore.get("user", rawMessage.user_id)
+            to = PeersStore.get("user", rawMessage.user_id);
         } else if (rawMessage.channel_id) {        // probably redundant, but who knows telegram
-            to = PeersStore.get("channel", rawMessage.channel_id)
+            to = PeersStore.get("channel", rawMessage.channel_id);
         }
 
         if (!isFrom && to === PeersStore.self()) {
-            return this.getFromPeerMessage(rawMessage)
+            return this.getFromPeerMessage(rawMessage);
         } else {
             if (!to) {
-                console.error("oh shit", rawMessage)
+                console.error("oh shit", rawMessage);
             }
 
-            return to
+            return to;
         }
     }
 }
 
-const MessagesManager = new MessageManager()
+const MessagesManager = new MessageManager();
 
-export default MessagesManager
+export default MessagesManager;

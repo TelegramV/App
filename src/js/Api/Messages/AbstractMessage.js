@@ -1,17 +1,17 @@
-import {Dialog} from "../Dialogs/Dialog"
-import {Message, MessageType} from "./Message"
-import {ReactiveObject} from "../../V/Reactive/ReactiveObject"
-import {MessageParser} from "./MessageParser"
-import {Peer} from "../Peers/Objects/Peer"
-import MessagesManager from "./MessagesManager"
-import PeersStore from "../Store/PeersStore"
-import MTProto from "../../MTProto/External"
-import API from "../Telegram/API"
-import type {BusEvent} from "../EventBus/EventBus"
-import AppEvents from "../EventBus/AppEvents"
-import {parseMessageEntities} from "../../Utils/htmlHelpers"
-import {DATE_FORMAT, TIME_FORMAT} from "../../Utils/date"
-import Locale from "../../Api/Localization/Locale"
+import {Dialog} from "../Dialogs/Dialog";
+import {Message, MessageType} from "./Message";
+import {ReactiveObject} from "../../V/Reactive/ReactiveObject";
+import {MessageParser} from "./MessageParser";
+import {Peer} from "../Peers/Objects/Peer";
+import MessagesManager from "./MessagesManager";
+import PeersStore from "../Store/PeersStore";
+import MTProto from "../../MTProto/External";
+import API from "../Telegram/API";
+import type {BusEvent} from "../EventBus/EventBus";
+import AppEvents from "../EventBus/AppEvents";
+import {parseMessageEntities} from "../../Utils/htmlHelpers";
+import {DATE_FORMAT, TIME_FORMAT} from "../../Utils/date";
+import Locale from "../../Api/Localization/Locale";
 
 export class AbstractMessage extends ReactiveObject implements Message {
 
@@ -33,12 +33,14 @@ export class AbstractMessage extends ReactiveObject implements Message {
     _hideAvatar: boolean;
     _tailsGroup: string;
 
+    isSending = false;
+
     constructor(dialogPeer: Peer) {
-        super()
+        super();
 
         if (dialogPeer) {
-            this._to = dialogPeer
-            this._dialog = dialogPeer.dialog
+            this._to = dialogPeer;
+            this._dialog = dialogPeer.dialog;
         }
     }
 
@@ -51,82 +53,82 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     get dialog() {
         if (!this._dialog) {
-            this._dialog = MessagesManager.getToPeerMessage(this.raw).dialog
+            this._dialog = MessagesManager.getToPeerMessage(this.raw).dialog;
         }
 
-        return this._dialog
+        return this._dialog;
     }
 
     set dialog(dialog) {
-        this._dialog = dialog
+        this._dialog = dialog;
     }
 
     get id(): number {
-        return this.raw.id
+        return this.raw.id;
     }
 
     get group() {
-        return this._group
+        return this._group;
     }
 
     set group(value) {
-        this._group = value
+        this._group = value;
     }
 
     get groupInitializer() {
-        return this._groupInitializer
+        return this._groupInitializer;
     }
 
     set groupInitializer(value) {
-        this._groupInitializer = value
+        this._groupInitializer = value;
     }
 
     get isOut(): boolean {
         if (this.raw.out) {
-            return true
+            return true;
         }
 
-        return this.raw.from_id === PeersStore.self().id || this.raw.user_id === PeersStore.self().id
+        return this.raw.from_id === PeersStore.self().id || this.raw.user_id === PeersStore.self().id;
     }
 
     get isDisplayedInMediaViewer(): boolean {
-        return false
+        return false;
     }
 
     get isSending(): boolean {
-        return !!this.raw.sending
+        return !!this.raw.sending;
     }
 
     get replyMarkup(): any {
-        return this.raw.reply_markup
+        return this.raw.reply_markup;
     }
 
     get isPost(): boolean {
-        return this.raw.post || false
+        return this.raw.post || false;
     }
 
     get isPinned(): boolean {
-        return this.dialogPeer.pinnedMessageId === this.id
+        return this.dialogPeer.pinnedMessageId === this.id;
     }
 
     set isPinned(value) {
-        this.dialogPeer.pinnedMessageId = value ? this.id : 0
+        this.dialogPeer.pinnedMessageId = value ? this.id : 0;
     }
 
     get isRead(): boolean {
         if (!this.dialogPeer) {
-            return false
+            return false;
         }
 
-        return this.dialogPeer.messages.readOutboxMaxId >= this.id || (this.isOut && this.isPost)
+        return this.dialogPeer.messages.readOutboxMaxId >= this.id || (this.isOut && this.isPost);
     }
 
     get isInRead(): boolean {
         if (!this.dialogPeer) {
-            return false
+            return false;
         }
 
-        return this.isOut || this.dialogPeer.messages.readInboxMaxId >= this.id
+        return this.isOut || this.dialogPeer.messages.readInboxMaxId >= this.id;
     }
 
     get hideAvatar(): boolean {
@@ -146,7 +148,7 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     get text(): string {
-        return this.raw?.message ?? ""
+        return this.raw?.message ?? "";
     }
 
     get parsed() {
@@ -155,103 +157,105 @@ export class AbstractMessage extends ReactiveObject implements Message {
 
     get to(): Peer {
         if (this._to) {
-            return this._to
+            return this._to;
         }
 
-        this._to = MessagesManager.getToPeerMessage(this.raw)
+        this._to = MessagesManager.getToPeerMessage(this.raw);
 
-        return this._to
+        return this._to;
     }
 
     get from(): Peer {
         if (this._from) {
-            return this._from
+            return this._from;
         }
 
-        this._from = MessagesManager.getFromPeerMessage(this.raw)
+        this._from = MessagesManager.getFromPeerMessage(this.raw);
 
         if (!this._from) {
-            console.warn("no from peer", this)
+            console.warn("no from peer", this);
         } else if (this._from.isMin && !this._from._min_messageId) {
             this._from.minData = {
                 message: this,
                 dialog: this.to
-            }
-            this._from._min_messageId = this.id
-            this._from._min_inputPeer = this.to.inputPeer
+            };
+            this._from._min_messageId = this.id;
+            this._from._min_inputPeer = this.to.inputPeer;
         }
 
-        return this._from
+        return this._from;
     }
 
     get date() {
-        return this.raw.date
+        return this.raw.date;
     }
 
     get editDate() {
-        return this.raw.edit_date
+        return this.raw.edit_date;
     }
 
     get media(): Object {
-        return this.raw.media
+        return this.raw.media;
     }
 
     getDate(locale: any, format: any) {
-        return this.jsDate.toLocaleString(locale, format)
+        return this.jsDate.toLocaleString(locale, format);
     }
 
-    formattedTime = null
+    formattedTime = null;
+
     getFormattedTime() {
-        if(this.formattedTime === null) {
-            this.formattedTime = this.getDate(Locale.currentLanguageCode, TIME_FORMAT)
+        if (this.formattedTime === null) {
+            this.formattedTime = this.getDate(Locale.currentLanguageCode, TIME_FORMAT);
         }
-        return this.formattedTime
+        return this.formattedTime;
     }
 
-    formattedDate = null
+    formattedDate = null;
+
     getFormattedDate() {
-        if(this.formattedDate === null) {
-            this.formattedDate = this.getDate(Locale.currentLanguageCode, DATE_FORMAT)
+        if (this.formattedDate === null) {
+            this.formattedDate = this.getDate(Locale.currentLanguageCode, DATE_FORMAT);
         }
-        return this.formattedDate
+        return this.formattedDate;
     }
 
     getFormattedDateOrTime() {
-        if(MTProto.TimeManager.now(true) - this.date > 86400) {
-            return this.getFormattedDate()
+        if (MTProto.TimeManager.now(true) - this.date > 86400) {
+            return this.getFormattedDate();
         } else {
-            return this.getFormattedTime()
+            return this.getFormattedTime();
         }
     }
 
     // always call super
     show() {
-        this.findReplyTo()
+        this.findReplyTo();
         // this.findForwarded()
     }
 
     get groupedId() {
-        return this.raw.grouped_id
+        return this.raw.grouped_id;
     }
 
     findReplyTo(fire = true) {
         if (!this.dialogPeer) {
-            return false
+            return false;
         }
 
         if (this.replyToMessage && this.replyToMessageType && fire) {
-            this.fire(this.replyToMessageType)
+            this.fire(this.replyToMessageType);
         }
 
         if (this.raw.reply_to_msg_id) {
-            const replyToMessage = this.dialogPeer.messages.getById(this.raw.reply_to_msg_id)
+            const replyToMessage = this.dialogPeer.messages.getById(this.raw.reply_to_msg_id);
 
             if (replyToMessage) {
-                this.replyToMessage = replyToMessage
-                this.replyToMessageType = "replyFound"
+                this.replyToMessage = replyToMessage;
+                this.replyToMessageType = "replyFound";
 
                 if (fire) {
-                    this.fire("replyFound")
+                    this.fire("replyFound");
                 }
             } else {
                 API.messages.getHistory(this.dialogPeer, {
@@ -259,67 +263,67 @@ export class AbstractMessage extends ReactiveObject implements Message {
                     add_offset: -1,
                     limit: 1
                 }).then(Messages => {
-                    const messages = Messages.messages
+                    const messages = Messages.messages;
 
                     if (messages.length && messages[0].id === this.raw.reply_to_msg_id) {
-                        this.replyToMessage = this.dialogPeer.messages.putRawMessage(messages[0])
-                        this.replyToMessageType = "replyFound"
+                        this.replyToMessage = this.dialogPeer.messages.putRawMessage(messages[0]);
+                        this.replyToMessageType = "replyFound";
 
                         if (fire) {
-                            this.fire("replyFound")
+                            this.fire("replyFound");
                         }
                     } else {
-                        this.replyToMessageType = "replyNotFound"
+                        this.replyToMessageType = "replyNotFound";
 
                         if (fire) {
-                            this.fire("replyFound")
+                            this.fire("replyFound");
                         }
                     }
-                })
+                });
             }
         }
     }
 
     findForwarded(fire = true) {
         if (this.forwarded && this.forwardedType && fire) {
-            this.fire(this.forwardedType)
+            this.fire(this.forwardedType);
 
-            return
+            return;
         }
 
         if (this.raw.fwd_from) {
             if (!this.raw.fwd_from.from_id) {
                 if (this.raw.fwd_from.from_name) {
-                    this.forwarded = this.raw.fwd_from.from_name
-                    this.forwardedType = "forwardedFound"
+                    this.forwarded = this.raw.fwd_from.from_name;
+                    this.forwardedType = "forwardedFound";
 
                     if (fire) {
-                        this.fire("forwardedFound")
+                        this.fire("forwardedFound");
                     }
                 }
             } else {
-                const forwarded = PeersStore.get("user", this.raw.fwd_from.from_id)
+                const forwarded = PeersStore.get("user", this.raw.fwd_from.from_id);
 
                 if (forwarded) {
-                    this.forwarded = forwarded
-                    this.forwardedType = "forwardedFound"
+                    this.forwarded = forwarded;
+                    this.forwardedType = "forwardedFound";
 
                     if (fire) {
-                        this.fire("forwardedFound")
+                        this.fire("forwardedFound");
                     }
                 }
             }
 
             if (this.raw.fwd_from.channel_id) {
-                const forwarded = PeersStore.get("channel", this.raw.fwd_from.channel_id)
+                const forwarded = PeersStore.get("channel", this.raw.fwd_from.channel_id);
 
                 if (forwarded) {
-                    this.forwarded = forwarded
-                    this.forwardedMessageId = this.raw.fwd_from.channel_post
-                    this.forwardedType = "forwardedFound"
+                    this.forwarded = forwarded;
+                    this.forwardedMessageId = this.raw.fwd_from.channel_post;
+                    this.forwardedType = "forwardedFound";
 
                     if (fire) {
-                        this.fire("forwardedFound")
+                        this.fire("forwardedFound");
                     }
                 }
             }
@@ -327,36 +331,43 @@ export class AbstractMessage extends ReactiveObject implements Message {
     }
 
     read() {
-        return this.dialogPeer.api.readHistory(this.id)
+        return this.dialogPeer.api.readHistory(this.id);
     }
 
     // WARNING: always call super
     fillRaw(raw: Object): Message {
-        this.parsedText = parseMessageEntities(raw.message || "", raw.entities)
 
-        this.raw = raw
-        this.jsDate = new Date(this.raw.date * 1000)
-        this.prefix = MessageParser.getDialogPrefix(this)
+        this.parsedText = parseMessageEntities(raw.message || "", raw.entities);
+
+        this.raw = raw;
+        this.jsDate = new Date(this.raw.date * 1000);
+        this.prefix = MessageParser.getDialogPrefix(this);
 
         if (this.dialogPeer) {
-            const replyToMessage = this.dialogPeer.messages.getById(this.raw.reply_to_msg_id)
+            const replyToMessage = this.dialogPeer.messages.getById(this.raw.reply_to_msg_id);
 
             if (replyToMessage) {
-                this.replyToMessage = replyToMessage
+                this.replyToMessage = replyToMessage;
             }
 
-            this.findForwarded()
+            this.findForwarded();
         }
 
-        return this
+        if (this.isSending !== raw._sending) {
+            this.isSending = Boolean(raw._sending);
+
+            this.fire("edited");
+        }
+
+        return this;
     }
 
     fillEdited(raw: Object): Message {
-        const message = this.fillRaw(raw)
+        const message = this.fillRaw(raw);
 
-        this.fire("edited")
+        this.fire("edited");
 
-        return message
+        return message;
     }
 
     fire(type: string, event: BusEvent = {}) {
@@ -364,10 +375,10 @@ export class AbstractMessage extends ReactiveObject implements Message {
             peer: this.dialogPeer,
             message: this,
             ...event
-        })
+        });
 
-        super.fire(type, event)
+        super.fire(type, event);
     }
 }
 
-export default AbstractMessage
+export default AbstractMessage;
