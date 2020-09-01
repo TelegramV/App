@@ -9,6 +9,8 @@ import {formatTime} from "../../../../../../Utils/date";
 import {DocumentMessagesTool} from "../../../../../Utils/document";
 import FileManager from "../../../../../../Api/Files/FileManager";
 import VSpinner from "../../../../../Elements/VSpinner";
+import VComponent from "../../../../../../V/VRDOM/component/VComponent"
+import {mediaViewerOpen} from "../../../../../Utils/mediaViewerOpen"
 
 class VideoMessageComponent extends GeneralMessageComponent {
     state = {
@@ -16,6 +18,8 @@ class VideoMessageComponent extends GeneralMessageComponent {
         isMuted: true,
         paused: true
     };
+
+    videoRef = VComponent.createComponentRef();
 
     render({message, showDate}, {isMuted}) {
         const document = message.raw.media.document;
@@ -28,10 +32,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
                 {message, showDate, showUsername: false, outerPad: text !== ""},
                 <>
                     <BetterVideoComponent document={message.raw.media.document}
-                                          onClick={() => {
-                                              this.$el.querySelector("video")?.pause();
-                                              UIEvents.MediaViewer.fire("showMessage", {message: this.props.message});
-                                          }}
+                                          onClick={this.videoClick}
                                           autoPlay
                                           paused={this.state.paused}
                                           alwaysShowVideo
@@ -121,7 +122,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
                                                   );
                                               }
                                           }
-                                          muted={isMuted}/>
+                                          muted={isMuted} ref={this.videoRef}/>
 
                     {!text ? MessageTimeFragment({message, bg: true}) : ""}
 
@@ -129,6 +130,11 @@ class VideoMessageComponent extends GeneralMessageComponent {
                 </>
             )
         );
+    }
+
+    videoClick = () => {
+      this.$el.querySelector("video")?.pause();
+      mediaViewerOpen(this.videoRef.component.$el, this.props.message)
     }
 
     onElementHidden() {

@@ -87,7 +87,7 @@ class BetterStickerComponent extends StatefulComponent {
                      css-height={props.useSizeOnAnimated && `${height}px`}
                      onMouseOver={this.onMouseOver}>
 
-                    <img className="loading"
+                    <img className={["loading", (state.url || state.thumbUrl) && "opacity-fade-in"]}
                          src={state.url || state.thumbUrl}
                          css-width={`${width}px`}
                          css-height={`${height}px`}
@@ -119,7 +119,7 @@ class BetterStickerComponent extends StatefulComponent {
                      class="sticker"
                      onClick={props.onClick}
                      onMouseOver={this.onMouseOver}>
-                    <img class="loading"
+                    <img class={["loading", (state.url || state.thumbUrl) && "opacity-fade-in"]}
                          src={state.url || state.thumbUrl}
                          css-width={`${width}px`}
                          css-height={`${height}px`}

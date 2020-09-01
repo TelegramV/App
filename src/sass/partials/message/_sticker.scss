@@ -5,7 +5,7 @@
         height: auto;
         max-height: 512px;
         display: flex;
-        flex-direction: row-reverse;
+        animation: opacity-fade-in 0.3 ease-in-out;
 
         &.clickable {
             cursor: pointer;

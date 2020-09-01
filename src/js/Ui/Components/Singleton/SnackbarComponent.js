@@ -69,7 +69,6 @@ class SnackbarComponent extends StatefulComponent {
 
     hideSnackbar = (id) => {
         const snack = this.state.snackbars.get(id);
-        console.log(snack)
         if(!snack) return;
         snack.isHiding = true;
         this.forceUpdate();

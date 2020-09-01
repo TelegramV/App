@@ -126,7 +126,6 @@ export class ForwardSidebar extends GenericSidebar {
     }
 
     onForwardMessage = event => {
-        console.log("WOW")
         this.state.selectedMessages = [event.message]
         this.state.selected = []
         this.state.from = event.from

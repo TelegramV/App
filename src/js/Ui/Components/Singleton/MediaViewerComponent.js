@@ -107,6 +107,7 @@ function NavigationButtonFragment({isNext, hidden, onClick}) {
 export class MediaViewerComponent extends StatefulComponent {
     state = {
         hidden: true,
+        reallyHidden: true,
         peer: null,
         messages: [],
         message: null,
@@ -126,7 +127,7 @@ export class MediaViewerComponent extends StatefulComponent {
     }
 
     render() {
-        const {message, hidden, isLoadingLeftPage, isLoadingRightPage, zoom} = this.state;
+        const {message, reallyHidden, hidden, isLoadingLeftPage, isLoadingRightPage, zoom} = this.state;
 
         const isLoadingPage = isLoadingLeftPage || isLoadingRightPage;
 
@@ -173,9 +174,8 @@ export class MediaViewerComponent extends StatefulComponent {
         let contextMenuHandler = VUI.ContextMenu.listener(contextActions);
 
         return (
-            <div css-display={this.state.hidden && "none"}
-                 className={["media-viewer-wrapper", hidden ? "hidden" : "", message?.type === MessageType.VIDEO && "media-viewdeo"]}>
-                <div className="media-viewer" onClick={this.close}>
+            <div className={["media-viewer-wrapper", reallyHidden ? "really-hidden" : "" ,hidden ? "hidden" : "", message?.type === MessageType.VIDEO && "media-viewdeo"]}>
+                <div className="media-viewer" onClick={this.close} onTransitionEnd={this.onTransitionEnd}>
                     <div className="header">
                         <div class="close-button">
                             <i className="tgico tgico-close rp rps"/>
@@ -262,6 +262,13 @@ export class MediaViewerComponent extends StatefulComponent {
         this.setState({
             nextMessage: null,
             previousMessage: null
+        })
+    }
+
+    onTransitionEnd = (event) => {
+        if(!this.state.hidden) return;
+        this.setState({
+            reallyHidden: true
         })
     }
 
@@ -356,6 +363,7 @@ export class MediaViewerComponent extends StatefulComponent {
 
         this.setState({
             hidden: false,
+            reallyHidden: false,
             message,
         })
     }
@@ -543,7 +551,7 @@ export class MediaViewerComponent extends StatefulComponent {
     close = (event) => {
         event.stopPropagation();
 
-        this.setState({...this.defaultState})
+        this.setState({...this.defaultState, reallyHidden: false})
     }
 
     zoom = (event) => {

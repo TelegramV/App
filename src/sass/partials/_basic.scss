@@ -156,6 +156,10 @@ img:not([src]) {
     }*/
 }
 
+.opacity-fade-in {
+    animation: opacity-fade-in 0.3s ease-in-out;
+}
+
 ::-webkit-scrollbar {
     width: 5px;
     height: 5px;

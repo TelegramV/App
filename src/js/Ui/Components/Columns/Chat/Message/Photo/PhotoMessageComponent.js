@@ -4,8 +4,12 @@ import MessageTimeFragment from "../Common/MessageTimeFragment";
 import GeneralMessageComponent from "../Common/GeneralMessageComponent";
 import UIEvents from "../../../../../EventBus/UIEvents";
 import BetterPhotoComponent from "../../../../Basic/BetterPhotoComponent";
+import {mediaViewerOpen} from "../../../../../Utils/mediaViewerOpen"
+import VComponent from "../../../../../../V/VRDOM/component/VComponent"
 
 class PhotoMessageComponent extends GeneralMessageComponent {
+    photoRef = VComponent.createComponentRef();
+
     render({message, showDate}) {
         const text = this.props.message.text.length > 0 ? TextWrapperFragment({message}) : "";
 
@@ -17,7 +21,8 @@ class PhotoMessageComponent extends GeneralMessageComponent {
                                           photo={this.props.message.raw.media.photo}
                                           maxWidth={this.props.message.text.length === 0 ? 480 : 470}
                                           maxHeight={512}
-                                          onClick={this.openMediaViewer}/>
+                                          onClick={this.openMediaViewer}
+                                          ref={this.photoRef}/>
 
                     {!text && MessageTimeFragment({message, bg: true})}
 
@@ -28,7 +33,7 @@ class PhotoMessageComponent extends GeneralMessageComponent {
     }
 
     openMediaViewer = () => {
-        UIEvents.MediaViewer.fire("showMessage", {message: this.props.message});
+        mediaViewerOpen(this.photoRef.component.$el, this.props.message)
     };
 }
 
