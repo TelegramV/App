@@ -118,6 +118,7 @@ class Lottie extends StatefulComponent {
 
     registerEvents = (eventListeners) => {
         this.anim.addEventListener("DOMLoaded", this.onDOMLoaded)
+        this.anim.addEventListener("data_ready", this.onDataReady)
 
         eventListeners.forEach((eventListener) => {
             this.anim.addEventListener(eventListener.eventName, eventListener.callback);
@@ -126,6 +127,7 @@ class Lottie extends StatefulComponent {
 
     deRegisterEvents = (eventListeners) => {
         this.anim.removeEventListener("DOMLoaded", this.onDOMLoaded)
+        this.anim.removeEventListener("data_ready", this.onDataReady)
 
         eventListeners.forEach((eventListener) => {
             this.anim.removeEventListener(eventListener.eventName, eventListener.callback);
@@ -197,6 +199,12 @@ class Lottie extends StatefulComponent {
         if (this.props.playOnHover) {
             this.anim.loop = false;
         }
+    }
+
+    onDataReady = () => {
+        this.withTimeout(() => {
+            window.dispatchEvent(new Event("resize"));
+        }, 10);
     }
 }
 

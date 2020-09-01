@@ -1,12 +1,12 @@
-import { RightSidebar } from "../RightSidebar";
-import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent"
-import messages from "../../../../../Api/Telegram/messages"
-import VButton from "../../../../Elements/Button/VButton"
-import StickerSet from "../../../../../Api/Stickers/StickerSet"
-import { StickerManager } from "../../../../../Api/Stickers/StickersManager"
-import BetterStickerComponent from "../../../Basic/BetterStickerComponent"
-import StickersState from "../../../../SharedStates/StickersState"
-import "./StickerSearchSidebar.scss"
+import {RightSidebar} from "../RightSidebar";
+import StatefulComponent from "../../../../../V/VRDOM/component/StatefulComponent";
+import messages from "../../../../../Api/Telegram/messages";
+import VButton from "../../../../Elements/Button/VButton";
+import StickerSet from "../../../../../Api/Stickers/StickerSet";
+import {StickerManager} from "../../../../../Api/Stickers/StickersManager";
+import BetterStickerComponent from "../../../Basic/BetterStickerComponent";
+import StickersState from "../../../../SharedStates/StickersState";
+import "./StickerSearchSidebar.scss";
 
 export class StickerSearchSidebar extends RightSidebar {
     state = {
@@ -15,20 +15,20 @@ export class StickerSearchSidebar extends RightSidebar {
         found: [],
         nextHash: 0,
         loadMore: true,
-    }
+    };
 
     globalState = {
         stickersState: StickersState
-    }
+    };
 
     content() {
         let sets = [];
         if (this.state.query) {
-            sets = this.state.found ?.map(coveredSet => <StickerSetPreviewComponent
+            sets = this.state.found?.map(coveredSet => <StickerSetPreviewComponent
                 set={StickerSet.fromRaw(coveredSet.set)}
                 added={this.globalState.stickersState.contains(coveredSet.set)}/>);
         } else {
-            sets = this.state.featured ?.map(coveredSet => <StickerSetPreviewComponent
+            sets = this.state.featured?.map(coveredSet => <StickerSetPreviewComponent
                 set={StickerSet.fromRaw(coveredSet.set)}
                 added={this.globalState.stickersState.contains(coveredSet.set)}/>);
         }
@@ -39,7 +39,7 @@ export class StickerSearchSidebar extends RightSidebar {
                 {sets}
                 {sets.length === 0 && <div class="nothing">{emptyText}</div>}
             </div>
-        </this.contentWrapper>
+        </this.contentWrapper>;
     }
 
     componentDidUpdate() {
@@ -48,12 +48,12 @@ export class StickerSearchSidebar extends RightSidebar {
     }
 
     onScroll = event => {
-        const $element = event.target
+        const $element = event.target;
 
         if ($element.scrollHeight - 300 <= $element.clientHeight + $element.scrollTop) {
             this.loadMore();
         }
-    }
+    };
 
     loadMore = () => {
         if (this.loadingMore || !this.state.loadMore) return;
@@ -64,46 +64,46 @@ export class StickerSearchSidebar extends RightSidebar {
                 if (found._ === "messages.foundStickerSetsNotModified") {
                     this.setState({
                         loadMore: false
-                    })
+                    });
                     return;
                 }
 
                 this.setState({
                     found: this.state.found.concat(found.sets),
                     nextHash: found.hash
-                })
+                });
 
                 this.loadingMore = false;
-            })
+            });
         } else {
             messages.getFeaturedStickers(this.state.nextHash).then(featured => {
                 if (featured._ === "messages.featuredStickersNotModified") {
                     this.setState({
                         loadMore: false
-                    })
+                    });
                     return;
                 }
 
                 this.setState({
                     featured: this.state.featured.concat(featured.sets),
                     nextHash: featured.hash
-                })
+                });
 
                 this.loadingMore = false;
-            })
+            });
         }
-    }
+    };
 
     get searchLazyLevel(): number {
-        return 500
+        return 500;
     }
 
     get isSearchAsTitle(): boolean {
-        return true
+        return true;
     }
 
     get leftButtonIcon() {
-        return "back"
+        return "back";
     }
 
     onShown(params) {
@@ -112,8 +112,8 @@ export class StickerSearchSidebar extends RightSidebar {
                 this.setState({
                     featured: featured.sets,
                     nextHash: featured.hash
-                })
-            })
+                });
+            });
         }
     }
 
@@ -122,7 +122,7 @@ export class StickerSearchSidebar extends RightSidebar {
         this.setState({
             query: "",
             found: []
-        })
+        });
     }
 
     onSearchInputUpdated = (event) => {
@@ -135,7 +135,7 @@ export class StickerSearchSidebar extends RightSidebar {
                 query: "",
                 found: [],
                 nextHash: 0
-            })
+            });
             return;
         }
 
@@ -147,11 +147,11 @@ export class StickerSearchSidebar extends RightSidebar {
                 query: q,
                 found: found.sets,
                 nextHash: found.hash,
-            })
-            this.searchInputRef.component.$el.value = q
-        })
+            });
+            this.searchInputRef.component.$el.value = q;
+        });
 
-    }
+    };
 }
 
 class StickerSetPreviewComponent extends StatefulComponent {
@@ -161,14 +161,17 @@ class StickerSetPreviewComponent extends StatefulComponent {
         if (props.set.isFetched) {
             for (let sticker of props.set.documents) {
                 if (stickers.length === 5) break; // yes, I'm lazy to make for(let i = 0; i<Math.min(5, this.state.fetchedSet.documents.length); i++)
-                stickers.push(<BetterStickerComponent width={75} document={sticker} hideAnimated/>)
+                stickers.push(<BetterStickerComponent width={75}
+                                                      document={sticker}
+                                                      hideAnimated
+                                                      useSizeOnAnimated/>);
             }
         }
 
         let addClasses = {
             addButton: true,
             added: props.added
-        }
+        };
 
         return (
             <div class="set-preview">
@@ -191,14 +194,14 @@ class StickerSetPreviewComponent extends StatefulComponent {
                     {stickers}
                 </div>
             </div>
-        )
+        );
     }
 
     componentDidMount() {
         if (!this.props.set.isFetched) {
             this.props.set.getStickerSet().then(set => {
                 this.forceUpdate();
-            })
+            });
         }
     }
 
@@ -206,15 +209,15 @@ class StickerSetPreviewComponent extends StatefulComponent {
         if (!props.set.isFetched) {
             props.set.getStickerSet().then(set => {
                 this.forceUpdate();
-            })
+            });
         }
     }
 
     handleAddClick = () => {
         if (this.props.added) {
-            StickerManager.uninstallStickerSet(this.props.set)
+            StickerManager.uninstallStickerSet(this.props.set);
         } else {
-            StickerManager.installStickerSet(this.props.set)
+            StickerManager.installStickerSet(this.props.set);
         }
-    }
+    };
 }

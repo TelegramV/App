@@ -16,40 +16,43 @@
  */
 
 import {ModalHeaderFragment} from "./ModalHeaderFragment";
-import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent"
-import BetterStickerComponent from "../Basic/BetterStickerComponent"
-import VButton from "../../Elements/Button/VButton"
-import StickersState from "../../SharedStates/StickersState"
-import {StickerManager} from "../../../Api/Stickers/StickersManager"
-import VUI from "../../VUI"
-import "./StickerSetModal.scss"
-import {IS_MOBILE_SCREEN} from "../../../Utils/browser"
+import TranslatableStatefulComponent from "../../../V/VRDOM/component/TranslatableStatefulComponent";
+import BetterStickerComponent from "../Basic/BetterStickerComponent";
+import VButton from "../../Elements/Button/VButton";
+import StickersState from "../../SharedStates/StickersState";
+import {StickerManager} from "../../../Api/Stickers/StickersManager";
+import VUI from "../../VUI";
+import "./StickerSetModal.scss";
+import {IS_MOBILE_SCREEN} from "../../../Utils/browser";
 
 export class StickerSetModal extends TranslatableStatefulComponent {
 
-    state = StickersState
+    state = StickersState;
 
     stickerProps = IS_MOBILE_SCREEN ? {} : {
         autoplay: true,
         loop: true,
         paused: false,
-        playOnHover: false,
-        hideAnimated: false
-    }
+        playOnHover: true,
+        hideAnimated: true
+    };
 
     render(props) {
         return <div className="sticker-set">
             <ModalHeaderFragment title={props.set.set?.title ?? "Loading..."} close/>
             <div class="scrollable">
                 <div class="container">
-                    {props.set?.documents?.map(sticker => <BetterStickerComponent width={75} document={sticker}
-                                                                                  hideAnimated {...this.stickerProps}/>)}
+                    {props.set?.documents?.map(sticker => <BetterStickerComponent width={75}
+                                                                                  document={sticker}
+                                                                                  hideAnimated
+                                                                                  useSizeOnAnimated
+                                                                                  {...this.stickerProps}/>)}
                 </div>
             </div>
             <div class="add">
                 <SetButton set={props.set} installed={this.state.contains(props.set.set)}/>
             </div>
-        </div>
+        </div>;
     }
 
     componentDidMount() {
@@ -59,21 +62,21 @@ export class StickerSetModal extends TranslatableStatefulComponent {
                 this.forceUpdate();
             }).catch(ex => {
                 VUI.Modal.popup(this.l("lng_stickers_not_found"));
-            })
+            });
         }
     }
 }
 
 const SetButton = ({set, installed}) => {
     if (!set || !set.isFetched) {
-        return <VButton isUppercase={false}>Loading...</VButton>
+        return <VButton isUppercase={false}>Loading...</VButton>;
     } else {
         if (installed) {
             return <VButton isUppercase={false} isFlat={true} onClick={_ => StickerManager.uninstallStickerSet(set)}>Remove
-                stickers</VButton>
+                stickers</VButton>;
         } else {
             return <VButton isUppercase={false}
-                            onClick={_ => StickerManager.installStickerSet(set)}>Add {set.set.count} stickers</VButton>
+                            onClick={_ => StickerManager.installStickerSet(set)}>Add {set.set.count} stickers</VButton>;
         }
     }
-}
+};

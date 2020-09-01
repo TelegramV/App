@@ -17,34 +17,35 @@
  *
  */
 
-import Lottie from "../../Lottie/Lottie"
-import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent"
-import {FileAPI} from "../../../Api/Files/FileAPI"
-import FileManager from "../../../Api/Files/FileManager"
-import AppEvents from "../../../Api/EventBus/AppEvents"
-import WebpHelper from "../../Utils/WebpHelper"
+import Lottie from "../../Lottie/Lottie";
+import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent";
+import {FileAPI} from "../../../Api/Files/FileAPI";
+import FileManager from "../../../Api/Files/FileManager";
+import AppEvents from "../../../Api/EventBus/AppEvents";
+import WebpHelper from "../../Utils/WebpHelper";
 
 // probably patch-compatible
 class BetterStickerComponent extends StatefulComponent {
     state = {
         isAnimated: false,
+        isAnimating: false,
         animationDataUrl: null,
         animationData: null,
         showAnimation: !this.props.hideAnimated,
         url: null,
         thumbUrl: null,
         isDownloading: false,
-    }
+    };
 
     appEvents(E) {
         E.bus(AppEvents.Files)
             .filter(event => FileManager.checkEvent(event, this.props.document))
             .on("download.start", this.onDownloadStart)
-            .on("download.done", this.onDownloadDone)
+            .on("download.done", this.onDownloadDone);
 
         E.bus(AppEvents.Files)
             .filter(event => FileManager.checkEvent(event, this.props.document, this.props.document.thumbs[0]))
-            .on("download.done", this.onAnimatedThumbDownloadDone)
+            .on("download.done", this.onAnimatedThumbDownloadDone);
     }
 
     render(props, state) {
@@ -54,7 +55,7 @@ class BetterStickerComponent extends StatefulComponent {
         const height = props.height || (sizeAttr ? sizeAttr.h / sizeAttr.w * width : width);
 
 
-        if ((!state.thumbUrl || state.showAnimation) && state.isAnimated) {
+        if (state.isAnimated) {
             const options = {
                 path: state.animationDataUrl,
                 loop: props.loop ?? false,
@@ -69,19 +70,31 @@ class BetterStickerComponent extends StatefulComponent {
             };
 
             const playOnHover = props.playOnHover ?? true;
-            const isPaused = props.paused ?? true;
+            const isPaused = props.paused ?? !(!state.thumbUrl || state.showAnimation);
 
             const classes = {
                 sticker: true,
                 rp: true,
                 rps: true,
                 clickable: props.clickable
-            }
+            };
 
             return (
                 <div id={props.id}
                      class={classes}
-                     onClick={props.onClick}>
+                     onClick={props.onClick}
+                     css-width={props.useSizeOnAnimated && `${width}px`}
+                     css-height={props.useSizeOnAnimated && `${height}px`}
+                     onMouseOver={this.onMouseOver}>
+
+                    <img className="loading"
+                         src={state.url || state.thumbUrl}
+                         css-width={`${width}px`}
+                         css-height={`${height}px`}
+                         alt="Sticker" showIf={!state.isAnimating}/>
+
+                    {state.showAnimation
+                    &&
                     <Lottie width={width}
                             height={height}
                             options={options}
@@ -90,12 +103,16 @@ class BetterStickerComponent extends StatefulComponent {
                             eventListeners={[
                                 {
                                     eventName: "complete",
-                                    callback: this.onAnimationStop
+                                    callback: this.onAnimationStop,
+                                },
+                                {
+                                    eventName: "data_ready",
+                                    callback: this.onAnimationStart,
                                 }
                             ]}
-                    />
+                    />}
                 </div>
-            )
+            );
         } else {
             return (
                 <div id={props.id}
@@ -108,7 +125,7 @@ class BetterStickerComponent extends StatefulComponent {
                          css-height={`${height}px`}
                          alt="Sticker"/>
                 </div>
-            )
+            );
         }
     }
 
@@ -116,7 +133,7 @@ class BetterStickerComponent extends StatefulComponent {
         const isAnimated = this.props.isAnimated != null ? this.props.isAnimated : document.mime_type === "application/x-tgsticker";
         const thumb = isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "";
 
-        const bytesThumb = FileAPI.getAnimatedStickerThumbnail(document)
+        const bytesThumb = FileAPI.getAnimatedStickerThumbnail(document);
 
         this.setState({
             isDownloading: true,
@@ -136,7 +153,7 @@ class BetterStickerComponent extends StatefulComponent {
             const {document, isFull} = nextProps;
             const isAnimated = nextProps.isAnimated ?? document.mime_type === "application/x-tgsticker";
             const thumb = isAnimated || isFull ? "" : document.thumbs && document.thumbs.length ? document.thumbs[0] : "";
-            const bytesThumb = FileAPI.getAnimatedStickerThumbnail(document)
+            const bytesThumb = FileAPI.getAnimatedStickerThumbnail(document);
 
             nextState.isDownloading = true;
             nextState.isAnimated = isAnimated;
@@ -156,21 +173,28 @@ class BetterStickerComponent extends StatefulComponent {
                 showAnimation: true,
             });
         }
-    }
+    };
 
     onAnimationStop = () => {
         if (this.props.hideAnimated) {
             this.setState({
                 showAnimation: false,
+                isAnimating: false
             });
         }
-    }
+    };
+
+    onAnimationStart = () => {
+        this.setState({
+            isAnimating: true,
+        });
+    };
 
     onDownloadStart = () => {
         this.setState({
             isDownloading: true,
         });
-    }
+    };
 
     onDownloadDone = event => {
         if (this.state.isAnimated) {
@@ -188,13 +212,13 @@ class BetterStickerComponent extends StatefulComponent {
                 });
             });
         } else {
-            if(WebpHelper.shouldConvert()) {
+            if (WebpHelper.shouldConvert()) {
                 WebpHelper.convertToPng(event.blob).then(url => {
                     this.setState({
                         url: url,
                         isDownloading: false,
-                    })
-                })   
+                    });
+                });
             } else {
                 this.setState({
                     url: event.url,
@@ -202,21 +226,21 @@ class BetterStickerComponent extends StatefulComponent {
                 });
             }
         }
-    }
+    };
 
     onAnimatedThumbDownloadDone = (event) => {
-        if(WebpHelper.shouldConvert()) {
+        if (WebpHelper.shouldConvert()) {
             WebpHelper.convertToPng(event.blob).then(url => {
                 this.setState({
                     thumbUrl: url
-                })
-            })
+                });
+            });
         } else {
             this.setState({
                 thumbUrl: event.url,
             });
         }
-    }
+    };
 }
 
 export default BetterStickerComponent;

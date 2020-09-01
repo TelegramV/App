@@ -251,7 +251,8 @@ class StickersComposerComponent extends StatelessComponent {
                                                 width={75}
                                                 document={Document}
                                                 onClick={() => this.sendSticker(Document)}
-                                                hideAnimated/>,
+                                                hideAnimated
+                                                useSizeOnAnimated/>,
                         $el
                     );
                 });
@@ -276,7 +277,8 @@ class StickersComposerComponent extends StatelessComponent {
                                         width={75}
                                         document={Document}
                                         onClick={() => this.sendSticker(Document)}
-                                        hideAnimated/>,
+                                        hideAnimated
+                                        useSizeOnAnimated/>,
                 $recent
             );
 
@@ -321,7 +323,8 @@ class StickersComposerComponent extends StatelessComponent {
                             onClick={() => this.sendSticker(Document)}
                             width={75}
                             document={Document}
-                            hideAnimated/>,
+                            hideAnimated
+                            useSizeOnAnimated/>,
                         $el
                     );
                 })
