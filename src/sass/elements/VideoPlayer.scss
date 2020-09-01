@@ -29,6 +29,7 @@
     position: relative;
     overflow: hidden;
     user-select: none;
+    z-index: 1000000;
 
     .player {
         display: flex;

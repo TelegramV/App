@@ -17,11 +17,8 @@
  *
  */
 
-import AppEvents from "../../../Api/EventBus/AppEvents"
-import FileManager from "../../../Api/Files/FileManager"
-import VideoPlayer from "./VideoPlayer"
-import DocumentParser from "../../../Api/Files/DocumentParser"
-import MP4StreamingFile, {getMediaFile} from "../../../Api/Media/MediaFile"
+import VideoPlayer from "./VideoPlayer";
+import FileManager from "../../../Api/Files/FileManager";
 
 class StreamingVideoComponent extends VideoPlayer {
     state = {
@@ -29,25 +26,31 @@ class StreamingVideoComponent extends VideoPlayer {
         url: "",
     };
 
-    mp4file: MP4StreamingFile;
-
     appEvents(E) {
-        E.bus(AppEvents.Files)
-            .filter(event => FileManager.checkEvent(event, this.props.document))
-            .on("download.start", this.onDownloadStart)
-            .on("download.newPart", this.onDownloadNewPart)
-            .on("download.done", this.onDownloadDone);
+        // E.bus(AppEvents.Files)
+        //     .filter(event => FileManager.checkEvent(event, this.props.document))
+        //     .on("download.start", this.onDownloadStart)
+        //     .on("download.newPart", this.onDownloadNewPart)
+        //     .on("download.done", this.onDownloadDone);
     }
 
     render(props, state, globalState) {
         props = {...props};
         props.size = props.document.size;
-        props.bufferedSize = props.document.__mp4file?.bufferOffset || FileManager.getPendingSize(props.document);
-        props.isDownloaded = FileManager.isDownloaded(props.document);
-        props.isStreamable = DocumentParser.isVideoStreamable(props.document);
+        // props.bufferedSize = props.document.__mp4file?.bufferOffset || FileManager.getPendingSize(props.document);
+        // props.isDownloaded = FileManager.isDownloaded(props.document);
+        // props.isStreamable = DocumentParser.isVideoStreamable(props.document);
+        if (FileManager.isDownloaded(props.document)) {
+            props.src = FileManager.getUrl(props.document);
+
+        } else {
+            props.src = `./stream/${props.document.id}`;
+            global.__DOCUMENTS__.set(props.document.id, props.document);
+        }
+        // console.log(props.document);
         delete props.document;
-        props.src = state.url;
-        props.previewSrc = state.previewSrc;
+        // props.src = state.url;
+        // props.previewSrc = state.previewSrc;
 
         return super.render(props, state, globalState);
     }
@@ -55,40 +58,40 @@ class StreamingVideoComponent extends VideoPlayer {
     componentWillMount(props) {
         super.componentWillMount(props);
 
-        if (!FileManager.isDownloaded(this.props.document) && DocumentParser.isVideoStreamable(props.document)) {
-            if (DocumentParser.isVideoStreamable(props.document)) {
-                this.mp4file = getMediaFile(this.props.document);
-                this.state.url = this.mp4file.url;
-            } else {
-                console.warn("streaming is not supported for this video");
-                FileManager.downloadDocument(this.props.document);
-            }
-        } else {
-            FileManager.downloadDocument(this.props.document);
-        }
+        // if (!FileManager.isDownloaded(this.props.document) && DocumentParser.isVideoStreamable(props.document)) {
+        //     if (DocumentParser.isVideoStreamable(props.document)) {
+        //         this.mp4file = getMediaFile(this.props.document);
+        //         this.state.url = this.mp4file.url;
+        //     } else {
+        //         console.warn("streaming is not supported for this video");
+        //         FileManager.downloadDocument(this.props.document);
+        //     }
+        // } else {
+        //     FileManager.downloadDocument(this.props.document);
+        // }
     }
 
     componentWillUpdate(nextProps, nextState) {
         super.componentWillUpdate(nextProps, nextState);
 
-        if (nextProps.document !== this.props.document || nextProps.document.id !== this.props.document.id) {
-            this.state.url = "";
-
-            if (!FileManager.isDownloaded(nextProps.document)) {
-                if (DocumentParser.isVideoStreamable(nextProps.document)) {
-                    this.mp4file = getMediaFile(nextProps.document);
-
-                    this.setState({
-                        url: this.mp4file.url,
-                    });
-                } else {
-                    console.warn("streaming is not supported for this video");
-                    FileManager.downloadDocument(nextProps.document);
-                }
-            } else {
-                FileManager.downloadDocument(nextProps.document);
-            }
-        }
+        // if (nextProps.document !== this.props.document || nextProps.document.id !== this.props.document.id) {
+        //     this.state.url = "";
+        //
+        //     if (!FileManager.isDownloaded(nextProps.document)) {
+        //         if (DocumentParser.isVideoStreamable(nextProps.document)) {
+        //             this.mp4file = getMediaFile(nextProps.document);
+        //
+        //             this.setState({
+        //                 url: this.mp4file.url,
+        //             });
+        //         } else {
+        //             console.warn("streaming is not supported for this video");
+        //             FileManager.downloadDocument(nextProps.document);
+        //         }
+        //     } else {
+        //         FileManager.downloadDocument(nextProps.document);
+        //     }
+        // }
     }
 
     componentWillUnmount() {
@@ -98,73 +101,41 @@ class StreamingVideoComponent extends VideoPlayer {
     }
 
     onDownloadStart = ({file}) => {
-        this.forceUpdate();
-
-        if (DocumentParser.isVideoStreamable(file)) {
-            // this.setState({
-            //     url: file.__mp4file.url,
-            // });
-        } else {
-            this.setState({
-                url: "",
-            });
-        }
-    }
+        // this.forceUpdate();
+        //
+        // if (DocumentParser.isVideoStreamable(file)) {
+        //     // this.setState({
+        //     //     url: file.__mp4file.url,
+        //     // });
+        // } else {
+        //     this.setState({
+        //         url: "",
+        //     });
+        // }
+    };
 
     onDownloadNewPart = () => {
-        this.forceUpdate();
-    }
+        // this.forceUpdate();
+    };
 
-    onSeeking = event => {
-        const $video: HTMLVideoElement = event.target;
-
-        if ($video.lastSeekTime !== $video.currentTime) {
-            for (let i = 0; i < $video.buffered.length; i++) {
-                let start = $video.buffered.start(i);
-                let end = $video.buffered.end(i);
-
-                if ($video.currentTime >= start && $video.currentTime <= end) {
-                    return;
-                }
-            }
-
-            this.mp4file.seek($video.currentTime);
-
-            $video.lastSeekTime = $video.currentTime;
-        }
-    }
-
-    onPreviewMouseMove = this.throttle((event: MouseEvent) => {
-        // currently we are ignoring previews for streaming videos
-        // it is really hard for browsers to serve two ISOFiles
-        // (the feature is implemented anyway)
-
-        if (this.state.downloaded) {
-            const $video: HTMLVideoElement = this.previewVideoRef.$el;
-
-            const box = (event.currentTarget || event.target).getBoundingClientRect();
-            const percentage = (event.pageX - box.x) / box.width;
-            $video.currentTime = $video.duration * Math.max(0, Math.min(1, percentage));
-            //this.pause();
-
-            this.setState({
-                showPreview: true,
-                previewPosition: percentage * 100,
-            });
-        }
-    }, 150)
-
-    onDownloadDone = ({blob, url}) => {
-        if (!this.state.url || !this.videoRef.$el?.currentTime) {
-            this.setState({
-                downloaded: true,
-                url,
-                previewSrc: url,
-            });
-        }
-
-        //this.pause();
-    }
+    // onSeeking = event => {
+    //     const $video: HTMLVideoElement = event.target;
+    //
+    //     if ($video.lastSeekTime !== $video.currentTime) {
+    //         for (let i = 0; i < $video.buffered.length; i++) {
+    //             let start = $video.buffered.start(i);
+    //             let end = $video.buffered.end(i);
+    //
+    //             if ($video.currentTime >= start && $video.currentTime <= end) {
+    //                 return;
+    //             }
+    //         }
+    //
+    //         this.mp4file.seek($video.currentTime);
+    //
+    //         $video.lastSeekTime = $video.currentTime;
+    //     }
+    // };
 }
 
 export default StreamingVideoComponent;

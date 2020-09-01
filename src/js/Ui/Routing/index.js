@@ -1,9 +1,9 @@
 // import LoginPage from "../Pages/Login/LoginPage"
 // import {MainPage} from "../Pages/Main/MainPage"
-import MTProto from "../../MTProto/External"
-import VApp from "../../V/vapp"
-import {ConfigurableExample} from "../Components/AnotherVirtualList"
-import {MainPage} from "../Pages/Main/MainPage"
+import MTProto from "../../MTProto/External";
+import VApp from "../../V/vapp";
+import {ConfigurableExample} from "../Components/AnotherVirtualList";
+import {MainPage} from "../Pages/Main/MainPage";
 import LoginPage from "../Pages/Login/LoginPage";
 //import {VideoStreamingPage} from "../Pages/Tests/VideoStreaming"
 //import CalendarTestPage from "../Pages/Tests/CalendarTestPage"
@@ -15,7 +15,9 @@ import LoginPage from "../Pages/Login/LoginPage";
 //import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage"
 //import ElementsPage from "../Pages/Tests/Elements"
 //import CanvasTestPage from "../Pages/Tests/CanvasTest"
-import RadioButtonPage from "../Pages/Tests/Radio"
+import RadioButtonPage from "../Pages/Tests/Radio";
+import {VideoPlayerPage} from "../Pages/Tests/VideoPlayerPage";
+
 //import IGEPage from "../Pages/Tests/IGE"
 
 /**
@@ -24,15 +26,15 @@ import RadioButtonPage from "../Pages/Tests/Radio"
 function AppRoutes(router) {
     router.route("/login", "login", {
         h() {
-            return LoginPage()
+            return LoginPage();
         }
-    })
+    });
 
     router.route("/", "main", {
         h() {
-            return MainPage()
+            return MainPage();
         }
-    })
+    });
 
     router.route("/virt", "main", {
         h() {
@@ -60,15 +62,15 @@ function AppRoutes(router) {
 
             return <div id="app">
                 <MyConfigurableExample/>
-            </div>
+            </div>;
         }
-    })
+    });
 
     router.route("/radio", "radio", {
         h() {
-            return RadioButtonPage()
+            return RadioButtonPage();
         }
-    })
+    });
 
     /*router.route("/ige", "ige", {
         h() {
@@ -88,11 +90,11 @@ function AppRoutes(router) {
     //     }
     // })
 
-    // router.route("/videoplayer", "videoplayer", {
-    //     h() {
-    //         return VideoPlayerPage()
-    //     }
-    // })
+    router.route("/videoplayer", "videoplayer", {
+        h() {
+            return VideoPlayerPage();
+        }
+    });
     // router.route("/calendar", "calendar", {
     //     h() {
     //         return CalendarTestPage()
@@ -178,23 +180,23 @@ function AppRoutes(router) {
                 return {
                     next: false,
                     doNext: () => {
-                        VApp.router.replace("/login")
+                        VApp.router.replace("/login");
                     },
-                }
+                };
             }
         } else {
             if (toRoute.route.name === "login") {
                 return {
                     next: false,
                     doNext: () => {
-                        VApp.router.replace("/")
+                        VApp.router.replace("/");
                     }
-                }
+                };
             }
         }
 
-        return true
-    })
+        return true;
+    });
 }
 
-export default AppRoutes
+export default AppRoutes;

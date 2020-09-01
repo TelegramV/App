@@ -1,17 +1,18 @@
-const webpack = require("webpack")
-const path = require("path")
+const webpack = require("webpack");
+const path = require("path");
 
-const MiniCssExtractPlugin = require("mini-css-extract-plugin")
-const {CleanWebpackPlugin} = require("clean-webpack-plugin")
-const HtmlWebpackPlugin = require("html-webpack-plugin")
-const FilterWarningsPlugin = require("webpack-filter-warnings-plugin")
-const CopyWebpackPlugin = require("copy-webpack-plugin")
-const TerserPlugin = require("terser-webpack-plugin")
-const CompressionPlugin = require("compression-webpack-plugin")
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin")
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const FilterWarningsPlugin = require("webpack-filter-warnings-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const CompressionPlugin = require("compression-webpack-plugin");
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const WorkboxPlugin = require("workbox-webpack-plugin");
 
-const __IS_PRODUCTION__ = process.argv.mode === "production" || process.argv.includes("production")
-const __IS_DEV__ = !__IS_PRODUCTION__
+const __IS_PRODUCTION__ = process.argv.mode === "production" || process.argv.includes("production");
+const __IS_DEV__ = !__IS_PRODUCTION__;
 
 const config = {
     node: {
@@ -36,8 +37,8 @@ const config = {
             },
             {
                 test: /encoderWorker\.min\.js$/,
-                use: [{ loader: 'file-loader' }]
-              },
+                use: [{loader: 'file-loader'}]
+            },
             {
                 test: /\.js$/,
                 use: [
@@ -106,6 +107,7 @@ const config = {
         ],
     },
     plugins: [
+        new WorkboxPlugin.GenerateSW(),
         new CopyWebpackPlugin([{
             from: "public",
         }]),
@@ -146,6 +148,6 @@ const config = {
         inline: true,
         port: 8090,
     },
-}
+};
 
-module.exports = config
+module.exports = config;

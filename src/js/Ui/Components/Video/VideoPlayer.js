@@ -20,7 +20,6 @@
 import StatefulComponent from "../../../V/VRDOM/component/StatefulComponent";
 import VComponent from "../../../V/VRDOM/component/VComponent";
 import {formatTime} from "../../../Utils/date";
-import {DocumentMessagesTool} from "../../Utils/document";
 import VSpinner from "../../Elements/VSpinner";
 import UIEvents from "../../EventBus/UIEvents";
 
@@ -100,25 +99,28 @@ class VideoPlayer extends StatefulComponent {
         previewPosition: 0,
     };
 
-    render({src, previewSrc, controls, containerWidth, containerHeight, bufferedSize, isDownloaded, isStreamable, size, thumbUrl, ...otherArgs}, {showControls, previewPosition, showPreview}, globalState) {
+    buffering = [];
+
+    render({src, controls, containerWidth, containerHeight, size, thumbUrl, ...otherArgs}, {showControls, previewPosition, showPreview}, globalState) {
         // https://ak.picdn.net/shutterstock/videos/31008538/preview/stock-footage-parrot-flies-alpha-matte-d-rendering-animation-animals.webm
         const isPaused = this.videoRef.$el?.paused ?? true;
         const time = this.videoRef.$el?.currentTime ?? 0;
         const duration = this.videoRef.$el?.duration ?? 0;
         const buffered = this.videoRef.$el?.buffered;
         const seeking = this.videoRef.$el?.seeking;
-        let bufferedEnd;
 
-        try {
-            bufferedEnd = buffered?.end(0);
-        } catch (e) {
-            bufferedEnd = 0;
-        }
+        const buffering = [];
+        this.buffering = buffering;
 
-        let progress = bufferedEnd / duration * 100;
-
-        if (this.videoRef.$el?.src !== src) {
-            progress = 0;
+        if (buffered) {
+            for (let i = 0; i < buffered.length; i++) {
+                const buff = {start: buffered.start(i), end: buffered.end(i)};
+                buffering.push({
+                    ...buff,
+                    startProgress: buff.start / duration * 100,
+                    endProgress: buff.end / duration * 100
+                });
+            }
         }
 
         let styleSize = {
@@ -148,7 +150,7 @@ class VideoPlayer extends StatefulComponent {
         }
 
         const isBuffering = this.videoRef.$el?.readyState < this.videoRef.$el?.HAVE_FUTURE_DATA;
-        const hideThumb = progress || (src && !isStreamable);
+        const hideThumb = buffering.length;
         const hideLoading = hideThumb && !seeking && !isBuffering;
 
         return (
@@ -170,25 +172,30 @@ class VideoPlayer extends StatefulComponent {
                         </div>
                     </div>
 
-                    <video css-display={!progress && "none"}
-                           ref={this.videoRef}
-                           src={src}
-                           {...otherArgs}
-                           onPlay={this.onPlay}
-                           onPause={this.onPause}
-                           onDurationChange={this.onDurationChange}
-                           onProgress={this.onProgress}
-                           onClick={this.onClickPause}
-                           onTimeUpdate={this.onTimeUpdate}
-                           onEnterPictureInPicture={this.onEnterPictureInPicture}
-                           onLeavePictureInPicture={this.onLeavePictureInPicture}
-                           onSeeking={this.onSeeking}
-                           $recreate={this.videoRef.$el?.src !== src /* THIS IS VERY BAD КОСТИЛЬ, but now idk how to do it better, NEVER REPEAT THIS!!!!*/}
-                    />
+                    <video
+                        css-display={!hideThumb && "none"}
+                        ref={this.videoRef}
+                        src={src}
+                        {...otherArgs}
+                        onPlay={this.onPlay}
+                        onPause={this.onPause}
+                        onDurationChange={this.onDurationChange}
+                        onProgress={this.onProgress}
+                        onClick={this.onClickPause}
+                        onTimeUpdate={this.onTimeUpdate}
+                        // onEnterPictureInPicture={this.onEnterPictureInPicture}
+                        // onLeavePictureInPicture={this.onLeavePictureInPicture}
+                        // onSeeking={this.onSeeking}
+                        // $recreate={this.videoRef.$el?.src !== src /* THIS IS VERY BAD КОСТИЛЬ, but now idk how to do it better, NEVER REPEAT THIS!!!!*/}
+                    >
+                        {src && <source src={`${src}`}/>}
+                    </video>
 
                     <div className={{
                         "controls": true,
-                        "hidden": !buffered || !controls || !showControls
+                        "hidden": !controls || !showControls,
+                    }} style={{
+                        "display": !buffering.length && "none",
                     }}>
                         <div style={{
                             "margin-left": `calc(${previewPosition}% - calc(170px / 2))`,
@@ -198,8 +205,9 @@ class VideoPlayer extends StatefulComponent {
                             {/*    src="https://12kanal.com/wp-content/uploads/2019/10/k-chemu-snitsya-popugay-zhenschine-ili-muzhchine-2.jpg"*/}
                             {/*    alt="Frame"/>*/}
                             <video ref={this.previewVideoRef}
-                                   src={previewSrc}
-                                   $recreate={this.videoRef.$el?.src !== src}/>
+                                   src={src}
+                                // $recreate={this.videoRef.$el?.src !== src}
+                            />
                         </div>
                         <div className="progress"
                              ref={this.timeWrapperRef}
@@ -214,9 +222,14 @@ class VideoPlayer extends StatefulComponent {
                                 }}/>
                                 <div className="dot"/>
                             </div>
-                            <div className="buffer" style={{
-                                width: `${progress}%`
-                            }}/>
+                            {
+                                buffering.map(({startProgress, endProgress}) => (
+                                    <div className="buffer" style={{
+                                        width: `${endProgress - startProgress}%`,
+                                        left: `${startProgress}%`,
+                                    }}/>
+                                ))
+                            }
                         </div>
                         <div className="buttons">
                             <div className="button pause">
@@ -226,9 +239,6 @@ class VideoPlayer extends StatefulComponent {
                             <div className="time">
                                 {formatTime(time)} / {formatTime(duration)}
                             </div>
-                            {size && !isDownloaded &&/*bufferedSize != null &&*/ <div className="bytes">
-                                {DocumentMessagesTool.formatSize(bufferedSize || 0)}/{DocumentMessagesTool.formatSize(size)}
-                            </div>}
                             <div className="button full">
                                 <i className="tgico tgico-full_screen" onClick={this.onClickFull}/>
                             </div>
@@ -250,6 +260,8 @@ class VideoPlayer extends StatefulComponent {
 
     componentWillUnmount() {
         // console.warn("will unmount")
+
+        // URL.revokeObjectURL(this.videoRef.$el.src);
 
         window.removeEventListener("keydown", this.onKeyDown);
     }
@@ -292,14 +304,15 @@ class VideoPlayer extends StatefulComponent {
         this.forceUpdate();
     };
 
-    onPreviewMouseMove = () => {
-    };
-
     onPreviewMouseOver = (event: MouseEvent) => {
+        this.isPreviewOver = true;
+
         this.onMouseMove(event);
     };
 
     onPreviewMouseLeave = (event: MouseEvent) => {
+        this.isPreviewOver = false;
+
         this.setState({
             showPreview: false,
         });
@@ -385,15 +398,15 @@ class VideoPlayer extends StatefulComponent {
         this.setState({
             showControls: true,
         });
-
-        this.hideControls();
     };
 
     hideControls = this.debounce(() => {
-        this.setState({
-            showControls: false,
-            showPreview: false
-        });
+        if (!this.isPreviewOver) {
+            this.setState({
+                showControls: false,
+                showPreview: false
+            });
+        }
     }, 4000);
 
     onEnterPictureInPicture = (event) => {
@@ -405,6 +418,23 @@ class VideoPlayer extends StatefulComponent {
     onLeavePictureInPicture = (event) => {
         console.log(event);
     };
+
+    onPreviewMouseMove = this.throttle((event: MouseEvent) => {
+        if (this.buffering.length) {
+            const $video: HTMLVideoElement = this.previewVideoRef.$el;
+
+            const box = this.timeWrapperRef.$el.getBoundingClientRect();
+            const percentage = (event.pageX - box.x) / box.width;
+            $video.currentTime = $video.duration * Math.max(0, Math.min(1, percentage));
+            $video.pause();
+            // this.pause();
+
+            this.setState({
+                showPreview: true,
+                previewPosition: percentage * 100,
+            });
+        }
+    }, 100);
 }
 
 export default VideoPlayer;
