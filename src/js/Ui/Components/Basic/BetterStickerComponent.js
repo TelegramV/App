@@ -93,7 +93,7 @@ class BetterStickerComponent extends StatefulComponent {
                          css-height={`${height}px`}
                          alt="Sticker" showIf={!state.isAnimating}/>
 
-                    {(!state.thumbUrl || state.showAnimation)
+                    {state.showAnimation
                     &&
                     <Lottie width={width}
                             height={height}
@@ -185,7 +185,6 @@ class BetterStickerComponent extends StatefulComponent {
     };
 
     onAnimationStart = () => {
-        console.log("Start anng")
         this.setState({
             isAnimating: true,
         });
