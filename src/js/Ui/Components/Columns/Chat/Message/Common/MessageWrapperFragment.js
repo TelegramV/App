@@ -13,6 +13,7 @@ import API from "../../../../../../Api/Telegram/API";
 import PeerName from "../../../../Reactive/PeerName";
 import AppSelectedChat from "../../../../../Reactive/SelectedChat";
 import {copyTextToClipboard} from "../../../../../../Utils/clipboard";
+import Locale from "../../../../../../Api/Localization/Locale"
 
 function ReplyToMessageFragment({message}) {
     if (!message.raw.reply_to_msg_id) {
@@ -43,33 +44,33 @@ function createContextMenu(message) {
     return [
         {
             icon: "reply",
-            title: "Reply",
+            title: Locale.l("lng_context_reply_msg"),
             onClick: _ => ChatInputManager.replyTo(message)
         },
         {
             icon: "copy",
-            title: "Copy",
+            title: Locale.l("lng_context_copy_text"),
             onClick: _ => {
                 copyTextToClipboard(message.text);
             }
         },
         {
             icon: _ => message.isPinned ? "unpin" : "pin",
-            title: _ => message.isPinned ? "Unpin" : "Pin",
+            title: _ => message.isPinned ? Locale.l("lng_context_unpin_msg") : Locale.l("lng_context_pin_msg"),
             onClick: _ => {
                 API.messages.updatePinnedMessage(message);
             }
         },
         {
             icon: "forward",
-            title: "Forward",
+            title: Locale.l("lng_context_forward_msg"),
             onClick: () => {
                 UIEvents.General.fire("message.forward", {message, from: message.dialog.peer});
             }
         },
         {
             icon: "delete",
-            title: "Delete",
+            title: Locale.l("lng_context_delete_msg"),
             red: true,
             onClick: () => {
                 if (message.dialogPeer instanceof ChannelPeer) {

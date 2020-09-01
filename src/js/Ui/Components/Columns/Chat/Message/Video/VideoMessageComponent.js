@@ -141,7 +141,7 @@ class VideoMessageComponent extends GeneralMessageComponent {
     onElementVisible() {
         super.onElementVisible();
         const document = this.props.message.raw.media.document;
-        if (!FileManager.isDownloaded(document)) {
+        if (!FileManager.isDownloaded(document) && document.size < 2*1024*1024) { //limit 2 MB autodownload
             FileManager.downloadVideo(document);
         }
 
