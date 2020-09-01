@@ -145,9 +145,9 @@ class Dialog extends StatefulComponent {
         );
     }
 
-    componentDidMount() {
+    /*componentDidMount() {
         console.log("MOUNTED");
-    }
+    }*/
 
     onClick = () => {
         if (AppSelectedChat.check(this.props.dialog.peer)) {

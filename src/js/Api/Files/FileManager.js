@@ -146,7 +146,7 @@ class FilesManager {
     }
 
     convertToWavIfNeeded(blob, mime)  {
-        if(mime !== "audio/ogg" || IS_OPUS_SUPPORTED) {
+        if(mime !== "audio/ogg" || false) {
             return Promise.resolve(blob);
         }
 
