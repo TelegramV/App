@@ -65,6 +65,7 @@ export class GenericSidebar extends TranslatableStatefulComponent {
             this.setState({
                 fadeIn: false
             })
+            this.onFadeInEnd()
             return
         }
 
@@ -81,6 +82,10 @@ export class GenericSidebar extends TranslatableStatefulComponent {
 
     onShown(params) {
 
+    }
+
+    onFadeInEnd() {
+        
     }
 
     hide() {

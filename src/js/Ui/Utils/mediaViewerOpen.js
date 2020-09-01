@@ -1,5 +1,6 @@
 import UIEvents from "../EventBus/UIEvents"
 import {FileAPI} from "../../Api/Files/FileAPI"
+import {IS_MOBILE_SCREEN} from "../../Utils/browser"
 
 export function mediaViewerOpen($media, message) {
     const loc = $media.getBoundingClientRect()
@@ -11,7 +12,7 @@ export function mediaViewerOpen($media, message) {
                             width: ${loc.width}px;
                             height: ${loc.height}px;
                             filter: blur(0);
-                            transition: transform 0.3s ease-in-out, top 0.3s ease-in-out, left 0.3s ease-in-out, opacity 1s ease, filter 1s ease;`
+                            transition: transform 0.2s ease-in-out, top 0.2s ease-in-out, left 0.2s ease-in-out, opacity 1s ease, filter 1s ease;`
     document.body.appendChild(ghost)
     setTimeout(() => {
         const newCoords = calculateCenter(loc.width, loc.height);
@@ -23,13 +24,13 @@ export function mediaViewerOpen($media, message) {
         setTimeout(() => {
             UIEvents.MediaViewer.fire("showMessage", {message});
             ghost.remove();
-        }, 300)
-    }, 150)
+        }, 200)
+    }, 90)
 }
 
 function calculateScale(width, height, message) {
-    const maxWidth = window.innerWidth*0.8
-    const maxHeight = window.innerHeight*0.8
+    const maxWidth = window.innerWidth * (IS_MOBILE_SCREEN ? 0.8 : 1)
+    const maxHeight = window.innerHeight/**0.8*/
 
     const size = FileAPI.getMaxSize(message.media.video || message.media.photo || message.media.document || message.media, false);
     if(!size) return Math.min(maxWidth/width, maxHeight/height);

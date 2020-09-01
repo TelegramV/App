@@ -78,6 +78,7 @@ export class DialogsSidebar extends LeftSidebar {
     // loaderRef = VComponent.createRef()
     searchRef = VComponent.createComponentRef()
     dialogsWrapperRef = VComponent.createRef()
+    listRef = VComponent.createComponentRef();
 
     searchOpen = false
     fixedFab = false
@@ -125,8 +126,8 @@ export class DialogsSidebar extends LeftSidebar {
                         <progress className="progress-circular big"/>
                     </div> : ""
             }
-            <VirtualDialogsFolderList/>
-
+            
+            <VirtualDialogsFolderList ref={this.listRef}/>
 
             {/*<div ref={this.dialogsWrapperRef} id="dialogsWrapper" class={{"scrollable": true, "loading": true}}>*/}
             {/*    <div ref={this.loaderRef} className="full-size-loader" id="loader">*/}

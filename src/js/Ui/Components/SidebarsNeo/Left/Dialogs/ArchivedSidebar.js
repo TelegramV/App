@@ -16,11 +16,7 @@ export class ArchivedSidebar extends LeftSidebar {
 
     content(): * {
         return <this.contentWrapper>
-            <div style={{
-                "height": "100%"
-            }}>
-                <VirtualDialogsFolderList archived ref={this.virtualFolderList}/>
-            </div>
+            <VirtualDialogsFolderList archived ref={this.virtualFolderList}/>
        </this.contentWrapper>
     }
 
