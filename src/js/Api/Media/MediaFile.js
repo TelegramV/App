@@ -266,7 +266,7 @@ class MP4StreamingFile {
             throw new Error("canceled");
         }
 
-        const file = await FileAPI.downloadDocumentPart(this.document, null, 1024 * 1024, this.bufferOffset);
+        const file = await FileAPI.downloadDocumentPart(this.document, null, 256 * 256, this.bufferOffset);
 
         if (this.canceled) {
             return;
