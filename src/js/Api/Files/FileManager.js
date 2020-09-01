@@ -1,5 +1,7 @@
 import {FileAPI} from "./FileAPI"
 import AppEvents from "../EventBus/AppEvents"
+import {oggToWav} from "../../Utils/oggToWav"
+import {IS_OPUS_SUPPORTED} from "../../Utils/browser"
 
 class FilesManager {
 
@@ -139,7 +141,16 @@ class FilesManager {
         this.internal_downloadStart(document, thumb);
 
         return document._promise = FileAPI.downloadDocument(document, thumb, event => this.internal_downloadNewPart(document, thumb, event), options)
+            .then(blob => this.convertToWavIfNeeded(blob, options?.type || document.mime_type))
             .then(blob => this.internal_downloadDone(document, thumb, blob));
+    }
+
+    convertToWavIfNeeded(blob, mime)  {
+        if(mime !== "audio/ogg" || IS_OPUS_SUPPORTED) {
+            return Promise.resolve(blob);
+        }
+
+        return oggToWav(blob)
     }
 
     downloadVideo(document, options = {}): Promise<Blob> | any {

@@ -49,11 +49,12 @@ class NewVoiceMessageComponent extends GeneralMessageComponent {
                     <div className="audio">
                         <div className={`play tgico tgico-${isPlaying && !isPaused ? 'pause' : 'play'} rp rps rp-white`}
                              onClick={this.onClickPlay}
-                             onDoubleClick={event => event.stopPropagation()}/>
-                        <progress className={{
-                            "progress-circular": true,
-                            "visible": FileManager.isPending(message.media.document)
-                        }}/>
+                             onDoubleClick={event => event.stopPropagation()}>
+                            <progress className={{
+                                "progress-circular": true,
+                                "visible": FileManager.isPending(message.media.document)
+                            }}/>
+                        </div>
                         <div className="audio-wrapper">
                             <div className="controls">
                                 <div className="controls rp rps" style={{cursor: "pointer"}} ref={this.controlsRef}>

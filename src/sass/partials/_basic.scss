@@ -93,8 +93,8 @@ img:not([src]) {
         position: absolute;
         background: $light;
         border-radius: 50%;
-        width: 1px;
-        height: 1px;
+        width: 2px;
+        height: 2px;
         animation: rippleEffect 1s ease;
         opacity: 0;
     }
@@ -116,8 +116,8 @@ img:not([src]) {
 
 .rp.rps {
     .ripple {
-        width: 1px;
-        height: 1px;
+        width: 2px;
+        height: 2px;
         animation: rippleEffectSmall 1s ease;
     }
 }
