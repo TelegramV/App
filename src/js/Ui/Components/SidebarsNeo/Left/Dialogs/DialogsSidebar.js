@@ -113,26 +113,19 @@ export class DialogsSidebar extends LeftSidebar {
             <ConnectionStatusComponent/>
 
             <Folders/>
-
-
-
-            <div style={{
-                "height": "100%",
-            }}>
-                {
-                    this.state.loading ?
-                        <div ref={this.loaderRef} className="full-size-loader" id="loader" style={{
-                            "height": "100%",
-                            "width": "100%",
-                            "display": "flex",
-                            "align-items": "center",
-                            "justify-content": "center",
-                        }}>
-                            <progress className="progress-circular big"/>
-                        </div> : ""
-                }
-                <VirtualDialogsFolderList/>
-            </div>
+            {
+                this.state.loading ?
+                    <div ref={this.loaderRef} className="full-size-loader" id="loader" style={{
+                        "height": "100%",
+                        "width": "100%",
+                        "display": "flex",
+                        "align-items": "center",
+                        "justify-content": "center",
+                    }}>
+                        <progress className="progress-circular big"/>
+                    </div> : ""
+            }
+            <VirtualDialogsFolderList/>
 
 
             {/*<div ref={this.dialogsWrapperRef} id="dialogsWrapper" class={{"scrollable": true, "loading": true}}>*/}

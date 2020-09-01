@@ -56,6 +56,7 @@ img:not([src]) {
     background-color: $lightblue;
     overflow: hidden;
     height: 100%;
+    overscroll-behavior: none;
     // Only specific parts should be selectable
     user-select: none;
     //-webkit-touch-callout: none;
