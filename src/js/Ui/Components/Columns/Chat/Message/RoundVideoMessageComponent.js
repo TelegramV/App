@@ -50,9 +50,8 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
                     <BetterVideoComponent isRound
                                           ref={this.videoComponentRef}
                                           document={document}
-                                          round
                                           autoDownload
-                                          autoPlay
+                                          playsinline
                                           muted={isMuted}
                                           onClick={(event: MouseEvent) => {
                                               const $video = event.currentTarget.querySelector("video");
@@ -63,9 +62,13 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
                                                   });
 
                                                   $video.volume = 1;
+                                                  $video.currentTime = 0;
                                                   $video.play();
                                               } else {
                                                   $video.volume = isMuted ? 1 : 0;
+                                                  if(isMuted) {
+                                                    $video.currentTime = 0;
+                                                  }
 
                                                   this.setState({
                                                       isMuted: !isMuted,
@@ -81,7 +84,7 @@ class RoundVideoMessageComponent extends GeneralMessageComponent {
                                                   <div className="round-overlay">
                                                       <ProgressLoaderFragment radius={95}
                                                                               progress={currentTime / video.duration}
-                                                                              hidden={this.state.isMuted}
+                                                                              hidden={isMuted}
                                                       />
                                                   </div>
                                               );
