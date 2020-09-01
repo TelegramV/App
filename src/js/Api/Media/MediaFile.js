@@ -245,13 +245,13 @@ class MP4StreamingFile {
             let newOffset = seekInfo.offset;
             let offsetDiff = offset - newOffset;
 
-            while (newOffset % (1024 * 1024) !== 0.0) {
+            while (newOffset % (256 * 256) !== 0.0) {
                 newOffset--;
             }
 
             this.bufferOffset = newOffset;
 
-            const file = await FileAPI.downloadDocumentPart(this.document, null, 1024 * 1024, newOffset);
+            const file = await FileAPI.downloadDocumentPart(this.document, null, 256 * 256, newOffset);
             this.onDownloadNewPart({newBytes: file.bytes.slice(offsetDiff)});
 
             this.downloadNextPart(this.seekedTime);
