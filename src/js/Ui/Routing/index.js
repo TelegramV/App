@@ -2,7 +2,7 @@
 // import {MainPage} from "../Pages/Main/MainPage"
 import MTProto from "../../MTProto/External";
 import VApp from "../../V/vapp";
-import {ConfigurableExample} from "../Components/AnotherVirtualList";
+//import {ConfigurableExample} from "../Components/AnotherVirtualList";
 import {MainPage} from "../Pages/Main/MainPage";
 import LoginPage from "../Pages/Login/LoginPage";
 //import {VideoStreamingPage} from "../Pages/Tests/VideoStreaming"
@@ -15,8 +15,8 @@ import LoginPage from "../Pages/Login/LoginPage";
 //import {SpinnerTestPage} from "../Pages/Tests/SpinnerTestPage"
 //import ElementsPage from "../Pages/Tests/Elements"
 //import CanvasTestPage from "../Pages/Tests/CanvasTest"
-import RadioButtonPage from "../Pages/Tests/Radio";
-import {VideoPlayerPage} from "../Pages/Tests/VideoPlayerPage";
+//import RadioButtonPage from "../Pages/Tests/Radio";
+//import {VideoPlayerPage} from "../Pages/Tests/VideoPlayerPage";
 
 //import IGEPage from "../Pages/Tests/IGE"
 
@@ -36,7 +36,7 @@ function AppRoutes(router) {
         }
     });
 
-    router.route("/virt", "main", {
+    /*router.route("/virt", "main", {
         h() {
             const MyList = ({
                                 virtual,
@@ -70,7 +70,7 @@ function AppRoutes(router) {
         h() {
             return RadioButtonPage();
         }
-    });
+    });*/
 
     /*router.route("/ige", "ige", {
         h() {
@@ -90,11 +90,11 @@ function AppRoutes(router) {
     //     }
     // })
 
-    router.route("/videoplayer", "videoplayer", {
-        h() {
-            return VideoPlayerPage();
-        }
-    });
+    //router.route("/videoplayer", "videoplayer", {
+    //    h() {
+    //        return VideoPlayerPage();
+    //    }
+    //});
     // router.route("/calendar", "calendar", {
     //     h() {
     //         return CalendarTestPage()
