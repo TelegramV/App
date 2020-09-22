@@ -20,6 +20,8 @@ import keval from "./Keval/keval";
 import API from "./Api/Telegram/API";
 import {FileAPI} from "./Api/Files/FileAPI";
 
+import AppSelectedChat from "./Ui/Reactive/SelectedChat"
+
 import {throttle} from "./Utils/func";
 import {getBrowser} from "./Utils/browser";
 
@@ -41,6 +43,7 @@ if (__IS_PRODUCTION__) {
     window.files = FileAPI;
     window.locale = Locale;
     window.settings = Settings;
+    window.currentChat = AppSelectedChat;
 }
 
 VApp.registerPlugin(RippleVRDOMPlugin);
