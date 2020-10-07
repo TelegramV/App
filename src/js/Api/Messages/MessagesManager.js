@@ -66,7 +66,7 @@ class MessageManager extends Manager {
         }
 
         if (rawMessage.from_id) {
-            return PeersStore.get("user", rawMessage.from_id);
+            rawMessage = rawMessage.from_id // Костиль, тре переписати тут все
         }
 
         if (rawMessage.user_id) {
@@ -89,12 +89,12 @@ class MessageManager extends Manager {
     getToPeerMessage(rawMessage, isFrom) {
         let to;
 
-        if (rawMessage.to_id && rawMessage.to_id._ === "peerChannel") {
-            to = PeersStore.get("channel", rawMessage.to_id.channel_id);
-        } else if (rawMessage.to_id && rawMessage.to_id._ === "peerChat") {
-            to = PeersStore.get("chat", rawMessage.to_id.chat_id);
-        } else if (rawMessage.to_id && rawMessage.to_id._ === "peerUser") {
-            to = PeersStore.get("user", rawMessage.to_id.user_id);
+        if (rawMessage.peer_id && rawMessage.peer_id._ === "peerChannel") {
+            to = PeersStore.get("channel", rawMessage.peer_id.channel_id);
+        } else if (rawMessage.peer_id && rawMessage.peer_id._ === "peerChat") {
+            to = PeersStore.get("chat", rawMessage.peer_id.chat_id);
+        } else if (rawMessage.peer_id && rawMessage.peer_id._ === "peerUser") {
+            to = PeersStore.get("user", rawMessage.peer_id.user_id);
         } else if (rawMessage.chat_id) {
             to = PeersStore.get("chat", rawMessage.chat_id);
         } else if (rawMessage.user_id) {

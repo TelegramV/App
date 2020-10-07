@@ -22,7 +22,7 @@ import MessagesManager from "../../../Messages/MessagesManager"
 import AppEvents from "../../../EventBus/AppEvents"
 
 function processUpdateNewChannelMessage(update) {
-    const peer = PeersStore.get("channel", update.message.to_id.channel_id);
+    const peer = PeersStore.get("channel", update.message.peer_id.channel_id);
 
     MessagesManager.processNewMessage(peer, update.message);
 

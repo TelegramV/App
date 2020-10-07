@@ -403,9 +403,9 @@ export class ChannelsUpdateProcessor extends UpdatesProcessor {
 
     getChannelIdFromUpdate(rawUpdate) {
         if (rawUpdate._ === "updateNewChannelMessage") {
-            return rawUpdate.message.to_id.channel_id
+            return rawUpdate.message.peer_id.channel_id
         } else if (rawUpdate._ === "updateEditChannelMessage") {
-            return rawUpdate.message.to_id.channel_id
+            return rawUpdate.message.peer_id.channel_id
         } else if (rawUpdate._ === "updateDeleteChannelMessages") {
             return rawUpdate.channel_id
         } else if (rawUpdate.channel_id) {

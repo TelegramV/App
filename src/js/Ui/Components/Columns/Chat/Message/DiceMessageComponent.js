@@ -14,6 +14,7 @@ class DiceMessageComponent extends GeneralMessageComponent {
     };
 
     render({message, showDate}, {sticker}) {
+        console.log(message)
         /*
         return (
             MessageWrapperFragment(

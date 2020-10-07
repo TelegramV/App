@@ -46,15 +46,15 @@ function getBlocked(limit = 20, offset = 0) {
     })
 }
 
-function block(inputUser) {
+function block(peer) {
     return MTProto.invokeMethod("contacts.block", {
-        id: inputUser
+        id: peer.inputPeer
     });
 }
 
-function unblock(inputUser) {
+function unblock(peer) {
     return MTProto.invokeMethod("contacts.unblock", {
-        id: inputUser
+        id: peer.inputPeer
     });
 }
 

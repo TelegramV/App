@@ -528,7 +528,7 @@ export class ChatInputComponent extends StatelessComponent {
 
         const { text, messageEntities } = domToMessageEntities(this.textarea)
 
-        if (Settings.get("app_config.emojies_send_dice")?.includes(text)) {
+        if (Settings.get("app_config.emojies_send_dice")?.includes(text) || text === "🎰") {
             AppSelectedChat.Current.api.sendDice(text);
         } else {
             AppSelectedChat.Current.api.sendMessage({

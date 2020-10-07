@@ -17,7 +17,7 @@ class BlockedManager {
 	}
 
 	block(user) {
-		API.contacts.block(user.input).then(() => {
+		API.contacts.block(user).then(() => {
 			this._updateUserBlock(user, true)
 			AppEvents.Peers.fire("contacts.blocked", {
 		    	peer: user,
@@ -27,7 +27,7 @@ class BlockedManager {
 	}
 
 	unblock(user) {
-		API.contacts.unblock(user.input).then(() => {
+		API.contacts.unblock(user).then(() => {
 			this._updateUserBlock(user, false)
 			AppEvents.Peers.fire("contacts.blocked", {
 		    	peer: user,
